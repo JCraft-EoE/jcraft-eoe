@@ -5,10 +5,12 @@ import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
 import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -45,6 +47,7 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO: give MiH a trail during speed slice and heaven's judgement
 public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAnimationTickable {
     AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
@@ -53,15 +56,16 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
             .setInfo("Slice", "quick combo starter");
     public static Attack barrage = new Attack(17, 0.85f, 32, 0, 2, 1.5f, 0.1f, AttackType.BARRAGE, 0.5f, 0, 3, JSoundRegister.IMPACT_1)
             .setInfo("Barrage", "short, knocks back");
-    public static Attack speedslice = new Attack(18, 1.25f, 11, 10, 0, 6f, 0.5f, AttackType.BOX, 1f, 0, 0).setRanged(true)
+    public static Attack speedslice = new Attack(18, 1.25f, 11, 10, 0, 6f, 0.5f, AttackType.BOX, 1f, 0, 0)
+            .setRanged(true).setMobility(MobilityType.TELEPORT)
             .setInfo("Speed Slice", "short windup, harming teleport with hitstun and light knockback");
     public static Attack judgement = new Attack(37, 1.25f, 60, 20, 0, 0f, 0.5f, AttackType.BARRAGE, 0, 0, 2, null)
             .setInfo("Heaven's Judgement", "mih rapidly speed slices an area and finishes with a larger one, knocks back");
     public static Attack legcrusher = new Attack(16, 0.75f, 17, 8, 1.25, 7f, 0.25f, AttackType.BOX, 1.5f, 0.2f, 0, JSoundRegister.TW_KICK_HIT)
             .setInfo("Leg Crusher", "combo starter/extender, mih hoofs the enemies legs in a quick, stunning attack");
-    public static Attack furychop = new Attack(19, 0.75f, 24, 15, 1.6, 7f, 0.25f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegister.IMPACT_2).setHitspark(2)
+    public static Attack furychop  = new Attack(19, 0.75f, 24, 15, 1.6, 7f, 0.25f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegister.IMPACT_2).setHitspark(2)
             .setInfo("Fury Chop", "combo extender, on hit gives haste(8s) to user and mining fatigue(8s) to victim, on whiff the fatigue goes to user");
-    public static Attack donut = new Attack(23, 0.75f, 32, 26, 2.2, 8.5f, 0.0f, AttackType.BOX, 3f, 0.2f, 0, JSoundRegister.IMPACT_4).setArmor(true).setHitspark(2)
+    public static Attack donut  = new Attack(23, 0.75f, 32, 26, 2.2, 8.5f, 0.0f, AttackType.BOX, 3f, 0.2f, 0, JSoundRegister.IMPACT_4).setArmor(true).setHitspark(2)
             .setInfo("Roundabout Donut", "feigns stand desummon, uninterruptable combo starter");
     public static Attack timeaccel = new Attack(70, 40, 20, 0, AttackType.BOX)
             .setInfo("Time Acceleration", "2s windup, 15s t. accel, enemies standless for 15s after finishing");
@@ -326,52 +330,54 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
 
         super.tick();
 
-        if (!world.isClient()) {
-            if (hasUser()) {
-                LivingEntity user = this.getUser();
-                this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
+        int aTime = getAccelTime();
 
-                Vec3d pos = this.getPos();
+        if (world.isClient()) {
+            if (world.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE) && aTime > 0) {
+                ClientWorld clientWorld = (ClientWorld) world;
+                clientWorld.setTimeOfDay(clientWorld.getTimeOfDay() + 4800 / aTime);
+            }
+        } else if (hasUser()) {
+            LivingEntity user = this.getUser();
+            this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
 
-                if (!this.world.isClient()) {
-                    ServerWorld serverWorld = (ServerWorld) world;
+            Vec3d pos = this.getPos();
 
-                    int aTime = this.getAccelTime();
-                    if (aTime > 1) {
-                        List<Entity> toCatch = world.getEntitiesByClass(Entity.class,
-                                new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+            if (!this.world.isClient()) {
+                ServerWorld serverWorld = (ServerWorld) world;
 
-                        toCatch.remove(this);
-                        toCatch.remove(user);
+                if (aTime > 1) {
+                    List<Entity> toCatch = world.getEntitiesByClass(Entity.class,
+                            new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
 
-                        for (Entity entity : toCatch) {
-                            if (entity instanceof LivingEntity) {
-                                continue;
-                            }
-                            entity.tick();
-                        }
+                    toCatch.remove(this);
+                    toCatch.remove(user);
 
-                        if (serverWorld.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)) {
-                            serverWorld.setTimeOfDay(serverWorld.getTimeOfDay() + 1200 / aTime);
-                        }
-
-                        user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 40, 2, true, false));
-                        user.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE, 40, 2, true, false));
-                    } else if (aTime == 1) {
-                        List<LivingEntity> toCatch = world.getEntitiesByClass(LivingEntity.class,
-                                new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
-
-                        toCatch.remove(this);
-                        toCatch.remove(user);
-
-                        for (LivingEntity entity : toCatch) {
-                            entity.addStatusEffect(new StatusEffectInstance(JStatusRegister.Standless, 300, 0, true, false));
-                        }
-                    } else if (!user.hasStatusEffect(JStatusRegister.Dazed)) {
-                        user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 40, 0, true, false));
+                    for (Entity entity : toCatch) {
+                        if (entity instanceof LivingEntity)
+                            continue;
+                        entity.tick();
                     }
-                    this.setAccelTime(aTime - 1);
+
+                    if (serverWorld.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE))
+                        serverWorld.setTimeOfDay(serverWorld.getTimeOfDay() + 4800 / aTime);
+
+                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 40, 2, true, false));
+                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE, 40, 2, true, false));
+                } else if (aTime == 1) {
+                    List<LivingEntity> toCatch = world.getEntitiesByClass(LivingEntity.class,
+                            new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+
+                    toCatch.remove(this);
+                    toCatch.remove(user);
+
+                    for (LivingEntity entity : toCatch) // 15s of Standless to any victims of Time Acceleration
+                        entity.addStatusEffect(new StatusEffectInstance(JStatusRegister.Standless, 300, 0, true, false));
+                } else if (!user.hasStatusEffect(JStatusRegister.Dazed)) {
+                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 40, 0, true, false));
                 }
+
+                this.setAccelTime(aTime - 1);
             }
         }
     }
