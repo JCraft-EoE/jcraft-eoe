@@ -9,6 +9,7 @@ import net.arna.jcraft.util.IEntityDataSaver;
 import net.arna.jcraft.util.MobilityType;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -44,6 +45,7 @@ import software.bernie.geckolib3.core.manager.AnimationFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO: give MiH a trail during speed slice and heaven's judgement
 public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAnimationTickable {
     AnimationFactory animationFactory = new AnimationFactory(this);
 
@@ -52,7 +54,8 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
             .setInfo("Slice", "quick combo starter");
     public static Attack barrage = new Attack(17, 0.85f, 32, 0, 2, 1.5f, 0.1f, AttackType.BARRAGE, 0.5f, 0, 3, ModSoundRegister.IMPACT_1)
             .setInfo("Barrage", "short, knocks back");
-    public static Attack speedslice = new Attack(18, 1.25f, 11, 10, 0, 6f, 0.5f, AttackType.BOX, 1f, 0, 0).setRanged(true)
+    public static Attack speedslice = new Attack(18, 1.25f, 11, 10, 0, 6f, 0.5f, AttackType.BOX, 1f, 0, 0)
+            .setRanged(true).setMobility(MobilityType.TELEPORT)
             .setInfo("Speed Slice", "short windup, harming teleport with hitstun and light knockback");
     public static Attack judgement = new Attack(37, 1.25f, 60, 20, 0, 0f, 0.5f, AttackType.BARRAGE, 0, 0, 2, null)
             .setInfo("Heaven's Judgement", "mih rapidly speed slices an area and finishes with a larger one, knocks back");
@@ -223,7 +226,7 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
                 user.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 160, 0));
             }
         } else if (attack == timeaccel) {
-            this.setAccelTime(300);
+            this.setAccelTime(600);
         } else if (attack == barrage && this.getMoveStun() < 10) {
             this.curAttack = barrageFinisher;
         }
@@ -293,56 +296,60 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
 
     @Override
     public void tick() {
-        if (age == 1) { this.world.playSound(null, this.getX(), this.getY(), this.getZ(), ModSoundRegister.STAND_SUMMON, SoundCategory.PLAYERS, 1f, 1f); }
+        if (age == 1) {
+            this.world.playSound(null, this.getX(), this.getY(), this.getZ(), ModSoundRegister.STAND_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
+        }
 
         super.tick();
 
-        if (!world.isClient()) {
-            if (hasUser()) {
-                LivingEntity user = this.getUser();
-                this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
+        int aTime = getAccelTime();
 
-                Vec3d pos = this.getPos();
+        if (world.isClient()) {
+            if (world.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE) && aTime > 0) {
+                ClientWorld clientWorld = (ClientWorld) world;
+                clientWorld.setTimeOfDay(clientWorld.getTimeOfDay() + 4800 / aTime);
+            }
+        } else if (hasUser()) {
+            LivingEntity user = this.getUser();
+            this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
 
-                if (!this.world.isClient()) {
-                    ServerWorld serverWorld = (ServerWorld) world;
+            Vec3d pos = this.getPos();
 
-                    int aTime = this.getAccelTime();
-                    if (aTime > 1) {
-                        List<Entity> toCatch = world.getEntitiesByClass(Entity.class,
-                                new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+            if (!this.world.isClient()) {
+                ServerWorld serverWorld = (ServerWorld) world;
 
-                        toCatch.remove(this);
-                        toCatch.remove(user);
+                if (aTime > 1) {
+                    List<Entity> toCatch = world.getEntitiesByClass(Entity.class,
+                            new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
 
-                        for (Entity entity : toCatch) {
-                            if (entity instanceof LivingEntity) {
-                                continue;
-                            }
-                            entity.tick();
-                        }
+                    toCatch.remove(this);
+                    toCatch.remove(user);
 
-                        if (serverWorld.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)) {
-                            serverWorld.setTimeOfDay(serverWorld.getTimeOfDay() + 1200 / aTime);
-                        }
-
-                        user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 40, 2, true, false));
-                        user.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE, 40, 2, true, false));
-                    } else if (aTime == 1) {
-                        List<LivingEntity> toCatch = world.getEntitiesByClass(LivingEntity.class,
-                                new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
-
-                        toCatch.remove(this);
-                        toCatch.remove(user);
-
-                        for (LivingEntity entity : toCatch) {
-                            entity.addStatusEffect(new StatusEffectInstance(ModStatusRegister.Standless, 300, 0, true, false));
-                        }
-                    } else if (!user.hasStatusEffect(ModStatusRegister.Dazed)) {
-                        user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 40, 0, true, false));
+                    for (Entity entity : toCatch) {
+                        if (entity instanceof LivingEntity)
+                            continue;
+                        entity.tick();
                     }
-                    this.setAccelTime(aTime - 1);
+
+                    if (serverWorld.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE))
+                        serverWorld.setTimeOfDay(serverWorld.getTimeOfDay() + 4800 / aTime);
+
+                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 40, 2, true, false));
+                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE, 40, 2, true, false));
+                } else if (aTime == 1) {
+                    List<LivingEntity> toCatch = world.getEntitiesByClass(LivingEntity.class,
+                            new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+
+                    toCatch.remove(this);
+                    toCatch.remove(user);
+
+                    for (LivingEntity entity : toCatch) // 15s of Standless to any victims of Time Acceleration
+                        entity.addStatusEffect(new StatusEffectInstance(ModStatusRegister.Standless, 300, 0, true, false));
+                } else if (!user.hasStatusEffect(ModStatusRegister.Dazed)) {
+                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 40, 0, true, false));
                 }
+
+                this.setAccelTime(aTime - 1);
             }
         }
     }
