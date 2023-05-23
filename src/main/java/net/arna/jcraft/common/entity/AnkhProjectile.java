@@ -22,6 +22,7 @@ import net.minecraft.world.World;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.Random;
 
@@ -32,7 +33,7 @@ public class AnkhProjectile extends PersistentProjectileEntity implements IAnima
     private double orbitRange = 1;
     private double orbitOffset = 0;
 
-    private final AnimationFactory factory = new AnimationFactory(this);
+    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
     public AnkhProjectile(EntityType<? extends AnkhProjectile> entityType, World world) {
         super(entityType, world);

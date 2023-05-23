@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.arna.jcraft.registry.JSoundRegister;
@@ -38,13 +39,14 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class GEREntity extends StandEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = new AnimationFactory(this);
+    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
     public static Attack light = new Attack(2, 0.75f, 9, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch/Downward Kick", "quick combo starter, in air: more hitstun, less blockstun");
@@ -231,7 +233,9 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
         buf.writeInt(entity.getId());
         buf.writeInt(counterStopTime);
         for (PlayerEntity sendPlayer : world.getPlayers()) {
-            ServerPlayNetworking.send((ServerPlayerEntity) sendPlayer, JCraft.serverFeedbackChannel, buf);
+            if(sendPlayer instanceof ServerPlayerEntity serverPlayerEntity){
+                ServerChannelFeedback.send(serverPlayerEntity, buf);
+            }
         }
         ((ITimeStop) entity).setTimeStopTicks(counterStopTime);
 
@@ -333,7 +337,7 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
                 l.addStatusEffect(new StatusEffectInstance(JStatusRegister.Knockdown, 30, 0, false, false));
             }
         } else if (attack == laser) {
-            GERScorpionEntity scorpion = new GERScorpionEntity(JEntityTypeRegister.GERSCORPION, world);
+            GERScorpionEntity scorpion = new GERScorpionEntity(JEntityTypeRegister.GER_SCORPION, world);
             scorpion.setInitialVel(user.getRotationVector().multiply(2));
             Vec3d ePos = this.getEyePos();
             scorpion.refreshPositionAndAngles(ePos.x, ePos.y, ePos.z, -user.getYaw() - 90f, getPitch());

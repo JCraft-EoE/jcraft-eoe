@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
 import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
@@ -37,11 +38,12 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
 
 public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = new AnimationFactory(this);
+    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
     public static Attack light = new Attack(2, 0.75f, 14, 7, 1.5, 5f, 0.75f, AttackType.BOX, 0.6f, 0.2f, 0, JSoundRegister.IMPACT_3)
             .setInfo("Punch", "quick combo starter");
@@ -201,7 +203,9 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
                 buf.writeDouble(headPos.z);
 
                 for (PlayerEntity sendPlayer : world.getPlayers()) {
-                    ServerPlayNetworking.send((ServerPlayerEntity) sendPlayer, JCraft.serverFeedbackChannel, buf);
+                    if (sendPlayer instanceof ServerPlayerEntity serverPlayerEntity) {
+                        ServerChannelFeedback.send(serverPlayerEntity, buf);
+                    }
                 }
             }
         } else if (attack == standdisk) {

@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.spec;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JStatusRegister;
@@ -76,7 +77,7 @@ public abstract class JCraftSpec {
         buf.writeInt(player.getId());
         buf.writeString(attack.animation);
         for (ServerPlayerEntity sendPlayer : serverWorld.getPlayers()) {
-            ServerPlayNetworking.send(sendPlayer, JCraft.serverFeedbackChannel, buf);
+            ServerChannelFeedback.send(sendPlayer, buf);
         }
         return true;
     }
@@ -95,7 +96,7 @@ public abstract class JCraftSpec {
         buf.writeInt(player.getId());
         ServerWorld serverWorld = (ServerWorld) player.getWorld();
         for (ServerPlayerEntity sendPlayer : serverWorld.getPlayers()) {
-            ServerPlayNetworking.send(sendPlayer, JCraft.serverFeedbackChannel, buf);
+            ServerChannelFeedback.send(sendPlayer, buf);
         }
     }
 

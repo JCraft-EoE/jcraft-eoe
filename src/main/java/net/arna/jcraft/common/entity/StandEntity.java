@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.mixin.LivingEntityInvoker;
@@ -793,7 +794,9 @@ public abstract class StandEntity extends MobEntity {
                     PacketByteBuf buf = PacketByteBufs.create();
                     buf.writeShort(6);
                     buf.writeInt(comboCounter.getComboCount());
-                    ServerPlayNetworking.send((ServerPlayerEntity) playerEntity, JCraft.serverFeedbackChannel, buf);
+                    if(playerEntity instanceof ServerPlayerEntity serverPlayerEntity){
+                        ServerChannelFeedback.send(serverPlayerEntity, buf);
+                    }
                 }
                 comboCounter.setLastAttacked(ent);
             }

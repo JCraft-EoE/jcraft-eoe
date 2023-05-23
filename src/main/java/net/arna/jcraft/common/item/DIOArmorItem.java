@@ -10,9 +10,10 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
 public class DIOArmorItem extends ArmorItem implements IAnimatable {
-    private final AnimationFactory factory = new AnimationFactory(this);
+    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
     public DIOArmorItem(ArmorMaterial materialIn, EquipmentSlot slot, Item.Settings builder) {
         super(materialIn, slot, builder);

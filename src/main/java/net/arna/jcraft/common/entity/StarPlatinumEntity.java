@@ -23,11 +23,12 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
 
 public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = new AnimationFactory(this);
+    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
     public static Attack light = new Attack(2, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter");

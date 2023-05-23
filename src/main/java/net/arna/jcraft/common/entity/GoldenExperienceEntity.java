@@ -28,11 +28,12 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
 
 public class GoldenExperienceEntity extends StandEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = new AnimationFactory(this);
+    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
     public static Attack light = new Attack(2, 0.75f, 9, 6, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
@@ -205,7 +206,7 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
                     }
                 }
             } else if (attack == tree) {
-                GETreeEntity tree = new GETreeEntity(JEntityTypeRegister.GETREE, world);
+                GETreeEntity tree = new GETreeEntity(JEntityTypeRegister.GE_TREE, world);
                 tree.owner = user;
                 tree.copyPositionAndRotation(this);
                 this.world.spawnEntity(tree);
@@ -219,7 +220,7 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
                 }
 
                 //todo: fix snake not working for mobs
-                GESnakeEntity snake = new GESnakeEntity(JEntityTypeRegister.GESNAKE, world);
+                GESnakeEntity snake = new GESnakeEntity(JEntityTypeRegister.GE_SNAKE, world);
                 if (user instanceof PlayerEntity playerEntity) {
                     snake.setOwner(playerEntity);
                 }

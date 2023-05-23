@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
 import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.JCraftUtils;
@@ -34,11 +35,12 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
 
 public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = new AnimationFactory(this);
+    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
     public static Attack light = new Attack(2, 0.75f, 8, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
@@ -286,7 +288,9 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
                         buf.writeDouble(hurricanePos.z);
 
                         for (PlayerEntity sendPlayer : world.getPlayers()) {
-                            ServerPlayNetworking.send((ServerPlayerEntity) sendPlayer, JCraft.serverFeedbackChannel, buf);
+                            if (sendPlayer instanceof ServerPlayerEntity serverPlayerEntity) {
+                                ServerChannelFeedback.send(serverPlayerEntity, buf);
+                            }
                         }
                     }
                 }

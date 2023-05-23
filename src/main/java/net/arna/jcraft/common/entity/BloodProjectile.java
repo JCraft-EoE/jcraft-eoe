@@ -20,12 +20,13 @@ import net.minecraft.world.World;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import static net.arna.jcraft.common.entity.StandEntity.DamageLogic;
 
 public class BloodProjectile extends PersistentProjectileEntity implements IAnimatable {
     private int ticksInAir;
-    private final AnimationFactory factory = new AnimationFactory(this);
+    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
     public BloodProjectile(EntityType<? extends BloodProjectile> entityType, World world) {
         super(entityType, world);
@@ -33,7 +34,7 @@ public class BloodProjectile extends PersistentProjectileEntity implements IAnim
     }
 
     public BloodProjectile(World world, LivingEntity owner) {
-        super(JEntityTypeRegister.BLOODPROJECTILE, owner, world);
+        super(JEntityTypeRegister.BLOOD_PROJECTILE, owner, world);
         this.setSound(SoundEvents.ITEM_BUCKET_EMPTY);
         this.setOwner(owner);
     }

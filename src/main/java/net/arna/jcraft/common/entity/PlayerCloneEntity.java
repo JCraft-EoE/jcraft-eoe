@@ -2,6 +2,7 @@ package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.ai.goal.CloneAttackGoal;
+import net.arna.jcraft.common.network.c2s.StandControlPacket;
 import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -228,7 +229,7 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob 
         boolean client = this.world.isClient();
 
         if (client) {
-            if (this.age == 1 && this.getType() == JEntityTypeRegister.PLAYERCLONE) {
+            if (this.age == 1 && this.getType() == JEntityTypeRegister.PLAYER_ENTITY_CLONE) {
                 // If the one running this instance of tick() is the owner of the clone, check for a thin model and apply if found via server message
                 // This is in fact an entirely clientside process and can be considered a "security flaw",
                 // but I really doubt anyone would care if someone turned all their clones thin
@@ -238,7 +239,7 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob 
                         PacketByteBuf buf = PacketByteBufs.create();
                         buf.writeShort(12);
                         buf.writeUuid(this.getUuid());
-                        ClientPlayNetworking.send(JCraft.standControlChannel, buf);
+                        StandControlPacket.send(buf);
                     }
                 }
             }

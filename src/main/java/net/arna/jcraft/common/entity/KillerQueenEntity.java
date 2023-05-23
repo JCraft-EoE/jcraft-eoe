@@ -1,14 +1,15 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
 import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.registry.JEntityTypeRegister;
+import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
-import net.arna.jcraft.registry.ModItemRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.Blocks;
@@ -40,11 +41,12 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
 
 public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = new AnimationFactory(this);
+    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
     public static Attack light = new Attack(2, 0.75f, 19, 0, 1.5, 3.5f, 0.75f, AttackType.MULTIHIT, 1f, 0, List.of(6, 11), JSoundRegister.IMPACT_4)
             .setInfo("Dual Punch", "quick combo starter");
@@ -196,7 +198,7 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
         }
 
         Vec3d lookVec = user.getRotationVector().multiply(0.75);
-        this.coin = new ItemEntity(this.world, user.getX(), user.getY() + user.getHeight() * 2 / 3, user.getZ(), new ItemStack(ModItemRegister.KQCOIN, 1), lookVec.x, lookVec.y, lookVec.z);
+        this.coin = new ItemEntity(this.world, user.getX(), user.getY() + user.getHeight() * 2 / 3, user.getZ(), new ItemStack(JObjectRegistry.KQCOIN, 1), lookVec.x, lookVec.y, lookVec.z);
         this.coin.setPickupDelayInfinite();
 
         this.world.spawnEntity(this.coin);
@@ -268,7 +270,7 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
             bombEntity = null;
             bombBlock = null;
         } else if (attack == sha) {
-            SheerHeartAttackEntity sha = new SheerHeartAttackEntity(JEntityTypeRegister.SHA, world);
+            SheerHeartAttackEntity sha = new SheerHeartAttackEntity(JEntityTypeRegister.SHEER_HEART_ATTACK, world);
             sha.setOwner(user);
             sha.copyPositionAndRotation(this);
 
@@ -391,7 +393,9 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
                         buf.writeBoolean(anyInRange);
 
                         if (bBox == null || bBox.getAverageSideLength() > 0) {
-                            ServerPlayNetworking.send((ServerPlayerEntity) playerEntity, JCraft.serverFeedbackChannel, buf);
+                            if (playerEntity instanceof ServerPlayerEntity serverPlayerEntity) {
+                                ServerChannelFeedback.send(serverPlayerEntity, buf);
+                            }
                         }
                     }
                 }

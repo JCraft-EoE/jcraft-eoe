@@ -10,6 +10,14 @@ import net.minecraft.util.registry.Registry;
 import java.util.Map;
 
 public interface JParticleTypeRegistry {
+
+
+    DefaultParticleType COMBO_BREAK = FabricParticleTypes.simple();
+    DefaultParticleType COOLDOWN_CANCEL = FabricParticleTypes.simple();
+    DefaultParticleType HITSPARK_1 = FabricParticleTypes.simple();
+    DefaultParticleType HITSPARK_2 = FabricParticleTypes.simple();
+    DefaultParticleType KCPARTICLE = FabricParticleTypes.simple();
+
     Map<Integer, DefaultParticleType> particles = Map.ofEntries(
             Map.entry(-1, ParticleTypes.FLASH),
             Map.entry(0, JParticleTypeRegistry.COMBO_BREAK),
@@ -17,12 +25,6 @@ public interface JParticleTypeRegistry {
             Map.entry(2, JParticleTypeRegistry.HITSPARK_1),
             Map.entry(3, JParticleTypeRegistry.HITSPARK_2)
     );
-
-    DefaultParticleType COMBO_BREAK = FabricParticleTypes.simple();
-    DefaultParticleType COOLDOWN_CANCEL = FabricParticleTypes.simple();
-    DefaultParticleType HITSPARK_1 = FabricParticleTypes.simple();
-    DefaultParticleType HITSPARK_2 = FabricParticleTypes.simple();
-    DefaultParticleType KCPARTICLE = FabricParticleTypes.simple();
 
     static void initParticleTypes() {
         Registry.register(Registry.PARTICLE_TYPE, new Identifier(JCraft.MOD_ID, "combo_break"), COMBO_BREAK);

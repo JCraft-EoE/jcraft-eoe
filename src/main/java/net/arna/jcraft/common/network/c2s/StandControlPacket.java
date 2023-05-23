@@ -33,16 +33,7 @@ import static net.arna.jcraft.JCraft.*;
 public class StandControlPacket {
     public static final Identifier ID = new Identifier(JCraft.MOD_ID, "scchannel");
 
-    public static void send(@Nullable GameOptions go, short val) {
-        PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeShort(val);
-        if (go != null) {
-            buf.writeBoolean(go.forwardKey.isPressed()); // W
-            buf.writeBoolean(go.leftKey.isPressed()); // A
-            buf.writeBoolean(go.backKey.isPressed()); // S
-            buf.writeBoolean(go.rightKey.isPressed()); // D
-            buf.writeBoolean(go.jumpKey.isPressed()); // Space
-        }
+    public static void send(PacketByteBuf buf) {
         ClientPlayNetworking.send(ID, buf);
     }
 

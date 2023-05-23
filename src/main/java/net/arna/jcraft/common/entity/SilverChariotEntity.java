@@ -5,9 +5,9 @@ import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.MobilityType;
+import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
-import net.arna.jcraft.registry.ModItemRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -30,11 +30,12 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
 
 public class SilverChariotEntity extends StandEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = new AnimationFactory(this);
+    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
     public Attack light = new Attack(2, 0.65f, 9, 6, 1.75, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0)
             .setInfo("Stab", "quick combo starter, links into Spinning Blade while armor is off");
@@ -301,7 +302,7 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
 
         if (hasUser()) {
             LivingEntity user = this.getUser();
-            boolean hasAnubis = (user instanceof PlayerEntity playerEntity) ? playerEntity.getInventory().contains(ModItemRegister.ANUBIS.getDefaultStack()) : user.getMainHandStack().getItem() == ModItemRegister.ANUBIS;
+            boolean hasAnubis = (user instanceof PlayerEntity playerEntity) ? playerEntity.getInventory().contains(JObjectRegistry.ANUBIS.getDefaultStack()) : user.getMainHandStack().getItem() == JObjectRegistry.ANUBIS;
             int mode = this.getMode();
 
             if (hasAnubis && mode != 3) {

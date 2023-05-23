@@ -2,8 +2,8 @@ package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.common.util.JCraftUtils;
 import net.arna.jcraft.registry.JEntityTypeRegister;
+import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegister;
-import net.arna.jcraft.registry.ModItemRegister;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.entity.Entity;
@@ -29,11 +29,12 @@ import net.minecraft.world.World;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
 public class KnifeProjectile extends PersistentProjectileEntity implements IAnimatable {
     private int ticksInAir;
 
-    private final AnimationFactory factory = new AnimationFactory(this);
+    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
     private static final TrackedData<Boolean> LIGHTNING;
     private boolean delayed = false;
@@ -85,7 +86,7 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
 
     @Override
     public ItemStack asItemStack() {
-        return new ItemStack(ModItemRegister.KNIFE);
+        return new ItemStack(JObjectRegistry.KNIFE);
     }
 
     @Override

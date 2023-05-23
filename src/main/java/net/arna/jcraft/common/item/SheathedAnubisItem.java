@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.item;
 
-import net.arna.jcraft.registry.ModItemRegister;
+import net.arna.jcraft.registry.JObjectRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -49,7 +49,7 @@ public class SheathedAnubisItem extends Item {
         if (!user.isSneaking()) {
             user.setCurrentHand(hand);
         } else {
-            user.setStackInHand(hand, new ItemStack(ModItemRegister.ANUBIS));
+            user.setStackInHand(hand, new ItemStack(JObjectRegistry.ANUBIS));
         }
         ItemStack itemStack = user.getStackInHand(hand);
 

@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
@@ -39,12 +40,13 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = new AnimationFactory(this);
+    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
     //maybe convert to grab - SPECIAL 2: Eye chop
 
@@ -240,7 +242,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                     buf.writeDouble(bBox.getXLength());
                     buf.writeDouble(bBox.getYLength());
                     buf.writeDouble(bBox.getZLength());
-                    ServerPlayNetworking.send(serverPlayer, JCraft.serverFeedbackChannel, buf);
+                    ServerChannelFeedback.send(serverPlayer, buf);
                 }
             }
         }
@@ -353,7 +355,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                 buf.writeDouble(bBox.getXLength());
                 buf.writeDouble(bBox.getYLength());
                 buf.writeDouble(bBox.getZLength());
-                ServerPlayNetworking.send(serverPlayer, JCraft.serverFeedbackChannel, buf);
+                ServerChannelFeedback.send(serverPlayer, buf);
             }
 
             this.world.playSound(null, pos.x, pos.y, pos.z, JSoundRegister.TE_TP, SoundCategory.PLAYERS, 1f, 1f);
@@ -459,7 +461,9 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                             buf.writeDouble(box.getYLength());
                             buf.writeDouble(box.getZLength());
 
-                            ServerPlayNetworking.send((ServerPlayerEntity) playerEntity, JCraft.serverFeedbackChannel, buf);
+                            if(playerEntity instanceof ServerPlayerEntity serverPlayerEntity){
+                                ServerChannelFeedback.send(serverPlayerEntity, buf);
+                            }
                         }
                     }
                 }

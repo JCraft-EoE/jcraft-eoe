@@ -28,6 +28,7 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +38,7 @@ import java.util.UUID;
 import static net.arna.jcraft.common.entity.StandEntity.DamageLogic;
 
 public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = new AnimationFactory(this);
+    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
     public GERScorpionEntity(EntityType<? extends MobEntity> entityType, World world) {
         super(entityType, world);

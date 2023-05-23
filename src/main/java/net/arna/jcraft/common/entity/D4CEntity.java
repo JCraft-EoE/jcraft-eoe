@@ -29,12 +29,13 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = new AnimationFactory(this);
+    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
     public static Attack light = new Attack(2, 0.75f, 15, 9, 1.5, 5f, 0.75f, AttackType.BOX, 1.5f, -0.1f, 0, JSoundRegister.IMPACT_2)
             .setInfo("Chop", "quick combo starter");
@@ -185,10 +186,10 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
         }
         if (getUser().isSneaking() && HandleAttack(givegun, JCraft.standS2CD, 10)) {
             this.playSound(JSoundRegister.D4C_THROW, 1, 1);
-            this.equipStack(EquipmentSlot.MAINHAND, ModItemRegister.FVREVOLVER.getDefaultStack());
+            this.equipStack(EquipmentSlot.MAINHAND, JObjectRegistry.FVREVOLVER.getDefaultStack());
         } else if (HandleAttack(grab, JCraft.standS2CD, 7)) {
             this.playSound(JSoundRegister.D4C_THROW, 1, 1);
-            this.equipStack(EquipmentSlot.MAINHAND, ModItemRegister.FVREVOLVER.getDefaultStack());
+            this.equipStack(EquipmentSlot.MAINHAND, JObjectRegistry.FVREVOLVER.getDefaultStack());
         }
     }
 
@@ -227,13 +228,13 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
                 Vec3d eyePos = this.getEyePos();
 
                 ItemEntity revolver1 = new ItemEntity(EntityType.ITEM, world);
-                revolver1.setStack(new ItemStack(ModItemRegister.FVREVOLVER, 1));
+                revolver1.setStack(new ItemStack(JObjectRegistry.FVREVOLVER, 1));
                 revolver1.setPickupDelay(100);
                 revolver1.setPosition(eyePos.add(rotVec.rotateY(90)));
                 revolver1.setVelocity(rotVec.rotateY(95).multiply(1.5));
 
                 ItemEntity revolver2 = new ItemEntity(EntityType.ITEM, world);
-                revolver2.setStack(new ItemStack(ModItemRegister.FVREVOLVER, 1));
+                revolver2.setStack(new ItemStack(JObjectRegistry.FVREVOLVER, 1));
                 revolver2.setPickupDelay(100);
                 revolver2.setPosition(eyePos.add(rotVec.rotateY(-90)));
                 revolver2.setVelocity(rotVec.rotateY(-95).multiply(1.5));
@@ -277,7 +278,7 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
             this.getMainHandStack().decrement(1);
 
         if (attack == givegun && player instanceof PlayerEntity playerEntity) {
-            playerEntity.giveItemStack(ModItemRegister.FVREVOLVER.getDefaultStack());
+            playerEntity.giveItemStack(JObjectRegistry.FVREVOLVER.getDefaultStack());
             this.getMainHandStack().decrement(1);
         }
 
@@ -317,7 +318,7 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
             weapon.setDamage(249);
 
             if (player instanceof PlayerEntity playerEntity) {
-                PlayerCloneEntity playerCloneEntity = new PlayerCloneEntity(JEntityTypeRegister.PLAYERCLONE, this.world);
+                PlayerCloneEntity playerCloneEntity = new PlayerCloneEntity(JEntityTypeRegister.PLAYER_ENTITY_CLONE, this.world);
                 playerCloneEntity.copyPositionAndRotation(playerEntity);
                 playerCloneEntity.setOwner(playerEntity);
                 this.world.spawnEntity(playerCloneEntity);

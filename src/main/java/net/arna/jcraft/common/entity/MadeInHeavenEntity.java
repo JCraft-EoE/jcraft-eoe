@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
 import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
@@ -39,12 +40,13 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = new AnimationFactory(this);
+    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
     // placeholder sound
     public static Attack light = new Attack(2, 0.75f, 8, 5, 1.5, 4f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, SoundEvents.ITEM_TRIDENT_HIT)
@@ -287,7 +289,9 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
                 buf.writeDouble(vec1.z);
                 buf.writeDouble(vec2.z);
                 for (PlayerEntity serverPlayer : this.world.getPlayers()) {
-                    ServerPlayNetworking.send((ServerPlayerEntity) serverPlayer, JCraft.serverFeedbackChannel, buf);
+                    if (serverPlayer instanceof ServerPlayerEntity serverPlayerEntity) {
+                        ServerChannelFeedback.send(serverPlayerEntity, buf);
+                    }
                 }
             }
 

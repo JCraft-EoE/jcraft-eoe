@@ -19,6 +19,7 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.hud.InGameHud;
@@ -29,6 +30,7 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Shader;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.MathHelper;
 import org.apache.commons.lang3.StringUtils;
@@ -227,60 +229,93 @@ public class JCraftClient implements ClientModInitializer {
 
         if (go != null && player != null) {
             if (player.isAlive()) {
-                StandControlPacket.send(MinecraftClient.getInstance().options, (short) 0);
+                PacketByteBuf buf = PacketByteBufs.create();
+                buf.writeShort(0);
+                if (go != null) {
+                    buf.writeBoolean(go.forwardKey.isPressed()); // W
+                    buf.writeBoolean(go.leftKey.isPressed()); // A
+                    buf.writeBoolean(go.backKey.isPressed()); // S
+                    buf.writeBoolean(go.rightKey.isPressed()); // D
+                    buf.writeBoolean(go.jumpKey.isPressed()); // Space
+                }
+                StandControlPacket.send(buf);
             } else {
                 clientCooldowns = DefaultedList.ofSize(JCraft.cooldowns.size(), 0.0);
             }
 
             if (player.getFirstPassenger() instanceof StandEntity) {
                 // Block (3)
-                StandControlPacket.send(go, (short) 3);
+                PacketByteBuf buf = PacketByteBufs.create();
+                buf.writeShort(3);
+                StandControlPacket.send(buf);
             }
 
             // Light attack (2)
             if (go.attackKey.isPressed()) { // wasPressed() simply doesn't work
-                StandControlPacket.send(go, (short) 2);
+                PacketByteBuf buf = PacketByteBufs.create();
+                buf.writeShort(2);
+                StandControlPacket.send(buf);
             }
             // Middle Click (10)
             if (utility.isPressed()) {
-                StandControlPacket.send(go, (short) 10);
+                PacketByteBuf buf = PacketByteBufs.create();
+                buf.writeShort(10);
+                StandControlPacket.send(buf);
             }
         }
         // (De)summon (1)
         if (standSummon.wasPressed()) {
-            StandControlPacket.send(go, (short) 1);
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeShort(1);
+            StandControlPacket.send(buf);
         }
         // Heavy (4)
         if (heavyKey.isPressed()) {
-            StandControlPacket.send(go, (short) 4);
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeShort(4);
+            StandControlPacket.send(buf);
         }
         // Barrage (5)
         if (barrageKey.isPressed()) {
-            StandControlPacket.send(go, (short) 5);
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeShort(5);
+            StandControlPacket.send(buf);
         }
         // Special 1 (6)
         if (special1Key.wasPressed()) {
-            StandControlPacket.send(go, (short) 6);
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeShort(6);
+            StandControlPacket.send(buf);
         }
         // Ult (7)
         if (ultKey.wasPressed()) {
-            StandControlPacket.send(go, (short) 7);
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeShort(7);
+            StandControlPacket.send(buf);
         }
         // Special 2 (8)
         if (special2Key.wasPressed()) {
-            StandControlPacket.send(go, (short) 8);
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeShort(8);
+            StandControlPacket.send(buf);
         }
         // Special 3 (9)
         if (special3Key.wasPressed()) {
-            StandControlPacket.send(go, (short) 9);
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeShort(9);
+            StandControlPacket.send(buf);
         }
         // Combo Breaker (11)
         if (comboBreaker.isPressed()) {
-            StandControlPacket.send(go, (short) 11);
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeShort(11);
+            StandControlPacket.send(buf);
         }
         // Cooldown Cancel (13)
         if (cooldownCancel.wasPressed()) {
-            StandControlPacket.send(go, (short) 13);
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeShort(13);
+            StandControlPacket.send(buf);
         }
     }
 

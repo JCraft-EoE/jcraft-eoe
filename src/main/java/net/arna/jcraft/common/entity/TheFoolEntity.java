@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
 import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
@@ -41,12 +42,13 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = new AnimationFactory(this);
+    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
     public static Attack light = new Attack(2, 1.5f, 14, 7, 2, 6f, 0.8f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_2)
             .setInfo("Swipe", "slow, long-reaching poke");
@@ -291,7 +293,9 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
             buf.writeDouble(pos.z);
 
             for (PlayerEntity sendPlayer : world.getPlayers()) {
-                ServerPlayNetworking.send((ServerPlayerEntity) sendPlayer, JCraft.serverFeedbackChannel, buf);
+                if (sendPlayer instanceof ServerPlayerEntity serverPlayerEntity) {
+                    ServerChannelFeedback.send(serverPlayerEntity, buf);
+                }
 
                 if (sendPlayer == user) {
                     continue;
@@ -305,7 +309,7 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
 
             // Summon clone
             if (user instanceof PlayerEntity playerEntity) {
-                PlayerCloneEntity playerCloneEntity = new PlayerCloneEntity(JEntityTypeRegister.PLAYERCLONE, this.world);
+                PlayerCloneEntity playerCloneEntity = new PlayerCloneEntity(JEntityTypeRegister.PLAYER_ENTITY_CLONE, this.world);
                 playerCloneEntity.copyPositionAndRotation(playerEntity);
                 playerCloneEntity.setOwner(playerEntity);
                 playerCloneEntity.sandClone = true;
