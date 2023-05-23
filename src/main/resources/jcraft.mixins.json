@@ -4,43 +4,32 @@
   "package": "net.arna.jcraft.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "ModEntityDataSaver",
-
-    "JCraftItemMixin",
-    "JCraftItemUsageMixin",
-    "JCraftLivingEntityMixin",
-    "JCraftEntityMixin",
-    "JCraftPlayerEntityMixin",
-    "JCraftMobEntityMixin",
-    "JCraftServerWorldMixin",
-    "JCraftTimestopBlockMixin",
-    "JCraftTimestopBlockEntityMixin",
-
+    "EntityMixin",
+    "ItemMixin",
+    "ItemUsageMixin",
     "LivingEntityInvoker",
-    "ParticleAccessor"
+    "LivingEntityMixin",
+    "MobEntityMixin",
+    "ModEntityDataSaver",
+    "PlayerEntityMixin",
+    "ServerNetworkHandlerMixin",
+    "ServerWorldMixin",
+    "TimestopBlockEntityMixin",
+    "TimestopBlockMixin"
   ],
   "client": [
-    "JCraftGameRendererMixin",
-
-    "JCraftItemMixin",
-    "JCraftItemUsageMixin",
-    "JCraftLivingEntityMixin",
-    "JCraftEntityMixin",
-    "JCraftClientWorldMixin",
-    "JCraftClientPlayerEntityMixin",
-
-    "JCraftHeldItemFeatureRendererMixin",
-    "JCraftArmorFeatureRendererMixin",
-    "JCraftWorldRendererMixin",
-
-    "JCraftCameraMixin",
-    "CameraInvoker",
-
-    "JCraftBipedEntityModelMixin",
-
-    "JCraftParticleManagerMixin",
-    "ParticleAccessor",
-    "RenderLayerAccessor"
+    "client.ArmorFeatureRendererMixin",
+    "client.BipedEntityModelMixin",
+    "client.CameraInvoker",
+    "client.CameraMixin",
+    "client.ClientPlayerEntityMixin",
+    "client.ClientWorldMixin",
+    "client.GameRendererMixin",
+    "client.HeldItemFeatureRendererMixin",
+    "client.ParticleAccessor",
+    "client.ParticleManagerMixin",
+    "client.RenderLayerAccessor",
+    "client.WorldRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.renderer.entity;
 
 import net.arna.jcraft.client.model.entity.KnifeModel;
-import net.arna.jcraft.entity.KnifeProjectile;
+import net.arna.jcraft.common.entity.KnifeProjectile;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -18,7 +18,9 @@ public class KnifeRenderer extends GeoProjectilesRenderer<KnifeProjectile> {
         super(renderManagerIn, new KnifeModel());
     }
 
-    protected int getBlockLight(KnifeProjectile entityIn, BlockPos partialTicks) { return (entityIn.getLightning() || entityIn.isOnFire()) ? 15 : entityIn.world.getLightLevel(LightType.BLOCK, entityIn.getBlockPos()); }
+    protected int getBlockLight(KnifeProjectile entityIn, BlockPos partialTicks) {
+        return (entityIn.getLightning() || entityIn.isOnFire()) ? 15 : entityIn.world.getLightLevel(LightType.BLOCK, entityIn.getBlockPos());
+    }
 
     @Override
     public RenderLayer getRenderType(KnifeProjectile animatable, float partialTicks, MatrixStack stack,

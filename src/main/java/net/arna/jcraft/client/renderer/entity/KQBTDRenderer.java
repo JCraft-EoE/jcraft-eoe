@@ -2,7 +2,7 @@ package net.arna.jcraft.client.renderer.entity;
 
 import net.arna.jcraft.client.model.entity.KQBTDModel;
 import net.arna.jcraft.client.renderer.entity.layer.KQBTDEyesLayer;
-import net.arna.jcraft.entity.KQBTDEntity;
+import net.arna.jcraft.common.entity.KQBTDEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -10,10 +10,9 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.geo.render.built.GeoModel;
 import software.bernie.geckolib3.renderers.geo.GeoEntityRenderer;
-
-import org.jetbrains.annotations.Nullable;
 
 public class KQBTDRenderer extends GeoEntityRenderer<KQBTDEntity> {
 
@@ -43,7 +42,9 @@ public class KQBTDRenderer extends GeoEntityRenderer<KQBTDEntity> {
         float a = 1f;
         MinecraftClient mcClient = MinecraftClient.getInstance();
         if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null) {
-            if (mcClient.player.getFirstPassenger() == animatable) { a = animatable.getAlpha(); }
+            if (mcClient.player.getFirstPassenger() == animatable) {
+                a = animatable.getAlpha();
+            }
         }
         super.render(model, animatable, partialTicks, type, matrixStackIn, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, a);
     }

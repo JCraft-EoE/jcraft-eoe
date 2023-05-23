@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.renderer.armor;
 
 import net.arna.jcraft.client.model.armor.JotaroArmorModel;
-import net.arna.jcraft.item.custom.JotaroArmorItem;
+import net.arna.jcraft.common.item.JotaroArmorItem;
 import software.bernie.geckolib3.renderers.geo.GeoArmorRenderer;
 
 public class JotaroArmorRenderer extends GeoArmorRenderer<JotaroArmorItem> {

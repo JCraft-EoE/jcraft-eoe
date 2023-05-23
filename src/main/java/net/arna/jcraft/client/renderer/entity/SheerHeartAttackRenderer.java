@@ -1,16 +1,15 @@
 package net.arna.jcraft.client.renderer.entity;
 
 import net.arna.jcraft.client.model.entity.SheerHeartAttackModel;
-import net.arna.jcraft.entity.SheerHeartAttackEntity;
+import net.arna.jcraft.common.entity.SheerHeartAttackEntity;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import software.bernie.geckolib3.renderers.geo.GeoEntityRenderer;
-
 import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib3.renderers.geo.GeoEntityRenderer;
 
 public class SheerHeartAttackRenderer extends GeoEntityRenderer<SheerHeartAttackEntity> {
 

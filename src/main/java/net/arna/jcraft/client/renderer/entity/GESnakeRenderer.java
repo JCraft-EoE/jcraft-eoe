@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.renderer.entity;
 
 import net.arna.jcraft.client.model.entity.GESnakeModel;
-import net.arna.jcraft.entity.GESnakeEntity;
+import net.arna.jcraft.common.entity.GESnakeEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -35,28 +35,43 @@ public class GESnakeRenderer extends ExtendedGeoEntityRenderer<GESnakeEntity> {
     protected ItemStack getHeldItemForBone(String boneName, GESnakeEntity currentEntity) {
         return Objects.equals(boneName, "body") ? mainHandItem : null;
     }
+
     @Override
-    protected ModelTransformation.Mode getCameraTransformForItemAtBone(ItemStack boneItem, String boneName) { return ModelTransformation.Mode.NONE; }
+    protected ModelTransformation.Mode getCameraTransformForItemAtBone(ItemStack boneItem, String boneName) {
+        return ModelTransformation.Mode.NONE;
+    }
+
     @Override
     protected void preRenderItem(MatrixStack stack, ItemStack item, String boneName, GESnakeEntity currentEntity, IBone bone) {
         if (item == this.mainHandItem) {
             stack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(-90f));
         }
     }
+
     @Override
     protected boolean isArmorBone(GeoBone bone) {
         return false;
     }
+
     @Override
     protected Identifier getTextureForBone(String boneName, GESnakeEntity currentEntity) {
         return null;
     }
+
     @Override
-    protected BlockState getHeldBlockForBone(String boneName, GESnakeEntity currentEntity) { return null; }
+    protected BlockState getHeldBlockForBone(String boneName, GESnakeEntity currentEntity) {
+        return null;
+    }
+
     @Override
-    protected void postRenderItem(MatrixStack PoseStack, ItemStack item, String boneName, GESnakeEntity currentEntity, IBone bone) { }
+    protected void postRenderItem(MatrixStack PoseStack, ItemStack item, String boneName, GESnakeEntity currentEntity, IBone bone) {
+    }
+
     @Override
-    protected void preRenderBlock(MatrixStack PoseStack, BlockState block, String boneName, GESnakeEntity currentEntity) { }
+    protected void preRenderBlock(MatrixStack PoseStack, BlockState block, String boneName, GESnakeEntity currentEntity) {
+    }
+
     @Override
-    protected void postRenderBlock(MatrixStack PoseStack, BlockState block, String boneName, GESnakeEntity currentEntity) { }
+    protected void postRenderBlock(MatrixStack PoseStack, BlockState block, String boneName, GESnakeEntity currentEntity) {
+    }
 }

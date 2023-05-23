@@ -1,8 +1,8 @@
 package net.arna.jcraft.client.model.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.entity.SilverChariotEntity;
-import net.arna.jcraft.util.JCraftUtils;
+import net.arna.jcraft.common.entity.SilverChariotEntity;
+import net.arna.jcraft.common.util.JCraftUtils;
 import net.minecraft.util.Identifier;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.model.AnimatedTickingGeoModel;
@@ -18,8 +18,12 @@ public class SilverChariotModel extends AnimatedTickingGeoModel<SilverChariotEnt
     public Identifier getTextureResource(SilverChariotEntity object) {
         int mode = object.getMode();
 
-        if (mode == 3) { return new Identifier(JCraft.MOD_ID, "textures/entity/possessedchariot.png"); }
-        if (mode == 2) { return new Identifier(JCraft.MOD_ID, "textures/entity/noarmorchariot.png"); }
+        if (mode == 3) {
+            return new Identifier(JCraft.MOD_ID, "textures/entity/possessedchariot.png");
+        }
+        if (mode == 2) {
+            return new Identifier(JCraft.MOD_ID, "textures/entity/noarmorchariot.png");
+        }
         return new Identifier(JCraft.MOD_ID, "textures/entity/silverchariot.png");
     }
 

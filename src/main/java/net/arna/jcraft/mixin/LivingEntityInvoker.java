@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 public interface LivingEntityInvoker {
     @Invoker("applyArmorToDamage")
     float invokeApplyArmorToDamage(DamageSource source, float amount);
+
     @Invoker("modifyAppliedDamage")
     float invokeModifyAppliedDamage(DamageSource source, float amount);
 }

@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.renderer.entity;
 
 import net.arna.jcraft.client.model.entity.BubbleModel;
-import net.arna.jcraft.entity.BubbleProjectile;
+import net.arna.jcraft.common.entity.BubbleProjectile;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -18,7 +18,9 @@ public class BubbleRenderer extends GeoProjectilesRenderer<BubbleProjectile> {
         super(renderManagerIn, new BubbleModel());
     }
 
-    protected int getBlockLight(BubbleProjectile entityIn, BlockPos partialTicks) { return entityIn.world.getLightLevel(LightType.BLOCK, entityIn.getBlockPos()); }
+    protected int getBlockLight(BubbleProjectile entityIn, BlockPos partialTicks) {
+        return entityIn.world.getLightLevel(LightType.BLOCK, entityIn.getBlockPos());
+    }
 
     @Override
     public RenderLayer getRenderType(BubbleProjectile animatable, float partialTicks, MatrixStack stack,

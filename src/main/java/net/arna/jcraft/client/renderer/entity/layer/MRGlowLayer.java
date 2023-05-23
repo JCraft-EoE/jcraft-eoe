@@ -16,7 +16,9 @@ public class MRGlowLayer extends GeoLayerRenderer {
     private static final Identifier MODEL = new Identifier(JCraft.MOD_ID, "geo/mr.geo.json");
 
     @SuppressWarnings("unchecked")
-    public MRGlowLayer(IGeoRenderer<?> entityRendererIn) { super(entityRendererIn); }
+    public MRGlowLayer(IGeoRenderer<?> entityRendererIn) {
+        super(entityRendererIn);
+    }
 
     @SuppressWarnings("unchecked")
     @Override

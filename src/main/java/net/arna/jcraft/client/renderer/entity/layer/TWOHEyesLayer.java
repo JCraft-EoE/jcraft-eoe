@@ -11,12 +11,14 @@ import software.bernie.geckolib3.renderers.geo.GeoLayerRenderer;
 import software.bernie.geckolib3.renderers.geo.IGeoRenderer;
 
 @SuppressWarnings("rawtypes")
-public class TWOHEyesLayer  extends GeoLayerRenderer {
+public class TWOHEyesLayer extends GeoLayerRenderer {
     private static final Identifier LAYER = new Identifier(JCraft.MOD_ID, "textures/entity/twoh_eyes.png");
     private static final Identifier MODEL = new Identifier(JCraft.MOD_ID, "geo/twoh.geo.json");
 
     @SuppressWarnings("unchecked")
-    public TWOHEyesLayer(IGeoRenderer<?> entityRendererIn) { super(entityRendererIn); }
+    public TWOHEyesLayer(IGeoRenderer<?> entityRendererIn) {
+        super(entityRendererIn);
+    }
 
     @SuppressWarnings("unchecked")
     @Override
