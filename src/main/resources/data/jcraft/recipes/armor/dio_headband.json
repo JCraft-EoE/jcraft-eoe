@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "   ",
+    "GHG",
+    "   "
+  ],
+  "key": {
+    "G": {
+      "item": "minecraft:green_dye"
+    },
+    "H": {
+      "item": "minecraft:netherite_helmet"
+    }
+  },
+  "result": {
+    "item": "jcraft:dio_headband"
+  }
+}

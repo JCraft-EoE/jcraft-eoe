@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "BBB",
+    "SMB",
+    "SSS"
+  ],
+  "key": {
+    "S": {
+      "item": "jcraft:soul_block"
+    },
+    "B": {
+      "item": "minecraft:bone_block"
+    },
+    "M": {
+      "item": "minecraft:netherite_ingot"
+    }
+  },
+  "result": {
+    "item": "jcraft:green_baby"
+  }
+}

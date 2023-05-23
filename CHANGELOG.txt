@@ -1,0 +1,593 @@
+started really late into development (after kqbtd went into production) on, but it's before release so i dont really care
+by this time the stands that were (mostly) finished are
+Star Platinum, The World, King Crimson, D4C, Cream, Killer Queen
+Whitesnake, C-Moon, Made in Heaven, The World: Over Heaven
+Magician's Red, Silver Chariot, The Fool
+
+● 3/10/2022
+Added Requiem Ruby, Requiem Arrow (non-functional) and Living Arrow (Killer Queen evolution item)
+Nerfed all Timestop durations (SP 5->3, TW 7->5, TWOH 10->7)
+
+The World: Over Heaven
+>Nerfed barrage stun (3->2s) because Overwrite was confirmable out of it
+>Nerfed heavy stun (2->1s) as it's already unblockable and doesn't need to also timestop confirm
+>Made Lightning launch on hit
+
+● 7/10/2022
+>Added 0.25s stun invulnerability window after knockdown
+
+● 20/10/2022
+Killer Queen
+>Replaced Uppercut with new Sheer Heart Attack
+>Fixed dropped coins persisting
+
+● 21/10/2022
+Magicians Red
+>Lowered hitbox on Heavy sweep
+
+Killer Queen: Bites the Dust
+Added new Heavy
+
+● 27/10/2022
+Killer Queen (& Bites the Dust)
+Reduced barrage length
+
+● 7/12/2022
+>Made moves interruptable on hit (with exceptions, namely slow heavy moves)
+
+Cream
+>Nerfed Void duration (7->6s)
+>Buffed M1 hitstun (0.5->0.75s)
+>Added Special 3: Overhead Smash, a slow, uninterruptable move that knocks down on hit
+
+● 8/12/2022
+Moved Block Gauge display upward (was covered by armor display)
+Added sound for blocking attacks
+Centered Combo Break particle
+Added Cooldown Cancel
+Added missing entries to lang/en_us.json
+
+Whitesnake
+>Removed knockback from end of barrage
+
+C-Moon
+>Only One Punch is now uninterruptable
+
+● 11/12/2022
+Fixed bug where Sheer Heart Attack dying would kill the user
+Added hit particles
+
+● 12/12/2022
+C-Moon
+>Increased stun on Only One Punch (0.3->0.75s)
+
+Cream
+>Increased stun on M1 (0.75->1s)
+>Decreased knockdown length on Overhead Smash (1.75->1.5s)
+
+The World
+>Decreased stun on Donut (5->4s)
+
+● 13/12/2022
+Fixed bug where stand users stop keep blocking after defending against one ranged move
+Added DIO's Outfit
+
+● 14/12/2022
+Taught AI to use Cooldown Cancel
+Added original SFX to Cooldown Cancel and Combo Break, made the one using it able to hear it
+
+● 15/12/2022
+Added custom idle pose for Killer Queen (& Bites the Dust)
+Added Jotaro's Outfit
+
+Cream
+>Moved Void from Special 1 to Ultimate
+
+Killer Queen
+>Reduced Sheer Heart Attack life duration (30->18s)
+
+● 16/12/2022
+Magician's Red
+>Fixed bug where Redirect would cause all ankhs to disappear due to ticksInAir not resetting
+
+Killer Queen: Bites the Dust
+>Added Special 2: Stray Cat Bubble
+
+● 20/12/2022
+Fixed bug where the Revolver would attract any item and explode
+Optimized mob spawning with stand code
+Compacted cooldown UI
+Improved D4C Clone AI
+
+Killer Queen (& Bites the Dust)
+>Increased trigger range on all explosions
+>Increased knockdown duration on all explosions (1->1.5s)
+
+● 25/1/2023
+Reduced initial block gauge from 120 to 60 (to prevent quick stand resummons invalidating pressure)
+
+Stand Detachment Moves - REWORKED
+>decreased hitbox offset (combos close-up, slight overall range decrease)
+>now allows followups to be buffered while keeping the stand detached
+
+● 26/1/2023
+Anubis
+>Added unique attack animations
+
+● 29/1/2023
+Made in Heaven
+>Added armor to Donut
+
+● 30/1/2023
+Fixed Cooldown Cancel input defaulting to an invalid key
+Refactored a bunch of hard-coded strings
+
+● 1/2/2023
+Added /spec set
+Began adding first spec - Brawler
+>Heavy - Uppercut (small stun)
+>Special 1 - Sweep (medium stun)
+
+● 2/2/2023
+Stand (de)summons can now be buffered
+Expanded input buffer window for specs
+
+The World: Over Heaven
+>Reduced damage on Heavy (14->10)
+
+● 6/2/2023
+Fixed bug where combo counter increased when the combo wasn't true
+Changed horizontal speed multiplier during stun (50->40%)
+
+Brawler
+>Barrage - 3-hit Combo (medium stun)
+
+● 7/2/2023
+Fixed bug where repeating the same move broke the animation
+Made Cooldown Cancels instant and produce no visuals when used in creative mode
+Added blockstun - moves (on block) force you to block for an extra amount of ticks identical to their damage
+Reduced block gauge damage from x^2 to 2x
+
+The World: Over Heaven
+>Added hitbox display logic for Smite
+
+● 12/2/2023
+Made AI stand users aware of spec attacks
+
+Brawler - FINISHED
+>Sweep reassigned to special 2, and now knocks down
+>Special 1 - Gut punch (medium stun)
+
+● 13/2/2023
+Made stands reflect damage back to the user when hit
+Killer Queen (and Bites the Dust)
+
+● 14/2/2023
+Began work on Golden Experience
+
+● 17/2/2023
+Made AI stand users more aware of blockstun mechanics
+Decreased stand visibility in first person
+
+● 27/2/2023
+Fixed stack overflow when a counter gets countered
+Fixed an issue where ridden entities do not get timestopped
+
+Reduced range of Combo Breaker from 16x16x16 to 8x8x8
+
+Killer Queen
+>Sheer heart attack now respects mobGriefing gamerule
+
+● 5/3/2023
+Made stand utility moves rebindable
+Began updating to 1.19.3
+
+● 9/3/2023
+Magicians Red
+>Red Bind is no longer unblockable and no longer disables block
+
+● 13/3/2023
+Stands can no longer hit whatever the user is riding
+Fixed multiple stand animation bugs
+
+● 14/3/2023
+Added Knife Bundles
+Timestop stands can no longer timeskip during timestop
+
+The World
+>Increased stun on roundhouse (6->9ticks)
+
+Star Platinum
+>Increased stun on roundhouse (6->8ticks)
+>Increased knockback on detached barrage by 25%
+
+The World: Over Heaven
+>Increased stun on light (10->11ticks)
+
+● 16/3/2023
+Stand users now influence their stand's elevation by looking up/down
+Timestop stands can no longer ride during timestop
+Added /framedata stand command, which allows you to view the statistics of your current/last used stand move
+
+Golden Experience
+>Heal - (3->2) hearts
+
+● 21/3/2023
+Reanimated brawler spec
+Stun now also nullifies attack speed
+Finished /framedata command
+
+Made in Heaven
+>No longer grants speed boost while stunned, and outside of time acceleration
+
+The World: Over Heaven
+>Smite can now pick up entities when selecting location
+
+Whitesnake
+>Memory and Stand Disk (respectively)
+    Startup: 34 -> 21
+    Recovery: 8 -> 14
+    Advantage (hit): 31/1 -> 25/5
+    Advantage (block): 2 -> -4
+    >Added armor
+>Memory Disk cooldown (55->45s)
+
+Killer Queen (and Bites the Dust)
+>Bomb Plant now works on non-living entities
+>Sheer Heart Attack deployment animation mirrored
+
+Silver Chariot (normal)
+>Special 3 - Cleave
+
+● 23/3/2023
+Fixed players not taking knockback
+Fixed improper combo counting
+
+Golden Experience
+>Special 3 - Summon Snake
+
+● 26/3/2023
+Added STAND DISCS - right click when out of combat to store your stand inside the disc
+
+Fixed inappropriate slowdown during hitstun
+
+Star Platinum, The World, The World: Over Heaven
+>Timeskip distance normalized to 14m
+
+D4C
+Reanimated several moves
+>Heavy considerably sped up (now links out of Light)
+>Gun Throw replaced with Grab
+>Counter damage nerfed (10->5hearts)
+
+● 27/3/2023
+Upgraded /stand about to a modular system
+Updated descriptions for every stand
+Non-detachment stand moves now apply mining fatigue for their duration
+
+Whitesnake
+>Stun on both disc moves reduced to 1s
+
+King Crimson
+>Improved invisibility on Time Erase
+>Improved Time Erase position tracking
+
+● 28/3/2023
+Block gauge universally reduced to 90, with 45 on summon
+
+Made in Heaven and King Crimson
+>Fixed inconsistent knockback on Barrage
+
+Made in Heaven
+>Reduced stun (1->0.5s) on Barrage
+
+Golden Experience
+>Increased stun (1->1.25s) on second hit of Tree Summon
+>Healing Hand now heals others while crouching
+>Special 2 - Rekka Series
+
+● 29/3/2023
+Added "Default Spec" gamerule
+Added recipe for Coin (2 golden nuggets)
+
+Finished Golden Experience
+>Ultimate - Overclock
+
+Killer Queen: Bites the Dust
+>crouching while doing Detonate now triggers a time rewind for the victim and the user
+
+Killer Queen
+>reanimated Heavy
+
+Silver Chariot
+>added sounds
+
+● 30/3/2023
+Grabs are no longer combo breakable
+Stand Arrows can no longer roll the same stand twice in a row
+Capped vertical speed during stun
+Minor changes to input system; light, barrage, heavy, combo breaker can now be held and consistenly come out
+
+C-Moon
+>blocking no longer makes you immobile
+
+The Fool
+>Sandwave now forces your stand back
+
+King Crimson - RECODED
+>many code optimizations
+>Epitaph duration reduced (3->1.5s), windup reduced (0.25->0.2s)
+    >improved input registration following Move Cancel
+>Heavy (Overhead Hook) is now a followup to new Heavy (Chop)
+
+● 2/4/2023
+Revolver can no longer be used while stunned
+Changed Timestop durations (TW 5->4, TWOH 7->5)
+Stand User mobs now respect NoAI
+Every counter now cancels opponent's move on hit
+Increased level (3->5) of mining fatigue while stand is performing move
+
+Silver Chariot
+added BNB combos to /stand about
+>God of Death animation slowed down
+
+Killer Queen (and Bites the Dust)
+>Coin Toss now puts Detonate on cooldown for 1s
+
+Killer Queen: Bites the Dust
+>Fixed Bites the Dust not working on player targets
+
+● 3/4/2023
+The World: Over Heaven
+>Overwrite reanimated, enslaved mob targetting logic improved
+
+Killer Queen (and Bites the Dust)
+>Stand User mobs now use Detonate better
+
+● 4/4/2023
+Began work on Golden Experience: Requiem
+
+● 5/4/2023
+Upgraded Stand User AI
+>AI now recognizes followups
+>AI no longer attempts to block its own projectiles
+>AI no longer Combo Breaks 100% predictably
+>AI now recognizes enemy attack better
+>AI overestimates its advantage less
+
+● 6/4/2023
+Golden Experience Requiem
+>Special 2 - Life Beam
+
+● 7/4/2023
+Golden Experience Requiem
+>Special 3 - Nullification
+
+● 9/4/2023
+Added first person animations for spec attacks
+
+Combo Breaker
+>reduced range
+>scaled up particle to better show range
+>added hitbox display
+
+Brawler
+>Reanimated attacks
+>Buffed stun and speed on Uppercut
+
+Golden Experience Requiem
+>Ultimate - Return to Zero
+>Added aerial variations to Light, Heavy and Barrage
+>Increased jump speed for Scorpion
+>Taught the AI how to use GER
+
+Silver Chariot
+>fixed minor mistake on /stand about page
+
+● 24/4/2023
+Combo Breaker cooldown is now reset on death
+
+Added recipes for DIO and Jotaro armor
+
+Golden Experience Requiem
+>Updated /stand about page
+
+● 25/4/2023
+Added recipe for Boxing Gloves
+
+Fixed combo counting for projectiles
+Fixed damage incorrectly accounting for armor
+Fixed bug relating to 0 stun moves
+
+Optimized Stand user AI
+
+Golden Experience Requiem
+>Updated /stand about page
+
+● 26/4/2023
+Increased stun time during Combo Breaker
+
+Updated D4C and Star Platinum models
+
+● 29/4/2023
+The World
+>Reduced stun on barrage (3->2s)
+
+Cream
+>Special 1 - Destroy
+>Increased recovery on Grab
+
+Magician's Red
+>Knockdown on Sweep is now blockable
+
+● 1/5/2023
+Fixed Combo Breaker
+
+Star Platinum
+>Updated model and animations
+>Advancing Barrage
+    >now tracks what it hits
+    >reduced duration (3->2.5s)
+    >reduced damage (1->0.6)
+
+● 7/5/2023
+Golden Experience: Requiem
+>Increased damage on both Heavies (8->9)
+>Increased damage on first hit of Life Beam (5->6)
+
+● 11/5/2023
+Launches reworked
+>no longer punishable on hit
+>no longer remove stun, instead overriding it with one that does not reduce movement
+
+Star Platinum
+>Star Finger cooldown reduced (26->20s)
+>Timestop cooldown reduced (70->60s)
+
+The World
+>Updated model and animations
+
+King Crimson
+>Eye Chop cooldown reduced (22->20s)
+
+Cream
+>3-Hit Combo cooldown reduced (18->17s) - standard for barrages
+>Charge cooldown reduced (25->20s)
+>Destroy cooldown reduced (30->25s)
+
+Whitesnake
+>Poison Spew cooldown reduced (29->23s)
+
+Silver Chariot
+>Ray Dart cooldown reduced (22->18s)
+>Invincible Blade stun increased (15->17t)
+
+Magician's Red
+>Redirect cooldown reduced (30->5s)
+>Red Bind cooldown reduced (25->20s)
+
+Golden Experience
+>Heavy damage increased (4->4.5 hearts)
+>Rekka 3 damage increased (2.5->3.5 hearts)
+>Tree cooldown reduced (23->20s), followup damage increased (2.5->3.5 hearts)
+
+C-Moon
+>Gut Punch startup reduced by 1 tick, cooldown reduced (22->17s)
+
+Golden Experience: Requiem
+>Life Beam cooldown reduced (28->24s)
+
+● 12/5/2023
+C-Moon
+>Barrage duration reduced (3.5->3s)
+>Only One Punch hitbox moved up and increased, stun increased (15->35t)
+>Reanimated
+
+Silver Chariot
+>Reanimated
+
+Golden Experience
+>Snake Summon now summons higher
+>Rekka 3 knockdown is now blockable
+
+● 13/5/2023
+Players are no longer able to use items while stunned
+Added launch property to some overlooked moves
+
+King Crimson
+>Remodeled and reanimated
+>Donut no longer stuns on whiff
+>Epitaph now swaps places between attacker and attacked
+>Added unique particles
+
+● 14/5/2023
+Stand code optimised
+
+Whitesnake
+>Utility replaced (Gun -> Remote Mode)
+
+● 15/5/2023
+King Crimson
+>Added Blood Throw (crouching alternative to Eye Chop)
+>Time Erase improved
+    >startup decreased (24->5ticks)
+    >sounds replaced (no longer audible to others)
+    >user is now truly incorporeal for its duration
+
+D4C
+>Remodeled and reanimated
+>Light startup sped up by 1 tick
+>Barrage stun reduced (3->2s), damage reduced (1->0.8)
+>Improved Clones
+    >Clones can now be given armor and weapons
+    >Now render at the exact scale a player does
+    >Added hand swinging animations
+    >Added ability to use bows
+    >Can only spawn with swords
+
+● 20/5/2023
+>Replaced number format for stand gauge with bar
+
+The World
+>Donut
+    >stuns less on whiff (3.5->3s)
+    >no longer moves victims vertically
+
+King Crimson
+>Blood projectile now blinds for proper duration (3s)
+>Donut no longer moves victims vertically
+>Time Erase now grants a portion of the cooldown back if cancelled early
+
+D4C
+>Crouching before using Special 2 now gives the gun to the user
+>Dimensional Hop reworked
+    >now takes everyone inside D4C's range into a copy of the current surroundings
+    >everyone affected comes back after 15s
+>Revolver remodeled and rebalanced
+    >cooldown reduced (10->0.5s)
+    >now has 6 shots
+>Utility - Dimensional Phase, unstunnable from frame 1, hides in a flag which floats for a while
+
+● 21/5/2023
+Knockdowns no longer inconsistently set victims pose
+Stand Gauge moved up
+
+King Crimson
+>Fixed bug where animations did not play correctly after Time Erase
+
+D4C
+>Fixed bug where thrown Revolvers do not attract and explode
+>Utility
+    >Fixed bug where pressing the bind would always lead to a self-inflicted knockdown
+    >Now reduces D4C's hitbox
+>Dimensional Hop can now be cut short by pressing the bind again
+
+The World: Over Heaven
+>Added aerial variant to Divine Finisher
+
+● 22/5/2023
+The World: Over Heaven
+>Reality Overwrite
+    >stun reduced (2->1s)
+    >now launches
+
+● 23/5/2023
+>Improved projectile damage logic
+>Improved projectile deletion logic
+
+Cream
+    >Remodeled and reanimated
+    >M1 sped up by 1 tick
+    >Grab moved to Special 1
+    >Destroy moved to Special 3
+    >New Utility - Enter Cream, partially enters Cream, allowing floating movement and swapping the moveset
+
+Magician's Red
+    >Fixed bug where you could pick up Ankhs
+
+priority (top to bottom)
+TODO: ability to position the HUD
+TODO: AI flags for unblockables and shouldn't-blockables
+TODO: stand summon particles
+TODO: patchouli and the stand users manual
+TODO: Knockback() method

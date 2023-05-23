@@ -1,0 +1,222 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.gesnake.idle": {
+			"loop": true,
+			"animation_length": 3.64,
+			"bones": {
+				"top": {
+					"rotation": {
+						"1.96": {
+							"vector": [0, 0, 0]
+						},
+						"2.16": {
+							"vector": [-27.5, 0, 0]
+						},
+						"2.64": {
+							"vector": [-27.5, 0, 0]
+						},
+						"2.88": {
+							"vector": [0, 0, 0],
+							"easing": "easeInOutSine"
+						}
+					}
+				},
+				"jaw": {
+					"rotation": {
+						"1.96": {
+							"vector": [0, 0, 0]
+						},
+						"2.16": {
+							"vector": [25, 0, 0]
+						},
+						"2.64": {
+							"vector": [25, 0, 0]
+						},
+						"2.88": {
+							"vector": [0, 0, 0],
+							"easing": "easeInOutSine"
+						}
+					}
+				},
+				"tongue": {
+					"rotation": {
+						"1.96": {
+							"vector": [0, 0, 0]
+						},
+						"2.08": {
+							"vector": [-35, 0, 0],
+							"easing": "easeInBounce",
+							"easingArgs": [1]
+						},
+						"2.2": {
+							"vector": [35, 0, 0],
+							"easing": "easeInBounce",
+							"easingArgs": [1]
+						},
+						"2.32": {
+							"vector": [-35, 0, 0],
+							"easing": "easeInBounce",
+							"easingArgs": [1]
+						},
+						"2.44": {
+							"vector": [35, 0, 0],
+							"easing": "easeInBounce",
+							"easingArgs": [1]
+						},
+						"2.56": {
+							"vector": [0, 0, 0],
+							"easing": "easeInBounce",
+							"easingArgs": [1]
+						}
+					},
+					"scale": {
+						"vector": [0.7, 1, 1]
+					}
+				}
+			}
+		},
+		"animation.gesnake.move": {
+			"loop": true,
+			"animation_length": 2,
+			"bones": {
+				"seg": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 25, 0]
+						},
+						"1.0": {
+							"vector": [0, -25, 0],
+							"easing": "easeInOutSine"
+						},
+						"2.0": {
+							"vector": [0, 25, 0],
+							"easing": "easeInOutSine"
+						}
+					}
+				},
+				"seg2": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, -15, 0]
+						},
+						"1.0": {
+							"vector": [0, 15, 0],
+							"easing": "easeInOutSine"
+						},
+						"2.0": {
+							"vector": [0, -15, 0],
+							"easing": "easeInOutSine"
+						}
+					}
+				},
+				"seg3": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, -32.5, 0]
+						},
+						"1.0": {
+							"vector": [0, 32.5, 0],
+							"easing": "easeInOutSine"
+						},
+						"2.0": {
+							"vector": [0, -32.5, 0],
+							"easing": "easeInOutSine"
+						}
+					}
+				},
+				"seg4": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 7.5, 0]
+						},
+						"1.0": {
+							"vector": [0, -7.5, 0],
+							"easing": "easeInOutSine"
+						},
+						"2.0": {
+							"vector": [0, 7.5, 0],
+							"easing": "easeInOutSine"
+						}
+					}
+				},
+				"seg5": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 25, 0]
+						},
+						"0.76": {
+							"vector": [0, -25, 0],
+							"easing": "easeInOutSine"
+						},
+						"2.0": {
+							"vector": [0, 25, 0],
+							"easing": "easeInOutSine"
+						}
+					}
+				},
+				"tongue": {
+					"scale": {
+						"vector": [0.7, 1, 1]
+					}
+				},
+				"head": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 35, 0]
+						},
+						"1.0": {
+							"vector": [0, -35, 0],
+							"easing": "easeInOutSine"
+						},
+						"2.0": {
+							"vector": [0, 35, 0],
+							"easing": "easeInOutSine"
+						}
+					}
+				}
+			}
+		},
+		"animation.gesnake.attack": {
+			"animation_length": 0.52,
+			"bones": {
+				"top": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.24": {
+							"vector": [-32.5, 0, 0],
+							"easing": "easeInOutSine"
+						},
+						"0.52": {
+							"vector": [0, 0, 0],
+							"easing": "easeOutBack"
+						}
+					}
+				},
+				"jaw": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.24": {
+							"vector": [40, 0, 0],
+							"easing": "easeInOutSine"
+						},
+						"0.52": {
+							"vector": [2.5, 0, 0],
+							"easing": "easeOutBack"
+						}
+					}
+				},
+				"tongue": {
+					"scale": {
+						"vector": [0.7, 1, 1]
+					}
+				}
+			}
+		}
+	},
+	"geckolib_format_version": 2
+}

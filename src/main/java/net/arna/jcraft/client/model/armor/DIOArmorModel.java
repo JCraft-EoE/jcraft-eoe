@@ -1,0 +1,23 @@
+package net.arna.jcraft.client.model.armor;
+
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.item.custom.DIOArmorItem;
+import net.minecraft.util.Identifier;
+import software.bernie.geckolib3.model.AnimatedGeoModel;
+
+public class DIOArmorModel extends AnimatedGeoModel<DIOArmorItem> {
+    @Override
+    public Identifier getModelResource(DIOArmorItem object) {
+        return new Identifier(JCraft.MOD_ID, "geo/diooutfit.geo.json");
+    }
+
+    @Override
+    public Identifier getTextureResource(DIOArmorItem object) {
+        return new Identifier(JCraft.MOD_ID, "textures/item/diooutfit.png");
+    }
+
+    @Override
+    public Identifier getAnimationResource(DIOArmorItem animatable) {
+        return new Identifier(JCraft.MOD_ID, "animations/diooutfit.animation.json");
+    }
+}

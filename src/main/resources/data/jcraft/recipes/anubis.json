@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "LSI",
+    "SDS",
+    "GSL"
+  ],
+  "key": {
+    "S": {
+      "item": "jcraft:sinners_soul"
+    },
+    "I": {
+      "item": "minecraft:iron_block"
+    },
+    "G": {
+      "item": "minecraft:gold_block"
+    },
+    "D": {
+      "item": "minecraft:diamond"
+    },
+    "L": {
+      "item": "minecraft:leather"
+    }
+  },
+  "result": {
+    "item": "jcraft:anubis_sheathed"
+  }
+}

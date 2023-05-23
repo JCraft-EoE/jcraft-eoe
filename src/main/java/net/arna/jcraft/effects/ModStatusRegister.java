@@ -1,0 +1,60 @@
+package net.arna.jcraft.effects;
+
+import net.arna.jcraft.JCraft;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
+
+public class ModStatusRegister {
+    public static final StatusEffect Dazed = new DazedStatusEffect();
+    public static final StatusEffect Knockdown = new KnockdownStatusEffect();
+    public static final StatusEffect WSPoison = new WSPoisonEffect();
+    public static final StatusEffect Standless = new StandlessEffect();
+    public static final StatusEffect OutOfBody = new OutOfBodyEffect();
+
+    public static void registerStatuses() {
+        Registry.register(
+                Registry.STATUS_EFFECT, new Identifier(JCraft.MOD_ID, "dazed_effect"),
+                Dazed.addAttributeModifier(
+                        EntityAttributes.GENERIC_ATTACK_DAMAGE,
+                        "FE04CA6A-A3D1-E22B-CB00-EDA6A853F90E",
+                        -1.0,
+                        EntityAttributeModifier.Operation.MULTIPLY_TOTAL
+                ).addAttributeModifier(
+                        EntityAttributes.GENERIC_ATTACK_SPEED,
+                        "CB402E34-0AAC-383B-B26B-B253430DEEEA",
+                        -1.0,
+                        EntityAttributeModifier.Operation.MULTIPLY_TOTAL
+                ).addAttributeModifier(EntityAttributes.GENERIC_MOVEMENT_SPEED,
+                        "778B48FC-485B-5BA7-58C7-E0D755CE354D",
+                        0,
+                        EntityAttributeModifier.Operation.MULTIPLY_TOTAL
+                )
+        );
+
+        Registry.register(
+                Registry.STATUS_EFFECT, new Identifier(JCraft.MOD_ID, "knockdown"),
+                Knockdown.addAttributeModifier(
+                        EntityAttributes.GENERIC_ARMOR,
+                        "BB2CA307-EEA6-B54C-B324-F7EB036289BF",
+                        30.0,
+                        EntityAttributeModifier.Operation.ADDITION
+                ).addAttributeModifier(
+                        EntityAttributes.GENERIC_ARMOR_TOUGHNESS,
+                        "3B9E3E15-2B1A-13F6-73D8-AB84287E7DF0",
+                        20.0,
+                        EntityAttributeModifier.Operation.ADDITION
+                ).addAttributeModifier(
+                        EntityAttributes.GENERIC_MOVEMENT_SPEED,
+                        "ADA0E470-7D4D-DF4E-DDB2-A1858C84236C",
+                        0.0,
+                        EntityAttributeModifier.Operation.MULTIPLY_TOTAL)
+        );
+
+        Registry.register(Registry.STATUS_EFFECT, new Identifier(JCraft.MOD_ID, "ws_poison"), WSPoison);
+        Registry.register(Registry.STATUS_EFFECT, new Identifier(JCraft.MOD_ID, "standless"), Standless);
+        Registry.register(Registry.STATUS_EFFECT, new Identifier(JCraft.MOD_ID, "outofbody"), OutOfBody);
+    }
+}

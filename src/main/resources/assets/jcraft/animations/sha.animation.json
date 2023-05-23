@@ -1,0 +1,52 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.sha.idle": {
+			"loop": true,
+			"animation_length": 3.12,
+			"bones": {
+				"lf": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"3.12": {
+							"vector": [720, 0, 0]
+						}
+					}
+				},
+				"lb": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"3.12": {
+							"vector": [720, 0, 0]
+						}
+					}
+				},
+				"rf": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"3.12": {
+							"vector": [720, 0, 0]
+						}
+					}
+				},
+				"rb": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"3.12": {
+							"vector": [720, 0, 0]
+						}
+					}
+				}
+			}
+		}
+	},
+	"geckolib_format_version": 2
+}

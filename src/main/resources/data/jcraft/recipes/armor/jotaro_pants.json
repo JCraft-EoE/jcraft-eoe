@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "YYY",
+    "BLB",
+    "B B"
+  ],
+  "key": {
+    "Y": {
+      "item": "minecraft:yellow_dye"
+    },
+    "B": {
+      "item": "minecraft:black_dye"
+    },
+    "L": {
+      "item": "minecraft:netherite_leggings"
+    }
+  },
+  "result": {
+    "item": "jcraft:jotaro_pants"
+  }
+}

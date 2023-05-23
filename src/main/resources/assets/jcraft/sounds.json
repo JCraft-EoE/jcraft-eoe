@@ -1,0 +1,611 @@
+{
+  "timeskip": {
+    "sounds": [
+      "jcraft:timeskip"
+    ]
+  },
+
+  "standsummon": {
+    "sounds": [
+      "jcraft:standsummon"
+    ]
+  },
+
+  "desummon": {
+    "sounds": [
+      "jcraft:desummon"
+    ]
+  },
+
+  "standblock": {
+    "sounds": [
+      "jcraft:standblock"
+    ]
+  },
+
+  "combobreak": {
+    "sounds": [
+      "jcraft:combobreak"
+    ]
+  },
+
+  "cooldowncancel": {
+    "sounds": [
+      "jcraft:cooldowncancel"
+    ]
+  },
+
+  "impact1": {
+    "sounds": [
+      "jcraft:impact1"
+    ]
+  },
+
+  "impact2": {
+    "sounds": [
+      "jcraft:impact2"
+    ]
+  },
+
+  "impact3": {
+    "sounds": [
+      "jcraft:impact3"
+    ]
+  },
+
+  "impact4": {
+    "sounds": [
+      "jcraft:impact4"
+    ]
+  },
+
+  "impact5": {
+    "sounds": [
+      "jcraft:impact5"
+    ]
+  },
+
+  "spbarrage": {
+    "sounds": [
+      "jcraft:spbarrage"
+    ]
+  },
+
+  "spadvbarrage": {
+    "sounds": [
+      "jcraft:spadvbarrage"
+    ]
+  },
+
+  "sptw": {
+    "subtitle": "subtitles.jcraft.sptw",
+    "sounds": [
+      "jcraft:sptw"
+    ]
+  },
+
+  "spkick": {
+    "sounds": [
+      "jcraft:spkick"
+    ]
+  },
+
+  "starbreaker": {
+    "sounds": [
+      "jcraft:starbreaker"
+    ]
+  },
+
+  "starfinger": {
+    "sounds": [
+      "jcraft:starfinger"
+    ]
+  },
+
+  "kcsummon": {
+    "sounds": [
+      "jcraft:kcsummon"
+    ]
+  },
+
+  "kcdualchop": {
+    "sounds": [
+      "jcraft:kcdualchop"
+    ]
+  },
+
+  "kcdonut": {
+    "sounds": [
+      "jcraft:kcdonut"
+    ]
+  },
+
+  "kcbarrage": {
+    "sounds": [
+      "jcraft:kcbarrage"
+    ]
+  },
+
+  "kcheavy": {
+    "sounds": [
+      "jcraft:kcheavy"
+    ]
+  },
+
+  "kcheavy2": {
+    "sounds": [
+      "jcraft:kcheavy2"
+    ]
+  },
+
+  "eyechop": {
+    "sounds": [
+      "jcraft:eyechop"
+    ]
+  },
+
+  "tetp": {
+    "sounds": [
+      "jcraft:tetp"
+    ]
+  },
+
+  "timeerase": {
+    "subtitle": "subtitles.jcraft.timeerase",
+    "sounds": [
+      "jcraft:timeerase"
+    ]
+  },
+
+  "kcteexit": {
+    "sounds": [
+      "jcraft:kcteexit"
+    ]
+  },
+
+  "mudada": {
+    "sounds": [
+      "jcraft:mudada"
+    ]
+  },
+
+  "twsummon": {
+    "sounds": [
+      "jcraft:twsummon"
+    ]
+  },
+
+  "twts": {
+    "subtitle": "subtitles.jcraft.twts",
+    "sounds": [
+      "jcraft:twts"
+    ]
+  },
+
+  "twbarrage": {
+    "sounds": [
+      "jcraft:twbarrage"
+    ]
+  },
+
+  "twcharge": {
+    "sounds": [
+      "jcraft:twcharge"
+    ]
+  },
+
+  "twchargehit": {
+    "sounds": [
+      "jcraft:twchargehit"
+    ]
+  },
+
+  "twdonut": {
+    "sounds": [
+      "jcraft:twdonut"
+    ]
+  },
+
+  "twdonuthit": {
+    "sounds": [
+      "jcraft:twdonuthit"
+    ]
+  },
+
+  "twkick": {
+    "sounds": [
+      "jcraft:twkick"
+    ]
+  },
+
+  "twkickhit": {
+    "sounds": [
+      "jcraft:twkickhit"
+    ]
+  },
+
+  "twcounter": {
+    "sounds": [
+      "jcraft:twcounter"
+    ]
+  },
+
+  "d4csummon": {
+    "sounds": [
+      "jcraft:d4csummon"
+    ]
+  },
+
+  "d4cheavy": {
+    "sounds": [
+      "jcraft:d4cheavy"
+    ]
+  },
+
+  "d4cbarrage": {
+    "sounds": [
+      "jcraft:d4cbarrage"
+    ]
+  },
+
+  "d4clight": {
+    "sounds": [
+      "jcraft:d4clight"
+    ]
+  },
+
+  "d4cdimhop": {
+    "sounds": [
+      "jcraft:d4cdimhop"
+    ]
+  },
+
+  "revolverfire": {
+    "sounds": [
+      "jcraft:revolverfire"
+    ]
+  },
+
+  "d4cthrow": {
+    "sounds": [
+      "jcraft:d4cthrow"
+    ]
+  },
+
+  "d4ccounter": {
+    "sounds": [
+      "jcraft:d4ccounter"
+    ]
+  },
+
+  "creamconsume": {
+    "sounds": [
+      "jcraft:creamconsume"
+    ]
+  },
+
+  "creamcharge": {
+    "sounds": [
+      "jcraft:creamcharge"
+    ]
+  },
+
+  "creamgrab": {
+    "sounds": [
+      "jcraft:creamgrab"
+    ]
+  },
+
+  "creamheavy": {
+    "sounds": [
+      "jcraft:creamheavy"
+    ]
+  },
+
+  "creamcombo": {
+    "sounds": [
+      "jcraft:creamcombo"
+    ]
+  },
+
+  "creamsmash": {
+    "sounds": [
+      "jcraft:creamsmash"
+    ]
+  },
+
+  "creamenter": {
+    "sounds": [
+      "jcraft:creamenter"
+    ]
+  },
+
+  "creamexit": {
+    "sounds": [
+      "jcraft:creamexit"
+    ]
+  },
+
+  "kqheavy": {
+    "sounds": [
+      "jcraft:kqheavy"
+    ]
+  },
+
+  "kqbarrage": {
+    "sounds": [
+      "jcraft:kqbarrage"
+    ]
+  },
+
+  "kqdetonate": {
+    "sounds": [
+      "jcraft:kqdetonate"
+    ]
+  },
+
+  "kquppercut": {
+    "sounds": [
+      "jcraft:kquppercut"
+    ]
+  },
+
+  "kqbtdelbow": {
+    "sounds": [
+      "jcraft:kqbtdelbow"
+    ]
+  },
+
+  "kqbtdsummon": {
+    "sounds": [
+      "jcraft:kqbtdsummon"
+    ]
+  },
+
+  "wsbarrage": {
+    "sounds": [
+      "jcraft:wsbarrage"
+    ]
+  },
+
+  "wslegcrush": {
+    "sounds": [
+      "jcraft:wslegcrush"
+    ]
+  },
+
+  "wsdonut": {
+    "sounds": [
+      "jcraft:wsdonut"
+    ]
+  },
+
+  "wsdisk": {
+    "sounds": [
+      "jcraft:wsdisk"
+    ]
+  },
+
+  "wsgun": {
+    "sounds": [
+      "jcraft:wsgun"
+    ]
+  },
+
+  "cmoongravpunch": {
+    "sounds": [
+      "jcraft:cmoongravpunch"
+    ]
+  },
+
+  "cmoongravpunchhit": {
+    "sounds": [
+      "jcraft:cmoongravpunchhit"
+    ]
+  },
+
+  "cmoongroundslam": {
+    "sounds": [
+      "jcraft:cmoongroundslam"
+    ]
+  },
+
+  "cmoongravshift": {
+    "sounds": [
+      "jcraft:cmoongravshift"
+    ]
+  },
+
+  "cmoondonut": {
+    "sounds": [
+      "jcraft:cmoondonut"
+    ]
+  },
+
+  "mihzoom": {
+    "sounds": [
+      "jcraft:mihzoom"
+    ]
+  },
+
+  "mihjudgement": {
+    "sounds": [
+      "jcraft:mihjudgement"
+    ]
+  },
+
+  "mihtaccel": {
+    "sounds": [
+      "jcraft:mihtaccel"
+    ]
+  },
+
+  "mihfurychop": {
+    "sounds": [
+      "jcraft:mihfurychop"
+    ]
+  },
+
+  "mihspeedslice": {
+    "sounds": [
+      "jcraft:mihspeedslice"
+    ]
+  },
+
+  "twohsummon": {
+    "sounds": [
+      "jcraft:twohsummon"
+    ]
+  },
+
+  "twohshoot": {
+    "sounds": [
+      "jcraft:twohshoot"
+    ]
+  },
+
+  "twohts": {
+    "subtitle": "subtitles.jcraft.twohts",
+    "sounds": [
+      "jcraft:twohts"
+    ]
+  },
+
+  "twohheavy": {
+    "sounds": [
+      "jcraft:twohheavy"
+    ]
+  },
+
+  "twohsmite": {
+    "sounds": [
+      "jcraft:twohsmite"
+    ]
+  },
+
+  "twohoverwrite": {
+    "sounds": [
+      "jcraft:twohoverwrite"
+    ]
+  },
+
+  "twohowarida": {
+    "sounds": [
+      "jcraft:twohowarida"
+    ]
+  },
+
+  "twohairknives": {
+    "sounds": [
+      "jcraft:twohairknives"
+    ]
+  },
+
+  "foolbark1": {
+    "sounds": [
+      "jcraft:foolbark1"
+    ]
+  },
+
+  "foolbark2": {
+    "sounds": [
+      "jcraft:foolbark2"
+    ]
+  },
+
+  "foollaunch": {
+    "sounds": [
+      "jcraft:foollaunch"
+    ]
+  },
+
+  "foolcharge": {
+    "sounds": [
+      "jcraft:foolcharge"
+    ]
+  },
+
+  "gesummon": {
+    "sounds": [
+      "jcraft:gesummon"
+    ]
+  },
+
+  "gebarrage": {
+    "sounds": [
+      "jcraft:gebarrage"
+    ]
+  },
+
+  "geheal": {
+    "sounds": [
+      "jcraft:geheal"
+    ]
+  },
+
+  "getree": {
+    "sounds": [
+      "jcraft:getree"
+    ]
+  },
+
+  "gersummon": {
+    "sounds": [
+      "jcraft:gersummon"
+    ]
+  },
+
+  "gerheavy": {
+    "sounds": [
+      "jcraft:gerheavy"
+    ]
+  },
+
+  "gerlaser": {
+    "sounds": [
+      "jcraft:gerlaser"
+    ]
+  },
+
+  "gerkickbarrage": {
+    "sounds": [
+      "jcraft:gerkickbarrage"
+    ]
+  },
+
+  "gersetup": {
+    "sounds": [
+      "jcraft:gersetup"
+    ]
+  },
+
+  "scsummon": {
+    "sounds": [
+      "jcraft:scsummon"
+    ]
+  },
+
+  "scbarrage": {
+    "sounds": [
+      "jcraft:scbarrage"
+    ]
+  },
+
+  "sccharge": {
+    "sounds": [
+      "jcraft:sccharge"
+    ]
+  },
+
+  "scheavy": {
+    "sounds": [
+      "jcraft:scheavy"
+    ]
+  },
+
+  "scspin": {
+    "sounds": [
+      "jcraft:scspin"
+    ]
+  }
+}

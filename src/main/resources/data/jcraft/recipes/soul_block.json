@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SSS",
+    "SSS",
+    "SSS"
+  ],
+  "key": {
+    "S": {
+      "item": "jcraft:sinners_soul"
+    }
+  },
+  "result": {
+    "item": "jcraft:soul_block"
+  }
+}

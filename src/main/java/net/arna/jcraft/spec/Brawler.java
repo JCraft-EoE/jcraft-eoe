@@ -1,0 +1,53 @@
+package net.arna.jcraft.spec;
+
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.effects.ModStatusRegister;
+import net.arna.jcraft.registry.ModSoundRegister;
+import net.arna.jcraft.util.Attack;
+import net.arna.jcraft.util.AttackType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.server.world.ServerWorld;
+
+import java.util.List;
+
+public class Brawler extends JCraftSpec {
+    public static Attack heavy = new Attack(17, 1f, 21, 10, 1.5, 6f, 0.8f, AttackType.BOX, 0.75f, 0, 0, ModSoundRegister.IMPACT_2).setAnimation("br.upct").setHitspark(2).setArmor(true);
+    public static Attack low = new Attack(20, 1f, 18, 11, 1.5, 5f, 0.6f, AttackType.BOX, 0.80f, 1, 0, ModSoundRegister.IMPACT_2).setAnimation("br.low");
+    public static Attack combo = new Attack(22, 1f, 26, 0, 1.5, 4f, 0.6f, AttackType.MULTIHIT, 0.75f, -0.1f, List.of(5, 10, 19), ModSoundRegister.IMPACT_2).setAnimation("br.3hit");
+    public static Attack gut = new Attack(20, 1f, 18, 11, 1.5, 6f, 0.8f, AttackType.BOX, 0.80f, 0, 0, ModSoundRegister.IMPACT_2).setAnimation("br.gut").setHitspark(2);
+
+    @Override
+    public void InitHeavyAttack(ServerWorld serverWorld) {
+        if (!CanAttack()) { return; }
+        HandleAttack(serverWorld, heavy, JCraft.heavyCD);
+    }
+
+    @Override
+    public void InitBarrage(ServerWorld serverWorld) {
+        if (!CanAttack()) { return; }
+        HandleAttack(serverWorld, combo, JCraft.barrageCD);
+    }
+
+    @Override
+    public void InitSpecial1(ServerWorld serverWorld) {
+        if (!CanAttack()) { return; }
+        HandleAttack(serverWorld, gut, JCraft.s1CD);
+    }
+
+    @Override
+    public void InitSpecial2(ServerWorld serverWorld) {
+        if (!CanAttack()) { return; }
+        HandleAttack(serverWorld, low, JCraft.s2CD);
+    }
+
+    @Override
+    public void SpecialAttack(Attack attack, List<LivingEntity> hurt) {
+        if (attack == low) {
+            for (LivingEntity ent:
+                 hurt) {
+                ent.addStatusEffect(new StatusEffectInstance(ModStatusRegister.Knockdown, 25, 0, true, true));
+            }
+        }
+    }
+}

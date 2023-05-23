@@ -1,0 +1,48 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.arna.jcraft.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "ModEntityDataSaver",
+
+    "JCraftItemMixin",
+    "JCraftItemUsageMixin",
+    "JCraftLivingEntityMixin",
+    "JCraftEntityMixin",
+    "JCraftPlayerEntityMixin",
+    "JCraftMobEntityMixin",
+    "JCraftServerWorldMixin",
+    "JCraftTimestopBlockMixin",
+    "JCraftTimestopBlockEntityMixin",
+
+    "LivingEntityInvoker",
+    "ParticleAccessor"
+  ],
+  "client": [
+    "JCraftGameRendererMixin",
+
+    "JCraftItemMixin",
+    "JCraftItemUsageMixin",
+    "JCraftLivingEntityMixin",
+    "JCraftEntityMixin",
+    "JCraftClientWorldMixin",
+    "JCraftClientPlayerEntityMixin",
+
+    "JCraftHeldItemFeatureRendererMixin",
+    "JCraftArmorFeatureRendererMixin",
+    "JCraftWorldRendererMixin",
+
+    "JCraftCameraMixin",
+    "CameraInvoker",
+
+    "JCraftBipedEntityModelMixin",
+
+    "JCraftParticleManagerMixin",
+    "ParticleAccessor",
+    "RenderLayerAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

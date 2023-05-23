@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "jcraft:block/soul_block" }
+  }
+}

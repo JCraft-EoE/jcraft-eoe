@@ -1,0 +1,26 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.bubble.idle": {
+			"loop": true,
+			"animation_length": 1.56,
+			"bones": {
+				"bubble": {
+					"scale": {
+						"0.0": {
+							"vector": [1, 1, 1]
+						},
+						"0.76": {
+							"vector": [1.1, 1.1, 1.1],
+							"easing": "easeInOutQuad"
+						},
+						"1.56": {
+							"vector": [1, 1, 1],
+							"easing": "easeInOutQuad"
+						}
+					}
+				}
+			}
+		}
+	}
+}

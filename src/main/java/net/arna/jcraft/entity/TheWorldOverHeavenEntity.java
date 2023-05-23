@@ -1,0 +1,445 @@
+package net.arna.jcraft.entity;
+
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.registry.ModSoundRegister;
+import net.arna.jcraft.util.*;
+import net.minecraft.command.argument.EntityAnchorArgumentType;
+import net.minecraft.entity.*;
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.projectile.PersistentProjectileEntity;
+import net.minecraft.entity.projectile.ProjectileUtil;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
+import net.minecraft.world.World;
+import software.bernie.geckolib3.core.IAnimatable;
+import software.bernie.geckolib3.core.IAnimationTickable;
+import software.bernie.geckolib3.core.PlayState;
+import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import software.bernie.geckolib3.core.controller.AnimationController;
+import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
+import software.bernie.geckolib3.core.manager.AnimationData;
+import software.bernie.geckolib3.core.manager.AnimationFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable, IAnimationTickable {
+    AnimationFactory animationFactory = new AnimationFactory(this);
+
+    public static Attack light = new Attack(2, 0.75f, 7, 4, 1.5, 6f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0, ModSoundRegister.IMPACT_1)
+            .setInfo("Punch", "quick combo starter");
+    public static Attack barrage = new Attack(17, 0.75f, 50, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 2, 0, 3, ModSoundRegister.IMPACT_1)
+            .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
+    public static Attack heavy = new Attack(19, 1f, 22, 10, 2, 0f, 0.0f, AttackType.BOX, 1, 0, 0, ModSoundRegister.IMPACT_5).setHitspark(2)
+            .setUB(false)
+            .setInfo("Singularity", "block bypass, low stun, medium windup");
+    public static Attack smite = new Attack(21, 1f, 20, 10, 0, 0f, 0.0f, AttackType.BOX, 2, 0, 0)
+            .setInfo("You won't run away!", "summons a heavy stunning lightning bolt at the user/in air summons one at aimed position, launches on hit");
+    public static Attack overwrite = new Attack(45, 1f, 58, 50, 2.5, 0f, 1.0f, AttackType.BOX, 1, 0, 0, ModSoundRegister.IMPACT_5).setHitspark(2).setLaunch()
+            .setUB(true)
+            .setInfo("Reality Overwrite",
+                    "launches with devastating aftereffects\n" +
+                    "    Effects:\n" +
+                    "    >On non-mobs: Weakness III (30s), Wither II (5s), Slowness I (30s)\n" +
+                    "    >On mobs: enslaved and attack anything the user last attacked\n" +
+                    "    >Universal: All defensive effects removed\n" +
+                    "    >Invulnerability removed\n" +
+                    "    >Inability to look at user for 10s");
+    public static Attack knives = new Attack(19, 0.75f, 22, 16, 1.5, 0f, 0.0f, AttackType.BOX).setRanged(true)
+            .setInfo("Divine Finisher", "summons and launches 8 knives that stun on hit/knives fire with a delay if used in air");
+    public static Attack airknives = new Attack(19, 0.75f, 22, 16, 1.5, 0f, 0.0f, AttackType.BOX).setRanged(true)
+            .setInfo("Aerial Divine Finisher", "you shouldn't be able to read this");
+
+    public static Attack timestop = new Attack(70, 40, 30, 5, AttackType.TIMESTOP)
+            .setInfo("Timestop", "5 seconds");
+
+    public Vec3d lightningPos;
+
+    public ArrayList<LivingEntity> overwriteEnts = new ArrayList<>();
+    public ArrayList<Integer> overwriteTimes = new ArrayList<>();
+
+    public TheWorldOverHeavenEntity(EntityType<? extends StandEntity> type, World worldIn) {
+        super(type, worldIn);
+        super.Initialize();
+        idleRotation = -45f;
+
+        pros = List.of(
+                "fast m1",
+                "longest timestop",
+                "unblockable heavy",
+                "timestop & timeskip"
+        );
+
+        cons = List.of(
+                "no knockdowns or knockbacks",
+                "unconfirmable overwrite",
+                "unsafe pressure"
+        );
+
+        description = "Mid Range DOMINATOR";
+
+        freespace =
+                "BNBs:\n" +
+                        "    the\n" +
+                        "    Knives>(Timeskip/M1>)Smite>M1>Heavy>M1>Barrage>Timestop\n" +
+                        "    dijon mustard\n" +
+                        "    jump.Smite>(Timeskip)>Knives>M1>Heavy>M1>Barrage>Timestop\n" +
+                        "    the superlord 2\n" +
+                        "    M1>Barrage>Timestop{ M1>M1>M1 delay.Heavy }>Knives>M1>Smite>M1";
+
+        moves = List.of(light, heavy, barrage, smite, timestop, knives, overwrite,
+                new Attack().setMobility(MobilityType.TELEPORT).setInfo("Timeskip", "14m range")
+        );
+    }
+
+    // Moveset
+    @Override
+    public void InitLightAttack() {
+        if (!this.CanAttack()) { return; }
+        HandleAttack(light, JCraft.standLightCD, 2);
+    }
+
+    @Override
+    public void InitBarrage() {
+        if (!this.CanAttack()) { return; }
+        if (HandleAttack(barrage, JCraft.standBarrageCD, 5)) {
+            this.playSound(ModSoundRegister.TW_BARRAGE,1, 1);
+        }
+    }
+
+    @Override
+    public void InitHeavyAttack() {
+        if (!this.CanAttack()) { return; }
+        if (HandleAttack(heavy, JCraft.standHeavyCD, 4)) {
+            this.playSound(ModSoundRegister.TWOH_HEAVY,1, 1);
+        }
+    }
+
+    @Override
+    public void InitSpecial1() {
+        if (!this.CanAttack() ) { return; }
+        if (HandleAttack(smite, JCraft.standS1CD, 6)) {
+            LivingEntity user = this.getUser();
+            if (user.isOnGround()) {
+                this.lightningPos = user.getPos();
+            } else {
+                Vec3d eP = user.getEyePos();
+                Vec3d rangeMod = user.getRotationVector().multiply(24);
+                EntityHitResult eHit = ProjectileUtil.raycast(user, eP, eP.add(rangeMod),
+                        user.getBoundingBox().expand(24),
+                        EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR,
+                        576 // Squared
+                );
+
+                if (eHit != null) {
+                    this.lightningPos = eHit.getPos();
+                } else {
+                    this.lightningPos = world.raycast(
+                            new RaycastContext(eP, eP.add(rangeMod), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user)
+                    ).getPos();
+                }
+            }
+
+            AreaEffectCloudEntity effectCloud = new AreaEffectCloudEntity(this.world, lightningPos.x, lightningPos.y, lightningPos.z);
+            effectCloud.setOwner(user);
+            effectCloud.setRadius(3);
+            effectCloud.setWaitTime(10);
+            effectCloud.setRadiusGrowth(-0.5f);
+            //effectCloud.setRadiusOnUse(0);
+
+            this.world.spawnEntity(effectCloud);
+
+            this.playSound(ModSoundRegister.TWOH_SMITE, 1, 1);
+        }
+    }
+
+    @Override
+    public void InitSpecial3() {
+        if (!this.CanAttack() || this.getTSTime() > 0) { return; }
+        if (HandleAttack(overwrite, JCraft.standS3CD, 8)) {
+            this.playSound(ModSoundRegister.TWOH_OVERWRITE,1, 1);
+        }
+    }
+
+    @Override
+    public void InitSpecial2() {
+        CanAttackData cad = this.CanAttackWithData();
+        if (!cad.canAttack)
+            return;
+        if (cad.user.isOnGround() && HandleAttack(knives, JCraft.standS2CD, 9)) {
+            this.playSound(ModSoundRegister.TWOH_KNIFETHROW, 1, 1);
+        } else if (HandleAttack(airknives, JCraft.standS2CD, 9)) {
+            this.playSound(ModSoundRegister.TWOH_AIRKNIVES, 1, 1);
+        }
+    }
+
+    @Override
+    public void InitUlt() {
+        if (!this.CanAttack() ) { return; }
+        if (HandleAttack(timestop, JCraft.standUltCD, 7)) {
+            this.playSound(ModSoundRegister.TWOH_TS,1, 1);
+        }
+    }
+
+    @Override
+    public void InitMiddleClick() {
+        CanAttackData data = this.CanAttackWithData();
+        if (!data.canAttack)
+            return;
+        if (this.getTSTime() > 0)
+            return;
+        IEntityDataSaver user = (IEntityDataSaver) data.user;
+        if (user.getPersistentData().getInt(JCraft.standMMBCD) > 0)
+            return;
+        Vec3d eP = data.user.getEyePos();
+
+        HitResult hitResult = this.world.raycast(new RaycastContext(eP, eP.add(data.user.getRotationVector().multiply(14)), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, data.user));
+        Vec3d pos = hitResult.getPos();
+
+        data.user.teleport(pos.x, pos.y, pos.z);
+
+        user.getPersistentData().putInt(JCraft.standMMBCD, 360); // 18 second timeskip cooldown
+
+        if (user.getPersistentData().getInt(JCraft.standUltCD) < 60) {
+            user.getPersistentData().putInt(JCraft.standUltCD, 60); // 3 second timestop cooldown
+        }
+
+        this.world.playSound(null, pos.x, pos.y, pos.z, ModSoundRegister.TIME_SKIP, SoundCategory.PLAYERS, 1f, 1f);
+    }
+
+    @Override
+    public void SpecialAttack(Attack attack, List<LivingEntity> entities) {
+        LivingEntity user = this.getUser();
+        DamageSource playerSource = DamageSource.mob(user);
+
+        if (attack == heavy) { // TWOH's heavy is a mini-overwrite that ignores block
+            for (LivingEntity ent : entities) {
+                Stun(ent, 20, 1);
+
+                float damage = 10f;
+                ent.damage(playerSource, 0.001f);
+
+                // All stands ignore 10% of armor & armor toughness
+                damage = DamageUtil.getDamageLeft(damage, (float) ent.getArmor() * 0.9f, (float) ent.getAttributeValue(EntityAttributes.GENERIC_ARMOR_TOUGHNESS) * 0.9f);
+
+                // Apply absorption
+                float f = damage;
+                damage = Math.max(damage - ent.getAbsorptionAmount(), 0.0F);
+                ent.setAbsorptionAmount(ent.getAbsorptionAmount() - (f - damage));
+
+                if (damage != 0.0F) {
+                    float h = ent.getHealth();
+                    if ((h - damage) <= 0) {
+                        ent.kill();
+                    } else {
+                        ent.setHealth(h - damage);
+                        ent.getDamageTracker().onDamage(playerSource, h, damage);
+                    }
+                }
+            }
+        } else if (attack == smite) {
+            Vec3d lP = this.lightningPos;
+
+            LightningEntity lightning = new LightningEntity(EntityType.LIGHTNING_BOLT, this.world);
+            lightning.setCosmetic(true);
+            lightning.setPosition(lP);
+
+            List<Entity> hit = (List<Entity>) JCraftUtils.GenerateHitbox(world, lP, 3, Entity.class, List.of(this, user));
+
+            for (Entity ent : hit) {
+                if (ent instanceof LivingEntity living) {
+                    living.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 5, 9, true, false));
+                    DamageLogic(world, living, Vec3d.ZERO, 40, 1, false, 9, false, playerSource, user);
+                }
+
+                ent.onStruckByLightning((ServerWorld) this.world, lightning);
+            }
+
+            this.world.spawnEntity(lightning);
+        } else if (attack == overwrite) {
+            for (LivingEntity ent : entities) {
+                Stun(ent, 40, 3);
+
+                ent.setInvulnerable(false);
+
+                ent.removeStatusEffect(StatusEffects.RESISTANCE);
+                ent.removeStatusEffect(StatusEffects.REGENERATION);
+                ent.removeStatusEffect(StatusEffects.HEALTH_BOOST);
+                ent.removeStatusEffect(StatusEffects.ABSORPTION);
+
+                if (ent instanceof MobEntity) {
+                    IEntityDataSaver entityDataSaver = (IEntityDataSaver) ent;
+                    entityDataSaver.getPersistentData().putUuid("SlavedTo", user.getUuid());
+                    overwriteTimes.add(1048576);
+
+                } else {
+                    ent.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 600, 2, false, true));
+                    ent.addStatusEffect(new StatusEffectInstance(StatusEffects.WITHER, 100, 1, false, true));
+                    ent.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 600, 0, false, true));
+                    overwriteTimes.add(200);
+                }
+
+                overwriteEnts.add(ent);
+            }
+        } else if (attack == knives) {
+            for (int i = 0; i < 8; i++) {
+                KnifeProjectile knife = new KnifeProjectile(world, user);
+                knife.setLightning(true);
+                knife.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
+                knife.setVelocity(user, user.getPitch(), user.getYaw(), 0.0F, 2F, 1F);
+                knife.setPosition(user.getPos().add(
+                        random.nextTriangular(0, 0.5),
+                        random.nextTriangular(1.5, 0.5),
+                        random.nextTriangular(0, 0.5)
+                ));
+                world.spawnEntity(knife);
+            }
+        } else if (attack == airknives) {
+            for (int i = 0; i < 8; i++) {
+                KnifeProjectile knife = new KnifeProjectile(world, user);
+                knife.setDelayedLightning(10 + i * 4);
+                knife.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
+                knife.setNoGravity(true);
+                knife.setVelocity(
+                        random.nextTriangular(0, 0.5),
+                        random.nextTriangular(0, 0.5),
+                        random.nextTriangular(0, 0.5)
+                );
+                knife.setPosition(getPos().add(
+                        random.nextTriangular(0, 0.5),
+                        random.nextTriangular(1.5, 0.5),
+                        random.nextTriangular(0, 0.5)
+                ));
+                world.spawnEntity(knife);
+            }
+        }
+    }
+
+    @Override
+    public void Desummon() {
+        if ( this.getTSTime() < 1 ) {
+            super.Desummon();
+        }
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        if (hasUser()) {
+            LivingEntity user = this.getUser();
+            if (age == 1) {
+                this.playSound(ModSoundRegister.TWOH_SUMMON, 1f, 1f);
+                this.playSound(ModSoundRegister.TW_SUMMON, 1f, 1f);
+
+                List<LivingEntity> hit = this.world.getEntitiesByClass(LivingEntity.class, new Box(this.getPos().add(-64, -64, -64), this.getPos().add(64, 64, 64)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+                hit.remove(this);
+                hit.remove(user);
+
+                for (LivingEntity ent : hit) {
+                    NbtCompound entityData = ((IEntityDataSaver) ent).getPersistentData();
+                    if (entityData.contains("SlavedTo")) {
+                        if (entityData.getUuid("SlavedTo").equals(user.getUuid())) {
+                            overwriteEnts.add(ent);
+                            overwriteTimes.add(1048576); // 2 to the whatever
+                        }
+                    }
+                }
+            }
+
+            if (this.world.isClient()) {
+                this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
+            } else {
+                for (int i = 0; i < overwriteTimes.size(); i++) {
+                    int time = overwriteTimes.get(i);
+                    overwriteTimes.set(i, time - 1);
+
+                    if (time < 1) {
+                        overwriteTimes.remove(i);
+                        overwriteEnts.remove(i);
+                    } else {
+                        LivingEntity entity = overwriteEnts.get(i);
+
+                        // Targetting and movement for mobs
+                        if (entity instanceof MobEntity mob) {
+                            LivingEntity victim = user.getAttacking();
+                            if (victim == null) {
+                                LivingEntity adv = user.getPrimeAdversary();
+                                if (adv != null && adv.isAlive()) { mob.setTarget(adv); }
+                            } else if (victim.isAlive()) { mob.setTarget(victim); }
+
+                            if (mob.distanceTo(this) > 16) { mob.getNavigation().startMovingTo(this, 1); }
+                        }
+
+                        // Inability to look at master
+                        double range = 1024.0;
+
+                        Box box = entity
+                                .getBoundingBox()
+                                .stretch(entity.getRotationVec(1.0F).multiply(range))
+                                .expand(1.0D);
+                        EntityHitResult hitResult = ProjectileUtil.raycast(
+                                entity,
+                                entity.getEyePos(),
+                                entity.getEyePos().add(entity.getRotationVector().multiply(range)),
+                                box,
+                                EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR,
+                                range
+                        );
+
+                        if (hitResult != null) {
+                            Entity lookEntity = hitResult.getEntity();
+                            if (lookEntity == user || lookEntity == this) {
+                                entity.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES,
+                                        this.getPos().add(
+                                                random.nextInt()*10,
+                                                random.nextInt()*10,
+                                                random.nextInt()*10
+                                        )
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Animation code
+    @Override
+    public void registerControllers(AnimationData animationData) { animationData.addAnimationController(new AnimationController(this, "controller", 0, this::predicate)); }
+    @Override
+    public AnimationFactory getFactory() { return this.animationFactory; }
+    @Override
+    public int tickTimer() { return age; }
+    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+        AnimationController controller = event.getController();
+        AnimationBuilder builder = new AnimationBuilder();
+        if (this.getSameState()) { controller.markNeedsReload(); }
+        switch (this.getState()) {
+            default -> controller.setAnimation(builder.loop("animation.twoh.idle"));
+            case 2 -> controller.setAnimation(builder.playAndHold("animation.twoh.light"));
+            case 3 -> controller.setAnimation(builder.loop("animation.twoh.block"));
+            case 4 -> controller.setAnimation(builder.playAndHold("animation.twoh.heavy"));
+            case 5 -> controller.setAnimation(builder.loop("animation.twoh.barrage"));
+            case 6 -> controller.setAnimation(builder.playAndHold("animation.twoh.smite"));
+            case 7 -> controller.setAnimation(builder.playAndHold("animation.twoh.timestop"));
+            case 8 -> controller.setAnimation(builder.playAndHold("animation.twoh.overwrite"));
+            case 9 -> controller.setAnimation(builder.playAndHold("animation.twoh.throw"));
+            case 10 -> controller.setAnimation(builder.playAndHold("animation.twoh.roundhouse"));
+        }
+        return PlayState.CONTINUE;
+    }
+}
