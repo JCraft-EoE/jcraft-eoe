@@ -1,8 +1,8 @@
 package net.arna.jcraft.client.model.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.entity.WhitesnakeEntity;
-import net.arna.jcraft.util.JCraftUtils;
+import net.arna.jcraft.common.entity.WhitesnakeEntity;
+import net.arna.jcraft.common.util.JCraftUtils;
 import net.minecraft.util.Identifier;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.model.AnimatedTickingGeoModel;

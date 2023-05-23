@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.renderer.entity;
 
 import net.arna.jcraft.client.model.entity.D4CModel;
-import net.arna.jcraft.entity.D4CEntity;
+import net.arna.jcraft.common.entity.D4CEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
@@ -22,7 +22,7 @@ import software.bernie.geckolib3.geo.render.built.GeoModel;
 import software.bernie.geckolib3.renderers.geo.ExtendedGeoEntityRenderer;
 
 public class D4CRenderer extends ExtendedGeoEntityRenderer<D4CEntity> {
-    
+
     protected ItemStack mainHandItem;
     protected ItemStack offHandItem;
 
@@ -51,7 +51,9 @@ public class D4CRenderer extends ExtendedGeoEntityRenderer<D4CEntity> {
         float a = 1f;
         MinecraftClient mcClient = MinecraftClient.getInstance();
         if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null) {
-            if (mcClient.player.getFirstPassenger() == animatable) { a = animatable.getAlpha(); }
+            if (mcClient.player.getFirstPassenger() == animatable) {
+                a = animatable.getAlpha();
+            }
         }
         float gR = 1.0f - a;
         super.render(model, animatable, partialTicks, type, matrixStackIn, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green - gR, blue, a);
@@ -71,8 +73,10 @@ public class D4CRenderer extends ExtendedGeoEntityRenderer<D4CEntity> {
     @Override
     protected ItemStack getHeldItemForBone(String boneName, D4CEntity currentEntity) {
         return switch (boneName) {
-            case DefaultBipedBoneIdents.LEFT_HAND_BONE_IDENT -> currentEntity.isLeftHanded() ? mainHandItem : offHandItem;
-            case DefaultBipedBoneIdents.RIGHT_HAND_BONE_IDENT -> currentEntity.isLeftHanded() ? offHandItem : mainHandItem;
+            case DefaultBipedBoneIdents.LEFT_HAND_BONE_IDENT ->
+                    currentEntity.isLeftHanded() ? mainHandItem : offHandItem;
+            case DefaultBipedBoneIdents.RIGHT_HAND_BONE_IDENT ->
+                    currentEntity.isLeftHanded() ? offHandItem : mainHandItem;
             default -> null;
         };
     }
@@ -80,7 +84,8 @@ public class D4CRenderer extends ExtendedGeoEntityRenderer<D4CEntity> {
     @Override
     protected ModelTransformation.Mode getCameraTransformForItemAtBone(ItemStack boneItem, String boneName) {
         return switch (boneName) {
-            case DefaultBipedBoneIdents.LEFT_HAND_BONE_IDENT, DefaultBipedBoneIdents.RIGHT_HAND_BONE_IDENT -> ModelTransformation.Mode.THIRD_PERSON_RIGHT_HAND; // Do Defaults
+            case DefaultBipedBoneIdents.LEFT_HAND_BONE_IDENT, DefaultBipedBoneIdents.RIGHT_HAND_BONE_IDENT ->
+                    ModelTransformation.Mode.THIRD_PERSON_RIGHT_HAND; // Do Defaults
             default -> ModelTransformation.Mode.NONE;
         };
     }
@@ -94,16 +99,26 @@ public class D4CRenderer extends ExtendedGeoEntityRenderer<D4CEntity> {
     protected boolean isArmorBone(GeoBone bone) {
         return false;
     }
+
     @Override
     protected Identifier getTextureForBone(String boneName, D4CEntity currentEntity) {
         return null;
     }
+
     @Override
-    protected BlockState getHeldBlockForBone(String boneName, D4CEntity currentEntity) { return null; }
+    protected BlockState getHeldBlockForBone(String boneName, D4CEntity currentEntity) {
+        return null;
+    }
+
     @Override
-    protected void postRenderItem(MatrixStack PoseStack, ItemStack item, String boneName, D4CEntity currentEntity, IBone bone) { }
+    protected void postRenderItem(MatrixStack PoseStack, ItemStack item, String boneName, D4CEntity currentEntity, IBone bone) {
+    }
+
     @Override
-    protected void preRenderBlock(MatrixStack PoseStack, BlockState block, String boneName, D4CEntity currentEntity) { }
+    protected void preRenderBlock(MatrixStack PoseStack, BlockState block, String boneName, D4CEntity currentEntity) {
+    }
+
     @Override
-    protected void postRenderBlock(MatrixStack PoseStack, BlockState block, String boneName, D4CEntity currentEntity) { }
+    protected void postRenderBlock(MatrixStack PoseStack, BlockState block, String boneName, D4CEntity currentEntity) {
+    }
 }

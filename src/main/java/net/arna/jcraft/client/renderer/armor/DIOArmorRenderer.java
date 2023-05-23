@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.renderer.armor;
 
 import net.arna.jcraft.client.model.armor.DIOArmorModel;
-import net.arna.jcraft.item.custom.DIOArmorItem;
+import net.arna.jcraft.common.item.DIOArmorItem;
 import software.bernie.geckolib3.renderers.geo.GeoArmorRenderer;
 
 public class DIOArmorRenderer extends GeoArmorRenderer<DIOArmorItem> {

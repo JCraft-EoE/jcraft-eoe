@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.renderer.entity;
 
 import net.arna.jcraft.client.model.entity.CMoonModel;
-import net.arna.jcraft.entity.CMoonEntity;
+import net.arna.jcraft.common.entity.CMoonEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -43,7 +43,9 @@ public class CMoonRenderer extends GeoEntityRenderer<CMoonEntity> {
         if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null) {
             if (mcClient.player.getFirstPassenger() == animatable) {
                 a = animatable.getAlpha();
-                if (a == 0f) { return; }
+                if (a == 0f) {
+                    return;
+                }
             }
         }
 

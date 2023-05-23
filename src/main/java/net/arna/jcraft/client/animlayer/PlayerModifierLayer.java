@@ -8,7 +8,7 @@ import dev.kosmx.playerAnim.api.layered.ModifierLayer;
 import dev.kosmx.playerAnim.core.util.Vec3f;
 import org.jetbrains.annotations.NotNull;
 
-public class PlayerModifierLayer<T extends IAnimation> extends ModifierLayer<T> implements IAnimation{
+public class PlayerModifierLayer<T extends IAnimation> extends ModifierLayer<T> implements IAnimation {
     @Override
     public boolean isActive() {
         return super.isActive();
@@ -30,6 +30,7 @@ public class PlayerModifierLayer<T extends IAnimation> extends ModifierLayer<T> 
     }
 
     private static final FirstPersonConfiguration config = new FirstPersonConfiguration(true, true, true, true);
+
     @Override
     public @NotNull FirstPersonConfiguration getFirstPersonConfiguration(float tickDelta) {
         return config;

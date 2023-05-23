@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.model.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.entity.TheFoolEntity;
+import net.arna.jcraft.common.entity.TheFoolEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
@@ -40,17 +40,19 @@ public class TheFoolModel extends AnimatedTickingGeoModel<TheFoolEntity> {
                 IBone torso = this.getAnimationProcessor().getBone("torso");
 
                 Vec3d userVel = user.getVelocity();
-                overVel = (float)userVel.horizontalLength() - 0.05f;
-                if (userVel.normalize().add(entity.getRotationVector()).horizontalLengthSquared() < userVel.normalize().horizontalLengthSquared()) { velInfluence *= -1; }
+                overVel = (float) userVel.horizontalLength() - 0.05f;
+                if (userVel.normalize().add(entity.getRotationVector()).horizontalLengthSquared() < userVel.normalize().horizontalLengthSquared()) {
+                    velInfluence *= -1;
+                }
                 if (torso != null) {
-                    torso.setRotationX( (-overVel * velInfluence) * 3.1415f / 180f );
+                    torso.setRotationX((-overVel * velInfluence) * 3.1415f / 180f);
                 }
             }
 
             IBone head = this.getAnimationProcessor().getBone("head");
 
             if (head != null) {
-                head.setRotationX( (-user.getPitch() + overVel * velInfluence) * 3.1415f / 180f );
+                head.setRotationX((-user.getPitch() + overVel * velInfluence) * 3.1415f / 180f);
             }
         }
     }

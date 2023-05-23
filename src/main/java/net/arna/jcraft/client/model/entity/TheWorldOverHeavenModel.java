@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.model.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.entity.TheWorldOverHeavenEntity;
+import net.arna.jcraft.common.entity.TheWorldOverHeavenEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
@@ -41,10 +41,12 @@ public class TheWorldOverHeavenModel extends AnimatedTickingGeoModel<TheWorldOve
                 IBone torso = this.getAnimationProcessor().getBone("torso");
 
                 Vec3d userVel = user.getVelocity();
-                overVel = (float)userVel.horizontalLength() - 0.05f;
-                if (userVel.normalize().add(entity.getRotationVector()).horizontalLengthSquared() < userVel.normalize().horizontalLengthSquared()) { velInfluence *= -1; }
+                overVel = (float) userVel.horizontalLength() - 0.05f;
+                if (userVel.normalize().add(entity.getRotationVector()).horizontalLengthSquared() < userVel.normalize().horizontalLengthSquared()) {
+                    velInfluence *= -1;
+                }
                 if (torso != null) {
-                    torso.setRotationX( (180f + overVel * velInfluence) * 3.1415f / 180f );
+                    torso.setRotationX((180f + overVel * velInfluence) * 3.1415f / 180f);
                 }
             }
 
@@ -52,9 +54,13 @@ public class TheWorldOverHeavenModel extends AnimatedTickingGeoModel<TheWorldOve
 
             if (head != null) {
                 float pOffset = 0f;
-                if (entity.getState() == 1) { pOffset += 7.5f; }
-                if (entity.getState() == 4) { pOffset -= 25f; }
-                head.setRotationX( (user.getPitch() + pOffset - overVel * velInfluence) * 3.1415f / 180f);
+                if (entity.getState() == 1) {
+                    pOffset += 7.5f;
+                }
+                if (entity.getState() == 4) {
+                    pOffset -= 25f;
+                }
+                head.setRotationX((user.getPitch() + pOffset - overVel * velInfluence) * 3.1415f / 180f);
             }
         }
     }

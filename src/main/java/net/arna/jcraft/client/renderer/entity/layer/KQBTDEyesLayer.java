@@ -16,7 +16,9 @@ public class KQBTDEyesLayer extends GeoLayerRenderer {
     private static final Identifier MODEL = new Identifier(JCraft.MOD_ID, "geo/kqbtd.geo.json");
 
     @SuppressWarnings("unchecked")
-    public KQBTDEyesLayer(IGeoRenderer<?> entityRendererIn) { super(entityRendererIn); }
+    public KQBTDEyesLayer(IGeoRenderer<?> entityRendererIn) {
+        super(entityRendererIn);
+    }
 
     @SuppressWarnings("unchecked")
     @Override

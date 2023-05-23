@@ -1,8 +1,7 @@
 package net.arna.jcraft.client.renderer.entity;
 
 import net.arna.jcraft.client.model.entity.KingCrimsonModel;
-import net.arna.jcraft.client.renderer.entity.layer.KCTELayer;
-import net.arna.jcraft.entity.KingCrimsonEntity;
+import net.arna.jcraft.common.entity.KingCrimsonEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -10,10 +9,9 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.geo.render.built.GeoModel;
 import software.bernie.geckolib3.renderers.geo.GeoEntityRenderer;
-
-import org.jetbrains.annotations.Nullable;
 
 public class KingCrimsonRenderer extends GeoEntityRenderer<KingCrimsonEntity> {
 
@@ -48,8 +46,11 @@ public class KingCrimsonRenderer extends GeoEntityRenderer<KingCrimsonEntity> {
 
         MinecraftClient mcClient = MinecraftClient.getInstance();
         if (mcClient.player != null) {
-            if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player.getFirstPassenger() == animatable) { a = animatable.getAlpha(); }
-            else if (a == 0) { return; }
+            if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player.getFirstPassenger() == animatable) {
+                a = animatable.getAlpha();
+            } else if (a == 0) {
+                return;
+            }
         }
 
         float gbR = 1.0f - a;

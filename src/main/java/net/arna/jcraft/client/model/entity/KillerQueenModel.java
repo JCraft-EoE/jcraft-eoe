@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.model.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.entity.KillerQueenEntity;
+import net.arna.jcraft.common.entity.KillerQueenEntity;
 import net.minecraft.util.Identifier;
 import software.bernie.geckolib3.core.processor.IBone;
 import software.bernie.geckolib3.model.AnimatedTickingGeoModel;
@@ -32,7 +32,9 @@ public class KillerQueenModel extends AnimatedTickingGeoModel<KillerQueenEntity>
         IBone head = this.getAnimationProcessor().getBone("head");
         if (head != null && entity.hasUser()) {
             float pitch = entity.getUser().getPitch();
-            if (entity.getState() == 1) { pitch += 30; }
+            if (entity.getState() == 1) {
+                pitch += 30;
+            }
             head.setRotationX(pitch * 3.1415f / 180f);
         }
     }

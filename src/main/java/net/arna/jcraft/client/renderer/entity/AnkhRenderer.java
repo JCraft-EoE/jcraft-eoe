@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.renderer.entity;
 
 import net.arna.jcraft.client.model.entity.AnkhModel;
-import net.arna.jcraft.entity.AnkhProjectile;
+import net.arna.jcraft.common.entity.AnkhProjectile;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -17,7 +17,9 @@ public class AnkhRenderer extends GeoProjectilesRenderer<AnkhProjectile> {
         super(renderManagerIn, new AnkhModel());
     }
 
-    protected int getBlockLight(AnkhProjectile entityIn, BlockPos partialTicks) { return 15; }
+    protected int getBlockLight(AnkhProjectile entityIn, BlockPos partialTicks) {
+        return 15;
+    }
 
     @Override
     public RenderLayer getRenderType(AnkhProjectile animatable, float partialTicks, MatrixStack stack,

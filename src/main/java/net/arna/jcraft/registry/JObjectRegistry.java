@@ -1,0 +1,98 @@
+package net.arna.jcraft.registry;
+
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.block.SoulBlock;
+import net.arna.jcraft.common.item.*;
+import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.minecraft.block.Block;
+import net.minecraft.block.Material;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.ArmorMaterials;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.Rarity;
+import net.minecraft.util.registry.Registry;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public interface JObjectRegistry {
+    Map<Block, Identifier> BLOCKS = new LinkedHashMap<>();
+    Map<Item, Identifier> ITEMS = new LinkedHashMap<>();
+
+
+    Item STANDARROW = register("stand_arrow", new StandArrowItem(settings().rarity(Rarity.RARE).fireproof()));
+
+    Item STANDDISC = register("stand_disc", new StandDiscItem(settings().rarity(Rarity.RARE).fireproof().maxCount(1)));
+
+    Item FVREVOLVER = register("fv_revolver", new FVRevolverItem(settings().rarity(Rarity.UNCOMMON).maxDamage(1200)));
+
+    Item KQCOIN = register("kq_coin", new KQCoinItem(settings()));
+
+    Item GREENBABY = register("green_baby", new GreenBabyItem(settings().rarity(Rarity.RARE)));
+
+    Item DIOSDIARY = register("dios_diary", new DIOsDiaryItem(settings().rarity(Rarity.EPIC).fireproof()));
+
+    Item SINNERSSOUL = register("sinners_soul", new SinnersSoulItem(settings()));
+
+    Item KNIFE = register("knife", new KnifeItem(settings()));
+
+    Item KNIFEBUNDLE = register("knife_bundle", new KnifeBundleItem(settings().maxCount(1)));
+
+    Item ANUBIS = register("anubis", new AnubisItem(settings().rarity(Rarity.RARE).maxCount(1)));
+
+    Item ANUBISSHEATHED = register("anubis_sheathed", new SheathedAnubisItem(settings().rarity(Rarity.RARE).maxCount(1)));
+
+    Item KNUCKLEDUSTER = register("knuckleduster", new KnuckledusterItem(settings()));
+
+    Item BOXINGGLOVES = register("boxing_gloves", new BoxingGlovesItem(settings().maxCount(1)));
+
+    Item REQUIEMRUBY = register("requiem_ruby", new Item(settings().rarity(Rarity.EPIC).fireproof()));
+
+    Item REQUIEMARROW = register("requiem_arrow", new RequiemArrowItem(settings().rarity(Rarity.EPIC).fireproof()));
+
+    Item LIVINGARROW = register("living_arrow", new LivingArrowItem(settings().rarity(Rarity.RARE).fireproof()));
+
+    Item DIOHEADBAND = register("dio_headband", new DIOArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.HEAD, settings()));
+
+    Item DIOJACKET = register("dio_jacket", new DIOArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.CHEST, settings()));
+
+    Item DIOPANTS = register("dio_pants", new DIOArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.LEGS, settings()));
+
+    Item DIOBOOTS = register("dio_boots", new DIOArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.FEET, settings()));
+
+    Item JOTAROCAP = register("jotaro_cap", new JotaroArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.HEAD, settings()));
+
+    Item JOTAROJACKET = register("jotaro_jacket", new JotaroArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.CHEST, settings()));
+
+    Item JOTAROPANTS = register("jotaro_pants", new JotaroArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.LEGS, settings()));
+
+    Item JOTAROBOOTS = register("jotaro_boots", new JotaroArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.FEET, settings()));
+
+
+    //Block
+    Block SOUL_BLOCK = register("soul_block", new SoulBlock(FabricBlockSettings.of(Material.DENSE_ICE).strength(4.0f)), settings(), true);
+
+    static Item.Settings settings() {
+        return new Item.Settings().group(JCraft.JCRAFT_GROUP);
+    }
+
+    static <T extends Item> T register(String name, T item) {
+        ITEMS.put(item, JCraft.id(name));
+        return item;
+    }
+
+    static <T extends Block> T register(String name, T block, Item.Settings settings, boolean createItem) {
+        BLOCKS.put(block, JCraft.id(name));
+        if (createItem) {
+            ITEMS.put(new BlockItem(block, settings), BLOCKS.get(block));
+        }
+        return block;
+    }
+
+    static void init() {
+        BLOCKS.keySet().forEach(block -> Registry.register(Registry.BLOCK, BLOCKS.get(block), block));
+        ITEMS.keySet().forEach(item -> Registry.register(Registry.ITEM, ITEMS.get(item), item));
+    }
+}

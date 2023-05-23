@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.model.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.entity.KnifeProjectile;
+import net.arna.jcraft.common.entity.KnifeProjectile;
 import net.minecraft.util.Identifier;
 import software.bernie.geckolib3.model.AnimatedGeoModel;
 

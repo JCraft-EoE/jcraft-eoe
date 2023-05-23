@@ -1,10 +1,8 @@
 package net.arna.jcraft.client.model.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.entity.KQBTDEntity;
-import net.arna.jcraft.entity.SilverChariotEntity;
-import net.arna.jcraft.util.JCraftUtils;
-import net.minecraft.entity.LivingEntity;
+import net.arna.jcraft.common.entity.KQBTDEntity;
+import net.arna.jcraft.common.util.JCraftUtils;
 import net.minecraft.util.Identifier;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.model.AnimatedTickingGeoModel;

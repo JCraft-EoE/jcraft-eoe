@@ -1,0 +1,155 @@
+package net.arna.jcraft.registry;
+
+import net.arna.jcraft.JCraft;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
+
+public interface JSoundRegister {
+
+    static SoundEvent registerSound(String id) {
+        JCraft.LOGGER.info("Registering sound: " + id);
+        SoundEvent event = new SoundEvent(new Identifier(JCraft.MOD_ID, id));
+        Registry.register(Registry.SOUND_EVENT, id, event);
+        return event;
+    }
+
+    // Generic
+    SoundEvent STAND_SUMMON = registerSound("standsummon");
+    SoundEvent STAND_DESUMMON = registerSound("desummon");
+    SoundEvent STAND_BLOCK = registerSound("standblock");
+    SoundEvent COMBO_BREAK = registerSound("combobreak");
+    SoundEvent COOLDOWN_CANCEL = registerSound("cooldowncancel");
+    SoundEvent IMPACT_1 = registerSound("impact1");
+    SoundEvent IMPACT_2 = registerSound("impact2");
+    SoundEvent IMPACT_3 = registerSound("impact3");
+    SoundEvent IMPACT_4 = registerSound("impact4");
+    SoundEvent IMPACT_5 = registerSound("impact5");
+    SoundEvent TIME_SKIP = registerSound("timeskip");
+
+    // Star Platinum
+    SoundEvent STAR_PLATINUM_BARRAGE = registerSound("spbarrage");
+    SoundEvent STAR_PLATINUM_ADVANCING_BARRAGE = registerSound("spadvbarrage");
+    SoundEvent STAR_PLATINUM_THE_WORLD = registerSound("sptw");
+    SoundEvent STAR_PLATINUM_KICK = registerSound("spkick");
+    SoundEvent STAR_BREAKER = registerSound("starbreaker");
+    SoundEvent STAR_FINGER = registerSound("starfinger");
+
+    //King Crimson
+    SoundEvent KC_SUMMON = registerSound("kcsummon");
+    SoundEvent KC_DUAL_CHOP = registerSound("kcdualchop");
+    SoundEvent KC_DONUT = registerSound("kcdonut");
+    SoundEvent KC_BARRAGE = registerSound("kcbarrage");
+    SoundEvent KC_HEAVY = registerSound("kcheavy");
+    SoundEvent KC_HEAVY2 = registerSound("kcheavy2");
+    SoundEvent EYE_CHOP = registerSound("eyechop");
+    SoundEvent TE_TP = registerSound("tetp");
+    SoundEvent TIME_ERASE = registerSound("timeerase");
+    SoundEvent TIME_ERASE_EXIT = registerSound("kcteexit");
+
+    //The World
+    SoundEvent TW_SUMMON = registerSound("twsummon");
+    SoundEvent TW_BARRAGE = registerSound("twbarrage");
+    SoundEvent TW_TS = registerSound("twts");
+    SoundEvent TW_CHARGE = registerSound("twcharge");
+    SoundEvent TW_CHARGE_HIT = registerSound("twchargehit");
+    SoundEvent TW_DONUT = registerSound("twdonut");
+    SoundEvent TW_DONUT_HIT = registerSound("twdonuthit");
+    SoundEvent TW_KICK = registerSound("twkick");
+    SoundEvent TW_KICK_HIT = registerSound("twkickhit");
+    SoundEvent TW_COUNTER = registerSound("twcounter");
+    SoundEvent MUDA_DA = registerSound("mudada");
+
+    //Dirty Deeds Done Dirt Cheap
+    SoundEvent D4C_SUMMON = registerSound("d4csummon");
+    SoundEvent D4C_LIGHT = registerSound("d4clight");
+    SoundEvent D4C_HEAVY = registerSound("d4cheavy");
+    SoundEvent D4C_BARRAGE = registerSound("d4cbarrage");
+    SoundEvent D4C_DIMHOP = registerSound("d4cdimhop");
+    SoundEvent REVOLVER_FIRE = registerSound("revolverfire");
+    SoundEvent D4C_THROW = registerSound("d4cthrow");
+    SoundEvent D4C_COUNTER = registerSound("d4ccounter");
+
+    //Cream
+    SoundEvent CREAM_CONSUME = registerSound("creamconsume");
+    SoundEvent CREAM_CHARGE = registerSound("creamcharge");
+    SoundEvent CREAM_COMBO = registerSound("creamcombo");
+    SoundEvent CREAM_HEAVY = registerSound("creamheavy");
+    SoundEvent CREAM_GRAB = registerSound("creamgrab");
+    SoundEvent CREAM_SMASH = registerSound("creamsmash");
+    SoundEvent CREAM_ENTER = registerSound("creamenter");
+    SoundEvent CREAM_EXIT = registerSound("creamexit");
+
+    //Killer Queen
+    SoundEvent KQ_HEAVY = registerSound("kqheavy");
+    SoundEvent KQ_BARRAGE = registerSound("kqbarrage");
+    SoundEvent KQ_DETONATE = registerSound("kqdetonate");
+    SoundEvent KQ_UPPERCUT = registerSound("kquppercut");
+
+    //Killer Queen: Bites The Dust
+    SoundEvent KQBTD_ELBOW = registerSound("kqbtdelbow");
+    SoundEvent KQBTD_SUMMON = registerSound("kqbtdsummon");
+
+    //Whitesnake
+    SoundEvent WS_BARRAGE = registerSound("wsbarrage");
+    SoundEvent WS_LEGCRUSH = registerSound("wslegcrush");
+    SoundEvent WS_DONUT = registerSound("wsdonut");
+    SoundEvent WS_DISK = registerSound("wsdisk");
+    SoundEvent WS_GUN = registerSound("wsgun");
+
+    //Silver Chariot
+    SoundEvent SC_SUMMON = registerSound("scsummon");
+    SoundEvent SC_BARRAGE = registerSound("scbarrage");
+    SoundEvent SC_CHARGE = registerSound("sccharge");
+    SoundEvent SC_HEAVY = registerSound("scheavy");
+    SoundEvent SC_SPIN = registerSound("scspin");
+
+    //Magicians Red
+
+    //Golden Experience
+    SoundEvent GE_SUMMON = registerSound("gesummon");
+    SoundEvent GE_BARRAGE = registerSound("gebarrage");
+    SoundEvent GE_HEAL = registerSound("geheal");
+    SoundEvent GE_TREE = registerSound("getree");
+
+    //Golden Experience: Requiem
+    SoundEvent GER_SUMMON = registerSound("gersummon");
+    SoundEvent GER_HEAVY = registerSound("gerheavy");
+    SoundEvent GER_LASER = registerSound("gerlaser");
+    SoundEvent GER_KICKBARRAGE = registerSound("gerkickbarrage");
+    SoundEvent GER_SETUP = registerSound("gersetup");
+
+    //The Fool
+    SoundEvent FOOL_BARK1 = registerSound("foolbark1");
+    SoundEvent FOOL_BARK2 = registerSound("foolbark2");
+    SoundEvent FOOL_LAUNCH = registerSound("foollaunch");
+    SoundEvent FOOL_CHARGE = registerSound("foolcharge");
+
+    //C-Moon
+    SoundEvent CMOON_GRAVPUNCH = registerSound("cmoongravpunch");
+    SoundEvent CMOON_GRAVPUNCHHIT = registerSound("cmoongravpunchhit");
+    SoundEvent CMOON_GROUNDSLAM = registerSound("cmoongroundslam");
+    SoundEvent CMOON_GRAVSHIFT = registerSound("cmoongravshift");
+    SoundEvent CMOON_DONUT = registerSound("cmoondonut");
+
+    //Made in Heaven
+    SoundEvent MIH_ZOOM = registerSound("mihzoom");
+    SoundEvent MIH_JUDGEMENT = registerSound("mihjudgement");
+    SoundEvent MIH_TACCEL = registerSound("mihtaccel");
+    SoundEvent MIH_FURYCHOP = registerSound("mihfurychop");
+    SoundEvent MIH_SPEEDSLICE = registerSound("mihspeedslice");
+
+    //The World: Over Heaven
+    SoundEvent TWOH_SUMMON = registerSound("twohsummon");
+    SoundEvent TWOH_SHOOT = registerSound("twohshoot");
+    SoundEvent TWOH_TS = registerSound("twohts");
+    SoundEvent TWOH_HEAVY = registerSound("twohheavy");
+    SoundEvent TWOH_SMITE = registerSound("twohsmite");
+    SoundEvent TWOH_OVERWRITE = registerSound("twohoverwrite");
+    SoundEvent TWOH_KNIFETHROW = registerSound("twohowarida");
+    SoundEvent TWOH_AIRKNIVES = registerSound("twohairknives");
+
+    static void registerSounds() {
+
+    }
+}

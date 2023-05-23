@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.renderer.entity;
 
 import net.arna.jcraft.client.model.entity.GERModel;
-import net.arna.jcraft.entity.GEREntity;
+import net.arna.jcraft.common.entity.GEREntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -40,7 +40,9 @@ public class GERRenderer extends GeoEntityRenderer<GEREntity> {
         float a = 1f;
         MinecraftClient mcClient = MinecraftClient.getInstance();
         if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null) {
-            if (mcClient.player.getFirstPassenger() == animatable) { a = animatable.getAlpha(); }
+            if (mcClient.player.getFirstPassenger() == animatable) {
+                a = animatable.getAlpha();
+            }
         }
         super.render(model, animatable, partialTicks, type, matrixStackIn, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, a);
     }

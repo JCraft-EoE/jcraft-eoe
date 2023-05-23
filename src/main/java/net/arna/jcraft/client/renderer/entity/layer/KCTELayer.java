@@ -1,8 +1,7 @@
 package net.arna.jcraft.client.renderer.entity.layer;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.JCraftClient;
-import net.arna.jcraft.entity.KingCrimsonEntity;
+import net.arna.jcraft.common.entity.KingCrimsonEntity;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -17,12 +16,16 @@ public class KCTELayer extends GeoLayerRenderer {
     private static final Identifier MODEL = new Identifier(JCraft.MOD_ID, "geo/box.geo.json");
 
     @SuppressWarnings("unchecked")
-    public KCTELayer(IGeoRenderer<?> entityRendererIn) { super(entityRendererIn); }
+    public KCTELayer(IGeoRenderer<?> entityRendererIn) {
+        super(entityRendererIn);
+    }
 
     @SuppressWarnings("unchecked")
     @Override
     public void render(MatrixStack matrixStackIn, VertexConsumerProvider bufferIn, int packedLightIn, Entity entityLivingBaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
-        if ( ((KingCrimsonEntity)entityLivingBaseIn).getTETime() < 1 ) { return; }
+        if (((KingCrimsonEntity) entityLivingBaseIn).getTETime() < 1) {
+            return;
+        }
         //RenderLayer cameo = JCraftClient.TIMEERASE_RENDER_LAYER;
         RenderLayer cameo = RenderLayer.getCutout();
 
