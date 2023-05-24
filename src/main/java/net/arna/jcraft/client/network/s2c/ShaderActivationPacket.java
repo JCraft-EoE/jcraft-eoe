@@ -31,12 +31,14 @@ public class ShaderActivationPacket {
      * @param duration duration of the shader
      * @param type which shader to use
      */
-    public static void send(ServerPlayerEntity serverPlayerEntity, LivingEntity sourceShader, int tickDelay, int duration, Type type) {
+    public static void send(ServerPlayerEntity serverPlayerEntity,  @Nullable  LivingEntity sourceShader, int tickDelay, int duration, Type type) {
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeInt(tickDelay);
         buf.writeInt(duration);
         buf.writeString(type.asString());
-        buf.writeInt(sourceShader.getId());
+        if(sourceShader != null){
+            buf.writeInt(sourceShader.getId());
+        }
         ServerPlayNetworking.send(serverPlayerEntity, ID, buf);
     }
 
@@ -59,6 +61,14 @@ public class ShaderActivationPacket {
                 switch (type) {
                     case NONE -> {}
                     case ZA_WARDO -> {
+
+        World world = client.world;
+        if (world != null) {
+            switch (type) {
+                case NONE -> { }
+                case ZA_WARDO -> {
+                    int id = buf.readInt();
+                    client.execute(() -> {
                         Entity sourceShader = world.getEntityById(id);
                         if (sourceShader instanceof LivingEntity livingEntity) {
                             zaWarudoShaderHandler.tickDelay = delay;
