@@ -54,14 +54,14 @@ public class ShaderActivationPacket {
         int delay = buf.readInt();
         int duration = buf.readInt();
         Type type = Type.byName(buf.readString());
-        client.execute(() -> {
-            World world = client.world;
-            if (world != null) {
 
-                switch (type) {
-                    case NONE -> {}
-                    case ZA_WARDO -> {
-                        int id = buf.readInt();
+        World world = client.world;
+        if (world != null) {
+            switch (type) {
+                case NONE -> { }
+                case ZA_WARDO -> {
+                    int id = buf.readInt();
+                    client.execute(() -> {
                         Entity sourceShader = world.getEntityById(id);
                         if (sourceShader instanceof LivingEntity livingEntity) {
                             zaWarudoShaderHandler.tickDelay = delay;
@@ -69,11 +69,10 @@ public class ShaderActivationPacket {
                             zaWarudoShaderHandler.effectLength = duration;
                             zaWarudoShaderHandler.shouldRender = true;
                         }
-                    }
+                    });
                 }
-
             }
-        });
+        }
     }
 
     public enum Type implements StringIdentifiable {

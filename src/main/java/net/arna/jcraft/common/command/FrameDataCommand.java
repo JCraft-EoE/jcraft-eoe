@@ -146,14 +146,19 @@ public class FrameDataCommand {
             }
         }
 
-        player.sendMessage(Text.of(
+        boolean effectOnlyUB = attack.ubEffectsOnly;
+        String advOnBlock = (attack.unblockable && !effectOnlyUB) ? "§5UNBLOCKABLE" : "Advantage on block: §5" + (4 + (int) attack.damage - recovery) + "§r ticks";
+        String mainFDMessage =
                 "======== ATTACK STATS ========\n" +
                         "Startup: §b" + startup + "§r ticks\n" +
                         "Active: " + frames + " ticks\n" +
                         "Recovery: §a" + recovery + "§r ticks\n" +
                         "Advantage on hit: §c" + (stun - recovery - 1) + "§r ticks\n" +
-                        "Advantage on block: §5" + (4 + (int) attack.damage - recovery) + "§r ticks"
-        ), false);
+                        advOnBlock;
+        if (effectOnlyUB)
+            mainFDMessage = mainFDMessage.concat("\n§5Effects on hit are UNBLOCKABLE");
+
+        player.sendMessage(Text.of(mainFDMessage), false);
         return 1;
     }
 
