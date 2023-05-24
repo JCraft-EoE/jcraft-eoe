@@ -70,11 +70,15 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
     public static Attack exit = new Attack(2, 15, 5, 0, 0f, AttackType.BOX)
             .setInfo("Exit Cream", "cream and its user return from the void");
 
-    public static Attack balllight = new Attack(2, 0f, 14, 7, 2, 5f, 0.75f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegister.IMPACT_3)
+    public static Attack balllight = new Attack(2, 0.1f, 14, 7, 2, 5f, 0.75f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegister.IMPACT_3)
             .setInfo("Swipe", "quick air-to-ground poke");
-    public static Attack ballheavy = new Attack(14, 0f, 20, 14, 2, 9f, 1.25f, AttackType.BOX, 0.75f, 0.3f, 0, JSoundRegister.TW_KICK_HIT)
+    public static Attack ballheavy = new Attack(14, 0.1f, 20, 14, 2, 9f, 1.25f, AttackType.BOX, 0.75f, 0.3f, 0, JSoundRegister.TW_KICK_HIT)
             .setHitspark(2).setArmor(true).setLaunch()
             .setInfo("Overhead Smash", "slow, uninterruptable launcher");
+    public static Attack ballcombo = new Attack(14, 0.1f, 36, 0, 2, 7f, 0.1f, AttackType.MULTIHIT, 0.75f, 0.3f, List.of(10, 17, 25), JSoundRegister.IMPACT_3)
+            .setInfo("3-hit Combo", "less stun than grounded version");
+    public static Attack ballcharge = new Attack(20, 28, 13, 0, AttackType.BOX)
+            .setInfo("Void Charge", "cream quickly transforms into a black hole and charges in the looked direction");
 
     public static TrackedData<Integer> VOIDTIME;
     public static TrackedData<Boolean> HALFBALL;
@@ -85,7 +89,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
         blockDistance = 0f;
         maxStandGauge = 45f;
 
-        moves = List.of(balllight, ballheavy, unusable, unusable, consume, unusable, grab, exit);
+        moves = List.of(balllight, ballheavy, ballcombo, ballcharge, consume, unusable, unusable, exit);
     }
 
     public void endHalfBall() {
@@ -109,21 +113,22 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
         description = "Close Range SETUP";
 
         pros = List.of(
-                "two block bypass moves",
-                "unpunishable void state",
-                "good poking"
+                "many block bypassing options",
+                "powerful void state",
+                "good poking",
+                "good mobility"
         );
 
         cons = List.of(
                 "very variable reward on hit",
-                "predictable playstyle",
-                "blind and deaf in the void"
+                "blind and deaf in the void",
+                "below average speed"
         );
 
-        freespace = "BNBs:\n" +
-                "    M1>Charge>Grab\n" +
-                "    Chop>Smash>Void\n" +
-                "    Chop>M1>Combo>M1>Charge>Grab";
+        freespace = "BNBs (i. - in Cream):\n" +
+                "    M1>Combo>M1>Charge>Grab\n" +
+                "    Chop>Void\n" +
+                "    i.M1>land+s.OFF>s.ON+Combo>M1>Charge>Grab";
 
         moves = List.of(light, heavy, combo, destroy, consume, charge, grab, enter);
     }
@@ -151,9 +156,8 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
     @Override
     public boolean canAttack() {
         if (hasUser()) {
-            if (!(getUser() instanceof PlayerEntity) && this.getVoidTime() > 0) {
+            if (!(getUser() instanceof PlayerEntity) && this.getVoidTime() > 0)
                 return false; // Prevents mobs from attacking while in void state and cancelling void early
-            }
         }
         return super.canAttack();
     }
@@ -161,9 +165,8 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
     // Moveset
     @Override
     public void initLightAttack() {
-        if (!this.canAttack()) {
+        if (!this.canAttack())
             return;
-        }
         if (getHalfBall())
             handleAttack(balllight, JCraft.standLightCD, 2);
         else
@@ -172,9 +175,8 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
 
     @Override
     public void initHeavyAttack() {
-        if (!this.canAttack()) {
+        if (!this.canAttack())
             return;
-        }
         if (getHalfBall()) {
             if (handleAttack(ballheavy, JCraft.standHeavyCD, 4)) {
                 this.playSound(JSoundRegister.CREAM_SMASH, 1, 1);
@@ -186,11 +188,10 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
 
     @Override
     public void initBarrage() {
-        if (!this.canAttack()) {
+        if (!this.canAttack())
             return;
-        }
-        if (getHalfBall()) { //TODO: half-ball barrage
-
+        if (getHalfBall() && handleAttack(ballcombo, JCraft.standBarrageCD, 5)) {
+            this.playSound(JSoundRegister.CREAM_COMBO, 1, 1);
         } else if (handleAttack(combo, JCraft.standBarrageCD, 5)) {
             this.playSound(JSoundRegister.CREAM_COMBO, 1, 1);
         }
@@ -198,9 +199,8 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
 
     @Override
     public void initUlt() {
-        if (!this.canAttack()) {
+        if (!this.canAttack())
             return;
-        }
         if (handleAttack(consume, JCraft.standUltCD, 6)) {
             this.playSound(JSoundRegister.CREAM_CONSUME, 1, 1);
         }
@@ -208,11 +208,10 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
 
     @Override
     public void initSpecial1() {
-        if (!this.canAttack()) {
+        if (!this.canAttack())
             return;
-        }
-        if (getHalfBall()) { //TODO: half-ball Grab
-
+        if (getHalfBall()) {
+            handleAttack(ballcharge, JCraft.standS1CD, 7);
         } else if (handleAttack(grab, JCraft.standS1CD, 9)) {
             this.playSound(JSoundRegister.CREAM_GRAB, 1, 1);
         }
@@ -220,25 +219,23 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
 
     @Override
     public void initSpecial2() {
-        if (!this.canAttack()) {
+        if (!this.canAttack())
             return;
-        }
-        if (getHalfBall()) { //TODO: Surge
-
-        } else if (handleAttack(charge, JCraft.standS2CD, 7)) {
-            this.playSound(JSoundRegister.CREAM_CHARGE, 1, 1);
+        if (!getHalfBall()) {
+            if (handleAttack(charge, JCraft.standS2CD, 7)) {
+                this.playSound(JSoundRegister.CREAM_CHARGE, 1, 1);
+            }
         }
     }
 
     @Override
     public void initSpecial3() {
-        if (!this.canAttack()) {
+        if (!this.canAttack())
             return;
-        }
-        if (getHalfBall()) { //TODO: half-ball Destroy
-
-        } else if (handleAttack(destroy, JCraft.standS3CD, 13)) {
-            this.playSound(JSoundRegister.CREAM_CHARGE, 1, 1);
+        if (!getHalfBall()) {
+            if (handleAttack(destroy, JCraft.standS3CD, 13)) {
+                this.playSound(JSoundRegister.CREAM_CHARGE, 1, 1);
+            }
         }
     }
 
@@ -256,6 +253,8 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
         }
     }
 
+    private Vec3d chargeDir;
+    private boolean charging = false;
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
         if (attack == combo && this.getMoveStun() == 11) {
@@ -268,6 +267,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
         } else if (attack == consume) {
             endHalfBall();
             setVoidTime(120);
+            charging = false;
             this.curAttack = null;
         } else if (attack == grab) {
             if (entities.size() > 0) {
@@ -322,6 +322,11 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
             beginHalfBall();
         } else if (attack == exit) {
             endHalfBall();
+        } else if (attack == ballcharge) {
+            this.playSound(JSoundRegister.CREAM_CHARGE, 1, 1);
+            charging = true;
+            chargeDir = getUser().getRotationVector().multiply(0.5);
+            setVoidTime(15);
         }
     }
 
@@ -350,9 +355,8 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
 
     @Override
     public void tick() {
-        if (age == 1) {
+        if (age == 1)
             this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.STAND_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
-        }
 
         super.tick();
         boolean server = !this.world.isClient();
@@ -366,25 +370,24 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
             int vTime = this.getVoidTime();
             boolean voiding = (vTime > 0);
 
-            // Players get creative flight, and mobs get nogravved and y level equalization (see if voiding)
+            // Players get creative flight, and mobs get nogravved and y level equalization (see: if voiding)
             if (user instanceof PlayerEntity playerEntity) {
                 notCorS = (!playerEntity.isCreative() && !playerEntity.isSpectator());
-
-                if (notCorS) {
+                if (notCorS && !charging)
                     playerEntity.getAbilities().flying = voiding;
-                }
-
                 isPlayer = true;
             }
 
             if (server) {
-                if (this.curAttack != null) {
-                    this.setVoidTime(0);
+                if (!charging) {
+                    if (this.curAttack != null) {
+                        this.setVoidTime(0);
+                        voiding = false;
+                    }
+                    this.idleOverride = this.getVoidTime() > 0;
                 }
-                boolean sVoiding = (this.getVoidTime() > 0);
 
-                this.idleOverride = sVoiding;
-                user.setInvulnerable(sVoiding);
+                user.setInvulnerable(this.getVoidTime() > 0);
             }
 
             if (voiding) {
@@ -405,30 +408,36 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
                         }
                     }
 
-                    if (!isPlayer) {
-                        double y = user.getY();
-                        Vec3d vel = new Vec3d(user.getVelocity().x, 0.0, user.getVelocity().z);
-                        // Targetting priority
-                        LivingEntity targetEntity = user.getDamageTracker().getBiggestAttacker();
-                        if (targetEntity == null && user instanceof MobEntity mob) {
-                            targetEntity = mob.getTarget();
-                        }
-                        if (targetEntity == null) {
-                            targetEntity = user.getAttacker();
-                        }
-                        // If target wasn't found, thrash around
-                        Vec3d target = targetEntity != null ? targetEntity.getPos() : this.getPos().add(Math.sin(this.age * 0.2) * 2, Math.sin(this.age * 0.2) / 4, Math.cos(this.age * 0.2) * 2);
+                    if (charging) {
+                        user.setVelocity(chargeDir);
+                        user.velocityModified = true;
+                        if (user instanceof ServerPlayerEntity player)
+                            player.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(user));
+                    } else {
+                        this.setState(0);
 
-                        double dY = MathHelper.clamp(target.getY() - y, -1, 1);
-                        y += dY;
+                        if (!isPlayer) {
+                            double y = user.getY();
+                            Vec3d vel = new Vec3d(user.getVelocity().x, 0.0, user.getVelocity().z);
+                            // Targetting priority
+                            LivingEntity targetEntity = user.getDamageTracker().getBiggestAttacker();
+                            if (targetEntity == null && user instanceof MobEntity mob)
+                                targetEntity = mob.getTarget();
+                            if (targetEntity == null)
+                                targetEntity = user.getAttacker();
+                            // If target wasn't found, thrash around
+                            Vec3d target = targetEntity != null ? targetEntity.getPos() : this.getPos().add(Math.sin(this.age * 0.2) * 2, Math.sin(this.age * 0.2) / 4, Math.cos(this.age * 0.2) * 2);
 
-                        vel = vel.add(target.subtract(user.getPos().add(random.nextDouble() * 2, random.nextDouble() * 3, random.nextDouble() * 3)).normalize()).multiply(0.3);
+                            double dY = MathHelper.clamp(target.getY() - y, -1, 1);
+                            y += dY;
 
-                        user.setVelocity(vel);
-                        user.setPos(user.getX(), y, user.getZ());
+                            vel = vel.add(target.subtract(user.getPos().add(random.nextDouble() * 2, random.nextDouble() * 3, random.nextDouble() * 3)).normalize()).multiply(0.3);
 
-                        if (vTime < 10) {
-                            user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 5, 1, true, false));
+                            user.setVelocity(vel);
+                            user.setPos(user.getX(), y, user.getZ());
+
+                            if (vTime < 10)
+                                user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 5, 1, true, false));
                         }
                     }
 
@@ -439,9 +448,9 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
                     toDamage.remove(this);
 
                     for (LivingEntity ent : toDamage)
-                        ent.damage(DamageSource.OUT_OF_WORLD, 1.5f);
+                        ent.damage(DamageSource.OUT_OF_WORLD, charging ? 4 : 1.5f);
                     if (notCorS)
-                        user.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 30, 0, false, false));
+                        user.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 25, 0, false, false));
                 } else {
                     for (int i = 0; i < 16; i++) {
                         this.world.addParticle(ParticleTypes.MYCELIUM,
@@ -453,9 +462,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
                 }
 
                 this.setVoidTime(vTime - 1);
-
                 this.setDistanceOffset(0);
-                this.setState(0);
                 this.setAlpha(1f);
             } else {
                 if (getHalfBall()) {
@@ -526,7 +533,9 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
                 case 2 -> controller.setAnimation(builder.playAndHold("animation.cream.balllight"));
                 case 3 -> controller.setAnimation(builder.loop("animation.cream.ballblock"));
                 case 4 -> controller.setAnimation(builder.playAndHold("animation.cream.ballheavy"));
+                case 5 -> controller.setAnimation(builder.playAndHold("animation.cream.ballcombo"));
                 case 6 -> controller.setAnimation(builder.playAndHold("animation.cream.consume"));
+                case 7 -> controller.setAnimation(builder.playAndHold("animation.cream.ballconsume"));
                 case 11 -> controller.setAnimation(builder.playAndHold("animation.cream.enter"));
                 case 12 -> controller.setAnimation(builder.playAndHold("animation.cream.exit"));
             }
