@@ -23,21 +23,37 @@ import java.util.Optional;
 public class ShaderActivationPacket {
     public static final Identifier ID = new Identifier(JCraft.MOD_ID, "shader_packet");
 
-    public static void send(ServerPlayerEntity serverPlayerEntity, LivingEntity sourceShader, int tickDelay, int duration, Type type) {
+    /**
+     * Send a packet S2C to start rendering a shader of a specific {@link Type}
+     * @param serverPlayerEntity player who will se the shader
+     * @param sourceShader origin of the shader, if not null, must call buf.readInt() in {@link #handle(MinecraftClient, ClientPlayNetworkHandler, PacketByteBuf, PacketSender)} switch
+     * @param tickDelay delay before starting to render shader
+     * @param duration duration of the shader
+     * @param type which shader to use
+     */
+    public static void send(ServerPlayerEntity serverPlayerEntity, @Nullable LivingEntity sourceShader, int tickDelay, int duration, Type type) {
         PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeInt(sourceShader.getId());
         buf.writeInt(tickDelay);
         buf.writeInt(duration);
         buf.writeString(type.asString());
+        if(sourceShader != null){
+            buf.writeInt(sourceShader.getId());
+        }
         ServerPlayNetworking.send(serverPlayerEntity, ID, buf);
     }
 
+    /**
+     * This is the client handling your packet with shader info in
+     * @param client mc
+     * @param clientPlayNetworkHandler .
+     * @param buf packet
+     * @param packetSender .
+     */
     public static void handle(MinecraftClient client, ClientPlayNetworkHandler clientPlayNetworkHandler, PacketByteBuf buf, PacketSender packetSender) {
         ZaWarudoShaderHandler zaWarudoShaderHandler = JCraftClient.zaWarudoShader;
-        int id = buf.readInt();
         int delay = buf.readInt();
         int duration = buf.readInt();
-        Type type = Type.byName(buf.readString(), Type.NONE);
+        Type type = Type.byName(buf.readString());
         client.execute(() -> {
             World world = client.world;
             if (world != null) {
@@ -45,6 +61,7 @@ public class ShaderActivationPacket {
                 switch (type) {
                     case NONE -> {}
                     case ZA_WARDO -> {
+                        int id = buf.readInt();
                         Entity sourceShader = world.getEntityById(id);
                         if (sourceShader instanceof LivingEntity livingEntity) {
                             zaWarudoShaderHandler.tickDelay = delay;
@@ -76,6 +93,10 @@ public class ShaderActivationPacket {
 
         public String getName() {
             return name;
+        }
+
+        public static Type byName(String name){
+            return byName(name, NONE);
         }
 
         public static Type byName(String name, @Nullable Type defaultType) {
