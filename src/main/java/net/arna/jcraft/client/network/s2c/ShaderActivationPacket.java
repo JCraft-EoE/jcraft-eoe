@@ -53,15 +53,7 @@ public class ShaderActivationPacket {
         ZaWarudoShaderHandler zaWarudoShaderHandler = JCraftClient.zaWarudoShader;
         int delay = buf.readInt();
         int duration = buf.readInt();
-        int id = buf.readInt();
         Type type = Type.byName(buf.readString());
-        client.execute(() -> {
-            World world = client.world;
-            if (world != null) {
-                switch (type) {
-                    case NONE -> {}
-                    case ZA_WARDO -> {
-
         World world = client.world;
         if (world != null) {
             switch (type) {
@@ -76,11 +68,11 @@ public class ShaderActivationPacket {
                             zaWarudoShaderHandler.effectLength = duration;
                             zaWarudoShaderHandler.shouldRender = true;
                         }
-                    }
+                    });
                 }
-
             }
-        });
+        }
+
     }
 
     public enum Type implements StringIdentifiable {
