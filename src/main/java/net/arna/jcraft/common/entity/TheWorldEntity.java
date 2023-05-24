@@ -130,7 +130,6 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
         }
         if (handleAttack(timestop, JCraft.standUltCD, 7)) {
             this.playSound(JSoundRegister.TW_TS, 1, 1);
-            PlayerLookup.tracking(this).forEach(tracked -> ShaderActivationPacket.send(tracked, this, 20, (int) timestop.stun * 20, ShaderActivationPacket.Type.ZA_WARDO));
         }
     }
 

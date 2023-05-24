@@ -2,12 +2,14 @@ package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
+import net.arna.jcraft.client.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.mixin.LivingEntityInvoker;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.Entity;
@@ -562,6 +564,10 @@ public abstract class StandEntity extends MobEntity {
                 }
 
                 if (attack.attackType == AttackType.TIMESTOP && this.getMoveStun() == realInitTime) {
+                    PlayerLookup
+                            .tracking(this)
+                            .forEach(tracked -> ShaderActivationPacket.send(tracked, this, 0, (int) curAttack.stun * 20, ShaderActivationPacket.Type.ZA_WARDO));
+
                     this.setTSTime(stunTicks);
                     this.curAttack = null;
 

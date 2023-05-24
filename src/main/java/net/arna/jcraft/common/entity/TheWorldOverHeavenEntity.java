@@ -206,7 +206,6 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
         }
         if (handleAttack(timestop, JCraft.standUltCD, 7)) {
             this.playSound(JSoundRegister.TWOH_TS, 1, 1);
-            PlayerLookup.tracking(this).forEach(tracked -> ShaderActivationPacket.send(tracked, this, 20, (int) timestop.stun * 20, ShaderActivationPacket.Type.ZA_WARDO));
         }
     }
 
