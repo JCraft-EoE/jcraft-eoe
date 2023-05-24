@@ -18,17 +18,20 @@
     "TimestopBlockMixin"
   ],
   "client": [
+    "IntegratedServerLoaderMixin",
     "client.ArmorFeatureRendererMixin",
+    "client.BackgroundRenderMixin",
     "client.BipedEntityModelMixin",
     "client.CameraInvoker",
     "client.CameraMixin",
     "client.ClientPlayerEntityMixin",
     "client.ClientWorldMixin",
+    "client.EffectProgramMixin",
     "client.GameRendererMixin",
     "client.HeldItemFeatureRendererMixin",
+    "client.ItemRendererMixin",
     "client.ParticleAccessor",
     "client.ParticleManagerMixin",
-    "client.RenderLayerAccessor",
     "client.WorldRendererMixin"
   ],
   "injectors": {

@@ -1,0 +1,14 @@
+{
+  "parent": "item/handheld",
+  "base": {
+    "parent": "jcraft:item/debug_wand_handheld"
+  },
+  "perspectives": {
+    "gui": {
+      "parent": "jcraft:item/debug_wand_gui"
+    },
+    "fixed": {
+      "parent": "jcraft:item/debug_wand_gui"
+    }
+  }
+}

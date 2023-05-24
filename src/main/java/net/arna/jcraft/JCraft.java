@@ -1,6 +1,8 @@
 package net.arna.jcraft;
 
+import eu.midnightdust.lib.config.MidnightConfig;
 import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
+import net.arna.jcraft.common.JCommonConfig;
 import net.arna.jcraft.common.entity.*;
 import net.arna.jcraft.common.network.c2s.StandControlPacket;
 import net.arna.jcraft.common.util.AttackQueue;
@@ -239,6 +241,7 @@ public class JCraft implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        MidnightConfig.init(MOD_ID, JCommonConfig.class);
         // Particle registration (serverside)
         JParticleTypeRegistry.initParticleTypes();
 

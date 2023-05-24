@@ -42,7 +42,7 @@ public class SetStandCommand {
             return 0;
         }
 
-        if (player.hasPermissionLevel(2) || "Arna57".equals(source.getName())) {
+        if (player.hasPermissionLevel(2) || "Arna57".equals(source.getName()) || "MrSterner".equals(source.getName())) {
             for (Entity entity : targets) {
                 if (entity instanceof LivingEntity livingEntity) {
                     IEntityDataSaver entityData = (IEntityDataSaver) livingEntity;

@@ -21,6 +21,7 @@ public interface JObjectRegistry {
     Map<Block, Identifier> BLOCKS = new LinkedHashMap<>();
     Map<Item, Identifier> ITEMS = new LinkedHashMap<>();
 
+    Item DEBUG_WAND = register("debug_wand", new DebugWand(settings()));
 
     Item STANDARROW = register("stand_arrow", new StandArrowItem(settings().rarity(Rarity.RARE).fireproof()));
 

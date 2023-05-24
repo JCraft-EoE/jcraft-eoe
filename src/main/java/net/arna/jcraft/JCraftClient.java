@@ -1,25 +1,32 @@
 package net.arna.jcraft;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import eu.midnightdust.lib.config.MidnightConfig;
+import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.hud.JCraftHudOverlay;
 import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
+import net.arna.jcraft.client.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.client.particle.ComboBreakerParticle;
 import net.arna.jcraft.client.particle.CooldownCancelParticle;
 import net.arna.jcraft.client.particle.HitsparkParticle;
 import net.arna.jcraft.client.particle.KCParticle;
+import net.arna.jcraft.client.renderer.item.BigItemRenderer;
+import net.arna.jcraft.client.rendering.RenderHandler;
+import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.network.c2s.StandControlPacket;
 import net.arna.jcraft.common.util.ColorUtils;
-import net.arna.jcraft.registry.JArmorRendererRegister;
-import net.arna.jcraft.registry.JEntityRendererRegister;
-import net.arna.jcraft.registry.JParticleTypeRegistry;
+import net.arna.jcraft.registry.*;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.hud.InGameHud;
@@ -29,8 +36,11 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Shader;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.resource.ResourceType;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.MathHelper;
 import org.apache.commons.lang3.StringUtils;
@@ -38,30 +48,16 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 
+import static net.arna.jcraft.JCraft.MOD_ID;
+
 public class JCraftClient implements ClientModInitializer {
 
+    public static ZaWarudoShaderHandler zaWarudoShader = new ZaWarudoShaderHandler();
     public static Shader timeeraseShader;
-    private final List<String> comboRemarks = List.of("admin rdm!!!", "baby combo", "caught lackin", "kinda ez", "skill issue", "cancelled on twitter", "sent to bulgaria");
+    private final List<String> comboRemarks = List.of("admin rdm!!!", "baby combo", "caught lackin", "kinda ez", "skill issue", "cancelled on twitter", "sent to bulgaria", "down bad");
     public static DefaultedList<Double> clientCooldowns = DefaultedList.ofSize(JCraft.cooldowns.size(), 0.0);
     public static int comboCounter = 0;
     public static int ticksSinceCounted = 0;
-
-
-    // TODO: Render Layers
-    /*
-    public static final RenderLayer TIMEERASE_RENDER_LAYER = RenderLayerAccessor.invokeOf(
-            "end_portal",
-            VertexFormats.POSITION,
-            VertexFormat.DrawMode.QUADS,
-            256,
-            false,
-            false,
-            RenderLayer.MultiPhaseParameters.builder().shader(
-                    new RenderPhase.Shader(() -> timeeraseShader))
-                    .texture(RenderPhase.Textures.create().add(new Identifier("jcraft:textures/environment/te_sky.png"), false, false)
-                            .add(new Identifier("jcraft:textures/environment/te_swirl.png"), false, false).build()).build(false)
-    );
-     */
 
     public static KeyBinding standSummon;
     public static KeyBinding heavyKey;
@@ -76,6 +72,14 @@ public class JCraftClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        MidnightConfig.init(MOD_ID, JClientConfig.class);
+
+        //Rendering
+        JRenderLayerRegistry.init();
+        RenderHandler.init();
+        JEventsRegister.registerClientEvents();
+        zaWarudoShader.init();
+
         // Particle registration
         ParticleFactoryRegistry.getInstance().register(JParticleTypeRegistry.COMBO_BREAK, ComboBreakerParticle.Factory::new);
         ParticleFactoryRegistry.getInstance().register(JParticleTypeRegistry.COOLDOWN_CANCEL, CooldownCancelParticle.Factory::new);
@@ -101,9 +105,19 @@ public class JCraftClient implements ClientModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(this::tickClient);
         ClientPlayNetworking.registerGlobalReceiver(ServerChannelFeedback.ID, ServerChannelFeedback::handle);
+        ClientPlayNetworking.registerGlobalReceiver(ShaderActivationPacket.ID, ShaderActivationPacket::handle);
 
         HudRenderCallback.EVENT.register(new JCraftHudOverlay());
         HudRenderCallback.EVENT.register(this::renderHud);
+
+        Identifier itemId = JObjectRegistry.ITEMS.get(JObjectRegistry.DEBUG_WAND);
+        BigItemRenderer itemRenderer = new BigItemRenderer(itemId);
+        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(itemRenderer);
+        BuiltinItemRendererRegistry.INSTANCE.register(JObjectRegistry.DEBUG_WAND, itemRenderer);
+        ModelLoadingRegistry.INSTANCE.registerModelProvider((manager, out) -> {
+            out.accept(new ModelIdentifier(itemId + "_gui", "inventory"));
+            out.accept(new ModelIdentifier(itemId + "_handheld", "inventory"));
+        });
     }
 
     private void renderHud(MatrixStack matrixStack, float v) {
@@ -231,13 +245,11 @@ public class JCraftClient implements ClientModInitializer {
             if (player.isAlive()) {
                 PacketByteBuf buf = PacketByteBufs.create();
                 buf.writeShort(0);
-                if (go != null) {
-                    buf.writeBoolean(go.forwardKey.isPressed()); // W
-                    buf.writeBoolean(go.leftKey.isPressed()); // A
-                    buf.writeBoolean(go.backKey.isPressed()); // S
-                    buf.writeBoolean(go.rightKey.isPressed()); // D
-                    buf.writeBoolean(go.jumpKey.isPressed()); // Space
-                }
+                buf.writeBoolean(go.forwardKey.isPressed()); // W
+                buf.writeBoolean(go.leftKey.isPressed()); // A
+                buf.writeBoolean(go.backKey.isPressed()); // S
+                buf.writeBoolean(go.rightKey.isPressed()); // D
+                buf.writeBoolean(go.jumpKey.isPressed()); // Space
                 StandControlPacket.send(buf);
             } else {
                 clientCooldowns = DefaultedList.ofSize(JCraft.cooldowns.size(), 0.0);
@@ -246,7 +258,9 @@ public class JCraftClient implements ClientModInitializer {
             if (player.getFirstPassenger() instanceof StandEntity) {
                 // Block (3)
                 PacketByteBuf buf = PacketByteBufs.create();
+                boolean rmb = go.useKey.wasPressed() || go.useKey.isPressed();
                 buf.writeShort(3);
+                buf.writeBoolean(rmb);
                 StandControlPacket.send(buf);
             }
 

@@ -6,7 +6,6 @@ import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -461,7 +460,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                             buf.writeDouble(box.getYLength());
                             buf.writeDouble(box.getZLength());
 
-                            if(playerEntity instanceof ServerPlayerEntity serverPlayerEntity){
+                            if (playerEntity instanceof ServerPlayerEntity serverPlayerEntity) {
                                 ServerChannelFeedback.send(serverPlayerEntity, buf);
                             }
                         }

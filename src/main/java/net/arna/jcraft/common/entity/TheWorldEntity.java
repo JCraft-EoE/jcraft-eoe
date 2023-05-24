@@ -1,11 +1,14 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.JClientConfig;
+import net.arna.jcraft.client.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.registry.JSoundRegister;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -125,6 +128,7 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
         }
         if (HandleAttack(timestop, JCraft.standUltCD, 7)) {
             this.playSound(JSoundRegister.TW_TS, 1, 1);
+            PlayerLookup.tracking(this).forEach(tracked -> ShaderActivationPacket.send(tracked, this, 20));
         }
     }
 
@@ -229,7 +233,9 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
     public void tick() {
         if (age == 1) {
             this.playSound(JSoundRegister.TW_SUMMON, 1f, 1f);
-            this.playSound(JSoundRegister.MUDA_DA, 1f, 1f);
+            if(JClientConfig.ANIME_VOICES){
+                this.playSound(JSoundRegister.MUDA_DA, 1f, 1f);
+            }
         }
 
         super.tick();

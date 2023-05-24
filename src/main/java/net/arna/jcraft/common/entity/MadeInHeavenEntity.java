@@ -9,7 +9,6 @@ import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -63,9 +62,9 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
             .setInfo("Heaven's Judgement", "mih rapidly speed slices an area and finishes with a larger one, knocks back");
     public static Attack legcrusher = new Attack(16, 0.75f, 17, 8, 1.25, 7f, 0.25f, AttackType.BOX, 1.5f, 0.2f, 0, JSoundRegister.TW_KICK_HIT)
             .setInfo("Leg Crusher", "combo starter/extender, mih hoofs the enemies legs in a quick, stunning attack");
-    public static Attack furychop  = new Attack(19, 0.75f, 24, 15, 1.6, 7f, 0.25f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegister.IMPACT_2).setHitspark(2)
+    public static Attack furychop = new Attack(19, 0.75f, 24, 15, 1.6, 7f, 0.25f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegister.IMPACT_2).setHitspark(2)
             .setInfo("Fury Chop", "combo extender, on hit gives haste(8s) to user and mining fatigue(8s) to victim, on whiff the fatigue goes to user");
-    public static Attack donut  = new Attack(23, 0.75f, 32, 26, 2.2, 8.5f, 0.0f, AttackType.BOX, 3f, 0.2f, 0, JSoundRegister.IMPACT_4).setArmor(true).setHitspark(2)
+    public static Attack donut = new Attack(23, 0.75f, 32, 26, 2.2, 8.5f, 0.0f, AttackType.BOX, 3f, 0.2f, 0, JSoundRegister.IMPACT_4).setArmor(true).setHitspark(2)
             .setInfo("Roundabout Donut", "feigns stand desummon, uninterruptable combo starter");
     public static Attack timeaccel = new Attack(70, 40, 20, 0, AttackType.BOX)
             .setInfo("Time Acceleration", "2s windup, 15s t. accel, enemies standless for 15s after finishing");

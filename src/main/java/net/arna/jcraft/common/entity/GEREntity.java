@@ -7,7 +7,6 @@ import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -233,7 +232,7 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
         buf.writeInt(entity.getId());
         buf.writeInt(counterStopTime);
         for (PlayerEntity sendPlayer : world.getPlayers()) {
-            if(sendPlayer instanceof ServerPlayerEntity serverPlayerEntity){
+            if (sendPlayer instanceof ServerPlayerEntity serverPlayerEntity) {
                 ServerChannelFeedback.send(serverPlayerEntity, buf);
             }
         }

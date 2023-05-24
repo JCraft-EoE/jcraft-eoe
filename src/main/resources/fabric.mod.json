@@ -26,6 +26,9 @@
     ],
     "client": [
       "net.arna.jcraft.JCraftClient"
+    ],
+    "fabric-datagen": [
+      "net.arna.jcraft.datagen.JDataGen"
     ]
   },
   "mixins": [

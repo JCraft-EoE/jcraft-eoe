@@ -1,30 +1,44 @@
 package net.arna.jcraft.mixin.client;
 
+import com.mojang.datafixers.util.Pair;
+import net.arna.jcraft.client.rendering.PostProcessHandler;
+import net.arna.jcraft.registry.JShaderRegistry;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Shader;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.resource.ResourceManager;
+import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.function.Consumer;
 
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
-    /*
-    @Unique
-    private final HashMap<Identifier, ShaderEffect> shaderEffects = new HashMap<Identifier, ShaderEffect>();
 
-    @Inject(method = "reload", at = @At("HEAD"))
-    private void jcraft$reload(ResourceManager manager, CallbackInfo ci) {
-        shaderEffects.forEach((id, shaderEffect) -> shaderEffect.close());
-        shaderEffects.clear();
+    @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WorldRenderer;render(Lnet/minecraft/client/util/math/MatrixStack;FJZLnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/GameRenderer;Lnet/minecraft/client/render/LightmapTextureManager;Lnet/minecraft/util/math/Matrix4f;)V", shift = At.Shift.AFTER))
+    private void jcraft$renderWorldLast(float tickDelta, long limitTime, MatrixStack matrix, CallbackInfo ci) {
+        Vec3d cameraPos = MinecraftClient.getInstance().gameRenderer.getCamera().getPos();
+        matrix.push();
+        matrix.translate(-cameraPos.getX(), -cameraPos.getY(), -cameraPos.getZ());
+        PostProcessHandler.renderLast(matrix);
+        matrix.pop();
     }
 
-    @Inject(method = "loadPrograms", at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z", ordinal = 53, shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD)
-    private void jcraft$loadPrograms(ResourceFactory factory) {
-        try {
-            list2.add(Pair.of(new Shader(factory, "rendertype_time_erase", VertexFormats.POSITION), (shader) -> {
-                JCraftClient.timeeraseShader = shader;
-            }));
-        } catch (IOException e) {
-            list2.forEach((pair) -> pair.getFirst().close());
-            throw new RuntimeException("could not reload shaders", e);
-        }
+    @Inject(method = "loadShaders", at = @At(value = "INVOKE_ASSIGN", target = "Ljava/util/List;add(Ljava/lang/Object;)Z", ordinal = 0), locals = LocalCapture.CAPTURE_FAILHARD)
+    private void jcraft$registerShaders(ResourceManager manager, CallbackInfo ci, List<Pair<Shader, Consumer<Shader>>> list, List<Pair<Shader, Consumer<Shader>>> list2) throws IOException {
+        JShaderRegistry.init(manager);
+        list2.addAll(JShaderRegistry.shaderList);
     }
-     */
+
+    @Inject(method = "onResized", at = @At(value = "HEAD"))
+    public void jcraft$injectionResizeListener(int width, int height, CallbackInfo ci) {
+        PostProcessHandler.resize(width, height);
+    }
 }

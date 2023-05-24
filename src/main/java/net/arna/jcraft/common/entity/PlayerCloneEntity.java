@@ -1,10 +1,8 @@
 package net.arna.jcraft.common.entity;
 
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.ai.goal.CloneAttackGoal;
 import net.arna.jcraft.common.network.c2s.StandControlPacket;
 import net.arna.jcraft.registry.JEntityTypeRegister;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.client.MinecraftClient;

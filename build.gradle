@@ -7,8 +7,10 @@ sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
-version = "${project.mod_version}+${project.minecraft_version}"
+version = "${project.mod_version}"
 group = project.maven_group
+
+sourceSets.main.resources.srcDirs += ['src/main/generated']
 
 repositories {
 	maven {
@@ -16,10 +18,19 @@ repositories {
 		url "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/"
 	}
 
-	// Player Animator
 	maven {
 		name "Player Animator"
 		url "https://maven.kosmx.dev/"
+	}
+
+	maven {
+		name = "Modrinth"
+		url = "https://api.modrinth.com/maven"
+	}
+
+	maven {
+		name = "Ladysnake"
+		url = "https://ladysnake.jfrog.io/artifactory/mods"
 	}
 }
 
@@ -37,6 +48,13 @@ dependencies {
 
 	//Player Anim
 	modImplementation("dev.kosmx.player-anim:player-animation-lib-fabric:${project.player_anim}")
+
+	//MidnightLib
+	modImplementation include("maven.modrinth:midnightlib:${project.midnightlib_version}-fabric")
+
+	//Satin
+	modImplementation include("io.github.ladysnake:satin:${project.satin_version}")
+
 }
 
 processResources {
@@ -63,6 +81,17 @@ jar {
 
 loom {
 	accessWidenerPath = file("src/main/resources/jcraft.accesswidener")
+	runs {
+		datagen {
+			server()
+
+			name "Minecraft Data"
+			vmArg "-Dfabric-api.datagen"
+			vmArg "-Dfabric-api.datagen.output-dir=${file("src/main/generated")}"
+
+			runDir "build/datagen"
+		}
+	}
 }
 
 // configure the maven publication
@@ -76,3 +105,5 @@ publishing {
 	repositories {
 	}
 }
+
+assemble.dependsOn runDatagen

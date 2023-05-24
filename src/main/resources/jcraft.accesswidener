@@ -3,3 +3,18 @@ accessible class net/minecraft/client/render/RenderPhase$Shader
 accessible class net/minecraft/client/render/RenderLayer$MultiPhase
 accessible class net/minecraft/client/render/RenderLayer$MultiPhaseParameters
 accessible class net/minecraft/client/render/RenderPhase$Textures
+
+accessible field net/minecraft/client/render/Shader uniforms Ljava/util/List;
+extendable method net/minecraft/client/render/Shader addUniform (Lcom/google/gson/JsonElement;)V
+accessible field net/minecraft/client/render/RenderLayer$MultiPhase phases Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;
+accessible field net/minecraft/client/render/RenderPhase name Ljava/lang/String;
+accessible field net/minecraft/client/render/RenderLayer$MultiPhaseParameters shader Lnet/minecraft/client/render/RenderPhase$Shader;
+accessible field net/minecraft/client/render/RenderPhase$Shader supplier Ljava/util/Optional;
+accessible field net/minecraft/client/render/WorldRenderer transparencyShader Lnet/minecraft/client/gl/ShaderEffect;
+accessible class net/minecraft/client/render/BackgroundRenderer$FogData
+accessible method net/minecraft/client/render/RenderLayer of (Ljava/lang/String;Lnet/minecraft/client/render/VertexFormat;Lnet/minecraft/client/render/VertexFormat$DrawMode;IZZLnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;)Lnet/minecraft/client/render/RenderLayer$MultiPhase;
+accessible method net/minecraft/client/render/GameRenderer getFov (Lnet/minecraft/client/render/Camera;FZ)D
+accessible field net/minecraft/client/gl/ShaderEffect passes Ljava/util/List;
+
+
+

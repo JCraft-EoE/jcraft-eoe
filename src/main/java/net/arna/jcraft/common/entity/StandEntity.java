@@ -8,7 +8,6 @@ import net.arna.jcraft.mixin.LivingEntityInvoker;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.Entity;
@@ -794,7 +793,7 @@ public abstract class StandEntity extends MobEntity {
                     PacketByteBuf buf = PacketByteBufs.create();
                     buf.writeShort(6);
                     buf.writeInt(comboCounter.getComboCount());
-                    if(playerEntity instanceof ServerPlayerEntity serverPlayerEntity){
+                    if (playerEntity instanceof ServerPlayerEntity serverPlayerEntity) {
                         ServerChannelFeedback.send(serverPlayerEntity, buf);
                     }
                 }
