@@ -3,6 +3,7 @@ package net.arna.jcraft.client.rendering;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.arna.jcraft.client.rendering.shader.JShader;
 import net.arna.jcraft.client.rendering.shader.ShaderUniformHandler;
+import net.arna.jcraft.common.util.RenderUtils;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
@@ -92,7 +93,7 @@ public class RenderHandler {
 
     public static void draw(VertexConsumerProvider.Immediate source, HashMap<RenderLayer, BufferBuilder> buffers) {
         for (RenderLayer type : buffers.keySet()) {
-            Shader instance = RenderHelper.getShader(type);
+            Shader instance = RenderUtils.getShader(type);
             if (UNIFORM_HANDLERS.containsKey(type)) {
                 ShaderUniformHandler handler = UNIFORM_HANDLERS.get(type);
                 handler.updateShaderData(instance);

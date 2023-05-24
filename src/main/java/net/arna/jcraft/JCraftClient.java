@@ -11,9 +11,11 @@ import net.arna.jcraft.client.particle.ComboBreakerParticle;
 import net.arna.jcraft.client.particle.CooldownCancelParticle;
 import net.arna.jcraft.client.particle.HitsparkParticle;
 import net.arna.jcraft.client.particle.KCParticle;
+import net.arna.jcraft.client.renderer.block.ShaderTestBlockEntityRenderer;
 import net.arna.jcraft.client.renderer.item.BigItemRenderer;
 import net.arna.jcraft.client.rendering.RenderHandler;
 import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
+import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.network.c2s.StandControlPacket;
 import net.arna.jcraft.common.util.ColorUtils;
@@ -35,7 +37,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Shader;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
@@ -53,7 +55,6 @@ import static net.arna.jcraft.JCraft.MOD_ID;
 
 public class JCraftClient implements ClientModInitializer {
 
-    public static Shader timeeraseShader;
     private final List<String> comboRemarks = List.of("admin rdm!!!", "baby combo", "caught lackin", "kinda ez", "skill issue", "cancelled on twitter", "sent to bulgaria", "down bad");
     public static DefaultedList<Double> clientCooldowns = DefaultedList.ofSize(JCraft.cooldowns.size(), 0.0);
     public static int comboCounter = 0;
@@ -90,6 +91,7 @@ public class JCraftClient implements ClientModInitializer {
         // Renderer registration
         JEntityRendererRegister.registerEntityRenderers();
         JArmorRendererRegister.registerArmorRenderers();
+        BlockEntityRendererFactories.register(JBlockEntityTypeRegistry.SHADER_TEST_BLOCK_ENTITY, ShaderTestBlockEntityRenderer::new);
 
         // Keybind registration
         standSummon = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.standsummon", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_N, "key.category.jcraft"));
@@ -104,6 +106,7 @@ public class JCraftClient implements ClientModInitializer {
         utility = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.utility", InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_5, "key.category.jcraft"));
 
         ClientTickEvents.END_CLIENT_TICK.register(this::tickClient);
+        ClientTickEvents.END_WORLD_TICK.register(new SkyBoxManager());
         ClientPlayNetworking.registerGlobalReceiver(ServerChannelFeedbackPacket.ID, ServerChannelFeedbackPacket::handle);
         ClientPlayNetworking.registerGlobalReceiver(ShaderActivationPacket.ID, ShaderActivationPacket::handle);
         ClientPlayNetworking.registerGlobalReceiver(ShaderDeactivationPacket.ID, ShaderDeactivationPacket::handle);

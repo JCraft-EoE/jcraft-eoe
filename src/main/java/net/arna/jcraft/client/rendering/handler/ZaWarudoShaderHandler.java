@@ -36,7 +36,6 @@ public class ZaWarudoShaderHandler extends StandShaderHandler {
     @Override
     public void onWorldRendered(MatrixStack matrices, Camera camera, float tickDelta, long nanoTime) {
         if (renderingEffect) {
-            //shader.setUniformValue("GameTime", (ticks + tickDelta) / 20f);
             shader.setUniformValue("InverseTransformMatrix", GlMatrices.getInverseTransformMatrix(projectionMatrix));
             Vec3d cameraPos = camera.getPos();
             shader.setUniformValue(

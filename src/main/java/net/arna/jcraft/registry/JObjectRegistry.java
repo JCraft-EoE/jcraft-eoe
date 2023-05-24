@@ -1,6 +1,7 @@
 package net.arna.jcraft.registry;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.block.ShaderTestBlock;
 import net.arna.jcraft.common.block.SoulBlock;
 import net.arna.jcraft.common.item.*;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
@@ -74,6 +75,8 @@ public interface JObjectRegistry {
 
     //Block
     Block SOUL_BLOCK = register("soul_block", new SoulBlock(FabricBlockSettings.of(Material.DENSE_ICE).strength(4.0f)), settings(), true);
+
+    Block SHADER_TEST_BLOCK = register("shader_test_block", new ShaderTestBlock(FabricBlockSettings.of(Material.METAL)), settings(), true);
 
     static Item.Settings settings() {
         return new Item.Settings().group(JCraft.JCRAFT_GROUP);

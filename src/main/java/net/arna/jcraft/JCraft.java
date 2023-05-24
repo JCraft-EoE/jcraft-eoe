@@ -250,6 +250,7 @@ public class JCraft implements ModInitializer {
 
         // Registration
         JObjectRegistry.init();
+        JBlockEntityTypeRegistry.init();
         JCommandRegister.registerCommands();
         JEventsRegister.registerEvents();
         JStatusRegister.registerStatuses();

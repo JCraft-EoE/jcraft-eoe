@@ -22,7 +22,7 @@ public class SkyBoxManager implements ClientTickEvents.EndWorldTick {
         return INSTANCE;
     }
 
-    public void clearSkyBoxe() {
+    public void clearSkyBox() {
         this.currentSkyBox = null;
     }
 
