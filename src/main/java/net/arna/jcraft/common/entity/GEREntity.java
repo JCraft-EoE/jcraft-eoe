@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
+import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.arna.jcraft.registry.JSoundRegister;
@@ -233,7 +233,7 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
         buf.writeInt(counterStopTime);
         for (PlayerEntity sendPlayer : world.getPlayers()) {
             if (sendPlayer instanceof ServerPlayerEntity serverPlayerEntity) {
-                ServerChannelFeedback.send(serverPlayerEntity, buf);
+                ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
             }
         }
         ((ITimeStop) entity).setTimeStopTicks(counterStopTime);
@@ -333,7 +333,7 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
             }
         } else if (attack == heavy) {
             for (LivingEntity l : entities) {
-                l.addStatusEffect(new StatusEffectInstance(JStatusRegister.Knockdown, 30, 0, false, false));
+                l.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 30, 0, false, false));
             }
         } else if (attack == laser) {
             GERScorpionEntity scorpion = new GERScorpionEntity(JEntityTypeRegister.GER_SCORPION, world);

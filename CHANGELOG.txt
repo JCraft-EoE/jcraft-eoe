@@ -418,7 +418,7 @@ Cream
 >Increased recovery on Grab
 
 Magician's Red
->Knockdown on Sweep is now blockable
+>KNOCKDOWN on Sweep is now blockable
 
 ● 1/5/2023
 Fixed Combo Breaker
@@ -549,7 +549,7 @@ D4C
 >Utility - Dimensional Phase, unstunnable from frame 1, hides in a flag which floats for a while
 
 ● 21/5/2023
-Knockdowns no longer inconsistently set victims pose
+KNOCKDOWNs no longer inconsistently set victims pose
 Stand Gauge moved up
 
 King Crimson

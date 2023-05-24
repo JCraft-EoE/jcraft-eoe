@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
+import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
@@ -293,7 +293,7 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
                 buf.writeDouble(vec2.z);
                 for (PlayerEntity serverPlayer : this.world.getPlayers()) {
                     if (serverPlayer instanceof ServerPlayerEntity serverPlayerEntity) {
-                        ServerChannelFeedback.send(serverPlayerEntity, buf);
+                        ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
                     }
                 }
             }
@@ -371,8 +371,8 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
                     toCatch.remove(user);
 
                     for (LivingEntity entity : toCatch) // 15s of Standless to any victims of Time Acceleration
-                        entity.addStatusEffect(new StatusEffectInstance(JStatusRegister.Standless, 300, 0, true, false));
-                } else if (!user.hasStatusEffect(JStatusRegister.Dazed)) {
+                        entity.addStatusEffect(new StatusEffectInstance(JStatusRegister.STANDLESS, 300, 0, true, false));
+                } else if (!user.hasStatusEffect(JStatusRegister.DAZED)) {
                     user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 40, 0, true, false));
                 }
 

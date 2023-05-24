@@ -50,7 +50,7 @@ public class ShaderActivationPacket {
      * @param packetSender .
      */
     public static void handle(MinecraftClient client, ClientPlayNetworkHandler clientPlayNetworkHandler, PacketByteBuf buf, PacketSender packetSender) {
-        ZaWarudoShaderHandler zaWarudoShaderHandler = JCraftClient.zaWarudoShader;
+        ZaWarudoShaderHandler zaWarudoShaderHandler = ZaWarudoShaderHandler.INSTANCE;
         int delay = buf.readInt();
         int duration = buf.readInt();
         Type type = Type.byName(buf.readString());

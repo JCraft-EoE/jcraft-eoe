@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class ItemMixin {
     @Inject(cancellable = true, at = @At("HEAD"), method = "use") // Inability to use items while stunned
     private void jcraft$use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<TypedActionResult<ItemStack>> cir) {
-        if (user.hasStatusEffect(JStatusRegister.Dazed)) {
+        if (user.hasStatusEffect(JStatusRegister.DAZED)) {
             cir.setReturnValue(TypedActionResult.fail(user.getStackInHand(hand)));
         }
     }

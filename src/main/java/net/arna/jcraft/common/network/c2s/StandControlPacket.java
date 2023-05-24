@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.network.c2s;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
+import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.spec.JCraftSpec;
@@ -87,7 +87,7 @@ public class StandControlPacket {
                     PacketByteBuf buf2 = PacketByteBufs.create();
                     buf2.writeShort(6);
                     buf2.writeInt(0);
-                    ServerChannelFeedback.send(player, buf2);
+                    ServerChannelFeedbackPacket.send(player, buf2);
 
                     if (player.getFirstPassenger() instanceof StandEntity stand) {
                         int moveStun = stand.getMoveStun();
@@ -255,7 +255,7 @@ public class StandControlPacket {
                 }
                 // 11 - Combo Breaker
                 case 11 -> {
-                    StatusEffectInstance stun = player.getStatusEffect(JStatusRegister.Dazed);
+                    StatusEffectInstance stun = player.getStatusEffect(JStatusRegister.DAZED);
                     if (JCraftUtils.isBlocking(player)) {
                         return;
                     }
@@ -283,7 +283,7 @@ public class StandControlPacket {
                         break;
                     }
 
-                    StatusEffectInstance stun = player.getStatusEffect(JStatusRegister.Dazed);
+                    StatusEffectInstance stun = player.getStatusEffect(JStatusRegister.DAZED);
                     if (stun == null) {
                         CooldownCancel(world, player);
                     }

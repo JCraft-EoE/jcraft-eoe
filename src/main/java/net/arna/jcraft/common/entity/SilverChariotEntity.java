@@ -276,7 +276,7 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
         } else if (attack == this.realbeatdown && this.getMoveStun() < 10) {
             Vec3d rotVec = this.getRotationVector();
             for (LivingEntity ent : entities) {
-                ent.removeStatusEffect(JStatusRegister.Dazed);
+                ent.removeStatusEffect(JStatusRegister.DAZED);
                 ent.takeKnockback(3, -rotVec.x, -rotVec.z);
             }
         }

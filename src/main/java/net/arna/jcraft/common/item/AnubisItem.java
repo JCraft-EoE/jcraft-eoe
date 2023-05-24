@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.item;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
+import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -192,7 +192,7 @@ public class AnubisItem extends Item {
 
                     for (PlayerEntity playerEntity : world.getPlayers()) {
                         if (playerEntity instanceof ServerPlayerEntity serverPlayerEntity) {
-                            ServerChannelFeedback.send(serverPlayerEntity, buf);
+                            ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
                         }
                     }
                     state = 0;

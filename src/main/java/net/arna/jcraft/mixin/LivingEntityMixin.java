@@ -35,9 +35,9 @@ public abstract class LivingEntityMixin {
     @Inject(cancellable = true, method = "getJumpBoostVelocityModifier", at = @At("HEAD"))
     public void jcraft$getJumpBoostVelocityModifier(CallbackInfoReturnable<Double> cir) {
         LivingEntity player = ((LivingEntity) (Object) this);
-        StatusEffectInstance stun = player.getStatusEffect(JStatusRegister.Dazed);
+        StatusEffectInstance stun = player.getStatusEffect(JStatusRegister.DAZED);
         if (
-                player.hasStatusEffect(JStatusRegister.Knockdown)
+                player.hasStatusEffect(JStatusRegister.KNOCKDOWN)
                         || (stun != null && stun.getAmplifier() < 2)
                         || player.getFirstPassenger() instanceof StandEntity stand && stand.getRemote()) {
             cir.setReturnValue(-1.0D);
@@ -54,7 +54,7 @@ public abstract class LivingEntityMixin {
             if (attack != null) {
                 if (attack.attackType == AttackType.COUNTER && stand.getMoveStun() < (attack.moveStun - attack.initTime)) {
                     stand.counter(source.getAttacker(), source); // Initiate counter
-                    player.removeStatusEffect(JStatusRegister.Dazed);
+                    player.removeStatusEffect(JStatusRegister.DAZED);
                     info.cancel();
                 }
             }
@@ -67,7 +67,7 @@ public abstract class LivingEntityMixin {
         LivingEntity livingEntity = (LivingEntity) (Object) this;
         IEntityDataSaver entityDataSaver = (IEntityDataSaver) livingEntity;
 
-        if ((livingEntity.hasStatusEffect(JStatusRegister.Dazed) && !JCraftUtils.isBlocking(livingEntity)) || livingEntity.hasStatusEffect(JStatusRegister.Knockdown)) {
+        if ((livingEntity.hasStatusEffect(JStatusRegister.DAZED) && !JCraftUtils.isBlocking(livingEntity)) || livingEntity.hasStatusEffect(JStatusRegister.KNOCKDOWN)) {
             cir.setReturnValue(false);
         }
 
@@ -88,9 +88,9 @@ public abstract class LivingEntityMixin {
     public void jcraft$canTarget(LivingEntity target, CallbackInfoReturnable<Boolean> cir) {
         LivingEntity livingEntity = (LivingEntity) (Object) this;
         IEntityDataSaver entityDataSaver = (IEntityDataSaver) livingEntity;
-        StatusEffectInstance stun = livingEntity.getStatusEffect(JStatusRegister.Dazed);
+        StatusEffectInstance stun = livingEntity.getStatusEffect(JStatusRegister.DAZED);
 
-        if ((livingEntity.hasStatusEffect(JStatusRegister.Dazed) && !JCraftUtils.isBlocking(livingEntity)) || livingEntity.hasStatusEffect(JStatusRegister.Knockdown)) {
+        if ((livingEntity.hasStatusEffect(JStatusRegister.DAZED) && !JCraftUtils.isBlocking(livingEntity)) || livingEntity.hasStatusEffect(JStatusRegister.KNOCKDOWN)) {
             cir.setReturnValue(false);
         }
 

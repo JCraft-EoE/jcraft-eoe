@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.util;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
+import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.entity.CreamEntity;
 import net.arna.jcraft.common.entity.D4CEntity;
 import net.arna.jcraft.common.entity.KingCrimsonEntity;
@@ -53,7 +53,7 @@ public final class JCraftUtils {
             buf.writeDouble(v2.z);
             for (PlayerEntity player : world.getPlayers()) {
                 if (player instanceof ServerPlayerEntity serverPlayerEntity) {
-                    ServerChannelFeedback.send(serverPlayerEntity, buf);
+                    ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
                 }
 
             }
@@ -97,7 +97,7 @@ public final class JCraftUtils {
             buf.writeDouble(v2.z);
             for (PlayerEntity player : world.getPlayers()) {
                 if (player instanceof ServerPlayerEntity serverPlayerEntity) {
-                    ServerChannelFeedback.send(serverPlayerEntity, buf);
+                    ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
                 }
             }
         }

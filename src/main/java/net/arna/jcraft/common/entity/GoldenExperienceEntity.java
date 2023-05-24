@@ -144,7 +144,7 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
     public void initSpecial2() {
         if (hasUser()) {
             LivingEntity user = this.getUser();
-            if (user.hasStatusEffect(JStatusRegister.Dazed)) {
+            if (user.hasStatusEffect(JStatusRegister.DAZED)) {
                 return;
             }
             boolean idling = this.getMoveStun() < 1;
@@ -235,15 +235,15 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
                 for (LivingEntity ent :
                         entities) {
                     if (!JCraftUtils.isBlocking(ent)) {
-                        ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.Knockdown, 50, 0, true, false));
+                        ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 50, 0, true, false));
                     }
                 }
             } else if (attack == overclock) {
                 for (LivingEntity ent :
                         entities) {
                     ent.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 5, 14, true, false));
-                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.Dazed, 60, 1, true, false));
-                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.OutOfBody, 60, 0, false, true));
+                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.DAZED, 60, 1, true, false));
+                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.OUTOFBODY, 60, 0, false, true));
                 }
             }
         }

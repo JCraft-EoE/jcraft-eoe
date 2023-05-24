@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
+import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.JCraftUtils;
@@ -186,7 +186,7 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
             } else if (attack == heavy) {
                 for (LivingEntity ent : entities) {
                     if (!JCraftUtils.isBlocking(ent)) {
-                        ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.Knockdown, 40, 0));
+                        ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 40, 0));
                     }
                 }
             } else if (attack == crossfirevariation) {
@@ -274,7 +274,7 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
                                     hurricaneTime = 15;
                                 } // Allows for zoning up until it hits something
                             } else {
-                                livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.Knockdown, 20, 0));
+                                livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 20, 0));
                             }
                         }
 
@@ -288,7 +288,7 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
 
                         for (PlayerEntity sendPlayer : world.getPlayers()) {
                             if (sendPlayer instanceof ServerPlayerEntity serverPlayerEntity) {
-                                ServerChannelFeedback.send(serverPlayerEntity, buf);
+                                ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
                             }
                         }
                     }

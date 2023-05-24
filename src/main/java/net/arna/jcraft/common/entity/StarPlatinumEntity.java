@@ -2,6 +2,7 @@ package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.network.s2c.ShaderActivationPacket;
+import net.arna.jcraft.client.network.s2c.ShaderDeactivationPacket;
 import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
@@ -230,6 +231,12 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
     @Override
     public int tickTimer() {
         return age;
+    }
+
+    @Override
+    public boolean canAttack() {
+        PlayerLookup.tracking(this).forEach(tracked -> ShaderDeactivationPacket.send(tracked, ShaderActivationPacket.Type.ZA_WARDO));
+        return super.canAttack();
     }
 
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {

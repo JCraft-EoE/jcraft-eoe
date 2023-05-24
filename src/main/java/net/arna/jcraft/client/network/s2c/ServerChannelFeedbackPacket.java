@@ -28,7 +28,7 @@ import net.minecraft.util.math.Vec3d;
 
 import java.util.Random;
 
-public class ServerChannelFeedback {
+public class ServerChannelFeedbackPacket {
     public static final Identifier ID = new Identifier(JCraft.MOD_ID, "sfchannel");
 
     public static void send(ServerPlayerEntity serverPlayerEntity, PacketByteBuf buf) {

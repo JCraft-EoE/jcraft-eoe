@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
+import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
@@ -183,7 +183,7 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
         if (attack == poisonspew) {
             if (!world.isClient()) {
                 for (LivingEntity ent : entities) {
-                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.WSPoison, 80, 1));
+                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.WSPOISON, 80, 1));
                 }
 
                 PacketByteBuf buf = PacketByteBufs.create();
@@ -203,13 +203,13 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
 
                 for (PlayerEntity sendPlayer : world.getPlayers()) {
                     if (sendPlayer instanceof ServerPlayerEntity serverPlayerEntity) {
-                        ServerChannelFeedback.send(serverPlayerEntity, buf);
+                        ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
                     }
                 }
             }
         } else if (attack == standdisk) {
             for (LivingEntity ent : entities) {
-                ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.Standless, 160, 0, true, false));
+                ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.STANDLESS, 160, 0, true, false));
             }
         } else if (attack == memorydisk) {
             for (LivingEntity ent : entities) {

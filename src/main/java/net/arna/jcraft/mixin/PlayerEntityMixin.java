@@ -1,6 +1,6 @@
 package net.arna.jcraft.mixin;
 
-import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
+import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.*;
@@ -83,18 +83,18 @@ public abstract class PlayerEntityMixin implements ISpec, IComboCounter {
                 buf.writeShort(6);
                 buf.writeInt(0);
                 if (PlayerEntity.class.cast(this) instanceof ServerPlayerEntity serverPlayerEntity) {
-                    ServerChannelFeedback.send(serverPlayerEntity, buf);
+                    ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
                 }
             }
         }
     }
 
-    // Knockdown and poison preventing pose updating
+    // KNOCKDOWN and poison preventing pose updating
     @Inject(cancellable = true, at = @At("HEAD"), method = "updatePose")
     public void jcraft$updatePose(CallbackInfo info) {
         if (
-                ((PlayerEntity) (Object) this).hasStatusEffect(JStatusRegister.Knockdown)
-                        || ((PlayerEntity) (Object) this).hasStatusEffect(JStatusRegister.WSPoison)
+                ((PlayerEntity) (Object) this).hasStatusEffect(JStatusRegister.KNOCKDOWN)
+                        || ((PlayerEntity) (Object) this).hasStatusEffect(JStatusRegister.WSPOISON)
         ) {
             info.cancel();
         }
@@ -121,7 +121,7 @@ public abstract class PlayerEntityMixin implements ISpec, IComboCounter {
             if (attack != null) {
                 if (attack.attackType == AttackType.COUNTER && stand.getMoveStun() < (attack.moveStun - attack.initTime)) {
                     stand.counter(source.getAttacker(), source); // Initiate counter
-                    player.removeStatusEffect(JStatusRegister.Dazed);
+                    player.removeStatusEffect(JStatusRegister.DAZED);
                     info.cancel();
                 }
             }

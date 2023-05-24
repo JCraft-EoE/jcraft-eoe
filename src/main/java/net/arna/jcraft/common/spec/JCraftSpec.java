@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.spec;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
+import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JStatusRegister;
@@ -58,7 +58,7 @@ public abstract class JCraftSpec {
 
     public boolean CanAttack() {
         ITimeStop timeStop = (ITimeStop) player;
-        return this.moveStun < 1 && timeStop.getTimeStopTicks() < 1 && !player.hasStatusEffect(JStatusRegister.Dazed);
+        return this.moveStun < 1 && timeStop.getTimeStopTicks() < 1 && !player.hasStatusEffect(JStatusRegister.DAZED);
     }
 
     public boolean HandleAttack(ServerWorld serverWorld, Attack attack, String cooldownName) {
@@ -76,7 +76,7 @@ public abstract class JCraftSpec {
         buf.writeInt(player.getId());
         buf.writeString(attack.animation);
         for (ServerPlayerEntity sendPlayer : serverWorld.getPlayers()) {
-            ServerChannelFeedback.send(sendPlayer, buf);
+            ServerChannelFeedbackPacket.send(sendPlayer, buf);
         }
         return true;
     }
@@ -95,7 +95,7 @@ public abstract class JCraftSpec {
         buf.writeInt(player.getId());
         ServerWorld serverWorld = (ServerWorld) player.getWorld();
         for (ServerPlayerEntity sendPlayer : serverWorld.getPlayers()) {
-            ServerChannelFeedback.send(sendPlayer, buf);
+            ServerChannelFeedbackPacket.send(sendPlayer, buf);
         }
     }
 

@@ -9,16 +9,16 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 public interface JStatusRegister {
-    StatusEffect Dazed = new DazedStatusEffect();
-    StatusEffect Knockdown = new KnockdownStatusEffect();
-    StatusEffect WSPoison = new WSPoisonEffect();
-    StatusEffect Standless = new StandlessEffect();
-    StatusEffect OutOfBody = new OutOfBodyEffect();
+    StatusEffect DAZED = new DazedStatusEffect();
+    StatusEffect KNOCKDOWN = new KnockdownStatusEffect();
+    StatusEffect WSPOISON = new WSPoisonEffect();
+    StatusEffect STANDLESS = new StandlessEffect();
+    StatusEffect OUTOFBODY = new OutOfBodyEffect();
 
     static void registerStatuses() {
         Registry.register(
                 Registry.STATUS_EFFECT, new Identifier(JCraft.MOD_ID, "dazed_effect"),
-                Dazed.addAttributeModifier(
+                DAZED.addAttributeModifier(
                         EntityAttributes.GENERIC_ATTACK_DAMAGE,
                         "FE04CA6A-A3D1-E22B-CB00-EDA6A853F90E",
                         -1.0,
@@ -37,7 +37,7 @@ public interface JStatusRegister {
 
         Registry.register(
                 Registry.STATUS_EFFECT, new Identifier(JCraft.MOD_ID, "knockdown"),
-                Knockdown.addAttributeModifier(
+                KNOCKDOWN.addAttributeModifier(
                         EntityAttributes.GENERIC_ARMOR,
                         "BB2CA307-EEA6-B54C-B324-F7EB036289BF",
                         30.0,
@@ -54,8 +54,8 @@ public interface JStatusRegister {
                         EntityAttributeModifier.Operation.MULTIPLY_TOTAL)
         );
 
-        Registry.register(Registry.STATUS_EFFECT, new Identifier(JCraft.MOD_ID, "ws_poison"), WSPoison);
-        Registry.register(Registry.STATUS_EFFECT, new Identifier(JCraft.MOD_ID, "standless"), Standless);
-        Registry.register(Registry.STATUS_EFFECT, new Identifier(JCraft.MOD_ID, "outofbody"), OutOfBody);
+        Registry.register(Registry.STATUS_EFFECT, new Identifier(JCraft.MOD_ID, "ws_poison"), WSPOISON);
+        Registry.register(Registry.STATUS_EFFECT, new Identifier(JCraft.MOD_ID, "standless"), STANDLESS);
+        Registry.register(Registry.STATUS_EFFECT, new Identifier(JCraft.MOD_ID, "outofbody"), OUTOFBODY);
     }
 }

@@ -60,7 +60,7 @@ public abstract class CameraMixin {
     @Inject(method = "update", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;setPos(DDD)V", shift = At.Shift.BEFORE))
     public void jcraft$prevSetPosUpdate(BlockView area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta, CallbackInfo info) {
         if (focusedEntity instanceof LivingEntity living) {
-            if (living.hasStatusEffect(JStatusRegister.OutOfBody)) {
+            if (living.hasStatusEffect(JStatusRegister.OUTOFBODY)) {
                 this.thirdPerson = true;
                 info.cancel();
             }

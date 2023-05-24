@@ -1,7 +1,7 @@
 package net.arna.jcraft;
 
 import eu.midnightdust.lib.config.MidnightConfig;
-import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
+import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.JCommonConfig;
 import net.arna.jcraft.common.entity.*;
 import net.arna.jcraft.common.network.c2s.StandControlPacket;
@@ -197,7 +197,7 @@ public class JCraft implements ModInitializer {
     );
 
     public static StandEntity Summon(ServerWorld world, LivingEntity player) {
-        if (player.hasStatusEffect(JStatusRegister.Standless)) {
+        if (player.hasStatusEffect(JStatusRegister.STANDLESS)) {
             return null;
         }
 
@@ -270,7 +270,7 @@ public class JCraft implements ModInitializer {
         buf.writeInt(id); // Combo breaker particle ID
 
         for (ServerPlayerEntity serverPlayer : world.getPlayers()) {
-            ServerChannelFeedback.send(serverPlayer, buf);
+            ServerChannelFeedbackPacket.send(serverPlayer, buf);
         }
     }
 

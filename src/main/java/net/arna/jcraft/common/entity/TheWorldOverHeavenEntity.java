@@ -2,6 +2,7 @@ package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.network.s2c.ShaderActivationPacket;
+import net.arna.jcraft.client.network.s2c.ShaderDeactivationPacket;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
@@ -453,6 +454,12 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
     @Override
     public int tickTimer() {
         return age;
+    }
+
+    @Override
+    public boolean canAttack() {
+        PlayerLookup.tracking(this).forEach(tracked -> ShaderDeactivationPacket.send(tracked, ShaderActivationPacket.Type.ZA_WARDO));
+        return super.canAttack();
     }
 
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {

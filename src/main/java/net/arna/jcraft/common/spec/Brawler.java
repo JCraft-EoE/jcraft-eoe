@@ -54,7 +54,7 @@ public class Brawler extends JCraftSpec {
         if (attack == low) {
             for (LivingEntity ent :
                     hurt) {
-                ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.Knockdown, 25, 0, true, true));
+                ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 25, 0, true, true));
             }
         }
     }

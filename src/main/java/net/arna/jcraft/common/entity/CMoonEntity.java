@@ -293,7 +293,7 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
                 ent.setVelocity(new Vec3d(0.0, -0.5, 0.0));
                 ent.velocityModified = true;
                 if (user.isSneaking()) {
-                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.Knockdown, 30, 0));
+                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 30, 0));
                 }
             }
 

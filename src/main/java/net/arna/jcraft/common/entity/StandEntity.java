@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
+import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.mixin.LivingEntityInvoker;
@@ -320,7 +320,7 @@ public abstract class StandEntity extends MobEntity {
     public boolean canAttack() {
         if (hasUser()) {
             ITimeStop timeStop = (ITimeStop) user;
-            return this.getMoveStun() < 1 && timeStop.getTimeStopTicks() < 1 && !user.hasStatusEffect(JStatusRegister.Dazed);
+            return this.getMoveStun() < 1 && timeStop.getTimeStopTicks() < 1 && !user.hasStatusEffect(JStatusRegister.DAZED);
         }
         return false;
     }
@@ -338,7 +338,7 @@ public abstract class StandEntity extends MobEntity {
     public CanAttackData canAttackWithData() {
         if (hasUser()) {
             ITimeStop timeStop = (ITimeStop) user;
-            return new CanAttackData(user, this.getMoveStun() < 1 && timeStop.getTimeStopTicks() < 1 && !user.hasStatusEffect(JStatusRegister.Dazed));
+            return new CanAttackData(user, this.getMoveStun() < 1 && timeStop.getTimeStopTicks() < 1 && !user.hasStatusEffect(JStatusRegister.DAZED));
         }
         return new CanAttackData(null, false);
     }
@@ -364,7 +364,7 @@ public abstract class StandEntity extends MobEntity {
         if (duration == 0) {
             return;
         }
-        entity.addStatusEffect(new StatusEffectInstance(JStatusRegister.Dazed, duration, amplifier, false, false, true));
+        entity.addStatusEffect(new StatusEffectInstance(JStatusRegister.DAZED, duration, amplifier, false, false, true));
         //JCraft.LOGGER.info("Stunned: " + entity.getEntityName() + " for: " + duration);
     }
 
@@ -509,7 +509,7 @@ public abstract class StandEntity extends MobEntity {
 
             // Block break check
             if (this.getStandGauge() < 1) {
-                user.addStatusEffect(new StatusEffectInstance(JStatusRegister.Dazed, 40, 2));
+                user.addStatusEffect(new StatusEffectInstance(JStatusRegister.DAZED, 40, 2));
                 this.playSound(SoundEvents.ITEM_TOTEM_USE, 1, 0.5f);
                 this.kill();
             }
@@ -664,8 +664,8 @@ public abstract class StandEntity extends MobEntity {
                     }
 
                     for (LivingEntity livingEntity : clashed) {
-                        livingEntity.removeStatusEffect(JStatusRegister.Dazed);
-                        livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.Dazed, 10, 3, true, false));
+                        livingEntity.removeStatusEffect(JStatusRegister.DAZED);
+                        livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.DAZED, 10, 3, true, false));
                     }
 
                     this.specialAttack(attack, hurt);
@@ -782,7 +782,7 @@ public abstract class StandEntity extends MobEntity {
                 if (comboCounter.getLastAttacked() != ent) {
                     comboCounter.setComboCount(1);
                 } else {
-                    StatusEffectInstance stun = ent.getStatusEffect(JStatusRegister.Dazed);
+                    StatusEffectInstance stun = ent.getStatusEffect(JStatusRegister.DAZED);
                     if (stun != null && stun.getAmplifier() == 1) {
                         //LOGGER.info("Target stun: " + stun.getDuration());
                         comboCounter.incrementComboCount();
@@ -794,7 +794,7 @@ public abstract class StandEntity extends MobEntity {
                     buf.writeShort(6);
                     buf.writeInt(comboCounter.getComboCount());
                     if (playerEntity instanceof ServerPlayerEntity serverPlayerEntity) {
-                        ServerChannelFeedback.send(serverPlayerEntity, buf);
+                        ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
                     }
                 }
                 comboCounter.setLastAttacked(ent);
@@ -813,7 +813,7 @@ public abstract class StandEntity extends MobEntity {
                 // Counter check
                 if (standAttack.attackType == AttackType.COUNTER && stand.getMoveStun() < (standAttack.moveStun - standAttack.initTime)) {
                     stand.counter(attacker, source);
-                    ent.removeStatusEffect(JStatusRegister.Dazed);
+                    ent.removeStatusEffect(JStatusRegister.DAZED);
                     return;
                 }
 
@@ -840,7 +840,7 @@ public abstract class StandEntity extends MobEntity {
         // Stun application & overriding
         if (hit) {
             if (overrideStun)
-                ent.removeStatusEffect(JStatusRegister.Dazed);
+                ent.removeStatusEffect(JStatusRegister.DAZED);
             stun(ent, stunTicks, stunType);
             ent.addVelocity(kbVec.x, kbVec.y, kbVec.z);
         }
@@ -993,17 +993,17 @@ public abstract class StandEntity extends MobEntity {
             this.blocking = false;
         }
 
-        boolean stunned = mob.hasStatusEffect(JStatusRegister.Dazed);
+        boolean stunned = mob.hasStatusEffect(JStatusRegister.DAZED);
         // If stunned, and about to get hit by another move, combo break sometimes
         if (stunned) {
-            StatusEffectInstance mobStun = mob.getStatusEffect(JStatusRegister.Dazed);
+            StatusEffectInstance mobStun = mob.getStatusEffect(JStatusRegister.DAZED);
             if (!this.blocking && enemyAttack != null && enemyMoveStun > enemyAttack.initTime && this.random.nextFloat() < 0.1f) {
                 ComboBreak((ServerWorld) this.world, mob, mobStun);
             }
         }
 
         if (!this.blocking) {
-            StatusEffectInstance stun = target.getStatusEffect(JStatusRegister.Dazed);
+            StatusEffectInstance stun = target.getStatusEffect(JStatusRegister.DAZED);
             // Overestimating stun up to 1/4 of a second for longer combos and frametraps
             int stunTicks = stun != null ? stun.getDuration() + random.nextInt(5) : 0;
             stunTicks += blockPlusTicks;

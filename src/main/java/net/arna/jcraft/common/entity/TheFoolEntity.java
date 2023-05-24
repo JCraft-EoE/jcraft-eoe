@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
+import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
@@ -277,7 +277,7 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
         LivingEntity user = this.getUser();
         if (attack == sandwave) {
             for (LivingEntity ent : entities) {
-                ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.Knockdown, 15, 0));
+                ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 15, 0));
             }
         } else if (attack == sandclone) {
             // Display sand effect
@@ -293,7 +293,7 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
 
             for (PlayerEntity sendPlayer : world.getPlayers()) {
                 if (sendPlayer instanceof ServerPlayerEntity serverPlayerEntity) {
-                    ServerChannelFeedback.send(serverPlayerEntity, buf);
+                    ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
                 }
 
                 if (sendPlayer == user) {
@@ -349,7 +349,7 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
             }
         } else if (attack == combo && this.getMoveStun() < 11) {
             for (LivingEntity ent : entities) {
-                ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.Knockdown, 20, 0));
+                ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 20, 0));
             }
         } else if (attack == sandstorm && entities.size() > 0) {
             this.superTarget = entities.get(0);

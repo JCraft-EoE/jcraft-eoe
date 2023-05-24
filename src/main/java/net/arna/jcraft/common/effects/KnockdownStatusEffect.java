@@ -19,15 +19,15 @@ public class KnockdownStatusEffect extends StatusEffect {
         return true;
     }
 
-    // Knockdown prevents attacking, and sets you into a horizontal pose
+    // KNOCKDOWN prevents attacking, and sets you into a horizontal pose
     @Override
     public void applyUpdateEffect(LivingEntity entity, int amplifier) {
-        StatusEffectInstance self = entity.getStatusEffect(JStatusRegister.Knockdown);
+        StatusEffectInstance self = entity.getStatusEffect(JStatusRegister.KNOCKDOWN);
         if (self.getDuration() > 6) { // 5 tick (0.25s) stun immunity window after knockdown
             entity.setPose(entity instanceof PlayerEntity ? EntityPose.SWIMMING : EntityPose.SLEEPING);
         } else {
             entity.setPose(EntityPose.STANDING);
-            entity.removeStatusEffect(JStatusRegister.Dazed);
+            entity.removeStatusEffect(JStatusRegister.DAZED);
         }
     }
 }

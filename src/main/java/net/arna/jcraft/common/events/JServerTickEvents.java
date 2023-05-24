@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.events;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
+import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.util.DimValues;
 import net.arna.jcraft.common.util.IEntityDataSaver;
@@ -70,7 +70,7 @@ public class JServerTickEvents {
                         buf.writeShort(3);
                         buf.writeInt(i);
                         buf.writeDouble(MathHelper.clamp(reducedCd / 20.0, 0.0, 10000.0));
-                        ServerChannelFeedback.send(player, buf);
+                        ServerChannelFeedbackPacket.send(player, buf);
                     }
                 }
             }
@@ -140,7 +140,7 @@ public class JServerTickEvents {
             if (newVal > 0) {
                 newBurstTimers.put(player, newVal);
             } else {
-                player.removeStatusEffect(JStatusRegister.Dazed);
+                player.removeStatusEffect(JStatusRegister.DAZED);
                 stun(player, 10, 1);
                 Vec3d pPos = player.getEyePos();
                 List<? extends Entity> toPush = JCraftUtils.GenerateHitbox(player.world, pPos, 4, Entity.class, filter);
@@ -267,7 +267,7 @@ public class JServerTickEvents {
 
                             for (LivingEntity ent : toDamage) {
                                 ent.damage(DamageSource.explosion(explosion), 10);
-                                ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.Knockdown, 30, 0));
+                                ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 30, 0));
                             }
                         }
                     }

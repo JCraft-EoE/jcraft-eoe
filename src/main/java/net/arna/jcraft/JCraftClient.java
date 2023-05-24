@@ -4,8 +4,9 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import eu.midnightdust.lib.config.MidnightConfig;
 import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.hud.JCraftHudOverlay;
-import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
+import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.client.network.s2c.ShaderActivationPacket;
+import net.arna.jcraft.client.network.s2c.ShaderDeactivationPacket;
 import net.arna.jcraft.client.particle.ComboBreakerParticle;
 import net.arna.jcraft.client.particle.CooldownCancelParticle;
 import net.arna.jcraft.client.particle.HitsparkParticle;
@@ -52,7 +53,6 @@ import static net.arna.jcraft.JCraft.MOD_ID;
 
 public class JCraftClient implements ClientModInitializer {
 
-    public static ZaWarudoShaderHandler zaWarudoShader = new ZaWarudoShaderHandler();
     public static Shader timeeraseShader;
     private final List<String> comboRemarks = List.of("admin rdm!!!", "baby combo", "caught lackin", "kinda ez", "skill issue", "cancelled on twitter", "sent to bulgaria", "down bad");
     public static DefaultedList<Double> clientCooldowns = DefaultedList.ofSize(JCraft.cooldowns.size(), 0.0);
@@ -78,7 +78,7 @@ public class JCraftClient implements ClientModInitializer {
         JRenderLayerRegistry.init();
         RenderHandler.init();
         JEventsRegister.registerClientEvents();
-        zaWarudoShader.init();
+        ZaWarudoShaderHandler.INSTANCE.init();
 
         // Particle registration
         ParticleFactoryRegistry.getInstance().register(JParticleTypeRegistry.COMBO_BREAK, ComboBreakerParticle.Factory::new);
@@ -104,8 +104,9 @@ public class JCraftClient implements ClientModInitializer {
         utility = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.utility", InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_5, "key.category.jcraft"));
 
         ClientTickEvents.END_CLIENT_TICK.register(this::tickClient);
-        ClientPlayNetworking.registerGlobalReceiver(ServerChannelFeedback.ID, ServerChannelFeedback::handle);
+        ClientPlayNetworking.registerGlobalReceiver(ServerChannelFeedbackPacket.ID, ServerChannelFeedbackPacket::handle);
         ClientPlayNetworking.registerGlobalReceiver(ShaderActivationPacket.ID, ShaderActivationPacket::handle);
+        ClientPlayNetworking.registerGlobalReceiver(ShaderDeactivationPacket.ID, ShaderDeactivationPacket::handle);
 
         HudRenderCallback.EVENT.register(new JCraftHudOverlay());
         HudRenderCallback.EVENT.register(this::renderHud);

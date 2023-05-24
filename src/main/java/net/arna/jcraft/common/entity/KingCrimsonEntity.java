@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
+import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
@@ -142,7 +142,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
     @Override
     public void initHeavyAttack() {
         if (hasUser()) {
-            if (getUser().hasStatusEffect(JStatusRegister.Dazed)) {
+            if (getUser().hasStatusEffect(JStatusRegister.DAZED)) {
                 return;
             }
             boolean idling = this.getMoveStun() < 1;
@@ -210,7 +210,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
         if (hasUser()) {
             LivingEntity user = this.getUser();
             ITimeStop timeStop = (ITimeStop) user;
-            if (user.hasStatusEffect(JStatusRegister.Dazed) || timeStop.getTimeStopTicks() > 0) {
+            if (user.hasStatusEffect(JStatusRegister.DAZED) || timeStop.getTimeStopTicks() > 0) {
                 return;
             }
             if (this.getMoveStun() < 1) {
@@ -241,7 +241,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                     buf.writeDouble(bBox.getXLength());
                     buf.writeDouble(bBox.getYLength());
                     buf.writeDouble(bBox.getZLength());
-                    ServerChannelFeedback.send(serverPlayer, buf);
+                    ServerChannelFeedbackPacket.send(serverPlayer, buf);
                 }
             }
         }
@@ -256,7 +256,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
             this.curAttack = barrageFinisher;
         } else if (attack == overhead) {
             for (LivingEntity ent : entities) {
-                ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.Knockdown, 35, 0));
+                ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0));
             }
         } else if (attack == eyechop) {
             for (LivingEntity ent : entities) {
@@ -354,7 +354,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                 buf.writeDouble(bBox.getXLength());
                 buf.writeDouble(bBox.getYLength());
                 buf.writeDouble(bBox.getZLength());
-                ServerChannelFeedback.send(serverPlayer, buf);
+                ServerChannelFeedbackPacket.send(serverPlayer, buf);
             }
 
             this.world.playSound(null, pos.x, pos.y, pos.z, JSoundRegister.TE_TP, SoundCategory.PLAYERS, 1f, 1f);
@@ -461,7 +461,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                             buf.writeDouble(box.getZLength());
 
                             if (playerEntity instanceof ServerPlayerEntity serverPlayerEntity) {
-                                ServerChannelFeedback.send(serverPlayerEntity, buf);
+                                ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
                             }
                         }
                     }
@@ -469,7 +469,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
 
                 user.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 10, 9, true, false));
                 user.addStatusEffect(new StatusEffectInstance(StatusEffects.INVISIBILITY, 10, 0, true, false));
-                user.removeStatusEffect(JStatusRegister.Dazed); // You are unstunnable inside of time erase
+                user.removeStatusEffect(JStatusRegister.DAZED); // You are unstunnable inside of time erase
                 Box noBox = new Box(0, 0, 0, 0, 0, 0);
                 user.setBoundingBox(noBox);
                 user.noClip = true;

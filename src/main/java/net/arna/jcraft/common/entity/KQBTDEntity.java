@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.network.s2c.ServerChannelFeedback;
+import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
@@ -285,7 +285,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
                     }
                 } else {
                     world.createExplosion(user, livingEntity.getX(), livingEntity.getY() + livingEntity.getHeight() / 2, livingEntity.getZ(), 2f, Explosion.DestructionType.NONE);
-                    livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.Knockdown, 35, 0, true, false));
+                    livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
                 }
             } else {
                 Vec3d bombPos = null;
@@ -308,7 +308,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
                     );
 
                     for (LivingEntity livingEntity : toKD) {
-                        livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.Knockdown, 35, 0, true, false));
+                        livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
                     }
 
                     world.playSound(bombPos.x, bombPos.y, bombPos.z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.75f, 1, true);
@@ -453,7 +453,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
 
                         if (bBox == null || bBox.getAverageSideLength() > 0) {
                             if (playerEntity instanceof ServerPlayerEntity serverPlayerEntity) {
-                                ServerChannelFeedback.send(serverPlayerEntity, buf);
+                                ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
                             }
                         }
                     }

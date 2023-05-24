@@ -287,7 +287,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
         } else if (attack == ballheavy) {
             for (LivingEntity ent : entities) {
                 if (!JCraftUtils.isBlocking(ent)) {
-                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.Knockdown, 35, 0));
+                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0));
                 }
             }
         } else if (attack == destroy) {
@@ -316,7 +316,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
                     }
                 }
 
-                ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.Knockdown, 35, 0));
+                ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0));
             }
         } else if (attack == enter) {
             beginHalfBall();

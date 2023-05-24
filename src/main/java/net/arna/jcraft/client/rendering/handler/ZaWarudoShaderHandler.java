@@ -17,7 +17,9 @@ import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
 public class ZaWarudoShaderHandler extends StandShaderHandler {
+    public static final ZaWarudoShaderHandler INSTANCE = new ZaWarudoShaderHandler();
     public final Identifier SHADER_ID = JCraft.id("shaders/post/za_warudo.json");
+
     public float prevRadius, radius = 0f;
     public long effectLength = 0;
 
