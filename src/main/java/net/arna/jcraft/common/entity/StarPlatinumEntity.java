@@ -1,14 +1,11 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.network.s2c.ShaderActivationPacket;
-import net.arna.jcraft.client.network.s2c.ShaderDeactivationPacket;
 import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.registry.JSoundRegister;
-import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -230,12 +227,6 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
     @Override
     public int tickTimer() {
         return age;
-    }
-
-    @Override
-    public boolean canAttack() {
-        PlayerLookup.tracking(this).forEach(tracked -> ShaderDeactivationPacket.send(tracked, ShaderActivationPacket.Type.ZA_WARDO));
-        return super.canAttack();
     }
 
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {

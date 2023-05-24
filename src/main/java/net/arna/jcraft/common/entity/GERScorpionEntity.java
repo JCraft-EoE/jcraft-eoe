@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static net.arna.jcraft.common.entity.StandEntity.DamageLogic;
+import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 
 public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimationTickable {
     AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
@@ -211,7 +211,7 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                         jumpTarget = hurtAll.get(0);
                         for (LivingEntity l :
                                 hurtAll) {
-                            DamageLogic(world, l, getVelocity(), 15, 1, false, 6f, true, DamageSource.mob(owner), owner);
+                            damageLogic(world, l, getVelocity(), 15, 1, false, 6f, true, DamageSource.mob(owner), owner);
                         }
                         Transform();
                         JCraft.CreateParticle((ServerWorld) this.world,
@@ -240,7 +240,7 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                         List<LivingEntity> hurt = JCraftUtils.GenerateHitbox(world, getPos(), 1.5, filter);
                         for (LivingEntity l :
                                 hurt) {
-                            DamageLogic(world, l, Vec3d.ZERO, 15, 1, false, 3f, true, DamageSource.mob(owner), owner);
+                            damageLogic(world, l, Vec3d.ZERO, 15, 1, false, 3f, true, DamageSource.mob(owner), owner);
                         }
                     }
                 }

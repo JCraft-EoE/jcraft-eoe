@@ -204,9 +204,9 @@ public class JServerTickEvents {
                                 LivingEntity primeAdversary = mob.getPrimeAdversary();
                                 LivingEntity target = mob.getTarget();
                                 if (primeAdversary != null && primeAdversary.isAlive()) {
-                                    stand.MobAI(mob, primeAdversary);
+                                    stand.mobAI(mob, primeAdversary);
                                 } else if (target != null && target.isAlive()) {
-                                    stand.MobAI(mob, target);
+                                    stand.mobAI(mob, target);
                                 } else if (biggestAttacker != null && biggestAttacker.isAlive()) {
                                     mob.setTarget(biggestAttacker);
                                 }

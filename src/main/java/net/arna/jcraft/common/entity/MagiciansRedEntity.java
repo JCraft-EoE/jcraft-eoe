@@ -269,7 +269,7 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
 
                         for (LivingEntity livingEntity : toHurt) {
                             if (hurricaneTime > 1) {
-                                DamageLogic(world, livingEntity, new Vec3d(Math.sin(this.age) * 3, 0.0, Math.cos(this.age) * 3), 10, 1, false, 0.5f, true, DamageSource.mob(user), user);
+                                damageLogic(world, livingEntity, new Vec3d(Math.sin(this.age) * 3, 0.0, Math.cos(this.age) * 3), 10, 1, false, 0.5f, true, DamageSource.mob(user), user);
                                 if (hurricaneTime > 15) {
                                     hurricaneTime = 15;
                                 } // Allows for zoning up until it hits something

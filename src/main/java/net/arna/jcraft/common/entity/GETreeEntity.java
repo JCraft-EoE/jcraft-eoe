@@ -67,7 +67,7 @@ public class GETreeEntity extends Entity implements IAnimatable, IAnimationTicka
                 for (LivingEntity living :
                         hurt) {
                     if (living != owner && living.getVehicle() != owner) {
-                        StandEntity.DamageLogic(world, living, new Vec3d(0, 1, 0), 25, 1, false, 7f, true, DamageSource.mob(owner), owner);
+                        StandEntity.damageLogic(world, living, new Vec3d(0, 1, 0), 25, 1, false, 7f, true, DamageSource.mob(owner), owner);
                     }
 
                     living.setVelocity(0, 1, 0);

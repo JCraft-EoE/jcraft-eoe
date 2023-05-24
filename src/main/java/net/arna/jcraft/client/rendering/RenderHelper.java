@@ -3,7 +3,8 @@ package net.arna.jcraft.client.rendering;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Matrix4f;
 
 import java.util.Optional;
 import java.util.function.Supplier;

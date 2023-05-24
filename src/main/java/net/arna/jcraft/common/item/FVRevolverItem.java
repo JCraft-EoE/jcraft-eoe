@@ -20,7 +20,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-import static net.arna.jcraft.common.entity.StandEntity.DamageLogic;
+import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 
 public class FVRevolverItem extends Item {
     public FVRevolverItem(Settings settings) {
@@ -66,7 +66,7 @@ public class FVRevolverItem extends Item {
             if (hitResult != null) {
                 Entity entity = hitResult.getEntity();
                 if (entity instanceof LivingEntity livingEntity)
-                    DamageLogic(world, livingEntity, dir, 10, 1, false, 5, true, DamageSource.mob(user), user);
+                    damageLogic(world, livingEntity, dir, 10, 1, false, 5, true, DamageSource.mob(user), user);
             }
         }
 

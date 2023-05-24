@@ -33,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import static net.arna.jcraft.common.entity.StandEntity.BaseDamageLogic;
+import static net.arna.jcraft.common.entity.StandEntity.baseDamageLogic;
 
 public class AnubisItem extends Item {
     public int state = 0;
@@ -72,7 +72,7 @@ public class AnubisItem extends Item {
             // Sneaking / heavy, stunning attack
             // puts barrage and light on cooldown
             if (attacker.isSneaking()) {
-                BaseDamageLogic(target, Vec3d.ZERO, 10, 1, false, 6.5f, false, damageSource, attacker);
+                baseDamageLogic(target, Vec3d.ZERO, 10, 1, false, 6.5f, false, damageSource, attacker);
                 target.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 80, 0, false, true));
                 state = 3;
 
@@ -91,7 +91,7 @@ public class AnubisItem extends Item {
                 hit.remove(attacker);
 
                 for (LivingEntity ent : hit) {
-                    BaseDamageLogic(ent, ent.getPos().subtract(aPos.x, ent.getY(), aPos.z).normalize().add(0, 0.2, 0), 5, 3, true, 3.5f, false, damageSource, attacker);
+                    baseDamageLogic(ent, ent.getPos().subtract(aPos.x, ent.getY(), aPos.z).normalize().add(0, 0.2, 0), 5, 3, true, 3.5f, false, damageSource, attacker);
                 }
 
                 state = 2;
@@ -100,7 +100,7 @@ public class AnubisItem extends Item {
             }
 
             // Standing / thrusting attack
-            BaseDamageLogic(target, Vec3d.ZERO, 5, 1, false, 4f, true, damageSource, attacker);
+            baseDamageLogic(target, Vec3d.ZERO, 5, 1, false, 4f, true, damageSource, attacker);
             attacker.setVelocity(attacker.getVelocity().add(target.getPos().subtract(aPos.x, target.getY(), aPos.z).normalize().multiply(0.25)));
             attacker.velocityModified = true;
             state = 1;

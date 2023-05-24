@@ -2,15 +2,11 @@ package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.JClientConfig;
-import net.arna.jcraft.client.network.s2c.ShaderActivationPacket;
-import net.arna.jcraft.client.network.s2c.ShaderDeactivationPacket;
 import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.registry.JSoundRegister;
-import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -234,7 +230,7 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
     public void tick() {
         if (age == 1) {
             this.playSound(JSoundRegister.TW_SUMMON, 1f, 1f);
-            if(JClientConfig.ANIME_VOICES){
+            if (JClientConfig.ANIME_VOICES) {
                 this.playSound(JSoundRegister.MUDA_DA, 1f, 1f);
             }
         }
@@ -259,12 +255,6 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
     @Override
     public int tickTimer() {
         return age;
-    }
-
-    @Override
-    public boolean canAttack() {
-        PlayerLookup.tracking(this).forEach(tracked -> ShaderDeactivationPacket.send(tracked, ShaderActivationPacket.Type.ZA_WARDO));
-        return super.canAttack();
     }
 
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {

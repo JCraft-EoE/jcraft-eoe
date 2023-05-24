@@ -17,7 +17,7 @@ in vec4 vPosition;
 
 out vec4 fragColor;
 
-vec4 CalcEyeFromWindow(in float depth){
+vec4 calcEyeFromWindow(in float depth){
     vec3 ndcPos;
     ndcPos.xy = ((2.0 * gl_FragCoord.xy) - (2.0 * ViewPort.xy)) / (ViewPort.zw) - 1;
     ndcPos.z = (2.0 * depth - gl_DepthRange.near - gl_DepthRange.far) / (gl_DepthRange.far - gl_DepthRange.near);
@@ -48,7 +48,7 @@ void main(){
     vec2 viewportCoord = ndc.xy * 0.5 + 0.5;
 
     float sceneDepth = texture(DepthSampler, viewportCoord).x;
-    vec3 pixelPosition = CalcEyeFromWindow(sceneDepth).xyz + CameraPosition;
+    vec3 pixelPosition = calcEyeFromWindow(sceneDepth).xyz + CameraPosition;
 
     float pct = distance(pixelPosition, Center);
 
@@ -73,6 +73,7 @@ void main(){
     uv = p;
     vec3 color = texture(DiffuseSampler, vec2(uv.x, uv.y * prop)).rgb;
     if(Radius > 0){
+        //Change this to modify the color of the "ring"
         color += pow(vec3(1.) * (outside * inside + outside2 * inside2), vec3(3.));
     }
 

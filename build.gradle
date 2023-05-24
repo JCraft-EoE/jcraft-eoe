@@ -32,6 +32,9 @@ repositories {
 		name = "Ladysnake"
 		url = "https://ladysnake.jfrog.io/artifactory/mods"
 	}
+	maven {
+		url = "https://jitpack.io"
+	}
 }
 
 dependencies {
@@ -55,6 +58,9 @@ dependencies {
 	//Satin
 	modImplementation include("io.github.ladysnake:satin:${project.satin_version}")
 
+	// MixinExtras
+	implementation("com.github.LlamaLad7:MixinExtras:0.1.1")
+	annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.1")
 }
 
 processResources {

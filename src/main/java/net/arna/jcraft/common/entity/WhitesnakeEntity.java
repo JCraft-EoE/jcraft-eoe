@@ -236,7 +236,7 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
             if (hitResult != null) {
                 Entity entity = hitResult.getEntity();
                 if (entity instanceof LivingEntity livingEntity) {
-                    DamageLogic(world, livingEntity, Vec3d.ZERO, (int) attack.stun * 20, 1, false, 6, false, DamageSource.mob(user), user);
+                    damageLogic(world, livingEntity, Vec3d.ZERO, (int) attack.stun * 20, 1, false, 6, false, DamageSource.mob(user), user);
                 }
             }
         }

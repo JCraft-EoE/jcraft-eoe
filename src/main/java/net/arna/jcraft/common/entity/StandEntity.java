@@ -9,7 +9,6 @@ import net.arna.jcraft.mixin.LivingEntityInvoker;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.Entity;
@@ -570,15 +569,15 @@ public abstract class StandEntity extends MobEntity {
                     StatusEffectInstance tsBlind = new StatusEffectInstance(StatusEffects.BLINDNESS, 19, 0, false, false, false);
                     user.addStatusEffect(tsBlind);
 
-                    JCraftUtils.activeTimestops.add( new DimValues(this, pos, this.world.getRegistryKey()) );
+                    JCraftUtils.activeTimestops.add(new DimValues(this, pos, this.world.getRegistryKey()));
 
                     List<PlayerEntity> toCooldown = world.getEntitiesByClass(PlayerEntity.class,
                             new Box(eyePos.add(96.0, 96.0, 96.0), eyePos.subtract(96.0, 96.0, 96.0)), EntityPredicates.VALID_LIVING_ENTITY);
 
                     for (PlayerEntity player : toCooldown) {
-                        ServerPlayerEntity serverPlayer = (ServerPlayerEntity)player;
+                        ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
                         // Shader handling
-                        ShaderActivationPacket.send(serverPlayer, this, 0, stunTicks, ShaderActivationPacket.Type.ZA_WARDO);
+                        ShaderActivationPacket.send(serverPlayer, this, 0, stunTicks, ShaderActivationPacket.Type.ZA_WARUDO);
                         if (serverPlayer == user || serverPlayer.isCreative()) continue;
                         // Puts all player items besides armor into cooldown for entire duration of timestop
                         for (int i = 0; i < serverPlayer.getInventory().main.size(); i++)
@@ -660,7 +659,7 @@ public abstract class StandEntity extends MobEntity {
                             }
                             continue;
                         }
-                        DamageLogic(world, livingEntity, kbVec, stunTicks, attack.stunType, attack.overrideStun, damage, attack.lift, playerSource, user);
+                        damageLogic(world, livingEntity, kbVec, stunTicks, attack.stunType, attack.overrideStun, damage, attack.lift, playerSource, user);
                     }
 
                     for (LivingEntity livingEntity : clashed) {
@@ -775,7 +774,7 @@ public abstract class StandEntity extends MobEntity {
         //this.pastAttack = this.curAttack;
     }
 
-    public static void DamageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, DamageSource playerSource, Entity attacker) {
+    public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, DamageSource playerSource, Entity attacker) {
         if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && !world.isClient()) {
             if (attacker instanceof PlayerEntity playerEntity) {
                 IComboCounter comboCounter = (IComboCounter) playerEntity;
@@ -801,10 +800,10 @@ public abstract class StandEntity extends MobEntity {
             }
         }
 
-        BaseDamageLogic(ent, kbVec, stunTicks, stunType, overrideStun, damage, lift, playerSource, attacker);
+        baseDamageLogic(ent, kbVec, stunTicks, stunType, overrideStun, damage, lift, playerSource, attacker);
     }
 
-    public static void BaseDamageLogic(LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, DamageSource source, Entity attacker) {
+    public static void baseDamageLogic(LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, DamageSource source, Entity attacker) {
         boolean hit = true;
 
         if (ent.getFirstPassenger() instanceof StandEntity stand) {
@@ -900,7 +899,7 @@ public abstract class StandEntity extends MobEntity {
     }
 
     // The fun stuff
-    public void MobAI(MobEntity mob, LivingEntity target) {
+    public void mobAI(MobEntity mob, LivingEntity target) {
         if (mob == target) {
             return;
         }

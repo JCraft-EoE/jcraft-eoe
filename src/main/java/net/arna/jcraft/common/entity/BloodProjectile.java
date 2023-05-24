@@ -22,7 +22,7 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
-import static net.arna.jcraft.common.entity.StandEntity.DamageLogic;
+import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 
 public class BloodProjectile extends PersistentProjectileEntity implements IAnimatable {
     private int ticksInAir;
@@ -75,7 +75,7 @@ public class BloodProjectile extends PersistentProjectileEntity implements IAnim
         }
 
         if (entity instanceof LivingEntity living) {
-            DamageLogic(world, living, Vec3d.ZERO, 10, 1, false, 2f, false, DamageSource.thrownProjectile(this, owner), owner);
+            damageLogic(world, living, Vec3d.ZERO, 10, 1, false, 2f, false, DamageSource.thrownProjectile(this, owner), owner);
             living.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 60, 0, false, true));
             this.remove(RemovalReason.DISCARDED);
         }

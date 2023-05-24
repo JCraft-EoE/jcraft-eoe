@@ -1,11 +1,8 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.network.s2c.ShaderActivationPacket;
-import net.arna.jcraft.client.network.s2c.ShaderDeactivationPacket;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JSoundRegister;
-import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.*;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -277,7 +274,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
             for (Entity ent : hit) {
                 if (ent instanceof LivingEntity living) {
                     living.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 5, 9, true, false));
-                    DamageLogic(world, living, Vec3d.ZERO, 40, 1, false, 9, false, playerSource, user);
+                    damageLogic(world, living, Vec3d.ZERO, 40, 1, false, 9, false, playerSource, user);
                 }
 
                 ent.onStruckByLightning((ServerWorld) this.world, lightning);
@@ -453,12 +450,6 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
     @Override
     public int tickTimer() {
         return age;
-    }
-
-    @Override
-    public boolean canAttack() {
-        PlayerLookup.tracking(this).forEach(tracked -> ShaderDeactivationPacket.send(tracked, ShaderActivationPacket.Type.ZA_WARDO));
-        return super.canAttack();
     }
 
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {

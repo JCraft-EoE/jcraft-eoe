@@ -308,7 +308,7 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
         //if (!hurtAll.contains(player)) { hurtAll.add(player); }
 
         for (LivingEntity ent : hurtAll) {
-            DamageLogic(world, ent, kbVec.multiply(kb).add(0, kb / 4, 0), 20, 1, false, damage, true, playerSource, player);
+            damageLogic(world, ent, kbVec.multiply(kb).add(0, kb / 4, 0), 20, 1, false, damage, true, playerSource, player);
         }
 
         this.playSound(JSoundRegister.MIH_ZOOM, 1f, 1f);

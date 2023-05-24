@@ -15,6 +15,6 @@ accessible class net/minecraft/client/render/BackgroundRenderer$FogData
 accessible method net/minecraft/client/render/RenderLayer of (Ljava/lang/String;Lnet/minecraft/client/render/VertexFormat;Lnet/minecraft/client/render/VertexFormat$DrawMode;IZZLnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;)Lnet/minecraft/client/render/RenderLayer$MultiPhase;
 accessible method net/minecraft/client/render/GameRenderer getFov (Lnet/minecraft/client/render/Camera;FZ)D
 accessible field net/minecraft/client/gl/ShaderEffect passes Ljava/util/List;
-
-
+accessible class net/minecraft/client/render/WorldRenderer$ChunkInfo
+accessible class net/minecraft/client/render/WorldRenderer$ChunkInfoList
 

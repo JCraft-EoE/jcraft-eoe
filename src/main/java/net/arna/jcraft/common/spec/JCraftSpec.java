@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static net.arna.jcraft.common.entity.StandEntity.DamageLogic;
+import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 
 /*
 Specs -
@@ -161,7 +161,7 @@ public abstract class JCraftSpec {
                                 if (livingEntity instanceof StandEntity) {
                                     continue;
                                 }
-                                DamageLogic(world, livingEntity, kbVec, stunS, attack.stunType, attack.overrideStun, attack.damage, attack.lift, playerSource, player);
+                                damageLogic(world, livingEntity, kbVec, stunS, attack.stunType, attack.overrideStun, attack.damage, attack.lift, playerSource, player);
                             }
 
                             this.SpecialAttack(attack, hurt);

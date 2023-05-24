@@ -17,7 +17,7 @@ public class DebugWand extends Item {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         if (!world.isClient()) {
-            ShaderActivationPacket.send((ServerPlayerEntity) user, user, 0, 20 * 2, ShaderActivationPacket.Type.ZA_WARDO);
+            ShaderActivationPacket.send((ServerPlayerEntity) user, user, 0, 20 * 2, ShaderActivationPacket.Type.ZA_WARUDO);
         }
 
         return super.use(world, user, hand);

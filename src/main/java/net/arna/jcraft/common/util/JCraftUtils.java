@@ -30,7 +30,7 @@ import software.bernie.geckolib3.model.AnimatedTickingGeoModel;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.arna.jcraft.common.entity.StandEntity.DamageLogic;
+import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 
 public final class JCraftUtils {
     public static List<DimValues> activeTimestops = new ArrayList<>();
@@ -161,7 +161,7 @@ public final class JCraftUtils {
             LivingEntity target = living;
             if (ent instanceof StandEntity stand && !stand.blocking)
                 target = stand.getUser();
-            DamageLogic(world, target, kb, stunT, stunType, overrideStun, damage, false, source, owner);
+            damageLogic(world, target, kb, stunT, stunType, overrideStun, damage, false, source, owner);
         }
 
         if (ent instanceof EndCrystalEntity endCrystal)
