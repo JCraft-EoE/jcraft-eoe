@@ -564,32 +564,26 @@ public abstract class StandEntity extends MobEntity {
                 }
 
                 if (attack.attackType == AttackType.TIMESTOP && this.getMoveStun() == realInitTime) {
-                    PlayerLookup
-                            .tracking(this)
-                            .forEach(tracked -> ShaderActivationPacket.send(tracked, this, 0, (int) curAttack.stun * 20, ShaderActivationPacket.Type.ZA_WARDO));
-
                     this.setTSTime(stunTicks);
                     this.curAttack = null;
 
                     StatusEffectInstance tsBlind = new StatusEffectInstance(StatusEffects.BLINDNESS, 19, 0, false, false, false);
                     user.addStatusEffect(tsBlind);
 
-                    JCraftUtils.activeTimestops.add(
-                            new DimValues(this, pos, this.world.getRegistryKey())
-                    );
+                    JCraftUtils.activeTimestops.add( new DimValues(this, pos, this.world.getRegistryKey()) );
 
                     List<PlayerEntity> toCooldown = world.getEntitiesByClass(PlayerEntity.class,
-                            new Box(eyePos.add(96.0, 96.0, 96.0), eyePos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+                            new Box(eyePos.add(96.0, 96.0, 96.0), eyePos.subtract(96.0, 96.0, 96.0)), EntityPredicates.VALID_LIVING_ENTITY);
 
-                    toCooldown.remove(user);
-
-                    // Puts all player items besides armor into cooldown for entire duration of timestop
-                    for (PlayerEntity playerEntity : toCooldown) {
-                        for (int i = 0; i < playerEntity.getInventory().main.size(); i++) {
-                            playerEntity.getItemCooldownManager().set(playerEntity.getInventory().main.get(i).getItem(), stunTicks);
-                        }
-
-                        playerEntity.getItemCooldownManager().set(playerEntity.getOffHandStack().getItem(), stunTicks);
+                    for (PlayerEntity player : toCooldown) {
+                        ServerPlayerEntity serverPlayer = (ServerPlayerEntity)player;
+                        // Shader handling
+                        ShaderActivationPacket.send(serverPlayer, this, 0, stunTicks, ShaderActivationPacket.Type.ZA_WARDO);
+                        if (serverPlayer == user || serverPlayer.isCreative()) continue;
+                        // Puts all player items besides armor into cooldown for entire duration of timestop
+                        for (int i = 0; i < serverPlayer.getInventory().main.size(); i++)
+                            serverPlayer.getItemCooldownManager().set(serverPlayer.getInventory().main.get(i).getItem(), stunTicks);
+                        serverPlayer.getItemCooldownManager().set(serverPlayer.getOffHandStack().getItem(), stunTicks);
                     }
                 }
 
