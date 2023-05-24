@@ -72,7 +72,9 @@ void main(){
     else
     uv = p;
     vec3 color = texture(DiffuseSampler, vec2(uv.x, uv.y * prop)).rgb;
-    color += pow(vec3(1.) * (outside * inside + outside2 * inside2), vec3(3.));
+    if(Radius > 0){
+        color += pow(vec3(1.) * (outside * inside + outside2 * inside2), vec3(3.));
+    }
 
     vec3 hsv = rgb2hsv(color);
     hsv[0] = mix(hsv[0], 1.0 - hsv[0], inside);
