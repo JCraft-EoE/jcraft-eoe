@@ -99,7 +99,7 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
 
     public CMoonEntity(EntityType<? extends StandEntity> type, World worldIn) {
         super(type, worldIn);
-        super.Initialize();
+        super.initialize();
         idleRotation = 220f;
 
         pros = List.of(
@@ -144,75 +144,75 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
 
     // Moveset
     @Override
-    public void InitLightAttack() {
-        if (!this.CanAttack()) {
+    public void initLightAttack() {
+        if (!this.canAttack()) {
             return;
         }
-        HandleAttack(light, JCraft.standLightCD, 2);
+        handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
-    public void InitBarrage() {
-        if (!this.CanAttack()) {
+    public void initBarrage() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(barrage, JCraft.standBarrageCD, 5)) {
+        if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
             this.playSound(JSoundRegister.WS_BARRAGE, 1, 1);
         }
     }
 
     @Override
-    public void InitHeavyAttack() {
-        if (!this.CanAttack()) {
+    public void initHeavyAttack() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(gutpunch, JCraft.standHeavyCD, 4)) {
+        if (handleAttack(gutpunch, JCraft.standHeavyCD, 4)) {
             this.playSound(JSoundRegister.CMOON_DONUT, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial1() {
-        if (!this.CanAttack()) {
+    public void initSpecial1() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(gravpunch, JCraft.standS1CD, 6)) {
+        if (handleAttack(gravpunch, JCraft.standS1CD, 6)) {
             this.playSound(JSoundRegister.CMOON_GRAVPUNCH, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial2() {
-        if (!this.CanAttack()) {
+    public void initSpecial2() {
+        if (!this.canAttack()) {
             return;
         }
-        HandleAttack(gun, JCraft.standS2CD, 9);
+        handleAttack(gun, JCraft.standS2CD, 9);
     }
 
     @Override
-    public void InitUlt() {
-        if (!this.CanAttack()) {
+    public void initUlt() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(gravshift, JCraft.standUltCD, 10)) {
+        if (handleAttack(gravshift, JCraft.standUltCD, 10)) {
             this.playSound(JSoundRegister.CMOON_GRAVSHIFT, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial3() {
-        if (!this.CanAttack()) {
+    public void initSpecial3() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(groundslam, JCraft.standS3CD, 7)) {
+        if (handleAttack(groundslam, JCraft.standS3CD, 7)) {
             this.playSound(JSoundRegister.CMOON_GROUNDSLAM, 1, 1);
         }
     }
 
 
     @Override
-    public void InitMiddleClick() {
-        if (!this.CanAttack()) {
+    public void initMiddleClick() {
+        if (!this.canAttack()) {
             return;
         }
         if (hasUser()) {
@@ -231,7 +231,7 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
     }
 
     @Override
-    public void StandBlock(LivingEntity player) {
+    public void standBlock(LivingEntity player) {
         if (player == null) {
             return;
         }
@@ -246,12 +246,12 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
             projectile.velocityModified = true;
         }
 
-        Stun(player, 2, 2);
+        stun(player, 2, 2);
         player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 10, 2, false, false));
     }
 
     @Override
-    public void SpecialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, List<LivingEntity> entities) {
         LivingEntity user = this.getUser();
         for (LivingEntity ent : entities) {
             invertDamages.add(attack == barrage ? 0.25f : 2f);
@@ -340,7 +340,7 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
                     invertTimes.set(i, time - 1);
                     if (time < 1) {
                         LivingEntity entity = invertEntities.get(i);
-                        Damage(invertDamages.get(i), DamageSource.mob(user), entity);
+                        damage(invertDamages.get(i), DamageSource.mob(user), entity);
                         invertTimes.remove(i);
                         invertEntities.remove(i);
                         invertDamages.remove(i);

@@ -19,7 +19,7 @@ public class StandlessEffect extends StatusEffect {
     @Override
     public void applyUpdateEffect(LivingEntity entity, int amplifier) {
         if (entity.getFirstPassenger() instanceof StandEntity stand) {
-            stand.Desummon();
+            stand.desummon();
         }
     }
 }

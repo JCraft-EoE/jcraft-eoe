@@ -120,7 +120,7 @@ public abstract class PlayerEntityMixin implements ISpec, IComboCounter {
             Attack attack = stand.curAttack;
             if (attack != null) {
                 if (attack.attackType == AttackType.COUNTER && stand.getMoveStun() < (attack.moveStun - attack.initTime)) {
-                    stand.Counter(source.getAttacker(), source); // Initiate counter
+                    stand.counter(source.getAttacker(), source); // Initiate counter
                     player.removeStatusEffect(JStatusRegister.Dazed);
                     info.cancel();
                 }

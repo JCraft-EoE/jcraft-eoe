@@ -103,7 +103,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
 
     public CreamEntity(EntityType<? extends StandEntity> type, World worldIn) {
         super(type, worldIn);
-        super.Initialize();
+        super.initialize();
         idleRotation = 220f;
 
         description = "Close Range SETUP";
@@ -149,115 +149,115 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
     }
 
     @Override
-    public boolean CanAttack() {
+    public boolean canAttack() {
         if (hasUser()) {
             if (!(getUser() instanceof PlayerEntity) && this.getVoidTime() > 0) {
                 return false; // Prevents mobs from attacking while in void state and cancelling void early
             }
         }
-        return super.CanAttack();
+        return super.canAttack();
     }
 
     // Moveset
     @Override
-    public void InitLightAttack() {
-        if (!this.CanAttack()) {
+    public void initLightAttack() {
+        if (!this.canAttack()) {
             return;
         }
         if (getHalfBall())
-            HandleAttack(balllight, JCraft.standLightCD, 2);
+            handleAttack(balllight, JCraft.standLightCD, 2);
         else
-            HandleAttack(light, JCraft.standLightCD, 2);
+            handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
-    public void InitHeavyAttack() {
-        if (!this.CanAttack()) {
+    public void initHeavyAttack() {
+        if (!this.canAttack()) {
             return;
         }
         if (getHalfBall()) {
-            if (HandleAttack(ballheavy, JCraft.standHeavyCD, 4)) {
+            if (handleAttack(ballheavy, JCraft.standHeavyCD, 4)) {
                 this.playSound(JSoundRegister.CREAM_SMASH, 1, 1);
             }
-        } else if (HandleAttack(heavy, JCraft.standHeavyCD, 4)) {
+        } else if (handleAttack(heavy, JCraft.standHeavyCD, 4)) {
             this.playSound(JSoundRegister.CREAM_HEAVY, 1, 1);
         }
     }
 
     @Override
-    public void InitBarrage() {
-        if (!this.CanAttack()) {
+    public void initBarrage() {
+        if (!this.canAttack()) {
             return;
         }
         if (getHalfBall()) { //TODO: half-ball barrage
 
-        } else if (HandleAttack(combo, JCraft.standBarrageCD, 5)) {
+        } else if (handleAttack(combo, JCraft.standBarrageCD, 5)) {
             this.playSound(JSoundRegister.CREAM_COMBO, 1, 1);
         }
     }
 
     @Override
-    public void InitUlt() {
-        if (!this.CanAttack()) {
+    public void initUlt() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(consume, JCraft.standUltCD, 6)) {
+        if (handleAttack(consume, JCraft.standUltCD, 6)) {
             this.playSound(JSoundRegister.CREAM_CONSUME, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial1() {
-        if (!this.CanAttack()) {
+    public void initSpecial1() {
+        if (!this.canAttack()) {
             return;
         }
         if (getHalfBall()) { //TODO: half-ball Grab
 
-        } else if (HandleAttack(grab, JCraft.standS1CD, 9)) {
+        } else if (handleAttack(grab, JCraft.standS1CD, 9)) {
             this.playSound(JSoundRegister.CREAM_GRAB, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial2() {
-        if (!this.CanAttack()) {
+    public void initSpecial2() {
+        if (!this.canAttack()) {
             return;
         }
         if (getHalfBall()) { //TODO: Surge
 
-        } else if (HandleAttack(charge, JCraft.standS2CD, 7)) {
+        } else if (handleAttack(charge, JCraft.standS2CD, 7)) {
             this.playSound(JSoundRegister.CREAM_CHARGE, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial3() {
-        if (!this.CanAttack()) {
+    public void initSpecial3() {
+        if (!this.canAttack()) {
             return;
         }
         if (getHalfBall()) { //TODO: half-ball Destroy
 
-        } else if (HandleAttack(destroy, JCraft.standS3CD, 13)) {
+        } else if (handleAttack(destroy, JCraft.standS3CD, 13)) {
             this.playSound(JSoundRegister.CREAM_CHARGE, 1, 1);
         }
     }
 
     @Override
-    public void InitMiddleClick() {
-        if (!this.CanAttack()) {
+    public void initMiddleClick() {
+        if (!this.canAttack()) {
             return;
         }
         if (getHalfBall()) {
-            if (HandleAttack(exit, JCraft.standMMBCD, 12))
+            if (handleAttack(exit, JCraft.standMMBCD, 12))
                 this.playSound(JSoundRegister.CREAM_EXIT, 1, 1);
         } else {
-            if (HandleAttack(enter, JCraft.standMMBCD, 11))
+            if (handleAttack(enter, JCraft.standMMBCD, 11))
                 this.playSound(JSoundRegister.CREAM_ENTER, 1, 1);
         }
     }
 
     @Override
-    public void SpecialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, List<LivingEntity> entities) {
         if (attack == combo && this.getMoveStun() == 11) {
             Vec3d rV = this.getRotationVector();
 
@@ -273,7 +273,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
             if (entities.size() > 0) {
                 // Grab bypasses and disables block
                 for (LivingEntity ent : entities) {
-                    Stun(ent, 20, 0);
+                    stun(ent, 20, 0);
 
                     if (ent.getFirstPassenger() instanceof StandEntity stand) {
                         stand.blocking = false;
@@ -337,7 +337,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
     }
 
     @Override
-    public void Desummon() {
+    public void desummon() {
         // Stop voiding if voiding
         if (this.getVoidTime() > 0) {
             this.setVoidTime(0);
@@ -345,7 +345,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
         }
 
         // Real desummon if not voiding
-        super.Desummon();
+        super.desummon();
     }
 
     @Override
@@ -465,7 +465,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
                     // Player Half-Ball controls
                     if (user instanceof ServerPlayerEntity serverPlayer) {
                         if (lastRemoteInputTime - age > 4) {
-                            UpdateRemoteInputs(0, 0, false);
+                            updateRemoteInputs(0, 0, false);
                         }
 
                         if (!blocking) {

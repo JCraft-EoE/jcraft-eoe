@@ -79,7 +79,7 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
 
     public TheFoolEntity(EntityType<? extends StandEntity> type, World worldIn) {
         super(type, worldIn);
-        super.Initialize();
+        super.initialize();
         idleRotation = 225f;
         idleDistance = 2f;
 
@@ -144,7 +144,7 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
     }
 
     @Override
-    public void StandBlock(LivingEntity player) {
+    public void standBlock(LivingEntity player) {
         if (player == null) {
             return;
         }
@@ -168,89 +168,89 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
         }
 
         player.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 2, 9, false, false, true));
-        Stun(player, 2, 2);
+        stun(player, 2, 2);
         player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 5, 4, false, false, true));
     }
 
     // Moveset
     @Override
-    public void InitLightAttack() {
-        if (!this.CanAttack()) {
+    public void initLightAttack() {
+        if (!this.canAttack()) {
             return;
         }
-        HandleAttack(light, JCraft.standLightCD, 2);
+        handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
-    public void InitBarrage() {
-        if (!this.CanAttack()) {
+    public void initBarrage() {
+        if (!this.canAttack()) {
             return;
         }
         if (this.getUser().isOnGround()) {
-            HandleAttack(combo, JCraft.standBarrageCD, 4);
+            handleAttack(combo, JCraft.standBarrageCD, 4);
         } else {
-            HandleAttack(airbarrage, JCraft.standBarrageCD, 5);
+            handleAttack(airbarrage, JCraft.standBarrageCD, 5);
         }
     }
 
     @Override
-    public void InitHeavyAttack() {
-        if (!this.CanAttack()) {
+    public void initHeavyAttack() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(launch, JCraft.standHeavyCD, 6)) {
+        if (handleAttack(launch, JCraft.standHeavyCD, 6)) {
             this.setSand(true);
             this.playSound(JSoundRegister.FOOL_LAUNCH, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial1() {
-        if (!this.CanAttack()) {
+    public void initSpecial1() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(pound, JCraft.standS1CD, 7)) {
+        if (handleAttack(pound, JCraft.standS1CD, 7)) {
             this.playSound(JSoundRegister.FOOL_BARK2, 1, 1);
         }
     }
 
     @Override
-    public void InitUlt() {
-        if (!this.CanAttack()) {
+    public void initUlt() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(sandstorm, JCraft.standUltCD, 12)) {
+        if (handleAttack(sandstorm, JCraft.standUltCD, 12)) {
             this.playSound(JSoundRegister.FOOL_CHARGE, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial2() {
-        if (!this.CanAttack()) {
+    public void initSpecial2() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(charge, JCraft.standS2CD, 8)) {
+        if (handleAttack(charge, JCraft.standS2CD, 8)) {
             this.playSound(JSoundRegister.FOOL_CHARGE, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial3() {
-        if (!this.CanAttack()) {
+    public void initSpecial3() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(sandclone, JCraft.standS3CD, 9)) {
+        if (handleAttack(sandclone, JCraft.standS3CD, 9)) {
             this.setSand(true);
             this.playSound(SoundEvents.BLOCK_SAND_PLACE, 1, 1);
         }
     }
 
     @Override
-    public void InitMiddleClick() {
-        if (!this.CanAttack()) {
+    public void initMiddleClick() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(sandwave, JCraft.standMMBCD, 10)) {
+        if (handleAttack(sandwave, JCraft.standMMBCD, 10)) {
             this.setSand(true);
             this.setWave(true);
             this.setFree(false);
@@ -260,7 +260,7 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
     }
 
     @Override
-    public void Desummon() {
+    public void desummon() {
         // Remove everything that The Fool summoned before removing the stand itself
         if (this.sandClone != null) {
             this.sandClone.kill();
@@ -269,11 +269,11 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
             sand.discard();
         }
 
-        super.Desummon();
+        super.desummon();
     }
 
     @Override
-    public void SpecialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, List<LivingEntity> entities) {
         LivingEntity user = this.getUser();
         if (attack == sandwave) {
             for (LivingEntity ent : entities) {

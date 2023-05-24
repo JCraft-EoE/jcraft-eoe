@@ -66,7 +66,7 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
 
     public WhitesnakeEntity(EntityType<? extends StandEntity> type, World worldIn) {
         super(type, worldIn);
-        super.Initialize();
+        super.initialize();
         idleRotation = 220f;
 
         pros = List.of(
@@ -96,74 +96,74 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
 
     // Moveset
     @Override
-    public void InitLightAttack() {
-        if (!this.CanAttack()) {
+    public void initLightAttack() {
+        if (!this.canAttack()) {
             return;
         }
-        HandleAttack(light, JCraft.standLightCD, 2);
+        handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
-    public void InitBarrage() {
-        if (!this.CanAttack()) {
+    public void initBarrage() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(barrage, JCraft.standBarrageCD, 5)) {
+        if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
             this.playSound(JSoundRegister.WS_BARRAGE, 1, 1);
         }
     }
 
     @Override
-    public void InitHeavyAttack() {
-        if (!this.CanAttack()) {
+    public void initHeavyAttack() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(donut, JCraft.standHeavyCD, 4)) {
+        if (handleAttack(donut, JCraft.standHeavyCD, 4)) {
             this.playSound(JSoundRegister.WS_DONUT, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial1() {
-        if (!this.CanAttack()) {
+    public void initSpecial1() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(standdisk, JCraft.standS1CD, 8)) {
+        if (handleAttack(standdisk, JCraft.standS1CD, 8)) {
             this.playSound(JSoundRegister.WS_DISK, 1, 1);
         }
     }
 
     @Override
-    public void InitUlt() {
-        if (!this.CanAttack()) {
+    public void initUlt() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(memorydisk, JCraft.standUltCD, 8)) {
+        if (handleAttack(memorydisk, JCraft.standUltCD, 8)) {
             this.playSound(JSoundRegister.WS_DISK, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial2() {
-        if (!this.CanAttack()) {
+    public void initSpecial2() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(legcrusher, JCraft.standS2CD, 6)) {
+        if (handleAttack(legcrusher, JCraft.standS2CD, 6)) {
             this.playSound(JSoundRegister.WS_LEGCRUSH, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial3() {
-        if (!this.CanAttack()) {
+    public void initSpecial3() {
+        if (!this.canAttack()) {
             return;
         }
-        HandleAttack(poisonspew, JCraft.standS3CD, 7);
+        handleAttack(poisonspew, JCraft.standS3CD, 7);
     }
 
     @Override
-    public void InitMiddleClick() {
-        if (!this.CanAttack()) {
+    public void initMiddleClick() {
+        if (!this.canAttack()) {
             return;
         }
         NbtCompound userData = ((IEntityDataSaver) getUser()).getPersistentData();
@@ -176,7 +176,7 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
     }
 
     @Override
-    public void SpecialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, List<LivingEntity> entities) {
         LivingEntity user = this.getUser();
         Vec3d rotVec = this.getRotationVector();
 
@@ -256,7 +256,7 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
                 double s = getRemoteSideInput();
                 // 3 ticks of inertia, helping movement be fluid as well as dealing with packet drops
                 if (lastRemoteInputTime - age > 4) {
-                    UpdateRemoteInputs(0, 0, false);
+                    updateRemoteInputs(0, 0, false);
                 }
                 Vec3d rotVec = new Vec3d(getRotationVector().x, 0, getRotationVector().z);
 

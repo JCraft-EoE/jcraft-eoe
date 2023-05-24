@@ -64,7 +64,7 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
 
     public MagiciansRedEntity(EntityType<? extends StandEntity> type, World worldIn) {
         super(type, worldIn);
-        super.Initialize();
+        super.initialize();
         idleRotation = 225f;
 
         description = "Tailor-made, Blazing ZONER";
@@ -90,85 +90,85 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
 
     // Moveset
     @Override
-    public void InitLightAttack() {
-        if (!this.CanAttack()) {
+    public void initLightAttack() {
+        if (!this.canAttack()) {
             return;
         }
-        HandleAttack(light, JCraft.standLightCD, 2);
+        handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
-    public void InitHeavyAttack() {
-        if (!this.CanAttack()) {
+    public void initHeavyAttack() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(heavy, JCraft.standHeavyCD, 4)) {
+        if (handleAttack(heavy, JCraft.standHeavyCD, 4)) {
             //this.playSound(ModSoundRegister.MR_HEAVY,1, 1);
         }
     }
 
     @Override
-    public void InitBarrage() {
-        if (!this.CanAttack()) {
+    public void initBarrage() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(barrage, JCraft.standBarrageCD, 5)) {
+        if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
             //this.playSound(ModSoundRegister.STAR_PLATINUM_BARRAGE,1, 1);
         }
     }
 
     @Override
-    public void InitSpecial1() {
-        if (!this.CanAttack()) {
+    public void initSpecial1() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(crossfire, JCraft.standS1CD, 6)) {
+        if (handleAttack(crossfire, JCraft.standS1CD, 6)) {
 
         }
     }
 
     @Override
-    public void InitUlt() {
-        if (!this.CanAttack()) {
+    public void initUlt() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(crossfirehurricane, JCraft.standUltCD, 7)) {
+        if (handleAttack(crossfirehurricane, JCraft.standUltCD, 7)) {
 
         }
     }
 
     @Override
-    public void InitSpecial2() {
-        if (!this.CanAttack()) {
+    public void initSpecial2() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(crossfirevariation, JCraft.standS2CD, 8)) {
+        if (handleAttack(crossfirevariation, JCraft.standS2CD, 8)) {
 
         }
     }
 
     @Override
-    public void InitSpecial3() {
-        if (!this.CanAttack()) {
+    public void initSpecial3() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(redirect, JCraft.standS3CD, 9)) {
+        if (handleAttack(redirect, JCraft.standS3CD, 9)) {
 
         }
     }
 
     @Override
-    public void InitMiddleClick() {
-        if (!this.CanAttack()) {
+    public void initMiddleClick() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(redbind, JCraft.standMMBCD, 10)) {
+        if (handleAttack(redbind, JCraft.standMMBCD, 10)) {
 
         }
     }
 
     @Override
-    public void SpecialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, List<LivingEntity> entities) {
         if (hasUser()) {
             LivingEntity user = this.getUser();
             Vec3d eyePos = user.getEyePos();

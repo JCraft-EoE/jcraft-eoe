@@ -75,7 +75,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
 
     public KingCrimsonEntity(EntityType<? extends StandEntity> type, World worldIn) {
         super(type, worldIn);
-        super.Initialize();
+        super.initialize();
 
         idleDistance = 1f;
         idleRotation = -65f;
@@ -130,17 +130,17 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
 
     // Moveset
     @Override
-    public void InitLightAttack() {
-        if (!this.CanAttack()) {
+    public void initLightAttack() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(light, JCraft.standLightCD, 2)) {
+        if (handleAttack(light, JCraft.standLightCD, 2)) {
             this.playSound(JSoundRegister.KC_DUAL_CHOP, 1, 1);
         }
     }
 
     @Override
-    public void InitHeavyAttack() {
+    public void initHeavyAttack() {
         if (hasUser()) {
             if (getUser().hasStatusEffect(JStatusRegister.Dazed)) {
                 return;
@@ -148,65 +148,65 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
             boolean idling = this.getMoveStun() < 1;
 
             if (this.curAttack != heavy) {
-                if (idling && HandleAttack(heavy, JCraft.standHeavyCD, 10)) {
+                if (idling && handleAttack(heavy, JCraft.standHeavyCD, 10)) {
                     this.playSound(JSoundRegister.KC_HEAVY, 1, 1);
                 }
             } else if (this.getMoveStun() < 7) {
-                SetAttack(overhead, 4);
+                setAttack(overhead, 4);
                 this.playSound(JSoundRegister.KC_HEAVY2, 1, 1);
             }
         }
     }
 
     @Override
-    public void InitBarrage() {
-        if (!this.CanAttack()) {
+    public void initBarrage() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(barrage, JCraft.standBarrageCD, 6)) {
+        if (handleAttack(barrage, JCraft.standBarrageCD, 6)) {
             this.playSound(JSoundRegister.KC_BARRAGE, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial1() {
-        if (!this.CanAttack()) {
+    public void initSpecial1() {
+        if (!this.canAttack()) {
             return;
         }
-        if (getUser().isSneaking() && HandleAttack(bloodthrow, JCraft.standS1CD, 11)) {
+        if (getUser().isSneaking() && handleAttack(bloodthrow, JCraft.standS1CD, 11)) {
             getUser().damage(DamageSource.MAGIC, 0.1f);
-        } else if (HandleAttack(eyechop, JCraft.standS1CD, 7)) {
+        } else if (handleAttack(eyechop, JCraft.standS1CD, 7)) {
             this.playSound(JSoundRegister.EYE_CHOP, 1, 1);
         }
     }
 
     @Override
-    public void InitUlt() {
-        if (!this.CanAttack()) {
+    public void initUlt() {
+        if (!this.canAttack()) {
             return;
         }
         if (getTETime() > 0) {
             CancelTE();
             return;
         }
-        if (HandleAttack(timeerase, JCraft.standUltCD, 8)) {
+        if (handleAttack(timeerase, JCraft.standUltCD, 8)) {
             if (getUser() instanceof ServerPlayerEntity player)
                 player.networkHandler.sendPacket(new PlaySoundS2CPacket(JSoundRegister.TIME_ERASE, SoundCategory.PLAYERS, getX(), getY(), getZ(), 1, 1, 0));
         }
     }
 
     @Override
-    public void InitSpecial2() {
-        if (!this.CanAttack()) {
+    public void initSpecial2() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(donut, JCraft.standS2CD, 5)) {
+        if (handleAttack(donut, JCraft.standS2CD, 5)) {
             this.playSound(JSoundRegister.KC_DONUT, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial3() {
+    public void initSpecial3() {
         if (hasUser()) {
             LivingEntity user = this.getUser();
             ITimeStop timeStop = (ITimeStop) user;
@@ -215,7 +215,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
             }
             if (this.getMoveStun() < 1) {
                 // When used raw, epitaphs
-                HandleAttack(epitaph, JCraft.standS3CD, 9);
+                handleAttack(epitaph, JCraft.standS3CD, 9);
             } else {
                 // When used during a move, cancels it and puts time erase on cooldown
                 this.curAttack = null;
@@ -250,7 +250,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
     private static final Attack barrageFinisher = new Attack(17, 0.85f, 50, 0, 1.5, 1f, 1.1f, AttackType.BARRAGE, 0.5f, 0, 3).setHitspark(2).setLaunch();
 
     @Override
-    public void SpecialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, List<LivingEntity> entities) {
         Vec3d rotVec = this.getRotationVector();
         if (attack == barrage && this.getMoveStun() < 4) {
             this.curAttack = barrageFinisher;
@@ -299,8 +299,8 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
     }
 
     @Override
-    public void InitMiddleClick() {
-        if (!this.CanAttack()) {
+    public void initMiddleClick() {
+        if (!this.canAttack()) {
             return;
         }
 
@@ -362,15 +362,15 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
     }
 
     @Override
-    public void Desummon() {
+    public void desummon() {
         if (this.getTETime() < 1) {
-            super.Desummon();
+            super.desummon();
         }
     }
 
     @Override
-    public void Counter(Entity entity, DamageSource source) {
-        super.Counter(entity, source);
+    public void counter(Entity entity, DamageSource source) {
+        super.counter(entity, source);
         if (entity == null || !hasUser())
             return;
         LivingEntity user = this.getUser();
@@ -382,9 +382,9 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
         user.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, entity.getEyePos());
 
         if (entity instanceof LivingEntity livingEntity) {
-            Stun(livingEntity, 20, 0);
+            stun(livingEntity, 20, 0);
             if (entity.getFirstPassenger() instanceof StandEntity stand)
-                stand.CancelAttack();
+                stand.cancelAttack();
         }
 
         this.world.playSound(null, uPos.x, uPos.y, uPos.z, JSoundRegister.TE_TP, SoundCategory.PLAYERS, 1f, 1f);

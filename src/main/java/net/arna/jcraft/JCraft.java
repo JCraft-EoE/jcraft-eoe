@@ -42,7 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static net.arna.jcraft.common.entity.StandEntity.Stun;
+import static net.arna.jcraft.common.entity.StandEntity.stun;
 
 //initialize your FUCKING variables, arna
 //todo: add static IDs for stuff like stands and attacks to make checks for individual ones less expensive
@@ -303,7 +303,7 @@ public class JCraft implements ModInitializer {
         if (stun.getDuration() > 1 && stun.getAmplifier() == 1 && data.getInt(standCBCD) <= 0) {
             data.putInt(standCBCD, 1200); // 60s
 
-            Stun(player, 5, 2); // Player is slowed down considerably pre-burst
+            stun(player, 5, 2); // Player is slowed down considerably pre-burst
 
             world.playSoundFromEntity(null, player, JSoundRegister.COMBO_BREAK, SoundCategory.PLAYERS, 1, 1);
 

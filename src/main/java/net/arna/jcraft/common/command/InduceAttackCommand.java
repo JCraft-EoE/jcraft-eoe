@@ -82,13 +82,13 @@ public class InduceAttackCommand {
                     if (entity.getFirstPassenger() instanceof StandEntity standEntity) {
                         //JCraft.LOGGER.info("TYPE: " + type.toString());
                         switch (type) {
-                            case LIGHT -> standEntity.InitLightAttack();
-                            case HEAVY -> standEntity.InitHeavyAttack();
-                            case BARRAGE -> standEntity.InitBarrage();
-                            case SPECIAL1 -> standEntity.InitSpecial1();
-                            case SPECIAL2 -> standEntity.InitSpecial2();
-                            case SPECIAL3 -> standEntity.InitSpecial3();
-                            case ULTIMATE -> standEntity.InitUlt(); // What the fuck????????
+                            case LIGHT -> standEntity.initLightAttack();
+                            case HEAVY -> standEntity.initHeavyAttack();
+                            case BARRAGE -> standEntity.initBarrage();
+                            case SPECIAL1 -> standEntity.initSpecial1();
+                            case SPECIAL2 -> standEntity.initSpecial2();
+                            case SPECIAL3 -> standEntity.initSpecial3();
+                            case ULTIMATE -> standEntity.initUlt(); // What the fuck????????
                         }
                         flag = 1;
                     }

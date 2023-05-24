@@ -1,11 +1,13 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.registry.JSoundRegister;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -47,7 +49,7 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
 
     public StarPlatinumEntity(EntityType<? extends StandEntity> type, World worldIn) {
         super(type, worldIn);
-        super.Initialize();
+        super.initialize();
         idleRotation = 225f;
 
         description = "High Speed RUSHDOWN";
@@ -82,76 +84,77 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
 
     // Moveset
     @Override
-    public void InitLightAttack() {
-        if (!this.CanAttack()) {
+    public void initLightAttack() {
+        if (!this.canAttack()) {
             return;
         }
-        HandleAttack(light, JCraft.standLightCD, 2);
+        handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
-    public void InitHeavyAttack() {
-        if (!this.CanAttack()) {
+    public void initHeavyAttack() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(heavy, JCraft.standHeavyCD, 4)) {
+        if (handleAttack(heavy, JCraft.standHeavyCD, 4)) {
             this.playSound(JSoundRegister.STAR_BREAKER, 1, 1);
         }
     }
 
     @Override
-    public void InitBarrage() {
-        if (!this.CanAttack()) {
+    public void initBarrage() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(barrage, JCraft.standBarrageCD, 5)) {
+        if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
             this.playSound(JSoundRegister.STAR_PLATINUM_BARRAGE, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial1() {
-        if (!this.CanAttack()) {
+    public void initSpecial1() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(starfinger, JCraft.standS1CD, 6)) {
+        if (handleAttack(starfinger, JCraft.standS1CD, 6)) {
             this.playSound(JSoundRegister.STAR_FINGER, 1, 1);
         }
     }
 
     @Override
-    public void InitUlt() {
-        if (!this.CanAttack()) {
+    public void initUlt() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(timestop, JCraft.standUltCD, 7)) {
+        if (handleAttack(timestop, JCraft.standUltCD, 7)) {
             this.playSound(JSoundRegister.STAR_PLATINUM_THE_WORLD, 1, 1);
+            PlayerLookup.tracking(this).forEach(tracked -> ShaderActivationPacket.send(tracked, this, 20, (int) timestop.stun * 20, ShaderActivationPacket.Type.ZA_WARDO));
         }
     }
 
     @Override
-    public void InitSpecial2() {
-        if (!this.CanAttack()) {
+    public void initSpecial2() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(lowkick, JCraft.standS2CD, 8)) {
+        if (handleAttack(lowkick, JCraft.standS2CD, 8)) {
             this.playSound(JSoundRegister.STAR_PLATINUM_KICK, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial3() {
-        if (!this.CanAttack()) {
+    public void initSpecial3() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(chargebarrage, JCraft.standS3CD, 5)) {
+        if (handleAttack(chargebarrage, JCraft.standS3CD, 5)) {
             this.playSound(JSoundRegister.STAR_PLATINUM_ADVANCING_BARRAGE, 1, 1);
         }
     }
 
     @Override
-    public void InitMiddleClick() {
-        CanAttackData data = this.CanAttackWithData();
+    public void initMiddleClick() {
+        CanAttackData data = this.canAttackWithData();
         if (!data.canAttack) {
             return;
         }
@@ -178,14 +181,14 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
     }
 
     @Override
-    public void Desummon() {
+    public void desummon() {
         if (this.getTSTime() < 1) {
-            super.Desummon();
+            super.desummon();
         }
     }
 
     @Override
-    public void SpecialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, List<LivingEntity> entities) {
         if (attack == chargebarrage && entities.size() > 0) { // Lock-on
             Vec3d avgPos = Vec3d.ZERO;
             float c = 0;

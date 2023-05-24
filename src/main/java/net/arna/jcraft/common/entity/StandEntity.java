@@ -226,7 +226,7 @@ public abstract class StandEntity extends MobEntity {
         return remoteJumpInput;
     }
 
-    public void UpdateRemoteInputs(int f, int s, boolean j) {
+    public void updateRemoteInputs(int f, int s, boolean j) {
         // These persist, so implementation for cleaning should be done in the stand code
         Vec3d v = new Vec3d(f, 0, s).normalize();
         remoteForwardInput = v.x;
@@ -244,7 +244,7 @@ public abstract class StandEntity extends MobEntity {
         if (r) {
             BeginRemote();
         } else {
-            EndRemote();
+            endRemote();
         }
     }
 
@@ -257,7 +257,7 @@ public abstract class StandEntity extends MobEntity {
         setAlpha(0.1f);
     }
 
-    protected void EndRemote() {
+    protected void endRemote() {
         setFree(false);
         setAlpha(1);
     }
@@ -310,14 +310,14 @@ public abstract class StandEntity extends MobEntity {
         this.dataTracker.startTracking(TIMESTOPTIME, 0);
     }
 
-    public void Initialize() {
+    public void initialize() {
         this.noClip = true;
         this.setInvulnerable(true);
         this.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 999999, 9, false, false));
     }
 
     // Attack controls
-    public boolean CanAttack() {
+    public boolean canAttack() {
         if (hasUser()) {
             ITimeStop timeStop = (ITimeStop) user;
             return this.getMoveStun() < 1 && timeStop.getTimeStopTicks() < 1 && !user.hasStatusEffect(JStatusRegister.Dazed);
@@ -335,7 +335,7 @@ public abstract class StandEntity extends MobEntity {
         }
     }
 
-    public CanAttackData CanAttackWithData() {
+    public CanAttackData canAttackWithData() {
         if (hasUser()) {
             ITimeStop timeStop = (ITimeStop) user;
             return new CanAttackData(user, this.getMoveStun() < 1 && timeStop.getTimeStopTicks() < 1 && !user.hasStatusEffect(JStatusRegister.Dazed));
@@ -343,24 +343,24 @@ public abstract class StandEntity extends MobEntity {
         return new CanAttackData(null, false);
     }
 
-    public boolean HandleAttack(Attack attack, String cooldownName, int animState) {
+    public boolean handleAttack(Attack attack, String cooldownName, int animState) {
         NbtCompound userData = ((IEntityDataSaver) user).getPersistentData();
         int cooldown = userData.getInt(cooldownName);
         if (cooldown > 0) {
             return false;
         }
         userData.putInt(cooldownName, attack.cooldown * 20);
-        this.SetAttack(attack, animState);
+        this.setAttack(attack, animState);
         return true;
     }
 
-    public void SetAttack(Attack attack, int animState) {
+    public void setAttack(Attack attack, int animState) {
         this.curAttack = attack;
         this.setMoveStun(attack.moveStun);
         this.setState(animState);
     }
 
-    public static void Stun(LivingEntity entity, int duration, int amplifier) {
+    public static void stun(LivingEntity entity, int duration, int amplifier) {
         if (duration == 0) {
             return;
         }
@@ -368,7 +368,7 @@ public abstract class StandEntity extends MobEntity {
         //JCraft.LOGGER.info("Stunned: " + entity.getEntityName() + " for: " + duration);
     }
 
-    public static void Damage(float damage, DamageSource damageSource, LivingEntity ent) {
+    public static void damage(float damage, DamageSource damageSource, LivingEntity ent) {
         ent.damage(damageSource, 0.001f);
 
         // All stands ignore 10% of armor & armor toughness
@@ -392,30 +392,30 @@ public abstract class StandEntity extends MobEntity {
     }
 
     // Stock attacks to define
-    public void InitLightAttack() {
+    public void initLightAttack() {
     }
 
-    public void InitHeavyAttack() {
+    public void initHeavyAttack() {
     }
 
-    public void InitBarrage() {
+    public void initBarrage() {
     }
 
     // Specials to define within the specific stand
-    public void InitSpecial1() {
+    public void initSpecial1() {
     }
 
-    public void InitSpecial2() {
+    public void initSpecial2() {
     }
 
-    public void InitSpecial3() {
+    public void initSpecial3() {
     }
 
-    public void InitUlt() {
+    public void initUlt() {
     }
 
     // Define what happens within your stand block
-    public void StandBlock(LivingEntity player) {
+    public void standBlock(LivingEntity player) {
         if (player == null) {
             return;
         }
@@ -430,36 +430,36 @@ public abstract class StandEntity extends MobEntity {
             projectile.velocityModified = true;
         }
 
-        Stun(player, 2, 2);
+        stun(player, 2, 2);
         player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 5, 3, false, false, true));
     }
 
     // Define Middle Click Action
-    public void InitMiddleClick() {
+    public void initMiddleClick() {
     }
 
     // Define special attack actions
-    public void SpecialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, List<LivingEntity> entities) {
     }
 
     // Define desummon conditions
-    public void Desummon() {
+    public void desummon() {
         if (this.curAttack == null && this.getMoveStun() <= 0) {
             this.discard();
         }
     }
 
     // Define idle override
-    public void IdleOverride(LivingEntity player) {
+    public void idleOverride(LivingEntity player) {
     }
 
     // Define counter action
-    public void Counter(Entity entity, DamageSource source) {
+    public void counter(Entity entity, DamageSource source) {
         this.curAttack = null;
         this.setMoveStun(0);
     }
 
-    public void CancelAttack() {
+    public void cancelAttack() {
         this.curAttack = null;
         this.setMoveStun(0);
         this.setState(0);
@@ -653,8 +653,8 @@ public abstract class StandEntity extends MobEntity {
                                 }
 
                                 // Cancels both barrages
-                                CancelAttack();
-                                stand.CancelAttack();
+                                cancelAttack();
+                                stand.cancelAttack();
                                 Vec3d midPos = stand.getPos().add(getPos()).multiply(0.5);
                                 this.world.playSound(null, midPos.x, midPos.y, midPos.z, JSoundRegister.IMPACT_1, SoundCategory.NEUTRAL, 1, 0.5f);
                             }
@@ -668,7 +668,7 @@ public abstract class StandEntity extends MobEntity {
                         livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.Dazed, 10, 3, true, false));
                     }
 
-                    this.SpecialAttack(attack, hurt);
+                    this.specialAttack(attack, hurt);
                 }
                 /*
                 else {
@@ -681,17 +681,17 @@ public abstract class StandEntity extends MobEntity {
                 // Attack buffering
                 if (this.queuedAttack != null) {
                     switch (this.queuedAttack) {
-                        case LIGHT -> this.InitLightAttack();
-                        case HEAVY -> this.InitHeavyAttack();
-                        case BARRAGE -> this.InitBarrage();
-                        case SPECIAL1 -> this.InitSpecial1();
-                        case ULTIMATE -> this.InitUlt();
-                        case SPECIAL2 -> this.InitSpecial2();
-                        case SPECIAL3 -> this.InitSpecial3();
-                        case MIDDLEMOUSE -> this.InitMiddleClick();
+                        case LIGHT -> this.initLightAttack();
+                        case HEAVY -> this.initHeavyAttack();
+                        case BARRAGE -> this.initBarrage();
+                        case SPECIAL1 -> this.initSpecial1();
+                        case ULTIMATE -> this.initUlt();
+                        case SPECIAL2 -> this.initSpecial2();
+                        case SPECIAL3 -> this.initSpecial3();
+                        case MIDDLEMOUSE -> this.initMiddleClick();
                         case STANDSUMMON -> {
                             this.curAttack = null;
-                            this.Desummon();
+                            this.desummon();
                         }
                     }
 
@@ -709,7 +709,7 @@ public abstract class StandEntity extends MobEntity {
                         this.setRotationOffset(this.idleRotation);
                     }
                 } else {
-                    IdleOverride(user);
+                    idleOverride(user);
                 }
             } else if (this.blocking) {
                 // Process block
@@ -724,7 +724,7 @@ public abstract class StandEntity extends MobEntity {
                 setDistanceOffset(this.blockDistance);
                 setRotationOffset(this.attackRotation);
 
-                StandBlock(user);
+                standBlock(user);
             }
         }
 
@@ -812,7 +812,7 @@ public abstract class StandEntity extends MobEntity {
             if (standAttack != null) {
                 // Counter check
                 if (standAttack.attackType == AttackType.COUNTER && stand.getMoveStun() < (standAttack.moveStun - standAttack.initTime)) {
-                    stand.Counter(attacker, source);
+                    stand.counter(attacker, source);
                     ent.removeStatusEffect(JStatusRegister.Dazed);
                     return;
                 }
@@ -841,7 +841,7 @@ public abstract class StandEntity extends MobEntity {
         if (hit) {
             if (overrideStun)
                 ent.removeStatusEffect(JStatusRegister.Dazed);
-            Stun(ent, stunTicks, stunType);
+            stun(ent, stunTicks, stunType);
             ent.addVelocity(kbVec.x, kbVec.y, kbVec.z);
         }
 
@@ -869,7 +869,7 @@ public abstract class StandEntity extends MobEntity {
             );
         }
 
-        Damage(damage, source, ent);
+        damage(damage, source, ent);
     }
 
     @Override
@@ -986,7 +986,7 @@ public abstract class StandEntity extends MobEntity {
         //JCraft.LOGGER.info("WTB: " + wantToBlock);
 
         if (wantToBlock) {
-            if (this.CanAttack()) {
+            if (this.canAttack()) {
                 this.blocking = true;
             }
         } else {
@@ -1021,14 +1021,14 @@ public abstract class StandEntity extends MobEntity {
 
                 if (shouldPerformMove) {
                     switch (move) {
-                        case 0 -> this.InitLightAttack();
-                        case 1 -> this.InitHeavyAttack();
-                        case 2 -> this.InitBarrage();
-                        case 3 -> this.InitSpecial1();
-                        case 4 -> this.InitUlt();
-                        case 5 -> this.InitSpecial2();
-                        case 6 -> this.InitSpecial3();
-                        case 7 -> this.InitMiddleClick();
+                        case 0 -> this.initLightAttack();
+                        case 1 -> this.initHeavyAttack();
+                        case 2 -> this.initBarrage();
+                        case 3 -> this.initSpecial1();
+                        case 4 -> this.initUlt();
+                        case 5 -> this.initSpecial2();
+                        case 6 -> this.initSpecial3();
+                        case 7 -> this.initMiddleClick();
                     }
                 } else {
                     this.queuedAttack = JCraft.idToButton.get(move);

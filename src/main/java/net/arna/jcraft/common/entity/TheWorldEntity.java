@@ -52,7 +52,7 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
 
     public TheWorldEntity(EntityType<? extends StandEntity> type, World worldIn) {
         super(type, worldIn);
-        super.Initialize();
+        super.initialize();
         idleRotation = 225f;
 
         pros = List.of(
@@ -84,77 +84,77 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
 
     // Moveset
     @Override
-    public void InitLightAttack() {
-        if (!this.CanAttack()) {
+    public void initLightAttack() {
+        if (!this.canAttack()) {
             return;
         }
-        HandleAttack(light, JCraft.standLightCD, 2);
+        handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
-    public void InitHeavyAttack() {
-        if (!this.CanAttack()) {
+    public void initHeavyAttack() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(donut, JCraft.standHeavyCD, 4) && !this.isSilent()) {
+        if (handleAttack(donut, JCraft.standHeavyCD, 4) && !this.isSilent()) {
             this.playSound(JSoundRegister.TW_DONUT, 1, 1);
         }
     }
 
     @Override
-    public void InitBarrage() {
-        if (!this.CanAttack()) {
+    public void initBarrage() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(barrage, JCraft.standBarrageCD, 5)) {
+        if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
             this.playSound(JSoundRegister.TW_BARRAGE, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial1() {
-        if (!this.CanAttack()) {
+    public void initSpecial1() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(roundhouse, JCraft.standS1CD, 10)) {
+        if (handleAttack(roundhouse, JCraft.standS1CD, 10)) {
             this.playSound(JSoundRegister.TW_KICK, 1, 1);
         }
     }
 
     @Override
-    public void InitUlt() {
-        if (!this.CanAttack()) {
+    public void initUlt() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(timestop, JCraft.standUltCD, 7)) {
+        if (handleAttack(timestop, JCraft.standUltCD, 7)) {
             this.playSound(JSoundRegister.TW_TS, 1, 1);
-            PlayerLookup.tracking(this).forEach(tracked -> ShaderActivationPacket.send(tracked, this, 20));
+            PlayerLookup.tracking(this).forEach(tracked -> ShaderActivationPacket.send(tracked, this, 20, (int) timestop.stun * 20, ShaderActivationPacket.Type.ZA_WARDO));
         }
     }
 
     @Override
-    public void InitSpecial2() {
-        if (!this.CanAttack()) {
+    public void initSpecial2() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(charge, JCraft.standS2CD, 8)) {
+        if (handleAttack(charge, JCraft.standS2CD, 8)) {
             this.playSound(JSoundRegister.TW_CHARGE, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial3() {
-        if (!this.CanAttack()) {
+    public void initSpecial3() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(feignbarrage, JCraft.standS3CD, 5)) {
+        if (handleAttack(feignbarrage, JCraft.standS3CD, 5)) {
             this.playSound(JSoundRegister.TW_BARRAGE, 1, 1);
         }
     }
 
     @Override
-    public void InitMiddleClick() {
-        CanAttackData data = this.CanAttackWithData();
+    public void initMiddleClick() {
+        CanAttackData data = this.canAttackWithData();
         if (!data.canAttack) {
             return;
         }
@@ -182,12 +182,12 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
     }
 
     @Override
-    public void SpecialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, List<LivingEntity> entities) {
         LivingEntity user = this.getUser();
         if (attack == donut) {
             // If miss, stun the user for 3 seconds
             if (entities.isEmpty()) {
-                Stun(user, 60, 0);
+                stun(user, 60, 0);
             } else {
                 // If hit, impale and set position to middle of arm
                 for (LivingEntity entity : entities) {
@@ -199,15 +199,15 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
     }
 
     @Override
-    public void Desummon() {
+    public void desummon() {
         if (this.getTSTime() < 1) {
-            super.Desummon();
+            super.desummon();
         }
     }
 
     @Override
-    public void Counter(Entity entity, DamageSource source) {
-        super.Counter(entity, source);
+    public void counter(Entity entity, DamageSource source) {
+        super.counter(entity, source);
 
         if (entity == null || !hasUser()) {
             return;
@@ -219,9 +219,9 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
         user.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, entity.getEyePos());
 
         if (entity instanceof LivingEntity livingEntity) {
-            Stun(livingEntity, 20, 0);
+            stun(livingEntity, 20, 0);
             if (entity.getFirstPassenger() instanceof StandEntity stand) {
-                stand.CancelAttack();
+                stand.cancelAttack();
             }
         }
 

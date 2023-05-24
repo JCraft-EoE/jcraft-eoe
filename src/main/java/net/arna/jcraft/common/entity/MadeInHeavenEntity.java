@@ -76,7 +76,7 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
 
     public MadeInHeavenEntity(EntityType<? extends StandEntity> type, World worldIn) {
         super(type, worldIn);
-        super.Initialize();
+        super.initialize();
         idleRotation = 225f;
 
         description = "Lightspeed RUSHDOWN";
@@ -121,86 +121,86 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
 
     // Moveset
     @Override
-    public void InitLightAttack() {
-        if (!this.CanAttack()) {
+    public void initLightAttack() {
+        if (!this.canAttack()) {
             return;
         }
-        HandleAttack(light, JCraft.standLightCD, 2);
+        handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
-    public void InitHeavyAttack() {
-        if (!this.CanAttack()) {
+    public void initHeavyAttack() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(donut, JCraft.standHeavyCD, 4)) {
+        if (handleAttack(donut, JCraft.standHeavyCD, 4)) {
             //this.playSound(ModSoundRegister.STAR_BREAKER,1, 1);
         }
     }
 
     @Override
-    public void InitBarrage() {
-        if (!this.CanAttack()) {
+    public void initBarrage() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(barrage, JCraft.standBarrageCD, 5)) {
+        if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
             //this.playSound(ModSoundRegister.MIH_BARRAGE,1, 1);
         }
     }
 
     @Override
-    public void InitSpecial1() {
-        if (!this.CanAttack()) {
+    public void initSpecial1() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(legcrusher, JCraft.standS1CD, 8)) {
+        if (handleAttack(legcrusher, JCraft.standS1CD, 8)) {
             //this.playSound(ModSoundRegister.MIH_LEGCRUSHER,1, 1);
         }
     }
 
     @Override
-    public void InitUlt() {
-        if (!this.CanAttack()) {
+    public void initUlt() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(timeaccel, JCraft.standUltCD, 10)) {
+        if (handleAttack(timeaccel, JCraft.standUltCD, 10)) {
             this.playSound(JSoundRegister.MIH_TACCEL, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial2() {
-        if (!this.CanAttack()) {
+    public void initSpecial2() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(furychop, JCraft.standS2CD, 9)) {
+        if (handleAttack(furychop, JCraft.standS2CD, 9)) {
             this.playSound(JSoundRegister.MIH_FURYCHOP, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial3() {
-        if (!this.CanAttack()) {
+    public void initSpecial3() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(judgement, JCraft.standS3CD, 7)) {
+        if (handleAttack(judgement, JCraft.standS3CD, 7)) {
             this.playSound(JSoundRegister.MIH_JUDGEMENT, 1, 1);
         }
     }
 
 
     @Override
-    public void InitMiddleClick() {
-        if (!this.CanAttack()) {
+    public void initMiddleClick() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(speedslice, JCraft.standMMBCD, 6)) {
+        if (handleAttack(speedslice, JCraft.standMMBCD, 6)) {
             this.playSound(JSoundRegister.MIH_SPEEDSLICE, 1, 1);
         }
     }
 
     @Override
-    public boolean HandleAttack(Attack attack, String cooldownName, int animState) {
+    public boolean handleAttack(Attack attack, String cooldownName, int animState) {
         LivingEntity player = this.getUser();
         IEntityDataSaver user = (IEntityDataSaver) player;
         int cooldown = user.getPersistentData().getInt(cooldownName);
@@ -220,7 +220,7 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
     private static final Attack barrageFinisher = new Attack(17, 0.85f, 9, 6, 1.5, 1f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.TW_KICK_HIT).setHitspark(2).setLaunch();
 
     @Override
-    public void SpecialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, List<LivingEntity> entities) {
         LivingEntity user = this.getUser();
         if (attack == speedslice) {
             this.curAttack = null;
@@ -315,9 +315,9 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
     }
 
     @Override
-    public void Desummon() {
+    public void desummon() {
         if (this.getTSTime() < 1) {
-            super.Desummon();
+            super.desummon();
         }
     }
 

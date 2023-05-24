@@ -61,7 +61,7 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
 
     public GoldenExperienceEntity(EntityType<? extends StandEntity> type, World worldIn) {
         super(type, worldIn);
-        super.Initialize();
+        super.initialize();
         idleRotation = 0f;
 
         description = "Impenetrable Regenerative DEFENSE";
@@ -88,60 +88,60 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
 
     // Moveset
     @Override
-    public void InitLightAttack() {
-        if (!this.CanAttack()) {
+    public void initLightAttack() {
+        if (!this.canAttack()) {
             return;
         }
-        HandleAttack(light, JCraft.standLightCD, 2);
+        handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
-    public void InitHeavyAttack() {
-        if (!this.CanAttack()) {
+    public void initHeavyAttack() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(heavy, JCraft.standHeavyCD, 4)) {
+        if (handleAttack(heavy, JCraft.standHeavyCD, 4)) {
             //this.playSound(ModSoundRegister.STAR_BREAKER,1, 1);
         }
     }
 
     @Override
-    public void InitBarrage() {
-        if (!this.CanAttack()) {
+    public void initBarrage() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(barrage, JCraft.standBarrageCD, 5)) {
+        if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
             this.playSound(JSoundRegister.GE_BARRAGE, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial1() {
-        CanAttackData data = this.CanAttackWithData();
+    public void initSpecial1() {
+        CanAttackData data = this.canAttackWithData();
         if (!data.canAttack) {
             return;
         }
         if (data.user.isSneaking()) {
-            if (HandleAttack(heal, JCraft.standS1CD, 7)) {
+            if (handleAttack(heal, JCraft.standS1CD, 7)) {
                 this.playSound(JSoundRegister.GE_HEAL, 1, 1);
             }
-        } else if (HandleAttack(healself, JCraft.standS1CD, 6)) {
+        } else if (handleAttack(healself, JCraft.standS1CD, 6)) {
             this.playSound(JSoundRegister.GE_HEAL, 1, 1);
         }
     }
 
     @Override
-    public void InitUlt() {
-        if (!this.CanAttack()) {
+    public void initUlt() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(overclock, JCraft.standUltCD, 13)) {
+        if (handleAttack(overclock, JCraft.standUltCD, 13)) {
             //this.playSound(ModSoundRegister.STAR_PLATINUM_THE_WORLD, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial2() {
+    public void initSpecial2() {
         if (hasUser()) {
             LivingEntity user = this.getUser();
             if (user.hasStatusEffect(JStatusRegister.Dazed)) {
@@ -151,41 +151,41 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
 
             if (this.curAttack != rekka1 && this.curAttack != rekka2 && this.curAttack != rekka3) {
                 if (idling) {
-                    HandleAttack(rekka1, JCraft.standS2CD, 10);
+                    handleAttack(rekka1, JCraft.standS2CD, 10);
                     return;
                 }
             }
             if (this.curAttack == rekka1 && this.getMoveStun() < 12) {
-                SetAttack(rekka2, 11);
+                setAttack(rekka2, 11);
             }
             if (this.curAttack == rekka2 && this.getMoveStun() < 8) {
-                SetAttack(rekka3, 12);
+                setAttack(rekka3, 12);
             }
         }
     }
 
     @Override
-    public void InitSpecial3() {
-        if (!this.CanAttack()) {
+    public void initSpecial3() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(snake, JCraft.standS3CD, 9)) {
+        if (handleAttack(snake, JCraft.standS3CD, 9)) {
             this.playSound(JSoundRegister.GE_HEAL, 1, 1);
         }
     }
 
     @Override
-    public void InitMiddleClick() {
-        if (!this.CanAttack()) {
+    public void initMiddleClick() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(tree, JCraft.standMMBCD, 8)) {
+        if (handleAttack(tree, JCraft.standMMBCD, 8)) {
             this.playSound(JSoundRegister.GE_TREE, 1, 1);
         }
     }
 
     @Override
-    public void SpecialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, List<LivingEntity> entities) {
         if (hasUser()) {
             LivingEntity user = this.getUser();
             if (attack == healself) {
@@ -197,7 +197,7 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
                     ent.setAttacker(null);
 
                     if (ent instanceof MobEntity mob) {
-                        Stun(mob, 10, 0);
+                        stun(mob, 10, 0);
                         mob.setTarget(null);
                         mob.setAttacking(null);
                         if (mob instanceof Angerable angerable) {

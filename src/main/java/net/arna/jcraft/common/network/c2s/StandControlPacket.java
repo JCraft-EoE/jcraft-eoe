@@ -79,7 +79,7 @@ public class StandControlPacket {
                 // 0 - MOVEMENT INPUT SYNC
                 case 0 -> {
                     if (player.getFirstPassenger() instanceof StandEntity stand) {
-                        stand.UpdateRemoteInputs(finalForward, finalSide, finalJump);
+                        stand.updateRemoteInputs(finalForward, finalSide, finalJump);
                     }
                 }
                 // 1 - STAND SUMMON & DESUMMON
@@ -94,7 +94,7 @@ public class StandControlPacket {
                         if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT) {
                             stand.queuedAttack = AttackQueue.STANDSUMMON;
                         } else {
-                            stand.Desummon();
+                            stand.desummon();
                         }
                     } else if (world != null) {
                         JCraft.Summon(world, player);
@@ -104,7 +104,7 @@ public class StandControlPacket {
                 case 2 -> {
                     if (player.getFirstPassenger() instanceof StandEntity stand) {
                         int moveStun = stand.getMoveStun();
-                        stand.InitLightAttack();
+                        stand.initLightAttack();
                         if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking()) {
                             stand.queuedAttack = AttackQueue.LIGHT;
                         }
@@ -114,7 +114,7 @@ public class StandControlPacket {
                 case 3 -> {
                     if (player.getFirstPassenger() instanceof StandEntity stand) {
                         boolean blocking = stand.blocking;
-                        if (!blocking && stand.CanAttack() && finalRmb) {
+                        if (!blocking && stand.canAttack() && finalRmb) {
                             if (player.getMainHandStack().getUseAction() == UseAction.NONE && player.getOffHandStack().getUseAction() == UseAction.NONE) {
                                 stand.blocking = true;
                             }
@@ -128,7 +128,7 @@ public class StandControlPacket {
                     if (player.getFirstPassenger() instanceof StandEntity stand) {
                         int moveStun = stand.getMoveStun();
 
-                        stand.InitHeavyAttack();
+                        stand.initHeavyAttack();
                         if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking()) {
                             stand.queuedAttack = AttackQueue.HEAVY;
                         }
@@ -147,7 +147,7 @@ public class StandControlPacket {
                     if (player.getFirstPassenger() instanceof StandEntity stand) {
                         int moveStun = stand.getMoveStun();
 
-                        stand.InitBarrage();
+                        stand.initBarrage();
                         if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking()) {
                             stand.queuedAttack = AttackQueue.BARRAGE;
                         }
@@ -166,7 +166,7 @@ public class StandControlPacket {
                     if (player.getFirstPassenger() instanceof StandEntity stand) {
                         int moveStun = stand.getMoveStun();
 
-                        stand.InitSpecial1();
+                        stand.initSpecial1();
                         if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking()) {
                             stand.queuedAttack = AttackQueue.SPECIAL1;
                         }
@@ -185,7 +185,7 @@ public class StandControlPacket {
                     if (player.getFirstPassenger() instanceof StandEntity stand) {
                         int moveStun = stand.getMoveStun();
 
-                        stand.InitUlt();
+                        stand.initUlt();
                         if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking()) {
                             stand.queuedAttack = AttackQueue.ULTIMATE;
                         }
@@ -204,7 +204,7 @@ public class StandControlPacket {
                     if (player.getFirstPassenger() instanceof StandEntity stand) {
                         int moveStun = stand.getMoveStun();
 
-                        stand.InitSpecial2();
+                        stand.initSpecial2();
                         if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking()) {
                             stand.queuedAttack = AttackQueue.SPECIAL2;
                         }
@@ -223,7 +223,7 @@ public class StandControlPacket {
                     if (player.getFirstPassenger() instanceof StandEntity stand) {
                         int moveStun = stand.getMoveStun();
 
-                        stand.InitSpecial3();
+                        stand.initSpecial3();
                         if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking()) {
                             stand.queuedAttack = AttackQueue.SPECIAL3;
                         }
@@ -242,14 +242,14 @@ public class StandControlPacket {
                     if (player.getFirstPassenger() instanceof StandEntity stand) {
                         int moveStun = stand.getMoveStun();
 
-                        stand.InitMiddleClick();
+                        stand.initMiddleClick();
                         if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking()) {
                             stand.queuedAttack = AttackQueue.MIDDLEMOUSE;
                         }
                     } else {
                         StandEntity stand2 = JCraft.Summon(world, player);
                         if (stand2 != null) {
-                            stand2.InitMiddleClick();
+                            stand2.initMiddleClick();
                         }
                     }
                 }

@@ -66,7 +66,7 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
 
     public KillerQueenEntity(EntityType<? extends StandEntity> type, World worldIn) {
         super(type, worldIn);
-        super.Initialize();
+        super.initialize();
         idleRotation = -30f;
 
         description = "Explosive SETPLAY";
@@ -113,37 +113,37 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
 
     // Moveset
     @Override
-    public void InitLightAttack() {
-        if (!this.CanAttack()) {
+    public void initLightAttack() {
+        if (!this.canAttack()) {
             return;
         }
-        HandleAttack(light, JCraft.standLightCD, 2);
+        handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
-    public void InitHeavyAttack() {
-        if (!this.CanAttack()) {
+    public void initHeavyAttack() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(heavy, JCraft.standHeavyCD, 4)) {
+        if (handleAttack(heavy, JCraft.standHeavyCD, 4)) {
             this.playSound(JSoundRegister.KQ_UPPERCUT, 1, 1);
             this.playSound(JSoundRegister.KQ_HEAVY, 1, 1);
         }
     }
 
     @Override
-    public void InitBarrage() {
-        if (!this.CanAttack()) {
+    public void initBarrage() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(barrage, JCraft.standBarrageCD, 5)) {
+        if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
             this.playSound(JSoundRegister.KQ_BARRAGE, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial1() {
-        if (!this.CanAttack()) {
+    public void initSpecial1() {
+        if (!this.canAttack()) {
             return;
         }
         LivingEntity user = this.getUser();
@@ -157,7 +157,7 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
                 userData.putInt(JCraft.standS1CD, bombplant.cooldown * 20);
             }
         } else {
-            HandleAttack(bombplant, JCraft.standS1CD, 7);
+            handleAttack(bombplant, JCraft.standS1CD, 7);
             this.bombBlock = null;
         }
 
@@ -166,28 +166,28 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
     }
 
     @Override
-    public void InitUlt() {
-        if (!this.CanAttack()) {
+    public void initUlt() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(detonate, JCraft.standUltCD, 6)) {
+        if (handleAttack(detonate, JCraft.standUltCD, 6)) {
             this.playSound(JSoundRegister.KQ_DETONATE, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial2() {
-        if (!this.CanAttack()) {
+    public void initSpecial2() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(sha, JCraft.standS2CD, 8)) {
+        if (handleAttack(sha, JCraft.standS2CD, 8)) {
             //this.playSound(ModSoundRegister.KQ_SHA,1, 1);
         }
     }
 
     @Override
-    public void InitSpecial3() {
-        if (!this.CanAttack())
+    public void initSpecial3() {
+        if (!this.canAttack())
             return;
 
         LivingEntity user = this.getUser();
@@ -210,7 +210,7 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
     }
 
     @Override
-    public void SpecialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, List<LivingEntity> entities) {
         LivingEntity user = this.getUser();
         if (attack == bombplant) {
             if (entities.size() > 0) { // Living entities take priority
@@ -278,8 +278,8 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
     }
 
     @Override
-    public void InitMiddleClick() {
-        if (!this.CanAttack())
+    public void initMiddleClick() {
+        if (!this.canAttack())
             return;
         LivingEntity user = this.getUser();
 
@@ -303,12 +303,12 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
     }
 
     @Override
-    public void Desummon() {
+    public void desummon() {
         if (coin != null) {
             coin.discard();
         }
 
-        super.Desummon();
+        super.desummon();
     }
 
     @Override

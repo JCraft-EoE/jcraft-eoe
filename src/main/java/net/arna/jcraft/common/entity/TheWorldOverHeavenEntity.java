@@ -1,8 +1,10 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JSoundRegister;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.*;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -73,7 +75,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
 
     public TheWorldOverHeavenEntity(EntityType<? extends StandEntity> type, World worldIn) {
         super(type, worldIn);
-        super.Initialize();
+        super.initialize();
         idleRotation = -45f;
 
         pros = List.of(
@@ -107,39 +109,39 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
 
     // Moveset
     @Override
-    public void InitLightAttack() {
-        if (!this.CanAttack()) {
+    public void initLightAttack() {
+        if (!this.canAttack()) {
             return;
         }
-        HandleAttack(light, JCraft.standLightCD, 2);
+        handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
-    public void InitBarrage() {
-        if (!this.CanAttack()) {
+    public void initBarrage() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(barrage, JCraft.standBarrageCD, 5)) {
+        if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
             this.playSound(JSoundRegister.TW_BARRAGE, 1, 1);
         }
     }
 
     @Override
-    public void InitHeavyAttack() {
-        if (!this.CanAttack()) {
+    public void initHeavyAttack() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(heavy, JCraft.standHeavyCD, 4)) {
+        if (handleAttack(heavy, JCraft.standHeavyCD, 4)) {
             this.playSound(JSoundRegister.TWOH_HEAVY, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial1() {
-        if (!this.CanAttack()) {
+    public void initSpecial1() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(smite, JCraft.standS1CD, 6)) {
+        if (handleAttack(smite, JCraft.standS1CD, 6)) {
             LivingEntity user = this.getUser();
             if (user.isOnGround()) {
                 this.lightningPos = user.getPos();
@@ -175,40 +177,41 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
     }
 
     @Override
-    public void InitSpecial3() {
-        if (!this.CanAttack() || this.getTSTime() > 0) {
+    public void initSpecial3() {
+        if (!this.canAttack() || this.getTSTime() > 0) {
             return;
         }
-        if (HandleAttack(overwrite, JCraft.standS3CD, 8)) {
+        if (handleAttack(overwrite, JCraft.standS3CD, 8)) {
             this.playSound(JSoundRegister.TWOH_OVERWRITE, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial2() {
-        CanAttackData cad = this.CanAttackWithData();
+    public void initSpecial2() {
+        CanAttackData cad = this.canAttackWithData();
         if (!cad.canAttack)
             return;
-        if (cad.user.isOnGround() && HandleAttack(knives, JCraft.standS2CD, 9)) {
+        if (cad.user.isOnGround() && handleAttack(knives, JCraft.standS2CD, 9)) {
             this.playSound(JSoundRegister.TWOH_KNIFETHROW, 1, 1);
-        } else if (HandleAttack(airknives, JCraft.standS2CD, 9)) {
+        } else if (handleAttack(airknives, JCraft.standS2CD, 9)) {
             this.playSound(JSoundRegister.TWOH_AIRKNIVES, 1, 1);
         }
     }
 
     @Override
-    public void InitUlt() {
-        if (!this.CanAttack()) {
+    public void initUlt() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(timestop, JCraft.standUltCD, 7)) {
+        if (handleAttack(timestop, JCraft.standUltCD, 7)) {
             this.playSound(JSoundRegister.TWOH_TS, 1, 1);
+            PlayerLookup.tracking(this).forEach(tracked -> ShaderActivationPacket.send(tracked, this, 20, (int) timestop.stun * 20, ShaderActivationPacket.Type.ZA_WARDO));
         }
     }
 
     @Override
-    public void InitMiddleClick() {
-        CanAttackData data = this.CanAttackWithData();
+    public void initMiddleClick() {
+        CanAttackData data = this.canAttackWithData();
         if (!data.canAttack)
             return;
         if (this.getTSTime() > 0)
@@ -233,13 +236,13 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
     }
 
     @Override
-    public void SpecialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, List<LivingEntity> entities) {
         LivingEntity user = this.getUser();
         DamageSource playerSource = DamageSource.mob(user);
 
         if (attack == heavy) { // TWOH's heavy is a mini-overwrite that ignores block
             for (LivingEntity ent : entities) {
-                Stun(ent, 20, 1);
+                stun(ent, 20, 1);
 
                 float damage = 10f;
                 ent.damage(playerSource, 0.001f);
@@ -283,7 +286,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
             this.world.spawnEntity(lightning);
         } else if (attack == overwrite) {
             for (LivingEntity ent : entities) {
-                Stun(ent, 40, 3);
+                stun(ent, 40, 3);
 
                 ent.setInvulnerable(false);
 
@@ -341,9 +344,9 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
     }
 
     @Override
-    public void Desummon() {
+    public void desummon() {
         if (this.getTSTime() < 1) {
-            super.Desummon();
+            super.desummon();
         }
     }
 

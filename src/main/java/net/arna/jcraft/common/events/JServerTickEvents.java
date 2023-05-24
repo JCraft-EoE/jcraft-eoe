@@ -32,7 +32,7 @@ import net.minecraft.world.explosion.Explosion;
 
 import java.util.*;
 
-import static net.arna.jcraft.common.entity.StandEntity.Stun;
+import static net.arna.jcraft.common.entity.StandEntity.stun;
 import static net.arna.jcraft.common.util.JCraftUtils.activeTimestops;
 
 public class JServerTickEvents {
@@ -141,7 +141,7 @@ public class JServerTickEvents {
                 newBurstTimers.put(player, newVal);
             } else {
                 player.removeStatusEffect(JStatusRegister.Dazed);
-                Stun(player, 10, 1);
+                stun(player, 10, 1);
                 Vec3d pPos = player.getEyePos();
                 List<? extends Entity> toPush = JCraftUtils.GenerateHitbox(player.world, pPos, 4, Entity.class, filter);
 
@@ -152,16 +152,16 @@ public class JServerTickEvents {
                     // If the stand was hit, the attack will stop and the user will be hit remotely
                     if (ent instanceof StandEntity stand) {
                         if (stand.hasUser()) {
-                            Stun(stand.getUser(), 10, 3);
-                            stand.CancelAttack();
+                            stun(stand.getUser(), 10, 3);
+                            stand.cancelAttack();
                         }
                     } else if (ent.getFirstPassenger() instanceof StandEntity stand) { // Stands should not have passengers
                         if (stand.blocking) {
                             pushAway = false;
                         } else if (ent instanceof LivingEntity living) { // Stand users that aren't blocking get launched and their stand attacks are cancelled
                             //awayVector = awayVector.multiply(0.5);
-                            Stun(living, 10, 3);
-                            stand.CancelAttack();
+                            stun(living, 10, 3);
+                            stand.cancelAttack();
                         }
                     }
 

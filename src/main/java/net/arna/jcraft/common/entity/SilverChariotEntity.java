@@ -86,7 +86,7 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
 
     public SilverChariotEntity(EntityType<? extends StandEntity> type, World worldIn) {
         super(type, worldIn);
-        super.Initialize();
+        super.initialize();
         idleRotation = 225f;
 
         pros = List.of(
@@ -125,50 +125,50 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
 
     // Moveset
     @Override
-    public void InitLightAttack() {
-        if (!this.CanAttack()) {
+    public void initLightAttack() {
+        if (!this.canAttack()) {
             return;
         }
-        HandleAttack(this.light, JCraft.standLightCD, 2);
+        handleAttack(this.light, JCraft.standLightCD, 2);
     }
 
     @Override
-    public void InitHeavyAttack() {
-        if (!this.CanAttack()) {
+    public void initHeavyAttack() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(this.heavy, JCraft.standHeavyCD, 4)) {
+        if (handleAttack(this.heavy, JCraft.standHeavyCD, 4)) {
             this.playSound(JSoundRegister.SC_HEAVY, 1, 1);
         }
     }
 
     @Override
-    public void InitBarrage() {
-        if (!this.CanAttack()) {
+    public void initBarrage() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(this.barrage, JCraft.standBarrageCD, 5)) {
+        if (handleAttack(this.barrage, JCraft.standBarrageCD, 5)) {
             this.playSound(JSoundRegister.SC_BARRAGE, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial1() {
-        if (!this.CanAttack()) {
+    public void initSpecial1() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(this.spinbarrage, JCraft.standS1CD, 6)) {
+        if (handleAttack(this.spinbarrage, JCraft.standS1CD, 6)) {
             this.playSound(JSoundRegister.SC_SPIN, 1, 1);
         }
     }
 
     @Override
-    public void InitUlt() {
-        if (!this.CanAttack()) {
+    public void initUlt() {
+        if (!this.canAttack()) {
             return;
         }
         if (this.getMode() == 3) {
-            if (HandleAttack(this.pbeatdown, JCraft.standUltCD, 11)) {
+            if (handleAttack(this.pbeatdown, JCraft.standUltCD, 11)) {
                 //this.playSound(ModSoundRegister.PSC_BEATDOWN,1, 1);
             }
         } else if (hasUser()) {
@@ -187,16 +187,16 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
     }
 
     @Override
-    public void InitSpecial2() {
-        if (!this.CanAttack()) {
+    public void initSpecial2() {
+        if (!this.canAttack()) {
             return;
         }
         if (this.getMode() == 3) {
-            if (HandleAttack(this.pcharge, JCraft.standS2CD, 8)) {
+            if (handleAttack(this.pcharge, JCraft.standS2CD, 8)) {
                 //this.playSound(ModSoundRegister.PSC_CHARGE,1, 1);
             }
         } else {
-            if (HandleAttack(this.charge, JCraft.standS2CD, 7)) {
+            if (handleAttack(this.charge, JCraft.standS2CD, 7)) {
                 Entity ent = this.getUser();
                 if (ent.isOnGround()) {
                     ent.setVelocity(ent.getVelocity().add(this.getRotationVector().multiply(0.75)).add(0.0, 0.15, 0.0));
@@ -208,16 +208,16 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
     }
 
     @Override
-    public void InitSpecial3() {
-        if (!this.CanAttack()) {
+    public void initSpecial3() {
+        if (!this.canAttack()) {
             return;
         }
         if (this.getMode() == 3) {
-            if (HandleAttack(this.counter, JCraft.standS3CD, 10)) {
+            if (handleAttack(this.counter, JCraft.standS3CD, 10)) {
                 //this.playSound(ModSoundRegister.PSC_CHARGE,1, 1);
             }
         } else {
-            if (HandleAttack(this.cleave, JCraft.standS3CD, 13)) {
+            if (handleAttack(this.cleave, JCraft.standS3CD, 13)) {
                 this.setFreePos(new Vec3f(getUser().getPos().add(getUser().getRotationVector().multiply(1.5))));
                 this.setFree(true);
                 //this.playSound(ModSoundRegister.SC_CLEAVE,1, 1);
@@ -234,7 +234,7 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
      */
 
     @Override
-    public boolean HandleAttack(Attack attack, String cooldownName, int animState) {
+    public boolean handleAttack(Attack attack, String cooldownName, int animState) {
         LivingEntity user = this.getUser();
         IEntityDataSaver userData = (IEntityDataSaver) user;
         int cooldown = userData.getPersistentData().getInt(cooldownName);
@@ -264,10 +264,10 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
     }
 
     @Override
-    public void SpecialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, List<LivingEntity> entities) {
         if (attack == this.pbeatdown) {
             if (entities.size() < 1) {
-                Stun(getUser(), 90, 1);
+                stun(getUser(), 90, 1);
             } else {
                 this.curAttack = this.realbeatdown;
                 this.setMoveStun(59);
@@ -283,12 +283,12 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
     }
 
     @Override
-    public void Counter(Entity entity, DamageSource source) {
-        super.Counter(entity, source);
+    public void counter(Entity entity, DamageSource source) {
+        super.counter(entity, source);
         if (entity instanceof LivingEntity ent) {
-            Stun(ent, 30, 0);
+            stun(ent, 30, 0);
             if (entity.getFirstPassenger() instanceof StandEntity stand) {
-                stand.CancelAttack();
+                stand.cancelAttack();
             }
         }
     }

@@ -61,7 +61,7 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
 
     public D4CEntity(EntityType<? extends StandEntity> type, World worldIn) {
         super(type, worldIn);
-        super.Initialize();
+        super.initialize();
         idleRotation = -45f;
 
         description = "All Range, Multipurpose TRICKSTER";
@@ -92,21 +92,21 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
     }
 
     @Override
-    public void InitLightAttack() {
-        if (!this.CanAttack()) {
+    public void initLightAttack() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(light, JCraft.standLightCD, 2)) {
+        if (handleAttack(light, JCraft.standLightCD, 2)) {
             this.playSound(JSoundRegister.D4C_LIGHT, 1, 1);
         }
     }
 
     @Override
-    public void InitHeavyAttack() {
-        if (!this.CanAttack()) {
+    public void initHeavyAttack() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(heavy, JCraft.standHeavyCD, 4)) {
+        if (handleAttack(heavy, JCraft.standHeavyCD, 4)) {
             this.playSound(JSoundRegister.D4C_HEAVY, 1, 1);
             Entity ent = this.getUser();
             if (ent.isOnGround()) {
@@ -117,24 +117,24 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
     }
 
     @Override
-    public void InitBarrage() {
-        if (!this.CanAttack()) {
+    public void initBarrage() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(barrage, JCraft.standBarrageCD, 5)) {
+        if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
             this.playSound(JSoundRegister.D4C_BARRAGE, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial1() {
+    public void initSpecial1() {
         // Ability to cancel dimension hop
         if (this.curAttack == dimhop_others) {
             this.setMoveStun(0);
             this.curAttack = null;
         }
 
-        if (!this.CanAttack()) {
+        if (!this.canAttack()) {
             return;
         }
 
@@ -164,41 +164,41 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
             }
         }
 
-        if (HandleAttack(dimhop_others, JCraft.standS1CD, 6)) {
+        if (handleAttack(dimhop_others, JCraft.standS1CD, 6)) {
             this.playSound(JSoundRegister.D4C_DIMHOP, 1, 1);
         }
     }
 
     @Override
-    public void InitUlt() {
-        if (!this.CanAttack()) {
+    public void initUlt() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(clonespawn, JCraft.standUltCD, 6)) {
+        if (handleAttack(clonespawn, JCraft.standUltCD, 6)) {
             this.playSound(JSoundRegister.D4C_DIMHOP, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial2() {
-        if (!this.CanAttack()) {
+    public void initSpecial2() {
+        if (!this.canAttack()) {
             return;
         }
-        if (getUser().isSneaking() && HandleAttack(givegun, JCraft.standS2CD, 10)) {
+        if (getUser().isSneaking() && handleAttack(givegun, JCraft.standS2CD, 10)) {
             this.playSound(JSoundRegister.D4C_THROW, 1, 1);
             this.equipStack(EquipmentSlot.MAINHAND, JObjectRegistry.FVREVOLVER.getDefaultStack());
-        } else if (HandleAttack(grab, JCraft.standS2CD, 7)) {
+        } else if (handleAttack(grab, JCraft.standS2CD, 7)) {
             this.playSound(JSoundRegister.D4C_THROW, 1, 1);
             this.equipStack(EquipmentSlot.MAINHAND, JObjectRegistry.FVREVOLVER.getDefaultStack());
         }
     }
 
     @Override
-    public void InitSpecial3() {
-        if (!this.CanAttack()) {
+    public void initSpecial3() {
+        if (!this.canAttack()) {
             return;
         }
-        HandleAttack(counter, JCraft.standS3CD, 8);
+        handleAttack(counter, JCraft.standS3CD, 8);
     }
 
     @Override
@@ -213,11 +213,11 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
     }
 
     @Override
-    public void InitMiddleClick() {
-        if (!this.CanAttack()) {
+    public void initMiddleClick() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(flag, JCraft.standMMBCD, 11)) {
+        if (handleAttack(flag, JCraft.standMMBCD, 11)) {
             getUser().addStatusEffect(new StatusEffectInstance(JStatusRegister.Knockdown, 50, 0, true, false));
             getUser().addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 50, 0, true, false));
         }
@@ -246,14 +246,14 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
     private static final Attack grabhitfinal = new Attack(0, 0.75f, 34, 0, 2, 4f, 1.1f, AttackType.MULTIHIT, 0.25f, 0, List.of(11, 17, 26), JSoundRegister.IMPACT_1).setHitspark(2).setLaunch();
 
     @Override
-    public void SpecialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, List<LivingEntity> entities) {
         Entity player = this.getUser();
 
         if (attack == grab) {
             if (entities.size() > 0) {
                 // Grab bypasses and disables block
                 for (LivingEntity ent : entities) {
-                    Stun(ent, 34, 0);
+                    stun(ent, 34, 0);
 
                     if (ent.getFirstPassenger() instanceof StandEntity stand) {
                         stand.blocking = false;
@@ -348,8 +348,8 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
     }
 
     @Override
-    public void Counter(Entity entity, DamageSource source) {
-        super.Counter(entity, source);
+    public void counter(Entity entity, DamageSource source) {
+        super.counter(entity, source);
 
         if (entity == null || !hasUser()) {
             return;
@@ -362,9 +362,9 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
 
             if (entity instanceof LivingEntity livingEntity) {
                 livingEntity.damage(DamageSource.mob(user), 10);
-                Stun(livingEntity, 20, 3);
+                stun(livingEntity, 20, 3);
                 if (entity.getFirstPassenger() instanceof StandEntity stand) {
-                    stand.CancelAttack();
+                    stand.cancelAttack();
                 }
             }
 

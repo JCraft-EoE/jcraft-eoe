@@ -87,7 +87,7 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
 
     public GEREntity(EntityType<? extends StandEntity> type, World worldIn) {
         super(type, worldIn);
-        super.Initialize();
+        super.initialize();
         idleRotation = 0f;
 
         description = "Impossible Ascended DEFENSE";
@@ -127,66 +127,66 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
 
     // Moveset
     @Override
-    public void InitLightAttack() {
-        CanAttackData data = CanAttackWithData();
+    public void initLightAttack() {
+        CanAttackData data = canAttackWithData();
         if (!data.canAttack) {
             return;
         }
         if (data.user.isOnGround()) {
-            HandleAttack(light, JCraft.standLightCD, 2);
+            handleAttack(light, JCraft.standLightCD, 2);
         } else {
-            HandleAttack(airlight, JCraft.standLightCD, 10);
+            handleAttack(airlight, JCraft.standLightCD, 10);
         }
     }
 
     @Override
-    public void InitHeavyAttack() {
-        CanAttackData data = CanAttackWithData();
+    public void initHeavyAttack() {
+        CanAttackData data = canAttackWithData();
         if (!data.canAttack) {
             return;
         }
         if (data.user.isOnGround()) {
-            if (HandleAttack(heavy, JCraft.standHeavyCD, 4))
+            if (handleAttack(heavy, JCraft.standHeavyCD, 4))
                 this.playSound(JSoundRegister.GER_HEAVY, 1, 1);
         } else {
-            if (HandleAttack(airheavy, JCraft.standHeavyCD, 11))
+            if (handleAttack(airheavy, JCraft.standHeavyCD, 11))
                 this.playSound(JSoundRegister.GER_HEAVY, 1, 1);
         }
     }
 
     @Override
-    public void InitBarrage() {
-        CanAttackData data = CanAttackWithData();
+    public void initBarrage() {
+        CanAttackData data = canAttackWithData();
         if (!data.canAttack) {
             return;
         }
         if (data.user.isOnGround()) {
-            if (HandleAttack(barrage, JCraft.standBarrageCD, 5))
+            if (handleAttack(barrage, JCraft.standBarrageCD, 5))
                 this.playSound(JSoundRegister.GE_BARRAGE, 1, 1);
         } else {
-            if (HandleAttack(airbarrage, JCraft.standBarrageCD, 12))
+            if (handleAttack(airbarrage, JCraft.standBarrageCD, 12))
                 this.playSound(JSoundRegister.GER_KICKBARRAGE, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial1() {
-        CanAttackData data = this.CanAttackWithData();
+    public void initSpecial1() {
+        CanAttackData data = this.canAttackWithData();
         if (!data.canAttack) {
             return;
         }
         if (data.user.isSneaking()) {
-            if (HandleAttack(heal, JCraft.standS1CD, 7)) {
+            if (handleAttack(heal, JCraft.standS1CD, 7)) {
                 this.playSound(JSoundRegister.GE_HEAL, 1, 1);
             }
-        } else if (HandleAttack(healself, JCraft.standS1CD, 6)) {
+        } else if (handleAttack(healself, JCraft.standS1CD, 6)) {
             this.playSound(JSoundRegister.GE_HEAL, 1, 1);
         }
     }
 
     @Override
-    public void InitMiddleClick() {
-        if (!this.CanAttack()) {
+    public void initMiddleClick() {
+        if (!this.canAttack()) {
             return;
         }
         NbtCompound data = ((IEntityDataSaver) getUser()).getPersistentData();
@@ -198,21 +198,21 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
     }
 
     @Override
-    public void InitSpecial2() {
-        if (!this.CanAttack()) {
+    public void initSpecial2() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(laser, JCraft.standS2CD, 8)) {
+        if (handleAttack(laser, JCraft.standS2CD, 8)) {
             this.playSound(JSoundRegister.GER_LASER, 1, 1);
         }
     }
 
     @Override
-    public void InitSpecial3() {
-        if (!this.CanAttack()) {
+    public void initSpecial3() {
+        if (!this.canAttack()) {
             return;
         }
-        if (HandleAttack(counter, JCraft.standS3CD, 9)) {
+        if (handleAttack(counter, JCraft.standS3CD, 9)) {
             this.playSound(JSoundRegister.GE_HEAL, 1, 1);
         }
     }
@@ -221,8 +221,8 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
     private static final int counterStopTime = 20; // Convenience
 
     @Override
-    public void Counter(Entity entity, DamageSource source) {
-        super.Counter(entity, source);
+    public void counter(Entity entity, DamageSource source) {
+        super.counter(entity, source);
         if (entity == null || !hasUser()) {
             return;
         }
@@ -239,11 +239,11 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
         ((ITimeStop) entity).setTimeStopTicks(counterStopTime);
 
         if (entity.getFirstPassenger() instanceof StandEntity stand) {
-            stand.CancelAttack();
+            stand.cancelAttack();
         }
 
         if (entity instanceof LivingEntity living) {
-            Stun(living, 10, 0);
+            stun(living, 10, 0);
         }
 
         Vec3d eP = this.getEyePos();
@@ -251,13 +251,13 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
     }
 
     @Override
-    public void InitUlt() {
-        if (!this.CanAttack()) {
+    public void initUlt() {
+        if (!this.canAttack()) {
             return;
         }
         if (rtzEntityData.isEmpty()) {
             // Setup
-            if (HandleAttack(rtz, JCraft.standUltCD, 13)) {
+            if (handleAttack(rtz, JCraft.standUltCD, 13)) {
                 this.playSound(JSoundRegister.GER_SETUP, 1, 1);
             }
         } else {
@@ -302,18 +302,18 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
      */
 
     @Override
-    public void Desummon() {
+    public void desummon() {
         if (getFlightTime() > 0) {
             setFlightTime(0);
             return;
         }
-        super.Desummon();
+        super.desummon();
     }
 
     private static final Attack barrageFinisher = new Attack(17, 1f, 9, 6, 1.75, 1f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.TW_KICK_HIT).setHitspark(2).setLaunch();
 
     @Override
-    public void SpecialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, List<LivingEntity> entities) {
         LivingEntity user = this.getUser();
         if (attack == healself) {
             user.heal(4f);
@@ -323,7 +323,7 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
                 ent.setAttacker(null);
 
                 if (ent instanceof MobEntity mob) {
-                    Stun(mob, 10, 0);
+                    stun(mob, 10, 0);
                     mob.setTarget(null);
                     mob.setAttacking(null);
                     if (mob instanceof Angerable angerable) {
