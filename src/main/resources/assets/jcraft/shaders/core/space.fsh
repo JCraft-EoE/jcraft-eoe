@@ -1,85 +1,83 @@
 #version 150
 
-#moj_import <matrix.glsl>
-
-#define NUM_OCTAVES 16
+#define time Time
 
 uniform sampler2D DiffuseSampler;
-uniform sampler2D DepthSampler;
 
-in vec2 texCoord0;
+
+uniform vec2      OutSize;
+uniform ivec4     ViewPort;           // viewport resolution (in pixels)
+uniform float     Time;                 // shader playback time (in seconds)
+
+uniform mat4      InverseTransformMatrix;
+
+in vec4 vPosition;
+in vec2 texCoord;
 
 out vec4 fragColor;
 
-mat3 rotX(float a) {
-    float c = cos(a);
-    float s = sin(a);
-    return mat3(
-    1, 0, 0,
-    0, c, -s,
-    0, s, c
-    );
-}
-mat3 rotY(float a) {
-    float c = cos(a);
-    float s = sin(a);
-    return mat3(
-    c, 0, -s,
-    0, 1, 0,
-    s, 0, c
-    );
+float hash(float x){
+    return fract(sin(x) * 43758.5453);
 }
 
-float random(vec2 pos) {
-    return fract(sin(dot(pos.xy, vec2(1399.9898, 78.233))) * 43758.5453123);
+float noise(vec3 pos){
+    vec3 i = floor(pos);
+    vec3 q = fract(pos);
+
+    // Random values
+    float a = hash(dot(i, vec3(1.0, 0.0, 0.0)));
+    float b = hash(dot(i, vec3(0.0, 1.0, 0.0)));
+    float c = hash(dot(i, vec3(0.0, 0.0, 1.0)));
+    float d = hash(dot(i, vec3(1.0, 1.0, 0.0)));
+    float e = hash(dot(i, vec3(0.0, 1.0, 1.0)));
+    float f = hash(dot(i, vec3(1.0, 0.0, 1.0)));
+    float g = hash(dot(i, vec3(1.0, 1.0, 1.0)));
+
+    // Smoothstep interpolation
+    vec3 u = q * q * (3.0 - 2.0 * q);
+
+    // Interpolate the random values
+    float x1 = mix(a, b, u.x);
+    float x2 = mix(c, d, u.x);
+    float x3 = mix(e, f, u.x);
+    float y1 = mix(x1, x2, u.y);
+    float y2 = mix(x3, g, u.y);
+    return mix(y1, y2, u.z);
 }
 
-float noise(vec2 pos) {
-    vec2 i = floor(pos);
-    vec2 f = fract(pos);
-    float a = random(i + vec2(0.0, 0.0));
-    float b = random(i + vec2(1.0, 0.0));
-    float c = random(i + vec2(0.0, 1.0));
-    float d = random(i + vec2(1.0, 1.0));
-    vec2 u = f * f * (3.0 - 2.0 * f);
-    return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
-}
-
-float fbm(vec2 pos) {
+float fbm(vec3 pos)
+{
     float v = 0.0;
     float a = 0.5;
-    vec2 shift = vec2(100.0);
-    mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));
-    for (int i=0; i<NUM_OCTAVES; i++) {
+    //vec3 shift = vec3(100.0);
+    mat3 rot = mat3(cos(0.5), sin(0.5), 0.0, -sin(0.5), cos(0.5), 0.0, 0.0, 0.0, 1.0);
+    for (int i = 0; i < 4; i++){
         v += a * noise(pos);
-        pos = rot * pos * 2.0 + shift;
+        pos = rot * pos * 2.0;// + shift;
         a *= 0.5;
     }
     return v;
 }
 
 void main(void) {
-    vec2 p = (gl_FragCoord.xy * 1.0 - vec2(840, 300)) / min(840, 300);
+    vec3 p = vPosition.xyz / 100;
 
-    float t = 0.0, d;
+    float time2 = 0.6 * Time / 2.0;
 
-    float time2 = 0.6 * 1 / 2.0;
+    vec3 q = vec3(0.0);
+    q.x = fbm(vec3(p + 0.30 * time2));
+    q.y = fbm(vec3(p + vec3(1.0)));
+    vec3 r = vec3(0.0);
+    r.x = fbm(vec3(p + q + vec3(1.2, 3.2, 0.0) + 0.135 * time2));
+    r.y = fbm(vec3(p + q + vec3(8.8, 2.8, 0.0) + 0.126 * time2));
+    float noiseResult = fbm(vec3(p + r));
+    vec3 color = mix(vec3(0.0, 0.0, 0.0), vec3(1.0, 0.0, 0.7), clamp((noiseResult * noiseResult) * 8.0, 0.0, 5.0));
 
-    vec2 q = vec2(0.0);
-    q.x = fbm(p + 0.30 * time2);
-    q.y = fbm(p + vec2(1.0));
-    vec2 r = vec2(0.0);
-    r.x = fbm(p + 1.0 * q + vec2(1.2, 3.2) + 0.135 * time2);
-    r.y = fbm(p + 1.0 * q + vec2(8.8, 2.8) + 0.126 * time2);
-    float f = fbm(p + r);
-    vec3 color = mix(vec3(0.0, 0.0, 0), vec3(1, 0, 0.7), clamp((f * f) * 8.0, 0.0, 5.0));
+    //color = mix(color, vec3(0.0, 0.0, 1.0), clamp(length(q), 0.0, 1.0));
 
-    color = mix(color, vec3(0, 0, 1), clamp(length(q), 0.0, 1.0));
+    //color = mix(color, vec3(1.0, 1.0, 1.0), clamp(length(r.x), 0.0, 1.0));
 
-
-    color = mix(color, vec3(1, 1, 1), clamp(length(r.x), 0.0, 1.0));
-
-    color = (f * f * f + 0.6 * f * f + 0.9 * f) * color;
+    color = (noiseResult * noiseResult * noiseResult + 0.6 * noiseResult * noiseResult + 0.9 * noiseResult) * color;
 
     fragColor = vec4(color, 1.0);
 }

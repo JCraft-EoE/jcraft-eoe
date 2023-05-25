@@ -14,6 +14,7 @@ import net.arna.jcraft.client.particle.KCParticle;
 import net.arna.jcraft.client.renderer.block.ShaderTestBlockEntityRenderer;
 import net.arna.jcraft.client.renderer.item.BigItemRenderer;
 import net.arna.jcraft.client.rendering.RenderHandler;
+import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
 import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
 import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
 import net.arna.jcraft.common.entity.StandEntity;
@@ -80,6 +81,7 @@ public class JCraftClient implements ClientModInitializer {
         RenderHandler.init();
         JEventsRegister.registerClientEvents();
         ZaWarudoShaderHandler.INSTANCE.init();
+        CrimsonShaderHandler.INSTANCE.init();
 
         // Particle registration
         ParticleFactoryRegistry.getInstance().register(JParticleTypeRegistry.COMBO_BREAK, ComboBreakerParticle.Factory::new);

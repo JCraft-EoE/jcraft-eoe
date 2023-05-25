@@ -9,12 +9,12 @@ public class Textures {
     private final List<Texture> textureList = Lists.newArrayList();
 
     public Textures(Texture north, Texture south, Texture east, Texture west, Texture up, Texture down) {
+        this.textureList.add(down);
         this.textureList.add(north);
         this.textureList.add(south);
+        this.textureList.add(up);
         this.textureList.add(east);
         this.textureList.add(west);
-        this.textureList.add(up);
-        this.textureList.add(down);
     }
 
     public Texture byId(int i) {

@@ -1,6 +1,9 @@
 package net.arna.jcraft.client.rendering.skybox;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import ladysnake.satin.api.managed.ManagedCoreShader;
+import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
+import net.arna.jcraft.client.rendering.shader.JShader;
 import net.arna.jcraft.registry.JShaderRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
@@ -24,15 +27,21 @@ public class CrimsonSkyBox implements JSkyBox {
         assert client.world != null;
         this.alpha = 1;
 
-        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
         RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
         RenderSystem.depthMask(false);
-
-        RenderSystem.setShader(JShaderRegistry.TEST.getInstance());
+        Matrix4f mat = matrices.peek().getPositionMatrix();
+        Matrix4f invMat = mat.copy();
+        invMat.invert();
+        ManagedCoreShader shader = CrimsonShaderHandler.SPACE;
+        shader.findUniformMat4("InverseTransformMatrix").set(invMat);
+        shader.findUniform1f("Time").set((client.world.getTime() + tickDelta) / 20);
+        RenderSystem.setShader(CrimsonShaderHandler.SPACE::getProgram);
 
         Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferBuilder = tessellator.getBuffer();
 
-        for (int i = 0; i < 6; ++i) {
+        for(int i = 0; i < 6; ++i) {
             matrices.push();
             if (i == 1) {
                 matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(90.0F));
@@ -54,20 +63,18 @@ public class CrimsonSkyBox implements JSkyBox {
                 matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(-90.0F));
             }
 
-            Matrix4f matrix4f = matrices.peek().getPositionMatrix();
+            projectionMatrix = matrices.peek().getPositionMatrix();
             bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-
-
-            Color color = new Color(255, 20, 105);
-            bufferBuilder.vertex(matrix4f, -100.0F, -100.0F, -100.0F).texture(0.0F, 0.0F).color(color.getRed(), color.getGreen(), color.getBlue(), 255 * getAlpha()).next();
-            bufferBuilder.vertex(matrix4f, -100.0F, -100.0F, 100.0F).texture(0.0F, 16.0F).color(color.getRed(), color.getGreen(), color.getBlue(), 255 * getAlpha()).next();
-            bufferBuilder.vertex(matrix4f, 100.0F, -100.0F, 100.0F).texture(16.0F, 16.0F).color(color.getRed(), color.getGreen(), color.getBlue(), 255 * getAlpha()).next();
-            bufferBuilder.vertex(matrix4f, 100.0F, -100.0F, -100.0F).texture(16.0F, 0.0F).color(color.getRed(), color.getGreen(), color.getBlue(), 255 * getAlpha()).next();
+            bufferBuilder.vertex(projectionMatrix, -110.0F, -110.0F, -110.0F).texture(0.0F, 0.0F).color(40, 40, 40, 255 * getAlpha()).next();
+            bufferBuilder.vertex(projectionMatrix, -110.0F, -110.0F, 110.0F).texture(0.0F, 16.0F).color(40, 40, 40, 255 * getAlpha()).next();
+            bufferBuilder.vertex(projectionMatrix, 110.0F, -110.0F, 110.0F).texture(16.0F, 16.0F).color(40, 40, 40, 255 * getAlpha()).next();
+            bufferBuilder.vertex(projectionMatrix, 110.0F, -110.0F, -110.0F).texture(16.0F, 0.0F).color(40, 40, 40, 255 * getAlpha()).next();
             tessellator.draw();
             matrices.pop();
         }
 
         RenderSystem.depthMask(true);
+        RenderSystem.enableTexture();
         RenderSystem.disableBlend();
     }
 }

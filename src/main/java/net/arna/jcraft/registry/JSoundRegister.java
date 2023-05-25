@@ -51,6 +51,7 @@ public interface JSoundRegister {
     SoundEvent TW_SUMMON = registerSound("twsummon");
     SoundEvent TW_BARRAGE = registerSound("twbarrage");
     SoundEvent TW_TS = registerSound("twts");
+    SoundEvent TW_TS_CLEAN = registerSound("twts_clean");
     SoundEvent TW_CHARGE = registerSound("twcharge");
     SoundEvent TW_CHARGE_HIT = registerSound("twchargehit");
     SoundEvent TW_DONUT = registerSound("twdonut");

@@ -182,6 +182,13 @@
     ]
   },
 
+  "twts_clean": {
+    "subtitle": "subtitles.jcraft.twts_clean",
+    "sounds": [
+      "jcraft:twts_clean"
+    ]
+  },
+
   "twbarrage": {
     "sounds": [
       "jcraft:twbarrage"

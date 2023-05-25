@@ -31,8 +31,7 @@ public class ClientWorldMixin {
 
             List<Entity> passengers = entity.getPassengerList();
 
-            for (Entity passenger :
-                    passengers) {
+            for (Entity passenger : passengers) {
                 stopTick(passenger);
             }
 
