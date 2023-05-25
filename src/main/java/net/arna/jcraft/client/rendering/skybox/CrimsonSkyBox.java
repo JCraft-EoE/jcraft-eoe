@@ -1,7 +1,6 @@
 package net.arna.jcraft.client.rendering.skybox;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.arna.jcraft.mixin.client.WorldRendererAccess;
 import net.arna.jcraft.registry.JShaderRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
@@ -20,12 +19,7 @@ public class CrimsonSkyBox implements JSkyBox {
     }
 
     @Override
-    public float updateAlpha() {
-        return this.getAlpha();
-    }
-
-    @Override
-    public void render(WorldRendererAccess worldRendererAccess, MatrixStack matrices, Matrix4f projectionMatrix, float tickDelta, Camera camera, boolean thickFog) {
+    public void render(MatrixStack matrices, Matrix4f projectionMatrix, float tickDelta, Camera camera, boolean thickFog) {
         MinecraftClient client = MinecraftClient.getInstance();
         assert client.world != null;
         this.alpha = 1;

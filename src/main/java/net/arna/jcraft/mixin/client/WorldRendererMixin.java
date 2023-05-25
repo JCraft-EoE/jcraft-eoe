@@ -30,7 +30,7 @@ public class WorldRendererMixin {
         SkyBoxManager skyboxManager = SkyBoxManager.getInstance();
         if (skyboxManager.isEnabled() && skyboxManager.getCurrentSkybox() != null) {
             runnable.run();
-            skyboxManager.renderSkyBox((WorldRendererAccess) this, matrices, matrix4f, tickDelta, camera, bl);
+            skyboxManager.renderSkyBox(matrices, matrix4f, tickDelta, camera, bl);
             ci.cancel();
         }
     }

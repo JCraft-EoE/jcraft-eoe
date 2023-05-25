@@ -33,7 +33,6 @@
     "client.ItemRendererMixin",
     "client.ParticleAccessor",
     "client.ParticleManagerMixin",
-    "client.WorldRendererAccess",
     "client.WorldRendererMixin"
   ],
   "injectors": {
