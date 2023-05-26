@@ -2,6 +2,7 @@ package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
+import net.arna.jcraft.client.network.s2c.TimeAccelStatePacket;
 import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
@@ -45,6 +46,7 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 //TODO: give MiH a trail during speed slice and heaven's judgement
 public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAnimationTickable {
@@ -111,6 +113,7 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
 
     public void setAccelTime(int aTime) {
         this.dataTracker.set(ACCELTIME, aTime);
+        TimeAccelStatePacket.sendStart(Objects.requireNonNull(world.getServer()).getPlayerManager(), this, aTime);
     }
 
     @Override
@@ -251,7 +254,7 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
                 user.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 160, 0));
             }
         } else if (attack == timeaccel) {
-            this.setAccelTime(300);
+            this.setAccelTime(800);
         } else if (attack == barrage && this.getMoveStun() < 10) {
             this.curAttack = barrageFinisher;
         }
@@ -331,60 +334,47 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
 
         int aTime = getAccelTime();
 
-        if (world.isClient()) {
-            if (world.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE) && aTime > 0) {
-                ClientWorld clientWorld = (ClientWorld) world;
-                clientWorld.setTimeOfDay(clientWorld.getTimeOfDay() + 4800 / aTime);
+        if (!hasUser()) return;
+
+        LivingEntity user = this.getUser();
+        this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
+
+        Vec3d pos = this.getPos();
+
+        if (this.world.isClient()) return;
+        if (aTime > 1) {
+            List<Entity> toCatch = world.getEntitiesByClass(Entity.class,
+                    new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+
+            toCatch.remove(this);
+            toCatch.remove(user);
+
+            for (Entity entity : toCatch) {
+                if (entity instanceof LivingEntity)
+                    continue;
+                entity.tick();
             }
-        } else if (hasUser()) {
-            LivingEntity user = this.getUser();
-            this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
 
-            Vec3d pos = this.getPos();
+            user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 40, 2, true, false));
+            user.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE, 40, 2, true, false));
+        } else if (aTime == 1) {
+            List<LivingEntity> toCatch = world.getEntitiesByClass(LivingEntity.class,
+                    new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
 
-            if (!this.world.isClient()) {
-                ServerWorld serverWorld = (ServerWorld) world;
+            toCatch.remove(this);
+            toCatch.remove(user);
 
-                if (aTime > 1) {
-                    List<Entity> toCatch = world.getEntitiesByClass(Entity.class,
-                            new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
-
-                    toCatch.remove(this);
-                    toCatch.remove(user);
-
-                    for (Entity entity : toCatch) {
-                        if (entity instanceof LivingEntity)
-                            continue;
-                        entity.tick();
-                    }
-
-                    if (serverWorld.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE))
-                        serverWorld.setTimeOfDay(serverWorld.getTimeOfDay() + 4800 / aTime);
-
-                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 40, 2, true, false));
-                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE, 40, 2, true, false));
-                } else if (aTime == 1) {
-                    List<LivingEntity> toCatch = world.getEntitiesByClass(LivingEntity.class,
-                            new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
-
-                    toCatch.remove(this);
-                    toCatch.remove(user);
-
-                    for (LivingEntity entity : toCatch) // 15s of Standless to any victims of Time Acceleration
-                        entity.addStatusEffect(new StatusEffectInstance(JStatusRegister.STANDLESS, 300, 0, true, false));
-                } else if (!user.hasStatusEffect(JStatusRegister.DAZED)) {
-                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 40, 0, true, false));
-                }
-
-                this.setAccelTime(aTime - 1);
-            }
+            for (LivingEntity entity : toCatch) // 15s of Standless to any victims of Time Acceleration
+                entity.addStatusEffect(new StatusEffectInstance(JStatusRegister.STANDLESS, 300, 0, true, false));
+        } else if (!user.hasStatusEffect(JStatusRegister.DAZED)) {
+            user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 40, 0, true, false));
         }
     }
 
     // Animation code
     @Override
     public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController(this, "controller", 0, this::predicate));
+        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
     }
 
     @Override
@@ -398,7 +388,7 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
     }
 
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        AnimationController controller = event.getController();
+        AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
         if (this.getSameState()) {
             controller.markNeedsReload();

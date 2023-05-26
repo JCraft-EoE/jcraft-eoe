@@ -7,6 +7,7 @@ import net.arna.jcraft.client.hud.JCraftHudOverlay;
 import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.client.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.client.network.s2c.ShaderDeactivationPacket;
+import net.arna.jcraft.client.network.s2c.TimeAccelStatePacket;
 import net.arna.jcraft.client.particle.ComboBreakerParticle;
 import net.arna.jcraft.client.particle.CooldownCancelParticle;
 import net.arna.jcraft.client.particle.HitsparkParticle;
@@ -112,6 +113,7 @@ public class JCraftClient implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(ServerChannelFeedbackPacket.ID, ServerChannelFeedbackPacket::handle);
         ClientPlayNetworking.registerGlobalReceiver(ShaderActivationPacket.ID, ShaderActivationPacket::handle);
         ClientPlayNetworking.registerGlobalReceiver(ShaderDeactivationPacket.ID, ShaderDeactivationPacket::handle);
+        ClientPlayNetworking.registerGlobalReceiver(TimeAccelStatePacket.ID, TimeAccelStatePacket::handle);
 
         HudRenderCallback.EVENT.register(new JCraftHudOverlay());
         HudRenderCallback.EVENT.register(this::renderHud);
