@@ -4,6 +4,7 @@ import ladysnake.satin.api.event.PostWorldRenderCallbackV2;
 import ladysnake.satin.api.managed.ManagedCoreShader;
 import ladysnake.satin.api.managed.ShaderEffectManager;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
@@ -25,7 +26,35 @@ public class CrimsonShaderHandler extends StandShaderHandler {
 
     @Override
     public void onEndTick(MinecraftClient client) {
+        if (shouldRender && !renderingEffect) {
+            if (tickDelay > 0) {
+                tickDelay--;
+            }
+        }
 
+        SkyBoxManager skyboxManager = SkyBoxManager.getInstance();
+
+        if (shouldRender) {
+            if (!renderingEffect) {
+                if (tickDelay <= 0) {
+                    ticks = 0;
+                    renderingEffect = true;
+                }
+                return;
+            }
+            ticks++;
+
+            if (hasFinishedAnimation()) {
+                renderingEffect = false;
+                shouldRender = false;
+            }
+        } else {
+            renderingEffect = false;
+        }
+    }
+
+    private boolean hasFinishedAnimation() {
+        return false;
     }
 
     public void init() {
