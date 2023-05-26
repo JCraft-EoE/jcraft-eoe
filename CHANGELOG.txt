@@ -593,7 +593,10 @@ Killer Queen
     >Added followup to M1
     >Bomb Plant now deals 9 ticks of stun
     >Fixed bug where Coin Toss could spawn multiple coins
-    >Sheer Heart Attack now spawns higher
+    >Sheer Heart Attack
+        >now spawns higher
+        >can't be damaged by explosives
+
 
 priority (top to bottom)
 TODO: ability to position the HUD

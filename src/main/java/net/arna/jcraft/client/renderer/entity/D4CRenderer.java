@@ -92,6 +92,7 @@ public class D4CRenderer extends ExtendedGeoEntityRenderer<D4CEntity> {
 
     @Override
     protected void preRenderItem(MatrixStack stack, ItemStack item, String boneName, D4CEntity currentEntity, IBone bone) {
+        //todo: fix d4c revolver rotation; theres a hack using currentEntity.getState() and currentEntity.age, but id prefer NOT to do this.
         stack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(-90f));
     }
 

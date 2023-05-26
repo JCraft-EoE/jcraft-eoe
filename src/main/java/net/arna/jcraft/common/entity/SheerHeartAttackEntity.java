@@ -100,6 +100,12 @@ public class SheerHeartAttackEntity extends MobEntity implements IAnimatable, IA
     }
 
     @Override
+    protected void applyDamage(DamageSource source, float amount) {
+        if (source.isExplosive()) return;
+        super.applyDamage(source, amount);
+    }
+
+    @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
         nbt.putString("OwnerName", this.getOwnerName());
