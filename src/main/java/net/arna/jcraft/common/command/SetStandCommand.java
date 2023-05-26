@@ -35,14 +35,12 @@ public class SetStandCommand {
     }
 
     public static int run(ServerCommandSource source, int id, Collection<? extends Entity> targets) throws CommandSyntaxException {
-        PlayerEntity player = source.getPlayer();
-
         if (-JCraft.EVOLUTION_COUNT > id || id > JCraft.STAND_COUNT) {
-            source.getPlayer().sendMessage(Text.of("Stand ID outside range!"));
+            source.sendMessage(Text.of("Stand ID outside range!"));
             return 0;
         }
 
-        if (player.hasPermissionLevel(2) || "Arna57".equals(source.getName()) || "MrSterner".equals(source.getName())) {
+        if (source.hasPermissionLevel(2) || "Arna57".equals(source.getName()) || "MrSterner".equals(source.getName())) {
             for (Entity entity : targets) {
                 if (entity instanceof LivingEntity livingEntity) {
                     IEntityDataSaver entityData = (IEntityDataSaver) livingEntity;
