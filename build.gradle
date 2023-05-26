@@ -60,6 +60,7 @@ dependencies {
 
 	// MixinExtras
 	implementation("com.github.LlamaLad7:MixinExtras:0.1.1")
+	implementation include("com.github.LlamaLad7:MixinExtras:0.1.1")
 	annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.1")
 
 	runtimeOnly('org.joml:joml:1.10.4')
