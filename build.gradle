@@ -64,6 +64,7 @@ dependencies {
 
 	runtimeOnly('org.joml:joml:1.10.4')
 	modRuntimeOnly("maven.modrinth:sodium:${project.sodium}")
+	modImplementation "com.ptsmods:devlogin:3.2.2" // To login into your Minecraft account
 }
 
 processResources {
