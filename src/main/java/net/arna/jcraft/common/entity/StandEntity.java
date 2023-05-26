@@ -39,6 +39,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -890,12 +891,15 @@ public abstract class StandEntity extends MobEntity {
 
     // Physical properties
     @Override
-    public void pushAwayFrom(Entity entity) {
-    }
+    public void pushAwayFrom(Entity entity) { }
 
     @Override
-    public boolean collidesWith(Entity other) {
-        return false;
+    public boolean collidesWith(Entity other) { return false; }
+
+    @Override
+    public boolean addStatusEffect(StatusEffectInstance effect, @Nullable Entity source) {
+        if (!hasUser()) return false;
+        return getUser().addStatusEffect(effect, source);
     }
 
     // The fun stuff

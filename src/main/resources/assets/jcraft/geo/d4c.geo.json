@@ -221,10 +221,8 @@
 				{
 					"name": "bipedHandRight",
 					"parent": "lowerRight",
-					"pivot": [-6, 11, 0],
-					"cubes": [
-						{"origin": [-6, 11, 0], "size": [0, 0, 0], "uv": [0, 0]}
-					]
+					"pivot": [-4, 13, -1],
+					"rotation": [90, 0, -180]
 				},
 				{
 					"name": "bipedArmLeft",
@@ -293,10 +291,7 @@
 				{
 					"name": "bipedHandLeft",
 					"parent": "lowerLeft",
-					"pivot": [6, 11, 0],
-					"cubes": [
-						{"origin": [6, 11, 0], "size": [0, 0, 0], "uv": [0, 0]}
-					]
+					"pivot": [4, 13, -1]
 				},
 				{
 					"name": "head",
