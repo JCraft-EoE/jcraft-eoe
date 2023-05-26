@@ -585,6 +585,16 @@ Cream
 Magician's Red
     >Fixed bug where you could pick up Ankhs
 
+● 26/5/2023
+>Giving status effects to stands now gives them to the user
+
+Killer Queen
+    >Remodeled and reanimated
+    >Added followup to M1
+    >Bomb Plant now deals 9 ticks of stun
+    >Fixed bug where Coin Toss could spawn multiple coins
+    >Sheer Heart Attack now spawns higher
+
 priority (top to bottom)
 TODO: ability to position the HUD
 TODO: AI flags for unblockables and shouldn't-blockables

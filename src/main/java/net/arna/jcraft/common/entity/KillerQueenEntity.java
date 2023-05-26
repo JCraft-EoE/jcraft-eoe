@@ -47,18 +47,26 @@ import java.util.List;
 public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnimationTickable {
     AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
-    public static Attack light = new Attack(2, 0.75f, 19, 0, 1.5, 3.5f, 0.75f, AttackType.MULTIHIT, 1f, 0, List.of(6, 11), JSoundRegister.IMPACT_4)
-            .setInfo("Dual Punch", "quick combo starter");
-    public static Attack heavy = new Attack(12, 0.75f, 24, 16, 2, 9f, 1.75f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_4).setHitspark(2).setArmor(true).setLaunch()
+    public static Attack low = new Attack(0, 0.85f, 13, 8, 1.5, 4f, 0.5f, AttackType.BOX, 0.5f, 0.1f, 0, JSoundRegister.IMPACT_1);
+
+    public static Attack light = new Attack(2, 0.75f, 19, 0, 1.5, 3f, 0.75f, AttackType.MULTIHIT, 1f, 0, List.of(6, 11), JSoundRegister.IMPACT_4)
+            .setFollowup(low)
+            .setInfo("Dual Punch", "combo starter, decent speed, has followup with more blockstun");
+
+    public static Attack heavy = new Attack(12, 0.75f, 24, 16, 2, 9f, 1.75f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_4)
+            .setHitspark(2)
+            .setArmor(true)
+            .setLaunch()
             .setInfo("Haymaker", "slow, uninterruptable launcher");
     public static Attack barrage = new Attack(17, 0.75f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3, JSoundRegister.IMPACT_4)
             .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
-    public static Attack bombplant = new Attack(30, 1, 20, 12, 1.5, 0f, 0.0f, AttackType.BOX)
+    public static Attack bombplant = new Attack(30, 1, 20, 12, 1.5, 0f, 0.0f, AttackType.BOX, 0.45f)
             .setUB(true)
             .setInfo("Bomb Plant", "crouch to plant on the ground below you, stealthily");
     public static Attack detonate = new Attack(1, 1, 6, 5, 0, 0f, 0.0f, AttackType.BOX)
             .setInfo("Detonate", "slight windup");
-    public static Attack sha = new Attack(45, 20, 16, 0, AttackType.BOX).setRanged(true)
+    public static Attack sha = new Attack(45, 20, 16, 0, AttackType.BOX)
+            .setRanged(true)
             .setInfo("Sheer Heart Attack", "creates an automatic, heat-seeking sub-stand that explodes on contact, reflects 25% damage back to owner");
     public ItemEntity coin;
     public Entity bombEntity;
@@ -102,29 +110,33 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
     }
 
     public Vec3d getBombPos() {
-        if (this.bombEntity != null) {
+        if (this.bombEntity != null)
             return this.bombEntity.getPos();
-        }
-        if (this.bombBlock != null) {
+        if (this.bombBlock != null)
             return this.bombBlock;
-        }
         return null;
     }
 
     // Moveset
     @Override
     public void initLightAttack() {
-        if (!this.canAttack()) {
-            return;
+        if (hasUser()) {
+            LivingEntity user = this.getUser();
+            if (user.hasStatusEffect(JStatusRegister.DAZED))
+                return;
+            boolean idling = this.getMoveStun() < 1;
+            if (curAttack != light) {
+                if (idling) handleAttack(light, JCraft.standLightCD, 2);
+            } else if (this.getMoveStun() < 7) {
+                setAttack(low, 9);
+            }
         }
-        handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
     public void initHeavyAttack() {
-        if (!this.canAttack()) {
+        if (!this.canAttack())
             return;
-        }
         if (handleAttack(heavy, JCraft.standHeavyCD, 4)) {
             this.playSound(JSoundRegister.KQ_UPPERCUT, 1, 1);
             this.playSound(JSoundRegister.KQ_HEAVY, 1, 1);
@@ -133,9 +145,7 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
 
     @Override
     public void initBarrage() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
             this.playSound(JSoundRegister.KQ_BARRAGE, 1, 1);
         }
@@ -143,9 +153,7 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
 
     @Override
     public void initSpecial1() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         LivingEntity user = this.getUser();
         NbtCompound userData = ((IEntityDataSaver) user).getPersistentData();
         if (user.isInSneakingPose() && userData.getInt(JCraft.standS1CD) < 1) {
@@ -167,9 +175,7 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
 
     @Override
     public void initUlt() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(detonate, JCraft.standUltCD, 6)) {
             this.playSound(JSoundRegister.KQ_DETONATE, 1, 1);
         }
@@ -177,9 +183,7 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
 
     @Override
     public void initSpecial2() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(sha, JCraft.standS2CD, 8)) {
             //this.playSound(ModSoundRegister.KQ_SHA,1, 1);
         }
@@ -187,16 +191,13 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
 
     @Override
     public void initSpecial3() {
-        if (!this.canAttack())
-            return;
-
+        if (!this.canAttack()) return;
         LivingEntity user = this.getUser();
         NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
-        if (playerData.getInt(JCraft.standS3CD) > 0) {
-            return;
-        }
+        if (playerData.getInt(JCraft.standS3CD) > 0) return;
 
         Vec3d lookVec = user.getRotationVector().multiply(0.75);
+        if (this.coin != null) this.coin.discard();
         this.coin = new ItemEntity(this.world, user.getX(), user.getY() + user.getHeight() * 2 / 3, user.getZ(), new ItemStack(JObjectRegistry.KQCOIN, 1), lookVec.x, lookVec.y, lookVec.z);
         this.coin.setPickupDelayInfinite();
 
@@ -271,7 +272,7 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
         } else if (attack == sha) {
             SheerHeartAttackEntity sha = new SheerHeartAttackEntity(JEntityTypeRegister.SHEER_HEART_ATTACK, world);
             sha.setOwner(user);
-            sha.copyPositionAndRotation(this);
+            sha.refreshPositionAndAngles(getX(), getY() + 0.5, getZ(), getYaw(), getPitch());
 
             world.spawnEntity(sha);
         }
@@ -279,14 +280,10 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
 
     @Override
     public void initMiddleClick() {
-        if (!this.canAttack())
-            return;
+        if (!this.canAttack()) return;
         LivingEntity user = this.getUser();
-
         NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
-        if (playerData.getInt(JCraft.standMMBCD) > 0) {
-            return;
-        }
+        if (playerData.getInt(JCraft.standMMBCD) > 0) return;
 
         Vec3d lookVec = user.getRotationVector().multiply(0.9);
         world.createExplosion(user,
@@ -304,10 +301,7 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
 
     @Override
     public void desummon() {
-        if (coin != null) {
-            coin.discard();
-        }
-
+        if (coin != null) coin.discard();
         super.desummon();
     }
 
@@ -421,18 +415,22 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         AnimationController controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
-        if (this.getSameState()) {
-            controller.markNeedsReload();
+
+        if (age < 20 && getState() < 2) {
+            controller.setAnimation(builder.playOnce("animation.killerqueen.summon"));
+            return PlayState.CONTINUE;
         }
+        if (this.getSameState()) controller.markNeedsReload();
         switch (this.getState()) {
-            default -> controller.setAnimation(builder.loop("animation.kq.idle"));
-            case 2 -> controller.setAnimation(builder.playAndHold("animation.kq.light"));
-            case 3 -> controller.setAnimation(builder.loop("animation.kq.block"));
-            case 4 -> controller.setAnimation(builder.playAndHold("animation.kq.heavy"));
-            case 5 -> controller.setAnimation(builder.loop("animation.kq.barrage"));
-            case 6 -> controller.setAnimation(builder.playAndHold("animation.kq.detonate"));
-            case 7 -> controller.setAnimation(builder.playAndHold("animation.kq.bombplant"));
-            case 8 -> controller.setAnimation(builder.playAndHold("animation.kq.sha"));
+            default -> controller.setAnimation(builder.loop("animation.killerqueen.idle"));
+            case 2 -> controller.setAnimation(builder.playAndHold("animation.killerqueen.light"));
+            case 3 -> controller.setAnimation(builder.loop("animation.killerqueen.block"));
+            case 4 -> controller.setAnimation(builder.playAndHold("animation.killerqueen.heavy"));
+            case 5 -> controller.setAnimation(builder.loop("animation.killerqueen.barrage"));
+            case 6 -> controller.setAnimation(builder.playAndHold("animation.killerqueen.detonate"));
+            case 7 -> controller.setAnimation(builder.playAndHold("animation.killerqueen.bombplant"));
+            case 8 -> controller.setAnimation(builder.playAndHold("animation.killerqueen.sha"));
+            case 9 -> controller.setAnimation(builder.playAndHold("animation.killerqueen.low"));
         }
         return PlayState.CONTINUE;
     }
