@@ -61,6 +61,9 @@ dependencies {
 	// MixinExtras
 	implementation("com.github.LlamaLad7:MixinExtras:0.1.1")
 	annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.1")
+
+	runtimeOnly('org.joml:joml:1.10.4')
+	modRuntimeOnly("maven.modrinth:sodium:${project.sodium}")
 }
 
 processResources {

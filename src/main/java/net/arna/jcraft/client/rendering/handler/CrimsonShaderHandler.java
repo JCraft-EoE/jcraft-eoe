@@ -1,6 +1,7 @@
 package net.arna.jcraft.client.rendering.handler;
 
 import ladysnake.satin.api.event.PostWorldRenderCallbackV2;
+import ladysnake.satin.api.event.ShaderEffectRenderCallback;
 import ladysnake.satin.api.managed.ManagedCoreShader;
 import ladysnake.satin.api.managed.ShaderEffectManager;
 import net.arna.jcraft.JCraft;
@@ -60,5 +61,11 @@ public class CrimsonShaderHandler extends StandShaderHandler {
     public void init() {
         PostWorldRenderCallbackV2.EVENT.register(this);
         ClientTickEvents.END_CLIENT_TICK.register(this);
+        ShaderEffectRenderCallback.EVENT.register(this);
+    }
+
+    @Override
+    public void renderShaderEffects(float tickDelta) {
+
     }
 }

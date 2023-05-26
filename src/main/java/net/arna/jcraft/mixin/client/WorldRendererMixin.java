@@ -56,6 +56,7 @@ public class WorldRendererMixin {
         }
     }
 
+    /*
     @WrapWithCondition(method = "renderLayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gl/GlUniform;set(FFF)V"))
     private boolean jcraft$chunkRender(GlUniform uniform, float cameraX, float cameraY, float cameraZ, RenderLayer layer, MatrixStack stack, double d){
         return false;
@@ -84,7 +85,7 @@ public class WorldRendererMixin {
                                        VertexBuffer vertexBuffer,
                                        BlockPos blockPos) {
 
-/*
+
         ClientPlayerEntity clientPlayerEntity = MinecraftClient.getInstance().player;
         if(clientPlayerEntity != null){
             var dx = (float)((double)blockPos.getX() - cameraX);
@@ -97,7 +98,8 @@ public class WorldRendererMixin {
             matrices.translate(0, - distance * 0.01, 0);
         }
 
- */
+
 
     }
+    */
 }

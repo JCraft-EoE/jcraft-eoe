@@ -1,6 +1,7 @@
 package net.arna.jcraft.client.rendering.handler;
 
 import ladysnake.satin.api.event.PostWorldRenderCallbackV2;
+import ladysnake.satin.api.event.ShaderEffectRenderCallback;
 import ladysnake.satin.api.experimental.ReadableDepthFramebuffer;
 import ladysnake.satin.api.managed.ManagedShaderEffect;
 import ladysnake.satin.api.managed.ShaderEffectManager;
@@ -104,5 +105,14 @@ public class ZaWarudoShaderHandler extends StandShaderHandler {
     public void init() {
         PostWorldRenderCallbackV2.EVENT.register(this);
         ClientTickEvents.END_CLIENT_TICK.register(this);
+        ShaderEffectRenderCallback.EVENT.register(this);
     }
+
+    @Override
+    public void renderShaderEffects(float tickDelta) {
+        if (this.renderingEffect) {
+            shader.render(tickDelta);
+        }
+    }
+
 }
