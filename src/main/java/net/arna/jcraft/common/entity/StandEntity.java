@@ -1033,7 +1033,7 @@ public abstract class StandEntity extends MobEntity {
                         case 7 -> this.initMiddleClick();
                     }
                 } else {
-                    this.queuedAttack = JCraft.idToButton.get(move);
+                    this.queuedAttack = AttackQueue.values()[move];
                 }
             }
 
@@ -1114,7 +1114,7 @@ public abstract class StandEntity extends MobEntity {
                 movesOnCooldown += 1;
                 // If the button matches the current attack's button, and it has a followup, then consider said followup
                 // This logic was chosen because simply checking this.curAttack.hasFollowup() only goes up to a depth of 1
-                if (this.curAttack != null && this.curAttack.hasFollowup() && idToButton.get(i) == this.curAttack.button) {
+                if (this.curAttack != null && this.curAttack.hasFollowup() && AttackQueue.values()[i] == this.curAttack.button) {
                     //JCraft.LOGGER.info("Followup detected");
                     attack = this.curAttack.followup;
                     initTime = stunTicks; // Followups should always win the initTime contest, given that they cancel the current move

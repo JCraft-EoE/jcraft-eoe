@@ -6,7 +6,6 @@ import net.arna.jcraft.common.JCommonConfig;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.entity.StandType;
 import net.arna.jcraft.common.network.c2s.StandControlPacket;
-import net.arna.jcraft.common.util.AttackQueue;
 import net.arna.jcraft.common.util.DimValues;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.registry.*;
@@ -39,7 +38,6 @@ import software.bernie.example.GeckoLibMod;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static net.arna.jcraft.common.entity.StandEntity.stun;
 
@@ -150,29 +148,6 @@ public class JCraft implements ModInitializer {
                 itemStacks.add(new ItemStack(JObjectRegistry.KQCOIN));
             }))
             .build();
-
-    // Buttons to IDs and vice versa
-    public static final Map<Integer, AttackQueue> idToButton = Map.ofEntries(
-            Map.entry(0, AttackQueue.LIGHT),
-            Map.entry(1, AttackQueue.HEAVY),
-            Map.entry(2, AttackQueue.BARRAGE),
-            Map.entry(3, AttackQueue.SPECIAL1),
-            Map.entry(4, AttackQueue.ULTIMATE),
-            Map.entry(5, AttackQueue.SPECIAL2),
-            Map.entry(6, AttackQueue.SPECIAL3),
-            Map.entry(7, AttackQueue.MIDDLEMOUSE)
-    );
-
-    public static final Map<AttackQueue, Integer> buttonToId = Map.ofEntries(
-            Map.entry(AttackQueue.LIGHT, 0),
-            Map.entry(AttackQueue.HEAVY, 1),
-            Map.entry(AttackQueue.BARRAGE, 2),
-            Map.entry(AttackQueue.SPECIAL1, 3),
-            Map.entry(AttackQueue.ULTIMATE, 4),
-            Map.entry(AttackQueue.SPECIAL2, 5),
-            Map.entry(AttackQueue.SPECIAL3, 6),
-            Map.entry(AttackQueue.MIDDLEMOUSE, 7)
-    );
 
     public static StandEntity Summon(ServerWorld world, LivingEntity player) {
         if (player.hasStatusEffect(JStatusRegister.STANDLESS)) return null;
