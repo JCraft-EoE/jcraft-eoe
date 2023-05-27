@@ -19,7 +19,7 @@ public interface JEntityRendererRegister {
 
         EntityRendererRegistry.register(JEntityTypeRegister.WHITE_SNAKE, WhitesnakeRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegister.C_MOON, CMoonRenderer::new);
-        EntityRendererRegistry.register(JEntityTypeRegister.MADE_IN_HAVEN, MadeInHeavenRenderer::new);
+        EntityRendererRegistry.register(JEntityTypeRegister.MADE_IN_HEAVEN, MadeInHeavenRenderer::new);
 
         EntityRendererRegistry.register(JEntityTypeRegister.THE_WORLD, TheWorldRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegister.THE_WORLD_OVER_HEAVEN, TheWorldOverHeavenRenderer::new);

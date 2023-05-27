@@ -72,7 +72,7 @@ public interface JEntityTypeRegister {
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, CMoonEntity::new).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
-    EntityType<MadeInHeavenEntity> MADE_IN_HAVEN = Registry.register( //todo: fix this typo
+    EntityType<MadeInHeavenEntity> MADE_IN_HEAVEN = Registry.register( //todo: fix this typo
             Registry.ENTITY_TYPE,
             new Identifier(JCraft.MOD_ID, "mih"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, MadeInHeavenEntity::new).dimensions(EntityDimensions.fixed(0.6f, 2.1f)).build()
@@ -185,7 +185,7 @@ public interface JEntityTypeRegister {
 
         FabricDefaultAttributeRegistry.register(WHITE_SNAKE, WhitesnakeEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(C_MOON, CMoonEntity.createMobAttributes());
-        FabricDefaultAttributeRegistry.register(MADE_IN_HAVEN, MadeInHeavenEntity.createMobAttributes());
+        FabricDefaultAttributeRegistry.register(MADE_IN_HEAVEN, MadeInHeavenEntity.createMobAttributes());
 
         FabricDefaultAttributeRegistry.register(THE_WORLD, TheWorldEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(THE_WORLD_OVER_HEAVEN, TheWorldOverHeavenEntity.createMobAttributes());

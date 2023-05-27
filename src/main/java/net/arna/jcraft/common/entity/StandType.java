@@ -30,7 +30,7 @@ public enum StandType {
 
     // Evolutions
     C_MOON(JEntityTypeRegister.C_MOON, CMoonEntity::new, "cmoon", true),                                  // -1
-    MADE_IN_HEAVEN(JEntityTypeRegister.MADE_IN_HAVEN, MadeInHeavenEntity::new, "mih", true),                // -2
+    MADE_IN_HEAVEN(JEntityTypeRegister.MADE_IN_HEAVEN, MadeInHeavenEntity::new, "mih", true),               // -2
     THE_WORLD_OVER_HEAVEN(JEntityTypeRegister.THE_WORLD_OVER_HEAVEN, TheWorldOverHeavenEntity::new, "twoh", true),  // -3
     KILLER_QUEEN_BITES_THE_DUST(JEntityTypeRegister.KILLER_QUEEN_BITES_THE_DUST, KQBTDEntity::new, "kqbtd",true),  // -4
     GER(JEntityTypeRegister.GER, GEREntity::new, "ger", true);                                              // -5
