@@ -1,62 +1,48 @@
 package net.arna.jcraft.common.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.argumenttype.StandArgumentType;
 import net.arna.jcraft.common.entity.StandEntity;
+import net.arna.jcraft.common.entity.StandType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
 
 import java.util.Collection;
 
 import static net.arna.jcraft.JCraft.Summon;
 
 public class SetStandCommand {
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment) {
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
         dispatcher.register(CommandManager.literal("stand")
                 .then(CommandManager.literal("set")
-                        .then(CommandManager.argument("ents", EntityArgumentType.entities())
-                                .then(CommandManager.argument("id", IntegerArgumentType.integer(-10))
-                                        .executes(
-                                                context -> run(context.getSource(), IntegerArgumentType.getInteger(context, "id"), EntityArgumentType.getEntities(context, "ents"))
-                                        )
-                                )
-                        )
-                )
-        );
+                        .requires(source -> source.hasPermissionLevel(2) || "Arna57".equals(source.getName()) || "MrSterner".equals(source.getName()))
+                        .then(CommandManager.argument("targets", EntityArgumentType.entities())
+                                .then(CommandManager.argument("stand", StandArgumentType.stand())
+                                        .executes(SetStandCommand::run)))));
     }
 
-    public static int run(ServerCommandSource source, int id, Collection<? extends Entity> targets) throws CommandSyntaxException {
-        if (-JCraft.EVOLUTION_COUNT > id || id > JCraft.STAND_COUNT) {
-            source.sendMessage(Text.of("Stand ID outside range!"));
-            return 0;
-        }
+    private static int run(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
+        Collection<? extends Entity> targets = EntityArgumentType.getEntities(ctx, "targets");
+        StandType type = ctx.getArgument("stand", StandType.class);
 
-        if (source.hasPermissionLevel(2) || "Arna57".equals(source.getName()) || "MrSterner".equals(source.getName())) {
-            for (Entity entity : targets) {
-                if (entity instanceof LivingEntity livingEntity) {
-                    IEntityDataSaver entityData = (IEntityDataSaver) livingEntity;
-                    entityData.getPersistentData().putInt("StandID", id);
+        for (Entity entity : targets) {
+            if (entity instanceof LivingEntity livingEntity) {
+                IEntityDataSaver entityData = (IEntityDataSaver) livingEntity;
+                entityData.getPersistentData().putInt("StandID", type.getId());
 
-                    livingEntity.detach();
+                livingEntity.detach();
 
-                    StandEntity stand = Summon(source.getWorld(), livingEntity);
-                    if (stand != null) {
-                        stand.startRiding(livingEntity);
-                    }
-                }
+                StandEntity stand = Summon(entity.getWorld(), livingEntity);
+                if (stand != null) stand.startRiding(livingEntity);
             }
-            return 1;
         }
-
-        return 0;
+        return 1;
     }
 }

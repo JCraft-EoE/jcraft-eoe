@@ -31,6 +31,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
+import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import software.bernie.example.GeckoLibMod;
@@ -149,7 +150,7 @@ public class JCraft implements ModInitializer {
             }))
             .build();
 
-    public static StandEntity Summon(ServerWorld world, LivingEntity player) {
+    public static StandEntity Summon(World world, LivingEntity player) {
         if (player.hasStatusEffect(JStatusRegister.STANDLESS)) return null;
 
         StandType type = StandType.fromId(((IEntityDataSaver) player).getPersistentData().getInt("StandID"));
@@ -186,6 +187,7 @@ public class JCraft implements ModInitializer {
         JSoundRegister.registerSounds();
         JEntityTypeRegister.registerEntities();
         JDimensionRegister.registerDimensions();
+        JArgumentTypeRegistry.registerArgumentTypes();
         ServerPlayNetworking.registerGlobalReceiver(StandControlPacket.ID, StandControlPacket::handle);
     }
 

@@ -7,8 +7,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.minecraft.entity.EntityType;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -47,15 +47,15 @@ public enum StandType {
     private final EntityType<? extends StandEntity> entityType;
     @Getter
     private final int id;
-    private final BiFunction<EntityType<? extends StandEntity>, ServerWorld, StandEntity> ctor;
+    private final BiFunction<EntityType<? extends StandEntity>, World, StandEntity> ctor;
     @Getter
     private final Text nameText;
 
-    StandType(EntityType<? extends StandEntity> entityType, BiFunction<EntityType<? extends StandEntity>, ServerWorld, StandEntity> ctor, String nameKey) {
+    StandType(EntityType<? extends StandEntity> entityType, BiFunction<EntityType<? extends StandEntity>, World, StandEntity> ctor, String nameKey) {
         this(entityType, ctor, nameKey, false);
     }
 
-    StandType(EntityType<? extends StandEntity> entityType, BiFunction<EntityType<? extends StandEntity>, ServerWorld, StandEntity> ctor, String nameKey, boolean isEvo) {
+    StandType(EntityType<? extends StandEntity> entityType, BiFunction<EntityType<? extends StandEntity>, World, StandEntity> ctor, String nameKey, boolean isEvo) {
         this.entityType = entityType;
         id = isEvo ? --StaticFields.nextEvoId : ++StaticFields.nextId;
         this.ctor = ctor;
@@ -70,7 +70,7 @@ public enum StandType {
     }
 
     @NonNull
-    public StandEntity createNew(ServerWorld world) {
+    public StandEntity createNew(World world) {
         return ctor.apply(getEntityType(), world);
     }
 
