@@ -1,20 +1,23 @@
 package net.arna.jcraft.client.network.s2c;
 
-import it.unimi.dsi.fastutil.ints.*;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import lombok.Data;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.MadeInHeavenEntity;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.PlayerManager;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.world.GameRules;
@@ -38,22 +41,23 @@ public class TimeAccelStatePacket {
     static {
         // Handle time acceleration on the client.
         // This should be done smoothly.
-        WorldRenderEvents.START.register(ctx -> {
-            if (!ctx.world().getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)) return;
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT)
+            WorldRenderEvents.START.register(ctx -> {
+                if (!ctx.world().getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)) return;
 
-            double acceleration = getAcceleration(ctx.world());
+                double acceleration = getAcceleration(ctx.world());
 
-            long currentTime = Util.getMeasuringTimeMs();
-            if (acceleration == 0) {
+                long currentTime = Util.getMeasuringTimeMs();
+                if (acceleration == 0) {
+                    lastUpdate = currentTime;
+                    return;
+                }
+
+                double multiplier = (currentTime - lastUpdate) / 1000d;
+                ctx.world().setTimeOfDay((long) (ctx.world().getTimeOfDay() + acceleration * multiplier));
+
                 lastUpdate = currentTime;
-                return;
-            }
-
-            double multiplier = (currentTime - lastUpdate) / 1000d;
-            ctx.world().setTimeOfDay((long) (ctx.world().getTimeOfDay() + acceleration * multiplier));
-
-            lastUpdate = currentTime;
-        });
+            });
 
         // Decrease all durations.
         ServerTickEvents.END_SERVER_TICK.register(server -> new IntOpenHashSet(accelerations.keySet()).forEach(id -> {
