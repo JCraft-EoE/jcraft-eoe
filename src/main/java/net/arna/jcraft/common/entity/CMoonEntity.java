@@ -9,7 +9,6 @@ import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.FallingBlockEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -97,8 +96,8 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
 
      */
 
-    public CMoonEntity(EntityType<? extends StandEntity> type, World worldIn) {
-        super(type, worldIn);
+    public CMoonEntity(World worldIn) {
+        super(StandType.C_MOON, worldIn);
         super.initialize();
         idleRotation = 220f;
 

@@ -71,8 +71,8 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
     public ArrayList<LivingEntity> overwriteEnts = new ArrayList<>();
     public ArrayList<Integer> overwriteTimes = new ArrayList<>();
 
-    public TheWorldOverHeavenEntity(EntityType<? extends StandEntity> type, World worldIn) {
-        super(type, worldIn);
+    public TheWorldOverHeavenEntity(World worldIn) {
+        super(StandType.THE_WORLD_OVER_HEAVEN, worldIn);
         super.initialize();
         idleRotation = -45f;
 

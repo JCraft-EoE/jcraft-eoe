@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.entity;
 
+import lombok.Getter;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.client.network.s2c.ShaderActivationPacket;
@@ -12,7 +13,6 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
@@ -44,7 +44,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.arna.jcraft.JCraft.*;
+import static net.arna.jcraft.JCraft.ComboBreak;
+import static net.arna.jcraft.JCraft.CooldownCancel;
 
 public abstract class StandEntity extends MobEntity {
 
@@ -97,8 +98,12 @@ public abstract class StandEntity extends MobEntity {
     public String description = "UNDESCRIBED";
     public String freespace;
 
-    protected StandEntity(EntityType<? extends MobEntity> entityType, World world) {
-        super(entityType, world);
+    @Getter
+    private final StandType standType;
+
+    protected StandEntity(StandType type, World world) {
+        super(type.getEntityType(), world);
+        standType = type;
     }
 
     // State controls

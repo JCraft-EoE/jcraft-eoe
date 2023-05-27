@@ -9,7 +9,6 @@ import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
@@ -84,8 +83,8 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
         moves = List.of(light, heavy, barrage, spinbarrage, pbeatdown, pcharge, counter, unusable);
     }
 
-    public SilverChariotEntity(EntityType<? extends StandEntity> type, World worldIn) {
-        super(type, worldIn);
+    public SilverChariotEntity(World worldIn) {
+        super(StandType.SILVER_CHARIOT, worldIn);
         super.initialize();
         idleRotation = 225f;
 

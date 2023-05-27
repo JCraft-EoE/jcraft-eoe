@@ -9,7 +9,6 @@ import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -62,8 +61,8 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
     private Vec3d hurricanePos;
     private int hurricaneTime;
 
-    public MagiciansRedEntity(EntityType<? extends StandEntity> type, World worldIn) {
-        super(type, worldIn);
+    public MagiciansRedEntity(World worldIn) {
+        super(StandType.MAGICIANS_RED, worldIn);
         super.initialize();
         idleRotation = 225f;
 

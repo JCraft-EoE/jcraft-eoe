@@ -77,8 +77,8 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
 
     private MobEntity sandClone;
 
-    public TheFoolEntity(EntityType<? extends StandEntity> type, World worldIn) {
-        super(type, worldIn);
+    public TheFoolEntity(World worldIn) {
+        super(StandType.THE_FOOL, worldIn);
         super.initialize();
         idleRotation = 225f;
         idleDistance = 2f;

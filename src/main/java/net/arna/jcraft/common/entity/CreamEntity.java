@@ -9,7 +9,6 @@ import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.minecraft.block.Block;
 import net.minecraft.entity.DamageUtil;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
@@ -105,8 +104,8 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
         return this.dataTracker.get(HALFBALL);
     }
 
-    public CreamEntity(EntityType<? extends StandEntity> type, World worldIn) {
-        super(type, worldIn);
+    public CreamEntity(World worldIn) {
+        super(StandType.CREAM, worldIn);
         super.initialize();
         idleRotation = 220f;
 

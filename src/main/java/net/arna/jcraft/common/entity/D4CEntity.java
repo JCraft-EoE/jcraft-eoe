@@ -59,8 +59,8 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
             .setInfo("Dimensional Phase", "hides in a flag in an un-stunnable, floating state").setMobility(MobilityType.HIGHJUMP);
     public static ServerWorld auWorld;
 
-    public D4CEntity(EntityType<? extends StandEntity> type, World worldIn) {
-        super(type, worldIn);
+    public D4CEntity(World worldIn) {
+        super(StandType.D4C, worldIn);
         super.initialize();
         idleRotation = -45f;
 

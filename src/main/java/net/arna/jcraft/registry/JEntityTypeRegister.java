@@ -1,58 +1,63 @@
 package net.arna.jcraft.registry;
 
+import lombok.RequiredArgsConstructor;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.*;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
+
+import java.util.function.Function;
 
 public interface JEntityTypeRegister {
 
     EntityType<StarPlatinumEntity> STAR_PLATINUM = Registry.register(
             Registry.ENTITY_TYPE,
             new Identifier(JCraft.MOD_ID, "starplatinum"),
-            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, StarPlatinumEntity::new).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(StarPlatinumEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     EntityType<KingCrimsonEntity> KING_CRIMSON = Registry.register(
             Registry.ENTITY_TYPE,
             new Identifier(JCraft.MOD_ID, "kingcrimson"),
-            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, KingCrimsonEntity::new).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(KingCrimsonEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     EntityType<TheWorldEntity> THE_WORLD = Registry.register(
             Registry.ENTITY_TYPE,
             new Identifier(JCraft.MOD_ID, "theworld"),
-            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, TheWorldEntity::new).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(TheWorldEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     EntityType<D4CEntity> D4C = Registry.register(
             Registry.ENTITY_TYPE,
             new Identifier(JCraft.MOD_ID, "d4c"),
-            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, D4CEntity::new).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(D4CEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     EntityType<CreamEntity> CREAM = Registry.register(
             Registry.ENTITY_TYPE,
             new Identifier(JCraft.MOD_ID, "cream"),
-            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, CreamEntity::new).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(CreamEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     EntityType<KillerQueenEntity> KILLER_QUEEN = Registry.register(
             Registry.ENTITY_TYPE,
             new Identifier(JCraft.MOD_ID, "killerqueen"),
-            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, KillerQueenEntity::new).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(KillerQueenEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     EntityType<KQBTDEntity> KILLER_QUEEN_BITES_THE_DUST = Registry.register(
             Registry.ENTITY_TYPE,
             new Identifier(JCraft.MOD_ID, "kqbtd"),
-            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, KQBTDEntity::new).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(KQBTDEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
     EntityType<SheerHeartAttackEntity> SHEER_HEART_ATTACK = Registry.register(
             Registry.ENTITY_TYPE,
@@ -63,49 +68,49 @@ public interface JEntityTypeRegister {
     EntityType<WhitesnakeEntity> WHITE_SNAKE = Registry.register(
             Registry.ENTITY_TYPE,
             new Identifier(JCraft.MOD_ID, "whitesnake"),
-            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WhitesnakeEntity::new).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(WhitesnakeEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     EntityType<CMoonEntity> C_MOON = Registry.register(
             Registry.ENTITY_TYPE,
             new Identifier(JCraft.MOD_ID, "cmoon"),
-            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, CMoonEntity::new).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(CMoonEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     EntityType<MadeInHeavenEntity> MADE_IN_HEAVEN = Registry.register(
             Registry.ENTITY_TYPE,
             new Identifier(JCraft.MOD_ID, "mih"),
-            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, MadeInHeavenEntity::new).dimensions(EntityDimensions.fixed(0.6f, 2.1f)).build()
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(MadeInHeavenEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 2.1f)).build()
     );
 
     EntityType<TheWorldOverHeavenEntity> THE_WORLD_OVER_HEAVEN = Registry.register(
             Registry.ENTITY_TYPE,
             new Identifier(JCraft.MOD_ID, "twoh"),
-            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, TheWorldOverHeavenEntity::new).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(TheWorldOverHeavenEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     EntityType<SilverChariotEntity> SILVER_CHARIOT = Registry.register(
             Registry.ENTITY_TYPE,
             new Identifier(JCraft.MOD_ID, "silverchariot"),
-            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, SilverChariotEntity::new).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(SilverChariotEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     EntityType<MagiciansRedEntity> MAGICIANS_RED = Registry.register(
             Registry.ENTITY_TYPE,
             new Identifier(JCraft.MOD_ID, "mr"),
-            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, MagiciansRedEntity::new).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(MagiciansRedEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     EntityType<TheFoolEntity> THE_FOOL = Registry.register(
             Registry.ENTITY_TYPE,
             new Identifier(JCraft.MOD_ID, "thefool"),
-            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, TheFoolEntity::new).dimensions(EntityDimensions.fixed(2f, 2f)).build()
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(TheFoolEntity::new)).dimensions(EntityDimensions.fixed(2f, 2f)).build()
     );
 
     EntityType<GoldenExperienceEntity> GOLDEN_EXPERIENCE = Registry.register(
             Registry.ENTITY_TYPE,
             new Identifier(JCraft.MOD_ID, "goldenexperience"),
-            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, GoldenExperienceEntity::new).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(GoldenExperienceEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
     EntityType<GETreeEntity> GE_TREE = Registry.register(
             Registry.ENTITY_TYPE,
@@ -120,7 +125,7 @@ public interface JEntityTypeRegister {
     EntityType<GEREntity> GER = Registry.register(
             Registry.ENTITY_TYPE,
             new Identifier(JCraft.MOD_ID, "ger"),
-            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, GEREntity::new).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(GEREntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
     EntityType<GERScorpionEntity> GER_SCORPION = Registry.register(
             Registry.ENTITY_TYPE,
@@ -213,5 +218,15 @@ public interface JEntityTypeRegister {
         FabricDefaultAttributeRegistry.register(D4C, D4CEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(PLAYER_ENTITY_CLONE, D4CEntity.createMobAttributes().add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 2).add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3));
         FabricDefaultAttributeRegistry.register(PLAYER_ENTITY_CLONE_SLIM, D4CEntity.createMobAttributes().add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 2).add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3));
+    }
+
+    @RequiredArgsConstructor(staticName = "from")
+    class WorldOnlyEntityFactory<T extends Entity> implements EntityType.EntityFactory<T> {
+        private final Function<World, T> ctor;
+
+        @Override
+        public T create(EntityType<T> type, World world) {
+            return ctor.apply(world);
+        }
     }
 }

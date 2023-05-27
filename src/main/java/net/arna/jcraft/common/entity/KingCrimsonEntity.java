@@ -8,7 +8,6 @@ import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
@@ -73,8 +72,8 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
     public List<Entity> timeEraseEntities;
     public List<Vec3d> timeErasePositions;
 
-    public KingCrimsonEntity(EntityType<? extends StandEntity> type, World worldIn) {
-        super(type, worldIn);
+    public KingCrimsonEntity(World worldIn) {
+        super(StandType.KING_CRIMSON, worldIn);
         super.initialize();
 
         idleDistance = 1f;

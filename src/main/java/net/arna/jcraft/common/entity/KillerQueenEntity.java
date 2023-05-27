@@ -13,7 +13,6 @@ import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -72,7 +71,11 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
     public Entity bombEntity;
     public Vec3d bombBlock;
 
-    public KillerQueenEntity(EntityType<? extends StandEntity> type, World worldIn) {
+    public KillerQueenEntity(World world) {
+        this(StandType.KILLER_QUEEN, world);
+    }
+
+    protected KillerQueenEntity(StandType type, World worldIn) {
         super(type, worldIn);
         super.initialize();
         idleRotation = -30f;

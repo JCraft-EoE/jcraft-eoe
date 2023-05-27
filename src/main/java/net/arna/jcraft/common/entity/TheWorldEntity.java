@@ -9,7 +9,6 @@ import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.sound.SoundCategory;
@@ -48,8 +47,8 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
     public static Attack feignbarrage = new Attack(30, 0.75f, 50, 5, 0, 0f, 0f, AttackType.COUNTER)
             .setInfo("Feign Barrage", "counter, no real damage, teleports behind attacker");
 
-    public TheWorldEntity(EntityType<? extends StandEntity> type, World worldIn) {
-        super(type, worldIn);
+    public TheWorldEntity(World worldIn) {
+        super(StandType.THE_WORLD, worldIn);
         super.initialize();
         idleRotation = 225f;
 

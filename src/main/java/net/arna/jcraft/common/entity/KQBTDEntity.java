@@ -12,7 +12,6 @@ import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -73,8 +72,8 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
     private NbtCompound userData;
     private NbtCompound targetData;
 
-    public KQBTDEntity(EntityType<? extends StandEntity> type, World worldIn) {
-        super(type, worldIn);
+    public KQBTDEntity(World worldIn) {
+        super(StandType.KILLER_QUEEN_BITES_THE_DUST, worldIn);
         super.initialize();
 
         description = "Ascended Explosive SETPLAY";

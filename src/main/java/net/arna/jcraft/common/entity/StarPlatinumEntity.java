@@ -7,7 +7,6 @@ import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.hit.HitResult;
@@ -45,8 +44,8 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
     public static Attack chargebarrage = new Attack(26, 4f, 55, 5, 1.5, 0.6f, 0.4f, AttackType.CHARGEBARRAGE, 1, 0, 3).setRanged(true)
             .setInfo("Advancing Barrage", "fast combo starter/extender, medium stun, extremely punishable on whiff");
 
-    public StarPlatinumEntity(EntityType<? extends StandEntity> type, World worldIn) {
-        super(type, worldIn);
+    public StarPlatinumEntity(World worldIn) {
+        super(StandType.STAR_PLATINUM, worldIn);
         super.initialize();
         idleRotation = 225f;
 

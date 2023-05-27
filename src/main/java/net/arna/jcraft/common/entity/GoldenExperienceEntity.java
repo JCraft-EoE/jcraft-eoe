@@ -8,7 +8,6 @@ import net.arna.jcraft.common.util.JCraftUtils;
 import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -59,8 +58,8 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
     //todo: sounds on MR
     //todo: add skin select
 
-    public GoldenExperienceEntity(EntityType<? extends StandEntity> type, World worldIn) {
-        super(type, worldIn);
+    public GoldenExperienceEntity(World worldIn) {
+        super(StandType.GOLDEN_EXPERIENCE, worldIn);
         super.initialize();
         idleRotation = 0f;
 

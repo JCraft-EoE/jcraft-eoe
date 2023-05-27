@@ -8,7 +8,6 @@ import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
@@ -85,8 +84,8 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
     }
 
 
-    public GEREntity(EntityType<? extends StandEntity> type, World worldIn) {
-        super(type, worldIn);
+    public GEREntity(World worldIn) {
+        super(StandType.GER, worldIn);
         super.initialize();
         idleRotation = 0f;
 

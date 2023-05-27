@@ -9,7 +9,6 @@ import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -64,8 +63,8 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
     public static Attack gun = new Attack(20, 21, 15, 1, 0.75f, AttackType.BOX).setRanged(true)
             .setInfo("Gun", "fully aimable, combo starter");
 
-    public WhitesnakeEntity(EntityType<? extends StandEntity> type, World worldIn) {
-        super(type, worldIn);
+    public WhitesnakeEntity(World worldIn) {
+        super(StandType.WHITE_SNAKE, worldIn);
         super.initialize();
         idleRotation = 220f;
 

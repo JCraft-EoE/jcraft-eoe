@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public enum StandType {
     STAR_PLATINUM(JEntityTypeRegister.STAR_PLATINUM, StarPlatinumEntity::new, "starplatinum"),                  // 1
@@ -47,15 +47,15 @@ public enum StandType {
     private final EntityType<? extends StandEntity> entityType;
     @Getter
     private final int id;
-    private final BiFunction<EntityType<? extends StandEntity>, World, StandEntity> ctor;
+    private final Function<World, StandEntity> ctor;
     @Getter
     private final Text nameText;
 
-    StandType(EntityType<? extends StandEntity> entityType, BiFunction<EntityType<? extends StandEntity>, World, StandEntity> ctor, String nameKey) {
+    StandType(EntityType<? extends StandEntity> entityType, Function<World, StandEntity> ctor, String nameKey) {
         this(entityType, ctor, nameKey, false);
     }
 
-    StandType(EntityType<? extends StandEntity> entityType, BiFunction<EntityType<? extends StandEntity>, World, StandEntity> ctor, String nameKey, boolean isEvo) {
+    StandType(EntityType<? extends StandEntity> entityType, Function<World, StandEntity> ctor, String nameKey, boolean isEvo) {
         this.entityType = entityType;
         id = isEvo ? --StaticFields.nextEvoId : ++StaticFields.nextId;
         this.ctor = ctor;
@@ -71,7 +71,7 @@ public enum StandType {
 
     @NonNull
     public StandEntity createNew(World world) {
-        return ctor.apply(getEntityType(), world);
+        return ctor.apply(world);
     }
 
     // Can't access static fields in enum constructor, blah blah blah.
