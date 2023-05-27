@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.item;
 
+import net.arna.jcraft.common.entity.StandType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
@@ -14,8 +15,6 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-
-import static net.arna.jcraft.JCraft.standNames;
 
 public class StandDiscItem extends Item {
     public StandDiscItem(Settings settings) {
@@ -60,14 +59,9 @@ public class StandDiscItem extends Item {
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         NbtCompound data = stack.getNbt();
-        if (data == null) {
-            return;
-        }
-        if (data.contains("StandID")) {
-            int standID = data.getInt("StandID");
-            if (standNames.containsKey(standID)) {
-                tooltip.add(standNames.get(standID));
-            }
-        }
+        if (data == null || !data.contains("StandID")) return;
+
+        StandType type = StandType.fromId(data.getInt("StandID"));
+        if (type != null) tooltip.add(type.getNameText());
     }
 }

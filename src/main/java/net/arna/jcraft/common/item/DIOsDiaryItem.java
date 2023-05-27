@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.item;
 
+import net.arna.jcraft.common.entity.StandType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -27,18 +28,18 @@ public class DIOsDiaryItem extends Item {
             NbtCompound playerNbt = ((IEntityDataSaver) user).getPersistentData();
             int standID = playerNbt.getInt("StandID");
 
-            if (standID == -1) {
+            if (standID == StandType.C_MOON.getId()) {
                 if (!user.isCreative()) {
                     itemStack.decrement(1);
                 }
-                playerNbt.putInt("StandID", -2);
+                playerNbt.putInt("StandID", StandType.MADE_IN_HEAVEN.getId());
             }
 
-            if (standID == 2) {
+            if (standID == StandType.THE_WORLD.getId()) {
                 if (!user.isCreative()) {
                     itemStack.decrement(1);
                 }
-                playerNbt.putInt("StandID", -3);
+                playerNbt.putInt("StandID", StandType.THE_WORLD_OVER_HEAVEN.getId());
             }
         }
 

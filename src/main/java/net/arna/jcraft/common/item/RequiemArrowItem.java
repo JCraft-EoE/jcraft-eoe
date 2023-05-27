@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.item;
 
+import net.arna.jcraft.common.entity.StandType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
@@ -37,11 +38,11 @@ public class RequiemArrowItem extends Item {
         if (!world.isClient) {
             NbtCompound playerNbt = ((IEntityDataSaver) user).getPersistentData();
             int standID = playerNbt.getInt("StandID");
-            if (standID == 11) {
+            if (standID == StandType.GOLDEN_EXPERIENCE.getId()) {
                 if (!user.isCreative()) {
                     itemStack.decrement(1);
                 }
-                playerNbt.putInt("StandID", -5);
+                playerNbt.putInt("StandID", StandType.GER.getId());
                 if (!user.isCreative()) {
                     itemStack.decrement(1);
                 }

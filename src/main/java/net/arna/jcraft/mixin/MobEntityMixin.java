@@ -1,6 +1,6 @@
 package net.arna.jcraft.mixin;
 
-import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.entity.StandType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.minecraft.enchantment.Enchantment;
@@ -29,7 +29,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.List;
 import java.util.Random;
 
-import static net.arna.jcraft.JCraft.*;
+import static net.arna.jcraft.JCraft.ALLOW_MOB_EVOLVED_STANDS;
+import static net.arna.jcraft.JCraft.CHANCE_MOB_SPAWNS_WITH_STAND;
 
 @Mixin(MobEntity.class)
 public class MobEntityMixin {
@@ -46,76 +47,71 @@ public class MobEntityMixin {
 
     @Inject(method = "<init>(Lnet/minecraft/entity/EntityType;Lnet/minecraft/world/World;)V", at = @At("TAIL"))
     public void jcraft$mobEntityInit(EntityType<? extends MobEntity> entityType, World world, CallbackInfo info) {
-        if (!world.isClient) {
-            ServerWorld serverWorld = (ServerWorld) world;
-            MobEntity mob = (MobEntity) (Object) this;
+        if (world.isClient) return;
 
-            NbtCompound nbt = ((IEntityDataSaver) mob).getPersistentData();
+        ServerWorld serverWorld = (ServerWorld) world;
+        MobEntity mob = (MobEntity) (Object) this;
 
-            if (!nbt.contains("StandID")) {
-                EntityGroup group = mob.getGroup();
+        NbtCompound nbt = ((IEntityDataSaver) mob).getPersistentData();
 
-                if (group == EntityGroup.UNDEAD || group == EntityGroup.ILLAGER || mob instanceof EndermanEntity) {
-                    Random random = new Random();
-                    GameRules gameRules = serverWorld.getGameRules();
+        if (nbt.contains("StandID")) return;
+        EntityGroup group = mob.getGroup();
 
-                    if (100 - random.nextInt(0, 100) <= gameRules.getInt(CHANCE_MOB_SPAWNS_WITH_STAND)) {
-                        int standID = random.nextInt(gameRules.getBoolean(ALLOW_MOB_EVOLVED_STANDS) ? -EVOLUTION_COUNT + 1 : 1, JCraft.STAND_COUNT + 1);
-                        if (standID <= 0) {
-                            standID -= 1;
-                        } // This offsetting is required to remove the unassigned 0 stand id
+        if (group != EntityGroup.UNDEAD && group != EntityGroup.ILLAGER && !(mob instanceof EndermanEntity)) return;
+        Random random = new Random();
+        GameRules gameRules = serverWorld.getGameRules();
 
-                        // Silver chariot users may spawn with anubis (25% chance)
-                        if (standID == 8 && random.nextInt(5) == 4) {
-                            handItems.set(0, new ItemStack(JObjectRegistry.ANUBIS));
-                        }
+        if (100 - random.nextInt(0, 100) > gameRules.getInt(CHANCE_MOB_SPAWNS_WITH_STAND)) return;
+        List<StandType> types = gameRules.getBoolean(ALLOW_MOB_EVOLVED_STANDS) ? StandType.getAllStandTypes() : StandType.getRegularStandTypes();
+        StandType type = types.get(random.nextInt(types.size()));
 
-                        nbt.putInt("StandID", standID);
-
-                        EntityAttributeInstance followRange = mob.getAttributeInstance(EntityAttributes.GENERIC_FOLLOW_RANGE);
-                        if (followRange != null) {
-                            followRange.setBaseValue(128.0);
-                        }
-
-                        EntityAttributeInstance movementSpeed = mob.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
-                        if (movementSpeed != null && movementSpeed.getBaseValue() < 0.3) {
-                            movementSpeed.setBaseValue(0.3);
-                        }
-
-                        if (random.nextInt(0, 100) >= 90) {
-                            handItems.set(1, new ItemStack(JObjectRegistry.STANDARROW));
-                            mob.setEquipmentDropChance(EquipmentSlot.OFFHAND, 100f);
-                        }
-
-                        Enchantment enchantment;
-                        ItemStack itemStack;
-
-                        int baseArmorLevel = random.nextInt(1, 6);
-                        int enchantsSize = jcraftArmorEnchants.size();
-
-                        // Randomize armor because stands tear through anything unarmored
-                        itemStack = new ItemStack(jcraftHeadArmor.get(baseArmorLevel + random.nextInt(-1, 1)));
-                        enchantment = jcraftArmorEnchants.get(random.nextInt(enchantsSize));
-                        itemStack.addEnchantment(enchantment, enchantment.getMaxLevel());
-                        armorItems.set(3, itemStack);
-
-                        itemStack = new ItemStack(jcraftChestArmor.get(baseArmorLevel + random.nextInt(-1, 1)));
-                        enchantment = jcraftArmorEnchants.get(random.nextInt(enchantsSize));
-                        itemStack.addEnchantment(enchantment, enchantment.getMaxLevel());
-                        armorItems.set(2, itemStack);
-
-                        itemStack = new ItemStack(jcraftLegArmor.get(baseArmorLevel + random.nextInt(-1, 1)));
-                        enchantment = jcraftArmorEnchants.get(random.nextInt(enchantsSize));
-                        itemStack.addEnchantment(enchantment, enchantment.getMaxLevel());
-                        armorItems.set(1, itemStack);
-
-                        itemStack = new ItemStack(jcraftFootArmor.get(baseArmorLevel + random.nextInt(-1, 1)));
-                        enchantment = jcraftArmorEnchants.get(random.nextInt(enchantsSize));
-                        itemStack.addEnchantment(enchantment, enchantment.getMaxLevel());
-                        armorItems.set(0, itemStack);
-                    }
-                }
-            }
+        // Silver chariot users may spawn with anubis (25% chance)
+        if (type == StandType.SILVER_CHARIOT && random.nextInt(5) == 4) {
+            handItems.set(0, new ItemStack(JObjectRegistry.ANUBIS));
         }
+
+        nbt.putInt("StandID", type.getId());
+
+        EntityAttributeInstance followRange = mob.getAttributeInstance(EntityAttributes.GENERIC_FOLLOW_RANGE);
+        if (followRange != null) {
+            followRange.setBaseValue(128.0);
+        }
+
+        EntityAttributeInstance movementSpeed = mob.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
+        if (movementSpeed != null && movementSpeed.getBaseValue() < 0.3) {
+            movementSpeed.setBaseValue(0.3);
+        }
+
+        if (random.nextInt(0, 100) >= 90) {
+            handItems.set(1, new ItemStack(JObjectRegistry.STANDARROW));
+            mob.setEquipmentDropChance(EquipmentSlot.OFFHAND, 100f);
+        }
+
+        Enchantment enchantment;
+        ItemStack itemStack;
+
+        int baseArmorLevel = random.nextInt(1, 6);
+        int enchantsSize = jcraftArmorEnchants.size();
+
+        // Randomize armor because stands tear through anything unarmored
+        itemStack = new ItemStack(jcraftHeadArmor.get(baseArmorLevel + random.nextInt(-1, 1)));
+        enchantment = jcraftArmorEnchants.get(random.nextInt(enchantsSize));
+        itemStack.addEnchantment(enchantment, enchantment.getMaxLevel());
+        armorItems.set(3, itemStack);
+
+        itemStack = new ItemStack(jcraftChestArmor.get(baseArmorLevel + random.nextInt(-1, 1)));
+        enchantment = jcraftArmorEnchants.get(random.nextInt(enchantsSize));
+        itemStack.addEnchantment(enchantment, enchantment.getMaxLevel());
+        armorItems.set(2, itemStack);
+
+        itemStack = new ItemStack(jcraftLegArmor.get(baseArmorLevel + random.nextInt(-1, 1)));
+        enchantment = jcraftArmorEnchants.get(random.nextInt(enchantsSize));
+        itemStack.addEnchantment(enchantment, enchantment.getMaxLevel());
+        armorItems.set(1, itemStack);
+
+        itemStack = new ItemStack(jcraftFootArmor.get(baseArmorLevel + random.nextInt(-1, 1)));
+        enchantment = jcraftArmorEnchants.get(random.nextInt(enchantsSize));
+        itemStack.addEnchantment(enchantment, enchantment.getMaxLevel());
+        armorItems.set(0, itemStack);
     }
 }

@@ -3,7 +3,8 @@ package net.arna.jcraft;
 import eu.midnightdust.lib.config.MidnightConfig;
 import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.JCommonConfig;
-import net.arna.jcraft.common.entity.*;
+import net.arna.jcraft.common.entity.StandEntity;
+import net.arna.jcraft.common.entity.StandType;
 import net.arna.jcraft.common.network.c2s.StandControlPacket;
 import net.arna.jcraft.common.util.AttackQueue;
 import net.arna.jcraft.common.util.DimValues;
@@ -27,8 +28,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
@@ -152,27 +151,6 @@ public class JCraft implements ModInitializer {
             }))
             .build();
 
-    // Stand names
-    public static final Map<Integer, MutableText> standNames = Map.ofEntries(
-            Map.entry(1, Text.translatable("entity.jcraft.starplatinum")),
-            Map.entry(2, Text.translatable("entity.jcraft.theworld")),
-            Map.entry(3, Text.translatable("entity.jcraft.kingcrimson")),
-            Map.entry(4, Text.translatable("entity.jcraft.d4c")),
-            Map.entry(5, Text.translatable("entity.jcraft.cream")),
-            Map.entry(6, Text.translatable("entity.jcraft.killerqueen")),
-            Map.entry(7, Text.translatable("entity.jcraft.whitesnake")),
-            Map.entry(8, Text.translatable("entity.jcraft.silverchariot")),
-            Map.entry(9, Text.translatable("entity.jcraft.mr")),
-            Map.entry(10, Text.translatable("entity.jcraft.thefool")),
-            Map.entry(11, Text.translatable("entity.jcraft.goldenexperience")),
-
-            Map.entry(-1, Text.translatable("entity.jcraft.cmoon")),
-            Map.entry(-2, Text.translatable("entity.jcraft.mih")),
-            Map.entry(-3, Text.translatable("entity.jcraft.twoh")),
-            Map.entry(-4, Text.translatable("entity.jcraft.kqbtd")),
-            Map.entry(-5, Text.translatable("entity.jcraft.ger"))
-    );
-
     // Buttons to IDs and vice versa
     public static final Map<Integer, AttackQueue> idToButton = Map.ofEntries(
             Map.entry(0, AttackQueue.LIGHT),
@@ -197,42 +175,18 @@ public class JCraft implements ModInitializer {
     );
 
     public static StandEntity Summon(ServerWorld world, LivingEntity player) {
-        if (player.hasStatusEffect(JStatusRegister.STANDLESS)) {
-            return null;
-        }
+        if (player.hasStatusEffect(JStatusRegister.STANDLESS)) return null;
 
-        StandEntity stand = null;
+        StandType type = StandType.fromId(((IEntityDataSaver) player).getPersistentData().getInt("StandID"));
+        StandEntity stand = type == null ? null : type.createNew(world);
 
-        //CMoonEntity(ModEntityRegister.MIH, world) works and i don't like that :(
-        switch (((IEntityDataSaver) player).getPersistentData().getInt("StandID")) {
-            case 1 -> stand = new StarPlatinumEntity(JEntityTypeRegister.STAR_PLATINUM, world);
-            case 2 -> stand = new TheWorldEntity(JEntityTypeRegister.THE_WORLD, world);
-            case 3 -> stand = new KingCrimsonEntity(JEntityTypeRegister.KING_CRIMSON, world);
-            case 4 -> stand = new D4CEntity(JEntityTypeRegister.D4C, world);
-            case 5 -> stand = new CreamEntity(JEntityTypeRegister.CREAM, world);
-            case 6 -> stand = new KillerQueenEntity(JEntityTypeRegister.KILLER_QUEEN, world);
-            case 7 -> stand = new WhitesnakeEntity(JEntityTypeRegister.WHITE_SNAKE, world);
-            case 8 -> stand = new SilverChariotEntity(JEntityTypeRegister.SILVER_CHARIOT, world);
-            case 9 -> stand = new MagiciansRedEntity(JEntityTypeRegister.MAGICIANS_RED, world);
-            case 10 -> stand = new TheFoolEntity(JEntityTypeRegister.THE_FOOL, world);
-            case 11 -> stand = new GoldenExperienceEntity(JEntityTypeRegister.GOLDEN_EXPERIENCE, world);
-            // All evolutions have a negative ID
-            case -1 -> stand = new CMoonEntity(JEntityTypeRegister.C_MOON, world);
-            case -2 -> stand = new MadeInHeavenEntity(JEntityTypeRegister.MADE_IN_HAVEN, world);
-            case -3 -> stand = new TheWorldOverHeavenEntity(JEntityTypeRegister.THE_WORLD_OVER_HEAVEN, world);
-            case -4 -> stand = new KQBTDEntity(JEntityTypeRegister.KILLER_QUEEN_BITES_THE_DUST, world);
-            case -5 -> stand = new GEREntity(JEntityTypeRegister.GER, world);
-        }
+        if (stand == null) return null;
 
-        if (stand != null) {
-            stand.setPosition(player.getPos().subtract(player.getRotationVector()));
-            stand.startRiding(player);
-            stand.setUser(player);
-            world.spawnEntity(stand);
-            return stand;
-        }
-
-        return null;
+        stand.setPosition(player.getPos().subtract(player.getRotationVector()));
+        stand.startRiding(player);
+        stand.setUser(player);
+        world.spawnEntity(stand);
+        return stand;
     }
 
     public static Identifier id(String name) {

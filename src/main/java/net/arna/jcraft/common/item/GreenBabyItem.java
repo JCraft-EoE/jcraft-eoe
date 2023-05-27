@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.item;
 
+import net.arna.jcraft.common.entity.StandType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -27,11 +28,11 @@ public class GreenBabyItem extends Item {
             NbtCompound playerNbt = ((IEntityDataSaver) user).getPersistentData();
             int standID = playerNbt.getInt("StandID");
 
-            if (standID == 7) {
+            if (standID == StandType.WHITE_SNAKE.getId()) {
                 if (!user.isCreative()) {
                     itemStack.decrement(1);
                 }
-                playerNbt.putInt("StandID", -1);
+                playerNbt.putInt("StandID", StandType.C_MOON.getId());
             }
         }
 
