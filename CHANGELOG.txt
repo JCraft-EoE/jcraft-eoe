@@ -594,9 +594,14 @@ Killer Queen
     >Bomb Plant now deals 9 ticks of stun
     >Fixed bug where Coin Toss could spawn multiple coins
     >Sheer Heart Attack
-        >now spawns higher
-        >can't be damaged by explosives
+        >Remodeled and reanimated
+        >Spawns higher
+        >Can't be damaged by explosives
 
+● 27/5/2023
+Whitesnake
+    >Remodeled and reanimated
+    >Gun utility replaced with Remote Mode
 
 priority (top to bottom)
 TODO: ability to position the HUD

@@ -144,9 +144,13 @@ public abstract class StandEntity extends MobEntity {
         return this.dataTracker.get(STATE);
     }
 
+    public void setStateNoReset(int s) {
+        this.dataTracker.set(STATE, s);
+    }
+
     public void setState(int s) {
         int state = this.getState();
-        this.dataTracker.set(SAMESTATE, state == s || state == 1);
+        this.dataTracker.set(SAMESTATE, state == s || state == 1); // Pretty much just an animation reset flag
         this.dataTracker.set(STATE, s);
     }
 
@@ -711,19 +715,13 @@ public abstract class StandEntity extends MobEntity {
                 } else {
                     idleOverride(user);
                 }
-            } else if (this.blocking) {
-                // Process block
+            } else if (this.blocking) { // Process block
                 this.curAttack = null;
+                this.setStateNoReset(3);
 
-                this.setState(3);
-
-                //JCraft.LOGGER.info(this.getMoveStun());
-                if (this.getMoveStun() < 4) {
-                    setMoveStun(4);
-                }
+                if (this.getMoveStun() < 4) setMoveStun(4);
                 setDistanceOffset(this.blockDistance);
                 setRotationOffset(this.attackRotation);
-
                 standBlock(user);
             }
         }
@@ -776,6 +774,7 @@ public abstract class StandEntity extends MobEntity {
     }
 
     public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, DamageSource playerSource, Entity attacker) {
+        if (world == null || ent == null) return;
         if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && !world.isClient()) {
             if (attacker instanceof PlayerEntity playerEntity) {
                 IComboCounter comboCounter = (IComboCounter) playerEntity;

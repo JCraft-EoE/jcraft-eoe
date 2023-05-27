@@ -4,10 +4,7 @@ import net.arna.jcraft.common.entity.ai.goal.SHAAttackGoal;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.goal.LookAroundGoal;
-import net.minecraft.entity.ai.goal.LookAtEntityGoal;
-import net.minecraft.entity.ai.goal.SwimGoal;
-import net.minecraft.entity.ai.goal.UniversalAngerGoal;
+import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -75,7 +72,7 @@ public class SheerHeartAttackEntity extends MobEntity implements IAnimatable, IA
         this.goalSelector.add(2, new SHAAttackGoal(this, 1.5));
         this.goalSelector.add(3, new LookAtEntityGoal(this, LivingEntity.class, 32.0F));
         this.goalSelector.add(4, new LookAroundGoal(this));
-        //this.targetSelector.add(2, new );
+        this.targetSelector.add(6, new PounceAtTargetGoal(this, 0.2f));
         this.targetSelector.add(8, new UniversalAngerGoal(this, true));
     }
 
@@ -95,7 +92,9 @@ public class SheerHeartAttackEntity extends MobEntity implements IAnimatable, IA
     }
 
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        event.getController().setAnimation(new AnimationBuilder().loop("animation.sha.idle"));
+        event.getController().setAnimation(
+                event.isMoving() ? new AnimationBuilder().loop("animation.sha.walk") : new AnimationBuilder().loop("animation.sha.idle")
+        );
         return PlayState.CONTINUE;
     }
 

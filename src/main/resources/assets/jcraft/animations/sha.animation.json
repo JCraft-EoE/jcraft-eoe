@@ -1,7 +1,7 @@
 {
 	"format_version": "1.8.0",
 	"animations": {
-		"animation.sha.idle": {
+		"animation.sha.walk": {
 			"loop": true,
 			"animation_length": 3.12,
 			"bones": {
@@ -44,8 +44,108 @@
 							"vector": [720, 0, 0]
 						}
 					}
+				},
+				"jaw": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.44": {
+							"vector": [22.5, 0, 0],
+							"easing": "easeInOutCubic"
+						},
+						"0.92": {
+							"vector": [0, 0, 0],
+							"easing": "easeInOutCubic"
+						},
+						"1.4": {
+							"vector": [22.5, 0, 0],
+							"easing": "easeInOutCubic"
+						},
+						"2.0": {
+							"vector": [0, 0, 0],
+							"easing": "easeInOutCubic"
+						},
+						"2.68": {
+							"vector": [22.5, 0, 0],
+							"easing": "easeInOutCubic"
+						},
+						"3.12": {
+							"vector": [0, 0, 0],
+							"easing": "easeInOutCubic"
+						}
+					}
+				},
+				"r1": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"3.12": {
+							"vector": [180, 0, 0],
+							"easing": "linear"
+						}
+					}
+				},
+				"r2": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"3.12": {
+							"vector": [180, 0, 0],
+							"easing": "linear"
+						}
+					}
+				},
+				"r3": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"3.12": {
+							"vector": [180, 0, 0],
+							"easing": "linear"
+						}
+					}
+				},
+				"l1": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"3.12": {
+							"vector": [180, 0, 0],
+							"easing": "linear"
+						}
+					}
+				},
+				"l2": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"3.12": {
+							"vector": [180, 0, 0],
+							"easing": "linear"
+						}
+					}
+				},
+				"l3": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"3.12": {
+							"vector": [180, 0, 0],
+							"easing": "linear"
+						}
+					}
 				}
 			}
+		},
+		"animation.sha.idle": {
+			"loop": true
 		}
 	},
 	"geckolib_format_version": 2

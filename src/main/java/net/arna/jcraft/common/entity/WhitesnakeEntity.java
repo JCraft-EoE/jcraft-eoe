@@ -254,18 +254,28 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
             if (getRemote()) {
                 double f = getRemoteForwardInput();
                 double s = getRemoteSideInput();
+                boolean jump = getRemoteJumpInput();
+
+                Vec3d pos = getPos();
+
                 // 3 ticks of inertia, helping movement be fluid as well as dealing with packet drops
-                if (lastRemoteInputTime - age > 4) {
-                    updateRemoteInputs(0, 0, false);
-                }
+                if (lastRemoteInputTime - age > 4) updateRemoteInputs(0, 0, false);
                 Vec3d rotVec = new Vec3d(getRotationVector().x, 0, getRotationVector().z);
 
                 double dragMult = getMoveStun() > 0 ? 0.4 : 0.6;
                 double moveSpeed = 1;
-                HitResult groundCheck = this.world.raycast(new RaycastContext(getEyePos(), getPos().add(0, -1.0E-5F, 0), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+                HitResult groundCheck = this.world.raycast(new RaycastContext(getEyePos(), pos.add(0, -1.0E-5F, 0), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+                boolean onGround = groundCheck.getType() != HitResult.Type.MISS;
 
-                if (groundCheck.getType() != HitResult.Type.MISS) { // If grounded
-                    if (getRemoteJumpInput() && getMoveStun() < 1) {
+                if (getState() < 2) { // Replace idle anim
+                    if (s > 0) setStateNoReset(onGround ? 12 : 16);
+                    if (s < 0) setStateNoReset(onGround ? 11 : 15);
+                    if (f < 0) setStateNoReset(onGround ? 10 : 14);
+                    if (f > 0) setStateNoReset(onGround ? 9 : 13);
+                }
+
+                if (onGround) { // If grounded
+                    if (jump && getMoveStun() < 1) {
                         remoteSpeed = new Vec3d(remoteSpeed.x, 0.3, remoteSpeed.z);
                         setRemoteJumpInput(false);
                     }
@@ -283,16 +293,21 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
 
                 remoteSpeed = remoteSpeed.multiply(dragMult, 1, dragMult);
 
-                if (getPos().add(remoteSpeed).squaredDistanceTo(getUser().getPos()) > 400) {
+                if (pos.add(remoteSpeed).squaredDistanceTo(getUser().getPos()) > 400) {
                     remoteSpeed.multiply(-0.1);
                 }
 
-                Vec3d newPos = getPos().add(remoteSpeed);
-                HitResult hitResult = this.world.raycast(new RaycastContext(getPos().add(0, 0.1, 0), newPos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+                Vec3d newPos = pos.add(remoteSpeed);
+                HitResult downCast = this.world.raycast(new RaycastContext(pos.add(0, 0.1, 0), newPos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+                HitResult upCast = this.world.raycast(new RaycastContext(pos.add(0, 0.1, 0), pos.add(0, 1.8, 0), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
 
-                if (hitResult.getType() != HitResult.Type.MISS) {
-                    //JCraft.LOGGER.info("Its over");
-                    newPos = hitResult.getPos();
+                if (downCast.getType() != HitResult.Type.MISS) {
+                    newPos = downCast.getPos();
+                    remoteSpeed.multiply(-0.1);
+                }
+
+                if (upCast.getType() != HitResult.Type.MISS) {
+                    newPos = upCast.getPos();
                     remoteSpeed.multiply(-0.1);
                 }
 
@@ -322,9 +337,13 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         AnimationController controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
-        if (this.getSameState()) {
-            controller.markNeedsReload();
+
+        if (age < 20 && getState() < 2) {
+            controller.setAnimation(builder.playOnce("animation.whitesnake.summon"));
+            return PlayState.CONTINUE;
         }
+
+        if (this.getSameState()) controller.markNeedsReload();
         switch (this.getState()) {
             default -> controller.setAnimation(builder.loop("animation.whitesnake.idle"));
             case 2 -> controller.setAnimation(builder.playAndHold("animation.whitesnake.light"));
@@ -332,10 +351,19 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
             case 4 -> controller.setAnimation(builder.playAndHold("animation.whitesnake.donut"));
             case 5 -> controller.setAnimation(builder.loop("animation.whitesnake.barrage"));
             case 6 -> controller.setAnimation(builder.playAndHold("animation.whitesnake.legcrusher"));
-            case 7 -> controller.setAnimation(builder.playAndHold("animation.whitesnake.poisonspew"));
-            case 8 -> controller.setAnimation(builder.playAndHold("animation.whitesnake.disk"));
-            case 9 -> controller.setAnimation(builder.playAndHold("animation.whitesnake.gun"));
+            case 7 -> controller.setAnimation(builder.playAndHold("animation.whitesnake.acidspew"));
+            case 8 -> controller.setAnimation(builder.playAndHold("animation.whitesnake.disc"));
+
+            case 9 -> controller.setAnimation(builder.loop("animation.whitesnake.forw"));
+            case 10 -> controller.setAnimation(builder.loop("animation.whitesnake.back"));
+            case 11 -> controller.setAnimation(builder.loop("animation.whitesnake.left"));
+            case 12 -> controller.setAnimation(builder.loop("animation.whitesnake.right"));
+            case 13 -> controller.setAnimation(builder.loop("animation.whitesnake.fdash"));
+            case 14 -> controller.setAnimation(builder.loop("animation.whitesnake.bdash"));
+            case 15 -> controller.setAnimation(builder.loop("animation.whitesnake.ldash"));
+            case 16 -> controller.setAnimation(builder.loop("animation.whitesnake.rdash"));
         }
+
         return PlayState.CONTINUE;
     }
 }

@@ -28,6 +28,6 @@ public class WhitesnakeModel extends AnimatedTickingGeoModel<WhitesnakeEntity> {
     public void setCustomAnimations(WhitesnakeEntity animatable, int instanceId, AnimationEvent animationEvent) {
         super.setCustomAnimations(animatable, instanceId, animationEvent);
         if (animatable.hasUser())
-            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser());
+            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), true, true, -0.10f, -0.10f);
     }
 }

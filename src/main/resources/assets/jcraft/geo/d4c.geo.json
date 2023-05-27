@@ -221,7 +221,7 @@
 				{
 					"name": "bipedHandRight",
 					"parent": "lowerRight",
-					"pivot": [-4, 13, -1],
+					"pivot": [-5, 12, -1],
 					"rotation": [90, 0, -180]
 				},
 				{
@@ -291,7 +291,7 @@
 				{
 					"name": "bipedHandLeft",
 					"parent": "lowerLeft",
-					"pivot": [4, 13, -1]
+					"pivot": [5, 12, -1]
 				},
 				{
 					"name": "head",
