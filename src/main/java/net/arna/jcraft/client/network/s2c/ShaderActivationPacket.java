@@ -44,37 +44,10 @@ public class ShaderActivationPacket {
     /**
      * This is the client handling your packet with shader info in
      *
-     * @param client                   mc
-     * @param clientPlayNetworkHandler .
      * @param buf                      packet
-     * @param packetSender             .
      */
-    public static void handle(MinecraftClient client, ClientPlayNetworkHandler clientPlayNetworkHandler, PacketByteBuf buf, PacketSender packetSender) {
-
-        int delay = buf.readInt();
-        int duration = buf.readInt();
-        Type type = Type.byName(buf.readString());
-        World world = client.world;
-        if (world != null) {
-            switch (type) {
-                case NONE -> {
-                }
-                case ZA_WARUDO -> {
-                    int id = buf.readInt();
-                    client.execute(() -> {
-                        Entity sourceShader = world.getEntityById(id);
-                        if (sourceShader instanceof LivingEntity livingEntity) {
-                            ZaWarudoShaderHandler zaWarudoShaderHandler = ZaWarudoShaderHandler.INSTANCE;
-                            zaWarudoShaderHandler.tickDelay = delay;
-                            zaWarudoShaderHandler.shaderSourceEntity = Optional.of(livingEntity).orElse(client.player);
-                            zaWarudoShaderHandler.effectLength = duration;
-                            zaWarudoShaderHandler.shouldRender = true;
-                        }
-                    });
-                }
-            }
-        }
-
+    public static void handle(PacketByteBuf buf) {
+        ClientHandler.handle(buf);
     }
 
     public enum Type implements StringIdentifiable {
@@ -108,6 +81,37 @@ public class ShaderActivationPacket {
                 }
             }
             return defaultType;
+        }
+    }
+
+    // Client-only code so that shit don't get loaded on the server and fuck everything up.
+    private static class ClientHandler {
+        private static void handle(PacketByteBuf buf) {
+            MinecraftClient client = MinecraftClient.getInstance();
+
+            int delay = buf.readInt();
+            int duration = buf.readInt();
+            Type type = Type.byName(buf.readString());
+            World world = client.world;
+            if (world == null) return;
+
+            switch (type) {
+                case NONE -> {
+                }
+                case ZA_WARUDO -> {
+                    int id = buf.readInt();
+                    client.execute(() -> {
+                        Entity sourceShader = world.getEntityById(id);
+                        if (sourceShader instanceof LivingEntity livingEntity) {
+                            ZaWarudoShaderHandler zaWarudoShaderHandler = ZaWarudoShaderHandler.INSTANCE;
+                            zaWarudoShaderHandler.tickDelay = delay;
+                            zaWarudoShaderHandler.shaderSourceEntity = Optional.of(livingEntity).orElse(client.player);
+                            zaWarudoShaderHandler.effectLength = duration;
+                            zaWarudoShaderHandler.shouldRender = true;
+                        }
+                    });
+                }
+            }
         }
     }
 }
