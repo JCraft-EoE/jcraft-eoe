@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.argumenttype;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
@@ -8,6 +9,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.arna.jcraft.common.entity.StandType;
 import net.minecraft.text.Text;
@@ -21,6 +23,8 @@ public class StandArgumentType implements ArgumentType<StandType> {
     private static final SimpleCommandExceptionType NOT_FOUND = new SimpleCommandExceptionType(Text.literal("That stand was not found"));
     private static final Map<String, StandType> suggestions = StandType.getAllStandTypes().stream()
             .collect(ImmutableMap.toImmutableMap(type -> type.name().toLowerCase().replaceAll("_", ""), type -> type));
+    @Getter // implements ArgumentType#getExamples()
+    private final Collection<String> examples = ImmutableList.of("MADE_IN_HEAVEN", "C_MOON", "GER");
 
     @Override
     public StandType parse(StringReader reader) throws CommandSyntaxException {
@@ -41,10 +45,5 @@ public class StandArgumentType implements ArgumentType<StandType> {
                 .map(StandType::name)
                 .forEach(builder::suggest);
         return builder.buildFuture();
-    }
-
-    @Override
-    public Collection<String> getExamples() {
-        return ArgumentType.super.getExamples();
     }
 }
