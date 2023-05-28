@@ -112,7 +112,7 @@ public class JCraftClient implements ClientModInitializer {
         ClientTickEvents.END_WORLD_TICK.register(new SkyBoxManager());
         ClientPlayNetworking.registerGlobalReceiver(ServerChannelFeedbackPacket.ID, ServerChannelFeedbackPacket::handle);
         ClientPlayNetworking.registerGlobalReceiver(ShaderActivationPacket.ID, (client, handler, buf, responseSender) -> ShaderActivationPacket.handle(buf));
-        ClientPlayNetworking.registerGlobalReceiver(ShaderDeactivationPacket.ID, ShaderDeactivationPacket::handle);
+        ClientPlayNetworking.registerGlobalReceiver(ShaderDeactivationPacket.ID, (client, handler, buf, responseSender) -> ShaderDeactivationPacket.handle(buf));
         ClientPlayNetworking.registerGlobalReceiver(TimeAccelStatePacket.ID, (client, handler, buf, responseSender) -> TimeAccelStatePacket.handle(buf));
 
         HudRenderCallback.EVENT.register(new JCraftHudOverlay());
