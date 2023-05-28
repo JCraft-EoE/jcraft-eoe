@@ -38,11 +38,7 @@ public class SheerHeartAttackEntity extends MobEntity implements IAnimatable, IA
     }
 
     private LivingEntity owner;
-    private static final TrackedData<String> OWNERNAME;
-
-    static {
-        OWNERNAME = DataTracker.registerData(SheerHeartAttackEntity.class, TrackedDataHandlerRegistry.STRING);
-    }
+    private static final TrackedData<String> OWNERNAME = DataTracker.registerData(SheerHeartAttackEntity.class, TrackedDataHandlerRegistry.STRING);
 
     public LivingEntity getOwner() {
         return this.owner;
@@ -73,12 +69,12 @@ public class SheerHeartAttackEntity extends MobEntity implements IAnimatable, IA
         this.goalSelector.add(3, new LookAtEntityGoal(this, LivingEntity.class, 32.0F));
         this.goalSelector.add(4, new LookAroundGoal(this));
         this.targetSelector.add(6, new PounceAtTargetGoal(this, 0.2f));
-        this.targetSelector.add(8, new UniversalAngerGoal(this, true));
+        this.targetSelector.add(8, new UniversalAngerGoal(this, true)); // TODO: this class must implement Angerable for this
     }
 
     @Override
     public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController(this, "controller", 0, this::predicate));
+        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
     }
 
     @Override

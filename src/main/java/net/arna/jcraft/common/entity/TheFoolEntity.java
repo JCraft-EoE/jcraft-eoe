@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
+import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;

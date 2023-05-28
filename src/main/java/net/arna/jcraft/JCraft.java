@@ -1,12 +1,16 @@
 package net.arna.jcraft;
 
 import eu.midnightdust.lib.config.MidnightConfig;
-import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
+import lombok.Getter;
+import lombok.Setter;
+import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.JCommonConfig;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.entity.StandType;
 import net.arna.jcraft.common.network.c2s.StandControlPacket;
 import net.arna.jcraft.common.util.DimValues;
+import net.arna.jcraft.common.util.DummyClientEntityHandler;
+import net.arna.jcraft.common.util.IClientEntityHandler;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.registry.*;
 import net.fabricmc.api.ModInitializer;
@@ -93,6 +97,9 @@ public class JCraft implements ModInitializer {
     public static GameRules.Key<GameRules.BooleanRule> CREAM_BLACK_HOLE_ERASES_BLOCKS = GameRuleRegistry.register("creamBlackHoleErasesBlocks", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
     public static GameRules.Key<GameRules.IntRule> DEFAULT_SPEC = GameRuleRegistry.register("defaultSpec", GameRules.Category.PLAYER, GameRuleFactory.createIntRule(0, 0, 1));
     //public static GameRules.Key<GameRules.IntRule> DAMAGE_MULT = GameRuleRegistry.register("jcraftDamageMult", GameRules.Category.MISC, GameRuleFactory.createIntRule(0, 0, 100));
+
+    @Getter @Setter
+    private static IClientEntityHandler clientEntityHandler = DummyClientEntityHandler.INSTANCE;
 
     // Dimensional travel bullshit
     public static ArrayList<DimValues> pastDimensions = new ArrayList<>();

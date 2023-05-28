@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.spec;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
+import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JStatusRegister;

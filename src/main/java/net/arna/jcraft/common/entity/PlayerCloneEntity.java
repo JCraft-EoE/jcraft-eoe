@@ -1,12 +1,8 @@
 package net.arna.jcraft.common.entity;
 
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.ai.goal.CloneAttackGoal;
-import net.arna.jcraft.common.network.c2s.StandControlPacket;
-import net.arna.jcraft.registry.JEntityTypeRegister;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -23,7 +19,6 @@ import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
@@ -227,62 +222,50 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob 
         boolean client = this.world.isClient();
 
         if (client) {
-            if (this.age == 1 && this.getType() == JEntityTypeRegister.PLAYER_ENTITY_CLONE) {
-                // If the one running this instance of tick() is the owner of the clone, check for a thin model and apply if found via server message
-                // This is in fact an entirely clientside process and can be considered a "security flaw",
-                // but I really doubt anyone would care if someone turned all their clones thin
-                ClientPlayerEntity clientPlayer = MinecraftClient.getInstance().player;
-                if (clientPlayer != null) {
-                    if (this.getOwnerName().equals(clientPlayer.getName().getString()) && clientPlayer.getModel().equals("slim")) {
-                        PacketByteBuf buf = PacketByteBufs.create();
-                        buf.writeShort(12);
-                        buf.writeUuid(this.getUuid());
-                        StandControlPacket.send(buf);
-                    }
-                }
-            }
-        } else {
-            if (this.switched && this.switchedTo.age > 10) {
-                this.discard();
-            } // Remove outdated clones
+            JCraft.getClientEntityHandler().playerCloneEntityClientTick(this);
+            return;
+        }
 
-            if (this.owner == null) {
-                // Run every 2 seconds (player lists are rather expensive)
-                if (this.age % 40 == 0) {
-                    // If the owner name is set, but the owner isn't (when loaded via NBT data), find owner
-                    String ownerName = this.getOwnerName();
-                    if (!ownerName.equals("%unset_owner_name")) {
-                        ServerWorld serverWorld = (ServerWorld) this.world;
-                        for (ServerPlayerEntity serverPlayerEntity : PlayerLookup.world(serverWorld)) {
-                            if (serverPlayerEntity.getName().getString().equals(ownerName)) {
-                                this.owner = serverPlayerEntity;
-                            }
+        if (this.switched && this.switchedTo.age > 10) {
+            this.discard();
+        } // Remove outdated clones
+
+        if (this.owner == null) {
+            // Run every 2 seconds (player lists are rather expensive)
+            if (this.age % 40 == 0) {
+                // If the owner name is set, but the owner isn't (when loaded via NBT data), find owner
+                String ownerName = this.getOwnerName();
+                if (!ownerName.equals("%unset_owner_name")) {
+                    ServerWorld serverWorld = (ServerWorld) this.world;
+                    for (ServerPlayerEntity serverPlayerEntity : PlayerLookup.world(serverWorld)) {
+                        if (serverPlayerEntity.getName().getString().equals(ownerName)) {
+                            this.owner = serverPlayerEntity;
                         }
                     }
                 }
+            }
 
-                LivingEntity attacker = this.getAttacking();
-                if (attacker != null) {
-                    this.setTarget(attacker);
+            LivingEntity attacker = this.getAttacking();
+            if (attacker != null) {
+                this.setTarget(attacker);
+            }
+        } else {
+            if (this.persistTarget == null) {
+                LivingEntity attacking = owner.getAttacking();
+                if (attacking != null && attacking.isAlive()) {
+                    this.persistTarget = attacking;
                 }
-            } else {
-                if (this.persistTarget == null) {
-                    LivingEntity attacking = owner.getAttacking();
-                    if (attacking != null && attacking.isAlive()) {
-                        this.persistTarget = attacking;
-                    }
 
-                    if (this.squaredDistanceTo(this.owner) > 100) {
-                        this.getNavigation().startMovingTo(this.owner, 1);
-                    }
-                } else if (this.persistTarget.isAlive() && this.canTarget(this.persistTarget)) {
-                    this.setTarget(this.persistTarget);
-                } else { // This is called once, usually when the opponent dies
-                    this.persistTarget = null;
-                    this.setTarget(null);
-                    if (!this.getNavigation().isIdle()) {
-                        this.getNavigation().stop();
-                    }
+                if (this.squaredDistanceTo(this.owner) > 100) {
+                    this.getNavigation().startMovingTo(this.owner, 1);
+                }
+            } else if (this.persistTarget.isAlive() && this.canTarget(this.persistTarget)) {
+                this.setTarget(this.persistTarget);
+            } else { // This is called once, usually when the opponent dies
+                this.persistTarget = null;
+                this.setTarget(null);
+                if (!this.getNavigation().isIdle()) {
+                    this.getNavigation().stop();
                 }
             }
         }

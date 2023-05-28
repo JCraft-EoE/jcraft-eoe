@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.item;
 
-import net.arna.jcraft.client.network.s2c.ShaderActivationPacket;
+import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;

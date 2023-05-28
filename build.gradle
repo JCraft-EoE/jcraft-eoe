@@ -104,6 +104,15 @@ loom {
 			runDir "build/datagen"
 		}
 	}
+
+	splitEnvironmentSourceSets()
+
+	mods {
+		jcraft {
+			sourceSet sourceSets.main
+			sourceSet sourceSets.client
+		}
+	}
 }
 
 // configure the maven publication
