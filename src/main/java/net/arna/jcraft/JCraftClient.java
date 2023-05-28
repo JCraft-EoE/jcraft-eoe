@@ -113,7 +113,7 @@ public class JCraftClient implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(ServerChannelFeedbackPacket.ID, ServerChannelFeedbackPacket::handle);
         ClientPlayNetworking.registerGlobalReceiver(ShaderActivationPacket.ID, ShaderActivationPacket::handle);
         ClientPlayNetworking.registerGlobalReceiver(ShaderDeactivationPacket.ID, ShaderDeactivationPacket::handle);
-        ClientPlayNetworking.registerGlobalReceiver(TimeAccelStatePacket.ID, TimeAccelStatePacket::handle);
+        ClientPlayNetworking.registerGlobalReceiver(TimeAccelStatePacket.ID, (client, handler, buf, responseSender) -> TimeAccelStatePacket.handle(buf));
 
         HudRenderCallback.EVENT.register(new JCraftHudOverlay());
         HudRenderCallback.EVENT.register(this::renderHud);

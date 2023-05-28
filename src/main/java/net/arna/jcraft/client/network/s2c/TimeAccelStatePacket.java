@@ -10,11 +10,9 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.PlayerManager;
@@ -42,22 +40,7 @@ public class TimeAccelStatePacket {
         // Handle time acceleration on the client.
         // This should be done smoothly.
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT)
-            WorldRenderEvents.START.register(ctx -> {
-                if (!ctx.world().getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)) return;
-
-                double acceleration = getAcceleration(ctx.world());
-
-                long currentTime = Util.getMeasuringTimeMs();
-                if (acceleration == 0) {
-                    lastUpdate = currentTime;
-                    return;
-                }
-
-                double multiplier = (currentTime - lastUpdate) / 1000d;
-                ctx.world().setTimeOfDay((long) (ctx.world().getTimeOfDay() + acceleration * multiplier));
-
-                lastUpdate = currentTime;
-            });
+            ClientHandler.registerHandler();
 
         // Decrease all durations.
         ServerTickEvents.END_SERVER_TICK.register(server -> new IntOpenHashSet(accelerations.keySet()).forEach(id -> {
@@ -94,7 +77,8 @@ public class TimeAccelStatePacket {
         accelerations.remove(mih.getId());
     }
 
-    public static void handle(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender sender) {
+    public static void handle(PacketByteBuf buf) {
+        MinecraftClient client = MinecraftClient.getInstance();
         State state = State.values()[buf.readVarInt()];
         Entity e = client.world == null ? null : client.world.getEntityById(buf.readVarInt());
 
@@ -143,6 +127,29 @@ public class TimeAccelStatePacket {
 
         public void decrementDuration() {
             duration--;
+        }
+    }
+
+    // Separate class so that this client-only code does not get loaded on the server.
+    // We should probably just split the sources, but that's a lot of work at this point.
+    private static class ClientHandler {
+        private static void registerHandler() {
+            WorldRenderEvents.START.register(ctx -> {
+                if (!ctx.world().getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)) return;
+
+                double acceleration = getAcceleration(ctx.world());
+
+                long currentTime = Util.getMeasuringTimeMs();
+                if (acceleration == 0) {
+                    lastUpdate = currentTime;
+                    return;
+                }
+
+                double multiplier = (currentTime - lastUpdate) / 1000d;
+                ctx.world().setTimeOfDay((long) (ctx.world().getTimeOfDay() + acceleration * multiplier));
+
+                lastUpdate = currentTime;
+            });
         }
     }
 }
