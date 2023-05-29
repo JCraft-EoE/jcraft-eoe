@@ -1,0 +1,24 @@
+package net.arna.jcraft.client.renderer.entity;
+
+import net.arna.jcraft.client.model.entity.AnkhModel;
+import net.arna.jcraft.client.model.entity.LifeDetectorModel;
+import net.arna.jcraft.common.entity.LifeDetector;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
+import software.bernie.geckolib3.renderers.geo.GeoProjectilesRenderer;
+
+public class LifeDetectorRenderer extends GeoProjectilesRenderer<LifeDetector> {
+    public LifeDetectorRenderer(EntityRendererFactory.Context renderManagerIn) { super(renderManagerIn, new LifeDetectorModel()); }
+    protected int getBlockLight(LifeDetector entityIn, BlockPos partialTicks) { return 15; }
+    @Override
+    public RenderLayer getRenderType(LifeDetector animatable, float partialTicks, MatrixStack stack,
+                                     VertexConsumerProvider renderTypeBuffer, VertexConsumer vertexBuilder, int packedLightIn,
+                                     Identifier textureLocation) {
+        return RenderLayer.getEyes(getTextureLocation(animatable));
+    }
+}

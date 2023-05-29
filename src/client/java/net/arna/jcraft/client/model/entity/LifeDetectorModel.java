@@ -1,0 +1,24 @@
+package net.arna.jcraft.client.model.entity;
+
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.entity.LifeDetector;
+import net.minecraft.util.Identifier;
+import software.bernie.geckolib3.model.AnimatedGeoModel;
+
+public class LifeDetectorModel extends AnimatedGeoModel<LifeDetector> {
+    @Override
+    public Identifier getModelResource(LifeDetector object) {
+        return new Identifier(JCraft.MOD_ID, "geo/detector.geo.json");
+    }
+
+    @Override
+    public Identifier getTextureResource(LifeDetector object) {
+        return new Identifier(JCraft.MOD_ID, "textures/entity/projectiles/detector.png");
+    }
+
+    @Override
+    public Identifier getAnimationResource(LifeDetector animatable) {
+        return new Identifier(JCraft.MOD_ID, "animations/knife.animation.json");
+    }
+
+}

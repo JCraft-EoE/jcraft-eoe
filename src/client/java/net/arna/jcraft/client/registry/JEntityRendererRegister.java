@@ -42,5 +42,6 @@ public interface JEntityRendererRegister {
         EntityRendererRegistry.register(JEntityTypeRegister.KNIFE, KnifeRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegister.ANKH, AnkhRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegister.BUBBLE, BubbleRenderer::new);
+        EntityRendererRegistry.register(JEntityTypeRegister.LIFE_DETECTOR, LifeDetectorRenderer::new);
     }
 }
