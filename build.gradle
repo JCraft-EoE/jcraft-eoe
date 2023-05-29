@@ -60,12 +60,11 @@ dependencies {
 	modImplementation include("io.github.ladysnake:satin:${project.satin_version}")
 
 	// MixinExtras
-	implementation("com.github.LlamaLad7:MixinExtras:0.1.1")
 	implementation include("com.github.LlamaLad7:MixinExtras:0.1.1")
 	annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.1")
 
 	runtimeOnly('org.joml:joml:1.10.4')
-	modRuntimeOnly("maven.modrinth:sodium:${project.sodium}")
+	modImplementation("maven.modrinth:sodium:${project.sodium}")
 	modImplementation "com.ptsmods:devlogin:3.2.2" // To login into your Minecraft account
 }
 

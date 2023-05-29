@@ -33,7 +33,9 @@
     "client.ItemRendererMixin",
     "client.ParticleAccessor",
     "client.ParticleManagerMixin",
-    "client.WorldRendererMixin"
+    "client.WorldRendererMixin",
+    "client.sodium.sodium.SodiumWorldRendererMixin",
+    "client.sodium.vanilla.WorldRendererVanillaMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -3,15 +3,11 @@ package net.arna.jcraft.client.rendering.skybox;
 import com.mojang.blaze3d.systems.RenderSystem;
 import ladysnake.satin.api.managed.ManagedCoreShader;
 import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
-import net.arna.jcraft.client.rendering.shader.JShader;
-import net.arna.jcraft.registry.JShaderRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3f;
-
-import java.awt.*;
 
 public class CrimsonSkyBox implements JSkyBox {
     public transient float alpha = 1;
@@ -33,10 +29,10 @@ public class CrimsonSkyBox implements JSkyBox {
         Matrix4f mat = matrices.peek().getPositionMatrix();
         Matrix4f invMat = mat.copy();
         invMat.invert();
-        ManagedCoreShader shader = CrimsonShaderHandler.SPACE;
+        ManagedCoreShader shader = CrimsonShaderHandler.SHADER;
         shader.findUniformMat4("InverseTransformMatrix").set(invMat);
         shader.findUniform1f("Time").set((client.world.getTime() + tickDelta) / 20);
-        RenderSystem.setShader(CrimsonShaderHandler.SPACE::getProgram);
+        RenderSystem.setShader(CrimsonShaderHandler.SHADER::getProgram);
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferBuilder = tessellator.getBuffer();

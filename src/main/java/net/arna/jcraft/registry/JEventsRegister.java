@@ -28,5 +28,6 @@ public interface JEventsRegister {
     static void registerClientEvents() {
         WorldRenderEvents.AFTER_TRANSLUCENT.register(JWorldRenderEvents::afterTranslucent);
         WorldRenderEvents.LAST.register(JWorldRenderEvents::onLast);
+        WorldRenderEvents.LAST.register(JWorldRenderEvents::crimsonBlocks);
     }
 }

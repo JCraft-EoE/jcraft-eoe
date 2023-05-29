@@ -585,14 +585,20 @@ public abstract class StandEntity extends MobEntity {
                             new Box(eyePos.add(96.0, 96.0, 96.0), eyePos.subtract(96.0, 96.0, 96.0)), EntityPredicates.VALID_LIVING_ENTITY);
 
                     for (PlayerEntity player : toCooldown) {
-                        ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+
                         // Shader handling
-                        ShaderActivationPacket.send(serverPlayer, this, 0, stunTicks, ShaderActivationPacket.Type.ZA_WARUDO);
-                        if (serverPlayer == user || serverPlayer.isCreative()) continue;
-                        // Puts all player items besides armor into cooldown for entire duration of timestop
-                        for (int i = 0; i < serverPlayer.getInventory().main.size(); i++)
-                            serverPlayer.getItemCooldownManager().set(serverPlayer.getInventory().main.get(i).getItem(), stunTicks);
-                        serverPlayer.getItemCooldownManager().set(serverPlayer.getOffHandStack().getItem(), stunTicks);
+                        if(player instanceof ServerPlayerEntity serverPlayerEntity){
+                            if(!world.isClient()){
+                                ShaderActivationPacket.send(serverPlayerEntity, this, 0, stunTicks, ShaderActivationPacket.Type.ZA_WARUDO);
+                            }
+                            if (serverPlayerEntity == user || serverPlayerEntity.isCreative()) continue;
+                            // Puts all player items besides armor into cooldown for entire duration of timestop
+                            for (int i = 0; i < serverPlayerEntity.getInventory().main.size(); i++){
+                                serverPlayerEntity.getItemCooldownManager().set(serverPlayerEntity.getInventory().main.get(i).getItem(), stunTicks);
+                            }
+                            serverPlayerEntity.getItemCooldownManager().set(serverPlayerEntity.getOffHandStack().getItem(), stunTicks);
+                        }
+
                     }
                 }
 

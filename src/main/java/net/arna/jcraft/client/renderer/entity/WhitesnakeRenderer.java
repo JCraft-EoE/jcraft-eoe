@@ -21,7 +21,7 @@ public class WhitesnakeRenderer extends GeoEntityRenderer<WhitesnakeEntity> {
 
     /*
     Cutout - no alpha
-    CutoutNoCull - identical
+    CutoutNoCull - identical (copium)
     Alpha - no lighting
     Translucent - with alpha, nothing renders through
     Decal - invisible

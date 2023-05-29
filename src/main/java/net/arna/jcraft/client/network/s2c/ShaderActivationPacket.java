@@ -1,6 +1,7 @@
 package net.arna.jcraft.client.network.s2c;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
 import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -25,7 +26,7 @@ public class ShaderActivationPacket {
      * Send a packet S2C to start rendering a shader of a specific {@link Type}
      *
      * @param serverPlayerEntity player who will se the shader
-     * @param sourceShader       origin of the shader, if not null, must call buf.readInt() in {@link #handle(MinecraftClient, ClientPlayNetworkHandler, PacketByteBuf, PacketSender)} switch
+     * @param sourceShader       origin of the shader, if not null, must call buf.readInt() in {@link #handle(PacketByteBuf)} )} switch
      * @param tickDelay          delay before starting to render shader
      * @param duration           duration of the shader
      * @param type               which shader to use
@@ -52,7 +53,8 @@ public class ShaderActivationPacket {
 
     public enum Type implements StringIdentifiable {
         NONE("none"),
-        ZA_WARUDO("za_warudo");
+        ZA_WARUDO("za_warudo"),
+        CRIMSON("crimson");
 
         private final String name;
 
@@ -62,7 +64,7 @@ public class ShaderActivationPacket {
 
         @Override
         public String asString() {
-            return this == ZA_WARUDO ? ZA_WARUDO.name : NONE.name;
+            return this == ZA_WARUDO ? ZA_WARUDO.name : this == CRIMSON ? CRIMSON.name : NONE.name;
         }
 
         public String getName() {
@@ -104,11 +106,17 @@ public class ShaderActivationPacket {
                         Entity sourceShader = world.getEntityById(id);
                         if (sourceShader instanceof LivingEntity livingEntity) {
                             ZaWarudoShaderHandler zaWarudoShaderHandler = ZaWarudoShaderHandler.INSTANCE;
-                            zaWarudoShaderHandler.tickDelay = delay;
                             zaWarudoShaderHandler.shaderSourceEntity = Optional.of(livingEntity).orElse(client.player);
                             zaWarudoShaderHandler.effectLength = duration;
                             zaWarudoShaderHandler.shouldRender = true;
                         }
+                    });
+                }
+                case CRIMSON -> {
+                    client.execute(() -> {
+                        CrimsonShaderHandler crimsonShaderHandler = CrimsonShaderHandler.INSTANCE;
+                        crimsonShaderHandler.shouldRender = true;
+                        crimsonShaderHandler.effectLength = 300;
                     });
                 }
             }

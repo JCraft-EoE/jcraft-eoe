@@ -3,6 +3,7 @@ package net.arna.jcraft.common.util;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.block.entity.EndPortalBlockEntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
@@ -72,6 +73,23 @@ public class RenderUtils {
         renderBlockAtPosition(matrixStack, camera, pos, texture, alpha, GameRenderer::getPositionColorTexShader);
     }
 
+    public static void renderBlock(MatrixStack matrixStack, VertexConsumer vertexConsumer){
+
+        Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();
+        renderSide(matrix4f, vertexConsumer, 0.0F, 1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F);
+        renderSide(matrix4f, vertexConsumer, 0.0F, 1.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
+        renderSide(matrix4f, vertexConsumer, 1.0F, 1.0F, 1.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.0F);
+        renderSide(matrix4f, vertexConsumer, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 1.0F, 1.0F, 0.0F);
+        renderSide(matrix4f, vertexConsumer, 0.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 0.0F, 0.0F);
+    }
+
+    private static void renderSide(Matrix4f model, VertexConsumer vertices, float x1, float x2, float y1, float y2, float z1, float z2, float z3, float z4) {
+        vertices.vertex(model, x1, y1, z1).next();
+        vertices.vertex(model, x2, y1, z2).next();
+        vertices.vertex(model, x2, y2, z3).next();
+        vertices.vertex(model, x1, y2, z4).next();
+    }
+
     /**
      * Renders a Block at a pos
      */
@@ -106,6 +124,66 @@ public class RenderUtils {
         RenderSystem.setShader(shader);
         RenderSystem.setShaderTexture(0, texture);
         tessellator.draw();
+
+        matrixStack.pop();
+    }
+
+    public static void renderBlockAtLocation(MatrixStack matrixStack, Camera camera, Vec3d loc, Identifier texture, float alpha) {
+        matrixStack.push();
+
+        Vec3d transformedPos = loc.subtract(camera.getPos());
+        matrixStack.translate(transformedPos.x, transformedPos.y, transformedPos.z);
+        Matrix4f positionMatrix = matrixStack.peek().getPositionMatrix();
+
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+
+        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
+
+        // front
+        buffer.vertex(positionMatrix, 0, 0, 0).color(1f, 1f, 1f, alpha).texture(0f, 1f).next();
+        buffer.vertex(positionMatrix, 0, 1, 0).color(1f, 1f, 1f, alpha).texture(0f, 0f).next();
+        buffer.vertex(positionMatrix, 1, 1, 0).color(1f, 1f, 1f, alpha).texture(1f, 0f).next();
+        buffer.vertex(positionMatrix, 1, 0, 0).color(1f, 1f, 1f, alpha).texture(1f, 1f).next();
+
+        // back
+        buffer.vertex(positionMatrix, 1, 0, 1).color(1f, 1f, 1f, alpha).texture(0f, 1f).next();
+        buffer.vertex(positionMatrix, 1, 1, 1).color(1f, 1f, 1f, alpha).texture(0f, 0f).next();
+        buffer.vertex(positionMatrix, 0, 1, 1).color(1f, 1f, 1f, alpha).texture(1f, 0f).next();
+        buffer.vertex(positionMatrix, 0, 0, 1).color(1f, 1f, 1f, alpha).texture(1f, 1f).next();
+
+        // bottom
+        buffer.vertex(positionMatrix, 0, 0, 1).color(1f, 1f, 1f, alpha).texture(1f, 0f).next();
+        buffer.vertex(positionMatrix, 0, 0, 0).color(1f, 1f, 1f, alpha).texture(1f, 1f).next();
+        buffer.vertex(positionMatrix, 1, 0, 0).color(1f, 1f, 1f, alpha).texture(0f, 1f).next();
+        buffer.vertex(positionMatrix, 1, 0, 1).color(1f, 1f, 1f, alpha).texture(0f, 0f).next();
+
+        // top
+        buffer.vertex(positionMatrix, 1, 1, 1).color(1f, 1f, 1f, alpha).texture(0f, 1f).next();
+        buffer.vertex(positionMatrix, 1, 1, 0).color(1f, 1f, 1f, alpha).texture(0f, 0f).next();
+        buffer.vertex(positionMatrix, 0, 1, 0).color(1f, 1f, 1f, alpha).texture(1f, 0f).next();
+        buffer.vertex(positionMatrix, 0, 1, 1).color(1f, 1f, 1f, alpha).texture(1f, 1f).next();
+
+        // right
+        buffer.vertex(positionMatrix, 0, 0, 1).color(1f, 1f, 1f, alpha).texture(0f, 1f).next();
+        buffer.vertex(positionMatrix, 0, 1, 1).color(1f, 1f, 1f, alpha).texture(0f, 0f).next();
+        buffer.vertex(positionMatrix, 0, 1, 0).color(1f, 1f, 1f, alpha).texture(1f, 0f).next();
+        buffer.vertex(positionMatrix, 0, 0, 0).color(1f, 1f, 1f, alpha).texture(1f, 1f).next();
+
+        // left
+        buffer.vertex(positionMatrix, 1, 0, 0).color(1f, 1f, 1f, alpha).texture(1f, 1f).next();
+        buffer.vertex(positionMatrix, 1, 1, 0).color(1f, 1f, 1f, alpha).texture(1f, 0f).next();
+        buffer.vertex(positionMatrix, 1, 1, 1).color(1f, 1f, 1f, alpha).texture(0f, 0f).next();
+        buffer.vertex(positionMatrix, 1, 0, 1).color(1f, 1f, 1f, alpha).texture(0f, 1f).next();
+
+        RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
+        RenderSystem.setShaderTexture(0, texture);
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+        RenderSystem.enableBlend();
+
+        tessellator.draw();
+
+        RenderSystem.disableBlend();
 
         matrixStack.pop();
     }

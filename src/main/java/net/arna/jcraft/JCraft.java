@@ -1,7 +1,9 @@
 package net.arna.jcraft;
 
 import eu.midnightdust.lib.config.MidnightConfig;
+import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
+import net.arna.jcraft.client.network.s2c.TimeAccelStatePacket;
 import net.arna.jcraft.common.JCommonConfig;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.entity.StandType;
@@ -172,6 +174,7 @@ public class JCraft implements ModInitializer {
     @Override
     public void onInitialize() {
         MidnightConfig.init(MOD_ID, JCommonConfig.class);
+        MidnightConfig.init(MOD_ID, JClientConfig.class);
         // Particle registration (serverside)
         JParticleTypeRegistry.initParticleTypes();
 
@@ -219,7 +222,7 @@ public class JCraft implements ModInitializer {
                 data.putInt(cooldownType, 0);
             }
 
-            data.putInt(standCCCD, 900); // 45s
+            data.putInt(standCCCD, 20 * 45); // 45s
 
             Vec3d pPos = player.getEyePos();
             world.playSoundFromEntity(null, player, JSoundRegister.COOLDOWN_CANCEL, SoundCategory.PLAYERS, 1, 1);
@@ -233,7 +236,7 @@ public class JCraft implements ModInitializer {
         NbtCompound data = ((IEntityDataSaver) player).getPersistentData();
         //if (!user.getPersistentData().contains(JCraft.standCBCD)) { user.getPersistentData().putInt(JCraft.standCBCD, 0); } // Handled elsewhere
         if (stun.getDuration() > 1 && stun.getAmplifier() == 1 && data.getInt(standCBCD) <= 0) {
-            data.putInt(standCBCD, 1200); // 60s
+            data.putInt(standCBCD, 20 * 60); // 60s
 
             stun(player, 5, 2); // Player is slowed down considerably pre-burst
 
