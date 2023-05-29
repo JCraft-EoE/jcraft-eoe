@@ -25,14 +25,18 @@
       "net.arna.jcraft.JCraft"
     ],
     "client": [
-      "net.arna.jcraft.JCraftClient"
+      "net.arna.jcraft.client.JCraftClient"
     ],
     "fabric-datagen": [
       "net.arna.jcraft.datagen.JDataGen"
     ]
   },
   "mixins": [
-    "jcraft.mixins.json"
+    "jcraft.mixins.json",
+    {
+      "environment": "client",
+      "config": "jcraft.client.mixins.json"
+    }
   ],
 
   "depends": {
@@ -40,10 +44,6 @@
     "fabric": "*",
     "minecraft": "~1.19.2",
     "java": ">=17",
-    "fabric-key-binding-api-v1": "*",
     "player-animator": ">=0.3"
-  },
-  "suggests": {
-    "another-mod": "*"
   }
 }

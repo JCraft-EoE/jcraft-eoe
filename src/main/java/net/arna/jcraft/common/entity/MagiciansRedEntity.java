@@ -1,11 +1,12 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
+import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.JCraftUtils;
 import net.arna.jcraft.common.util.MobilityType;
+import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -44,11 +45,13 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
             .setInfo("Punch", "quick combo starter");
     public static Attack heavy = new Attack(17, 1f, 22, 12, 1.75, 7f, 0.5f, AttackType.BOX, 0, 0.6f, 0, JSoundRegister.TW_KICK_HIT)
             .setInfo("Low Kick", "knockdown provider, medium windup");
-    public static Attack barrage = new Attack(17, 0.75f, 60, 0, 2, 0.8f, 0.25f, AttackType.BARRAGE, 1.5f, 0, 3)
+    public static Attack barrage = new Attack(17, 0.75f, 60, 0, 2, 0.5f, 0.25f, AttackType.BARRAGE, 1.5f, 0, 3)
             .setInfo("Flamethrower", "fast reliable combo starter/extender, high stun, burns");
-    public static Attack crossfire = new Attack(20, 0.75f, 10, 8, 0, 0f, 0f, AttackType.BOX).setRanged(true)
+    public static Attack crossfire = new Attack(20, 0.75f, 10, 8, 0, 0f, 0f, AttackType.BOX)
+            .setRanged(true)
             .setInfo("Crossfire", "fires 3 stunning ankhs");
-    public static Attack crossfirevariation = new Attack(30, 0.75f, 17, 12, 0, 0f, 0f, AttackType.BOX).setRanged(true)
+    public static Attack crossfirevariation = new Attack(30, 0.75f, 17, 12, 0, 0f, 0f, AttackType.BOX)
+            .setRanged(true)
             .setInfo("Crossfire Variation", "summons 4 ankhs that orbit around the user");
     public static Attack crossfirehurricane = new Attack(60, 0.75f, 22, 18, 0, 0f, 0f, AttackType.BOX)
             .setInfo("Crossfire Hurricane", "summons slow, homing fire hurricane that knocks down, lasts for 3 seconds after hitting anything");
@@ -57,6 +60,10 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
     public static Attack redirect = new Attack(5, 0.75f, 10, 7, 0, 0f, 0f, AttackType.BOX).setMobility(MobilityType.TELEPORT)
             .setInfo("Redirect", "redirects all the users ankhs to where they're looking");
     // and so begins my terrible misuse of my own AI flags, the tldr here being that its simply called whenever the enemy is >3 blocks away, which is great here
+
+    public static Attack detector = new Attack(25, 0.75f, 20, 13, 0, 0f, 0f, AttackType.BOX)
+            .setRanged(true)
+            .setInfo("Life Detector", "tracks down nearby life, lasts 15s");
 
     private Vec3d hurricanePos;
     private int hurricaneTime;
@@ -158,10 +165,9 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
 
     @Override
     public void initMiddleClick() {
-        if (!this.canAttack()) {
-            return;
-        }
-        if (handleAttack(redbind, JCraft.standMMBCD, 10)) {
+        if (!this.canAttack()) return;
+        if (getUser().isSneaking() && handleAttack(redbind, JCraft.standMMBCD, 10)) {
+        } else if (handleAttack(detector, JCraft.standMMBCD, 11)) {
 
         }
     }
@@ -184,9 +190,8 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
                 }
             } else if (attack == heavy) {
                 for (LivingEntity ent : entities) {
-                    if (!JCraftUtils.isBlocking(ent)) {
+                    if (!JCraftUtils.isBlocking(ent))
                         ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 40, 0));
-                    }
                 }
             } else if (attack == crossfirevariation) {
                 for (int i = 0; i < 6; i++) {
@@ -213,6 +218,11 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
                         }
                     }
                 }
+            } else if (attack == detector) {
+                LifeDetector lifeDetector = new LifeDetector(JEntityTypeRegister.LIFE_DETECTOR,world);
+                lifeDetector.setOwner(user);
+                lifeDetector.setPosition(eyePos);
+                world.spawnEntity(lifeDetector);
             }
         }
     }

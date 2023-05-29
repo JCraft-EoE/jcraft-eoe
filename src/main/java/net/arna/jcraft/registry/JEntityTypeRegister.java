@@ -175,6 +175,13 @@ public interface JEntityTypeRegister {
                     .dimensions(EntityDimensions.fixed(0.5f, 0.5f)).trackRangeChunks(4).trackedUpdateRate(10).build()
     );
 
+    EntityType<LifeDetector> LIFE_DETECTOR = Registry.register(
+            Registry.ENTITY_TYPE,
+            new Identifier(JCraft.MOD_ID, "lifedetector"),
+                FabricEntityTypeBuilder.create(SpawnGroup.MISC, LifeDetector::new)
+                        .dimensions(EntityDimensions.fixed(1f, 1f)).build()
+    );
+
     static void registerEntities() {
         FabricDefaultAttributeRegistry.register(STAR_PLATINUM, StarPlatinumEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(KING_CRIMSON, KingCrimsonEntity.createMobAttributes());
@@ -218,6 +225,8 @@ public interface JEntityTypeRegister {
         FabricDefaultAttributeRegistry.register(D4C, D4CEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(PLAYER_ENTITY_CLONE, D4CEntity.createMobAttributes().add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 2).add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3));
         FabricDefaultAttributeRegistry.register(PLAYER_ENTITY_CLONE_SLIM, D4CEntity.createMobAttributes().add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 2).add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3));
+
+        FabricDefaultAttributeRegistry.register(LIFE_DETECTOR, LifeDetector.createLivingAttributes());
     }
 
     @RequiredArgsConstructor(staticName = "from")

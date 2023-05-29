@@ -18,25 +18,6 @@
     "TimestopBlockEntityMixin",
     "TimestopBlockMixin"
   ],
-  "client": [
-    "IntegratedServerLoaderMixin",
-    "client.ArmorFeatureRendererMixin",
-    "client.BackgroundRenderMixin",
-    "client.BipedEntityModelMixin",
-    "client.CameraInvoker",
-    "client.CameraMixin",
-    "client.ClientPlayerEntityMixin",
-    "client.ClientWorldMixin",
-    "client.EffectProgramMixin",
-    "client.GameRendererMixin",
-    "client.HeldItemFeatureRendererMixin",
-    "client.ItemRendererMixin",
-    "client.ParticleAccessor",
-    "client.ParticleManagerMixin",
-    "client.WorldRendererMixin",
-    "client.sodium.sodium.SodiumWorldRendererMixin",
-    "client.sodium.vanilla.WorldRendererVanillaMixin"
-  ],
   "injectors": {
     "defaultRequire": 1
   }

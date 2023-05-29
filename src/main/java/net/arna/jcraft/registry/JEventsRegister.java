@@ -24,10 +24,4 @@ public interface JEventsRegister {
 
         ServerTickEvents.END_SERVER_TICK.register(JServerTickEvents::serverTick);
     }
-
-    static void registerClientEvents() {
-        WorldRenderEvents.AFTER_TRANSLUCENT.register(JWorldRenderEvents::afterTranslucent);
-        WorldRenderEvents.LAST.register(JWorldRenderEvents::onLast);
-        WorldRenderEvents.LAST.register(JWorldRenderEvents::crimsonBlocks);
-    }
 }

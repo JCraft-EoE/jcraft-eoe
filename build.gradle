@@ -1,11 +1,8 @@
 plugins {
-	id 'fabric-loom' version '1.1-SNAPSHOT'
+	id 'fabric-loom' version '1.2-SNAPSHOT'
 	id 'maven-publish'
 	id 'io.freefair.lombok' version '8.0.1'
 }
-
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
 version = "${project.mod_version}"
@@ -82,6 +79,9 @@ tasks.withType(JavaCompile).configureEach {
 
 java {
 	withSourcesJar()
+
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
 }
 
 jar {
@@ -96,11 +96,20 @@ loom {
 		datagen {
 			server()
 
-			name "Minecraft Data"
+			name "Data Generation"
 			vmArg "-Dfabric-api.datagen"
 			vmArg "-Dfabric-api.datagen.output-dir=${file("src/main/generated")}"
 
 			runDir "build/datagen"
+		}
+	}
+
+	splitEnvironmentSourceSets()
+
+	mods {
+		"jcraft" {
+			sourceSet sourceSets.main
+			sourceSet sourceSets.client
 		}
 	}
 }

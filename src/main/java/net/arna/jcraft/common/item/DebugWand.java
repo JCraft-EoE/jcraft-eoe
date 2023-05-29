@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.item;
 
+import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.client.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
 import net.arna.jcraft.common.util.BlockInfo;
@@ -32,10 +33,6 @@ public class DebugWand extends Item {
                 world.playSound(null, user.getBlockPos(),  JSoundRegister.TW_TS_CLEAN, SoundCategory.PLAYERS, 1.2f, 1);
                 ShaderActivationPacket.send((ServerPlayerEntity) user, user, 0, 20 * 6, ShaderActivationPacket.Type.ZA_WARUDO);
             }
-
-
-
-        }
 
         return super.use(world, user, hand);
     }
