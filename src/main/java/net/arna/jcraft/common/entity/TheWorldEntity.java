@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.JConfig;
 import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
@@ -228,10 +229,9 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
     public void tick() {
         if (age == 1) {
             this.playSound(JSoundRegister.TW_SUMMON, 1f, 1f);
-            // FIXME: accessing JClientConfig on the server?
-//            if (JClientConfig.ANIME_VOICES) {
-//                this.playSound(JSoundRegister.MUDA_DA, 1f, 1f);
-//            }
+            if (JConfig.ANIME_VOICES) {
+                this.playSound(JSoundRegister.MUDA_DA, 1f, 1f);
+            }
         }
 
         super.tick();

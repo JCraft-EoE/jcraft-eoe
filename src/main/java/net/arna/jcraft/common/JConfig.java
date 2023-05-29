@@ -1,9 +1,8 @@
-package net.arna.jcraft.client;
+package net.arna.jcraft.common;
 
 import eu.midnightdust.lib.config.MidnightConfig;
 
-public class JClientConfig extends MidnightConfig {
-
+public class JConfig extends MidnightConfig {
     @Entry
     public static boolean SHADER_CRIMSON_SKY = false;
     @Entry

@@ -4,7 +4,7 @@ import eu.midnightdust.lib.config.MidnightConfig;
 import lombok.Getter;
 import lombok.Setter;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.common.JCommonConfig;
+import net.arna.jcraft.common.JConfig;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.entity.StandType;
 import net.arna.jcraft.common.network.c2s.StandControlPacket;
@@ -178,7 +178,7 @@ public class JCraft implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        MidnightConfig.init(MOD_ID, JCommonConfig.class);
+        MidnightConfig.init(MOD_ID, JConfig.class);
         // Particle registration (serverside)
         JParticleTypeRegistry.initParticleTypes();
 

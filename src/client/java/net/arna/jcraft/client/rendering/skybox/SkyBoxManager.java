@@ -1,6 +1,6 @@
 package net.arna.jcraft.client.rendering.skybox;
 
-import net.arna.jcraft.client.JClientConfig;
+import net.arna.jcraft.common.JConfig;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.util.math.MatrixStack;
@@ -10,7 +10,7 @@ import net.minecraft.util.math.Matrix4f;
 public class SkyBoxManager implements ClientTickEvents.EndWorldTick {
     private static final SkyBoxManager INSTANCE = new SkyBoxManager();
 
-    private JSkyBox currentSkyBox = JClientConfig.FORCE_CRIMSON_SKIES ? JClientConfig.SHADER_CRIMSON_SKY ? new CrimsonSkyBox() : new CrimsonSkyBoxCool() : null;
+    private JSkyBox currentSkyBox = JConfig.FORCE_CRIMSON_SKIES ? JConfig.SHADER_CRIMSON_SKY ? new CrimsonSkyBox() : new CrimsonSkyBoxCool() : null;
     private boolean enabled = true;
 
     @Override

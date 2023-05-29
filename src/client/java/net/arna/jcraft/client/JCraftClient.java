@@ -81,7 +81,6 @@ public class JCraftClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        MidnightConfig.init(MOD_ID, JClientConfig.class);
         JCraft.setClientEntityHandler(ClientEntityHandlerImpl.INSTANCE);
 
         //Rendering
