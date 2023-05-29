@@ -1,0 +1,27 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.arna.jcraft.client.mixin",
+  "plugin": "net.arna.jcraft.mixin.JMixinPlugin",
+  "compatibilityLevel": "JAVA_16",
+  "client": [
+    "IntegratedServerLoaderMixin",
+    "ArmorFeatureRendererMixin",
+    "BackgroundRenderMixin",
+    "BipedEntityModelMixin",
+    "CameraInvoker",
+    "CameraMixin",
+    "ClientPlayerEntityMixin",
+    "ClientWorldMixin",
+    "EffectProgramMixin",
+    "GameRendererMixin",
+    "HeldItemFeatureRendererMixin",
+    "ItemRendererMixin",
+    "ParticleAccessor",
+    "ParticleManagerMixin",
+    "WorldRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

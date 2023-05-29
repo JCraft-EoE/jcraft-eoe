@@ -1,16 +1,15 @@
 package net.arna.jcraft.common.network.c2s;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.entity.StandEntity;
+import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.AttackQueue;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.JCraftUtils;
 import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.arna.jcraft.registry.JStatusRegister;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.entity.LivingEntity;
@@ -30,10 +29,6 @@ import static net.arna.jcraft.JCraft.*;
 
 public class StandControlPacket {
     public static final Identifier ID = new Identifier(JCraft.MOD_ID, "scchannel");
-
-    public static void send(PacketByteBuf buf) {
-        ClientPlayNetworking.send(ID, buf);
-    }
 
     public static void handle(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler network, PacketByteBuf buf, PacketSender sender) {
         short control = buf.readShort();

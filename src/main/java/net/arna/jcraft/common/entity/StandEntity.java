@@ -2,8 +2,8 @@ package net.arna.jcraft.common.entity;
 
 import lombok.Getter;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.client.network.s2c.ShaderActivationPacket;
+import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
+import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.mixin.LivingEntityInvoker;
