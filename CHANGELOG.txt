@@ -603,6 +603,21 @@ Whitesnake
     >Remodeled and reanimated
     >Gun utility replaced with Remote Mode
 
+● 30/5/2023
+>Fixed threading error for some clientside particle effects
+
+Magician's Red
+    >Remodeled and reanimated
+    >Added sounds
+    >Red Bind rebound to crouching Utility
+    >New Utility - Life Detector
+    >Crouching during Crossfire Variation now alters the orbital distance of the ankhs
+    >Improved particle effects
+    >Barrage damage reduced(0.8->0.4)
+
+Cream
+    >Can no longer levitate while stunned in half-ball form
+
 priority (top to bottom)
 TODO: ability to position the HUD
 TODO: AI flags for unblockables and shouldn't-blockables

@@ -886,6 +886,11 @@ public abstract class StandEntity extends MobEntity {
     }
 
     @Override
+    public void readCustomDataFromNbt(NbtCompound nbt) {
+        kill(); // Whenever the stand is being loaded, kill it, it'll break
+    }
+
+    @Override
     public boolean damage(DamageSource source, float amount) {
         if (source.isMagic() || source.isExplosive()) {
             return false;

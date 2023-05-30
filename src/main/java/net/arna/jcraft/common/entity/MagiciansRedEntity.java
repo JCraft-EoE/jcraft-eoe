@@ -46,7 +46,8 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
 
     public static Attack light = new Attack(2, 0.75f, 8, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
-    public static Attack heavy = new Attack(17, 1f, 22, 12, 1.75, 7f, 0.5f, AttackType.BOX, 0, 0.6f, 0, JSoundRegister.TW_KICK_HIT)
+    public static Attack heavy = new Attack(17, 1f, 22, 12, 1.75, 7f, 0.5f, AttackType.BOX, 0.5f, 0.6f, 0, JSoundRegister.TW_KICK_HIT)
+            .setLaunch()
             .setInfo("Low Kick", "knockdown provider, medium windup");
     public static Attack barrage = new Attack(17, 0.75f, 60, 0, 2, 0.4f, 0.25f, AttackType.BARRAGE, 1.5f, 0, 3)
             .setInfo("Flamethrower", "fast reliable combo starter/extender, high stun, burns");
@@ -55,7 +56,7 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
             .setInfo("Crossfire", "fires 3 stunning ankhs");
     public static Attack crossfirevariation = new Attack(30, 0.75f, 17, 12, 0, 0f, 0f, AttackType.BOX)
             .setRanged(true)
-            .setInfo("Crossfire Variation", "summons 4 ankhs that orbit around the user");
+            .setInfo("Crossfire Variation", "summons 6 ankhs that orbit around the user, crouch to increase orbit distance");
     public static Attack crossfirehurricane = new Attack(60, 0.75f, 22, 18, 0, 0f, 0f, AttackType.BOX)
             .setInfo("Crossfire Hurricane", "summons slow, homing fire hurricane that knocks down, lasts for 3 seconds after hitting anything");
     public static Attack redbind = new Attack(20, 0.75f, 22, 12, 1.5, 5, 0, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.IMPACT_3)
@@ -66,7 +67,7 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
 
     public static Attack detector = new Attack(25, 0.75f, 20, 13, 0, 0f, 0f, AttackType.BOX)
             .setRanged(true)
-            .setInfo("Life Detector", "tracks down nearby life, lasts 15s");
+            .setInfo("Life Detector/Red Bind", "tracks down nearby life, lasts 15s/crouch for a whip attack");
 
     private Vec3d hurricanePos;
     private int hurricaneTime;
@@ -86,7 +87,9 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
 
         cons = List.of(
                 "easily blockable projectiles",
-                "slower than average"
+                "slower than average",
+                "no mobility options",
+                "no armored options"
         );
 
         freespace = "PASSIVE: Fire Resistance\n\n" +
@@ -107,60 +110,56 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
     @Override
     public void initHeavyAttack() {
         if (!this.canAttack()) return;
-        if (handleAttack(heavy, JCraft.standHeavyCD, 4)) {
-            //this.playSound(ModSoundRegister.MR_HEAVY,1, 1);
-        }
+        if (handleAttack(heavy, JCraft.standHeavyCD, 4))
+            playSound(JSoundRegister.MR_HEAVY,1, 1);
     }
 
     @Override
     public void initBarrage() {
         if (!this.canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
-            //this.playSound(ModSoundRegister.STAR_PLATINUM_BARRAGE,1, 1);
-        }
+        if (handleAttack(barrage, JCraft.standBarrageCD, 5))
+            playSound(JSoundRegister.MR_BARRAGE,1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!this.canAttack()) return;
-        if (handleAttack(crossfire, JCraft.standS1CD, 6)) {
-
-        }
+        if (handleAttack(crossfire, JCraft.standS1CD, 6))
+            playSound(JSoundRegister.MR_CROSSFIRE,1, 1);
     }
 
     @Override
     public void initUlt() {
         if (!this.canAttack()) return;
-        if (handleAttack(crossfirehurricane, JCraft.standUltCD, 7)) {
-
-        }
+        if (handleAttack(crossfirehurricane, JCraft.standUltCD, 7))
+            playSound(JSoundRegister.MR_ULT,1, 1);
     }
 
     @Override
     public void initSpecial2() {
         if (!this.canAttack()) return;
-        if (handleAttack(crossfirevariation, JCraft.standS2CD, 8)) {
-
-        }
+        if (handleAttack(crossfirevariation, JCraft.standS2CD, 8))
+            playSound(JSoundRegister.MR_CROSSFIRE,1, 1);
     }
 
     @Override
     public void initSpecial3() {
         if (!this.canAttack()) return;
-        if (handleAttack(redirect, JCraft.standS3CD, 9)) {
-
-        }
+        if (handleAttack(redirect, JCraft.standS3CD, 9))
+            playSound(JSoundRegister.MR_REDIRECT,1, 1);
     }
 
     @Override
     public void initMiddleClick() {
         if (!this.canAttack()) return;
         if (getUser().isSneaking() && handleAttack(redbind, JCraft.standMMBCD, 10)) {
+            playSound(JSoundRegister.MR_REDBIND,1, 1);
         } else if (handleAttack(detector, JCraft.standMMBCD, 11)) {
-
+            playSound(JSoundRegister.MR_DETECTOR,1, 1);
         }
     }
 
+    private static int variationAnkhs = 6;
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
         if (hasUser()) {
@@ -183,11 +182,14 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
                         ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 40, 0));
                 }
             } else if (attack == crossfirevariation) {
-                for (int i = 0; i < 6; i++) {
+                int orbitRange = user.isSneaking() ? 5 : 3;
+                for (int i = 0; i < variationAnkhs; i++) {
                     AnkhProjectile ankh = new AnkhProjectile(world, user);
                     ankh.setVelocity(0.0, 1.0, 0.0);
                     ankh.setPosition(eyePos.add(0.0, 1.0, 0.0));
                     ankh.setVariation(true);
+                    ankh.setOrbitRange(orbitRange);
+                    ankh.setOrbitOffset( (360f / variationAnkhs) * i );
                     world.spawnEntity(ankh);
                 }
             } else if (attack == crossfirehurricane) {
@@ -218,21 +220,23 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
 
     @Override
     public void tick() {
-        if (age == 1) {
-            this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.STAND_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
-        }
-
+        if (age == 1) this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.MR_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
         super.tick();
 
         if (hasUser()) {
             LivingEntity user = this.getUser();
             if (this.world.isClient()) {
                 if (this.getState() == 5) {
-                    Vec3d mouthPos = this.getEyePos().add(this.getRotationVector());
+                    Vec3d rotVec = getRotationVector();
+                    Vec3d mouthPos = getEyePos().add(rotVec);
                     for (int i = 0; i < 16; i++) {
-                        Vec3d vel = this.getRotationVector().multiply(0.2)
+                        Vec3d vel = user.getVelocity().add(
+                                rotVec
                                 .rotateX(random.nextFloat() - 0.5f)
-                                .rotateY(random.nextFloat() - 0.5f);
+                                .rotateY(random.nextFloat() - 0.5f)
+                                .rotateZ(random.nextFloat() - 0.5f)
+                                        .multiply(0.2)
+                        );
                         this.world.addParticle(
                                 random.nextInt(6) == 5 ? ParticleTypes.LAVA : ParticleTypes.FLAME,
                                 mouthPos.x, mouthPos.y, mouthPos.z,
@@ -316,9 +320,11 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         AnimationController controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
-        if (this.getSameState()) {
-            controller.markNeedsReload();
+        if (age < 20 && getState() < 2) {
+            controller.setAnimation(builder.playOnce("animation.mr.summon"));
+            return PlayState.CONTINUE;
         }
+        if (this.getSameState()) controller.markNeedsReload();
         switch (this.getState()) {
             default -> controller.setAnimation(builder.loop("animation.mr.idle"));
             case 2 -> controller.setAnimation(builder.playAndHold("animation.mr.light"));

@@ -98,6 +98,16 @@ public interface JSoundRegister {
     SoundEvent WS_DISK = registerSound("wsdisk");
     SoundEvent WS_GUN = registerSound("wsgun");
 
+    //Magician's Red
+    SoundEvent MR_SUMMON = registerSound("mrsummon");
+    SoundEvent MR_BARRAGE = registerSound("mrbarrage");
+    SoundEvent MR_CROSSFIRE = registerSound("mrcrossfire");
+    SoundEvent MR_DETECTOR = registerSound("mrdetector");
+    SoundEvent MR_HEAVY = registerSound("mrheavy");
+    SoundEvent MR_REDIRECT = registerSound("mrredirect");
+    SoundEvent MR_ULT = registerSound("mrult");
+    SoundEvent MR_REDBIND = registerSound("mrredbind");
+
     //Silver Chariot
     SoundEvent SC_SUMMON = registerSound("scsummon");
     SoundEvent SC_BARRAGE = registerSound("scbarrage");

@@ -11,7 +11,9 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.sound.SoundEvent;
@@ -54,10 +56,11 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable {
 
     @Override
     public boolean canTarget(LivingEntity target) {
+        if (target == null) return false;
         if (target == this) return false;
         if (target == owner) return false;
         if (target.isConnectedThroughVehicle(owner)) return false;
-        return target.canTakeDamage();
+        return target.canTakeDamage() && target.isAlive();
     }
 
     private void Explode() {
@@ -68,7 +71,7 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable {
         List<LivingEntity> hurt = JCraftUtils.GenerateHitbox(world, pos, 2.25, null);
         for (LivingEntity living :
                 hurt) {
-            if (living == owner || living.getVehicle() == owner) continue;
+            if (!canTarget(living)) continue;
             Vec3d kbVec = living.getPos().subtract(pos).normalize();
             StandEntity.damageLogic(world, living, kbVec, 10, 1, false, 5f, true, DamageSource.mob(owner), owner);
         }
@@ -83,6 +86,7 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable {
     @Override
     public void tick() {
         super.tick();
+        if (owner == null) kill();
         if (hasExploded()) return;
 
         if (world.isClient) {
@@ -113,17 +117,19 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable {
 
                     target = finalTarget;
                 }
-            } else {
+            } else if (target.isAlive()) {
                 Vec3d eyePos = target.getEyePos();
                 lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, eyePos);
-                if (this.squaredDistanceTo(eyePos) < 3) Explode(); //If closer than 1.72m
+                if (this.squaredDistanceTo(eyePos) < 2.5) Explode(); //If closer than 1.58m
+            } else {
+                target = null;
             }
 
             if ( !hasExploded() && (this.age >= 300 || getHealth() <= 0f) ) Explode();
 
             // Lerp velocity to simulate inertia
             this.setVelocity(
-                    getVelocity().add( getRotationVector().multiply(0.25f) ).multiply(0.5)
+                    getVelocity().add( getRotationVector().multiply(0.5) ).multiply(0.25)
             );
             this.velocityModified = true;
         }
@@ -134,10 +140,11 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable {
     protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.BLOCK_LAVA_EXTINGUISH;
     }
+    @Nullable
     @Override
-    public boolean hasNoGravity() {
-        return true;
-    }
+    protected SoundEvent getDeathSound() { return SoundEvents.BLOCK_LAVA_EXTINGUISH; }
+    @Override
+    public boolean hasNoGravity() { return true; }
     public static DefaultAttributeContainer.Builder createDetectorAttributes() {
         return DefaultAttributeContainer.builder()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 10)
@@ -148,11 +155,32 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable {
     }
     @Override
     protected Box calculateBoundingBox() { // Centered around 0,0,0 instead of 0,0.5,0
-        if (hasExploded()) return new Box(0, 0, 0, 0, 0.1, 0);
-        return new Box(getX() + 0.5, getY() + 0.5, getZ() + 0.5, getX() - 0.5, getY() - 0.5, getZ() - 0.5);
+        double x = getX();
+        double y = getY();
+        double z = getZ();
+        double s = hasExploded() ? 0.1 : 0.5;
+        return new Box(x + s, y + s, z + s, x - s, y - s, z - s);
     }
 
-
+    @Override
+    public void writeCustomDataToNbt(NbtCompound tag) {
+        super.writeCustomDataToNbt(tag);
+        boolean ownerIsPlayer = owner instanceof PlayerEntity;
+        tag.putBoolean("playerOwner", ownerIsPlayer);
+        if (ownerIsPlayer)
+            tag.putUuid("ownerUUID", owner.getUuid());
+        else
+            tag.putInt("ownerID", owner.getId());
+    }
+    @Override
+    public void readCustomDataFromNbt(NbtCompound tag) {
+        super.readCustomDataFromNbt(tag);
+        boolean ownerIsPlayer = tag.getBoolean("playerOwner");
+        if (ownerIsPlayer)
+            owner = world.getPlayerByUuid(tag.getUuid("ownerUUID"));
+        else
+            owner = (LivingEntity) world.getEntityById(tag.getInt("ownerID")); // Always is living
+    }
     @Override
     public Iterable<ItemStack> getArmorItems() { return List.of(); }
     @Override

@@ -470,11 +470,9 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
 
                     // Player Half-Ball controls
                     if (user instanceof ServerPlayerEntity serverPlayer) {
-                        if (lastRemoteInputTime - age > 4) {
-                            updateRemoteInputs(0, 0, false);
-                        }
+                        if (lastRemoteInputTime - age > 4) updateRemoteInputs(0, 0, false);
 
-                        if (!blocking) {
+                        if (!blocking && !user.hasStatusEffect(JStatusRegister.DAZED)) {
                             Vec3d eP = user.getEyePos();
                             Vec3d groundPos = world.raycast(
                                     new RaycastContext(eP, eP.add(0, -24, 0), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user)

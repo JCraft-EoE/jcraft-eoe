@@ -399,6 +399,54 @@
     ]
   },
 
+  "mrsummon": {
+    "sounds": [
+      "jcraft:mrsummon"
+    ]
+  },
+
+  "mrbarrage": {
+    "sounds": [
+      "jcraft:mrbarrage"
+    ]
+  },
+
+  "mrcrossfire": {
+    "sounds": [
+      "jcraft:mrcrossfire"
+    ]
+  },
+
+  "mrdetector": {
+    "sounds": [
+      "jcraft:mrdetector"
+    ]
+  },
+
+  "mrheavy": {
+    "sounds": [
+      "jcraft:mrheavy"
+    ]
+  },
+
+  "mrredirect": {
+    "sounds": [
+      "jcraft:mrredirect"
+    ]
+  },
+
+  "mrult": {
+    "sounds": [
+      "jcraft:mrult"
+    ]
+  },
+
+  "mrredbind": {
+    "sounds": [
+      "jcraft:mrredbind"
+    ]
+  },
+
   "cmoongravpunch": {
     "sounds": [
       "jcraft:cmoongravpunch"
