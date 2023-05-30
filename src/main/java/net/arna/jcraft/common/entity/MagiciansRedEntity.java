@@ -20,12 +20,15 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.IAnimationTickable;
 import software.bernie.geckolib3.core.PlayState;
@@ -45,7 +48,7 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
             .setInfo("Punch", "quick combo starter");
     public static Attack heavy = new Attack(17, 1f, 22, 12, 1.75, 7f, 0.5f, AttackType.BOX, 0, 0.6f, 0, JSoundRegister.TW_KICK_HIT)
             .setInfo("Low Kick", "knockdown provider, medium windup");
-    public static Attack barrage = new Attack(17, 0.75f, 60, 0, 2, 0.5f, 0.25f, AttackType.BARRAGE, 1.5f, 0, 3)
+    public static Attack barrage = new Attack(17, 0.75f, 60, 0, 2, 0.4f, 0.25f, AttackType.BARRAGE, 1.5f, 0, 3)
             .setInfo("Flamethrower", "fast reliable combo starter/extender, high stun, burns");
     public static Attack crossfire = new Attack(20, 0.75f, 10, 8, 0, 0f, 0f, AttackType.BOX)
             .setRanged(true)
@@ -91,23 +94,19 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
                 "    Hurricane>[opponent in air]Barrage>M1>Crossfire>Red Bind>M1>Low Kick>Variation\n" +
                 "    Red Bind>M1>Barrage>M1>Crossfire>Low Kick>Hurricane+Variation";
 
-        moves = List.of(light, heavy, barrage, crossfire, crossfirehurricane, crossfirevariation, redirect, redbind);
+        moves = List.of(light, heavy, barrage, crossfire, crossfirehurricane, crossfirevariation, redirect, detector);
     }
 
     // Moveset
     @Override
     public void initLightAttack() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
     public void initHeavyAttack() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(heavy, JCraft.standHeavyCD, 4)) {
             //this.playSound(ModSoundRegister.MR_HEAVY,1, 1);
         }
@@ -115,9 +114,7 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
 
     @Override
     public void initBarrage() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
             //this.playSound(ModSoundRegister.STAR_PLATINUM_BARRAGE,1, 1);
         }
@@ -125,9 +122,7 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
 
     @Override
     public void initSpecial1() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(crossfire, JCraft.standS1CD, 6)) {
 
         }
@@ -135,9 +130,7 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
 
     @Override
     public void initUlt() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(crossfirehurricane, JCraft.standUltCD, 7)) {
 
         }
@@ -145,9 +138,7 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
 
     @Override
     public void initSpecial2() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(crossfirevariation, JCraft.standS2CD, 8)) {
 
         }
@@ -155,9 +146,7 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
 
     @Override
     public void initSpecial3() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(redirect, JCraft.standS3CD, 9)) {
 
         }
@@ -219,9 +208,9 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
                     }
                 }
             } else if (attack == detector) {
-                LifeDetector lifeDetector = new LifeDetector(JEntityTypeRegister.LIFE_DETECTOR,world);
+                LifeDetectorEntity lifeDetector = new LifeDetectorEntity(JEntityTypeRegister.LIFE_DETECTOR,world);
                 lifeDetector.setOwner(user);
-                lifeDetector.setPosition(eyePos);
+                lifeDetector.refreshPositionAndAngles(getX(), getY() + 1.5, getZ(), getYaw(), getPitch());
                 world.spawnEntity(lifeDetector);
             }
         }
@@ -341,6 +330,7 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
             case 8 -> controller.setAnimation(builder.playAndHold("animation.mr.crossfirevariation"));
             case 9 -> controller.setAnimation(builder.playAndHold("animation.mr.redirect"));
             case 10 -> controller.setAnimation(builder.playAndHold("animation.mr.redbind"));
+            case 11 -> controller.setAnimation(builder.playAndHold("animation.mr.detector"));
 
             //default -> throw new IllegalStateException("Unexpected value: " + this.getState());
         }

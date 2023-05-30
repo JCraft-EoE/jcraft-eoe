@@ -3,7 +3,7 @@
 	"minecraft:geometry": [
 		{
 			"description": {
-				"identifier": "geometry.ankh",
+				"identifier": "geometry.detector",
 				"texture_width": 26,
 				"texture_height": 26,
 				"visible_bounds_width": 3,
@@ -15,15 +15,57 @@
 					"name": "dtec",
 					"pivot": [0, 0, 0],
 					"cubes": [
-						{"origin": [-1, -7, -1], "size": [2, 14, 2], "uv": [18, 0]},
-						{"origin": [-1, -7, -1], "size": [2, 14, 2], "pivot": [0, 0, 0], "rotation": [-90, 0, 0], "uv": [18, 0]},
-						{"origin": [-1, -7, -1], "size": [2, 14, 2], "pivot": [0, 0, 0], "rotation": [0, 90, 90], "uv": [18, 0]},
-						{"origin": [-2, -2, 4], "size": [4, 4, 4], "uv": [0, 0]},
-						{"origin": [-2, -2, -8], "size": [4, 4, 4], "uv": [0, 0]},
-						{"origin": [-2, 4, -2], "size": [4, 4, 4], "uv": [0, 0]},
-						{"origin": [-2, -8, -2], "size": [4, 4, 4], "uv": [0, 0]},
-						{"origin": [-8, -2, -2], "size": [4, 4, 4], "uv": [0, 0]},
-						{"origin": [4, -2, -2], "size": [4, 4, 4], "uv": [0, 0]}
+						{"origin": [-1, -8, -1], "size": [2, 16, 2], "uv": [18, 0]},
+						{"origin": [-1, -8, -1], "size": [2, 16, 2], "pivot": [0, 0, 0], "rotation": [-90, 0, 0], "uv": [18, 0]},
+						{"origin": [-1, -8, -1], "size": [2, 16, 2], "pivot": [0, 0, 0], "rotation": [0, 90, 90], "uv": [18, 0]}
+					]
+				},
+				{
+					"name": "end1",
+					"parent": "dtec",
+					"pivot": [0, 0, 7],
+					"cubes": [
+						{"origin": [-2, -2, 5], "size": [4, 4, 4], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "end2",
+					"parent": "dtec",
+					"pivot": [0, 0, -7],
+					"cubes": [
+						{"origin": [-2, -2, -9], "size": [4, 4, 4], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "end3",
+					"parent": "dtec",
+					"pivot": [0, 7, 0],
+					"cubes": [
+						{"origin": [-2, 5, -2], "size": [4, 4, 4], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "end4",
+					"parent": "dtec",
+					"pivot": [0, -7, 0],
+					"cubes": [
+						{"origin": [-2, -9, -2], "size": [4, 4, 4], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "end5",
+					"parent": "dtec",
+					"pivot": [-7, 0, 0],
+					"cubes": [
+						{"origin": [-9, -2, -2], "size": [4, 4, 4], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "end6",
+					"parent": "dtec",
+					"pivot": [7, 0, 0],
+					"cubes": [
+						{"origin": [5, -2, -2], "size": [4, 4, 4], "uv": [0, 0]}
 					]
 				}
 			]
