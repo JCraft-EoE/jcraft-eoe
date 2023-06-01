@@ -15,14 +15,18 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import software.bernie.geckolib3.core.processor.IBone;
 import software.bernie.geckolib3.model.AnimatedTickingGeoModel;
@@ -151,6 +155,39 @@ public final class JCraftUtils {
         }
 
         return playerSpec.getSpec();
+    }
+
+    public enum RaycastPriority {
+        ENTITY,
+        BLOCK,
+        NEAREST
+    }
+
+    //todo: generic raycast that hits entities and blocks
+    public static Vec3d raycastAll(Entity entity, Vec3d start, Vec3d end, RaycastContext.FluidHandling fluidHandling, RaycastPriority priority) {
+        Vec3d ePos = entity.getEyePos();
+        World world = entity.getWorld();
+        double rangeSquared = start.squaredDistanceTo(end);
+
+        EntityHitResult eHit = ProjectileUtil.raycast(entity, start, end,
+                entity.getBoundingBox().expand(rangeSquared), // Not technically necessary but doesn't matter
+                EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR,
+                rangeSquared
+        );
+        HitResult bHit = world.raycast(new RaycastContext(start, end, RaycastContext.ShapeType.COLLIDER, fluidHandling, entity));
+
+        switch (priority) {
+            default -> {
+                if (eHit != null) return eHit.getPos();
+                return bHit.getPos();
+            }
+            case BLOCK -> {
+                if (bHit.getType() != HitResult.Type.MISS) return bHit.getPos();
+                // STOPPED HERE
+            }
+        }
+
+        return Vec3d.ZERO; //THIS IS A TERRIBLE IDEA!!!!!
     }
 
     public static void ProjectileDamageLogic(ProjectileEntity proj, World world, Entity ent, Vec3d kb, int stunT, int stunType, boolean overrideStun, float damage) {

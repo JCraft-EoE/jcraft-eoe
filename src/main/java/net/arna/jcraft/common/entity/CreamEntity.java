@@ -483,7 +483,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
 
                             double groundDist = groundPos.distanceTo(pos);
                             double stabilization = user.getVelocity().y;
-                            if (stabilization < 0) stabilization *= -0.5;
+                            if (stabilization < 0) stabilization *= -0.75;
                             else stabilization = 0;
 
                             if (getRemoteJumpInput() && groundDist < 3)

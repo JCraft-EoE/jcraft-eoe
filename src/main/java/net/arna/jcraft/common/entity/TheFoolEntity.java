@@ -144,32 +144,27 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
     }
 
     @Override
-    public void standBlock(LivingEntity player) {
-        if (player == null) {
-            return;
-        }
+    public void standBlock() {
+        LivingEntity user = getUser();
+        if (user == null) return;
 
         // The Fool does a special block depending on your height
-        boolean sand = player.getHeight() < 1.8f;
+        boolean sand = user.getHeight() < 1.8f;
         this.setSand(sand);
-        if (sand) {
-            this.setDistanceOffset(0);
-        }
+        if (sand) this.setDistanceOffset(0);
 
         // Projectile deflection
         List<ProjectileEntity> toDeflect = this.world.getEntitiesByClass(ProjectileEntity.class, this.getBoundingBox().expand(0.75f), EntityPredicates.VALID_ENTITY);
 
         for (ProjectileEntity projectile : toDeflect) {
-            if (projectile.getOwner() == player) {
-                continue;
-            }
+            if (projectile.getOwner() == user) continue;
             projectile.setVelocity(projectile.getVelocity().multiply(-0.5).add(0, -0.1, 0));
             projectile.velocityModified = true;
         }
 
-        player.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 2, 9, false, false, true));
-        stun(player, 2, 2);
-        player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 5, 4, false, false, true));
+        user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 2, 9, false, false, true));
+        stun(user, 2, 2);
+        user.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 5, 4, false, false, true));
     }
 
     // Moveset

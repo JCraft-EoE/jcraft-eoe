@@ -8,6 +8,8 @@ import net.arna.jcraft.common.util.JCraftUtils;
 import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -101,9 +103,8 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
     @Override
     public void initBarrage() {
         if (!this.canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
+        if (handleAttack(barrage, JCraft.standBarrageCD, 5))
             this.playSound(JSoundRegister.GE_BARRAGE, 1, 1);
-        }
     }
 
     @Override
@@ -161,6 +162,20 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
             this.playSound(JSoundRegister.GE_TREE, 1, 1);
     }
 
+    /*
+    @Override
+    public boolean allowUtilityUse() { // Disables using the utility while sneaking, allowing menu control
+        if (getUser().isSneaking()) return false;
+        return super.allowUtilityUse();
+    }
+    @Environment(EnvType.CLIENT)
+    boolean inMenu = false;
+    @Override
+    public void initClientUtility() {
+        inMenu = true;
+    }
+     */
+
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
         LivingEntity user = this.getUser();
@@ -185,7 +200,7 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
             case (5) -> {
                 GETreeEntity tree = new GETreeEntity(JEntityTypeRegister.GE_TREE, world);
                 tree.owner = user;
-                tree.copyPositionAndRotation(this);
+                tree.refreshPositionAndAngles(getX(), getY(), getZ(), getYaw(), 0);
                 this.world.spawnEntity(tree);
             }
             case (6) -> {

@@ -1,8 +1,6 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.registry.JEntityTypeRegister;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -25,9 +23,6 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 
 public class BloodProjectile extends PersistentProjectileEntity implements IAnimatable {
-    private int ticksInAir;
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
-
     public BloodProjectile(EntityType<? extends BloodProjectile> entityType, World world) {
         super(entityType, world);
         this.pickupType = PickupPermission.DISALLOWED;
@@ -40,39 +35,16 @@ public class BloodProjectile extends PersistentProjectileEntity implements IAnim
     }
 
     @Override
-    public void registerControllers(AnimationData data) {
-    }
-
-    @Override
-    public AnimationFactory getFactory() {
-        return this.factory;
-    }
-
-    @Override
-    public ItemStack asItemStack() {
-        return ItemStack.EMPTY;
-    }
-
-    @Override
     protected void age() {
-        if (!this.inGround) {
-            if (this.ticksInAir++ >= 160)
-                this.remove(RemovalReason.DISCARDED);
-        } else {
-            this.remove(RemovalReason.DISCARDED);
-        }
+        this.remove(RemovalReason.DISCARDED);
     }
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
         Entity owner = this.getOwner();
-        if (owner == null) {
-            return;
-        }
+        if (owner == null) return;
         Entity entity = entityHitResult.getEntity();
-        if (owner.hasPassenger(entity) || entity == owner) {
-            return;
-        }
+        if (owner.hasPassenger(entity) || entity == owner) return;
 
         if (entity instanceof LivingEntity living) {
             damageLogic(world, living, Vec3d.ZERO, 10, 1, false, 2f, false, DamageSource.thrownProjectile(this, owner), owner);
@@ -87,31 +59,14 @@ public class BloodProjectile extends PersistentProjectileEntity implements IAnim
     }
 
     @Override
-    public void setVelocity(double x, double y, double z, float speed, float divergence) {
-        super.setVelocity(x, y, z, speed, divergence);
-        this.ticksInAir = 0;
-    }
-
+    public ItemStack asItemStack() { return ItemStack.EMPTY; }
     @Override
-    public void writeCustomDataToNbt(NbtCompound tag) {
-        super.writeCustomDataToNbt(tag);
-        tag.putShort("life", (short) this.ticksInAir);
-    }
+    public boolean hasNoGravity() { return false; }
 
+    // Animations
+    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
     @Override
-    public void readCustomDataFromNbt(NbtCompound tag) {
-        super.readCustomDataFromNbt(tag);
-        this.ticksInAir = tag.getShort("life");
-    }
-
+    public void registerControllers(AnimationData data) { }
     @Override
-    @Environment(EnvType.CLIENT)
-    public boolean shouldRender(double distance) {
-        return true;
-    }
-
-    @Override
-    public boolean hasNoGravity() {
-        return false;
-    }
+    public AnimationFactory getFactory() { return this.factory; }
 }

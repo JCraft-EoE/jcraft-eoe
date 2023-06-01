@@ -170,7 +170,7 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
-        if (attack.id == chargebarrage.id && entities.size() > 0) { // Lock-on
+        if (curAttack != null && !entities.isEmpty() && attack.id == chargebarrage.id) { // Lock-on
             Vec3d avgPos = Vec3d.ZERO;
             float c = 0;
             for (LivingEntity ent : entities) {

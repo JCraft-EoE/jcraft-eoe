@@ -7,6 +7,7 @@ import net.arna.jcraft.client.hud.JCraftHudOverlay;
 import net.arna.jcraft.client.net.ClientPacketHandler;
 import net.arna.jcraft.client.registry.JClientEventsRegistry;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
+import net.arna.jcraft.common.JConfig;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.ShaderDeactivationPacket;
@@ -138,10 +139,25 @@ public class JCraftClient implements ClientModInitializer {
         MinecraftClient client = MinecraftClient.getInstance();
         ClientPlayerEntity player = client.player;
         ticksSinceCounted += 1;
-        int maxX = (int) (client.getWindow().getScaledWidth() * 0.75);
-        int maxY = (int) (client.getWindow().getScaledHeight() * 0.85);
-        int midX = (client.getWindow().getScaledWidth() / 2);
-        int midY = (client.getWindow().getScaledHeight() / 2);
+        int selectedX = client.getWindow().getScaledWidth();
+        int selectedY = client.getWindow().getScaledHeight();
+
+        switch (JConfig.UI_POSITION) {
+            case LEFT -> {
+                selectedX *= 0.1f;
+                selectedY /= 20f;
+            }
+
+            case MIDDLE -> {
+                selectedX *= 0.55f;
+                selectedY /= 3f;
+            }
+
+            case RIGHT -> {
+                selectedX *= 0.75f;
+                selectedY /= 2.25f;
+            }
+        }
 
         int i = 0;
         TextRenderer textRenderer = client.inGameHud.getTextRenderer();
@@ -156,8 +172,8 @@ public class JCraftClient implements ClientModInitializer {
             textRenderer.drawWithShadow(
                     matrixStack,
                     remark + " - " + comboCounter,
-                    maxX + (ticksSinceCounted < 5 ? player.getRandom().nextFloat() * 5f : 0),
-                    midY * (1.15f) + (ticksSinceCounted < 5 ? player.getRandom().nextFloat() * 5f : 0),
+                    selectedX + (ticksSinceCounted < 5 ? player.getRandom().nextFloat() * 5f : 0),
+                    selectedY * (1.15f) + (ticksSinceCounted < 5 ? player.getRandom().nextFloat() * 5f : 0),
                     ColorUtils.HSBAtoRGBA(comboCounter / 360f - 1f, 1f, 1f, 0.8f)
                     , true
             );
@@ -231,7 +247,7 @@ public class JCraftClient implements ClientModInitializer {
                     }
                 }
 
-                float offsetY = midY * (1.25f) + (isSpec ? 9 * (i - 9) : 9 * i);
+                float offsetY = selectedY * (1.25f) + (isSpec ? 9 * (i - 9) : 9 * i);
 
                         /*
                         RenderSystem.setShaderTexture(0, BIND_BG);
@@ -241,7 +257,7 @@ public class JCraftClient implements ClientModInitializer {
                 textRenderer.drawWithShadow(
                         matrixStack,
                         finalText,
-                        maxX + xOffset,
+                        selectedX + xOffset,
                         offsetY,
                         ColorUtils.HSBAtoRGBA(0.3f - (float) (double) cooldown * 10f / 720f, (cooldown < 1.6) ? 0.0f : 1.0f, 1.0f, (cooldown < 1.6) ? 1.0f : defaultAlpha)
                         , true
@@ -255,8 +271,15 @@ public class JCraftClient implements ClientModInitializer {
         GameOptions go = MinecraftClient.getInstance().options;
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
 
-        if (go != null && player != null) {
-            if (player.isAlive()) {
+        if (player != null) {
+            boolean standOn = false;
+            StandEntity stand = null;
+            if (player.getFirstPassenger() instanceof StandEntity s) {
+                standOn = true;
+                stand = s;
+            }
+
+            if (player.isAlive()) { // Send movement inputs to server
                 PacketByteBuf buf = PacketByteBufs.create();
                 buf.writeShort(0);
                 buf.writeBoolean(go.forwardKey.isPressed()); // W
@@ -265,85 +288,93 @@ public class JCraftClient implements ClientModInitializer {
                 buf.writeBoolean(go.rightKey.isPressed()); // D
                 buf.writeBoolean(go.jumpKey.isPressed()); // Space
                 sendStandControlPacket(buf);
-            } else {
+            } else { // Reset cooldowns on death
                 clientCooldowns = DefaultedList.ofSize(JCraft.cooldowns.size(), 0.0);
             }
 
-            if (player.getFirstPassenger() instanceof StandEntity) {
-                // Block (3)
+            // (De)summon (1)
+            if (standSummon.wasPressed()) {
                 PacketByteBuf buf = PacketByteBufs.create();
-                boolean rmb = go.useKey.wasPressed() || go.useKey.isPressed();
-                buf.writeShort(3);
-                buf.writeBoolean(rmb);
+                buf.writeShort(1);
                 sendStandControlPacket(buf);
             }
-
             // Light attack (2)
             if (go.attackKey.isPressed()) { // wasPressed() simply doesn't work
                 PacketByteBuf buf = PacketByteBufs.create();
                 buf.writeShort(2);
                 sendStandControlPacket(buf);
             }
-            // Middle Click (10)
+            // Block (3)
+            if (standOn) {
+                PacketByteBuf buf = PacketByteBufs.create();
+                boolean rmb = go.useKey.wasPressed() || go.useKey.isPressed();
+                buf.writeShort(3);
+                buf.writeBoolean(rmb);
+                sendStandControlPacket(buf);
+            }
+            // Heavy (4)
+            if (heavyKey.isPressed()) {
+                PacketByteBuf buf = PacketByteBufs.create();
+                buf.writeShort(4);
+                sendStandControlPacket(buf);
+            }
+            // Barrage (5)
+            if (barrageKey.isPressed()) {
+                PacketByteBuf buf = PacketByteBufs.create();
+                buf.writeShort(5);
+                sendStandControlPacket(buf);
+            }
+            // Special 1 (6)
+            if (special1Key.wasPressed()) {
+                PacketByteBuf buf = PacketByteBufs.create();
+                buf.writeShort(6);
+                sendStandControlPacket(buf);
+            }
+            // Ult (7)
+            if (ultKey.wasPressed()) {
+                PacketByteBuf buf = PacketByteBufs.create();
+                buf.writeShort(7);
+                sendStandControlPacket(buf);
+            }
+            // Special 2 (8)
+            if (special2Key.wasPressed()) {
+                PacketByteBuf buf = PacketByteBufs.create();
+                buf.writeShort(8);
+                sendStandControlPacket(buf);
+            }
+            // Special 3 (9)
+            if (special3Key.wasPressed()) {
+                PacketByteBuf buf = PacketByteBufs.create();
+                buf.writeShort(9);
+                sendStandControlPacket(buf);
+            }
+            // Utility (10)
             if (utility.isPressed()) {
                 PacketByteBuf buf = PacketByteBufs.create();
                 buf.writeShort(10);
+                /*
+                if (standOn) {
+                    if (stand.allowUtilityUse())
+                        sendStandControlPacket(buf);
+                    else
+                        stand.initClientUtility();
+                } else {
+                 */
+                    sendStandControlPacket(buf);
+                //}
+            }
+            // Combo Breaker (11)
+            if (comboBreaker.isPressed()) {
+                PacketByteBuf buf = PacketByteBufs.create();
+                buf.writeShort(11);
                 sendStandControlPacket(buf);
             }
-        }
-        // (De)summon (1)
-        if (standSummon.wasPressed()) {
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(1);
-            sendStandControlPacket(buf);
-        }
-        // Heavy (4)
-        if (heavyKey.isPressed()) {
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(4);
-            sendStandControlPacket(buf);
-        }
-        // Barrage (5)
-        if (barrageKey.isPressed()) {
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(5);
-            sendStandControlPacket(buf);
-        }
-        // Special 1 (6)
-        if (special1Key.wasPressed()) {
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(6);
-            sendStandControlPacket(buf);
-        }
-        // Ult (7)
-        if (ultKey.wasPressed()) {
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(7);
-            sendStandControlPacket(buf);
-        }
-        // Special 2 (8)
-        if (special2Key.wasPressed()) {
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(8);
-            sendStandControlPacket(buf);
-        }
-        // Special 3 (9)
-        if (special3Key.wasPressed()) {
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(9);
-            sendStandControlPacket(buf);
-        }
-        // Combo Breaker (11)
-        if (comboBreaker.isPressed()) {
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(11);
-            sendStandControlPacket(buf);
-        }
-        // Cooldown Cancel (13)
-        if (cooldownCancel.wasPressed()) {
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(13);
-            sendStandControlPacket(buf);
+            // Cooldown Cancel (13)
+            if (cooldownCancel.wasPressed()) {
+                PacketByteBuf buf = PacketByteBufs.create();
+                buf.writeShort(13);
+                sendStandControlPacket(buf);
+            }
         }
     }
 
@@ -361,57 +392,4 @@ public class JCraftClient implements ClientModInitializer {
 
         return StringUtils.capitalize(secondLast) + StringUtils.capitalize(last);
     }
-
-    /*
-    public static class EntityPacketOnClient {
-        @Environment(EnvType.CLIENT)
-        public static void onPacket(PacketContext context, PacketByteBuf byteBuf) {
-            EntityType<?> type = Registries.ENTITY_TYPE.get(byteBuf.readVarInt());
-            UUID entityUUID = byteBuf.readUuid();
-            int entityID = byteBuf.readVarInt();
-            double x = byteBuf.readDouble();
-            double y = byteBuf.readDouble();
-            double z = byteBuf.readDouble();
-            float pitch = (byteBuf.readByte() * 360) / 256.0F;
-            float yaw = (byteBuf.readByte() * 360) / 256.0F;
-            context.getTaskQueue().execute(() -> {
-                @SuppressWarnings("resource")
-                ClientWorld world = MinecraftClient.getInstance().world;
-                Entity entity = type.create(world);
-                if (entity != null) {
-                    entity.updatePosition(x, y, z);
-                    entity.updateTrackedPosition(x, y, z);
-                    entity.setPitch(pitch);
-                    entity.setYaw(yaw);
-                    entity.setId(entityID);
-                    entity.setUuid(entityUUID);
-                    world.addEntity(entityID, entity);
-                }
-            });
-        }
-    }
-
-    public static class EntityPacket {
-        public static final Identifier ID = new Identifier(JCraft.MOD_ID, "spawn_entity");
-
-        public static Packet<ClientPlayPacketListener> createPacket(Entity entity) {
-            PacketByteBuf buf = createBuffer();
-            buf.writeVarInt(Registries.ENTITY_TYPE.getRawId(entity.getType()));
-            buf.writeUuid(entity.getUuid());
-            buf.writeVarInt(entity.getId());
-            buf.writeDouble(entity.getX());
-            buf.writeDouble(entity.getY());
-            buf.writeDouble(entity.getZ());
-            buf.writeByte(MathHelper.floor(entity.getPitch() * 256.0F / 360.0F));
-            buf.writeByte(MathHelper.floor(entity.getYaw() * 256.0F / 360.0F));
-            buf.writeFloat(entity.getPitch());
-            buf.writeFloat(entity.getYaw());
-            return ServerPlayNetworking.createS2CPacket(ID, buf);
-        }
-
-        private static PacketByteBuf createBuffer() {
-            return new PacketByteBuf(Unpooled.buffer());
-        }
-    }
-     */
 }

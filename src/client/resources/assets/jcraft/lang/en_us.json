@@ -86,5 +86,12 @@
   "subtitles.jcraft.sptw": "Star Platinum: The World!",
   "subtitles.jcraft.twohts": "The World: Over Heaven!",
 
+  "jcraft.midnightconfig.title": "JCraft Config",
+  "jcraft.midnightconfig.ANIME_VOICES": "Enable Anime Voicelines",
+  "jcraft.midnightconfig.UI_POSITION": "UI Position",
+  "jcraft.midnightconfig.enum.UIPos.RIGHT": "Right",
+  "jcraft.midnightconfig.enum.UIPos.LEFT": "Left",
+  "jcraft.midnightconfig.enum.UIPos.MIDDLE": "Middle",
+
   "jcraft.disc.error": "Cannot use disc while in combat!"
 }

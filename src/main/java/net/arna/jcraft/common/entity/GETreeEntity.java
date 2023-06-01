@@ -14,6 +14,8 @@ import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.IAnimationTickable;
 import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import software.bernie.geckolib3.core.builder.ILoopType;
+import software.bernie.geckolib3.core.builder.ILoopType.EDefaultLoopTypes;
 import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
@@ -23,39 +25,11 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 import java.util.List;
 
 public class GETreeEntity extends Entity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
     public LivingEntity owner;
 
-    public GETreeEntity(EntityType<? extends Entity> type, World world) {
-        super(type, world);
-    }
-
+    public GETreeEntity(EntityType<? extends Entity> type, World world) { super(type, world); }
     @Override
-    protected void initDataTracker() {
-    }
-
-    @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController(this, "controller", 0, this::predicate));
-    }
-
-    @Override
-    public AnimationFactory getFactory() {
-        return this.animationFactory;
-    }
-
-    @Override
-    public int tickTimer() {
-        return age;
-    }
-
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        AnimationController controller = event.getController();
-        AnimationBuilder builder = new AnimationBuilder();
-        controller.setAnimation(builder.addAnimation("animation.getree.spawn").addAnimation("animation.getree.idle").addAnimation("animation.getree.return"));
-        return PlayState.CONTINUE;
-    }
+    protected void initDataTracker() { }
 
     @Override
     public void tick() {
@@ -66,9 +40,8 @@ public class GETreeEntity extends Entity implements IAnimatable, IAnimationTicka
                 List<LivingEntity> hurt = JCraftUtils.GenerateHitbox(world, getPos().add(0, 1, 0), 2.5, null);
                 for (LivingEntity living :
                         hurt) {
-                    if (living != owner && living.getVehicle() != owner) {
+                    if (living != owner && living.getVehicle() != owner)
                         StandEntity.damageLogic(world, living, new Vec3d(0, 1, 0), 25, 1, false, 7f, true, DamageSource.mob(owner), owner);
-                    }
 
                     living.setVelocity(0, 1, 0);
                     living.velocityModified = true;
@@ -94,4 +67,23 @@ public class GETreeEntity extends Entity implements IAnimatable, IAnimationTicka
         return new EntitySpawnS2CPacket(this);
     }
 
+    // Animations
+    AnimationFactory factory = GeckoLibUtil.createFactory(this);
+    @Override
+    public AnimationFactory getFactory() { return this.factory; }
+    @Override
+    public void registerControllers(AnimationData animationData) { animationData.addAnimationController(new AnimationController(this, "controller", 0, this::predicate)); }
+    @Override
+    public int tickTimer() { return age; }
+    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+        AnimationController controller = event.getController();
+        if (controller.getCurrentAnimation() == null) {
+            controller.setAnimation(
+                    new AnimationBuilder().addAnimation("animation.getree.spawn", EDefaultLoopTypes.PLAY_ONCE)
+                            .addAnimation("animation.getree.idle", EDefaultLoopTypes.PLAY_ONCE)
+                            .addAnimation("animation.getree.return", EDefaultLoopTypes.PLAY_ONCE)
+            );
+        }
+        return PlayState.CONTINUE;
+    }
 }

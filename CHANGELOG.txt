@@ -628,12 +628,24 @@ The World
     >Donut
         >Damage reduced (14->9)
         >Stun on whiff reduced (3->1.5s)
+Cream
+    >Improved hovering during half-ball mode
 Silver Chariot
     >Beatdown stun on whiff reduced (4.5->1.5s)
+Magician's Red
+    >Improved rendering on Life Detector
 Whitesnake
     >Cooldown on Pilot Mode reduced (3->1.5s)
 Golden Experience
     >Remodeled and reanimated
+
+● 1/6/2023
+>Added config option that allows the HUD to be repositioned
+
+Projectiles
+    >optimized code
+    >fixed bug where they wouldn't disappear
+
 
 priority (top to bottom)
 TODO: ability to position the HUD

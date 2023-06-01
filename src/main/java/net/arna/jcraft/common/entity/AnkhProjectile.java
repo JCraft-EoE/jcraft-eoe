@@ -3,8 +3,6 @@ package net.arna.jcraft.common.entity;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.util.JCraftUtils;
 import net.arna.jcraft.registry.JEntityTypeRegister;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -16,16 +14,12 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
-
-import java.util.Random;
 
 public class AnkhProjectile extends PersistentProjectileEntity implements IAnimatable {
 
@@ -33,8 +27,6 @@ public class AnkhProjectile extends PersistentProjectileEntity implements IAnima
     private boolean variation = false;
     private double orbitRange = 3;
     private double orbitOffset = 0;
-
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
     public AnkhProjectile(EntityType<? extends AnkhProjectile> entityType, World world) {
         super(entityType, world);
@@ -53,12 +45,6 @@ public class AnkhProjectile extends PersistentProjectileEntity implements IAnima
         this.variation = variation;
     }
 
-    @Override
-    public void registerControllers(AnimationData data) { }
-    @Override
-    public AnimationFactory getFactory() {
-        return this.factory;
-    }
     @Override
     public ItemStack asItemStack() {
         return new ItemStack(Items.AIR);
@@ -83,18 +69,6 @@ public class AnkhProjectile extends PersistentProjectileEntity implements IAnima
         JCraftUtils.ProjectileDamageLogic(this, world, entity, Vec3d.ZERO, 10, 1, false, 2.5f);
 
         this.remove(RemovalReason.DISCARDED);
-    }
-
-    @Override
-    public void setVelocity(Vec3d velocity) {
-        super.setVelocity(velocity);
-        this.ticksInAir = 0;
-    }
-
-    @Override
-    public void setVelocity(double x, double y, double z, float speed, float divergence) {
-        super.setVelocity(x, y, z, speed, divergence);
-        this.ticksInAir = 0;
     }
 
     @Override
@@ -168,5 +142,14 @@ public class AnkhProjectile extends PersistentProjectileEntity implements IAnima
                 discard();
             }
         }
+    }
+
+    // Animations
+    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+    @Override
+    public void registerControllers(AnimationData data) { }
+    @Override
+    public AnimationFactory getFactory() {
+        return this.factory;
     }
 }

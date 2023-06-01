@@ -231,23 +231,20 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
     }
 
     @Override
-    public void standBlock(LivingEntity player) {
-        if (player == null) {
-            return;
-        }
+    public void standBlock() {
+        LivingEntity user = getUser();
+        if (user == null) return;
         // Projectile deflection
         List<ProjectileEntity> toDeflect = this.world.getEntitiesByClass(ProjectileEntity.class, this.getBoundingBox().expand(0.75f), EntityPredicates.VALID_ENTITY);
 
         for (ProjectileEntity projectile : toDeflect) {
-            if (projectile.getOwner() == player) {
-                continue;
-            }
+            if (projectile.getOwner() == user) continue;
             projectile.setVelocity(projectile.getPos().subtract(this.getPos()).normalize());
             projectile.velocityModified = true;
         }
 
-        stun(player, 2, 2);
-        player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 10, 2, false, false));
+        stun(user, 2, 2);
+        user.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 10, 2, false, false));
     }
 
     @Override

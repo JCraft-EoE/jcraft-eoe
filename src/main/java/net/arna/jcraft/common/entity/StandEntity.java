@@ -9,6 +9,8 @@ import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.mixin.LivingEntityInvoker;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.DamageUtil;
@@ -132,16 +134,16 @@ public abstract class StandEntity extends MobEntity {
     }
 
     private LivingEntity user = null;
-
-    public void setUser(LivingEntity l) {
-        if (user == null)
-            user = l;
+    /**
+     * Sets the stands user if there isn't one
+     */
+    public void setUser(LivingEntity user) {
+        if (this.user == null)
+            this.user = user;
     }
-
     public LivingEntity getUser() {
-        return this.user;
+        return user;
     }
-
     public boolean hasUser() {
         return user != null;
     }
@@ -149,11 +151,15 @@ public abstract class StandEntity extends MobEntity {
     public int getState() {
         return this.dataTracker.get(STATE);
     }
-
+    /**
+     * Sets the stands state directly
+     */
     public void setStateNoReset(int s) {
         this.dataTracker.set(STATE, s);
     }
-
+    /**
+     * Sets the stands state with extra processing
+     */
     public void setState(int s) {
         int state = this.getState();
         this.dataTracker.set(SAMESTATE, state == s || state == 1); // Pretty much just an animation reset flag
@@ -163,7 +169,6 @@ public abstract class StandEntity extends MobEntity {
     public boolean getSameState() {
         return this.dataTracker.get(SAMESTATE);
     }
-
     public void setSameState(boolean samestate) {
         this.dataTracker.set(SAMESTATE, samestate);
     }
@@ -171,7 +176,9 @@ public abstract class StandEntity extends MobEntity {
     public int getMoveStun() {
         return this.dataTracker.get(MOVESTUN);
     }
-
+    /**
+     * Sets how many ticks the stand will be occupied doing an animation for
+     */
     public void setMoveStun(int moveStun) {
         this.dataTracker.set(MOVESTUN, moveStun);
     }
@@ -179,7 +186,9 @@ public abstract class StandEntity extends MobEntity {
     public float getRotationOffset() {
         return this.dataTracker.get(ROTATIONOFFSET);
     }
-
+    /**
+     * Sets the angle of the offset the stand is at relative to the user, used in the cylindrical coordinates system in {@link net.arna.jcraft.mixin.EntityMixin}
+     */
     public void setRotationOffset(float rotationOffset) {
         this.dataTracker.set(ROTATIONOFFSET, rotationOffset);
     }
@@ -187,7 +196,9 @@ public abstract class StandEntity extends MobEntity {
     public float getDistanceOffset() {
         return this.dataTracker.get(DISTANCEOFFSET);
     }
-
+    /**
+     * Sets the distance between the stand and user
+     */
     public void setDistanceOffset(float distanceOffset) {
         this.dataTracker.set(DISTANCEOFFSET, distanceOffset);
     }
@@ -195,7 +206,6 @@ public abstract class StandEntity extends MobEntity {
     public float getAlpha() {
         return this.dataTracker.get(ALPHA);
     }
-
     public void setAlpha(float alpha) {
         this.dataTracker.set(ALPHA, alpha);
     }
@@ -203,7 +213,6 @@ public abstract class StandEntity extends MobEntity {
     public float getStandGauge() {
         return this.dataTracker.get(STANDGAUGE);
     }
-
     public void setStandGauge(float standGauge) {
         this.dataTracker.set(STANDGAUGE, standGauge);
     }
@@ -211,7 +220,9 @@ public abstract class StandEntity extends MobEntity {
     public boolean getFree() {
         return this.dataTracker.get(FREE);
     }
-
+    /**
+     * Changes whether the stand is detached from the user
+     */
     public void setFree(boolean free) {
         this.dataTracker.set(FREE, free);
     }
@@ -225,19 +236,19 @@ public abstract class StandEntity extends MobEntity {
     public double getRemoteForwardInput() {
         return remoteForwardInput;
     }
-
     public double getRemoteSideInput() {
         return remoteSideInput;
     }
-
     public void setRemoteJumpInput(boolean b) {
         remoteJumpInput = b;
     }
-
     public boolean getRemoteJumpInput() {
         return remoteJumpInput;
     }
 
+    /**
+     * Synchronises the user inputs serverside
+     */
     public void updateRemoteInputs(int f, int s, boolean j) {
         // These persist, so implementation for cleaning should be done in the stand code
         Vec3d v = new Vec3d(f, 0, s).normalize();
@@ -260,6 +271,9 @@ public abstract class StandEntity extends MobEntity {
         }
     }
 
+    /**
+     * Puts the stand into remote mode
+     */
     protected void BeginRemote() {
         setFree(true);
         Vec3d fPos = user.getPos().add(user.getRotationVector());
@@ -269,15 +283,36 @@ public abstract class StandEntity extends MobEntity {
         setAlpha(0.1f);
     }
 
+    /**
+     * Ends remote mode instantly
+     */
     protected void endRemote() {
         setFree(false);
         setAlpha(1);
     }
 
+
+    /**
+     * Returns whether the utility should be used by the stand, otherwise calls initClientUtility()
+     */
+    /*@Environment(EnvType.CLIENT)
+    public boolean allowUtilityUse() {
+        return true;
+    }
+    public void initClientUtility() {
+    }
+    */
+
+    /**
+     * Gets the stands position while detached
+     */
     public Vec3f getFreePos() {
         return new Vec3f(this.dataTracker.get(FREEX), this.dataTracker.get(FREEY), this.dataTracker.get(FREEZ));
     }
-
+    /**
+     * Sets the stands position while detached
+     * @param freePos new position
+     */
     public void setFreePos(Vec3f freePos) {
         this.dataTracker.set(FREEX, freePos.getX());
         this.dataTracker.set(FREEY, freePos.getY());
@@ -287,7 +322,9 @@ public abstract class StandEntity extends MobEntity {
     public int getTSTime() {
         return this.dataTracker.get(TIMESTOPTIME);
     }
-
+    /**
+     * Sets the time in ticks time will be stopped for on account of this stand
+     */
     public void setTSTime(int tsTime) {
         this.dataTracker.set(TIMESTOPTIME, tsTime);
     }
@@ -329,6 +366,9 @@ public abstract class StandEntity extends MobEntity {
     }
 
     // Attack controls
+    /**
+     * Returns whether the stand should be able to attack
+     */
     public boolean canAttack() {
         if (hasUser()) {
             ITimeStop timeStop = (ITimeStop) user;
@@ -337,6 +377,9 @@ public abstract class StandEntity extends MobEntity {
         return false;
     }
 
+    /**
+     * Struct used for storing extra information relating to the stands ability to attack
+     */
     public class CanAttackData {
         public LivingEntity user;
         public boolean canAttack;
@@ -347,6 +390,9 @@ public abstract class StandEntity extends MobEntity {
         }
     }
 
+    /**
+     * Returns a {@link CanAttackData} with information relating to the stands ability to attack
+     */
     public CanAttackData canAttackWithData() {
         if (hasUser()) {
             ITimeStop timeStop = (ITimeStop) user;
@@ -355,31 +401,50 @@ public abstract class StandEntity extends MobEntity {
         return new CanAttackData(null, false);
     }
 
+    /**
+     * Initiates an attack with the stand
+     * @param attack attack to handle
+     * @param cooldownName string identifier for which cooldown to start
+     * @param animState int identifier for which state to put the stand into
+     */
     public boolean handleAttack(Attack attack, String cooldownName, int animState) {
         NbtCompound userData = ((IEntityDataSaver) user).getPersistentData();
         int cooldown = userData.getInt(cooldownName);
-        if (cooldown > 0) {
-            return false;
-        }
+        if (cooldown > 0) return false;
         userData.putInt(cooldownName, attack.cooldown * 20);
         this.setAttack(attack, animState);
         return true;
     }
 
+    /**
+     * Instantly sets the stands attack
+     * @param attack attack to set
+     * @param animState int identifier for which state to put the stand into
+     */
     public void setAttack(Attack attack, int animState) {
         this.curAttack = attack;
         this.setMoveStun(attack.moveStun);
         this.setState(animState);
     }
 
+    /**
+     * Stuns specified {@link LivingEntity}
+     * @param entity victim to stun
+     * @param duration in ticks
+     * @param amplifier type of stun
+     */
     public static void stun(LivingEntity entity, int duration, int amplifier) {
-        if (duration == 0) {
-            return;
-        }
+        if (entity == null || duration == 0) return;
         entity.addStatusEffect(new StatusEffectInstance(JStatusRegister.DAZED, duration, amplifier, false, false, true));
         //JCraft.LOGGER.info("Stunned: " + entity.getEntityName() + " for: " + duration);
     }
 
+    /**
+     * Basic damage method, you likely want to use BaseDamageLogic or DamageLogic instead
+     * @param damage damage in half hearts
+     * @param damageSource source of damage
+     * @param ent entity to harm
+     */
     public static void damage(float damage, DamageSource damageSource, LivingEntity ent) {
         ent.damage(damageSource, 0.001f);
 
@@ -426,27 +491,25 @@ public abstract class StandEntity extends MobEntity {
     public void initUlt() {
     }
 
-    // Define what happens within your stand block
-    public void standBlock(LivingEntity player) {
-        if (player == null) {
-            return;
-        }
+    /**
+     * Defines what happens while the stand is blocking
+     */
+    public void standBlock() {
+        if (!hasUser()) return;
         // Projectile deflection
         List<ProjectileEntity> toDeflect = this.world.getEntitiesByClass(ProjectileEntity.class, this.getBoundingBox().expand(0.75f), EntityPredicates.VALID_ENTITY);
 
         for (ProjectileEntity projectile : toDeflect) {
-            if (projectile.getOwner() == player) {
-                continue;
-            }
+            if (projectile.getOwner() == user) continue;
             projectile.setVelocity(projectile.getVelocity().multiply(-0.5).add(0, -0.1, 0));
             projectile.velocityModified = true;
         }
 
-        stun(player, 2, 2);
-        player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 5, 3, false, false, true));
+        stun(user, 2, 2);
+        user.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 5, 3, false, false, true));
     }
 
-    // Define Middle Click Action
+    // Define Middle Click action
     public void initMiddleClick() {
     }
 
@@ -465,31 +528,40 @@ public abstract class StandEntity extends MobEntity {
     public void idleOverride(LivingEntity player) {
     }
 
-    // Define counter action
+    /**
+     * Defines what happens if the stand successfully countered something
+     * @param entity countered entity
+     * @param source exact source of damage
+     */
     public void counter(Entity entity, DamageSource source) {
         this.curAttack = null;
         this.setMoveStun(0);
     }
 
+    /**
+     * Cancels the stands attack instantly
+     */
     public void cancelAttack() {
         this.curAttack = null;
         this.setMoveStun(0);
         this.setState(0);
     }
 
-    // Does the stand default to being near the user?
+    /**
+     * Returns whether the stand defaults to returning to the user while idle and detached
+     */
     public boolean defaultToNear() {
         return !getRemote();
     }
 
-    // Main
+    /**
+     * does evrything :)
+     */
     @Override
     public void tick() {
         super.tick();
 
-        if (this.isDead()) {
-            return;
-        }
+        if (this.isDead()) return;
 
         if (this.user == null) {
             if (world.isClient && this.getVehicle() instanceof LivingEntity living) {
@@ -728,7 +800,7 @@ public abstract class StandEntity extends MobEntity {
                 if (this.getMoveStun() < 4) setMoveStun(4);
                 setDistanceOffset(this.blockDistance);
                 setRotationOffset(this.attackRotation);
-                standBlock(user);
+                standBlock();
             }
         }
 
@@ -779,6 +851,16 @@ public abstract class StandEntity extends MobEntity {
         //this.pastAttack = this.curAttack;
     }
 
+    /**
+     * Highest level damage method, handles combo counting
+     * @param world world to process damage in
+     * @param ent victim
+     * @param kbVec knockback vector to apply
+     * @param stunTicks stun duration in ticks
+     * @param overrideStun will the attack override all other types of stun?
+     * @param damage damage in half hearts
+     * @param lift will the attack lift the victim upon an aerial hit?
+     */
     public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, DamageSource playerSource, Entity attacker) {
         if (world == null || ent == null) return;
         if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && !world.isClient()) {
@@ -809,6 +891,15 @@ public abstract class StandEntity extends MobEntity {
         baseDamageLogic(ent, kbVec, stunTicks, stunType, overrideStun, damage, lift, playerSource, attacker);
     }
 
+    /**
+     * Mid-level damage method, handles blocking, lifting, counters, velocity modification
+     * @param ent victim
+     * @param kbVec knockback vector to apply
+     * @param stunTicks stun duration in ticks
+     * @param overrideStun will the attack override all other types of stun?
+     * @param damage damage in half hearts
+     * @param lift will the attack lift the victim upon an aerial hit?
+     */
     public static void baseDamageLogic(LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, DamageSource source, Entity attacker) {
         boolean hit = true;
 
@@ -893,9 +984,7 @@ public abstract class StandEntity extends MobEntity {
 
     @Override
     public boolean damage(DamageSource source, float amount) {
-        if (source.isMagic() || source.isExplosive()) {
-            return false;
-        }
+        if (source.isMagic() || source.isExplosive()) return false;
         return super.damage(source, amount);
     }
 
@@ -912,17 +1001,13 @@ public abstract class StandEntity extends MobEntity {
         return getUser().addStatusEffect(effect, source);
     }
 
-    // The fun stuff
+    /**
+     * Handles AI for mob stand users
+     */
     public void mobAI(MobEntity mob, LivingEntity target) {
-        if (mob == target) {
-            return;
-        }
-        if (target == null) {
-            return;
-        }
-        if (!target.isAlive()) {
-            return;
-        }
+        if (mob == target) return;
+        if (target == null) return;
+        if (!target.isAlive()) return;
 
         mob.getLookControl().lookAt(target); // Usually detrimental not to
 
@@ -1089,13 +1174,22 @@ public abstract class StandEntity extends MobEntity {
         }
     }
 
+    /**
+     * Tells the AI to:
+     * PASS - ignore this and continue move evaluation
+     * USE - use the move
+     * STOP - skip to next evaluation
+     */
     public enum MoveSelectionResult {
         PASS,
         USE,
         STOP
     }
 
-    // Used to help AIs that use stands with unique moves
+
+    /**
+     * Used to help AIs that use stands with unique moves
+     */
     public MoveSelectionResult SpecificMoveSelectionCriterion(Attack attack, MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity enemyStand, Attack enemyAttack) {
         return MoveSelectionResult.PASS;
     }
@@ -1140,16 +1234,12 @@ public abstract class StandEntity extends MobEntity {
                 chosenMove = i;
                 break;
             }
-            if (result == MoveSelectionResult.STOP) {
-                continue;
-            }
+            if (result == MoveSelectionResult.STOP) continue;
 
             // Use mobility if opponent is far away
             if (attack.mobilityType != null) {
                 // ...and isn't being comboed or is blocking
-                if (stunTicks > 0) {
-                    continue;
-                }
+                if (stunTicks > 0) continue;
 
                 if (attack.mobilityType != MobilityType.HIGHJUMP && distance > 6) {
                     if (target.isOnGround()) {

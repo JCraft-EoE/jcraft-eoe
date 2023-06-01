@@ -28,8 +28,6 @@ public class BubbleProjectile extends PersistentProjectileEntity implements IAni
 
     private int ticksInAir = 0;
 
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
-
     public BubbleProjectile(EntityType<? extends BubbleProjectile> entityType, World world) {
         super(entityType, world);
         this.pickupType = PersistentProjectileEntity.PickupPermission.DISALLOWED;
@@ -38,21 +36,6 @@ public class BubbleProjectile extends PersistentProjectileEntity implements IAni
     public BubbleProjectile(World world, LivingEntity owner) {
         super(JEntityTypeRegister.BUBBLE, owner, world);
         this.setOwner(owner);
-    }
-
-    @Override
-    public void registerControllers(AnimationData data) {
-        data.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
-    }
-
-    @Override
-    public AnimationFactory getFactory() {
-        return this.factory;
-    }
-
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        event.getController().setAnimation(new AnimationBuilder().loop("animation.bubble.idle"));
-        return PlayState.CONTINUE;
     }
 
     @Override
@@ -89,7 +72,6 @@ public class BubbleProjectile extends PersistentProjectileEntity implements IAni
         super.writeCustomDataToNbt(tag);
         tag.putShort("life", (short) this.ticksInAir);
     }
-
     @Override
     public void readCustomDataFromNbt(NbtCompound tag) {
         super.readCustomDataFromNbt(tag);
@@ -101,14 +83,27 @@ public class BubbleProjectile extends PersistentProjectileEntity implements IAni
     public boolean shouldRender(double distance) {
         return true;
     }
-
     @Override
     public boolean hasNoGravity() {
         return true;
     }
-
     @Override
     protected SoundEvent getHitSound() {
         return SoundEvents.BLOCK_BUBBLE_COLUMN_BUBBLE_POP;
+    }
+
+    // Animations
+    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+    @Override
+    public void registerControllers(AnimationData data) {
+        data.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
+    }
+    @Override
+    public AnimationFactory getFactory() {
+        return this.factory;
+    }
+    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+        event.getController().setAnimation(new AnimationBuilder().loop("animation.bubble.idle"));
+        return PlayState.CONTINUE;
     }
 }
