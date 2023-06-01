@@ -39,31 +39,32 @@ import java.util.List;
 public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable, IAnimationTickable {
     AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
-    public static Attack light = new Attack(2, 0.75f, 7, 4, 1.5, 6f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0, JSoundRegister.IMPACT_1)
+    public static Attack light = new Attack(0, 2, 0.75f, 7, 4, 1.5, 6f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
-    public static Attack barrage = new Attack(17, 0.75f, 50, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 2, 0, 3, JSoundRegister.IMPACT_1)
+    public static Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 2, 0, 3, JSoundRegister.IMPACT_1)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public static Attack heavy = new Attack(19, 1f, 22, 10, 2, 0f, 0.0f, AttackType.BOX, 1, 0, 0, JSoundRegister.IMPACT_5).setHitspark(2)
+    public static Attack heavy = new Attack(1, 19, 1f, 22, 10, 2, 0f, 0.0f, AttackType.BOX, 1, 0, 0, JSoundRegister.IMPACT_5).setHitspark(2)
             .setUB(false)
             .setInfo("Singularity", "block bypass, low stun, medium windup");
-    public static Attack smite = new Attack(21, 1f, 20, 10, 0, 0f, 0.0f, AttackType.BOX, 2, 0, 0)
+    public static Attack smite = new Attack(3, 21, 1f, 20, 10, 0, 0f, 0.0f, AttackType.BOX, 2, 0, 0)
             .setInfo("You won't run away!", "summons a heavy stunning lightning bolt at the user/in air summons one at aimed position, launches on hit");
-    public static Attack overwrite = new Attack(45, 1f, 58, 50, 2.5, 0f, 1.0f, AttackType.BOX, 1, 0, 0, JSoundRegister.IMPACT_5).setHitspark(2).setLaunch()
+    public static Attack overwrite = new Attack(6, 45, 1f, 58, 50, 2.5, 0f, 1.0f, AttackType.BOX, 1, 0, 0, JSoundRegister.IMPACT_5).setHitspark(2).setLaunch()
             .setUB(true)
             .setInfo("Reality Overwrite",
-                    "launches with devastating aftereffects\n" +
-                            "    Effects:\n" +
-                            "    >On non-mobs: Weakness III (30s), Wither II (5s), Slowness I (30s)\n" +
-                            "    >On mobs: enslaved and attack anything the user last attacked\n" +
-                            "    >Universal: All defensive effects removed\n" +
-                            "    >Invulnerability removed\n" +
-                            "    >Inability to look at user for 10s");
-    public static Attack knives = new Attack(19, 0.75f, 22, 16, 1.5, 0f, 0.0f, AttackType.BOX).setRanged(true)
+                    """
+                            launches with devastating aftereffects
+                                Effects:
+                                >On non-mobs: Weakness III (30s), Wither II (5s), Slowness I (30s)
+                                >On mobs: enslaved and attack anything the user last attacked
+                                >Universal: All defensive effects removed
+                                >Invulnerability removed
+                                >Inability to look at user for 10s""");
+    public static Attack knives = new Attack(4, 19, 0.75f, 22, 16, 1.5, 0f, 0.0f, AttackType.BOX).setRanged(true)
             .setInfo("Divine Finisher", "summons and launches 8 knives that stun on hit/knives fire with a delay if used in air");
-    public static Attack airknives = new Attack(19, 0.75f, 22, 16, 1.5, 0f, 0.0f, AttackType.BOX).setRanged(true)
+    public static Attack airknives = new Attack(5, 19, 0.75f, 22, 16, 1.5, 0f, 0.0f, AttackType.BOX).setRanged(true)
             .setInfo("Aerial Divine Finisher", "you shouldn't be able to read this");
 
-    public static Attack timestop = new Attack(70, 40, 30, 5, AttackType.TIMESTOP)
+    public static Attack timestop = new Attack(7, 70, 40, 30, 5, AttackType.TIMESTOP)
             .setInfo("Timestop", "5 seconds");
 
     public Vec3d lightningPos;
@@ -224,10 +225,8 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
         data.user.teleport(pos.x, pos.y, pos.z);
 
         user.getPersistentData().putInt(JCraft.standMMBCD, 360); // 18 second timeskip cooldown
-
-        if (user.getPersistentData().getInt(JCraft.standUltCD) < 60) {
+        if (user.getPersistentData().getInt(JCraft.standUltCD) < 60)
             user.getPersistentData().putInt(JCraft.standUltCD, 60); // 3 second timestop cooldown
-        }
 
         this.world.playSound(null, pos.x, pos.y, pos.z, JSoundRegister.TIME_SKIP, SoundCategory.PLAYERS, 1f, 1f);
     }
@@ -237,105 +236,111 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
         LivingEntity user = this.getUser();
         DamageSource playerSource = DamageSource.mob(user);
 
-        if (attack == heavy) { // TWOH's heavy is a mini-overwrite that ignores block
-            for (LivingEntity ent : entities) {
-                stun(ent, 20, 1);
+        switch (attack.id) {
+            case (1) -> { // TWOH's heavy is a mini-overwrite that ignores block
+                for (LivingEntity ent : entities) {
+                    stun(ent, 20, 1);
 
-                float damage = 10f;
-                ent.damage(playerSource, 0.001f);
+                    float damage = 10f;
+                    ent.damage(playerSource, 0.001f);
 
-                // All stands ignore 10% of armor & armor toughness
-                damage = DamageUtil.getDamageLeft(damage, (float) ent.getArmor() * 0.9f, (float) ent.getAttributeValue(EntityAttributes.GENERIC_ARMOR_TOUGHNESS) * 0.9f);
+                    // All stands ignore 10% of armor & armor toughness
+                    damage = DamageUtil.getDamageLeft(damage, (float) ent.getArmor() * 0.9f, (float) ent.getAttributeValue(EntityAttributes.GENERIC_ARMOR_TOUGHNESS) * 0.9f);
 
-                // Apply absorption
-                float f = damage;
-                damage = Math.max(damage - ent.getAbsorptionAmount(), 0.0F);
-                ent.setAbsorptionAmount(ent.getAbsorptionAmount() - (f - damage));
+                    // Apply absorption
+                    float f = damage;
+                    damage = Math.max(damage - ent.getAbsorptionAmount(), 0.0F);
+                    ent.setAbsorptionAmount(ent.getAbsorptionAmount() - (f - damage));
 
-                if (damage != 0.0F) {
-                    float h = ent.getHealth();
-                    if ((h - damage) <= 0) {
-                        ent.kill();
-                    } else {
-                        ent.setHealth(h - damage);
-                        ent.getDamageTracker().onDamage(playerSource, h, damage);
+                    if (damage != 0.0F) {
+                        float h = ent.getHealth();
+                        if ((h - damage) <= 0) {
+                            ent.kill();
+                        } else {
+                            ent.setHealth(h - damage);
+                            ent.getDamageTracker().onDamage(playerSource, h, damage);
+                        }
                     }
                 }
             }
-        } else if (attack == smite) {
-            Vec3d lP = this.lightningPos;
+            case (3) -> {
+                Vec3d lP = this.lightningPos;
 
-            LightningEntity lightning = new LightningEntity(EntityType.LIGHTNING_BOLT, this.world);
-            lightning.setCosmetic(true);
-            lightning.setPosition(lP);
+                LightningEntity lightning = new LightningEntity(EntityType.LIGHTNING_BOLT, this.world);
+                lightning.setCosmetic(true);
+                lightning.setPosition(lP);
 
-            List<Entity> hit = (List<Entity>) JCraftUtils.GenerateHitbox(world, lP, 3, Entity.class, List.of(this, user));
+                List<Entity> hit = (List<Entity>) JCraftUtils.GenerateHitbox(world, lP, 3, Entity.class, List.of(this, user));
 
-            for (Entity ent : hit) {
-                if (ent instanceof LivingEntity living) {
-                    living.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 5, 9, true, false));
-                    damageLogic(world, living, Vec3d.ZERO, 40, 1, false, 9, false, playerSource, user);
+                for (Entity ent : hit) {
+                    if (ent instanceof LivingEntity living) {
+                        living.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 5, 9, true, false));
+                        damageLogic(world, living, Vec3d.ZERO, 40, 1, false, 9, false, playerSource, user);
+                    }
+
+                    ent.onStruckByLightning((ServerWorld) world, lightning);
                 }
 
-                ent.onStruckByLightning((ServerWorld) this.world, lightning);
+                world.spawnEntity(lightning);
             }
-
-            this.world.spawnEntity(lightning);
-        } else if (attack == overwrite) {
-            for (LivingEntity ent : entities) {
-                stun(ent, 40, 3);
-
-                ent.setInvulnerable(false);
-
-                ent.removeStatusEffect(StatusEffects.RESISTANCE);
-                ent.removeStatusEffect(StatusEffects.REGENERATION);
-                ent.removeStatusEffect(StatusEffects.HEALTH_BOOST);
-                ent.removeStatusEffect(StatusEffects.ABSORPTION);
-
-                if (ent instanceof MobEntity) {
-                    IEntityDataSaver entityDataSaver = (IEntityDataSaver) ent;
-                    entityDataSaver.getPersistentData().putUuid("SlavedTo", user.getUuid());
-                    overwriteTimes.add(1048576);
-
-                } else {
-                    ent.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 600, 2, false, true));
-                    ent.addStatusEffect(new StatusEffectInstance(StatusEffects.WITHER, 100, 1, false, true));
-                    ent.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 600, 0, false, true));
-                    overwriteTimes.add(200);
+            case (4) -> {
+                for (int i = 0; i < 8; i++) {
+                    KnifeProjectile knife = new KnifeProjectile(world, user);
+                    knife.setLightning(true);
+                    knife.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
+                    knife.setVelocity(user, user.getPitch(), user.getYaw(), 0.0F, 2F, 1F);
+                    knife.setPosition(user.getPos().add(
+                            random.nextTriangular(0, 0.5),
+                            random.nextTriangular(1.5, 0.5),
+                            random.nextTriangular(0, 0.5)
+                    ));
+                    world.spawnEntity(knife);
                 }
+            }
+            case (5) -> {
+                for (int i = 0; i < 8; i++) {
+                    KnifeProjectile knife = new KnifeProjectile(world, user);
+                    knife.setDelayedLightning(10 + i * 4);
+                    knife.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
+                    knife.setNoGravity(true);
+                    knife.setVelocity(
+                            random.nextTriangular(0, 0.5),
+                            random.nextTriangular(0, 0.5),
+                            random.nextTriangular(0, 0.5)
+                    );
+                    knife.setPosition(getPos().add(
+                            random.nextTriangular(0, 0.5),
+                            random.nextTriangular(1.5, 0.5),
+                            random.nextTriangular(0, 0.5)
+                    ));
+                    world.spawnEntity(knife);
+                }
+            }
+            case (6) -> {
+                for (LivingEntity ent : entities) {
+                    stun(ent, 40, 3);
 
-                overwriteEnts.add(ent);
-            }
-        } else if (attack == knives) {
-            for (int i = 0; i < 8; i++) {
-                KnifeProjectile knife = new KnifeProjectile(world, user);
-                knife.setLightning(true);
-                knife.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
-                knife.setVelocity(user, user.getPitch(), user.getYaw(), 0.0F, 2F, 1F);
-                knife.setPosition(user.getPos().add(
-                        random.nextTriangular(0, 0.5),
-                        random.nextTriangular(1.5, 0.5),
-                        random.nextTriangular(0, 0.5)
-                ));
-                world.spawnEntity(knife);
-            }
-        } else if (attack == airknives) {
-            for (int i = 0; i < 8; i++) {
-                KnifeProjectile knife = new KnifeProjectile(world, user);
-                knife.setDelayedLightning(10 + i * 4);
-                knife.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
-                knife.setNoGravity(true);
-                knife.setVelocity(
-                        random.nextTriangular(0, 0.5),
-                        random.nextTriangular(0, 0.5),
-                        random.nextTriangular(0, 0.5)
-                );
-                knife.setPosition(getPos().add(
-                        random.nextTriangular(0, 0.5),
-                        random.nextTriangular(1.5, 0.5),
-                        random.nextTriangular(0, 0.5)
-                ));
-                world.spawnEntity(knife);
+                    ent.setInvulnerable(false);
+
+                    ent.removeStatusEffect(StatusEffects.RESISTANCE);
+                    ent.removeStatusEffect(StatusEffects.REGENERATION);
+                    ent.removeStatusEffect(StatusEffects.HEALTH_BOOST);
+                    ent.removeStatusEffect(StatusEffects.ABSORPTION);
+
+                    if (ent instanceof MobEntity) {
+                        IEntityDataSaver entityDataSaver = (IEntityDataSaver) ent;
+                        entityDataSaver.getPersistentData().putUuid("SlavedTo", user.getUuid());
+                        overwriteTimes.add(1048576);
+
+                    } else {
+                        ent.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 600, 2, false, true));
+                        ent.addStatusEffect(new StatusEffectInstance(StatusEffects.WITHER, 100, 1, false, true));
+                        ent.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 600, 0, false, true));
+                        overwriteTimes.add(200);
+                    }
+
+                    overwriteEnts.add(ent);
+                }
             }
         }
     }
@@ -455,9 +460,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         AnimationController controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
-        if (this.getSameState()) {
-            controller.markNeedsReload();
-        }
+        if (this.getSameState()) controller.markNeedsReload();
         switch (this.getState()) {
             default -> controller.setAnimation(builder.loop("animation.twoh.idle"));
             case 2 -> controller.setAnimation(builder.playAndHold("animation.twoh.light"));

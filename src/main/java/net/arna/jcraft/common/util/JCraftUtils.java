@@ -170,9 +170,8 @@ public final class JCraftUtils {
 
     //To check method ms usage, use spark[something]
     public static boolean isBlocking(LivingEntity entity) {
-        if (entity.getFirstPassenger() instanceof StandEntity stand) {
-            return stand.blocking;
-        }
+        if (entity instanceof StandEntity stand) return stand.blocking;
+        if (entity.getFirstPassenger() instanceof StandEntity stand) return stand.blocking;
         return false;
     }
 

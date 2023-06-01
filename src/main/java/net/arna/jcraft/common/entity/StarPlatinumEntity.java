@@ -29,20 +29,20 @@ import java.util.List;
 public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAnimationTickable {
     AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
-    public static Attack light = new Attack(2, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
+    public static Attack light = new Attack(0, 2, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
-    public static Attack heavy = new Attack(17, 1f, 30, 20, 2.0, 10f, 1.5f, AttackType.BOX, 0.5f).setHitspark(2).setArmor(true).setLaunch()
+    public static Attack heavy = new Attack(1, 17, 1f, 30, 20, 2.0, 10f, 1.5f, AttackType.BOX, 0.5f).setHitspark(2).setArmor(true).setLaunch()
             .setInfo("Star Breaker", "uninterruptable launcher");
-    public static Attack barrage = new Attack(17, 0.75f, 60, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 2, 0, 3)
+    public static Attack barrage = new Attack(2, 17, 0.75f, 60, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 2, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public static Attack starfinger = new Attack(20, 1.25f, 20, 12, 1.75, 6f, -0.25f, AttackType.BOX, 1.5f, -0.25f).setHitspark(2)
+    public static Attack starfinger = new Attack(3, 20, 1.25f, 20, 12, 1.75, 6f, -0.25f, AttackType.BOX, 1.5f, -0.25f).setHitspark(2)
             .setInfo("Star Finger", "medium windup, combo starter/extender");
-    public static Attack timestop = new Attack(60, 40, 39, 3, AttackType.TIMESTOP) // TS = (moveStun-initTime)/20
-            .setInfo("Timestop", "3 seconds");
-    public static Attack lowkick = new Attack(12, 0.75f, 12, 7, 1.5, 7f, 0.25f, AttackType.BOX, 0.4f, 0)
+    public static Attack lowkick = new Attack(4, 12, 0.75f, 12, 7, 1.5, 7f, 0.25f, AttackType.BOX, 0.4f, 0)
             .setInfo("Roundhouse", "fast poke, low stun");
-    public static Attack chargebarrage = new Attack(26, 4f, 55, 5, 1.5, 0.6f, 0.4f, AttackType.CHARGEBARRAGE, 1, 0, 3).setRanged(true)
+    public static Attack chargebarrage = new Attack(5, 26, 4f, 55, 5, 1.5, 0.6f, 0.4f, AttackType.CHARGEBARRAGE, 1, 0, 3).setRanged(true)
             .setInfo("Advancing Barrage", "fast combo starter/extender, medium stun, extremely punishable on whiff");
+    public static Attack timestop = new Attack(6, 60, 40, 39, 3, AttackType.TIMESTOP) // TS = (moveStun-initTime)/20
+            .setInfo("Timestop", "3 seconds");
 
     public StarPlatinumEntity(World worldIn) {
         super(StandType.STAR_PLATINUM, worldIn);
@@ -90,9 +90,7 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
 
     @Override
     public void initHeavyAttack() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(heavy, JCraft.standHeavyCD, 4)) {
             this.playSound(JSoundRegister.STAR_BREAKER, 1, 1);
         }
@@ -100,9 +98,7 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
 
     @Override
     public void initBarrage() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
             this.playSound(JSoundRegister.STAR_PLATINUM_BARRAGE, 1, 1);
         }
@@ -110,9 +106,7 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
 
     @Override
     public void initSpecial1() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(starfinger, JCraft.standS1CD, 6)) {
             this.playSound(JSoundRegister.STAR_FINGER, 1, 1);
         }
@@ -120,9 +114,7 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
 
     @Override
     public void initUlt() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(timestop, JCraft.standUltCD, 7)) {
             this.playSound(JSoundRegister.STAR_PLATINUM_THE_WORLD, 1, 1);
         }
@@ -130,9 +122,7 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
 
     @Override
     public void initSpecial2() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(lowkick, JCraft.standS2CD, 8)) {
             this.playSound(JSoundRegister.STAR_PLATINUM_KICK, 1, 1);
         }
@@ -140,9 +130,7 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
 
     @Override
     public void initSpecial3() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(chargebarrage, JCraft.standS3CD, 5)) {
             this.playSound(JSoundRegister.STAR_PLATINUM_ADVANCING_BARRAGE, 1, 1);
         }
@@ -151,16 +139,13 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
     @Override
     public void initMiddleClick() {
         CanAttackData data = this.canAttackWithData();
-        if (!data.canAttack) {
+        if (!data.canAttack)
             return;
-        }
-        if (this.getTSTime() > 0) {
+        if (this.getTSTime() > 0)
             return;
-        }
         IEntityDataSaver user = (IEntityDataSaver) data.user;
-        if (user.getPersistentData().getInt(JCraft.standMMBCD) > 0) {
+        if (user.getPersistentData().getInt(JCraft.standMMBCD) > 0)
             return;
-        }
         Vec3d eP = data.user.getEyePos();
 
         HitResult hitResult = this.world.raycast(new RaycastContext(eP, eP.add(data.user.getRotationVector().multiply(14)), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, data.user));
@@ -185,31 +170,25 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
-        if (attack == chargebarrage && entities.size() > 0) { // Lock-on
+        if (attack.id == chargebarrage.id && entities.size() > 0) { // Lock-on
             Vec3d avgPos = Vec3d.ZERO;
             float c = 0;
             for (LivingEntity ent : entities) {
-                if (ent instanceof StandEntity)
-                    continue;
+                if (ent instanceof StandEntity) continue;
                 avgPos = avgPos.add(ent.getPos());
                 c += 1f;
             }
             avgPos = avgPos.multiply(1f / c);
-            this.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, avgPos);
+            lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, avgPos);
+            curAttack.attackDist = (float) avgPos.distanceTo(getPos());
         }
     }
 
     @Override
     public void tick() {
-        if (age == 1) {
-            this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.STAND_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
-        }
-
+        if (age == 1) this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.STAND_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
         super.tick();
-
-        if (hasUser()) {
-            this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(getUser()) / 2, 0.0, 255.0) / 255f);
-        }
+        if (hasUser()) this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(getUser()) / 2, 0.0, 255.0) / 255f);
     }
 
     // Animation code

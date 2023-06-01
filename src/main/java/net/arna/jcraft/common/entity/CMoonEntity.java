@@ -44,22 +44,22 @@ import java.util.List;
 public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationTickable {
     AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
-    public static Attack light = new Attack(2, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
+    public static Attack light = new Attack(0, 2, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
 
-    public static Attack barrage = new Attack(17, 0.75f, 60, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 1, 0, 4, JSoundRegister.IMPACT_3)
+    public static Attack barrage = new Attack(2, 17, 0.75f, 60, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 1, 0, 4, JSoundRegister.IMPACT_3)
             .setInfo("Barrage", "fast reliable combo starter/extender/finisher, medium stun");
-    public static Attack gutpunch = new Attack(17, 1f, 30, 19, 2.0, 10f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.TW_KICK_HIT).setHitspark(2).setArmor(true).setLaunch()
+    public static Attack gutpunch = new Attack(1, 17, 1f, 30, 19, 2.0, 10f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.TW_KICK_HIT).setHitspark(2).setArmor(true).setLaunch()
             .setInfo("Gut Punch", "slow, uninterruptable combo finisher");
-    public static Attack gun = new Attack(20, 21, 15, 1, 0.75f, AttackType.BOX).setRanged(true)
+    public static Attack gun = new Attack(4, 20, 21, 15, 1, 0.75f, AttackType.BOX).setRanged(true)
             .setInfo("Gun", "fully aimable, combo starter");
-    public static Attack gravpunch = new Attack(24, 1f, 32, 20, 1.75, 8f, 0.35f, AttackType.BOX, 1.75f, -0.3f, 0, JSoundRegister.CMOON_GRAVPUNCHHIT).setHitspark(2).setArmor(true)
+    public static Attack gravpunch = new Attack(3, 24, 1f, 32, 20, 1.75, 8f, 0.35f, AttackType.BOX, 1.75f, -0.3f, 0, JSoundRegister.CMOON_GRAVPUNCHHIT).setHitspark(2).setArmor(true)
             .setUB(true)
             .setInfo("Only One Punch", "lifts enemy on hit");
-    public static Attack groundslam = new Attack(28, 1f, 18, 10, 3, 7f, 0.2f, AttackType.BOX, 0.85f, 1.4f, 0, JSoundRegister.CMOON_GRAVPUNCHHIT)
+    public static Attack groundslam = new Attack(5, 28, 1f, 18, 10, 3, 7f, 0.2f, AttackType.BOX, 0.85f, 1.4f, 0, JSoundRegister.CMOON_GRAVPUNCHHIT)
             .setUB(true)
             .setInfo("Ground Slam", "lifts the ground, combo starter/extender, knockdown when used while crouching");
-    public static Attack gravshift = new Attack(70, 32, 20, 7, AttackType.BOX)
+    public static Attack gravshift = new Attack(6, 70, 32, 20, 7, AttackType.BOX)
             .setInfo("Gravity Shift", "increases user jump height, applies hypergravity to everything in a 64 block radius");
 
 
@@ -113,11 +113,12 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
                 "gun is fully blockable"
         );
 
-        freespace = "Passive: Inversion, all physical hits deal an extra half heart after 2s\n\n" +
-                "\n" +
-                "    BNBs:\n" +
-                "    (Only One Punch>)Gun>Ground Slam>M1>Barrage>Gut Punch\n" +
-                "    Ground Slam>M1>Barrage>Gun>Gravity Shift";
+        freespace = """
+                Passive: Inversion, all physical hits deal an extra half heart after 2s
+
+                    BNBs:
+                    (Only One Punch>)Gun>Ground Slam>M1>Barrage>Gut Punch
+                    Ground Slam>M1>Barrage>Gun>Gravity Shift""";
 
         moves = List.of(light, gutpunch, barrage, gravpunch, gravshift, gun, groundslam
                 , new Attack().setMobility(MobilityType.HIGHJUMP).setInfo("Gravitational Hop", "jumps up and grants 2s slow falling"));
@@ -264,7 +265,7 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
             }
         }
 
-        if (attack == gun) {
+        if (attack.id == gun.id) {
             this.playSound(JSoundRegister.WS_GUN, 1, 1);
 
             Box box = this
@@ -287,7 +288,7 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
                     damageLogic(world, livingEntity, Vec3d.ZERO, (int) attack.stun * 20, 1, false, 6, false, DamageSource.mob(user), user);
                 }
             }
-        } else if (attack == groundslam) {
+        } else if (attack.id == groundslam.id) {
             for (LivingEntity ent : entities) {
                 ent.setVelocity(new Vec3d(0.0, -0.5, 0.0));
                 ent.velocityModified = true;
@@ -314,7 +315,7 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
                     }
                 }
             }
-        } else if (attack == gravshift) {
+        } else if (attack.id == gravshift.id) {
             user.addStatusEffect(new StatusEffectInstance(StatusEffects.JUMP_BOOST, 350, 1));
             user.onLanding();
             this.setShiftTime(350);
@@ -323,10 +324,7 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
 
     @Override
     public void tick() {
-        if (age == 1) {
-            this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.STAND_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
-        }
-
+        if (age == 1) this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.STAND_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
         super.tick();
 
         if (hasUser()) {

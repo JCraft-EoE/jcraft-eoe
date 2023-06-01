@@ -50,6 +50,7 @@ import static net.arna.jcraft.JCraft.CooldownCancel;
 public abstract class StandEntity extends MobEntity {
 
     // TODO: finish custom player idle poses for all stands
+    // TODO: add skin select
 
     // All variables that the player can see in action (i.e. time erase time, timestop time, alpha, state) have to be tracked.
     public List<Attack> moves = List.of();
@@ -90,7 +91,7 @@ public abstract class StandEntity extends MobEntity {
     public Attack previousAttack;
 
     public static List<String> attackCooldowns = List.of(JCraft.standLightCD, JCraft.standHeavyCD, JCraft.standBarrageCD, JCraft.standS1CD, JCraft.standUltCD, JCraft.standS2CD, JCraft.standS3CD, JCraft.standMMBCD);
-    static Attack unusable = new Attack(999, 999, 999, 0, AttackType.BOX).setInfo("NONE", "NONE");
+    static Attack unusable = new Attack(-1,999, 999, 999, 0, AttackType.BOX).setInfo("NONE", "NONE");
 
     // Info
     public List<String> pros;

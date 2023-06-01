@@ -130,12 +130,12 @@ public class ClientPacketHandler {
                 double posX = buf.readDouble();
                 double posY = buf.readDouble();
                 double posZ = buf.readDouble();
+                double sizeX = MathHelper.clamp(buf.readDouble(), 0.1, 100);
+                double sizeY = MathHelper.clamp(buf.readDouble(), 0.1, 100);
+                double sizeZ = MathHelper.clamp(buf.readDouble(), 0.1, 100);
 
                 client.execute(() -> {
                     Random random = new Random();
-                    double sizeX = MathHelper.clamp(buf.readDouble(), 0.1, 100);
-                    double sizeY = MathHelper.clamp(buf.readDouble(), 0.1, 100);
-                    double sizeZ = MathHelper.clamp(buf.readDouble(), 0.1, 100);
 
                     for (int h = 0; h < 8; ++h) {
                         client.world.addParticle(

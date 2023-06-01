@@ -45,38 +45,36 @@ import java.util.List;
 public class CreamEntity extends StandEntity implements IAnimatable, IAnimationTickable {
     AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
-    public static Attack light = new Attack(2, 0.75f, 14, 6, 1.5, 5f, 0.75f, AttackType.BOX, 1f, 0.1f, 0, JSoundRegister.IMPACT_3)
+    public static Attack light = new Attack(0, 2, 0.75f, 14, 6, 1.5, 5f, 0.75f, AttackType.BOX, 1f, 0.1f, 0, JSoundRegister.IMPACT_3)
             .setInfo("Punch", "quick combo starter");
-    public static Attack heavy = new Attack(14, 1f, 30, 20, 1.5, 10f, 0.1f, AttackType.BOX, 2, 0, 0, JSoundRegister.IMPACT_3).setHitspark(2).setArmor(true)
+    public static Attack heavy = new Attack(1, 14, 1f, 30, 20, 1.5, 10f, 0.1f, AttackType.BOX, 2, 0, 0, JSoundRegister.IMPACT_3).setHitspark(2).setArmor(true)
             .setInfo("Vertical Chop", "slow, uninterruptable combo starter");
-    public static Attack combo = new Attack(17, 0.75f, 36, 0, 2.0, 7f, 0.1f, AttackType.MULTIHIT, 1, 0, List.of(10, 17, 25), JSoundRegister.IMPACT_3)
+    public static Attack combo = new Attack(2, 17, 0.75f, 36, 0, 2.0, 7f, 0.1f, AttackType.MULTIHIT, 1, 0, List.of(10, 17, 25), JSoundRegister.IMPACT_3)
             .setInfo("3-hit Combo", "medium windup, good stun");
-    public static Attack consume = new Attack(32, 1f, 40, 35, 2.0, 2f, 0f, AttackType.BOX).setRanged(true)
-            .setInfo("Void", "high windup, 6 seconds");
-    public static Attack charge = new Attack(20, 4f, 13, 5, 1.5, 8f, 0.25f, AttackType.CHARGE, 1, 0, 8, JSoundRegister.IMPACT_3).setRanged(true)
-            .setInfo("Charge", "3.5 block range, combo starter/extender");
-    public static Attack grab = new Attack(20, 1f, 20, 8, 1.5, 3f, 0f, AttackType.BOX, 1.5f, 0, 0)
+    public static Attack grab = new Attack(3, 20, 1f, 20, 8, 1.5, 3f, 0f, AttackType.BOX, 1.5f, 0, 0)
             .setUB(false)
             .setInfo("Grab", "unblockable, knocks back");
-    public static Attack grabhit = new Attack(0, 1f, 20, 13, 2.0, 6f, 1.5f, AttackType.BOX, 0.25f).setLaunch();
-
-    public static Attack destroy = new Attack(25, 1f, 30, 21, 2, 0f, 1.25f, AttackType.BOX, 0f, 0f, 0, JSoundRegister.IMPACT_5).setHitspark(2).setArmor(true)
+    public static Attack grabhit = new Attack(4, 0, 1f, 20, 13, 2.0, 6f, 1.5f, AttackType.BOX, 0.25f).setLaunch();
+    public static Attack charge = new Attack(5, 20, 4f, 13, 5, 1.5, 8f, 0.25f, AttackType.CHARGE, 1, 0, 8, JSoundRegister.IMPACT_3).setRanged(true)
+            .setInfo("Charge", "3.5 block range, combo starter/extender");
+    public static Attack destroy = new Attack(6, 25, 1f, 30, 21, 2, 0f, 1.25f, AttackType.BOX, 0f, 0f, 0, JSoundRegister.IMPACT_5).setHitspark(2).setArmor(true)
             .setUB(true)
             .setInfo("Destroy", "slow, uninterruptable, unblockable knockdown");
-
-    public static Attack enter = new Attack(2, 15, 10, 0, 0f, AttackType.BOX)
+    public static Attack consume = new Attack(7, 32, 1f, 40, 35, 2.0, 2f, 0f, AttackType.BOX).setRanged(true)
+            .setInfo("Void", "high windup, 6 seconds");
+    public static Attack enter = new Attack(8, 2, 15, 10, 0, 0f, AttackType.BOX)
             .setInfo("Enter Cream", "cream consumes itself and the user halfway, increasing mobility and decreasing defense").setMobility(MobilityType.FLIGHT);
-    public static Attack exit = new Attack(2, 15, 5, 0, 0f, AttackType.BOX)
+    public static Attack exit = new Attack(9, 2, 15, 5, 0, 0f, AttackType.BOX)
             .setInfo("Exit Cream", "cream and its user return from the void");
 
-    public static Attack balllight = new Attack(2, 0.1f, 14, 7, 2, 5f, 0.75f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegister.IMPACT_3)
+    public static Attack balllight = new Attack(10, 2, 0.1f, 14, 7, 2, 5f, 0.75f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegister.IMPACT_3)
             .setInfo("Swipe", "quick air-to-ground poke");
-    public static Attack ballheavy = new Attack(14, 0.1f, 20, 14, 2, 9f, 1.25f, AttackType.BOX, 0.75f, 0.3f, 0, JSoundRegister.TW_KICK_HIT)
+    public static Attack ballheavy = new Attack(11, 14, 0.1f, 20, 14, 2, 9f, 1.25f, AttackType.BOX, 0.75f, 0.3f, 0, JSoundRegister.TW_KICK_HIT)
             .setHitspark(2).setArmor(true).setLaunch()
             .setInfo("Overhead Smash", "slow, uninterruptable launcher");
-    public static Attack ballcombo = new Attack(14, 0.1f, 36, 0, 2, 7f, 0.1f, AttackType.MULTIHIT, 0.75f, 0.3f, List.of(10, 17, 25), JSoundRegister.IMPACT_3)
+    public static Attack ballcombo = new Attack(12, 14, 0.1f, 36, 0, 2, 7f, 0.1f, AttackType.MULTIHIT, 0.75f, 0.3f, List.of(10, 17, 25), JSoundRegister.IMPACT_3)
             .setInfo("3-hit Combo", "less stun than grounded version");
-    public static Attack ballcharge = new Attack(20, 28, 13, 0, AttackType.BOX)
+    public static Attack ballcharge = new Attack(13, 20, 28, 13, 0, AttackType.BOX)
             .setInfo("Void Charge", "cream quickly transforms into a black hole and charges in the looked direction");
 
     public static TrackedData<Integer> VOIDTIME;
@@ -124,10 +122,11 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
                 "below average speed"
         );
 
-        freespace = "BNBs (i. - in Cream):\n" +
-                "    M1>Combo>M1>Charge>Grab\n" +
-                "    Chop>Void\n" +
-                "    i.M1>land+s.OFF>s.ON+Combo>M1>Charge>Grab";
+        freespace = """
+                BNBs (i. - in Cream):
+                    M1>Combo>M1>Charge>Grab
+                    Chop>Void
+                    i.M1>land+s.OFF>s.ON+Combo>M1>Charge>Grab""";
 
         moves = List.of(light, heavy, combo, destroy, consume, charge, grab, enter);
     }
@@ -256,76 +255,81 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
     private boolean charging = false;
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
-        if (attack == combo && this.getMoveStun() == 11) {
-            Vec3d rV = this.getRotationVector();
+        switch (attack.id) {
+            case (2) -> {
+                if (this.getMoveStun() == 11) {
+                    Vec3d rV = this.getRotationVector();
 
-            for (LivingEntity ent : entities) {
-                ent.takeKnockback(1, rV.x, rV.z);
-                ent.velocityModified = true;
-            }
-        } else if (attack == consume) {
-            endHalfBall();
-            setVoidTime(120);
-            charging = false;
-            this.curAttack = null;
-        } else if (attack == grab) {
-            if (entities.size() > 0) {
-                // Grab bypasses and disables block
-                for (LivingEntity ent : entities) {
-                    stun(ent, 20, 0);
-
-                    if (ent.getFirstPassenger() instanceof StandEntity stand) {
-                        stand.blocking = false;
+                    for (LivingEntity ent : entities) {
+                        ent.takeKnockback(1, rV.x, rV.z);
+                        ent.velocityModified = true;
                     }
                 }
-
-                this.curAttack = grabhit;
-                this.setMoveStun(20);
-                this.setState(10);
             }
-        } else if (attack == ballheavy) {
-            for (LivingEntity ent : entities) {
-                if (!JCraftUtils.isBlocking(ent)) {
+            case (3) -> {
+                if (entities.size() > 0) {
+                    // Grab bypasses and disables block
+                    for (LivingEntity ent : entities) {
+                        stun(ent, 20, 0);
+
+                        if (ent.getFirstPassenger() instanceof StandEntity stand) {
+                            stand.blocking = false;
+                        }
+                    }
+
+                    this.curAttack = grabhit;
+                    this.setMoveStun(20);
+                    this.setState(10);
+                }
+            }
+            case (6) -> {
+                DamageSource playerSource = DamageSource.mob(getUser());
+
+                for (LivingEntity ent :
+                        entities) {
+                    float damage = 10f;
+                    ent.damage(playerSource, 0.001f);
+
+                    // All stands ignore 10% of armor & armor toughness
+                    damage = DamageUtil.getDamageLeft(damage, (float) ent.getArmor() * 0.9f, (float) ent.getAttributeValue(EntityAttributes.GENERIC_ARMOR_TOUGHNESS) * 0.9f);
+
+                    // Apply absorption
+                    float f = damage;
+                    damage = Math.max(damage - ent.getAbsorptionAmount(), 0.0F);
+                    ent.setAbsorptionAmount(ent.getAbsorptionAmount() - (f - damage));
+
+                    if (damage != 0.0F) {
+                        float h = ent.getHealth();
+                        if ((h - damage) <= 0) {
+                            ent.kill();
+                        } else {
+                            ent.setHealth(h - damage);
+                            ent.getDamageTracker().onDamage(playerSource, h, damage);
+                        }
+                    }
+
                     ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0));
                 }
             }
-        } else if (attack == destroy) {
-            DamageSource playerSource = DamageSource.mob(getUser());
-
-            for (LivingEntity ent :
-                    entities) {
-                float damage = 10f;
-                ent.damage(playerSource, 0.001f);
-
-                // All stands ignore 10% of armor & armor toughness
-                damage = DamageUtil.getDamageLeft(damage, (float) ent.getArmor() * 0.9f, (float) ent.getAttributeValue(EntityAttributes.GENERIC_ARMOR_TOUGHNESS) * 0.9f);
-
-                // Apply absorption
-                float f = damage;
-                damage = Math.max(damage - ent.getAbsorptionAmount(), 0.0F);
-                ent.setAbsorptionAmount(ent.getAbsorptionAmount() - (f - damage));
-
-                if (damage != 0.0F) {
-                    float h = ent.getHealth();
-                    if ((h - damage) <= 0) {
-                        ent.kill();
-                    } else {
-                        ent.setHealth(h - damage);
-                        ent.getDamageTracker().onDamage(playerSource, h, damage);
-                    }
-                }
-
-                ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0));
+            case (7) -> {
+                endHalfBall();
+                setVoidTime(120);
+                charging = false;
+                this.curAttack = null;
             }
-        } else if (attack == enter) {
-            beginHalfBall();
-        } else if (attack == exit) {
-            endHalfBall();
-        } else if (attack == ballcharge) {
-            this.playSound(JSoundRegister.CREAM_CHARGE, 1, 1);
-            charging = true;
-            chargeDir = getUser().getRotationVector().multiply(0.5);
-            setVoidTime(15);
+            case (8) -> beginHalfBall();
+            case (9) -> endHalfBall();
+            case (11) -> {
+                for (LivingEntity ent : entities)
+                    if (!JCraftUtils.isBlocking(ent))
+                        ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0));
+            }
+            case (13) -> {
+                this.playSound(JSoundRegister.CREAM_CHARGE, 1, 1);
+                charging = true;
+                chargeDir = getUser().getRotationVector().multiply(0.5);
+                setVoidTime(15);
+            }
         }
     }
 
@@ -354,9 +358,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
 
     @Override
     public void tick() {
-        if (age == 1)
-            this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.STAND_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
-
+        if (age == 1) this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.STAND_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
         super.tick();
         boolean server = !this.world.isClient();
 
@@ -472,17 +474,22 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
                     if (user instanceof ServerPlayerEntity serverPlayer) {
                         if (lastRemoteInputTime - age > 4) updateRemoteInputs(0, 0, false);
 
+                        Vec3d finalSpeed = Vec3d.ZERO;
                         if (!blocking && !user.hasStatusEffect(JStatusRegister.DAZED)) {
                             Vec3d eP = user.getEyePos();
                             Vec3d groundPos = world.raycast(
                                     new RaycastContext(eP, eP.add(0, -24, 0), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user)
                             ).getPos();
 
-                            if (getRemoteJumpInput() && groundPos.squaredDistanceTo(getPos()) < 9)
-                                user.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 4, 4, true, false));
+                            double groundDist = groundPos.distanceTo(pos);
+                            double stabilization = user.getVelocity().y;
+                            if (stabilization < 0) stabilization *= -0.5;
+                            else stabilization = 0;
+
+                            if (getRemoteJumpInput() && groundDist < 3)
+                                finalSpeed = finalSpeed.add(0, 0.25 / groundDist + stabilization, 0);
                         }
 
-                        Vec3d finalSpeed = Vec3d.ZERO;
                         Vec3d rotVec = user.getRotationVector();
                         finalSpeed = finalSpeed.add(rotVec.multiply(getRemoteForwardInput() / 30)); // Forward movement
                         finalSpeed = finalSpeed.add(rotVec.rotateY(1.5707963f).multiply(getRemoteSideInput() / 30)); // Side movement

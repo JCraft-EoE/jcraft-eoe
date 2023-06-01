@@ -46,29 +46,29 @@ import java.util.Map;
 public class GEREntity extends StandEntity implements IAnimatable, IAnimationTickable {
     AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
-    public static Attack light = new Attack(2, 0.75f, 9, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0, JSoundRegister.IMPACT_1)
+    public static Attack light = new Attack(0, 2, 0.75f, 9, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch/Downward Kick", "quick combo starter, in air: more hitstun, less blockstun");
-    public static Attack heavy = new Attack(17, 1f, 19, 10, 1.5, 9f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_2).setHitspark(2).setArmor(true).setLaunch()
+    public static Attack heavy = new Attack(2, 17, 1f, 19, 10, 1.5, 9f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_2).setHitspark(2).setArmor(true).setLaunch()
             .setInfo("Overhead Smash/Overhead Kick", "slow, uninterruptable knockdown, in air: slow combo starter");
-    public static Attack barrage = new Attack(14, 0.75f, 30, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 2, 0, 3)
+    public static Attack barrage = new Attack(4, 14, 0.75f, 30, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 2, 0, 3)
             .setInfo("Barrage/Kick Barrage", "fast reliable combo starter/extender, high stun, in air: fast combo finisher, knocks back");
-    public static Attack healself = new Attack(26, 1f, 14, 10, 0, 0f, 0f, AttackType.BOX)
+    public static Attack healself = new Attack(6, 26, 1f, 14, 10, 0, 0f, 0f, AttackType.BOX)
             .setInfo("Healing Hand", "standing: heals user for 2 hearts, crouching: heals others for 3 hearts, pacifies angered mobs");
-    public static Attack heal = new Attack(26, 1f, 16, 10, 0, 0f, 0f, AttackType.BOX);
-    public static Attack laser = new Attack(24, 1f, 20, 10, 0, 0f, 0f, AttackType.BOX)
+    public static Attack heal = new Attack(7, 26, 1f, 16, 10, 0, 0f, 0f, AttackType.BOX);
+    public static Attack laser = new Attack(8, 24, 1f, 20, 10, 0, 0f, 0f, AttackType.BOX)
             .setInfo("Life Beam", "summons a quick, stunning rock projectile that turns into a scorpion a small time after landing").setRanged(true);
 
-    public static Attack counter = new Attack(26, 1f, 35, 5, 0, 0f, 0f, AttackType.COUNTER)
+    public static Attack counter = new Attack(9, 26, 1f, 35, 5, 0, 0f, 0f, AttackType.COUNTER)
             .setInfo("Nullification", "0.25s windup, 1.5s counter, stuns on hit");
 
-    public static Attack airlight = new Attack(2, 0.75f, 12, 5, 1.25, 4f, 0.75f, AttackType.BOX, 1, 0.33f, 0, JSoundRegister.IMPACT_1)
+    public static Attack airlight = new Attack(1, 2, 0.75f, 12, 5, 1.25, 4f, 0.75f, AttackType.BOX, 1, 0.33f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Downward Kick", "");
-    public static Attack airheavy = new Attack(17, 1f, 24, 14, 1.5, 9f, 0.8f, AttackType.BOX, 2, 0.25f, 0, JSoundRegister.IMPACT_1).setHitspark(2)
+    public static Attack airheavy = new Attack(3, 17, 1f, 24, 14, 1.5, 9f, 0.8f, AttackType.BOX, 2, 0.25f, 0, JSoundRegister.IMPACT_1).setHitspark(2)
             .setInfo("Overhead Kick", "");
-    public static Attack airbarrage = new Attack(14, 1f, 48, 0, 1.5, 1f, 0.3f, AttackType.BARRAGE, 1, 0, 3)
+    public static Attack airbarrage = new Attack(5, 14, 1f, 48, 0, 1.5, 1f, 0.3f, AttackType.BARRAGE, 1, 0, 3)
             .setInfo("Kick Barrage", ""); //fast combo finisher, knocks back
 
-    public static Attack rtz = new Attack(60, 32, 30, 0, 1, AttackType.BOX)
+    public static Attack rtz = new Attack(10, 60, 32, 30, 0, 1, AttackType.BOX)
             .setInfo("Return to Zero", "initial press: saves the state of every entity in a 4 chunk radius (save lasts 1 minute), second press: reverts all states except users\nDoesn't affect player inventories");
     private static int rtzTimer;
     private static final HashMap<Entity, NbtCompound> rtzEntityData = new HashMap<>();
@@ -104,11 +104,12 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
                 "limited pressure"
         );
 
-        freespace = "BNBs:\n" +
-                "the scorpy patty (sets up stand off transition)\n" +
-                "(M1>)Barrage>jump>Overhead Kick>Life Beam>M1>Life Beam (second hit)\n" +
-                "knockdown experience\n" +
-                "M1>Barrage>Life Beam>M1~Overhead Smash>Life Beam (second hit)";
+        freespace = """
+                BNBs:
+                the scorpy patty (sets up stand off transition)
+                (M1>)Barrage>jump>Overhead Kick>Life Beam>M1>Life Beam (second hit)
+                knockdown experience
+                M1>Barrage>Life Beam>M1~Overhead Smash>Life Beam (second hit)""";
 
         moves = List.of(light, heavy, barrage, healself, rtz, laser, counter,
                 new Attack().setInfo("Flight", "1 second").setMobility(MobilityType.FLIGHT));
@@ -309,55 +310,60 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
         super.desummon();
     }
 
-    private static final Attack barrageFinisher = new Attack(17, 1f, 9, 6, 1.75, 1f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.TW_KICK_HIT).setHitspark(2).setLaunch();
+    private static final Attack barrageFinisher = new Attack(11, 17, 1f, 9, 6, 1.75, 1f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.TW_KICK_HIT).setHitspark(2).setLaunch();
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
         LivingEntity user = this.getUser();
-        if (attack == healself) {
-            user.heal(4f);
-        } else if (attack == heal) {
-            for (LivingEntity ent : entities) {
-                ent.heal(6f);
-                ent.setAttacker(null);
+        switch (attack.id) {
+            case (2) -> {
+                for (LivingEntity l : entities)
+                    l.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 30, 0, false, false));
+            }
+            case (3) -> {
+                for (LivingEntity ent : entities) {
+                    ent.addVelocity(0, -1, 0);
+                    ent.velocityModified = true;
+                    ent.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 5, 19, false, false));
+                }
+            }
+            case (5) -> {
+                if (getMoveStun() < 12) this.curAttack = barrageFinisher;
+            }
+            case (6) -> user.heal(4f);
+            case (7) -> {
+                for (LivingEntity ent : entities) {
+                    ent.heal(6f);
+                    ent.setAttacker(null);
 
-                if (ent instanceof MobEntity mob) {
-                    stun(mob, 10, 0);
-                    mob.setTarget(null);
-                    mob.setAttacking(null);
-                    if (mob instanceof Angerable angerable) {
-                        angerable.stopAnger();
+                    if (ent instanceof MobEntity mob) {
+                        stun(mob, 10, 0);
+                        mob.setTarget(null);
+                        mob.setAttacking(null);
+                        if (mob instanceof Angerable angerable) {
+                            angerable.stopAnger();
+                        }
                     }
                 }
             }
-        } else if (attack == heavy) {
-            for (LivingEntity l : entities) {
-                l.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 30, 0, false, false));
+            case (8) -> {
+                GERScorpionEntity scorpion = new GERScorpionEntity(JEntityTypeRegister.GER_SCORPION, world);
+                scorpion.setInitialVel(user.getRotationVector().multiply(2));
+                Vec3d ePos = this.getEyePos();
+                scorpion.refreshPositionAndAngles(ePos.x, ePos.y, ePos.z, -user.getYaw() - 90f, getPitch());
+                scorpion.setOwner(user);
+                world.spawnEntity(scorpion);
             }
-        } else if (attack == laser) {
-            GERScorpionEntity scorpion = new GERScorpionEntity(JEntityTypeRegister.GER_SCORPION, world);
-            scorpion.setInitialVel(user.getRotationVector().multiply(2));
-            Vec3d ePos = this.getEyePos();
-            scorpion.refreshPositionAndAngles(ePos.x, ePos.y, ePos.z, -user.getYaw() - 90f, getPitch());
-            scorpion.setOwner(user);
-            world.spawnEntity(scorpion);
-        } else if (attack == airheavy) {
-            for (LivingEntity ent : entities) {
-                ent.addVelocity(0, -1, 0);
-                ent.velocityModified = true;
-                ent.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 5, 19, false, false));
-            }
-        } else if (attack == airbarrage && this.getMoveStun() < 12) {
-            this.curAttack = barrageFinisher;
-        } else if (attack == rtz) {
-            List<Entity> toReturn = world.getEntitiesByClass(Entity.class, this.getBoundingBox().expand(64), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
-            toReturn.remove(this);
-            toReturn.remove(user);
+            case (10) -> {
+                List<Entity> toReturn = world.getEntitiesByClass(Entity.class, this.getBoundingBox().expand(64), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+                toReturn.remove(this);
+                toReturn.remove(user);
 
-            for (Entity e : toReturn) {
-                NbtCompound data = new NbtCompound();
-                e.writeNbt(data);
-                rtzEntityData.put(e, data);
+                for (Entity e : toReturn) {
+                    NbtCompound data = new NbtCompound();
+                    e.writeNbt(data);
+                    rtzEntityData.put(e, data);
+                }
             }
         }
     }

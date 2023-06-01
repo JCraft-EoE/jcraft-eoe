@@ -46,27 +46,28 @@ import java.util.List;
 public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnimationTickable {
     AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
-    public static Attack low = new Attack(0, 0.85f, 13, 8, 1.5, 4f, 0.5f, AttackType.BOX, 0.5f, 0.1f, 0, JSoundRegister.IMPACT_1);
+    public static Attack low = new Attack(1, 0, 0.85f, 13, 8, 1.5, 4f, 0.5f, AttackType.BOX, 0.5f, 0.1f, 0, JSoundRegister.IMPACT_1);
 
-    public static Attack light = new Attack(2, 0.75f, 19, 0, 1.5, 3f, 0.75f, AttackType.MULTIHIT, 1f, 0, List.of(6, 11), JSoundRegister.IMPACT_4)
+    public static Attack light = new Attack(0, 2, 0.75f, 19, 0, 1.5, 3f, 0.75f, AttackType.MULTIHIT, 1f, 0, List.of(6, 11), JSoundRegister.IMPACT_4)
             .setFollowup(low)
             .setInfo("Dual Punch", "combo starter, decent speed, has followup with more blockstun");
 
-    public static Attack heavy = new Attack(12, 0.75f, 24, 16, 2, 9f, 1.75f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_4)
+    public static Attack heavy = new Attack(2, 12, 0.75f, 24, 16, 2, 9f, 1.75f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_4)
             .setHitspark(2)
             .setArmor(true)
             .setLaunch()
             .setInfo("Haymaker", "slow, uninterruptable launcher");
-    public static Attack barrage = new Attack(17, 0.75f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3, JSoundRegister.IMPACT_4)
+    public static Attack barrage = new Attack(3, 17, 0.75f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3, JSoundRegister.IMPACT_4)
             .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
-    public static Attack bombplant = new Attack(30, 1, 20, 12, 1.5, 0f, 0.0f, AttackType.BOX, 0.45f)
+    public static Attack bombplant = new Attack(4, 30, 1, 20, 12, 1.5, 0f, 0.0f, AttackType.BOX, 0.45f)
             .setUB(true)
             .setInfo("Bomb Plant", "crouch to plant on the ground below you, stealthily");
-    public static Attack detonate = new Attack(1, 1, 6, 5, 0, 0f, 0.0f, AttackType.BOX)
-            .setInfo("Detonate", "slight windup");
-    public static Attack sha = new Attack(45, 20, 16, 0, AttackType.BOX)
+    public static Attack sha = new Attack(5, 45, 20, 16, 0, AttackType.BOX)
             .setRanged(true)
             .setInfo("Sheer Heart Attack", "creates an automatic, heat-seeking sub-stand that explodes on contact, reflects 25% damage back to owner");
+    public static Attack detonate = new Attack(6, 1, 1, 6, 5, 0, 0f, 0.0f, AttackType.BOX)
+            .setInfo("Detonate", "slight windup");
+
     public ItemEntity coin;
     public Entity bombEntity;
     public Vec3d bombBlock;
@@ -95,11 +96,12 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
                 "limited combo tools"
         );
 
-        freespace = "BNBs:\n" +
-                "    -Standard bomb plant confirm and SHA setup\n" +
-                "    M1>Barrage>Bomb plant>Detonate(>Sheer Heart Attack)\n" +
-                "    -Confirm while bomb plant is on cd\n" +
-                "    M1>Barrage>Heavy(>Sheer Heart Attack)";
+        freespace = """
+                BNBs:
+                    -Standard bomb plant confirm and SHA setup
+                    M1>Barrage>Bomb plant>Detonate(>Sheer Heart Attack)
+                    -Confirm while bomb plant is on cd
+                    M1>Barrage>Heavy(>Sheer Heart Attack)""";
 
 
         moves = List.of(light, heavy, barrage, bombplant, detonate, sha
@@ -149,9 +151,8 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
     @Override
     public void initBarrage() {
         if (!this.canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
+        if (handleAttack(barrage, JCraft.standBarrageCD, 5))
             this.playSound(JSoundRegister.KQ_BARRAGE, 1, 1);
-        }
     }
 
     @Override
@@ -179,9 +180,8 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
     @Override
     public void initUlt() {
         if (!this.canAttack()) return;
-        if (handleAttack(detonate, JCraft.standUltCD, 6)) {
+        if (handleAttack(detonate, JCraft.standUltCD, 6))
             this.playSound(JSoundRegister.KQ_DETONATE, 1, 1);
-        }
     }
 
     @Override
@@ -216,68 +216,72 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
         LivingEntity user = this.getUser();
-        if (attack == bombplant) {
-            if (entities.size() > 0) { // Living entities take priority
-                bombEntity = entities.get(0);
-                bombBlock = null;
-            } else { // If none are found, re-do an optimized hitbox check for any entity type
-                Vec3d rotVec = getRotationVector();
-                Vec3d boxCenter = getPos().add(0, user.getHeight() / 2, 0).add(rotVec);
-                Vec3d halfBox = new Vec3d(0.5, 0.5, 0.5);
-                List<Entity> hit = world.getEntitiesByClass(Entity.class,
-                        new Box(boxCenter.subtract(halfBox), boxCenter.add(halfBox))
-                        , EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
-
-                hit.remove(this);
-                hit.remove(user);
-
-                if (hit.size() > 0) {
-                    bombEntity = hit.get(0);
+        switch (attack.id) {
+            case (4) -> {
+                if (entities.size() > 0) { // Living entities take priority
+                    bombEntity = entities.get(0);
                     bombBlock = null;
-                }
-            }
-        } else if (attack == detonate) {
-            if (bombEntity instanceof LivingEntity livingEntity) {
-                world.createExplosion(user, livingEntity.getX(), livingEntity.getY() + livingEntity.getHeight() / 2, livingEntity.getZ(), 2f, Explosion.DestructionType.NONE);
-                livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
-            } else {
-                Vec3d bombPos = null;
+                } else { // If none are found, re-do an optimized hitbox check for any entity type
+                    Vec3d rotVec = getRotationVector();
+                    Vec3d boxCenter = getPos().add(0, user.getHeight() / 2, 0).add(rotVec);
+                    Vec3d halfBox = new Vec3d(0.5, 0.5, 0.5);
+                    List<Entity> hit = world.getEntitiesByClass(Entity.class,
+                            new Box(boxCenter.subtract(halfBox), boxCenter.add(halfBox))
+                            , EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
 
-                if (bombEntity != null) {
-                    bombPos = bombEntity.getPos();
-                    if (bombEntity instanceof ItemEntity) {
-                        bombEntity.kill();
+                    hit.remove(this);
+                    hit.remove(user);
+
+                    if (hit.size() > 0) {
+                        bombEntity = hit.get(0);
+                        bombBlock = null;
                     }
                 }
-                if (bombBlock != null) {
-                    bombPos = bombBlock;
-                }
+            }
+            case (5) -> {
+                SheerHeartAttackEntity sha = new SheerHeartAttackEntity(JEntityTypeRegister.SHEER_HEART_ATTACK, world);
+                sha.setOwner(user);
+                sha.refreshPositionAndAngles(getX(), getY() + 0.5, getZ(), getYaw(), getPitch());
 
-                if (bombPos != null) {
-                    world.createExplosion(user, bombPos.x, bombPos.y, bombPos.z, 2f, Explosion.DestructionType.NONE);
+                world.spawnEntity(sha);
+            }
+            case (6) -> {
+                if (bombEntity instanceof LivingEntity livingEntity) {
+                    world.createExplosion(user, livingEntity.getX(), livingEntity.getY() + livingEntity.getHeight() / 2, livingEntity.getZ(), 2f, Explosion.DestructionType.NONE);
+                    livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
+                } else {
+                    Vec3d bombPos = null;
 
-                    List<LivingEntity> toKD = world.getEntitiesByClass(
-                            LivingEntity.class,
-                            new Box(bombPos.add(2.2, 2.2, 2.2), bombPos.add(-2.2, -2.2, -2.2)),
-                            EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR
-                    );
-
-                    for (LivingEntity livingEntity : toKD) {
-                        livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
+                    if (bombEntity != null) {
+                        bombPos = bombEntity.getPos();
+                        if (bombEntity instanceof ItemEntity) {
+                            bombEntity.kill();
+                        }
+                    }
+                    if (bombBlock != null) {
+                        bombPos = bombBlock;
                     }
 
-                    world.playSound(bombPos.x, bombPos.y, bombPos.z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.75f, 1, true);
+                    if (bombPos != null) {
+                        world.createExplosion(user, bombPos.x, bombPos.y, bombPos.z, 2f, Explosion.DestructionType.NONE);
+
+                        List<LivingEntity> toKD = world.getEntitiesByClass(
+                                LivingEntity.class,
+                                new Box(bombPos.add(2.2, 2.2, 2.2), bombPos.add(-2.2, -2.2, -2.2)),
+                                EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR
+                        );
+
+                        for (LivingEntity livingEntity : toKD) {
+                            livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
+                        }
+
+                        world.playSound(bombPos.x, bombPos.y, bombPos.z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.75f, 1, true);
+                    }
                 }
+
+                bombEntity = null;
+                bombBlock = null;
             }
-
-            bombEntity = null;
-            bombBlock = null;
-        } else if (attack == sha) {
-            SheerHeartAttackEntity sha = new SheerHeartAttackEntity(JEntityTypeRegister.SHEER_HEART_ATTACK, world);
-            sha.setOwner(user);
-            sha.refreshPositionAndAngles(getX(), getY() + 0.5, getZ(), getYaw(), getPitch());
-
-            world.spawnEntity(sha);
         }
     }
 

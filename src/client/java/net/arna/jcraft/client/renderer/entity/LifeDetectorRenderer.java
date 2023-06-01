@@ -9,6 +9,7 @@ import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Quaternion;
 import software.bernie.geckolib3.renderers.geo.GeoProjectilesRenderer;
 
 public class LifeDetectorRenderer extends GeoProjectilesRenderer<LifeDetectorEntity> {
@@ -19,5 +20,13 @@ public class LifeDetectorRenderer extends GeoProjectilesRenderer<LifeDetectorEnt
                                      VertexConsumerProvider renderTypeBuffer, VertexConsumer vertexBuilder, int packedLightIn,
                                      Identifier textureLocation) {
         return RenderLayer.getEyes(getTextureLocation(animatable));
+    }
+
+    @Override
+    public void render(LifeDetectorEntity animatable, float yaw, float partialTick, MatrixStack poseStack, VertexConsumerProvider bufferSource, int packedLight) {
+        poseStack.push();
+        poseStack.multiply(Quaternion.fromEulerXyz(3.1415f, 3.1415f, 0));
+        super.render(animatable, yaw, partialTick, poseStack, bufferSource, packedLight);
+        poseStack.pop();
     }
 }

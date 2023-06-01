@@ -20,15 +20,12 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.IAnimationTickable;
 import software.bernie.geckolib3.core.PlayState;
@@ -44,30 +41,29 @@ import java.util.List;
 public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAnimationTickable {
     AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
-    public static Attack light = new Attack(2, 0.75f, 8, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_1)
+    public static Attack light = new Attack(0, 2, 0.75f, 8, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
-    public static Attack heavy = new Attack(17, 1f, 22, 12, 1.75, 7f, 0.5f, AttackType.BOX, 0.5f, 0.6f, 0, JSoundRegister.TW_KICK_HIT)
+    public static Attack heavy = new Attack(1, 17, 1f, 22, 12, 1.75, 7f, 0.5f, AttackType.BOX, 0.5f, 0.6f, 0, JSoundRegister.TW_KICK_HIT)
             .setLaunch()
             .setInfo("Low Kick", "knockdown provider, medium windup");
-    public static Attack barrage = new Attack(17, 0.75f, 60, 0, 2, 0.4f, 0.25f, AttackType.BARRAGE, 1.5f, 0, 3)
+    public static Attack barrage = new Attack(2, 17, 0.75f, 60, 0, 2, 0.4f, 0.25f, AttackType.BARRAGE, 1.5f, 0, 3)
             .setInfo("Flamethrower", "fast reliable combo starter/extender, high stun, burns");
-    public static Attack crossfire = new Attack(20, 0.75f, 10, 8, 0, 0f, 0f, AttackType.BOX)
+    public static Attack crossfire = new Attack(3, 20, 0.75f, 10, 8, 0, 0f, 0f, AttackType.BOX)
             .setRanged(true)
             .setInfo("Crossfire", "fires 3 stunning ankhs");
-    public static Attack crossfirevariation = new Attack(30, 0.75f, 17, 12, 0, 0f, 0f, AttackType.BOX)
+    public static Attack crossfirevariation = new Attack(4, 30, 0.75f, 17, 12, 0, 0f, 0f, AttackType.BOX)
             .setRanged(true)
             .setInfo("Crossfire Variation", "summons 6 ankhs that orbit around the user, crouch to increase orbit distance");
-    public static Attack crossfirehurricane = new Attack(60, 0.75f, 22, 18, 0, 0f, 0f, AttackType.BOX)
-            .setInfo("Crossfire Hurricane", "summons slow, homing fire hurricane that knocks down, lasts for 3 seconds after hitting anything");
-    public static Attack redbind = new Attack(20, 0.75f, 22, 12, 1.5, 5, 0, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.IMPACT_3)
-            .setInfo("Red Bind", "medium windup, good stun");
-    public static Attack redirect = new Attack(5, 0.75f, 10, 7, 0, 0f, 0f, AttackType.BOX).setMobility(MobilityType.TELEPORT)
+    public static Attack redirect = new Attack(5, 5, 0.75f, 10, 7, 0, 0f, 0f, AttackType.BOX).setMobility(MobilityType.TELEPORT)
             .setInfo("Redirect", "redirects all the users ankhs to where they're looking");
     // and so begins my terrible misuse of my own AI flags, the tldr here being that its simply called whenever the enemy is >3 blocks away, which is great here
-
-    public static Attack detector = new Attack(25, 0.75f, 20, 13, 0, 0f, 0f, AttackType.BOX)
+    public static Attack crossfirehurricane = new Attack(6, 60, 0.75f, 22, 18, 0, 0f, 0f, AttackType.BOX)
+            .setInfo("Crossfire Hurricane", "summons slow, homing fire hurricane that knocks down, lasts for 3 seconds after hitting anything");
+    public static Attack detector = new Attack(7, 25, 0.75f, 20, 13, 0, 0f, 0f, AttackType.BOX)
             .setRanged(true)
             .setInfo("Life Detector/Red Bind", "tracks down nearby life, lasts 15s/crouch for a whip attack");
+    public static Attack redbind = new Attack(8, 20, 0.75f, 22, 12, 1.5, 5, 0, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.IMPACT_3)
+            .setInfo("Red Bind", "medium windup, good stun");
 
     private Vec3d hurricanePos;
     private int hurricaneTime;
@@ -159,29 +155,29 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
         }
     }
 
-    private static int variationAnkhs = 6;
+    private static final int variationAnkhs = 6;
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
-        if (hasUser()) {
-            LivingEntity user = this.getUser();
-            Vec3d eyePos = user.getEyePos();
-            if (attack == barrage) {
+        LivingEntity user = this.getUser();
+        Vec3d eyePos = user.getEyePos();
+
+        switch (attack.id) {
+            case (1) -> {
                 for (LivingEntity ent : entities) {
-                    ent.setOnFireFor(3);
+                    if (!JCraftUtils.isBlocking(ent))
+                        ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 40, 0));
                 }
-            } else if (attack == crossfire) {
+            }
+            case (2) -> { for (LivingEntity ent : entities) ent.setOnFireFor(3); }
+            case (3) -> {
                 for (int i = 0; i < 3; i++) {
                     AnkhProjectile ankh = new AnkhProjectile(world, user);
                     ankh.setVelocity(user, user.getPitch(), user.getYaw(), 0.0F, 1F, 5F);
                     ankh.setPosition(eyePos);
                     world.spawnEntity(ankh);
                 }
-            } else if (attack == heavy) {
-                for (LivingEntity ent : entities) {
-                    if (!JCraftUtils.isBlocking(ent))
-                        ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 40, 0));
-                }
-            } else if (attack == crossfirevariation) {
+            }
+            case (4) -> {
                 int orbitRange = user.isSneaking() ? 5 : 3;
                 for (int i = 0; i < variationAnkhs; i++) {
                     AnkhProjectile ankh = new AnkhProjectile(world, user);
@@ -192,10 +188,8 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
                     ankh.setOrbitOffset( (360f / variationAnkhs) * i );
                     world.spawnEntity(ankh);
                 }
-            } else if (attack == crossfirehurricane) {
-                hurricaneTime = 50; // In quad ticks
-                hurricanePos = this.getPos();
-            } else if (attack == redirect) {
+            }
+            case (5) -> {
                 List<AnkhProjectile> ankhs = world.getEntitiesByClass(AnkhProjectile.class,
                         new Box(eyePos.add(32.0, 32.0, 32.0), eyePos.subtract(32.0, 32.0, 32.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
 
@@ -209,7 +203,12 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
                         }
                     }
                 }
-            } else if (attack == detector) {
+            }
+            case (6) -> {
+                hurricaneTime = 50; // In quad ticks
+                hurricanePos = this.getPos();
+            }
+            case (7) -> {
                 LifeDetectorEntity lifeDetector = new LifeDetectorEntity(JEntityTypeRegister.LIFE_DETECTOR,world);
                 lifeDetector.setOwner(user);
                 lifeDetector.refreshPositionAndAngles(getX(), getY() + 1.5, getZ(), getYaw(), getPitch());

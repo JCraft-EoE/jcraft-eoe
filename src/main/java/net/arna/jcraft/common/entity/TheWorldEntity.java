@@ -32,19 +32,22 @@ import java.util.List;
 public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimationTickable {
     AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
-    public static Attack light = new Attack(2, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
+    public static Attack light = new Attack(0, 2, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
-    public static Attack barrage = new Attack(17, 0.75f, 50, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 2, 0, 3)
+    public static Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 2, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public static Attack donut = new Attack(14, 1f, 48, 26, 2, 14f, 0.0f, AttackType.BOX, 4, 0, 0, JSoundRegister.TW_DONUT_HIT).setHitspark(2).setArmor(true)
-            .setInfo("Donut", "slow, uninterruptable combo starter/extender, 2s stun on whiff");
-    public static Attack charge = new Attack(20, 7.5f, 19, 5, 1.5, 7f, 0.25f, AttackType.CHARGE, 1, 0, 9, JSoundRegister.TW_CHARGE_HIT).setRanged(true)
+    public static Attack donut = new Attack(1, 14, 1f, 48, 26, 2, 9f, 0.0f, AttackType.BOX, 4, 0, 0, JSoundRegister.TW_DONUT_HIT)
+            .setHitspark(2)
+            .setArmor(true)
+            .setInfo("Donut", "slow, uninterruptable combo starter/extender, 1.5s stun on whiff");
+    public static Attack charge = new Attack(4, 20, 7.5f, 19, 5, 1.5, 7f, 0.25f, AttackType.CHARGE, 1, 0, 9, JSoundRegister.TW_CHARGE_HIT)
+            .setRanged(true)
             .setInfo("Forward Charge", "The World detaches from the user and lunges forward, combo starter");
-    public static Attack roundhouse = new Attack(11, 0.75f, 13, 7, 1.75, 8f, 0.3f, AttackType.BOX, 0.45f, -0.1f, 0, JSoundRegister.TW_KICK_HIT)
+    public static Attack roundhouse = new Attack(3, 11, 0.75f, 13, 7, 1.75, 8f, 0.3f, AttackType.BOX, 0.45f, -0.1f, 0, JSoundRegister.TW_KICK_HIT)
             .setInfo("Roundhouse", "fast poke, low stun");
-    public static Attack timestop = new Attack(70, 40, 30, 4, AttackType.TIMESTOP)
+    public static Attack timestop = new Attack(6, 70, 40, 30, 4, AttackType.TIMESTOP)
             .setInfo("Timestop", "4 seconds");
-    public static Attack feignbarrage = new Attack(30, 0.75f, 50, 5, 0, 0f, 0f, AttackType.COUNTER)
+    public static Attack feignbarrage = new Attack(5, 30, 0.75f, 50, 5, 0, 0f, 0f, AttackType.COUNTER)
             .setInfo("Feign Barrage", "counter, no real damage, teleports behind attacker");
 
     public TheWorldEntity(World worldIn) {
@@ -179,11 +182,11 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
-        LivingEntity user = this.getUser();
-        if (attack == donut) {
-            // If miss, stun the user for 3 seconds
+        if (attack.id == 1) {
+            LivingEntity user = this.getUser();
+            // If missed, stun the user for 1.5 seconds
             if (entities.isEmpty()) {
-                stun(user, 60, 0);
+                stun(user, 30, 0);
             } else {
                 // If hit, impale and set position to middle of arm
                 for (LivingEntity entity : entities) {
@@ -205,9 +208,8 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
     public void counter(Entity entity, DamageSource source) {
         super.counter(entity, source);
 
-        if (entity == null || !hasUser()) {
+        if (entity == null || !hasUser())
             return;
-        }
         LivingEntity user = this.getUser();
         Vec3d behind = entity.getPos().subtract(entity.getRotationVector());
 
@@ -216,9 +218,7 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
 
         if (entity instanceof LivingEntity livingEntity) {
             stun(livingEntity, 20, 0);
-            if (entity.getFirstPassenger() instanceof StandEntity stand) {
-                stand.cancelAttack();
-            }
+            if (entity.getFirstPassenger() instanceof StandEntity stand) stand.cancelAttack();
         }
 
         this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.TIME_SKIP, SoundCategory.PLAYERS, 1f, 1f);
@@ -265,9 +265,7 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
             return PlayState.CONTINUE;
         }
 
-        if (this.getSameState()) {
-            controller.markNeedsReload();
-        }
+        if (this.getSameState()) controller.markNeedsReload();
         switch (this.getState()) {
             default -> controller.setAnimation(builder.loop("animation.theworld.idle"));
             case 2 -> controller.setAnimation(builder.playAndHold("animation.theworld.light"));

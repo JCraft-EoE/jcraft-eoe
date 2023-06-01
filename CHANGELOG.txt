@@ -618,6 +618,23 @@ Magician's Red
 Cream
     >Can no longer levitate while stunned in half-ball form
 
+● 31/5/2023
+>Optimized stand attack code
+>Fixed bug where blockable attack effects were made unblockable
+
+Star Platinum
+    >Advancing Barrage targetting improved
+The World
+    >Donut
+        >Damage reduced (14->9)
+        >Stun on whiff reduced (3->1.5s)
+Silver Chariot
+    >Beatdown stun on whiff reduced (4.5->1.5s)
+Whitesnake
+    >Cooldown on Pilot Mode reduced (3->1.5s)
+Golden Experience
+    >Remodeled and reanimated
+
 priority (top to bottom)
 TODO: ability to position the HUD
 TODO: AI flags for unblockables and shouldn't-blockables

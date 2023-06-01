@@ -49,23 +49,23 @@ import java.util.List;
 public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimationTickable {
     AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
-    public static Attack light = new Attack(2, 1.5f, 14, 7, 2, 6f, 0.8f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_2)
+    public static Attack light = new Attack(0, 2, 1.5f, 14, 7, 2, 6f, 0.8f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_2)
             .setInfo("Swipe", "slow, long-reaching poke");
-    public static Attack airbarrage = new Attack(20, 1f, 30, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 0.5f, 0, 3);
+    public static Attack airbarrage = new Attack(3, 20, 1f, 30, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 0.5f, 0, 3);
 
-    public static Attack combo = new Attack(17, 1.5f, 31, 0, 1.75, 4.5f, 0.1f, AttackType.MULTIHIT, 1f, -0.1f, List.of(8, 16, 20, 21), JSoundRegister.IMPACT_2)
+    public static Attack combo = new Attack(2, 17, 1.5f, 31, 0, 1.75, 4.5f, 0.1f, AttackType.MULTIHIT, 1f, -0.1f, List.of(8, 16, 20, 21), JSoundRegister.IMPACT_2)
             .setInfo("3-hit combo (grounded) / Burn Rubber (aerial)", "knockdown on final hit / slows down all movement, combo starter/extender");
-    public static Attack launch = new Attack(16, 1.25f, 20, 16, 2, 8f, 0.5f, AttackType.BOX, 1.25f, -0.3f, 0, JSoundRegister.IMPACT_2).setHitspark(2).setArmor(true)
+    public static Attack launch = new Attack(1, 16, 1.25f, 20, 16, 2, 8f, 0.5f, AttackType.BOX, 1.25f, -0.3f, 0, JSoundRegister.IMPACT_2).setHitspark(2).setArmor(true)
             .setInfo("Launch", "uninterruptable, slow, launching uppercut");
-    public static Attack pound = new Attack(24, 1.25f, 23, 0, 1.5, 4f, 0.1f, AttackType.MULTIHIT, 1.25f, -0.1f, List.of(7, 15), JSoundRegister.IMPACT_2).setLift(false)
+    public static Attack pound = new Attack(4, 24, 1.25f, 23, 0, 1.5, 4f, 0.1f, AttackType.MULTIHIT, 1.25f, -0.1f, List.of(7, 15), JSoundRegister.IMPACT_2).setLift(false)
             .setInfo("Pound", "two-hitter, sends opponent up on first hit, and down on the second");
-    public static Attack sandclone = new Attack(30, 1, 11, 7, 0, 0f, 0.0f, AttackType.BOX).setRanged(true)
+    public static Attack sandclone = new Attack(6, 30, 1, 11, 7, 0, 0f, 0.0f, AttackType.BOX).setRanged(true)
             .setInfo("Sand Clone", "in a blinding cloud, summons a slow sand clone which attacks alongside you");
-    public static Attack sandwave = new Attack(27, 0f, 80, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 0, 0, 3).setRanged(true)
+    public static Attack sandwave = new Attack(8, 27, 0f, 80, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 0, 0, 3).setRanged(true)
             .setInfo("Sandwave - for 4s", "turn into a quick sandwave that knocks anything it touches down");
-    public static Attack charge = new Attack(22, 5f, 22, 5, 1.5, 6f, 1.2f, AttackType.CHARGE, 0.5f, 0, 11, JSoundRegister.IMPACT_2).setRanged(true).setLaunch()
+    public static Attack charge = new Attack(5, 22, 5f, 22, 5, 1.5, 6f, 1.2f, AttackType.CHARGE, 0.5f, 0, 11, JSoundRegister.IMPACT_2).setRanged(true).setLaunch()
             .setInfo("Charge", "The Fool detaches from the user and charges forward, dealing knockback on hit");
-    public static Attack sandstorm = new Attack(50, 1.5f, 41, 28, 2, 7f, 0.1f, AttackType.BOX, 1, 0, 0, JSoundRegister.TW_KICK_HIT).setHitspark(2)
+    public static Attack sandstorm = new Attack(7, 50, 1.5f, 41, 28, 2, 7f, 0.1f, AttackType.BOX, 1, 0, 0, JSoundRegister.TW_KICK_HIT).setHitspark(2)
             .setUB(true)
             .setInfo("Suffocating Sandstorm", "very slow, traps the opponent in a cloud of slowing sand");
 
@@ -275,107 +275,108 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
         LivingEntity user = this.getUser();
-        if (attack == sandwave) {
-            for (LivingEntity ent : entities) {
-                ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 15, 0));
+        switch (attack.id) {
+            case (1) -> {
+                for (LivingEntity ent : entities)
+                    ent.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 5, 19, true, false));
             }
-        } else if (attack == sandclone) {
-            // Display sand effect
-            PacketByteBuf buf = PacketByteBufs.create();
-
-            Vec3d pos = user.getEyePos();
-
-            buf.writeShort(11);
-
-            buf.writeDouble(pos.x);
-            buf.writeDouble(pos.y);
-            buf.writeDouble(pos.z);
-
-            for (PlayerEntity sendPlayer : world.getPlayers()) {
-                if (sendPlayer instanceof ServerPlayerEntity serverPlayerEntity) {
-                    ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
-                }
-
-                if (sendPlayer == user) {
-                    continue;
-                }
-
-                // Blind players caught in the cloud
-                if (sendPlayer.isInRange(user, 4)) {
-                    sendPlayer.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 40, 0, true, false));
+            case (2) -> {
+                if (this.getMoveStun() < 11)
+                    for (LivingEntity ent : entities)
+                        ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 20, 0));
+            }
+            case (4) -> {
+                for (LivingEntity ent : entities) {
+                    Vec3d vel = ent.getVelocity();
+                    ent.setVelocity(vel.x, (this.getMoveStun() > 14) ? 0.5 : -1, vel.y);
+                    ent.velocityModified = true;
                 }
             }
+            case (6) -> {
+                // Display sand effect
+                PacketByteBuf buf = PacketByteBufs.create();
 
-            // Summon clone
-            if (user instanceof PlayerEntity playerEntity) {
-                PlayerCloneEntity playerCloneEntity = new PlayerCloneEntity(JEntityTypeRegister.PLAYER_ENTITY_CLONE, this.world);
-                playerCloneEntity.copyPositionAndRotation(playerEntity);
-                playerCloneEntity.setOwner(playerEntity);
-                playerCloneEntity.sandClone = true;
-                this.world.spawnEntity(playerCloneEntity);
+                Vec3d pos = user.getEyePos();
 
-                this.sandClone = playerCloneEntity;
-            } else if (user instanceof MobEntity mob) {
-                //Code sourced from MobEntity.class convertTo()
-                EntityType<?> entityType = mob.getType();
-                MobEntity newMob = (MobEntity) entityType.create(this.world);
+                buf.writeShort(11);
 
-                newMob.copyPositionAndRotation(this);
-                newMob.setBaby(mob.isBaby());
+                buf.writeDouble(pos.x);
+                buf.writeDouble(pos.y);
+                buf.writeDouble(pos.z);
 
-                if (mob.hasCustomName()) {
-                    newMob.setCustomName(mob.getCustomName());
-                    newMob.setCustomNameVisible(mob.isCustomNameVisible());
+                for (PlayerEntity sendPlayer : world.getPlayers()) {
+                    if (sendPlayer instanceof ServerPlayerEntity serverPlayerEntity)
+                        ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
+                    if (sendPlayer == user)
+                        continue;
+
+                    // Blind players caught in the cloud
+                    if (sendPlayer.isInRange(user, 4)) {
+                        sendPlayer.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 40, 0, true, false));
+                    }
                 }
 
-                this.world.spawnEntity(newMob);
-                newMob.age = mob.age;
-                IEntityDataSaver newMobData = (IEntityDataSaver) newMob;
-                newMobData.getPersistentData().putInt("StandID", 0);
+                // Summon clone
+                if (user instanceof PlayerEntity playerEntity) {
+                    PlayerCloneEntity playerCloneEntity = new PlayerCloneEntity(JEntityTypeRegister.PLAYER_ENTITY_CLONE, this.world);
+                    playerCloneEntity.copyPositionAndRotation(playerEntity);
+                    playerCloneEntity.setOwner(playerEntity);
+                    playerCloneEntity.sandClone = true;
+                    this.world.spawnEntity(playerCloneEntity);
 
-                this.sandClone = newMob;
-            }
+                    this.sandClone = playerCloneEntity;
+                } else if (user instanceof MobEntity mob) {
+                    //Code sourced from MobEntity.class convertTo()
+                    EntityType<?> entityType = mob.getType();
+                    MobEntity newMob = (MobEntity) entityType.create(this.world);
 
-            this.sandClone.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 200, 2, true, false));
-        } else if (attack == pound) {
-            for (LivingEntity ent : entities) {
-                Vec3d vel = ent.getVelocity();
-                ent.setVelocity(vel.x, (this.getMoveStun() > 14) ? 0.5 : -1, vel.y);
-                ent.velocityModified = true;
-            }
-        } else if (attack == launch) {
-            for (LivingEntity ent : entities) {
-                ent.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 5, 19, true, false));
-            }
-        } else if (attack == combo && this.getMoveStun() < 11) {
-            for (LivingEntity ent : entities) {
-                ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 20, 0));
-            }
-        } else if (attack == sandstorm && entities.size() > 0) {
-            this.superTarget = entities.get(0);
+                    newMob.copyPositionAndRotation(this);
+                    newMob.setBaby(mob.isBaby());
 
-            for (int i = 0; i < 8; i++) {
-                FallingBlockEntity sand = FallingBlockEntity.spawnFromBlock(this.world, superTarget.getBlockPos(), Blocks.SAND.getDefaultState());
-                sand.timeFalling = -32767;
-                sand.noClip = true;
-                sand.dropItem = false;
-                sand.setBoundingBox(new Box(0, 0, 0, 0, 0, 0));
-                sand.setNoGravity(true);
-                sands.add(sand);
+                    if (mob.hasCustomName()) {
+                        newMob.setCustomName(mob.getCustomName());
+                        newMob.setCustomNameVisible(mob.isCustomNameVisible());
+                    }
+
+                    this.world.spawnEntity(newMob);
+                    newMob.age = mob.age;
+                    IEntityDataSaver newMobData = (IEntityDataSaver) newMob;
+                    newMobData.getPersistentData().putInt("StandID", 0);
+
+                    this.sandClone = newMob;
+                }
+
+                this.sandClone.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 200, 2, true, false));
+            }
+            case (7) -> {
+                if (!entities.isEmpty()) {
+                    this.superTarget = entities.get(0);
+
+                    for (int i = 0; i < 8; i++) {
+                        FallingBlockEntity sand = FallingBlockEntity.spawnFromBlock(this.world, superTarget.getBlockPos(), Blocks.SAND.getDefaultState());
+                        sand.timeFalling = -32767;
+                        sand.noClip = true;
+                        sand.dropItem = false;
+                        sand.setBoundingBox(new Box(0, 0, 0, 0, 0, 0));
+                        sand.setNoGravity(true);
+                        sands.add(sand);
+                    }
+                }
+            }
+            case (8) -> {
+                for (LivingEntity ent : entities)
+                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 15, 0));
             }
         }
     }
 
     @Override
     public void tick() {
-        if (age == 1) {
-            this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.STAND_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
-        }
+        if (age == 1) this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.STAND_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
 
         super.tick();
 
         boolean client = this.world.isClient();
-
         if (hasUser()) {
             LivingEntity user = this.getUser();
             if (client) {

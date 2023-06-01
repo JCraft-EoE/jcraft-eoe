@@ -34,29 +34,27 @@ import java.util.List;
 public class GoldenExperienceEntity extends StandEntity implements IAnimatable, IAnimationTickable {
     AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
-    public static Attack light = new Attack(2, 0.75f, 9, 6, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
+    public static Attack light = new Attack(0, 2, 0.75f, 9, 6, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
-    public static Attack heavy = new Attack(17, 1f, 22, 13, 1.5, 9f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_2).setHitspark(2).setArmor(true).setLaunch()
+    public static Attack heavy = new Attack(1, 17, 1f, 22, 13, 1.5, 9f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_2).setHitspark(2).setArmor(true).setLaunch()
             .setInfo("Shoulder Smash", "slow, uninterruptable combo finisher");
-    public static Attack barrage = new Attack(14, 0.75f, 30, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 2, 0, 3)
+    public static Attack barrage = new Attack(2, 14, 0.75f, 30, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 2, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public static Attack healself = new Attack(26, 1f, 14, 10, 0, 0f, 0f, AttackType.BOX)
+    public static Attack healself = new Attack(3, 26, 1f, 14, 10, 0, 0f, 0f, AttackType.BOX)
             .setInfo("Healing Hand", "standing: heals user for 2 hearts, crouching: heals others for 2 hearts, pacifies angered mobs");
-    public static Attack heal = new Attack(26, 1f, 16, 10, 0, 0f, 0f, AttackType.BOX);
-    public static Attack tree = new Attack(20, 1f, 24, 14, 1.25, 5f, 0.2f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_2).setHitspark(2)
+    public static Attack heal = new Attack(4, 26, 1f, 16, 10, 0, 0f, 0f, AttackType.BOX);
+    public static Attack tree = new Attack(5, 20, 1f, 24, 14, 1.25, 5f, 0.2f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_2).setHitspark(2)
             .setInfo("Tree Summon", "two-hitting launch");
-    public static Attack snake = new Attack(36, 1f, 25, 16, 0, 0f, 0f, AttackType.BOX).setRanged(true)
+    public static Attack snake = new Attack(6, 36, 1f, 25, 16, 0, 0f, 0f, AttackType.BOX).setRanged(true)
             .setInfo("Snake Summon", "turns a held item into a snake which lasts for 25s and stuns for 0.5s on hit");
-    public static Attack overclock = new Attack(46, 1f, 31, 22, 2, 9f, 0.9f, AttackType.BOX, 3, 0, 0, JSoundRegister.IMPACT_5).setHitspark(2)
+    public static Attack overclock = new Attack(10, 46, 1f, 31, 22, 2, 9f, 0.9f, AttackType.BOX, 3, 0, 0, JSoundRegister.IMPACT_5).setHitspark(2)
             .setUB(false)
             .setInfo("Overclock", "slow, unblockable, devastating stun");
-    public static Attack rekka3 = new Attack(23, 1f, 24, 12, 2, 7f, 0.5f, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.TW_KICK_HIT).setHitspark(2);
-    public static Attack rekka2 = new Attack(23, 1f, 18, 10, 1.75, 5f, 0.5f, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.IMPACT_2)
+    public static Attack rekka3 = new Attack(9, 23, 1f, 24, 12, 2, 7f, 0.5f, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.TW_KICK_HIT).setHitspark(2);
+    public static Attack rekka2 = new Attack(8, 23, 1f, 18, 10, 1.75, 5f, 0.5f, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.IMPACT_2)
             .setInfo("how did you", "get here", AttackQueue.SPECIAL2).setHitspark(2).setFollowup(rekka3);
-    public static Attack rekka1 = new Attack(23, 1f, 20, 8, 1.5, 5f, 0.5f, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.IMPACT_2)
+    public static Attack rekka1 = new Attack(7, 23, 1f, 20, 8, 1.5, 5f, 0.5f, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.IMPACT_2)
             .setInfo("Rekka Series", "a set of three attacks, which cancel into each other during recovery", AttackQueue.SPECIAL2).setFollowup(rekka2);
-    //todo: sounds on MR
-    //todo: add skin select
 
     public GoldenExperienceEntity(World worldIn) {
         super(StandType.GOLDEN_EXPERIENCE, worldIn);
@@ -88,17 +86,13 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
     // Moveset
     @Override
     public void initLightAttack() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
     public void initHeavyAttack() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(heavy, JCraft.standHeavyCD, 4)) {
             //this.playSound(ModSoundRegister.STAR_BREAKER,1, 1);
         }
@@ -106,9 +100,7 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
 
     @Override
     public void initBarrage() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
             this.playSound(JSoundRegister.GE_BARRAGE, 1, 1);
         }
@@ -117,9 +109,7 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
     @Override
     public void initSpecial1() {
         CanAttackData data = this.canAttackWithData();
-        if (!data.canAttack) {
-            return;
-        }
+        if (!data.canAttack) return;
         if (data.user.isSneaking()) {
             if (handleAttack(heal, JCraft.standS1CD, 7)) {
                 this.playSound(JSoundRegister.GE_HEAL, 1, 1);
@@ -131,9 +121,7 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
 
     @Override
     public void initUlt() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(overclock, JCraft.standUltCD, 13)) {
             //this.playSound(ModSoundRegister.STAR_PLATINUM_THE_WORLD, 1, 1);
         }
@@ -143,53 +131,42 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
     public void initSpecial2() {
         if (hasUser()) {
             LivingEntity user = this.getUser();
-            if (user.hasStatusEffect(JStatusRegister.DAZED)) {
-                return;
-            }
+            if (user.hasStatusEffect(JStatusRegister.DAZED)) return;
             boolean idling = this.getMoveStun() < 1;
 
-            if (this.curAttack != rekka1 && this.curAttack != rekka2 && this.curAttack != rekka3) {
+            if (curAttack != rekka1 && curAttack != rekka2 && curAttack != rekka3) {
                 if (idling) {
                     handleAttack(rekka1, JCraft.standS2CD, 10);
                     return;
                 }
             }
-            if (this.curAttack == rekka1 && this.getMoveStun() < 12) {
+            if (curAttack.id == rekka1.id && this.getMoveStun() < 12)
                 setAttack(rekka2, 11);
-            }
-            if (this.curAttack == rekka2 && this.getMoveStun() < 8) {
+            if (curAttack.id == rekka2.id && this.getMoveStun() < 8)
                 setAttack(rekka3, 12);
-            }
         }
     }
 
     @Override
     public void initSpecial3() {
-        if (!this.canAttack()) {
-            return;
-        }
-        if (handleAttack(snake, JCraft.standS3CD, 9)) {
+        if (!this.canAttack()) return;
+        if (handleAttack(snake, JCraft.standS3CD, 9))
             this.playSound(JSoundRegister.GE_HEAL, 1, 1);
-        }
     }
 
     @Override
     public void initMiddleClick() {
-        if (!this.canAttack()) {
-            return;
-        }
-        if (handleAttack(tree, JCraft.standMMBCD, 8)) {
+        if (!this.canAttack()) return;
+        if (handleAttack(tree, JCraft.standMMBCD, 8))
             this.playSound(JSoundRegister.GE_TREE, 1, 1);
-        }
     }
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
-        if (hasUser()) {
-            LivingEntity user = this.getUser();
-            if (attack == healself) {
-                user.heal(4f);
-            } else if (attack == heal) {
+        LivingEntity user = this.getUser();
+        switch (attack.id) {
+            case (3) -> user.heal(4f);
+            case (4) -> {
                 for (LivingEntity ent :
                         entities) {
                     ent.heal(4f);
@@ -204,12 +181,14 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
                         }
                     }
                 }
-            } else if (attack == tree) {
+            }
+            case (5) -> {
                 GETreeEntity tree = new GETreeEntity(JEntityTypeRegister.GE_TREE, world);
                 tree.owner = user;
                 tree.copyPositionAndRotation(this);
                 this.world.spawnEntity(tree);
-            } else if (attack == snake) {
+            }
+            case (6) -> {
                 ItemStack item = user.getOffHandStack(); // Get offhand, or if unavailable main hand stack
                 if (item.isEmpty()) {
                     item = user.getMainHandStack();
@@ -230,14 +209,16 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
                 snake.setStackInHand(Hand.MAIN_HAND, snakeItem);
                 item.decrement(1);
                 this.world.spawnEntity(snake);
-            } else if (attack == rekka3) {
+            }
+            case (9) -> {
                 for (LivingEntity ent :
                         entities) {
                     if (!JCraftUtils.isBlocking(ent)) {
                         ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 50, 0, true, false));
                     }
                 }
-            } else if (attack == overclock) {
+            }
+            case (10) -> {
                 for (LivingEntity ent :
                         entities) {
                     ent.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 5, 14, true, false));
@@ -261,9 +242,7 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
 
     @Override
     public void tick() {
-        if (age == 1) {
-            this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.GE_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
-        }
+        if (age == 1) this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.GE_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
 
         super.tick();
 
