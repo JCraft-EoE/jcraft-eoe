@@ -137,9 +137,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
 
     @Override
     public void initSpecial1() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(smite, JCraft.standS1CD, 6)) {
             LivingEntity user = this.getUser();
             if (user.isOnGround()) {
