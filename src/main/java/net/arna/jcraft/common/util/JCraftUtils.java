@@ -37,6 +37,7 @@ import java.util.List;
 import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 
 public final class JCraftUtils {
+    //TODO: synchronise this with clients
     public static List<DimValues> activeTimestops = new ArrayList<>();
 
     // Specify what type the hitbox searches for
