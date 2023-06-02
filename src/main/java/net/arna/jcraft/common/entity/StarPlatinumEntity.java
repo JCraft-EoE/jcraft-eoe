@@ -27,19 +27,24 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 import java.util.List;
 
 public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
     public static Attack light = new Attack(0, 2, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
-    public static Attack heavy = new Attack(1, 17, 1f, 30, 20, 2.0, 10f, 1.5f, AttackType.BOX, 0.5f).setHitspark(2).setArmor(true).setLaunch()
+    public static Attack heavy = new Attack(1, 17, 1f, 30, 20, 2.0, 10f, 1.5f, AttackType.BOX, 0.5f)
+            .setHitspark(2)
+            .setArmor(true)
+            .setLaunch()
             .setInfo("Star Breaker", "uninterruptable launcher");
     public static Attack barrage = new Attack(2, 17, 0.75f, 60, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 2, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public static Attack starfinger = new Attack(3, 20, 1.25f, 20, 12, 1.75, 6f, -0.25f, AttackType.BOX, 1.5f, -0.25f).setHitspark(2)
+    public static Attack starfinger = new Attack(3, 20, 1.25f, 20, 12, 1.75, 6f, -0.25f, AttackType.BOX, 1.5f, -0.25f)
+            .setHitspark(2)
             .setInfo("Star Finger", "medium windup, combo starter/extender");
     public static Attack lowkick = new Attack(4, 12, 0.75f, 12, 7, 1.5, 7f, 0.25f, AttackType.BOX, 0.4f, 0)
             .setInfo("Roundhouse", "fast poke, low stun");
-    public static Attack chargebarrage = new Attack(5, 26, 4f, 55, 5, 1.5, 0.6f, 0.4f, AttackType.CHARGEBARRAGE, 1, 0, 3).setRanged(true)
+    public static Attack chargebarrage = new Attack(5, 26, 5f, 55, 5, 1.5, 0.6f, 0.4f, AttackType.CHARGEBARRAGE, 1, 0, 3)
+            .setRanged(true)
+            .disableBackstab()
             .setInfo("Advancing Barrage", "fast combo starter/extender, medium stun, extremely punishable on whiff");
     public static Attack timestop = new Attack(6, 60, 40, 39, 3, AttackType.TIMESTOP) // TS = (moveStun-initTime)/20
             .setInfo("Timestop", "3 seconds");
@@ -131,7 +136,8 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
     @Override
     public void initSpecial3() {
         if (!this.canAttack()) return;
-        if (handleAttack(chargebarrage, JCraft.standS3CD, 5)) {
+        // Uses a copy because otherwise the main one gets overwritten by specialAttack()
+        if (handleAttack(Attack.copyOf(chargebarrage), JCraft.standS3CD, 5)) {
             this.playSound(JSoundRegister.STAR_PLATINUM_ADVANCING_BARRAGE, 1, 1);
         }
     }
@@ -192,33 +198,26 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
     }
 
     // Animation code
+    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+
     @Override
     public void registerControllers(AnimationData animationData) {
         animationData.addAnimationController(new AnimationController(this, "controller", 0, this::predicate));
     }
-
     @Override
-    public AnimationFactory getFactory() {
-        return this.animationFactory;
-    }
-
+    public AnimationFactory getFactory() { return this.animationFactory; }
     @Override
-    public int tickTimer() {
-        return age;
-    }
-
+    public int tickTimer() { return age; }
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         AnimationController controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 
-        if (age < 15 && getState() < 2) {
+        if (controller.isJustStarting) {
             controller.setAnimation(builder.playOnce("animation.starplatinum.summon"));
             return PlayState.CONTINUE;
         }
 
-        if (getSameState()) {
-            controller.markNeedsReload();
-        }
+        if (getSameState()) controller.markNeedsReload();
         switch (getState()) {
             default -> controller.setAnimation(builder.loop("animation.starplatinum.idle"));
             case 2 -> controller.setAnimation(builder.playAndHold("animation.starplatinum.punch"));

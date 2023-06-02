@@ -50,15 +50,22 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
             .setInfo("Dual Chop", "quick combo starter");
     public static Attack barrage = new Attack(3, 17, 0.85f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender/finisher, medium stun, knocks back");
-    public static Attack overhead = new Attack(2, 8, 0.85f, 32, 22, 2, 9f, 1.5f, AttackType.BOX, 0.5f).setHitspark(2).setArmor(true).setLaunch()
+    public static Attack overhead = new Attack(2, 8, 0.85f, 32, 22, 2, 9f, 1.5f, AttackType.BOX, 0.5f)
+            .setHitspark(2)
+            .setArmor(true)
+            .setLaunch()
             .setInfo("Overhead Hook", "long windup, knockdown", AttackQueue.HEAVY);
     public static Attack heavy = new Attack(1, 13, 0.85f, 19, 12, 1.5, 6f, 0.2f, AttackType.BOX, 1.25f, 0, 0)
-            .setInfo("Vertical Chop", "medium windup combo starter, has a true followup in the form of a slow, armored knockdown", AttackQueue.HEAVY).setFollowup(overhead);
-    public static Attack eyechop = new Attack(4, 20, 1f, 50, 37, 1.75, 9f, 0.3f, AttackType.BOX, 3, -0.3f).setHitspark(2)
+            .setInfo("Vertical Chop", "medium windup combo starter, has a true followup in the form of a slow, armored knockdown", AttackQueue.HEAVY)
+            .setFollowup(overhead);
+    public static Attack eyechop = new Attack(4, 20, 1f, 50, 37, 1.75, 9f, 0.3f, AttackType.BOX, 3, -0.3f)
+            .setHitspark(2)
             .setInfo("Eye Chop/Blood Throw", "blindness on hit, donut combo extender/crouch to throw a stunning, blinding blood projectile");
     public static Attack bloodthrow = new Attack(5, 25, 15, 10, 10, AttackType.BOX)
             .setInfo("Blood Throw", "");
-    public static Attack donut = new Attack(6, 15, 1f, 60, 42, 2, 14f, 0.0f, AttackType.BOX, 6, 0.1f).setHitspark(2)
+    public static Attack donut = new Attack(6, 15, 1f, 60, 42, 2, 14f, 0.0f, AttackType.BOX, 6, 0.1f)
+            .setHitspark(2)
+            .setArmor(true)
             .setInfo("Donut", "huge windup, 6s hitstun");
     public static Attack epitaph = new Attack(7, 30, 34, 4, 0, -1, AttackType.COUNTER)
             .setInfo("Epitaph/Move Cancel", "when used raw, 0.2s windup, 1.5s counter; cancels move when used during one");

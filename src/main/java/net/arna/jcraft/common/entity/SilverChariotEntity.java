@@ -40,19 +40,29 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
             .setInfo("Stab", "quick combo starter, links into Spinning Blade while armor is off");
     public Attack barrage = new Attack(2, 17, 0.65f, 60, 0, 2.25, 0.9f, 0.1f, AttackType.BARRAGE, 1.25f, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public Attack heavy = new Attack(1, 18, 0.65f, 28, 20, 2.0, 8f, 1.5f, AttackType.BOX, 0.5f).setHitspark(2).setArmor(true).setLaunch()
+    public Attack heavy = new Attack(1, 18, 0.65f, 28, 20, 2.0, 8f, 1.5f, AttackType.BOX, 0.5f)
+            .setHitspark(2)
+            .setArmor(true)
+            .setLaunch()
             .setInfo("Impaling Thrust", "slow, uninterruptable launcher");
     public Attack spinbarrage = new Attack(3, 25, 0.65f, 24, 7, 2, 1f, 0.1f, AttackType.BARRAGE, 0.50f, 0, 2)
             .setInfo("Spinning Blade", "fast reliable combo starter/extender, low stun");
-    public Attack charge = new Attack(4, 18, 0.65f, 25, 15, 1.75, 5f, 0.25f, AttackType.BOX, 0.65f, -0.2f, 0).setRanged(true).setMobility(MobilityType.DASH)
+    public Attack charge = new Attack(4, 18, 0.65f, 25, 15, 1.75, 5f, 0.25f, AttackType.BOX, 0.65f, -0.2f, 0)
+            .setRanged(true)
+            .setMobility(MobilityType.DASH)
             .setInfo("Ray Dart", "Silver Chariot and the user charge forward, combo finisher (base form), combo extender (armor off)");
-    public Attack cleave = new Attack(5, 26, 0.75f, 21, 12, 2.5, 9f, 0.8f, AttackType.BOX, 1f, 0, 0).setHitspark(2).setArmor(true)
+    public Attack cleave = new Attack(5, 26, 0.75f, 21, 12, 2.5, 9f, 0.8f, AttackType.BOX, 1f, 0, 0)
+            .setHitspark(2)
+            .setArmor(true)
             .setInfo("Cleave", "Silver Chariot detaches from the user, delivering an uninterruptable, combo-starting slice");
-    public Attack pcharge = new Attack(6, 22, 8f, 19, 5, 1.5, 5f, 0.25f, AttackType.CHARGE, 0.85f, 0, 9).setRanged(true)
+    public Attack pcharge = new Attack(6, 22, 8f, 19, 5, 1.5, 5f, 0.25f, AttackType.CHARGE, 0.85f, 0, 9)
+            .setRanged(true)
+            .disableBackstab()
             .setInfo("Invincible Blade", "Silver Chariot detaches from the user and charges forward, combo starter/extender");
     public Attack counter = new Attack(7, 32, 0.5f, 44, 4, 0, 0, 0, AttackType.COUNTER)
             .setInfo("Counter", "0.2s windup, 2s duration, stuns when hit");
-    public Attack pbeatdown = new Attack(8, 60, 0.65f, 28, 23, 1.75, 4f, 0f, AttackType.BOX, 2, 0, 0).setHitspark(2)
+    public Attack pbeatdown = new Attack(8, 60, 0.65f, 28, 23, 1.75, 4f, 0f, AttackType.BOX, 2, 0, 0)
+            .setHitspark(2)
             .setInfo("God of Death", "high-damage beatdown, 2s stun on whiff");
     public Attack realbeatdown = new Attack(9, 0, 0.65f, 59, 0, 2.0, 3.5f, 0.75f, AttackType.MULTIHIT, 1.1f, 0, List.of(1, 6, 13, 14, 24, 36, 56), JSoundRegister.IMPACT_1);
 

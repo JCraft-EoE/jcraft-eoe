@@ -144,11 +144,13 @@ public interface JSoundRegister {
     SoundEvent CMOON_DONUT = registerSound("cmoondonut");
 
     //Made in Heaven
+    SoundEvent MIH_BARRAGE = registerSound("mihbarrage");
     SoundEvent MIH_ZOOM = registerSound("mihzoom");
     SoundEvent MIH_JUDGEMENT = registerSound("mihjudgement");
     SoundEvent MIH_TACCEL = registerSound("mihtaccel");
     SoundEvent MIH_FURYCHOP = registerSound("mihfurychop");
     SoundEvent MIH_SPEEDSLICE = registerSound("mihspeedslice");
+    SoundEvent MIH_LEGCRUSHER = registerSound("mihlegcrusher");
 
     //The World: Over Heaven
     SoundEvent TWOH_SUMMON = registerSound("twohsummon");

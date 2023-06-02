@@ -42,6 +42,7 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
             .setInfo("Donut", "slow, uninterruptable combo starter/extender, 1.5s stun on whiff");
     public static Attack charge = new Attack(4, 20, 7.5f, 19, 5, 1.5, 7f, 0.25f, AttackType.CHARGE, 1, 0, 9, JSoundRegister.TW_CHARGE_HIT)
             .setRanged(true)
+            .disableBackstab()
             .setInfo("Forward Charge", "The World detaches from the user and lunges forward, combo starter");
     public static Attack roundhouse = new Attack(3, 11, 0.75f, 13, 7, 1.75, 8f, 0.3f, AttackType.BOX, 0.45f, -0.1f, 0, JSoundRegister.TW_KICK_HIT)
             .setInfo("Roundhouse", "fast poke, low stun");

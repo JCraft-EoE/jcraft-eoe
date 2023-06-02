@@ -7,17 +7,15 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.DefaultParticleType;
 
 @Environment(EnvType.CLIENT)
-public class CooldownCancelParticle extends AbstractSlowingParticle {
+public class BackstabParticle extends AbstractSlowingParticle {
     private final SpriteProvider spriteProvider;
 
-    CooldownCancelParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, SpriteProvider spriteProvider) {
+    BackstabParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, SpriteProvider spriteProvider) {
         super(world, x, y, z, velocityX, velocityY, velocityZ);
         this.spriteProvider = spriteProvider;
-        this.alpha = 0.7f;
-        this.maxAge = 8;
-
-        this.setColor(0.9f, 0.3f, 0.3f);
-        this.scale = 2;
+        this.alpha = 1f;
+        this.scale = 1f;
+        this.maxAge = 9;
         this.setSpriteForAge(spriteProvider);
     }
 
@@ -44,7 +42,7 @@ public class CooldownCancelParticle extends AbstractSlowingParticle {
         }
 
         public Particle createParticle(DefaultParticleType defaultParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-            return new CooldownCancelParticle(clientWorld, d, e, f, g, h, i, this.spriteProvider);
+            return new BackstabParticle(clientWorld, d, e, f, g, h, i, this.spriteProvider);
         }
     }
 }

@@ -50,25 +50,33 @@ public final class Attack {
     }
 
     public boolean overrideStun = false; // If set to true, attack will override current stun on victim
-
     public Attack setStunOverride(boolean o) {
         this.overrideStun = o;
         return this;
     }
 
-    public Attack setLaunch() {
+    public Attack setLaunch() { // Shorthand
         this.stunType = 3;
         this.overrideStun = true;
         return this;
-    } // Shorthand
+    }
 
     public boolean unblockable = false;
     public boolean ubEffectsOnly = false;
 
-    // The boolean sets whether the effects are the only ub thing, or the entire attack
+    /**
+     * Marks the attack as unblockable
+     * @param ubEO is the effect of the attack the only unblockable feature?
+     */
     public Attack setUB(boolean ubEO) {
         this.unblockable = true;
         this.ubEffectsOnly = ubEO;
+        return this;
+    }
+
+    public boolean canBackstab = true;
+    public Attack disableBackstab() {
+        this.canBackstab = false;
         return this;
     }
 
@@ -155,6 +163,7 @@ public final class Attack {
         attackCopy.stunType = attack.stunType;
         attackCopy.overrideStun = attack.overrideStun;
         attackCopy.animation = attack.animation;
+        attackCopy.canBackstab = attack.canBackstab;
         return attackCopy;
     }
 

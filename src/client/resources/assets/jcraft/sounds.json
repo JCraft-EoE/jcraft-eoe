@@ -477,6 +477,12 @@
     ]
   },
 
+  "mihbarrage": {
+    "sounds": [
+      "jcraft:mihbarrage"
+    ]
+  },
+
   "mihzoom": {
     "sounds": [
       "jcraft:mihzoom"
@@ -504,6 +510,12 @@
   "mihspeedslice": {
     "sounds": [
       "jcraft:mihspeedslice"
+    ]
+  },
+
+  "mihlegcrusher": {
+    "sounds": [
+      "jcraft:mihlegcrusher"
     ]
   },
 

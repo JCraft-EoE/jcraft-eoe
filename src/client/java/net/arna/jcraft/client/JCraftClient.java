@@ -5,6 +5,7 @@ import eu.midnightdust.lib.config.MidnightConfig;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.hud.JCraftHudOverlay;
 import net.arna.jcraft.client.net.ClientPacketHandler;
+import net.arna.jcraft.client.particle.*;
 import net.arna.jcraft.client.registry.JClientEventsRegistry;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
 import net.arna.jcraft.common.JConfig;
@@ -12,10 +13,6 @@ import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.ShaderDeactivationPacket;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
-import net.arna.jcraft.client.particle.ComboBreakerParticle;
-import net.arna.jcraft.client.particle.CooldownCancelParticle;
-import net.arna.jcraft.client.particle.HitsparkParticle;
-import net.arna.jcraft.client.particle.KCParticle;
 import net.arna.jcraft.client.registry.JArmorRendererRegister;
 import net.arna.jcraft.client.registry.JEntityRendererRegister;
 import net.arna.jcraft.client.registry.JRenderLayerRegistry;
@@ -92,11 +89,13 @@ public class JCraftClient implements ClientModInitializer {
         CrimsonShaderHandler.INSTANCE.init();
 
         // Particle registration
-        ParticleFactoryRegistry.getInstance().register(JParticleTypeRegistry.COMBO_BREAK, ComboBreakerParticle.Factory::new);
-        ParticleFactoryRegistry.getInstance().register(JParticleTypeRegistry.COOLDOWN_CANCEL, CooldownCancelParticle.Factory::new);
-        ParticleFactoryRegistry.getInstance().register(JParticleTypeRegistry.HITSPARK_1, provider -> new HitsparkParticle.Factory(provider, 0.5f));
-        ParticleFactoryRegistry.getInstance().register(JParticleTypeRegistry.HITSPARK_2, provider -> new HitsparkParticle.Factory(provider, 1f));
-        ParticleFactoryRegistry.getInstance().register(JParticleTypeRegistry.KCPARTICLE, KCParticle.Factory::new);
+        ParticleFactoryRegistry particleFactoryRegistry = ParticleFactoryRegistry.getInstance();
+        particleFactoryRegistry.register(JParticleTypeRegistry.COMBO_BREAK, ComboBreakerParticle.Factory::new);
+        particleFactoryRegistry.register(JParticleTypeRegistry.COOLDOWN_CANCEL, CooldownCancelParticle.Factory::new);
+        particleFactoryRegistry.register(JParticleTypeRegistry.HITSPARK_1, provider -> new HitsparkParticle.Factory(provider, 0.5f));
+        particleFactoryRegistry.register(JParticleTypeRegistry.HITSPARK_2, provider -> new HitsparkParticle.Factory(provider, 1f));
+        particleFactoryRegistry.register(JParticleTypeRegistry.KCPARTICLE, KCParticle.Factory::new);
+        particleFactoryRegistry.register(JParticleTypeRegistry.BACKSTAB, BackstabParticle.Factory::new);
 
         // Renderer registration
         JEntityRendererRegister.registerEntityRenderers();

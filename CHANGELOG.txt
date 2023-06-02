@@ -646,6 +646,17 @@ Projectiles
     >optimized code
     >fixed bug where they wouldn't disappear
 
+● 2/6/2023
+Added Backstabs
+    >going in a 90° angle behind and hitting someone who's blocking stuns them and stops the block
+    >projectiles and ranged moves in general CANNOT backstab
+>Fixed impact sounds being broken for Specs
+
+Star Platinum
+    >Increased distance to travel on Advancing Barrage (4->5m)
+
+King Crimson
+    >Donut is now armored
 
 priority (top to bottom)
 TODO: ability to position the HUD

@@ -42,8 +42,7 @@ public class ComboBreakerParticle extends AbstractSlowingParticle {
         }
 
         public Particle createParticle(DefaultParticleType defaultParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-            ComboBreakerParticle timeStopParticle = new ComboBreakerParticle(clientWorld, d, e, f, g, h, i, this.spriteProvider);
-            return timeStopParticle;
+            return new ComboBreakerParticle(clientWorld, d, e, f, g, h, i, this.spriteProvider);
         }
     }
 }

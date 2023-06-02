@@ -55,17 +55,26 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
 
     public static Attack combo = new Attack(2, 17, 1.5f, 31, 0, 1.75, 4.5f, 0.1f, AttackType.MULTIHIT, 1f, -0.1f, List.of(8, 16, 20, 21), JSoundRegister.IMPACT_2)
             .setInfo("3-hit combo (grounded) / Burn Rubber (aerial)", "knockdown on final hit / slows down all movement, combo starter/extender");
-    public static Attack launch = new Attack(1, 16, 1.25f, 20, 16, 2, 8f, 0.5f, AttackType.BOX, 1.25f, -0.3f, 0, JSoundRegister.IMPACT_2).setHitspark(2).setArmor(true)
+    public static Attack launch = new Attack(1, 16, 1.25f, 20, 16, 2, 8f, 0.5f, AttackType.BOX, 1.25f, -0.3f, 0, JSoundRegister.IMPACT_2)
+            .setHitspark(2)
+            .setArmor(true)
             .setInfo("Launch", "uninterruptable, slow, launching uppercut");
-    public static Attack pound = new Attack(4, 24, 1.25f, 23, 0, 1.5, 4f, 0.1f, AttackType.MULTIHIT, 1.25f, -0.1f, List.of(7, 15), JSoundRegister.IMPACT_2).setLift(false)
+    public static Attack pound = new Attack(4, 24, 1.25f, 23, 0, 1.5, 4f, 0.1f, AttackType.MULTIHIT, 1.25f, -0.1f, List.of(7, 15), JSoundRegister.IMPACT_2)
+            .setLift(false)
             .setInfo("Pound", "two-hitter, sends opponent up on first hit, and down on the second");
-    public static Attack sandclone = new Attack(6, 30, 1, 11, 7, 0, 0f, 0.0f, AttackType.BOX).setRanged(true)
+    public static Attack sandclone = new Attack(6, 30, 1, 11, 7, 0, 0f, 0.0f, AttackType.BOX)
+            .setRanged(true)
             .setInfo("Sand Clone", "in a blinding cloud, summons a slow sand clone which attacks alongside you");
-    public static Attack sandwave = new Attack(8, 27, 0f, 80, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 0, 0, 3).setRanged(true)
+    public static Attack sandwave = new Attack(8, 27, 0f, 80, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 0, 0, 3)
+            .setRanged(true)
+            .disableBackstab()
             .setInfo("Sandwave - for 4s", "turn into a quick sandwave that knocks anything it touches down");
-    public static Attack charge = new Attack(5, 22, 5f, 22, 5, 1.5, 6f, 1.2f, AttackType.CHARGE, 0.5f, 0, 11, JSoundRegister.IMPACT_2).setRanged(true).setLaunch()
+    public static Attack charge = new Attack(5, 22, 5f, 22, 5, 1.5, 6f, 1.2f, AttackType.CHARGE, 0.5f, 0, 11, JSoundRegister.IMPACT_2)
+            .setRanged(true)
+            .setLaunch()
             .setInfo("Charge", "The Fool detaches from the user and charges forward, dealing knockback on hit");
-    public static Attack sandstorm = new Attack(7, 50, 1.5f, 41, 28, 2, 7f, 0.1f, AttackType.BOX, 1, 0, 0, JSoundRegister.TW_KICK_HIT).setHitspark(2)
+    public static Attack sandstorm = new Attack(7, 50, 1.5f, 41, 28, 2, 7f, 0.1f, AttackType.BOX, 1, 0, 0, JSoundRegister.TW_KICK_HIT)
+            .setHitspark(2)
             .setUB(true)
             .setInfo("Suffocating Sandstorm", "very slow, traps the opponent in a cloud of slowing sand");
 
@@ -99,18 +108,19 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
         description = "Poke and Setup-based ZONER";
 
         freespace =
-                "BNBs:\n" +
-                        "    M1>Pound>Launch>M1>Burn Rubber>Finisher*\n" +
-                        "    Burn Rubber>M1>Pound>Launch>Finisher*\n" +
-                        "    Launch>M1>Burn Rubber>M1>Pound>Finisher*\n" +
-                        "\n" +
-                        "    Stylish:\n" +
-                        "    the social distancing\n" +
-                        "    M1>Pound>M1>Combo>Charge>Sandwave\n" +
-                        "    the pancake flip\n" +
-                        "    Launch>Pound>M1>Burn Rubber>Finisher*\n" +
-                        "\n" +
-                        "    *Finisher: M1>Charge>(Sand Clone/Sandwave)";
+                """
+                        BNBs:
+                            M1>Pound>Launch>M1>Burn Rubber>Finisher*
+                            Burn Rubber>M1>Pound>Launch>Finisher*
+                            Launch>M1>Burn Rubber>M1>Pound>Finisher*
+
+                            Stylish:
+                            the social distancing
+                            M1>Pound>M1>Combo>Charge>Sandwave
+                            the pancake flip
+                            Launch>Pound>M1>Burn Rubber>Finisher*
+
+                            *Finisher: M1>Charge>(Sand Clone/Sandwave)""";
 
         moves = List.of(light, launch, combo, pound, sandstorm, charge, sandclone, sandwave);
     }

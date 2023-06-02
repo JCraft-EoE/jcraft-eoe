@@ -54,15 +54,19 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
     public static Attack barrage = new Attack(2, 17, 0.85f, 32, 0, 2, 1.5f, 0.1f, AttackType.BARRAGE, 0.5f, 0, 3, JSoundRegister.IMPACT_1)
             .setInfo("Barrage", "short, knocks back");
     public static Attack speedslice = new Attack(7, 18, 1.25f, 11, 10, 0, 6f, 0.5f, AttackType.BOX, 1f, 0, 0)
-            .setRanged(true).setMobility(MobilityType.TELEPORT)
+            .setRanged(true)
+            .setMobility(MobilityType.TELEPORT)
             .setInfo("Speed Slice", "short windup, harming teleport with hitstun and light knockback");
     public static Attack judgement = new Attack(5, 37, 1.25f, 60, 20, 0, 0f, 0.5f, AttackType.BARRAGE, 0, 0, 2, null)
             .setInfo("Heaven's Judgement", "mih rapidly speed slices an area and finishes with a larger one, knocks back");
     public static Attack legcrusher = new Attack(3, 16, 0.75f, 17, 8, 1.25, 7f, 0.25f, AttackType.BOX, 1.5f, 0.2f, 0, JSoundRegister.TW_KICK_HIT)
             .setInfo("Leg Crusher", "combo starter/extender, mih hoofs the enemies legs in a quick, stunning attack");
-    public static Attack furychop = new Attack(4, 19, 0.75f, 24, 15, 1.6, 7f, 0.25f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegister.IMPACT_2).setHitspark(2)
+    public static Attack furychop = new Attack(4, 19, 0.75f, 24, 15, 1.6, 7f, 0.25f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegister.IMPACT_2)
+            .setHitspark(2)
             .setInfo("Fury Chop", "combo extender, on hit gives haste(8s) to user and mining fatigue(8s) to victim, on whiff the fatigue goes to user");
-    public static Attack donut = new Attack(1, 23, 0.75f, 32, 26, 2.2, 8.5f, 0.0f, AttackType.BOX, 3f, 0.2f, 0, JSoundRegister.IMPACT_4).setArmor(true).setHitspark(2)
+    public static Attack donut = new Attack(1, 23, 0.75f, 32, 26, 2.2, 8.5f, 0.0f, AttackType.BOX, 3f, 0.2f, 0, JSoundRegister.IMPACT_4)
+            .setArmor(true)
+            .setHitspark(2)
             .setInfo("Roundabout Donut", "feigns stand desummon, uninterruptable combo starter");
     public static Attack timeaccel = new Attack(6, 70, 40, 20, 0, AttackType.BOX)
             .setInfo("Time Acceleration", "2s windup, 15s t. accel, enemies standless for 15s after finishing");
@@ -137,7 +141,7 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
     public void initBarrage() {
         if (!this.canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
-            //this.playSound(ModSoundRegister.MIH_BARRAGE,1, 1);
+            this.playSound(JSoundRegister.MIH_BARRAGE,1, 1);
         }
     }
 
@@ -145,7 +149,7 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
     public void initSpecial1() {
         if (!this.canAttack()) return;
         if (handleAttack(legcrusher, JCraft.standS1CD, 8)) {
-            //this.playSound(ModSoundRegister.MIH_LEGCRUSHER,1, 1);
+            this.playSound(JSoundRegister.MIH_LEGCRUSHER,1, 1);
         }
     }
 
@@ -235,7 +239,7 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
                             judgementInitPos.add(judgementInitRot.multiply(10)), 6, 3, 2.0);
                 }
             }
-            case (6) -> this.setAccelTime(800);
+            case (6) -> this.setAccelTime(300);
             case (7) -> {
                 this.curAttack = null;
                 SpeedSlice(user, user.getEyePos(), user.getEyePos().add(user.getRotationVector().multiply(8)), 6, 1, 1.75);
