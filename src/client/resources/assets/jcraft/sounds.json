@@ -29,6 +29,12 @@
     ]
   },
 
+  "cointoss": {
+    "sounds": [
+      "jcraft:cointoss"
+    ]
+  },
+
   "cooldowncancel": {
     "sounds": [
       "jcraft:cooldowncancel"
@@ -333,6 +339,18 @@
     ]
   },
 
+  "creamballdash": {
+    "sounds": [
+      "jcraft:creamballdash"
+    ]
+  },
+
+  "creamoverhead": {
+    "sounds": [
+      "jcraft:creamoverhead"
+    ]
+  },
+
   "kqheavy": {
     "sounds": [
       "jcraft:kqheavy"
@@ -366,6 +384,12 @@
   "kqbtdsummon": {
     "sounds": [
       "jcraft:kqbtdsummon"
+    ]
+  },
+
+  "wssummon": {
+    "sounds": [
+      "jcraft:wssummon"
     ]
   },
 
@@ -447,6 +471,18 @@
     ]
   },
 
+  "cmoonsummon": {
+    "sounds": [
+      "jcraft:cmoonsummon"
+    ]
+  },
+
+  "cmoonbarrage": {
+    "sounds": [
+      "jcraft:cmoonbarrage"
+    ]
+  },
+
   "cmoongravpunch": {
     "sounds": [
       "jcraft:cmoongravpunch"
@@ -474,6 +510,12 @@
   "cmoondonut": {
     "sounds": [
       "jcraft:cmoondonut"
+    ]
+  },
+
+  "mihsummon": {
+    "sounds": [
+      "jcraft:mihsummon"
     ]
   },
 
@@ -607,6 +649,24 @@
   "geheal": {
     "sounds": [
       "jcraft:geheal"
+    ]
+  },
+
+  "gerekka1": {
+    "sounds": [
+      "jcraft:gerekka1"
+    ]
+  },
+
+  "gerekka2": {
+    "sounds": [
+      "jcraft:gerekka2"
+    ]
+  },
+
+  "gerekka3": {
+    "sounds": [
+      "jcraft:gerekka3"
     ]
   },
 

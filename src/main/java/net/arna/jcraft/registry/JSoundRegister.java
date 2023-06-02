@@ -26,6 +26,7 @@ public interface JSoundRegister {
     SoundEvent IMPACT_4 = registerSound("impact4");
     SoundEvent IMPACT_5 = registerSound("impact5");
     SoundEvent TIME_SKIP = registerSound("timeskip");
+    SoundEvent COIN_TOSS = registerSound("cointoss");
 
     // Star Platinum
     SoundEvent STAR_PLATINUM_BARRAGE = registerSound("spbarrage");
@@ -80,6 +81,8 @@ public interface JSoundRegister {
     SoundEvent CREAM_SMASH = registerSound("creamsmash");
     SoundEvent CREAM_ENTER = registerSound("creamenter");
     SoundEvent CREAM_EXIT = registerSound("creamexit");
+    SoundEvent CREAM_OVERHEAD = registerSound("creamoverhead");
+    SoundEvent CREAM_BALLDASH = registerSound("creamballdash");
 
     //Killer Queen
     SoundEvent KQ_HEAVY = registerSound("kqheavy");
@@ -92,6 +95,7 @@ public interface JSoundRegister {
     SoundEvent KQBTD_SUMMON = registerSound("kqbtdsummon");
 
     //Whitesnake
+    SoundEvent WS_SUMMON = registerSound("wssummon");
     SoundEvent WS_BARRAGE = registerSound("wsbarrage");
     SoundEvent WS_LEGCRUSH = registerSound("wslegcrush");
     SoundEvent WS_DONUT = registerSound("wsdonut");
@@ -122,6 +126,9 @@ public interface JSoundRegister {
     SoundEvent GE_BARRAGE = registerSound("gebarrage");
     SoundEvent GE_HEAL = registerSound("geheal");
     SoundEvent GE_TREE = registerSound("getree");
+    SoundEvent GE_REKKA1 = registerSound("gerekka1");
+    SoundEvent GE_REKKA2 = registerSound("gerekka2");
+    SoundEvent GE_REKKA3 = registerSound("gerekka3");
 
     //Golden Experience: Requiem
     SoundEvent GER_SUMMON = registerSound("gersummon");
@@ -137,6 +144,8 @@ public interface JSoundRegister {
     SoundEvent FOOL_CHARGE = registerSound("foolcharge");
 
     //C-Moon
+    SoundEvent CMOON_SUMMON = registerSound("cmoonsummon");
+    SoundEvent CMOON_BARRAGE = registerSound("cmoonbarrage");
     SoundEvent CMOON_GRAVPUNCH = registerSound("cmoongravpunch");
     SoundEvent CMOON_GRAVPUNCHHIT = registerSound("cmoongravpunchhit");
     SoundEvent CMOON_GROUNDSLAM = registerSound("cmoongroundslam");
@@ -144,6 +153,7 @@ public interface JSoundRegister {
     SoundEvent CMOON_DONUT = registerSound("cmoondonut");
 
     //Made in Heaven
+    SoundEvent MIH_SUMMON = registerSound("mihsummon");
     SoundEvent MIH_BARRAGE = registerSound("mihbarrage");
     SoundEvent MIH_ZOOM = registerSound("mihzoom");
     SoundEvent MIH_JUDGEMENT = registerSound("mihjudgement");

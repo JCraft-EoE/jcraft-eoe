@@ -201,16 +201,38 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
 
         Vec3d lookVec = user.getRotationVector().multiply(0.75);
         if (this.coin != null) this.coin.discard();
-        this.coin = new ItemEntity(this.world, user.getX(), user.getY() + user.getHeight() * 2 / 3, user.getZ(), new ItemStack(JObjectRegistry.KQCOIN, 1), lookVec.x, lookVec.y, lookVec.z);
+        this.coin = new ItemEntity(world, user.getX(), user.getY() + user.getHeight() * 2 / 3, user.getZ(), new ItemStack(JObjectRegistry.KQCOIN, 1), lookVec.x, lookVec.y, lookVec.z);
         this.coin.setPickupDelayInfinite();
 
-        this.world.spawnEntity(this.coin);
+        world.spawnEntity(this.coin);
 
         this.bombEntity = this.coin;
         this.bombBlock = null;
 
+        playSound(JSoundRegister.COIN_TOSS, 1, 1);
         playerData.putInt(JCraft.standS3CD, 500); // 25s coin toss cd
         playerData.putInt(JCraft.standUltCD, 20); // 1s detonate cd (prevents IUB)
+    }
+
+    @Override
+    public void initMiddleClick() {
+        if (!this.canAttack()) return;
+        LivingEntity user = this.getUser();
+        NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
+        if (playerData.getInt(JCraft.standMMBCD) > 0) return;
+
+        Vec3d lookVec = user.getRotationVector().multiply(0.9);
+        world.createExplosion(user,
+                user.getX() - lookVec.x,
+                user.getY() + user.getHeight() / 2 - lookVec.y,
+                user.getZ() - lookVec.z,
+                1f, Explosion.DestructionType.NONE);
+
+        user.setVelocity(user.getVelocity().add(lookVec));
+        user.velocityModified = true;
+
+        playerData.putInt(JCraft.standMMBCD, 360); // 18s explosive dash cooldown
+        this.playSound(JSoundRegister.KQ_DETONATE, 1, 1);
     }
 
     @Override
@@ -283,27 +305,6 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
                 bombBlock = null;
             }
         }
-    }
-
-    @Override
-    public void initMiddleClick() {
-        if (!this.canAttack()) return;
-        LivingEntity user = this.getUser();
-        NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
-        if (playerData.getInt(JCraft.standMMBCD) > 0) return;
-
-        Vec3d lookVec = user.getRotationVector().multiply(0.9);
-        world.createExplosion(user,
-                user.getX() - lookVec.x,
-                user.getY() + user.getHeight() / 2 - lookVec.y,
-                user.getZ() - lookVec.z,
-                1f, Explosion.DestructionType.NONE);
-
-        user.setVelocity(user.getVelocity().add(lookVec));
-        user.velocityModified = true;
-
-        playerData.putInt(JCraft.standMMBCD, 360); // 18s explosive dash cooldown
-        this.playSound(JSoundRegister.KQ_DETONATE, 1, 1);
     }
 
     @Override

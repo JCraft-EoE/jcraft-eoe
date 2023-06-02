@@ -145,27 +145,21 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
     // Moveset
     @Override
     public void initLightAttack() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
     public void initBarrage() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
-            this.playSound(JSoundRegister.WS_BARRAGE, 1, 1);
+            this.playSound(JSoundRegister.CMOON_BARRAGE, 1, 1);
         }
     }
 
     @Override
     public void initHeavyAttack() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(gutpunch, JCraft.standHeavyCD, 4)) {
             this.playSound(JSoundRegister.CMOON_DONUT, 1, 1);
         }
@@ -173,9 +167,7 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
 
     @Override
     public void initSpecial1() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(gravpunch, JCraft.standS1CD, 6)) {
             this.playSound(JSoundRegister.CMOON_GRAVPUNCH, 1, 1);
         }
@@ -183,17 +175,13 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
 
     @Override
     public void initSpecial2() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         handleAttack(gun, JCraft.standS2CD, 9);
     }
 
     @Override
     public void initUlt() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(gravshift, JCraft.standUltCD, 10)) {
             this.playSound(JSoundRegister.CMOON_GRAVSHIFT, 1, 1);
         }
@@ -201,9 +189,7 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
 
     @Override
     public void initSpecial3() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(groundslam, JCraft.standS3CD, 7)) {
             this.playSound(JSoundRegister.CMOON_GROUNDSLAM, 1, 1);
         }
@@ -212,9 +198,7 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
 
     @Override
     public void initMiddleClick() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (hasUser()) {
             LivingEntity user = this.getUser();
             IEntityDataSaver userData = (IEntityDataSaver) user;
@@ -320,7 +304,7 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
 
     @Override
     public void tick() {
-        if (age == 1) this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.STAND_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
+        if (age == 1) this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.CMOON_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
         super.tick();
 
         if (hasUser()) {

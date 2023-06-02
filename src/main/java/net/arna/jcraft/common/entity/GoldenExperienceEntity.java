@@ -113,10 +113,10 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
         if (!data.canAttack) return;
         if (data.user.isSneaking()) {
             if (handleAttack(heal, JCraft.standS1CD, 7)) {
-                this.playSound(JSoundRegister.GE_HEAL, 1, 1);
+                playSound(JSoundRegister.GE_HEAL, 1, 1);
             }
         } else if (handleAttack(healself, JCraft.standS1CD, 6)) {
-            this.playSound(JSoundRegister.GE_HEAL, 1, 1);
+            playSound(JSoundRegister.GE_HEAL, 1, 1);
         }
     }
 
@@ -137,14 +137,20 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
 
             if (curAttack != rekka1 && curAttack != rekka2 && curAttack != rekka3) {
                 if (idling) {
-                    handleAttack(rekka1, JCraft.standS2CD, 10);
+                    if (handleAttack(rekka1, JCraft.standS2CD, 10)) {
+                        playSound(JSoundRegister.GE_REKKA1, 1, 1);
+                    }
                     return;
                 }
             }
-            if (curAttack.id == rekka1.id && this.getMoveStun() < 12)
+            if (curAttack.id == rekka1.id && this.getMoveStun() < 12) {
                 setAttack(rekka2, 11);
-            if (curAttack.id == rekka2.id && this.getMoveStun() < 8)
+                playSound(JSoundRegister.GE_REKKA2, 1, 1);
+            }
+            if (curAttack.id == rekka2.id && this.getMoveStun() < 8) {
                 setAttack(rekka3, 12);
+                playSound(JSoundRegister.GE_REKKA3, 1, 1);
+            }
         }
     }
 

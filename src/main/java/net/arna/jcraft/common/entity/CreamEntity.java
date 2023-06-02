@@ -208,8 +208,8 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
     public void initSpecial1() {
         if (!this.canAttack())
             return;
-        if (getHalfBall()) {
-            handleAttack(ballcharge, JCraft.standS1CD, 7);
+        if (getHalfBall() && handleAttack(ballcharge, JCraft.standS1CD, 7)) {
+            this.playSound(JSoundRegister.CREAM_BALLDASH, 1, 1);
         } else if (handleAttack(grab, JCraft.standS1CD, 9)) {
             this.playSound(JSoundRegister.CREAM_GRAB, 1, 1);
         }
@@ -232,7 +232,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
             return;
         if (!getHalfBall()) {
             if (handleAttack(destroy, JCraft.standS3CD, 13)) {
-                this.playSound(JSoundRegister.CREAM_CHARGE, 1, 1);
+                this.playSound(JSoundRegister.CREAM_OVERHEAD, 1, 1);
             }
         }
     }
