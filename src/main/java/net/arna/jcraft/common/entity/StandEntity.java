@@ -22,6 +22,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
@@ -1024,6 +1025,7 @@ public abstract class StandEntity extends MobEntity {
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
+        if (hasUser() && getUser() instanceof ArmorStandEntity) return;
         kill(); // Whenever the stand is being loaded, kill it, it'll break
     }
 

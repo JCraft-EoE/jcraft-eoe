@@ -178,7 +178,7 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
                 }
             }
             case (4) -> {
-                int orbitRange = user.isSneaking() ? 5 : 3;
+                int orbitRange = user.isSneaking() ? 6 : 4;
                 for (int i = 0; i < variationAnkhs; i++) {
                     AnkhProjectile ankh = new AnkhProjectile(world, user);
                     ankh.setVelocity(0.0, 1.0, 0.0);

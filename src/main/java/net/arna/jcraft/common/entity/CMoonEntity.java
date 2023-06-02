@@ -272,26 +272,23 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
             for (LivingEntity ent : entities) {
                 ent.setVelocity(new Vec3d(0.0, -0.5, 0.0));
                 ent.velocityModified = true;
-                if (user.isSneaking()) {
-                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 30, 0));
-                }
+                if (user.isSneaking()) ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 30, 0));
             }
 
-            BlockPos bPos = this.getBlockPos();
+            if (world.getGameRules().getBoolean(JCraft.STAND_GRIEFING)) {
+                BlockPos bPos = getBlockPos();
+                for (int x = -2; x < 3; x++) {
+                    for (int y = -1; y < 1; y++) {
+                        for (int z = -2; z < 3; z++) {
+                            BlockPos curPos = bPos.add(x, y, z);
+                            BlockState curState = world.getBlockState(curPos);
 
-            for (int x = -2; x < 3; x++) {
-                for (int y = -1; y < 1; y++) {
-                    for (int z = -2; z < 3; z++) {
-                        BlockPos curPos = bPos.add(x, y, z);
-                        BlockState curState = this.world.getBlockState(curPos);
+                            if (curState.getBlock().getBlastResistance() > 10f || curState.isAir()) continue;
 
-                        if (curState.getBlock().getBlastResistance() > 10f || curState.isAir()) {
-                            continue;
+                            FallingBlockEntity fallingBlock = FallingBlockEntity.spawnFromBlock(world, curPos, curState);
+                            fallingBlock.setVelocity(0, 0.5, 0);
+                            fallingBlock.timeFalling = -120;
                         }
-
-                        FallingBlockEntity fallingBlock = FallingBlockEntity.spawnFromBlock(this.world, curPos, curState);
-                        fallingBlock.setVelocity(0, 0.5, 0);
-                        fallingBlock.timeFalling = -120;
                     }
                 }
             }

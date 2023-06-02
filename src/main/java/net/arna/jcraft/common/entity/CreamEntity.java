@@ -358,7 +358,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
 
     @Override
     public void tick() {
-        if (age == 1) this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.STAND_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
+        if (age == 1) this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.CREAM_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
         super.tick();
         boolean server = !this.world.isClient();
 
@@ -393,16 +393,13 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
 
             if (voiding) {
                 if (server) {
-                    if (this.world.getGameRules().getBoolean(JCraft.CREAM_BLACK_HOLE_ERASES_BLOCKS)) {
+                    if (this.world.getGameRules().getBoolean(JCraft.STAND_GRIEFING)) {
                         // Unfun 3x4x3 void code
                         for (int x = -1; x < 2; x++) {
                             for (int y = -1; y < 3; y++) {
                                 for (int z = -1; z < 2; z++) {
                                     BlockPos curPos = this.getBlockPos().add(x, y, z);
-
-                                    if (this.world.getBlockState(curPos).getBlock().getBlastResistance() > 100.1f) {
-                                        continue;
-                                    }
+                                    if (this.world.getBlockState(curPos).getBlock().getBlastResistance() > 100.1f) continue;
                                     this.world.setBlockState(curPos, Block.getStateFromRawId(0));
                                 }
                             }
@@ -486,8 +483,10 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
                             if (stabilization < 0) stabilization *= -0.75;
                             else stabilization = 0;
 
-                            if (getRemoteJumpInput() && groundDist < 3)
+                            if (getRemoteJumpInput() && groundDist < 3) {
+                                user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 5, 1, true, false));
                                 finalSpeed = finalSpeed.add(0, 0.25 / groundDist + stabilization, 0);
+                            }
                         }
 
                         Vec3d rotVec = user.getRotationVector();

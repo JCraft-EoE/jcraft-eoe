@@ -73,6 +73,7 @@ public interface JSoundRegister {
     SoundEvent D4C_COUNTER = registerSound("d4ccounter");
 
     //Cream
+    SoundEvent CREAM_SUMMON = registerSound("creamsummon");
     SoundEvent CREAM_CONSUME = registerSound("creamconsume");
     SoundEvent CREAM_CHARGE = registerSound("creamcharge");
     SoundEvent CREAM_COMBO = registerSound("creamcombo");

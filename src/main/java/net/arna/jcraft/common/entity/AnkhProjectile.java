@@ -66,9 +66,8 @@ public class AnkhProjectile extends PersistentProjectileEntity implements IAnima
         if (owner.hasPassenger(entity) || entity == owner) return;
 
         entity.setOnFireFor(3);
-        JCraftUtils.ProjectileDamageLogic(this, world, entity, Vec3d.ZERO, 10, 1, false, 2.5f);
-
-        this.remove(RemovalReason.DISCARDED);
+        JCraftUtils.ProjectileDamageLogic(this, world, entity, Vec3d.ZERO, 5, 1, false, 3.5f);
+        discard();
     }
 
     @Override
@@ -103,8 +102,7 @@ public class AnkhProjectile extends PersistentProjectileEntity implements IAnima
                 discard();
             } else {
                 this.ticksInAir++;
-                int removalTicks = this.variation ? 600 : 160;
-                if (this.ticksInAir >= removalTicks) discard();
+                if (this.ticksInAir >= 600) discard();
             }
 
             if (this.getOwner() instanceof LivingEntity owner) {

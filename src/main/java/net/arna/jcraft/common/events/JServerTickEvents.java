@@ -246,10 +246,7 @@ public class JServerTickEvents {
                             EntityPredicates.VALID_ENTITY);
 
                     for (ItemEntity item2 : nearbyItems) {
-                        if (!item2.getStack().isOf(JObjectRegistry.FVREVOLVER)) {
-                            continue;
-                        }
-
+                        if (!item2.getStack().isOf(JObjectRegistry.FVREVOLVER)) continue;
                         Vec3d converge = item2.getPos().subtract(iPos);
                         Vec3d towardsVector = converge.normalize().multiply(0.25);
                         item.addVelocity(towardsVector.x, towardsVector.y, towardsVector.z);
@@ -257,7 +254,7 @@ public class JServerTickEvents {
 
                         if (!item2.equals(item) && item2.distanceTo(item) < 1.0) {
                             Explosion explosion = serverWorld.createExplosion(null, iPos.x, iPos.y, iPos.z, 1f,
-                                    serverWorld.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING) ? Explosion.DestructionType.BREAK : Explosion.DestructionType.NONE);
+                                    serverWorld.getGameRules().getBoolean(JCraft.STAND_GRIEFING) ? Explosion.DestructionType.BREAK : Explosion.DestructionType.NONE);
                             item.kill();
                             item2.kill();
 

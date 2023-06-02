@@ -651,12 +651,21 @@ Added Backstabs
     >going in a 90° angle behind and hitting someone who's blocking stuns them and stops the block
     >projectiles and ranged moves in general CANNOT backstab
 >Fixed impact sounds being broken for Specs
+>Added various noises
+>Added standGriefing gamerule
 
 Star Platinum
     >Increased distance to travel on Advancing Barrage (4->5m)
 
 King Crimson
     >Donut is now armored
+
+Cream
+    >improved half-ball hover
+
+Magician's Red
+    >increased Crossfire Variation orbit range by 1m on both versions
+    >Ankh stun reduced (10->5t), damage increased (2.5->3.5)
 
 priority (top to bottom)
 TODO: ability to position the HUD

@@ -291,6 +291,13 @@
     ]
   },
 
+  "creamsummon": {
+    "sounds": [
+      "jcraft:creamsummon"
+    ]
+  },
+
+
   "creamconsume": {
     "sounds": [
       "jcraft:creamconsume"
