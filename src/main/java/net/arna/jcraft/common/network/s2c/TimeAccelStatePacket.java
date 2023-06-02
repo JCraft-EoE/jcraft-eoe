@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import lombok.Data;
+import lombok.Synchronized;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.MadeInHeavenEntity;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -30,13 +31,19 @@ public class TimeAccelStatePacket {
     public static final Identifier ID = JCraft.id("time_accel_state");
     public static final Int2ObjectMap<TimeAcceleration> accelerations = new Int2ObjectOpenHashMap<>();
     public static long lastUpdate = 0;
+    private static final Object lock = new Object();
 
     static {
         // Decrease all durations.
-        ServerTickEvents.END_SERVER_TICK.register(server -> new IntOpenHashSet(accelerations.keySet()).forEach(id -> {
-            if (accelerations.get(id).getDuration() <= 0) accelerations.remove(id);
-            else accelerations.get(id).decrementDuration();
-        }));
+        ServerTickEvents.END_SERVER_TICK.register(server -> {
+            // Avoid thread-safety issues by locking on our lock.
+            synchronized (lock) {
+                new IntOpenHashSet(accelerations.keySet()).forEach(id -> {
+                    if (accelerations.get(id).getDuration() <= 0) accelerations.remove(id);
+                    else accelerations.get(id).decrementDuration();
+                });
+            }
+        });
 
         // Handle acceleration on server.
         ServerTickEvents.END_WORLD_TICK.register(world -> {
@@ -54,7 +61,10 @@ public class TimeAccelStatePacket {
         buf.writeVarInt(duration);
 
         playerManager.getPlayerList().forEach(player -> ServerPlayNetworking.send(player, ID, buf));
-        accelerations.put(mih.getId(), new TimeAcceleration(duration, mih.getId()));
+
+        synchronized (lock) {
+            accelerations.put(mih.getId(), new TimeAcceleration(duration, mih.getId()));
+        }
     }
 
     // TODO: some kind of stop condition? Player/stand dies or something?
@@ -64,7 +74,10 @@ public class TimeAccelStatePacket {
         buf.writeVarInt(mih.getId());
 
         playerManager.getPlayerList().forEach(player -> ServerPlayNetworking.send(player, ID, buf));
-        accelerations.remove(mih.getId());
+
+        synchronized (lock) {
+            accelerations.remove(mih.getId());
+        }
     }
 
     private static double someBsArnaPutTogetherInDesmos(double x) {
@@ -72,13 +85,15 @@ public class TimeAccelStatePacket {
     }
 
     public static double getAcceleration(World world) {
-        return accelerations.int2ObjectEntrySet().stream()
-                // Ensure entity exists in this world
-                .filter(e -> e.getValue().isValid(world))
-                .map(Map.Entry::getValue)
-                .mapToDouble(a -> someBsArnaPutTogetherInDesmos((Util.getMeasuringTimeMs() - a.getStartTime()) /
-                        (a.getInitialDuration() * 50d)))
-                .sum() * 24000;
+        synchronized (lock) {
+            return accelerations.int2ObjectEntrySet().stream()
+                    // Ensure entity exists in this world
+                    .filter(e -> e.getValue().isValid(world))
+                    .map(Map.Entry::getValue)
+                    .mapToDouble(a -> someBsArnaPutTogetherInDesmos((Util.getMeasuringTimeMs() - a.getStartTime()) /
+                            (a.getInitialDuration() * 50d)))
+                    .sum() * 24000;
+        }
     }
 
     public enum State {
