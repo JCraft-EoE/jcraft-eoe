@@ -8,7 +8,7 @@ import net.minecraft.util.registry.Registry;
 public interface JSoundRegister {
 
     static SoundEvent registerSound(String id) {
-        JCraft.LOGGER.info("Registering sound: " + id);
+//        JCraft.LOGGER.info("Registering sound: " + id); // Probably unnecessary
         SoundEvent event = new SoundEvent(new Identifier(JCraft.MOD_ID, id));
         Registry.register(Registry.SOUND_EVENT, id, event);
         return event;
@@ -51,8 +51,8 @@ public interface JSoundRegister {
     //The World
     SoundEvent TW_SUMMON = registerSound("twsummon");
     SoundEvent TW_BARRAGE = registerSound("twbarrage");
-    SoundEvent TW_TS = registerSound("twts");
-    SoundEvent TW_TS_CLEAN = registerSound("twts_clean");
+    SoundEvent TW_TS = registerSound("twtimestop");
+    SoundEvent TW_TS_CLEAN = registerSound("twtimestop_clean");
     SoundEvent TW_CHARGE = registerSound("twcharge");
     SoundEvent TW_CHARGE_HIT = registerSound("twchargehit");
     SoundEvent TW_DONUT = registerSound("twdonut");
@@ -166,7 +166,7 @@ public interface JSoundRegister {
     //The World: Over Heaven
     SoundEvent TWOH_SUMMON = registerSound("twohsummon");
     SoundEvent TWOH_SHOOT = registerSound("twohshoot");
-    SoundEvent TWOH_TS = registerSound("twohts");
+    SoundEvent TWOH_TS = registerSound("twohtimestop");
     SoundEvent TWOH_HEAVY = registerSound("twohheavy");
     SoundEvent TWOH_SMITE = registerSound("twohsmite");
     SoundEvent TWOH_OVERWRITE = registerSound("twohoverwrite");
