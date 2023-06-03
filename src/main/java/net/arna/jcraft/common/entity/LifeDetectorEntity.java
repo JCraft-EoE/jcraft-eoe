@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.entity;
 
+import net.arna.jcraft.common.util.IOwnable;
 import net.arna.jcraft.common.util.JCraftUtils;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.EntityType;
@@ -34,9 +35,8 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
 
-public class LifeDetectorEntity extends LivingEntity implements IAnimatable {
+public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOwnable {
     public LivingEntity target;
-    private LivingEntity owner;
     private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
     public static TrackedData<Boolean> EXPLODED;
@@ -52,14 +52,18 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable {
     public LifeDetectorEntity(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);
     }
-    public void setOwner(LivingEntity l) { this.owner = l; }
+
+    private LivingEntity master;
+    @Override
+    public LivingEntity getMaster() { return master; }
+    public void setMaster(LivingEntity l) { this.master = l; }
 
     @Override
     public boolean canTarget(LivingEntity target) {
         if (target == null) return false;
         if (target == this) return false;
-        if (target == owner) return false;
-        if (target.isConnectedThroughVehicle(owner)) return false;
+        if (target == master) return false;
+        if (target.isConnectedThroughVehicle(master)) return false;
         return target.canTakeDamage() && target.isAlive();
     }
 
@@ -73,7 +77,7 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable {
                 hurt) {
             if (!canTarget(living)) continue;
             Vec3d kbVec = living.getPos().subtract(pos).normalize();
-            StandEntity.damageLogic(world, living, kbVec, 10, 1, false, 5f, true, DamageSource.mob(owner), owner);
+            StandEntity.damageLogic(world, living, kbVec, 10, 1, false, 5f, true, DamageSource.mob(master), master);
         }
 
         this.dataTracker.set(EXPLODED, true);
@@ -86,7 +90,7 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable {
     @Override
     public void tick() {
         super.tick();
-        if (owner == null) kill();
+        if (master == null) kill();
         if (hasExploded()) return;
 
         if (world.isClient) {
@@ -165,21 +169,21 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable {
     @Override
     public void writeCustomDataToNbt(NbtCompound tag) {
         super.writeCustomDataToNbt(tag);
-        boolean ownerIsPlayer = owner instanceof PlayerEntity;
+        boolean ownerIsPlayer = master instanceof PlayerEntity;
         tag.putBoolean("playerOwner", ownerIsPlayer);
         if (ownerIsPlayer)
-            tag.putUuid("ownerUUID", owner.getUuid());
+            tag.putUuid("ownerUUID", master.getUuid());
         else
-            tag.putInt("ownerID", owner.getId());
+            tag.putInt("ownerID", master.getId());
     }
     @Override
     public void readCustomDataFromNbt(NbtCompound tag) {
         super.readCustomDataFromNbt(tag);
         boolean ownerIsPlayer = tag.getBoolean("playerOwner");
         if (ownerIsPlayer)
-            owner = world.getPlayerByUuid(tag.getUuid("ownerUUID"));
+            master = world.getPlayerByUuid(tag.getUuid("ownerUUID"));
         else
-            owner = (LivingEntity) world.getEntityById(tag.getInt("ownerID")); // Always is living
+            master = (LivingEntity) world.getEntityById(tag.getInt("ownerID")); // Always is living
     }
     @Override
     public Iterable<ItemStack> getArmorItems() { return List.of(); }

@@ -2727,7 +2727,7 @@
 			}
 		},
 		"animation.d4c.flag": {
-			"animation_length": 2.64,
+			"animation_length": 3.4,
 			"bones": {
 				"torso": {
 					"rotation": {
@@ -2911,6 +2911,14 @@
 						"2.48": {
 							"vector": [10, 0, 0],
 							"easing": "easeInOutSine"
+						},
+						"2.92": {
+							"vector": [15, 0, 0],
+							"easing": "easeInOutSine"
+						},
+						"3.4": {
+							"vector": [10, 0, 0],
+							"easing": "easeInOutSine"
 						}
 					},
 					"position": {
@@ -2954,6 +2962,14 @@
 						"2.36": {
 							"vector": [7.5, 0, 0],
 							"easing": "easeInOutSine"
+						},
+						"2.8": {
+							"vector": [-2.5, 0, 0],
+							"easing": "easeInOutSine"
+						},
+						"3.28": {
+							"vector": [7.5, 0, 0],
+							"easing": "easeInOutSine"
 						}
 					}
 				},
@@ -2983,6 +2999,14 @@
 							"easing": "easeInOutSine"
 						},
 						"2.36": {
+							"vector": [7.5, 0, 0],
+							"easing": "easeInOutSine"
+						},
+						"2.8": {
+							"vector": [-15, 0, 0],
+							"easing": "easeInOutSine"
+						},
+						"3.28": {
 							"vector": [7.5, 0, 0],
 							"easing": "easeInOutSine"
 						}

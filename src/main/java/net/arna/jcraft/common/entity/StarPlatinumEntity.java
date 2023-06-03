@@ -69,15 +69,16 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
         );
 
         freespace =
-                "BNBs:\n" +
-                        "    advancing barrage is only confirmed if the opponent is lifted, so the M1 between regular and advancing barrage may be removed\n" +
-                        "    -the classic\n" +
-                        "    M1>Low Kick>Barrage>M1>Advancing Barrage>(queue)Star Finger>(queue)M1>(queue)Star Breaker\n" +
-                        "    works as a timestop setup that's beaten by mobility options\n" +
-                        "    ...>(queue)Timestop{ Timeskip>[Spam weapon crits]M1>M1 }>M1>Low kick\n" +
-                        "\n" +
-                        "    -the poke\n" +
-                        "    Star Finger>Low Kick>Barrage>M1>Advancing Barrage>(queue)M1>(queue)Star Breaker";
+                """
+                        BNBs:
+                            advancing barrage is only confirmed if the opponent is lifted, so the M1 between regular and advancing barrage may be removed
+                            -the classic
+                            M1>Low Kick>Barrage>M1>Advancing Barrage>(queue)Star Finger>(queue)M1>(queue)Star Breaker
+                            works as a timestop setup that's beaten by mobility options
+                            ...>(queue)Timestop{ Timeskip>[Spam weapon crits]M1>M1 }>M1>Low kick
+
+                            -the poke
+                            Star Finger>Low Kick>Barrage>M1>Advancing Barrage>(queue)M1>(queue)Star Breaker""";
 
         moves = List.of(light, heavy, barrage, starfinger, timestop, lowkick, starfinger,
                 new Attack().setMobility(MobilityType.TELEPORT).setInfo("Timeskip", "14m range")
@@ -212,7 +213,7 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
         AnimationController controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 
-        if (controller.isJustStarting) {
+        if (playSummonAnim) {
             controller.setAnimation(builder.playOnce("animation.starplatinum.summon"));
             return PlayState.CONTINUE;
         }

@@ -483,17 +483,19 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
                             if (stabilization < 0) stabilization *= -0.75;
                             else stabilization = 0;
 
-                            if (getRemoteJumpInput() && groundDist < 3) {
-                                user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 5, 1, true, false));
-                                finalSpeed = finalSpeed.add(0, 0.25 / groundDist + stabilization, 0);
+                            if (getRemoteJumpInput()) {
+                                if (groundDist < 5) {
+                                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 10, 2, true, false));
+                                    if (groundDist < 3) finalSpeed = finalSpeed.add(0, 0.25 / groundDist + stabilization, 0);
+                                }
                             }
-                        }
 
-                        Vec3d rotVec = user.getRotationVector();
-                        finalSpeed = finalSpeed.add(rotVec.multiply(getRemoteForwardInput() / 30)); // Forward movement
-                        finalSpeed = finalSpeed.add(rotVec.rotateY(1.5707963f).multiply(getRemoteSideInput() / 30)); // Side movement
-                        user.addVelocity(finalSpeed.x, finalSpeed.y, finalSpeed.z);
-                        serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(user));
+                            Vec3d rotVec = user.getRotationVector();
+                            finalSpeed = finalSpeed.add(rotVec.multiply(getRemoteForwardInput() / 30)); // Forward movement
+                            finalSpeed = finalSpeed.add(rotVec.rotateY(1.5707963f).multiply(getRemoteSideInput() / 30)); // Side movement
+                            user.addVelocity(finalSpeed.x, finalSpeed.y, finalSpeed.z);
+                            serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(user));
+                        }
                     }
                 } else {
                     this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
@@ -522,14 +524,12 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
         AnimationController controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 
-        if (age < 20 && !getHalfBall() && getState() < 2) {
+        if (playSummonAnim) {
             controller.setAnimation(builder.playOnce("animation.cream.summon"));
             return PlayState.CONTINUE;
         }
 
-        if (this.getSameState()) {
-            controller.markNeedsReload();
-        }
+        if (this.getSameState()) controller.markNeedsReload();
         if (getHalfBall()) {
             switch (this.getState()) {
                 default -> controller.setAnimation(builder.loop("animation.cream.ballidle"));

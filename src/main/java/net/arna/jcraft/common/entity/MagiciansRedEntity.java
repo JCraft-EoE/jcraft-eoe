@@ -2,10 +2,7 @@ package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.common.util.Attack;
-import net.arna.jcraft.common.util.AttackType;
-import net.arna.jcraft.common.util.JCraftUtils;
-import net.arna.jcraft.common.util.MobilityType;
+import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
@@ -210,7 +207,7 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
             }
             case (7) -> {
                 LifeDetectorEntity lifeDetector = new LifeDetectorEntity(JEntityTypeRegister.LIFE_DETECTOR,world);
-                lifeDetector.setOwner(user);
+                ((IOwnable) lifeDetector).setMaster(user);
                 lifeDetector.refreshPositionAndAngles(getX(), getY() + 1.5, getZ(), getYaw(), getPitch());
                 world.spawnEntity(lifeDetector);
             }
@@ -319,7 +316,7 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         AnimationController controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
-        if (age < 20 && getState() < 2) {
+        if (playSummonAnim) {
             controller.setAnimation(builder.playOnce("animation.mr.summon"));
             return PlayState.CONTINUE;
         }

@@ -295,9 +295,8 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         AnimationController controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
-        if (this.getSameState()) {
-            controller.markNeedsReload();
-        }
+
+        if (this.getSameState()) controller.markNeedsReload();
         switch (this.getState()) {
 
             default -> controller.setAnimation(builder.loop("animation.ge.idle"));

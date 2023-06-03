@@ -260,7 +260,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                 LivingEntity user = this.getUser();
                 BloodProjectile bloodProjectile = new BloodProjectile(world, user);
                 bloodProjectile.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
-                bloodProjectile.setVelocity(user, user.getPitch(), user.getYaw(), 0, 1F, 0);
+                bloodProjectile.setVelocity(user, user.getPitch(), user.getYaw(), 0, 1.33F, 0);
                 bloodProjectile.setPosition(getEyePos());
                 world.spawnEntity(bloodProjectile);
             }
@@ -508,14 +508,11 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
         AnimationController controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 
-        if (age < 20 && getState() < 2) {
+        if (playSummonAnim) {
             controller.setAnimation(builder.playOnce("animation.kingcrimson.summon"));
             return PlayState.CONTINUE;
         }
-
-        if (this.getSameState()) {
-            controller.markNeedsReload();
-        }
+        if (this.getSameState()) controller.markNeedsReload();
         switch (this.getState()) {
             default -> controller.setAnimation(builder.loop("animation.kingcrimson.idle"));
             case 2 -> controller.setAnimation(builder.playAndHold("animation.kingcrimson.dual_chop"));

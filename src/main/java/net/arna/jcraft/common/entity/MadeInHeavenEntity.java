@@ -3,10 +3,7 @@ package net.arna.jcraft.common.entity;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
-import net.arna.jcraft.common.util.Attack;
-import net.arna.jcraft.common.util.AttackType;
-import net.arna.jcraft.common.util.IEntityDataSaver;
-import net.arna.jcraft.common.util.MobilityType;
+import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -113,7 +110,6 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
 
     public void setAccelTime(int aTime) {
         this.dataTracker.set(ACCELTIME, aTime);
-        TimeAccelStatePacket.sendStart(Objects.requireNonNull(world.getServer()).getPlayerManager(), this, aTime);
     }
 
     @Override
@@ -225,7 +221,7 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
             case (5) -> {
                 if (this.getMoveStun() > 1) {
                     if (this.getMoveStun() < 40) {
-                        SpeedSlice(user,
+                        speedSlice(user,
                                 judgementInitPos.add(judgementInitRot.multiply(random.nextTriangular(2, 2))),
                                 judgementInitPos.add(random.nextTriangular(0, 5), random.nextTriangular(0, 5), random.nextTriangular(0, 5)),
                                 1f, 0.1f, 1.75);
@@ -234,20 +230,23 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
                         judgementInitRot = Vec3d.fromPolar(0, user.getYaw());
                     }
                 } else {
-                    SpeedSlice(user,
+                    speedSlice(user,
                             judgementInitPos.subtract(user.getRotationVector().multiply(3)),
                             judgementInitPos.add(judgementInitRot.multiply(10)), 6, 3, 2.0);
                 }
             }
-            case (6) -> this.setAccelTime(300);
+            case (6) -> {
+                this.setAccelTime(800);
+                TimeAccelStatePacket.sendStart(Objects.requireNonNull(world.getServer()).getPlayerManager(), this, 800);
+            }
             case (7) -> {
                 this.curAttack = null;
-                SpeedSlice(user, user.getEyePos(), user.getEyePos().add(user.getRotationVector().multiply(8)), 6, 1, 1.75);
+                speedSlice(user, user.getEyePos(), user.getEyePos().add(user.getRotationVector().multiply(8)), 6, 1, 1.75);
             }
         }
     }
 
-    private void SpeedSlice(LivingEntity player, Vec3d start, Vec3d destination, float damage, float kb, double size) {
+    private void speedSlice(LivingEntity player, Vec3d start, Vec3d destination, float damage, float kb, double size) {
         HitResult hitResult = this.world.raycast(new RaycastContext(start, destination, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, player));
         Vec3d pos1 = player.getPos();
         Vec3d pos2 = hitResult.getPos();
@@ -308,13 +307,14 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
     public void tick() {
         if (age == 1) this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.MIH_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
         super.tick();
-        if (!hasUser()) return;
 
+        if (!hasUser()) return;
         LivingEntity user = this.getUser();
-        this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
+        setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
 
         if (this.world.isClient()) return;
         int aTime = getAccelTime();
+        setAccelTime(aTime - 1);
         Vec3d pos = this.getPos();
 
         if (aTime > 1) {

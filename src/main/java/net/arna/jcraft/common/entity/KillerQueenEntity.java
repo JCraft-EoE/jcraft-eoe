@@ -424,7 +424,7 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
         AnimationController controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 
-        if (age < 20 && getState() < 2) {
+        if (playSummonAnim) {
             controller.setAnimation(builder.playOnce("animation.killerqueen.summon"));
             return PlayState.CONTINUE;
         }

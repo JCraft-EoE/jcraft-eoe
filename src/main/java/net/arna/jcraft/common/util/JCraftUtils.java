@@ -33,6 +33,7 @@ import software.bernie.geckolib3.model.AnimatedTickingGeoModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 
@@ -166,7 +167,6 @@ public final class JCraftUtils {
 
     //todo: generic raycast that hits entities and blocks
     public static Vec3d raycastAll(Entity entity, Vec3d start, Vec3d end, RaycastContext.FluidHandling fluidHandling, RaycastPriority priority) {
-        Vec3d ePos = entity.getEyePos();
         World world = entity.getWorld();
         double rangeSquared = start.squaredDistanceTo(end);
 
@@ -192,12 +192,18 @@ public final class JCraftUtils {
     }
 
     public static void ProjectileDamageLogic(ProjectileEntity proj, World world, Entity ent, Vec3d kb, int stunT, int stunType, boolean overrideStun, float damage) {
+        if (world.isClient) return;
+        Objects.requireNonNull(proj, "Attempted to run ProjectileDamageLogic with invalid projectile in world " + world);
         Entity owner = proj.getOwner();
-        DamageSource source = DamageSource.thrownProjectile(proj, owner);
+        DamageSource source;
+        if (owner == null)
+            source = DamageSource.GENERIC;
+        else
+            source = DamageSource.thrownProjectile(proj, owner);
 
         if (ent instanceof LivingEntity living) {
             LivingEntity target = living;
-            if (ent instanceof StandEntity stand && !stand.blocking)
+            if (ent instanceof StandEntity stand)
                 target = stand.getUser();
             damageLogic(world, target, kb, stunT, stunType, overrideStun, damage, false, source, owner);
         }

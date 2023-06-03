@@ -71,12 +71,13 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
         description = "Mid Range DOMINATOR";
 
         freespace =
-                "BNBs:\n" +
-                        "    the saucy racist\n" +
-                        "    ppl without timeskips will suffer, but so will people with timeskips :)))\n" +
-                        "    (M1>)Charge>M1>Roundhouse>Barrage>M1>Donut>Timestop{  }\n" +
-                        "    the no ts racist\n" +
-                        "    Donut>Roundhouse>Charge>M1>Barrage>M1";
+                """
+                        BNBs:
+                            the saucy racist
+                            ppl without timeskips will suffer, but so will people with timeskips :)))
+                            (M1>)Charge>M1>Roundhouse>Barrage>M1>Donut>Timestop{  }
+                            the no ts racist
+                            Donut>Roundhouse>Charge>M1>Barrage>M1""";
 
         moves = List.of(light, donut, barrage, roundhouse, timestop, charge, feignbarrage,
                 new Attack().setMobility(MobilityType.TELEPORT).setMobility(MobilityType.TELEPORT).setInfo("Timeskip", "14m range")
@@ -261,7 +262,7 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
         AnimationController controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 
-        if (age < 20 && getState() < 2) {
+        if (playSummonAnim) {
             controller.setAnimation(builder.playOnce("animation.theworld.summon"));
             return PlayState.CONTINUE;
         }

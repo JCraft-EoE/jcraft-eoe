@@ -41,7 +41,10 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
             .setInfo("Chop", "quick combo starter");
     public static Attack barrage = new Attack(2, 17, 0.75f, 75, 0, 2, 0.8f, 0.25f, AttackType.BARRAGE, 2, 0, 3, JSoundRegister.IMPACT_2)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public static Attack heavy = new Attack(1, 15, 1, 25, 14, 2, 8f, 1.5f, AttackType.BOX, 0.5f, -0.2f, 0, JSoundRegister.IMPACT_2).setHitspark(2).setArmor(true).setLaunch()
+    public static Attack heavy = new Attack(1, 15, 1, 25, 14, 2, 8f, 1.5f, AttackType.BOX, 0.5f, -0.2f, 0, JSoundRegister.IMPACT_2)
+            .setHitspark(2)
+            .setArmor(true)
+            .setLaunch()
             .setInfo("Charge", "user & stand charge forward, uninterruptable launcher");
     public static Attack dimhop_others = new Attack(3, 60, 1, 60, 40, 1.5, 0f, 0.0f, AttackType.BOX)
             .setInfo("Dimensional Hop", "travels to a random dimension at exact coordinates, if user was hit in the last 30s, he is forced back, certified death button");
@@ -53,10 +56,12 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
             .setInfo("Grab", "unblockable, combo finisher");
     public static Attack counter = new Attack(7, 30, 50, 5, 0, 0.75f, AttackType.COUNTER)
             .setInfo("Counter", "high damage, knocks back when hit");
-    public static Attack clonespawn = new Attack(8, 40, 1, 50, 40, 0, 0f, 0.0f, AttackType.BOX).setRanged(true)
+    public static Attack clonespawn = new Attack(8, 40, 1, 50, 40, 0, 0f, 0.0f, AttackType.BOX)
+            .setRanged(true)
             .setInfo("Dimensional Clone", "summons an unlimited number of servants");
-    public static Attack flag = new Attack(9, 20, 50, 10, 0, 0, AttackType.BOX)
-            .setInfo("Dimensional Phase", "hides in a flag in an un-stunnable, floating state").setMobility(MobilityType.HIGHJUMP);
+    public static Attack flag = new Attack(9, 20, 60, 10, 0, 0, AttackType.BOX)
+            .setInfo("Dimensional Phase", "hides in a flag in an un-stunnable, floating state")
+            .setMobility(MobilityType.HIGHJUMP);
     public static ServerWorld auWorld;
 
     public D4CEntity(World worldIn) {
@@ -92,9 +97,7 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
 
     @Override
     public void initLightAttack() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(light, JCraft.standLightCD, 2)) {
             this.playSound(JSoundRegister.D4C_LIGHT, 1, 1);
         }
@@ -102,9 +105,7 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
 
     @Override
     public void initHeavyAttack() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(heavy, JCraft.standHeavyCD, 4)) {
             this.playSound(JSoundRegister.D4C_HEAVY, 1, 1);
             Entity ent = this.getUser();
@@ -117,9 +118,7 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
 
     @Override
     public void initBarrage() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
             this.playSound(JSoundRegister.D4C_BARRAGE, 1, 1);
         }
@@ -127,15 +126,21 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
 
     @Override
     public void initSpecial1() {
+        if (!this.canAttack()) return;
+        if (handleAttack(clonespawn, JCraft.standS1CD, 6)) {
+            this.playSound(JSoundRegister.D4C_DIMHOP, 1, 1);
+        }
+    }
+
+    @Override
+    public void initUlt() {
         // Ability to cancel dimension hop
         if (this.curAttack == dimhop_others) {
             this.setMoveStun(0);
             this.curAttack = null;
         }
 
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
 
         LivingEntity user = getUser();
         if (user instanceof ServerPlayerEntity serverPlayer) { // Logic for cancelling dimhop early, and generating failsafe data
@@ -163,26 +168,14 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
             }
         }
 
-        if (handleAttack(dimhop_others, JCraft.standS1CD, 6)) {
-            this.playSound(JSoundRegister.D4C_DIMHOP, 1, 1);
-        }
-    }
-
-    @Override
-    public void initUlt() {
-        if (!this.canAttack()) {
-            return;
-        }
-        if (handleAttack(clonespawn, JCraft.standUltCD, 6)) {
+        if (handleAttack(dimhop_others, JCraft.standUltCD, 6)) {
             this.playSound(JSoundRegister.D4C_DIMHOP, 1, 1);
         }
     }
 
     @Override
     public void initSpecial2() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (getUser().isSneaking() && handleAttack(givegun, JCraft.standS2CD, 10)) {
             this.playSound(JSoundRegister.D4C_THROW, 1, 1);
             this.equipStack(EquipmentSlot.MAINHAND, JObjectRegistry.FVREVOLVER.getDefaultStack());
@@ -194,9 +187,7 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
 
     @Override
     public void initSpecial3() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         handleAttack(counter, JCraft.standS3CD, 8);
     }
 
@@ -213,12 +204,10 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
 
     @Override
     public void initMiddleClick() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(flag, JCraft.standMMBCD, 11)) {
-            getUser().addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 50, 0, true, false));
-            getUser().addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 50, 0, true, false));
+            getUser().addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, flag.moveStun, 0, true, false));
+            getUser().addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, flag.moveStun, 0, true, false));
         }
     }
 
@@ -334,8 +323,9 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
                 }
             }
             case (9) -> {
-                getUser().addStatusEffect(new StatusEffectInstance(StatusEffects.INVISIBILITY, 40, 0, true, false));
-                getUser().addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 40, 2, true, false));
+                int duration = flag.moveStun - flag.initTime;
+                getUser().addStatusEffect(new StatusEffectInstance(StatusEffects.INVISIBILITY, duration, 0, true, false));
+                getUser().addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, duration, 2, true, false));
             }
             case (10) -> this.getMainHandStack().decrement(1);
         }
@@ -400,14 +390,11 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
         AnimationController controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 
-        if (age < 20 && getState() < 2) {
+        if (playSummonAnim) {
             controller.setAnimation(builder.playOnce("animation.d4c.summon"));
             return PlayState.CONTINUE;
         }
-
-        if (this.getSameState()) {
-            controller.markNeedsReload();
-        }
+        if (this.getSameState()) controller.markNeedsReload();
         switch (this.getState()) {
             default -> controller.setAnimation(builder.loop("animation.d4c.idle"));
             case 2 -> controller.setAnimation(builder.playAndHold("animation.d4c.light"));

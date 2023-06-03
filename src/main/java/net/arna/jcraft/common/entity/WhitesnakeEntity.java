@@ -275,7 +275,7 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
         AnimationController controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 
-        if (age < 20 && getState() < 2) {
+        if (playSummonAnim) {
             controller.setAnimation(builder.playOnce("animation.whitesnake.summon"));
             return PlayState.CONTINUE;
         }

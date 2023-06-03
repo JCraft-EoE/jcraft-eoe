@@ -106,6 +106,8 @@ public abstract class StandEntity extends MobEntity {
     @Getter
     private final StandType standType;
 
+    protected boolean playSummonAnim = true;
+
     protected StandEntity(StandType type, World world) {
         super(type.getEntityType(), world);
         standType = type;
@@ -442,7 +444,7 @@ public abstract class StandEntity extends MobEntity {
     }
 
     /**
-     * Basic damage method, you likely want to use BaseDamageLogic or DamageLogic instead
+     * Basic damage method, you likely want to use baseDamageLogic or damageLogic instead
      * @param damage damage in half hearts
      * @param damageSource source of damage
      * @param ent entity to harm
@@ -565,14 +567,15 @@ public abstract class StandEntity extends MobEntity {
         if (this.isDead()) return;
 
         if (this.user == null) {
-            if (world.isClient && this.getVehicle() instanceof LivingEntity living) {
+            if (world.isClient && this.getVehicle() instanceof LivingEntity living)
                 user = living;
-            }
             return;
         } //else if (this.owner == null) { this.owner = player; }
         Entity vehicle = user.getVehicle();
 
         this.setMoveStun(this.getMoveStun() - 1);
+        if (playSummonAnim && (getMoveStun() > 0 || age > 19) )
+            playSummonAnim = false;
 
         Attack attack = this.curAttack;
 
@@ -939,27 +942,29 @@ public abstract class StandEntity extends MobEntity {
      */
     public static void baseDamageLogic(LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, DamageSource source, Entity attacker, boolean canBackstab) {
         boolean hit = true;
+        boolean tsHit = ( (ITimeStop)ent ).getTimeStopTicks() > 0;
+        if (tsHit) {
+            stunType = 3;
+            if (stunTicks > 20) stunTicks = 20;
+            lift = false;
+        }
 
         if (ent.getFirstPassenger() instanceof StandEntity stand) {
             Attack standAttack = stand.curAttack;
             if (standAttack != null) {
                 // Counter check
-                if (standAttack.attackType == AttackType.COUNTER && stand.getMoveStun() < (standAttack.moveStun - standAttack.initTime)) {
+                if (!tsHit && standAttack.attackType == AttackType.COUNTER && stand.getMoveStun() < (standAttack.moveStun - standAttack.initTime)) {
                     stand.counter(attacker, source);
                     ent.removeStatusEffect(JStatusRegister.DAZED);
                     return;
                 }
 
-                // Move interruption
-                if (!standAttack.hasArmor) {
-                    stand.curAttack = null;
-                    stand.setMoveStun(0);
-                }
+                if (!standAttack.hasArmor) stand.cancelAttack();
             }
 
             if (stand.blocking && !stand.getRemote()) {
                 double delta = Math.abs((ent.headYaw + 90.0f) % 360.0f - (attacker.getHeadYaw() + 90.0f) % 360.0f);
-                if ( canBackstab && (360.0 - delta % 360.0 < 90 || delta % 360.0 < 90) ) { // Backstab logic
+                if ( canBackstab && (360.0 - delta % 360.0 < 90 || delta % 360.0 < 90) && ent.squaredDistanceTo(attacker.getPos()) >= 1 ) { // Backstab logic
                     JCraft.CreateParticle((ServerWorld) attacker.getWorld(), ent.getX(), attacker.getEyeY(), ent.getZ(), -2);
                     stand.playSound(SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, 1, 1);
                     stand.blocking = false;
@@ -1111,11 +1116,9 @@ public abstract class StandEntity extends MobEntity {
             List<ProjectileEntity> nearbyProjectiles = this.world.getEntitiesByClass(ProjectileEntity.class, mob.getBoundingBox().expand(3), EntityPredicates.VALID_ENTITY);
             boolean anyInAir = false;
             for (ProjectileEntity projectile : nearbyProjectiles) {
-                if (projectile.getOwner() == mob) {
-                    continue;
-                }
-                // No, checking for the projectile velocity does NOT work
-                if (projectile.squaredDistanceTo(new Vec3d(projectile.prevX, projectile.prevY, projectile.prevZ)) > 0) {
+                if (projectile.getOwner() == mob) continue;
+                // Is it moving towards the stand?
+                if (projectile.squaredDistanceTo(getPos()) < new Vec3d(projectile.prevX, projectile.prevY, projectile.prevZ).squaredDistanceTo(getPos())) {
                     anyInAir = true;
                     break;
                 }

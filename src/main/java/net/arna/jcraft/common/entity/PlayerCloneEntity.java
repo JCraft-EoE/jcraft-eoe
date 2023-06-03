@@ -39,6 +39,7 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob 
         this.updateAttackType();
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     private final BowAttackGoal<PlayerCloneEntity> bowAttackGoal = new BowAttackGoal(this, 1.0, 30, 15.0F);
     private final CloneAttackGoal cloneAttackGoal = new CloneAttackGoal(this, 1) {
         public void stop() {

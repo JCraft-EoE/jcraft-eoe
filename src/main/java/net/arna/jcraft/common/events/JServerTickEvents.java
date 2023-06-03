@@ -83,7 +83,7 @@ public class JServerTickEvents {
         while (iterator.hasNext()) {
             DimValues dimValues = iterator.next();
             Entity user = dimValues.user;
-            if (user == null)
+            if (user == null || !user.isAlive() || user.isRemoved())
                 continue;
 
             ServerWorld au = (ServerWorld) user.getWorld();
@@ -97,7 +97,7 @@ public class JServerTickEvents {
                 continue;
             }
 
-            Vec3d dimPos = dimValues.pos;
+            Vec3d dimPos = user.getPos(); //dimValues.pos;
             if (user instanceof ServerPlayerEntity player) {
                 player.teleport(original, dimPos.x, dimPos.y, dimPos.z, player.getYaw(), player.getPitch());
             } else {
@@ -112,9 +112,7 @@ public class JServerTickEvents {
 
         for (DimValues dimValues : activeTimestops) {
             if (dimValues.user instanceof StandEntity stand && dimValues.user.isAlive()) {
-                if (stand.getTSTime() > 0) {
-                    continue;
-                }
+                if (stand.getTSTime() > 0) continue;
             }
 
             activeTimestops.remove(dimValues);

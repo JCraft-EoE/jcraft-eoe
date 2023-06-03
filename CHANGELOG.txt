@@ -667,6 +667,29 @@ Magician's Red
     >increased Crossfire Variation orbit range by 1m on both versions
     >Ankh stun reduced (10->5t), damage increased (2.5->3.5)
 
+● 3/6/2023
+>Backstabs now require a minimum distance of 1m between the attacker and target
+>Improved projectile blocking logic for Stand user mobs
+
+Timestop
+    >All hits inside TS apply launch stun
+    >Stun in TS is capped at 1s
+    >Counters cannot be triggered in TS
+
+King Crimson
+    >Increased Blood Throw velocity by 33%
+
+D4C
+    >Ultimate and Special 1 swapped
+    >Players coming out of the Alternate Universe now exit at the position they were in while inside
+    >Dimensional Phase duration increased by 0.5s
+
+Cream
+    >improved half-ball hover
+
+Made in Heaven
+    >Fixed bugs relating to Time Acceleration
+
 priority (top to bottom)
 TODO: ability to position the HUD
 TODO: AI flags for unblockables and shouldn't-blockables
