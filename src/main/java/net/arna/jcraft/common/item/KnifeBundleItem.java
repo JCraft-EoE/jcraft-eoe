@@ -3,6 +3,7 @@ package net.arna.jcraft.common.item;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.arna.jcraft.common.entity.KnifeProjectile;
+import net.arna.jcraft.registry.JStatusRegister;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EquipmentSlot;
@@ -40,6 +41,8 @@ public class KnifeBundleItem extends Item {
 
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack itemStack = user.getStackInHand(hand);
+        if (user.hasStatusEffect(JStatusRegister.DAZED))
+            return TypedActionResult.fail(itemStack);
         world.playSound(null, user.getX(), user.getY(), user.getZ(), SoundEvents.ENTITY_ENDER_PEARL_THROW, SoundCategory.NEUTRAL, 0.5F, 1F); // plays a globalSoundEvent
 
         user.getItemCooldownManager().set(this, 60);

@@ -56,9 +56,9 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
             .setInfo("Speed Slice", "short windup, harming teleport with hitstun and light knockback");
     public static Attack judgement = new Attack(5, 37, 1.25f, 60, 20, 0, 0f, 0.5f, AttackType.BARRAGE, 0, 0, 2, null)
             .setInfo("Heaven's Judgement", "mih rapidly speed slices an area and finishes with a larger one, knocks back");
-    public static Attack legcrusher = new Attack(3, 16, 0.75f, 17, 8, 1.25, 7f, 0.25f, AttackType.BOX, 1.5f, 0.2f, 0, JSoundRegister.TW_KICK_HIT)
+    public static Attack legcrusher = new Attack(3, 16, 0.85f, 17, 8, 1.5, 7f, 0.25f, AttackType.BOX, 1.5f, 0.2f, 0, JSoundRegister.TW_KICK_HIT)
             .setInfo("Leg Crusher", "combo starter/extender, mih hoofs the enemies legs in a quick, stunning attack");
-    public static Attack furychop = new Attack(4, 19, 0.75f, 24, 15, 1.6, 7f, 0.25f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegister.IMPACT_2)
+    public static Attack furychop = new Attack(4, 19, 0.85f, 24, 15, 1.6, 7f, 0.25f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegister.IMPACT_2)
             .setHitspark(2)
             .setInfo("Fury Chop", "combo extender, on hit gives haste(8s) to user and mining fatigue(8s) to victim, on whiff the fatigue goes to user");
     public static Attack donut = new Attack(1, 23, 0.75f, 32, 26, 2.2, 8.5f, 0.0f, AttackType.BOX, 3f, 0.2f, 0, JSoundRegister.IMPACT_4)

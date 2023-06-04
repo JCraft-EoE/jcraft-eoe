@@ -33,6 +33,7 @@ public interface JEntityRendererRegister {
 
         EntityRendererRegistry.register(JEntityTypeRegister.GOLDEN_EXPERIENCE, GoldenExperienceRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegister.GE_TREE, GETreeRenderer::new);
+        EntityRendererRegistry.register(JEntityTypeRegister.GE_FROG, GEFrogRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegister.GE_SNAKE, GESnakeRenderer::new);
 
         EntityRendererRegistry.register(JEntityTypeRegister.GER, GERRenderer::new);

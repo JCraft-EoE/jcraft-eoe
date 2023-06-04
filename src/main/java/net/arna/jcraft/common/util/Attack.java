@@ -5,6 +5,7 @@ import net.minecraft.sound.SoundEvent;
 import java.util.List;
 
 public final class Attack {
+    //TODO: ADD MULTI HITBOX MOVES
     public int id = -1; // Unique ID
     public int cooldown = 0; // Ability cooldown
     public float attackDist = 1f; // Distance your stand is at while attacking

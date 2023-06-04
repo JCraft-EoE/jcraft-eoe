@@ -34,9 +34,9 @@ public class FVRevolverItem extends Item {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         if (!world.isClient()) {
-            if (user.hasStatusEffect(JStatusRegister.DAZED))
-                return TypedActionResult.fail(user.getStackInHand(hand));
             ItemStack itemStack = user.getStackInHand(hand);
+            if (user.hasStatusEffect(JStatusRegister.DAZED))
+                return TypedActionResult.fail(itemStack);
 
             NbtCompound data = itemStack.getOrCreateNbt();
             int shots = data.getInt("Shots");

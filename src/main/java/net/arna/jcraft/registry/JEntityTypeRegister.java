@@ -122,6 +122,11 @@ public interface JEntityTypeRegister {
             new Identifier(JCraft.MOD_ID, "gesnake"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, GESnakeEntity::new).dimensions(EntityDimensions.fixed(1f, 0.3f)).build()
     );
+    EntityType<GEFrogEntity> GE_FROG = Registry.register(
+            Registry.ENTITY_TYPE,
+            new Identifier(JCraft.MOD_ID, "gefrog"),
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, GEFrogEntity::new).dimensions(EntityDimensions.fixed(0.3f, 0.3f)).build()
+    );
     EntityType<GEREntity> GER = Registry.register(
             Registry.ENTITY_TYPE,
             new Identifier(JCraft.MOD_ID, "ger"),
@@ -208,6 +213,7 @@ public interface JEntityTypeRegister {
 
         FabricDefaultAttributeRegistry.register(GOLDEN_EXPERIENCE, GoldenExperienceEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(GER, GEREntity.createMobAttributes());
+        FabricDefaultAttributeRegistry.register(GE_FROG, GEFrogEntity.createFrogAttributes());
         FabricDefaultAttributeRegistry.register(GE_SNAKE, SheerHeartAttackEntity.createMobAttributes()
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3)
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 10)

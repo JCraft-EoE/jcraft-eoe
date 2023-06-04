@@ -43,12 +43,15 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
             .setInfo("Punch", "quick combo starter");
     public static Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 2, 0, 3, JSoundRegister.IMPACT_1)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public static Attack heavy = new Attack(1, 19, 1f, 22, 10, 2, 0f, 0.0f, AttackType.BOX, 1, 0, 0, JSoundRegister.IMPACT_5).setHitspark(2)
+    public static Attack heavy = new Attack(1, 19, 1f, 22, 10, 2, 0f, 0.0f, AttackType.BOX, 1, 0, 0, JSoundRegister.IMPACT_5)
+            .setHitspark(2)
             .setUB(false)
             .setInfo("Singularity", "block bypass, low stun, medium windup");
     public static Attack smite = new Attack(3, 21, 1f, 20, 10, 0, 0f, 0.0f, AttackType.BOX, 2, 0, 0)
             .setInfo("You won't run away!", "summons a heavy stunning lightning bolt at the user/in air summons one at aimed position, launches on hit");
-    public static Attack overwrite = new Attack(6, 45, 1f, 58, 50, 2.5, 0f, 1.0f, AttackType.BOX, 1, 0, 0, JSoundRegister.IMPACT_5).setHitspark(2).setLaunch()
+    public static Attack overwrite = new Attack(6, 45, 1f, 58, 50, 2.5, 0f, 1.0f, AttackType.BOX, 1, 0, 0, JSoundRegister.IMPACT_5)
+            .setHitspark(2)
+            .setLaunch()
             .setUB(true)
             .setInfo("Reality Overwrite",
                     """
@@ -59,9 +62,11 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
                                 >Universal: All defensive effects removed
                                 >Invulnerability removed
                                 >Inability to look at user for 10s""");
-    public static Attack knives = new Attack(4, 19, 0.75f, 22, 16, 1.5, 0f, 0.0f, AttackType.BOX).setRanged(true)
-            .setInfo("Divine Finisher", "summons and launches 8 knives that stun on hit/knives fire with a delay if used in air");
-    public static Attack airknives = new Attack(5, 19, 0.75f, 22, 16, 1.5, 0f, 0.0f, AttackType.BOX).setRanged(true)
+    public static Attack knives = new Attack(4, 19, 0.75f, 22, 16, 1.5, 0f, 0.0f, AttackType.BOX)
+            .setRanged(true)
+            .setInfo("Divine Finisher", "summons and launches 8 knives that stun on hit/in air, fires 6 knives that launch at a delay");
+    public static Attack airknives = new Attack(5, 19, 0.75f, 22, 16, 1.5, 0f, 0.0f, AttackType.BOX)
+            .setRanged(true)
             .setInfo("Aerial Divine Finisher", "you shouldn't be able to read this");
 
     public static Attack timestop = new Attack(7, 70, 40, 30, 5, AttackType.TIMESTOP)
@@ -296,7 +301,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
                 }
             }
             case (5) -> {
-                for (int i = 0; i < 8; i++) {
+                for (int i = 0; i < 6; i++) {
                     KnifeProjectile knife = new KnifeProjectile(world, user);
                     knife.setDelayedLightning(10 + i * 4);
                     knife.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;

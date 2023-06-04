@@ -103,7 +103,7 @@ public class GESnakeEntity extends TameableEntity implements IAnimatable, IAnima
                 }
             }
         } else if (this.age == 500) {
-            this.dropStack(this.getMainHandStack());
+            dropStack(getMainHandStack());
             this.kill();
         } else if (this.isAlive() && this.age > 500) { // Edge case, mostly dealing with unloading
             this.discard();

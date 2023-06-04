@@ -1,15 +1,10 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.util.Attack;
-import net.arna.jcraft.common.util.AttackQueue;
-import net.arna.jcraft.common.util.AttackType;
-import net.arna.jcraft.common.util.JCraftUtils;
+import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -38,25 +33,38 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
 
     public static Attack light = new Attack(0, 2, 0.75f, 9, 6, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
-    public static Attack heavy = new Attack(1, 17, 1f, 22, 13, 1.5, 9f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_2).setHitspark(2).setArmor(true).setLaunch()
+    public static Attack heavy = new Attack(1, 17, 1f, 22, 13, 1.5, 9f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_2)
+            .setHitspark(2)
+            .setArmor(true)
+            .setLaunch()
             .setInfo("Shoulder Smash", "slow, uninterruptable combo finisher");
     public static Attack barrage = new Attack(2, 14, 0.75f, 30, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 2, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
     public static Attack healself = new Attack(3, 26, 1f, 14, 10, 0, 0f, 0f, AttackType.BOX)
             .setInfo("Healing Hand", "standing: heals user for 2 hearts, crouching: heals others for 2 hearts, pacifies angered mobs");
     public static Attack heal = new Attack(4, 26, 1f, 16, 10, 0, 0f, 0f, AttackType.BOX);
-    public static Attack tree = new Attack(5, 20, 1f, 24, 14, 1.25, 5f, 0.2f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_2).setHitspark(2)
+    public static Attack tree = new Attack(5, 20, 1f, 24, 14, 1.25, 5f, 0.2f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_2)
+            .setHitspark(2)
             .setInfo("Tree Summon", "two-hitting launch");
-    public static Attack snake = new Attack(6, 36, 1f, 25, 16, 0, 0f, 0f, AttackType.BOX).setRanged(true)
-            .setInfo("Snake Summon", "turns a held item into a snake which lasts for 25s and stuns for 0.5s on hit");
-    public static Attack overclock = new Attack(10, 46, 1f, 31, 22, 2, 9f, 0.9f, AttackType.BOX, 3, 0, 0, JSoundRegister.IMPACT_5).setHitspark(2)
+    public static Attack lifegiver = new Attack(6, 36, 1f, 25, 16, 0, 0f, 0f, AttackType.BOX).setRanged(true)
+            .setInfo("Life Giver",
+                    """
+                    turns a held item into a:
+                    STANDING: snake which lasts for 25s and stuns for 0.5s on hit
+                    CROUCHING: frog which lasts for 15s and reflects damage while following you""");
+    public static Attack overclock = new Attack(10, 46, 1f, 31, 22, 2, 9f, 0.9f, AttackType.BOX, 3, 0, 0, JSoundRegister.IMPACT_5)
+            .setHitspark(2)
             .setUB(false)
             .setInfo("Overclock", "slow, unblockable, devastating stun");
-    public static Attack rekka3 = new Attack(9, 23, 1f, 24, 12, 2, 7f, 0.5f, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.TW_KICK_HIT).setHitspark(2);
+    public static Attack rekka3 = new Attack(9, 23, 1f, 24, 12, 2, 7f, 0.5f, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.TW_KICK_HIT)
+            .setHitspark(2);
     public static Attack rekka2 = new Attack(8, 23, 1f, 18, 10, 1.75, 5f, 0.5f, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.IMPACT_2)
-            .setInfo("how did you", "get here", AttackQueue.SPECIAL2).setHitspark(2).setFollowup(rekka3);
+            .setInfo("how did you", "get here", AttackQueue.SPECIAL2)
+            .setHitspark(2)
+            .setFollowup(rekka3);
     public static Attack rekka1 = new Attack(7, 23, 1f, 20, 8, 1.5, 5f, 0.5f, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.IMPACT_2)
-            .setInfo("Rekka Series", "a set of three attacks, which cancel into each other during recovery", AttackQueue.SPECIAL2).setFollowup(rekka2);
+            .setInfo("Rekka Series", "a set of three attacks, which cancel into each other during recovery", AttackQueue.SPECIAL2)
+            .setFollowup(rekka2);
 
     public GoldenExperienceEntity(World worldIn) {
         super(StandType.GOLDEN_EXPERIENCE, worldIn);
@@ -76,13 +84,14 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
                 "snake is unreliable"
         );
 
-        freespace = "BNBs:\n" +
-                "the giogio\n" +
-                "M1>Barrage>M1>Tree>Rekka 1~2~3\n" +
-                "the superprince of gaming\n" +
-                "Rekka 1~2>M1>Barrage>M1>Tree>Heavy";
+        freespace = """
+                BNBs:
+                the giogio
+                M1>Barrage>M1>Tree>Rekka 1~2~3
+                the superprince of gaming
+                Rekka 1~2>M1>Barrage>M1>Tree>Heavy""";
 
-        moves = List.of(light, heavy, barrage, healself, overclock, rekka1, snake, tree);
+        moves = List.of(light, heavy, barrage, healself, overclock, rekka1, lifegiver, tree);
     }
 
     // Moveset
@@ -154,10 +163,17 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
         }
     }
 
+    private enum LifeGiverType {
+        SNAKE,
+        FROG,
+        FISH
+    }
+    private LifeGiverType toSummon;
     @Override
     public void initSpecial3() {
         if (!this.canAttack()) return;
-        if (handleAttack(snake, JCraft.standS3CD, 9))
+        toSummon = getUser().isSneaking() ? LifeGiverType.FROG : LifeGiverType.SNAKE;
+        if (handleAttack(lifegiver, JCraft.standS3CD, 9))
             this.playSound(JSoundRegister.GE_HEAL, 1, 1);
     }
 
@@ -211,25 +227,28 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
             }
             case (6) -> {
                 ItemStack item = user.getOffHandStack(); // Get offhand, or if unavailable main hand stack
-                if (item.isEmpty()) {
-                    item = user.getMainHandStack();
+                if (item.isEmpty()) item = user.getMainHandStack();
+                if (item.isEmpty()) return;
+
+                LivingEntity animal = null;
+                ItemStack animalItem = item.copy();
+                animalItem.setCount(1);
+                if (toSummon == LifeGiverType.SNAKE) {
+                    GESnakeEntity snake = new GESnakeEntity(JEntityTypeRegister.GE_SNAKE, world);
+                    //todo: fix snake not working for mobs
+                    if (user instanceof PlayerEntity playerEntity) snake.setOwner(playerEntity);
+                    animal = snake;
                 }
-                if (item.isEmpty()) {
-                    return;
+                if (toSummon == LifeGiverType.FROG) {
+                    GEFrogEntity frog = new GEFrogEntity(JEntityTypeRegister.GE_FROG, world);
+                    ((IOwnable) frog).setMaster(user);
+                    animal = frog;
                 }
 
-                //todo: fix snake not working for mobs
-                GESnakeEntity snake = new GESnakeEntity(JEntityTypeRegister.GE_SNAKE, world);
-                if (user instanceof PlayerEntity playerEntity) {
-                    snake.setOwner(playerEntity);
-                }
-
-                ItemStack snakeItem = item.copy();
-                snakeItem.setCount(1);
-                snake.refreshPositionAndAngles(this.getX(), this.getY() + 0.5f, this.getZ(), this.getYaw(), this.getPitch());
-                snake.setStackInHand(Hand.MAIN_HAND, snakeItem);
                 item.decrement(1);
-                this.world.spawnEntity(snake);
+                animal.refreshPositionAndAngles(this.getX(), this.getY() + 0.5f, this.getZ(), this.getYaw(), this.getPitch());
+                animal.setStackInHand(Hand.MAIN_HAND, animalItem);
+                world.spawnEntity(animal);
             }
             case (9) -> {
                 for (LivingEntity ent :
@@ -252,7 +271,7 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
 
     @Override
     public MoveSelectionResult SpecificMoveSelectionCriterion(Attack attack, MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity enemyStand, Attack enemyAttack) {
-        if (attack == snake) {
+        if (attack == lifegiver) {
             if (mob.getMainHandStack().isEmpty() && mob.getOffHandStack().isEmpty()) {
                 return MoveSelectionResult.STOP;
             }

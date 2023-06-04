@@ -689,6 +689,14 @@ Cream
 
 Made in Heaven
     >Fixed bugs relating to Time Acceleration
+    >Leg Crusher hitbox expanded, stand moved forward
+    >Stand moved forward on Fury Chop
+
+● 4/6/2023
+>Knives can no longer be used while stunned
+
+Golden Experience
+    >Added crouching variation to Life Giver
 
 priority (top to bottom)
 TODO: ability to position the HUD

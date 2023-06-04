@@ -68,6 +68,7 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
     public static Attack airbarrage = new Attack(5, 14, 1f, 48, 0, 1.5, 1f, 0.3f, AttackType.BARRAGE, 1, 0, 3)
             .setInfo("Kick Barrage", ""); //fast combo finisher, knocks back
 
+    //TODO: rtz turns off stands (1s), visuals
     public static Attack rtz = new Attack(10, 60, 32, 30, 0, 1, AttackType.BOX)
             .setInfo("Return to Zero", "initial press: saves the state of every entity in a 4 chunk radius (save lasts 1 minute), second press: reverts all states except users\nDoesn't affect player inventories");
     private static int rtzTimer;
