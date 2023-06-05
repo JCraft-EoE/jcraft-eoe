@@ -265,14 +265,15 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
                         toHurt.remove(this);
                         toHurt.remove(user);
 
-                        for (LivingEntity livingEntity : toHurt) {
+                        for (LivingEntity living : toHurt) {
+                            LivingEntity target = JCraftUtils.getUserIfStand(living);
                             if (hurricaneTime > 1) {
-                                damageLogic(world, livingEntity, new Vec3d(Math.sin(this.age) * 3, 0.0, Math.cos(this.age) * 3), 10, 1, false, 0.5f, true, DamageSource.mob(user), user);
+                                damageLogic(world, target, new Vec3d(Math.sin(this.age) * 3, 0.0, Math.cos(this.age) * 3), 10, 1, false, 0.5f, true, 5, DamageSource.mob(user), user);
                                 if (hurricaneTime > 15) {
                                     hurricaneTime = 15;
                                 } // Allows for zoning up until it hits something
                             } else {
-                                livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 20, 0));
+                                target.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 20, 0));
                             }
                         }
 

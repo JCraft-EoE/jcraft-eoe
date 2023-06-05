@@ -184,14 +184,14 @@
   "twtimestop": {
     "subtitle": "subtitles.jcraft.twts",
     "sounds": [
-      "jcraft:stands/theworld/timestop"
+      "jcraft:stands/theworld/ts"
     ]
   },
 
   "twtimestop_clean": {
     "subtitle": "subtitles.jcraft.twts_clean",
     "sounds": [
-      "jcraft:stands/theworld/timestop_clean"
+      "jcraft:stands/theworld/ts_clean"
     ]
   },
 
@@ -336,7 +336,7 @@
 
   "creamenter": {
     "sounds": [
-      "jcraft:stands/cream/nter"
+      "jcraft:stands/cream/enter"
     ]
   },
 
@@ -559,6 +559,12 @@
   "mihspeedslice": {
     "sounds": [
       "jcraft:stands/madeinheaven/speedslice"
+    ]
+  },
+
+  "mihcircle": {
+    "sounds": [
+      "jcraft:stands/madeinheaven/circle"
     ]
   },
 

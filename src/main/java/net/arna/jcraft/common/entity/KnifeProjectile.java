@@ -146,14 +146,16 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
 
         if (this.isOnFire()) entity.setOnFireFor(5);
 
+        int blockstun = 4;
         int stunT = 0;
         if (this.getLightning()) {
             stunT = 20;
+            blockstun = 6;
         } else {
             this.dropStack(this.asItemStack(), 0.1F);
         }
 
-        JCraftUtils.ProjectileDamageLogic(this, world, entity, Vec3d.ZERO, stunT, 1, false, 2);
+        JCraftUtils.ProjectileDamageLogic(this, world, entity, Vec3d.ZERO, stunT, 1, false, 2, blockstun);
 
         this.discard();
         this.playSound(SoundEvents.ITEM_TRIDENT_HIT, 1, 1);

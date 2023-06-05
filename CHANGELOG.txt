@@ -693,10 +693,34 @@ Made in Heaven
     >Stand moved forward on Fury Chop
 
 ● 4/6/2023
+>Added support for multiple hitboxes during one tick in an attack
 >Knives can no longer be used while stunned
+
+Star Platinum
+    >Moved stand back during Star Finger, added second hitbox
 
 Golden Experience
     >Added crouching variation to Life Giver
+
+Made in Heaven
+    >Remodeled and reanimated
+    >Reduced hitbox size for Speed Slice
+    >Increased hitbox size for Donut
+
+● 5/6/2023
+>Minor optimizations to StandEntity code
+>Fixed minor inaccuracies in /framedata
+>Improved on-hit logic for projectiles
+
+The World
+    >Roundhouse damage lowered (8->5)
+    >Charge damage lowered (7->5)
+    >Feign barrage now does a followup instead of only stunning
+    >Timestop startup increased (1.5->1.75s)
+
+Made in Heaven
+    >Added second, low hitbox to Leg Crusher
+    >Heaven's Judgement reworked
 
 priority (top to bottom)
 TODO: ability to position the HUD

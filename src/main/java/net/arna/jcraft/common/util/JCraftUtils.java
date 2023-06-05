@@ -191,7 +191,16 @@ public final class JCraftUtils {
         return Vec3d.ZERO; //THIS IS A TERRIBLE IDEA!!!!!
     }
 
-    public static void ProjectileDamageLogic(ProjectileEntity proj, World world, Entity ent, Vec3d kb, int stunT, int stunType, boolean overrideStun, float damage) {
+    /**
+     * @return the stand user if the specified entity is a {@link StandEntity}
+     */
+    public static LivingEntity getUserIfStand(LivingEntity ent) {
+        if (ent instanceof StandEntity stand && stand.hasUser())
+            return stand.getUser();
+        return ent;
+    }
+
+    public static void ProjectileDamageLogic(ProjectileEntity proj, World world, Entity ent, Vec3d kb, int stunT, int stunType, boolean overrideStun, float damage, int blockstun) {
         if (world.isClient) return;
         Objects.requireNonNull(proj, "Attempted to run ProjectileDamageLogic with invalid projectile in world " + world);
         Entity owner = proj.getOwner();
@@ -205,7 +214,7 @@ public final class JCraftUtils {
             LivingEntity target = living;
             if (ent instanceof StandEntity stand)
                 target = stand.getUser();
-            damageLogic(world, target, kb, stunT, stunType, overrideStun, damage, false, source, owner);
+            damageLogic(world, target, kb, stunT, stunType, overrideStun, damage, false, blockstun, source, owner);
         }
 
         if (ent instanceof EndCrystalEntity endCrystal)

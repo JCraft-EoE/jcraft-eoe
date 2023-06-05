@@ -24,6 +24,7 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAnimationTickable {
@@ -37,8 +38,9 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
             .setInfo("Star Breaker", "uninterruptable launcher");
     public static Attack barrage = new Attack(2, 17, 0.75f, 60, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 2, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public static Attack starfinger = new Attack(3, 20, 1.25f, 20, 12, 1.75, 6f, -0.25f, AttackType.BOX, 1.5f, -0.25f)
+    public static Attack starfinger = new Attack(3, 20, 0.75f, 20, 12, 1.75, 6f, -0.25f, AttackType.BOX, 1.5f, -0.25f)
             .setHitspark(2)
+            .appendHitbox(new Attack.HitboxData(2, 0.5, 1))
             .setInfo("Star Finger", "medium windup, combo starter/extender");
     public static Attack lowkick = new Attack(4, 12, 0.75f, 12, 7, 1.5, 7f, 0.25f, AttackType.BOX, 0.4f, 0)
             .setInfo("Roundhouse", "fast poke, low stun");
@@ -47,6 +49,7 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
             .disableBackstab()
             .setInfo("Advancing Barrage", "fast combo starter/extender, medium stun, extremely punishable on whiff");
     public static Attack timestop = new Attack(6, 60, 40, 39, 3, AttackType.TIMESTOP) // TS = (moveStun-initTime)/20
+            .setUB(true)
             .setInfo("Timestop", "3 seconds");
 
     public StarPlatinumEntity(World worldIn) {

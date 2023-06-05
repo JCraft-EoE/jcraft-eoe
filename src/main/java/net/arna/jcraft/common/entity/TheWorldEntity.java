@@ -7,10 +7,12 @@ import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.registry.JSoundRegister;
+import net.arna.jcraft.registry.JStatusRegister;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.MathHelper;
@@ -40,16 +42,23 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
             .setHitspark(2)
             .setArmor(true)
             .setInfo("Donut", "slow, uninterruptable combo starter/extender, 1.5s stun on whiff");
-    public static Attack charge = new Attack(4, 20, 7.5f, 19, 5, 1.5, 7f, 0.25f, AttackType.CHARGE, 1, 0, 9, JSoundRegister.TW_CHARGE_HIT)
+    public static Attack charge = new Attack(4, 20, 7.5f, 19, 5, 1.5, 5f, 0.25f, AttackType.CHARGE, 1, 0, 9, JSoundRegister.TW_CHARGE_HIT)
             .setRanged(true)
             .disableBackstab()
+            .setBlockstun(11)
             .setInfo("Forward Charge", "The World detaches from the user and lunges forward, combo starter");
-    public static Attack roundhouse = new Attack(3, 11, 0.75f, 13, 7, 1.75, 8f, 0.3f, AttackType.BOX, 0.45f, -0.1f, 0, JSoundRegister.TW_KICK_HIT)
+    public static Attack roundhouse = new Attack(3, 11, 0.75f, 13, 7, 1.75, 5f, 0.3f, AttackType.BOX, 0.45f, -0.1f, 0, JSoundRegister.TW_KICK_HIT)
+            .setBlockstun(12)
             .setInfo("Roundhouse", "fast poke, low stun");
-    public static Attack timestop = new Attack(6, 70, 40, 30, 4, AttackType.TIMESTOP)
+    public static Attack timestop = new Attack(6, 70, 40, 35, 4, AttackType.TIMESTOP)
+            .setUB(true)
             .setInfo("Timestop", "4 seconds");
     public static Attack feignbarrage = new Attack(5, 30, 0.75f, 50, 5, 0, 0f, 0f, AttackType.COUNTER)
-            .setInfo("Feign Barrage", "counter, no real damage, teleports behind attacker");
+            .setInfo("Feign Barrage", "counter, 0.25s windup, teleports behind attacker");
+    public static Attack counterfollowup = new Attack(7, 0, 0.75f, 9, 5, 1.75, 6f, 0.7f, AttackType.BOX, 0.8f, 0.1f, 0, JSoundRegister.IMPACT_4)
+            .appendHitbox(new Attack.HitboxData(1.25))
+            .setArmor(true)
+            .setLaunch();
 
     public TheWorldEntity(World worldIn) {
         super(StandType.THE_WORLD, worldIn);
@@ -87,85 +96,59 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
     // Moveset
     @Override
     public void initLightAttack() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
     public void initHeavyAttack() {
-        if (!this.canAttack()) {
-            return;
-        }
-        if (handleAttack(donut, JCraft.standHeavyCD, 4) && !this.isSilent()) {
+        if (!this.canAttack()) return;
+        if (handleAttack(donut, JCraft.standHeavyCD, 4))
             this.playSound(JSoundRegister.TW_DONUT, 1, 1);
-        }
     }
 
     @Override
     public void initBarrage() {
-        if (!this.canAttack()) {
-            return;
-        }
-        if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
+        if (!this.canAttack()) return;
+        if (handleAttack(barrage, JCraft.standBarrageCD, 5))
             this.playSound(JSoundRegister.TW_BARRAGE, 1, 1);
-        }
     }
 
     @Override
     public void initSpecial1() {
-        if (!this.canAttack()) {
-            return;
-        }
-        if (handleAttack(roundhouse, JCraft.standS1CD, 10)) {
+        if (!this.canAttack()) return;
+        if (handleAttack(roundhouse, JCraft.standS1CD, 10))
             this.playSound(JSoundRegister.TW_KICK, 1, 1);
-        }
     }
 
     @Override
     public void initUlt() {
-        if (!this.canAttack()) {
-            return;
-        }
-        if (handleAttack(timestop, JCraft.standUltCD, 7)) {
+        if (!this.canAttack()) return;
+        if (handleAttack(timestop, JCraft.standUltCD, 7))
             this.playSound(JSoundRegister.TW_TS, 1, 1);
-        }
     }
 
     @Override
     public void initSpecial2() {
-        if (!this.canAttack()) {
-            return;
-        }
-        if (handleAttack(charge, JCraft.standS2CD, 8)) {
+        if (!this.canAttack()) return;
+        if (handleAttack(charge, JCraft.standS2CD, 8))
             this.playSound(JSoundRegister.TW_CHARGE, 1, 1);
-        }
     }
 
     @Override
     public void initSpecial3() {
-        if (!this.canAttack()) {
-            return;
-        }
-        if (handleAttack(feignbarrage, JCraft.standS3CD, 5)) {
+        if (!this.canAttack()) return;
+        if (handleAttack(feignbarrage, JCraft.standS3CD, 5))
             this.playSound(JSoundRegister.TW_BARRAGE, 1, 1);
-        }
     }
 
     @Override
     public void initMiddleClick() {
         CanAttackData data = this.canAttackWithData();
-        if (!data.canAttack) {
-            return;
-        }
-        if (this.getTSTime() > 0) {
-            return;
-        }
+        if (!data.canAttack) return;
+        if (this.getTSTime() > 0) return;
         IEntityDataSaver user = (IEntityDataSaver) data.user;
-        if (user.getPersistentData().getInt(JCraft.standMMBCD) > 0) {
-            return;
-        }
+        if (user.getPersistentData().getInt(JCraft.standMMBCD) > 0) return;
         Vec3d eP = data.user.getEyePos();
 
         HitResult hitResult = this.world.raycast(new RaycastContext(eP, eP.add(data.user.getRotationVector().multiply(14)), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, data.user));
@@ -175,11 +158,10 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
 
         user.getPersistentData().putInt(JCraft.standMMBCD, 360); // 18 second timeskip cooldown
 
-        if (user.getPersistentData().getInt(JCraft.standUltCD) < 60) {
+        if (user.getPersistentData().getInt(JCraft.standUltCD) < 60)
             user.getPersistentData().putInt(JCraft.standUltCD, 60); // 3 second timestop cooldown
-        }
 
-        this.world.playSound(null, pos.x, pos.y, pos.z, JSoundRegister.TIME_SKIP, SoundCategory.PLAYERS, 1f, 1f);
+        world.playSound(null, pos.x, pos.y, pos.z, JSoundRegister.TIME_SKIP, SoundCategory.PLAYERS, 1f, 1f);
     }
 
     @Override
@@ -197,13 +179,16 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
                 }
             }
         }
+        if (attack.id == 7) {
+            for (LivingEntity entity : entities)
+                entity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
+        }
     }
 
     @Override
     public void desummon() {
-        if (this.getTSTime() < 1) {
+        if (this.getTSTime() < 1)
             super.desummon();
-        }
     }
 
     @Override
@@ -223,17 +208,18 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
             if (entity.getFirstPassenger() instanceof StandEntity stand) stand.cancelAttack();
         }
 
-        this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.TIME_SKIP, SoundCategory.PLAYERS, 1f, 1f);
-        this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.TW_COUNTER, SoundCategory.PLAYERS, 1f, 1f);
+        setAttack(counterfollowup, 11);
+
+        world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.TIME_SKIP, SoundCategory.PLAYERS, 1f, 1f);
+        world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.TW_COUNTER, SoundCategory.PLAYERS, 1f, 1f);
     }
 
     @Override
     public void tick() {
         if (age == 1) {
             this.playSound(JSoundRegister.TW_SUMMON, 1f, 1f);
-            if (JConfig.ANIME_VOICES) {
+            if (JConfig.ANIME_VOICES)
                 this.playSound(JSoundRegister.MUDA_DA, 1f, 1f);
-            }
         }
 
         super.tick();
@@ -278,6 +264,7 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
             case 8 -> controller.setAnimation(builder.loop("animation.theworld.charge"));
             case 9 -> controller.setAnimation(builder.playAndHold("animation.theworld.charge_hit"));
             case 10 -> controller.setAnimation(builder.playAndHold("animation.theworld.roundhouse"));
+            case 11 -> controller.setAnimation(builder.playAndHold("animation.theworld.counter_hit"));
         }
         return PlayState.CONTINUE;
     }

@@ -70,6 +70,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
             .setInfo("Aerial Divine Finisher", "you shouldn't be able to read this");
 
     public static Attack timestop = new Attack(7, 70, 40, 30, 5, AttackType.TIMESTOP)
+            .setUB(true)
             .setInfo("Timestop", "5 seconds");
 
     public Vec3d lightningPos;
@@ -277,8 +278,9 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
                 List<? extends Entity> hit = JCraftUtils.GenerateHitbox(world, lP, 3, Entity.class, List.of(this, user));
                 for (Entity ent : hit) {
                     if (ent instanceof LivingEntity living) {
-                        living.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 5, 9, true, false));
-                        damageLogic(world, living, Vec3d.ZERO, 40, 1, false, 9, false, playerSource, user);
+                        LivingEntity target = JCraftUtils.getUserIfStand(living);
+                        target.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 5, 9, true, false));
+                        damageLogic(world, target, Vec3d.ZERO, 40, 1, false, 9, false, 13, playerSource, user);
                     }
 
                     ent.onStruckByLightning((ServerWorld) world, lightning);

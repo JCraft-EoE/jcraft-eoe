@@ -40,18 +40,17 @@ public class GETreeEntity extends Entity implements IAnimatable, IAnimationTicka
                 List<LivingEntity> hurt = JCraftUtils.GenerateHitbox(world, getPos().add(0, 1, 0), 2.5, null);
                 for (LivingEntity living :
                         hurt) {
-                    if (living != owner && living.getVehicle() != owner)
-                        StandEntity.damageLogic(world, living, new Vec3d(0, 1, 0), 25, 1, false, 7f, true, DamageSource.mob(owner), owner);
+                    LivingEntity target = JCraftUtils.getUserIfStand(living);
+                    if (owner != target)
+                        StandEntity.damageLogic(world, target, new Vec3d(0, 1, 0), 25, 1, false, 7f, true, 11, DamageSource.mob(owner), owner);
 
-                    living.setVelocity(0, 1, 0);
-                    living.velocityModified = true;
+                    target.setVelocity(0, 1, 0);
+                    target.velocityModified = true;
                 }
             }
         }
 
-        if (age > 120) {
-            discard();
-        }
+        if (age > 120) discard();
     }
 
     @Override

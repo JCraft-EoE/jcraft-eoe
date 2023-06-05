@@ -7,6 +7,7 @@ import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -16,11 +17,14 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
@@ -54,24 +58,32 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
             .setRanged(true)
             .setMobility(MobilityType.TELEPORT)
             .setInfo("Speed Slice", "short windup, harming teleport with hitstun and light knockback");
-    public static Attack judgement = new Attack(5, 37, 1.25f, 60, 20, 0, 0f, 0.5f, AttackType.BARRAGE, 0, 0, 2, null)
-            .setInfo("Heaven's Judgement", "mih rapidly speed slices an area and finishes with a larger one, knocks back");
     public static Attack legcrusher = new Attack(3, 16, 0.85f, 17, 8, 1.5, 7f, 0.25f, AttackType.BOX, 1.5f, 0.2f, 0, JSoundRegister.TW_KICK_HIT)
+            .appendHitbox(new Attack.HitboxData(0, -0.5, 1))
             .setInfo("Leg Crusher", "combo starter/extender, mih hoofs the enemies legs in a quick, stunning attack");
     public static Attack furychop = new Attack(4, 19, 0.85f, 24, 15, 1.6, 7f, 0.25f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegister.IMPACT_2)
             .setHitspark(2)
             .setInfo("Fury Chop", "combo extender, on hit gives haste(8s) to user and mining fatigue(8s) to victim, on whiff the fatigue goes to user");
-    public static Attack donut = new Attack(1, 23, 0.75f, 32, 26, 2.2, 8.5f, 0.0f, AttackType.BOX, 3f, 0.2f, 0, JSoundRegister.IMPACT_4)
+    public static Attack donut = new Attack(1, 23, 0.75f, 32, 26, 2.5, 8.5f, 0.0f, AttackType.BOX, 3f, 0.2f, 0, JSoundRegister.IMPACT_4)
             .setArmor(true)
             .setHitspark(2)
             .setInfo("Roundabout Donut", "feigns stand desummon, uninterruptable combo starter");
     public static Attack timeaccel = new Attack(6, 70, 40, 20, 0, AttackType.BOX)
             .setInfo("Time Acceleration", "2s windup, 15s t. accel, enemies standless for 15s after finishing");
+    private int circleTime = 0;
+    public static Attack circle = new Attack(8, 40, 14, 13, 0, 1.25f, AttackType.BOX)
+            .setRanged(true)
+            .setMobility(MobilityType.DASH)
+            .setInfo("Heaven's Judgement", "rapidly circles a looked-at target within 4m at a radius of 7m/crouch to repeatedly speed slice an area");
+    public static Attack judgement = new Attack(5, 33, 1.25f, 60, 20, 0, 0f, 0.5f, AttackType.BARRAGE, 0, 0, 2, null)
+            .setInfo("", "mih rapidly speed slices an area and finishes with a larger one, knocks back");
 
     public Vec3d judgementInitPos = Vec3d.ZERO;
     public Vec3d judgementInitRot = Vec3d.ZERO;
 
     public static TrackedData<Integer> ACCELTIME;
+    public static TrackedData<Boolean> AFTERIMAGE;
+    public static TrackedData<Integer> TARGETID;
 
     public MadeInHeavenEntity(World worldIn) {
         super(StandType.MADE_IN_HEAVEN, worldIn);
@@ -82,40 +94,55 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
 
         pros = List.of(
                 "absurdly good mobility",
-                "good zoning tools",
+                "good mixups",
                 "good pressure",
                 "low cooldowns"
         );
 
         cons = List.of(
                 "zero defensive options barring running away",
-                "vulnerable to block"
+                "highly spacing-dependent"
         );
 
         freespace =
-                "PASSIVE: Speed I\n\n" +
-                        "BNBs:\n" +
-                        "    (Donut>M1>)Speed Slice>Leg Crusher>Fury Chop>M1>Barrage";
+                """
+                        PASSIVE: Speed I
+                        BNBs:
+                        the white supremacist
+                            (Donut>M1>)Speed Slice>Leg Crusher>Fury Chop>M1>Barrage""";
 
-        moves = List.of(light, donut, barrage, legcrusher, timeaccel, furychop, judgement, speedslice);
+        moves = List.of(light, donut, barrage, legcrusher, timeaccel, furychop, circle, speedslice);
     }
 
     static {
         ACCELTIME = DataTracker.registerData(MadeInHeavenEntity.class, TrackedDataHandlerRegistry.INTEGER);
+        TARGETID = DataTracker.registerData(MadeInHeavenEntity.class, TrackedDataHandlerRegistry.INTEGER);
+        AFTERIMAGE = DataTracker.registerData(MadeInHeavenEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     }
 
-    public int getAccelTime() {
-        return this.dataTracker.get(ACCELTIME);
+    public int getAccelTime() { return this.dataTracker.get(ACCELTIME); }
+    public void setAccelTime(int aTime) { this.dataTracker.set(ACCELTIME, aTime); }
+    public boolean getAfterimage() { return this.dataTracker.get(AFTERIMAGE); }
+    public void setAfterimage(boolean a) { this.dataTracker.set(AFTERIMAGE, a); }
+    public Entity getCircleTarget() {
+        int id = dataTracker.get(TARGETID);
+        if (id == -1) return null;
+        return world.getEntityById(id);
     }
-
-    public void setAccelTime(int aTime) {
-        this.dataTracker.set(ACCELTIME, aTime);
-    }
+    public void setTargetId(int id) { this.dataTracker.set(TARGETID, id); }
 
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
-        this.getDataTracker().startTracking(ACCELTIME, 0);
+        getDataTracker().startTracking(ACCELTIME, 0);
+        getDataTracker().startTracking(TARGETID, -1);
+        getDataTracker().startTracking(AFTERIMAGE, false);
+    }
+
+    @Override
+    public void cancelAttack() {
+        if (curAttack != null && curAttack.id == 8) endCircle();
+        super.cancelAttack();
     }
 
     // Moveset
@@ -128,9 +155,7 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
     @Override
     public void initHeavyAttack() {
         if (!this.canAttack()) return;
-        if (handleAttack(donut, JCraft.standHeavyCD, 4)) {
-            //this.playSound(ModSoundRegister.STAR_BREAKER,1, 1);
-        }
+        handleAttack(donut, JCraft.standHeavyCD, 4);
     }
 
     @Override
@@ -165,11 +190,28 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
         }
     }
 
+    private LivingEntity circleTarget;
+    private float circleOrbitProg;
     @Override
     public void initSpecial3() {
         if (!this.canAttack()) return;
-        if (handleAttack(judgement, JCraft.standS3CD, 7)) {
-            this.playSound(JSoundRegister.MIH_JUDGEMENT, 1, 1);
+        LivingEntity user = getUser();
+        if (user.isSneaking() && handleAttack(judgement, JCraft.standS3CD, 7)) {
+            playSound(JSoundRegister.MIH_JUDGEMENT, 1, 1);
+        } else {
+            Vec3d eP = user.getEyePos();
+            Vec3d rangeMod = user.getRotationVector().multiply(4);
+            EntityHitResult eHit = ProjectileUtil.raycast(user, eP, eP.add(rangeMod),
+                    user.getBoundingBox().expand(4),
+                    EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR,
+                    16 // Squared
+            );
+            if (eHit != null && eHit.getEntity() instanceof LivingEntity living && handleAttack(circle, JCraft.standS3CD, 11)) {
+                circleTarget = living;
+                circleOrbitProg = user.getHeadYaw();
+                setTargetId(circleTarget.getId());
+                playSound(JSoundRegister.MIH_CIRCLE, 1f, 1f);
+            }
         }
     }
 
@@ -237,14 +279,29 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
             }
             case (6) -> {
                 this.setAccelTime(800);
+                setAfterimage(true);
                 TimeAccelStatePacket.sendStart(Objects.requireNonNull(world.getServer()).getPlayerManager(), this, 800);
             }
             case (7) -> {
                 this.curAttack = null;
-                speedSlice(user, user.getEyePos(), user.getEyePos().add(user.getRotationVector().multiply(8)), 6, 1, 1.75);
+                speedSlice(user, user.getEyePos(), user.getEyePos().add(user.getRotationVector().multiply(8)), 6, 1, 1.5);
             }
+            case (8) -> startCircle();
         }
     }
+
+    private void startCircle() {
+        circleTime = 100;
+        setAfterimage(true);
+        updateRemoteInputs(0, 0, false);
+    }
+
+     private void endCircle() {
+        circleTime = 0;
+        circleTarget = null;
+         setTargetId(-1);
+        if (getAccelTime() <= 0) setAfterimage(false);
+     }
 
     private void speedSlice(LivingEntity player, Vec3d start, Vec3d destination, float damage, float kb, double size) {
         HitResult hitResult = this.world.raycast(new RaycastContext(start, destination, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, player));
@@ -297,52 +354,110 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
         //if (!hurtAll.contains(player)) { hurtAll.add(player); }
 
         for (LivingEntity ent : hurtAll) {
-            damageLogic(world, ent, kbVec.multiply(kb).add(0, kb / 4, 0), 20, 1, false, damage, true, playerSource, player);
+            LivingEntity target = JCraftUtils.getUserIfStand(ent);
+            damageLogic(world, target, kbVec.multiply(kb).add(0, kb / 4, 0), 20, 1, false, damage, true, (int) (4 + damage), playerSource, player);
         }
 
-        this.playSound(JSoundRegister.MIH_ZOOM, 1f, 1f);
+        playSound(JSoundRegister.MIH_ZOOM, 1f, 1f);
     }
 
     @Override
     public void tick() {
-        if (age == 1) this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.MIH_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
+        if (age == 1)
+            this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.MIH_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
         super.tick();
 
         if (!hasUser()) return;
         LivingEntity user = this.getUser();
         setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
-
-        if (this.world.isClient()) return;
         int aTime = getAccelTime();
-        setAccelTime(aTime - 1);
-        Vec3d pos = this.getPos();
 
-        if (aTime > 1) {
-            List<Entity> toCatch = world.getEntitiesByClass(Entity.class,
-                    new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+        if (world.isClient) {
+            Entity clientCircleTarget = getCircleTarget();
+            if (clientCircleTarget != null)
+                user.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, clientCircleTarget.getEyePos());
+        } else {
+            Vec3d pos = this.getPos();
+            // Circling
+            if (circleTime > 0) {
+                circleTime--;
+                if (circleTarget == null || !circleTarget.isAlive() || circleTarget.isRemoved())
+                    circleTime = 1;
+                else {
+                    circleOrbitProg += 0.15f;
+                    boolean toExit = curAttack != null && curAttack.id != 8;
+                    Vec3d rotVec = user.getRotationVector();
+                    Vec3d exitVel = Vec3d.ZERO;
+                    double side = getRemoteSideInput();
+                    double forw = getRemoteForwardInput();
+                    // This isn't normalized and idc
+                    if (side != 0) {
+                        exitVel = exitVel.add(rotVec.rotateY(1.5707963f).multiply(side));
+                        toExit = true;
+                    }
+                    if (forw != 0) {
+                        exitVel = exitVel.add(rotVec.multiply(forw));
+                        toExit = true;
+                    }
 
-            toCatch.remove(this);
-            toCatch.remove(user);
+                    if (toExit) {
+                        user.setVelocity(exitVel.add(0, 0.5, 0));
+                        endCircle();
+                    } else {
+                        Vec3d orbitPos = circleTarget.getEyePos().add(Math.sin(circleOrbitProg) * 7, 0, Math.cos(circleOrbitProg) * 7);
+                        Vec3d towardsVel = orbitPos.subtract(user.getPos()).normalize();
+                        double stabilization = user.getPos().distanceTo(orbitPos);
+                        if (stabilization > 0.8) stabilization = 0.8;
+                        user.setVelocity(user.getVelocity().multiply(stabilization).add(towardsVel));
+                    }
 
-            for (Entity entity : toCatch) {
-                if (entity instanceof LivingEntity)
-                    continue;
-                entity.tick();
+                    if (user instanceof ServerPlayerEntity serverPlayer)
+                        serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(serverPlayer));
+                    else
+                        user.velocityModified = true;
+                }
+            }
+            if (circleTime == 1) endCircle();
+
+            // Time Accel handling
+            boolean userIsStunned = user.hasStatusEffect(JStatusRegister.DAZED);
+            setAccelTime(aTime - 1);
+
+            if (aTime > 1) {
+                List<Entity> toCatch = world.getEntitiesByClass(Entity.class,
+                        new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+
+                toCatch.remove(this);
+                toCatch.remove(user);
+
+                for (Entity entity : toCatch) {
+                    if (entity instanceof LivingEntity)
+                        continue;
+                    entity.tick();
+                }
+            } else if (aTime == 1) {
+                List<LivingEntity> toCatch = world.getEntitiesByClass(LivingEntity.class,
+                        new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+
+                toCatch.remove(this);
+                toCatch.remove(user);
+
+                for (LivingEntity entity : toCatch) // 15s of Standless to any victims of Time Acceleration
+                    entity.addStatusEffect(new StatusEffectInstance(JStatusRegister.STANDLESS, 300, 0, true, false));
+
+                setAfterimage(false);
             }
 
-            user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 40, 2, true, false));
-            user.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE, 40, 2, true, false));
-        } else if (aTime == 1) {
-            List<LivingEntity> toCatch = world.getEntitiesByClass(LivingEntity.class,
-                    new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
-
-            toCatch.remove(this);
-            toCatch.remove(user);
-
-            for (LivingEntity entity : toCatch) // 15s of Standless to any victims of Time Acceleration
-                entity.addStatusEffect(new StatusEffectInstance(JStatusRegister.STANDLESS, 300, 0, true, false));
-        } else if (!user.hasStatusEffect(JStatusRegister.DAZED)) {
-            user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 40, 0, true, false));
+            if (userIsStunned) {
+                if (circleTime > 0) endCircle();
+            } else {
+                if (aTime > 0) {
+                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 20, 2, true, false));
+                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE, 20, 2, true, false));
+                } else {
+                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 40, 0, true, false));
+                }
+            }
         }
     }
 
@@ -379,6 +494,7 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
             case 8 -> controller.setAnimation(builder.playAndHold("animation.mih.legcrusher"));
             case 9 -> controller.setAnimation(builder.playAndHold("animation.mih.furychop"));
             case 10 -> controller.setAnimation(builder.playAndHold("animation.mih.taccel"));
+            case 11 -> controller.setAnimation(builder.playAndHold("animation.mih.circlestartup"));
 
             //default -> throw new IllegalStateException("Unexpected value: " + this.getState());
         }

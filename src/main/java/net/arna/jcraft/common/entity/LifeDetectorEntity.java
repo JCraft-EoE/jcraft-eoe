@@ -60,9 +60,8 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
 
     @Override
     public boolean canTarget(LivingEntity target) {
-        if (target == null) return false;
-        if (target == this) return false;
-        if (target == master) return false;
+        if (target == null || master == null) return false;
+        if (target == this || target == master) return false;
         if (target.isConnectedThroughVehicle(master)) return false;
         return target.canTakeDamage() && target.isAlive();
     }
@@ -76,8 +75,9 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
         for (LivingEntity living :
                 hurt) {
             if (!canTarget(living)) continue;
-            Vec3d kbVec = living.getPos().subtract(pos).normalize();
-            StandEntity.damageLogic(world, living, kbVec, 10, 1, false, 5f, true, DamageSource.mob(master), master);
+            LivingEntity target = JCraftUtils.getUserIfStand(living);
+            Vec3d kbVec = target.getPos().subtract(pos).normalize();
+            StandEntity.damageLogic(world, target, kbVec, 10, 1, false, 5f, true, 9, DamageSource.mob(master), master);
         }
 
         this.dataTracker.set(EXPLODED, true);

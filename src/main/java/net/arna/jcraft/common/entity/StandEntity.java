@@ -10,8 +10,6 @@ import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.mixin.LivingEntityInvoker;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.DamageUtil;
@@ -295,11 +293,11 @@ public abstract class StandEntity extends MobEntity {
         setAlpha(1);
     }
 
-
-    /**
+    /*
      * Returns whether the utility should be used by the stand, otherwise calls initClientUtility()
      */
-    /*@Environment(EnvType.CLIENT)
+    /*
+    @Environment(EnvType.CLIENT)
     public boolean allowUtilityUse() {
         return true;
     }
@@ -522,9 +520,8 @@ public abstract class StandEntity extends MobEntity {
 
     // Define desummon conditions
     public void desummon() {
-        if (this.curAttack == null && this.getMoveStun() <= 0) {
+        if (this.curAttack == null && this.getMoveStun() <= 0)
             this.discard();
-        }
     }
 
     // Define idle override
@@ -556,6 +553,28 @@ public abstract class StandEntity extends MobEntity {
     public boolean defaultToNear() {
         return !getRemote();
     }
+
+    @Override
+    public boolean hasNoGravity() {
+        if (getFree() && !getRemote()) return true;
+        return super.hasNoGravity();
+    }
+
+    /*
+    @Override
+    public void tickRiding() {
+        this.tick();
+        if (hasUser()) {
+            if (getFree()) {
+                Vec3f freePos = getFreePos();
+                setPosition(freePos.getX(), freePos.getY(), freePos.getZ());
+            } else {
+                user.updatePassengerPosition(this);
+                setVelocity(0, 0, 0);
+            }
+        }
+    }
+     */
 
     /**
      * does evrything :)
@@ -683,16 +702,19 @@ public abstract class StandEntity extends MobEntity {
                 ) {
                     //JCraft.LOGGER.info(this.getMoveStun() + " ACTIVE " + attack.interval);
                     Vec3d hPos = pos.add(0.0, user.getHeight() / 2, 0.0);
-                    Vec3d fPos = (isChargeAttack) ?
-                            hPos.add(rotVec) :
-                            hPos.add(rotVec.multiply(attackDist)).subtract(0, attack.offset, 0);
+                    Vec3d fPos = (isChargeAttack) ? hPos.add(rotVec) :
+                            hPos.add( rotVec.multiply(attackDist) ).subtract(0, attack.offset, 0);
 
                     List<Entity> filter = new ArrayList<>(List.of(this, user));
-                    if (vehicle != null) {
-                        filter.add(vehicle);
-                    }
+                    if (vehicle != null) filter.add(vehicle);
 
                     List<LivingEntity> hurt = JCraftUtils.GenerateHitbox(world, fPos, attack.hitboxSize, filter);
+                    for (Attack.HitboxData data : attack.extraHitboxes) {
+                        List<LivingEntity> extraHurt = JCraftUtils.GenerateHitbox(world,
+                                hPos.add( rotVec.multiply(data.forwardOffset) ).add(0, data.verticalOffset, 0), data.hitboxSize, filter);
+                        for (LivingEntity hurtEntity : extraHurt)
+                            if (!hurt.contains(hurtEntity)) hurt.add(hurtEntity);
+                    }
                     //JCraft.LOGGER.info("Hurt: " + hurt + " at world time: " + world.getTime());
                     //if (!hurt.contains(player)) { hurt.add(player); } // Damage Debugging
 
@@ -726,13 +748,11 @@ public abstract class StandEntity extends MobEntity {
                                 if (stand.hasUser()) {
                                     clashed.add(stand.getUser());
 
-                                    if (stand.getUser() instanceof ServerPlayerEntity serverPlayer) {
+                                    if (stand.getUser() instanceof ServerPlayerEntity serverPlayer)
                                         serverPlayer.networkHandler.sendPacket(new StopSoundS2CPacket(null, SoundCategory.PLAYERS));
-                                    }
                                 }
-                                if (user instanceof ServerPlayerEntity serverPlayer) {
+                                if (user instanceof ServerPlayerEntity serverPlayer)
                                     serverPlayer.networkHandler.sendPacket(new StopSoundS2CPacket(null, SoundCategory.PLAYERS));
-                                }
 
                                 // Cancels both barrages
                                 cancelAttack();
@@ -742,7 +762,7 @@ public abstract class StandEntity extends MobEntity {
                             }
                             continue;
                         }
-                        damageLogic(world, livingEntity, kbVec, stunTicks, attack.stunType, attack.overrideStun, damage, attack.lift, JDamageSources.stand(this, user), user, attack.canBackstab);
+                        damageLogic(world, livingEntity, kbVec, stunTicks, attack.stunType, attack.overrideStun, damage, attack.lift, attack.getEffectiveBlockstun(), JDamageSources.stand(this, user), user, attack.canBackstab);
                     }
 
                     for (LivingEntity livingEntity : clashed) {
@@ -861,7 +881,7 @@ public abstract class StandEntity extends MobEntity {
      * @param damage damage in half hearts
      * @param lift will the attack lift the victim upon an aerial hit?
      */
-    public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, DamageSource playerSource, Entity attacker, boolean canBackstab) {
+    public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, boolean canBackstab) {
         if (world == null || ent == null) return;
         if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && !world.isClient()) {
             if (attacker instanceof PlayerEntity playerEntity) {
@@ -888,7 +908,7 @@ public abstract class StandEntity extends MobEntity {
             }
         }
 
-        baseDamageLogic(ent, kbVec, stunTicks, stunType, overrideStun, damage, lift, playerSource, attacker, canBackstab);
+        baseDamageLogic(ent, kbVec, stunTicks, stunType, overrideStun, damage, lift, blockstun, source, attacker, canBackstab);
     }
 
     /**
@@ -901,7 +921,7 @@ public abstract class StandEntity extends MobEntity {
      * @param damage damage in half hearts
      * @param lift will the attack lift the victim upon an aerial hit?
      */
-    public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, DamageSource playerSource, Entity attacker) {
+    public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker) {
         if (world == null || ent == null) return;
         if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && !world.isClient()) {
             if (attacker instanceof PlayerEntity playerEntity) {
@@ -928,7 +948,7 @@ public abstract class StandEntity extends MobEntity {
             }
         }
 
-        baseDamageLogic(ent, kbVec, stunTicks, stunType, overrideStun, damage, lift, playerSource, attacker, false);
+        baseDamageLogic(ent, kbVec, stunTicks, stunType, overrideStun, damage, lift, blockstun, source, attacker, false);
     }
 
     /**
@@ -940,14 +960,9 @@ public abstract class StandEntity extends MobEntity {
      * @param damage damage in half hearts
      * @param lift will the attack lift the victim upon an aerial hit?
      */
-    public static void baseDamageLogic(LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, DamageSource source, Entity attacker, boolean canBackstab) {
+    public static void baseDamageLogic(LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, boolean canBackstab) {
         boolean hit = true;
         boolean tsHit = ( (ITimeStop)ent ).getTimeStopTicks() > 0;
-        if (tsHit) {
-            stunType = 3;
-            if (stunTicks > 20) stunTicks = 20;
-            lift = false;
-        }
 
         if (ent.getFirstPassenger() instanceof StandEntity stand) {
             Attack standAttack = stand.curAttack;
@@ -971,7 +986,7 @@ public abstract class StandEntity extends MobEntity {
                     overrideStun = true;
 
                 } else {
-                    stand.setMoveStun(stand.getMoveStun() + (int) damage);
+                    stand.setMoveStun(blockstun);
                     stand.setStandGauge(stand.getStandGauge() - 2 * damage);
                     stand.playSound(JSoundRegister.STAND_BLOCK, 1, 1);
                     hit = false;
@@ -979,10 +994,17 @@ public abstract class StandEntity extends MobEntity {
             }
         }
 
-        // Velocity modification synchronisation
-        if (ent instanceof ServerPlayerEntity serverPlayer)
-            serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(ent));
-        ent.velocityModified = true;
+        if (tsHit) {
+            stunType = 3;
+            if (stunTicks > 20) stunTicks = 20;
+            lift = false;
+        } else {
+            // Velocity modification synchronisation
+            if (ent instanceof ServerPlayerEntity serverPlayer)
+                serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(serverPlayer));
+            else
+                ent.velocityModified = true;
+        }
 
         // Stun application & overriding
         if (hit) {
@@ -995,9 +1017,7 @@ public abstract class StandEntity extends MobEntity {
         // Interrupting spec moves
         if (ent instanceof PlayerEntity playerEntity) {
             JCraftSpec spec = JCraftUtils.getSpec(playerEntity);
-            if (spec != null && spec.curAttack != null && !spec.curAttack.hasArmor) {
-                spec.CancelAttack();
-            }
+            if (spec != null && spec.curAttack != null && !spec.curAttack.hasArmor) spec.CancelAttack();
         }
 
         // Aerial hits keep the victim up
@@ -1005,9 +1025,8 @@ public abstract class StandEntity extends MobEntity {
             Vec3d vel = ent.getVelocity();
             double finalY = vel.y;
 
-            if (!ent.isOnGround()) {
+            if (!ent.isOnGround())
                 finalY = MathHelper.clamp(vel.y / 2, 0.085, 0.25);
-            }
 
             ent.setVelocity(
                     MathHelper.clamp(vel.x, -1, 1),

@@ -229,19 +229,11 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
 
                 remoteSpeed = remoteSpeed.multiply(dragMult, 1, dragMult);
 
-                if (pos.add(remoteSpeed).squaredDistanceTo(getUser().getPos()) > 400) {
+                if (pos.add(remoteSpeed).squaredDistanceTo(getUser().getPos()) > 400)
                     remoteSpeed.multiply(-0.1);
-                }
 
                 //todo: make this actually respect the WS collider
                 Vec3d newPos = pos.add(remoteSpeed);
-                /*
-                HitResult upCast = this.world.raycast(new RaycastContext(pos.add(0, 0.1, 0), pos.add(0, 1.8, 0), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
-                if (upCast.getType() != HitResult.Type.MISS) {
-                    newPos = pos;
-                    remoteSpeed.multiply(-0.1);
-                }
-                 */
                 HitResult downCast = this.world.raycast(new RaycastContext(pos.add(0, 0.1, 0), newPos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
                 if (downCast.getType() != HitResult.Type.MISS) {
                     newPos = downCast.getPos();

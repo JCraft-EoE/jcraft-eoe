@@ -14,25 +14,24 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class EntityMixin implements ITimeStop {
     // Timestop duration storage
     private int timeStopTicks = 0;
-
     @Override
     public int getTimeStopTicks() {
         return timeStopTicks;
     }
-
     @Override
     public void setTimeStopTicks(int tsTicks) {
         this.timeStopTicks = tsTicks;
     }
 
-    // Two possible functions, therefore use signature
+    /**
+     * Stand positioning mixin function
+     * @param passenger stand entity
+     */
     @Inject(method = "updatePassengerPosition(Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/Entity$PositionUpdater;)V", at = @At("HEAD"), cancellable = true)
-    // Synced stand pos setup
     private void jcraft$updatePassengerPosition(Entity passenger, Entity.PositionUpdater positionUpdater, CallbackInfo info) {
         if (passenger instanceof StandEntity stand) {
             if (stand.getFree()) {
                 Vec3f freePos = stand.getFreePos();
-
                 positionUpdater.accept(passenger, freePos.getX(), freePos.getY(), freePos.getZ());
                 info.cancel();
                 return;
@@ -45,7 +44,7 @@ public class EntityMixin implements ITimeStop {
             float y = e.getYaw() + stand.getRotationOffset();
             y *= (float) Math.PI / 180;
 
-            double heightOffset = stand.getState() > 1 ? passenger.getVehicle().getRotationVector().y : 0;
+            double heightOffset = stand.getState() > 1 ? e.getRotationVector().y : 0;
             positionUpdater.accept(passenger, e.getX() + MathHelper.cos(y) * dist, d + heightOffset, e.getZ() + MathHelper.sin(y) * dist);
             info.cancel();
         }

@@ -211,7 +211,8 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                         jumpTarget = hurtAll.get(0);
                         for (LivingEntity l :
                                 hurtAll) {
-                            damageLogic(world, l, getVelocity(), 15, 1, false, 6f, true, DamageSource.mob(owner), owner);
+                            LivingEntity target = JCraftUtils.getUserIfStand(l);
+                            damageLogic(world, target, getVelocity(), 15, 1, false, 6f, true, 10, DamageSource.mob(owner), owner);
                         }
                         Transform();
                         JCraft.CreateParticle((ServerWorld) this.world,
@@ -240,7 +241,8 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                         List<LivingEntity> hurt = JCraftUtils.GenerateHitbox(world, getPos(), 1.5, filter);
                         for (LivingEntity l :
                                 hurt) {
-                            damageLogic(world, l, Vec3d.ZERO, 15, 1, false, 3f, true, DamageSource.mob(owner), owner);
+                            LivingEntity target = JCraftUtils.getUserIfStand(l);
+                            damageLogic(world, target, Vec3d.ZERO, 15, 1, false, 3f, true, 7, DamageSource.mob(owner), owner);
                         }
                     }
                 }

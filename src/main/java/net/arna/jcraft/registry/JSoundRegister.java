@@ -162,6 +162,7 @@ public interface JSoundRegister {
     SoundEvent MIH_FURYCHOP = registerSound("mihfurychop");
     SoundEvent MIH_SPEEDSLICE = registerSound("mihspeedslice");
     SoundEvent MIH_LEGCRUSHER = registerSound("mihlegcrusher");
+    SoundEvent MIH_CIRCLE = registerSound("mihcircle");
 
     //The World: Over Heaven
     SoundEvent TWOH_SUMMON = registerSound("twohsummon");

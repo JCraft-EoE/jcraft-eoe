@@ -10,7 +10,6 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Vec3d;
@@ -47,15 +46,18 @@ public class BloodProjectile extends PersistentProjectileEntity implements IAnim
         if (owner.hasPassenger(entity) || entity == owner) return;
 
         if (entity instanceof LivingEntity living) {
-            damageLogic(world, living, Vec3d.ZERO, 10, 1, false, 2f, false, DamageSource.thrownProjectile(this, owner), owner);
-            living.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 60, 0, false, true));
-            this.remove(RemovalReason.DISCARDED);
+            LivingEntity target = living;
+            if (entity instanceof StandEntity stand && stand.hasUser())
+                target = stand.getUser();
+            damageLogic(world, target, Vec3d.ZERO, 10, 1, false, 2f, false, 6, DamageSource.thrownProjectile(this, owner), owner);
+            target.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 60, 0, false, true));
+            discard();
         }
 
         if (entity instanceof EndCrystalEntity endCrystal)
             endCrystal.damage(DamageSource.thrownProjectile(this, this.getOwner()), 2f);
 
-        this.playSound(SoundEvents.ITEM_BUCKET_EMPTY, 1, 0.5f);
+        playSound(SoundEvents.ITEM_BUCKET_EMPTY, 1, 0.5f);
     }
 
     @Override

@@ -162,7 +162,7 @@ public abstract class JCraftSpec {
                             DamageSource playerSource = DamageSource.player(player);
                             for (LivingEntity livingEntity : hurt) {
                                 if (livingEntity instanceof StandEntity) continue;
-                                damageLogic(world, livingEntity, kbVec, stunS, attack.stunType, attack.overrideStun, attack.damage, attack.lift, playerSource, player, attack.canBackstab);
+                                damageLogic(world, livingEntity, kbVec, stunS, attack.stunType, attack.overrideStun, attack.damage, attack.lift, attack.getEffectiveBlockstun(), playerSource, player, attack.canBackstab);
                             }
 
                             this.SpecialAttack(attack, hurt);

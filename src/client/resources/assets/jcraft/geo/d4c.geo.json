@@ -219,8 +219,13 @@
 					]
 				},
 				{
-					"name": "bipedHandRight",
+					"name": "bone4",
 					"parent": "lowerRight",
+					"pivot": [-5.75, 18.4875, -1.00004]
+				},
+				{
+					"name": "bipedHandRight",
+					"parent": "bone4",
 					"pivot": [-5, 12, -1],
 					"rotation": [90, 0, -180]
 				},

@@ -66,7 +66,7 @@ public class AnkhProjectile extends PersistentProjectileEntity implements IAnima
         if (owner.hasPassenger(entity) || entity == owner) return;
 
         entity.setOnFireFor(3);
-        JCraftUtils.ProjectileDamageLogic(this, world, entity, Vec3d.ZERO, 5, 1, false, 3.5f);
+        JCraftUtils.ProjectileDamageLogic(this, world, entity, Vec3d.ZERO, 5, 1, false, 3.5f, 8);
         discard();
     }
 
