@@ -9,8 +9,8 @@ public interface JSoundRegister {
 
     static SoundEvent registerSound(String id) {
 //        JCraft.LOGGER.info("Registering sound: " + id); // Probably unnecessary
-        SoundEvent event = new SoundEvent(new Identifier(JCraft.MOD_ID, id));
-        Registry.register(Registry.SOUND_EVENT, id, event);
+        SoundEvent event = new SoundEvent(JCraft.id(id));
+        Registry.register(Registry.SOUND_EVENT, event.getId(), event);
         return event;
     }
 
