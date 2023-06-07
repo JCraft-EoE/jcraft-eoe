@@ -383,6 +383,148 @@
 				}
 			}
 		},
+		"animation.cmoon.summon": {
+			"loop": "hold_on_last_frame",
+			"animation_length": 1.04,
+			"bones": {
+				"C_Moon": {
+					"position": {
+						"0.0": {
+							"vector": [0, -5, 0]
+						},
+						"1.0": {
+							"vector": [0, 0, 0],
+							"easing": "easeOutBack"
+						}
+					},
+					"scale": {
+						"0.0": {
+							"vector": [1, 0.8, 1]
+						},
+						"1.0": {
+							"vector": [1, 1, 1],
+							"easing": "easeOutBack"
+						}
+					}
+				},
+				"torso": {
+					"rotation": {
+						"vector": [3.81859, 25.51161, -0.38598]
+					},
+					"position": {
+						"vector": [0, 0.5, 0]
+					}
+				},
+				"body": {
+					"rotation": {
+						"vector": [-2.5, 0, 0]
+					}
+				},
+				"upperBody": {
+					"rotation": {
+						"0.0": {
+							"vector": [41, 0, 0]
+						},
+						"1.0": {
+							"vector": [0, 0, 0],
+							"easing": "easeOutBack"
+						}
+					}
+				},
+				"head": {
+					"rotation": {
+						"vector": [0.49311, -26.2457, -1.11496]
+					}
+				},
+				"rightArm": {
+					"rotation": {
+						"0.0": {
+							"vector": [-79.99254, -1.05313, 66.68397]
+						},
+						"1.0": {
+							"vector": [-79.87364, 23.00981, -1.01619],
+							"easing": "easeOutBack"
+						}
+					},
+					"position": {
+						"vector": [0, -0.75, 0]
+					}
+				},
+				"rightLower": {
+					"rotation": {
+						"vector": [-97.02671, -7.08285, 8.82489]
+					}
+				},
+				"leftArm": {
+					"rotation": {
+						"0.0": {
+							"vector": [297.94864, 10.52933, -427.66436]
+						},
+						"1.0": {
+							"vector": [294.6693, -31.44411, -365.83852],
+							"easing": "easeOutBack"
+						}
+					}
+				},
+				"leftLower": {
+					"rotation": {
+						"vector": [-109.37006, 5.07855, 14.13272]
+					}
+				},
+				"leftLeg": {
+					"rotation": {
+						"0.0": {
+							"vector": [-80.86723, -30.71362, -1.31144]
+						},
+						"1.0": {
+							"vector": [-10.86723, -30.71362, -1.31144],
+							"easing": "easeOutBack"
+						}
+					},
+					"position": {
+						"vector": [0, 0, 0.4]
+					}
+				},
+				"leftLegLower": {
+					"rotation": {
+						"0.0": {
+							"vector": [67.5, 0, -2.5]
+						},
+						"1.0": {
+							"vector": [20, 0, -2.5],
+							"easing": "easeOutBack"
+						}
+					},
+					"position": {
+						"vector": [0, 0.5, 0]
+					}
+				},
+				"rightLeg": {
+					"rotation": {
+						"0.0": {
+							"vector": [-72.93471, 9.2891, 6.24547]
+						},
+						"1.0": {
+							"vector": [-40.43471, 9.2891, 6.24547],
+							"easing": "easeOutBack"
+						}
+					}
+				},
+				"rightLegLower": {
+					"rotation": {
+						"vector": [61, 0, 0]
+					},
+					"position": {
+						"vector": [0, 1.4, -1.2]
+					}
+				},
+				"BAM": {
+					"scale": {
+						"vector": [0, 0, 0]
+					}
+				}
+			}
+		},
 		"animation.cmoon.block": {
 			"loop": true,
 			"animation_length": 3.28,

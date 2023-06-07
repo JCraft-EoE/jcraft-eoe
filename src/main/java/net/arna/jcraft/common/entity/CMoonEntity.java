@@ -372,9 +372,13 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         AnimationController controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
-        if (this.getSameState()) {
-            controller.markNeedsReload();
+
+        if (playSummonAnim) {
+            controller.setAnimation(builder.playOnce("animation.cmoon.summon"));
+            return PlayState.CONTINUE;
         }
+
+        if (this.getSameState()) controller.markNeedsReload();
         switch (this.getState()) {
             default -> controller.setAnimation(builder.loop("animation.cmoon.idle"));
             case 2 -> controller.setAnimation(builder.playAndHold("animation.cmoon.light"));
