@@ -1,0 +1,35 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.block.idle": {
+			"loop": true,
+			"animation_length": 1.44,
+			"bones": {
+				"base": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"1.44": {
+							"vector": [1080, 1080, 1080]
+						}
+					},
+					"scale": {
+						"0.0": {
+							"vector": [1, 1, 1]
+						},
+						"0.72": {
+							"vector": [1.5, 1.5, 1.5],
+							"easing": "easeInOutElastic"
+						},
+						"1.44": {
+							"vector": [1, 1, 1],
+							"easing": "easeInOutElastic"
+						}
+					}
+				}
+			}
+		}
+	},
+	"geckolib_format_version": 2
+}

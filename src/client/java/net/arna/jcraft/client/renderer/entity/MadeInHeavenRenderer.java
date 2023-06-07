@@ -26,24 +26,20 @@ public class MadeInHeavenRenderer extends GeoEntityRenderer<MadeInHeavenEntity> 
                                      int packedLightIn, Identifier textureLocation) {
 
         MinecraftClient mcClient = MinecraftClient.getInstance();
-        if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null) {
-            if (mcClient.player.getFirstPassenger() == animatable) {
+        if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null)
+            if (mcClient.player.getFirstPassenger() == animatable)
                 return RenderLayer.getEntityNoOutline(this.getTextureLocation(animatable));
-            }
-        }
 
         return RenderLayer.getEntityCutout(getTextureLocation(animatable));
     }
 
-    // Adds ability to change render alpha
     @Override
     public void render(GeoModel model, MadeInHeavenEntity animatable, float partialTicks, RenderLayer type, MatrixStack matrixStack, VertexConsumerProvider renderTypeBuffer, VertexConsumer vertexBuilder, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
         float a = 1f;
 
         MinecraftClient mcClient = MinecraftClient.getInstance();
-        if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null) {
+        if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null)
             if (mcClient.player.getFirstPassenger() == animatable) a = animatable.getAlpha();
-        }
 
         super.render(model, animatable, partialTicks, type, matrixStack, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, a);
 

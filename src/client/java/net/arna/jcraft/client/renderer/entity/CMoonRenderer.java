@@ -31,7 +31,7 @@ public class CMoonRenderer extends GeoEntityRenderer<CMoonEntity> {
             }
         }
 
-        return RenderLayer.getEntityCutout(this.getTextureLocation(animatable));
+        return RenderLayer.getEntityTranslucent(this.getTextureLocation(animatable));
     }
 
     // Adds ability to change render alpha

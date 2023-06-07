@@ -39,7 +39,7 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
 
     public static Attack light = new Attack(0, 2, 0.75f, 15, 9, 1.5, 5f, 0.75f, AttackType.BOX, 1.5f, -0.1f, 0, JSoundRegister.IMPACT_2)
             .setInfo("Chop", "quick combo starter");
-    public static Attack barrage = new Attack(2, 17, 0.75f, 75, 0, 2, 0.8f, 0.25f, AttackType.BARRAGE, 2, 0, 3, JSoundRegister.IMPACT_2)
+    public static Attack barrage = new Attack(2, 17, 0.75f, 60, 0, 2, 0.8f, 0.25f, AttackType.BARRAGE, 2, 0, 3, JSoundRegister.IMPACT_2)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
     public static Attack heavy = new Attack(1, 15, 1, 25, 14, 2, 8f, 1.5f, AttackType.BOX, 0.5f, -0.2f, 0, JSoundRegister.IMPACT_2)
             .setHitspark(2)

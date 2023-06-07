@@ -520,6 +520,24 @@
     ]
   },
 
+  "cmoongroundshoot": {
+    "sounds": [
+      "jcraft:stands/cmoon/groundshoot"
+    ]
+  },
+
+  "blocklaunch": {
+    "sounds": [
+      "jcraft:stands/cmoon/blocklaunch"
+    ]
+  },
+
+  "blockhalt": {
+    "sounds": [
+      "jcraft:stands/cmoon/blockhalt"
+    ]
+  },
+
   "mihsummon": {
     "sounds": [
       "jcraft:stands/madeinheaven/summon"

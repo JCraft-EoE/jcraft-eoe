@@ -96,6 +96,7 @@
   "jcraft.disc.error": "Cannot use disc while in combat!",
 
   "death.attack.stand": "%1$s was retired",
+  "death.attack.stand.item": "%1$s was retired by %2$s while wielding %3$s",
   "death.attack.stand.player": "%1$s was retired by %2$s",
   "death.attack.stand.player.item": "%1$s was retired by %2$s while wielding %3$s"
 }

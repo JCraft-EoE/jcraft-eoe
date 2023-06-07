@@ -67,8 +67,6 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
             .setInfo("Overhead Kick", "");
     public static Attack airbarrage = new Attack(5, 14, 1f, 48, 0, 1.5, 1f, 0.3f, AttackType.BARRAGE, 1, 0, 3)
             .setInfo("Kick Barrage", ""); //fast combo finisher, knocks back
-
-    //TODO: rtz turns off stands (1s), visuals
     public static Attack rtz = new Attack(10, 60, 32, 30, 0, 1, AttackType.BOX)
             .setInfo("Return to Zero", "initial press: saves the state of every entity in a 4 chunk radius (save lasts 1 minute), second press: reverts all states except users\nDoesn't affect player inventories");
     private static int rtzTimer;
@@ -253,22 +251,17 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
 
     @Override
     public void initUlt() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (rtzEntityData.isEmpty()) {
             // Setup
-            if (handleAttack(rtz, JCraft.standUltCD, 13)) {
+            if (handleAttack(rtz, JCraft.standUltCD, 13))
                 this.playSound(JSoundRegister.GER_SETUP, 1, 1);
-            }
         } else {
             // Fun part
             for (Map.Entry<Entity, NbtCompound> data :
                     rtzEntityData.entrySet()) {
                 Entity ent = data.getKey();
-                if (!ent.isAlive()) {
-                    continue;
-                }
+                if (!ent.isAlive()) continue;
                 NbtCompound nbt = data.getValue();
 
                 if (ent instanceof PlayerEntity playerEntity) {
@@ -371,9 +364,7 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
 
     @Override
     public void tick() {
-        if (age == 1) {
-            this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.GER_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
-        }
+        if (age == 1) world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.GER_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
 
         super.tick();
 

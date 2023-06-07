@@ -152,6 +152,9 @@ public interface JSoundRegister {
     SoundEvent CMOON_GROUNDSLAM = registerSound("cmoongroundslam");
     SoundEvent CMOON_GRAVSHIFT = registerSound("cmoongravshift");
     SoundEvent CMOON_DONUT = registerSound("cmoondonut");
+    SoundEvent CMOON_GROUNDSHOOT = registerSound("cmoongroundshoot");
+    SoundEvent CMOON_BLOCKLAUNCH = registerSound("blocklaunch");
+    SoundEvent CMOON_BLOCKHALT = registerSound("blockhalt");
 
     //Made in Heaven
     SoundEvent MIH_SUMMON = registerSound("mihsummon");

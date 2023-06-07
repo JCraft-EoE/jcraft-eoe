@@ -14,6 +14,7 @@ public interface JStatusRegister {
     StatusEffect WSPOISON = new WSPoisonEffect();
     StatusEffect STANDLESS = new StandlessEffect();
     StatusEffect OUTOFBODY = new OutOfBodyEffect();
+    StatusEffect WEIGHTLESS = new WeightlessStatusEffect();
 
     static void registerStatuses() {
         Registry.register(
@@ -57,5 +58,6 @@ public interface JStatusRegister {
         Registry.register(Registry.STATUS_EFFECT, new Identifier(JCraft.MOD_ID, "ws_poison"), WSPOISON);
         Registry.register(Registry.STATUS_EFFECT, new Identifier(JCraft.MOD_ID, "standless"), STANDLESS);
         Registry.register(Registry.STATUS_EFFECT, new Identifier(JCraft.MOD_ID, "outofbody"), OUTOFBODY);
+        Registry.register(Registry.STATUS_EFFECT, new Identifier(JCraft.MOD_ID, "weightless"), WEIGHTLESS);
     }
 }
