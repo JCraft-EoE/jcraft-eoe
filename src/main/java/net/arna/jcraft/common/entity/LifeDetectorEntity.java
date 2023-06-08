@@ -37,7 +37,6 @@ import java.util.List;
 
 public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOwnable {
     public LivingEntity target;
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
     public static TrackedData<Boolean> EXPLODED;
     static { EXPLODED = DataTracker.registerData(LifeDetectorEntity.class, TrackedDataHandlerRegistry.BOOLEAN); }
@@ -139,6 +138,8 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
         }
     }
 
+    @Override
+    public boolean isFireImmune() { return true; }
     @Nullable
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
@@ -169,6 +170,7 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
     @Override
     public void writeCustomDataToNbt(NbtCompound tag) {
         super.writeCustomDataToNbt(tag);
+        if (master == null) return;
         boolean ownerIsPlayer = master instanceof PlayerEntity;
         tag.putBoolean("playerOwner", ownerIsPlayer);
         if (ownerIsPlayer)
@@ -193,11 +195,12 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
     public void equipStack(EquipmentSlot slot, ItemStack stack) { }
     @Override
     public Arm getMainArm() { return null; }
+
+    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
     @Override
     public void registerControllers(AnimationData animationData) {
         animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
     }
-
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         if (hasExploded())
             event.getController().setAnimation(new AnimationBuilder().playOnce("animation.detector.explode"));
@@ -205,7 +208,6 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
             event.getController().setAnimation(new AnimationBuilder().loop("animation.detector.idle"));
         return PlayState.CONTINUE;
     }
-
     @Override
     public AnimationFactory getFactory() { return this.factory; }
 }

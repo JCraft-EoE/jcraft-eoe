@@ -40,6 +40,7 @@ public interface JEntityRendererRegister {
         EntityRendererRegistry.register(JEntityTypeRegister.GER_SCORPION, GERScorpionRenderer::new);
 
         EntityRendererRegistry.register(JEntityTypeRegister.BLOOD_PROJECTILE, BloodProjectileRenderer::new);
+        EntityRendererRegistry.register(JEntityTypeRegister.BLOCK_PROJECTILE, BlockProjectileRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegister.KNIFE, KnifeRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegister.ANKH, AnkhRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegister.BUBBLE, BubbleRenderer::new);

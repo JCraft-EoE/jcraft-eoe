@@ -4,6 +4,7 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
 import net.arna.jcraft.common.util.*;
+import net.arna.jcraft.registry.JParticleTypeRegistry;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -361,10 +362,21 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
         playSound(JSoundRegister.MIH_ZOOM, 1f, 1f);
     }
 
+    private void createSpeedParticles(Entity entity) {
+        Box box = entity.getBoundingBox();
+        for (int i = 0; i < box.getAverageSideLength(); i++) {
+            world.addParticle(JParticleTypeRegistry.SPEEDPARTICLE,
+                    random.nextDouble() * box.getXLength() + box.minX,
+                    random.nextDouble() * box.getYLength() + box.minY,
+                    random.nextDouble() * box.getZLength() + box.minZ,
+                    0, 0, 0
+            );
+        }
+    }
+
     @Override
     public void tick() {
-        if (age == 1)
-            this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.MIH_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
+        if (age == 1) world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.MIH_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
         super.tick();
 
         if (!hasUser()) return;
@@ -376,8 +388,21 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
             Entity clientCircleTarget = getCircleTarget();
             if (clientCircleTarget != null)
                 user.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, clientCircleTarget.getEyePos());
+
+            if (aTime > 1) { // Updating on the client, to make sure all is smooth
+                createSpeedParticles(this);
+
+                List<Entity> toCatch = world.getEntitiesByClass(Entity.class, // Lower range by 32 to reduce lag
+                        getBoundingBox().expand(96), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+
+                for (Entity entity : toCatch) {
+                    if (entity instanceof LivingEntity) continue;
+                    if (entity.getPos().squaredDistanceTo(new Vec3d(entity.prevX, entity.prevY, entity.prevZ)) > 0)
+                        createSpeedParticles(entity);
+                    entity.tick();
+                }
+            }
         } else {
-            Vec3d pos = this.getPos();
             // Circling
             if (circleTime > 0) {
                 circleTime--;
@@ -407,7 +432,7 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
                         Vec3d orbitPos = circleTarget.getEyePos().add(Math.sin(circleOrbitProg) * 7, 0, Math.cos(circleOrbitProg) * 7);
                         Vec3d towardsVel = orbitPos.subtract(user.getPos()).normalize();
                         double stabilization = user.getPos().distanceTo(orbitPos);
-                        if (stabilization > 0.8) stabilization = 0.8;
+                        if (stabilization > 0.5) stabilization = 0.5;
                         user.setVelocity(user.getVelocity().multiply(stabilization).add(towardsVel));
                     }
 
@@ -425,19 +450,14 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
 
             if (aTime > 1) {
                 List<Entity> toCatch = world.getEntitiesByClass(Entity.class,
-                        new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
-
-                toCatch.remove(this);
-                toCatch.remove(user);
-
+                        getBoundingBox().expand(96), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
                 for (Entity entity : toCatch) {
-                    if (entity instanceof LivingEntity)
-                        continue;
+                    if (entity instanceof LivingEntity) continue;
                     entity.tick();
                 }
             } else if (aTime == 1) {
                 List<LivingEntity> toCatch = world.getEntitiesByClass(LivingEntity.class,
-                        new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+                        getBoundingBox().expand(96), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
 
                 toCatch.remove(this);
                 toCatch.remove(user);

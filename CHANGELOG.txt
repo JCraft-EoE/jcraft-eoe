@@ -722,6 +722,41 @@ Made in Heaven
     >Added second, low hitbox to Leg Crusher
     >Heaven's Judgement reworked
 
+● 6/6/2023
+Magician's Red
+    >Life Detector can no longer die of fire damage
+
+C-Moon
+    >Remodeled and reanimated
+    >Barrage duration reduced (60->50t)
+    >Gut Punch damage reduced (10->8)
+    >Only One Punch
+        >Damage reduced (8->6)
+        >Now applies Weightless, and momentary Levitation
+        >Increased stun (1.75->2.25s)
+        >Added second hitbox
+    >Gravity Shift
+        >Now has three modes (Hypergravity, Repulse, Attract)
+        >No longer applies shift while stunned
+    >Replaced Gun with Block Launch
+    >Ground Slam cooldown reduced (28->23t)
+
+● 7/6/2023
+>Updated texture for Knockdown
+
+D4C
+    >Barrage duration reduced (75->60t)
+
+Magician's Red
+    >Improved tracking for Crossfire Hurricane
+
+C-Moon
+    >Added crouching variation to utility
+
+Made in Heaven
+    >Added particle effects
+    >Strengthened stabilization on circling version of Heaven's Judgement
+
 priority (top to bottom)
 TODO: ability to position the HUD
 TODO: AI flags for unblockables and shouldn't-blockables

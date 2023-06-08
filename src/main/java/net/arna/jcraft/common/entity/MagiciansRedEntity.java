@@ -16,6 +16,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
@@ -221,7 +222,7 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
 
         if (hasUser()) {
             LivingEntity user = this.getUser();
-            if (this.world.isClient()) {
+            if (world.isClient) {
                 if (this.getState() == 5) {
                     Vec3d rotVec = getRotationVector();
                     Vec3d mouthPos = getEyePos().add(rotVec);
@@ -254,9 +255,13 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
                         nearbyEnts.remove(this);
                         nearbyEnts.remove(user);
 
-                        for (LivingEntity livingEntity : nearbyEnts) {
-                            hurricanePos = hurricanePos.add(livingEntity.getEyePos().subtract(hurricanePos).normalize().multiply(0.5));
-                            break;
+                        if (!nearbyEnts.isEmpty()) {
+                            Vec3d avgPos = Vec3d.ZERO;
+                            for (LivingEntity livingEntity : nearbyEnts)
+                                avgPos = avgPos.add(livingEntity.getEyePos());
+                            avgPos = avgPos.multiply(1.0 / nearbyEnts.size());
+
+                            hurricanePos = hurricanePos.add(avgPos.subtract(hurricanePos).normalize().multiply(0.5));
                         }
 
                         // Damage
@@ -268,10 +273,9 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
                         for (LivingEntity living : toHurt) {
                             LivingEntity target = JCraftUtils.getUserIfStand(living);
                             if (hurricaneTime > 1) {
-                                damageLogic(world, target, new Vec3d(Math.sin(this.age) * 3, 0.0, Math.cos(this.age) * 3), 10, 1, false, 0.5f, true, 5, DamageSource.mob(user), user);
-                                if (hurricaneTime > 15) {
-                                    hurricaneTime = 15;
-                                } // Allows for zoning up until it hits something
+                                damageLogic(world, target, new Vec3d(Math.sin(age / 10.0) * 3, 0.0, Math.cos(age / 10.0) * 3), 10, 1, false, 0.5f, true, 5, DamageSource.mob(user), user);
+                                if (hurricaneTime > 15)
+                                    hurricaneTime = 15; // Allows for zoning up until it hits something
                             } else {
                                 target.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 20, 0));
                             }
@@ -285,11 +289,8 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
                         buf.writeDouble(hurricanePos.y);
                         buf.writeDouble(hurricanePos.z);
 
-                        for (PlayerEntity sendPlayer : world.getPlayers()) {
-                            if (sendPlayer instanceof ServerPlayerEntity serverPlayerEntity) {
-                                ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
-                            }
-                        }
+                        for (ServerPlayerEntity sendPlayer : ((ServerWorld) world).getPlayers())
+                            ServerChannelFeedbackPacket.send(sendPlayer, buf);
                     }
                 }
 

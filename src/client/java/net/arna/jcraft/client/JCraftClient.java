@@ -96,6 +96,7 @@ public class JCraftClient implements ClientModInitializer {
         particleFactoryRegistry.register(JParticleTypeRegistry.HITSPARK_2, provider -> new HitsparkParticle.Factory(provider, 1f));
         particleFactoryRegistry.register(JParticleTypeRegistry.KCPARTICLE, KCParticle.Factory::new);
         particleFactoryRegistry.register(JParticleTypeRegistry.BACKSTAB, BackstabParticle.Factory::new);
+        particleFactoryRegistry.register(JParticleTypeRegistry.SPEEDPARTICLE, SpeedParticle.Factory::new);
 
         // Renderer registration
         JEntityRendererRegister.registerEntityRenderers();

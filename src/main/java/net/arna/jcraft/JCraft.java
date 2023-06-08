@@ -47,7 +47,6 @@ import java.util.List;
 import static net.arna.jcraft.common.entity.StandEntity.stun;
 
 //initialize your FUCKING variables, arna
-//todo: add static IDs for stuff like stands and attacks to make checks for individual ones less expensive
 //todo: add working out
 public class JCraft implements ModInitializer {
 
@@ -282,7 +281,6 @@ public class JCraft implements ModInitializer {
 
         if (entity instanceof ServerPlayerEntity player) {
             player.teleport(au, pos.x, pos.y - heightOffset, pos.z, entity.getYaw(), entity.getPitch());
-            //todo: fix ability to get stuck in hell
         } else {
             finalEnt = teleportToWorld(entity, au, entity.getX(), entity.getY() - heightOffset, entity.getZ());
         }
