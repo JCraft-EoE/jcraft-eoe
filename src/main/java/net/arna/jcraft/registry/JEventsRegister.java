@@ -15,7 +15,7 @@ public interface JEventsRegister {
         ServerLivingEntityEvents.AFTER_DEATH.register(
                 (living, source) -> {
                     if (living instanceof ServerPlayerEntity player) {
-                        ((IEntityDataSaver) player).getPersistentData().putInt(JCraft.standCBCD, 0);
+                        ((IEntityDataSaver) player).getPersistentData().putInt(JCraft.comboBreakerCD, 0);
                     }
                 }
         );

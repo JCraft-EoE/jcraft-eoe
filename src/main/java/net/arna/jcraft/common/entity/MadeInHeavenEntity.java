@@ -220,7 +220,7 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
     @Override
     public void initMiddleClick() {
         if (!this.canAttack()) return;
-        if (handleAttack(speedslice, JCraft.standMMBCD, 6)) {
+        if (handleAttack(speedslice, JCraft.utilCD, 6)) {
             this.playSound(JSoundRegister.MIH_SPEEDSLICE, 1, 1);
         }
     }

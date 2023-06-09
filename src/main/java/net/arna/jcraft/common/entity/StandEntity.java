@@ -92,7 +92,7 @@ public abstract class StandEntity extends MobEntity {
     public Attack curAttack;
     public Attack previousAttack;
 
-    public static List<String> attackCooldowns = List.of(JCraft.standLightCD, JCraft.standHeavyCD, JCraft.standBarrageCD, JCraft.standS1CD, JCraft.standUltCD, JCraft.standS2CD, JCraft.standS3CD, JCraft.standMMBCD);
+    public static List<String> attackCooldowns = List.of(JCraft.standLightCD, JCraft.standHeavyCD, JCraft.standBarrageCD, JCraft.standS1CD, JCraft.standUltCD, JCraft.standS2CD, JCraft.standS3CD, JCraft.utilCD);
     static Attack unusable = new Attack(-1,999, 999, 999, 0, AttackType.BOX).setInfo("NONE", "NONE");
 
     // Info
@@ -104,6 +104,7 @@ public abstract class StandEntity extends MobEntity {
     @Getter
     private final StandType standType;
 
+    protected int summonAnimDuration = 19;
     protected boolean playSummonAnim = true;
 
     protected StandEntity(StandType type, World world) {
@@ -593,7 +594,7 @@ public abstract class StandEntity extends MobEntity {
         Entity vehicle = user.getVehicle();
 
         this.setMoveStun(this.getMoveStun() - 1);
-        if (playSummonAnim && (getMoveStun() > 0 || age > 19) )
+        if (playSummonAnim && (getMoveStun() > 0 || age > summonAnimDuration) )
             playSummonAnim = false;
 
         Attack attack = this.curAttack;
@@ -701,73 +702,74 @@ public abstract class StandEntity extends MobEntity {
                                 || (attack.attackType == AttackType.MULTIHIT && attack.attackTimes.contains(moveStun - this.getMoveStun()))
                 ) {
                     //JCraft.LOGGER.info(this.getMoveStun() + " ACTIVE " + attack.interval);
-                    Vec3d hPos = pos.add(0.0, user.getHeight() / 2, 0.0);
-                    Vec3d fPos = (isChargeAttack) ? hPos.add(rotVec) :
-                            hPos.add( rotVec.multiply(attackDist) ).subtract(0, attack.offset, 0);
+                    List<LivingEntity> hurt = new ArrayList<>();
 
-                    List<Entity> filter = new ArrayList<>(List.of(this, user));
-                    if (vehicle != null) filter.add(vehicle);
+                    if (attack.hitboxSize > 0) {
+                        Vec3d hPos = pos.add(0.0, user.getHeight() / 2, 0.0);
+                        Vec3d fPos = (isChargeAttack) ? hPos.add(rotVec) :
+                                hPos.add(rotVec.multiply(attackDist)).subtract(0, attack.offset, 0);
 
-                    List<LivingEntity> hurt = JCraftUtils.GenerateHitbox(world, fPos, attack.hitboxSize, filter);
-                    for (Attack.HitboxData data : attack.extraHitboxes) {
-                        List<LivingEntity> extraHurt = JCraftUtils.GenerateHitbox(world,
-                                hPos.add( rotVec.multiply(data.forwardOffset) ).add(0, data.verticalOffset, 0), data.hitboxSize, filter);
-                        for (LivingEntity hurtEntity : extraHurt)
-                            if (!hurt.contains(hurtEntity)) hurt.add(hurtEntity);
-                    }
-                    //JCraft.LOGGER.info("Hurt: " + hurt + " at world time: " + world.getTime());
-                    //if (!hurt.contains(player)) { hurt.add(player); } // Damage Debugging
+                        List<Entity> filter = new ArrayList<>(List.of(this, user));
+                        if (vehicle != null) filter.add(vehicle);
 
-                    if (!hurt.isEmpty()) {
-                        JCraft.CreateParticle((ServerWorld) this.world,
-                                fPos.x + random.nextGaussian() * 0.25,
-                                fPos.y + random.nextGaussian() * 0.25,
-                                fPos.z + random.nextGaussian() * 0.25,
-                                attack.hitspark + 1);
-
-                        if (attack.impactSound != null) playSound(attack.impactSound, 1, 1);
-
-                        if (attack.attackType == AttackType.CHARGE) {
-                            this.setMoveStun(10);
-                            this.setState(attack.interval); // Interval is hitAnim for charges
-                            this.curAttack = null;
+                        hurt = JCraftUtils.GenerateHitbox(world, fPos, attack.hitboxSize, filter);
+                        for (Attack.HitboxData data : attack.extraHitboxes) {
+                            List<LivingEntity> extraHurt = JCraftUtils.GenerateHitbox(world,
+                                    hPos.add(rotVec.multiply(data.forwardOffset)).add(0, data.verticalOffset, 0), data.hitboxSize, filter);
+                            for (LivingEntity hurtEntity : extraHurt)
+                                if (!hurt.contains(hurtEntity)) hurt.add(hurtEntity);
                         }
-                    }
+                        if (!hurt.isEmpty()) {
+                            JCraft.CreateParticle((ServerWorld) this.world,
+                                    fPos.x + random.nextGaussian() * 0.25,
+                                    fPos.y + random.nextGaussian() * 0.25,
+                                    fPos.z + random.nextGaussian() * 0.25,
+                                    attack.hitspark + 1);
 
-                    float kb = attack.knockback;
-                    Vec3d kbVec = rotVec.multiply(kb).add(new Vec3d(0.0, Math.abs(attack.knockback) / 4, 0.0));
+                            if (attack.impactSound != null) playSound(attack.impactSound, 1, 1);
 
-                    List<LivingEntity> clashed = new ArrayList<>();
-
-                    for (LivingEntity livingEntity : hurt) {
-                        if (livingEntity instanceof StandEntity stand) {
-                            // Barrage clashing
-                            if (isBarrage && stand.curAttack != null && stand.curAttack.attackType == AttackType.BARRAGE) {
-                                // Override stun with high priority 0.5s stun, also stops all current sounds for cleaner audio cue
-                                clashed.add(user);
-                                if (stand.hasUser()) {
-                                    clashed.add(stand.getUser());
-
-                                    if (stand.getUser() instanceof ServerPlayerEntity serverPlayer)
-                                        serverPlayer.networkHandler.sendPacket(new StopSoundS2CPacket(null, SoundCategory.PLAYERS));
-                                }
-                                if (user instanceof ServerPlayerEntity serverPlayer)
-                                    serverPlayer.networkHandler.sendPacket(new StopSoundS2CPacket(null, SoundCategory.PLAYERS));
-
-                                // Cancels both barrages
-                                cancelAttack();
-                                stand.cancelAttack();
-                                Vec3d midPos = stand.getPos().add(getPos()).multiply(0.5);
-                                this.world.playSound(null, midPos.x, midPos.y, midPos.z, JSoundRegister.IMPACT_1, SoundCategory.NEUTRAL, 1, 0.5f);
+                            if (attack.attackType == AttackType.CHARGE) {
+                                this.setMoveStun(10);
+                                this.setState(attack.interval); // Interval is hitAnim for charges
+                                this.curAttack = null;
                             }
-                            continue;
                         }
-                        damageLogic(world, livingEntity, kbVec, stunTicks, attack.stunType, attack.overrideStun, damage, attack.lift, attack.getEffectiveBlockstun(), JDamageSources.stand(this, user), user, attack.canBackstab);
-                    }
 
-                    for (LivingEntity livingEntity : clashed) {
-                        livingEntity.removeStatusEffect(JStatusRegister.DAZED);
-                        livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.DAZED, 10, 3, true, false));
+                        float kb = attack.knockback;
+                        Vec3d kbVec = rotVec.multiply(kb).add(new Vec3d(0.0, Math.abs(attack.knockback) / 4, 0.0));
+
+                        List<LivingEntity> clashed = new ArrayList<>();
+
+                        for (LivingEntity livingEntity : hurt) {
+                            if (livingEntity instanceof StandEntity stand) {
+                                // Barrage clashing
+                                if (isBarrage && stand.curAttack != null && stand.curAttack.attackType == AttackType.BARRAGE) {
+                                    // Override stun with high priority 0.5s stun, also stops all current sounds for cleaner audio cue
+                                    clashed.add(user);
+                                    if (stand.hasUser()) {
+                                        clashed.add(stand.getUser());
+
+                                        if (stand.getUser() instanceof ServerPlayerEntity serverPlayer)
+                                            serverPlayer.networkHandler.sendPacket(new StopSoundS2CPacket(null, SoundCategory.PLAYERS));
+                                    }
+                                    if (user instanceof ServerPlayerEntity serverPlayer)
+                                        serverPlayer.networkHandler.sendPacket(new StopSoundS2CPacket(null, SoundCategory.PLAYERS));
+
+                                    // Cancels both barrages
+                                    cancelAttack();
+                                    stand.cancelAttack();
+                                    Vec3d midPos = stand.getPos().add(getPos()).multiply(0.5);
+                                    this.world.playSound(null, midPos.x, midPos.y, midPos.z, JSoundRegister.IMPACT_1, SoundCategory.NEUTRAL, 1, 0.5f);
+                                }
+                                continue;
+                            }
+                            damageLogic(world, livingEntity, kbVec, stunTicks, attack.stunType, attack.overrideStun, damage, attack.lift, attack.getEffectiveBlockstun(), JDamageSources.stand(this, user), user, attack.canBackstab);
+                        }
+
+                        for (LivingEntity livingEntity : clashed) {
+                            livingEntity.removeStatusEffect(JStatusRegister.DAZED);
+                            livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.DAZED, 10, 3, true, false));
+                        }
                     }
 
                     this.specialAttack(attack, hurt);
@@ -890,8 +892,7 @@ public abstract class StandEntity extends MobEntity {
                     comboCounter.setComboCount(1);
                 } else {
                     StatusEffectInstance stun = ent.getStatusEffect(JStatusRegister.DAZED);
-                    if (stun != null && stun.getAmplifier() == 1) {
-                        //LOGGER.info("Target stun: " + stun.getDuration());
+                    if (stun != null && stun.getAmplifier() != 2) { // Stunned but not blocking
                         comboCounter.incrementComboCount();
                     } else {
                         comboCounter.setComboCount(1);

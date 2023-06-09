@@ -148,7 +148,7 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
         if (!data.canAttack) return;
         if (this.getTSTime() > 0) return;
         IEntityDataSaver user = (IEntityDataSaver) data.user;
-        if (user.getPersistentData().getInt(JCraft.standMMBCD) > 0) return;
+        if (user.getPersistentData().getInt(JCraft.utilCD) > 0) return;
         Vec3d eP = data.user.getEyePos();
 
         HitResult hitResult = this.world.raycast(new RaycastContext(eP, eP.add(data.user.getRotationVector().multiply(14)), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, data.user));
@@ -156,7 +156,7 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
 
         data.user.teleport(pos.x, pos.y, pos.z);
 
-        user.getPersistentData().putInt(JCraft.standMMBCD, 360); // 18 second timeskip cooldown
+        user.getPersistentData().putInt(JCraft.utilCD, 360); // 18 second timeskip cooldown
 
         if (user.getPersistentData().getInt(JCraft.standUltCD) < 60)
             user.getPersistentData().putInt(JCraft.standUltCD, 60); // 3 second timestop cooldown

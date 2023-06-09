@@ -173,6 +173,7 @@ public interface JSoundRegister {
     SoundEvent TWOH_TS = registerSound("twohtimestop");
     SoundEvent TWOH_HEAVY = registerSound("twohheavy");
     SoundEvent TWOH_SMITE = registerSound("twohsmite");
+    SoundEvent TWOH_CHARGEOVERWRITE = registerSound("twohchargeoverwrite");
     SoundEvent TWOH_OVERWRITE = registerSound("twohoverwrite");
     SoundEvent TWOH_KNIFETHROW = registerSound("twohowarida");
     SoundEvent TWOH_AIRKNIVES = registerSound("twohairknives");

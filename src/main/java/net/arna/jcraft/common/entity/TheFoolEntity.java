@@ -51,11 +51,12 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
 
     public static Attack light = new Attack(0, 2, 1.5f, 14, 7, 2, 6f, 0.8f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_2)
             .setInfo("Swipe", "slow, long-reaching poke");
-    public static Attack airbarrage = new Attack(3, 20, 1f, 30, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 0.5f, 0, 3);
+    public static Attack airbarrage = new Attack(3, 17, 1f, 30, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 0.5f, 0, 3);
 
-    public static Attack combo = new Attack(2, 17, 1.5f, 31, 0, 1.75, 4.5f, 0.1f, AttackType.MULTIHIT, 1f, -0.1f, List.of(8, 16, 20, 21), JSoundRegister.IMPACT_2)
+    public static Attack combo = new Attack(2, 15, 1.5f, 31, 0, 1.75, 4.5f, 0.1f, AttackType.MULTIHIT, 1f, -0.1f, List.of(8, 16, 20, 21), JSoundRegister.IMPACT_2)
             .setInfo("3-hit combo (grounded) / Burn Rubber (aerial)", "knockdown on final hit / slows down all movement, combo starter/extender");
     public static Attack launch = new Attack(1, 16, 1.25f, 20, 16, 2, 8f, 0.5f, AttackType.BOX, 1.25f, -0.3f, 0, JSoundRegister.IMPACT_2)
+            .appendHitbox(new Attack.HitboxData(1.5))
             .setHitspark(2)
             .setArmor(true)
             .setInfo("Launch", "uninterruptable, slow, launching uppercut");
@@ -180,9 +181,7 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
     // Moveset
     @Override
     public void initLightAttack() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!canAttack()) return;
         handleAttack(light, JCraft.standLightCD, 2);
     }
 
@@ -255,7 +254,7 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
         if (!this.canAttack()) {
             return;
         }
-        if (handleAttack(sandwave, JCraft.standMMBCD, 10)) {
+        if (handleAttack(sandwave, JCraft.utilCD, 10)) {
             this.setSand(true);
             this.setWave(true);
             this.setFree(false);
@@ -393,10 +392,9 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
 
                     for (int i = 0; i < particleNum; i++) {
                         ParticleEffect effect = new BlockStateParticleEffect(ParticleTypes.FALLING_DUST, Blocks.SAND.getDefaultState());
-                        if (this.isWave() && random.nextFloat() * 0.5f > 0) {
+                        if (isWave() && random.nextFloat() * 0.5f > 0)
                             effect = new BlockStateParticleEffect(ParticleTypes.BLOCK, Blocks.SAND.getDefaultState());
-                        }
-                        this.world.addParticle(
+                        world.addParticle(
                                 effect,
                                 pos.x + random.nextTriangular(0, 1),
                                 pos.y + random.nextTriangular(height / 2f, height / 2f),
@@ -412,7 +410,7 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
                         user.setVelocity(user.getVelocity().multiply(0.5).add(0, 0.01, 0));
                         user.velocityModified = true;
                     } else if (attack == sandwave && user.isOnGround()) {
-                        Vec3d rotVec = user.getRotationVector().multiply(0.5);
+                        Vec3d rotVec = user.getRotationVector().multiply(0.25);
                         user.addVelocity(rotVec.x, 0, rotVec.z);
                         user.velocityModified = true;
                     }

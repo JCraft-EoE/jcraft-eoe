@@ -2,6 +2,7 @@ package net.arna.jcraft.client.model.entity;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.TheFoolEntity;
+import net.arna.jcraft.common.util.JCraftUtils;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
@@ -28,32 +29,9 @@ public class TheFoolModel extends AnimatedTickingGeoModel<TheFoolEntity> {
     }
 
     @Override
-    public void setCustomAnimations(TheFoolEntity entity, int uniqueID, AnimationEvent animationEvent) {
-        super.setCustomAnimations(entity, uniqueID, animationEvent);
-
-        if (entity.hasUser()) {
-            LivingEntity user = entity.getUser();
-            float overVel = 0;
-            float velInfluence = 30f;
-
-            if (entity.getMoveStun() < 1) {
-                IBone torso = this.getAnimationProcessor().getBone("torso");
-
-                Vec3d userVel = user.getVelocity();
-                overVel = (float) userVel.horizontalLength() - 0.05f;
-                if (userVel.normalize().add(entity.getRotationVector()).horizontalLengthSquared() < userVel.normalize().horizontalLengthSquared()) {
-                    velInfluence *= -1;
-                }
-                if (torso != null) {
-                    torso.setRotationX((-overVel * velInfluence) * 3.1415f / 180f);
-                }
-            }
-
-            IBone head = this.getAnimationProcessor().getBone("head");
-
-            if (head != null) {
-                head.setRotationX((-user.getPitch() + overVel * velInfluence) * 3.1415f / 180f);
-            }
-        }
+    public void setCustomAnimations(TheFoolEntity animatable, int instanceId, AnimationEvent animationEvent) {
+        super.setCustomAnimations(animatable, instanceId, animationEvent);
+        if (animatable.hasUser()) // -10Pi/180
+            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), true, true, 0.445329251f, -0.1745329251f);
     }
 }

@@ -140,9 +140,9 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
     public void initMiddleClick() {
         if (!this.canAttack()) return;
         NbtCompound userData = ((IEntityDataSaver) getUser()).getPersistentData();
-        if (userData.getInt(JCraft.standMMBCD) > 0) return;
+        if (userData.getInt(JCraft.utilCD) > 0) return;
         setRemote(!getRemote());
-        userData.putInt(JCraft.standMMBCD, 30);
+        userData.putInt(JCraft.utilCD, 30);
         //HandleAttack(gun, JCraft.standMMBCD, 9);
     }
 

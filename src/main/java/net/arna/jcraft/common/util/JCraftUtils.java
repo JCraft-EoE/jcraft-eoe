@@ -57,12 +57,9 @@ public final class JCraftUtils {
             buf.writeDouble(v2.y);
             buf.writeDouble(v1.z);
             buf.writeDouble(v2.z);
-            for (PlayerEntity player : world.getPlayers()) {
-                if (player instanceof ServerPlayerEntity serverPlayerEntity) {
+            for (PlayerEntity player : world.getPlayers())
+                if (player instanceof ServerPlayerEntity serverPlayerEntity)
                     ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
-                }
-
-            }
         }
 
         List<? extends Entity> hit = world.getEntitiesByClass(entityClass, new Box(v1, v2), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
@@ -101,11 +98,9 @@ public final class JCraftUtils {
             buf.writeDouble(v2.y);
             buf.writeDouble(v1.z);
             buf.writeDouble(v2.z);
-            for (PlayerEntity player : world.getPlayers()) {
-                if (player instanceof ServerPlayerEntity serverPlayerEntity) {
+            for (PlayerEntity player : world.getPlayers())
+                if (player instanceof ServerPlayerEntity serverPlayerEntity)
                     ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
-                }
-            }
         }
 
         List<LivingEntity> hit = world.getEntitiesByClass(LivingEntity.class, new Box(v1, v2), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
@@ -132,12 +127,10 @@ public final class JCraftUtils {
     public static void assignSpec(PlayerEntity player, NbtCompound playerNbt, ISpec playerSpec) {
         JCraftSpec spec = null;
 
-        if (playerNbt.getInt("SpecID") == 1) {
+        if (playerNbt.getInt("SpecID") == 1)
             spec = new Brawler();
-        }
-        if (spec != null) {
+        if (spec != null)
             spec.player = player;
-        }
 
         playerSpec.setSpec(spec);
     }
@@ -309,15 +302,15 @@ public final class JCraftUtils {
         return 0;
     }
 
-    public static void animateGenericHumanoid(AnimatedTickingGeoModel model, StandEntity entity, LivingEntity player) {
+    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player) {
         animateGenericHumanoid(model, entity, player, false, false);
     }
 
-    public static void animateGenericHumanoid(AnimatedTickingGeoModel model, StandEntity entity, LivingEntity player, boolean flipBody, boolean flipHead) {
+    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, boolean flipBody, boolean flipHead) {
         animateGenericHumanoid(model, entity, player, flipBody, flipHead, 0, 0);
     }
 
-    public static void animateGenericHumanoid(AnimatedTickingGeoModel model, StandEntity entity, LivingEntity player, boolean flipBody, boolean flipHead, float tPO, float hPO) {
+    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, boolean flipBody, boolean flipHead, float tPO, float hPO) {
         float overVel = 0;
         float velInfluence = 90f;
 

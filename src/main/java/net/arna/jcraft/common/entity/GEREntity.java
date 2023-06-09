@@ -54,7 +54,7 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
             .setInfo("Barrage/Kick Barrage", "fast reliable combo starter/extender, high stun, in air: fast combo finisher, knocks back");
     public static Attack healself = new Attack(6, 26, 1f, 14, 10, 0, 0f, 0f, AttackType.BOX)
             .setInfo("Healing Hand", "standing: heals user for 2 hearts, crouching: heals others for 3 hearts, pacifies angered mobs");
-    public static Attack heal = new Attack(7, 26, 1f, 16, 10, 0, 0f, 0f, AttackType.BOX);
+    public static Attack heal = new Attack(7, 26, 1f, 16, 10, 1.25, 0f, 0f, AttackType.BOX);
     public static Attack laser = new Attack(8, 24, 1f, 20, 10, 0, 0f, 0f, AttackType.BOX)
             .setInfo("Life Beam", "summons a quick, stunning rock projectile that turns into a scorpion a small time after landing").setRanged(true);
 
@@ -189,10 +189,10 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
             return;
         }
         NbtCompound data = ((IEntityDataSaver) getUser()).getPersistentData();
-        if (data.getInt(JCraft.standMMBCD) > 0) {
+        if (data.getInt(JCraft.utilCD) > 0) {
             return;
         }
-        data.putInt(JCraft.standMMBCD, 360); // 18 second flight cd
+        data.putInt(JCraft.utilCD, 360); // 18 second flight cd
         setFlightTime(20);
     }
 

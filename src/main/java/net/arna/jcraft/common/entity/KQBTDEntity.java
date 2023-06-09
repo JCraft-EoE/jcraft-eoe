@@ -330,7 +330,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
         if (!this.canAttack()) return;
         LivingEntity user = this.getUser();
         NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
-        if (playerData.getInt(JCraft.standMMBCD) > 0) return;
+        if (playerData.getInt(JCraft.utilCD) > 0) return;
 
         Vec3d lookVec = user.getRotationVector().multiply(0.9);
         world.createExplosion(user,
@@ -342,7 +342,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
         user.setVelocity(user.getVelocity().add(lookVec));
         user.velocityModified = true;
 
-        playerData.putInt(JCraft.standMMBCD, 360); // 18s explosive dash cooldown
+        playerData.putInt(JCraft.utilCD, 360); // 18s explosive dash cooldown
         this.playSound(JSoundRegister.KQ_DETONATE, 1, 1);
     }
 

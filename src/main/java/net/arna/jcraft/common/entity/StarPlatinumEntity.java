@@ -24,7 +24,6 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAnimationTickable {
@@ -154,7 +153,7 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
         if (this.getTSTime() > 0)
             return;
         IEntityDataSaver user = (IEntityDataSaver) data.user;
-        if (user.getPersistentData().getInt(JCraft.standMMBCD) > 0)
+        if (user.getPersistentData().getInt(JCraft.utilCD) > 0)
             return;
         Vec3d eP = data.user.getEyePos();
 
@@ -163,7 +162,7 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
 
         data.user.teleport(pos.x, pos.y, pos.z);
 
-        user.getPersistentData().putInt(JCraft.standMMBCD, 360); // 18 second timeskip cooldown
+        user.getPersistentData().putInt(JCraft.utilCD, 360); // 18 second timeskip cooldown
 
         if (user.getPersistentData().getInt(JCraft.standUltCD) < 60)
             user.getPersistentData().putInt(JCraft.standUltCD, 60); // 3 second timestop cooldown
