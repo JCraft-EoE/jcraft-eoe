@@ -370,7 +370,7 @@ public abstract class StandEntity extends MobEntity {
 
     // Attack controls
     /**
-     * Returns whether the stand should be able to attack
+     * @return whether the stand should be able to attack
      */
     public boolean canAttack() {
         if (hasUser()) {
@@ -378,6 +378,13 @@ public abstract class StandEntity extends MobEntity {
             return this.getMoveStun() < 1 && timeStop.getTimeStopTicks() < 1 && !user.hasStatusEffect(JStatusRegister.DAZED);
         }
         return false;
+    }
+
+    /**
+     * @return whether the stand should change its height depending on the user's look pitch
+     */
+    public boolean shouldOffsetHeight() {
+        return getState() > 1;
     }
 
     /**

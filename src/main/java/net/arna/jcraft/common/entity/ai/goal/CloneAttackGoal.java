@@ -60,7 +60,7 @@ public class CloneAttackGoal extends Goal {
     }
 
     public void start() {
-        this.mob.getNavigation().startMovingAlong(this.path, this.speed);
+        //this.mob.getNavigation().startMovingAlong(this.path, this.speed);
         this.mob.setAttacking(true);
         this.cooldown = 0;
     }
@@ -78,6 +78,7 @@ public class CloneAttackGoal extends Goal {
 
     public void tick() {
         if (this.target != null) {
+            this.mob.getNavigation().startMovingTo(this.target, this.speed);
             this.mob.getLookControl().lookAt(this.target, 30.0F, 30.0F);
             this.cooldown = Math.max(this.cooldown - 1, 0);
             double d = this.getSquaredMaxAttackDistance(target);

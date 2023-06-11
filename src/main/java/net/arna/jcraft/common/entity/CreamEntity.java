@@ -146,7 +146,6 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
     public int getVoidTime() {
         return this.dataTracker.get(VOIDTIME);
     }
-
     public void setVoidTime(int vTime) {
         this.dataTracker.set(VOIDTIME, vTime);
     }
@@ -452,8 +451,10 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
                     toDamage.remove(user);
                     toDamage.remove(this);
 
+                    //todo: FALL DAMAGE!!!!!!
+
                     for (LivingEntity ent : toDamage)
-                        ent.damage(DamageSource.OUT_OF_WORLD, charging ? 4 : 1.5f);
+                        ent.damage(DamageSource.OUT_OF_WORLD, charging ? 4 : 2.5f);
                     if (notCorS)
                         user.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 25, 0, false, false));
                 } else {
@@ -472,6 +473,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
             } else {
                 if (getHalfBall()) {
                     this.setAlpha(0.1f);
+                    user.onLanding();
                     user.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 5, 9, true, false));
 
                     // Player Half-Ball controls

@@ -9,7 +9,13 @@ import java.util.List;
 public final class Attack {
     public int id = -1; // Unique ID
     public int cooldown = 0; // Ability cooldown
+
     public float attackDist = 1f; // Distance your stand is at while attacking
+    public Attack setDist(float attackDist) {
+        this.attackDist = attackDist;
+        return this;
+    }
+
     public int moveStun = 0; // Duration you can't use another move
     public int initTime = 0; // Time during movestun the move initiates
     public double hitboxSize = 0; // Hitbox size in meters cubed

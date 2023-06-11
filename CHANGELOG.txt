@@ -811,6 +811,42 @@ The Fool
 The World: Over Heaven
     >Hitbox reduced on Overwrite swing
 
+● 9/6/2023
+>Improved PlayerCloneEntity logic
+
+Cream
+    >Fall damage removed during Half Ball state
+    >Consume damage increased (1.5->2.5)
+
+The Fool
+    >Can now change attack range by crouching
+    >Added Glide, aerial variant to Sandwave
+    >Sand Clones
+        >Improved AI & other logic
+        >Removed speed nerf
+    >Suffocating Sandstorm
+        >Improved hit logic
+        >Added armor
+        >Added second hitbox
+        >Cooldown reduced (50->40s)
+
+Golden Experience
+    >Added second hitbox to Rekka 1
+
+● 11/6/2023
+>Dashes can now be stopped by being stunned
+
+Star Platinum
+    >Updated /stand about
+
+The Fool
+    >Pound
+        >Cooldown reduced (22->18s)
+        >Now has followups
+
+C-Moon
+    >Improved block launch logic on Ground Slam
+
 priority (top to bottom)
 TODO: ability to position the HUD
 TODO: AI flags for unblockables and shouldn't-blockables

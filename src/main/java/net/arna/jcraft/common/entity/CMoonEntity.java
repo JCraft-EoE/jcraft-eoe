@@ -267,6 +267,8 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
                             FallingBlockEntity fallingBlock = FallingBlockEntity.spawnFromBlock(world, curPos, curState);
                             fallingBlock.setVelocity(0, 0.5, 0);
                             fallingBlock.timeFalling = -120;
+                            fallingBlock.velocityModified = true;
+                            fallingBlock.velocityDirty = true;
                         }
                     }
                 }

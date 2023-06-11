@@ -110,20 +110,23 @@ public class JCraft implements ModInitializer {
      */
     public static class DashData {
         public final Vec3d dashVector;
-        public final Entity entity;
+        public final LivingEntity entity;
         public boolean finished = false;
         private int duration = 10;
 
-        public DashData(Vec3d dashVector, Entity entity) {
+        public DashData(Vec3d dashVector, LivingEntity entity) {
             this.dashVector = dashVector;
             this.entity = entity;
         }
 
         public void tickDash() {
             duration--;
+            if (entity.hasStatusEffect(JStatusRegister.DAZED)) { // Being stunned stops dashes
+                finished = true;
+                return;
+            }
             if (duration <= 5) { // 5 ticks of movement, then recovery
-                if (duration <= 0)
-                    finished = true;
+                if (duration <= 0) finished = true;
                 return;
             }
             entity.setVelocity( entity.getVelocity().add(dashVector).multiply(0.5) );
@@ -224,6 +227,7 @@ public class JCraft implements ModInitializer {
                 itemStacks.add(new ItemStack(JObjectRegistry.JOTAROBOOTS));
 
                 itemStacks.add(new ItemStack(JObjectRegistry.KQCOIN));
+                itemStacks.add(new ItemStack(JObjectRegistry.FOOLISH_SAND_BLOCK.asItem()));
             }))
             .build();
 

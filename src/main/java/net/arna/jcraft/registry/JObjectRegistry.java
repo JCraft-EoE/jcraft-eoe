@@ -1,16 +1,17 @@
 package net.arna.jcraft.registry;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.block.ShaderTestBlock;
-import net.arna.jcraft.common.block.SoulBlock;
+import net.arna.jcraft.common.block.*;
 import net.arna.jcraft.common.item.*;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
+import net.minecraft.block.MapColor;
 import net.minecraft.block.Material;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ArmorMaterials;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.registry.Registry;
@@ -72,10 +73,12 @@ public interface JObjectRegistry {
 
     Item JOTAROBOOTS = register("jotaro_boots", new JotaroArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.FEET, settings()));
 
-
     //Block
+    Block FOOLISH_SAND_BLOCK = register("foolish_sand_block", new FoolishSandBlock(FabricBlockSettings.of(Material.AGGREGATE, MapColor.PALE_YELLOW)
+                    .strength(0.5f)
+                    .sounds(BlockSoundGroup.SAND)
+            ), settings(), true);
     Block SOUL_BLOCK = register("soul_block", new SoulBlock(FabricBlockSettings.of(Material.DENSE_ICE).strength(4.0f)), settings(), true);
-
     Block SHADER_TEST_BLOCK = register("shader_test_block", new ShaderTestBlock(FabricBlockSettings.of(Material.METAL)), settings(), true);
 
     static Item.Settings settings() {

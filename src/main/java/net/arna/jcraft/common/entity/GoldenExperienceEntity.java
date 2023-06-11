@@ -63,6 +63,7 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
             .setHitspark(2)
             .setFollowup(rekka3);
     public static Attack rekka1 = new Attack(7, 23, 1f, 20, 8, 1.5, 5f, 0.5f, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.IMPACT_2)
+            .appendHitbox(new Attack.HitboxData(1.25))
             .setInfo("Rekka Series", "a set of three attacks, which cancel into each other during recovery", AttackQueue.SPECIAL2)
             .setFollowup(rekka2);
 

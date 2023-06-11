@@ -44,7 +44,7 @@ public class EntityMixin implements ITimeStop {
             float y = e.getYaw() + stand.getRotationOffset();
             y *= (float) Math.PI / 180;
 
-            double heightOffset = stand.getState() > 1 ? e.getRotationVector().y : 0;
+            double heightOffset = stand.shouldOffsetHeight() ? e.getRotationVector().y : 0;
             positionUpdater.accept(passenger, e.getX() + MathHelper.cos(y) * dist, d + heightOffset, e.getZ() + MathHelper.sin(y) * dist);
             info.cancel();
         }

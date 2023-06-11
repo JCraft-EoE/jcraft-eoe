@@ -73,14 +73,16 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
         freespace =
                 """
                         BNBs:
-                            advancing barrage is only confirmed if the opponent is lifted, so the M1 between regular and advancing barrage may be removed
+                        ~ represents a queued attack
+                        
                             -the classic
-                            M1>Low Kick>Barrage>M1>Advancing Barrage>(queue)Star Finger>(queue)M1>(queue)Star Breaker
-                            works as a timestop setup that's beaten by mobility options
-                            ...>(queue)Timestop{ Timeskip>[Spam weapon crits]M1>M1 }>M1>Low kick
+                            M1>Barrage>M1>Low Kick>Advancing Barrage~M1~Star Finger~Star Breaker
+                            
+                            -the "omg you can confirm ts??"
+                            M1>Advancing Barrage~M1~Star Finger>Barrage>Timestop{ M1>Low Kick>Star Breaker }
 
                             -the poke
-                            Star Finger>Low Kick>Barrage>M1>Advancing Barrage>(queue)M1>(queue)Star Breaker""";
+                            Star Finger>Low Kick>M1>Advancing Barrage~M1~Low Kick>Barrage>M1>Star Breaker""";
 
         moves = List.of(light, heavy, barrage, starfinger, timestop, lowkick, starfinger,
                 new Attack().setMobility(MobilityType.TELEPORT).setInfo("Timeskip", "14m range")

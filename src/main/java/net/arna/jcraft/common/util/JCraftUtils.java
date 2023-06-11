@@ -307,12 +307,15 @@ public final class JCraftUtils {
     }
 
     public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, boolean flipBody, boolean flipHead) {
-        animateGenericHumanoid(model, entity, player, flipBody, flipHead, 0, 0);
+        animateGenericHumanoid(model, entity, player, flipBody, flipHead, 0, 0, 90f);
     }
 
     public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, boolean flipBody, boolean flipHead, float tPO, float hPO) {
+        animateGenericHumanoid(model, entity, player, flipBody, flipHead, tPO, hPO, 90f);
+    }
+
+    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, boolean flipBody, boolean flipHead, float tPO, float hPO, float velInfluence) {
         float overVel = 0;
-        float velInfluence = 90f;
 
         if (entity.getMoveStun() < 1) {
             Vec3d playerVel = player.getVelocity();
