@@ -294,8 +294,6 @@ public class ClientPacketHandler {
                     if (ent instanceof PlayerEntity player) {
                         ModifierLayer<IAnimation> animationContainer = ((IJCraftAnimatedPlayer) player).jcraft_getModAnimation();
                         KeyframeAnimation anim = PlayerAnimationRegistry.getAnimation(new Identifier(JCraft.MOD_ID, "animation." + animPath));
-                        //KeyframeAnimation.AnimationBuilder builder = anim.mutableCopy();
-                        //builder.getPart("head")
                         animationContainer.setAnimation(new KeyframeAnimationPlayer(anim));
                     }
                 });

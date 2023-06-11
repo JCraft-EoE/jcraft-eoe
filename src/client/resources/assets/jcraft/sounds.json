@@ -623,6 +623,12 @@
     ]
   },
 
+  "twohchargeoverwrite": {
+    "sounds": [
+      "jcraft:stands/theworldoverheaven/chargeoverwrite"
+    ]
+  },
+
   "twohoverwrite": {
     "sounds": [
       "jcraft:stands/theworldoverheaven/overwrite"

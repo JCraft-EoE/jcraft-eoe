@@ -24,7 +24,6 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAnimationTickable {
@@ -74,14 +73,16 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
         freespace =
                 """
                         BNBs:
-                            advancing barrage is only confirmed if the opponent is lifted, so the M1 between regular and advancing barrage may be removed
+                        ~ represents a queued attack
+                        
                             -the classic
-                            M1>Low Kick>Barrage>M1>Advancing Barrage>(queue)Star Finger>(queue)M1>(queue)Star Breaker
-                            works as a timestop setup that's beaten by mobility options
-                            ...>(queue)Timestop{ Timeskip>[Spam weapon crits]M1>M1 }>M1>Low kick
+                            M1>Barrage>M1>Low Kick>Advancing Barrage~M1~Star Finger~Star Breaker
+                            
+                            -the "omg you can confirm ts??"
+                            M1>Advancing Barrage~M1~Star Finger>Barrage>Timestop{ M1>Low Kick>Star Breaker }
 
                             -the poke
-                            Star Finger>Low Kick>Barrage>M1>Advancing Barrage>(queue)M1>(queue)Star Breaker""";
+                            Star Finger>Low Kick>M1>Advancing Barrage~M1~Low Kick>Barrage>M1>Star Breaker""";
 
         moves = List.of(light, heavy, barrage, starfinger, timestop, lowkick, starfinger,
                 new Attack().setMobility(MobilityType.TELEPORT).setInfo("Timeskip", "14m range")
@@ -154,7 +155,7 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
         if (this.getTSTime() > 0)
             return;
         IEntityDataSaver user = (IEntityDataSaver) data.user;
-        if (user.getPersistentData().getInt(JCraft.standMMBCD) > 0)
+        if (user.getPersistentData().getInt(JCraft.utilCD) > 0)
             return;
         Vec3d eP = data.user.getEyePos();
 
@@ -163,7 +164,7 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
 
         data.user.teleport(pos.x, pos.y, pos.z);
 
-        user.getPersistentData().putInt(JCraft.standMMBCD, 360); // 18 second timeskip cooldown
+        user.getPersistentData().putInt(JCraft.utilCD, 360); // 18 second timeskip cooldown
 
         if (user.getPersistentData().getInt(JCraft.standUltCD) < 60)
             user.getPersistentData().putInt(JCraft.standUltCD, 60); // 3 second timestop cooldown

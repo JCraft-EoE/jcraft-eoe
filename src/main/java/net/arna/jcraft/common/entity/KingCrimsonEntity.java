@@ -302,7 +302,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
         if (hasUser()) {
             LivingEntity user = this.getUser();
             NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
-            if (playerData.getInt(JCraft.standMMBCD) > 0) return;
+            if (playerData.getInt(JCraft.utilCD) > 0) return;
             Vec3d oPos = user.getPos();
 
             HitResult hitResult = this.world.raycast(new RaycastContext(user.getEyePos(), user.getEyePos().add(user.getRotationVector().multiply(16)), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user));
@@ -310,7 +310,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
 
             user.teleport(pos.x, pos.y, pos.z);
 
-            playerData.putInt(JCraft.standMMBCD, 300); // 15 second timeskip cooldown
+            playerData.putInt(JCraft.utilCD, 300); // 15 second timeskip cooldown
 
             if (playerData.getInt(JCraft.standUltCD) < 60) {
                 playerData.putInt(JCraft.standUltCD, 60);

@@ -27,14 +27,10 @@ public class TheWorldOverHeavenRenderer extends GeoEntityRenderer<TheWorldOverHe
                                      int packedLightIn, Identifier textureLocation) {
 
         MinecraftClient mcClient = MinecraftClient.getInstance();
-        if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null) {
-            if (mcClient.player.getFirstPassenger() == animatable) {
+        if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null)
+            if (mcClient.player.getFirstPassenger() == animatable)
                 return RenderLayer.getEntityNoOutline(this.getTextureLocation(animatable));
-            }
-        }
-
-        //return RenderLayer.getEntityCutout(this.getTextureLocation(animatable));
-        return RenderLayer.getEntityCutout(this.getTextureLocation(animatable));
+        return RenderLayer.getEntityTranslucent(this.getTextureLocation(animatable));
     }
 
 
@@ -43,11 +39,9 @@ public class TheWorldOverHeavenRenderer extends GeoEntityRenderer<TheWorldOverHe
     public void render(GeoModel model, TheWorldOverHeavenEntity animatable, float partialTicks, RenderLayer type, MatrixStack matrixStackIn, VertexConsumerProvider renderTypeBuffer, VertexConsumer vertexBuilder, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
         float a = 1f;
         MinecraftClient mcClient = MinecraftClient.getInstance();
-        if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null) {
-            if (mcClient.player.getFirstPassenger() == animatable) {
+        if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null)
+            if (mcClient.player.getFirstPassenger() == animatable)
                 a = animatable.getAlpha();
-            }
-        }
 
         super.render(model, animatable, partialTicks, type, matrixStackIn, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, a);
     }

@@ -47,20 +47,27 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
 
     public static Attack light = new Attack(0, 2, 0.75f, 14, 6, 1.5, 5f, 0.75f, AttackType.BOX, 1f, 0.1f, 0, JSoundRegister.IMPACT_3)
             .setInfo("Punch", "quick combo starter");
-    public static Attack heavy = new Attack(1, 14, 1f, 30, 20, 1.5, 10f, 0.1f, AttackType.BOX, 2, 0, 0, JSoundRegister.IMPACT_3).setHitspark(2).setArmor(true)
+    public static Attack heavy = new Attack(1, 14, 1f, 30, 20, 1.5, 10f, 0.1f, AttackType.BOX, 2, 0, 0, JSoundRegister.IMPACT_3)
+            .setHitspark(2)
+            .setArmor(true)
             .setInfo("Vertical Chop", "slow, uninterruptable combo starter");
     public static Attack combo = new Attack(2, 17, 0.75f, 36, 0, 2.0, 7f, 0.1f, AttackType.MULTIHIT, 1, 0, List.of(10, 17, 25), JSoundRegister.IMPACT_3)
             .setInfo("3-hit Combo", "medium windup, good stun");
     public static Attack grab = new Attack(3, 20, 1f, 20, 8, 1.5, 3f, 0f, AttackType.BOX, 1.5f, 0, 0)
             .setUB(false)
             .setInfo("Grab", "unblockable, knocks back");
-    public static Attack grabhit = new Attack(4, 0, 1f, 20, 13, 2.0, 6f, 1.5f, AttackType.BOX, 0.25f).setLaunch();
-    public static Attack charge = new Attack(5, 20, 4f, 13, 5, 1.5, 8f, 0.25f, AttackType.CHARGE, 1, 0, 8, JSoundRegister.IMPACT_3).setRanged(true)
+    public static Attack grabhit = new Attack(4, 0, 1f, 20, 13, 2.0, 6f, 1.5f, AttackType.BOX, 0.25f)
+            .setLaunch();
+    public static Attack charge = new Attack(5, 20, 4f, 13, 5, 1.5, 8f, 0.25f, AttackType.CHARGE, 1, 0, 8, JSoundRegister.IMPACT_3)
+            .setRanged(true)
             .setInfo("Charge", "3.5 block range, combo starter/extender");
-    public static Attack destroy = new Attack(6, 25, 1f, 30, 21, 2, 0f, 1.25f, AttackType.BOX, 0f, 0f, 0, JSoundRegister.IMPACT_5).setHitspark(2).setArmor(true)
+    public static Attack destroy = new Attack(6, 25, 1f, 30, 21, 2, 0f, 1.25f, AttackType.BOX, 0f, 0f, 0, JSoundRegister.IMPACT_5)
+            .setHitspark(2)
+            .setArmor(true)
             .setUB(true)
             .setInfo("Destroy", "slow, uninterruptable, unblockable knockdown");
-    public static Attack consume = new Attack(7, 32, 1f, 40, 35, 2.0, 2f, 0f, AttackType.BOX).setRanged(true)
+    public static Attack consume = new Attack(7, 32, 1f, 40, 35, 2.0, 2f, 0f, AttackType.BOX)
+            .setRanged(true)
             .setInfo("Void", "high windup, 6 seconds");
     public static Attack enter = new Attack(8, 2, 15, 10, 0, 0f, AttackType.BOX)
             .setInfo("Enter Cream", "cream consumes itself and the user halfway, increasing mobility and decreasing defense").setMobility(MobilityType.FLIGHT);
@@ -139,7 +146,6 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
     public int getVoidTime() {
         return this.dataTracker.get(VOIDTIME);
     }
-
     public void setVoidTime(int vTime) {
         this.dataTracker.set(VOIDTIME, vTime);
     }
@@ -243,10 +249,10 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
             return;
         }
         if (getHalfBall()) {
-            if (handleAttack(exit, JCraft.standMMBCD, 12))
+            if (handleAttack(exit, JCraft.utilCD, 12))
                 this.playSound(JSoundRegister.CREAM_EXIT, 1, 1);
         } else {
-            if (handleAttack(enter, JCraft.standMMBCD, 11))
+            if (handleAttack(enter, JCraft.utilCD, 11))
                 this.playSound(JSoundRegister.CREAM_ENTER, 1, 1);
         }
     }
@@ -445,8 +451,10 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
                     toDamage.remove(user);
                     toDamage.remove(this);
 
+                    //todo: FALL DAMAGE!!!!!!
+
                     for (LivingEntity ent : toDamage)
-                        ent.damage(DamageSource.OUT_OF_WORLD, charging ? 4 : 1.5f);
+                        ent.damage(DamageSource.OUT_OF_WORLD, charging ? 4 : 2.5f);
                     if (notCorS)
                         user.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 25, 0, false, false));
                 } else {
@@ -465,6 +473,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
             } else {
                 if (getHalfBall()) {
                     this.setAlpha(0.1f);
+                    user.onLanding();
                     user.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 5, 9, true, false));
 
                     // Player Half-Ball controls

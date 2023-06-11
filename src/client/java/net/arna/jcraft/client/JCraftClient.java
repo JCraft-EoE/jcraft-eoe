@@ -76,6 +76,7 @@ public class JCraftClient implements ClientModInitializer {
     public static KeyBinding comboBreaker;
     public static KeyBinding cooldownCancel;
     public static KeyBinding utility;
+    public static KeyBinding dash;
 
     @Override
     public void onInitializeClient() {
@@ -114,6 +115,7 @@ public class JCraftClient implements ClientModInitializer {
         comboBreaker = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.combobreaker", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_ALT, "key.category.jcraft"));
         cooldownCancel = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.cooldowncancel", InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_4, "key.category.jcraft"));
         utility = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.utility", InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_5, "key.category.jcraft"));
+        dash = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.dash", InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_4, "key.category.jcraft"));
 
         ClientTickEvents.END_CLIENT_TICK.register(this::tickClient);
         ClientTickEvents.END_WORLD_TICK.register(new SkyBoxManager());
@@ -194,27 +196,27 @@ public class JCraftClient implements ClientModInitializer {
                     case (1):
                         keyBindText = "M1";
                         break;
-                    case (11):
+                    case (12):
                     case (2):
                         keyBindText = GenerateName(heavyKey.getBoundKeyTranslationKey());
                         break;
-                    case (12):
+                    case (13):
                     case (3):
                         keyBindText = GenerateName(barrageKey.getBoundKeyTranslationKey());
                         break;
-                    case (13):
+                    case (14):
                     case (4):
                         keyBindText = GenerateName(ultKey.getBoundKeyTranslationKey());
                         break;
-                    case (14):
+                    case (15):
                     case (5):
                         keyBindText = GenerateName(special1Key.getBoundKeyTranslationKey());
                         break;
-                    case (15):
+                    case (16):
                     case (6):
                         keyBindText = GenerateName(special2Key.getBoundKeyTranslationKey());
                         break;
-                    case (16):
+                    case (17):
                     case (7):
                         keyBindText = GenerateName(special3Key.getBoundKeyTranslationKey());
                         break;
@@ -228,18 +230,19 @@ public class JCraftClient implements ClientModInitializer {
                     case (10):
                         keyBindText = GenerateName(cooldownCancel.getBoundKeyTranslationKey());
                         break;
+                    case (11):
+                        keyBindText = GenerateName(dash.getBoundKeyTranslationKey());
+                        break;
                 }
 
-                boolean isSpec = i > 10;
+                boolean isSpec = i > 11;
                 float defaultAlpha = 0.65f;
                 int xOffset = 0;
 
                 String finalText = keyBindText + " - " + MathHelper.clamp(cooldown, 0.0, 9999.0) + "s";
 
                 if (i < 8 || isSpec) {
-                    if (!isSpec) {
-                        finalText = "s." + finalText;
-                    }
+                    if (!isSpec) finalText = "s." + finalText;
 
                     if ((isSpec && standOn) || (!isSpec && !standOn)) {
                         xOffset = 48;
@@ -248,12 +251,8 @@ public class JCraftClient implements ClientModInitializer {
                 }
 
                 float offsetY = selectedY * (1.25f) + (isSpec ? 9 * (i - 9) : 9 * i);
-
-                        /*
-                        RenderSystem.setShaderTexture(0, BIND_BG);
-                        DrawableHelper.drawTexture(matrixStack, maxX + xOffset + 6, (int) offsetY - 2, 0, 0, 10, 10, 10, 10);
-                         */
-
+                //RenderSystem.setShaderTexture(0, BIND_BG);
+                //DrawableHelper.drawTexture(matrixStack, maxX + xOffset + 6, (int) offsetY - 2, 0, 0, 10, 10, 10, 10);
                 textRenderer.drawWithShadow(
                         matrixStack,
                         finalText,
@@ -287,6 +286,7 @@ public class JCraftClient implements ClientModInitializer {
                 buf.writeBoolean(go.backKey.isPressed()); // S
                 buf.writeBoolean(go.rightKey.isPressed()); // D
                 buf.writeBoolean(go.jumpKey.isPressed()); // Space
+                buf.writeBoolean(dash.isPressed()); // Dash
                 sendStandControlPacket(buf);
             } else { // Reset cooldowns on death
                 clientCooldowns = DefaultedList.ofSize(JCraft.cooldowns.size(), 0.0);

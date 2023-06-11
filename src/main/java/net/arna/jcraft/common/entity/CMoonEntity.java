@@ -190,7 +190,7 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
         LivingEntity user = getUser();
 
         IEntityDataSaver userData = (IEntityDataSaver) user;
-        if (userData.getPersistentData().getInt(JCraft.standMMBCD) > 0) return;
+        if (userData.getPersistentData().getInt(JCraft.utilCD) > 0) return;
 
         if (user.isSneaking()) {
             user.addStatusEffect(new StatusEffectInstance(JStatusRegister.WEIGHTLESS, 30, 1));
@@ -200,7 +200,7 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
         }
 
         user.velocityModified = true;
-        userData.getPersistentData().putInt(JCraft.standMMBCD, 340);
+        userData.getPersistentData().putInt(JCraft.utilCD, 340);
     }
 
     @Override
@@ -267,6 +267,8 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
                             FallingBlockEntity fallingBlock = FallingBlockEntity.spawnFromBlock(world, curPos, curState);
                             fallingBlock.setVelocity(0, 0.5, 0);
                             fallingBlock.timeFalling = -120;
+                            fallingBlock.velocityModified = true;
+                            fallingBlock.velocityDirty = true;
                         }
                     }
                 }

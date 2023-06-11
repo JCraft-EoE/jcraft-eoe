@@ -11,7 +11,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
@@ -146,9 +145,9 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
     @Override
     public void initMiddleClick() {
         if (!this.canAttack()) return;
-        if (getUser().isSneaking() && handleAttack(redbind, JCraft.standMMBCD, 10)) {
+        if (getUser().isSneaking() && handleAttack(redbind, JCraft.utilCD, 10)) {
             playSound(JSoundRegister.MR_REDBIND,1, 1);
-        } else if (handleAttack(detector, JCraft.standMMBCD, 11)) {
+        } else if (handleAttack(detector, JCraft.utilCD, 11)) {
             playSound(JSoundRegister.MR_DETECTOR,1, 1);
         }
     }

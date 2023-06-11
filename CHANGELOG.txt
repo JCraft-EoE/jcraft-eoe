@@ -757,6 +757,96 @@ Made in Heaven
     >Added particle effects
     >Strengthened stabilization on circling version of Heaven's Judgement
 
+● 8/6/2023
+Added Dashing
+    >FRAMEDATA: 5 ticks of MOVEMENT, 5 ticks of RECOVERY
+    >DEFAULT BIND: Mouse 4
+    >COOLDOWN: 2s
+        >Cannot be Cooldown Cancelled
+        >Extended to 5s if you jump while dashing
+    >Works in any cardinal or diagonal direction
+    >Dashing sideways and backwards has a stacking reduction in speed
+    >You cannot block while dashing
+
+>Fixed combo counter incorrectly resetting when hitting someone during launch stun
+>Fixed bug where attacks not meant to have hitboxes had point hitboxes instead
+>Optimized stand control code
+
+D4C
+    >Barrage duration increased (60->70t)
+    >Grab (final hit)
+        >increased launch stun (5->9t)
+        >increased knockback
+
+The Fool
+    >Burn Rubber cooldown reduced (20->17s)
+    >Combo cooldown reduced (17->15s)
+    >Sandwave speed reduced
+    >Added second hitbox to Launch
+
+Golden Experience (+ Requiem)
+    >Fixed tiny hitbox on Healing Hand (others)
+
+Made in Heaven
+    >Updated animations
+
+The World: Over Heaven
+    >Remodeled and reanimated
+    >Singularity damage reduced (10->8)
+    >Aerial Divine Finisher
+        >reduced knife count (8->6)
+        >knives now consistently spawn in hexagon pattern
+    >Smite
+        >damage reduced (9->6)
+        >increased launch
+    >Overwrite reworked
+        >Faster startup
+        >Now has 3 types
+        >Overwrite swing now has armor
+
+● 9/6/2023
+The Fool
+    >Remodeled and reanimated
+
+The World: Over Heaven
+    >Hitbox reduced on Overwrite swing
+
+● 9/6/2023
+>Improved PlayerCloneEntity logic
+
+Cream
+    >Fall damage removed during Half Ball state
+    >Consume damage increased (1.5->2.5)
+
+The Fool
+    >Can now change attack range by crouching
+    >Added Glide, aerial variant to Sandwave
+    >Sand Clones
+        >Improved AI & other logic
+        >Removed speed nerf
+    >Suffocating Sandstorm
+        >Improved hit logic
+        >Added armor
+        >Added second hitbox
+        >Cooldown reduced (50->40s)
+
+Golden Experience
+    >Added second hitbox to Rekka 1
+
+● 11/6/2023
+>Dashes can now be stopped by being stunned
+
+Star Platinum
+    >Updated /stand about
+
+The Fool
+    >Pound
+        >Cooldown reduced (22->18s)
+        >Now has followups
+
+C-Moon
+    >Improved block launch logic on Ground Slam
+
 priority (top to bottom)
 TODO: ability to position the HUD
 TODO: AI flags for unblockables and shouldn't-blockables

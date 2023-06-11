@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.events;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.JCraft.DashData;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.util.DimValues;
@@ -39,28 +40,20 @@ public class JServerTickEvents {
     public static void serverTick(MinecraftServer server) {
         // Player logic (cooldown handling and DamageTimer counting)
         for (ServerPlayerEntity player : PlayerLookup.all(server)) {
-            if (player == null) {
-                continue;
-            }
+            if (player == null) continue;
+
             if (player.isAlive()) {
-                IEntityDataSaver user = (IEntityDataSaver) player;
-                NbtCompound userData = user.getPersistentData();
-                if (player.getAttacker() != null) {
-                    userData.putInt("DamageTimer", 600);
-                }
+                NbtCompound userData = ((IEntityDataSaver) player).getPersistentData();
+                if (player.getAttacker() != null)  userData.putInt("DamageTimer", 600);
 
                 // Damage timer
-                if (userData.contains("DamageTimer")) {
-                    userData.putInt("DamageTimer", userData.getInt("DamageTimer") - 1);
-                }
+                if (userData.contains("DamageTimer"))  userData.putInt("DamageTimer", userData.getInt("DamageTimer") - 1);
 
                 // Handle cooldowns
                 int i = 0;
                 for (String cooldownType : JCraft.cooldowns) {
                     i++;
-                    if (!userData.contains(cooldownType)) {
-                        userData.putInt(cooldownType, 0);
-                    }
+                    if (!userData.contains(cooldownType)) userData.putInt(cooldownType, 0);
 
                     int reducedCd = userData.getInt(cooldownType) - 1;
                     userData.putInt(cooldownType, reducedCd);
@@ -76,7 +69,7 @@ public class JServerTickEvents {
             }
         }
 
-        // Keeping track of dimhops
+        // Dimensional hop handling
         Iterator<DimValues> iterator = JCraft.pastDimensions.iterator();
         ArrayList<DimValues> newPastDimensions = new ArrayList<>();
 
@@ -108,8 +101,7 @@ public class JServerTickEvents {
 
         JCraft.pastDimensions = newPastDimensions;
 
-        // Keeping track of timestops
-
+        // Timestop handling
         for (DimValues dimValues : activeTimestops) {
             if (dimValues.user instanceof StandEntity stand && dimValues.user.isAlive()) {
                 if (stand.getTSTime() > 0) continue;
@@ -177,8 +169,19 @@ public class JServerTickEvents {
 
         JCraft.burstTimers = newBurstTimers;
 
+        // Dash handling
+        ArrayList<DashData> newDashes = new ArrayList<>();
+
+        for (DashData dash : JCraft.dashes) {
+            dash.tickDash();
+            if (dash.finished) continue;
+            newDashes.add(dash);
+        }
+
+        JCraft.dashes = newDashes;
+
         for (ServerWorld serverWorld : server.getWorlds()) {
-            // Mob stand control logic
+            //TODO: make mob stand control logic use a static void and not require them to have their stand active
             List<MobEntity> mobEntities = (List<MobEntity>) serverWorld.getEntitiesByType(TypeFilter.instanceOf(MobEntity.class), EntityPredicates.VALID_ENTITY);
 
             for (MobEntity mob : mobEntities) {

@@ -42,7 +42,7 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
     public static Attack healself = new Attack(3, 26, 1f, 14, 10, 0, 0f, 0f, AttackType.BOX)
             .setInfo("Healing Hand", "standing: heals user for 2 hearts, crouching: heals others for 2 hearts, pacifies angered mobs");
-    public static Attack heal = new Attack(4, 26, 1f, 16, 10, 0, 0f, 0f, AttackType.BOX);
+    public static Attack heal = new Attack(4, 26, 1f, 16, 10, 1.25, 0f, 0f, AttackType.BOX);
     public static Attack tree = new Attack(5, 20, 1f, 24, 14, 1.25, 5f, 0.2f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_2)
             .setHitspark(2)
             .setInfo("Tree Summon", "two-hitting launch");
@@ -63,6 +63,7 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
             .setHitspark(2)
             .setFollowup(rekka3);
     public static Attack rekka1 = new Attack(7, 23, 1f, 20, 8, 1.5, 5f, 0.5f, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.IMPACT_2)
+            .appendHitbox(new Attack.HitboxData(1.25))
             .setInfo("Rekka Series", "a set of three attacks, which cancel into each other during recovery", AttackQueue.SPECIAL2)
             .setFollowup(rekka2);
 
@@ -180,7 +181,7 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
     @Override
     public void initMiddleClick() {
         if (!this.canAttack()) return;
-        if (handleAttack(tree, JCraft.standMMBCD, 8))
+        if (handleAttack(tree, JCraft.utilCD, 8))
             this.playSound(JSoundRegister.GE_TREE, 1, 1);
     }
 
