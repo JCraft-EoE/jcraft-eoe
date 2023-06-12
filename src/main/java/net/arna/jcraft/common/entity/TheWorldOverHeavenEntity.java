@@ -4,6 +4,7 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JSoundRegister;
+import net.arna.jcraft.registry.JStatusRegister;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.*;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -49,7 +50,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
             .setHitspark(2)
             .setUB(false)
             .setInfo("Singularity", "block bypass, low stun, medium windup");
-    public static Attack smite = new Attack(3, 21, 1f, 20, 10, 0, 6f, 0.0f, AttackType.BOX, 2, 0, 0)
+    public static Attack smite = new Attack(3, 21, 1f, 20, 10, 0, 6f, 0.0f, AttackType.BOX, 1.05f, 0, 0)
             .setBlockstun(13)
             .setInfo("You won't run away!", "summons a stunning lightning bolt at the user/in air summons one at aimed position, launches on hit");
     public static Attack overwrite = new Attack(6, 0, 1f, 23, 7, 2, 0f, 1.0f, AttackType.BOX, 2, 0, 0, JSoundRegister.IMPACT_5)
@@ -71,13 +72,13 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
     public static Attack knives = new Attack(4, 19, 0.75f, 22, 16, 1.5, 0f, 0.0f, AttackType.BOX, 1)
             .setBlockstun(6)
             .setRanged(true)
-            .setInfo("Divine Finisher", "summons and launches 8 stunning knives/in air, fires 6 knives that launch at a delay");
+            .setInfo("Divine Finisher", "fires 4 stunning knives that launch at a delay/in air summons and launches 8 knives");
     public static Attack airknives = new Attack(5, 19, 0.75f, 22, 16, 1.5, 0f, 0.0f, AttackType.BOX, 1)
             .setBlockstun(6)
             .setRanged(true)
             .setInfo("Aerial Divine Finisher", "you shouldn't be able to read this");
 
-    public static Attack timestop = new Attack(7, 70, 40, 30, 5, AttackType.TIMESTOP)
+    public static Attack timestop = new Attack(7, 70, 50, 45, 5, AttackType.TIMESTOP)
             .setUB(true)
             .setInfo("Timestop", "5 seconds");
 
@@ -164,6 +165,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
         playSound(JSoundRegister.TWOH_OVERWRITE, 1, 1);
     }
 
+    private float smiteDamage = 6f;
     @Override
     public void initSpecial1() {
         if (curAttack == chargeoverwrite && getMoveStun() < 50) {
@@ -173,8 +175,10 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
         if (canAttack() && handleAttack(smite, JCraft.standS1CD, 6)) {
             LivingEntity user = this.getUser();
             if (user.isOnGround()) {
+                smiteDamage = 8f;
                 this.lightningPos = user.getPos();
             } else {
+                smiteDamage = 6f;
                 Vec3d eP = user.getEyePos();
                 Vec3d rangeMod = user.getRotationVector().multiply(24);
                 EntityHitResult eHit = ProjectileUtil.raycast(user, eP, eP.add(rangeMod),
@@ -192,16 +196,16 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
                 }
             }
 
-            AreaEffectCloudEntity effectCloud = new AreaEffectCloudEntity(this.world, lightningPos.x, lightningPos.y, lightningPos.z);
+            AreaEffectCloudEntity effectCloud = new AreaEffectCloudEntity(world, lightningPos.x, lightningPos.y, lightningPos.z);
             effectCloud.setOwner(user);
-            effectCloud.setRadius(3);
+            effectCloud.setRadius(smiteDamage / 2f);
             effectCloud.setWaitTime(10);
             effectCloud.setRadiusGrowth(-0.5f);
-            //effectCloud.setRadiusOnUse(0);
 
             world.spawnEntity(effectCloud);
 
-            this.playSound(JSoundRegister.TWOH_SMITE, 1, 1);
+            world.playSound(null, lightningPos.x, lightningPos.y, lightningPos.z, JSoundRegister.TWOH_CHARGE, SoundCategory.PLAYERS, 1, 1);
+            playSound(JSoundRegister.TWOH_SMITE, 1, 1);
         }
     }
 
@@ -214,10 +218,10 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
         CanAttackData cad = this.canAttackWithData();
         if (!cad.canAttack)
             return;
-        if (cad.user.isOnGround() && handleAttack(knives, JCraft.standS2CD, 9)) {
-            this.playSound(JSoundRegister.TWOH_KNIFETHROW, 1, 1);
-        } else if (handleAttack(airknives, JCraft.standS2CD, 11)) {
-            this.playSound(JSoundRegister.TWOH_AIRKNIVES, 1, 1);
+        if (cad.user.isOnGround() && handleAttack(airknives, JCraft.standS2CD, 11)) {
+            playSound(JSoundRegister.TWOH_AIRKNIVES, 1, 1);
+        } else if (handleAttack(knives, JCraft.standS2CD, 9)) {
+            playSound(JSoundRegister.TWOH_KNIFETHROW, 1, 1);
         }
     }
 
@@ -257,7 +261,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
         if (user.getPersistentData().getInt(JCraft.standUltCD) < 60)
             user.getPersistentData().putInt(JCraft.standUltCD, 60); // 3 second timestop cooldown
 
-        world.playSound(null, pos.x, pos.y, pos.z, JSoundRegister.TIME_SKIP, SoundCategory.PLAYERS, 1f, 1f);
+        world.playSound(null, pos.x, pos.y, pos.z, JSoundRegister.TWOH_TIMESKIP, SoundCategory.PLAYERS, 1f, 1f);
     }
 
     @Override
@@ -270,7 +274,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
                 for (LivingEntity ent : entities) {
                     stun(ent, 20, 1);
                     ent.damage(damageSource, 0.001f);
-                    float damage = 8f;
+                    float damage = 6f;
 
                     // All stands ignore 10% of armor & armor toughness
                     damage = DamageUtil.getDamageLeft(damage, (float) ent.getArmor() * 0.9f, (float) ent.getAttributeValue(EntityAttributes.GENERIC_ARMOR_TOUGHNESS) * 0.9f);
@@ -301,7 +305,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
                     if (ent instanceof LivingEntity living) {
                         LivingEntity target = JCraftUtils.getUserIfStand(living);
                         target.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 10, 9, true, false));
-                        damageLogic(world, target, Vec3d.ZERO, 40, 1, false, 6, false, 13, damageSource, user);
+                        damageLogic(world, target, Vec3d.ZERO, 21, 1, false, smiteDamage, false, 13, damageSource, user);
                     }
 
                     ent.onStruckByLightning((ServerWorld) world, lightning);
@@ -326,13 +330,13 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
             case (5) -> {
                 Vec3d rotVec = user.getRotationVector();
 
-                for (int i = 0; i < 6; i++) {
+                for (int i = 0; i < 4; i++) {
                     KnifeProjectile knife = new KnifeProjectile(world, user);
-                    knife.setDelayedLightning(10 + i * 4);
+                    knife.setDelayedLightning(10 + i * 5);
                     knife.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
                     knife.setNoGravity(true);
                     knife.setVelocity(
-                            new Vec3d(rotVec.x, 0, rotVec.z).rotateY(1.0472f * i)
+                            new Vec3d(rotVec.x * 0.7, 0, rotVec.z * 0.7).rotateY(1.5708f * i)
                     );
                     knife.setPosition(getEyePos());
                     world.spawnEntity(knife);
@@ -340,7 +344,8 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
             }
             case (6) -> {
                 for (LivingEntity ent : entities) {
-                    stun(ent, 40, 3);
+                    ent.removeStatusEffect(JStatusRegister.DAZED);
+                    stun(ent, 30, 3);
 
                     if (getOverwriteType() == 1) {
                         overwriteTimes.add(200);
@@ -371,8 +376,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
 
     @Override
     public void desummon() {
-        if (getTSTime() < 1)
-            super.desummon();
+        if (getTSTime() < 1) super.desummon();
     }
 
     @Override
@@ -400,8 +404,8 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
                 }
             }
 
-            if (this.world.isClient()) {
-                this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
+            if (world.isClient) {
+                setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
             } else {
                 if (getOverwriteType() != 0 && getMoveStun() <= 0)
                     setOverwriteType(0);

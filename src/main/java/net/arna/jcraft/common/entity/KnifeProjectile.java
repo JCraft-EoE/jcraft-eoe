@@ -152,13 +152,12 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
             stunT = 20;
             blockstun = 6;
         } else {
-            this.dropStack(this.asItemStack(), 0.1F);
+            dropStack(this.asItemStack(), 0.1F);
         }
 
         JCraftUtils.ProjectileDamageLogic(this, world, entity, Vec3d.ZERO, stunT, 1, false, 2, blockstun);
-
-        this.discard();
-        this.playSound(SoundEvents.ITEM_TRIDENT_HIT, 1, 1);
+        playSound(SoundEvents.ITEM_TRIDENT_HIT, 1, 1);
+        discard();
     }
 
     @Override

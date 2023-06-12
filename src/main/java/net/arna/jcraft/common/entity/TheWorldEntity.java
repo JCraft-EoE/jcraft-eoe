@@ -50,7 +50,7 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
     public static Attack roundhouse = new Attack(3, 11, 0.75f, 13, 7, 1.75, 5f, 0.3f, AttackType.BOX, 0.45f, -0.1f, 0, JSoundRegister.TW_KICK_HIT)
             .setBlockstun(12)
             .setInfo("Roundhouse", "fast poke, low stun");
-    public static Attack timestop = new Attack(6, 70, 40, 35, 4, AttackType.TIMESTOP)
+    public static Attack timestop = new Attack(6, 70, 52, 45, 4, AttackType.TIMESTOP)
             .setUB(true)
             .setInfo("Timestop", "4 seconds");
     public static Attack feignbarrage = new Attack(5, 30, 0.75f, 50, 5, 0, 0f, 0f, AttackType.COUNTER)

@@ -908,9 +908,8 @@ public abstract class StandEntity extends MobEntity {
                     PacketByteBuf buf = PacketByteBufs.create();
                     buf.writeShort(6);
                     buf.writeInt(comboCounter.getComboCount());
-                    if (playerEntity instanceof ServerPlayerEntity serverPlayerEntity) {
+                    if (playerEntity instanceof ServerPlayerEntity serverPlayerEntity)
                         ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
-                    }
                 }
                 comboCounter.setLastAttacked(ent);
             }
@@ -938,7 +937,7 @@ public abstract class StandEntity extends MobEntity {
                     comboCounter.setComboCount(1);
                 } else {
                     StatusEffectInstance stun = ent.getStatusEffect(JStatusRegister.DAZED);
-                    if (stun != null && stun.getAmplifier() == 1) {
+                    if (stun != null && stun.getAmplifier() != 2) {
                         //LOGGER.info("Target stun: " + stun.getDuration());
                         comboCounter.incrementComboCount();
                     } else {

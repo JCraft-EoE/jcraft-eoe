@@ -847,6 +847,25 @@ The Fool
 C-Moon
     >Improved block launch logic on Ground Slam
 
+● 12/6/2023
+Star Platinum
+    >Updated sounds
+
+The World
+    >Timestop startup increased (35->45t)
+
+The World: Over Heaven
+    >Updated sounds
+    >Smite
+        >stun reduced (40->21t)
+        >damage increased on grounded variation (6->8)
+    >Singularity damage reduced (8->6)
+    >Aerial Divine Finisher knife count reduced (6->4)
+    >Overwrite
+        >Stun reduced (2->1.5s)
+        >Now overrides stun
+    >Timestop startup increased (35->45t)
+
 priority (top to bottom)
 TODO: ability to position the HUD
 TODO: AI flags for unblockables and shouldn't-blockables
