@@ -27,11 +27,17 @@ public class CrimsonShaderHandler extends StandShaderHandler {
     @Override
     public void onWorldRendered(MatrixStack matrices, Camera camera, float tickDelta, long nanoTime) {
         if (renderingEffect) {
+            var player = MinecraftClient.getInstance().player;
+            if(player == null){
+                return;
+            }
+
             World world = camera.getFocusedEntity().getWorld();
             if(list.isEmpty()){
                 list = JCraftUtils.collectBlockInfo(world, camera.getBlockPos(), 8);
             }
             BlockRenderManager manager = MinecraftClient.getInstance().getBlockRenderManager();
+
 
             VertexConsumerProvider.Immediate consumer = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
             for (BlockInfo info : list){
@@ -46,8 +52,8 @@ public class CrimsonShaderHandler extends StandShaderHandler {
                         info.state(),
                         info.pos(),
                         matrices,
-                        consumer.getBuffer(RenderLayers.getMovingBlockLayer(info.state())),
-                        false,
+                        consumer.getBuffer(RenderLayers.getBlockLayer(info.state())),
+                        true,
                         Random.create(),
                         info.state().getRenderingSeed(info.pos()),
                         OverlayTexture.DEFAULT_UV

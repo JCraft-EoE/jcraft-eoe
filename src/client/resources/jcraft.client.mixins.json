@@ -20,7 +20,6 @@
     "ParticleAccessor",
     "ParticleManagerMixin",
     "WorldRendererMixin",
-    "LivingEntityMixin",
     "sodium.vanilla.WorldRendererVanillaMixin",
     "sodium.sodium.SodiumWorldRendererMixin"
   ],
