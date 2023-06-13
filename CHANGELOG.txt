@@ -603,6 +603,269 @@ Whitesnake
     >Remodeled and reanimated
     >Gun utility replaced with Remote Mode
 
+● 30/5/2023
+>Fixed threading error for some clientside particle effects
+
+Magician's Red
+    >Remodeled and reanimated
+    >Added sounds
+    >Red Bind rebound to crouching Utility
+    >New Utility - Life Detector
+    >Crouching during Crossfire Variation now alters the orbital distance of the ankhs
+    >Improved particle effects
+    >Barrage damage reduced(0.8->0.4)
+
+Cream
+    >Can no longer levitate while stunned in half-ball form
+
+● 31/5/2023
+>Optimized stand attack code
+>Fixed bug where blockable attack effects were made unblockable
+
+Star Platinum
+    >Advancing Barrage targetting improved
+The World
+    >Donut
+        >Damage reduced (14->9)
+        >Stun on whiff reduced (3->1.5s)
+Cream
+    >Improved hovering during half-ball mode
+Silver Chariot
+    >Beatdown stun on whiff reduced (4.5->1.5s)
+Magician's Red
+    >Improved rendering on Life Detector
+Whitesnake
+    >Cooldown on Pilot Mode reduced (3->1.5s)
+Golden Experience
+    >Remodeled and reanimated
+
+● 1/6/2023
+>Added config option that allows the HUD to be repositioned
+
+Projectiles
+    >optimized code
+    >fixed bug where they wouldn't disappear
+
+● 2/6/2023
+Added Backstabs
+    >going in a 90° angle behind and hitting someone who's blocking stuns them and stops the block
+    >projectiles and ranged moves in general CANNOT backstab
+>Fixed impact sounds being broken for Specs
+>Added various noises
+>Added standGriefing gamerule
+
+Star Platinum
+    >Increased distance to travel on Advancing Barrage (4->5m)
+
+King Crimson
+    >Donut is now armored
+
+Cream
+    >improved half-ball hover
+
+Magician's Red
+    >increased Crossfire Variation orbit range by 1m on both versions
+    >Ankh stun reduced (10->5t), damage increased (2.5->3.5)
+
+● 3/6/2023
+>Backstabs now require a minimum distance of 1m between the attacker and target
+>Improved projectile blocking logic for Stand user mobs
+
+Timestop
+    >All hits inside TS apply launch stun
+    >Stun in TS is capped at 1s
+    >Counters cannot be triggered in TS
+
+King Crimson
+    >Increased Blood Throw velocity by 33%
+
+D4C
+    >Ultimate and Special 1 swapped
+    >Players coming out of the Alternate Universe now exit at the position they were in while inside
+    >Dimensional Phase duration increased by 0.5s
+
+Cream
+    >improved half-ball hover
+
+Made in Heaven
+    >Fixed bugs relating to Time Acceleration
+    >Leg Crusher hitbox expanded, stand moved forward
+    >Stand moved forward on Fury Chop
+
+● 4/6/2023
+>Added support for multiple hitboxes during one tick in an attack
+>Knives can no longer be used while stunned
+
+Star Platinum
+    >Moved stand back during Star Finger, added second hitbox
+
+Golden Experience
+    >Added crouching variation to Life Giver
+
+Made in Heaven
+    >Remodeled and reanimated
+    >Reduced hitbox size for Speed Slice
+    >Increased hitbox size for Donut
+
+● 5/6/2023
+>Minor optimizations to StandEntity code
+>Fixed minor inaccuracies in /framedata
+>Improved on-hit logic for projectiles
+
+The World
+    >Roundhouse damage lowered (8->5)
+    >Charge damage lowered (7->5)
+    >Feign barrage now does a followup instead of only stunning
+    >Timestop startup increased (1.5->1.75s)
+
+Made in Heaven
+    >Added second, low hitbox to Leg Crusher
+    >Heaven's Judgement reworked
+
+● 6/6/2023
+Magician's Red
+    >Life Detector can no longer die of fire damage
+
+C-Moon
+    >Remodeled and reanimated
+    >Barrage duration reduced (60->50t)
+    >Gut Punch damage reduced (10->8)
+    >Only One Punch
+        >Damage reduced (8->6)
+        >Now applies Weightless, and momentary Levitation
+        >Increased stun (1.75->2.25s)
+        >Added second hitbox
+    >Gravity Shift
+        >Now has three modes (Hypergravity, Repulse, Attract)
+        >No longer applies shift while stunned
+    >Replaced Gun with Block Launch
+    >Ground Slam cooldown reduced (28->23t)
+
+● 7/6/2023
+>Updated texture for Knockdown
+
+D4C
+    >Barrage duration reduced (75->60t)
+
+Magician's Red
+    >Improved tracking for Crossfire Hurricane
+
+C-Moon
+    >Added crouching variation to utility
+
+Made in Heaven
+    >Added particle effects
+    >Strengthened stabilization on circling version of Heaven's Judgement
+
+● 8/6/2023
+Added Dashing
+    >FRAMEDATA: 5 ticks of MOVEMENT, 5 ticks of RECOVERY
+    >DEFAULT BIND: Mouse 4
+    >COOLDOWN: 2s
+        >Cannot be Cooldown Cancelled
+        >Extended to 5s if you jump while dashing
+    >Works in any cardinal or diagonal direction
+    >Dashing sideways and backwards has a stacking reduction in speed
+    >You cannot block while dashing
+
+>Fixed combo counter incorrectly resetting when hitting someone during launch stun
+>Fixed bug where attacks not meant to have hitboxes had point hitboxes instead
+>Optimized stand control code
+
+D4C
+    >Barrage duration increased (60->70t)
+    >Grab (final hit)
+        >increased launch stun (5->9t)
+        >increased knockback
+
+The Fool
+    >Burn Rubber cooldown reduced (20->17s)
+    >Combo cooldown reduced (17->15s)
+    >Sandwave speed reduced
+    >Added second hitbox to Launch
+
+Golden Experience (+ Requiem)
+    >Fixed tiny hitbox on Healing Hand (others)
+
+Made in Heaven
+    >Updated animations
+
+The World: Over Heaven
+    >Remodeled and reanimated
+    >Singularity damage reduced (10->8)
+    >Aerial Divine Finisher
+        >reduced knife count (8->6)
+        >knives now consistently spawn in hexagon pattern
+    >Smite
+        >damage reduced (9->6)
+        >increased launch
+    >Overwrite reworked
+        >Faster startup
+        >Now has 3 types
+        >Overwrite swing now has armor
+
+● 9/6/2023
+The Fool
+    >Remodeled and reanimated
+
+The World: Over Heaven
+    >Hitbox reduced on Overwrite swing
+
+● 9/6/2023
+>Improved PlayerCloneEntity logic
+
+Cream
+    >Fall damage removed during Half Ball state
+    >Consume damage increased (1.5->2.5)
+
+The Fool
+    >Can now change attack range by crouching
+    >Added Glide, aerial variant to Sandwave
+    >Sand Clones
+        >Improved AI & other logic
+        >Removed speed nerf
+    >Suffocating Sandstorm
+        >Improved hit logic
+        >Added armor
+        >Added second hitbox
+        >Cooldown reduced (50->40s)
+
+Golden Experience
+    >Added second hitbox to Rekka 1
+
+● 11/6/2023
+>Dashes can now be stopped by being stunned
+
+Star Platinum
+    >Updated /stand about
+
+The Fool
+    >Pound
+        >Cooldown reduced (22->18s)
+        >Now has followups
+
+C-Moon
+    >Improved block launch logic on Ground Slam
+
+● 12/6/2023
+Star Platinum
+    >Updated sounds
+
+The World
+    >Timestop startup increased (35->45t)
+
+The World: Over Heaven
+    >Updated sounds
+    >Smite
+        >stun reduced (40->21t)
+        >damage increased on grounded variation (6->8)
+    >Singularity damage reduced (8->6)
+    >Aerial Divine Finisher knife count reduced (6->4)
+    >Overwrite
+        >Stun reduced (2->1.5s)
+        >Now overrides stun
+    >Timestop startup increased (35->45t)
+
 priority (top to bottom)
 TODO: ability to position the HUD
 TODO: AI flags for unblockables and shouldn't-blockables

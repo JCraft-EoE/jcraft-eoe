@@ -69,7 +69,6 @@ public class SheerHeartAttackEntity extends MobEntity implements IAnimatable, IA
         this.goalSelector.add(3, new LookAtEntityGoal(this, LivingEntity.class, 32.0F));
         this.goalSelector.add(4, new LookAroundGoal(this));
         this.targetSelector.add(6, new PounceAtTargetGoal(this, 0.2f));
-        this.targetSelector.add(8, new UniversalAngerGoal(this, true)); // TODO: this class must implement Angerable for this
     }
 
     @Override

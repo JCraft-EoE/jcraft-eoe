@@ -6,9 +6,12 @@ import net.arna.jcraft.common.util.IClientEntityHandler;
 import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.particle.BlockStateParticleEffect;
+import net.minecraft.particle.ParticleTypes;
 
 public class ClientEntityHandlerImpl implements IClientEntityHandler {
     public static final ClientEntityHandlerImpl INSTANCE = new ClientEntityHandlerImpl();

@@ -49,19 +49,19 @@ import java.util.List;
 public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnimationTickable {
     AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
-    public static Attack light = new Attack(2, 0.75f, 19, 0, 1.5, 3.5f, 0.75f, AttackType.MULTIHIT, 1f, 0, List.of(6, 11), JSoundRegister.IMPACT_4)
+    public static Attack light = new Attack(0, 2, 0.75f, 19, 0, 1.5, 3.5f, 0.75f, AttackType.MULTIHIT, 1f, 0, List.of(6, 11), JSoundRegister.IMPACT_4)
             .setInfo("Dual Punch", "quick combo starter");
-    public static Attack heavy = new Attack(12, 0.75f, 9, 5, 1, 7.5f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_4).setHitspark(2).setLaunch()
+    public static Attack heavy = new Attack(1, 12, 0.75f, 9, 5, 1, 7.5f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_4).setHitspark(2).setLaunch()
             .setInfo("Elbow", "fast, short-range knockback");
-    public static Attack barrage = new Attack(17, 0.75f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3, JSoundRegister.IMPACT_4)
+    public static Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3, JSoundRegister.IMPACT_4)
             .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
-    public static Attack bombplant = new Attack(30, 1, 20, 12, 1.5, 0f, 0.0f, AttackType.BOX)
+    public static Attack bombplant = new Attack(3, 30, 1, 20, 12, 1.5, 0f, 0.0f, AttackType.BOX)
             .setUB(true)
             .setInfo("Bomb Plant", "crouch to plant on the ground below you, stealthily");
-    public static Attack detonate = new Attack(1, 0.75f, 6, 5, 0, 0f, 0.0f, AttackType.BOX)
-            .setInfo("Detonate", "crouch with a bomb planted within 20s on a living being to activate Bites the Dust");
-    public static Attack bubble = new Attack(23, 0.75f, 18, 15, 0, 0f, 0.0f, AttackType.BOX).setRanged(true)
+    public static Attack bubble = new Attack(4, 23, 0.75f, 18, 15, 0, 0f, 0.0f, AttackType.BOX).setRanged(true)
             .setInfo("Stray Cat", "launches an explosive bubble");
+    public static Attack detonate = new Attack(5, 1, 0.75f, 6, 5, 0, 0f, 0.0f, AttackType.BOX)
+            .setInfo("Detonate", "crouch with a bomb planted within 20s on a living being to activate Bites the Dust");
 
     public ItemEntity coin;
     public BubbleProjectile bubbleProjectile;
@@ -118,17 +118,13 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
     // Moveset
     @Override
     public void initLightAttack() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
     public void initHeavyAttack() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(heavy, JCraft.standHeavyCD, 4)) {
             this.playSound(JSoundRegister.KQBTD_ELBOW, 1, 1);
         }
@@ -136,9 +132,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
 
     @Override
     public void initBarrage() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
             this.playSound(JSoundRegister.KQ_BARRAGE, 1, 1);
         }
@@ -170,9 +164,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
 
     @Override
     public void initUlt() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(detonate, JCraft.standUltCD, 6)) {
             this.playSound(JSoundRegister.KQ_DETONATE, 1, 1);
         }
@@ -180,9 +172,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
 
     @Override
     public void initSpecial2() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(bubble, JCraft.standS2CD, 8)) {
             this.playSound(JSoundRegister.KQ_UPPERCUT, 1, 1);
         }
@@ -190,23 +180,22 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
 
     @Override
     public void initSpecial3() {
-        if (!this.canAttack())
-            return;
+        if (!this.canAttack()) return;
         LivingEntity user = this.getUser();
         NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
-        if (playerData.getInt(JCraft.standS3CD) > 0) {
-            return;
-        }
+        if (playerData.getInt(JCraft.standS3CD) > 0) return;
 
         Vec3d lookVec = user.getRotationVector().multiply(0.75);
+        if (this.coin != null) this.coin.discard();
         this.coin = new ItemEntity(world, user.getX(), user.getY() + user.getHeight() * 2 / 3, user.getZ(), new ItemStack(JObjectRegistry.KQCOIN, 1), lookVec.x, lookVec.y, lookVec.z);
-        this.coin.setPickupDelay(200);
+        this.coin.setPickupDelayInfinite();
 
         world.spawnEntity(this.coin);
 
         this.bombEntity = this.coin;
         this.bombBlock = null;
 
+        playSound(JSoundRegister.COIN_TOSS, 1, 1);
         playerData.putInt(JCraft.standS3CD, 500); // 25s coin toss cd
         playerData.putInt(JCraft.standUltCD, 20); // 1s detonate cd (prevents IUB)
     }
@@ -214,133 +203,134 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
         LivingEntity user = this.getUser();
-        if (attack == bombplant) {
-            if (entities.size() > 0) { // Living entities take priority
-                bombEntity = entities.get(0);
-                bombBlock = null;
-
-                targetData = new NbtCompound();
-                userData = new NbtCompound();
-
-                bombEntity.writeNbt(targetData);
-                user.writeNbt(userData);
-            } else { // If none are found, re-do an optimized hitbox check for any entity type
-                Vec3d rotVec = getRotationVector();
-                Vec3d boxCenter = getPos().add(0, user.getHeight() / 2, 0).add(rotVec);
-                Vec3d halfBox = new Vec3d(0.5, 0.5, 0.5);
-                List<Entity> hit = world.getEntitiesByClass(Entity.class,
-                        new Box(boxCenter.subtract(halfBox), boxCenter.add(halfBox))
-                        , EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
-
-                hit.remove(this);
-                hit.remove(user);
-
-                if (hit.size() > 0) {
-                    bombEntity = hit.get(0);
+        switch (attack.id) {
+            case (1) -> {
+                for (LivingEntity ent : entities)
+                    ent.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 5, 4, true, false));
+            }
+            case (3) -> {
+                if (entities.size() > 0) { // Living entities take priority
+                    bombEntity = entities.get(0);
                     bombBlock = null;
+
+                    targetData = new NbtCompound();
+                    userData = new NbtCompound();
+
+                    bombEntity.writeNbt(targetData);
+                    user.writeNbt(userData);
+                } else { // If none are found, re-do an optimized hitbox check for any entity type
+                    Vec3d rotVec = getRotationVector();
+                    Vec3d boxCenter = getPos().add(0, user.getHeight() / 2, 0).add(rotVec);
+                    Vec3d halfBox = new Vec3d(0.5, 0.5, 0.5);
+                    List<Entity> hit = world.getEntitiesByClass(Entity.class,
+                            new Box(boxCenter.subtract(halfBox), boxCenter.add(halfBox))
+                            , EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+
+                    hit.remove(this);
+                    hit.remove(user);
+
+                    if (hit.size() > 0) {
+                        bombEntity = hit.get(0);
+                        bombBlock = null;
+                    }
                 }
             }
-        } else if (attack == detonate) {
-            if (bombEntity instanceof LivingEntity livingEntity) {
-                if (user.isSneaking()) {
-                    if (targetData != null && userData != null) {
-                        if (bombEntity.isAlive()) {
-                            if (bombEntity instanceof PlayerEntity playerEntity) {
-                                // Antidupe
-                                targetData.put("Inventory", playerEntity.getInventory().writeNbt(new NbtList()));
-                                targetData.put("EnderItems", playerEntity.getEnderChestInventory().toNbtList());
+            case (4) -> {
+                bubbleProjectile = new BubbleProjectile(world, user);
+                bubbleProjectile.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
+                bubbleProjectile.setVelocity(user, user.getPitch(), user.getYaw(), 0, 0.5f, 0f);
+                bubbleProjectile.setPosition(user.getEyePos());
+                world.spawnEntity(bubbleProjectile);
 
-                                // Correct position and velocity update
-                                ServerPlayerEntity serverPlayer = ((ServerPlayerEntity) playerEntity);
-                                serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(bombEntity));
-                                NbtList list = targetData.getList("Pos", 6);
-                                serverPlayer.teleport(list.getDouble(0), list.getDouble(1), list.getDouble(2));
+                bombEntity = bubbleProjectile;
+                bombBlock = null;
+            }
+            case (5) -> {
+                if (bombEntity instanceof LivingEntity livingEntity) {
+                    if (user.isSneaking()) {
+                        if (targetData != null && userData != null) {
+                            if (bombEntity.isAlive()) {
+                                if (bombEntity instanceof PlayerEntity playerEntity) {
+                                    // Antidupe
+                                    targetData.put("Inventory", playerEntity.getInventory().writeNbt(new NbtList()));
+                                    targetData.put("EnderItems", playerEntity.getEnderChestInventory().toNbtList());
+
+                                    // Correct position and velocity update
+                                    ServerPlayerEntity serverPlayer = ((ServerPlayerEntity) playerEntity);
+                                    serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(bombEntity));
+                                    NbtList list = targetData.getList("Pos", 6);
+                                    serverPlayer.teleport(list.getDouble(0), list.getDouble(1), list.getDouble(2));
+                                }
+                                bombEntity.readNbt(targetData);
                             }
-                            bombEntity.readNbt(targetData);
-                        }
 
-                        if (user.isAlive()) {
-                            if (user instanceof PlayerEntity playerEntity) {
-                                // Antidupe
-                                userData.put("Inventory", playerEntity.getInventory().writeNbt(new NbtList()));
-                                userData.put("EnderItems", playerEntity.getEnderChestInventory().toNbtList());
+                            if (user.isAlive()) {
+                                if (user instanceof PlayerEntity playerEntity) {
+                                    // Antidupe
+                                    userData.put("Inventory", playerEntity.getInventory().writeNbt(new NbtList()));
+                                    userData.put("EnderItems", playerEntity.getEnderChestInventory().toNbtList());
 
-                                // Correct position and velocity update
-                                ServerPlayerEntity serverPlayer = ((ServerPlayerEntity) playerEntity);
-                                serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(playerEntity));
-                                NbtList list = userData.getList("Pos", 6);
-                                serverPlayer.teleport(list.getDouble(0), list.getDouble(1), list.getDouble(2));
+                                    // Correct position and velocity update
+                                    ServerPlayerEntity serverPlayer = ((ServerPlayerEntity) playerEntity);
+                                    serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(playerEntity));
+                                    NbtList list = userData.getList("Pos", 6);
+                                    serverPlayer.teleport(list.getDouble(0), list.getDouble(1), list.getDouble(2));
+                                }
+                                user.readNbt(userData);
+
+                                // Cooldowns
+                                NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
+                                playerData.putInt(JCraft.standUltCD, 20);
+                                playerData.putInt(JCraft.standS1CD, 600);
                             }
-                            user.readNbt(userData);
-
-                            // Cooldowns
-                            NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
-                            playerData.putInt(JCraft.standUltCD, 20);
-                            playerData.putInt(JCraft.standS1CD, 600);
+                        } else {
+                            JCraft.LOGGER.error("Tried to rewind null NBT via Bites the Dust on entities: \n"
+                                    + user + "\n" + bombEntity);
                         }
                     } else {
-                        JCraft.LOGGER.error("Tried to rewind null NBT via Bites the Dust on entities: \n"
-                                + user + "\n" + bombEntity);
-                    }
-                } else {
-                    world.createExplosion(user, livingEntity.getX(), livingEntity.getY() + livingEntity.getHeight() / 2, livingEntity.getZ(), 2f, Explosion.DestructionType.NONE);
-                    livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
-                }
-            } else {
-                Vec3d bombPos = null;
-
-                if (bombEntity != null) {
-                    bombPos = bombEntity.getPos();
-                    if (bombEntity instanceof ItemEntity || bombEntity == bubbleProjectile)
-                        bombEntity.kill();
-                }
-                if (bombBlock != null)
-                    bombPos = bombBlock;
-
-                if (bombPos != null) {
-                    world.createExplosion(user, bombPos.x, bombPos.y, bombPos.z, 2f, Explosion.DestructionType.NONE);
-
-                    List<LivingEntity> toKD = world.getEntitiesByClass(
-                            LivingEntity.class,
-                            new Box(bombPos.add(2.2, 2.2, 2.2), bombPos.add(-2.2, -2.2, -2.2)),
-                            EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR
-                    );
-
-                    for (LivingEntity livingEntity : toKD) {
+                        world.createExplosion(user, livingEntity.getX(), livingEntity.getY() + livingEntity.getHeight() / 2, livingEntity.getZ(), 2f, Explosion.DestructionType.NONE);
                         livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
                     }
+                } else {
+                    Vec3d bombPos = null;
 
-                    world.playSound(bombPos.x, bombPos.y, bombPos.z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.75f, 1, true);
+                    if (bombEntity != null) {
+                        bombPos = bombEntity.getPos();
+                        if (bombEntity instanceof ItemEntity || bombEntity == bubbleProjectile)
+                            bombEntity.kill();
+                    }
+                    if (bombBlock != null)
+                        bombPos = bombBlock;
+
+                    if (bombPos != null) {
+                        world.createExplosion(user, bombPos.x, bombPos.y, bombPos.z, 2f, Explosion.DestructionType.NONE);
+
+                        List<LivingEntity> toKD = world.getEntitiesByClass(
+                                LivingEntity.class,
+                                new Box(bombPos.add(2.2, 2.2, 2.2), bombPos.add(-2.2, -2.2, -2.2)),
+                                EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR
+                        );
+
+                        for (LivingEntity livingEntity : toKD) {
+                            livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
+                        }
+
+                        world.playSound(bombPos.x, bombPos.y, bombPos.z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.75f, 1, true);
+                    }
                 }
-            }
 
-            bombEntity = null;
-            bombBlock = null;
-        } else if (attack == heavy) { // Elbow slightly launches on hit
-            for (LivingEntity ent : entities) {
-                ent.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 5, 4, true, false));
+                bombEntity = null;
+                bombBlock = null;
             }
-        } else if (attack == bubble) {
-            bubbleProjectile = new BubbleProjectile(world, user);
-            bubbleProjectile.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
-            bubbleProjectile.setVelocity(user, user.getPitch(), user.getYaw(), 0, 0.5f, 0f);
-            bubbleProjectile.setPosition(user.getEyePos());
-            world.spawnEntity(bubbleProjectile);
-
-            bombEntity = bubbleProjectile;
-            bombBlock = null;
         }
     }
 
     @Override
     public void initMiddleClick() {
-        if (!this.canAttack())
-            return;
+        if (!this.canAttack()) return;
         LivingEntity user = this.getUser();
         NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
-        if (playerData.getInt(JCraft.standMMBCD) > 0) {
-            return;
-        }
+        if (playerData.getInt(JCraft.utilCD) > 0) return;
 
         Vec3d lookVec = user.getRotationVector().multiply(0.9);
         world.createExplosion(user,
@@ -352,7 +342,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
         user.setVelocity(user.getVelocity().add(lookVec));
         user.velocityModified = true;
 
-        playerData.putInt(JCraft.standMMBCD, 360); // 18s explosive dash cooldown
+        playerData.putInt(JCraft.utilCD, 360); // 18s explosive dash cooldown
         this.playSound(JSoundRegister.KQ_DETONATE, 1, 1);
     }
 
@@ -367,10 +357,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
 
     @Override
     public void tick() {
-        if (age == 1) {
-            this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.KQBTD_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
-        }
-
+        if (age == 1) this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.KQBTD_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
         super.tick();
 
         if (hasUser()) {

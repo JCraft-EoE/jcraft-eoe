@@ -122,6 +122,11 @@ public interface JEntityTypeRegister {
             new Identifier(JCraft.MOD_ID, "gesnake"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, GESnakeEntity::new).dimensions(EntityDimensions.fixed(1f, 0.3f)).build()
     );
+    EntityType<GEFrogEntity> GE_FROG = Registry.register(
+            Registry.ENTITY_TYPE,
+            new Identifier(JCraft.MOD_ID, "gefrog"),
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, GEFrogEntity::new).dimensions(EntityDimensions.fixed(0.3f, 0.3f)).build()
+    );
     EntityType<GEREntity> GER = Registry.register(
             Registry.ENTITY_TYPE,
             new Identifier(JCraft.MOD_ID, "ger"),
@@ -175,11 +180,18 @@ public interface JEntityTypeRegister {
                     .dimensions(EntityDimensions.fixed(0.5f, 0.5f)).trackRangeChunks(4).trackedUpdateRate(10).build()
     );
 
-    EntityType<LifeDetector> LIFE_DETECTOR = Registry.register(
+    EntityType<LifeDetectorEntity> LIFE_DETECTOR = Registry.register(
             Registry.ENTITY_TYPE,
             new Identifier(JCraft.MOD_ID, "lifedetector"),
-                FabricEntityTypeBuilder.create(SpawnGroup.MISC, LifeDetector::new)
+                FabricEntityTypeBuilder.create(SpawnGroup.MISC, LifeDetectorEntity::new)
                         .dimensions(EntityDimensions.fixed(1f, 1f)).build()
+    );
+
+    EntityType<BlockProjectile> BLOCK_PROJECTILE = Registry.register(
+            Registry.ENTITY_TYPE,
+            new Identifier(JCraft.MOD_ID, "blockprojectile"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MISC, BlockProjectile::new)
+                    .dimensions(EntityDimensions.fixed(0.5f, 0.5f)).build()
     );
 
     static void registerEntities() {
@@ -208,6 +220,7 @@ public interface JEntityTypeRegister {
 
         FabricDefaultAttributeRegistry.register(GOLDEN_EXPERIENCE, GoldenExperienceEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(GER, GEREntity.createMobAttributes());
+        FabricDefaultAttributeRegistry.register(GE_FROG, GEFrogEntity.createFrogAttributes());
         FabricDefaultAttributeRegistry.register(GE_SNAKE, SheerHeartAttackEntity.createMobAttributes()
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3)
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 10)
@@ -226,7 +239,8 @@ public interface JEntityTypeRegister {
         FabricDefaultAttributeRegistry.register(PLAYER_ENTITY_CLONE, D4CEntity.createMobAttributes().add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 2).add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3));
         FabricDefaultAttributeRegistry.register(PLAYER_ENTITY_CLONE_SLIM, D4CEntity.createMobAttributes().add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 2).add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3));
 
-        FabricDefaultAttributeRegistry.register(LIFE_DETECTOR, LifeDetector.createLivingAttributes());
+        FabricDefaultAttributeRegistry.register(LIFE_DETECTOR, LifeDetectorEntity.createDetectorAttributes());
+        FabricDefaultAttributeRegistry.register(BLOCK_PROJECTILE, BlockProjectile.createBlockAttributes());
     }
 
     @RequiredArgsConstructor(staticName = "from")

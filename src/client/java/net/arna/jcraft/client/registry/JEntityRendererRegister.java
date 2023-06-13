@@ -33,12 +33,14 @@ public interface JEntityRendererRegister {
 
         EntityRendererRegistry.register(JEntityTypeRegister.GOLDEN_EXPERIENCE, GoldenExperienceRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegister.GE_TREE, GETreeRenderer::new);
+        EntityRendererRegistry.register(JEntityTypeRegister.GE_FROG, GEFrogRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegister.GE_SNAKE, GESnakeRenderer::new);
 
         EntityRendererRegistry.register(JEntityTypeRegister.GER, GERRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegister.GER_SCORPION, GERScorpionRenderer::new);
 
         EntityRendererRegistry.register(JEntityTypeRegister.BLOOD_PROJECTILE, BloodProjectileRenderer::new);
+        EntityRendererRegistry.register(JEntityTypeRegister.BLOCK_PROJECTILE, BlockProjectileRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegister.KNIFE, KnifeRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegister.ANKH, AnkhRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegister.BUBBLE, BubbleRenderer::new);

@@ -44,8 +44,7 @@ public class CooldownCancelParticle extends AbstractSlowingParticle {
         }
 
         public Particle createParticle(DefaultParticleType defaultParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-            CooldownCancelParticle cooldownCancelParticle = new CooldownCancelParticle(clientWorld, d, e, f, g, h, i, this.spriteProvider);
-            return cooldownCancelParticle;
+            return new CooldownCancelParticle(clientWorld, d, e, f, g, h, i, this.spriteProvider);
         }
     }
 }

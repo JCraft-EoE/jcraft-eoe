@@ -3,6 +3,7 @@ package net.arna.jcraft.common.entity;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.ai.goal.CloneAttackGoal;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -19,6 +20,8 @@ import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.particle.BlockStateParticleEffect;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
@@ -31,7 +34,6 @@ import net.minecraft.world.World;
 import java.util.Arrays;
 
 public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob {
-
     public PlayerCloneEntity(EntityType<? extends HostileEntity> entityType, World world) {
         super(entityType, world);
         Arrays.fill(this.armorDropChances, 1F);
@@ -39,6 +41,7 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob 
         this.updateAttackType();
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     private final BowAttackGoal<PlayerCloneEntity> bowAttackGoal = new BowAttackGoal(this, 1.0, 30, 15.0F);
     private final CloneAttackGoal cloneAttackGoal = new CloneAttackGoal(this, 1) {
         public void stop() {
@@ -52,23 +55,23 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob 
         }
     };
 
-    public boolean sandClone = false;
     public boolean switched = false; // Has this clone switched to a thin version?
     public PlayerCloneEntity switchedTo; // The thin clone instance
 
     private LivingEntity persistTarget = null;
     private LivingEntity owner;
     private int disabledSlots;
-    private static final TrackedData<String> OWNERNAME;
+
 
     static {
         OWNERNAME = DataTracker.registerData(PlayerCloneEntity.class, TrackedDataHandlerRegistry.STRING);
+        SAND = DataTracker.registerData(PlayerCloneEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     }
 
-    public LivingEntity getOwner() {
-        return this.owner;
-    }
-
+    private static final TrackedData<String> OWNERNAME;
+    public String getOwnerName() { return dataTracker.get(OWNERNAME); }
+    public void setOwnerName(String state) { dataTracker.set(OWNERNAME, state); }
+    public LivingEntity getOwner() { return this.owner; }
     public void setOwner(LivingEntity owner) {
         this.owner = owner;
         Text oName = owner.getName();
@@ -76,17 +79,17 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob 
         this.setOwnerName(oName.getString());
     }
 
-    public String getOwnerName() {
-        return this.dataTracker.get(OWNERNAME);
-    }
-
-    public void setOwnerName(String state) {
-        this.dataTracker.set(OWNERNAME, state);
+    private static final TrackedData<Boolean> SAND;
+    public boolean isSand() { return dataTracker.get(SAND); }
+    public void markSand() {
+        dataTracker.set(SAND, true);
+        TheFoolEntity.applySandCloneModifiers(this);
     }
 
     protected void initDataTracker() {
         super.initDataTracker();
-        this.dataTracker.startTracking(OWNERNAME, "%unset_owner_name");
+        dataTracker.startTracking(OWNERNAME, "%unset_owner_name");
+        dataTracker.startTracking(SAND, false);
     }
 
     @Override
@@ -101,7 +104,6 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob 
     protected boolean isDisallowedInPeaceful() {
         return false;
     }
-
     @Override
     public boolean canPickUpLoot() {
         return true;
@@ -113,7 +115,6 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob 
         nbt.putString("OwnerName", this.getOwnerName());
         nbt.putInt("DisabledSlots", this.disabledSlots);
     }
-
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
@@ -222,33 +223,34 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob 
         boolean client = this.world.isClient();
 
         if (client) {
+            if (isSand() && age % 4 == 0)
+                world.addParticle(
+                        new BlockStateParticleEffect(ParticleTypes.BLOCK, Blocks.SAND.getDefaultState()),
+                        getX() + getRandom().nextTriangular(0, 0.5),
+                        getRandomBodyY(),
+                        getZ() + getRandom().nextTriangular(0, 0.5)
+                        , 0, 0, 0
+                );
+
             JCraft.getClientEntityHandler().playerCloneEntityClientTick(this);
             return;
         }
 
-        if (this.switched && this.switchedTo.age > 10) {
-            this.discard();
-        } // Remove outdated clones
+        if (this.switched && this.switchedTo.age > 10) discard(); // Remove outdated clones
 
         if (this.owner == null) {
             // Run every 2 seconds (player lists are rather expensive)
             if (this.age % 40 == 0) {
                 // If the owner name is set, but the owner isn't (when loaded via NBT data), find owner
                 String ownerName = this.getOwnerName();
-                if (!ownerName.equals("%unset_owner_name")) {
-                    ServerWorld serverWorld = (ServerWorld) this.world;
-                    for (ServerPlayerEntity serverPlayerEntity : PlayerLookup.world(serverWorld)) {
-                        if (serverPlayerEntity.getName().getString().equals(ownerName)) {
+                if (!ownerName.equals("%unset_owner_name"))
+                    for (ServerPlayerEntity serverPlayerEntity : PlayerLookup.world((ServerWorld) world))
+                        if (serverPlayerEntity.getName().getString().equals(ownerName))
                             this.owner = serverPlayerEntity;
-                        }
-                    }
-                }
             }
 
-            LivingEntity attacker = this.getAttacking();
-            if (attacker != null) {
-                this.setTarget(attacker);
-            }
+            LivingEntity attacker = getAttacker();
+            if (attacker != null) setTarget(attacker);
         } else {
             if (this.persistTarget == null) {
                 LivingEntity attacking = owner.getAttacking();

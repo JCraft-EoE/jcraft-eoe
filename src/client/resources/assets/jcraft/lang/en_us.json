@@ -46,22 +46,29 @@
 
   "entity.jcraft.starplatinum": "Star Platinum",
   "entity.jcraft.kingcrimson": "King Crimson",
-  "entity.jcraft.theworld": "The World",
   "entity.jcraft.d4c": "Dirty Deeds Done Dirt Cheap",
   "entity.jcraft.cream": "Cream",
+  "entity.jcraft.silverchariot": "Silver Chariot",
+  "entity.jcraft.thefool": "The Fool",
+
   "entity.jcraft.killerqueen": "Killer Queen",
   "entity.jcraft.kqbtd": "Killer Queen: Bites the Dust",
   "entity.jcraft.sha": "Sheer Heart Attack",
-  "entity.jcraft.whitesnake": "Whitesnake",
-  "entity.jcraft.silverchariot": "Silver Chariot",
+
   "entity.jcraft.mr": "Magicians Red",
-  "entity.jcraft.thefool": "The Fool",
+  "entity.jcraft.lifedetector": "Life Detector",
+
   "entity.jcraft.goldenexperience": "Golden Experience",
+  "entity.jcraft.ger": "Golden Experience: Requiem",
+  "entity.jcraft.gefrog": "Frog",
   "entity.jcraft.getree": "Tree",
   "entity.jcraft.gesnake": "Snake",
-  "entity.jcraft.ger": "Golden Experience: Requiem",
+
+  "entity.jcraft.whitesnake": "Whitesnake",
   "entity.jcraft.cmoon": "C-Moon",
+  "entity.jcraft.block": "Block",
   "entity.jcraft.mih": "Made in Heaven",
+  "entity.jcraft.theworld": "The World",
   "entity.jcraft.twoh": "The World: Over Heaven",
 
   "entity.jcraft.playerclone": "Clone",
@@ -72,6 +79,7 @@
   "effect.jcraft.standless": "Standless",
   "effect.jcraft.knockdown": "Knocked Down",
   "effect.jcraft.outofbody": "Out of Body",
+  "effect.jcraft.weightless": "Weightless",
 
   "gamerule.showHitboxes": "Show JCraft hitboxes",
   "gamerule.kingCrimsonTeleportEffect": "King Crimson's teleport displacement",
@@ -86,5 +94,17 @@
   "subtitles.jcraft.sptw": "Star Platinum: The World!",
   "subtitles.jcraft.twohts": "The World: Over Heaven!",
 
-  "jcraft.disc.error": "Cannot use disc while in combat!"
+  "jcraft.midnightconfig.title": "JCraft Config",
+  "jcraft.midnightconfig.ANIME_VOICES": "Enable Anime Voicelines",
+  "jcraft.midnightconfig.UI_POSITION": "UI Position",
+  "jcraft.midnightconfig.enum.UIPos.RIGHT": "Right",
+  "jcraft.midnightconfig.enum.UIPos.LEFT": "Left",
+  "jcraft.midnightconfig.enum.UIPos.MIDDLE": "Middle",
+
+  "jcraft.disc.error": "Cannot use disc while in combat!",
+
+  "death.attack.stand": "%1$s was retired",
+  "death.attack.stand.item": "%1$s was retired by %2$s while wielding %3$s",
+  "death.attack.stand.player": "%1$s was retired by %2$s",
+  "death.attack.stand.player.item": "%1$s was retired by %2$s while wielding %3$s"
 }

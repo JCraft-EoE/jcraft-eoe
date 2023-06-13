@@ -2,11 +2,20 @@ package net.arna.jcraft.common.util;
 
 import net.minecraft.sound.SoundEvent;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public final class Attack {
+    public int id = -1; // Unique ID
     public int cooldown = 0; // Ability cooldown
+
     public float attackDist = 1f; // Distance your stand is at while attacking
+    public Attack setDist(float attackDist) {
+        this.attackDist = attackDist;
+        return this;
+    }
+
     public int moveStun = 0; // Duration you can't use another move
     public int initTime = 0; // Time during movestun the move initiates
     public double hitboxSize = 0; // Hitbox size in meters cubed
@@ -16,58 +25,76 @@ public final class Attack {
     public float stun = 0f; // How long is the opponent stunned for after being hit
     public float offset = 0; // Hitbox Y offset (inverted)
     public int interval = 1; // For barrages; attack interval | For charges; hit state ID
-
     public SoundEvent impactSound;
     public List<Integer> attackTimes;
 
     public boolean hasArmor = false; // For (un)interruptable attacks
-
+    /**
+     * Assigns whether attack is armored
+     */
     public Attack setArmor(boolean armor) {
         this.hasArmor = armor;
         return this;
     }
 
     public boolean lift = true; // If set to true, attack will attempt to keep the victim in air on hit
-
+    /**
+     * Assigns whether the attack will attempt to lift the victim on hit
+     */
     public Attack setLift(boolean lift) {
         this.lift = lift;
         return this;
     }
 
     public int hitspark = 1; // Particle that appears on hit
-
+    /**
+     * Assigns the particle the attack will generate on hit
+     * @param hitspark id of particle (see: net.arna.jcraft.client.net.ClientPacketHandler)
+     */
     public Attack setHitspark(int hitspark) {
         this.hitspark = hitspark;
         return this;
     }
 
     public int stunType = 1; // 1 - HITSTUN, 2 - BLOCKSTUN, 3 - NO MOVEMENT PENALTY
-
     public Attack setStunType(int st) {
         this.stunType = st;
         return this;
     }
 
     public boolean overrideStun = false; // If set to true, attack will override current stun on victim
-
     public Attack setStunOverride(boolean o) {
         this.overrideStun = o;
         return this;
     }
 
-    public Attack setLaunch() {
+    /**
+     * Marks attack as a launcher
+     */
+    public Attack setLaunch() { // Shorthand
         this.stunType = 3;
         this.overrideStun = true;
         return this;
-    } // Shorthand
+    }
 
     public boolean unblockable = false;
     public boolean ubEffectsOnly = false;
-
-    // The boolean sets whether the effects are the only ub thing, or the entire attack
-    public Attack setUB(boolean ubEO) {
+    /**
+     * Marks the attack as unblockable
+     * @param effectsOnly is the effect of the attack the only unblockable feature?
+     */
+    public Attack setUB(boolean effectsOnly) {
         this.unblockable = true;
-        this.ubEffectsOnly = ubEO;
+        this.ubEffectsOnly = effectsOnly;
+        return this;
+    }
+
+    public boolean canBackstab = true;
+    /**
+     * @return attack with backstabs disabled
+     */
+    public Attack disableBackstab() {
+        this.canBackstab = false;
         return this;
     }
 
@@ -75,13 +102,22 @@ public final class Attack {
     public AttackQueue button;
     public String name = "UNNAMED";
     public String description = "UNDESCRIBED";
-
+    /**
+     * Assigns information to attack
+     * @param name name of attack
+     * @param desc description
+     */
     public Attack setInfo(String name, String desc) {
         this.name = name;
         this.description = desc;
         return this;
     }
-
+    /**
+     * Assigns information to attack
+     * @param name name of attack
+     * @param desc description
+     * @param b which type of button the attack corresponds to
+     */
     public Attack setInfo(String name, String desc, AttackQueue b) {
         this.name = name;
         this.description = desc;
@@ -91,7 +127,10 @@ public final class Attack {
 
     // Spec-exclusive
     public String animation;
-
+    /**
+     * Assigns {@link net.minecraft.entity.player.PlayerEntity} animation id to attack, used for spec moves
+     * @param anim string id for animation
+     */
     public Attack setAnimation(String anim) {
         this.animation = anim;
         return this;
@@ -99,7 +138,9 @@ public final class Attack {
 
     // AI Flags, mostly
     public boolean isRanged = false;
-
+    /**
+     * Marks attack as ranged or not
+     */
     public Attack setRanged(boolean ranged) {
         this.isRanged = ranged;
         return this;
@@ -110,20 +151,82 @@ public final class Attack {
         return this;
     }
 
-    public MobilityType mobilityType = null;
+    public static class HitboxData {
+        public double forwardOffset = 0.0;
+        public double verticalOffset = 0.0;
+        public double hitboxSize;
 
+        public HitboxData(double size) {
+            this.hitboxSize = size;
+        }
+
+        public HitboxData(double fO, double vO, double size) {
+            this.forwardOffset = fO;
+            this.verticalOffset = vO;
+            this.hitboxSize = size;
+        }
+    }
+
+    public List<HitboxData> extraHitboxes = new ArrayList<>();
+    /**
+     * Adds new hitboxes to the attack
+     * @param list hitboxes to add
+     */
+    public Attack appendHitboxes(Collection<? extends HitboxData> list) {
+        extraHitboxes.addAll(list);
+        return this;
+    }
+    /**
+     * Adds a new hitbox to the attack
+     * @param data hitbox to add
+     */
+    public Attack appendHitbox(HitboxData data) {
+        extraHitboxes.add(data);
+        return this;
+    }
+
+    public MobilityType mobilityType = null;
+    /**
+     * Assigns a specified mobility type to the attack
+     * @param mobility type of mobility
+     */
     public Attack setMobility(MobilityType mobility) {
         this.mobilityType = mobility;
         return this;
     }
 
-    public Attack followup;
+    public boolean overrideBlockstun = false;
+    public int blockstun;
 
-    public Attack setFollowup(Attack f) {
-        this.followup = f;
+    /**
+     * Disables automatic blockstun calculation, and forces baseDamageLogic to use the specified value
+     */
+    public Attack setBlockstun(int blockstun) {
+        overrideBlockstun = true;
+        this.blockstun = blockstun;
         return this;
     }
 
+    /**
+     * @return effective blockstun (in ticks) for attack (4 + damage OR assigned blockstun)
+     */
+    public int getEffectiveBlockstun() {
+        if (overrideBlockstun)
+            return blockstun;
+        return (int) (4 + damage);
+    }
+
+    public Attack followup;
+    /**
+     * Assigns a followup to the attack
+     */
+    public Attack setFollowup(Attack followup) {
+        this.followup = followup;
+        return this;
+    }
+    /**
+     * @return whether the attack has a followup
+     */
     public boolean hasFollowup() {
         return this.followup != null;
     }
@@ -134,6 +237,7 @@ public final class Attack {
 
     public static Attack copyOf(Attack attack) {
         Attack attackCopy = new Attack();
+        attackCopy.id = attack.id;
         attackCopy.cooldown = attack.cooldown;
         attackCopy.attackDist = attack.attackDist;
         attackCopy.moveStun = attack.moveStun;
@@ -150,15 +254,19 @@ public final class Attack {
         attackCopy.hasArmor = attack.hasArmor;
         attackCopy.lift = attack.lift;
         attackCopy.hitspark = attack.hitspark;
+        attackCopy.stunType = attack.stunType;
+        attackCopy.overrideStun = attack.overrideStun;
         attackCopy.animation = attack.animation;
+        attackCopy.canBackstab = attack.canBackstab;
+        attackCopy.extraHitboxes = attack.extraHitboxes;
         return attackCopy;
     }
 
     // For non-physicals
-    public Attack() {
-    }
+    public Attack() { }
 
-    public Attack(int cooldown, int moveStun, int initTime, float stun, AttackType attackType) {
+    public Attack(int id, int cooldown, int moveStun, int initTime, float stun, AttackType attackType) {
+        this.id = id;
         this.cooldown = cooldown;
         this.moveStun = moveStun; // Anim duration
         this.initTime = initTime; // TS init
@@ -166,7 +274,8 @@ public final class Attack {
         this.attackType = attackType;
     }
 
-    public Attack(int cooldown, int moveStun, int initTime, float stun, float attackDist, AttackType attackType) {
+    public Attack(int id, int cooldown, int moveStun, int initTime, float stun, float attackDist, AttackType attackType) {
+        this.id = id;
         this.cooldown = cooldown;
         this.moveStun = moveStun;
         this.initTime = initTime;
@@ -176,7 +285,8 @@ public final class Attack {
     }
 
     // For knockback moves
-    public Attack(int cooldown, float attackDist, int moveStun, int initTime, double hitboxSize, float damage, float knockback, AttackType attackType) {
+    public Attack(int id, int cooldown, float attackDist, int moveStun, int initTime, double hitboxSize, float damage, float knockback, AttackType attackType) {
+        this.id = id;
         this.cooldown = cooldown;
         this.attackDist = attackDist;
         this.moveStun = moveStun;
@@ -188,10 +298,11 @@ public final class Attack {
     }
 
     // Stun moves (simplified)
-    public Attack(int cooldown, float attackDist, int moveStun, int initTime, double hitboxSize, float damage, float knockback, AttackType attackType, float stun) {
+    public Attack(int id, int cooldown, float attackDist, int moveStun, int initTime, double hitboxSize, float damage, float knockback, AttackType attackType, float stun) {
+        this.id = id;
         this.cooldown = cooldown;
         this.attackDist = attackDist; // CHARGE: max. attack dist
-        this.moveStun = moveStun; // CHARGE: After initTime has passed, the remaining moveStun is how many ticks it takes for the stand to finish it's charge
+        this.moveStun = moveStun; // CHARGE: After initTime has passed, the remaining moveStun is how many ticks it takes for the stand to finish its charge
         this.initTime = initTime;
         this.hitboxSize = hitboxSize;
         this.damage = damage;
@@ -201,10 +312,11 @@ public final class Attack {
     }
 
     // For stun moves
-    public Attack(int cooldown, float attackDist, int moveStun, int initTime, double hitboxSize, float damage, float knockback, AttackType attackType, float stun, float offset) {
+    public Attack(int id, int cooldown, float attackDist, int moveStun, int initTime, double hitboxSize, float damage, float knockback, AttackType attackType, float stun, float offset) {
+        this.id = id;
         this.cooldown = cooldown; //
         this.attackDist = attackDist; // CHARGE: max. attack dist
-        this.moveStun = moveStun; // CHARGE: After initTime has passed, the remaining moveStun is how many ticks it takes for the stand to finish it's charge
+        this.moveStun = moveStun; // CHARGE: After initTime has passed, the remaining moveStun is how many ticks it takes for the stand to finish its charge
         this.initTime = initTime; //
         this.hitboxSize = hitboxSize; //
         this.damage = damage; //
@@ -215,7 +327,8 @@ public final class Attack {
     }
 
     // For barrages
-    public Attack(int cooldown, float attackDist, int moveStun, int initTime, double hitboxSize, float damage, float knockback, AttackType attackType, float stun, float offset, int intervalOrHitAnim) {
+    public Attack(int id, int cooldown, float attackDist, int moveStun, int initTime, double hitboxSize, float damage, float knockback, AttackType attackType, float stun, float offset, int intervalOrHitAnim) {
+        this.id = id;
         this.cooldown = cooldown;
         this.attackDist = attackDist;
         this.moveStun = moveStun;
@@ -229,7 +342,8 @@ public final class Attack {
         this.interval = intervalOrHitAnim;
     }
 
-    public Attack(int cooldown, float attackDist, int moveStun, int initTime, double hitboxSize, float damage, float knockback, AttackType attackType, float stun, float offset, int interval, SoundEvent impactSound) {
+    public Attack(int id, int cooldown, float attackDist, int moveStun, int initTime, double hitboxSize, float damage, float knockback, AttackType attackType, float stun, float offset, int interval, SoundEvent impactSound) {
+        this.id = id;
         this.cooldown = cooldown;
         this.attackDist = attackDist;
         this.moveStun = moveStun;
@@ -245,7 +359,8 @@ public final class Attack {
     }
 
     // For multi-hits that aren't barrages
-    public Attack(int cooldown, float attackDist, int moveStun, int initTime, double hitboxSize, float damage, float knockback, AttackType attackType, float stun, float offset, List<Integer> attackTimes, SoundEvent impactSound) {
+    public Attack(int id, int cooldown, float attackDist, int moveStun, int initTime, double hitboxSize, float damage, float knockback, AttackType attackType, float stun, float offset, List<Integer> attackTimes, SoundEvent impactSound) {
+        this.id = id;
         this.cooldown = cooldown;
         this.attackDist = attackDist;
         this.moveStun = moveStun;

@@ -1,0 +1,6 @@
+{
+  "parent": "block/cube_all",
+  "textures": {
+    "all": "jcraft:block/foolish_sand_block"
+  }
+}

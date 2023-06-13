@@ -46,26 +46,31 @@ import java.util.List;
 public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnimationTickable {
     AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
-    //maybe convert to grab - SPECIAL 2: Eye chop
-
-    public static Attack light = new Attack(3, 0.85f, 23, 0, 1.5, 4f, 0.1f, AttackType.MULTIHIT, 2f, -0.1f, List.of(10, 16), JSoundRegister.IMPACT_4)
+    public static Attack light = new Attack(0, 3, 0.85f, 23, 0, 1.5, 4f, 0.1f, AttackType.MULTIHIT, 2f, -0.1f, List.of(10, 16), JSoundRegister.IMPACT_4)
             .setInfo("Dual Chop", "quick combo starter");
-    public static Attack barrage = new Attack(17, 0.85f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3)
+    public static Attack barrage = new Attack(3, 17, 0.85f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender/finisher, medium stun, knocks back");
-    public static Attack overhead = new Attack(8, 0.85f, 32, 22, 2, 9f, 1.5f, AttackType.BOX, 0.5f).setHitspark(2).setArmor(true).setLaunch()
+    public static Attack overhead = new Attack(2, 8, 0.85f, 32, 22, 2, 9f, 1.5f, AttackType.BOX, 0.5f)
+            .setHitspark(2)
+            .setArmor(true)
+            .setLaunch()
             .setInfo("Overhead Hook", "long windup, knockdown", AttackQueue.HEAVY);
-    public static Attack heavy = new Attack(13, 0.85f, 19, 12, 1.5, 6f, 0.2f, AttackType.BOX, 1.25f, 0, 0)
-            .setInfo("Vertical Chop", "medium windup combo starter, has a true followup in the form of a slow, armored knockdown", AttackQueue.HEAVY).setFollowup(overhead);
-    public static Attack eyechop = new Attack(20, 1f, 50, 37, 1.75, 9f, 0.3f, AttackType.BOX, 3, -0.3f).setHitspark(2)
+    public static Attack heavy = new Attack(1, 13, 0.85f, 19, 12, 1.5, 6f, 0.2f, AttackType.BOX, 1.25f, 0, 0)
+            .setInfo("Vertical Chop", "medium windup combo starter, has a true followup in the form of a slow, armored knockdown", AttackQueue.HEAVY)
+            .setFollowup(overhead);
+    public static Attack eyechop = new Attack(4, 20, 1f, 50, 37, 1.75, 9f, 0.3f, AttackType.BOX, 3, -0.3f)
+            .setHitspark(2)
             .setInfo("Eye Chop/Blood Throw", "blindness on hit, donut combo extender/crouch to throw a stunning, blinding blood projectile");
-    public static Attack bloodthrow = new Attack(25, 15, 10, 10, AttackType.BOX)
+    public static Attack bloodthrow = new Attack(5, 25, 15, 10, 10, AttackType.BOX)
             .setInfo("Blood Throw", "");
-    public static Attack donut = new Attack(15, 1f, 60, 42, 2, 14f, 0.0f, AttackType.BOX, 6, 0.1f).setHitspark(2)
+    public static Attack donut = new Attack(6, 15, 1f, 60, 42, 2, 14f, 0.0f, AttackType.BOX, 6, 0.1f)
+            .setHitspark(2)
+            .setArmor(true)
             .setInfo("Donut", "huge windup, 6s hitstun");
-    public static Attack timeerase = new Attack(50, 15, 5, 6, AttackType.BOX)
-            .setInfo("Time Erase", "6 seconds duration"); // TE = (moveStun-initTime)/20
-    public static Attack epitaph = new Attack(30, 34, 4, 0, -1, AttackType.COUNTER)
+    public static Attack epitaph = new Attack(7, 30, 34, 4, 0, -1, AttackType.COUNTER)
             .setInfo("Epitaph/Move Cancel", "when used raw, 0.2s windup, 1.5s counter; cancels move when used during one");
+    public static Attack timeerase = new Attack(8, 50, 15, 5, 6, AttackType.BOX)
+            .setInfo("Time Erase", "6 seconds duration"); // TE = (moveStun-initTime)/20
 
     public static TrackedData<Integer> TIMEERASETIME;
 
@@ -130,12 +135,9 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
     // Moveset
     @Override
     public void initLightAttack() {
-        if (!this.canAttack()) {
-            return;
-        }
-        if (handleAttack(light, JCraft.standLightCD, 2)) {
+        if (!this.canAttack()) return;
+        if (handleAttack(light, JCraft.standLightCD, 2))
             this.playSound(JSoundRegister.KC_DUAL_CHOP, 1, 1);
-        }
     }
 
     @Override
@@ -159,19 +161,14 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
 
     @Override
     public void initBarrage() {
-        if (!this.canAttack()) {
-            return;
-        }
-        if (handleAttack(barrage, JCraft.standBarrageCD, 6)) {
+        if (!this.canAttack()) return;
+        if (handleAttack(barrage, JCraft.standBarrageCD, 6))
             this.playSound(JSoundRegister.KC_BARRAGE, 1, 1);
-        }
     }
 
     @Override
     public void initSpecial1() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (getUser().isSneaking() && handleAttack(bloodthrow, JCraft.standS1CD, 11)) {
             getUser().damage(DamageSource.MAGIC, 0.1f);
         } else if (handleAttack(eyechop, JCraft.standS1CD, 7)) {
@@ -181,9 +178,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
 
     @Override
     public void initUlt() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (getTETime() > 0) {
             CancelTE();
             return;
@@ -196,9 +191,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
 
     @Override
     public void initSpecial2() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
         if (handleAttack(donut, JCraft.standS2CD, 5)) {
             this.playSound(JSoundRegister.KC_DONUT, 1, 1);
         }
@@ -246,69 +239,70 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
         }
     }
 
-    private static final Attack barrageFinisher = new Attack(17, 0.85f, 50, 0, 1.5, 1f, 1.1f, AttackType.BARRAGE, 0.5f, 0, 3).setHitspark(2).setLaunch();
+    private static final Attack barrageFinisher = new Attack(9, 17, 0.85f, 50, 0, 1.5, 1f, 1.1f, AttackType.BARRAGE, 0.5f, 0, 3).setHitspark(2).setLaunch();
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
         Vec3d rotVec = this.getRotationVector();
-        if (attack == barrage && this.getMoveStun() < 4) {
-            this.curAttack = barrageFinisher;
-        } else if (attack == overhead) {
-            for (LivingEntity ent : entities) {
-                ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0));
+        switch (attack.id) {
+            case (2) -> {
+                for (LivingEntity ent : entities)
+                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0));
             }
-        } else if (attack == eyechop) {
-            for (LivingEntity ent : entities) {
-                ent.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 200, 0));
+            case (3) -> {
+                if (getMoveStun() < 4) this.curAttack = barrageFinisher;
             }
-        } else if (attack == donut) {
-            // If hit, impale and set position to middle of arm
-            for (LivingEntity entity : entities) {
-                Vec3d pos = this.getPos().add(rotVec.multiply(1.5));
-                entity.teleport(pos.x, entity.getY(), pos.z);
+            case (4) -> {
+                for (LivingEntity ent : entities)
+                    ent.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 200, 0));
             }
-        } else if (attack == timeerase) {
-            timeEraseEntities = new LinkedList<>();
-            timeErasePositions = new LinkedList<>();
-
-            Vec3d pos = this.getEyePos();
-
-            this.setTETime((int) (timeerase.stun * 20));
-            this.curAttack = null;
-            this.setBoundingBox(new Box(0, 0, 0, 0, 0, 0));
-
-            List<Entity> toCatch = world.getEntitiesByClass(Entity.class,
-                    new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
-
-            toCatch.remove(this);
-            toCatch.remove(getUser());
-
-            for (Entity entity : toCatch) {
-                timeEraseEntities.add(entity);
-                timeErasePositions.add(entity.getPos());
+            case (5) -> {
+                LivingEntity user = this.getUser();
+                BloodProjectile bloodProjectile = new BloodProjectile(world, user);
+                bloodProjectile.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
+                bloodProjectile.setVelocity(user, user.getPitch(), user.getYaw(), 0, 1.33F, 0);
+                bloodProjectile.setPosition(getEyePos());
+                world.spawnEntity(bloodProjectile);
             }
-        } else if (attack == bloodthrow) {
-            LivingEntity user = this.getUser();
-            BloodProjectile bloodProjectile = new BloodProjectile(world, user);
-            bloodProjectile.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
-            bloodProjectile.setVelocity(user, user.getPitch(), user.getYaw(), 0, 1F, 0);
-            bloodProjectile.setPosition(getEyePos());
-            world.spawnEntity(bloodProjectile);
+            case (6) -> {
+                // If hit, impale and set position to middle of arm
+                for (LivingEntity entity : entities) {
+                    Vec3d pos = this.getPos().add(rotVec.multiply(1.5));
+                    entity.teleport(pos.x, entity.getY(), pos.z);
+                }
+            }
+            case (8) -> {
+                timeEraseEntities = new LinkedList<>();
+                timeErasePositions = new LinkedList<>();
+
+                Vec3d pos = this.getEyePos();
+
+                this.setTETime((int) (timeerase.stun * 20));
+                this.curAttack = null;
+                this.setBoundingBox(new Box(0, 0, 0, 0, 0, 0));
+
+                List<Entity> toCatch = world.getEntitiesByClass(Entity.class,
+                        new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+
+                toCatch.remove(this);
+                toCatch.remove(getUser());
+
+                for (Entity entity : toCatch) {
+                    timeEraseEntities.add(entity);
+                    timeErasePositions.add(entity.getPos());
+                }
+            }
         }
     }
 
     @Override
     public void initMiddleClick() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!this.canAttack()) return;
 
-        if (!this.world.isClient() && hasUser()) {
+        if (hasUser()) {
             LivingEntity user = this.getUser();
             NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
-            if (playerData.getInt(JCraft.standMMBCD) > 0) {
-                return;
-            }
+            if (playerData.getInt(JCraft.utilCD) > 0) return;
             Vec3d oPos = user.getPos();
 
             HitResult hitResult = this.world.raycast(new RaycastContext(user.getEyePos(), user.getEyePos().add(user.getRotationVector().multiply(16)), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user));
@@ -316,7 +310,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
 
             user.teleport(pos.x, pos.y, pos.z);
 
-            playerData.putInt(JCraft.standMMBCD, 300); // 15 second timeskip cooldown
+            playerData.putInt(JCraft.utilCD, 300); // 15 second timeskip cooldown
 
             if (playerData.getInt(JCraft.standUltCD) < 60) {
                 playerData.putInt(JCraft.standUltCD, 60);
@@ -514,14 +508,11 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
         AnimationController controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 
-        if (age < 20 && getState() < 2) {
+        if (playSummonAnim) {
             controller.setAnimation(builder.playOnce("animation.kingcrimson.summon"));
             return PlayState.CONTINUE;
         }
-
-        if (this.getSameState()) {
-            controller.markNeedsReload();
-        }
+        if (this.getSameState()) controller.markNeedsReload();
         switch (this.getState()) {
             default -> controller.setAnimation(builder.loop("animation.kingcrimson.idle"));
             case 2 -> controller.setAnimation(builder.playAndHold("animation.kingcrimson.dual_chop"));

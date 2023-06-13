@@ -4,8 +4,6 @@ import net.arna.jcraft.common.util.JCraftUtils;
 import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegister;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
@@ -33,8 +31,6 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 
 public class KnifeProjectile extends PersistentProjectileEntity implements IAnimatable {
     private int ticksInAir;
-
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
     private static final TrackedData<Boolean> LIGHTNING;
     private boolean delayed = false;
@@ -76,32 +72,15 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
     }
 
     @Override
-    public void registerControllers(AnimationData data) {
-    }
-
-    @Override
-    public AnimationFactory getFactory() {
-        return this.factory;
-    }
-
-    @Override
     public ItemStack asItemStack() {
         return new ItemStack(JObjectRegistry.KNIFE);
     }
 
     @Override
-    protected void age() {
-        if (!this.inGround) {
-            ++this.ticksInAir;
-            if (this.ticksInAir >= 160)
-                this.remove(Entity.RemovalReason.DISCARDED);
-        } else if (getLightning())
-            this.remove(Entity.RemovalReason.DISCARDED);
-    }
-
-    @Override
     public void tick() {
         super.tick();
+
+        if (!this.inGround) ++this.ticksInAir;
 
         if (getLightning()) {
             if (world.isClient) {
@@ -111,8 +90,8 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
                 world.addParticle(ParticleTypes.ELECTRIC_SPARK, x, y, z, 0, 0, 0);
                 world.addParticle(ParticleTypes.ELECTRIC_SPARK, (x + prevX) / 2, (y + prevY) / 2, (z + prevZ) / 2, 0, 0, 0);
             } else {
-                if (this.age > 1600)
-                    this.discard();
+                if (ticksInAir > 200 || inGround)
+                    discard();
                 if (delayed) {
                     delayTime--;
                     Entity owner = getOwner();
@@ -148,7 +127,7 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
                     }
                 }
             }
-        }
+        } else if (ticksInAir > 640 && !world.isClient) discard();
     }
 
     @Override
@@ -158,35 +137,27 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
+        if (world.isClient) return;
+        if (delayed && delayTime > 0) return;
         Entity owner = this.getOwner();
-        if (owner == null) {
-            return;
-        }
+        if (owner == null) return;
         Entity entity = entityHitResult.getEntity();
-        if (owner.hasPassenger(entity) || entity == owner) {
-            return;
-        }
+        if (owner.hasPassenger(entity) || entity == owner) return;
 
-        if (this.isOnFire())
-            entity.setOnFireFor(5);
+        if (this.isOnFire()) entity.setOnFireFor(5);
 
+        int blockstun = 4;
         int stunT = 0;
         if (this.getLightning()) {
             stunT = 20;
+            blockstun = 6;
         } else {
-            this.dropStack(this.asItemStack(), 0.1F);
+            dropStack(this.asItemStack(), 0.1F);
         }
 
-        JCraftUtils.ProjectileDamageLogic(this, world, entity, Vec3d.ZERO, stunT, 1, false, 2);
-
-        this.remove(RemovalReason.DISCARDED);
-        this.playSound(SoundEvents.ITEM_TRIDENT_HIT, 1, 1);
-    }
-
-    @Override
-    public void setVelocity(double x, double y, double z, float speed, float divergence) {
-        super.setVelocity(x, y, z, speed, divergence);
-        this.ticksInAir = 0;
+        JCraftUtils.ProjectileDamageLogic(this, world, entity, Vec3d.ZERO, stunT, 1, false, 2, blockstun);
+        playSound(SoundEvents.ITEM_TRIDENT_HIT, 1, 1);
+        discard();
     }
 
     @Override
@@ -203,9 +174,10 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
         setLightning(tag.getBoolean("lightning"));
     }
 
+    // Animations
+    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
     @Override
-    @Environment(EnvType.CLIENT)
-    public boolean shouldRender(double distance) {
-        return true;
-    }
+    public void registerControllers(AnimationData data) { }
+    @Override
+    public AnimationFactory getFactory() { return this.factory; }
 }

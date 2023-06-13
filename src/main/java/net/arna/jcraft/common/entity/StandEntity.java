@@ -2,6 +2,7 @@ package net.arna.jcraft.common.entity;
 
 import lombok.Getter;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
@@ -19,6 +20,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
@@ -50,6 +52,7 @@ import static net.arna.jcraft.JCraft.CooldownCancel;
 public abstract class StandEntity extends MobEntity {
 
     // TODO: finish custom player idle poses for all stands
+    // TODO: add skin select
 
     // All variables that the player can see in action (i.e. time erase time, timestop time, alpha, state) have to be tracked.
     public List<Attack> moves = List.of();
@@ -89,8 +92,8 @@ public abstract class StandEntity extends MobEntity {
     public Attack curAttack;
     public Attack previousAttack;
 
-    public static List<String> attackCooldowns = List.of(JCraft.standLightCD, JCraft.standHeavyCD, JCraft.standBarrageCD, JCraft.standS1CD, JCraft.standUltCD, JCraft.standS2CD, JCraft.standS3CD, JCraft.standMMBCD);
-    static Attack unusable = new Attack(999, 999, 999, 0, AttackType.BOX).setInfo("NONE", "NONE");
+    public static List<String> attackCooldowns = List.of(JCraft.standLightCD, JCraft.standHeavyCD, JCraft.standBarrageCD, JCraft.standS1CD, JCraft.standUltCD, JCraft.standS2CD, JCraft.standS3CD, JCraft.utilCD);
+    static Attack unusable = new Attack(-1,999, 999, 999, 0, AttackType.BOX).setInfo("NONE", "NONE");
 
     // Info
     public List<String> pros;
@@ -100,6 +103,9 @@ public abstract class StandEntity extends MobEntity {
 
     @Getter
     private final StandType standType;
+
+    protected int summonAnimDuration = 19;
+    protected boolean playSummonAnim = true;
 
     protected StandEntity(StandType type, World world) {
         super(type.getEntityType(), world);
@@ -131,16 +137,16 @@ public abstract class StandEntity extends MobEntity {
     }
 
     private LivingEntity user = null;
-
-    public void setUser(LivingEntity l) {
-        if (user == null)
-            user = l;
+    /**
+     * Sets the stands user if there isn't one
+     */
+    public void setUser(LivingEntity user) {
+        if (this.user == null)
+            this.user = user;
     }
-
     public LivingEntity getUser() {
-        return this.user;
+        return user;
     }
-
     public boolean hasUser() {
         return user != null;
     }
@@ -148,11 +154,15 @@ public abstract class StandEntity extends MobEntity {
     public int getState() {
         return this.dataTracker.get(STATE);
     }
-
+    /**
+     * Sets the stands state directly
+     */
     public void setStateNoReset(int s) {
         this.dataTracker.set(STATE, s);
     }
-
+    /**
+     * Sets the stands state with extra processing
+     */
     public void setState(int s) {
         int state = this.getState();
         this.dataTracker.set(SAMESTATE, state == s || state == 1); // Pretty much just an animation reset flag
@@ -162,7 +172,6 @@ public abstract class StandEntity extends MobEntity {
     public boolean getSameState() {
         return this.dataTracker.get(SAMESTATE);
     }
-
     public void setSameState(boolean samestate) {
         this.dataTracker.set(SAMESTATE, samestate);
     }
@@ -170,7 +179,9 @@ public abstract class StandEntity extends MobEntity {
     public int getMoveStun() {
         return this.dataTracker.get(MOVESTUN);
     }
-
+    /**
+     * Sets how many ticks the stand will be occupied doing an animation for
+     */
     public void setMoveStun(int moveStun) {
         this.dataTracker.set(MOVESTUN, moveStun);
     }
@@ -178,7 +189,9 @@ public abstract class StandEntity extends MobEntity {
     public float getRotationOffset() {
         return this.dataTracker.get(ROTATIONOFFSET);
     }
-
+    /**
+     * Sets the angle of the offset the stand is at relative to the user, used in the cylindrical coordinates system in {@link net.arna.jcraft.mixin.EntityMixin}
+     */
     public void setRotationOffset(float rotationOffset) {
         this.dataTracker.set(ROTATIONOFFSET, rotationOffset);
     }
@@ -186,7 +199,9 @@ public abstract class StandEntity extends MobEntity {
     public float getDistanceOffset() {
         return this.dataTracker.get(DISTANCEOFFSET);
     }
-
+    /**
+     * Sets the distance between the stand and user
+     */
     public void setDistanceOffset(float distanceOffset) {
         this.dataTracker.set(DISTANCEOFFSET, distanceOffset);
     }
@@ -194,7 +209,6 @@ public abstract class StandEntity extends MobEntity {
     public float getAlpha() {
         return this.dataTracker.get(ALPHA);
     }
-
     public void setAlpha(float alpha) {
         this.dataTracker.set(ALPHA, alpha);
     }
@@ -202,7 +216,6 @@ public abstract class StandEntity extends MobEntity {
     public float getStandGauge() {
         return this.dataTracker.get(STANDGAUGE);
     }
-
     public void setStandGauge(float standGauge) {
         this.dataTracker.set(STANDGAUGE, standGauge);
     }
@@ -210,7 +223,9 @@ public abstract class StandEntity extends MobEntity {
     public boolean getFree() {
         return this.dataTracker.get(FREE);
     }
-
+    /**
+     * Changes whether the stand is detached from the user
+     */
     public void setFree(boolean free) {
         this.dataTracker.set(FREE, free);
     }
@@ -224,19 +239,19 @@ public abstract class StandEntity extends MobEntity {
     public double getRemoteForwardInput() {
         return remoteForwardInput;
     }
-
     public double getRemoteSideInput() {
         return remoteSideInput;
     }
-
     public void setRemoteJumpInput(boolean b) {
         remoteJumpInput = b;
     }
-
     public boolean getRemoteJumpInput() {
         return remoteJumpInput;
     }
 
+    /**
+     * Synchronises the user inputs serverside
+     */
     public void updateRemoteInputs(int f, int s, boolean j) {
         // These persist, so implementation for cleaning should be done in the stand code
         Vec3d v = new Vec3d(f, 0, s).normalize();
@@ -259,6 +274,9 @@ public abstract class StandEntity extends MobEntity {
         }
     }
 
+    /**
+     * Puts the stand into remote mode
+     */
     protected void BeginRemote() {
         setFree(true);
         Vec3d fPos = user.getPos().add(user.getRotationVector());
@@ -268,15 +286,36 @@ public abstract class StandEntity extends MobEntity {
         setAlpha(0.1f);
     }
 
+    /**
+     * Ends remote mode instantly
+     */
     protected void endRemote() {
         setFree(false);
         setAlpha(1);
     }
 
+    /*
+     * Returns whether the utility should be used by the stand, otherwise calls initClientUtility()
+     */
+    /*
+    @Environment(EnvType.CLIENT)
+    public boolean allowUtilityUse() {
+        return true;
+    }
+    public void initClientUtility() {
+    }
+    */
+
+    /**
+     * Gets the stands position while detached
+     */
     public Vec3f getFreePos() {
         return new Vec3f(this.dataTracker.get(FREEX), this.dataTracker.get(FREEY), this.dataTracker.get(FREEZ));
     }
-
+    /**
+     * Sets the stands position while detached
+     * @param freePos new position
+     */
     public void setFreePos(Vec3f freePos) {
         this.dataTracker.set(FREEX, freePos.getX());
         this.dataTracker.set(FREEY, freePos.getY());
@@ -286,7 +325,9 @@ public abstract class StandEntity extends MobEntity {
     public int getTSTime() {
         return this.dataTracker.get(TIMESTOPTIME);
     }
-
+    /**
+     * Sets the time in ticks time will be stopped for on account of this stand
+     */
     public void setTSTime(int tsTime) {
         this.dataTracker.set(TIMESTOPTIME, tsTime);
     }
@@ -328,6 +369,9 @@ public abstract class StandEntity extends MobEntity {
     }
 
     // Attack controls
+    /**
+     * @return whether the stand should be able to attack
+     */
     public boolean canAttack() {
         if (hasUser()) {
             ITimeStop timeStop = (ITimeStop) user;
@@ -336,6 +380,16 @@ public abstract class StandEntity extends MobEntity {
         return false;
     }
 
+    /**
+     * @return whether the stand should change its height depending on the user's look pitch
+     */
+    public boolean shouldOffsetHeight() {
+        return getState() > 1;
+    }
+
+    /**
+     * Struct used for storing extra information relating to the stands ability to attack
+     */
     public class CanAttackData {
         public LivingEntity user;
         public boolean canAttack;
@@ -346,6 +400,9 @@ public abstract class StandEntity extends MobEntity {
         }
     }
 
+    /**
+     * Returns a {@link CanAttackData} with information relating to the stands ability to attack
+     */
     public CanAttackData canAttackWithData() {
         if (hasUser()) {
             ITimeStop timeStop = (ITimeStop) user;
@@ -354,32 +411,52 @@ public abstract class StandEntity extends MobEntity {
         return new CanAttackData(null, false);
     }
 
+    /**
+     * Initiates an attack with the stand
+     * @param attack attack to handle
+     * @param cooldownName string identifier for which cooldown to start
+     * @param animState int identifier for which state to put the stand into
+     */
     public boolean handleAttack(Attack attack, String cooldownName, int animState) {
         NbtCompound userData = ((IEntityDataSaver) user).getPersistentData();
         int cooldown = userData.getInt(cooldownName);
-        if (cooldown > 0) {
-            return false;
-        }
+        if (cooldown > 0) return false;
         userData.putInt(cooldownName, attack.cooldown * 20);
         this.setAttack(attack, animState);
         return true;
     }
 
+    /**
+     * Instantly sets the stands attack
+     * @param attack attack to set
+     * @param animState int identifier for which state to put the stand into
+     */
     public void setAttack(Attack attack, int animState) {
         this.curAttack = attack;
         this.setMoveStun(attack.moveStun);
         this.setState(animState);
     }
 
+    /**
+     * Stuns specified {@link LivingEntity}
+     * @param entity victim to stun
+     * @param duration in ticks
+     * @param amplifier type of stun
+     */
     public static void stun(LivingEntity entity, int duration, int amplifier) {
-        if (duration == 0) {
-            return;
-        }
+        if (entity == null || duration == 0) return;
         entity.addStatusEffect(new StatusEffectInstance(JStatusRegister.DAZED, duration, amplifier, false, false, true));
         //JCraft.LOGGER.info("Stunned: " + entity.getEntityName() + " for: " + duration);
     }
 
+    /**
+     * Basic damage method, you likely want to use baseDamageLogic or damageLogic instead
+     * @param damage damage in half hearts
+     * @param damageSource source of damage
+     * @param ent entity to harm
+     */
     public static void damage(float damage, DamageSource damageSource, LivingEntity ent) {
+        if (ent == null || ent.isRemoved() || ent.isDead()) { return; }
         ent.damage(damageSource, 0.001f);
 
         // All stands ignore 10% of armor & armor toughness
@@ -391,15 +468,13 @@ public abstract class StandEntity extends MobEntity {
         damage = Math.max(damage - ent.getAbsorptionAmount(), 0.0F);
         ent.setAbsorptionAmount(ent.getAbsorptionAmount() - (f - damage));
 
-        if (damage != 0.0F) {
-            float h = ent.getHealth();
-            if ((h - damage) <= 0) {
-                ent.kill();
-            } else {
-                ent.setHealth(h - damage);
-                ent.getDamageTracker().onDamage(damageSource, h, damage);
-            }
-        }
+        if (damage <= 0) return;
+
+        float h = ent.getHealth();
+        ent.setHealth(h - damage);
+        ent.getDamageTracker().onDamage(damageSource, h, damage);
+        if (ent.isDead())
+            ent.onDeath(damageSource);
     }
 
     // Stock attacks to define
@@ -425,27 +500,25 @@ public abstract class StandEntity extends MobEntity {
     public void initUlt() {
     }
 
-    // Define what happens within your stand block
-    public void standBlock(LivingEntity player) {
-        if (player == null) {
-            return;
-        }
+    /**
+     * Defines what happens while the stand is blocking
+     */
+    public void standBlock() {
+        if (!hasUser()) return;
         // Projectile deflection
         List<ProjectileEntity> toDeflect = this.world.getEntitiesByClass(ProjectileEntity.class, this.getBoundingBox().expand(0.75f), EntityPredicates.VALID_ENTITY);
 
         for (ProjectileEntity projectile : toDeflect) {
-            if (projectile.getOwner() == player) {
-                continue;
-            }
+            if (projectile.getOwner() == user) continue;
             projectile.setVelocity(projectile.getVelocity().multiply(-0.5).add(0, -0.1, 0));
             projectile.velocityModified = true;
         }
 
-        stun(player, 2, 2);
-        player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 5, 3, false, false, true));
+        stun(user, 2, 2);
+        user.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 5, 3, false, false, true));
     }
 
-    // Define Middle Click Action
+    // Define Middle Click action
     public void initMiddleClick() {
     }
 
@@ -455,50 +528,81 @@ public abstract class StandEntity extends MobEntity {
 
     // Define desummon conditions
     public void desummon() {
-        if (this.curAttack == null && this.getMoveStun() <= 0) {
+        if (this.curAttack == null && this.getMoveStun() <= 0)
             this.discard();
-        }
     }
 
     // Define idle override
     public void idleOverride(LivingEntity player) {
     }
 
-    // Define counter action
+    /**
+     * Defines what happens if the stand successfully countered something
+     * @param entity countered entity
+     * @param source exact source of damage
+     */
     public void counter(Entity entity, DamageSource source) {
         this.curAttack = null;
         this.setMoveStun(0);
     }
 
+    /**
+     * Cancels the stands attack instantly
+     */
     public void cancelAttack() {
         this.curAttack = null;
         this.setMoveStun(0);
         this.setState(0);
     }
 
-    // Does the stand default to being near the user?
+    /**
+     * Returns whether the stand defaults to returning to the user while idle and detached
+     */
     public boolean defaultToNear() {
         return !getRemote();
     }
 
-    // Main
+    @Override
+    public boolean hasNoGravity() {
+        if (getFree() && !getRemote()) return true;
+        return super.hasNoGravity();
+    }
+
+    /*
+    @Override
+    public void tickRiding() {
+        this.tick();
+        if (hasUser()) {
+            if (getFree()) {
+                Vec3f freePos = getFreePos();
+                setPosition(freePos.getX(), freePos.getY(), freePos.getZ());
+            } else {
+                user.updatePassengerPosition(this);
+                setVelocity(0, 0, 0);
+            }
+        }
+    }
+     */
+
+    /**
+     * does evrything :)
+     */
     @Override
     public void tick() {
         super.tick();
 
-        if (this.isDead()) {
-            return;
-        }
+        if (this.isDead()) return;
 
         if (this.user == null) {
-            if (world.isClient && this.getVehicle() instanceof LivingEntity living) {
+            if (world.isClient && this.getVehicle() instanceof LivingEntity living)
                 user = living;
-            }
             return;
         } //else if (this.owner == null) { this.owner = player; }
         Entity vehicle = user.getVehicle();
 
         this.setMoveStun(this.getMoveStun() - 1);
+        if (playSummonAnim && (getMoveStun() > 0 || age > summonAnimDuration) )
+            playSummonAnim = false;
 
         Attack attack = this.curAttack;
 
@@ -611,76 +715,74 @@ public abstract class StandEntity extends MobEntity {
                                 || (attack.attackType == AttackType.MULTIHIT && attack.attackTimes.contains(moveStun - this.getMoveStun()))
                 ) {
                     //JCraft.LOGGER.info(this.getMoveStun() + " ACTIVE " + attack.interval);
-                    Vec3d hPos = pos.add(0.0, user.getHeight() / 2, 0.0);
-                    Vec3d fPos = (isChargeAttack) ?
-                            hPos.add(rotVec) :
-                            hPos.add(rotVec.multiply(attackDist)).subtract(0, attack.offset, 0);
+                    List<LivingEntity> hurt = new ArrayList<>();
 
-                    List<Entity> filter = new ArrayList<>(List.of(this, user));
-                    if (vehicle != null) {
-                        filter.add(vehicle);
-                    }
+                    if (attack.hitboxSize > 0) {
+                        Vec3d hPos = pos.add(0.0, user.getHeight() / 2, 0.0);
+                        Vec3d fPos = (isChargeAttack) ? hPos.add(rotVec) :
+                                hPos.add(rotVec.multiply(attackDist)).subtract(0, attack.offset, 0);
 
-                    List<LivingEntity> hurt = JCraftUtils.GenerateHitbox(world, fPos, attack.hitboxSize, filter);
-                    //JCraft.LOGGER.info("Hurt: " + hurt + " at world time: " + world.getTime());
-                    //if (!hurt.contains(player)) { hurt.add(player); } // Damage Debugging
+                        List<Entity> filter = new ArrayList<>(List.of(this, user));
+                        if (vehicle != null) filter.add(vehicle);
 
-                    DamageSource playerSource = (user instanceof PlayerEntity playerEntity) ? DamageSource.player(playerEntity) : DamageSource.mob(user);
-
-                    if (!hurt.isEmpty()) {
-                        JCraft.CreateParticle((ServerWorld) this.world,
-                                fPos.x + random.nextGaussian() * 0.25,
-                                fPos.y + random.nextGaussian() * 0.25,
-                                fPos.z + random.nextGaussian() * 0.25,
-                                attack.hitspark + 1);
-
-                        if (attack.impactSound != null) {
-                            this.playSound(attack.impactSound, 1, 1);
+                        hurt = JCraftUtils.GenerateHitbox(world, fPos, attack.hitboxSize, filter);
+                        for (Attack.HitboxData data : attack.extraHitboxes) {
+                            List<LivingEntity> extraHurt = JCraftUtils.GenerateHitbox(world,
+                                    hPos.add(rotVec.multiply(data.forwardOffset)).add(0, data.verticalOffset, 0), data.hitboxSize, filter);
+                            for (LivingEntity hurtEntity : extraHurt)
+                                if (!hurt.contains(hurtEntity)) hurt.add(hurtEntity);
                         }
+                        if (!hurt.isEmpty()) {
+                            JCraft.CreateParticle((ServerWorld) this.world,
+                                    fPos.x + random.nextGaussian() * 0.25,
+                                    fPos.y + random.nextGaussian() * 0.25,
+                                    fPos.z + random.nextGaussian() * 0.25,
+                                    attack.hitspark + 1);
 
-                        if (attack.attackType == AttackType.CHARGE) {
-                            this.setMoveStun(10);
-                            this.setState(attack.interval); // Interval is hitAnim for charges
-                            this.curAttack = null;
-                        }
-                    }
+                            if (attack.impactSound != null) playSound(attack.impactSound, 1, 1);
 
-                    float kb = attack.knockback;
-                    Vec3d kbVec = rotVec.multiply(kb).add(new Vec3d(0.0, Math.abs(attack.knockback) / 4, 0.0));
-
-                    List<LivingEntity> clashed = new ArrayList<>();
-
-                    for (LivingEntity livingEntity : hurt) {
-                        if (livingEntity instanceof StandEntity stand) {
-                            // Barrage clashing
-                            if (isBarrage && stand.curAttack != null && stand.curAttack.attackType == AttackType.BARRAGE) {
-                                // Override stun with high priority 0.5s stun, also stops all current sounds for cleaner audio cue
-                                clashed.add(user);
-                                if (stand.hasUser()) {
-                                    clashed.add(stand.getUser());
-
-                                    if (stand.getUser() instanceof ServerPlayerEntity serverPlayer) {
-                                        serverPlayer.networkHandler.sendPacket(new StopSoundS2CPacket(null, SoundCategory.PLAYERS));
-                                    }
-                                }
-                                if (user instanceof ServerPlayerEntity serverPlayer) {
-                                    serverPlayer.networkHandler.sendPacket(new StopSoundS2CPacket(null, SoundCategory.PLAYERS));
-                                }
-
-                                // Cancels both barrages
-                                cancelAttack();
-                                stand.cancelAttack();
-                                Vec3d midPos = stand.getPos().add(getPos()).multiply(0.5);
-                                this.world.playSound(null, midPos.x, midPos.y, midPos.z, JSoundRegister.IMPACT_1, SoundCategory.NEUTRAL, 1, 0.5f);
+                            if (attack.attackType == AttackType.CHARGE) {
+                                this.setMoveStun(10);
+                                this.setState(attack.interval); // Interval is hitAnim for charges
+                                this.curAttack = null;
                             }
-                            continue;
                         }
-                        damageLogic(world, livingEntity, kbVec, stunTicks, attack.stunType, attack.overrideStun, damage, attack.lift, playerSource, user);
-                    }
 
-                    for (LivingEntity livingEntity : clashed) {
-                        livingEntity.removeStatusEffect(JStatusRegister.DAZED);
-                        livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.DAZED, 10, 3, true, false));
+                        float kb = attack.knockback;
+                        Vec3d kbVec = rotVec.multiply(kb).add(new Vec3d(0.0, Math.abs(attack.knockback) / 4, 0.0));
+
+                        List<LivingEntity> clashed = new ArrayList<>();
+
+                        for (LivingEntity livingEntity : hurt) {
+                            if (livingEntity instanceof StandEntity stand) {
+                                // Barrage clashing
+                                if (isBarrage && stand.curAttack != null && stand.curAttack.attackType == AttackType.BARRAGE) {
+                                    // Override stun with high priority 0.5s stun, also stops all current sounds for cleaner audio cue
+                                    clashed.add(user);
+                                    if (stand.hasUser()) {
+                                        clashed.add(stand.getUser());
+
+                                        if (stand.getUser() instanceof ServerPlayerEntity serverPlayer)
+                                            serverPlayer.networkHandler.sendPacket(new StopSoundS2CPacket(null, SoundCategory.PLAYERS));
+                                    }
+                                    if (user instanceof ServerPlayerEntity serverPlayer)
+                                        serverPlayer.networkHandler.sendPacket(new StopSoundS2CPacket(null, SoundCategory.PLAYERS));
+
+                                    // Cancels both barrages
+                                    cancelAttack();
+                                    stand.cancelAttack();
+                                    Vec3d midPos = stand.getPos().add(getPos()).multiply(0.5);
+                                    this.world.playSound(null, midPos.x, midPos.y, midPos.z, JSoundRegister.IMPACT_1, SoundCategory.NEUTRAL, 1, 0.5f);
+                                }
+                                continue;
+                            }
+                            damageLogic(world, livingEntity, kbVec, stunTicks, attack.stunType, attack.overrideStun, damage, attack.lift, attack.getEffectiveBlockstun(), JDamageSources.stand(this, user), user, attack.canBackstab);
+                        }
+
+                        for (LivingEntity livingEntity : clashed) {
+                            livingEntity.removeStatusEffect(JStatusRegister.DAZED);
+                            livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.DAZED, 10, 3, true, false));
+                        }
                     }
 
                     this.specialAttack(attack, hurt);
@@ -733,7 +835,7 @@ public abstract class StandEntity extends MobEntity {
                 if (this.getMoveStun() < 4) setMoveStun(4);
                 setDistanceOffset(this.blockDistance);
                 setRotationOffset(this.attackRotation);
-                standBlock(user);
+                standBlock();
             }
         }
 
@@ -784,7 +886,17 @@ public abstract class StandEntity extends MobEntity {
         //this.pastAttack = this.curAttack;
     }
 
-    public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, DamageSource playerSource, Entity attacker) {
+    /**
+     * Highest level damage method, handles combo counting
+     * @param world world to process damage in
+     * @param ent victim
+     * @param kbVec knockback vector to apply
+     * @param stunTicks stun duration in ticks
+     * @param overrideStun will the attack override all other types of stun?
+     * @param damage damage in half hearts
+     * @param lift will the attack lift the victim upon an aerial hit?
+     */
+    public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, boolean canBackstab) {
         if (world == null || ent == null) return;
         if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && !world.isClient()) {
             if (attacker instanceof PlayerEntity playerEntity) {
@@ -793,7 +905,45 @@ public abstract class StandEntity extends MobEntity {
                     comboCounter.setComboCount(1);
                 } else {
                     StatusEffectInstance stun = ent.getStatusEffect(JStatusRegister.DAZED);
-                    if (stun != null && stun.getAmplifier() == 1) {
+                    if (stun != null && stun.getAmplifier() != 2) { // Stunned but not blocking
+                        comboCounter.incrementComboCount();
+                    } else {
+                        comboCounter.setComboCount(1);
+                    }
+
+                    PacketByteBuf buf = PacketByteBufs.create();
+                    buf.writeShort(6);
+                    buf.writeInt(comboCounter.getComboCount());
+                    if (playerEntity instanceof ServerPlayerEntity serverPlayerEntity)
+                        ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
+                }
+                comboCounter.setLastAttacked(ent);
+            }
+        }
+
+        baseDamageLogic(ent, kbVec, stunTicks, stunType, overrideStun, damage, lift, blockstun, source, attacker, canBackstab);
+    }
+
+    /**
+     * Highest level damage method, handles combo counting, DEFAULTS canBackstab TO FALSE
+     * @param world world to process damage in
+     * @param ent victim
+     * @param kbVec knockback vector to apply
+     * @param stunTicks stun duration in ticks
+     * @param overrideStun will the attack override all other types of stun?
+     * @param damage damage in half hearts
+     * @param lift will the attack lift the victim upon an aerial hit?
+     */
+    public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker) {
+        if (world == null || ent == null) return;
+        if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && !world.isClient()) {
+            if (attacker instanceof PlayerEntity playerEntity) {
+                IComboCounter comboCounter = (IComboCounter) playerEntity;
+                if (comboCounter.getLastAttacked() != ent) {
+                    comboCounter.setComboCount(1);
+                } else {
+                    StatusEffectInstance stun = ent.getStatusEffect(JStatusRegister.DAZED);
+                    if (stun != null && stun.getAmplifier() != 2) {
                         //LOGGER.info("Target stun: " + stun.getDuration());
                         comboCounter.incrementComboCount();
                     } else {
@@ -811,41 +961,63 @@ public abstract class StandEntity extends MobEntity {
             }
         }
 
-        baseDamageLogic(ent, kbVec, stunTicks, stunType, overrideStun, damage, lift, playerSource, attacker);
+        baseDamageLogic(ent, kbVec, stunTicks, stunType, overrideStun, damage, lift, blockstun, source, attacker, false);
     }
 
-    public static void baseDamageLogic(LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, DamageSource source, Entity attacker) {
+    /**
+     * Mid-level damage method, handles blocking, lifting, counters, velocity modification
+     * @param ent victim
+     * @param kbVec knockback vector to apply
+     * @param stunTicks stun duration in ticks
+     * @param overrideStun will the attack override all other types of stun?
+     * @param damage damage in half hearts
+     * @param lift will the attack lift the victim upon an aerial hit?
+     */
+    public static void baseDamageLogic(LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, boolean canBackstab) {
         boolean hit = true;
+        boolean tsHit = ( (ITimeStop)ent ).getTimeStopTicks() > 0;
 
         if (ent.getFirstPassenger() instanceof StandEntity stand) {
             Attack standAttack = stand.curAttack;
             if (standAttack != null) {
                 // Counter check
-                if (standAttack.attackType == AttackType.COUNTER && stand.getMoveStun() < (standAttack.moveStun - standAttack.initTime)) {
+                if (!tsHit && standAttack.attackType == AttackType.COUNTER && stand.getMoveStun() < (standAttack.moveStun - standAttack.initTime)) {
                     stand.counter(attacker, source);
                     ent.removeStatusEffect(JStatusRegister.DAZED);
                     return;
                 }
 
-                // Move interruption
-                if (!standAttack.hasArmor) {
-                    stand.curAttack = null;
-                    stand.setMoveStun(0);
-                }
+                if (!standAttack.hasArmor) stand.cancelAttack();
             }
 
             if (stand.blocking && !stand.getRemote()) {
-                stand.setMoveStun(stand.getMoveStun() + (int) damage);
-                stand.setStandGauge(stand.getStandGauge() - 2 * damage);
-                stand.playSound(JSoundRegister.STAND_BLOCK, 1, 1);
-                hit = false;
+                double delta = Math.abs((ent.headYaw + 90.0f) % 360.0f - (attacker.getHeadYaw() + 90.0f) % 360.0f);
+                if ( canBackstab && (360.0 - delta % 360.0 < 90 || delta % 360.0 < 90) && ent.squaredDistanceTo(attacker.getPos()) >= 1 ) { // Backstab logic
+                    JCraft.CreateParticle((ServerWorld) attacker.getWorld(), ent.getX(), attacker.getEyeY(), ent.getZ(), -2);
+                    stand.playSound(SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, 1, 1);
+                    stand.blocking = false;
+                    overrideStun = true;
+
+                } else {
+                    stand.setMoveStun(blockstun);
+                    stand.setStandGauge(stand.getStandGauge() - 2 * damage);
+                    stand.playSound(JSoundRegister.STAND_BLOCK, 1, 1);
+                    hit = false;
+                }
             }
         }
 
-        // Velocity modification synchronisation
-        if (ent instanceof ServerPlayerEntity serverPlayer)
-            serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(ent));
-        ent.velocityModified = true;
+        if (tsHit) {
+            stunType = 3;
+            if (stunTicks > 20) stunTicks = 20;
+            lift = false;
+        } else {
+            // Velocity modification synchronisation
+            if (ent instanceof ServerPlayerEntity serverPlayer)
+                serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(serverPlayer));
+            else
+                ent.velocityModified = true;
+        }
 
         // Stun application & overriding
         if (hit) {
@@ -858,9 +1030,7 @@ public abstract class StandEntity extends MobEntity {
         // Interrupting spec moves
         if (ent instanceof PlayerEntity playerEntity) {
             JCraftSpec spec = JCraftUtils.getSpec(playerEntity);
-            if (spec != null && spec.curAttack != null && !spec.curAttack.hasArmor) {
-                spec.CancelAttack();
-            }
+            if (spec != null && spec.curAttack != null && !spec.curAttack.hasArmor) spec.CancelAttack();
         }
 
         // Aerial hits keep the victim up
@@ -868,9 +1038,8 @@ public abstract class StandEntity extends MobEntity {
             Vec3d vel = ent.getVelocity();
             double finalY = vel.y;
 
-            if (!ent.isOnGround()) {
+            if (!ent.isOnGround())
                 finalY = MathHelper.clamp(vel.y / 2, 0.085, 0.25);
-            }
 
             ent.setVelocity(
                     MathHelper.clamp(vel.x, -1, 1),
@@ -892,10 +1061,14 @@ public abstract class StandEntity extends MobEntity {
     }
 
     @Override
+    public void readCustomDataFromNbt(NbtCompound nbt) {
+        if (hasUser() && getUser() instanceof ArmorStandEntity) return;
+        kill(); // Whenever the stand is being loaded, kill it, it'll break
+    }
+
+    @Override
     public boolean damage(DamageSource source, float amount) {
-        if (source.isMagic() || source.isExplosive()) {
-            return false;
-        }
+        if (source.isMagic() || source.isExplosive()) return false;
         return super.damage(source, amount);
     }
 
@@ -912,18 +1085,15 @@ public abstract class StandEntity extends MobEntity {
         return getUser().addStatusEffect(effect, source);
     }
 
-    // The fun stuff
+    /**
+     * Handles AI for mob stand users
+     */
     public void mobAI(MobEntity mob, LivingEntity target) {
-        if (mob == target) {
-            return;
-        }
-        if (target == null) {
-            return;
-        }
-        if (!target.isAlive()) {
-            return;
-        }
+        if (mob == target) return;
+        if (target == null) return;
+        if (!target.isAlive()) return;
 
+        mob.lookAtEntity(target, 30, 30); // Point body at enemy
         mob.getLookControl().lookAt(target); // Usually detrimental not to
 
         JCraftSpec enemySpec;
@@ -963,17 +1133,13 @@ public abstract class StandEntity extends MobEntity {
 
         // Blocking logic
         boolean wantToBlock = false;
-
         if (enemyAttack != null && enemyMoveStun > 0) { // Only block if the attack is actually active
             // Block regardless of range if the attack is ranged, or is a barrage
-            if (enemyAttack.isRanged || enemyAttack.attackType == AttackType.BARRAGE) {
+            if (enemyAttack.isRanged || enemyAttack.attackType == AttackType.BARRAGE)
                 wantToBlock = true;
-            }
-
             // Block if the attack isn't ranged, but is within hitting distance, and doesn't block break
-            if (enemyAttack.attackDist + enemyAttack.hitboxSize * 0.66 > distance && enemyAttack.damage * 2 < this.getStandGauge()) {
+            if (enemyAttack.attackDist + enemyAttack.hitboxSize * 0.66 > distance && enemyAttack.damage * 2 < this.getStandGauge())
                 wantToBlock = true;
-            }
         }
 
         // Block if falling or there are projectiles nearby
@@ -982,11 +1148,9 @@ public abstract class StandEntity extends MobEntity {
             List<ProjectileEntity> nearbyProjectiles = this.world.getEntitiesByClass(ProjectileEntity.class, mob.getBoundingBox().expand(3), EntityPredicates.VALID_ENTITY);
             boolean anyInAir = false;
             for (ProjectileEntity projectile : nearbyProjectiles) {
-                if (projectile.getOwner() == mob) {
-                    continue;
-                }
-                // No, checking for the projectile velocity does NOT work
-                if (projectile.squaredDistanceTo(new Vec3d(projectile.prevX, projectile.prevY, projectile.prevZ)) > 0) {
+                if (projectile.getOwner() == mob) continue;
+                // Is it moving towards the stand?
+                if (projectile.squaredDistanceTo(getPos()) < new Vec3d(projectile.prevX, projectile.prevY, projectile.prevZ).squaredDistanceTo(getPos())) {
                     anyInAir = true;
                     break;
                 }
@@ -999,11 +1163,9 @@ public abstract class StandEntity extends MobEntity {
         //JCraft.LOGGER.info("WTB: " + wantToBlock);
 
         if (wantToBlock) {
-            if (this.canAttack()) {
-                this.blocking = true;
-            }
+            if (this.canAttack()) blocking = true;
         } else {
-            this.blocking = false;
+            blocking = false;
         }
 
         boolean stunned = mob.hasStatusEffect(JStatusRegister.DAZED);
@@ -1055,9 +1217,6 @@ public abstract class StandEntity extends MobEntity {
                     (selectedAttack != null && distance < selectedAttack.attackDist + selectedAttack.hitboxSize * 0.75) ||
                             (enemyAttack != null && !enemyAttack.isRanged && distance < enemyAttack.attackDist + enemyAttack.hitboxSize * 1.5)
             ) {
-                // Point body at enemy
-                mob.lookAtEntity(target, 30, 30);
-
                 // Move towards or away depending on distance and intent
                 mob.getNavigation().setSpeed(distance < sideswitchDistance && selectedAttack == null ? 0.25 : -0.25);
             }
@@ -1089,13 +1248,22 @@ public abstract class StandEntity extends MobEntity {
         }
     }
 
+    /**
+     * Tells the AI to:
+     * PASS - ignore this and continue move evaluation
+     * USE - use the move
+     * STOP - skip to next evaluation
+     */
     public enum MoveSelectionResult {
         PASS,
         USE,
         STOP
     }
 
-    // Used to help AIs that use stands with unique moves
+
+    /**
+     * Used to help AIs that use stands with unique moves
+     */
     public MoveSelectionResult SpecificMoveSelectionCriterion(Attack attack, MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity enemyStand, Attack enemyAttack) {
         return MoveSelectionResult.PASS;
     }
@@ -1140,16 +1308,12 @@ public abstract class StandEntity extends MobEntity {
                 chosenMove = i;
                 break;
             }
-            if (result == MoveSelectionResult.STOP) {
-                continue;
-            }
+            if (result == MoveSelectionResult.STOP) continue;
 
             // Use mobility if opponent is far away
             if (attack.mobilityType != null) {
                 // ...and isn't being comboed or is blocking
-                if (stunTicks > 0) {
-                    continue;
-                }
+                if (stunTicks > 0) continue;
 
                 if (attack.mobilityType != MobilityType.HIGHJUMP && distance > 6) {
                     if (target.isOnGround()) {

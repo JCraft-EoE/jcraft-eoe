@@ -1,618 +1,799 @@
 {
   "timeskip": {
     "sounds": [
-      "jcraft:timeskip"
+      "jcraft:generic/timeskip"
     ]
   },
 
   "standsummon": {
     "sounds": [
-      "jcraft:standsummon"
+      "jcraft:generic/stand_summon"
     ]
   },
 
   "desummon": {
     "sounds": [
-      "jcraft:desummon"
+      "jcraft:generic/stand_desummon"
     ]
   },
 
   "standblock": {
     "sounds": [
-      "jcraft:standblock"
+      "jcraft:generic/stand_block"
     ]
   },
 
   "combobreak": {
     "sounds": [
-      "jcraft:combobreak"
+      "jcraft:generic/combobreak"
+    ]
+  },
+
+  "cointoss": {
+    "sounds": [
+      "jcraft:generic/cointoss"
     ]
   },
 
   "cooldowncancel": {
     "sounds": [
-      "jcraft:cooldowncancel"
+      "jcraft:generic/cooldowncancel"
     ]
   },
 
   "impact1": {
     "sounds": [
-      "jcraft:impact1"
+      "jcraft:generic/impact1"
     ]
   },
 
   "impact2": {
     "sounds": [
-      "jcraft:impact2"
+      "jcraft:generic/impact2"
     ]
   },
 
   "impact3": {
     "sounds": [
-      "jcraft:impact3"
+      "jcraft:generic/impact3"
     ]
   },
 
   "impact4": {
     "sounds": [
-      "jcraft:impact4"
+      "jcraft:generic/impact4"
     ]
   },
 
   "impact5": {
     "sounds": [
-      "jcraft:impact5"
+      "jcraft:generic/impact5"
+    ]
+  },
+
+  "spsummon": {
+    "sounds": [
+      "jcraft:stands/starplatinum/summon"
+    ]
+  },
+
+  "sptimeskip": {
+    "sounds": [
+      "jcraft:stands/starplatinum/timeskip"
     ]
   },
 
   "spbarrage": {
     "sounds": [
-      "jcraft:spbarrage"
+      "jcraft:stands/starplatinum/barrage"
     ]
   },
 
   "spadvbarrage": {
     "sounds": [
-      "jcraft:spadvbarrage"
+      "jcraft:stands/starplatinum/advbarrage"
     ]
   },
 
   "sptw": {
     "subtitle": "subtitles.jcraft.sptw",
     "sounds": [
-      "jcraft:sptw"
+      "jcraft:stands/starplatinum/theworld"
     ]
   },
 
   "spkick": {
     "sounds": [
-      "jcraft:spkick"
+      "jcraft:stands/starplatinum/kick"
     ]
   },
 
   "starbreaker": {
     "sounds": [
-      "jcraft:starbreaker"
+      "jcraft:stands/starplatinum/starbreaker"
     ]
   },
 
   "starfinger": {
     "sounds": [
-      "jcraft:starfinger"
+      "jcraft:stands/starplatinum/starfinger"
     ]
   },
 
   "kcsummon": {
     "sounds": [
-      "jcraft:kcsummon"
+      "jcraft:stands/kingcrimson/summon"
     ]
   },
 
   "kcdualchop": {
     "sounds": [
-      "jcraft:kcdualchop"
+      "jcraft:stands/kingcrimson/dualchop"
     ]
   },
 
   "kcdonut": {
     "sounds": [
-      "jcraft:kcdonut"
+      "jcraft:stands/kingcrimson/donut"
     ]
   },
 
   "kcbarrage": {
     "sounds": [
-      "jcraft:kcbarrage"
+      "jcraft:stands/kingcrimson/barrage"
     ]
   },
 
   "kcheavy": {
     "sounds": [
-      "jcraft:kcheavy"
+      "jcraft:stands/kingcrimson/heavy"
     ]
   },
 
   "kcheavy2": {
     "sounds": [
-      "jcraft:kcheavy2"
+      "jcraft:stands/kingcrimson/heavy2"
     ]
   },
 
   "eyechop": {
     "sounds": [
-      "jcraft:eyechop"
+      "jcraft:stands/kingcrimson/eyechop"
     ]
   },
 
   "tetp": {
     "sounds": [
-      "jcraft:tetp"
+      "jcraft:stands/kingcrimson/timeerase_teleport"
     ]
   },
 
   "timeerase": {
     "subtitle": "subtitles.jcraft.timeerase",
     "sounds": [
-      "jcraft:timeerase"
+      "jcraft:stands/kingcrimson/timeerase"
     ]
   },
 
   "kcteexit": {
     "sounds": [
-      "jcraft:kcteexit"
+      "jcraft:stands/kingcrimson/timeerase_exit"
     ]
   },
 
   "mudada": {
     "sounds": [
-      "jcraft:mudada"
+      "jcraft:stands/theworld/mudada"
     ]
   },
 
   "twsummon": {
     "sounds": [
-      "jcraft:twsummon"
+      "jcraft:stands/theworld/summon"
     ]
   },
 
-  "twts": {
+  "twtimestop": {
     "subtitle": "subtitles.jcraft.twts",
     "sounds": [
-      "jcraft:twts"
+      "jcraft:stands/theworld/ts"
     ]
   },
 
-  "twts_clean": {
+  "twtimestop_clean": {
     "subtitle": "subtitles.jcraft.twts_clean",
     "sounds": [
-      "jcraft:twts_clean"
+      "jcraft:stands/theworld/ts_clean"
     ]
   },
 
   "twbarrage": {
     "sounds": [
-      "jcraft:twbarrage"
+      "jcraft:stands/theworld/barrage"
     ]
   },
 
   "twcharge": {
     "sounds": [
-      "jcraft:twcharge"
+      "jcraft:stands/theworld/charge"
     ]
   },
 
   "twchargehit": {
     "sounds": [
-      "jcraft:twchargehit"
+      "jcraft:stands/theworld/chargehit"
     ]
   },
 
   "twdonut": {
     "sounds": [
-      "jcraft:twdonut"
+      "jcraft:stands/theworld/donut"
     ]
   },
 
   "twdonuthit": {
     "sounds": [
-      "jcraft:twdonuthit"
+      "jcraft:stands/theworld/donut_hit"
     ]
   },
 
   "twkick": {
     "sounds": [
-      "jcraft:twkick"
+      "jcraft:stands/theworld/kick"
     ]
   },
 
   "twkickhit": {
     "sounds": [
-      "jcraft:twkickhit"
+      "jcraft:stands/theworld/kick_hit"
     ]
   },
 
   "twcounter": {
     "sounds": [
-      "jcraft:twcounter"
+      "jcraft:stands/theworld/counter"
     ]
   },
 
   "d4csummon": {
     "sounds": [
-      "jcraft:d4csummon"
+      "jcraft:stands/d4c/summon"
     ]
   },
 
   "d4cheavy": {
     "sounds": [
-      "jcraft:d4cheavy"
+      "jcraft:stands/d4c/heavy"
     ]
   },
 
   "d4cbarrage": {
     "sounds": [
-      "jcraft:d4cbarrage"
+      "jcraft:stands/d4c/barrage"
     ]
   },
 
   "d4clight": {
     "sounds": [
-      "jcraft:d4clight"
+      "jcraft:stands/d4c/light"
     ]
   },
 
   "d4cdimhop": {
     "sounds": [
-      "jcraft:d4cdimhop"
+      "jcraft:stands/d4c/dimhop"
     ]
   },
 
   "revolverfire": {
     "sounds": [
-      "jcraft:revolverfire"
+      "jcraft:generic/revolverfire"
     ]
   },
 
   "d4cthrow": {
     "sounds": [
-      "jcraft:d4cthrow"
+      "jcraft:stands/d4c/throw"
     ]
   },
 
   "d4ccounter": {
     "sounds": [
-      "jcraft:d4ccounter"
+      "jcraft:stands/d4c/counter"
     ]
   },
 
+  "creamsummon": {
+    "sounds": [
+      "jcraft:stands/cream/summon"
+    ]
+  },
+
+
   "creamconsume": {
     "sounds": [
-      "jcraft:creamconsume"
+      "jcraft:stands/cream/consume"
     ]
   },
 
   "creamcharge": {
     "sounds": [
-      "jcraft:creamcharge"
+      "jcraft:stands/cream/charge"
     ]
   },
 
   "creamgrab": {
     "sounds": [
-      "jcraft:creamgrab"
+      "jcraft:stands/cream/grab"
     ]
   },
 
   "creamheavy": {
     "sounds": [
-      "jcraft:creamheavy"
+      "jcraft:stands/cream/heavy"
     ]
   },
 
   "creamcombo": {
     "sounds": [
-      "jcraft:creamcombo"
+      "jcraft:stands/cream/combo"
     ]
   },
 
   "creamsmash": {
     "sounds": [
-      "jcraft:creamsmash"
+      "jcraft:stands/cream/smash"
     ]
   },
 
   "creamenter": {
     "sounds": [
-      "jcraft:creamenter"
+      "jcraft:stands/cream/enter"
     ]
   },
 
   "creamexit": {
     "sounds": [
-      "jcraft:creamexit"
+      "jcraft:stands/cream/exit"
+    ]
+  },
+
+  "creamballdash": {
+    "sounds": [
+      "jcraft:stands/cream/balldash"
+    ]
+  },
+
+  "creamoverhead": {
+    "sounds": [
+      "jcraft:stands/cream/overhead"
     ]
   },
 
   "kqheavy": {
     "sounds": [
-      "jcraft:kqheavy"
+      "jcraft:stands/killerqueen/heavy"
     ]
   },
 
   "kqbarrage": {
     "sounds": [
-      "jcraft:kqbarrage"
+      "jcraft:stands/killerqueen/barrage"
     ]
   },
 
   "kqdetonate": {
     "sounds": [
-      "jcraft:kqdetonate"
+      "jcraft:stands/killerqueen/detonate"
     ]
   },
 
   "kquppercut": {
     "sounds": [
-      "jcraft:kquppercut"
+      "jcraft:stands/killerqueen/uppercut"
     ]
   },
 
   "kqbtdelbow": {
     "sounds": [
-      "jcraft:kqbtdelbow"
+      "jcraft:stands/kqbtd/elbow"
     ]
   },
 
   "kqbtdsummon": {
     "sounds": [
-      "jcraft:kqbtdsummon"
+      "jcraft:stands/kqbtd/summon"
+    ]
+  },
+
+  "wssummon": {
+    "sounds": [
+      "jcraft:stands/whitesnake/summon"
     ]
   },
 
   "wsbarrage": {
     "sounds": [
-      "jcraft:wsbarrage"
+      "jcraft:stands/whitesnake/barrage"
     ]
   },
 
   "wslegcrush": {
     "sounds": [
-      "jcraft:wslegcrush"
+      "jcraft:stands/whitesnake/legcrush"
     ]
   },
 
   "wsdonut": {
     "sounds": [
-      "jcraft:wsdonut"
+      "jcraft:stands/whitesnake/donut"
     ]
   },
 
   "wsdisk": {
     "sounds": [
-      "jcraft:wsdisk"
+      "jcraft:stands/whitesnake/disk"
     ]
   },
 
   "wsgun": {
     "sounds": [
-      "jcraft:wsgun"
+      "jcraft:stands/whitesnake/gun"
+    ]
+  },
+
+  "mrsummon": {
+    "sounds": [
+      "jcraft:stands/magiciansred/summon"
+    ]
+  },
+
+  "mrbarrage": {
+    "sounds": [
+      "jcraft:stands/magiciansred/barrage"
+    ]
+  },
+
+  "mrcrossfire": {
+    "sounds": [
+      "jcraft:stands/magiciansred/crossfire"
+    ]
+  },
+
+  "mrdetector": {
+    "sounds": [
+      "jcraft:stands/magiciansred/detector"
+    ]
+  },
+
+  "mrheavy": {
+    "sounds": [
+      "jcraft:stands/magiciansred/heavy"
+    ]
+  },
+
+  "mrredirect": {
+    "sounds": [
+      "jcraft:stands/magiciansred/redirect"
+    ]
+  },
+
+  "mrult": {
+    "sounds": [
+      "jcraft:stands/magiciansred/ult"
+    ]
+  },
+
+  "mrredbind": {
+    "sounds": [
+      "jcraft:stands/magiciansred/redbind"
+    ]
+  },
+
+  "cmoonsummon": {
+    "sounds": [
+      "jcraft:stands/cmoon/summon"
+    ]
+  },
+
+  "cmoonbarrage": {
+    "sounds": [
+      "jcraft:stands/cmoon/barrage"
     ]
   },
 
   "cmoongravpunch": {
     "sounds": [
-      "jcraft:cmoongravpunch"
+      "jcraft:stands/cmoon/gravpunch"
     ]
   },
 
   "cmoongravpunchhit": {
     "sounds": [
-      "jcraft:cmoongravpunchhit"
+      "jcraft:stands/cmoon/gravpunch_hit"
     ]
   },
 
   "cmoongroundslam": {
     "sounds": [
-      "jcraft:cmoongroundslam"
+      "jcraft:stands/cmoon/groundslam"
     ]
   },
 
   "cmoongravshift": {
     "sounds": [
-      "jcraft:cmoongravshift"
+      "jcraft:stands/cmoon/gravshift"
     ]
   },
 
   "cmoondonut": {
     "sounds": [
-      "jcraft:cmoondonut"
+      "jcraft:stands/cmoon/donut"
+    ]
+  },
+
+  "cmoongroundshoot": {
+    "sounds": [
+      "jcraft:stands/cmoon/groundshoot"
+    ]
+  },
+
+  "blocklaunch": {
+    "sounds": [
+      "jcraft:stands/cmoon/blocklaunch"
+    ]
+  },
+
+  "blockhalt": {
+    "sounds": [
+      "jcraft:stands/cmoon/blockhalt"
+    ]
+  },
+
+  "mihsummon": {
+    "sounds": [
+      "jcraft:stands/madeinheaven/summon"
+    ]
+  },
+
+  "mihbarrage": {
+    "sounds": [
+      "jcraft:stands/madeinheaven/barrage"
     ]
   },
 
   "mihzoom": {
     "sounds": [
-      "jcraft:mihzoom"
+      "jcraft:stands/madeinheaven/zoom"
     ]
   },
 
   "mihjudgement": {
     "sounds": [
-      "jcraft:mihjudgement"
+      "jcraft:stands/madeinheaven/judgement"
     ]
   },
 
   "mihtaccel": {
     "sounds": [
-      "jcraft:mihtaccel"
+      "jcraft:stands/madeinheaven/timeaccel"
     ]
   },
 
   "mihfurychop": {
     "sounds": [
-      "jcraft:mihfurychop"
+      "jcraft:stands/madeinheaven/furychop"
     ]
   },
 
   "mihspeedslice": {
     "sounds": [
-      "jcraft:mihspeedslice"
+      "jcraft:stands/madeinheaven/speedslice"
+    ]
+  },
+
+  "mihcircle": {
+    "sounds": [
+      "jcraft:stands/madeinheaven/circle"
+    ]
+  },
+
+  "mihlegcrusher": {
+    "sounds": [
+      "jcraft:stands/madeinheaven/legcrusher"
     ]
   },
 
   "twohsummon": {
     "sounds": [
-      "jcraft:twohsummon"
+      "jcraft:stands/theworldoverheaven/summon"
     ]
   },
 
   "twohshoot": {
     "sounds": [
-      "jcraft:twohshoot"
+      "jcraft:stands/theworldoverheaven/shoot"
     ]
   },
 
-  "twohts": {
+  "twohtimeskip": {
+    "sounds": [
+      "jcraft:stands/theworldoverheaven/timeskip"
+    ]
+  },
+
+  "twohtimestop": {
     "subtitle": "subtitles.jcraft.twohts",
     "sounds": [
-      "jcraft:twohts"
+      "jcraft:stands/theworldoverheaven/timestop"
     ]
   },
 
   "twohheavy": {
     "sounds": [
-      "jcraft:twohheavy"
+      "jcraft:stands/theworldoverheaven/heavy"
     ]
   },
 
   "twohsmite": {
     "sounds": [
-      "jcraft:twohsmite"
+      "jcraft:stands/theworldoverheaven/smite"
+    ]
+  },
+
+  "twohchargeoverwrite": {
+    "sounds": [
+      "jcraft:stands/theworldoverheaven/chargeoverwrite"
+    ]
+  },
+
+  "twohcharge": {
+    "sounds": [
+      "jcraft:stands/theworldoverheaven/charge"
     ]
   },
 
   "twohoverwrite": {
     "sounds": [
-      "jcraft:twohoverwrite"
+      "jcraft:stands/theworldoverheaven/overwrite"
     ]
   },
 
   "twohowarida": {
     "sounds": [
-      "jcraft:twohowarida"
+      "jcraft:stands/theworldoverheaven/owarida"
     ]
   },
 
   "twohairknives": {
     "sounds": [
-      "jcraft:twohairknives"
+      "jcraft:stands/theworldoverheaven/airknives"
     ]
   },
 
   "foolbark1": {
     "sounds": [
-      "jcraft:foolbark1"
+      "jcraft:stands/fool/bark1"
     ]
   },
 
   "foolbark2": {
     "sounds": [
-      "jcraft:foolbark2"
+      "jcraft:stands/fool/bark2"
     ]
   },
 
   "foollaunch": {
     "sounds": [
-      "jcraft:foollaunch"
+      "jcraft:stands/fool/launch"
     ]
   },
 
   "foolcharge": {
     "sounds": [
-      "jcraft:foolcharge"
+      "jcraft:stands/fool/charge"
     ]
   },
 
   "gesummon": {
     "sounds": [
-      "jcraft:gesummon"
+      "jcraft:stands/goldexperience/summon"
     ]
   },
 
   "gebarrage": {
     "sounds": [
-      "jcraft:gebarrage"
+      "jcraft:stands/goldexperience/barrage"
     ]
   },
 
   "geheal": {
     "sounds": [
-      "jcraft:geheal"
+      "jcraft:stands/goldexperience/heal"
+    ]
+  },
+
+  "gerekka1": {
+    "sounds": [
+      "jcraft:stands/goldexperience/rekka1"
+    ]
+  },
+
+  "gerekka2": {
+    "sounds": [
+      "jcraft:stands/goldexperience/rekka2"
+    ]
+  },
+
+  "gerekka3": {
+    "sounds": [
+      "jcraft:stands/goldexperience/rekka3"
     ]
   },
 
   "getree": {
     "sounds": [
-      "jcraft:getree"
+      "jcraft:stands/goldexperience/tree"
     ]
   },
 
   "gersummon": {
     "sounds": [
-      "jcraft:gersummon"
+      "jcraft:stands/goldexperiencerequiem/summon"
     ]
   },
 
   "gerheavy": {
     "sounds": [
-      "jcraft:gerheavy"
+      "jcraft:stands/goldexperiencerequiem/heavy"
     ]
   },
 
   "gerlaser": {
     "sounds": [
-      "jcraft:gerlaser"
+      "jcraft:stands/goldexperiencerequiem/laser"
     ]
   },
 
   "gerkickbarrage": {
     "sounds": [
-      "jcraft:gerkickbarrage"
+      "jcraft:stands/goldexperiencerequiem/kickbarrage"
     ]
   },
 
   "gersetup": {
     "sounds": [
-      "jcraft:gersetup"
+      "jcraft:stands/goldexperiencerequiem/setup"
     ]
   },
 
   "scsummon": {
     "sounds": [
-      "jcraft:scsummon"
+      "jcraft:stands/silverchariot/summon"
     ]
   },
 
   "scbarrage": {
     "sounds": [
-      "jcraft:scbarrage"
+      "jcraft:stands/silverchariot/barrage"
     ]
   },
 
   "sccharge": {
     "sounds": [
-      "jcraft:sccharge"
+      "jcraft:stands/silverchariot/charge"
     ]
   },
 
   "scheavy": {
     "sounds": [
-      "jcraft:scheavy"
+      "jcraft:stands/silverchariot/heavy"
     ]
   },
 
   "scspin": {
     "sounds": [
-      "jcraft:scspin"
+      "jcraft:stands/silverchariot/spin"
     ]
   }
 }

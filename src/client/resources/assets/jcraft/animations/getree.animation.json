@@ -2,6 +2,7 @@
 	"format_version": "1.8.0",
 	"animations": {
 		"animation.getree.spawn": {
+			"loop": "hold_on_last_frame",
 			"animation_length": 1.56,
 			"bones": {
 				"trunk": {
@@ -117,7 +118,8 @@
 							"vector": [-45, 0, 0]
 						},
 						"1.36": {
-							"vector": [-5, -5, -5]
+							"vector": [-5, -5, -5],
+							"easing": "easeInOutSine"
 						}
 					},
 					"position": {
@@ -145,7 +147,8 @@
 							"vector": [-45, 0, 0]
 						},
 						"1.36": {
-							"vector": [-5, 5, 5]
+							"vector": [-5, 5, 5],
+							"easing": "easeInOutSine"
 						}
 					},
 					"position": {
@@ -173,7 +176,8 @@
 							"vector": [-45, 0, 0]
 						},
 						"1.36": {
-							"vector": [5, -5, 5]
+							"vector": [5, -5, 5],
+							"easing": "easeInOutSine"
 						}
 					},
 					"position": {
@@ -201,7 +205,8 @@
 							"vector": [-45, 0, 0]
 						},
 						"1.36": {
-							"vector": [5, 5, -5]
+							"vector": [5, 5, -5],
+							"easing": "easeInOutSine"
 						}
 					},
 					"position": {
@@ -255,6 +260,7 @@
 			}
 		},
 		"animation.getree.idle": {
+			"loop": "hold_on_last_frame",
 			"animation_length": 3.12,
 			"bones": {
 				"seg": {

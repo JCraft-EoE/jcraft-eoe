@@ -142,12 +142,12 @@ public class FrameDataCommand {
             }
             default -> {
                 frames = new StringBuilder("§41§r");
-                recovery = attack.moveStun - initTime + 1;
+                recovery = attack.moveStun - initTime - 1;
             }
         }
 
         boolean effectOnlyUB = attack.ubEffectsOnly;
-        String advOnBlock = (attack.unblockable && !effectOnlyUB) ? "§5UNBLOCKABLE" : "Advantage on block: §5" + (4 + (int) attack.damage - recovery) + "§r ticks";
+        String advOnBlock = (attack.unblockable && !effectOnlyUB) ? "§5UNBLOCKABLE" : "Advantage on block: §5" + (attack.getEffectiveBlockstun() - recovery) + "§r ticks";
         String mainFDMessage =
                 "======== ATTACK STATS ========\n" +
                         "Startup: §b" + startup + "§r ticks\n" +

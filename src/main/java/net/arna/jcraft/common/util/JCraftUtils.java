@@ -15,24 +15,30 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import software.bernie.geckolib3.core.processor.IBone;
 import software.bernie.geckolib3.model.AnimatedTickingGeoModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 
 public final class JCraftUtils {
+    //TODO: synchronise this with clients
     public static List<DimValues> activeTimestops = new ArrayList<>();
 
     // Specify what type the hitbox searches for
@@ -51,12 +57,9 @@ public final class JCraftUtils {
             buf.writeDouble(v2.y);
             buf.writeDouble(v1.z);
             buf.writeDouble(v2.z);
-            for (PlayerEntity player : world.getPlayers()) {
-                if (player instanceof ServerPlayerEntity serverPlayerEntity) {
+            for (PlayerEntity player : world.getPlayers())
+                if (player instanceof ServerPlayerEntity serverPlayerEntity)
                     ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
-                }
-
-            }
         }
 
         List<? extends Entity> hit = world.getEntitiesByClass(entityClass, new Box(v1, v2), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
@@ -95,11 +98,9 @@ public final class JCraftUtils {
             buf.writeDouble(v2.y);
             buf.writeDouble(v1.z);
             buf.writeDouble(v2.z);
-            for (PlayerEntity player : world.getPlayers()) {
-                if (player instanceof ServerPlayerEntity serverPlayerEntity) {
+            for (PlayerEntity player : world.getPlayers())
+                if (player instanceof ServerPlayerEntity serverPlayerEntity)
                     ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
-                }
-            }
         }
 
         List<LivingEntity> hit = world.getEntitiesByClass(LivingEntity.class, new Box(v1, v2), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
@@ -126,12 +127,10 @@ public final class JCraftUtils {
     public static void assignSpec(PlayerEntity player, NbtCompound playerNbt, ISpec playerSpec) {
         JCraftSpec spec = null;
 
-        if (playerNbt.getInt("SpecID") == 1) {
+        if (playerNbt.getInt("SpecID") == 1)
             spec = new Brawler();
-        }
-        if (spec != null) {
+        if (spec != null)
             spec.player = player;
-        }
 
         playerSpec.setSpec(spec);
     }
@@ -153,15 +152,62 @@ public final class JCraftUtils {
         return playerSpec.getSpec();
     }
 
-    public static void ProjectileDamageLogic(ProjectileEntity proj, World world, Entity ent, Vec3d kb, int stunT, int stunType, boolean overrideStun, float damage) {
+    public enum RaycastPriority {
+        ENTITY,
+        BLOCK,
+        NEAREST
+    }
+
+    //todo: generic raycast that hits entities and blocks
+    public static Vec3d raycastAll(Entity entity, Vec3d start, Vec3d end, RaycastContext.FluidHandling fluidHandling, RaycastPriority priority) {
+        World world = entity.getWorld();
+        double rangeSquared = start.squaredDistanceTo(end);
+
+        EntityHitResult eHit = ProjectileUtil.raycast(entity, start, end,
+                entity.getBoundingBox().expand(rangeSquared), // Not technically necessary but doesn't matter
+                EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR,
+                rangeSquared
+        );
+        HitResult bHit = world.raycast(new RaycastContext(start, end, RaycastContext.ShapeType.COLLIDER, fluidHandling, entity));
+
+        switch (priority) {
+            default -> {
+                if (eHit != null) return eHit.getPos();
+                return bHit.getPos();
+            }
+            case BLOCK -> {
+                if (bHit.getType() != HitResult.Type.MISS) return bHit.getPos();
+                // STOPPED HERE
+            }
+        }
+
+        return Vec3d.ZERO; //THIS IS A TERRIBLE IDEA!!!!!
+    }
+
+    /**
+     * @return the stand user if the specified entity is a {@link StandEntity}
+     */
+    public static LivingEntity getUserIfStand(LivingEntity ent) {
+        if (ent instanceof StandEntity stand && stand.hasUser())
+            return stand.getUser();
+        return ent;
+    }
+
+    public static void ProjectileDamageLogic(ProjectileEntity proj, World world, Entity ent, Vec3d kb, int stunT, int stunType, boolean overrideStun, float damage, int blockstun) {
+        if (world.isClient) return;
+        Objects.requireNonNull(proj, "Attempted to run ProjectileDamageLogic with invalid projectile in world " + world);
         Entity owner = proj.getOwner();
-        DamageSource source = DamageSource.thrownProjectile(proj, owner);
+        DamageSource source;
+        if (owner == null)
+            source = DamageSource.GENERIC;
+        else
+            source = DamageSource.thrownProjectile(proj, owner);
 
         if (ent instanceof LivingEntity living) {
             LivingEntity target = living;
-            if (ent instanceof StandEntity stand && !stand.blocking)
+            if (ent instanceof StandEntity stand)
                 target = stand.getUser();
-            damageLogic(world, target, kb, stunT, stunType, overrideStun, damage, false, source, owner);
+            damageLogic(world, target, kb, stunT, stunType, overrideStun, damage, false, blockstun, source, owner);
         }
 
         if (ent instanceof EndCrystalEntity endCrystal)
@@ -170,9 +216,8 @@ public final class JCraftUtils {
 
     //To check method ms usage, use spark[something]
     public static boolean isBlocking(LivingEntity entity) {
-        if (entity.getFirstPassenger() instanceof StandEntity stand) {
-            return stand.blocking;
-        }
+        if (entity instanceof StandEntity stand) return stand.blocking;
+        if (entity.getFirstPassenger() instanceof StandEntity stand) return stand.blocking;
         return false;
     }
 
@@ -257,17 +302,20 @@ public final class JCraftUtils {
         return 0;
     }
 
-    public static void animateGenericHumanoid(AnimatedTickingGeoModel model, StandEntity entity, LivingEntity player) {
+    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player) {
         animateGenericHumanoid(model, entity, player, false, false);
     }
 
-    public static void animateGenericHumanoid(AnimatedTickingGeoModel model, StandEntity entity, LivingEntity player, boolean flipBody, boolean flipHead) {
-        animateGenericHumanoid(model, entity, player, flipBody, flipHead, 0, 0);
+    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, boolean flipBody, boolean flipHead) {
+        animateGenericHumanoid(model, entity, player, flipBody, flipHead, 0, 0, 90f);
     }
 
-    public static void animateGenericHumanoid(AnimatedTickingGeoModel model, StandEntity entity, LivingEntity player, boolean flipBody, boolean flipHead, float tPO, float hPO) {
+    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, boolean flipBody, boolean flipHead, float tPO, float hPO) {
+        animateGenericHumanoid(model, entity, player, flipBody, flipHead, tPO, hPO, 90f);
+    }
+
+    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, boolean flipBody, boolean flipHead, float tPO, float hPO, float velInfluence) {
         float overVel = 0;
-        float velInfluence = 90f;
 
         if (entity.getMoveStun() < 1) {
             Vec3d playerVel = player.getVelocity();

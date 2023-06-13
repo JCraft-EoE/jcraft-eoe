@@ -46,8 +46,7 @@ public class KCParticle extends AbstractSlowingParticle {
         }
 
         public Particle createParticle(DefaultParticleType defaultParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-            KCParticle kcParticle = new KCParticle(clientWorld, d, e, f, g, h, i, this.spriteProvider);
-            return kcParticle;
+            return new KCParticle(clientWorld, d, e, f, g, h, i, this.spriteProvider);
         }
     }
 }

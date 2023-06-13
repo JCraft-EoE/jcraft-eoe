@@ -18,10 +18,12 @@ import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -47,7 +49,6 @@ import java.util.List;
 import static net.arna.jcraft.common.entity.StandEntity.stun;
 
 //initialize your FUCKING variables, arna
-//todo: add static IDs for stuff like stands and attacks to make checks for individual ones less expensive
 //todo: add working out
 public class JCraft implements ModInitializer {
 
@@ -79,13 +80,14 @@ public class JCraft implements ModInitializer {
     public static final String ultCD = "UltCD";
 
     // Universal Cooldowns
-    public static final String standMMBCD = "M3CD";
-    public static final String standCBCD = "CBCD";
-    public static final String standCCCD = "CCCD";
+    public static final String utilCD = "M3CD";
+    public static final String comboBreakerCD = "CBCD";
+    public static final String cooldownCancelCD = "CCCD";
+    public static final String dashCD = "dCD";
 
     public static List<String> cooldowns = List.of(
             standLightCD, standHeavyCD, standBarrageCD, standUltCD, standS1CD, standS2CD, standS3CD,
-            standMMBCD, standCBCD, standCCCD,
+            utilCD, comboBreakerCD, cooldownCancelCD, dashCD,
             heavyCD, barrageCD, ultCD, s1CD, s2CD, s3CD);
 
     // Gamerules
@@ -94,12 +96,85 @@ public class JCraft implements ModInitializer {
     public static GameRules.Key<GameRules.BooleanRule> COMBO_COUNTER = GameRuleRegistry.register("comboCounter", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
     public static GameRules.Key<GameRules.IntRule> CHANCE_MOB_SPAWNS_WITH_STAND = GameRuleRegistry.register("chanceMobSpawnsWithStand", GameRules.Category.MOBS, GameRuleFactory.createIntRule(5, 0, 100));
     public static GameRules.Key<GameRules.BooleanRule> ALLOW_MOB_EVOLVED_STANDS = GameRuleRegistry.register("allowMobEvolvedStands", GameRules.Category.MOBS, GameRuleFactory.createBooleanRule(false));
-    public static GameRules.Key<GameRules.BooleanRule> CREAM_BLACK_HOLE_ERASES_BLOCKS = GameRuleRegistry.register("creamBlackHoleErasesBlocks", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
+    public static GameRules.Key<GameRules.BooleanRule> STAND_GRIEFING = GameRuleRegistry.register("standGriefing", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
     public static GameRules.Key<GameRules.IntRule> DEFAULT_SPEC = GameRuleRegistry.register("defaultSpec", GameRules.Category.PLAYER, GameRuleFactory.createIntRule(0, 0, 1));
     //public static GameRules.Key<GameRules.IntRule> DAMAGE_MULT = GameRuleRegistry.register("jcraftDamageMult", GameRules.Category.MISC, GameRuleFactory.createIntRule(0, 0, 100));
 
     @Getter @Setter
     private static IClientEntityHandler clientEntityHandler = DummyClientEntityHandler.INSTANCE;
+
+    // Dashes
+
+    /**
+     * Holds the data of an individual entities dash ({@link DashData#entity}, {@link DashData#dashVector}, {@link DashData#finished}, {@link DashData#duration})
+     */
+    public static class DashData {
+        public final Vec3d dashVector;
+        public final LivingEntity entity;
+        public boolean finished = false;
+        private int duration = 10;
+
+        public DashData(Vec3d dashVector, LivingEntity entity) {
+            this.dashVector = dashVector;
+            this.entity = entity;
+        }
+
+        public void tickDash() {
+            duration--;
+            if (entity.hasStatusEffect(JStatusRegister.DAZED)) { // Being stunned stops dashes
+                finished = true;
+                return;
+            }
+            if (duration <= 5) { // 5 ticks of movement, then recovery
+                if (duration <= 0) finished = true;
+                return;
+            }
+            entity.setVelocity( entity.getVelocity().add(dashVector).multiply(0.5) );
+            entity.velocityModified = true;
+        }
+    }
+    public static ArrayList<DashData> dashes = new ArrayList<>();
+    public static final int dashCooldown = 40;
+    public static boolean isDashing(LivingEntity player) {
+        for (DashData dash : dashes)
+            if (player == dash.entity) return true;
+        return false;
+    }
+    public static DashData getDash(LivingEntity player) {
+        for (DashData dash : dashes)
+            if (player == dash.entity) return dash;
+        return null;
+    }
+    public static void tryDash(int forward, int side, LivingEntity entity) {
+        NbtCompound data = ((IEntityDataSaver)entity).getPersistentData();
+        //todo: make a JCraftUtils method for checking if the player should be effectively disabled? like when stunned or knocked down as shown here:
+        if ( data.getInt(dashCD) > 0 || !entity.isOnGround() || entity.hasStatusEffect(JStatusRegister.DAZED) || entity.hasStatusEffect(JStatusRegister.KNOCKDOWN) ) return;
+        data.putInt(dashCD, dashCooldown);
+
+        double dashSpeed = 0.75;
+        Vec3d rotVec = entity.getRotationVector().rotateY(1.57079632679f * side); // L/R
+        if (side != 0) {
+            dashSpeed *= 0.75; // Sideways speed nerf
+            if (forward == 1)
+                rotVec = rotVec.rotateY(-0.785398163397f * side); // Forward diagonals
+        }
+        if (forward == -1) {
+            rotVec = rotVec.rotateY(side == 0 ? 3.14159265359f : 0.785398163397f * side); // Back diagonals
+            dashSpeed *= 0.75; // Backwards speed nerf
+        }
+        dashes.add(new DashData(new Vec3d(rotVec.x, 0, rotVec.z).normalize().multiply(dashSpeed), entity));
+
+        // Syncs dash anim with every player in the vicinity
+        if (entity instanceof PlayerEntity) {
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeShort(12);
+            buf.writeInt(entity.getId());
+            buf.writeString("dash");
+            PlayerLookup.around((ServerWorld) entity.getWorld(), entity.getPos(), 96).forEach( //todo: find a less arbitrary number for radius here
+                    serverPlayer -> ServerChannelFeedbackPacket.send(serverPlayer, buf)
+            );
+        }
+    }
 
     // Dimensional travel bullshit
     public static ArrayList<DimValues> pastDimensions = new ArrayList<>();
@@ -154,6 +229,7 @@ public class JCraft implements ModInitializer {
                 itemStacks.add(new ItemStack(JObjectRegistry.JOTAROBOOTS));
 
                 itemStacks.add(new ItemStack(JObjectRegistry.KQCOIN));
+                itemStacks.add(new ItemStack(JObjectRegistry.FOOLISH_SAND_BLOCK.asItem()));
             }))
             .build();
 
@@ -213,12 +289,12 @@ public class JCraft implements ModInitializer {
         }
     }
 
-    public static List<String> unresettableCooldowns = List.of(standBarrageCD, standUltCD, barrageCD, ultCD, standCBCD, standCCCD);
+    public static List<String> unresettableCooldowns = List.of(standBarrageCD, standUltCD, barrageCD, ultCD, comboBreakerCD, cooldownCancelCD, dashCD);
 
     public static void CooldownCancel(ServerWorld world, LivingEntity player) {
         NbtCompound data = ((IEntityDataSaver) player).getPersistentData();
 
-        if (data.getInt(standCCCD) <= 0) {
+        if (data.getInt(cooldownCancelCD) <= 0) {
             for (String cooldownType : cooldowns) {
                 if (unresettableCooldowns.contains(cooldownType)) {
                     continue;
@@ -226,7 +302,7 @@ public class JCraft implements ModInitializer {
                 data.putInt(cooldownType, 0);
             }
 
-            data.putInt(standCCCD, 20 * 45); // 45s
+            data.putInt(cooldownCancelCD, 900); // 45s
 
             Vec3d pPos = player.getEyePos();
             world.playSoundFromEntity(null, player, JSoundRegister.COOLDOWN_CANCEL, SoundCategory.PLAYERS, 1, 1);
@@ -239,8 +315,8 @@ public class JCraft implements ModInitializer {
     public static void ComboBreak(ServerWorld world, LivingEntity player, StatusEffectInstance stun) {
         NbtCompound data = ((IEntityDataSaver) player).getPersistentData();
         //if (!user.getPersistentData().contains(JCraft.standCBCD)) { user.getPersistentData().putInt(JCraft.standCBCD, 0); } // Handled elsewhere
-        if (stun.getDuration() > 1 && stun.getAmplifier() == 1 && data.getInt(standCBCD) <= 0) {
-            data.putInt(standCBCD, 20 * 60); // 60s
+        if (stun.getDuration() > 1 && stun.getAmplifier() == 1 && data.getInt(comboBreakerCD) <= 0) {
+            data.putInt(comboBreakerCD, 1200); // 60s
 
             stun(player, 5, 2); // Player is slowed down considerably pre-burst
 
@@ -282,7 +358,6 @@ public class JCraft implements ModInitializer {
 
         if (entity instanceof ServerPlayerEntity player) {
             player.teleport(au, pos.x, pos.y - heightOffset, pos.z, entity.getYaw(), entity.getPitch());
-            //todo: fix ability to get stuck in hell
         } else {
             finalEnt = teleportToWorld(entity, au, entity.getX(), entity.getY() - heightOffset, entity.getZ());
         }

@@ -127,24 +127,26 @@ public class ClientPacketHandler {
 
             // Time erase trackers
             case (2) -> {
-                Random random = new Random();
                 double posX = buf.readDouble();
                 double posY = buf.readDouble();
                 double posZ = buf.readDouble();
-
                 double sizeX = MathHelper.clamp(buf.readDouble(), 0.1, 100);
                 double sizeY = MathHelper.clamp(buf.readDouble(), 0.1, 100);
                 double sizeZ = MathHelper.clamp(buf.readDouble(), 0.1, 100);
 
-                for (int h = 0; h < 8; ++h) {
-                    client.world.addParticle(
-                            JParticleTypeRegistry.KCPARTICLE,
-                            posX + random.nextDouble(sizeX) - sizeX / 2,
-                            posY + random.nextDouble(sizeY),
-                            posZ + random.nextDouble(sizeZ) - sizeZ / 2,
-                            0.0, 0.0, 0.0
-                    );
-                }
+                client.execute(() -> {
+                    Random random = new Random();
+
+                    for (int h = 0; h < 8; ++h) {
+                        client.world.addParticle(
+                                JParticleTypeRegistry.KCPARTICLE,
+                                posX + random.nextDouble(sizeX) - sizeX / 2,
+                                posY + random.nextDouble(sizeY),
+                                posZ + random.nextDouble(sizeZ) - sizeZ / 2,
+                                0.0, 0.0, 0.0
+                        );
+                    }
+                });
             }
 
             // Cooldown tracking
@@ -156,7 +158,6 @@ public class ClientPacketHandler {
 
             // KQ bomb tracker
             case (4) -> {
-                Random random = new Random();
                 double v1x = buf.readDouble();
                 double v1y = buf.readDouble();
                 double v1z = buf.readDouble();
@@ -170,6 +171,7 @@ public class ClientPacketHandler {
                 Vec3d mid = new Vec3d(v1x, v1y + v2y / 2, v1z);
 
                 client.execute(() -> {
+                    Random random = new Random();
                     for (int h = 0; h < 16; ++h) {
                         double x = v1x + random.nextDouble(v2x) - v2x / 2;
                         double y = v1y + random.nextDouble(v2y);
@@ -186,7 +188,6 @@ public class ClientPacketHandler {
 
             // WS acid spew
             case (5) -> {
-                Random random = new Random();
                 double epx = buf.readDouble();
                 double epy = buf.readDouble();
                 double epz = buf.readDouble();
@@ -196,6 +197,7 @@ public class ClientPacketHandler {
                 double hpz = buf.readDouble();
 
                 client.execute(() -> {
+                    Random random = new Random();
                     for (int h = 0; h < 256; ++h) {
                         double x = hpx + random.nextDouble(2) - 1;
                         double y = hpy + random.nextDouble(2) - 1;
@@ -265,12 +267,12 @@ public class ClientPacketHandler {
 
             // Fool Dust Cloud
             case (11) -> {
-                Random random = new Random();
                 double x = buf.readDouble();
                 double y = buf.readDouble();
                 double z = buf.readDouble();
 
                 client.execute(() -> {
+                    Random random = new Random();
                     for (int h = 0; h < 256; ++h) {
                         client.world.addParticle(
                                 new BlockStateParticleEffect(ParticleTypes.FALLING_DUST, Blocks.SAND.getDefaultState()),
@@ -292,8 +294,6 @@ public class ClientPacketHandler {
                     if (ent instanceof PlayerEntity player) {
                         ModifierLayer<IAnimation> animationContainer = ((IJCraftAnimatedPlayer) player).jcraft_getModAnimation();
                         KeyframeAnimation anim = PlayerAnimationRegistry.getAnimation(new Identifier(JCraft.MOD_ID, "animation." + animPath));
-                        //KeyframeAnimation.AnimationBuilder builder = anim.mutableCopy();
-                        //builder.getPart("head")
                         animationContainer.setAnimation(new KeyframeAnimationPlayer(anim));
                     }
                 });

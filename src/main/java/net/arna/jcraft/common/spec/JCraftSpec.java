@@ -6,12 +6,14 @@ import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -147,10 +149,11 @@ public abstract class JCraftSpec {
                                     attack.hitspark + 1);
 
                             if (attack.impactSound != null) {
-                                serverWorld.playSound(hitPos.x, hitPos.y, hitPos.z, attack.impactSound, SoundCategory.PLAYERS, 1, 1, true);
-                                //serverPlayer.networkHandler.sendPacket(
-                                //        new PlaySoundS2CPacket(attack.impactSound, SoundCategory.PLAYERS, hitPos.x, hitPos.y, hitPos.z, 1, 1, random.nextLong()));
-                                //world.playSound(player.getX(), player.getY() + 0.5, player.getZ(), attack.impactSound, SoundCategory.PLAYERS, 1, 1, false);
+                                for (ServerPlayerEntity serverPlayerEntity : PlayerLookup.around(serverWorld, hitPos, 32)) {
+                                    serverPlayerEntity.networkHandler.sendPacket(
+                                            new PlaySoundS2CPacket(attack.impactSound, SoundCategory.PLAYERS, hitPos.x, hitPos.y, hitPos.z, 1, 1, 0)
+                                    );
+                                }
                             }
 
                             float kb = attack.knockback;
@@ -158,10 +161,8 @@ public abstract class JCraftSpec {
 
                             DamageSource playerSource = DamageSource.player(player);
                             for (LivingEntity livingEntity : hurt) {
-                                if (livingEntity instanceof StandEntity) {
-                                    continue;
-                                }
-                                damageLogic(world, livingEntity, kbVec, stunS, attack.stunType, attack.overrideStun, attack.damage, attack.lift, playerSource, player);
+                                if (livingEntity instanceof StandEntity) continue;
+                                damageLogic(world, livingEntity, kbVec, stunS, attack.stunType, attack.overrideStun, attack.damage, attack.lift, attack.getEffectiveBlockstun(), playerSource, player, attack.canBackstab);
                             }
 
                             this.SpecialAttack(attack, hurt);
