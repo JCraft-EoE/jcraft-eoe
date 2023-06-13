@@ -27,11 +27,6 @@ public class CrimsonShaderHandler extends StandShaderHandler {
     @Override
     public void onWorldRendered(MatrixStack matrices, Camera camera, float tickDelta, long nanoTime) {
         if (renderingEffect) {
-            var player = MinecraftClient.getInstance().player;
-            if(player == null){
-                return;
-            }
-
             World world = camera.getFocusedEntity().getWorld();
             if(list.isEmpty()){
                 list = JCraftUtils.collectBlockInfo(world, camera.getBlockPos(), 8);
