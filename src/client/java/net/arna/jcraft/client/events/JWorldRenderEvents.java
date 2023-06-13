@@ -39,9 +39,4 @@ public class JWorldRenderEvents {
         RenderHandler.MATRIX4F = new Matrix4f(RenderSystem.getModelViewMatrix());
         matrixStack.pop();
     }
-
-
-    public static void crimsonBlocks(WorldRenderContext ctx) {
-
-    }
 }

@@ -246,7 +246,7 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
                     for (int z = -3; z < 4; z++) {
                         int cX = origin.x + x;
                         int cZ = origin.z + z;
-                        JCraft.PreloadChunk(auWorld, cX, cZ);
+                        JCraft.preloadChunk(auWorld, cX, cZ);
                         ChunkSection[] orSec = world.getChunk(cX, cZ).getSectionArray();
                         ChunkSection[] auSec = auWorld.getChunk(cX, cZ).getSectionArray();
                         System.arraycopy(orSec, 0, auSec, 0, Math.min(orSec.length, auSec.length));

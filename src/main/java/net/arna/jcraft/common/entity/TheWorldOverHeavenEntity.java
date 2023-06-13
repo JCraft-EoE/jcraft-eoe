@@ -300,7 +300,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
                 lightning.setCosmetic(true);
                 lightning.setPosition(lP);
 
-                List<? extends Entity> hit = JCraftUtils.GenerateHitbox(world, lP, 3, Entity.class, List.of(this, user));
+                List<? extends Entity> hit = JCraftUtils.generateHitbox(world, lP, 3, Entity.class, List.of(this, user));
                 for (Entity ent : hit) {
                     if (ent instanceof LivingEntity living) {
                         LivingEntity target = JCraftUtils.getUserIfStand(living);

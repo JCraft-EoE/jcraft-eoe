@@ -1,12 +1,10 @@
 package net.arna.jcraft.common.item;
 
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
-import net.arna.jcraft.client.network.s2c.ShaderActivationPacket;
-import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
 import net.arna.jcraft.common.util.BlockInfo;
+import net.arna.jcraft.common.util.JCraftUtils;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
@@ -27,13 +25,11 @@ public class DebugWand extends Item {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         if (!world.isClient()) {
-            if(user.isSneaking()){
-
-            } else {
-                world.playSound(null, user.getBlockPos(),  JSoundRegister.TW_TS_CLEAN, SoundCategory.PLAYERS, 1.2f, 1);
+            if (user.isSneaking()) {
+                world.playSound(null, user.getBlockPos(), JSoundRegister.TW_TS_CLEAN, SoundCategory.PLAYERS, 1.2f, 1);
                 ShaderActivationPacket.send((ServerPlayerEntity) user, user, 0, 20 * 6, ShaderActivationPacket.Type.ZA_WARUDO);
             }
-
+        }
         return super.use(world, user, hand);
     }
 
@@ -42,19 +38,7 @@ public class DebugWand extends Item {
         PlayerEntity player = context.getPlayer();
         World world = context.getWorld();
         if(player.isSneaking()){
-            float yaw = player.getYaw();
-            float pitch = player.getPitch();
 
-            double x = Math.sin(-yaw * 0.017453292F - Math.PI) * Math.cos(-pitch * 0.017453292F);
-            double y = -Math.sin(-pitch * 0.017453292F);
-            double z = Math.cos(-yaw * 0.017453292F - Math.PI) * Math.cos(-pitch * 0.017453292F);
-
-            Vec3d lookDirection = new Vec3d(x, y, z).normalize().multiply(10);
-
-            var list = CrimsonShaderHandler.collectBlockInfo(world, player.getBlockPos());
-            for (BlockInfo info : list){
-                world.setBlockState(info.pos().up(32), info.state());
-            }
         } else {
             if (!world.isClient()) {
                 ShaderActivationPacket.send((ServerPlayerEntity) player, player, 0, 20 * 6, ShaderActivationPacket.Type.CRIMSON);

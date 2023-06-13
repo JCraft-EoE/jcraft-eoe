@@ -2,11 +2,6 @@
 
 #define time Time
 
-uniform sampler2D DiffuseSampler;
-
-
-uniform vec2      OutSize;
-uniform ivec4     ViewPort;           // viewport resolution (in pixels)
 uniform float     Time;                 // shader playback time (in seconds)
 
 uniform mat4      InverseTransformMatrix;

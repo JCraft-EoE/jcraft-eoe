@@ -1,11 +1,9 @@
 package net.arna.jcraft.registry;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.events.JWorldRenderEvents;
 import net.arna.jcraft.common.events.JPlayerEntityEvents;
 import net.arna.jcraft.common.events.JServerTickEvents;
 import net.arna.jcraft.common.util.IEntityDataSaver;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;

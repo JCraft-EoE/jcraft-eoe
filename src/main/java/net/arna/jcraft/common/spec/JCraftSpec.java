@@ -28,7 +28,7 @@ import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 
 /*
 Specs -
-classes that need to be instantiated per-player so as to contain temporary data relating to their current state
+classes that need to be instantiated per-player to contain temporary data relating to their current state
 they will handle stand-off attacks
  */
 
@@ -58,12 +58,12 @@ public abstract class JCraftSpec {
     public void InitUlt(ServerWorld serverWorld) {
     }
 
-    public boolean CanAttack() {
+    public boolean canAttack() {
         ITimeStop timeStop = (ITimeStop) player;
         return this.moveStun < 1 && timeStop.getTimeStopTicks() < 1 && !player.hasStatusEffect(JStatusRegister.DAZED);
     }
 
-    public boolean HandleAttack(ServerWorld serverWorld, Attack attack, String cooldownName) {
+    public boolean handleAttack(ServerWorld serverWorld, Attack attack, String cooldownName) {
         NbtCompound playerData = ((IEntityDataSaver) player).getPersistentData();
         int cd = playerData.getInt(cooldownName);
         if (cd > 0) {
@@ -83,7 +83,7 @@ public abstract class JCraftSpec {
         return true;
     }
 
-    public void CancelAttack() {
+    public void cancelAttack() {
         curAttack = null;
         queuedAttack = null;
         moveStun = 0;
@@ -101,7 +101,7 @@ public abstract class JCraftSpec {
         }
     }
 
-    public void SpecialAttack(Attack attack, List<LivingEntity> hurt) {
+    public void specialAttack(Attack attack, List<LivingEntity> hurt) {
 
     }
 
@@ -134,7 +134,7 @@ public abstract class JCraftSpec {
                         Vec3d hitPos = player.getPos().add(0, player.getHeight() / 2 - attack.offset, 0).add(rotVec.multiply(attack.attackDist));
                         ArrayList<Entity> exclude = new ArrayList<>(player.getPassengerList());
                         exclude.add(player);
-                        List<LivingEntity> hurt = JCraftUtils.GenerateHitbox(world,
+                        List<LivingEntity> hurt = JCraftUtils.generateHitbox(world,
                                 hitPos,
                                 attack.hitboxSize,
                                 List.copyOf(exclude)
@@ -165,7 +165,7 @@ public abstract class JCraftSpec {
                                 damageLogic(world, livingEntity, kbVec, stunS, attack.stunType, attack.overrideStun, attack.damage, attack.lift, attack.getEffectiveBlockstun(), playerSource, player, attack.canBackstab);
                             }
 
-                            this.SpecialAttack(attack, hurt);
+                            this.specialAttack(attack, hurt);
                         }
                     }
                 }

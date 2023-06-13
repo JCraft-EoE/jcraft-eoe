@@ -314,7 +314,7 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
     }
 
     @Override
-    public MoveSelectionResult SpecificMoveSelectionCriterion(Attack attack, MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity enemyStand, Attack enemyAttack) {
+    public MoveSelectionResult specificMoveSelectionCriterion(Attack attack, MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity enemyStand, Attack enemyAttack) {
         Vec3d bombPos = this.getBombPos();
         if (bombPos != null && attack == detonate && target.squaredDistanceTo(bombPos) < 9.0D) {
             return MoveSelectionResult.USE;

@@ -1,4 +1,4 @@
-package net.arna.jcraft.mixin.client.sodium.sodium;
+package net.arna.jcraft.client.mixin.sodium.sodium;
 
 import me.jellysquid.mods.sodium.client.render.SodiumWorldRenderer;
 import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
@@ -15,7 +15,7 @@ public class SodiumWorldRendererMixin {
     @Inject(method = "drawChunkLayer", at = @At("HEAD"), cancellable = true)
     private void jcraft$killSodium(RenderLayer renderLayer, MatrixStack matrixStack, double x, double y, double z, CallbackInfo ci){
         if(CrimsonShaderHandler.INSTANCE.renderingEffect){
-            //ci.cancel();
+            ci.cancel();
         }
     }
 }

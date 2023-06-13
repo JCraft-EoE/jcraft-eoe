@@ -16,11 +16,11 @@ import java.util.function.Consumer;
 public class JShaderRegistry {
     public static List<Pair<Shader, Consumer<Shader>>> shaderList;
 
-    public static ShaderHolder TEST = new ShaderHolder("GameTime", "Yaw", "Pitch");
+    public static ShaderHolder TEST = new ShaderHolder("DiffuseSampler", "DepthSampler", "OutSize", "ViewPort");
 
     public static void init(ResourceManager manager) throws IOException {
         shaderList = new ArrayList<>();
-        registerShader(JShader.createShaderInstance(TEST, manager, JCraft.id("space"), VertexFormats.POSITION_COLOR_TEXTURE_LIGHT));
+        registerShader(JShader.createShaderInstance(TEST, manager, JCraft.id("space"), VertexFormats.POSITION_TEXTURE));
 
     }
 

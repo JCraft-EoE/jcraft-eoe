@@ -2,7 +2,6 @@ package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.common.util.JCraftUtils;
 import net.arna.jcraft.registry.JEntityTypeRegister;
-import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -28,6 +27,7 @@ import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
+import net.arna.jcraft.registry.*;
 
 public class KnifeProjectile extends PersistentProjectileEntity implements IAnimatable {
     private int ticksInAir;
@@ -155,7 +155,7 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
             dropStack(this.asItemStack(), 0.1F);
         }
 
-        JCraftUtils.ProjectileDamageLogic(this, world, entity, Vec3d.ZERO, stunT, 1, false, 2, blockstun);
+        JCraftUtils.projectileDamageLogic(this, world, entity, Vec3d.ZERO, stunT, 1, false, 2, blockstun);
         playSound(SoundEvents.ITEM_TRIDENT_HIT, 1, 1);
         discard();
     }
