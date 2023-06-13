@@ -15,15 +15,10 @@ public class SilverChariotModel extends AnimatedTickingGeoModel<SilverChariotEnt
     }
 
     @Override
-    public Identifier getTextureResource(SilverChariotEntity object) {
-        int mode = object.getMode();
-
-        if (mode == 3) {
-            return new Identifier(JCraft.MOD_ID, "textures/entity/possessedchariot.png");
-        }
-        if (mode == 2) {
-            return new Identifier(JCraft.MOD_ID, "textures/entity/noarmorchariot.png");
-        }
+    public Identifier getTextureResource(SilverChariotEntity chariot) {
+        int mode = chariot.getMode();
+        if (mode == 3) return new Identifier(JCraft.MOD_ID, "textures/entity/possessedchariot.png");
+        if (mode == 2) return new Identifier(JCraft.MOD_ID, "textures/entity/noarmorchariot.png");
         return new Identifier(JCraft.MOD_ID, "textures/entity/silverchariot.png");
     }
 
@@ -36,6 +31,6 @@ public class SilverChariotModel extends AnimatedTickingGeoModel<SilverChariotEnt
     public void setCustomAnimations(SilverChariotEntity animatable, int instanceId, AnimationEvent animationEvent) {
         super.setCustomAnimations(animatable, instanceId, animationEvent);
         if (animatable.hasUser())
-            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser());
+            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), animationEvent.getPartialTick(), true, true);
     }
 }

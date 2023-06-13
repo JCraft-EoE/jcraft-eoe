@@ -301,28 +301,36 @@ public final class JCraftUtils {
         return 0;
     }
 
-    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player) {
-        animateGenericHumanoid(model, entity, player, false, false);
+    public static Vec3d deltaPos(Entity ent) {
+        return new Vec3d(
+                ent.getX() - ent.prevX,
+                ent.getY() - ent.prevY,
+                ent.getZ() - ent.prevZ
+        );
     }
 
-    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, boolean flipBody, boolean flipHead) {
-        animateGenericHumanoid(model, entity, player, flipBody, flipHead, 0, 0, 90f);
+    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, float partialTick) {
+        animateGenericHumanoid(model, entity, player, partialTick, false, false);
     }
 
-    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, boolean flipBody, boolean flipHead, float tPO, float hPO) {
-        animateGenericHumanoid(model, entity, player, flipBody, flipHead, tPO, hPO, 90f);
+    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, float partialTick, boolean flipBody, boolean flipHead) {
+        animateGenericHumanoid(model, entity, player, partialTick, flipBody, flipHead, 0, 0, 90f);
     }
 
-    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, boolean flipBody, boolean flipHead, float tPO, float hPO, float velInfluence) {
+    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, float partialTick, boolean flipBody, boolean flipHead, float tPO, float hPO) {
+        animateGenericHumanoid(model, entity, player, partialTick, flipBody, flipHead, tPO, hPO, 90f);
+    }
+
+    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, float partialTick, boolean flipBody, boolean flipHead, float tPO, float hPO, float velInfluence) {
         float overVel = 0;
 
         if (entity.getMoveStun() < 1) {
-            Vec3d playerVel = player.getVelocity();
+            Vec3d playerVel = deltaPos(player);
             overVel = MathHelper.clamp((float) playerVel.horizontalLength() - 0.05f, -1f, 1f);
 
-            if (playerVel.normalize().add(entity.getRotationVector()).horizontalLengthSquared() < playerVel.normalize().horizontalLengthSquared()) {
+            // If going backwards
+            if (playerVel.normalize().add(entity.getRotationVector()).horizontalLengthSquared() < playerVel.normalize().horizontalLengthSquared())
                 velInfluence *= -1;
-            }
 
             IBone torso = model.getAnimationProcessor().getBone("torso");
             if (torso != null) {
@@ -339,9 +347,7 @@ public final class JCraftUtils {
             IBone head = model.getAnimationProcessor().getBone("head");
             if (head != null) {
                 float headPitch = (player.getPitch() - overVel * velInfluence) * 3.1415f / 180f;
-                if (flipHead) {
-                    headPitch = -headPitch;
-                }
+                if (flipHead) headPitch = -headPitch;
                 head.setRotationX(headPitch + hPO);
             }
         }

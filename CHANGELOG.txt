@@ -866,6 +866,25 @@ The World: Over Heaven
         >Now overrides stun
     >Timestop startup increased (35->45t)
 
+● 13/6/2023
+>Fixed ability to do a tiny hop when jumping is supposed to be disabled
+>Fixed specific stuns not combo counting correctly
+>Launch stun now nullifies movement speed and jump height
+>Backstab distance requirement increased to 1.5m
+
+Whitesnake
+    >Added summon animation
+
+Silver Chariot
+    >Remodeled and reanimated
+    >Charge blockstun increased (9->15t)
+
+The Fool
+    >Updated /stand about
+
+The World: Over Heaven
+    >
+
 priority (top to bottom)
 TODO: ability to position the HUD
 TODO: AI flags for unblockables and shouldn't-blockables

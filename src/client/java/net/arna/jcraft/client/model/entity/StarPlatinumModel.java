@@ -29,6 +29,6 @@ public class StarPlatinumModel extends AnimatedTickingGeoModel<StarPlatinumEntit
     public void setCustomAnimations(StarPlatinumEntity animatable, int instanceId, AnimationEvent animationEvent) {
         super.setCustomAnimations(animatable, instanceId, animationEvent);
         if (animatable.hasUser())
-            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), true, true);
+            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), animationEvent.getPartialTick(), true, true);
     }
 }

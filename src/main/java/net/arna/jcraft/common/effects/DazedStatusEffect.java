@@ -55,7 +55,7 @@ public class DazedStatusEffect extends StatusEffect {
     public double adjustModifierAmount(int amplifier, EntityAttributeModifier modifier) {
         if (Objects.equals(modifier.getId(), slowUUID)) {
             return switch (amplifier) {
-                case 1, 0 -> -1;
+                case 3, 1, 0 -> -1;
                 default -> 0;
             };
         }

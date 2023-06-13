@@ -30,6 +30,6 @@ public class GoldenExperienceModel extends AnimatedTickingGeoModel<GoldenExperie
         super.setCustomAnimations(animatable, instanceId, animationEvent);
 
         if (animatable.hasUser()) // -10Pi/180
-            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), true, true, 0, -0.1f);
+            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), animationEvent.getPartialTick(), true, true, 0, -0.1f);
     }
 }

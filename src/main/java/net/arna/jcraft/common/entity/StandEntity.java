@@ -281,7 +281,7 @@ public abstract class StandEntity extends MobEntity {
         setFree(true);
         Vec3d fPos = user.getPos().add(user.getRotationVector());
         setFreePos(new Vec3f(fPos));
-        setPos(fPos.x, fPos.y, fPos.z);
+        setPos(fPos.x, fPos.y + 0.5, fPos.z);
         remoteSpeed = user.getVelocity(); // Inertia
         setAlpha(0.1f);
     }
@@ -900,28 +900,8 @@ public abstract class StandEntity extends MobEntity {
      */
     public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, boolean canBackstab) {
         if (world == null || ent == null) return;
-        if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && !world.isClient()) {
-            if (attacker instanceof PlayerEntity playerEntity) {
-                IComboCounter comboCounter = (IComboCounter) playerEntity;
-                if (comboCounter.getLastAttacked() != ent) {
-                    comboCounter.setComboCount(1);
-                } else {
-                    StatusEffectInstance stun = ent.getStatusEffect(JStatusRegister.DAZED);
-                    if (stun != null && stun.getAmplifier() != 2) { // Stunned but not blocking
-                        comboCounter.incrementComboCount();
-                    } else {
-                        comboCounter.setComboCount(1);
-                    }
-
-                    PacketByteBuf buf = PacketByteBufs.create();
-                    buf.writeShort(6);
-                    buf.writeInt(comboCounter.getComboCount());
-                    if (playerEntity instanceof ServerPlayerEntity serverPlayerEntity)
-                        ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
-                }
-                comboCounter.setLastAttacked(ent);
-            }
-        }
+        if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && attacker instanceof PlayerEntity playerEntity)
+            comboCounterLogic(playerEntity, ent);
 
         baseDamageLogic(ent, kbVec, stunTicks, stunType, overrideStun, damage, lift, blockstun, source, attacker, canBackstab);
     }
@@ -938,32 +918,32 @@ public abstract class StandEntity extends MobEntity {
      */
     public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker) {
         if (world == null || ent == null) return;
-        if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && !world.isClient()) {
-            if (attacker instanceof PlayerEntity playerEntity) {
-                IComboCounter comboCounter = (IComboCounter) playerEntity;
-                if (comboCounter.getLastAttacked() != ent) {
-                    comboCounter.setComboCount(1);
-                } else {
-                    StatusEffectInstance stun = ent.getStatusEffect(JStatusRegister.DAZED);
-                    if (stun != null && stun.getAmplifier() != 2) {
-                        //LOGGER.info("Target stun: " + stun.getDuration());
-                        comboCounter.incrementComboCount();
-                    } else {
-                        comboCounter.setComboCount(1);
-                    }
-
-                    PacketByteBuf buf = PacketByteBufs.create();
-                    buf.writeShort(6);
-                    buf.writeInt(comboCounter.getComboCount());
-                    if (playerEntity instanceof ServerPlayerEntity serverPlayerEntity) {
-                        ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
-                    }
-                }
-                comboCounter.setLastAttacked(ent);
-            }
-        }
-
+        if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && attacker instanceof PlayerEntity playerEntity)
+            comboCounterLogic(playerEntity, ent);
         baseDamageLogic(ent, kbVec, stunTicks, stunType, overrideStun, damage, lift, blockstun, source, attacker, false);
+    }
+
+    /**
+     * Handles combo counting for specific player
+     * @param playerEntity attacker
+     */
+    private static void comboCounterLogic(PlayerEntity playerEntity, LivingEntity victim) {
+        IComboCounter comboCounter = (IComboCounter) playerEntity;
+        if (comboCounter.getLastAttacked() != victim)
+            comboCounter.setComboCount(1);
+        else {
+            StatusEffectInstance stun = victim.getStatusEffect(JStatusRegister.DAZED);
+            if (stun != null && stun.getAmplifier() != 2) //LOGGER.info("Target stun: " + stun.getDuration());
+                comboCounter.incrementComboCount();
+            else
+                comboCounter.setComboCount(1);
+
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeShort(6);
+            buf.writeInt(comboCounter.getComboCount());
+            ServerChannelFeedbackPacket.send((ServerPlayerEntity) playerEntity, buf);
+        }
+        comboCounter.setLastAttacked(victim);
     }
 
     /**
@@ -994,7 +974,7 @@ public abstract class StandEntity extends MobEntity {
 
             if (stand.blocking && !stand.getRemote()) {
                 double delta = Math.abs((ent.headYaw + 90.0f) % 360.0f - (attacker.getHeadYaw() + 90.0f) % 360.0f);
-                if ( canBackstab && (360.0 - delta % 360.0 < 90 || delta % 360.0 < 90) && ent.squaredDistanceTo(attacker.getPos()) >= 1 ) { // Backstab logic
+                if ( canBackstab && (360.0 - delta % 360.0 < 90 || delta % 360.0 < 90) && ent.squaredDistanceTo(attacker.getPos()) >= 2.25 ) { // Backstab logic
                     JCraft.CreateParticle((ServerWorld) attacker.getWorld(), ent.getX(), attacker.getEyeY(), ent.getZ(), -2);
                     stand.playSound(SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, 1, 1);
                     stand.blocking = false;

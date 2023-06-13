@@ -246,20 +246,19 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
     @Override
     public void initMiddleClick() {
         CanAttackData data = canAttackWithData();
-        if (!data.canAttack) return;
-        if (getTSTime() > 0) return;
-        IEntityDataSaver user = (IEntityDataSaver) data.user;
-        if (user.getPersistentData().getInt(JCraft.utilCD) > 0) return;
+        if (!data.canAttack || getTSTime() > 0) return;
+        NbtCompound userData = ((IEntityDataSaver) data.user).getPersistentData();
+        if (userData.getInt(JCraft.utilCD) > 0) return;
         Vec3d eP = data.user.getEyePos();
 
-        HitResult hitResult = this.world.raycast(new RaycastContext(eP, eP.add(data.user.getRotationVector().multiply(14)), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, data.user));
+        HitResult hitResult = world.raycast(new RaycastContext(eP, eP.add(data.user.getRotationVector().multiply(14)), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, data.user));
         Vec3d pos = hitResult.getPos();
 
         data.user.teleport(pos.x, pos.y, pos.z);
 
-        user.getPersistentData().putInt(JCraft.utilCD, 360); // 18 second timeskip cooldown
-        if (user.getPersistentData().getInt(JCraft.standUltCD) < 60)
-            user.getPersistentData().putInt(JCraft.standUltCD, 60); // 3 second timestop cooldown
+        userData.putInt(JCraft.utilCD, 360); // 18 second timeskip cooldown
+        if (userData.getInt(JCraft.standUltCD) < 60)
+            userData.putInt(JCraft.standUltCD, 60); // 3 second timestop cooldown
 
         world.playSound(null, pos.x, pos.y, pos.z, JSoundRegister.TWOH_TIMESKIP, SoundCategory.PLAYERS, 1f, 1f);
     }
