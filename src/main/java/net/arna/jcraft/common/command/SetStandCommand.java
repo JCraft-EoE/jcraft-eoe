@@ -16,7 +16,7 @@ import net.minecraft.server.command.ServerCommandSource;
 
 import java.util.Collection;
 
-import static net.arna.jcraft.JCraft.Summon;
+import static net.arna.jcraft.JCraft.summon;
 
 public class SetStandCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
@@ -39,7 +39,7 @@ public class SetStandCommand {
 
                 livingEntity.detach();
 
-                StandEntity stand = Summon(entity.getWorld(), livingEntity);
+                StandEntity stand = summon(entity.getWorld(), livingEntity);
                 if (stand != null) stand.startRiding(livingEntity);
             }
         }

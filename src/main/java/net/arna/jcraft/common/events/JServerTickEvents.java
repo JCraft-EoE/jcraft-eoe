@@ -96,7 +96,7 @@ public class JServerTickEvents {
             } else {
                 JCraft.teleportToWorld(user, original, dimPos.x, dimPos.y, dimPos.z);
             }
-            JCraft.ClearPreloadedChunks(au); //this can probably be optimized
+            JCraft.clearPreloadedChunks(au); //this can probably be optimized
         }
 
         JCraft.pastDimensions = newPastDimensions;
@@ -133,7 +133,7 @@ public class JServerTickEvents {
                 player.removeStatusEffect(JStatusRegister.DAZED);
                 stun(player, 10, 1);
                 Vec3d pPos = player.getEyePos();
-                List<? extends Entity> toPush = JCraftUtils.GenerateHitbox(player.world, pPos, 4, Entity.class, filter);
+                List<? extends Entity> toPush = JCraftUtils.generateHitbox(player.world, pPos, 4, Entity.class, filter);
 
                 for (Entity ent : toPush) {
                     Vec3d awayVector = ent.getPos().subtract(pPos).normalize();
@@ -212,7 +212,7 @@ public class JServerTickEvents {
                                     mob.setTarget(biggestAttacker);
                                 }
                             } else if (mobData.contains("StandID")) {
-                                JCraft.Summon(serverWorld, mob);
+                                JCraft.summon(serverWorld, mob);
                             }
 
                             // Handle cooldowns

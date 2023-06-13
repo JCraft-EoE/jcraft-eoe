@@ -35,7 +35,8 @@ public class ShaderActivationPacket {
 
     public enum Type implements StringIdentifiable {
         NONE("none"),
-        ZA_WARUDO("za_warudo");
+        ZA_WARUDO("za_warudo"),
+        CRIMSON("crimson");
 
         private final String name;
 
@@ -45,7 +46,7 @@ public class ShaderActivationPacket {
 
         @Override
         public String asString() {
-            return this == ZA_WARUDO ? ZA_WARUDO.name : NONE.name;
+            return this == ZA_WARUDO ? ZA_WARUDO.name : this == CRIMSON ? CRIMSON.name : NONE.name;
         }
 
         public String getName() {

@@ -271,7 +271,7 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
     }
 
     @Override
-    public MoveSelectionResult SpecificMoveSelectionCriterion(Attack attack, MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity enemyStand, Attack enemyAttack) {
+    public MoveSelectionResult specificMoveSelectionCriterion(Attack attack, MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity enemyStand, Attack enemyAttack) {
         if (attack == lifegiver) {
             if (mob.getMainHandStack().isEmpty() && mob.getOffHandStack().isEmpty()) {
                 return MoveSelectionResult.STOP;

@@ -9,6 +9,8 @@ import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.spec.Brawler;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.SideShapeType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -22,10 +24,7 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import software.bernie.geckolib3.core.processor.IBone;
@@ -42,7 +41,7 @@ public final class JCraftUtils {
     public static List<DimValues> activeTimestops = new ArrayList<>();
 
     // Specify what type the hitbox searches for
-    public static List<? extends Entity> GenerateHitbox(World world, Vec3d center, double hitboxSize, Class<? extends Entity> entityClass, List<Entity> except) {
+    public static List<? extends Entity> generateHitbox(World world, Vec3d center, double hitboxSize, Class<? extends Entity> entityClass, List<Entity> except) {
         double size = hitboxSize / 2;
 
         Vec3d v1 = center.subtract(size, size, size);
@@ -83,7 +82,7 @@ public final class JCraftUtils {
     }
 
     // Defaults to LivingEntity
-    public static List<LivingEntity> GenerateHitbox(World world, Vec3d center, double hitboxSize, List<Entity> except) {
+    public static List<LivingEntity> generateHitbox(World world, Vec3d center, double hitboxSize, List<Entity> except) {
         double size = hitboxSize / 2;
 
         Vec3d v1 = center.subtract(size, size, size);
@@ -193,7 +192,7 @@ public final class JCraftUtils {
         return ent;
     }
 
-    public static void ProjectileDamageLogic(ProjectileEntity proj, World world, Entity ent, Vec3d kb, int stunT, int stunType, boolean overrideStun, float damage, int blockstun) {
+    public static void projectileDamageLogic(ProjectileEntity proj, World world, Entity ent, Vec3d kb, int stunT, int stunType, boolean overrideStun, float damage, int blockstun) {
         if (world.isClient) return;
         Objects.requireNonNull(proj, "Attempted to run ProjectileDamageLogic with invalid projectile in world " + world);
         Entity owner = proj.getOwner();
@@ -346,5 +345,47 @@ public final class JCraftUtils {
                 head.setRotationX(headPitch + hPO);
             }
         }
+    }
+
+
+    public static List<BlockInfo> collectBlockInfo(World world, BlockPos origin, int radius) {
+        List<BlockInfo> infoList = new ArrayList<>();
+
+        int[][] array = new int[radius * 2 + 1][radius * 2 + 1];
+
+        for (int i = 0; i < radius; i++) {
+            for (int j = 0; j < radius; j++) {
+                array[i][j] = 0;
+            }
+        }
+
+        int originX = origin.getX();
+        int originY = origin.getY();
+        int originZ = origin.getZ();
+
+        for (int y = originY + radius; y >= originY - radius; y--) {
+            for (int x = originX - radius; x <= originX + radius; x++) {
+                for (int z = originZ - radius; z <= originZ + radius; z++) {
+                    double distance = Math.sqrt(Math.pow(x - originX, 2) + Math.pow(y - originY, 2) + Math.pow(z - originZ, 2));
+                    if (distance <= radius) {
+                        double skipProbability = (distance / radius);
+                        if (world.getRandom().nextDouble() > skipProbability / 2) {
+                            BlockPos pos = new BlockPos(x, y, z);
+                            BlockState state = world.getBlockState(pos);
+                            int x0 = x - originX + radius;
+                            int z0 = z - originZ + radius;
+                            if(state.isSideSolid(world, pos, Direction.UP, SideShapeType.RIGID) && array[x0][z0] == 0){
+                                array[x0][z0] = 1;
+
+                                BlockInfo info = new BlockInfo(state, pos);
+                                infoList.add(info);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return infoList;
     }
 }

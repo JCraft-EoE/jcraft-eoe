@@ -1,6 +1,7 @@
 package net.arna.jcraft.mixin;
 
 import com.llamalad7.mixinextras.MixinExtrasBootstrap;
+import net.fabricmc.loader.api.FabricLoader;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 public class JMixinPlugin implements IMixinConfigPlugin {
+
     @Override
     public void onLoad(String mixinPackage) {
         MixinExtrasBootstrap.init();
@@ -21,6 +23,12 @@ public class JMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+        if(mixinClassName.contains("SodiumWorldRendererMixin")){
+            return FabricLoader.getInstance().isModLoaded("sodium");
+        }
+        if(mixinClassName.contains("WorldRendererVanillaMixin")){
+            return !FabricLoader.getInstance().isModLoaded("sodium");
+        }
         return true;
     }
 

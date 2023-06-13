@@ -167,7 +167,7 @@ public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatab
 
             if (launched && timeLaunched < 20 && !hit) {
                 timeLaunched++;
-                List<LivingEntity> toHurt = JCraftUtils.GenerateHitbox(world, getPos(), 1, List.of(master));
+                List<LivingEntity> toHurt = JCraftUtils.generateHitbox(world, getPos(), 1, List.of(master));
                 for (LivingEntity living : toHurt) {
                     LivingEntity target = JCraftUtils.getUserIfStand(living);
                     if (target == master || target == this) continue;

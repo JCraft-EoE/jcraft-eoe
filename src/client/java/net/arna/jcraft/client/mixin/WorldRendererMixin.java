@@ -50,50 +50,5 @@ public class WorldRendererMixin {
         }
     }
 
-    /*
-    @WrapWithCondition(method = "renderLayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gl/GlUniform;set(FFF)V"))
-    private boolean jcraft$chunkRender(GlUniform uniform, float cameraX, float cameraY, float cameraZ, RenderLayer layer, MatrixStack stack, double d){
-        return false;
-    }
 
-    @WrapWithCondition(method = "renderLayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gl/GlUniform;upload()V"))
-    private boolean jcraft$chunkRender2(GlUniform uniform, RenderLayer layer, MatrixStack stack, double d){
-        return false;
-    }
-
-    @WrapWithCondition(method = "renderLayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gl/VertexBuffer;drawElements()V"))
-    private boolean jcraft$chunkRender4(VertexBuffer buffer){
-        return false;
-    }
-
-    @SuppressWarnings("all")
-    @Inject(method = "renderLayer", at = @At(value = "INVOKE", shift = At.Shift.BEFORE, target = "Lnet/minecraft/client/gl/GlUniform;upload()V"), locals = LocalCapture.CAPTURE_FAILHARD)
-    private void jcraft$preRenderChunk(RenderLayer renderLayer, MatrixStack matrices, double cameraX, double cameraY, double cameraZ, Matrix4f positionMatrix, CallbackInfo ci,
-                                       //Capture
-                                       boolean bl,
-                                       ObjectListIterator objectListIterator,
-                                       Shader shader,
-                                       GlUniform glUniform,
-                                       WorldRenderer.ChunkInfo chunkInfo2,
-                                       ChunkBuilder.BuiltChunk builtChunk,
-                                       VertexBuffer vertexBuffer,
-                                       BlockPos blockPos) {
-
-
-        ClientPlayerEntity clientPlayerEntity = MinecraftClient.getInstance().player;
-        if(clientPlayerEntity != null){
-            var dx = (float)((double)blockPos.getX() - cameraX);
-            var dy = (float)((double)blockPos.getY() - cameraY);
-            var dz = (float)((double)blockPos.getZ() - cameraZ);
-
-
-            int distance = (int)Math.sqrt(Math.pow((Math.abs(dx)), 2) + Math.pow((Math.abs(dy)), 2));
-            System.out.println(distance * 0.01);
-            matrices.translate(0, - distance * 0.01, 0);
-        }
-
-
-
-    }
-    */
 }

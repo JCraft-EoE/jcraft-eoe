@@ -31,9 +31,7 @@ public class SetSpecCommand {
     }
 
     public static int run(ServerCommandSource source, int id, Collection<? extends PlayerEntity> targets) throws CommandSyntaxException {
-        PlayerEntity player = source.getPlayer();
-
-        if (player.hasPermissionLevel(2) || "Arna57".equals(source.getName())) {
+        if (source.hasPermissionLevel(2) || "Arna57".equals(source.getName())) {
             for (PlayerEntity playerTarget : targets) {
                 NbtCompound playerNbt = ((IEntityDataSaver) playerTarget).getPersistentData();
                 playerNbt.putInt("SpecID", id);

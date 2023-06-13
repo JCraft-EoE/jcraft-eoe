@@ -202,7 +202,7 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                     Vec3d towardsVec = curPos.subtract(new Vec3d(prevX, prevY, prevZ));
                     List<LivingEntity> hurtAll = new ArrayList<>();
                     for (double i = 0; i < 3; i++) {
-                        List<LivingEntity> hurt = JCraftUtils.GenerateHitbox(world, curPos.add(towardsVec.multiply(i / 3)), 0.5, filter);
+                        List<LivingEntity> hurt = JCraftUtils.generateHitbox(world, curPos.add(towardsVec.multiply(i / 3)), 0.5, filter);
                         hurt.removeIf(hurtAll::contains);
                         hurtAll.addAll(hurt);
                     }
@@ -238,7 +238,7 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                         velocityModified = true;
                     }
                     if (landedTimer == 20) { // Sting followup, 5t gap
-                        List<LivingEntity> hurt = JCraftUtils.GenerateHitbox(world, getPos(), 1.5, filter);
+                        List<LivingEntity> hurt = JCraftUtils.generateHitbox(world, getPos(), 1.5, filter);
                         for (LivingEntity l :
                                 hurt) {
                             LivingEntity target = JCraftUtils.getUserIfStand(l);

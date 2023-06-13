@@ -218,8 +218,7 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
     public void tick() {
         if (age == 1) {
             this.playSound(JSoundRegister.TW_SUMMON, 1f, 1f);
-            if (JConfig.ANIME_VOICES)
-                this.playSound(JSoundRegister.MUDA_DA, 1f, 1f);
+            this.playSound(JSoundRegister.MUDA_DA, 1f, 1f);
         }
 
         super.tick();

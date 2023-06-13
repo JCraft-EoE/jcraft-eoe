@@ -19,7 +19,9 @@
     "ItemRendererMixin",
     "ParticleAccessor",
     "ParticleManagerMixin",
-    "WorldRendererMixin"
+    "WorldRendererMixin",
+    "sodium.vanilla.WorldRendererVanillaMixin",
+    "sodium.sodium.SodiumWorldRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

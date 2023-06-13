@@ -180,14 +180,16 @@ public class JCraft implements ModInitializer {
     public static ArrayList<DimValues> pastDimensions = new ArrayList<>();
     private static final List<ChunkPos> preloadedChunks = new ArrayList<>();
 
-    public static void ClearPreloadedChunks(ServerWorld auWorld) {
-        if (preloadedChunks.isEmpty()) return;
+    public static void clearPreloadedChunks(ServerWorld auWorld) {
+        if (preloadedChunks.isEmpty()) {
+            return;
+        }
         for (ChunkPos p : preloadedChunks)
             auWorld.setChunkForced(p.x, p.z, false);
         preloadedChunks.clear();
     }
 
-    public static void PreloadChunk(ServerWorld auWorld, int chunkX, int chunkY) {
+    public static void preloadChunk(ServerWorld auWorld, int chunkX, int chunkY) {
         preloadedChunks.add(new ChunkPos(chunkX, chunkY));
         auWorld.setChunkForced(chunkX, chunkY, true);
     }
@@ -231,7 +233,7 @@ public class JCraft implements ModInitializer {
             }))
             .build();
 
-    public static StandEntity Summon(World world, LivingEntity player) {
+    public static StandEntity summon(World world, LivingEntity player) {
         if (player.hasStatusEffect(JStatusRegister.STANDLESS)) return null;
 
         StandType type = StandType.fromId(((IEntityDataSaver) player).getPersistentData().getInt("StandID"));
@@ -294,7 +296,9 @@ public class JCraft implements ModInitializer {
 
         if (data.getInt(cooldownCancelCD) <= 0) {
             for (String cooldownType : cooldowns) {
-                if (unresettableCooldowns.contains(cooldownType)) continue;
+                if (unresettableCooldowns.contains(cooldownType)) {
+                    continue;
+                }
                 data.putInt(cooldownType, 0);
             }
 

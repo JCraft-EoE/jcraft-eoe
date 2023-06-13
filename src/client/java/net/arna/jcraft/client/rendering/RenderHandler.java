@@ -99,8 +99,8 @@ public class RenderHandler {
                 handler.updateShaderData(instance);
             }
             source.draw(type);
-            if (instance instanceof JShader extendedShaderInstance) {
-                extendedShaderInstance.setUniformDefaults();
+            if (instance instanceof JShader jShader) {
+                jShader.setUniformDefaults();
             }
         }
         source.draw();
