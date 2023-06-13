@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "net.arna.jcraft.client.mixin",
-  "plugin": "net.arna.jcraft.JMixinPlugin",
+  "plugin": "net.arna.jcraft.client.JClientMixinPlugin",
   "compatibilityLevel": "JAVA_16",
   "client": [
     "IntegratedServerLoaderMixin",
