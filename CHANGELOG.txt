@@ -885,6 +885,9 @@ The Fool
 ● 14/6/2023
 >Backstab distance requirement decreased to 1.25m
 
+Whitesnake
+    >Finalized remote mode movement
+
 Silver Chariot
     >Updated sounds
 
