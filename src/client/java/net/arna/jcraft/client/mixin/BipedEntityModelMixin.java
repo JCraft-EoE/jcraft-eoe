@@ -118,8 +118,8 @@ public abstract class BipedEntityModelMixin<T extends LivingEntity> {
                 }
             }
 
-            if (stand instanceof KingCrimsonEntity kc) { // Back towards KC
-                if (livingEntity.getVelocity().horizontalLengthSquared() <= 0) {
+            if (stand instanceof KingCrimsonEntity) { // Back towards KC
+                if (JCraftUtils.deltaPos(livingEntity).horizontalLengthSquared() <= 0) {
                     this.body.yaw += 30 * 0.017453292F;
 
                     if (this.leftArmPose == BipedEntityModel.ArmPose.EMPTY) {
@@ -140,7 +140,7 @@ public abstract class BipedEntityModelMixin<T extends LivingEntity> {
             }
 
             if (stand instanceof KillerQueenEntity) {
-                if (livingEntity.getVelocity().horizontalLengthSquared() <= 0) {
+                if (JCraftUtils.deltaPos(livingEntity).horizontalLengthSquared() <= 0) {
                     if (this.leftArmPose == BipedEntityModel.ArmPose.EMPTY) {
                         this.leftArm.yaw += 15 * 0.017453292F;
                         this.leftArm.pitch -= 15 * 0.017453292F;
@@ -169,7 +169,7 @@ public abstract class BipedEntityModelMixin<T extends LivingEntity> {
                 this.rightArm.pivotY -= heightOffset;
 
                 // Leaning while moving
-                float speedInfluence = (float) livingEntity.getVelocity().horizontalLength() * 80f * 0.017453292F;
+                float speedInfluence = (float) JCraftUtils.deltaPos(livingEntity).horizontalLength() * 80f * 0.017453292F;
 
                 this.body.pitch += speedInfluence;
 

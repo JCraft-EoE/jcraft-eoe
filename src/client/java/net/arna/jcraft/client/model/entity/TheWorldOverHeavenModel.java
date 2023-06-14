@@ -33,6 +33,6 @@ public class TheWorldOverHeavenModel extends AnimatedTickingGeoModel<TheWorldOve
     public void setCustomAnimations(TheWorldOverHeavenEntity animatable, int instanceId, AnimationEvent animationEvent) {
         super.setCustomAnimations(animatable, instanceId, animationEvent);
         if (animatable.hasUser())
-            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), true, true, -0.1745329251f, -0.31f);
+            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), animationEvent.getPartialTick(), true, true, -0.1745329251f, -0.31f);
     }
 }

@@ -71,6 +71,18 @@
     ]
   },
 
+  "spsummon": {
+    "sounds": [
+      "jcraft:stands/starplatinum/summon"
+    ]
+  },
+
+  "sptimeskip": {
+    "sounds": [
+      "jcraft:stands/starplatinum/timeskip"
+    ]
+  },
+
   "spbarrage": {
     "sounds": [
       "jcraft:stands/starplatinum/barrage"
@@ -604,6 +616,12 @@
     ]
   },
 
+  "twohtimeskip": {
+    "sounds": [
+      "jcraft:stands/theworldoverheaven/timeskip"
+    ]
+  },
+
   "twohtimestop": {
     "subtitle": "subtitles.jcraft.twohts",
     "sounds": [
@@ -626,6 +644,12 @@
   "twohchargeoverwrite": {
     "sounds": [
       "jcraft:stands/theworldoverheaven/chargeoverwrite"
+    ]
+  },
+
+  "twohcharge": {
+    "sounds": [
+      "jcraft:stands/theworldoverheaven/charge"
     ]
   },
 

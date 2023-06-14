@@ -70,7 +70,7 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
         velocityModified = true;
 
         Vec3d pos = getPos();
-        List<LivingEntity> hurt = JCraftUtils.GenerateHitbox(world, pos, 2.25, null);
+        List<LivingEntity> hurt = JCraftUtils.generateHitbox(world, pos, 2.25, null);
         for (LivingEntity living :
                 hurt) {
             if (!canTarget(living)) continue;

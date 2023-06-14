@@ -268,7 +268,7 @@ public abstract class StandEntity extends MobEntity {
     public void setRemote(boolean r) {
         this.dataTracker.set(REMOTE, r);
         if (r) {
-            BeginRemote();
+            beginRemote();
         } else {
             endRemote();
         }
@@ -277,11 +277,11 @@ public abstract class StandEntity extends MobEntity {
     /**
      * Puts the stand into remote mode
      */
-    protected void BeginRemote() {
+    protected void beginRemote() {
         setFree(true);
         Vec3d fPos = user.getPos().add(user.getRotationVector());
         setFreePos(new Vec3f(fPos));
-        setPos(fPos.x, fPos.y, fPos.z);
+        setPos(fPos.x, fPos.y + 0.5, fPos.z);
         remoteSpeed = user.getVelocity(); // Inertia
         setAlpha(0.1f);
     }
@@ -420,7 +420,9 @@ public abstract class StandEntity extends MobEntity {
     public boolean handleAttack(Attack attack, String cooldownName, int animState) {
         NbtCompound userData = ((IEntityDataSaver) user).getPersistentData();
         int cooldown = userData.getInt(cooldownName);
-        if (cooldown > 0) return false;
+        if (cooldown > 0) {
+            return false;
+        }
         userData.putInt(cooldownName, attack.cooldown * 20);
         this.setAttack(attack, animState);
         return true;
@@ -689,14 +691,20 @@ public abstract class StandEntity extends MobEntity {
                             new Box(eyePos.add(96.0, 96.0, 96.0), eyePos.subtract(96.0, 96.0, 96.0)), EntityPredicates.VALID_LIVING_ENTITY);
 
                     for (PlayerEntity player : toCooldown) {
-                        ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+
                         // Shader handling
-                        ShaderActivationPacket.send(serverPlayer, this, 0, stunTicks, ShaderActivationPacket.Type.ZA_WARUDO);
-                        if (serverPlayer == user || serverPlayer.isCreative()) continue;
-                        // Puts all player items besides armor into cooldown for entire duration of timestop
-                        for (int i = 0; i < serverPlayer.getInventory().main.size(); i++)
-                            serverPlayer.getItemCooldownManager().set(serverPlayer.getInventory().main.get(i).getItem(), stunTicks);
-                        serverPlayer.getItemCooldownManager().set(serverPlayer.getOffHandStack().getItem(), stunTicks);
+                        if(player instanceof ServerPlayerEntity serverPlayerEntity){
+                            if(!world.isClient()){
+                                ShaderActivationPacket.send(serverPlayerEntity, this, 0, stunTicks, ShaderActivationPacket.Type.ZA_WARUDO);
+                            }
+                            if (serverPlayerEntity == user || serverPlayerEntity.isCreative()) continue;
+                            // Puts all player items besides armor into cooldown for entire duration of timestop
+                            for (int i = 0; i < serverPlayerEntity.getInventory().main.size(); i++){
+                                serverPlayerEntity.getItemCooldownManager().set(serverPlayerEntity.getInventory().main.get(i).getItem(), stunTicks);
+                            }
+                            serverPlayerEntity.getItemCooldownManager().set(serverPlayerEntity.getOffHandStack().getItem(), stunTicks);
+                        }
+
                     }
                 }
 
@@ -719,9 +727,9 @@ public abstract class StandEntity extends MobEntity {
                         List<Entity> filter = new ArrayList<>(List.of(this, user));
                         if (vehicle != null) filter.add(vehicle);
 
-                        hurt = JCraftUtils.GenerateHitbox(world, fPos, attack.hitboxSize, filter);
+                        hurt = JCraftUtils.generateHitbox(world, fPos, attack.hitboxSize, filter);
                         for (Attack.HitboxData data : attack.extraHitboxes) {
-                            List<LivingEntity> extraHurt = JCraftUtils.GenerateHitbox(world,
+                            List<LivingEntity> extraHurt = JCraftUtils.generateHitbox(world,
                                     hPos.add(rotVec.multiply(data.forwardOffset)).add(0, data.verticalOffset, 0), data.hitboxSize, filter);
                             for (LivingEntity hurtEntity : extraHurt)
                                 if (!hurt.contains(hurtEntity)) hurt.add(hurtEntity);
@@ -892,29 +900,8 @@ public abstract class StandEntity extends MobEntity {
      */
     public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, boolean canBackstab) {
         if (world == null || ent == null) return;
-        if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && !world.isClient()) {
-            if (attacker instanceof PlayerEntity playerEntity) {
-                IComboCounter comboCounter = (IComboCounter) playerEntity;
-                if (comboCounter.getLastAttacked() != ent) {
-                    comboCounter.setComboCount(1);
-                } else {
-                    StatusEffectInstance stun = ent.getStatusEffect(JStatusRegister.DAZED);
-                    if (stun != null && stun.getAmplifier() != 2) { // Stunned but not blocking
-                        comboCounter.incrementComboCount();
-                    } else {
-                        comboCounter.setComboCount(1);
-                    }
-
-                    PacketByteBuf buf = PacketByteBufs.create();
-                    buf.writeShort(6);
-                    buf.writeInt(comboCounter.getComboCount());
-                    if (playerEntity instanceof ServerPlayerEntity serverPlayerEntity) {
-                        ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
-                    }
-                }
-                comboCounter.setLastAttacked(ent);
-            }
-        }
+        if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && attacker instanceof PlayerEntity playerEntity)
+            comboCounterLogic(playerEntity, ent);
 
         baseDamageLogic(ent, kbVec, stunTicks, stunType, overrideStun, damage, lift, blockstun, source, attacker, canBackstab);
     }
@@ -931,32 +918,32 @@ public abstract class StandEntity extends MobEntity {
      */
     public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker) {
         if (world == null || ent == null) return;
-        if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && !world.isClient()) {
-            if (attacker instanceof PlayerEntity playerEntity) {
-                IComboCounter comboCounter = (IComboCounter) playerEntity;
-                if (comboCounter.getLastAttacked() != ent) {
-                    comboCounter.setComboCount(1);
-                } else {
-                    StatusEffectInstance stun = ent.getStatusEffect(JStatusRegister.DAZED);
-                    if (stun != null && stun.getAmplifier() == 1) {
-                        //LOGGER.info("Target stun: " + stun.getDuration());
-                        comboCounter.incrementComboCount();
-                    } else {
-                        comboCounter.setComboCount(1);
-                    }
-
-                    PacketByteBuf buf = PacketByteBufs.create();
-                    buf.writeShort(6);
-                    buf.writeInt(comboCounter.getComboCount());
-                    if (playerEntity instanceof ServerPlayerEntity serverPlayerEntity) {
-                        ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
-                    }
-                }
-                comboCounter.setLastAttacked(ent);
-            }
-        }
-
+        if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && attacker instanceof PlayerEntity playerEntity)
+            comboCounterLogic(playerEntity, ent);
         baseDamageLogic(ent, kbVec, stunTicks, stunType, overrideStun, damage, lift, blockstun, source, attacker, false);
+    }
+
+    /**
+     * Handles combo counting for specific player
+     * @param playerEntity attacker
+     */
+    private static void comboCounterLogic(PlayerEntity playerEntity, LivingEntity victim) {
+        IComboCounter comboCounter = (IComboCounter) playerEntity;
+        if (comboCounter.getLastAttacked() != victim)
+            comboCounter.setComboCount(1);
+        else {
+            StatusEffectInstance stun = victim.getStatusEffect(JStatusRegister.DAZED);
+            if (stun != null && stun.getAmplifier() != 2) //LOGGER.info("Target stun: " + stun.getDuration());
+                comboCounter.incrementComboCount();
+            else
+                comboCounter.setComboCount(1);
+
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeShort(6);
+            buf.writeInt(comboCounter.getComboCount());
+            ServerChannelFeedbackPacket.send((ServerPlayerEntity) playerEntity, buf);
+        }
+        comboCounter.setLastAttacked(victim);
     }
 
     /**
@@ -987,7 +974,7 @@ public abstract class StandEntity extends MobEntity {
 
             if (stand.blocking && !stand.getRemote()) {
                 double delta = Math.abs((ent.headYaw + 90.0f) % 360.0f - (attacker.getHeadYaw() + 90.0f) % 360.0f);
-                if ( canBackstab && (360.0 - delta % 360.0 < 90 || delta % 360.0 < 90) && ent.squaredDistanceTo(attacker.getPos()) >= 1 ) { // Backstab logic
+                if ( canBackstab && (360.0 - delta % 360.0 < 90 || delta % 360.0 < 90) && ent.squaredDistanceTo(attacker.getPos()) >= 2.25 ) { // Backstab logic
                     JCraft.CreateParticle((ServerWorld) attacker.getWorld(), ent.getX(), attacker.getEyeY(), ent.getZ(), -2);
                     stand.playSound(SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, 1, 1);
                     stand.blocking = false;
@@ -1025,7 +1012,7 @@ public abstract class StandEntity extends MobEntity {
         // Interrupting spec moves
         if (ent instanceof PlayerEntity playerEntity) {
             JCraftSpec spec = JCraftUtils.getSpec(playerEntity);
-            if (spec != null && spec.curAttack != null && !spec.curAttack.hasArmor) spec.CancelAttack();
+            if (spec != null && spec.curAttack != null && !spec.curAttack.hasArmor) spec.cancelAttack();
         }
 
         // Aerial hits keep the victim up
@@ -1063,7 +1050,9 @@ public abstract class StandEntity extends MobEntity {
 
     @Override
     public boolean damage(DamageSource source, float amount) {
-        if (source.isMagic() || source.isExplosive()) return false;
+        if (source.isMagic() || source.isExplosive()) {
+            return false;
+        }
         return super.damage(source, amount);
     }
 
@@ -1084,9 +1073,15 @@ public abstract class StandEntity extends MobEntity {
      * Handles AI for mob stand users
      */
     public void mobAI(MobEntity mob, LivingEntity target) {
-        if (mob == target) return;
-        if (target == null) return;
-        if (!target.isAlive()) return;
+        if (mob == target) {
+            return;
+        }
+        if (target == null) {
+            return;
+        }
+        if (!target.isAlive()) {
+            return;
+        }
 
         mob.lookAtEntity(target, 30, 30); // Point body at enemy
         mob.getLookControl().lookAt(target); // Usually detrimental not to
@@ -1178,7 +1173,7 @@ public abstract class StandEntity extends MobEntity {
             int stunTicks = stun != null ? stun.getDuration() + random.nextInt(5) : 0;
             stunTicks += blockPlusTicks;
             stunTicks += ((ITimeStop) target).getTimeStopTicks();
-            int move = SelectMove(mob, target, stunTicks, enemyMoveStun, distance, enemyStand, enemyAttack);
+            int move = selectMove(mob, target, stunTicks, enemyMoveStun, distance, enemyStand, enemyAttack);
             Attack selectedAttack = null;
 
             boolean shouldPerformMove = this.getMoveStun() < 1;
@@ -1259,11 +1254,11 @@ public abstract class StandEntity extends MobEntity {
     /**
      * Used to help AIs that use stands with unique moves
      */
-    public MoveSelectionResult SpecificMoveSelectionCriterion(Attack attack, MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity enemyStand, Attack enemyAttack) {
+    public MoveSelectionResult specificMoveSelectionCriterion(Attack attack, MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity enemyStand, Attack enemyAttack) {
         return MoveSelectionResult.PASS;
     }
 
-    private int SelectMove(MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity enemyStand, Attack enemyAttack) {
+    private int selectMove(MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity enemyStand, Attack enemyAttack) {
         int chosenMove = 0; //random.nextInt(0, 4);
         int chosenMoveInitTime = this.moves.get(chosenMove).initTime;
         int movesOnCooldown = 0;
@@ -1298,7 +1293,7 @@ public abstract class StandEntity extends MobEntity {
             }
 
             // Selection of characteristic moves with custom usage logic
-            MoveSelectionResult result = SpecificMoveSelectionCriterion(attack, mob, target, stunTicks, enemyMoveStun, distance, enemyStand, enemyAttack);
+            MoveSelectionResult result = specificMoveSelectionCriterion(attack, mob, target, stunTicks, enemyMoveStun, distance, enemyStand, enemyAttack);
             if (result == MoveSelectionResult.USE) {
                 chosenMove = i;
                 break;

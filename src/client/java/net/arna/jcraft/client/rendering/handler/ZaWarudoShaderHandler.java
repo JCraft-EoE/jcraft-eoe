@@ -9,7 +9,9 @@ import ladysnake.satin.api.util.GlMatrices;
 import net.arna.jcraft.JCraft;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.PostProcessShader;
 import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.Shader;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
@@ -26,53 +28,41 @@ public class ZaWarudoShaderHandler extends StandShaderHandler {
 
     public @Nullable LivingEntity shaderSourceEntity = null;
 
-    private final ManagedShaderEffect shader = ShaderEffectManager.getInstance().manage(SHADER_ID, this::setup);
+    private final ManagedShaderEffect SHADER = ShaderEffectManager.getInstance().manage(SHADER_ID, this::setup);
 
     private void setup(ManagedShaderEffect managedShaderEffect) {
         MinecraftClient mc = MinecraftClient.getInstance();
-        shader.setSamplerUniform("DepthSampler", ((ReadableDepthFramebuffer) mc.getFramebuffer()).getStillDepthMap());
-        shader.setUniformValue("ViewPort", 0, 0, mc.getWindow().getFramebufferWidth(), mc.getWindow().getFramebufferHeight());
+        SHADER.setSamplerUniform("DepthSampler", ((ReadableDepthFramebuffer) mc.getFramebuffer()).getStillDepthMap());
+        SHADER.setUniformValue("ViewPort", 0, 0, mc.getWindow().getFramebufferWidth(), mc.getWindow().getFramebufferHeight());
     }
 
     @Override
     public void onWorldRendered(MatrixStack matrices, Camera camera, float tickDelta, long nanoTime) {
         if (renderingEffect) {
-            shader.setUniformValue("InverseTransformMatrix", GlMatrices.getInverseTransformMatrix(projectionMatrix));
+            SHADER.setUniformValue("InverseTransformMatrix", GlMatrices.getInverseTransformMatrix(projectionMatrix));
             Vec3d cameraPos = camera.getPos();
-            shader.setUniformValue(
-                    "CameraPosition", (float) cameraPos.x, (float) cameraPos.y,
-                    (float) cameraPos.z
-            );
+            SHADER.setUniformValue("CameraPosition", (float) cameraPos.x, (float) cameraPos.y, (float) cameraPos.z);
             if (shaderSourceEntity != null) {
-                shader.setUniformValue(
+                SHADER.setUniformValue(
                         "Center",
                         lerp(shaderSourceEntity.getX(), shaderSourceEntity.prevX, tickDelta),
                         lerp(shaderSourceEntity.getY() + shaderSourceEntity.getHeight() / 2, shaderSourceEntity.prevY + shaderSourceEntity.getHeight() / 2, tickDelta),
                         lerp(shaderSourceEntity.getZ(), shaderSourceEntity.prevZ, tickDelta)
                 );
             }
-            shader.setUniformValue("Radius", Math.max(0f, lerp(radius, prevRadius, tickDelta)));
-            shader.render(tickDelta);
+            SHADER.setUniformValue("Radius", Math.max(0f, lerp(radius, prevRadius, tickDelta)));
+            SHADER.render(tickDelta);
         }
     }
 
     @Override
     public void onEndTick(MinecraftClient client) {
-        if (shouldRender && !renderingEffect) {
-            if (tickDelay > 0) {
-                tickDelay--;
-            }
-        }
-
-        if (shouldRender) {
+       if (shouldRender) {
             if (!renderingEffect) {
-                if (tickDelay <= 0) {
-                    shader.setUniformValue("OuterSat", 1f);
-                    ticks = 0;
-                    radius = 0f;
-                    renderingEffect = true;
-                }
-                return;
+                SHADER.setUniformValue("OuterSat", 1f);
+                ticks = 0;
+                radius = 0f;
+                renderingEffect = true;
             }
             ticks++;
             prevRadius = radius;
@@ -81,7 +71,7 @@ public class ZaWarudoShaderHandler extends StandShaderHandler {
             if (ticks < inversion) {
                 radius += expansionRate;
             } else if (ticks == inversion) {
-                shader.setUniformValue("OuterSat", 0.3f);
+                SHADER.setUniformValue("OuterSat", 0.3f);
             } else if (ticks < 2 * inversion) {
                 radius -= 2 * expansionRate;
             }
@@ -111,8 +101,7 @@ public class ZaWarudoShaderHandler extends StandShaderHandler {
     @Override
     public void renderShaderEffects(float tickDelta) {
         if (this.renderingEffect) {
-            shader.render(tickDelta);
+            SHADER.render(tickDelta);
         }
     }
-
 }

@@ -28,6 +28,6 @@ public class D4CModel extends AnimatedTickingGeoModel<D4CEntity> {
     public void setCustomAnimations(D4CEntity animatable, int instanceId, AnimationEvent animationEvent) {
         super.setCustomAnimations(animatable, instanceId, animationEvent);
         if (animatable.hasUser())
-            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), true, true);
+            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), animationEvent.getPartialTick(), true, true);
     }
 }

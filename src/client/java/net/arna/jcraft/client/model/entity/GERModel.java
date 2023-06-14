@@ -27,6 +27,6 @@ public class GERModel extends AnimatedTickingGeoModel<GEREntity> {
     public void setCustomAnimations(GEREntity animatable, int instanceId, AnimationEvent animationEvent) {
         super.setCustomAnimations(animatable, instanceId, animationEvent);
         if (animatable.hasUser())
-            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser());
+            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), animationEvent.getPartialTick());
     }
 }

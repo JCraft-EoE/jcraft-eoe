@@ -29,6 +29,8 @@ public interface JSoundRegister {
     SoundEvent COIN_TOSS = registerSound("cointoss");
 
     // Star Platinum
+    SoundEvent STAR_PLATINUM_SUMMON = registerSound("spsummon");
+    SoundEvent STAR_PLATINUM_TIMESKIP = registerSound("sptimeskip");
     SoundEvent STAR_PLATINUM_BARRAGE = registerSound("spbarrage");
     SoundEvent STAR_PLATINUM_ADVANCING_BARRAGE = registerSound("spadvbarrage");
     SoundEvent STAR_PLATINUM_THE_WORLD = registerSound("sptw");
@@ -170,10 +172,12 @@ public interface JSoundRegister {
     //The World: Over Heaven
     SoundEvent TWOH_SUMMON = registerSound("twohsummon");
     SoundEvent TWOH_SHOOT = registerSound("twohshoot");
+    SoundEvent TWOH_TIMESKIP = registerSound("twohtimeskip");
     SoundEvent TWOH_TS = registerSound("twohtimestop");
     SoundEvent TWOH_HEAVY = registerSound("twohheavy");
     SoundEvent TWOH_SMITE = registerSound("twohsmite");
     SoundEvent TWOH_CHARGEOVERWRITE = registerSound("twohchargeoverwrite");
+    SoundEvent TWOH_CHARGE = registerSound("twohcharge");
     SoundEvent TWOH_OVERWRITE = registerSound("twohoverwrite");
     SoundEvent TWOH_KNIFETHROW = registerSound("twohowarida");
     SoundEvent TWOH_AIRKNIVES = registerSound("twohairknives");

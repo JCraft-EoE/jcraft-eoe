@@ -27,6 +27,6 @@ public class MadeInHeavenModel extends AnimatedTickingGeoModel<MadeInHeavenEntit
     public void setCustomAnimations(MadeInHeavenEntity animatable, int instanceId, AnimationEvent animationEvent) {
         super.setCustomAnimations(animatable, instanceId, animationEvent);
         if (animatable.hasUser())
-            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), true, true, -0.1745329251f, -0.1745329251f);
+            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), animationEvent.getPartialTick(), true, true, -0.1745329251f, -0.1745329251f);
     }
 }

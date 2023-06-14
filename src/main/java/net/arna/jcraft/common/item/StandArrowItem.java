@@ -49,7 +49,7 @@ public class StandArrowItem extends Item {
             if (user.hasPassengers()) {
                 user.detach();
             }
-            JCraft.Summon((ServerWorld) world, user);
+            JCraft.summon((ServerWorld) world, user);
         }
 
         return TypedActionResult.consume(itemStack);

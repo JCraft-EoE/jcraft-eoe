@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "net.arna.jcraft.client.mixin",
-  "plugin": "net.arna.jcraft.mixin.JMixinPlugin",
+  "plugin": "net.arna.jcraft.client.JClientMixinPlugin",
   "compatibilityLevel": "JAVA_16",
   "client": [
     "IntegratedServerLoaderMixin",
@@ -19,7 +19,9 @@
     "ItemRendererMixin",
     "ParticleAccessor",
     "ParticleManagerMixin",
-    "WorldRendererMixin"
+    "WorldRendererMixin",
+    "sodium.vanilla.WorldRendererVanillaMixin",
+    "sodium.sodium.SodiumWorldRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

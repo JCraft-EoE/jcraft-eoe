@@ -110,13 +110,14 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
 
         pros = List.of(
                 "long reach",
+                "easy, accessible space control using crouching (reduces attack distance) and multiple armored options",
                 "easy setups",
-                "excellent combo tools",
+                "good combo tools",
                 "doesn't receive chip damage on block"
         );
 
         cons = List.of(
-                "slowest light in the game",
+                "overall slow",
                 "extremely susceptible to rushdown",
                 "immobile while blocking"
         );
@@ -126,15 +127,15 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
         freespace =
                 """
                         BNBs:
-                            M1>Pound>Launch>M1>Burn Rubber>Finisher*
-                            Burn Rubber>M1>Pound>Launch>Finisher*
-                            Launch>M1>Burn Rubber>M1>Pound>Finisher*
+                            M1>Pound~Slam>Launch>M1>Burn Rubber>Finisher*
+                            Burn Rubber>M1>Pound~Slam>Launch>Finisher*
+                            Launch>M1>Burn Rubber>M1>Pound~Slam>Finisher*
 
                             Stylish:
                             the social distancing
-                            M1>Pound>M1>Combo>Charge>Sandwave
+                            M1>Pound~Slam>M1>Combo>Charge>Sandwave
                             the pancake flip
-                            Launch>Pound>M1>Burn Rubber>Finisher*
+                            Launch>Pound~Slam>M1>Burn Rubber>Finisher*
 
                             *Finisher: M1>Charge>(Sand Clone/Sandwave)""";
 
@@ -180,7 +181,7 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
         if (sand) this.setDistanceOffset(0);
 
         // Projectile deflection
-        List<ProjectileEntity> toDeflect = world.getEntitiesByClass(ProjectileEntity.class, this.getBoundingBox().expand(0.75f), EntityPredicates.VALID_ENTITY);
+        List<ProjectileEntity> toDeflect = world.getEntitiesByClass(ProjectileEntity.class, getBoundingBox().expand(0.75f), EntityPredicates.VALID_ENTITY);
 
         for (ProjectileEntity projectile : toDeflect) {
             if (projectile.getOwner() == user) continue;

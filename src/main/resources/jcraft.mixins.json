@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "net.arna.jcraft.mixin",
-  "plugin": "net.arna.jcraft.mixin.JMixinPlugin",
+  "plugin": "net.arna.jcraft.JMixinPlugin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "EntityMixin",

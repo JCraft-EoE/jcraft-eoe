@@ -2,7 +2,6 @@ package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.common.util.JCraftUtils;
 import net.arna.jcraft.registry.JEntityTypeRegister;
-import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -28,6 +27,7 @@ import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
+import net.arna.jcraft.registry.*;
 
 public class KnifeProjectile extends PersistentProjectileEntity implements IAnimatable {
     private int ticksInAir;
@@ -107,23 +107,18 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
                                         576 // Squared
                                 );
 
-                                HitResult hitResult = this.world.raycast(new RaycastContext(eP, eP.add(rangeMod), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, owner));
+                                HitResult hitResult = world.raycast(new RaycastContext(eP, eP.add(rangeMod), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, owner));
 
                                 playSound(JSoundRegister.TWOH_SHOOT, 1, 1);
 
                                 Vec3d hitPos = hitResult.getPos();
-                                if (eHit != null) {
-                                    hitPos = eHit.getPos();
-                                    this.setVelocity(new Vec3d(hitPos.x - getX(), hitPos.y - getY(), hitPos.z - getZ()).normalize());
-                                } else {
-                                    this.setVelocity(new Vec3d(hitPos.x - getX(), hitPos.y - getY(), hitPos.z - getZ()).normalize());
-                                }
+                                if (eHit != null) hitPos = eHit.getPos();
+                                setVelocity(new Vec3d(hitPos.x - getX(), hitPos.y - getY(), hitPos.z - getZ()).normalize());
+
                                 velocityDirty = true;
                                 delayFired = true;
                             }
-                        } else {
-                            this.setVelocity(this.getVelocity().multiply(0.5));
-                        }
+                        } else setVelocity(getVelocity().multiply(0.5));
                     }
                 }
             }
@@ -138,7 +133,7 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
         if (world.isClient) return;
-        if (delayed && delayTime > 0) return;
+        if (delayed && delayTime > 1) return;
         Entity owner = this.getOwner();
         if (owner == null) return;
         Entity entity = entityHitResult.getEntity();
@@ -152,13 +147,12 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
             stunT = 20;
             blockstun = 6;
         } else {
-            this.dropStack(this.asItemStack(), 0.1F);
+            dropStack(this.asItemStack(), 0.1F);
         }
 
-        JCraftUtils.ProjectileDamageLogic(this, world, entity, Vec3d.ZERO, stunT, 1, false, 2, blockstun);
-
-        this.discard();
-        this.playSound(SoundEvents.ITEM_TRIDENT_HIT, 1, 1);
+        JCraftUtils.projectileDamageLogic(this, world, entity, Vec3d.ZERO, stunT, 1, false, 2, blockstun);
+        playSound(SoundEvents.ITEM_TRIDENT_HIT, 1, 1);
+        discard();
     }
 
     @Override

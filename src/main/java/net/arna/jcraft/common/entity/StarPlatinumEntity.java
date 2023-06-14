@@ -169,14 +169,12 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
         if (user.getPersistentData().getInt(JCraft.standUltCD) < 60)
             user.getPersistentData().putInt(JCraft.standUltCD, 60); // 3 second timestop cooldown
 
-        this.world.playSound(null, pos.x, pos.y, pos.z, JSoundRegister.TIME_SKIP, SoundCategory.PLAYERS, 1f, 1f);
+        world.playSound(null, pos.x, pos.y, pos.z, JSoundRegister.STAR_PLATINUM_TIMESKIP, SoundCategory.PLAYERS, 1f, 1f);
     }
 
     @Override
     public void desummon() {
-        if (this.getTSTime() < 1) {
-            super.desummon();
-        }
+        if (this.getTSTime() < 1) super.desummon();
     }
 
     @Override
@@ -197,7 +195,7 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
 
     @Override
     public void tick() {
-        if (age == 1) this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.STAND_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
+        if (age == 1) this.playSound(JSoundRegister.STAR_PLATINUM_SUMMON, 1f, 1f);
         super.tick();
         if (hasUser()) this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(getUser()) / 2, 0.0, 255.0) / 255f);
     }

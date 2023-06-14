@@ -27,6 +27,6 @@ public class CMoonModel extends AnimatedTickingGeoModel<CMoonEntity> {
     public void setCustomAnimations(CMoonEntity animatable, int instanceId, AnimationEvent animationEvent) {
         super.setCustomAnimations(animatable, instanceId, animationEvent);
         if (animatable.hasUser())
-            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), true, true);
+            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), animationEvent.getPartialTick(), true, true);
     }
 }

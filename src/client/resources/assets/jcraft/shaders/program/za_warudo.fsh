@@ -67,7 +67,7 @@ void main(){
 
 
     vec2 uv;
-    if (power < 0.0)
+    if (power < 0.0 && Radius > 0)
     uv = m + normalize(d) * atan(r * -power * 10.0) * bind / atan(-power * bind * 10.0);
     else
     uv = p;

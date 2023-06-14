@@ -80,7 +80,7 @@ public class StandControlPacket {
                     else
                         stand.desummon();
                 } else if (world != null)
-                    JCraft.Summon(world, player);
+                    JCraft.summon(world, player);
             });
             // 2 - LIGHT ATTACK
             case 2 -> server.execute(() -> {
@@ -217,7 +217,7 @@ public class StandControlPacket {
                     if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking())
                         stand.queuedAttack = AttackQueue.MIDDLEMOUSE;
                 } else {
-                    StandEntity stand2 = JCraft.Summon(world, player);
+                    StandEntity stand2 = JCraft.summon(world, player);
                     if (stand2 != null)
                         stand2.initMiddleClick();
                 }

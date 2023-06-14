@@ -26,32 +26,43 @@ public class Brawler extends JCraftSpec {
 
     @Override
     public void InitHeavyAttack(ServerWorld serverWorld) {
-        if (!CanAttack()) return;
-        HandleAttack(serverWorld, heavy, JCraft.heavyCD);
+        if (!canAttack()) {
+            return;
+        }
+        handleAttack(serverWorld, heavy, JCraft.heavyCD);
     }
 
     @Override
     public void InitBarrage(ServerWorld serverWorld) {
-        if (!CanAttack()) return;
-        HandleAttack(serverWorld, combo, JCraft.barrageCD);
+        if (!canAttack()) {
+            return;
+        }
+        handleAttack(serverWorld, combo, JCraft.barrageCD);
     }
 
     @Override
     public void InitSpecial1(ServerWorld serverWorld) {
-        if (!CanAttack()) return;
-        HandleAttack(serverWorld, gut, JCraft.s1CD);
+        if (!canAttack()) {
+            return;
+        }
+        handleAttack(serverWorld, gut, JCraft.s1CD);
     }
 
     @Override
     public void InitSpecial2(ServerWorld serverWorld) {
-        if (!CanAttack()) return;
-        HandleAttack(serverWorld, low, JCraft.s2CD);
+        if (!canAttack()) {
+            return;
+        }
+        handleAttack(serverWorld, low, JCraft.s2CD);
     }
 
     @Override
-    public void SpecialAttack(Attack attack, List<LivingEntity> hurt) {
-        if (attack.id == 1)
-            for (LivingEntity ent : hurt)
+    public void specialAttack(Attack attack, List<LivingEntity> hurt) {
+        if (attack == low) {
+            for (LivingEntity ent :
+                    hurt) {
                 ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 25, 0, true, true));
+            }
+        }
     }
 }

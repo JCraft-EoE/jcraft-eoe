@@ -37,7 +37,7 @@ public class GETreeEntity extends Entity implements IAnimatable, IAnimationTicka
 
         if (owner != null) {
             if (age == 4) {
-                List<LivingEntity> hurt = JCraftUtils.GenerateHitbox(world, getPos().add(0, 1, 0), 2.5, null);
+                List<LivingEntity> hurt = JCraftUtils.generateHitbox(world, getPos().add(0, 1, 0), 2.5, null);
                 for (LivingEntity living :
                         hurt) {
                     LivingEntity target = JCraftUtils.getUserIfStand(living);

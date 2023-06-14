@@ -8,6 +8,7 @@ import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import lombok.experimental.UtilityClass;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.JCraftClient;
+import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
 import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
 import net.arna.jcraft.common.entity.MadeInHeavenEntity;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
@@ -343,11 +344,17 @@ public class ClientPacketHandler {
                     Entity sourceShader = world.getEntityById(id);
                     if (sourceShader instanceof LivingEntity livingEntity) {
                         ZaWarudoShaderHandler zaWarudoShaderHandler = ZaWarudoShaderHandler.INSTANCE;
-                        zaWarudoShaderHandler.tickDelay = delay;
                         zaWarudoShaderHandler.shaderSourceEntity = Optional.of(livingEntity).orElse(client.player);
                         zaWarudoShaderHandler.effectLength = duration;
                         zaWarudoShaderHandler.shouldRender = true;
                     }
+                });
+            }
+            case CRIMSON -> {
+                client.execute(() -> {
+                    CrimsonShaderHandler crimsonShaderHandler = CrimsonShaderHandler.INSTANCE;
+                    crimsonShaderHandler.effectLength = 300;
+                    crimsonShaderHandler.shouldRender = true;
                 });
             }
         }
@@ -364,6 +371,11 @@ public class ClientPacketHandler {
                     ZaWarudoShaderHandler zaWarudoShaderHandler = ZaWarudoShaderHandler.INSTANCE;
                     zaWarudoShaderHandler.shouldRender = false;
                     zaWarudoShaderHandler.renderingEffect = false;
+                });
+                case CRIMSON -> client.execute(() -> {
+                    CrimsonShaderHandler crimsonShaderHandler = CrimsonShaderHandler.INSTANCE;
+                    crimsonShaderHandler.shouldRender = false;
+                    crimsonShaderHandler.renderingEffect = false;
                 });
             }
         }

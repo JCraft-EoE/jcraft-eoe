@@ -38,7 +38,7 @@ public abstract class LivingEntityMixin {
         StatusEffectInstance stun = player.getStatusEffect(JStatusRegister.DAZED);
         if (
                 player.hasStatusEffect(JStatusRegister.KNOCKDOWN)
-                        || (stun != null && stun.getAmplifier() < 2)
+                        || (stun != null && stun.getAmplifier() != 2)
                         || player.getFirstPassenger() instanceof StandEntity stand && stand.getRemote()) {
             cir.setReturnValue(-1.0D);
         }

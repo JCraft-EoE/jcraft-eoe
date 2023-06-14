@@ -10,7 +10,7 @@ import net.minecraft.util.math.Matrix4f;
 public class SkyBoxManager implements ClientTickEvents.EndWorldTick {
     private static final SkyBoxManager INSTANCE = new SkyBoxManager();
 
-    private JSkyBox currentSkyBox = JConfig.FORCE_CRIMSON_SKIES ? JConfig.SHADER_CRIMSON_SKY ? new CrimsonSkyBox() : new CrimsonSkyBoxCool() : null;
+    private JSkyBox currentSkyBox = null;
     private boolean enabled = true;
 
     @Override
