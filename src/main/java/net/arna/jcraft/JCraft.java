@@ -104,7 +104,7 @@ public class JCraft implements ModInitializer {
     private static IClientEntityHandler clientEntityHandler = DummyClientEntityHandler.INSTANCE;
 
     // Dashes
-
+    //todo: teach the ai how to dash
     /**
      * Holds the data of an individual entities dash ({@link DashData#entity}, {@link DashData#dashVector}, {@link DashData#finished}, {@link DashData#duration})
      */

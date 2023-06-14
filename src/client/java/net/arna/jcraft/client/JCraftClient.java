@@ -25,6 +25,7 @@ import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.network.c2s.StandControlPacket;
 import net.arna.jcraft.common.util.ColorUtils;
+import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.registry.*;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -181,7 +182,7 @@ public class JCraftClient implements ClientModInitializer {
             );
         }
 
-        boolean standOn = player.getFirstPassenger() instanceof StandEntity;
+        boolean standOn = ((IEntityDataSaver)player).getStand() != null;
 
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -271,12 +272,8 @@ public class JCraftClient implements ClientModInitializer {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
 
         if (player != null) {
-            boolean standOn = false;
-            StandEntity stand = null;
-            if (player.getFirstPassenger() instanceof StandEntity s) {
-                standOn = true;
-                stand = s;
-            }
+            StandEntity stand = ((IEntityDataSaver)player).getStand();
+            boolean standOn = stand != null;
 
             if (player.isAlive()) { // Send movement inputs to server
                 PacketByteBuf buf = PacketByteBufs.create();

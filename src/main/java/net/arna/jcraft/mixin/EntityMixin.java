@@ -30,7 +30,7 @@ public class EntityMixin implements ITimeStop {
     @Inject(method = "updatePassengerPosition(Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/Entity$PositionUpdater;)V", at = @At("HEAD"), cancellable = true)
     private void jcraft$updatePassengerPosition(Entity passenger, Entity.PositionUpdater positionUpdater, CallbackInfo info) {
         if (passenger instanceof StandEntity stand) {
-            if (stand.getFree()) {
+            if (stand.getFree() && !stand.getRemote()) {
                 Vec3f freePos = stand.getFreePos();
                 positionUpdater.accept(passenger, freePos.getX(), freePos.getY(), freePos.getZ());
                 info.cancel();

@@ -882,8 +882,14 @@ Silver Chariot
 The Fool
     >Updated /stand about
 
+● 14/6/2023
+>Backstab distance requirement decreased to 1.25m
+
+Silver Chariot
+    >Updated sounds
+
 The World: Over Heaven
-    >
+    >Updated sounds
 
 priority (top to bottom)
 TODO: ability to position the HUD

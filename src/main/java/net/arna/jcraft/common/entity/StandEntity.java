@@ -11,6 +11,7 @@ import net.arna.jcraft.mixin.LivingEntityInvoker;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.Entity;
@@ -28,6 +29,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.s2c.play.EntityPassengersSetS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.StopSoundS2CPacket;
 import net.minecraft.particle.ParticleTypes;
@@ -267,11 +269,10 @@ public abstract class StandEntity extends MobEntity {
 
     public void setRemote(boolean r) {
         this.dataTracker.set(REMOTE, r);
-        if (r) {
+        if (r)
             beginRemote();
-        } else {
+        else
             endRemote();
-        }
     }
 
     /**
@@ -279,11 +280,19 @@ public abstract class StandEntity extends MobEntity {
      */
     protected void beginRemote() {
         setFree(true);
-        Vec3d fPos = user.getPos().add(user.getRotationVector());
-        setFreePos(new Vec3f(fPos));
-        setPos(fPos.x, fPos.y + 0.5, fPos.z);
+
+        Vec3d fPos = user.getPos().add( user.getRotationVector() );
         remoteSpeed = user.getVelocity(); // Inertia
+        remoteSpeed = new Vec3d(remoteSpeed.x * 5, remoteSpeed.y / 2, remoteSpeed.z * 5);
+
         setAlpha(0.1f);
+
+        detach();
+
+        this.noClip = false;
+
+        this.velocityDirty = true;
+        setPos(fPos.x, user.getY() + 0.5, fPos.z);
     }
 
     /**
@@ -291,7 +300,12 @@ public abstract class StandEntity extends MobEntity {
      */
     protected void endRemote() {
         setFree(false);
+
         setAlpha(1);
+
+        startRiding(user);
+
+        this.noClip = true;
     }
 
     /*
@@ -364,8 +378,8 @@ public abstract class StandEntity extends MobEntity {
 
     public void initialize() {
         this.noClip = true;
-        this.setInvulnerable(true);
-        this.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 999999, 9, false, false));
+        setInvulnerable(true);
+        addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 999999, 9, false, false));
     }
 
     // Attack controls
@@ -530,6 +544,8 @@ public abstract class StandEntity extends MobEntity {
 
     // Define desummon conditions
     public void desummon() {
+        if (user != null)
+            ((IEntityDataSaver)user).setStand(null);
         if (this.curAttack == null && this.getMoveStun() <= 0)
             this.discard();
     }
@@ -593,16 +609,18 @@ public abstract class StandEntity extends MobEntity {
     public void tick() {
         super.tick();
 
-        if (this.isDead()) return;
+        if (isDead()) return;
 
-        if (this.user == null) {
-            if (world.isClient && this.getVehicle() instanceof LivingEntity living)
+        boolean client = world.isClient;
+
+        if (user == null) {
+            if (client && getVehicle() instanceof LivingEntity living)
                 user = living;
             return;
         } //else if (this.owner == null) { this.owner = player; }
         Entity vehicle = user.getVehicle();
 
-        this.setMoveStun(this.getMoveStun() - 1);
+        setMoveStun(getMoveStun() - 1); // Counting down animation time or similar
         if (playSummonAnim && (getMoveStun() > 0 || age > summonAnimDuration) )
             playSummonAnim = false;
 
@@ -614,32 +632,38 @@ public abstract class StandEntity extends MobEntity {
         boolean isFree = getFree();
         boolean isRemote = getRemote();
 
-        boolean client = this.world.isClient();
         if (client) {
-            if (isRemote)
+            if (isRemote) {
+                if (hasVehicle()) detach();
+
+                // Clientside rotational sync for remote mode
                 user.setBodyYaw(user.getHeadYaw());
+
+                setHeadYaw(user.getHeadYaw());
+                setRotation(user.getYaw(), user.getPitch());
+            } else if (!hasVehicle())
+                startRiding(user);
         } else {
             // Reset samestate
-            if (this.getSameState()) {
-                this.setSameState(false);
-            }
+            if (getSameState()) setSameState(false);
+
+            // Make sure the user is using this stand
+            if (((IEntityDataSaver)user).getStand() != this) discard();
 
             // Block break check
-            if (this.getStandGauge() < 1) {
+            if (getStandGauge() < 1) {
                 user.addStatusEffect(new StatusEffectInstance(JStatusRegister.DAZED, 40, 2));
-                this.playSound(SoundEvents.ITEM_TOTEM_USE, 1, 0.5f);
-                this.kill();
+                playSound(SoundEvents.ITEM_TOTEM_USE, 1, 0.5f);
+                kill();
             }
 
             // Return to user after stand detach move, provided it's finished recovering and there's no queued followup
-            if (this.defaultToNear() && this.getMoveStun() < 1 && this.queuedAttack == null && attack == null) {
-                this.setFree(false);
-            }
+            if (defaultToNear() && getMoveStun() < 1 && this.queuedAttack == null && attack == null) setFree(false);
 
             // Rotate with user
             if (!isFree || isRemote) {
-                this.setHeadYaw(user.getHeadYaw());
-                this.setRotation(user.getYaw(), user.getPitch());
+                setHeadYaw(user.getHeadYaw());
+                setRotation(user.getYaw(), user.getPitch());
             }
 
             // Remote mode
@@ -691,12 +715,9 @@ public abstract class StandEntity extends MobEntity {
                             new Box(eyePos.add(96.0, 96.0, 96.0), eyePos.subtract(96.0, 96.0, 96.0)), EntityPredicates.VALID_LIVING_ENTITY);
 
                     for (PlayerEntity player : toCooldown) {
-
                         // Shader handling
                         if(player instanceof ServerPlayerEntity serverPlayerEntity){
-                            if(!world.isClient()){
-                                ShaderActivationPacket.send(serverPlayerEntity, this, 0, stunTicks, ShaderActivationPacket.Type.ZA_WARUDO);
-                            }
+                            ShaderActivationPacket.send(serverPlayerEntity, this, 0, stunTicks, ShaderActivationPacket.Type.ZA_WARUDO);
                             if (serverPlayerEntity == user || serverPlayerEntity.isCreative()) continue;
                             // Puts all player items besides armor into cooldown for entire duration of timestop
                             for (int i = 0; i < serverPlayerEntity.getInventory().main.size(); i++){
@@ -865,19 +886,11 @@ public abstract class StandEntity extends MobEntity {
             toStop.remove(user);
 
             for (Entity entity : toStop) {
-                /*
-                if (entity.getFirstPassenger() instanceof StandEntity stand) {
-                    JCraft.LOGGER.info("TSing stand: " + stand.getName());
-                    if (tsTime - stand.tsRes > 0)
-                }
-                 */
                 ITimeStop ts = ((ITimeStop) entity);
                 ts.setTimeStopTicks(2);
             }
 
-            if (!client) {
-                this.setTSTime(tsTime - 1);
-            }
+            if (!client) this.setTSTime(tsTime - 1);
         }
 
         if (this.curAttack != this.previousAttack && this.curAttack != null) {
@@ -959,7 +972,8 @@ public abstract class StandEntity extends MobEntity {
         boolean hit = true;
         boolean tsHit = ( (ITimeStop)ent ).getTimeStopTicks() > 0;
 
-        if (ent.getFirstPassenger() instanceof StandEntity stand) {
+        StandEntity stand = ((IEntityDataSaver)ent).getStand();
+        if (stand != null) {
             Attack standAttack = stand.curAttack;
             if (standAttack != null) {
                 // Counter check
@@ -974,7 +988,7 @@ public abstract class StandEntity extends MobEntity {
 
             if (stand.blocking && !stand.getRemote()) {
                 double delta = Math.abs((ent.headYaw + 90.0f) % 360.0f - (attacker.getHeadYaw() + 90.0f) % 360.0f);
-                if ( canBackstab && (360.0 - delta % 360.0 < 90 || delta % 360.0 < 90) && ent.squaredDistanceTo(attacker.getPos()) >= 2.25 ) { // Backstab logic
+                if ( canBackstab && (360.0 - delta % 360.0 < 90 || delta % 360.0 < 90) && ent.squaredDistanceTo(attacker.getPos()) >= 1.5625 ) { // Backstab logic
                     JCraft.CreateParticle((ServerWorld) attacker.getWorld(), ent.getX(), attacker.getEyeY(), ent.getZ(), -2);
                     stand.playSound(SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, 1, 1);
                     stand.blocking = false;
@@ -1036,8 +1050,8 @@ public abstract class StandEntity extends MobEntity {
     @Override
     public void stopRiding() {
         if (!getRemote()) {
-            this.playSound(JSoundRegister.STAND_DESUMMON, 1, 1);
-            this.kill();
+            playSound(JSoundRegister.STAND_DESUMMON, 1, 1);
+            kill();
         }
         super.stopRiding();
     }
@@ -1050,16 +1064,13 @@ public abstract class StandEntity extends MobEntity {
 
     @Override
     public boolean damage(DamageSource source, float amount) {
-        if (source.isMagic() || source.isExplosive()) {
-            return false;
-        }
+        if (source.isMagic() || source.isExplosive()) return false;
         return super.damage(source, amount);
     }
 
     // Physical properties
     @Override
     public void pushAwayFrom(Entity entity) { }
-
     @Override
     public boolean collidesWith(Entity other) { return false; }
 
@@ -1087,19 +1098,16 @@ public abstract class StandEntity extends MobEntity {
         mob.getLookControl().lookAt(target); // Usually detrimental not to
 
         JCraftSpec enemySpec;
-        StandEntity enemyStand = null;
+        StandEntity enemyStand = ((IEntityDataSaver)target).getStand();
         Attack enemyAttack = null;
-        boolean enemyHasStand = false;
+        boolean enemyHasStand = enemyStand != null;
 
         double distance = target.distanceTo(mob);
         int enemyMoveStun = 0;
         int blockPlusTicks = 0;
 
         // Get enemy stand attack (most common)
-        if (target.getFirstPassenger() instanceof StandEntity stand) {
-            enemyHasStand = true;
-            enemyStand = stand;
-
+        if (enemyHasStand) {
             enemyMoveStun = enemyStand.getMoveStun();
             enemyAttack = enemyStand.curAttack;
 

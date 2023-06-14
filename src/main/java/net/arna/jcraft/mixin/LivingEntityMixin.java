@@ -35,11 +35,12 @@ public abstract class LivingEntityMixin {
     @Inject(cancellable = true, method = "getJumpBoostVelocityModifier", at = @At("HEAD"))
     public void jcraft$getJumpBoostVelocityModifier(CallbackInfoReturnable<Double> cir) {
         LivingEntity player = ((LivingEntity) (Object) this);
+        StandEntity stand = ((IEntityDataSaver)this).getStand();
         StatusEffectInstance stun = player.getStatusEffect(JStatusRegister.DAZED);
         if (
                 player.hasStatusEffect(JStatusRegister.KNOCKDOWN)
                         || (stun != null && stun.getAmplifier() != 2)
-                        || player.getFirstPassenger() instanceof StandEntity stand && stand.getRemote()) {
+                        || (stand != null && stand.getRemote()) ) {
             cir.setReturnValue(-1.0D);
         }
     }

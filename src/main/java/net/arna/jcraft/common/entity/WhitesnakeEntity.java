@@ -8,12 +8,14 @@ import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.hit.HitResult;
@@ -183,11 +185,12 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
 
     @Override
     public void tick() {
-        if (age == 1) this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.WS_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
+        if (age == 1)
+            this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.WS_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
         super.tick();
 
-        if (!this.world.isClient()) {
-            if (getRemote()) {
+        if (getRemote()) {
+            if (!world.isClient) {
                 double f = getRemoteForwardInput();
                 double s = getRemoteSideInput();
                 boolean jump = getRemoteJumpInput();
@@ -196,12 +199,12 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
 
                 // 3 ticks of inertia, helping movement be fluid as well as dealing with packet drops
                 if (lastRemoteInputTime - age > 4) updateRemoteInputs(0, 0, false);
-                Vec3d rotVec = new Vec3d(getRotationVector().x, 0, getRotationVector().z);
+                Vec3d rotVec = new Vec3d(getRotationVector().x, 0, getRotationVector().z).normalize();
 
-                double dragMult = getMoveStun() > 0 ? 0.4 : 0.6;
-                double moveSpeed = 1;
-                HitResult groundCheck = this.world.raycast(new RaycastContext(getEyePos(), pos.add(0, -1.0E-5F, 0), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
-                boolean onGround = groundCheck.getType() != HitResult.Type.MISS;
+                double dragMult = getMoveStun() > 0 ? 0.2 : 0.4;
+                double moveSpeed = 0.2;
+                //HitResult groundCheck = this.world.raycast(new RaycastContext(getEyePos(), pos.add(0, -1.0E-5F, 0), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+                boolean onGround = isOnGround();
 
                 if (getState() < 2) { // Replace idle anim
                     if (s > 0) setStateNoReset(onGround ? 12 : 16);
@@ -212,14 +215,14 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
 
                 if (onGround) { // If grounded
                     if (jump && getMoveStun() < 1) {
-                        remoteSpeed = new Vec3d(remoteSpeed.x, 0.3, remoteSpeed.z);
+                        remoteSpeed = new Vec3d(remoteSpeed.x, 0.25, remoteSpeed.z);
                         setRemoteJumpInput(false);
                     }
                 } else {
                     //JCraft.LOGGER.info("Airborne");
-                    moveSpeed = 0.1;
+                    moveSpeed = 0.02;
                     remoteSpeed = remoteSpeed.add(0, -9.81 / 200, 0); // Account for gravity
-                    dragMult = 0.7;
+                    dragMult = 0.4;
                 }
 
                 remoteSpeed = remoteSpeed
@@ -230,21 +233,15 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
                 remoteSpeed = remoteSpeed.multiply(dragMult, 1, dragMult);
 
                 if (pos.add(remoteSpeed).squaredDistanceTo(getUser().getPos()) > 400)
-                    remoteSpeed.multiply(-0.1);
+                    remoteSpeed.multiply(-1);
 
-                //todo: make this actually respect the WS collider
-                Vec3d newPos = pos.add(remoteSpeed);
-                HitResult downCast = this.world.raycast(new RaycastContext(pos.add(0, 0.1, 0), newPos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
-                if (downCast.getType() != HitResult.Type.MISS) {
-                    newPos = downCast.getPos();
-                    remoteSpeed.multiply(-0.1);
-                }
-
-                this.setFreePos(new Vec3f(newPos));
-            } else if (hasUser()) {
-                this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(getUser()) / 2, 0.0, 255.0) / 255f);
+                addVelocity(remoteSpeed.x, remoteSpeed.y, remoteSpeed.z);
             }
-        }
+
+            velocityDirty = true;
+            velocityModified = true;
+        } else if (hasUser())
+            setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(getUser()) / 2, 0.0, 255.0) / 255f);
     }
 
     // Animation code

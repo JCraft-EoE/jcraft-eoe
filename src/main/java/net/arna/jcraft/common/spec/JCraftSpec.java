@@ -66,9 +66,7 @@ public abstract class JCraftSpec {
     public boolean handleAttack(ServerWorld serverWorld, Attack attack, String cooldownName) {
         NbtCompound playerData = ((IEntityDataSaver) player).getPersistentData();
         int cd = playerData.getInt(cooldownName);
-        if (cd > 0) {
-            return false;
-        }
+        if (cd > 0) return false;
         moveStun = attack.moveStun;
         playerData.putInt(cooldownName, attack.cooldown * 20);
         curAttack = attack;
@@ -77,9 +75,8 @@ public abstract class JCraftSpec {
         buf.writeShort(12);
         buf.writeInt(player.getId());
         buf.writeString(attack.animation);
-        for (ServerPlayerEntity sendPlayer : serverWorld.getPlayers()) {
+        for (ServerPlayerEntity sendPlayer : serverWorld.getPlayers())
             ServerChannelFeedbackPacket.send(sendPlayer, buf);
-        }
         return true;
     }
 
@@ -88,17 +85,14 @@ public abstract class JCraftSpec {
         queuedAttack = null;
         moveStun = 0;
 
-        if (player == null) {
-            return;
-        }
+        if (player == null) return;
 
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeShort(13);
         buf.writeInt(player.getId());
         ServerWorld serverWorld = (ServerWorld) player.getWorld();
-        for (ServerPlayerEntity sendPlayer : serverWorld.getPlayers()) {
+        for (ServerPlayerEntity sendPlayer : serverWorld.getPlayers())
             ServerChannelFeedbackPacket.send(sendPlayer, buf);
-        }
     }
 
     public void specialAttack(Attack attack, List<LivingEntity> hurt) {
@@ -109,18 +103,17 @@ public abstract class JCraftSpec {
         //JCraft.LOGGER.info("ticking spec");
         World world = player.getWorld();
 
-        if (world.isClient()) {
-
-        } else {
+        if (!world.isClient()) {
             ServerWorld serverWorld = (ServerWorld) world;
-            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+            //ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
 
             Attack attack = this.curAttack;
 
             if (moveStun > 0) {
                 moveStun -= 1;
 
-                Entity passenger = player.getFirstPassenger();
+                //Entity passenger = player.getFirstPassenger();
+
                 //StandEntity stand = null;
                 //if (passenger instanceof StandEntity s) { stand = s; }
 

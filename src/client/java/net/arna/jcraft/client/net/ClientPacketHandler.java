@@ -288,7 +288,7 @@ public class ClientPacketHandler {
             // Spec Animations
             case (12) -> {
                 int entID = buf.readInt();
-                String animPath = buf.readString(); // i know exactly how unoptimized this is but i fail to care
+                String animPath = buf.readString(); // I know exactly how unoptimized this is, but I fail to care
 
                 client.execute(() -> {
                     Entity ent = client.world.getEntityById(entID);

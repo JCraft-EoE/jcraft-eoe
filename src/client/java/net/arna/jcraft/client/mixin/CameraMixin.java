@@ -1,6 +1,7 @@
 package net.arna.jcraft.client.mixin;
 
 import net.arna.jcraft.common.entity.StandEntity;
+import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.minecraft.client.render.Camera;
 import net.minecraft.entity.Entity;
@@ -69,7 +70,8 @@ public abstract class CameraMixin {
 
     @Inject(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;setPos(DDD)V", shift = At.Shift.AFTER))
     public void jcraft$afterSetPosUpdate(BlockView area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta, CallbackInfo info) {
-        if (focusedEntity.getFirstPassenger() instanceof StandEntity stand && stand.getRemote()) {
+        StandEntity stand = ((IEntityDataSaver)focusedEntity).getStand();
+        if (stand != null && stand.getRemote()) {
             CameraInvoker cameraInvoker = (CameraInvoker) this;
             cameraInvoker.invokeSetPos(
                     new Vec3d(
@@ -88,9 +90,5 @@ public abstract class CameraMixin {
             cameraInvoker.invokeMoveBy(0, clipToSpaceVertical(0.75D), 0);
             info.cancel();
         }*/
-    }
-
-    public void jcraft$() {
-
     }
 }
