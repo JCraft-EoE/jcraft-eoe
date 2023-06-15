@@ -44,28 +44,26 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 import java.util.List;
 
 public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+    public static final Attack low = new Attack(1, 0, 0.85f, 13, 8, 1.5, 4f, 0.5f, AttackType.BOX, 0.5f, 0.1f, 0, JSoundRegister.IMPACT_1);
 
-    public static Attack low = new Attack(1, 0, 0.85f, 13, 8, 1.5, 4f, 0.5f, AttackType.BOX, 0.5f, 0.1f, 0, JSoundRegister.IMPACT_1);
-
-    public static Attack light = new Attack(0, 2, 0.75f, 19, 0, 1.5, 3f, 0.75f, AttackType.MULTIHIT, 1f, 0, List.of(6, 11), JSoundRegister.IMPACT_4)
+    public static final Attack light = new Attack(0, 2, 0.75f, 19, 0, 1.5, 3f, 0.75f, AttackType.MULTIHIT, 1f, 0, List.of(6, 11), JSoundRegister.IMPACT_4)
             .setFollowup(low)
             .setInfo("Dual Punch", "combo starter, decent speed, has followup with more blockstun");
 
-    public static Attack heavy = new Attack(2, 12, 0.75f, 24, 16, 2, 9f, 1.75f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_4)
+    public static final Attack heavy = new Attack(2, 12, 0.75f, 24, 16, 2, 9f, 1.75f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_4)
             .setHitspark(2)
             .setArmor(true)
             .setLaunch()
             .setInfo("Haymaker", "slow, uninterruptable launcher");
-    public static Attack barrage = new Attack(3, 17, 0.75f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3, JSoundRegister.IMPACT_4)
+    public static final Attack barrage = new Attack(3, 17, 0.75f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3, JSoundRegister.IMPACT_4)
             .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
-    public static Attack bombplant = new Attack(4, 30, 1, 20, 12, 1.5, 0f, 0.0f, AttackType.BOX, 0.45f)
+    public static final Attack bombplant = new Attack(4, 30, 1, 20, 12, 1.5, 0f, 0.0f, AttackType.BOX, 0.45f)
             .setUB(true)
             .setInfo("Bomb Plant", "crouch to plant on the ground below you, stealthily");
-    public static Attack sha = new Attack(5, 45, 20, 16, 0, AttackType.BOX)
+    public static final Attack sha = new Attack(5, 45, 20, 16, 0, AttackType.BOX)
             .setRanged(true)
             .setInfo("Sheer Heart Attack", "creates an automatic, heat-seeking sub-stand that explodes on contact, reflects 25% damage back to owner");
-    public static Attack detonate = new Attack(6, 1, 1, 6, 5, 0, 0f, 0.0f, AttackType.BOX)
+    public static final Attack detonate = new Attack(6, 1, 1, 6, 5, 0, 0f, 0.0f, AttackType.BOX)
             .setInfo("Detonate", "slight windup");
 
     public ItemEntity coin;
@@ -404,10 +402,12 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
         }
     }
 
-    // Animation code
+    // Animations
+    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+
     @Override
     public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController(this, "controller", 0, this::predicate));
+        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
     }
 
     @Override
@@ -421,7 +421,7 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
     }
 
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        AnimationController controller = event.getController();
+        AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 
         if (playSummonAnim) {

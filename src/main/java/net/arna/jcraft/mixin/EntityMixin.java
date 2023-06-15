@@ -49,16 +49,5 @@ public class EntityMixin implements ITimeStop {
             info.cancel();
         }
     }
-
-    /*
-    @Inject(cancellable = true, at = @At("HEAD"), method = "Lnet/minecraft/entity/Entity;shouldRender(D)Z")
-    public void shouldRender(double distance, CallbackInfoReturnable info) {
-        if ( ((Entity)(Object)this).getFirstPassenger() instanceof KingCrimsonEntity kingCrimson ) {
-            info.setReturnValue(kingCrimson.shouldRender(distance));
-        }
-        if ( ((ITrueInvis)this).getTrueInvis() ) { info.setReturnValue(false); }
-    }
-     */
-
-    //POLISHING: stand position autosolver
+    //todo (polishing): stand position autosolver
 }

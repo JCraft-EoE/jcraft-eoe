@@ -21,28 +21,30 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class BipedEntityModelMixin<T extends LivingEntity> {
     @Shadow
     @Final
-    private ModelPart head;
+    public ModelPart head;
     @Shadow
     @Final
-    private ModelPart hat;
+    public ModelPart hat;
     @Shadow
     @Final
-    private ModelPart body;
+    public ModelPart body;
     @Shadow
     @Final
-    private ModelPart rightArm;
+    public ModelPart rightArm;
     @Shadow
     @Final
-    private ModelPart leftArm;
+    public ModelPart leftArm;
     @Shadow
     @Final
-    private ModelPart rightLeg;
+    public ModelPart rightLeg;
     @Shadow
     @Final
-    private ModelPart leftLeg;
+    public ModelPart leftLeg;
     @Shadow
+    public
     BipedEntityModel.ArmPose leftArmPose;
     @Shadow
+    public
     BipedEntityModel.ArmPose rightArmPose;
 
     private void setScale(ModelPart p, float f) {

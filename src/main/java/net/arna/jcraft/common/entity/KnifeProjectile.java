@@ -1,8 +1,6 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.common.util.JCraftUtils;
-import net.arna.jcraft.registry.JEntityTypeRegister;
-import net.arna.jcraft.registry.JSoundRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;

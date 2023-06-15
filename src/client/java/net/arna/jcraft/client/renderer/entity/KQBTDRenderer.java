@@ -3,6 +3,7 @@ package net.arna.jcraft.client.renderer.entity;
 import net.arna.jcraft.client.model.entity.KQBTDModel;
 import net.arna.jcraft.client.renderer.entity.layer.KQBTDEyesLayer;
 import net.arna.jcraft.common.entity.KQBTDEntity;
+import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -27,11 +28,9 @@ public class KQBTDRenderer extends GeoEntityRenderer<KQBTDEntity> {
                                      int packedLightIn, Identifier textureLocation) {
 
         MinecraftClient mcClient = MinecraftClient.getInstance();
-        if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null) {
-            if (mcClient.player.getFirstPassenger() == animatable) {
+        if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null)
+            if (mcClient.player.getFirstPassenger() == animatable)
                 return RenderLayer.getEntityNoOutline(this.getTextureLocation(animatable));
-            }
-        }
 
         return RenderLayer.getEntityCutout(this.getTextureLocation(animatable));
     }
@@ -41,11 +40,9 @@ public class KQBTDRenderer extends GeoEntityRenderer<KQBTDEntity> {
     public void render(GeoModel model, KQBTDEntity animatable, float partialTicks, RenderLayer type, MatrixStack matrixStackIn, VertexConsumerProvider renderTypeBuffer, VertexConsumer vertexBuilder, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
         float a = 1f;
         MinecraftClient mcClient = MinecraftClient.getInstance();
-        if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null) {
-            if (mcClient.player.getFirstPassenger() == animatable) {
+        if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null)
+            if ( ((IEntityDataSaver)mcClient.player).getStand() == animatable )
                 a = animatable.getAlpha();
-            }
-        }
         super.render(model, animatable, partialTicks, type, matrixStackIn, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, a);
     }
 }

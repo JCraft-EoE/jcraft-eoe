@@ -10,7 +10,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import software.bernie.geckolib3.renderers.geo.GeoProjectilesRenderer;
-import software.bernie.geckolib3.util.GeckoLibUtil;
 
 public class AnkhRenderer extends GeoProjectilesRenderer<AnkhProjectile> {
 

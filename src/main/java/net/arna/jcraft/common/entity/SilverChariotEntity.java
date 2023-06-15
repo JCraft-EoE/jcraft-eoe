@@ -18,7 +18,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import software.bernie.geckolib3.core.IAnimatable;
@@ -35,39 +34,39 @@ import java.util.List;
 
 public class SilverChariotEntity extends StandEntity implements IAnimatable, IAnimationTickable {
 
-    public Attack light = new Attack(0, 2, 0.65f, 9, 6, 1.75, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0)
+    public final Attack light = new Attack(0, 2, 0.65f, 9, 6, 1.75, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0)
             .setInfo("Stab", "quick combo starter, links into Spinning Blade while armor is off");
-    public Attack barrage = new Attack(2, 17, 0.65f, 60, 0, 2.25, 0.9f, 0.1f, AttackType.BARRAGE, 1.25f, 0, 3)
+    public final Attack barrage = new Attack(2, 17, 0.65f, 60, 0, 2.25, 0.9f, 0.1f, AttackType.BARRAGE, 1.25f, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public Attack heavy = new Attack(1, 18, 0.65f, 28, 20, 2.0, 8f, 1.5f, AttackType.BOX, 0.5f)
+    public final Attack heavy = new Attack(1, 18, 0.65f, 28, 20, 2.0, 8f, 1.5f, AttackType.BOX, 0.5f)
             .setHitspark(2)
             .setArmor(true)
             .setLaunch()
             .setInfo("Impaling Thrust", "slow, uninterruptable launcher");
-    public Attack spinbarrage = new Attack(3, 25, 0.65f, 24, 7, 2, 1f, 0.1f, AttackType.BARRAGE, 0.50f, 0, 2)
+    public final Attack spinbarrage = new Attack(3, 25, 0.65f, 24, 7, 2, 1f, 0.1f, AttackType.BARRAGE, 0.50f, 0, 2)
             .setInfo("Spinning Blade", "fast reliable combo starter/extender, low stun");
-    public Attack charge = new Attack(4, 18, 0.65f, 25, 15, 1.75, 5f, 0.25f, AttackType.BOX, 0.65f, -0.2f, 0)
+    public final Attack charge = new Attack(4, 18, 0.65f, 25, 15, 1.75, 5f, 0.25f, AttackType.BOX, 0.65f, -0.2f, 0)
             .setRanged(true)
             .setMobility(MobilityType.DASH)
             .setBlockstun(15)
             .setInfo("Ray Dart", "Silver Chariot and the user charge forward, combo finisher (base form), combo extender (armor off)");
-    public Attack cleave = new Attack(5, 26, 0.75f, 21, 12, 2.5, 9f, 0.8f, AttackType.BOX, 1f, 0, 0)
+    public final Attack cleave = new Attack(5, 26, 0.75f, 21, 12, 2.5, 9f, 0.8f, AttackType.BOX, 1f, 0, 0)
             .setHitspark(2)
             .setArmor(true)
             .setInfo("Cleave", "Silver Chariot detaches from the user, delivering an uninterruptable, combo-starting slice");
-    public Attack pcharge = new Attack(6, 22, 8f, 19, 5, 1.5, 5f, 0.25f, AttackType.CHARGE, 0.85f, 0, 9)
+    public final Attack pcharge = new Attack(6, 22, 8f, 19, 5, 1.5, 5f, 0.25f, AttackType.CHARGE, 0.85f, 0, 9)
             .setRanged(true)
             .disableBackstab()
             .setInfo("Invincible Blade", "Silver Chariot detaches from the user and charges forward, combo starter/extender");
-    public Attack counter = new Attack(7, 32, 0.5f, 44, 4, 0, 0, 0, AttackType.COUNTER)
+    public final Attack counter = new Attack(7, 32, 0.5f, 44, 4, 0, 0, 0, AttackType.COUNTER)
             .setInfo("Counter", "0.2s windup, 2s duration, stuns when hit");
-    public Attack pbeatdown = new Attack(8, 60, 0.65f, 28, 23, 1.75, 4f, 0f, AttackType.BOX, 2, 0, 0)
+    public final Attack pbeatdown = new Attack(8, 60, 0.65f, 28, 23, 1.75, 4f, 0f, AttackType.BOX, 2, 0, 0)
             .setHitspark(2)
             .setStunType(0)
             .setInfo("God of Death", "high-damage beatdown, 1.5s stun on whiff, cannot be combo broken");
-    public Attack mainbeatdown = new Attack(9, 0, 0.65f, 59, 0, 2.0, 4.5f, 0.75f, AttackType.MULTIHIT, 1.6f, 0, List.of(13, 23), JSoundRegister.IMPACT_1)
+    public final Attack mainbeatdown = new Attack(9, 0, 0.65f, 59, 0, 2.0, 4.5f, 0.75f, AttackType.MULTIHIT, 1.6f, 0, List.of(13, 23), JSoundRegister.IMPACT_1)
             .setStunType(0);
-    public Attack beatdownfinish = new Attack(10, 0, 0.65f, 59, 0, 2.5, 6f, 1.25f, AttackType.MULTIHIT, 1, 0, List.of(54), JSoundRegister.TW_KICK_HIT)
+    public final Attack beatdownfinish = new Attack(10, 0, 0.65f, 59, 0, 2.5, 6f, 1.25f, AttackType.MULTIHIT, 1, 0, List.of(54), JSoundRegister.TW_KICK_HIT)
             .setLaunch()
             .setHitspark(2);
     private int armorTime;
@@ -76,10 +75,12 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
         description = "Close Range RUSHDOWN";
 
         freespace =
-                "BNBs:\n" +
-                        "    (Armor ON) M1>Barrage>M1>Cleave>Spin\n" +
-                        "    (Armor OFF) Charge>M1>Spin>Barrage>M1>Cleave>Impale\n" +
-                        "    (Armor OFF) Spin>M1>Barrage>Charge>Cleave>M1\n";
+                """
+                        BNBs:
+                            (Armor ON) M1>Barrage>M1>Cleave>Spin
+                            (Armor OFF) Charge>M1>Spin>Barrage>M1>Cleave>Impale
+                            (Armor OFF) Spin>M1>Barrage>Charge>Cleave>M1
+                        """;
 
         moves = List.of(light, heavy, barrage, spinbarrage, new Attack().setRanged(true).setInfo("Armor Off", "25s of faster moves"), charge, cleave, unusable);
     }
@@ -88,9 +89,10 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
         description = "Mid Range TRICKSTER";
 
         freespace =
-                "BNBs:\n" +
-                        "    (M1>)Charge~Barrage>M1>Spin\n" +
-                        "    (M1>)Charge~Barrage>God of Death";
+                """
+                        BNBs:
+                            (M1>)Charge~Barrage>M1>Spin
+                            (M1>)Charge~Barrage>God of Death""";
 
         // Possessed moveset
         moves = List.of(light, heavy, barrage, spinbarrage, pbeatdown, pcharge, counter, unusable);
@@ -117,12 +119,19 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
         setNormalDesc();
     }
 
-    public static TrackedData<Integer> MODE;
+    public static final TrackedData<Integer> MODE;
+
     static {
         MODE = DataTracker.registerData(SilverChariotEntity.class, TrackedDataHandlerRegistry.INTEGER);
     }
-    public int getMode() { return dataTracker.get(MODE); }
-    public void setMode(int m) { dataTracker.set(MODE, m); }
+
+    public int getMode() {
+        return dataTracker.get(MODE);
+    }
+
+    public void setMode(int m) {
+        dataTracker.set(MODE, m);
+    }
 
     @Override
     protected void initDataTracker() {
@@ -134,7 +143,8 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        handleAttack(this.light, JCraft.standLightCD, 2);
+        if (handleAttack(this.light, JCraft.standLightCD, 2))
+            playSound(JSoundRegister.SC_POKE, 1, 1);
     }
 
     @Override
@@ -162,13 +172,14 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
     public void initUlt() {
         if (!canAttack()) return;
         if (this.getMode() == 3) {
-            if (handleAttack(this.pbeatdown, JCraft.standUltCD, 11)) {
-                //playSound(ModSoundRegister.PSC_BEATDOWN,1, 1);
-            }
+            handleAttack(this.pbeatdown, JCraft.standUltCD, 11);
+            //playSound(ModSoundRegister.PSC_BEATDOWN,1, 1);
         } else if (hasUser()) {
             NbtCompound userData = ((IEntityDataSaver) getUser()).getPersistentData();
             int cooldown = userData.getInt(JCraft.standUltCD);
             if (cooldown > 0) return;
+
+            playSound(JSoundRegister.SC_ARMOROFF, 1, 1);
 
             userData.putInt(JCraft.standUltCD, 1400);
             setMode(2);
@@ -206,7 +217,7 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
             if (handleAttack(this.cleave, JCraft.standS3CD, 13)) {
                 this.setFreePos(new Vec3f(getUser().getPos().add(getUser().getRotationVector().multiply(1.5))));
                 this.setFree(true);
-                //playSound(ModSoundRegister.SC_CLEAVE,1, 1);
+                playSound(JSoundRegister.SC_CLEAVE, 1, 1);
             }
         }
     }
@@ -269,7 +280,8 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
 
     @Override
     public void tick() {
-        if (age == 1) world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.SC_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
+        if (age == 1)
+            world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.SC_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
         super.tick();
 
         if (hasUser()) {
@@ -322,13 +334,23 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
     }
 
     // Animation code
-    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+
     @Override
-    public void registerControllers(AnimationData animationData) { animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate)); }
+    public void registerControllers(AnimationData animationData) {
+        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
+    }
+
     @Override
-    public AnimationFactory getFactory() { return this.animationFactory; }
+    public AnimationFactory getFactory() {
+        return this.animationFactory;
+    }
+
     @Override
-    public int tickTimer() { return age; }
+    public int tickTimer() {
+        return age;
+    }
+
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         String idleAnim = "animation.silverchariot.idle";
         if (getMode() == 2)
@@ -336,7 +358,7 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
         if (getMode() == 3)
             idleAnim = "animation.silverchariot.idle_possessed";
 
-        AnimationController controller = event.getController();
+        AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 
         if (playSummonAnim) {

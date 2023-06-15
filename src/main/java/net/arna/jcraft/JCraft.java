@@ -8,10 +8,8 @@ import net.arna.jcraft.common.JConfig;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.entity.StandType;
 import net.arna.jcraft.common.network.c2s.StandControlPacket;
-import net.arna.jcraft.common.util.DimValues;
-import net.arna.jcraft.common.util.DummyClientEntityHandler;
-import net.arna.jcraft.common.util.IClientEntityHandler;
-import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.spec.JCraftSpec;
+import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.*;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
@@ -85,19 +83,19 @@ public class JCraft implements ModInitializer {
     public static final String cooldownCancelCD = "CCCD";
     public static final String dashCD = "dCD";
 
-    public static List<String> cooldowns = List.of(
+    public static final List<String> cooldowns = List.of(
             standLightCD, standHeavyCD, standBarrageCD, standUltCD, standS1CD, standS2CD, standS3CD,
             utilCD, comboBreakerCD, cooldownCancelCD, dashCD,
             heavyCD, barrageCD, ultCD, s1CD, s2CD, s3CD);
 
     // Gamerules
-    public static GameRules.Key<GameRules.BooleanRule> SHOW_HITBOXES = GameRuleRegistry.register("showHitboxes", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(false));
-    public static GameRules.Key<GameRules.BooleanRule> KINGCRIMSON_TELEPORT_EFFECT = GameRuleRegistry.register("kingCrimsonTeleportEffect", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(false));
-    public static GameRules.Key<GameRules.BooleanRule> COMBO_COUNTER = GameRuleRegistry.register("comboCounter", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
-    public static GameRules.Key<GameRules.IntRule> CHANCE_MOB_SPAWNS_WITH_STAND = GameRuleRegistry.register("chanceMobSpawnsWithStand", GameRules.Category.MOBS, GameRuleFactory.createIntRule(5, 0, 100));
-    public static GameRules.Key<GameRules.BooleanRule> ALLOW_MOB_EVOLVED_STANDS = GameRuleRegistry.register("allowMobEvolvedStands", GameRules.Category.MOBS, GameRuleFactory.createBooleanRule(false));
-    public static GameRules.Key<GameRules.BooleanRule> STAND_GRIEFING = GameRuleRegistry.register("standGriefing", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
-    public static GameRules.Key<GameRules.IntRule> DEFAULT_SPEC = GameRuleRegistry.register("defaultSpec", GameRules.Category.PLAYER, GameRuleFactory.createIntRule(0, 0, 1));
+    public static final GameRules.Key<GameRules.BooleanRule> SHOW_HITBOXES = GameRuleRegistry.register("showHitboxes", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(false));
+    public static final GameRules.Key<GameRules.BooleanRule> KINGCRIMSON_TELEPORT_EFFECT = GameRuleRegistry.register("kingCrimsonTeleportEffect", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(false));
+    public static final GameRules.Key<GameRules.BooleanRule> COMBO_COUNTER = GameRuleRegistry.register("comboCounter", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
+    public static final GameRules.Key<GameRules.IntRule> CHANCE_MOB_SPAWNS_WITH_STAND = GameRuleRegistry.register("chanceMobSpawnsWithStand", GameRules.Category.MOBS, GameRuleFactory.createIntRule(5, 0, 100));
+    public static final GameRules.Key<GameRules.BooleanRule> ALLOW_MOB_EVOLVED_STANDS = GameRuleRegistry.register("allowMobEvolvedStands", GameRules.Category.MOBS, GameRuleFactory.createBooleanRule(false));
+    public static final GameRules.Key<GameRules.BooleanRule> STAND_GRIEFING = GameRuleRegistry.register("standGriefing", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
+    public static final GameRules.Key<GameRules.IntRule> DEFAULT_SPEC = GameRuleRegistry.register("defaultSpec", GameRules.Category.PLAYER, GameRuleFactory.createIntRule(0, 0, 1));
     //public static GameRules.Key<GameRules.IntRule> DAMAGE_MULT = GameRuleRegistry.register("jcraftDamageMult", GameRules.Category.MISC, GameRuleFactory.createIntRule(0, 0, 100));
 
     @Getter @Setter
@@ -164,15 +162,18 @@ public class JCraft implements ModInitializer {
         }
         dashes.add(new DashData(new Vec3d(rotVec.x, 0, rotVec.z).normalize().multiply(dashSpeed), entity));
 
-        // Syncs dash anim with every player in the vicinity
-        if (entity instanceof PlayerEntity) {
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(12);
-            buf.writeInt(entity.getId());
-            buf.writeString("dash");
-            PlayerLookup.around((ServerWorld) entity.getWorld(), entity.getPos(), 96).forEach( //todo: find a less arbitrary number for radius here
-                    serverPlayer -> ServerChannelFeedbackPacket.send(serverPlayer, buf)
-            );
+        // Syncs dash anim (unless already attacking with a spec) with every player in the vicinity
+        if (entity instanceof PlayerEntity player) {
+            JCraftSpec spec = JCraftUtils.getSpec(player);
+            if (spec.moveStun < 1) {
+                PacketByteBuf buf = PacketByteBufs.create();
+                buf.writeShort(12);
+                buf.writeInt(entity.getId());
+                buf.writeString("dash");
+                PlayerLookup.around((ServerWorld) entity.getWorld(), entity.getPos(), 96).forEach( //todo: find a less arbitrary number for radius here
+                        serverPlayer -> ServerChannelFeedbackPacket.send(serverPlayer, buf)
+                );
+            }
         }
     }
 
@@ -289,7 +290,7 @@ public class JCraft implements ModInitializer {
         }
     }
 
-    public static List<String> unresettableCooldowns = List.of(standBarrageCD, standUltCD, barrageCD, ultCD, comboBreakerCD, cooldownCancelCD, dashCD);
+    public static final List<String> unresettableCooldowns = List.of(standBarrageCD, standUltCD, barrageCD, ultCD, comboBreakerCD, cooldownCancelCD, dashCD);
 
     public static void CooldownCancel(ServerWorld world, LivingEntity player) {
         NbtCompound data = ((IEntityDataSaver) player).getPersistentData();

@@ -10,11 +10,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class PlayerModifierLayer<T extends IAnimation> extends ModifierLayer<T> implements IAnimation {
     @Override
-    public boolean isActive() {
-        return super.isActive();
-    }
-
-    @Override
     public @NotNull Vec3f get3DTransform(@NotNull String modelName, @NotNull TransformType type, float tickDelta, @NotNull Vec3f value0) {
         return super.get3DTransform(modelName, type, tickDelta, value0);
     }

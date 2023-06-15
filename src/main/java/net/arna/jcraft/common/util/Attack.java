@@ -154,7 +154,7 @@ public final class Attack {
     public static class HitboxData {
         public double forwardOffset = 0.0;
         public double verticalOffset = 0.0;
-        public double hitboxSize;
+        public final double hitboxSize;
 
         public HitboxData(double size) {
             this.hitboxSize = size;

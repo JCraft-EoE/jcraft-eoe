@@ -2,6 +2,7 @@ package net.arna.jcraft.client.renderer.entity;
 
 import net.arna.jcraft.client.model.entity.CreamModel;
 import net.arna.jcraft.common.entity.CreamEntity;
+import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -39,11 +40,9 @@ public class CreamRenderer extends GeoEntityRenderer<CreamEntity> {
     public void render(GeoModel model, CreamEntity animatable, float partialTicks, RenderLayer type, MatrixStack matrixStackIn, VertexConsumerProvider renderTypeBuffer, VertexConsumer vertexBuilder, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
         float a = 1f;
         MinecraftClient mcClient = MinecraftClient.getInstance();
-        if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null) {
-            if (mcClient.player.getFirstPassenger() == animatable) {
+        if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null)
+            if ( ((IEntityDataSaver)mcClient.player).getStand() == animatable )
                 a = animatable.getAlpha();
-            }
-        }
         float rgR = (1.0f - a) / 2f;
         super.render(model, animatable, partialTicks, type, matrixStackIn, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red - rgR, green - rgR, blue, a);
     }

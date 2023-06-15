@@ -8,21 +8,16 @@ import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
-import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.IAnimationTickable;
@@ -37,27 +32,25 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 import java.util.List;
 
 public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
-    public static Attack light = new Attack(0, 2, 0.75f, 14, 7, 1.5, 5f, 0.75f, AttackType.BOX, 0.6f, 0.2f, 0, JSoundRegister.IMPACT_3)
+    public static final Attack light = new Attack(0, 2, 0.75f, 14, 7, 1.5, 5f, 0.75f, AttackType.BOX, 0.6f, 0.2f, 0, JSoundRegister.IMPACT_3)
             .setInfo("Punch", "quick combo starter");
-    public static Attack legcrusher = new Attack(4, 20, 0.75f, 22, 16, 1.5, 5f, 0.25f, AttackType.BOX, 1.6f, 0.2f, 0, JSoundRegister.TW_KICK_HIT).setHitspark(2)
+    public static final Attack legcrusher = new Attack(4, 20, 0.75f, 22, 16, 1.5, 5f, 0.25f, AttackType.BOX, 1.6f, 0.2f, 0, JSoundRegister.TW_KICK_HIT).setHitspark(2)
             .setInfo("Leg Crusher", "high stun, medium windup");
-    public static Attack poisonspew = new Attack(5, 23, 0.75f, 14, 10, 2, 0f, 0, AttackType.BOX)
+    public static final Attack poisonspew = new Attack(5, 23, 0.75f, 14, 10, 2, 0f, 0, AttackType.BOX)
             .setUB(true)
             .setInfo("Poison Spew", "forces enemy into crawling for 4s, no stun"); //todo: make poison pool on ground
-    public static Attack barrage = new Attack(2, 17, 0.75f, 60, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 1, 0, 3, JSoundRegister.IMPACT_3)
+    public static final Attack barrage = new Attack(2, 17, 0.75f, 60, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 1, 0, 3, JSoundRegister.IMPACT_3)
             .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
-    public static Attack donut = new Attack(1, 18, 1f, 36, 17, 2, 12f, 0.0f, AttackType.BOX, 1.4f, 0, 0, JSoundRegister.TW_DONUT_HIT).setHitspark(2)
+    public static final Attack donut = new Attack(1, 18, 1f, 36, 17, 2, 12f, 0.0f, AttackType.BOX, 1.4f, 0, 0, JSoundRegister.TW_DONUT_HIT).setHitspark(2)
             .setInfo("Donut", "slow combo starter/extender");
-    public static Attack memorydisk = new Attack(6, 45, 1f, 34, 22, 2, 6f, 0.0f, AttackType.BOX, 1f, 0, 0, JSoundRegister.IMPACT_2).setHitspark(2).setArmor(true)
+    public static final Attack memorydisk = new Attack(6, 45, 1f, 34, 22, 2, 6f, 0.0f, AttackType.BOX, 1f, 0, 0, JSoundRegister.IMPACT_2).setHitspark(2).setArmor(true)
             .setUB(true)
             .setInfo("Memory Disk", "uninterruptable, mining fatigue & weakness for 30s");
-    public static Attack standdisk = new Attack(3, 36, 1f, 34, 22, 2, 6f, 0.0f, AttackType.BOX, 1f, 0, 0, JSoundRegister.IMPACT_2).setArmor(true)
+    public static final Attack standdisk = new Attack(3, 36, 1f, 34, 22, 2, 6f, 0.0f, AttackType.BOX, 1f, 0, 0, JSoundRegister.IMPACT_2).setArmor(true)
             .setUB(true)
             .setInfo("Stand Disk", "uninterruptable, removes enemy stand for 8s");
-    //public static Attack gun = new Attack(-1,20, 21, 15, 1, 0.75f, AttackType.BOX).setRanged(true)
-    //        .setInfo("Gun", "fully aimable, combo starter");
+
+    //public static Attack gun = new Attack(-1,20, 21, 15, 1, 0.75f, AttackType.BOX).setRanged(true).setInfo("Gun", "fully aimable, combo starter");
 
     public WhitesnakeEntity(World worldIn) {
         super(StandType.WHITE_SNAKE, worldIn);
@@ -83,11 +76,6 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
 
         moves = List.of(light, donut, barrage, standdisk, memorydisk, legcrusher, poisonspew,
                 new Attack().setInfo("Pilot Mode", ""));
-    }
-
-    @Override
-    protected void initDataTracker() {
-        super.initDataTracker();
     }
 
     // Moveset
@@ -144,7 +132,7 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
         NbtCompound userData = ((IEntityDataSaver) getUser()).getPersistentData();
         if (userData.getInt(JCraft.utilCD) > 0) return;
         setRemote(!getRemote());
-        userData.putInt(JCraft.utilCD, 30);
+        userData.putInt(JCraft.utilCD, 20);
         //HandleAttack(gun, JCraft.standMMBCD, 9);
     }
 
@@ -245,9 +233,11 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
     }
 
     // Animation code
+    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+
     @Override
     public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController(this, "controller", 0, this::predicate));
+        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
     }
 
     @Override
@@ -260,6 +250,7 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
         return age;
     }
 
+    @SuppressWarnings("rawtypes")
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         AnimationController controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();

@@ -50,21 +50,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
-    public static Attack light = new Attack(0, 2, 1.5f, 14, 7, 2, 6f, 0.8f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_2)
+    public static final Attack light = new Attack(0, 2, 1.5f, 14, 7, 2, 6f, 0.8f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_2)
             .setInfo("Swipe", "slow, long-reaching poke");
-    public static Attack airbarrage = new Attack(3, 17, 1f, 30, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 0.5f, 0, 3);
+    public static final Attack airbarrage = new Attack(3, 17, 1f, 30, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 0.5f, 0, 3);
 
-    public static Attack combo = new Attack(2, 15, 1.5f, 31, 0, 1.75, 4.5f, 0.1f, AttackType.MULTIHIT, 1f, -0.1f, List.of(8, 16, 20, 21), JSoundRegister.IMPACT_2)
+    public static final Attack combo = new Attack(2, 15, 1.5f, 31, 0, 1.75, 4.5f, 0.1f, AttackType.MULTIHIT, 1f, -0.1f, List.of(8, 16, 20, 21), JSoundRegister.IMPACT_2)
             .setInfo("3-hit combo (grounded) / Burn Rubber (aerial)", "knockdown on final hit / slows down all movement, combo starter/extender");
-    public static Attack launch = new Attack(1, 16, 1.25f, 20, 16, 2, 8f, 0.5f, AttackType.BOX, 1.25f, -0.3f, 0, JSoundRegister.IMPACT_2)
+    public static final Attack launch = new Attack(1, 16, 1.25f, 20, 16, 2, 8f, 0.5f, AttackType.BOX, 1.25f, -0.3f, 0, JSoundRegister.IMPACT_2)
             .appendHitbox(new Attack.HitboxData(1.5))
             .setHitspark(2)
             .setArmor(true)
             .setInfo("Launch", "uninterruptable, slow, launching uppercut");
-    public static Attack slam = new Attack(10, 0, 1.25f, 10, 4, 2, 4f, 0.2f, AttackType.BOX, 1.2f, 0.1f, 0, JSoundRegister.IMPACT_2);
-    public static Attack pound = new Attack(4, 18, 1.25f, 22, 7, 1.5, 4f, 0.1f, AttackType.BOX, 1.25f, -0.1f, 0, JSoundRegister.IMPACT_2)
+    public static final Attack slam = new Attack(10, 0, 1.25f, 10, 4, 2, 4f, 0.2f, AttackType.BOX, 1.2f, 0.1f, 0, JSoundRegister.IMPACT_2);
+    public static final Attack pound = new Attack(4, 18, 1.25f, 22, 7, 1.5, 4f, 0.1f, AttackType.BOX, 1.25f, -0.1f, 0, JSoundRegister.IMPACT_2)
             .setLift(false)
             .setFollowup(slam)
             .setInfo("Pound", """
@@ -72,30 +70,30 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
                     SPECIAL 1 - no sand
                     SPECIAL 2 - semicircle
                     SPECIAL 3 - diagonal pattern (influenced by where the user is looking)""", AttackQueue.SPECIAL1);
-    public static Attack sandclone = new Attack(6, 30, 1, 11, 7, 0, 0f, 0.0f, AttackType.BOX)
+    public static final Attack sandclone = new Attack(6, 30, 1, 11, 7, 0, 0f, 0.0f, AttackType.BOX)
             .setRanged(true)
             .setInfo("Sand Manipulation", "creates a blinding sand cloud, then a clone or (if crouching) circles of sand");
-    public static Attack sandwave = new Attack(8, 27, 0f, 80, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 0, 0, 3)
+    public static final Attack sandwave = new Attack(8, 27, 0f, 80, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 0, 0, 3)
             .setMobility(MobilityType.DASH)
             .setRanged(true)
             .disableBackstab()
             .setInfo("Sandwave/Glider", "The Fool turns into a quick sandwave that knocks anything it touches down/in air turns into a glider");
-    public static Attack glide = new Attack(9, 27, 0f, 85, 5, 0, 0, 0, AttackType.BOX)
+    public static final Attack glide = new Attack(9, 27, 0f, 85, 5, 0, 0, 0, AttackType.BOX)
             .setMobility(MobilityType.FLIGHT)
             .setInfo("Glider", "turns The Fool into a glider");
-    public static Attack charge = new Attack(5, 22, 5f, 22, 5, 1.5, 6f, 1.2f, AttackType.CHARGE, 0.5f, 0, 11, JSoundRegister.IMPACT_2)
+    public static final Attack charge = new Attack(5, 22, 5f, 22, 5, 1.5, 6f, 1.2f, AttackType.CHARGE, 0.5f, 0, 11, JSoundRegister.IMPACT_2)
             .setRanged(true)
             .setLaunch()
             .setInfo("Charge", "The Fool detaches from the user and charges forward, dealing knockback on hit");
-    public static Attack sandstorm = new Attack(7, 40, 1.5f, 41, 28, 2, 7f, 0.1f, AttackType.BOX, 1, 0, 0, JSoundRegister.TW_KICK_HIT)
+    public static final Attack sandstorm = new Attack(7, 40, 1.5f, 41, 28, 2, 7f, 0.1f, AttackType.BOX, 1, 0, 0, JSoundRegister.TW_KICK_HIT)
             .appendHitbox(new Attack.HitboxData(1.5))
             .setHitspark(2)
             .setArmor(true)
             .setUB(true)
             .setInfo("Suffocating Sandstorm", "very slow, traps the opponent in a cloud of slowing sand");
 
-    public static TrackedData<Boolean> ISSAND;
-    public static TrackedData<Boolean> ISWAVE;
+    public static final TrackedData<Boolean> ISSAND;
+    public static final TrackedData<Boolean> ISWAVE;
 
     private LivingEntity superTarget;
     private final ArrayList<FallingBlockEntity> sands = new ArrayList<>();
@@ -229,6 +227,7 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
     }
 
     private int slamType = 0;
+
     private void initSlam(int type) {
         slamType = type;
         setAttack(slam, 14);
@@ -377,6 +376,12 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
                     } else if (user instanceof MobEntity mob) {
                         EntityType<?> entityType = mob.getType();
                         MobEntity newMob = (MobEntity) entityType.create(world);
+
+                        if (newMob == null) {
+                            JCraft.LOGGER.error("Failed to create sand clone of " + mob + " in world " + world);
+                            return;
+                        }
+
                         newMob.copyPositionAndRotation(this);
                         newMob.setBaby(mob.isBaby());
 
@@ -420,18 +425,19 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
                         Vec3d leftVec = user.getRotationVector().rotateY(1.75f);
                         for (int i = 0; i < 8; i++) {
                             leftVec = leftVec.rotateY(-3.141592f / 8).normalize();
-                            createFoolishSand( new Vec3d(leftVec.x / 4, 0.25, leftVec.z / 4) );
+                            createFoolishSand(new Vec3d(leftVec.x / 4, 0.25, leftVec.z / 4));
                         }
                     }
                     case (3) -> {
                         Vec3d rotVec = user.getRotationVector();
                         for (double i = 0; i < 8; i++)
                             for (double j = 0; j < i; j++) {
-                                double hDiv = 5.0 * (1 + j/i);
+                                double hDiv = 5.0 * (1 + j / i);
                                 createFoolishSand(new Vec3d(rotVec.x * Math.sqrt(i) / hDiv, j / 5.0, rotVec.z * Math.sqrt(i) / hDiv));
                             }
                     }
-                    default -> { }
+                    default -> {
+                    }
                 }
             }
         }
@@ -445,6 +451,7 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
         sand.velocityDirty = true;
         world.spawnEntity(sand);
     }
+
     private void setSandClone(MobEntity clone) {
         //JCraft.LOGGER.info("Setting sand clone to: " + clone + " from " + sandClone);
         if (sandClone != null) sandClone.kill();
@@ -452,8 +459,8 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
         if (clone == null) return;
         applySandCloneModifiers(clone);
     }
-    public static void applySandCloneModifiers(LivingEntity entity)
-    {
+
+    public static void applySandCloneModifiers(LivingEntity entity) {
         if (entity == null) {
             JCraft.LOGGER.error("Tried to apply sand clone attribute modifiers to invalid entity!");
             return;
@@ -463,9 +470,11 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
                 new EntityAttributeModifier("Sand Clone Max Health Modifier", -1.0, EntityAttributeModifier.Operation.MULTIPLY_TOTAL)
         );
     }
+
     @Override
     public void tick() {
-        if (age == 1) this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.STAND_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
+        if (age == 1)
+            this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.STAND_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
 
         super.tick();
 
@@ -475,7 +484,7 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
             if (client) {
                 if (this.age % 2 == 0) {
                     Vec3d pos = this.getPos();
-                    // If the fool is using any morphing attack, the amount of sand multiplies and it changes color
+                    // If the fool is using any morphing attack, the amount of sand multiplies, and the stand itself changes color
                     int particleNum = this.isWave() ? 32 : 1 + MathHelper.clamp(this.getMoveStun() / 2, 0, 5) * (this.isSand() ? 2 : 1);
                     int height = this.isWave() || this.isBlocking() ? 1 : 2;
 
@@ -569,9 +578,11 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
     }
 
     // Animation code
+    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+
     @Override
     public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController(this, "controller", 0, this::predicate));
+        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
     }
 
     @Override
@@ -588,7 +599,7 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
         int state = this.getState();
         String blockAnim = this.isSand() ? "animation.thefool.crouchblock" : "animation.thefool.block";
 
-        AnimationController controller = event.getController();
+        AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
         if (this.getSameState()) {
             controller.markNeedsReload();

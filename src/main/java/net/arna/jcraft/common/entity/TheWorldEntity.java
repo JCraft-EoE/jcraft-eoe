@@ -1,7 +1,6 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.JConfig;
 import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
@@ -32,30 +31,28 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 import java.util.List;
 
 public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
-    public static Attack light = new Attack(0, 2, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
+    public static final Attack light = new Attack(0, 2, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
-    public static Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 2, 0, 3)
+    public static final Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 2, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public static Attack donut = new Attack(1, 14, 1f, 48, 26, 2, 9f, 0.0f, AttackType.BOX, 4, 0, 0, JSoundRegister.TW_DONUT_HIT)
+    public static final Attack donut = new Attack(1, 14, 1f, 48, 26, 2, 9f, 0.0f, AttackType.BOX, 4, 0, 0, JSoundRegister.TW_DONUT_HIT)
             .setHitspark(2)
             .setArmor(true)
             .setInfo("Donut", "slow, uninterruptable combo starter/extender, 1.5s stun on whiff");
-    public static Attack charge = new Attack(4, 20, 7.5f, 19, 5, 1.5, 5f, 0.25f, AttackType.CHARGE, 1, 0, 9, JSoundRegister.TW_CHARGE_HIT)
+    public static final Attack charge = new Attack(4, 20, 7.5f, 19, 5, 1.5, 5f, 0.25f, AttackType.CHARGE, 1, 0, 9, JSoundRegister.TW_CHARGE_HIT)
             .setRanged(true)
             .disableBackstab()
             .setBlockstun(11)
             .setInfo("Forward Charge", "The World detaches from the user and lunges forward, combo starter");
-    public static Attack roundhouse = new Attack(3, 11, 0.75f, 13, 7, 1.75, 5f, 0.3f, AttackType.BOX, 0.45f, -0.1f, 0, JSoundRegister.TW_KICK_HIT)
+    public static final Attack roundhouse = new Attack(3, 11, 0.75f, 13, 7, 1.75, 5f, 0.3f, AttackType.BOX, 0.45f, -0.1f, 0, JSoundRegister.TW_KICK_HIT)
             .setBlockstun(12)
             .setInfo("Roundhouse", "fast poke, low stun");
-    public static Attack timestop = new Attack(6, 70, 52, 45, 4, AttackType.TIMESTOP)
+    public static final Attack timestop = new Attack(6, 70, 52, 45, 4, AttackType.TIMESTOP)
             .setUB(true)
             .setInfo("Timestop", "4 seconds");
-    public static Attack feignbarrage = new Attack(5, 30, 0.75f, 50, 5, 0, 0f, 0f, AttackType.COUNTER)
+    public static final Attack feignbarrage = new Attack(5, 30, 0.75f, 50, 5, 0, 0f, 0f, AttackType.COUNTER)
             .setInfo("Feign Barrage", "counter, 0.25s windup, teleports behind attacker");
-    public static Attack counterfollowup = new Attack(7, 0, 0.75f, 9, 5, 1.75, 6f, 0.7f, AttackType.BOX, 0.8f, 0.1f, 0, JSoundRegister.IMPACT_4)
+    public static final Attack counterfollowup = new Attack(7, 0, 0.75f, 9, 5, 1.75, 6f, 0.7f, AttackType.BOX, 0.8f, 0.1f, 0, JSoundRegister.IMPACT_4)
             .appendHitbox(new Attack.HitboxData(1.25))
             .setArmor(true)
             .setLaunch();
@@ -228,9 +225,11 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
     }
 
     // Animation code
+    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+
     @Override
     public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController(this, "controller", 0, this::predicate));
+        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
     }
 
     @Override
@@ -244,7 +243,7 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
     }
 
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        AnimationController controller = event.getController();
+        AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 
         if (playSummonAnim) {

@@ -121,6 +121,9 @@ public interface JSoundRegister {
     SoundEvent SC_CHARGE = registerSound("sccharge");
     SoundEvent SC_HEAVY = registerSound("scheavy");
     SoundEvent SC_SPIN = registerSound("scspin");
+    SoundEvent SC_CLEAVE = registerSound("sccleave");
+    SoundEvent SC_ARMOROFF = registerSound("scarmoroff");
+    SoundEvent SC_POKE = registerSound("scpoke");
 
     //Magicians Red
 
@@ -170,7 +173,9 @@ public interface JSoundRegister {
     SoundEvent MIH_CIRCLE = registerSound("mihcircle");
 
     //The World: Over Heaven
+
     SoundEvent TWOH_SUMMON = registerSound("twohsummon");
+    SoundEvent TWOH_BARRAGE = registerSound("twohbarrage");
     SoundEvent TWOH_SHOOT = registerSound("twohshoot");
     SoundEvent TWOH_TIMESKIP = registerSound("twohtimeskip");
     SoundEvent TWOH_TS = registerSound("twohtimestop");

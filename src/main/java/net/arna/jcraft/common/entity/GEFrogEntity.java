@@ -9,15 +9,14 @@ import net.minecraft.entity.passive.FrogEntity;
 import net.minecraft.world.World;
 
 public class GEFrogEntity extends FrogEntity implements IOwnable {
-
-    public GEFrogEntity(EntityType<? extends AnimalEntity> entityType, World world) {
-        super(entityType, world);
-    }
+    public GEFrogEntity(EntityType<? extends AnimalEntity> entityType, World world) { super(entityType, world); }
 
     @Override
     public boolean damage(DamageSource source, float amount) {
-        if (source.getAttacker() instanceof LivingEntity living)
+        if (source.getAttacker() instanceof LivingEntity living) {
+            setAttacker(living);
             return living.damage(source, amount);
+        }
         if (source.isOutOfWorld())
             return super.damage(source, amount);
         return false;
@@ -25,24 +24,37 @@ public class GEFrogEntity extends FrogEntity implements IOwnable {
 
     private LivingEntity master;
     @Override
-    public LivingEntity getMaster() {
-        return master;
-    }
+    public LivingEntity getMaster() { return master; }
     @Override
-    public void setMaster(LivingEntity m) {
-        master = m;
-    }
+    public void setMaster(LivingEntity m) { master = m; }
 
     private int timeToLive = 300;
     @Override
     public void tick() {
-        super.tick();
-        if (world.isClient) return;
         timeToLive--;
-        getNavigation().startMovingTo(master, 2);
         if (timeToLive == 0) {
-            kill();
+            discard();
             dropStack(getMainHandStack());
         }
+
+        if (!world.isClient) {
+            if (master == null) {
+                kill();
+            } else {
+                // Covers any edge cases, including stand damage (which uses a separate damage routine
+                float deltaHealth = getMaxHealth() - getHealth();
+                if (deltaHealth > 0) {
+                    //JCraft.LOGGER.info("Redirecting " + deltaHealth + " damage from frog to " + master);
+                    setHealth(getMaxHealth());
+                    DamageSource source = getAttacker() == null ? DamageSource.GENERIC : DamageSource.mob(getAttacker());
+                    master.damage(source, deltaHealth);
+                }
+
+                // Go to master
+                getNavigation().startMovingTo(master, 2.5);
+            }
+        }
+
+        super.tick();
     }
 }

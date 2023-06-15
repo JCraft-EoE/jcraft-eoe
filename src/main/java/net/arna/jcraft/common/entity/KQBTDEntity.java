@@ -6,8 +6,6 @@ import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.MobilityType;
-import net.arna.jcraft.registry.JSoundRegister;
-import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
@@ -47,20 +45,18 @@ import net.arna.jcraft.registry.*;
 import java.util.List;
 
 public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
-    public static Attack light = new Attack(0, 2, 0.75f, 19, 0, 1.5, 3.5f, 0.75f, AttackType.MULTIHIT, 1f, 0, List.of(6, 11), JSoundRegister.IMPACT_4)
+    public static final Attack light = new Attack(0, 2, 0.75f, 19, 0, 1.5, 3.5f, 0.75f, AttackType.MULTIHIT, 1f, 0, List.of(6, 11), JSoundRegister.IMPACT_4)
             .setInfo("Dual Punch", "quick combo starter");
-    public static Attack heavy = new Attack(1, 12, 0.75f, 9, 5, 1, 7.5f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_4).setHitspark(2).setLaunch()
+    public static final Attack heavy = new Attack(1, 12, 0.75f, 9, 5, 1, 7.5f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_4).setHitspark(2).setLaunch()
             .setInfo("Elbow", "fast, short-range knockback");
-    public static Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3, JSoundRegister.IMPACT_4)
+    public static final Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3, JSoundRegister.IMPACT_4)
             .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
-    public static Attack bombplant = new Attack(3, 30, 1, 20, 12, 1.5, 0f, 0.0f, AttackType.BOX)
+    public static final Attack bombplant = new Attack(3, 30, 1, 20, 12, 1.5, 0f, 0.0f, AttackType.BOX)
             .setUB(true)
             .setInfo("Bomb Plant", "crouch to plant on the ground below you, stealthily");
-    public static Attack bubble = new Attack(4, 23, 0.75f, 18, 15, 0, 0f, 0.0f, AttackType.BOX).setRanged(true)
+    public static final Attack bubble = new Attack(4, 23, 0.75f, 18, 15, 0, 0f, 0.0f, AttackType.BOX).setRanged(true)
             .setInfo("Stray Cat", "launches an explosive bubble");
-    public static Attack detonate = new Attack(5, 1, 0.75f, 6, 5, 0, 0f, 0.0f, AttackType.BOX)
+    public static final Attack detonate = new Attack(5, 1, 0.75f, 6, 5, 0, 0f, 0.0f, AttackType.BOX)
             .setInfo("Detonate", "crouch with a bomb planted within 20s on a living being to activate Bites the Dust");
 
     public ItemEntity coin;
@@ -126,7 +122,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
     public void initHeavyAttack() {
         if (!this.canAttack()) return;
         if (handleAttack(heavy, JCraft.standHeavyCD, 4)) {
-            this.playSound(JSoundRegister.KQBTD_ELBOW, 1, 1);
+            playSound(JSoundRegister.KQBTD_ELBOW, 1, 1);
         }
     }
 
@@ -134,7 +130,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
     public void initBarrage() {
         if (!this.canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
-            this.playSound(JSoundRegister.KQ_BARRAGE, 1, 1);
+            playSound(JSoundRegister.KQ_BARRAGE, 1, 1);
         }
     }
 
@@ -166,7 +162,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
     public void initUlt() {
         if (!this.canAttack()) return;
         if (handleAttack(detonate, JCraft.standUltCD, 6)) {
-            this.playSound(JSoundRegister.KQ_DETONATE, 1, 1);
+            playSound(JSoundRegister.KQ_DETONATE, 1, 1);
         }
     }
 
@@ -174,7 +170,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
     public void initSpecial2() {
         if (!this.canAttack()) return;
         if (handleAttack(bubble, JCraft.standS2CD, 8)) {
-            this.playSound(JSoundRegister.KQ_UPPERCUT, 1, 1);
+            playSound(JSoundRegister.KQ_UPPERCUT, 1, 1);
         }
     }
 
@@ -343,7 +339,13 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
         user.velocityModified = true;
 
         playerData.putInt(JCraft.utilCD, 360); // 18s explosive dash cooldown
-        this.playSound(JSoundRegister.KQ_DETONATE, 1, 1);
+        playSound(JSoundRegister.KQ_DETONATE, 1, 1);
+    }
+
+    @Override
+    public void desummon() {
+        if (coin != null) coin.discard();
+        super.desummon();
     }
 
     @Override
@@ -357,7 +359,8 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
 
     @Override
     public void tick() {
-        if (age == 1) this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.KQBTD_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
+        if (age == 1)
+            this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.KQBTD_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
         super.tick();
 
         if (hasUser()) {
@@ -448,10 +451,12 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
         }
     }
 
-    // Animation code
+    // Animations
+    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+
     @Override
     public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController(this, "controller", 0, this::predicate));
+        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
     }
 
     @Override
@@ -465,11 +470,12 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
     }
 
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        AnimationController controller = event.getController();
+        AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
-        if (this.getSameState()) {
-            controller.markNeedsReload();
-        }
+
+
+
+        if (getSameState()) controller.markNeedsReload();
         switch (this.getState()) {
             default -> controller.setAnimation(builder.loop("animation.kqbtd.idle"));
             case 2 -> controller.setAnimation(builder.playAndHold("animation.kqbtd.light"));

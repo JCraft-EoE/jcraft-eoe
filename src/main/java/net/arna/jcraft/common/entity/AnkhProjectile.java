@@ -1,6 +1,5 @@
 package net.arna.jcraft.common.entity;
 
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.util.JCraftUtils;
 import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.minecraft.entity.Entity;
@@ -22,7 +21,6 @@ import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
 public class AnkhProjectile extends PersistentProjectileEntity implements IAnimatable {
-
     private int ticksInAir;
     private boolean variation = false;
     private double orbitRange = 3;

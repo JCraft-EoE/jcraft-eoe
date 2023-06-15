@@ -20,8 +20,6 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-import java.util.List;
-
 import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 
 public class FVRevolverItem extends Item {

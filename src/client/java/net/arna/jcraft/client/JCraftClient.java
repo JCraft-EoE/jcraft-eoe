@@ -1,7 +1,6 @@
 package net.arna.jcraft.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import eu.midnightdust.lib.config.MidnightConfig;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.hud.JCraftHudOverlay;
 import net.arna.jcraft.client.net.ClientPacketHandler;
@@ -57,8 +56,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
-
-import static net.arna.jcraft.JCraft.MOD_ID;
 
 public class JCraftClient implements ClientModInitializer {
 

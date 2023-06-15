@@ -68,6 +68,7 @@ public class AboutStandCommand {
             playerEntity.sendMessage(Text.of(readout.toString()));
         } else {
             playerEntity.sendMessage(Text.of("No stand found!"), false);
+            return 0;
         }
 
         return 1;

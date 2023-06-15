@@ -17,8 +17,6 @@ public class TimestopBlockEntityMixin {
 
     @Inject(method = "canTickBlockEntity", at = @At("HEAD"), cancellable = true)
     void jcraft$canTickBlockEntity(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        if (JCraftUtils.isInTSRange(pos)) {
-            cir.cancel();
-        }
+        if (JCraftUtils.isInTSRange(pos)) cir.cancel();
     }
 }

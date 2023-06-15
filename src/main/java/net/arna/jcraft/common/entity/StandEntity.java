@@ -11,7 +11,6 @@ import net.arna.jcraft.mixin.LivingEntityInvoker;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.Entity;
@@ -29,7 +28,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.EntityPassengersSetS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.StopSoundS2CPacket;
 import net.minecraft.particle.ParticleTypes;
@@ -77,13 +75,13 @@ public abstract class StandEntity extends MobEntity {
     private static final TrackedData<Boolean> FREE;
     private static final TrackedData<Boolean> REMOTE;
 
-    public static TrackedData<Integer> TIMESTOPTIME;
+    public static final TrackedData<Integer> TIMESTOPTIME;
     public Boolean blocking = false;
     public Boolean idleOverride = false;
 
     public Float idleDistance = 1.25f;
     public Float idleRotation = -45f;
-    public float attackRotation = 90f;
+    public final float attackRotation = 90f;
     public float blockDistance = 0.75f;
 
     public float maxStandGauge = 90f;
@@ -94,8 +92,8 @@ public abstract class StandEntity extends MobEntity {
     public Attack curAttack;
     public Attack previousAttack;
 
-    public static List<String> attackCooldowns = List.of(JCraft.standLightCD, JCraft.standHeavyCD, JCraft.standBarrageCD, JCraft.standS1CD, JCraft.standUltCD, JCraft.standS2CD, JCraft.standS3CD, JCraft.utilCD);
-    static Attack unusable = new Attack(-1,999, 999, 999, 0, AttackType.BOX).setInfo("NONE", "NONE");
+    public static final List<String> attackCooldowns = List.of(JCraft.standLightCD, JCraft.standHeavyCD, JCraft.standBarrageCD, JCraft.standS1CD, JCraft.standUltCD, JCraft.standS2CD, JCraft.standS3CD, JCraft.utilCD);
+    static final Attack unusable = new Attack(-1,999, 999, 999, 0, AttackType.BOX).setInfo("NONE", "NONE");
 
     // Info
     public List<String> pros;
@@ -269,10 +267,8 @@ public abstract class StandEntity extends MobEntity {
 
     public void setRemote(boolean r) {
         this.dataTracker.set(REMOTE, r);
-        if (r)
-            beginRemote();
-        else
-            endRemote();
+        if (r) beginRemote();
+        else endRemote();
     }
 
     /**
@@ -405,8 +401,8 @@ public abstract class StandEntity extends MobEntity {
      * Struct used for storing extra information relating to the stands ability to attack
      */
     public class CanAttackData {
-        public LivingEntity user;
-        public boolean canAttack;
+        public final LivingEntity user;
+        public final boolean canAttack;
 
         public CanAttackData(LivingEntity l, boolean b) {
             this.user = l;
@@ -632,17 +628,30 @@ public abstract class StandEntity extends MobEntity {
         boolean isFree = getFree();
         boolean isRemote = getRemote();
 
+        // Common code for remote mode
+        if (isRemote) {
+            if (hasVehicle()) detach();
+
+            // Clientside rotational sync for remote mode
+            user.setBodyYaw(user.getHeadYaw());
+
+            setHeadYaw(user.getHeadYaw());
+            setRotation(user.getYaw(), user.getPitch());
+        } else if (!hasVehicle() && !getFree())
+            startRiding(user, true);
+
+        /*
+        JCraft.LOGGER.info(
+                (client ? "CLIENT:" : "SERVER:") + " Ticking stand " + this +
+                        "\nUser: " + user +
+                        "\nVehicle (stand): " + getVehicle() +
+                        "\nFree: " + getFree() +
+                        "\nRemote: " + getRemote()
+        );
+         */
+
         if (client) {
-            if (isRemote) {
-                if (hasVehicle()) detach();
 
-                // Clientside rotational sync for remote mode
-                user.setBodyYaw(user.getHeadYaw());
-
-                setHeadYaw(user.getHeadYaw());
-                setRotation(user.getYaw(), user.getPitch());
-            } else if (!hasVehicle())
-                startRiding(user);
         } else {
             // Reset samestate
             if (getSameState()) setSameState(false);
@@ -667,9 +676,7 @@ public abstract class StandEntity extends MobEntity {
             }
 
             // Remote mode
-            if (isRemote) {
-                user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 5, 9, true, false));
-            }
+            if (isRemote) user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 5, 9, true, false));
 
             // Attack logic
             if (this.getMoveStun() >= 0 && !this.blocking && attack != null) {
@@ -893,10 +900,9 @@ public abstract class StandEntity extends MobEntity {
             if (!client) this.setTSTime(tsTime - 1);
         }
 
-        if (this.curAttack != this.previousAttack && this.curAttack != null) {
+        if (this.curAttack != this.previousAttack && this.curAttack != null)
             //JCraft.LOGGER.info("Logged previous attack change: " + this.curAttack + " " + this.previousAttack);
             this.previousAttack = this.curAttack;
-        }
 
         //this.pastAttack = this.curAttack;
     }
@@ -1154,26 +1160,17 @@ public abstract class StandEntity extends MobEntity {
                 }
             }
 
-            if (mob.fallDistance > 2 || anyInAir) {
-                wantToBlock = true;
-            }
-        }
-        //JCraft.LOGGER.info("WTB: " + wantToBlock);
-
-        if (wantToBlock) {
-            if (this.canAttack()) blocking = true;
-        } else {
-            blocking = false;
+            if (mob.fallDistance > 2 || anyInAir) wantToBlock = true;
         }
 
-        boolean stunned = mob.hasStatusEffect(JStatusRegister.DAZED);
+        //JCraft.LOGGER.info("Want to block: " + wantToBlock);
+        blocking = wantToBlock && canAttack();
+
+        StatusEffectInstance mobStun = mob.getStatusEffect(JStatusRegister.DAZED);
         // If stunned, and about to get hit by another move, combo break sometimes
-        if (stunned) {
-            StatusEffectInstance mobStun = mob.getStatusEffect(JStatusRegister.DAZED);
-            if (!this.blocking && enemyAttack != null && enemyMoveStun > enemyAttack.initTime && this.random.nextFloat() < 0.1f) {
+        if (mobStun != null)
+            if (!this.blocking && enemyAttack != null && enemyMoveStun > enemyAttack.initTime && this.random.nextFloat() < 0.1f)
                 ComboBreak((ServerWorld) this.world, mob, mobStun);
-            }
-        }
 
         if (!this.blocking) {
             StatusEffectInstance stun = target.getStatusEffect(JStatusRegister.DAZED);

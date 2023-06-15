@@ -38,9 +38,15 @@ import java.util.List;
 public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOwnable {
     public LivingEntity target;
 
-    public static TrackedData<Boolean> EXPLODED;
-    static { EXPLODED = DataTracker.registerData(LifeDetectorEntity.class, TrackedDataHandlerRegistry.BOOLEAN); }
-    public boolean hasExploded() { return this.dataTracker.get(EXPLODED); }
+    public static final TrackedData<Boolean> EXPLODED;
+
+    static {
+        EXPLODED = DataTracker.registerData(LifeDetectorEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    }
+
+    public boolean hasExploded() {
+        return this.dataTracker.get(EXPLODED);
+    }
 
     @Override
     protected void initDataTracker() {
@@ -53,9 +59,15 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
     }
 
     private LivingEntity master;
+
     @Override
-    public LivingEntity getMaster() { return master; }
-    public void setMaster(LivingEntity l) { this.master = l; }
+    public LivingEntity getMaster() {
+        return master;
+    }
+
+    public void setMaster(LivingEntity l) {
+        this.master = l;
+    }
 
     @Override
     public boolean canTarget(LivingEntity target) {
@@ -128,28 +140,38 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
                 target = null;
             }
 
-            if ( !hasExploded() && (this.age >= 300 || getHealth() <= 0f) ) Explode();
+            if (!hasExploded() && (this.age >= 300 || getHealth() <= 0f)) Explode();
 
             // Lerp velocity to simulate inertia
             this.setVelocity(
-                    getVelocity().add( getRotationVector().multiply(0.5) ).multiply(0.25)
+                    getVelocity().add(getRotationVector().multiply(0.5)).multiply(0.25)
             );
             this.velocityModified = true;
         }
     }
 
     @Override
-    public boolean isFireImmune() { return true; }
+    public boolean isFireImmune() {
+        return true;
+    }
+
     @Nullable
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.BLOCK_LAVA_EXTINGUISH;
     }
+
     @Nullable
     @Override
-    protected SoundEvent getDeathSound() { return SoundEvents.BLOCK_LAVA_EXTINGUISH; }
+    protected SoundEvent getDeathSound() {
+        return SoundEvents.BLOCK_LAVA_EXTINGUISH;
+    }
+
     @Override
-    public boolean hasNoGravity() { return true; }
+    public boolean hasNoGravity() {
+        return true;
+    }
+
     public static DefaultAttributeContainer.Builder createDetectorAttributes() {
         return DefaultAttributeContainer.builder()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 10)
@@ -158,6 +180,7 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
                 .add(EntityAttributes.GENERIC_ARMOR)
                 .add(EntityAttributes.GENERIC_ARMOR_TOUGHNESS);
     }
+
     @Override
     protected Box calculateBoundingBox() { // Centered around 0,0,0 instead of 0,0.5,0
         double x = getX();
@@ -178,6 +201,7 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
         else
             tag.putInt("ownerID", master.getId());
     }
+
     @Override
     public void readCustomDataFromNbt(NbtCompound tag) {
         super.readCustomDataFromNbt(tag);
@@ -187,20 +211,34 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
         else
             master = (LivingEntity) world.getEntityById(tag.getInt("ownerID")); // Always is living
     }
-    @Override
-    public Iterable<ItemStack> getArmorItems() { return List.of(); }
-    @Override
-    public ItemStack getEquippedStack(EquipmentSlot slot) { return ItemStack.EMPTY; }
-    @Override
-    public void equipStack(EquipmentSlot slot, ItemStack stack) { }
-    @Override
-    public Arm getMainArm() { return null; }
 
+    @Override
+    public Iterable<ItemStack> getArmorItems() {
+        return List.of();
+    }
+
+    @Override
+    public ItemStack getEquippedStack(EquipmentSlot slot) {
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public void equipStack(EquipmentSlot slot, ItemStack stack) {
+    }
+
+    @Override
+    public Arm getMainArm() {
+        return null;
+    }
+
+    // Animations
     private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+
     @Override
     public void registerControllers(AnimationData animationData) {
         animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
     }
+
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         if (hasExploded())
             event.getController().setAnimation(new AnimationBuilder().playOnce("animation.detector.explode"));
@@ -208,6 +246,9 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
             event.getController().setAnimation(new AnimationBuilder().loop("animation.detector.idle"));
         return PlayState.CONTINUE;
     }
+
     @Override
-    public AnimationFactory getFactory() { return this.factory; }
+    public AnimationFactory getFactory() {
+        return this.factory;
+    }
 }

@@ -48,43 +48,41 @@ import java.util.Objects;
 
 //TODO: give MiH a trail during speed slice and heaven's judgement
 public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
     // placeholder sound
-    public static Attack light = new Attack(0, 2, 0.75f, 8, 5, 1.5, 4f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, SoundEvents.ITEM_TRIDENT_HIT)
+    public static final Attack light = new Attack(0, 2, 0.75f, 8, 5, 1.5, 4f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, SoundEvents.ITEM_TRIDENT_HIT)
             .setInfo("Slice", "quick combo starter");
-    public static Attack barrage = new Attack(2, 17, 0.85f, 32, 0, 2, 1.5f, 0.1f, AttackType.BARRAGE, 0.5f, 0, 3, JSoundRegister.IMPACT_1)
+    public static final Attack barrage = new Attack(2, 17, 0.85f, 32, 0, 2, 1.5f, 0.1f, AttackType.BARRAGE, 0.5f, 0, 3, JSoundRegister.IMPACT_1)
             .setInfo("Barrage", "short, knocks back");
-    public static Attack speedslice = new Attack(7, 18, 1.25f, 11, 10, 0, 6f, 0.5f, AttackType.BOX, 1f, 0, 0)
+    public static final Attack speedslice = new Attack(7, 18, 1.25f, 11, 10, 0, 6f, 0.5f, AttackType.BOX, 1f, 0, 0)
             .setRanged(true)
             .setMobility(MobilityType.TELEPORT)
             .setInfo("Speed Slice", "short windup, harming teleport with hitstun and light knockback");
-    public static Attack legcrusher = new Attack(3, 16, 0.85f, 17, 8, 1.5, 7f, 0.25f, AttackType.BOX, 1.5f, 0.2f, 0, JSoundRegister.TW_KICK_HIT)
+    public static final Attack legcrusher = new Attack(3, 16, 0.85f, 17, 8, 1.5, 7f, 0.25f, AttackType.BOX, 1.5f, 0.2f, 0, JSoundRegister.TW_KICK_HIT)
             .appendHitbox(new Attack.HitboxData(0, -0.5, 1))
             .setInfo("Leg Crusher", "combo starter/extender, mih hoofs the enemies legs in a quick, stunning attack");
-    public static Attack furychop = new Attack(4, 19, 0.85f, 24, 15, 1.6, 7f, 0.25f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegister.IMPACT_2)
+    public static final Attack furychop = new Attack(4, 19, 0.85f, 24, 15, 1.6, 7f, 0.25f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegister.IMPACT_2)
             .setHitspark(2)
             .setInfo("Fury Chop", "combo extender, on hit gives haste(8s) to user and mining fatigue(8s) to victim, on whiff the fatigue goes to user");
-    public static Attack donut = new Attack(1, 23, 0.75f, 32, 26, 2.5, 8.5f, 0.0f, AttackType.BOX, 3f, 0.2f, 0, JSoundRegister.IMPACT_4)
+    public static final Attack donut = new Attack(1, 23, 0.75f, 32, 26, 2.5, 8.5f, 0.0f, AttackType.BOX, 3f, 0.2f, 0, JSoundRegister.IMPACT_4)
             .setArmor(true)
             .setHitspark(2)
             .setInfo("Roundabout Donut", "feigns stand desummon, uninterruptable combo starter");
-    public static Attack timeaccel = new Attack(6, 70, 40, 20, 0, AttackType.BOX)
+    public static final Attack timeaccel = new Attack(6, 70, 40, 20, 0, AttackType.BOX)
             .setInfo("Time Acceleration", "2s windup, 15s t. accel, enemies standless for 15s after finishing");
     private int circleTime = 0;
-    public static Attack circle = new Attack(8, 40, 14, 13, 0, 1.25f, AttackType.BOX)
+    public static final Attack circle = new Attack(8, 40, 14, 13, 0, 1.25f, AttackType.BOX)
             .setRanged(true)
             .setMobility(MobilityType.DASH)
             .setInfo("Heaven's Judgement", "rapidly circles a looked-at target within 4m at a radius of 7m/crouch to repeatedly speed slice an area");
-    public static Attack judgement = new Attack(5, 33, 1.25f, 60, 20, 0, 0f, 0.5f, AttackType.BARRAGE, 0, 0, 2, null)
+    public static final Attack judgement = new Attack(5, 33, 1.25f, 60, 20, 0, 0f, 0.5f, AttackType.BARRAGE, 0, 0, 2, null)
             .setInfo("", "mih rapidly speed slices an area and finishes with a larger one, knocks back");
 
     public Vec3d judgementInitPos = Vec3d.ZERO;
     public Vec3d judgementInitRot = Vec3d.ZERO;
 
-    public static TrackedData<Integer> ACCELTIME;
-    public static TrackedData<Boolean> AFTERIMAGE;
-    public static TrackedData<Integer> TARGETID;
+    public static final TrackedData<Integer> ACCELTIME;
+    public static final TrackedData<Boolean> AFTERIMAGE;
+    public static final TrackedData<Integer> TARGETID;
 
     public MadeInHeavenEntity(World worldIn) {
         super(StandType.MADE_IN_HEAVEN, worldIn);
@@ -121,16 +119,31 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
         AFTERIMAGE = DataTracker.registerData(MadeInHeavenEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     }
 
-    public int getAccelTime() { return this.dataTracker.get(ACCELTIME); }
-    public void setAccelTime(int aTime) { this.dataTracker.set(ACCELTIME, aTime); }
-    public boolean getAfterimage() { return this.dataTracker.get(AFTERIMAGE); }
-    public void setAfterimage(boolean a) { this.dataTracker.set(AFTERIMAGE, a); }
+    public int getAccelTime() {
+        return this.dataTracker.get(ACCELTIME);
+    }
+
+    public void setAccelTime(int aTime) {
+        this.dataTracker.set(ACCELTIME, aTime);
+    }
+
+    public boolean getAfterimage() {
+        return this.dataTracker.get(AFTERIMAGE);
+    }
+
+    public void setAfterimage(boolean a) {
+        this.dataTracker.set(AFTERIMAGE, a);
+    }
+
     public Entity getCircleTarget() {
         int id = dataTracker.get(TARGETID);
         if (id == -1) return null;
         return world.getEntityById(id);
     }
-    public void setTargetId(int id) { this.dataTracker.set(TARGETID, id); }
+
+    public void setTargetId(int id) {
+        this.dataTracker.set(TARGETID, id);
+    }
 
     @Override
     protected void initDataTracker() {
@@ -163,7 +176,7 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
     public void initBarrage() {
         if (!this.canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
-            this.playSound(JSoundRegister.MIH_BARRAGE,1, 1);
+            this.playSound(JSoundRegister.MIH_BARRAGE, 1, 1);
         }
     }
 
@@ -171,7 +184,7 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
     public void initSpecial1() {
         if (!this.canAttack()) return;
         if (handleAttack(legcrusher, JCraft.standS1CD, 8)) {
-            this.playSound(JSoundRegister.MIH_LEGCRUSHER,1, 1);
+            this.playSound(JSoundRegister.MIH_LEGCRUSHER, 1, 1);
         }
     }
 
@@ -193,6 +206,7 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
 
     private LivingEntity circleTarget;
     private float circleOrbitProg;
+
     @Override
     public void initSpecial3() {
         if (!this.canAttack()) return;
@@ -297,12 +311,12 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
         updateRemoteInputs(0, 0, false);
     }
 
-     private void endCircle() {
+    private void endCircle() {
         circleTime = 0;
         circleTarget = null;
-         setTargetId(-1);
+        setTargetId(-1);
         if (getAccelTime() <= 0) setAfterimage(false);
-     }
+    }
 
     private void speedSlice(LivingEntity player, Vec3d start, Vec3d destination, float damage, float kb, double size) {
         HitResult hitResult = this.world.raycast(new RaycastContext(start, destination, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, player));
@@ -376,7 +390,8 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
 
     @Override
     public void tick() {
-        if (age == 1) world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.MIH_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
+        if (age == 1)
+            world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.MIH_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
         super.tick();
 
         if (!hasUser()) return;
@@ -481,7 +496,9 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
         }
     }
 
-    // Animation code
+    // Animations
+    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+
     @Override
     public void registerControllers(AnimationData animationData) {
         animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));

@@ -12,6 +12,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.RaycastContext;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,19 +22,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Camera.class)
 public abstract class CameraMixin {
     @Shadow
-    protected BlockView area;
+    private BlockView area;
     @Shadow
-    protected Vec3d pos;
+    private Vec3d pos;
+    @Final
     @Shadow
-    protected Vec3f verticalPlane;
+    private Vec3f verticalPlane;
     @Shadow
-    protected Entity focusedEntity;
+    private Entity focusedEntity;
     @Shadow
-    protected boolean thirdPerson;
+    private boolean thirdPerson;
     @Shadow
-    protected float lastCameraY;
+    private float lastCameraY;
     @Shadow
-    protected float cameraY;
+    private float cameraY;
 
     //todo: fix camera
     private double clipToSpaceVertical(double desiredCameraDistance) {

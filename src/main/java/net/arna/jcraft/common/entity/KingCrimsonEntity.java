@@ -44,35 +44,33 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
-    public static Attack light = new Attack(0, 3, 0.85f, 23, 0, 1.5, 4f, 0.1f, AttackType.MULTIHIT, 2f, -0.1f, List.of(10, 16), JSoundRegister.IMPACT_4)
+    public static final Attack light = new Attack(0, 3, 0.85f, 23, 0, 1.5, 4f, 0.1f, AttackType.MULTIHIT, 2f, -0.1f, List.of(10, 16), JSoundRegister.IMPACT_4)
             .setInfo("Dual Chop", "quick combo starter");
-    public static Attack barrage = new Attack(3, 17, 0.85f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3)
+    public static final Attack barrage = new Attack(3, 17, 0.85f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender/finisher, medium stun, knocks back");
-    public static Attack overhead = new Attack(2, 8, 0.85f, 32, 22, 2, 9f, 1.5f, AttackType.BOX, 0.5f)
+    public static final Attack overhead = new Attack(2, 8, 0.85f, 32, 22, 2, 9f, 1.5f, AttackType.BOX, 0.5f)
             .setHitspark(2)
             .setArmor(true)
             .setLaunch()
             .setInfo("Overhead Hook", "long windup, knockdown", AttackQueue.HEAVY);
-    public static Attack heavy = new Attack(1, 13, 0.85f, 19, 12, 1.5, 6f, 0.2f, AttackType.BOX, 1.25f, 0, 0)
+    public static final Attack heavy = new Attack(1, 13, 0.85f, 19, 12, 1.5, 6f, 0.2f, AttackType.BOX, 1.25f, 0, 0)
             .setInfo("Vertical Chop", "medium windup combo starter, has a true followup in the form of a slow, armored knockdown", AttackQueue.HEAVY)
             .setFollowup(overhead);
-    public static Attack eyechop = new Attack(4, 20, 1f, 50, 37, 1.75, 9f, 0.3f, AttackType.BOX, 3, -0.3f)
+    public static final Attack eyechop = new Attack(4, 20, 1f, 50, 37, 1.75, 9f, 0.3f, AttackType.BOX, 3, -0.3f)
             .setHitspark(2)
             .setInfo("Eye Chop/Blood Throw", "blindness on hit, donut combo extender/crouch to throw a stunning, blinding blood projectile");
-    public static Attack bloodthrow = new Attack(5, 25, 15, 10, 10, AttackType.BOX)
+    public static final Attack bloodthrow = new Attack(5, 25, 15, 10, 10, AttackType.BOX)
             .setInfo("Blood Throw", "");
-    public static Attack donut = new Attack(6, 15, 1f, 60, 42, 2, 14f, 0.0f, AttackType.BOX, 6, 0.1f)
+    public static final Attack donut = new Attack(6, 15, 1f, 60, 42, 2, 14f, 0.0f, AttackType.BOX, 6, 0.1f)
             .setHitspark(2)
             .setArmor(true)
             .setInfo("Donut", "huge windup, 6s hitstun");
-    public static Attack epitaph = new Attack(7, 30, 34, 4, 0, -1, AttackType.COUNTER)
+    public static final Attack epitaph = new Attack(7, 30, 34, 4, 0, -1, AttackType.COUNTER)
             .setInfo("Epitaph/Move Cancel", "when used raw, 0.2s windup, 1.5s counter; cancels move when used during one");
-    public static Attack timeerase = new Attack(8, 50, 15, 5, 6, AttackType.BOX)
+    public static final Attack timeerase = new Attack(8, 50, 15, 5, 6, AttackType.BOX)
             .setInfo("Time Erase", "6 seconds duration"); // TE = (moveStun-initTime)/20
 
-    public static TrackedData<Integer> TIMEERASETIME;
+    public static final TrackedData<Integer> TIMEERASETIME;
 
     public List<Entity> timeEraseEntities;
     public List<Vec3d> timeErasePositions;
@@ -102,13 +100,14 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                 "hard to master"
         );
 
-        freespace = "BNB:\n" +
-                "    the red racist\n" +
-                "    Donut>M1>Eye Chop>M1>Barrage>\n" +
-                "    ...Move Cancel>M1>Heavy~Overhead\n" +
-                "    ...Time Erase\n" +
-                "    the gamer\n" +
-                "    M1>Barrage>delay.Move Cancel>M1>Heavy~Overhead";
+        freespace = """
+                BNB:
+                    the red racist
+                    Donut>M1>Eye Chop>M1>Barrage>
+                    ...Move Cancel>M1>Heavy~Overhead
+                    ...Time Erase
+                    the gamer
+                    M1>Barrage>delay.Move Cancel>M1>Heavy~Overhead""";
 
         moves = List.of(light, heavy, barrage, eyechop, timeerase, donut, epitaph
                 , new Attack().setMobility(MobilityType.TELEPORT).setInfo("Timeskip", "15m range"));
@@ -488,10 +487,12 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
         }
     }
 
-    // Animation code
+    // Animations
+    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+
     @Override
     public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController(this, "controller", 0, this::predicate));
+        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
     }
 
     @Override
@@ -505,7 +506,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
     }
 
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        AnimationController controller = event.getController();
+        AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 
         if (playSummonAnim) {

@@ -38,8 +38,6 @@ import java.util.UUID;
 import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 
 public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
     public GERScorpionEntity(EntityType<? extends MobEntity> entityType, World world) {
         super(entityType, world);
         this.setNoDrag(true);
@@ -91,30 +89,6 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
         super.initDataTracker();
         this.dataTracker.startTracking(OWNERUUID, Optional.empty());
         this.dataTracker.startTracking(ISROCK, true);
-    }
-
-    @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController(this, "controller", 0, this::predicate));
-    }
-
-    @Override
-    public AnimationFactory getFactory() {
-        return this.animationFactory;
-    }
-
-    @Override
-    public int tickTimer() {
-        return age;
-    }
-
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        if (this.isRock()) {
-            event.getController().setAnimation(new AnimationBuilder().loop("animation.gerscorpion.rock"));
-        } else {
-            event.getController().setAnimation(new AnimationBuilder().playOnce("animation.gerscorpion.transform").playAndHold("animation.gerscorpion.attack"));
-        }
-        return PlayState.CONTINUE;
     }
 
     @Override
@@ -266,5 +240,31 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                     kill();
             }
         }
+    }
+
+    // Animations
+    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+
+    @Override
+    public void registerControllers(AnimationData animationData) {
+        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
+    }
+
+    @Override
+    public AnimationFactory getFactory() {
+        return this.animationFactory;
+    }
+
+    @Override
+    public int tickTimer() {
+        return age;
+    }
+
+    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+        if (this.isRock())
+            event.getController().setAnimation(new AnimationBuilder().loop("animation.gerscorpion.rock"));
+        else
+            event.getController().setAnimation(new AnimationBuilder().playOnce("animation.gerscorpion.transform").playAndHold("animation.gerscorpion.attack"));
+        return PlayState.CONTINUE;
     }
 }

@@ -894,6 +894,25 @@ Silver Chariot
 The World: Over Heaven
     >Updated sounds
 
+● 15/6/2023
+>fixed a shitton of minor bugs
+>Fixed bug where dash animation would cancel spec attack animation
+
+Whitesnake
+    >Fixed bug where remote mode was not semitransparent
+    >Remote mode cooldown reduced (1.5s->1s)
+
+Silver Chariot
+    >Added sounds
+
+Golden Experience
+    >Life Giver (frog)
+        >increased speed by 25%
+        >now correctly redirects damage from all sources
+
+Killer Queen: Bites the Dust
+    >Fixed bug where thrown coins do not disappear when desummoned
+
 priority (top to bottom)
 TODO: ability to position the HUD
 TODO: AI flags for unblockables and shouldn't-blockables

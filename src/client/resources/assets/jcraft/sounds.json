@@ -610,6 +610,12 @@
     ]
   },
 
+  "twohbarrage": {
+    "sounds": [
+      "jcraft:stands/theworldoverheaven/barrage"
+    ]
+  },
+
   "twohshoot": {
     "sounds": [
       "jcraft:stands/theworldoverheaven/shoot"
@@ -794,6 +800,24 @@
   "scspin": {
     "sounds": [
       "jcraft:stands/silverchariot/spin"
+    ]
+  },
+
+  "sccleave": {
+    "sounds": [
+      "jcraft:stands/silverchariot/cleave"
+    ]
+  },
+
+  "scarmoroff": {
+    "sounds": [
+      "jcraft:stands/silverchariot/armoroff"
+    ]
+  },
+
+  "scpoke": {
+    "sounds": [
+      "jcraft:stands/silverchariot/poke"
     ]
   }
 }

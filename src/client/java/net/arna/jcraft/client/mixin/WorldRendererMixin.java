@@ -2,16 +2,8 @@ package net.arna.jcraft.client.mixin;
 
 import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
 import net.arna.jcraft.common.util.ITimeStop;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.GlUniform;
-import net.minecraft.client.gl.Uniform;
-import net.minecraft.client.gl.VertexBuffer;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.render.chunk.ChunkBuilder;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;

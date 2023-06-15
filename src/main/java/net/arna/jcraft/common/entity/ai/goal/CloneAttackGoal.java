@@ -11,7 +11,6 @@ import java.util.EnumSet;
 public class CloneAttackGoal extends Goal {
 
     private final PlayerCloneEntity mob;
-    private Path path;
     private LivingEntity target;
     private final double speed;
     private int cooldown;
@@ -35,12 +34,11 @@ public class CloneAttackGoal extends Goal {
             } else if (!target.isAlive()) {
                 return false;
             } else {
-                this.path = this.mob.getNavigation().findPathTo(target, 0);
-                if (this.path != null) {
+                Path path = this.mob.getNavigation().findPathTo(target, 0);
+                if (path != null)
                     return true;
-                } else {
+                else
                     return this.getSquaredMaxAttackDistance(target) >= this.mob.squaredDistanceTo(target);
-                }
             }
         }
     }
