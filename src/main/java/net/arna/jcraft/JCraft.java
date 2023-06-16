@@ -160,7 +160,15 @@ public class JCraft implements ModInitializer {
             rotVec = rotVec.rotateY(side == 0 ? 3.14159265359f : 0.785398163397f * side); // Back diagonals
             dashSpeed *= 0.75; // Backwards speed nerf
         }
-        dashes.add(new DashData(new Vec3d(rotVec.x, 0, rotVec.z).normalize().multiply(dashSpeed), entity));
+
+        Vec3d dashDir;
+        if (rotVec.x == 0 && rotVec.z == 0) {
+            dashDir = new Vec3d(0, rotVec.y, 0);
+            dashSpeed *= 0.75;
+        } else
+            dashDir = new Vec3d(rotVec.x, 0, rotVec.z);
+
+        dashes.add(new DashData(dashDir.normalize().multiply(dashSpeed), entity));
 
         // Syncs dash anim (unless already attacking with a spec) with every player in the vicinity
         if (entity instanceof PlayerEntity player) {

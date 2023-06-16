@@ -913,6 +913,9 @@ Golden Experience
 Killer Queen: Bites the Dust
     >Fixed bug where thrown coins do not disappear when desummoned
 
+● 16/6/2023
+>Added vertical dashes
+
 priority (top to bottom)
 TODO: ability to position the HUD
 TODO: AI flags for unblockables and shouldn't-blockables
