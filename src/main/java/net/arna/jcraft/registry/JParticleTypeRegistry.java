@@ -21,6 +21,7 @@ public interface JParticleTypeRegistry {
     DefaultParticleType SPEEDPARTICLE = FabricParticleTypes.simple();
 
     Map<Integer, DefaultParticleType> particles = Map.ofEntries(
+            Map.entry(-3, ParticleTypes.SWEEP_ATTACK),
             Map.entry(-2, BACKSTAB),
             Map.entry(-1, ParticleTypes.FLASH),
             Map.entry(0, JParticleTypeRegistry.COMBO_BREAK),

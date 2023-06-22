@@ -10,6 +10,8 @@ import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
@@ -39,6 +41,11 @@ public abstract class JCraftSpec {
     public Attack curAttack;
     public Attack previousAttack;
     public AttackQueue queuedAttack;
+
+    public String getName() { return "UNNAMED"; }
+    public String getDescription() { return "UNDESCRIBED"; }
+    public String getDetails() { return "UNFINISHED"; }
+    public List<Attack> getAttacks() { return null; }
 
     public void InitHeavyAttack(ServerWorld serverWorld) {
     }
@@ -118,6 +125,8 @@ public abstract class JCraftSpec {
                 //if (passenger instanceof StandEntity s) { stand = s; }
 
                 if (attack != null) {
+                    player.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 5, 9, true, false));
+
                     int realInitTime = attack.moveStun - attack.initTime;
                     int stunS = (int) (attack.stun * 20f);
 
@@ -132,7 +141,12 @@ public abstract class JCraftSpec {
                                 attack.hitboxSize,
                                 List.copyOf(exclude)
                         );
-
+                        for (Attack.HitboxData data : attack.extraHitboxes) {
+                            List<LivingEntity> extraHurt = JCraftUtils.generateHitbox(world,
+                                    hitPos.add(rotVec.multiply(data.forwardOffset)).add(0, data.verticalOffset, 0), data.hitboxSize, exclude);
+                            for (LivingEntity hurtEntity : extraHurt)
+                                if (!hurt.contains(hurtEntity)) hurt.add(hurtEntity);
+                        }
                         if (!hurt.isEmpty()) {
                             Random random = new Random();
                             JCraft.CreateParticle((ServerWorld) world,

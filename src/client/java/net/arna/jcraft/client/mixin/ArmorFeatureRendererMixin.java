@@ -17,7 +17,7 @@ public class ArmorFeatureRendererMixin<T extends LivingEntity, M extends BipedEn
 
     @Inject(method = "renderArmor", at = @At("HEAD"), cancellable = true)
     private void jcraft$renderArmor(MatrixStack matrices, VertexConsumerProvider vertexConsumers, T livingEntity, EquipmentSlot equipmentSlot, int i, A bipedEntityModel, CallbackInfo ci) {
-        if (!JCraftUtils.shouldRender(livingEntity)) {
+        if (JCraftUtils.shouldNotRender(livingEntity)) {
             ci.cancel();
         }
     }

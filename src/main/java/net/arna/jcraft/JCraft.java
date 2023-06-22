@@ -358,18 +358,20 @@ public class JCraft implements ModInitializer {
         ServerWorld original = (ServerWorld) entity.getWorld();
         MinecraftServer server = original.getServer();
         ServerWorld au = server.getWorld(JDimensionRegister.AU_DIMENSION_KEY);
-        if (original == au) {
+        if (au == null) {
+            JCraft.LOGGER.fatal("Alternate universe world does not exist!");
             return;
         }
+        if (original == au)
+            return;
 
         Vec3d pos = entity.getPos();
         Entity finalEnt = entity;
 
-        if (entity instanceof ServerPlayerEntity player) {
+        if (entity instanceof ServerPlayerEntity player)
             player.teleport(au, pos.x, pos.y - heightOffset, pos.z, entity.getYaw(), entity.getPitch());
-        } else {
+        else
             finalEnt = teleportToWorld(entity, au, entity.getX(), entity.getY() - heightOffset, entity.getZ());
-        }
 
         pastDimensions.add(new DimValues(finalEnt, pos, original.getRegistryKey()));
         au.playSound(null, pos.x, pos.y - heightOffset, pos.z, SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0F, 1.0F);

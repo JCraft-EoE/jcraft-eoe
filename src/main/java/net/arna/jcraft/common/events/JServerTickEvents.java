@@ -32,6 +32,7 @@ import net.minecraft.world.explosion.Explosion;
 
 import java.util.*;
 
+import static net.arna.jcraft.common.entity.StandEntity.standUserAI;
 import static net.arna.jcraft.common.entity.StandEntity.stun;
 import static net.arna.jcraft.common.util.JCraftUtils.activeTimestops;
 
@@ -180,8 +181,8 @@ public class JServerTickEvents {
         JCraft.dashes = newDashes;
 
         for (ServerWorld serverWorld : server.getWorlds()) {
-            //TODO: make mob stand control logic use a static void and not require them to have their stand active
-            List<MobEntity> mobEntities = (List<MobEntity>) serverWorld.getEntitiesByType(TypeFilter.instanceOf(MobEntity.class), EntityPredicates.VALID_ENTITY);
+            //TODO: make MobAI not be dependent on having an active stand
+            List<? extends MobEntity> mobEntities = serverWorld.getEntitiesByType(TypeFilter.instanceOf(MobEntity.class), EntityPredicates.VALID_ENTITY);
 
             for (MobEntity mob : mobEntities) {
                 IEntityDataSaver user = (IEntityDataSaver) mob;
@@ -204,9 +205,9 @@ public class JServerTickEvents {
                                 LivingEntity primeAdversary = mob.getPrimeAdversary();
                                 LivingEntity target = mob.getTarget();
                                 if (primeAdversary != null && primeAdversary.isAlive()) {
-                                    stand.mobAI(mob, primeAdversary);
+                                    standUserAI(mob, primeAdversary, stand);
                                 } else if (target != null && target.isAlive()) {
-                                    stand.mobAI(mob, target);
+                                    standUserAI(mob, target, stand);
                                 } else if (biggestAttacker != null && biggestAttacker.isAlive()) {
                                     mob.setTarget(biggestAttacker);
                                 }
@@ -229,7 +230,7 @@ public class JServerTickEvents {
             }
 
             // Item attaction logic
-            List<ItemEntity> itemEntities = (List<ItemEntity>) serverWorld.getEntitiesByType(TypeFilter.instanceOf(ItemEntity.class), EntityPredicates.VALID_ENTITY);
+            List<? extends ItemEntity> itemEntities = serverWorld.getEntitiesByType(TypeFilter.instanceOf(ItemEntity.class), EntityPredicates.VALID_ENTITY);
 
             for (ItemEntity item : itemEntities) {
                 if (item.getStack().isOf(JObjectRegistry.ANUBIS))

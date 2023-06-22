@@ -42,6 +42,8 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
 
+import static net.arna.jcraft.common.util.Attack.unusable;
+
 public class CreamEntity extends StandEntity implements IAnimatable, IAnimationTickable {
     public static final Attack light = new Attack(0, 2, 0.75f, 14, 6, 1.5, 5f, 0.75f, AttackType.BOX, 1f, 0.1f, 0, JSoundRegister.IMPACT_3)
             .setInfo("Punch", "quick combo starter");
@@ -448,8 +450,6 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
 
                     toDamage.remove(user);
                     toDamage.remove(this);
-
-                    //todo: FALL DAMAGE!!!!!!
 
                     for (LivingEntity ent : toDamage)
                         ent.damage(DamageSource.OUT_OF_WORLD, charging ? 4 : 2.5f);

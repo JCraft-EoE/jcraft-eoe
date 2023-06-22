@@ -12,9 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(WorldChunk.class)
 public class TimestopBlockEntityMixin {
-    @Final
-    private World world;
-
     @Inject(method = "canTickBlockEntity", at = @At("HEAD"), cancellable = true)
     void jcraft$canTickBlockEntity(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
         if (JCraftUtils.isInTSRange(pos)) cir.cancel();

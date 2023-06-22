@@ -29,6 +29,6 @@ public class TheFoolModel extends AnimatedTickingGeoModel<TheFoolEntity> {
     public void setCustomAnimations(TheFoolEntity animatable, int instanceId, AnimationEvent animationEvent) {
         super.setCustomAnimations(animatable, instanceId, animationEvent);
         if (animatable.hasUser())
-            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), animationEvent.getPartialTick(), true, true, 0.445329251f, -0.1745329251f, 30f);
+            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), animationEvent.getPartialTick(), true, true, 0.7854f, -0.349f, 30f);
     }
 }

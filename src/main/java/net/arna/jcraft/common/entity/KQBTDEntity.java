@@ -45,24 +45,20 @@ import net.arna.jcraft.registry.*;
 import java.util.List;
 
 public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnimationTickable {
-    public static final Attack light = new Attack(0, 2, 0.75f, 19, 0, 1.5, 3.5f, 0.75f, AttackType.MULTIHIT, 1f, 0, List.of(6, 11), JSoundRegister.IMPACT_4)
-            .setInfo("Dual Punch", "quick combo starter");
-    public static final Attack heavy = new Attack(1, 12, 0.75f, 9, 5, 1, 7.5f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_4).setHitspark(2).setLaunch()
+    public static final Attack light = KillerQueenEntity.light;
+    public static final Attack heavy = new Attack(2, 12, 0.75f, 9, 5, 1, 7.5f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_4).setHitspark(2).setLaunch()
             .setInfo("Elbow", "fast, short-range knockback");
-    public static final Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3, JSoundRegister.IMPACT_4)
-            .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
-    public static final Attack bombplant = new Attack(3, 30, 1, 20, 12, 1.5, 0f, 0.0f, AttackType.BOX)
-            .setUB(true)
-            .setInfo("Bomb Plant", "crouch to plant on the ground below you, stealthily");
-    public static final Attack bubble = new Attack(4, 23, 0.75f, 18, 15, 0, 0f, 0.0f, AttackType.BOX).setRanged(true)
+    public static final Attack barrage = KillerQueenEntity.barrage;
+    public static final Attack bombplant = KillerQueenEntity.bombplant;
+    public static final Attack bubble = new Attack(5, 23, 0.75f, 18, 15, 0, 0f, 0.0f, AttackType.BOX).setRanged(true)
             .setInfo("Stray Cat", "launches an explosive bubble");
-    public static final Attack detonate = new Attack(5, 1, 0.75f, 6, 5, 0, 0f, 0.0f, AttackType.BOX)
+    public static final Attack detonate = new Attack(6, 1, 0.75f, 6, 5, 0, 0f, 0.0f, AttackType.BOX)
             .setInfo("Detonate", "crouch with a bomb planted within 20s on a living being to activate Bites the Dust");
 
-    public ItemEntity coin;
-    public BubbleProjectile bubbleProjectile;
-    public Entity bombEntity;
-    public Vec3d bombBlock;
+    private ItemEntity coin;
+    private BubbleProjectile bubbleProjectile;
+    private Entity bombEntity;
+    private Vec3d bombBlock;
 
     private int ticksDataStored = 0;
     private NbtCompound userData;
@@ -94,49 +90,40 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
                 , new Attack().setMobility(MobilityType.DASH).setInfo("Explosive Dash", "slight aoe damage, 3D movement tool"));
     }
 
-    @Override
-    protected void initDataTracker() {
-        super.initDataTracker();
-    }
-
     // Necessary, otherwise it simply doesn't reference the correct ones
     @Override
     public Vec3d getBombPos() {
-        if (this.bombEntity != null) {
+        if (this.bombEntity != null)
             return this.bombEntity.getPos();
-        }
-        if (this.bombBlock != null) {
+        if (this.bombBlock != null)
             return this.bombBlock;
-        }
         return null;
     }
 
     // Moveset
     @Override
     public void initLightAttack() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
     public void initHeavyAttack() {
-        if (!this.canAttack()) return;
-        if (handleAttack(heavy, JCraft.standHeavyCD, 4)) {
+        if (!canAttack()) return;
+        if (handleAttack(heavy, JCraft.standHeavyCD, 4))
             playSound(JSoundRegister.KQBTD_ELBOW, 1, 1);
-        }
     }
 
     @Override
     public void initBarrage() {
-        if (!this.canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
+        if (!canAttack()) return;
+        if (handleAttack(barrage, JCraft.standBarrageCD, 5))
             playSound(JSoundRegister.KQ_BARRAGE, 1, 1);
-        }
     }
 
     @Override
     public void initSpecial1() {
-        if (!this.canAttack())
+        if (!canAttack())
             return;
         LivingEntity user = this.getUser();
         NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
@@ -153,14 +140,13 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
             this.bombBlock = null;
         }
 
-        if (this.coin != null) {
+        if (this.coin != null)
             this.coin.discard();
-        }
     }
 
     @Override
     public void initUlt() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(detonate, JCraft.standUltCD, 6)) {
             playSound(JSoundRegister.KQ_DETONATE, 1, 1);
         }
@@ -168,7 +154,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
 
     @Override
     public void initSpecial2() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(bubble, JCraft.standS2CD, 8)) {
             playSound(JSoundRegister.KQ_UPPERCUT, 1, 1);
         }
@@ -176,7 +162,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
 
     @Override
     public void initSpecial3() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         LivingEntity user = this.getUser();
         NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
         if (playerData.getInt(JCraft.standS3CD) > 0) return;
@@ -200,11 +186,11 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
         LivingEntity user = this.getUser();
         switch (attack.id) {
-            case (1) -> {
+            case (2) -> {
                 for (LivingEntity ent : entities)
                     ent.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 5, 4, true, false));
             }
-            case (3) -> {
+            case (4) -> {
                 if (entities.size() > 0) { // Living entities take priority
                     bombEntity = entities.get(0);
                     bombBlock = null;
@@ -231,7 +217,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
                     }
                 }
             }
-            case (4) -> {
+            case (5) -> {
                 bubbleProjectile = new BubbleProjectile(world, user);
                 bubbleProjectile.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
                 bubbleProjectile.setVelocity(user, user.getPitch(), user.getYaw(), 0, 0.5f, 0f);
@@ -241,7 +227,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
                 bombEntity = bubbleProjectile;
                 bombBlock = null;
             }
-            case (5) -> {
+            case (6) -> {
                 if (bombEntity instanceof LivingEntity livingEntity) {
                     if (user.isSneaking()) {
                         if (targetData != null && userData != null) {
@@ -323,7 +309,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
 
     @Override
     public void initMiddleClick() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         LivingEntity user = this.getUser();
         NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
         if (playerData.getInt(JCraft.utilCD) > 0) return;
@@ -357,17 +343,17 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
         return MoveSelectionResult.PASS;
     }
 
+    @SuppressWarnings("SuspiciousMethodCalls")
     @Override
     public void tick() {
-        if (age == 1)
-            this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.KQBTD_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
+        if (age == 1) playSound(JSoundRegister.KQBTD_SUMMON, 1f, 1f);
         super.tick();
 
         if (hasUser()) {
-            LivingEntity user = this.getUser();
-            if (world.isClient) {
-                this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
-            } else {
+            LivingEntity user = getUser();
+            if (world.isClient)
+                setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
+            else {
                 if (bubbleProjectile != null && !bubbleProjectile.isInGround()) {
                     bubbleProjectile.setVelocity(user.getRotationVector().multiply(0.5));
                     bubbleProjectile.velocityModified = true;

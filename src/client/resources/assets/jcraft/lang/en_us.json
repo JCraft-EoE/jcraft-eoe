@@ -31,6 +31,7 @@
   "itemGroup.jcraft.main": "JCraft Items",
 
   "block.jcraft.soul_block": "Block of Suffering",
+  "block.jcraft.foolish_sand_block": "Foolish Sand",
 
   "key.category.jcraft": "JCraft Binds",
   "key.jcraft.standsummon": "Stand Summon",
@@ -102,6 +103,7 @@
   "jcraft.midnightconfig.enum.UIPos.MIDDLE": "Middle",
 
   "jcraft.disc.error": "Cannot use disc while in combat!",
+  "jcraft.anubis.unsheathe": "Unsheathing Anubis will override your spec, are you sure?",
 
   "death.attack.stand": "%1$s was retired",
   "death.attack.stand.item": "%1$s was retired by %2$s while wielding %3$s",

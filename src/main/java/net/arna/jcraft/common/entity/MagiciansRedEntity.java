@@ -210,7 +210,7 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
             }
             case (7) -> {
                 LifeDetectorEntity lifeDetector = new LifeDetectorEntity(JEntityTypeRegister.LIFE_DETECTOR, world);
-                ((IOwnable) lifeDetector).setMaster(user);
+                lifeDetector.setMaster(user);
                 lifeDetector.refreshPositionAndAngles(getX(), getY() + 1.5, getZ(), getYaw(), getPitch());
                 world.spawnEntity(lifeDetector);
             }

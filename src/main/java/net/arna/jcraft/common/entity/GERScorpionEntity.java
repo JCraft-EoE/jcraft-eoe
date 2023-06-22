@@ -11,6 +11,8 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.BlockStateParticleEffect;
@@ -54,10 +56,12 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
     private int landedTimer;
     private static final TrackedData<Optional<UUID>> OWNERUUID;
     private static final TrackedData<Boolean> ISROCK;
+    private static final TrackedData<Boolean> CHARGED;
 
     static {
         OWNERUUID = DataTracker.registerData(GERScorpionEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
         ISROCK = DataTracker.registerData(GERScorpionEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+        CHARGED = DataTracker.registerData(GERScorpionEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     }
 
     public LivingEntity getOwner() {
@@ -70,25 +74,33 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
     }
 
     public Optional<UUID> getOwnerUUID() {
-        return this.dataTracker.get(OWNERUUID);
+        return dataTracker.get(OWNERUUID);
     }
-
     public void setOwnerUUID(UUID uuid) {
-        this.dataTracker.set(OWNERUUID, Optional.of(uuid));
+        dataTracker.set(OWNERUUID, Optional.of(uuid));
     }
 
     public boolean isRock() {
-        return this.dataTracker.get(ISROCK);
+        return dataTracker.get(ISROCK);
+    }
+    public void setRock(boolean r) {
+        dataTracker.set(ISROCK, r);
     }
 
-    public void setRock(boolean r) {
-        this.dataTracker.set(ISROCK, r);
+    public boolean isCharged() {
+        return dataTracker.get(CHARGED);
+    }
+    private int rockStun = 15;
+    public void charge() {
+        dataTracker.set(CHARGED, true);
+        rockStun = 21;
     }
 
     protected void initDataTracker() {
         super.initDataTracker();
-        this.dataTracker.startTracking(OWNERUUID, Optional.empty());
-        this.dataTracker.startTracking(ISROCK, true);
+        dataTracker.startTracking(OWNERUUID, Optional.empty());
+        dataTracker.startTracking(ISROCK, true);
+        dataTracker.startTracking(CHARGED, false);
     }
 
     @Override
@@ -138,17 +150,18 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
         Vec3d curPos = getPos();
 
         if (world.isClient) {
-            if (!isRock()) {
-                landedTimer += 1;
-            }
+            if (!isRock()) landedTimer += 1;
             double x = getX();
             double y = getY();
             double z = getZ();
             if (landedTimer < 1) { // Laser
-                Vec3d towardsVec = curPos.subtract(new Vec3d(prevX, prevY, prevZ));
+                Vec3d towardsVec = JCraftUtils.deltaPos(this);
                 for (double i = 0; i < 6; i++) {
                     double lerp = i / 6;
-                    world.addParticle(ParticleTypes.COMPOSTER, x + towardsVec.x * lerp, y + towardsVec.y * lerp, z + towardsVec.z * lerp, 0, 0, 0);
+                    world.addParticle(
+                            isCharged() ? ParticleTypes.WITCH : ParticleTypes.COMPOSTER
+                            , x + towardsVec.x * lerp, y + towardsVec.y * lerp, z + towardsVec.z * lerp
+                            , towardsVec.x, towardsVec.y, towardsVec.z);
                 }
             } else if (landedTimer == 1) { // Landing burst
                 for (int i = 0; i < 8; i++) {
@@ -186,7 +199,7 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                         for (LivingEntity l :
                                 hurtAll) {
                             LivingEntity target = JCraftUtils.getUserIfStand(l);
-                            damageLogic(world, target, getVelocity(), 15, 1, false, 6f, true, 10, DamageSource.mob(owner), owner);
+                            damageLogic(world, target, getVelocity(), rockStun, 1, false, 6f, true, 10, DamageSource.mob(owner), owner);
                         }
                         Transform();
                         JCraft.CreateParticle((ServerWorld) this.world,
@@ -213,11 +226,19 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                     }
                     if (landedTimer == 20) { // Sting followup, 5t gap
                         List<LivingEntity> hurt = JCraftUtils.generateHitbox(world, getPos(), 1.5, filter);
-                        for (LivingEntity l :
-                                hurt) {
-                            LivingEntity target = JCraftUtils.getUserIfStand(l);
-                            damageLogic(world, target, Vec3d.ZERO, 15, 1, false, 3f, true, 7, DamageSource.mob(owner), owner);
-                        }
+                        if (isCharged())
+                            for (LivingEntity l :
+                                    hurt) {
+                                LivingEntity target = JCraftUtils.getUserIfStand(l);
+                                target.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 60, 0, false, true));
+                                damageLogic(world, target, Vec3d.ZERO, 15, 1, false, 3f, true, 7, DamageSource.mob(owner), owner);
+                            }
+                        else
+                            for (LivingEntity l :
+                                    hurt) {
+                                LivingEntity target = JCraftUtils.getUserIfStand(l);
+                                damageLogic(world, target, Vec3d.ZERO, 15, 1, false, 3f, true, 7, DamageSource.mob(owner), owner);
+                            }
                     }
                 }
                 if (age > 30)

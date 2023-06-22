@@ -140,6 +140,7 @@ public interface JSoundRegister {
     SoundEvent GER_SUMMON = registerSound("gersummon");
     SoundEvent GER_HEAVY = registerSound("gerheavy");
     SoundEvent GER_LASER = registerSound("gerlaser");
+    SoundEvent GER_SLOW_LASER = registerSound("gerslowlaser");
     SoundEvent GER_KICKBARRAGE = registerSound("gerkickbarrage");
     SoundEvent GER_SETUP = registerSound("gersetup");
 

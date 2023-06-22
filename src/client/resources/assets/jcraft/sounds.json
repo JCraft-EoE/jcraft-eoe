@@ -755,6 +755,13 @@
     ]
   },
 
+  "gerslowlaser": {
+    "sounds": [
+      "jcraft:stands/goldexperiencerequiem/slowlaser"
+    ]
+  },
+
+
   "gerlaser": {
     "sounds": [
       "jcraft:stands/goldexperiencerequiem/laser"

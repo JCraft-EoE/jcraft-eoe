@@ -54,14 +54,19 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
             .setInfo("Healing Hand", "standing: heals user for 2 hearts, crouching: heals others for 3 hearts, pacifies angered mobs");
     public static final Attack heal = new Attack(7, 26, 1f, 16, 10, 1.25, 0f, 0f, AttackType.BOX);
     public static final Attack laser = new Attack(8, 24, 1f, 20, 10, 0, 0f, 0f, AttackType.BOX)
-            .setInfo("Life Beam", "summons a quick, stunning rock projectile that turns into a scorpion a small time after landing").setRanged(true);
+            .setRanged(true)
+            .setInfo("Life Beam", "summons a quick, stunning rock projectile that turns into a scorpion a small time after landing/crouch to unleash a slower, poisoning variant");
+    public static final Attack chargelaser = new Attack(8, 24, 1.1f, 28, 18, 0, 0f, 0f, AttackType.BOX)
+            .setRanged(true);
 
     public static final Attack counter = new Attack(9, 26, 1f, 35, 5, 0, 0f, 0f, AttackType.COUNTER)
             .setInfo("Nullification", "0.25s windup, 1.5s counter, stuns on hit");
 
     public static final Attack airlight = new Attack(1, 2, 0.75f, 12, 5, 1.25, 4f, 0.75f, AttackType.BOX, 1, 0.33f, 0, JSoundRegister.IMPACT_1)
+            .appendHitbox(new Attack.HitboxData(0, -1, 1))
             .setInfo("Downward Kick", "");
     public static final Attack airheavy = new Attack(3, 17, 1f, 24, 14, 1.5, 9f, 0.8f, AttackType.BOX, 2, 0.25f, 0, JSoundRegister.IMPACT_1).setHitspark(2)
+            .appendHitbox(new Attack.HitboxData(0, -1, 1))
             .setInfo("Overhead Kick", "");
     public static final Attack airbarrage = new Attack(5, 14, 1f, 48, 0, 1.5, 1f, 0.3f, AttackType.BARRAGE, 1, 0, 3)
             .setInfo("Kick Barrage", ""); //fast combo finisher, knocks back
@@ -126,92 +131,82 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
     @Override
     public void initLightAttack() {
         CanAttackData data = canAttackWithData();
-        if (!data.canAttack) {
-            return;
-        }
-        if (data.user.isOnGround()) {
+        if (!data.canAttack) return;
+
+        if (data.user.isOnGround())
             handleAttack(light, JCraft.standLightCD, 2);
-        } else {
+        else
             handleAttack(airlight, JCraft.standLightCD, 10);
-        }
     }
 
     @Override
     public void initHeavyAttack() {
         CanAttackData data = canAttackWithData();
-        if (!data.canAttack) {
-            return;
-        }
+        if (!data.canAttack) return;
+
         if (data.user.isOnGround()) {
             if (handleAttack(heavy, JCraft.standHeavyCD, 4))
-                this.playSound(JSoundRegister.GER_HEAVY, 1, 1);
+                playSound(JSoundRegister.GER_HEAVY, 1, 1);
         } else {
             if (handleAttack(airheavy, JCraft.standHeavyCD, 11))
-                this.playSound(JSoundRegister.GER_HEAVY, 1, 1);
+                playSound(JSoundRegister.GER_HEAVY, 1, 1);
         }
     }
 
     @Override
     public void initBarrage() {
         CanAttackData data = canAttackWithData();
-        if (!data.canAttack) {
-            return;
-        }
+        if (!data.canAttack) return;
+
         if (data.user.isOnGround()) {
             if (handleAttack(barrage, JCraft.standBarrageCD, 5))
-                this.playSound(JSoundRegister.GE_BARRAGE, 1, 1);
+                playSound(JSoundRegister.GE_BARRAGE, 1, 1);
         } else {
             if (handleAttack(airbarrage, JCraft.standBarrageCD, 12))
-                this.playSound(JSoundRegister.GER_KICKBARRAGE, 1, 1);
+                playSound(JSoundRegister.GER_KICKBARRAGE, 1, 1);
         }
     }
 
     @Override
     public void initSpecial1() {
         CanAttackData data = this.canAttackWithData();
-        if (!data.canAttack) {
-            return;
-        }
+        if (!data.canAttack) return;
+
         if (data.user.isSneaking()) {
-            if (handleAttack(heal, JCraft.standS1CD, 7)) {
-                this.playSound(JSoundRegister.GE_HEAL, 1, 1);
-            }
-        } else if (handleAttack(healself, JCraft.standS1CD, 6)) {
-            this.playSound(JSoundRegister.GE_HEAL, 1, 1);
+            if (handleAttack(heal, JCraft.standS1CD, 7))
+                playSound(JSoundRegister.GE_HEAL, 1, 1);
+        } else {
+            if (handleAttack(healself, JCraft.standS1CD, 6))
+                playSound(JSoundRegister.GE_HEAL, 1, 1);
         }
     }
 
     @Override
     public void initMiddleClick() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!canAttack()) return;
+
         NbtCompound data = ((IEntityDataSaver) getUser()).getPersistentData();
-        if (data.getInt(JCraft.utilCD) > 0) {
-            return;
-        }
+        if (data.getInt(JCraft.utilCD) > 0) return;
         data.putInt(JCraft.utilCD, 360); // 18 second flight cd
         setFlightTime(20);
     }
 
     @Override
     public void initSpecial2() {
-        if (!this.canAttack()) {
-            return;
-        }
-        if (handleAttack(laser, JCraft.standS2CD, 8)) {
-            this.playSound(JSoundRegister.GER_LASER, 1, 1);
-        }
+        CanAttackData data = this.canAttackWithData();
+        if (!data.canAttack) return;
+
+        if (data.user.isSneaking() && handleAttack(chargelaser, JCraft.standS2CD, 14))
+            playSound(JSoundRegister.GER_SLOW_LASER, 1, 1);
+        else if (handleAttack(laser, JCraft.standS2CD, 8))
+            playSound(JSoundRegister.GER_LASER, 1, 1);
     }
 
     @Override
     public void initSpecial3() {
-        if (!this.canAttack()) {
-            return;
-        }
-        if (handleAttack(counter, JCraft.standS3CD, 9)) {
-            this.playSound(JSoundRegister.GE_HEAL, 1, 1);
-        }
+        if (!this.canAttack()) return;
+        if (handleAttack(counter, JCraft.standS3CD, 9))
+            playSound(JSoundRegister.GE_HEAL, 1, 1);
     }
 
 
@@ -220,28 +215,23 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
     @Override
     public void counter(Entity entity, DamageSource source) {
         super.counter(entity, source);
-        if (entity == null || !hasUser()) {
-            return;
-        }
+        if (entity == null || !hasUser()) return;
 
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeShort(14);
         buf.writeInt(entity.getId());
         buf.writeInt(counterStopTime);
-        for (PlayerEntity sendPlayer : world.getPlayers()) {
-            if (sendPlayer instanceof ServerPlayerEntity serverPlayerEntity) {
+        for (PlayerEntity sendPlayer : world.getPlayers())
+            if (sendPlayer instanceof ServerPlayerEntity serverPlayerEntity)
                 ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
-            }
-        }
         ((ITimeStop) entity).setTimeStopTicks(counterStopTime);
 
-        if (entity.getFirstPassenger() instanceof StandEntity stand) {
+        StandEntity stand = ((IEntityDataSaver)entity).getStand();
+        if (stand != null)
             stand.cancelAttack();
-        }
 
-        if (entity instanceof LivingEntity living) {
+        if (entity instanceof LivingEntity living)
             stun(living, 10, 0);
-        }
 
         Vec3d eP = this.getEyePos();
         JCraft.CreateParticle((ServerWorld) world, eP.x, eP.y, eP.z, -1);
@@ -249,11 +239,12 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
 
     @Override
     public void initUlt() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
+
         if (rtzEntityData.isEmpty()) {
             // Setup
             if (handleAttack(rtz, JCraft.standUltCD, 13))
-                this.playSound(JSoundRegister.GER_SETUP, 1, 1);
+                playSound(JSoundRegister.GER_SETUP, 1, 1);
         } else {
             // Fun part
             for (Map.Entry<Entity, NbtCompound> data :
@@ -280,19 +271,6 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
         }
     }
 
-    /*
-    @Override
-    public boolean SpecificMoveSelectionCriterion(Attack attack, MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity enemyStand, Attack enemyAttack) {
-        if (attack == snake) {
-            return !mob.getMainHandStack().isEmpty() || !mob.getOffHandStack().isEmpty();
-        }
-        if (this.getMoveStun() > 0 && attack == rekka1) {
-            return (this.curAttack == rekka1 || this.curAttack == rekka2);
-        }
-        return false;
-    }
-     */
-
     @Override
     public void desummon() {
         if (getFlightTime() > 0) {
@@ -302,7 +280,9 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
         super.desummon();
     }
 
-    private static final Attack barrageFinisher = new Attack(11, 17, 1f, 9, 6, 1.75, 1f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.TW_KICK_HIT).setHitspark(2).setLaunch();
+    private static final Attack barrageFinisher = new Attack(11, 17, 1f, 9, 6, 1.75, 1f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.TW_KICK_HIT)
+            .setHitspark(2)
+            .setLaunch();
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
@@ -340,6 +320,7 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
             }
             case (8) -> {
                 GERScorpionEntity scorpion = new GERScorpionEntity(JEntityTypeRegister.GER_SCORPION, world);
+                if (attack.moveStun == 28) scorpion.charge(); // If it's the slow variation
                 scorpion.setInitialVel(user.getRotationVector().multiply(2));
                 Vec3d ePos = this.getEyePos();
                 scorpion.refreshPositionAndAngles(ePos.x, ePos.y, ePos.z, -user.getYaw() - 90f, getPitch());
@@ -387,7 +368,7 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
                 if (targetEntity == null) {
                     targetEntity = user.getAttacker();
                 }
-                // If target wasnt found, search in a radius
+                // If target wasn't found, search in a radius
                 Vec3d target = targetEntity != null ? targetEntity.getEyePos() : this.getPos().add(Math.sin(this.age * 0.2) * 3, 0, Math.cos(this.age * 0.2) * 3);
 
                 double dY = MathHelper.clamp(target.getY() - y, -1, 1);
@@ -402,7 +383,7 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
             }
 
             if (world.isClient) {
-                this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
+                setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
             } else if (rtzTimer > 0) {
                 rtzTimer -= 1;
                 if (rtzTimer == 0) {
@@ -433,10 +414,14 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
-        if (this.getSameState()) {
-            controller.markNeedsReload();
+
+        if (playSummonAnim) {
+            controller.setAnimation(builder.playAndHold("animation.ger.summon"));
+            return PlayState.CONTINUE;
         }
-        switch (this.getState()) {
+
+        if (getSameState()) controller.markNeedsReload();
+        switch (getState()) {
 
             default -> controller.setAnimation(builder.loop("animation.ger.idle"));
             case 2 -> controller.setAnimation(builder.playAndHold("animation.ger.light"));
@@ -447,6 +432,7 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
             case 6 -> controller.setAnimation(builder.playAndHold("animation.ger.healself"));
             case 7 -> controller.setAnimation(builder.playAndHold("animation.ger.heal"));
             case 8 -> controller.setAnimation(builder.playAndHold("animation.ger.laser"));
+            case 14 -> controller.setAnimation(builder.playAndHold("animation.ger.slowlaser"));
             case 9 -> controller.setAnimation(builder.playAndHold("animation.ger.counter"));
 
             case 10 -> controller.setAnimation(builder.playAndHold("animation.ger.airlight"));

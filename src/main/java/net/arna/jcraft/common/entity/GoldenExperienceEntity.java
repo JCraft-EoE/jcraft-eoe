@@ -242,7 +242,7 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
                 }
                 if (toSummon == LifeGiverType.FROG) {
                     GEFrogEntity frog = new GEFrogEntity(JEntityTypeRegister.GE_FROG, world);
-                    ((IOwnable) frog).setMaster(user);
+                    frog.setMaster(user);
                     animal = frog;
                 }
 

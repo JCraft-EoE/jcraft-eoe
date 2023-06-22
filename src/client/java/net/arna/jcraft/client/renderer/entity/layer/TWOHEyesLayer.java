@@ -13,7 +13,6 @@ import software.bernie.geckolib3.renderers.geo.IGeoRenderer;
 
 import java.util.Map;
 
-@SuppressWarnings("rawtypes")
 public class TWOHEyesLayer extends GeoLayerRenderer<TheWorldOverHeavenEntity> {
     private static final Identifier LAYER = new Identifier(JCraft.MOD_ID, "textures/entity/twoh_eyes.png");
     private static final Identifier MODEL = new Identifier(JCraft.MOD_ID, "geo/twoh.geo.json");
@@ -28,12 +27,10 @@ public class TWOHEyesLayer extends GeoLayerRenderer<TheWorldOverHeavenEntity> {
               Map.entry(4, new Vec3f(1f, 0.8f, 0)) // Heavy, YELLOW
             );
 
-    @SuppressWarnings("unchecked")
     public TWOHEyesLayer(IGeoRenderer<TheWorldOverHeavenEntity> entityRendererIn) {
         super(entityRendererIn);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void render(MatrixStack matrixStackIn, VertexConsumerProvider bufferIn, int packedLightIn, TheWorldOverHeavenEntity twoh, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         Vec3f color = overwriteColors.get(twoh.getOverwriteType());

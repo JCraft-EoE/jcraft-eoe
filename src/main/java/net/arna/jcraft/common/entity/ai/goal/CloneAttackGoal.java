@@ -2,72 +2,75 @@ package net.arna.jcraft.common.entity.ai.goal;
 
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.control.LookControl;
 import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.util.Hand;
 
 import java.util.EnumSet;
 
 public class CloneAttackGoal extends Goal {
-
-    private final PlayerCloneEntity mob;
+    private final PlayerCloneEntity clone;
+    private final LookControl cloneLookControl;
+    private final EntityNavigation cloneNavigation;
     private LivingEntity target;
     private final double speed;
     private int cooldown;
     private long lastUpdateTime;
 
     public CloneAttackGoal(PlayerCloneEntity mob, double speed) {
-        this.mob = mob;
+        clone = mob;
+        cloneLookControl = mob.getLookControl();
+        cloneNavigation = mob.getNavigation();
         this.speed = speed;
         this.setControls(EnumSet.of(Control.MOVE, Control.LOOK));
     }
 
     public boolean canStart() {
-        long l = this.mob.world.getTime();
-        if (l - this.lastUpdateTime < 20L) {
+        long l = clone.world.getTime();
+        if (l - this.lastUpdateTime < 10L) {
             return false;
         } else {
             this.lastUpdateTime = l;
-            this.target = this.mob.getTarget();
+            target = clone.getTarget();
             if (target == null) {
                 return false;
             } else if (!target.isAlive()) {
                 return false;
             } else {
-                Path path = this.mob.getNavigation().findPathTo(target, 0);
+                Path path = cloneNavigation.findPathTo(target, 0);
                 if (path != null)
                     return true;
                 else
-                    return this.getSquaredMaxAttackDistance(target) >= this.mob.squaredDistanceTo(target);
+                    return this.getSquaredMaxAttackDistance(target) >= clone.squaredDistanceTo(target);
             }
         }
     }
 
     public boolean shouldContinue() {
-        if (this.target == null) {
+        if (target == null)
             return false;
-        } else if (!this.target.isAlive()) {
+        else if (!target.isAlive() ||target.isRemoved())
             return false;
-        } else if (this.mob.squaredDistanceTo(this.target) > 1024.0D) {
+        else if (clone.squaredDistanceTo(target) > 1024.0D)
             return false;
-        } else if (this.target == this.mob.getOwner()) {
+        else if (target == clone.getMaster())
             return false;
-        } else {
-            return !this.mob.getNavigation().isIdle() || this.canStart();
-        }
+        else
+            return !cloneNavigation.isIdle() || this.canStart();
     }
 
     public void start() {
-        //this.mob.getNavigation().startMovingAlong(this.path, this.speed);
-        this.mob.setAttacking(true);
-        this.cooldown = 0;
+        clone.setAttacking(true);
+        cooldown = 0;
     }
 
     public void stop() {
-        this.target = null;
-        this.mob.setTarget(null);
-        this.mob.setAttacking(false);
-        this.mob.getNavigation().stop();
+        target = null;
+        clone.setTarget(null);
+        clone.setAttacking(false);
+        cloneNavigation.stop();
     }
 
     public boolean shouldRunEveryTick() {
@@ -75,21 +78,19 @@ public class CloneAttackGoal extends Goal {
     }
 
     public void tick() {
-        if (this.target != null) {
-            this.mob.getNavigation().startMovingTo(this.target, this.speed);
-            this.mob.getLookControl().lookAt(this.target, 30.0F, 30.0F);
-            this.cooldown = Math.max(this.cooldown - 1, 0);
-            double d = this.getSquaredMaxAttackDistance(target);
-
-            if (target.squaredDistanceTo(this.mob) <= d && this.cooldown <= 0) {
-                this.cooldown = 20;
-                this.mob.swingHand(Hand.MAIN_HAND);
-                this.mob.tryAttack(this.target);
-            }
+        if (target == null) return;
+        
+        cloneNavigation.startMovingTo(target, speed);
+        cloneLookControl.lookAt(target, 30.0F, 30.0F);
+        double d = this.getSquaredMaxAttackDistance(target);
+        if (target.squaredDistanceTo(clone) <= d && cooldown-- <= 0) {
+            cooldown = 20;
+            clone.swingHand(Hand.MAIN_HAND);
+            clone.tryAttack(target);
         }
     }
 
     private double getSquaredMaxAttackDistance(LivingEntity entity) {
-        return this.mob.getWidth() * 2.0F * this.mob.getWidth() * 2.0F + entity.getWidth();
+        return 1.44F + entity.getWidth(); // 0.6^2 * 4 i.e. cloneWidth^2 * 2^2
     }
 }

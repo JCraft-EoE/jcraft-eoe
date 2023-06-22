@@ -6,7 +6,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.UseAction;
@@ -49,7 +48,7 @@ public class StandArrowItem extends Item {
             if (user.hasPassengers()) {
                 user.detach();
             }
-            JCraft.summon((ServerWorld) world, user);
+            JCraft.summon(world, user);
         }
 
         return TypedActionResult.consume(itemStack);

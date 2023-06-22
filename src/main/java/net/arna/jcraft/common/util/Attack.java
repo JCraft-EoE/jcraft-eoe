@@ -28,6 +28,8 @@ public final class Attack {
     public SoundEvent impactSound;
     public List<Integer> attackTimes;
 
+    public static final Attack unusable = new Attack(-1,999, 999, 999, 0, AttackType.BOX).setInfo("NONE", "NONE");
+
     public boolean hasArmor = false; // For (un)interruptable attacks
     /**
      * Assigns whether attack is armored

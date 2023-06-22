@@ -66,9 +66,9 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
     public static final Attack detonate = new Attack(6, 1, 1, 6, 5, 0, 0f, 0.0f, AttackType.BOX)
             .setInfo("Detonate", "slight windup");
 
-    public ItemEntity coin;
-    public Entity bombEntity;
-    public Vec3d bombBlock;
+    private ItemEntity coin;
+    private Entity bombEntity;
+    private Vec3d bombBlock;
 
     public KillerQueenEntity(World world) {
         this(StandType.KILLER_QUEEN, world);
@@ -107,11 +107,6 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
                 , new Attack().setMobility(MobilityType.DASH).setInfo("Explosive Dash", "slight aoe damage, 3D movement tool"));
     }
 
-    @Override
-    protected void initDataTracker() {
-        super.initDataTracker();
-    }
-
     public Vec3d getBombPos() {
         if (this.bombEntity != null)
             return this.bombEntity.getPos();
@@ -138,24 +133,24 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
 
     @Override
     public void initHeavyAttack() {
-        if (!this.canAttack())
+        if (!canAttack())
             return;
         if (handleAttack(heavy, JCraft.standHeavyCD, 4)) {
-            this.playSound(JSoundRegister.KQ_UPPERCUT, 1, 1);
-            this.playSound(JSoundRegister.KQ_HEAVY, 1, 1);
+            playSound(JSoundRegister.KQ_UPPERCUT, 1, 1);
+            playSound(JSoundRegister.KQ_HEAVY, 1, 1);
         }
     }
 
     @Override
     public void initBarrage() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, 5))
-            this.playSound(JSoundRegister.KQ_BARRAGE, 1, 1);
+            playSound(JSoundRegister.KQ_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         LivingEntity user = this.getUser();
         NbtCompound userData = ((IEntityDataSaver) user).getPersistentData();
         if (user.isInSneakingPose() && userData.getInt(JCraft.standS1CD) < 1) {
@@ -177,22 +172,21 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
 
     @Override
     public void initUlt() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(detonate, JCraft.standUltCD, 6))
-            this.playSound(JSoundRegister.KQ_DETONATE, 1, 1);
+            playSound(JSoundRegister.KQ_DETONATE, 1, 1);
     }
 
     @Override
     public void initSpecial2() {
-        if (!this.canAttack()) return;
-        if (handleAttack(sha, JCraft.standS2CD, 8)) {
-            //this.playSound(ModSoundRegister.KQ_SHA,1, 1);
-        }
+        if (!canAttack()) return;
+        handleAttack(sha, JCraft.standS2CD, 8);
+        //playSound(ModSoundRegister.KQ_SHA,1, 1);
     }
 
     @Override
     public void initSpecial3() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         LivingEntity user = this.getUser();
         NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
         if (playerData.getInt(JCraft.standS3CD) > 0) return;
@@ -214,7 +208,7 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
 
     @Override
     public void initMiddleClick() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         LivingEntity user = this.getUser();
         NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
         if (playerData.getInt(JCraft.utilCD) > 0) return;
@@ -230,7 +224,7 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
         user.velocityModified = true;
 
         playerData.putInt(JCraft.utilCD, 360); // 18s explosive dash cooldown
-        this.playSound(JSoundRegister.KQ_DETONATE, 1, 1);
+        playSound(JSoundRegister.KQ_DETONATE, 1, 1);
     }
 
     @Override
@@ -320,83 +314,75 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
         return MoveSelectionResult.PASS;
     }
 
+    @SuppressWarnings("SuspiciousMethodCalls")
     @Override
     public void tick() {
-        if (age == 1) {
-            this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.STAND_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
-        }
-
+        if (age == 1) playSound(JSoundRegister.STAND_SUMMON, 1f, 1f);
         super.tick();
 
         if (hasUser()) {
             LivingEntity user = this.getUser();
-            if (world.isClient) {
-                this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
-            } else {
-                if (user instanceof PlayerEntity playerEntity) {
-                    boolean bombExists = (bombEntity != null || bombBlock != null);
+            if (world.isClient)
+                setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
+            else if (user instanceof PlayerEntity playerEntity) {
+                boolean bombExists = (bombEntity != null || bombBlock != null);
 
-                    double dX1 = 0;
-                    double dY1 = 0;
-                    double dZ1 = 0;
-                    double dX2 = 0;
-                    double dY2 = 0;
-                    double dZ2 = 0;
+                double dX1 = 0;
+                double dY1 = 0;
+                double dZ1 = 0;
+                double dX2 = 0;
+                double dY2 = 0;
+                double dZ2 = 0;
 
-                    Box bBox = null;
+                Box bBox = null;
 
-                    if (bombEntity != null) { // If the bomb isn't a block
-                        dX1 = bombEntity.getX();
-                        dY1 = bombEntity.getY();
-                        dZ1 = bombEntity.getZ();
+                if (bombEntity != null) { // If the bomb isn't a block
+                    dX1 = bombEntity.getX();
+                    dY1 = bombEntity.getY();
+                    dZ1 = bombEntity.getZ();
 
-                        bBox = bombEntity.getBoundingBox();
+                    bBox = bombEntity.getBoundingBox();
 
-                        dX2 = bBox.getXLength();
-                        dY2 = bBox.getYLength();
-                        dZ2 = bBox.getZLength();
-                    } else if (bombBlock != null) { // If the bomb is a block
-                        dX1 = bombBlock.getX();
-                        dY1 = bombBlock.getY();
-                        dZ1 = bombBlock.getZ();
+                    dX2 = bBox.getXLength();
+                    dY2 = bBox.getYLength();
+                    dZ2 = bBox.getZLength();
+                } else if (bombBlock != null) { // If the bomb is a block
+                    dX1 = bombBlock.getX();
+                    dY1 = bombBlock.getY();
+                    dZ1 = bombBlock.getZ();
 
-                        dX2 = dY2 = dZ2 = 1.41;
-                    }
+                    dX2 = dY2 = dZ2 = 1.41;
+                }
 
-                    if (bombExists) {
-                        PacketByteBuf buf = PacketByteBufs.create();
-                        buf.writeShort(4);
+                if (bombExists) {
+                    PacketByteBuf buf = PacketByteBufs.create();
+                    buf.writeShort(4);
 
-                        buf.writeDouble(dX1);
-                        buf.writeDouble(dY1);
-                        buf.writeDouble(dZ1);
+                    buf.writeDouble(dX1);
+                    buf.writeDouble(dY1);
+                    buf.writeDouble(dZ1);
 
-                        buf.writeDouble(dX2);
-                        buf.writeDouble(dY2);
-                        buf.writeDouble(dZ2);
+                    buf.writeDouble(dX2);
+                    buf.writeDouble(dY2);
+                    buf.writeDouble(dZ2);
 
-                        boolean anyInRange = false;
-                        Vec3d bPos = this.getBombPos();
-                        Vec3d v1 = bPos.add(3, 3, 3);
-                        Vec3d v2 = bPos.add(-3, -3, -3);
-                        List<LivingEntity> list = this.world.getEntitiesByClass(LivingEntity.class, new Box(v1, v2), EntityPredicates.VALID_LIVING_ENTITY);
-                        list.remove(bombEntity);
-                        for (LivingEntity l :
-                                list) {
-                            if (l.squaredDistanceTo(bPos) < 9) {
-                                anyInRange = true;
-                                break;
-                            }
-                        }
-
-                        buf.writeBoolean(anyInRange);
-
-                        if (bBox == null || bBox.getAverageSideLength() > 0) {
-                            if (playerEntity instanceof ServerPlayerEntity serverPlayerEntity) {
-                                ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
-                            }
+                    boolean anyInRange = false;
+                    Vec3d bPos = getBombPos();
+                    Vec3d v1 = bPos.add(3, 3, 3);
+                    Vec3d v2 = bPos.add(-3, -3, -3);
+                    List<LivingEntity> list = world.getEntitiesByClass(LivingEntity.class, new Box(v1, v2), EntityPredicates.VALID_LIVING_ENTITY);
+                    list.remove(bombEntity);
+                    for (LivingEntity l : list) {
+                        if (l.squaredDistanceTo(bPos) < 9) {
+                            anyInRange = true;
+                            break;
                         }
                     }
+
+                    buf.writeBoolean(anyInRange);
+
+                    if (bBox != null && bBox.getAverageSideLength() > 0 && playerEntity instanceof ServerPlayerEntity serverPlayerEntity)
+                        ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
                 }
             }
         }

@@ -916,9 +916,64 @@ Killer Queen: Bites the Dust
 ● 16/6/2023
 >Added vertical dashes
 
+● 19/6/2023
+>Stand user mobs now use dashes
+>Added /spec about
+
+Silver Chariot
+    >Cooldown reduced on God of Death (60->50s)
+
+Anubis
+    >Updated model
+    >Converted to a Spec
+    >Overrides current Spec when unsheathed
+    >Can no longer block while Anubis is unsheathed
+    >No longer disables buffs/debuffs when sheathed
+    >Now has sword attack attributes
+
+● 20/6/2023
+Golden Experience: Requiem
+    >Remodeled and reanimated
+    >Added second hitbox to aerial Light and Heavy
+    >Added crouching variant to Life Beam
+    >Counter now stops remote stands' attacks
+
+● 21/6/2023
+>Many small optimizations
+
+Player Clones
+    >No longer attack their master when they come too close
+    >Now attack those that attack their master (lower priority than what the master is attacking)
+
+King Crimson
+    >Epitaph no longer swaps positions if the opponent is inside a wall
+    >Added shader to Time Erase
+
+Silver Chariot
+    >Armor Off
+        >Added hitbox
+        >Added animation
+        >Cooldown reduced (70->60s)
+
+The Fool
+    >Updated textures
+    >All summoned sand entities now do damage
+    >It is no longer possible to queue moves during the Pound followups that create sand
+    >Charge
+        >Cooldown reduced (22->20s)
+        >Increased speed
+        >Increased range (5->7m)
+        >Added visual effects on hit
+        >Added aerial variant (Sand Tornado)
+    >Combo
+        >Decreased startup (8->6t) and duration (31->29t)
+        >Added second hitbox
+
+Killer Queen: Bites the Dust
+    >Increased stun on Bomb Plant
+
 priority (top to bottom)
-TODO: ability to position the HUD
 TODO: AI flags for unblockables and shouldn't-blockables
 TODO: stand summon particles
 TODO: patchouli and the stand users manual
-TODO: Knockback() method
+TODO: Knockdown() method

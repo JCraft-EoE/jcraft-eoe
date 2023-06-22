@@ -278,6 +278,7 @@ public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatab
         animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
     }
 
+    @SuppressWarnings("SameReturnValue")
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         event.getController().setAnimation(new AnimationBuilder().loop("animation.block.idle"));
         return PlayState.CONTINUE;

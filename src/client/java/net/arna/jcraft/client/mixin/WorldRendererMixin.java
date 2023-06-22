@@ -21,9 +21,6 @@ import java.util.List;
 
 @Mixin(WorldRenderer.class)
 public class WorldRendererMixin {
-
-    @Unique private List<BlockPos> blockPosList = new ArrayList<>();
-
     @ModifyArgs(method = "renderEntity(Lnet/minecraft/entity/Entity;DDDFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/EntityRenderDispatcher;render(Lnet/minecraft/entity/Entity;DDDFFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V"))
     private void jcraft$deltaTick(Args args) {
         Entity entity = args.get(0);
@@ -41,6 +38,4 @@ public class WorldRendererMixin {
             ci.cancel();
         }
     }
-
-
 }

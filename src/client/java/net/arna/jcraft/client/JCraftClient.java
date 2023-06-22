@@ -189,49 +189,20 @@ public class JCraftClient implements ClientModInitializer {
             i++;
             if (cooldown != 0) {
 
-                String keyBindText = "unknown";
-                switch (i) {
-                    case (1):
-                        keyBindText = "M1";
-                        break;
-                    case (12):
-                    case (2):
-                        keyBindText = GenerateName(heavyKey.getBoundKeyTranslationKey());
-                        break;
-                    case (13):
-                    case (3):
-                        keyBindText = GenerateName(barrageKey.getBoundKeyTranslationKey());
-                        break;
-                    case (14):
-                    case (4):
-                        keyBindText = GenerateName(ultKey.getBoundKeyTranslationKey());
-                        break;
-                    case (15):
-                    case (5):
-                        keyBindText = GenerateName(special1Key.getBoundKeyTranslationKey());
-                        break;
-                    case (16):
-                    case (6):
-                        keyBindText = GenerateName(special2Key.getBoundKeyTranslationKey());
-                        break;
-                    case (17):
-                    case (7):
-                        keyBindText = GenerateName(special3Key.getBoundKeyTranslationKey());
-                        break;
-
-                    case (8):
-                        keyBindText = GenerateName(utility.getBoundKeyTranslationKey());
-                        break;
-                    case (9):
-                        keyBindText = GenerateName(comboBreaker.getBoundKeyTranslationKey());
-                        break;
-                    case (10):
-                        keyBindText = GenerateName(cooldownCancel.getBoundKeyTranslationKey());
-                        break;
-                    case (11):
-                        keyBindText = GenerateName(dash.getBoundKeyTranslationKey());
-                        break;
-                }
+                String keyBindText = switch (i) {
+                    case (1) -> "M1";
+                    case (12), (2) -> GenerateName(heavyKey.getBoundKeyTranslationKey());
+                    case (13), (3) -> GenerateName(barrageKey.getBoundKeyTranslationKey());
+                    case (14), (4) -> GenerateName(ultKey.getBoundKeyTranslationKey());
+                    case (15), (5) -> GenerateName(special1Key.getBoundKeyTranslationKey());
+                    case (16), (6) -> GenerateName(special2Key.getBoundKeyTranslationKey());
+                    case (17), (7) -> GenerateName(special3Key.getBoundKeyTranslationKey());
+                    case (8) -> GenerateName(utility.getBoundKeyTranslationKey());
+                    case (9) -> GenerateName(comboBreaker.getBoundKeyTranslationKey());
+                    case (10) -> GenerateName(cooldownCancel.getBoundKeyTranslationKey());
+                    case (11) -> GenerateName(dash.getBoundKeyTranslationKey());
+                    default -> "unknown";
+                };
 
                 boolean isSpec = i > 11;
                 float defaultAlpha = 0.65f;

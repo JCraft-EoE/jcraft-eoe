@@ -245,9 +245,13 @@ public class StandControlPacket {
                 UUID uuid = buf.readUuid();
                 server.execute(() -> {
                     if (world.getEntity(uuid) instanceof PlayerCloneEntity clone) {
-                        LivingEntity ownerReference = clone.getOwner();
+                        LivingEntity ownerReference = clone.getMaster();
                         PlayerCloneEntity slimClone = clone.convertTo(JEntityTypeRegister.PLAYER_ENTITY_CLONE_SLIM, true);
-                        slimClone.setOwner(ownerReference);
+                        if (slimClone == null) {
+                            LOGGER.error("Failed to convert clone " + clone + " into slim variation in world " + clone.world);
+                            return;
+                        }
+                        slimClone.setMaster(ownerReference);
 
                         clone.switched = true;
                         clone.switchedTo = slimClone;

@@ -2,6 +2,8 @@ package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
+import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
+import net.arna.jcraft.common.network.s2c.ShaderDeactivationPacket;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
@@ -15,7 +17,6 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
@@ -134,66 +135,66 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
     // Moveset
     @Override
     public void initLightAttack() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(light, JCraft.standLightCD, 2))
-            this.playSound(JSoundRegister.KC_DUAL_CHOP, 1, 1);
+            playSound(JSoundRegister.KC_DUAL_CHOP, 1, 1);
     }
 
     @Override
     public void initHeavyAttack() {
         if (hasUser()) {
-            if (getUser().hasStatusEffect(JStatusRegister.DAZED)) {
+            if (getUser().hasStatusEffect(JStatusRegister.DAZED))
                 return;
-            }
-            boolean idling = this.getMoveStun() < 1;
+            boolean idling = getMoveStun() < 1;
 
-            if (this.curAttack != heavy) {
+            if (curAttack != heavy) {
                 if (idling && handleAttack(heavy, JCraft.standHeavyCD, 10)) {
-                    this.playSound(JSoundRegister.KC_HEAVY, 1, 1);
+                    playSound(JSoundRegister.KC_HEAVY, 1, 1);
                 }
-            } else if (this.getMoveStun() < 7) {
+            } else if (getMoveStun() < 7) {
                 setAttack(overhead, 4);
-                this.playSound(JSoundRegister.KC_HEAVY2, 1, 1);
+                playSound(JSoundRegister.KC_HEAVY2, 1, 1);
             }
         }
     }
 
     @Override
     public void initBarrage() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, 6))
-            this.playSound(JSoundRegister.KC_BARRAGE, 1, 1);
+            playSound(JSoundRegister.KC_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (getUser().isSneaking() && handleAttack(bloodthrow, JCraft.standS1CD, 11)) {
             getUser().damage(DamageSource.MAGIC, 0.1f);
         } else if (handleAttack(eyechop, JCraft.standS1CD, 7)) {
-            this.playSound(JSoundRegister.EYE_CHOP, 1, 1);
+            playSound(JSoundRegister.EYE_CHOP, 1, 1);
         }
     }
 
     @Override
     public void initUlt() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (getTETime() > 0) {
             CancelTE();
             return;
         }
         if (handleAttack(timeerase, JCraft.standUltCD, 8)) {
-            if (getUser() instanceof ServerPlayerEntity player)
+            if (getUser() instanceof ServerPlayerEntity player) {
                 player.networkHandler.sendPacket(new PlaySoundS2CPacket(JSoundRegister.TIME_ERASE, SoundCategory.PLAYERS, getX(), getY(), getZ(), 1, 1, 0));
+                ShaderActivationPacket.send(player, this, 0, 120, ShaderActivationPacket.Type.CRIMSON);
+            }
         }
     }
 
     @Override
     public void initSpecial2() {
-        if (!this.canAttack()) return;
-        if (handleAttack(donut, JCraft.standS2CD, 5)) {
-            this.playSound(JSoundRegister.KC_DONUT, 1, 1);
-        }
+        if (!canAttack()) return;
+        if (handleAttack(donut, JCraft.standS2CD, 5))
+            playSound(JSoundRegister.KC_DONUT, 1, 1);
     }
 
     @Override
@@ -201,10 +202,9 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
         if (hasUser()) {
             LivingEntity user = this.getUser();
             ITimeStop timeStop = (ITimeStop) user;
-            if (user.hasStatusEffect(JStatusRegister.DAZED) || timeStop.getTimeStopTicks() > 0) {
+            if (user.hasStatusEffect(JStatusRegister.DAZED) || timeStop.getTimeStopTicks() > 0)
                 return;
-            }
-            if (this.getMoveStun() < 1) {
+            if (getMoveStun() < 1) {
                 // When used raw, epitaphs
                 handleAttack(epitaph, JCraft.standS3CD, 9);
             } else {
@@ -242,21 +242,22 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
-        Vec3d rotVec = this.getRotationVector();
+        Vec3d rotVec = getRotationVector();
         switch (attack.id) {
             case (2) -> {
                 for (LivingEntity ent : entities)
                     ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0));
             }
             case (3) -> {
-                if (getMoveStun() < 4) this.curAttack = barrageFinisher;
+                if (getMoveStun() < 4)
+                    curAttack = barrageFinisher;
             }
             case (4) -> {
                 for (LivingEntity ent : entities)
                     ent.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 200, 0));
             }
             case (5) -> {
-                LivingEntity user = this.getUser();
+                LivingEntity user = getUser();
                 BloodProjectile bloodProjectile = new BloodProjectile(world, user);
                 bloodProjectile.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
                 bloodProjectile.setVelocity(user, user.getPitch(), user.getYaw(), 0, 1.33F, 0);
@@ -296,15 +297,15 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
 
     @Override
     public void initMiddleClick() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
 
         if (hasUser()) {
-            LivingEntity user = this.getUser();
+            LivingEntity user = getUser();
             NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
             if (playerData.getInt(JCraft.utilCD) > 0) return;
             Vec3d oPos = user.getPos();
 
-            HitResult hitResult = this.world.raycast(new RaycastContext(user.getEyePos(), user.getEyePos().add(user.getRotationVector().multiply(16)), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user));
+            HitResult hitResult = world.raycast(new RaycastContext(user.getEyePos(), user.getEyePos().add(user.getRotationVector().multiply(16)), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user));
             Vec3d pos = hitResult.getPos();
 
             user.teleport(pos.x, pos.y, pos.z);
@@ -316,10 +317,10 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
             } // 3 second time erase cooldown
 
             // Move everything around user slightly
-            if (this.world.getGameRules().getBoolean(JCraft.KINGCRIMSON_TELEPORT_EFFECT)) {
+            if (world.getGameRules().getBoolean(JCraft.KINGCRIMSON_TELEPORT_EFFECT)) {
                 Vec3d vec = new Vec3d(8, 8, 8);
 
-                List<LivingEntity> toMove = this.world.getEntitiesByClass(LivingEntity.class, new Box(pos.subtract(vec), pos.add(vec)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+                List<LivingEntity> toMove = world.getEntitiesByClass(LivingEntity.class, new Box(pos.subtract(vec), pos.add(vec)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
                 for (LivingEntity entity : toMove) {
                     Vec3d ePos = entity.getPos();
 
@@ -329,9 +330,8 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                     Vec3d tPos = ePos.add(new Vec3d(random.nextDouble() * 2, random.nextDouble() * 2, random.nextDouble() * 2));
 
                     entity.teleport(tPos.x, tPos.y, tPos.z);
-                    if (!this.world.isSpaceEmpty(entity)) {
+                    if (!world.isSpaceEmpty(entity))
                         entity.teleport(ePos.x, ePos.y, ePos.z);
-                    }
                 }
             }
 
@@ -349,15 +349,14 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                 ServerChannelFeedbackPacket.send(serverPlayer, buf);
             }
 
-            this.world.playSound(null, pos.x, pos.y, pos.z, JSoundRegister.TE_TP, SoundCategory.PLAYERS, 1f, 1f);
+            world.playSound(null, pos.x, pos.y, pos.z, JSoundRegister.TE_TP, SoundCategory.PLAYERS, 1f, 1f);
         }
     }
 
     @Override
     public void desummon() {
-        if (this.getTETime() < 1) {
+        if (this.getTETime() < 1)
             super.desummon();
-        }
     }
 
     @Override
@@ -365,12 +364,16 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
         super.counter(entity, source);
         if (entity == null || !hasUser())
             return;
-        LivingEntity user = this.getUser();
-        Vec3d ePos = entity.getPos();
-        Vec3d uPos = user.getPos();
+        LivingEntity user = getUser();
 
-        entity.teleport(uPos.x, uPos.y, uPos.z);
-        user.teleport(ePos.x, ePos.y, ePos.z);
+        Vec3d ePos = entity.getPos();
+        if (!entity.isInsideWall()) {
+            Vec3d uPos = user.getPos();
+
+            entity.teleport(uPos.x, uPos.y, uPos.z);
+            user.teleport(ePos.x, ePos.y, ePos.z);
+        }
+
         user.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, entity.getEyePos());
 
         if (entity instanceof LivingEntity livingEntity) {
@@ -379,7 +382,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                 stand.cancelAttack();
         }
 
-        this.world.playSound(null, uPos.x, uPos.y, uPos.z, JSoundRegister.TE_TP, SoundCategory.PLAYERS, 1f, 1f);
+        world.playSound(null, ePos.x, ePos.y, ePos.z, JSoundRegister.TE_TP, SoundCategory.PLAYERS, 1f, 1f);
     }
 
     @Override
@@ -398,44 +401,38 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
         NbtCompound userData = ((IEntityDataSaver) user).getPersistentData();
         userData.putInt(JCraft.standUltCD, userData.getInt(JCraft.standUltCD) - getTETime() * 2);
         setTETime(0);
+        if (user instanceof ServerPlayerEntity serverPlayer)
+            ShaderDeactivationPacket.send(serverPlayer, ShaderActivationPacket.Type.CRIMSON);
     }
 
     @Override
     public void tick() {
-        if (age == 1) {
-            this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.KC_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
-        }
+        if (age == 1) playSound(JSoundRegister.KC_SUMMON, 1f, 1f);
         super.tick();
 
         LivingEntity user = this.getUser();
-        if (user == null) {
-            return;
-        }
+        if (user == null) return;
 
-        Attack attack = this.curAttack;
-        if (!this.world.isClient()) {
-            if (attack != null) {
-                if (attack == overhead) {
-                    this.queuedAttack = null;
-                }
-            }
+        Attack attack = curAttack;
+        if (!world.isClient) {
+            if (attack == overhead)
+                this.queuedAttack = null;
 
             int teTime = this.getTETime();
+
             if (teTime > 0) {
-                this.setTETime(teTime - 1);
+                setTETime(teTime - 1);
 
                 if (blocking)
                     CancelTE();
 
-                if (attack != null) {
-                    if (this.getMoveStun() < (attack.moveStun - attack.realInitTime() * 2 / 3))
+                if (attack != null)
+                    if (getMoveStun() < (attack.moveStun - attack.realInitTime() * 2 / 3))
                         CancelTE();
-                }
 
                 // Only a player user has to see the time erase trackers
-                if (age % 2 == 0 && user instanceof PlayerEntity playerEntity) {
+                if (age % 2 == 0 && user instanceof ServerPlayerEntity serverPlayerEntity) {
                     int i = -1;
-
                     for (Vec3d pos : timeErasePositions) {
                         i++;
 
@@ -452,9 +449,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                             buf.writeDouble(box.getYLength());
                             buf.writeDouble(box.getZLength());
 
-                            if (playerEntity instanceof ServerPlayerEntity serverPlayerEntity) {
-                                ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
-                            }
+                            ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
                         }
                     }
                 }
@@ -466,7 +461,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                 user.setBoundingBox(noBox);
                 user.noClip = true;
 
-                if (this.getTETime() < 1) {
+                if (getTETime() < 1) {
                     if (user instanceof ServerPlayerEntity player)
                         player.networkHandler.sendPacket(new PlaySoundS2CPacket(JSoundRegister.TIME_ERASE_EXIT, SoundCategory.PLAYERS, getX(), getY(), getZ(), 1, 1, 0));
 
@@ -475,12 +470,11 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                         entity.teleport(tePos.x, tePos.y, tePos.z);
                     }
                 }
-
             } else {
-                this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
+                setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
             }
 
-            this.setSilent(teTime > 0);
+            setSilent(teTime > 0);
 
             if (user.hasCustomName())
                 user.setCustomNameVisible(teTime <= 0);
@@ -513,7 +507,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
             controller.setAnimation(builder.playOnce("animation.kingcrimson.summon"));
             return PlayState.CONTINUE;
         }
-        if (this.getSameState()) controller.markNeedsReload();
+        if (getSameState()) controller.markNeedsReload();
         switch (this.getState()) {
             default -> controller.setAnimation(builder.loop("animation.kingcrimson.idle"));
             case 2 -> controller.setAnimation(builder.playAndHold("animation.kingcrimson.dual_chop"));

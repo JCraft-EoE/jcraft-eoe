@@ -2,7 +2,8 @@ package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.common.util.IOwnable;
 import net.arna.jcraft.common.util.JCraftUtils;
-import net.minecraft.command.argument.EntityAnchorArgumentType;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -15,12 +16,12 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Arm;
-import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -35,27 +36,25 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
 
-public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOwnable {
-    public LivingEntity target;
-
-    public static final TrackedData<Boolean> EXPLODED;
-
-    static {
-        EXPLODED = DataTracker.registerData(LifeDetectorEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+public class SandTornadoEntity extends LivingEntity implements IAnimatable, IOwnable {
+    public SandTornadoEntity(EntityType<? extends LivingEntity> entityType, World world) {
+        super(entityType, world);
     }
 
-    public boolean hasExploded() {
-        return this.dataTracker.get(EXPLODED);
+    public static final TrackedData<Boolean> DISAPPEARED;
+
+    static {
+        DISAPPEARED = DataTracker.registerData(SandTornadoEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    }
+
+    public boolean hasDisappeared() {
+        return this.dataTracker.get(DISAPPEARED);
     }
 
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
-        dataTracker.startTracking(EXPLODED, false);
-    }
-
-    public LifeDetectorEntity(EntityType<? extends LivingEntity> entityType, World world) {
-        super(entityType, world);
+        dataTracker.startTracking(DISAPPEARED, false);
     }
 
     private LivingEntity master;
@@ -69,85 +68,71 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
         this.master = l;
     }
 
-    @Override
-    public boolean canTarget(LivingEntity target) {
-        if (target == null || master == null) return false;
-        if (target == this || target == master) return false;
-        if (target.isConnectedThroughVehicle(master)) return false;
-        return target.canTakeDamage() && target.isAlive();
-    }
-
-    private void Explode() {
-        setVelocity(0, 0, 0);
-        velocityModified = true;
-
-        Vec3d pos = getPos();
-        List<LivingEntity> hurt = JCraftUtils.generateHitbox(world, pos, 2.25, null);
-        for (LivingEntity living :
-                hurt) {
-            if (!canTarget(living)) continue;
-            LivingEntity target = JCraftUtils.getUserIfStand(living);
-            Vec3d kbVec = target.getPos().subtract(pos).normalize();
-            StandEntity.damageLogic(world, target, kbVec, 10, 1, false, 5f, true, 9, DamageSource.mob(master), master);
-        }
-
-        dataTracker.set(EXPLODED, true);
-
-        playSound(SoundEvents.ITEM_FIRECHARGE_USE, 1f, 1f);
-
+    private void disappear() {
+        dataTracker.set(DISAPPEARED, true);
         kill();
     }
+
+    private int hitsLeft = 5;
 
     @Override
     public void tick() {
         super.tick();
-        if (master == null) kill();
-        if (hasExploded()) return;
+        if (hasDisappeared()) return;
+
+        Vec3d circulation = new Vec3d(MathHelper.sin(age * 0.25f), 0.0, MathHelper.cos(age * 0.25f));
 
         if (world.isClient) {
-            this.world.addParticle(
-                    ParticleTypes.FLAME,
-                    this.getX() + random.nextFloat() - 0.5f,
-                    this.getY() + random.nextFloat() - 0.5f,
-                    this.getZ() + random.nextFloat() - 0.5f,
-                    0.0, 0.0, 0.0
-            );
-        } else {
-            if (target == null) {
-                if (this.age % 2 == 0) {
-                    LivingEntity finalTarget = null;
-                    List<LivingEntity> targets = world.getEntitiesByClass(LivingEntity.class, this.getBoundingBox().expand(32f), EntityPredicates.VALID_ENTITY);
-
-                    for (LivingEntity t :
-                            targets) {
-                        if (!canTarget(t)) continue;
-                        if (finalTarget == null) {
-                            finalTarget = t;
-                            continue;
-                        }
-                        // Prioritise nearest
-                        if (t.getPos().squaredDistanceTo(getPos()) < finalTarget.getPos().squaredDistanceTo(getPos()))
-                            finalTarget = t;
-                    }
-
-                    target = finalTarget;
-                }
-            } else if (target.isAlive()) {
-                Vec3d eyePos = target.getEyePos();
-                lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, eyePos);
-                if (this.squaredDistanceTo(eyePos) < 2.5) Explode(); //If closer than 1.58m
-            } else {
-                target = null;
+            for (int i = 0; i < 3; i++)
+                world.addParticle(
+                        new BlockStateParticleEffect(ParticleTypes.BLOCK, Blocks.SAND.getDefaultState()),
+                        getX() + random.nextFloat() - 0.5f,
+                        getY() + random.nextFloat() * 2f,
+                        getZ() + random.nextFloat() - 0.5f,
+                        circulation.x, 0, circulation.z
+                );
+        } else if (age % 5 == 0) {
+            if (master == null) {
+                if (isAlive()) kill();
+                return;
             }
 
-            if (!hasExploded() && (this.age >= 300 || getHealth() <= 0f)) Explode();
+            List<LivingEntity> toHurt = JCraftUtils.generateHitbox(world, getEyePos(), 1.8, List.of(this, master));
 
-            // Lerp velocity to simulate inertia
-            this.setVelocity(
-                    getVelocity().add(getRotationVector().multiply(0.5)).multiply(0.25)
-            );
-            this.velocityModified = true;
+            if (toHurt.isEmpty()) {
+                setVelocity( getVelocity().add( getRotationVector().multiply(0.5) ).multiply(0.25) );
+            } else {
+                setVelocity( getVelocity().multiply(0.25) );
+                for (LivingEntity living : toHurt) {
+                    LivingEntity target = JCraftUtils.getUserIfStand(living);
+                    if (target.isConnectedThroughVehicle(master)) return;
+                    StandEntity.damageLogic(world, target, circulation, 10, 1, false, 2f, true, 6, DamageSource.mob(master), master);
+                }
+                hitsLeft--;
+            }
+
+            velocityModified = true;
+
+            if (hitsLeft < 1 || getHealth() <= 0 || age >= 500)
+                disappear();
         }
+    }
+
+    // Physical properties
+    @Override
+    public boolean isInvulnerableTo(DamageSource damageSource) {
+        return !damageSource.isOutOfWorld();
+    }
+
+    @Override
+    protected void pushAway(Entity entity) {
+    }
+    @Override
+    public void pushAwayFrom(Entity entity) {
+    }
+    @Override
+    public boolean collidesWith(Entity other) {
+        return false;
     }
 
     @Override
@@ -158,13 +143,13 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
     @Nullable
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
-        return SoundEvents.BLOCK_LAVA_EXTINGUISH;
+        return SoundEvents.BLOCK_SAND_STEP;
     }
 
     @Nullable
     @Override
     protected SoundEvent getDeathSound() {
-        return SoundEvents.BLOCK_LAVA_EXTINGUISH;
+        return SoundEvents.BLOCK_SAND_BREAK;
     }
 
     @Override
@@ -172,22 +157,13 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
         return true;
     }
 
-    public static DefaultAttributeContainer.Builder createDetectorAttributes() {
+    public static DefaultAttributeContainer.Builder createTornadoAttributes() {
         return DefaultAttributeContainer.builder()
-                .add(EntityAttributes.GENERIC_MAX_HEALTH, 10)
+                .add(EntityAttributes.GENERIC_MAX_HEALTH, 20)
                 .add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE)
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED)
                 .add(EntityAttributes.GENERIC_ARMOR)
                 .add(EntityAttributes.GENERIC_ARMOR_TOUGHNESS);
-    }
-
-    @Override
-    protected Box calculateBoundingBox() { // Centered around 0,0,0 instead of 0,0.5,0
-        double x = getX();
-        double y = getY();
-        double z = getZ();
-        double s = hasExploded() ? 0.1 : 0.5;
-        return new Box(x + s, y + s, z + s, x - s, y - s, z - s);
     }
 
     @Override
@@ -240,7 +216,7 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
     }
 
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        event.getController().setAnimation(new AnimationBuilder().loop(hasExploded() ? "animation.detector.explode" : "animation.detector.idle"));
+        event.getController().setAnimation(new AnimationBuilder().loop(hasDisappeared() ? "animation.sandtornado.disappear" : "animation.sandtornado.idle"));
         return PlayState.CONTINUE;
     }
 

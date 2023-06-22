@@ -6,8 +6,7 @@ import net.arna.jcraft.common.entity.CreamEntity;
 import net.arna.jcraft.common.entity.D4CEntity;
 import net.arna.jcraft.common.entity.KingCrimsonEntity;
 import net.arna.jcraft.common.entity.StandEntity;
-import net.arna.jcraft.common.spec.Brawler;
-import net.arna.jcraft.common.spec.JCraftSpec;
+import net.arna.jcraft.common.spec.*;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SideShapeType;
@@ -126,8 +125,10 @@ public final class JCraftUtils {
     public static void assignSpec(PlayerEntity player, NbtCompound playerNbt, ISpec playerSpec) {
         JCraftSpec spec = null;
 
-        if (playerNbt.getInt("SpecID") == 1)
-            spec = new Brawler();
+        switch (playerNbt.getInt("SpecID")) {
+            case (1) -> spec = new BrawlerSpec();
+            case (2) -> spec = new AnubisSpec();
+        }
         if (spec != null)
             spec.player = player;
 
@@ -140,9 +141,8 @@ public final class JCraftUtils {
         // Autogenerate spec data when necessary
         NbtCompound playerNbt = ((IEntityDataSaver) player).getPersistentData();
         if (playerNbt.contains("SpecID")) {
-            if (playerSpec.getSpec() == null) {
+            if (playerSpec.getSpec() == null)
                 assignSpec(player, playerNbt, playerSpec);
-            }
         } else {
             playerNbt.putInt("SpecID", player.world.getGameRules().getInt(JCraft.DEFAULT_SPEC));
             return getSpec(player);
@@ -169,15 +169,12 @@ public final class JCraftUtils {
         );
         HitResult bHit = world.raycast(new RaycastContext(start, end, RaycastContext.ShapeType.COLLIDER, fluidHandling, entity));
 
-        switch (priority) {
-            default -> {
-                if (eHit != null) return eHit.getPos();
-                return bHit.getPos();
-            }
-            case BLOCK -> {
-                if (bHit.getType() != HitResult.Type.MISS) return bHit.getPos();
-                // STOPPED HERE
-            }
+        if (Objects.requireNonNull(priority) == RaycastPriority.BLOCK) {
+            if (bHit.getType() != HitResult.Type.MISS) return bHit.getPos();
+            // STOPPED HERE
+        } else {
+            if (eHit != null) return eHit.getPos();
+            return bHit.getPos();
         }
 
         return Vec3d.ZERO; //THIS IS A TERRIBLE IDEA!!!!!
@@ -190,6 +187,16 @@ public final class JCraftUtils {
         if (ent instanceof StandEntity stand && stand.hasUser())
             return stand.getUser();
         return ent;
+    }
+
+    /**
+     * @param data NBT data of the entity in question
+     * @return whether an entity is a stand user based on its NBT data
+     */
+    public static boolean isStandUser(NbtCompound data) {
+        if (data.contains("StandID"))
+            return data.getInt("StandID") != 0;
+        return false;
     }
 
     public static void projectileDamageLogic(ProjectileEntity proj, World world, Entity ent, Vec3d kb, int stunT, int stunType, boolean overrideStun, float damage, int blockstun) {
@@ -220,13 +227,13 @@ public final class JCraftUtils {
         return false;
     }
 
-    public static boolean shouldRender(LivingEntity entity) {
+    public static boolean shouldNotRender(LivingEntity entity) {
         Entity passenger = entity.getFirstPassenger();
         if (passenger instanceof KingCrimsonEntity kc && kc.getTETime() > 0)
-            return false;
+            return true;
         if (passenger instanceof D4CEntity d4c && d4c.getState() == 11)
-            return false;
-        return !(passenger instanceof CreamEntity cream) || !cream.getHalfBall();
+            return true;
+        return passenger instanceof CreamEntity cream && cream.getHalfBall();
     }
 
     public static boolean isTimestopped(Entity entity) {

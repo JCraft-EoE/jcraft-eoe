@@ -2,6 +2,7 @@ package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.ai.goal.CloneAttackGoal;
+import net.arna.jcraft.common.util.IOwnable;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
@@ -9,6 +10,7 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.goal.*;
+import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -33,12 +35,13 @@ import net.minecraft.world.World;
 
 import java.util.Arrays;
 
-public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob {
+public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob, IOwnable {
     public PlayerCloneEntity(EntityType<? extends HostileEntity> entityType, World world) {
         super(entityType, world);
         Arrays.fill(this.armorDropChances, 1F);
         Arrays.fill(this.handDropChances, 1F);
-        this.updateAttackType();
+        updateAttackType();
+        navigation = getNavigation();
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -59,25 +62,30 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob 
     public PlayerCloneEntity switchedTo; // The thin clone instance
 
     private LivingEntity persistTarget = null;
-    private LivingEntity owner;
+    private LivingEntity master;
+    private final EntityNavigation navigation;
     private int disabledSlots;
 
 
     static {
-        OWNERNAME = DataTracker.registerData(PlayerCloneEntity.class, TrackedDataHandlerRegistry.STRING);
+        MASTERNAME = DataTracker.registerData(PlayerCloneEntity.class, TrackedDataHandlerRegistry.STRING);
         SAND = DataTracker.registerData(PlayerCloneEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     }
 
-    private static final TrackedData<String> OWNERNAME;
-    public String getOwnerName() { return dataTracker.get(OWNERNAME); }
-    public void setOwnerName(String state) { dataTracker.set(OWNERNAME, state); }
-    public LivingEntity getOwner() { return this.owner; }
-    public void setOwner(LivingEntity owner) {
-        this.owner = owner;
-        Text oName = owner.getName();
-        this.setCustomName(oName);
-        this.setOwnerName(oName.getString());
+    @Override
+    public LivingEntity getMaster() {
+        return master;
     }
+    @Override
+    public void setMaster(LivingEntity m) {
+        this.master = m;
+        Text mName = m.getName();
+        setCustomName(mName);
+        setMasterName(mName.getString());
+    }
+    private static final TrackedData<String> MASTERNAME;
+    public String getMasterName() { return dataTracker.get(MASTERNAME); }
+    private void setMasterName(String state) { dataTracker.set(MASTERNAME, state); }
 
     private static final TrackedData<Boolean> SAND;
     public boolean isSand() { return dataTracker.get(SAND); }
@@ -86,9 +94,10 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob 
         TheFoolEntity.applySandCloneModifiers(this);
     }
 
+    private static final String unsetMasterName = "%unset_master_name";
     protected void initDataTracker() {
         super.initDataTracker();
-        dataTracker.startTracking(OWNERNAME, "%unset_owner_name");
+        dataTracker.startTracking(MASTERNAME, unsetMasterName);
         dataTracker.startTracking(SAND, false);
     }
 
@@ -112,14 +121,14 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob 
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
-        nbt.putString("OwnerName", this.getOwnerName());
-        nbt.putInt("DisabledSlots", this.disabledSlots);
+        nbt.putString("MasterName", getMasterName());
+        nbt.putInt("DisabledSlots", disabledSlots);
     }
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        this.setOwnerName(nbt.getString("OwnerName"));
-        this.disabledSlots = nbt.getInt("DisabledSlots");
+        setMasterName(nbt.getString("MasterName"));
+        disabledSlots = nbt.getInt("DisabledSlots");
         updateAttackType();
     }
 
@@ -145,7 +154,7 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob 
 
     @Override
     public ActionResult interactAt(PlayerEntity player, Vec3d hitPos, Hand hand) {
-        if (player != owner)
+        if (player != master)
             return ActionResult.FAIL;
 
         ItemStack itemStack = player.getStackInHand(hand);
@@ -219,6 +228,10 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob 
     @Override
     public void tick() {
         super.tick();
+        if (switched && switchedTo.age > 10) { // Remove outdated clones
+            discard();
+            return;
+        }
 
         boolean client = this.world.isClient();
 
@@ -233,56 +246,58 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob 
                 );
 
             JCraft.getClientEntityHandler().playerCloneEntityClientTick(this);
-            return;
-        }
-
-        if (this.switched && this.switchedTo.age > 10) discard(); // Remove outdated clones
-
-        if (this.owner == null) {
+        } else if (master == null) {
             // Run every 2 seconds (player lists are rather expensive)
-            if (this.age % 40 == 0) {
-                // If the owner name is set, but the owner isn't (when loaded via NBT data), find owner
-                String ownerName = this.getOwnerName();
-                if (!ownerName.equals("%unset_owner_name"))
+            if (age % 40 == 0) {
+                // If the master name is set, but the master isn't (when loaded via NBT data), find master
+                String masterName = this.getMasterName();
+                if (!masterName.equals(unsetMasterName))
                     for (ServerPlayerEntity serverPlayerEntity : PlayerLookup.world((ServerWorld) world))
-                        if (serverPlayerEntity.getName().getString().equals(ownerName))
-                            this.owner = serverPlayerEntity;
+                        if (serverPlayerEntity.getName().getString().equals(masterName))
+                            this.master = serverPlayerEntity;
             }
 
             LivingEntity attacker = getAttacker();
             if (attacker != null) setTarget(attacker);
-        } else {
-            if (this.persistTarget == null) {
-                LivingEntity attacking = owner.getAttacking();
-                if (attacking != null && attacking.isAlive()) {
-                    this.persistTarget = attacking;
-                }
+        } else { // Server & Master isn't null
+            if (persistTarget == null) {
+                // Prioritize what the master is attacking, then what is attacking him
+                LivingEntity attacking = master.getAttacking();
+                if (attacking != null && attacking.isAlive())
+                    persistTarget = attacking;
 
-                if (this.squaredDistanceTo(this.owner) > 100) {
-                    this.getNavigation().startMovingTo(this.owner, 1);
-                }
-            } else if (this.persistTarget.isAlive() && this.canTarget(this.persistTarget)) {
+                LivingEntity attacker = master.getAttacker();
+                if (attacker != null && attacker.isAlive())
+                    persistTarget = attacker;
+
+                if (squaredDistanceTo(master) > 100)
+                    navigation.startMovingTo(master, 1);
+            } else if (persistTarget.isAlive() && canTarget(persistTarget)) {
                 this.setTarget(this.persistTarget);
             } else { // This is called once, usually when the opponent dies
-                this.persistTarget = null;
+                persistTarget = null;
                 this.setTarget(null);
-                if (!this.getNavigation().isIdle()) {
-                    this.getNavigation().stop();
-                }
+                if (!navigation.isIdle())
+                    navigation.stop();
             }
         }
     }
 
+    @Override
+    public boolean canTarget(LivingEntity target) {
+        if (target == master) return false;
+        return super.canTarget(target);
+    }
+
     public void updateAttackType() {
-        if (this.world != null && !this.world.isClient) {
-            this.goalSelector.remove(this.cloneAttackGoal);
-            this.goalSelector.remove(this.bowAttackGoal);
+        if (world != null && !world.isClient) {
+            goalSelector.remove(this.cloneAttackGoal);
+            goalSelector.remove(this.bowAttackGoal);
             ItemStack itemStack = this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW));
-            if (itemStack.isOf(Items.BOW)) {
-                this.goalSelector.add(2, this.bowAttackGoal);
-            } else {
-                this.goalSelector.add(2, this.cloneAttackGoal);
-            }
+            if (itemStack.isOf(Items.BOW))
+                goalSelector.add(2, this.bowAttackGoal);
+            else
+                goalSelector.add(2, this.cloneAttackGoal);
         }
     }
 

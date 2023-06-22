@@ -32,6 +32,8 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
 
+import static net.arna.jcraft.common.util.Attack.unusable;
+
 public class SilverChariotEntity extends StandEntity implements IAnimatable, IAnimationTickable {
 
     public final Attack light = new Attack(0, 2, 0.65f, 9, 6, 1.75, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0)
@@ -60,7 +62,7 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
             .setInfo("Invincible Blade", "Silver Chariot detaches from the user and charges forward, combo starter/extender");
     public final Attack counter = new Attack(7, 32, 0.5f, 44, 4, 0, 0, 0, AttackType.COUNTER)
             .setInfo("Counter", "0.2s windup, 2s duration, stuns when hit");
-    public final Attack pbeatdown = new Attack(8, 60, 0.65f, 28, 23, 1.75, 4f, 0f, AttackType.BOX, 2, 0, 0)
+    public final Attack pbeatdown = new Attack(8, 50, 0.65f, 28, 23, 1.75, 4f, 0f, AttackType.BOX, 2, 0, 0)
             .setHitspark(2)
             .setStunType(0)
             .setInfo("God of Death", "high-damage beatdown, 1.5s stun on whiff, cannot be combo broken");
@@ -69,6 +71,9 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
     public final Attack beatdownfinish = new Attack(10, 0, 0.65f, 59, 0, 2.5, 6f, 1.25f, AttackType.MULTIHIT, 1, 0, List.of(54), JSoundRegister.TW_KICK_HIT)
             .setLaunch()
             .setHitspark(2);
+    public final Attack armoroff = new Attack(11, 60, 0.65f, 15, 6, 1.75, 4f, 0.75f, AttackType.BOX, 0.35f, 0f, 0)
+            .setLaunch()
+            .setInfo("Armor Off", "25s of faster moves");
     private int armorTime;
 
     private void setNormalDesc() {
@@ -82,7 +87,7 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
                             (Armor OFF) Spin>M1>Barrage>Charge>Cleave>M1
                         """;
 
-        moves = List.of(light, heavy, barrage, spinbarrage, new Attack().setRanged(true).setInfo("Armor Off", "25s of faster moves"), charge, cleave, unusable);
+        moves = List.of(light, heavy, barrage, spinbarrage, armoroff, charge, cleave, unusable);
     }
 
     private void setPossessedDesc() {
@@ -171,20 +176,11 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        if (this.getMode() == 3) {
-            handleAttack(this.pbeatdown, JCraft.standUltCD, 11);
+        if (this.getMode() == 3)
+            handleAttack(pbeatdown, JCraft.standUltCD, 11);
             //playSound(ModSoundRegister.PSC_BEATDOWN,1, 1);
-        } else if (hasUser()) {
-            NbtCompound userData = ((IEntityDataSaver) getUser()).getPersistentData();
-            int cooldown = userData.getInt(JCraft.standUltCD);
-            if (cooldown > 0) return;
-
+        else if (handleAttack(armoroff, JCraft.standUltCD, 14))
             playSound(JSoundRegister.SC_ARMOROFF, 1, 1);
-
-            userData.putInt(JCraft.standUltCD, 1400);
-            setMode(2);
-            armorTime = 500;
-        }
     }
 
     @Override
@@ -260,13 +256,22 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
-        if (attack.id == 8) {
-            if (entities.isEmpty())
-                stun(getUser(), 30, 1);
-            else
-                setAttack(mainbeatdown, 12);
-        } else if (attack.id == 9 && getMoveStun() == 36)
-            curAttack = beatdownfinish;
+        switch (attack.id) {
+            case (8) -> {
+                if (entities.isEmpty())
+                    stun(getUser(), 30, 1);
+                else
+                    setAttack(mainbeatdown, 12);
+            }
+            case (9) -> {
+                if (getMoveStun() == 36)
+                    curAttack = beatdownfinish;
+            }
+            case (11) -> {
+                setMode(2);
+                armorTime = 500;
+            }
+        }
     }
 
     @Override
@@ -280,22 +285,21 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
 
     @Override
     public void tick() {
-        if (age == 1)
-            world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.SC_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
+        if (age == 1) playSound(JSoundRegister.SC_SUMMON, 1f, 1f);
         super.tick();
 
         if (hasUser()) {
-            LivingEntity user = this.getUser();
+            LivingEntity user = getUser();
             int mode = getMode();
 
             if (world.isClient) {
-                setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
+                setAlpha((float) MathHelper.clamp(255.0 * squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
 
                 if (mode == 3)
                     for (int i = 0; i < 16; i++)
                         world.addParticle(
                                 ParticleTypes.ASH,
-                                this.getX() + random.nextDouble() - 0.5, this.getY() + random.nextDouble() * 0.25 + 0.5, this.getZ() + random.nextDouble() - 0.5,
+                                getX() + random.nextDouble() - 0.5, getY() + random.nextDouble() * 0.25 + 0.5, getZ() + random.nextDouble() - 0.5,
                                 0.0, 0.0, 0.0
                         );
             } else {
@@ -305,7 +309,7 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
                     for (int i = 0; i < 128; i++)
                         world.addParticle(
                                 ParticleTypes.ASH,
-                                this.getX() + random.nextDouble() - 0.5, this.getY() + random.nextDouble() * 2, this.getZ() + random.nextDouble() - 0.5,
+                                getX() + random.nextDouble() - 0.5, getY() + random.nextDouble() * 2, getZ() + random.nextDouble() - 0.5,
                                 0.0, 0.1, 0.0
                         );
 
@@ -316,7 +320,7 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
                     for (int i = 0; i < 128; i++)
                         world.addParticle(
                                 ParticleTypes.ELECTRIC_SPARK,
-                                this.getX() + random.nextDouble() - 0.5, this.getY() + random.nextDouble() * 2, this.getZ() + random.nextDouble() - 0.5,
+                                getX() + random.nextDouble() - 0.5, getY() + random.nextDouble() * 2, getZ() + random.nextDouble() - 0.5,
                                 0.0, 0.1, 0.0
                         );
 
@@ -381,6 +385,7 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
             case 11 -> controller.setAnimation(builder.playAndHold("animation.silverchariot.beatdownstart"));
             case 12 -> controller.setAnimation(builder.playAndHold("animation.silverchariot.beatdown"));
             case 13 -> controller.setAnimation(builder.playAndHold("animation.silverchariot.cleave"));
+            case 14 -> controller.setAnimation(builder.playAndHold("animation.silverchariot.armor_off"));
         }
         controller.setAnimationSpeed(this.getMode() == 2 ? 1.5 : 1);
         return PlayState.CONTINUE;

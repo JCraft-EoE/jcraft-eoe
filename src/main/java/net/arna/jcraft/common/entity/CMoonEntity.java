@@ -152,7 +152,7 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
                 List<BlockProjectile> blocks = world.getEntitiesByClass(BlockProjectile.class, getBoundingBox().expand(16), EntityPredicates.VALID_LIVING_ENTITY);
                 for (BlockProjectile block :
                         blocks) {
-                    if (((IOwnable) block).getMaster() != user) continue;
+                    if (block.getMaster() != user) continue;
                     block.markRefresh();
                 }
             } else if (canAttack() && handleAttack(launch, JCraft.standS2CD, 9))

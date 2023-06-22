@@ -90,7 +90,7 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
         moves = List.of(light, heavy, barrage, dimhop_others, clonespawn, grab, counter, flag);
 
         if (world.isClient) return;
-        auWorld = this.getServer().getWorld(JDimensionRegister.AU_DIMENSION_KEY);
+        auWorld = getServer().getWorld(JDimensionRegister.AU_DIMENSION_KEY);
     }
 
     @Override
@@ -237,7 +237,7 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
         Entity player = this.getUser();
         switch (attack.id) {
             case (3) -> {
-                ChunkPos origin = this.getChunkPos();
+                ChunkPos origin = getChunkPos();
                 ServerWorld world = (ServerWorld) getWorld();
 
                 for (int x = -3; x < 4; x++) {
@@ -296,7 +296,7 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
                 if (player instanceof PlayerEntity playerEntity) {
                     PlayerCloneEntity playerCloneEntity = new PlayerCloneEntity(JEntityTypeRegister.PLAYER_ENTITY_CLONE, this.world);
                     playerCloneEntity.copyPositionAndRotation(playerEntity);
-                    playerCloneEntity.setOwner(playerEntity);
+                    playerCloneEntity.setMaster(playerEntity);
 
                     world.spawnEntity(playerCloneEntity);
                     playerCloneEntity.equipStack(EquipmentSlot.MAINHAND, weapon);

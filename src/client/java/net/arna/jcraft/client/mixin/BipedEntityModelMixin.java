@@ -55,7 +55,7 @@ public abstract class BipedEntityModelMixin<T extends LivingEntity> {
 
     @Inject(method = "setAngles(Lnet/minecraft/entity/LivingEntity;FFFFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/ModelPart;copyTransform(Lnet/minecraft/client/model/ModelPart;)V", shift = At.Shift.BEFORE), cancellable = true)
     public void jcraft$setAngles(T livingEntity, float f, float g, float h, float i, float j, CallbackInfo info) {
-        if (!JCraftUtils.shouldRender(livingEntity)) {
+        if (JCraftUtils.shouldNotRender(livingEntity)) {
             setScale(this.head, 0f);
             setScale(this.hat, 0f);
             setScale(this.body, 0f);

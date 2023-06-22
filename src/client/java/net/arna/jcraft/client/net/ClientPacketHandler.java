@@ -25,7 +25,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.util.Arm;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
@@ -59,8 +58,9 @@ public class ClientPacketHandler {
     }
 
     public static void handleChannelFeedback(MinecraftClient client, PacketByteBuf buf) {
-        short control = buf.readShort();
+        if (client.world == null) return;
 
+        short control = buf.readShort();
         // Show hitboxes gamerule
         switch (control) {
             case (1) -> {
@@ -219,8 +219,9 @@ public class ClientPacketHandler {
                 JCraftClient.ticksSinceCounted = 0;
             }
 
-            // Anubis swings
+            // WAS ANUBIS SWINGS, NOW OPEN
             case (7) -> {
+                /*
                 int state = buf.readInt();
                 int entID = buf.readInt();
 
@@ -234,6 +235,7 @@ public class ClientPacketHandler {
                         animationContainer.setAnimation(new KeyframeAnimationPlayer(anim));
                     }
                 });
+                 */
             }
 
             // Generic single particle
@@ -271,15 +273,16 @@ public class ClientPacketHandler {
                 double x = buf.readDouble();
                 double y = buf.readDouble();
                 double z = buf.readDouble();
+                double size = buf.readDouble();
 
                 client.execute(() -> {
                     Random random = new Random();
-                    for (int h = 0; h < 256; ++h) {
+                    for (int h = 0; h < size * 128; ++h) {
                         client.world.addParticle(
                                 new BlockStateParticleEffect(ParticleTypes.FALLING_DUST, Blocks.SAND.getDefaultState()),
-                                x + random.nextGaussian() * 2,
-                                y + random.nextGaussian() * 2,
-                                z + random.nextGaussian() * 2,
+                                x + random.nextGaussian() * size,
+                                y + random.nextGaussian() * size,
+                                z + random.nextGaussian() * size,
                                 0, 0, 0);
                     }
                 });
@@ -295,6 +298,10 @@ public class ClientPacketHandler {
                     if (ent instanceof PlayerEntity player) {
                         ModifierLayer<IAnimation> animationContainer = ((IJCraftAnimatedPlayer) player).jcraft_getModAnimation();
                         KeyframeAnimation anim = PlayerAnimationRegistry.getAnimation(new Identifier(JCraft.MOD_ID, "animation." + animPath));
+                        if (anim == null) {
+                            JCraft.LOGGER.error("Tried to play null animation on player " + player + " in world " + client.world);
+                            return;
+                        }
                         animationContainer.setAnimation(new KeyframeAnimationPlayer(anim));
                     }
                 });
@@ -320,9 +327,8 @@ public class ClientPacketHandler {
 
                 client.execute(() -> {
                     Entity ent = client.world.getEntityById(entID);
-                    if (ent != null) {
-                        ((ITimeStop) ent).setTimeStopTicks(ticks);
-                    }
+                    if (ent == null) return;
+                    ((ITimeStop) ent).setTimeStopTicks(ticks);
                 });
             }
         }
@@ -350,13 +356,11 @@ public class ClientPacketHandler {
                     }
                 });
             }
-            case CRIMSON -> {
-                client.execute(() -> {
-                    CrimsonShaderHandler crimsonShaderHandler = CrimsonShaderHandler.INSTANCE;
-                    crimsonShaderHandler.effectLength = 300;
-                    crimsonShaderHandler.shouldRender = true;
-                });
-            }
+            case CRIMSON -> client.execute(() -> {
+                CrimsonShaderHandler crimsonShaderHandler = CrimsonShaderHandler.INSTANCE;
+                crimsonShaderHandler.effectLength = duration;
+                crimsonShaderHandler.shouldRender = true;
+            });
         }
     }
 
