@@ -46,7 +46,7 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
     public static final Attack light = new Attack(0, 2, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
 
-    public static final Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 1, 0, 4, JSoundRegister.IMPACT_3)
+    public static final Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 0.75f, 0.25f, AttackType.BARRAGE, 1, 0, 4, JSoundRegister.IMPACT_3)
             .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
     public static final Attack gutpunch = new Attack(1, 17, 1f, 30, 19, 2.0, 8f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.TW_KICK_HIT).setHitspark(2).setArmor(true).setLaunch()
             .setInfo("Gut Punch", "slow, uninterruptable combo finisher");
@@ -222,7 +222,7 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
         LivingEntity user = this.getUser();
         for (LivingEntity ent : entities) {
-            invertDamages.add(attack == barrage ? 0.25f : 2f);
+            invertDamages.add(attack == barrage ? 0.25f : 0.5f);
             invertEntities.add(ent);
             invertTimes.add(40);
 
@@ -274,7 +274,7 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
         } else if (attack.id == gravshift.id) {
             user.addStatusEffect(new StatusEffectInstance(StatusEffects.JUMP_BOOST, 350, 1));
             user.onLanding();
-            this.setShiftTime(350);
+            setShiftTime(200);
         }
     }
 

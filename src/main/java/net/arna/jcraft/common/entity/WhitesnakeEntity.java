@@ -1,20 +1,16 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -34,19 +30,25 @@ import java.util.List;
 public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnimationTickable {
     public static final Attack light = new Attack(0, 2, 0.75f, 14, 7, 1.5, 5f, 0.75f, AttackType.BOX, 0.6f, 0.2f, 0, JSoundRegister.IMPACT_3)
             .setInfo("Punch", "quick combo starter");
-    public static final Attack legcrusher = new Attack(4, 20, 0.75f, 22, 16, 1.5, 5f, 0.25f, AttackType.BOX, 1.6f, 0.2f, 0, JSoundRegister.TW_KICK_HIT).setHitspark(2)
+    public static final Attack legcrusher = new Attack(4, 20, 0.75f, 22, 16, 1.5, 5f, 0.25f, AttackType.BOX, 1.6f, 0.2f, 0, JSoundRegister.TW_KICK_HIT)
+            .setHitspark(2)
             .setInfo("Leg Crusher", "high stun, medium windup");
-    public static final Attack poisonspew = new Attack(5, 23, 0.75f, 14, 10, 2, 0f, 0, AttackType.BOX)
+    public static final Attack poisonspew = new Attack(5, 20, 0.75f, 14, 10, 2, 0f, 0, AttackType.BOX)
             .setUB(true)
-            .setInfo("Poison Spew", "forces enemy into crawling for 4s, no stun"); //todo: make poison pool on ground
+            .setInfo("Melt your Heart", "fires an acid projectile that slows enemies and persists on the surface it hits for 5s");
     public static final Attack barrage = new Attack(2, 17, 0.75f, 60, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 1, 0, 3, JSoundRegister.IMPACT_3)
             .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
-    public static final Attack donut = new Attack(1, 18, 1f, 36, 17, 2, 12f, 0.0f, AttackType.BOX, 1.4f, 0, 0, JSoundRegister.TW_DONUT_HIT).setHitspark(2)
+    public static final Attack donut = new Attack(1, 18, 1f, 36, 17, 2, 12f, 0.0f, AttackType.BOX, 1.4f, 0, 0, JSoundRegister.TW_DONUT_HIT)
+            .setHitspark(2)
             .setInfo("Donut", "slow combo starter/extender");
-    public static final Attack memorydisk = new Attack(6, 45, 1f, 34, 22, 2, 6f, 0.0f, AttackType.BOX, 1f, 0, 0, JSoundRegister.IMPACT_2).setHitspark(2).setArmor(true)
+    public static final Attack memorydisk = new Attack(6, 30, 1f, 34, 22, 2, 6f, 0.0f, AttackType.BOX, 1f, 0, 0, JSoundRegister.IMPACT_2)
+            .setHitspark(2)
+            .setArmor(true)
             .setUB(true)
             .setInfo("Memory Disk", "uninterruptable, mining fatigue & weakness for 30s");
-    public static final Attack standdisk = new Attack(3, 36, 1f, 34, 22, 2, 6f, 0.0f, AttackType.BOX, 1f, 0, 0, JSoundRegister.IMPACT_2).setArmor(true)
+    public static final Attack standdisk = new Attack(3, 30, 1f, 34, 22, 2, 6f, 0.0f, AttackType.BOX, 1f, 0, 0, JSoundRegister.IMPACT_2)
+            .setHitspark(2)
+            .setArmor(true)
             .setUB(true)
             .setInfo("Stand Disk", "uninterruptable, removes enemy stand for 8s");
 
@@ -81,54 +83,54 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
     // Moveset
     @Override
     public void initLightAttack() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
     public void initBarrage() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, 5))
-            this.playSound(JSoundRegister.WS_BARRAGE, 1, 1);
+            playSound(JSoundRegister.WS_BARRAGE, 1, 1);
     }
 
     @Override
     public void initHeavyAttack() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(donut, JCraft.standHeavyCD, 4))
-            this.playSound(JSoundRegister.WS_DONUT, 1, 1);
+            playSound(JSoundRegister.WS_DONUT, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
-        if (!this.canAttack()) return;
-        if (handleAttack(standdisk, JCraft.standS1CD, 8))
-            this.playSound(JSoundRegister.WS_DISK, 1, 1);
+        if (!canAttack()) return;
+        if (handleAttack(memorydisk, JCraft.standS1CD, 8))
+            playSound(JSoundRegister.WS_DISK, 1, 1);
     }
 
     @Override
     public void initUlt() {
-        if (!this.canAttack()) return;
-        if (handleAttack(memorydisk, JCraft.standUltCD, 8))
-            this.playSound(JSoundRegister.WS_DISK, 1, 1);
+        if (!canAttack()) return;
+        if (handleAttack(standdisk, JCraft.standUltCD, 8))
+            playSound(JSoundRegister.WS_DISK, 1, 1);
     }
 
     @Override
     public void initSpecial2() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(legcrusher, JCraft.standS2CD, 6))
-            this.playSound(JSoundRegister.WS_LEGCRUSH, 1, 1);
+            playSound(JSoundRegister.WS_LEGCRUSH, 1, 1);
     }
 
     @Override
     public void initSpecial3() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         handleAttack(poisonspew, JCraft.standS3CD, 7);
     }
 
     @Override
     public void initMiddleClick() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         NbtCompound userData = ((IEntityDataSaver) getUser()).getPersistentData();
         if (userData.getInt(JCraft.utilCD) > 0) return;
         setRemote(!getRemote());
@@ -138,29 +140,17 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
-        Vec3d rotVec = this.getRotationVector();
-
         switch (attack.id) {
             case (3) -> { // Stand Disc
                 for (LivingEntity ent : entities)
                     ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.STANDLESS, 160, 0, true, false));
             }
             case (5) -> { // Poison Spew
-                for (LivingEntity ent : entities)
-                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.WSPOISON, 80, 1));
-                PacketByteBuf buf = PacketByteBufs.create();
-                Vec3d backPos = this.getEyePos().subtract(rotVec.multiply(3));
-                Vec3d headPos = this.getEyePos().add(rotVec);
-                buf.writeShort(5);
-                buf.writeDouble(backPos.x);
-                buf.writeDouble(backPos.y);
-                buf.writeDouble(backPos.z);
-                buf.writeDouble(headPos.x);
-                buf.writeDouble(headPos.y);
-                buf.writeDouble(headPos.z);
-                for (PlayerEntity sendPlayer : world.getPlayers())
-                    if (sendPlayer instanceof ServerPlayerEntity serverPlayerEntity)
-                        ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
+                LivingEntity user = getUser();
+                WSAcidProjectile acidProjectile = new WSAcidProjectile(world, user);
+                acidProjectile.setVelocity(user, user.getPitch(), user.getYaw(), 0, 1.33F, 0);
+                acidProjectile.setPosition(getEyePos());
+                world.spawnEntity(acidProjectile);
             }
             case (6) -> {
                 for (LivingEntity ent : entities) {
@@ -190,7 +180,7 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
                 Vec3d rotVec = new Vec3d(getRotationVector().x, 0, getRotationVector().z).normalize();
 
                 double dragMult = getMoveStun() > 0 ? 0.2 : 0.4;
-                double moveSpeed = 0.2;
+                double moveSpeed = 0.24;
                 //HitResult groundCheck = this.world.raycast(new RaycastContext(getEyePos(), pos.add(0, -1.0E-5F, 0), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
                 boolean onGround = isOnGround();
 
@@ -208,7 +198,7 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
                     }
                 } else {
                     //JCraft.LOGGER.info("Airborne");
-                    moveSpeed = 0.02;
+                    moveSpeed = 0.024;
                     remoteSpeed = remoteSpeed.add(0, -9.81 / 200, 0); // Account for gravity
                     dragMult = 0.4;
                 }
@@ -260,8 +250,9 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
             return PlayState.CONTINUE;
         }
 
-        if (this.getSameState()) controller.markNeedsReload();
-        switch (this.getState()) {
+        if (getSameState()) controller.markNeedsReload();
+        int state = getState();
+        switch (state) {
             default -> controller.setAnimation(builder.loop("animation.whitesnake.idle"));
             case 2 -> controller.setAnimation(builder.playAndHold("animation.whitesnake.light"));
             case 3 -> controller.setAnimation(builder.loop("animation.whitesnake.block"));
@@ -280,7 +271,7 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
             case 15 -> controller.setAnimation(builder.loop("animation.whitesnake.ldash"));
             case 16 -> controller.setAnimation(builder.loop("animation.whitesnake.rdash"));
         }
-
+        controller.setAnimationSpeed(state > 8 ? 1.2 : 1);
         return PlayState.CONTINUE;
     }
 }

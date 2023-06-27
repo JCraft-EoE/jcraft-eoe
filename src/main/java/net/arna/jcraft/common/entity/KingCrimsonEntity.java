@@ -242,7 +242,6 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
-        Vec3d rotVec = getRotationVector();
         switch (attack.id) {
             case (2) -> {
                 for (LivingEntity ent : entities)
@@ -267,7 +266,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
             case (6) -> {
                 // If hit, impale and set position to middle of arm
                 for (LivingEntity entity : entities) {
-                    Vec3d pos = this.getPos().add(rotVec.multiply(1.5));
+                    Vec3d pos = getPos().add(getRotationVector().multiply(1.5));
                     entity.teleport(pos.x, entity.getY(), pos.z);
                 }
             }
@@ -275,11 +274,10 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                 timeEraseEntities = new LinkedList<>();
                 timeErasePositions = new LinkedList<>();
 
-                Vec3d pos = this.getEyePos();
+                Vec3d pos = getEyePos();
 
-                this.setTETime((int) (timeerase.stun * 20));
-                this.curAttack = null;
-                this.setBoundingBox(new Box(0, 0, 0, 0, 0, 0));
+                setTETime((int) (timeerase.stun * 20));
+                curAttack = null;
 
                 List<Entity> toCatch = world.getEntitiesByClass(Entity.class,
                         new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
@@ -312,9 +310,8 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
 
             playerData.putInt(JCraft.utilCD, 300); // 15 second timeskip cooldown
 
-            if (playerData.getInt(JCraft.standUltCD) < 60) {
-                playerData.putInt(JCraft.standUltCD, 60);
-            } // 3 second time erase cooldown
+            if (playerData.getInt(JCraft.standUltCD) < 60)
+                playerData.putInt(JCraft.standUltCD, 60); // 3 second time erase cooldown
 
             // Move everything around user slightly
             if (world.getGameRules().getBoolean(JCraft.KINGCRIMSON_TELEPORT_EFFECT)) {

@@ -189,28 +189,7 @@ public class ClientPacketHandler {
 
             // WS acid spew
             case (5) -> {
-                double epx = buf.readDouble();
-                double epy = buf.readDouble();
-                double epz = buf.readDouble();
 
-                double hpx = buf.readDouble();
-                double hpy = buf.readDouble();
-                double hpz = buf.readDouble();
-
-                client.execute(() -> {
-                    Random random = new Random();
-                    for (int h = 0; h < 256; ++h) {
-                        double x = hpx + random.nextDouble(2) - 1;
-                        double y = hpy + random.nextDouble(2) - 1;
-                        double z = hpz + random.nextDouble(2) - 1;
-                        Vec3d awayVector = new Vec3d(x, y, z).subtract(epx, epy + 0.5, epz).normalize().multiply(0.3);
-
-                        client.world.addParticle(
-                                ParticleTypes.SPIT,
-                                x, y, z,
-                                awayVector.x, awayVector.y, awayVector.z);
-                    }
-                });
             }
 
             // Combo counter
@@ -219,23 +198,24 @@ public class ClientPacketHandler {
                 JCraftClient.ticksSinceCounted = 0;
             }
 
-            // WAS ANUBIS SWINGS, NOW OPEN
+            // Return to Zero trackers
             case (7) -> {
-                /*
-                int state = buf.readInt();
                 int entID = buf.readInt();
+                Vec3d originalPos = new Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
 
                 client.execute(() -> {
                     Entity ent = client.world.getEntityById(entID);
-                    if (ent instanceof PlayerEntity player) {
-                        String arm = (player.getMainArm() == Arm.RIGHT) ? "r" : "l";
-                        var animationContainer = ((IJCraftAnimatedPlayer) player).jcraft_getModAnimation();
-                        //ex. swing1L - standing thrust w/ left arm
-                        var anim = PlayerAnimationRegistry.getAnimation(new Identifier(JCraft.MOD_ID, "animation.anubis.swing" + state + arm));
-                        animationContainer.setAnimation(new KeyframeAnimationPlayer(anim));
+                    if (ent == null) return;
+                    Vec3d currentPos = ent.getEyePos();
+                    Vec3d originalToCurrent = currentPos.subtract(originalPos).normalize();
+                    for (double h = 0; h < currentPos.distanceTo(originalPos); ++h) {
+                        client.world.addParticle(
+                                ParticleTypes.ELECTRIC_SPARK,
+                                originalPos.x + originalToCurrent.x * h, originalPos.y + originalToCurrent.y * h, originalPos.z + originalToCurrent.z * h,
+                                -originalToCurrent.x, -originalToCurrent.y, -originalToCurrent.z
+                        );
                     }
                 });
-                 */
             }
 
             // Generic single particle

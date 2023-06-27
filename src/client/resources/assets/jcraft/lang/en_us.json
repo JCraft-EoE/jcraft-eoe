@@ -108,5 +108,10 @@
   "death.attack.stand": "%1$s was retired",
   "death.attack.stand.item": "%1$s was retired by %2$s while wielding %3$s",
   "death.attack.stand.player": "%1$s was retired by %2$s",
-  "death.attack.stand.player.item": "%1$s was retired by %2$s while wielding %3$s"
+  "death.attack.stand.player.item": "%1$s was retired by %2$s while wielding %3$s",
+
+  "death.attack.wsacid": "%1$s was melted",
+  "death.attack.wsacid.item": "%1$s was melted by %2$s while wielding %3$s",
+  "death.attack.wsacid.player": "%1$s was melted by %2$s",
+  "death.attack.wsacid.player.item": "%1$s was melted by %2$s while wielding %3$s"
 }

@@ -103,7 +103,10 @@ public interface JEntityTypeRegister {
     EntityType<TheFoolEntity> THE_FOOL = Registry.register(
             Registry.ENTITY_TYPE,
             JCraft.id("thefool"),
-            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(TheFoolEntity::new)).dimensions(EntityDimensions.fixed(2f, 2f)).build()
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(TheFoolEntity::new))
+                    .dimensions(EntityDimensions.fixed(2f, 2f))
+                    .fireImmune()
+                    .build()
     );
 
     EntityType<GoldenExperienceEntity> GOLDEN_EXPERIENCE = Registry.register(
@@ -198,6 +201,13 @@ public interface JEntityTypeRegister {
             JCraft.id("sandtornado"),
             FabricEntityTypeBuilder.create(SpawnGroup.MISC, SandTornadoEntity::new)
                     .dimensions(EntityDimensions.fixed(1f, 2f)).build()
+    );
+
+    EntityType<WSAcidProjectile> WS_ACID_PROJECTILE = Registry.register(
+            Registry.ENTITY_TYPE,
+            JCraft.id("wsacidprojectile"),
+            FabricEntityTypeBuilder.<WSAcidProjectile>create(SpawnGroup.MISC, WSAcidProjectile::new)
+                    .dimensions(EntityDimensions.fixed(0.5f, 0.5f)).trackRangeChunks(4).trackedUpdateRate(10).build()
     );
 
     static void registerEntities() {

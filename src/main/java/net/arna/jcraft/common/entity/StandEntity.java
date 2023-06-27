@@ -536,10 +536,10 @@ public abstract class StandEntity extends MobEntity {
 
     // Define desummon conditions
     public void desummon() {
+        if (curAttack != null || getMoveStun() > 0) return;
+        discard();
         if (user != null)
             ((IEntityDataSaver)user).setStand(null);
-        if (this.curAttack == null && this.getMoveStun() <= 0)
-            this.discard();
     }
 
     // Define idle override
@@ -611,6 +611,8 @@ public abstract class StandEntity extends MobEntity {
         // Common code for remote mode
         if (isRemote) {
             if (hasVehicle()) detach();
+            if (!user.isAlive())
+                kill();
 
             // Clientside rotational sync for remote mode
             user.setBodyYaw(user.getHeadYaw());
@@ -1064,8 +1066,8 @@ public abstract class StandEntity extends MobEntity {
 
     @Override
     public boolean addStatusEffect(StatusEffectInstance effect, @Nullable Entity source) {
-        if (!hasUser()) return false;
-        return getUser().addStatusEffect(effect, source);
+        if (world.isClient || user == null) return false;
+        return user.addStatusEffect(effect, source);
     }
 
     /**

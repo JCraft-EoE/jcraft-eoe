@@ -58,7 +58,8 @@ public class AnkhProjectile extends PersistentProjectileEntity implements IAnima
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
-        Entity owner = this.getOwner();
+        if (world.isClient) return;
+        Entity owner = getOwner();
         if (owner == null) return;
         Entity entity = entityHitResult.getEntity();
         if (owner.hasPassenger(entity) || entity == owner) return;

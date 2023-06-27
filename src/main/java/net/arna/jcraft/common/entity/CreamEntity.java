@@ -364,7 +364,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
 
     @Override
     public void tick() {
-        if (age == 1) this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.CREAM_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
+        if (age == 1) playSound(JSoundRegister.CREAM_SUMMON, 1f, 1f);
         super.tick();
         boolean server = !this.world.isClient();
 
@@ -399,7 +399,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
 
             if (voiding) {
                 if (server) {
-                    if (this.world.getGameRules().getBoolean(JCraft.STAND_GRIEFING)) {
+                    if (world.getGameRules().getBoolean(JCraft.STAND_GRIEFING)) {
                         // Unfun 3x4x3 void code
                         for (int x = -1; x < 2; x++) {
                             for (int y = -1; y < 3; y++) {
@@ -418,17 +418,19 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
                         if (user instanceof ServerPlayerEntity player)
                             player.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(user));
                     } else {
-                        this.setState(0);
+                        setState(0);
 
                         if (!isPlayer) {
                             double y = user.getY();
                             Vec3d vel = new Vec3d(user.getVelocity().x, 0.0, user.getVelocity().z);
+
                             // Targetting priority
                             LivingEntity targetEntity = user.getDamageTracker().getBiggestAttacker();
                             if (targetEntity == null && user instanceof MobEntity mob)
                                 targetEntity = mob.getTarget();
                             if (targetEntity == null)
                                 targetEntity = user.getAttacker();
+
                             // If target wasn't found, thrash around
                             Vec3d target = targetEntity != null ? targetEntity.getPos() : this.getPos().add(Math.sin(this.age * 0.2) * 2, Math.sin(this.age * 0.2) / 4, Math.cos(this.age * 0.2) * 2);
 
@@ -445,32 +447,32 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
                         }
                     }
 
-                    List<LivingEntity> toDamage = this.world.getEntitiesByClass(LivingEntity.class,
+                    List<LivingEntity> toDamage = world.getEntitiesByClass(LivingEntity.class,
                             new Box(pos.add(1.5, 1.5, 1.5), pos.subtract(1.5, 1.5, 1.5)), EntityPredicates.VALID_ENTITY);
 
                     toDamage.remove(user);
                     toDamage.remove(this);
 
-                    for (LivingEntity ent : toDamage)
+                    for (LivingEntity ent : toDamage) {
+                        stun(ent, 2, 1);
                         ent.damage(DamageSource.OUT_OF_WORLD, charging ? 4 : 2.5f);
-                    if (notCorS)
+                    } if (notCorS)
                         user.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 25, 0, false, false));
                 } else {
-                    for (int i = 0; i < 16; i++) {
-                        this.world.addParticle(ParticleTypes.MYCELIUM,
+                    for (int i = 0; i < 16; i++)
+                        world.addParticle(ParticleTypes.MYCELIUM,
                                 pos.x + (random.nextFloat() - 0.5f) * 2f,
                                 pos.y + (random.nextFloat() - 0.5f) * 2f,
                                 pos.z + (random.nextFloat() - 0.5f) * 2f,
                                 0, 0, 0);
-                    }
                 }
 
-                this.setVoidTime(vTime - 1);
-                this.setDistanceOffset(0);
-                this.setAlpha(1f);
+                setVoidTime(vTime - 1);
+                setDistanceOffset(0);
+                setAlpha(0);
             } else {
                 if (getHalfBall()) {
-                    this.setAlpha(0.1f);
+                    setAlpha(0.1f);
                     user.onLanding();
                     user.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 5, 9, true, false));
 
@@ -504,9 +506,8 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
                             serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(user));
                         }
                     }
-                } else {
-                    this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
-                }
+                } else
+                    setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
             }
         }
     }

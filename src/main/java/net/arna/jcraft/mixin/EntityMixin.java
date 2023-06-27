@@ -1,6 +1,8 @@
 package net.arna.jcraft.mixin;
 
+import net.arna.jcraft.common.entity.KingCrimsonEntity;
 import net.arna.jcraft.common.entity.StandEntity;
+import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.ITimeStop;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
@@ -9,6 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
 public class EntityMixin implements ITimeStop {
@@ -48,6 +51,15 @@ public class EntityMixin implements ITimeStop {
             positionUpdater.accept(passenger, e.getX() + MathHelper.cos(y) * dist, d + heightOffset, e.getZ() + MathHelper.sin(y) * dist);
             info.cancel();
         }
+    }
+
+    /**
+     * Disables sprinting particles during time erase
+     */
+    @Inject(method = "shouldSpawnSprintingParticles", at = @At("HEAD"), cancellable = true)
+    private void jcraft$shouldSpawnSprintingParticles(CallbackInfoReturnable<Boolean> cir) {
+        if ( ((IEntityDataSaver)this).getStand() instanceof KingCrimsonEntity kc && kc.getTETime() > 0 )
+            cir.setReturnValue(false);
     }
     //todo (polishing): stand position autosolver
 }

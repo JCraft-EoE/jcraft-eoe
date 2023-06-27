@@ -36,11 +36,11 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
             .setInfo("Star Breaker", "uninterruptable launcher");
     public static final Attack barrage = new Attack(2, 17, 0.75f, 60, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 2, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public static final Attack starfinger = new Attack(3, 20, 0.75f, 20, 12, 1.75, 6f, -0.25f, AttackType.BOX, 1.5f, -0.25f)
+    public static final Attack starfinger = new Attack(3, 20, 0.75f, 20, 12, 1.75, 5f, -0.25f, AttackType.BOX, 1.5f, -0.25f)
             .setHitspark(2)
             .appendHitbox(new Attack.HitboxData(2, 0.5, 1))
             .setInfo("Star Finger", "medium windup, combo starter/extender");
-    public static final Attack lowkick = new Attack(4, 12, 0.75f, 12, 7, 1.5, 7f, 0.25f, AttackType.BOX, 0.4f, 0)
+    public static final Attack lowkick = new Attack(4, 12, 0.75f, 12, 7, 1.5, 6f, 0.25f, AttackType.BOX, 0.4f, 0)
             .setInfo("Roundhouse", "fast poke, low stun");
     public static final Attack chargebarrage = new Attack(5, 26, 5f, 55, 5, 1.5, 0.6f, 0.4f, AttackType.CHARGEBARRAGE, 1, 0, 3)
             .setRanged(true)

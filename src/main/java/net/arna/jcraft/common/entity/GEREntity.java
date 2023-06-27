@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.entity;
 
+import lombok.Data;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.*;
@@ -25,7 +26,6 @@ import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -39,6 +39,7 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,9 +72,18 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
     public static final Attack airbarrage = new Attack(5, 14, 1f, 48, 0, 1.5, 1f, 0.3f, AttackType.BARRAGE, 1, 0, 3)
             .setInfo("Kick Barrage", ""); //fast combo finisher, knocks back
     public static final Attack rtz = new Attack(10, 60, 32, 30, 0, 1, AttackType.BOX)
-            .setInfo("Return to Zero", "initial press: saves the state of every entity in a 4 chunk radius (save lasts 1 minute), second press: reverts all states except users\nDoesn't affect player inventories");
-    private static int rtzTimer;
-    private static final HashMap<Entity, NbtCompound> rtzEntityData = new HashMap<>();
+            .setInfo("Return to Zero", "initial press: saves the state of every entity in a 4 chunk radius, second press: reverts all states except users\nDoesn't affect player inventories");
+    private final HashMap<Entity, NbtCompound> rtzEntityData = new HashMap<>();
+    @Data
+    private class ReturnData {
+        Vec3d originalPos;
+        Entity entity;
+        public ReturnData(Vec3d originalPos, Entity entity) {
+            this.originalPos = originalPos;
+            this.entity = entity;
+        }
+    }
+    private final ArrayList<ReturnData> returnInformation = new ArrayList<>();
 
     private static final TrackedData<Integer> FLIGHTTIME;
 
@@ -158,18 +168,15 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
         CanAttackData data = canAttackWithData();
         if (!data.canAttack) return;
 
-        if (data.user.isOnGround()) {
-            if (handleAttack(barrage, JCraft.standBarrageCD, 5))
+        if (data.user.isOnGround() && handleAttack(barrage, JCraft.standBarrageCD, 5))
                 playSound(JSoundRegister.GE_BARRAGE, 1, 1);
-        } else {
-            if (handleAttack(airbarrage, JCraft.standBarrageCD, 12))
+        else if (handleAttack(airbarrage, JCraft.standBarrageCD, 12))
                 playSound(JSoundRegister.GER_KICKBARRAGE, 1, 1);
-        }
     }
 
     @Override
     public void initSpecial1() {
-        CanAttackData data = this.canAttackWithData();
+        CanAttackData data = canAttackWithData();
         if (!data.canAttack) return;
 
         if (data.user.isSneaking()) {
@@ -193,7 +200,7 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
 
     @Override
     public void initSpecial2() {
-        CanAttackData data = this.canAttackWithData();
+        CanAttackData data = canAttackWithData();
         if (!data.canAttack) return;
 
         if (data.user.isSneaking() && handleAttack(chargelaser, JCraft.standS2CD, 14))
@@ -204,7 +211,7 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
 
     @Override
     public void initSpecial3() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(counter, JCraft.standS3CD, 9))
             playSound(JSoundRegister.GE_HEAL, 1, 1);
     }
@@ -240,35 +247,35 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-
         if (rtzEntityData.isEmpty()) {
-            // Setup
-            if (handleAttack(rtz, JCraft.standUltCD, 13))
+            if (handleAttack(rtz, JCraft.standUltCD, 13)) // Setup
                 playSound(JSoundRegister.GER_SETUP, 1, 1);
         } else {
-            // Fun part
-            for (Map.Entry<Entity, NbtCompound> data :
-                    rtzEntityData.entrySet()) {
-                Entity ent = data.getKey();
-                if (!ent.isAlive()) continue;
-                NbtCompound nbt = data.getValue();
+            returnToZero();
+        }
+    }
 
-                if (ent instanceof PlayerEntity playerEntity) {
-                    nbt.put("Inventory", playerEntity.getInventory().writeNbt(new NbtList()));
-                    nbt.put("EnderItems", playerEntity.getEnderChestInventory().toNbtList());
+    private void returnToZero() {
+        for (Map.Entry<Entity, NbtCompound> data : rtzEntityData.entrySet()) {
+            Entity ent = data.getKey();
+            if (!ent.isAlive()) continue;
+            NbtCompound nbt = data.getValue();
 
-                    ServerPlayerEntity serverPlayer = ((ServerPlayerEntity) playerEntity);
-                    serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(ent));
-                    NbtList list = nbt.getList("Pos", 6);
-                    serverPlayer.teleport(list.getDouble(0), list.getDouble(1), list.getDouble(2));
-                }
+            if (ent instanceof PlayerEntity playerEntity) {
+                nbt.put("Inventory", playerEntity.getInventory().writeNbt(new NbtList()));
+                nbt.put("EnderItems", playerEntity.getEnderChestInventory().toNbtList());
 
-                ent.readNbt(nbt);
+                ServerPlayerEntity serverPlayer = ((ServerPlayerEntity) playerEntity);
+                serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(ent));
+                NbtList list = nbt.getList("Pos", 6);
+                serverPlayer.teleport(list.getDouble(0), list.getDouble(1), list.getDouble(2));
             }
 
-            rtzEntityData.clear();
-            rtzTimer = 0;
+            ent.readNbt(nbt);
         }
+
+        rtzEntityData.clear();
+        returnInformation.clear();
     }
 
     @Override
@@ -312,9 +319,8 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
                         stun(mob, 10, 0);
                         mob.setTarget(null);
                         mob.setAttacking(null);
-                        if (mob instanceof Angerable angerable) {
+                        if (mob instanceof Angerable angerable)
                             angerable.stopAnger();
-                        }
                     }
                 }
             }
@@ -336,6 +342,7 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
                     NbtCompound data = new NbtCompound();
                     e.writeNbt(data);
                     rtzEntityData.put(e, data);
+                    returnInformation.add(new ReturnData(e.getEyePos(), e));
                 }
             }
         }
@@ -343,31 +350,30 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
 
     @Override
     public void tick() {
-        if (age == 1) world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.GER_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
-
+        if (age == 1) playSound(JSoundRegister.GER_SUMMON, 1f, 1f);
         super.tick();
 
         if (hasUser()) {
+            PlayerEntity userPlayer = null;
             LivingEntity user = this.getUser();
             // Must be run on client and server because of fun mod compatibility
             int flightTime = getFlightTime();
             flightTime -= 1;
             setFlightTime(flightTime);
             if (user instanceof PlayerEntity playerEntity) {
-                if (!playerEntity.isCreative() && !playerEntity.isSpectator()) {
+                userPlayer = playerEntity;
+
+                if (!playerEntity.isCreative() && !playerEntity.isSpectator())
                     playerEntity.getAbilities().flying = (flightTime > 1);
-                }
             } else if (flightTime > 1) {
                 double y = user.getY();
                 Vec3d vel = new Vec3d(user.getVelocity().x, 0.0, user.getVelocity().z);
                 // Targetting priority
                 LivingEntity targetEntity = user.getDamageTracker().getBiggestAttacker();
-                if (targetEntity == null && user instanceof MobEntity mob) {
+                if (targetEntity == null && user instanceof MobEntity mob)
                     targetEntity = mob.getTarget();
-                }
-                if (targetEntity == null) {
+                if (targetEntity == null)
                     targetEntity = user.getAttacker();
-                }
                 // If target wasn't found, search in a radius
                 Vec3d target = targetEntity != null ? targetEntity.getEyePos() : this.getPos().add(Math.sin(this.age * 0.2) * 3, 0, Math.cos(this.age * 0.2) * 3);
 
@@ -384,10 +390,31 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
 
             if (world.isClient) {
                 setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
-            } else if (rtzTimer > 0) {
-                rtzTimer -= 1;
-                if (rtzTimer == 0) {
-                    rtzEntityData.clear();
+            } else {
+                /*
+                if (rtzTimer-- > 0)
+                    if (rtzTimer == 0)
+                        rtzEntityData.clear();
+                 */
+
+                if (userPlayer instanceof ServerPlayerEntity serverPlayer) {
+                    for (ReturnData data : returnInformation) {
+                        Entity entity = data.getEntity();
+                        if (entity == null || !entity.isAlive()) continue;
+                        Vec3d position = data.getOriginalPos();
+                        PacketByteBuf buf = PacketByteBufs.create();
+                        buf.writeShort(7);
+
+                        buf.writeInt(entity.getId());
+
+                        buf.writeDouble(position.getX());
+                        buf.writeDouble(position.getY());
+                        buf.writeDouble(position.getZ());
+
+                        ServerChannelFeedbackPacket.send(
+                                serverPlayer, buf
+                        );
+                    }
                 }
             }
         }
