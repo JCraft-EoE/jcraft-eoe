@@ -206,6 +206,7 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
         if (handleAttack(flag, JCraft.utilCD, 11)) {
             getUser().addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, flag.moveStun, 0, true, false));
             getUser().addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, flag.moveStun, 0, true, false));
+            playSound(JSoundRegister.D4C_UTILITY, 1, 1);
         }
     }
 

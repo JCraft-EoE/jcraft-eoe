@@ -75,10 +75,13 @@ public interface JObjectRegistry {
 
     //Block
     Block FOOLISH_SAND_BLOCK = register("foolish_sand_block", new FoolishSandBlock(FabricBlockSettings.of(Material.AGGREGATE, MapColor.PALE_YELLOW)
-                    .strength(0.5f)
-                    .sounds(BlockSoundGroup.SAND)
-            ), settings(), true);
-    Block SOUL_BLOCK = register("soul_block", new SoulBlock(FabricBlockSettings.of(Material.DENSE_ICE).strength(4.0f)), settings(), true);
+            .strength(0.5f)
+            .sounds(BlockSoundGroup.SAND)
+    ), settings(), true);
+    Block SOUL_BLOCK = register("soul_block", new SoulBlock(FabricBlockSettings.of(Material.DENSE_ICE, MapColor.LIGHT_BLUE_GRAY)
+            .strength(4.0f)
+            .sounds(BlockSoundGroup.SOUL_SOIL)
+    ), settings(), true);
     Block SHADER_TEST_BLOCK = register("shader_test_block", new ShaderTestBlock(FabricBlockSettings.of(Material.METAL)), settings(), true);
 
     static Item.Settings settings() {

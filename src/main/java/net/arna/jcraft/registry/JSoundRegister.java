@@ -8,7 +8,7 @@ import net.minecraft.util.registry.Registry;
 public interface JSoundRegister {
 
     static SoundEvent registerSound(String id) {
-//        JCraft.LOGGER.info("Registering sound: " + id); // Probably unnecessary
+        //JCraft.LOGGER.info("Registering sound: " + id);
         SoundEvent event = new SoundEvent(new Identifier(JCraft.MOD_ID, id));
         Registry.register(Registry.SOUND_EVENT, id, event);
         return event;
@@ -73,6 +73,8 @@ public interface JSoundRegister {
     SoundEvent REVOLVER_FIRE = registerSound("revolverfire");
     SoundEvent D4C_THROW = registerSound("d4cthrow");
     SoundEvent D4C_COUNTER = registerSound("d4ccounter");
+    SoundEvent D4C_UTILITY = registerSound("d4cutility");
+    SoundEvent D4C_ALT_UNIVERSE_AMBIENCE = registerSound("altuniverseambience");
 
     //Cream
     SoundEvent CREAM_SUMMON = registerSound("creamsummon");
@@ -125,8 +127,6 @@ public interface JSoundRegister {
     SoundEvent SC_ARMOROFF = registerSound("scarmoroff");
     SoundEvent SC_POKE = registerSound("scpoke");
 
-    //Magicians Red
-
     //Golden Experience
     SoundEvent GE_SUMMON = registerSound("gesummon");
     SoundEvent GE_BARRAGE = registerSound("gebarrage");
@@ -143,12 +143,16 @@ public interface JSoundRegister {
     SoundEvent GER_SLOW_LASER = registerSound("gerslowlaser");
     SoundEvent GER_KICKBARRAGE = registerSound("gerkickbarrage");
     SoundEvent GER_SETUP = registerSound("gersetup");
+    SoundEvent GER_FLY = registerSound("gerfly");
+    SoundEvent GER_RTZ = registerSound("gerrtz");
 
     //The Fool
     SoundEvent FOOL_BARK1 = registerSound("foolbark1");
     SoundEvent FOOL_BARK2 = registerSound("foolbark2");
     SoundEvent FOOL_LAUNCH = registerSound("foollaunch");
     SoundEvent FOOL_CHARGE = registerSound("foolcharge");
+    SoundEvent FOOL_ULT = registerSound("foolultimate");
+    SoundEvent FOOL_GLIDE = registerSound("foolglide");
 
     //C-Moon
     SoundEvent CMOON_SUMMON = registerSound("cmoonsummon");

@@ -26,6 +26,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -368,12 +369,14 @@ public class JCraft implements ModInitializer {
         Vec3d pos = entity.getPos();
         Entity finalEnt = entity;
 
-        if (entity instanceof ServerPlayerEntity player)
+        if (entity instanceof ServerPlayerEntity player) {
             player.teleport(au, pos.x, pos.y - heightOffset, pos.z, entity.getYaw(), entity.getPitch());
-        else
+            player.networkHandler.sendPacket(
+                    new PlaySoundS2CPacket(JSoundRegister.D4C_ALT_UNIVERSE_AMBIENCE, SoundCategory.MUSIC, pos.x, pos.y - heightOffset, pos.z, 1.0F, 1.0F, 0)
+            );
+        } else
             finalEnt = teleportToWorld(entity, au, entity.getX(), entity.getY() - heightOffset, entity.getZ());
 
         pastDimensions.add(new DimValues(finalEnt, pos, original.getRegistryKey()));
-        au.playSound(null, pos.x, pos.y - heightOffset, pos.z, SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0F, 1.0F);
     }
 }

@@ -196,6 +196,8 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
         if (data.getInt(JCraft.utilCD) > 0) return;
         data.putInt(JCraft.utilCD, 360); // 18 second flight cd
         setFlightTime(20);
+
+        playSound(JSoundRegister.GER_FLY, 1, 1);
     }
 
     @Override
@@ -276,6 +278,8 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
 
         rtzEntityData.clear();
         returnInformation.clear();
+
+        playSound(JSoundRegister.GER_RTZ, 1, 1);
     }
 
     @Override

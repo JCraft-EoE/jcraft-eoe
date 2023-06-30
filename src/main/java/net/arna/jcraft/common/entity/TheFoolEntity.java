@@ -230,7 +230,7 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
     public void initUlt() {
         if (!canAttack()) return;
         if (handleAttack(sandstorm, JCraft.standUltCD, 12))
-            playSound(JSoundRegister.FOOL_CHARGE, 1, 1);
+            playSound(JSoundRegister.FOOL_ULT, 1, 1);
     }
 
     private int slamType = 0;
@@ -285,7 +285,7 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
             setSand(true);
             setFree(false);
 
-            playSound(JSoundRegister.FOOL_BARK2, 1, 1);
+            playSound(JSoundRegister.FOOL_GLIDE, 1, 1);
         }
     }
 
