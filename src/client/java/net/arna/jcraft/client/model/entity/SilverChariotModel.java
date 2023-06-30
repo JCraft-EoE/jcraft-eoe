@@ -31,6 +31,6 @@ public class SilverChariotModel extends AnimatedTickingGeoModel<SilverChariotEnt
     public void setCustomAnimations(SilverChariotEntity animatable, int instanceId, AnimationEvent animationEvent) {
         super.setCustomAnimations(animatable, instanceId, animationEvent);
         if (animatable.hasUser())
-            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), animationEvent.getPartialTick(), true, true);
+            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), animationEvent.getPartialTick(), true, true, 0, -0.2f);
     }
 }

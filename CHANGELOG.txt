@@ -1013,6 +1013,21 @@ Golden Experience: Requiem
     >Return to Zero
         >Now displays particles moving towards the original position of each entity
 
+● 27/6/2023
+>Fixed bug where Sheathed Anubis had sword attack attributes
+
+Silver Chariot
+    >M1 startup reduced (5->4t)
+    >Heavy cooldown reduced (18->15s)
+    >Cleave cooldown reduced (26->23s)
+    >Ray Dart
+        >Startup reduced (14->12t)
+        >Now accessible during Possessed state
+        >Increased speed
+    >Shooting Star
+        >Replaces Ray Dart in normal state
+        >New can be aimed in any direction
+
 priority (top to bottom)
 TODO: AI flags for unblockables and shouldn't-blockables
 TODO: stand summon particles

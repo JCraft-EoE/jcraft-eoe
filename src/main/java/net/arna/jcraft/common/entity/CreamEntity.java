@@ -454,9 +454,12 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
                     toDamage.remove(this);
 
                     for (LivingEntity ent : toDamage) {
-                        stun(ent, 2, 1);
+                        if (age % 4 == 0)
+                            stun(ent, 2, 1);
                         ent.damage(DamageSource.OUT_OF_WORLD, charging ? 4 : 2.5f);
-                    } if (notCorS)
+                    }
+
+                    if (notCorS)
                         user.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 25, 0, false, false));
                 } else {
                     for (int i = 0; i < 16; i++)

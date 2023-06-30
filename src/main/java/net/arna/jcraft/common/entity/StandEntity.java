@@ -632,9 +632,7 @@ public abstract class StandEntity extends MobEntity {
         );
          */
 
-        if (client) {
-
-        } else {
+        if (!client) {
             // Reset samestate
             if (getSameState()) setSameState(false);
 

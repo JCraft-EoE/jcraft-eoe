@@ -1,5 +1,8 @@
 package net.arna.jcraft.common.item;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import net.arna.jcraft.common.spec.AnubisSpec;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.IEntityDataSaver;
@@ -8,6 +11,9 @@ import net.arna.jcraft.common.util.JCraftUtils;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.attribute.EntityAttribute;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -29,6 +35,11 @@ public class SheathedAnubisItem extends AnubisItem {
 
     public UseAction getUseAction(ItemStack stack) {
         return UseAction.BLOCK;
+    }
+
+    @Override
+    public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot slot) {
+        return ImmutableMultimap.of();
     }
 
     public int getMaxUseTime(ItemStack stack) {

@@ -313,7 +313,6 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
         return MoveSelectionResult.PASS;
     }
 
-    @SuppressWarnings("SuspiciousMethodCalls")
     @Override
     public void tick() {
         if (age == 1) playSound(JSoundRegister.STAND_SUMMON, 1f, 1f);
@@ -322,68 +321,72 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
         if (hasUser()) {
             LivingEntity user = getUser();
             if (world.isClient)
-                setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
-            else if (user instanceof ServerPlayerEntity playerEntity) {
-                boolean bombIsBlock = bombBlock != null;
-                boolean bombExists = (bombEntity != null || bombIsBlock);
+                setAlpha((float) MathHelper.clamp(255.0 * squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
+            else if (user instanceof ServerPlayerEntity playerEntity)
+                displayBombParticles(playerEntity, this.bombBlock, this.bombEntity);
+        }
+    }
 
-                double dX1 = 0;
-                double dY1 = 0;
-                double dZ1 = 0;
-                double dX2 = 0;
-                double dY2 = 0;
-                double dZ2 = 0;
+    @SuppressWarnings("SuspiciousMethodCalls")
+    protected void displayBombParticles(ServerPlayerEntity playerEntity, Vec3d bombBlock, Entity bombEntity) {
+        boolean bombIsBlock = bombBlock != null;
+        boolean bombExists = (bombEntity != null || bombIsBlock);
 
-                Box bBox = null;
+        double dX1 = 0;
+        double dY1 = 0;
+        double dZ1 = 0;
+        double dX2 = 0;
+        double dY2 = 0;
+        double dZ2 = 0;
 
-                if (bombEntity != null) { // If the bomb isn't a block
-                    dX1 = bombEntity.getX();
-                    dY1 = bombEntity.getY();
-                    dZ1 = bombEntity.getZ();
+        Box bBox = null;
 
-                    bBox = bombEntity.getBoundingBox();
+        if (bombEntity != null) { // If the bomb isn't a block
+            dX1 = bombEntity.getX();
+            dY1 = bombEntity.getY();
+            dZ1 = bombEntity.getZ();
 
-                    dX2 = bBox.getXLength();
-                    dY2 = bBox.getYLength();
-                    dZ2 = bBox.getZLength();
-                } else if (bombIsBlock) { // If the bomb is a block
-                    dX1 = bombBlock.getX();
-                    dY1 = bombBlock.getY();
-                    dZ1 = bombBlock.getZ();
+            bBox = bombEntity.getBoundingBox();
 
-                    dX2 = dY2 = dZ2 = 1.41;
+            dX2 = bBox.getXLength();
+            dY2 = bBox.getYLength();
+            dZ2 = bBox.getZLength();
+        } else if (bombIsBlock) { // If the bomb is a block
+            dX1 = bombBlock.getX();
+            dY1 = bombBlock.getY();
+            dZ1 = bombBlock.getZ();
+
+            dX2 = dY2 = dZ2 = 1.41;
+        }
+
+        if (bombExists) {
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeShort(4);
+
+            buf.writeDouble(dX1);
+            buf.writeDouble(dY1);
+            buf.writeDouble(dZ1);
+
+            buf.writeDouble(dX2);
+            buf.writeDouble(dY2);
+            buf.writeDouble(dZ2);
+
+            boolean anyInRange = false;
+            Vec3d bPos = getBombPos();
+            Vec3d v1 = bPos.add(3, 3, 3);
+            Vec3d v2 = bPos.add(-3, -3, -3);
+            List<LivingEntity> list = world.getEntitiesByClass(LivingEntity.class, new Box(v1, v2), EntityPredicates.VALID_LIVING_ENTITY);
+            list.remove(bombEntity);
+            for (LivingEntity l : list)
+                if (l.squaredDistanceTo(bPos) < 9) {
+                    anyInRange = true;
+                    break;
                 }
 
-                if (bombExists) {
-                    PacketByteBuf buf = PacketByteBufs.create();
-                    buf.writeShort(4);
+            buf.writeBoolean(anyInRange);
 
-                    buf.writeDouble(dX1);
-                    buf.writeDouble(dY1);
-                    buf.writeDouble(dZ1);
-
-                    buf.writeDouble(dX2);
-                    buf.writeDouble(dY2);
-                    buf.writeDouble(dZ2);
-
-                    boolean anyInRange = false;
-                    Vec3d bPos = getBombPos();
-                    Vec3d v1 = bPos.add(3, 3, 3);
-                    Vec3d v2 = bPos.add(-3, -3, -3);
-                    List<LivingEntity> list = world.getEntitiesByClass(LivingEntity.class, new Box(v1, v2), EntityPredicates.VALID_LIVING_ENTITY);
-                    list.remove(bombEntity);
-                    for (LivingEntity l : list)
-                        if (l.squaredDistanceTo(bPos) < 9) {
-                            anyInRange = true;
-                            break;
-                        }
-
-                    buf.writeBoolean(anyInRange);
-
-                    if ( (bBox != null && bBox.getAverageSideLength() > 0) || bombIsBlock )
-                        ServerChannelFeedbackPacket.send(playerEntity, buf);
-                }
-            }
+            if ((bBox != null && bBox.getAverageSideLength() > 0) || bombIsBlock)
+                ServerChannelFeedbackPacket.send(playerEntity, buf);
         }
     }
 
@@ -413,8 +416,8 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
             controller.setAnimation(builder.playOnce("animation.killerqueen.summon"));
             return PlayState.CONTINUE;
         }
-        if (this.getSameState()) controller.markNeedsReload();
-        switch (this.getState()) {
+        if (getSameState()) controller.markNeedsReload();
+        switch (getState()) {
             default -> controller.setAnimation(builder.loop("animation.killerqueen.idle"));
             case 2 -> controller.setAnimation(builder.playAndHold("animation.killerqueen.light"));
             case 3 -> controller.setAnimation(builder.loop("animation.killerqueen.block"));

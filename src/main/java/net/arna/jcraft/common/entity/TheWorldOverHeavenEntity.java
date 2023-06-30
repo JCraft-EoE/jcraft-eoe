@@ -499,8 +499,8 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
             controller.setAnimation(builder.loop("animation.twoh.summon"));
             return PlayState.CONTINUE;
         }
-        if (this.getSameState()) controller.markNeedsReload();
-        switch (this.getState()) {
+        if (getSameState()) controller.markNeedsReload();
+        switch (getState()) {
             default -> controller.setAnimation(builder.loop("animation.twoh.idle"));
             case 2 -> controller.setAnimation(builder.playAndHold("animation.twoh.light"));
             case 3 -> controller.setAnimation(builder.loop("animation.twoh.block"));

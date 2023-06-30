@@ -219,8 +219,7 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
 
     @Override
     public void tick() {
-        if (age == 1)
-            this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.MR_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
+        if (age == 1) playSound(JSoundRegister.MR_SUMMON, 1f, 1f);
         super.tick();
 
         if (hasUser()) {

@@ -33,35 +33,34 @@ import java.util.List;
 import static net.arna.jcraft.common.util.Attack.unusable;
 
 public class SilverChariotEntity extends StandEntity implements IAnimatable, IAnimationTickable {
-
-    public final Attack light = new Attack(0, 2, 0.65f, 9, 6, 1.75, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0)
+    public final Attack light = new Attack(0, 2, 0.65f, 9, 5, 1.75, 5f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0)
             .setInfo("Stab", "quick combo starter, links into Spinning Blade while armor is off");
     public final Attack barrage = new Attack(2, 17, 0.65f, 60, 0, 2.25, 0.9f, 0.1f, AttackType.BARRAGE, 1.25f, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public final Attack heavy = new Attack(1, 18, 0.65f, 28, 20, 2.0, 8f, 1.5f, AttackType.BOX, 0.5f)
+    public final Attack heavy = new Attack(1, 15, 0.65f, 28, 20, 2.0, 8f, 1.5f, AttackType.BOX, 0.5f)
             .setHitspark(2)
             .setArmor(true)
             .setLaunch()
             .setInfo("Impaling Thrust", "slow, uninterruptable launcher");
     public final Attack spinbarrage = new Attack(3, 25, 0.65f, 24, 7, 2, 1f, 0.1f, AttackType.BARRAGE, 0.50f, 0, 2)
             .setInfo("Spinning Blade", "fast reliable combo starter/extender, low stun");
-    public final Attack charge = new Attack(4, 18, 0.65f, 25, 15, 1.75, 5f, 0.25f, AttackType.BOX, 0.65f, -0.2f, 0)
+    public final Attack pcharge = new Attack(4, 18, 0.65f, 25, 13, 1.75, 5f, 0.25f, AttackType.BOX, 0.75f, -0.2f, 0)
             .setRanged(true)
             .setMobility(MobilityType.DASH)
-            .setBlockstun(15)
-            .setInfo("Ray Dart", "Silver Chariot and the user charge forward, combo finisher (base form), combo extender (armor off)");
-    public final Attack cleave = new Attack(5, 26, 0.75f, 21, 12, 2.5, 9f, 0.8f, AttackType.BOX, 1f, 0, 0)
+            .setBlockstun(17)
+            .setInfo("Ray Dart", "Silver Chariot and the user charge forward, combo finisher");
+    public final Attack cleave = new Attack(5, 23, 0.75f, 21, 12, 2.5, 9f, 0.8f, AttackType.BOX, 1f, 0, 0)
             .setHitspark(2)
             .setArmor(true)
             .setInfo("Cleave", "Silver Chariot detaches from the user, delivering an uninterruptable, combo-starting slice");
-    public final Attack pcharge = new Attack(6, 22, 8f, 19, 5, 1.5, 5f, 0.25f, AttackType.CHARGE, 0.85f, 0, 9)
+    public final Attack charge = new Attack(6, 22, 8f, 19, 5, 1.5, 5f, 0.25f, AttackType.CHARGE, 0.85f, 0, 9)
             .setRanged(true)
             .disableBackstab()
-            .setInfo("Invincible Blade", "Silver Chariot detaches from the user and charges forward, combo starter/extender");
+            .setInfo("Shooting Star", "Silver Chariot detaches from the user and charges in the looked direction, combo starter/extender");
     public final Attack counter = new Attack(7, 32, 0.5f, 44, 4, 0, 0, 0, AttackType.COUNTER)
             .setInfo("Counter", "0.2s windup, 2s duration, stuns when hit");
     public final Attack pbeatdown = new Attack(8, 50, 0.65f, 28, 23, 1.75, 4f, 0f, AttackType.BOX, 2, 0, 0)
-            .setHitspark(2)
+            .setHitspark(-4)
             .setStunType(0)
             .setInfo("God of Death", "high-damage beatdown, 1.5s stun on whiff, cannot be combo broken");
     public final Attack mainbeatdown = new Attack(9, 0, 0.65f, 59, 0, 2.0, 4.5f, 0.75f, AttackType.MULTIHIT, 1.6f, 0, List.of(13, 23), JSoundRegister.IMPACT_1)
@@ -116,7 +115,8 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
         cons = List.of(
                 "high execution requirement",
                 "individual forms have limited movesets",
-                "below-average damage output"
+                "below-average damage output",
+                "lacking in mobility"
         );
 
         setNormalDesc();
@@ -184,18 +184,21 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
     @Override
     public void initSpecial2() {
         if (!canAttack()) return;
-        if (this.getMode() == 3) {
-            if (handleAttack(this.pcharge, JCraft.standS2CD, 8)) {
+        Entity ent = getUser();
+        if (getMode() == 3) {
+            if (handleAttack(this.pcharge, JCraft.standS2CD, 7)) {
                 //playSound(ModSoundRegister.PSC_CHARGE,1, 1);
-            }
-        } else {
-            if (handleAttack(this.charge, JCraft.standS2CD, 7)) {
-                Entity ent = this.getUser();
                 if (ent.isOnGround()) {
-                    ent.setVelocity(ent.getVelocity().add(this.getRotationVector().multiply(0.75)).add(0.0, 0.15, 0.0));
+                    ent.setVelocity(ent.getVelocity().add(getRotationVector().multiply(0.85)).add(0.0, 0.15, 0.0));
                     ent.velocityModified = true;
                 }
                 playSound(JSoundRegister.SC_CHARGE, 1, 1);
+
+            }
+        } else {
+            if (handleAttack(this.charge, JCraft.standS2CD, 8)) {
+                lookDirY = (float) ent.getRotationVector().y;
+                lookDirY *= MathHelper.abs(lookDirY);
             }
         }
     }
@@ -248,10 +251,11 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
 
         userData.getPersistentData().putInt(cooldownName, attack.cooldown * 20);
 
-        this.setState(animState);
+        setState(animState);
         return true;
     }
 
+    private float lookDirY = 0.0F;
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
         switch (attack.id) {
@@ -277,7 +281,8 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
         super.counter(entity, source);
         if (entity instanceof LivingEntity ent) {
             stun(ent, 30, 0);
-            if (entity.getFirstPassenger() instanceof StandEntity stand) stand.cancelAttack();
+            StandEntity stand = ((IEntityDataSaver)ent).getStand();
+            if (stand != null) stand.cancelAttack();
         }
     }
 
@@ -327,9 +332,12 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
                     setNormalDesc();
                 }
 
-                if (mode == 2) {
-                    armorTime -= 1;
-                    if (armorTime < 1) setMode(1);
+                if (mode == 2 && armorTime-- < 1) setMode(1);
+
+                if (curAttack != null && curAttack.id == charge.id) {
+                    Vec3f chargePos = getFreePos();
+                    chargePos.add(0, lookDirY, 0);
+                    setFreePos(chargePos);
                 }
             }
         }
@@ -368,8 +376,8 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
             return PlayState.CONTINUE;
         }
 
-        if (this.getSameState()) controller.markNeedsReload();
-        switch (this.getState()) {
+        if (getSameState()) controller.markNeedsReload();
+        switch (getState()) {
             default -> controller.setAnimation(builder.loop(idleAnim));
             case 2 -> controller.setAnimation(builder.playAndHold("animation.silverchariot.stab"));
             case 3 -> controller.setAnimation(builder.loop("animation.silverchariot.block"));

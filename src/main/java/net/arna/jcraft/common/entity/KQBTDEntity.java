@@ -1,12 +1,13 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.MobilityType;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.arna.jcraft.registry.JObjectRegistry;
+import net.arna.jcraft.registry.JSoundRegister;
+import net.arna.jcraft.registry.JStatusRegister;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
@@ -19,7 +20,6 @@ import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -40,7 +40,6 @@ import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
-import net.arna.jcraft.registry.*;
 
 import java.util.List;
 
@@ -360,79 +359,15 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
                 }
 
                 if (userData != null && !userData.isEmpty()) {
-                    ticksDataStored += 1;
-                    if (ticksDataStored > 400) {
+                    if (ticksDataStored++ > 400) {
                         ticksDataStored = 0;
                         userData = null;
                         targetData = null;
                     }
                 }
 
-                if (user instanceof PlayerEntity playerEntity) {
-                    boolean bombExists = (bombEntity != null || bombBlock != null);
-
-                    double dX1 = 0;
-                    double dY1 = 0;
-                    double dZ1 = 0;
-                    double dX2 = 0;
-                    double dY2 = 0;
-                    double dZ2 = 0;
-
-                    Box bBox = null;
-
-                    if (bombEntity != null) { // If the bomb isn't a block
-                        dX1 = bombEntity.getX();
-                        dY1 = bombEntity.getY();
-                        dZ1 = bombEntity.getZ();
-
-                        bBox = bombEntity.getBoundingBox();
-
-                        dX2 = bBox.getXLength();
-                        dY2 = bBox.getYLength();
-                        dZ2 = bBox.getZLength();
-                    } else if (bombBlock != null) { // If the bomb is a block
-                        dX1 = bombBlock.getX();
-                        dY1 = bombBlock.getY();
-                        dZ1 = bombBlock.getZ();
-
-                        dX2 = dY2 = dZ2 = 1.41;
-                    }
-
-                    if (bombExists) {
-                        PacketByteBuf buf = PacketByteBufs.create();
-                        buf.writeShort(4);
-
-                        buf.writeDouble(dX1);
-                        buf.writeDouble(dY1);
-                        buf.writeDouble(dZ1);
-
-                        buf.writeDouble(dX2);
-                        buf.writeDouble(dY2);
-                        buf.writeDouble(dZ2);
-
-                        boolean anyInRange = false;
-                        Vec3d bPos = this.getBombPos();
-                        Vec3d v1 = bPos.add(3, 3, 3);
-                        Vec3d v2 = bPos.add(-3, -3, -3);
-                        List<LivingEntity> list = this.world.getEntitiesByClass(LivingEntity.class, new Box(v1, v2), EntityPredicates.VALID_LIVING_ENTITY);
-                        list.remove(bombEntity);
-                        for (LivingEntity l :
-                                list) {
-                            if (l.squaredDistanceTo(bPos) < 9) {
-                                anyInRange = true;
-                                break;
-                            }
-                        }
-
-                        buf.writeBoolean(anyInRange);
-
-                        if (bBox == null || bBox.getAverageSideLength() > 0) {
-                            if (playerEntity instanceof ServerPlayerEntity serverPlayerEntity) {
-                                ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
-                            }
-                        }
-                    }
-                }
+                if (user instanceof ServerPlayerEntity playerEntity)
+                    super.displayBombParticles(playerEntity, this.bombBlock, this.bombEntity);
             }
         }
     }
@@ -459,10 +394,12 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
         AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 
-
-
+        if (playSummonAnim) {
+            controller.setAnimation(builder.playOnce("animation.kqbtd.summon"));
+            return PlayState.CONTINUE;
+        }
         if (getSameState()) controller.markNeedsReload();
-        switch (this.getState()) {
+        switch (getState()) {
             default -> controller.setAnimation(builder.loop("animation.kqbtd.idle"));
             case 2 -> controller.setAnimation(builder.playAndHold("animation.kqbtd.light"));
             case 3 -> controller.setAnimation(builder.loop("animation.kqbtd.block"));

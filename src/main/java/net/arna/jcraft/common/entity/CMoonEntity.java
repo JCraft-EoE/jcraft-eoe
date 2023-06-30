@@ -280,7 +280,7 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
 
     @Override
     public void tick() {
-        if (age == 1) this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.CMOON_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
+        if (age == 1) playSound(JSoundRegister.CMOON_SUMMON, 1f, 1f);
         super.tick();
 
         if (hasUser()) {

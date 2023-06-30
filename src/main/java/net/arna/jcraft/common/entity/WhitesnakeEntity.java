@@ -70,7 +70,7 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
                 "unsafe pokes"
         );
 
-        description = "All Range SPECIALIST";
+        description = "All Range DISABLER";
 
         freespace =
                 "BNBs:\n" +
@@ -163,8 +163,7 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
 
     @Override
     public void tick() {
-        if (age == 1)
-            this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.WS_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
+        if (age == 1) playSound(JSoundRegister.WS_SUMMON, 1f, 1f);
         super.tick();
 
         if (getRemote()) {
