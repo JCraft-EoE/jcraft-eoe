@@ -27,6 +27,6 @@ public class KQBTDModel extends AnimatedTickingGeoModel<KQBTDEntity> {
     public void setCustomAnimations(KQBTDEntity animatable, int instanceId, AnimationEvent animationEvent) {
         super.setCustomAnimations(animatable, instanceId, animationEvent);
         if (animatable.hasUser())
-            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), animationEvent.getPartialTick());
+            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), animationEvent.getPartialTick(), true, true, 0, -0.2f);
     }
 }

@@ -1028,6 +1028,10 @@ Silver Chariot
         >Replaces Ray Dart in normal state
         >New can be aimed in any direction
 
+● 30/6/2023
+Killer Queen: Bites the Dust
+    >Reanimated and remodeled
+
 priority (top to bottom)
 TODO: AI flags for unblockables and shouldn't-blockables
 TODO: stand summon particles
