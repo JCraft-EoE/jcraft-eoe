@@ -28,6 +28,16 @@ public class RenderUtils {
         return null;
     }
 
+    public static void renderGuiQuad(BufferBuilder buffer, int x, int y, int width, int height, int red, int green, int blue, int alpha) {
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        buffer.vertex((x + 0), (double)(y + 0), 0.0).color(red, green, blue, alpha).next();
+        buffer.vertex((x + 0), (double)(y + height), 0.0).color(red, green, blue, alpha).next();
+        buffer.vertex((double)(x + width), (double)(y + height), 0.0).color(red, green, blue, alpha).next();
+        buffer.vertex((double)(x + width), (double)(y + 0), 0.0).color(red, green, blue, alpha).next();
+        BufferRenderer.drawWithShader(buffer.end());
+    }
+
     public static void vertexPos(VertexConsumer vertexConsumer, Matrix4f last, float x, float y, float z) {
         vertexConsumer.vertex(last, x, y, z).next();
     }

@@ -2,6 +2,7 @@ package net.arna.jcraft.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.hud.JCraftAbilityHud;
 import net.arna.jcraft.client.hud.JCraftHudOverlay;
 import net.arna.jcraft.client.net.ClientPacketHandler;
 import net.arna.jcraft.client.particle.*;
@@ -117,6 +118,8 @@ public class JCraftClient implements ClientModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(this::tickClient);
         ClientTickEvents.END_WORLD_TICK.register(new SkyBoxManager());
+        ClientTickEvents.END_CLIENT_TICK.register(new JCraftAbilityHud());
+
         ClientPlayNetworking.registerGlobalReceiver(ServerChannelFeedbackPacket.ID, (client, handler, buf, sender) -> ClientPacketHandler.handleChannelFeedback(client, buf));
         ClientPlayNetworking.registerGlobalReceiver(ShaderActivationPacket.ID, (client, handler, buf, sender) -> ClientPacketHandler.handleShaderActivation(client, buf));
         ClientPlayNetworking.registerGlobalReceiver(ShaderDeactivationPacket.ID, (client, handler, buf, sender) -> ClientPacketHandler.handleShaderDeactivation(client, buf));
@@ -124,6 +127,7 @@ public class JCraftClient implements ClientModInitializer {
 
         HudRenderCallback.EVENT.register(new JCraftHudOverlay());
         HudRenderCallback.EVENT.register(this::renderHud);
+        HudRenderCallback.EVENT.register(new JCraftAbilityHud());
 
         Identifier itemId = JObjectRegistry.ITEMS.get(JObjectRegistry.DEBUG_WAND);
         BigItemRenderer itemRenderer = new BigItemRenderer(itemId);
