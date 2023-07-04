@@ -6,13 +6,16 @@ import net.arna.jcraft.client.JCraftClient;
 import net.arna.jcraft.client.util.RenderUtils;
 import net.arna.jcraft.common.JConfig;
 import net.arna.jcraft.common.entity.StandEntity;
+import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.util.JCraftUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.*;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
@@ -34,17 +37,21 @@ public class JCraftAbilityHud extends DrawableHelper implements HudRenderCallbac
     static final IconPos LIGHT = new IconPos("light", 10, iconSpacing * 2);
     static final IconPos HEAVY = new IconPos("heavy", 10, iconSpacing * 5); // 2 + 3 * N
     static final IconPos BARRAGE = new IconPos("barrage", 10, iconSpacing * 8);
-
     static final IconPos UTILITY = new IconPos("utility", 10, iconSpacing * 11);
-
     static final IconPos SPECIAL_1 = new IconPos("special1", 10, iconSpacing * 14);
     static final IconPos SPECIAL_2 = new IconPos("special2", 10, iconSpacing * 17);
     static final IconPos SPECIAL_3 = new IconPos("special3", 10, iconSpacing * 20);
-
     static final IconPos ULT = new IconPos("ult", 10, iconSpacing * 23);
 
+    // Spec-only icons
+    static final IconPos SPEC_SPECIAL_1 = new IconPos("special1", 10, iconSpacing * 11);
+    static final IconPos SPEC_SPECIAL_2 = new IconPos("special2", 10, iconSpacing * 14);
+    static final IconPos SPEC_SPECIAL_3 = new IconPos("special3", 10, iconSpacing * 17);
+    static final IconPos SPEC_ULT = new IconPos("ult", 10, iconSpacing * 20);
 
-    final List<IconPos> ICONS = Arrays.asList(LIGHT, HEAVY, BARRAGE, UTILITY, SPECIAL_1, SPECIAL_2, SPECIAL_3, ULT);
+
+    final List<IconPos> STANDICONS = Arrays.asList(LIGHT, HEAVY, BARRAGE, UTILITY, SPECIAL_1, SPECIAL_2, SPECIAL_3, ULT);
+    final List<IconPos> SPECICONS = Arrays.asList(HEAVY, BARRAGE, SPEC_SPECIAL_1, SPEC_SPECIAL_2, SPEC_SPECIAL_3, SPEC_ULT);
 
     private static int getHudX(int scaledX) {
         switch (JConfig.UI_POSITION) {
@@ -74,22 +81,45 @@ public class JCraftAbilityHud extends DrawableHelper implements HudRenderCallbac
 
         if (player != null) {
             StandEntity stand = ( (IEntityDataSaver)player ).getStand();
-            if (stand == null) return;
+            JCraftSpec spec = JCraftUtils.getSpec(player);
+            if (stand == null) {
+                // Render cooldown HUD for specs
+                if (spec != null) {
+                    for (int i = 0; i < SPECICONS.size(); i++) {
+                        IconPos iconPos = SPECICONS.get(i);
+                        int iconY = iconPos.y();
 
-            for (int i = 0; i < ICONS.size(); i++) {
-                IconPos iconPos = ICONS.get(i);
-                int iconY = iconPos.y();
+                        if (JConfig.UI_POSITION == JConfig.UIPos.MIDDLE) { // Special positioning for middle HUD position
+                            iconY += iconSpacing * 11;
+                            if (i > 3) {
+                                iconY -= iconSpacing * 12;
+                                if (i == 4) selectedX += 28; // 22x22 border with 6px spacing
+                            }
+                        }
 
-                if (JConfig.UI_POSITION == JConfig.UIPos.MIDDLE) { // Special positioning for middle HUD position
-                    iconY += iconSpacing * 11;
-                    if (i > 3) {
-                        iconY -= iconSpacing * 12;
-                        if (i == 4) selectedX += 28; // 22x22 border with 6px spacing
+                        //TODO: icon doesn't render if the related move is not on cooldown (spec only)
+                        //here, check if the cooldown is <= 0 then stop/continue
+                        //renderBorder(matrices, selectedX, iconY);
+                        //renderIcon(matrices, selectedX, iconY, spec.getName().toLowerCase(), iconPos.name(), i);
                     }
                 }
+            } else {
+                // Render cooldown HUD for stands
+                for (int i = 0; i < STANDICONS.size(); i++) {
+                    IconPos iconPos = STANDICONS.get(i);
+                    int iconY = iconPos.y();
 
-                renderBorder(matrices, selectedX, iconY);
-                renderIcon(matrices, selectedX, iconY, stand.getType().getUntranslatedName(), iconPos.name(), ICONS.indexOf(iconPos));
+                    if (JConfig.UI_POSITION == JConfig.UIPos.MIDDLE) { // Special positioning for middle HUD position
+                        iconY += iconSpacing * 11;
+                        if (i > 3) {
+                            iconY -= iconSpacing * 12;
+                            if (i == 4) selectedX += 28; // 22x22 border with 6px spacing
+                        }
+                    }
+
+                    renderBorder(matrices, selectedX, iconY);
+                    renderIcon(matrices, selectedX, iconY, stand.getType().getUntranslatedName(), iconPos.name(), i);
+                }
             }
         }
     }

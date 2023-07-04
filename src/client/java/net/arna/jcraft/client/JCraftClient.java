@@ -165,6 +165,8 @@ public class JCraftClient implements ClientModInitializer {
         int selectedX = getHudX(client.getWindow().getScaledWidth());
         int selectedY = client.getWindow().getScaledHeight();
 
+        boolean useIcons = JConfig.ICON_HUD;
+
         switch (JConfig.UI_POSITION) {
             case LEFT -> selectedY /= 20f;
             case MIDDLE -> selectedY /= 3f;
@@ -184,7 +186,8 @@ public class JCraftClient implements ClientModInitializer {
             textRenderer.drawWithShadow(
                     matrixStack,
                     remark + " - " + comboCounter,
-                    selectedX + (ticksSinceCounted < 5 ? player.getRandom().nextFloat() * 5f : 0),
+                    selectedX + (ticksSinceCounted < 5 ? player.getRandom().nextFloat() * 5f : 0) +
+                            ( (JConfig.UI_POSITION == JConfig.UIPos.MIDDLE && useIcons) ? 54f : 0 ),
                     selectedY * (1.15f) + (ticksSinceCounted < 5 ? player.getRandom().nextFloat() * 5f : 0),
                     ColorUtils.HSBAtoRGBA(comboCounter / 360f - 1f, 1f, 1f, 0.8f)
                     , true
@@ -192,7 +195,7 @@ public class JCraftClient implements ClientModInitializer {
         }
 
         // Cooldown rendering, for icon hud see JCraftHudOverlay
-        if (JConfig.ICON_HUD) return;
+        if (useIcons) return;
         boolean standOn = ((IEntityDataSaver)player).getStand() != null;
 
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
