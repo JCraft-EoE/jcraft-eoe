@@ -35,15 +35,16 @@ public class JCraftAbilityHud extends DrawableHelper implements HudRenderCallbac
     static final IconPos HEAVY = new IconPos("heavy", 10, iconSpacing * 5); // 2 + 3 * N
     static final IconPos BARRAGE = new IconPos("barrage", 10, iconSpacing * 8);
 
-    static final IconPos ULT = new IconPos("ult", 10, iconSpacing * 11);
+    static final IconPos UTILITY = new IconPos("utility", 10, iconSpacing * 11);
 
     static final IconPos SPECIAL_1 = new IconPos("special1", 10, iconSpacing * 14);
     static final IconPos SPECIAL_2 = new IconPos("special2", 10, iconSpacing * 17);
     static final IconPos SPECIAL_3 = new IconPos("special3", 10, iconSpacing * 20);
 
-    static final IconPos UTILITY = new IconPos("utility", 10, iconSpacing * 23);
+    static final IconPos ULT = new IconPos("ult", 10, iconSpacing * 23);
 
-    final List<IconPos> ICONS = Arrays.asList(LIGHT, HEAVY, BARRAGE, ULT, SPECIAL_1, SPECIAL_2, SPECIAL_3, UTILITY);
+
+    final List<IconPos> ICONS = Arrays.asList(LIGHT, HEAVY, BARRAGE, UTILITY, SPECIAL_1, SPECIAL_2, SPECIAL_3, ULT);
 
     private static int getHudX(int scaledX) {
         switch (JConfig.UI_POSITION) {
