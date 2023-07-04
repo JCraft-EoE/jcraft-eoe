@@ -1032,6 +1032,14 @@ Silver Chariot
 Killer Queen: Bites the Dust
     >Reanimated and remodeled
 
+● 4/7/2023
+>Dash animation updated
+>Added icon HUD for cooldown and attack display
+
+Killer Queen: Bites the Dust
+    >Added followup to M1
+    >Added crouching variation to Stray Cat
+
 priority (top to bottom)
 TODO: AI flags for unblockables and shouldn't-blockables
 TODO: stand summon particles

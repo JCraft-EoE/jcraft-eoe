@@ -174,7 +174,7 @@ public class JCraft implements ModInitializer {
         // Syncs dash anim (unless already attacking with a spec) with every player in the vicinity
         if (entity instanceof PlayerEntity player) {
             JCraftSpec spec = JCraftUtils.getSpec(player);
-            if (spec.moveStun < 1) {
+            if (spec == null || spec.moveStun < 1) {
                 PacketByteBuf buf = PacketByteBufs.create();
                 buf.writeShort(12);
                 buf.writeInt(entity.getId());

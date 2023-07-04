@@ -32,7 +32,7 @@ public class KQBTDRenderer extends GeoEntityRenderer<KQBTDEntity> {
             if (mcClient.player.getFirstPassenger() == animatable)
                 return RenderLayer.getEntityNoOutline(this.getTextureLocation(animatable));
 
-        return RenderLayer.getEntityCutout(this.getTextureLocation(animatable));
+        return RenderLayer.getEntityTranslucent(this.getTextureLocation(animatable));
     }
 
     // Adds ability to change render alpha

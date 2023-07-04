@@ -11,4 +11,7 @@ public class JConfig extends MidnightConfig {
 
     @Entry
     public static UIPos UI_POSITION = UIPos.RIGHT;
+
+    @Entry
+    public static boolean ICON_HUD = true;
 }

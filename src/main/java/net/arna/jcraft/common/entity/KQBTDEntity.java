@@ -12,6 +12,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
@@ -44,15 +45,17 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 import java.util.List;
 
 public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnimationTickable {
-    public static final Attack light = KillerQueenEntity.light;
+    public static final Attack light = Attack.copyOf(KillerQueenEntity.light);
     public static final Attack heavy = new Attack(2, 12, 0.75f, 9, 5, 1, 7.5f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_4).setHitspark(2).setLaunch()
             .setInfo("Elbow", "fast, short-range knockback");
-    public static final Attack barrage = KillerQueenEntity.barrage;
-    public static final Attack bombplant = KillerQueenEntity.bombplant;
+    public static final Attack barrage = Attack.copyOf(KillerQueenEntity.barrage);
+    public static final Attack bombplant = Attack.copyOf(KillerQueenEntity.bombplant);
     public static final Attack bubble = new Attack(5, 23, 0.75f, 18, 15, 0, 0f, 0.0f, AttackType.BOX).setRanged(true)
-            .setInfo("Stray Cat", "launches an explosive bubble");
+            .setInfo("Stray Cat", "launches an explosive bubble/crouch for a 0.25s windup counter");
     public static final Attack detonate = new Attack(6, 1, 0.75f, 6, 5, 0, 0f, 0.0f, AttackType.BOX)
             .setInfo("Detonate", "crouch with a bomb planted within 20s on a living being to activate Bites the Dust");
+    public static final Attack bubblecounter = new Attack(7, 27, 20, 5, 0, 1, AttackType.COUNTER)
+            .setInfo("Stray Cat Counter", "");
 
     private ItemEntity coin;
     private BubbleProjectile bubbleProjectile;
@@ -84,9 +87,14 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
         freespace = "BNBs:\n" +
                 "    M1>Barrage>Coin Toss>M1>Heavy>Detonate";
 
-        moves = List.of(light, heavy, barrage, bombplant, detonate, bubble
+        moves = List.of(KillerQueenEntity.light, heavy, KillerQueenEntity.barrage, KillerQueenEntity.bombplant, detonate, bubble
                 , new Attack().setRanged(true).setInfo("Coin Toss", "overrides current bomb with an aimable coin")
                 , new Attack().setMobility(MobilityType.DASH).setInfo("Explosive Dash", "slight aoe damage, 3D movement tool"));
+    }
+
+    private void clearCoin() {
+        if (coin != null)
+            coin.discard();
     }
 
     // Necessary, otherwise it simply doesn't reference the correct ones
@@ -102,8 +110,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
     // Moveset
     @Override
     public void initLightAttack() {
-        if (!canAttack()) return;
-        handleAttack(light, JCraft.standLightCD, 2);
+        super.initLightAttack();
     }
 
     @Override
@@ -139,8 +146,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
             this.bombBlock = null;
         }
 
-        if (this.coin != null)
-            this.coin.discard();
+        clearCoin();
     }
 
     @Override
@@ -154,9 +160,10 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
     @Override
     public void initSpecial2() {
         if (!canAttack()) return;
-        if (handleAttack(bubble, JCraft.standS2CD, 8)) {
+        if (getUser().isSneaking() && handleAttack(bubblecounter, JCraft.standS2CD, 10)) {
+            //playSound(JSoundRegister.KQBTD_COUNTER, 1, 1);
+        } else if (handleAttack(bubble, JCraft.standS2CD, 8))
             playSound(JSoundRegister.KQ_UPPERCUT, 1, 1);
-        }
     }
 
     @Override
@@ -167,7 +174,9 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
         if (playerData.getInt(JCraft.standS3CD) > 0) return;
 
         Vec3d lookVec = user.getRotationVector().multiply(0.75);
-        if (this.coin != null) this.coin.discard();
+
+        clearCoin();
+
         this.coin = new ItemEntity(world, user.getX(), user.getY() + user.getHeight() * 2 / 3, user.getZ(), new ItemStack(JObjectRegistry.KQCOIN, 1), lookVec.x, lookVec.y, lookVec.z);
         this.coin.setPickupDelayInfinite();
 
@@ -220,7 +229,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
                 bubbleProjectile = new BubbleProjectile(world, user);
                 bubbleProjectile.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
                 bubbleProjectile.setVelocity(user, user.getPitch(), user.getYaw(), 0, 0.5f, 0f);
-                bubbleProjectile.setPosition(user.getEyePos());
+                bubbleProjectile.setPosition(getPos().add(0, 1.25, 0));
                 world.spawnEntity(bubbleProjectile);
 
                 bombEntity = bubbleProjectile;
@@ -328,8 +337,29 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
     }
 
     @Override
+    public void counter(Entity entity, DamageSource source) {
+        super.counter(entity, source);
+
+        if (entity == null || !hasUser()) return;
+        if (!source.isMagic()) {
+            if (entity instanceof LivingEntity livingEntity) {
+                stun(livingEntity, 10, 3);
+
+                StandEntity stand = ( (IEntityDataSaver)livingEntity ).getStand();
+                if (stand != null)
+                    stand.cancelAttack();
+            }
+
+            clearCoin();
+            bombEntity = entity;
+            bombBlock = null;
+            //playSound(JSoundRegister.BTD_COUNTER_HIT, 1, 1);
+        }
+    }
+
+    @Override
     public void desummon() {
-        if (coin != null) coin.discard();
+        clearCoin();
         super.desummon();
     }
 
@@ -342,7 +372,6 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
         return MoveSelectionResult.PASS;
     }
 
-    @SuppressWarnings("SuspiciousMethodCalls")
     @Override
     public void tick() {
         if (age == 1) playSound(JSoundRegister.KQBTD_SUMMON, 1f, 1f);
@@ -408,6 +437,8 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
             case 6 -> controller.setAnimation(builder.playAndHold("animation.kqbtd.detonate"));
             case 7 -> controller.setAnimation(builder.playAndHold("animation.kqbtd.bombplant"));
             case 8 -> controller.setAnimation(builder.playAndHold("animation.kqbtd.bubble"));
+            case 9 -> controller.setAnimation(builder.playAndHold("animation.kqbtd.low"));
+            case 10 -> controller.setAnimation(builder.playAndHold("animation.kqbtd.bubblecounter"));
         }
         return PlayState.CONTINUE;
     }

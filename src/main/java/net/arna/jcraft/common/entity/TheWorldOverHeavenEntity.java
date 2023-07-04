@@ -435,9 +435,8 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
                                 mob.setTarget(victim);
                             }
 
-                            if (mob.distanceTo(this) > 16) {
+                            if (mob.squaredDistanceTo(this) > 256)
                                 mob.getNavigation().startMovingTo(this, 1);
-                            }
                         }
 
                         // Inability to look at master

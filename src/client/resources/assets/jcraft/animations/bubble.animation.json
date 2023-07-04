@@ -3,24 +3,25 @@
 	"animations": {
 		"animation.bubble.idle": {
 			"loop": true,
-			"animation_length": 1.56,
+			"animation_length": 2.4,
 			"bones": {
 				"bubble": {
 					"scale": {
 						"0.0": {
 							"vector": [1, 1, 1]
 						},
-						"0.76": {
+						"1.16": {
 							"vector": [1.1, 1.1, 1.1],
-							"easing": "easeInOutQuad"
+							"easing": "easeInOutSine"
 						},
-						"1.56": {
+						"2.4": {
 							"vector": [1, 1, 1],
-							"easing": "easeInOutQuad"
+							"easing": "easeInOutSine"
 						}
 					}
 				}
 			}
 		}
-	}
+	},
+	"geckolib_format_version": 2
 }

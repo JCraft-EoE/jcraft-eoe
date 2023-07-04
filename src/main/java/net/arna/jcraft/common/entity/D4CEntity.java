@@ -351,9 +351,10 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
             if (entity instanceof LivingEntity livingEntity) {
                 livingEntity.damage(DamageSource.mob(user), 10);
                 stun(livingEntity, 20, 3);
-                if (entity.getFirstPassenger() instanceof StandEntity stand) {
+
+                StandEntity stand = ( (IEntityDataSaver)livingEntity ).getStand();
+                if (stand != null)
                     stand.cancelAttack();
-                }
             }
 
             this.world.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1f, 1f);

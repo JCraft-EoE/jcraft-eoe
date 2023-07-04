@@ -37,7 +37,7 @@ they will handle stand-off attacks
 public abstract class JCraftSpec {
     public PlayerEntity player;
 
-    public int moveStun;
+    public int moveStun = 0;
     public Attack curAttack;
     public Attack previousAttack;
     public AttackQueue queuedAttack;

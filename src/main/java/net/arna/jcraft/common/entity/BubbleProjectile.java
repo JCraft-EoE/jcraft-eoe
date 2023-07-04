@@ -8,7 +8,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.BlockHitResult;
@@ -25,9 +24,6 @@ import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
 public class BubbleProjectile extends PersistentProjectileEntity implements IAnimatable {
-
-    private int ticksInAir = 0;
-
     public BubbleProjectile(EntityType<? extends BubbleProjectile> entityType, World world) {
         super(entityType, world);
         this.pickupType = PersistentProjectileEntity.PickupPermission.DISALLOWED;
@@ -49,7 +45,7 @@ public class BubbleProjectile extends PersistentProjectileEntity implements IAni
 
         if (type == HitResult.Type.BLOCK) {
             this.onBlockHit((BlockHitResult) hitResult);
-            this.emitGameEvent(GameEvent.PROJECTILE_LAND, this.getOwner());
+            this.emitGameEvent(GameEvent.PROJECTILE_LAND, getOwner());
             this.discard();
         }
     }
@@ -61,21 +57,9 @@ public class BubbleProjectile extends PersistentProjectileEntity implements IAni
     @Override
     public void tick() {
         super.tick();
-        if (!world.isClient()) {
-            if (this.getOwner() == null || this.age > 1600)
-                this.discard();
-        }
-    }
-
-    @Override
-    public void writeCustomDataToNbt(NbtCompound tag) {
-        super.writeCustomDataToNbt(tag);
-        tag.putShort("life", (short) this.ticksInAir);
-    }
-    @Override
-    public void readCustomDataFromNbt(NbtCompound tag) {
-        super.readCustomDataFromNbt(tag);
-        this.ticksInAir = tag.getShort("life");
+        if (!world.isClient())
+            if (getOwner() == null || age > 1600)
+                discard();
     }
 
     @Override

@@ -4,11 +4,14 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.JCraftClient;
 import net.arna.jcraft.client.util.RenderUtils;
+import net.arna.jcraft.common.JConfig;
 import net.arna.jcraft.common.entity.StandEntity;
+import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.resource.ResourceManager;
@@ -26,25 +29,66 @@ public class JCraftAbilityHud extends DrawableHelper implements HudRenderCallbac
 
     final IconPos ICON = new IconPos("icon", 10, 18 * 3 + 18);
 
-    final IconPos LIGHT = new IconPos("light", 10, 9 * 2);
-    final IconPos HEAVY = new IconPos("heavy", 10, 9 * 5);
-    final IconPos BARRAGE = new IconPos("barrage", 10, 9 * 8);
+    public static final int iconSpacing = 9;
 
-    final IconPos SPECIAL_1 = new IconPos("special1", 10, 9 * 11);
-    final IconPos SPECIAL_2 = new IconPos("special2", 10, 9 * 14);
-    final IconPos SPECIAL_3 = new IconPos("special3", 10, 9 * 17);
+    static final IconPos LIGHT = new IconPos("light", 10, iconSpacing * 2);
+    static final IconPos HEAVY = new IconPos("heavy", 10, iconSpacing * 5); // 2 + 3 * N
+    static final IconPos BARRAGE = new IconPos("barrage", 10, iconSpacing * 8);
 
-    final IconPos ULT = new IconPos("ult", 10, 9 * 20);
+    static final IconPos ULT = new IconPos("ult", 10, iconSpacing * 11);
 
-    final List<IconPos> ICONS = Arrays.asList(LIGHT, HEAVY, BARRAGE, ULT, SPECIAL_1, SPECIAL_2, SPECIAL_3);
+    static final IconPos SPECIAL_1 = new IconPos("special1", 10, iconSpacing * 14);
+    static final IconPos SPECIAL_2 = new IconPos("special2", 10, iconSpacing * 17);
+    static final IconPos SPECIAL_3 = new IconPos("special3", 10, iconSpacing * 20);
+
+    static final IconPos UTILITY = new IconPos("utility", 10, iconSpacing * 23);
+
+    final List<IconPos> ICONS = Arrays.asList(LIGHT, HEAVY, BARRAGE, ULT, SPECIAL_1, SPECIAL_2, SPECIAL_3, UTILITY);
+
+    private static int getHudX(int scaledX) {
+        switch (JConfig.UI_POSITION) {
+            case LEFT -> {
+                return (int) (scaledX * 0.01f);
+            }
+            case RIGHT -> {
+                return (int) (scaledX * 0.95f);
+            }
+            case MIDDLE -> {
+                return (int) (scaledX * 0.55f);
+            }
+            default -> {
+                JCraft.LOGGER.error("JCraft UI position is set to an invalid value!");
+                return 10;
+            }
+        }
+    }
 
     @Override
     public void onHudRender(MatrixStack matrices, float tickDelta) {
-        var player = MinecraftClient.getInstance().player;
-        if (player != null && player.getFirstPassenger() instanceof StandEntity stand) {
-            for (IconPos iconPos : ICONS) {
-                renderBorder(matrices, iconPos.x(), iconPos.y());
-                renderIcon(matrices, iconPos.x(), iconPos.y(), stand.getType().getUntranslatedName(), iconPos.name(), ICONS.indexOf(iconPos));
+        if (!JConfig.ICON_HUD) return;
+
+        MinecraftClient client = MinecraftClient.getInstance();
+        ClientPlayerEntity player = client.player;
+        int selectedX = getHudX(client.getWindow().getScaledWidth());
+
+        if (player != null) {
+            StandEntity stand = ( (IEntityDataSaver)player ).getStand();
+            if (stand == null) return;
+
+            for (int i = 0; i < ICONS.size(); i++) {
+                IconPos iconPos = ICONS.get(i);
+                int iconY = iconPos.y();
+
+                if (JConfig.UI_POSITION == JConfig.UIPos.MIDDLE) { // Special positioning for middle HUD position
+                    iconY += iconSpacing * 11;
+                    if (i > 3) {
+                        iconY -= iconSpacing * 12;
+                        if (i == 4) selectedX += 28; // 22x22 border with 6px spacing
+                    }
+                }
+
+                renderBorder(matrices, selectedX, iconY);
+                renderIcon(matrices, selectedX, iconY, stand.getType().getUntranslatedName(), iconPos.name(), ICONS.indexOf(iconPos));
             }
         }
     }
@@ -60,7 +104,7 @@ public class JCraftAbilityHud extends DrawableHelper implements HudRenderCallbac
         if (isTextureAvailable(texture)) {
             RenderSystem.setShaderTexture(0, texture);
         } else {
-            texture = JCraft.id("textures/gui/ability_icons/starplatinum/"+ fallback + ".png");
+            texture = JCraft.id("textures/gui/ability_icons/fallback/"+ fallback + ".png");
             RenderSystem.setShaderTexture(0, texture);
         }
 

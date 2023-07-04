@@ -139,28 +139,36 @@ public class JCraftClient implements ClientModInitializer {
         });
     }
 
+    private static int getHudX(int scaledX) {
+        switch (JConfig.UI_POSITION) {
+            case LEFT -> {
+                return (int) (scaledX * 0.1f);
+            }
+            case RIGHT -> {
+                return (int) (scaledX * 0.75f);
+            }
+            case MIDDLE -> {
+                return (int) (scaledX * 0.55f);
+            }
+            default -> {
+                JCraft.LOGGER.error("JCraft UI position is set to an invalid value!");
+                return 10;
+            }
+        }
+    }
+
     private void renderHud(MatrixStack matrixStack, float v) {
         MinecraftClient client = MinecraftClient.getInstance();
         ClientPlayerEntity player = client.player;
-        ticksSinceCounted += 1;
-        int selectedX = client.getWindow().getScaledWidth();
+        ticksSinceCounted++;
+
+        int selectedX = getHudX(client.getWindow().getScaledWidth());
         int selectedY = client.getWindow().getScaledHeight();
 
         switch (JConfig.UI_POSITION) {
-            case LEFT -> {
-                selectedX *= 0.1f;
-                selectedY /= 20f;
-            }
-
-            case MIDDLE -> {
-                selectedX *= 0.55f;
-                selectedY /= 3f;
-            }
-
-            case RIGHT -> {
-                selectedX *= 0.75f;
-                selectedY /= 2.25f;
-            }
+            case LEFT -> selectedY /= 20f;
+            case MIDDLE -> selectedY /= 3f;
+            case RIGHT -> selectedY /= 2.25f;
         }
 
         int i = 0;
@@ -183,12 +191,13 @@ public class JCraftClient implements ClientModInitializer {
             );
         }
 
+        // Cooldown rendering, for icon hud see JCraftHudOverlay
+        if (JConfig.ICON_HUD) return;
         boolean standOn = ((IEntityDataSaver)player).getStand() != null;
 
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1, 1, 1, 1);
 
-        // Cooldown rendering
         for (Double cooldown : clientCooldowns) {
             i++;
             if (cooldown != 0) {

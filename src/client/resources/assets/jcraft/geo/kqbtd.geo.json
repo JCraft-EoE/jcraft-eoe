@@ -618,6 +618,25 @@
 					]
 				},
 				{
+					"name": "bubble",
+					"parent": "torso",
+					"pivot": [0, -9, 0],
+					"cubes": [
+						{
+							"origin": [-4, -13, -4],
+							"size": [8, 8, 8],
+							"uv": {
+								"north": {"uv": [72, 31], "uv_size": [8, 8]},
+								"east": {"uv": [72, 31], "uv_size": [8, 8]},
+								"south": {"uv": [72, 31], "uv_size": [8, 8]},
+								"west": {"uv": [72, 31], "uv_size": [8, 8]},
+								"up": {"uv": [80, 39], "uv_size": [-8, -8]},
+								"down": {"uv": [80, 39], "uv_size": [-8, -8]}
+							}
+						}
+					]
+				},
+				{
 					"name": "BAM",
 					"parent": "Queen",
 					"pivot": [0, 19, 1]
