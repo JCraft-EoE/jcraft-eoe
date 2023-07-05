@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.entity;
 
-import net.arna.jcraft.common.util.JCraftUtils;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -40,10 +40,10 @@ public class GETreeEntity extends Entity implements IAnimatable, IAnimationTicka
 
         if (owner != null) {
             if (age == 4) {
-                List<LivingEntity> hurt = JCraftUtils.generateHitbox(world, getPos().add(0, 1, 0), 2.5, null);
+                List<LivingEntity> hurt = JUtils.generateHitbox(world, getPos().add(0, 1, 0), 2.5, null);
                 for (LivingEntity living :
                         hurt) {
-                    LivingEntity target = JCraftUtils.getUserIfStand(living);
+                    LivingEntity target = JUtils.getUserIfStand(living);
                     if (owner != target)
                         StandEntity.damageLogic(world, target, new Vec3d(0, 1, 0), 25, 1, false, 7f, true, 11, DamageSource.mob(owner), owner);
 

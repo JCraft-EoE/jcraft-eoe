@@ -16,7 +16,6 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
@@ -162,7 +161,7 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
         switch (attack.id) {
             case (1) -> {
                 for (LivingEntity ent : entities) {
-                    if (!JCraftUtils.isBlocking(ent))
+                    if (!JUtils.isBlocking(ent))
                         ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 40, 0));
                 }
             }
@@ -273,7 +272,7 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
                         toHurt.remove(user);
 
                         for (LivingEntity living : toHurt) {
-                            LivingEntity target = JCraftUtils.getUserIfStand(living);
+                            LivingEntity target = JUtils.getUserIfStand(living);
                             if (hurricaneTime > 1) {
                                 damageLogic(world, target, new Vec3d(Math.sin(age / 10.0) * 3, 0.0, Math.cos(age / 10.0) * 3), 10, 1, false, 0.5f, true, 5, DamageSource.mob(user), user);
                                 if (hurricaneTime > 15)

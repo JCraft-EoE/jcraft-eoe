@@ -96,8 +96,7 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
             .setArmor(true)
             .setUB(true)
             .setInfo("Suffocating Sandstorm", "very slow, traps the opponent in a cloud of slowing sand");
-    //todo: replace this with a funny local storm
-    //todo: potholes :(((((((((((((
+    //todo: replace this with a funny local storm?
 
     public static final TrackedData<Boolean> ISSAND;
     public static final TrackedData<Boolean> ISWAVE;
@@ -433,7 +432,7 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
             case (7) -> {
                 if (entities.isEmpty()) return;
 
-                superTarget = JCraftUtils.getUserIfStand(entities.get(0));
+                superTarget = JUtils.getUserIfStand(entities.get(0));
                 for (int i = 0; i < 8; i++) {
                     FallingBlockEntity sand = FallingBlockEntity.spawnFromBlock(world, superTarget.getBlockPos(), sandState);
                     sand.timeFalling = -32767;

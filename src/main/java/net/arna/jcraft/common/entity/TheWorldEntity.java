@@ -57,6 +57,12 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
             .setArmor(true)
             .setLaunch();
 
+    @Override
+    public void desummon() {
+        if (tsTime > 0) return;
+        super.desummon();
+    }
+
     public TheWorldEntity(World worldIn) {
         super(StandType.THE_WORLD, worldIn);
         super.initialize();
@@ -143,7 +149,7 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
     public void initMiddleClick() {
         CanAttackData data = this.canAttackWithData();
         if (!data.canAttack) return;
-        if (this.getTSTime() > 0) return;
+        if (tsTime > 0) return;
         IEntityDataSaver user = (IEntityDataSaver) data.user;
         if (user.getPersistentData().getInt(JCraft.utilCD) > 0) return;
         Vec3d eP = data.user.getEyePos();
@@ -180,12 +186,6 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
             for (LivingEntity entity : entities)
                 entity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
         }
-    }
-
-    @Override
-    public void desummon() {
-        if (this.getTSTime() < 1)
-            super.desummon();
     }
 
     @Override

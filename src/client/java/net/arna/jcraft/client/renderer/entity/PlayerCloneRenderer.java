@@ -37,6 +37,7 @@ public class PlayerCloneRenderer extends BipedEntityRenderer<PlayerCloneEntity, 
     }
 
 
+    @SuppressWarnings("DataFlowIssue") // If the client instance or network handler are null, something has gone very wrong
     @Override
     public Identifier getTexture(PlayerCloneEntity mobEntity) {
         String ownerName = mobEntity.getMasterName();

@@ -28,12 +28,10 @@ import java.util.Random;
 
 import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 
-/*
-Specs -
-classes that need to be instantiated per-player to contain temporary data relating to their current state
-they will handle stand-off attacks
+/**
+ * Class that needs to be instantiated per-player to contain temporary data relating to their current state.
+ * Used to handle stand-off attacks.
  */
-
 public abstract class JCraftSpec {
     public PlayerEntity player;
 
@@ -46,6 +44,7 @@ public abstract class JCraftSpec {
     public String getDescription() { return "UNDESCRIBED"; }
     public String getDetails() { return "UNFINISHED"; }
     public List<Attack> getAttacks() { return null; }
+    public int getId() { return 0; }
 
     public void InitHeavyAttack(ServerWorld serverWorld) {
     }
@@ -107,13 +106,14 @@ public abstract class JCraftSpec {
     }
 
     public void tickSpec() {
-        //JCraft.LOGGER.info("ticking spec");
         World world = player.getWorld();
 
-        if (!world.isClient()) {
-            ServerWorld serverWorld = (ServerWorld) world;
-            //ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+        if (world.isClient()) {
+            //JCraft.LOGGER.info("CLIENT: Ticking spec " + this);
+        } else {
+            //JCraft.LOGGER.info("SERVER: Ticking spec " + this);
 
+            ServerWorld serverWorld = (ServerWorld) world;
             Attack attack = this.curAttack;
 
             if (moveStun > 0) {
@@ -136,13 +136,13 @@ public abstract class JCraftSpec {
                         Vec3d hitPos = player.getPos().add(0, player.getHeight() / 2 - attack.offset, 0).add(rotVec.multiply(attack.attackDist));
                         ArrayList<Entity> exclude = new ArrayList<>(player.getPassengerList());
                         exclude.add(player);
-                        List<LivingEntity> hurt = JCraftUtils.generateHitbox(world,
+                        List<LivingEntity> hurt = JUtils.generateHitbox(world,
                                 hitPos,
                                 attack.hitboxSize,
                                 List.copyOf(exclude)
                         );
                         for (Attack.HitboxData data : attack.extraHitboxes) {
-                            List<LivingEntity> extraHurt = JCraftUtils.generateHitbox(world,
+                            List<LivingEntity> extraHurt = JUtils.generateHitbox(world,
                                     hitPos.add(rotVec.multiply(data.forwardOffset)).add(0, data.verticalOffset, 0), data.hitboxSize, exclude);
                             for (LivingEntity hurtEntity : extraHurt)
                                 if (!hurt.contains(hurtEntity)) hurt.add(hurtEntity);
@@ -193,4 +193,5 @@ public abstract class JCraftSpec {
             }
         }
     }
+
 }

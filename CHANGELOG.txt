@@ -1040,6 +1040,19 @@ Killer Queen: Bites the Dust
     >Added followup to M1
     >Added crouching variation to Stray Cat
 
+● 5/7/2023
+HUD
+    >Updated Icon HUD
+    >Improved text/icon placement logic
+
+Anubis
+    >Added sheathed Special 3 - Sweep
+
+Timestops
+    >Updated logic
+    >Fixed bug where particles were not stopped in timestop
+    >Newly created entities now move for one tick before stopping
+
 priority (top to bottom)
 TODO: AI flags for unblockables and shouldn't-blockables
 TODO: stand summon particles

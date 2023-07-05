@@ -24,8 +24,7 @@ import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
 import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.network.c2s.StandControlPacket;
-import net.arna.jcraft.common.util.ColorUtils;
-import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.*;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -48,15 +47,22 @@ import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static net.arna.jcraft.client.util.JClientUtils.activeTimestops;
 
 public class JCraftClient implements ClientModInitializer {
 
@@ -142,10 +148,10 @@ public class JCraftClient implements ClientModInitializer {
     private static int getHudX(int scaledX) {
         switch (JConfig.UI_POSITION) {
             case LEFT -> {
-                return (int) (scaledX * 0.1f);
+                return 2;
             }
             case RIGHT -> {
-                return (int) (scaledX * 0.75f);
+                return scaledX - 128;
             }
             case MIDDLE -> {
                 return (int) (scaledX * 0.55f);
@@ -157,6 +163,7 @@ public class JCraftClient implements ClientModInitializer {
         }
     }
 
+    @SuppressWarnings("DataFlowIssue") // If the player is null, we have much larger problems than that
     private void renderHud(MatrixStack matrixStack, float v) {
         MinecraftClient client = MinecraftClient.getInstance();
         ClientPlayerEntity player = client.player;
@@ -252,10 +259,39 @@ public class JCraftClient implements ClientModInitializer {
     }
 
     private void tickClient(MinecraftClient minecraftClient) {
-        GameOptions go = MinecraftClient.getInstance().options;
-        ClientPlayerEntity player = MinecraftClient.getInstance().player;
+        ClientPlayerEntity player = minecraftClient.player;
 
+        if (minecraftClient.isPaused() && minecraftClient.isInSingleplayer()) return;
+
+        // Timestop handling (nearly identical to serverside, but toStop is obtained in user.world instead of server world)
+        ArrayList<DimValues> newActiveTimestops = new ArrayList<>();
+
+        for (DimValues timestop : activeTimestops) {
+            Entity user = timestop.user;
+            //JCraft.LOGGER.info("CLIENT: Ticking timestop " + timestop + " with user " + user + " and duration " + timestop.timer);
+
+            if (user != null && user.isAlive() && timestop.timer-- > 0) {
+                Vec3d pos = timestop.pos;
+
+                List<? extends Entity> toStop = user.world.getEntitiesByClass(Entity.class,
+                        new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+
+                for (Entity entity : toStop) {
+                    if ( entity == user || entity == ((IEntityDataSaver)user).getStand() ) continue;
+                    ITimeStop ts = ((ITimeStop) entity);
+                    ts.setTimeStopTicks(2);
+                }
+
+                newActiveTimestops.add(timestop);
+            }
+        }
+
+        activeTimestops = newActiveTimestops;
+
+        // Handle JCraft inputs (stand, spec, universal controls)
         if (player != null) {
+            GameOptions go = minecraftClient.options;
+
             StandEntity stand = ((IEntityDataSaver)player).getStand();
             boolean standOn = stand != null;
 

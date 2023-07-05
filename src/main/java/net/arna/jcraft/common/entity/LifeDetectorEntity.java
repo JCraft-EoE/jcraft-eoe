@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.common.util.IOwnable;
-import net.arna.jcraft.common.util.JCraftUtils;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
@@ -82,11 +82,11 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
         velocityModified = true;
 
         Vec3d pos = getPos();
-        List<LivingEntity> hurt = JCraftUtils.generateHitbox(world, pos, 2.25, null);
+        List<LivingEntity> hurt = JUtils.generateHitbox(world, pos, 2.25, null);
         for (LivingEntity living :
                 hurt) {
             if (!canTarget(living)) continue;
-            LivingEntity target = JCraftUtils.getUserIfStand(living);
+            LivingEntity target = JUtils.getUserIfStand(living);
             Vec3d kbVec = target.getPos().subtract(pos).normalize();
             StandEntity.damageLogic(world, target, kbVec, 10, 1, false, 5f, true, 9, DamageSource.mob(master), master);
         }

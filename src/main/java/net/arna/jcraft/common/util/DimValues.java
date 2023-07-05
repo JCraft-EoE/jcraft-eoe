@@ -16,4 +16,11 @@ public class DimValues {
         this.pos = pos;
         this.worldKey = worldKey;
     }
+
+    public DimValues(Entity user, Vec3d pos, RegistryKey<World> worldKey, int timer) {
+        this.user = user;
+        this.pos = pos;
+        this.worldKey = worldKey;
+        this.timer = timer;
+    }
 }

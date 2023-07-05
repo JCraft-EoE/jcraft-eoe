@@ -6,7 +6,7 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.Attack;
-import net.arna.jcraft.common.util.JCraftUtils;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandManager;
@@ -50,7 +50,7 @@ public class FrameDataCommand {
                 return 0;
             }
         } else {
-            JCraftSpec spec = JCraftUtils.getSpec(player);
+            JCraftSpec spec = JUtils.getSpec(player);
             if (spec != null) {
                 attack = spec.curAttack;
                 if (attack == null) {

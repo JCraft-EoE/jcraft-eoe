@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.entity;
 
-import net.arna.jcraft.common.util.JCraftUtils;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -65,7 +65,7 @@ public class AnkhProjectile extends PersistentProjectileEntity implements IAnima
         if (owner.hasPassenger(entity) || entity == owner) return;
 
         entity.setOnFireFor(3);
-        JCraftUtils.projectileDamageLogic(this, world, entity, Vec3d.ZERO, 5, 1, false, 3.5f, 8);
+        JUtils.projectileDamageLogic(this, world, entity, Vec3d.ZERO, 5, 1, false, 3.5f, 8);
         discard();
     }
 

@@ -10,11 +10,12 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.JCraftClient;
 import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
 import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
+import net.arna.jcraft.client.util.JClientUtils;
 import net.arna.jcraft.common.entity.MadeInHeavenEntity;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
-import net.arna.jcraft.common.util.IJCraftAnimatedPlayer;
-import net.arna.jcraft.common.util.ITimeStop;
+import net.arna.jcraft.common.spec.JCraftSpec;
+import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.block.Blocks;
@@ -29,6 +30,8 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 
@@ -58,7 +61,7 @@ public class ClientPacketHandler {
     }
 
     public static void handleChannelFeedback(MinecraftClient client, PacketByteBuf buf) {
-        if (client.world == null) return;
+        if (client == null || client.world == null || client.player == null) return;
 
         short control = buf.readShort();
         // Show hitboxes gamerule
@@ -187,9 +190,17 @@ public class ClientPacketHandler {
                 });
             }
 
-            // WS acid spew
+            // Spec synchronization
             case (5) -> {
+                int specID = buf.readInt();
+                client.execute(() -> {
+                    JCraftSpec spec = JUtils.getSpecByID(specID);
 
+                    if (spec != null)
+                        spec.player = client.player;
+
+                    ((ISpec)(client.player)).setClientSpec(spec);
+                });
             }
 
             // Combo counter
@@ -309,6 +320,20 @@ public class ClientPacketHandler {
                     Entity ent = client.world.getEntityById(entID);
                     if (ent == null) return;
                     ((ITimeStop) ent).setTimeStopTicks(ticks);
+                });
+            }
+
+            // TS Synchronization (see JCraft.java startTrackingTimestop())
+            case (15) -> {
+                int entID = buf.readInt();
+                Vec3d position = new Vec3d( buf.readDouble(), buf.readDouble(), buf.readDouble() );
+                RegistryKey<World> registryKey = buf.readRegistryKey(Registry.WORLD_KEY);
+                int time = buf.readInt();
+
+                client.execute(() -> {
+                    Entity ent = client.world.getEntityById(entID);
+                    if (ent == null) return;
+                    JClientUtils.activeTimestops.add( new DimValues(ent, position, registryKey, time) );
                 });
             }
         }

@@ -12,7 +12,6 @@ import net.minecraft.entity.mob.Angerable;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -258,7 +257,7 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
             case (9) -> {
                 for (LivingEntity ent :
                         entities) {
-                    if (!JCraftUtils.isBlocking(ent)) {
+                    if (!JUtils.isBlocking(ent)) {
                         ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 50, 0, true, false));
                     }
                 }

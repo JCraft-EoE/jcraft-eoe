@@ -4,7 +4,6 @@ import lombok.Getter;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.mixin.LivingEntityInvoker;
@@ -72,7 +71,9 @@ public abstract class StandEntity extends MobEntity {
     private static final TrackedData<Boolean> FREE;
     private static final TrackedData<Boolean> REMOTE;
 
-    public static final TrackedData<Integer> TIMESTOPTIME;
+    protected int tsTime = 0;
+
+
     public Boolean blocking = false;
     public Boolean idleOverride = false;
 
@@ -82,8 +83,6 @@ public abstract class StandEntity extends MobEntity {
     public float blockDistance = 0.75f;
 
     public float maxStandGauge = 90f;
-
-    //public int tsRes = 20;
 
     public AttackQueue queuedAttack;
     public Attack curAttack;
@@ -128,8 +127,6 @@ public abstract class StandEntity extends MobEntity {
         FREEX = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.FLOAT);
         FREEY = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.FLOAT);
         FREEZ = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.FLOAT);
-
-        TIMESTOPTIME = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.INTEGER);
     }
 
     private LivingEntity user = null;
@@ -328,16 +325,6 @@ public abstract class StandEntity extends MobEntity {
         this.dataTracker.set(FREEZ, freePos.getZ());
     }
 
-    public int getTSTime() {
-        return this.dataTracker.get(TIMESTOPTIME);
-    }
-    /**
-     * Sets the time in ticks time will be stopped for on account of this stand
-     */
-    public void setTSTime(int tsTime) {
-        this.dataTracker.set(TIMESTOPTIME, tsTime);
-    }
-
     @Override
     public SoundCategory getSoundCategory() {
         return SoundCategory.PLAYERS;
@@ -364,8 +351,6 @@ public abstract class StandEntity extends MobEntity {
         this.dataTracker.startTracking(FREEX, 0f);
         this.dataTracker.startTracking(FREEY, 0f);
         this.dataTracker.startTracking(FREEZ, 0f);
-
-        this.dataTracker.startTracking(TIMESTOPTIME, 0);
     }
 
     public void initialize() {
@@ -692,30 +677,13 @@ public abstract class StandEntity extends MobEntity {
                 }
 
                 if (attack.attackType == AttackType.TIMESTOP && curMoveStun == realInitTime) {
-                    this.setTSTime(stunTicks);
+                    tsTime = stunTicks;
                     this.curAttack = null;
 
                     StatusEffectInstance tsBlind = new StatusEffectInstance(StatusEffects.BLINDNESS, 19, 0, false, false, false);
                     user.addStatusEffect(tsBlind);
 
-                    JCraftUtils.activeTimestops.add(new DimValues(this, pos, this.world.getRegistryKey()));
-
-                    List<PlayerEntity> toCooldown = world.getEntitiesByClass(PlayerEntity.class,
-                            new Box(eyePos.add(96.0, 96.0, 96.0), eyePos.subtract(96.0, 96.0, 96.0)), EntityPredicates.VALID_LIVING_ENTITY);
-
-                    for (PlayerEntity player : toCooldown) {
-                        // Shader handling
-                        if(player instanceof ServerPlayerEntity serverPlayerEntity){
-                            ShaderActivationPacket.send(serverPlayerEntity, this, 0, stunTicks, ShaderActivationPacket.Type.ZA_WARUDO);
-                            if (serverPlayerEntity == user || serverPlayerEntity.isCreative()) continue;
-                            // Puts all player items besides armor into cooldown for entire duration of timestop
-                            for (int i = 0; i < serverPlayerEntity.getInventory().main.size(); i++){
-                                serverPlayerEntity.getItemCooldownManager().set(serverPlayerEntity.getInventory().main.get(i).getItem(), stunTicks);
-                            }
-                            serverPlayerEntity.getItemCooldownManager().set(serverPlayerEntity.getOffHandStack().getItem(), stunTicks);
-                        }
-
-                    }
+                    JCraft.stopTime(user, pos, (ServerWorld) world, stunTicks);
                 }
 
                 boolean isBarrage = attack.attackType == AttackType.BARRAGE || attack.attackType == AttackType.CHARGEBARRAGE;
@@ -737,9 +705,9 @@ public abstract class StandEntity extends MobEntity {
                         List<Entity> filter = new ArrayList<>(List.of(this, user));
                         if (vehicle != null) filter.add(vehicle);
 
-                        hurt = JCraftUtils.generateHitbox(world, fPos, attack.hitboxSize, filter);
+                        hurt = JUtils.generateHitbox(world, fPos, attack.hitboxSize, filter);
                         for (Attack.HitboxData data : attack.extraHitboxes) {
-                            List<LivingEntity> extraHurt = JCraftUtils.generateHitbox(world,
+                            List<LivingEntity> extraHurt = JUtils.generateHitbox(world,
                                     hPos.add(rotVec.multiply(data.forwardOffset)).add(0, data.verticalOffset, 0), data.hitboxSize, filter);
                             for (LivingEntity hurtEntity : extraHurt)
                                 if (!hurt.contains(hurtEntity)) hurt.add(hurtEntity);
@@ -853,33 +821,20 @@ public abstract class StandEntity extends MobEntity {
 
         // JCraft.LOGGER.info( "State: " + this.getState() + " Movestun: " + curMoveStun + " Currently attacking: " + (this.curAttack != null)); // Massive debug log
 
-        int tsTime = this.getTSTime();
-
+        // Minor aspects of timestop logic, actual stopping is handled at JServerTickEvents
         if (tsTime > 0) {
             user.stopRiding();
 
-            for (int h = 0; h < 1500 / tsTime; ++h) {
-                this.world.addParticle(
+            for (int h = 0; h < 1500 / tsTime; ++h)
+                world.addParticle(
                         ParticleTypes.MYCELIUM,
                         eyePos.x + random.nextTriangular(0, tsTime),
                         eyePos.y + random.nextTriangular(0, tsTime) / 4,
                         eyePos.z + random.nextTriangular(0, tsTime),
                         0.0, 0.0, 0.0
                 );
-            }
 
-            List<Entity> toStop = world.getEntitiesByClass(Entity.class,
-                    new Box(eyePos.add(96.0, 96.0, 96.0), eyePos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
-
-            toStop.remove(this);
-            toStop.remove(user);
-
-            for (Entity entity : toStop) {
-                ITimeStop ts = ((ITimeStop) entity);
-                ts.setTimeStopTicks(2);
-            }
-
-            if (!client) this.setTSTime(tsTime - 1);
+            if (!client) tsTime--;
         }
 
         if (this.curAttack != this.previousAttack && this.curAttack != null)
@@ -1013,7 +968,7 @@ public abstract class StandEntity extends MobEntity {
 
         // Interrupting spec moves
         if (ent instanceof PlayerEntity playerEntity) {
-            JCraftSpec spec = JCraftUtils.getSpec(playerEntity);
+            JCraftSpec spec = JUtils.getSpec(playerEntity);
             if (spec != null && spec.curAttack != null && !spec.curAttack.hasArmor) spec.cancelAttack();
         }
 

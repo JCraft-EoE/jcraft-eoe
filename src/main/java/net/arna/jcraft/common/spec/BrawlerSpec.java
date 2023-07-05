@@ -46,6 +46,10 @@ public class BrawlerSpec extends JCraftSpec {
     public List<Attack> getAttacks() {
         return List.of(heavy, combo, gut, low);
     }
+    @Override
+    public int getId() {
+        return 1;
+    }
 
     // Attacks
     @Override

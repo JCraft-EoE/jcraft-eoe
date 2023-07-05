@@ -1,13 +1,12 @@
 package net.arna.jcraft.common.item;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.arna.jcraft.common.spec.AnubisSpec;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.ISpec;
-import net.arna.jcraft.common.util.JCraftUtils;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
@@ -61,13 +60,13 @@ public class SheathedAnubisItem extends AnubisItem {
         if (world.isClient) return TypedActionResult.fail(itemStack);
         if (!user.isSneaking()) user.setCurrentHand(hand);
         else {
-            JCraftSpec spec = JCraftUtils.getSpec(user);
+            JCraftSpec spec = JUtils.getSpec(user);
             if (spec instanceof AnubisSpec)
                 user.setStackInHand(hand, new ItemStack(JObjectRegistry.ANUBIS));
             else if (warned) {
                 NbtCompound data = ((IEntityDataSaver)user).getPersistentData();
                 data.putInt("SpecID", 2);
-                JCraftUtils.assignSpec(user, data, (ISpec)user);
+                JUtils.assignSpec(user, data, (ISpec)user);
                 user.setStackInHand(hand, new ItemStack(JObjectRegistry.ANUBIS));
                 warned = false;
             } else {

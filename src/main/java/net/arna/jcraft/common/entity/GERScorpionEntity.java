@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.util.JCraftUtils;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.block.Blocks;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.Entity;
@@ -39,7 +39,7 @@ import java.util.UUID;
 
 import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 
-public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimationTickable {
+public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimationTickable { //todo: implement IOwnable
     public GERScorpionEntity(EntityType<? extends MobEntity> entityType, World world) {
         super(entityType, world);
         this.setNoDrag(true);
@@ -155,7 +155,7 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
             double y = getY();
             double z = getZ();
             if (landedTimer < 1) { // Laser
-                Vec3d towardsVec = JCraftUtils.deltaPos(this);
+                Vec3d towardsVec = JUtils.deltaPos(this);
                 for (double i = 0; i < 6; i++) {
                     double lerp = i / 6;
                     world.addParticle(
@@ -189,7 +189,7 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                     Vec3d towardsVec = curPos.subtract(new Vec3d(prevX, prevY, prevZ));
                     List<LivingEntity> hurtAll = new ArrayList<>();
                     for (double i = 0; i < 3; i++) {
-                        List<LivingEntity> hurt = JCraftUtils.generateHitbox(world, curPos.add(towardsVec.multiply(i / 3)), 0.5, filter);
+                        List<LivingEntity> hurt = JUtils.generateHitbox(world, curPos.add(towardsVec.multiply(i / 3)), 0.5, filter);
                         hurt.removeIf(hurtAll::contains);
                         hurtAll.addAll(hurt);
                     }
@@ -198,7 +198,7 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                         jumpTarget = hurtAll.get(0);
                         for (LivingEntity l :
                                 hurtAll) {
-                            LivingEntity target = JCraftUtils.getUserIfStand(l);
+                            LivingEntity target = JUtils.getUserIfStand(l);
                             damageLogic(world, target, getVelocity(), rockStun, 1, false, 6f, true, 10, DamageSource.mob(owner), owner);
                         }
                         Transform();
@@ -225,25 +225,25 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                         velocityModified = true;
                     }
                     if (landedTimer == 20) { // Sting followup, 5t gap
-                        List<LivingEntity> hurt = JCraftUtils.generateHitbox(world, getPos(), 1.5, filter);
+                        List<LivingEntity> hurt = JUtils.generateHitbox(world, getPos(), 1.5, filter);
                         if (isCharged())
                             for (LivingEntity l :
                                     hurt) {
-                                LivingEntity target = JCraftUtils.getUserIfStand(l);
+                                LivingEntity target = JUtils.getUserIfStand(l);
                                 target.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 60, 0, false, true));
                                 damageLogic(world, target, Vec3d.ZERO, 15, 1, false, 3f, true, 7, DamageSource.mob(owner), owner);
                             }
                         else
                             for (LivingEntity l :
                                     hurt) {
-                                LivingEntity target = JCraftUtils.getUserIfStand(l);
+                                LivingEntity target = JUtils.getUserIfStand(l);
                                 damageLogic(world, target, Vec3d.ZERO, 15, 1, false, 3f, true, 7, DamageSource.mob(owner), owner);
                             }
                     }
                 }
                 if (age > 30)
                     kill();
-            } else if (getOwnerUUID().isPresent()) { //todo: make an OwnableMobEntity - ie TamedEntity but dumbed down and ownable by other mobs
+            } else if (getOwnerUUID().isPresent()) {
                 UUID searchID = getOwnerUUID().get();
                 Box box = Box.of(this.getPos(), 64, 64, 64);
                 boolean found = false;

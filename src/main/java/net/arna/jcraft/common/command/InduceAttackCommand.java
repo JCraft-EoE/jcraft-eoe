@@ -7,7 +7,7 @@ import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.AttackQueue;
 import net.arna.jcraft.common.util.IEntityDataSaver;
-import net.arna.jcraft.common.util.JCraftUtils;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
@@ -101,7 +101,7 @@ public class InduceAttackCommand {
                             ((IEntityDataSaver) playerEntity).getPersistentData().putInt(cdType, 0);
                         }
 
-                        JCraftSpec spec = JCraftUtils.getSpec(playerEntity);
+                        JCraftSpec spec = JUtils.getSpec(playerEntity);
                         if (spec != null) {
                             ServerWorld serverWorld = source.getWorld();
                             switch (type) {

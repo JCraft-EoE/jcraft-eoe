@@ -2,7 +2,7 @@ package net.arna.jcraft.common.item;
 
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.ISpec;
-import net.arna.jcraft.common.util.JCraftUtils;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -32,7 +32,7 @@ public class BoxingGlovesItem extends Item {
 
             NbtCompound data = ((IEntityDataSaver) user).getPersistentData();
             data.putInt("SpecID", 1);
-            JCraftUtils.assignSpec(user, data, (ISpec)user);
+            JUtils.assignSpec(user, data, (ISpec)user);
         }
 
         return TypedActionResult.consume(itemStack);

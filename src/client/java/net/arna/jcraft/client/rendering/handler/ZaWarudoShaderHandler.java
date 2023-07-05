@@ -15,6 +15,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ZaWarudoShaderHandler extends StandShaderHandler {
@@ -35,7 +36,7 @@ public class ZaWarudoShaderHandler extends StandShaderHandler {
     }
 
     @Override
-    public void onWorldRendered(MatrixStack matrices, Camera camera, float tickDelta, long nanoTime) {
+    public void onWorldRendered(@NotNull MatrixStack matrices, @NotNull Camera camera, float tickDelta, long nanoTime) {
         if (renderingEffect) {
             SHADER.setUniformValue("InverseTransformMatrix", GlMatrices.getInverseTransformMatrix(projectionMatrix));
             Vec3d cameraPos = camera.getPos();

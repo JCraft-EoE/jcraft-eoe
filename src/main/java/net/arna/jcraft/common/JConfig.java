@@ -2,6 +2,7 @@ package net.arna.jcraft.common;
 
 import eu.midnightdust.lib.config.MidnightConfig;
 
+@SuppressWarnings("CanBeFinal") // They literally cannot
 public class JConfig extends MidnightConfig {
     public enum UIPos {
         LEFT,

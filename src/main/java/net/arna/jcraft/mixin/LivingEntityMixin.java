@@ -68,7 +68,7 @@ public abstract class LivingEntityMixin {
         LivingEntity livingEntity = (LivingEntity) (Object) this;
         IEntityDataSaver entityDataSaver = (IEntityDataSaver) livingEntity;
 
-        if ((livingEntity.hasStatusEffect(JStatusRegister.DAZED) && !JCraftUtils.isBlocking(livingEntity)) || livingEntity.hasStatusEffect(JStatusRegister.KNOCKDOWN)) {
+        if ((livingEntity.hasStatusEffect(JStatusRegister.DAZED) && !JUtils.isBlocking(livingEntity)) || livingEntity.hasStatusEffect(JStatusRegister.KNOCKDOWN)) {
             cir.setReturnValue(false);
         }
 
@@ -91,7 +91,7 @@ public abstract class LivingEntityMixin {
         IEntityDataSaver entityDataSaver = (IEntityDataSaver) livingEntity;
         StatusEffectInstance stun = livingEntity.getStatusEffect(JStatusRegister.DAZED);
 
-        if ((livingEntity.hasStatusEffect(JStatusRegister.DAZED) && !JCraftUtils.isBlocking(livingEntity)) || livingEntity.hasStatusEffect(JStatusRegister.KNOCKDOWN)) {
+        if ((livingEntity.hasStatusEffect(JStatusRegister.DAZED) && !JUtils.isBlocking(livingEntity)) || livingEntity.hasStatusEffect(JStatusRegister.KNOCKDOWN)) {
             cir.setReturnValue(false);
         }
 

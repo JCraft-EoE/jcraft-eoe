@@ -2,7 +2,7 @@ package net.arna.jcraft.client.model.entity;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.GoldenExperienceEntity;
-import net.arna.jcraft.common.util.JCraftUtils;
+import net.arna.jcraft.client.util.JClientUtils;
 import net.minecraft.util.Identifier;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.model.AnimatedTickingGeoModel;
@@ -30,6 +30,6 @@ public class GoldenExperienceModel extends AnimatedTickingGeoModel<GoldenExperie
         super.setCustomAnimations(animatable, instanceId, animationEvent);
 
         if (animatable.hasUser()) // -10Pi/180
-            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), animationEvent.getPartialTick(), true, true, 0, -0.1f);
+            JClientUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), animationEvent.getPartialTick(), true, true, 0, -0.1f);
     }
 }

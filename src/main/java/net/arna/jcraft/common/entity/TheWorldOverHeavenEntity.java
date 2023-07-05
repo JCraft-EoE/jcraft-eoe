@@ -100,6 +100,12 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
     }
 
     @Override
+    public void desummon() {
+        if (tsTime > 0) return;
+        super.desummon();
+    }
+
+    @Override
     protected void initDataTracker() {
         super.initDataTracker();
         dataTracker.startTracking(OVERWRITETYPE, 0);
@@ -126,16 +132,11 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
 
         description = "Mid Range DOMINATOR";
 
-        //todo: update twoh freespace
         freespace =
                 """
                         BNBs:
-                            the
-                            Knives>(Timeskip/M1>)Smite>M1>Heavy>M1>Barrage>Timestop
-                            dijon mustard
-                            jump.Smite>(Timeskip)>Knives>M1>Heavy>M1>Barrage>Timestop
-                            the superlord 2
-                            M1>Barrage>Timestop{ M1>M1>M1 delay.Heavy }>Knives>M1>Smite>M1""";
+                            the ultrakill
+                            M1>Barrage>M1>Knives>Overwrite~S2/S3>dash>Smite>Heavy>M1""";
 
         moves = List.of(light, heavy, barrage, smite, timestop, knives, chargeoverwrite,
                 new Attack().setMobility(MobilityType.TELEPORT).setInfo("Timeskip", "14m range")
@@ -251,7 +252,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
     @Override
     public void initMiddleClick() {
         CanAttackData data = canAttackWithData();
-        if (!data.canAttack || getTSTime() > 0) return;
+        if (!data.canAttack || tsTime > 0) return;
         NbtCompound userData = ((IEntityDataSaver) data.user).getPersistentData();
         if (userData.getInt(JCraft.utilCD) > 0) return;
         Vec3d eP = data.user.getEyePos();
@@ -304,10 +305,10 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
                 lightning.setCosmetic(true);
                 lightning.setPosition(lP);
 
-                List<? extends Entity> hit = JCraftUtils.generateHitbox(world, lP, 3, Entity.class, List.of(this, user));
+                List<? extends Entity> hit = JUtils.generateHitbox(world, lP, 3, Entity.class, List.of(this, user));
                 for (Entity ent : hit) {
                     if (ent instanceof LivingEntity living) {
-                        LivingEntity target = JCraftUtils.getUserIfStand(living);
+                        LivingEntity target = JUtils.getUserIfStand(living);
                         target.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 10, 9, true, false));
                         damageLogic(world, target, Vec3d.ZERO, 21, 1, false, smiteDamage, false, 13, damageSource, user);
                     }
@@ -376,11 +377,6 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
                 }
             }
         }
-    }
-
-    @Override
-    public void desummon() {
-        if (getTSTime() < 1) super.desummon();
     }
 
     @Override

@@ -23,7 +23,6 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -369,7 +368,7 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
         //if (!hurtAll.contains(player)) { hurtAll.add(player); }
 
         for (LivingEntity ent : hurtAll) {
-            LivingEntity target = JCraftUtils.getUserIfStand(ent);
+            LivingEntity target = JUtils.getUserIfStand(ent);
             damageLogic(world, target, kbVec.multiply(kb).add(0, kb / 4, 0), 20, 1, false, damage, true, (int) (4 + damage), playerSource, player);
         }
 

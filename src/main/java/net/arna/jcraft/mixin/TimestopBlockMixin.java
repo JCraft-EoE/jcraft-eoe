@@ -1,6 +1,6 @@
 package net.arna.jcraft.mixin;
 
-import net.arna.jcraft.common.util.JCraftUtils;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.block.Block;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.TickPriority;
@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public interface TimestopBlockMixin {
     @Inject(method = "createAndScheduleBlockTick(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;ILnet/minecraft/world/TickPriority;)V", at = @At("HEAD"), cancellable = true)
     private void jcraft$createAndScheduleBlockTick(BlockPos pos, Block block, int delay, TickPriority priority, CallbackInfo info) {
-        int ticks = JCraftUtils.getTicksIfInTSRange(pos);
+        int ticks = JUtils.getTicksIfInTSRange(pos);
 
         if (ticks > 0) {
             WorldAccess worldAccess = (WorldAccess) this;

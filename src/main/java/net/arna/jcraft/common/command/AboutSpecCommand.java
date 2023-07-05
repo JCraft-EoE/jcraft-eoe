@@ -6,7 +6,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.Attack;
-import net.arna.jcraft.common.util.JCraftUtils;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandManager;
@@ -37,7 +37,7 @@ public class AboutSpecCommand {
             return 0;
         }
 
-        JCraftSpec spec = JCraftUtils.getSpec(playerEntity);
+        JCraftSpec spec = JUtils.getSpec(playerEntity);
         if (spec != null) {
             StringBuilder readout = new StringBuilder("Name: §e");
 

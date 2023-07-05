@@ -50,6 +50,12 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
             .setUB(true)
             .setInfo("Timestop", "3 seconds");
 
+    @Override
+    public void desummon() {
+        if (tsTime > 0) return;
+        super.desummon();
+    }
+
     public StarPlatinumEntity(World worldIn) {
         super(StandType.STAR_PLATINUM, worldIn);
         super.initialize();
@@ -151,7 +157,7 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
         CanAttackData data = this.canAttackWithData();
         if (!data.canAttack)
             return;
-        if (this.getTSTime() > 0)
+        if (tsTime > 0)
             return;
         IEntityDataSaver user = (IEntityDataSaver) data.user;
         if (user.getPersistentData().getInt(JCraft.utilCD) > 0)
@@ -169,11 +175,6 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
             user.getPersistentData().putInt(JCraft.standUltCD, 60); // 3 second timestop cooldown
 
         world.playSound(null, pos.x, pos.y, pos.z, JSoundRegister.STAR_PLATINUM_TIMESKIP, SoundCategory.PLAYERS, 1f, 1f);
-    }
-
-    @Override
-    public void desummon() {
-        if (this.getTSTime() < 1) super.desummon();
     }
 
     @Override

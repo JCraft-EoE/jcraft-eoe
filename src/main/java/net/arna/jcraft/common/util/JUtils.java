@@ -26,8 +26,6 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.processor.IBone;
-import software.bernie.geckolib3.model.AnimatedTickingGeoModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +33,7 @@ import java.util.Objects;
 
 import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 
-public final class JCraftUtils {
-    //TODO: synchronise this with clients
+public final class JUtils {
     public static List<DimValues> activeTimestops = new ArrayList<>();
 
     // Specify what type the hitbox searches for
@@ -122,16 +119,22 @@ public final class JCraftUtils {
         return toReturn;
     }
 
-    public static void assignSpec(PlayerEntity player, NbtCompound playerNbt, ISpec playerSpec) {
+    //TODO: Int2ObjectHashmap for specs
+    public static JCraftSpec getSpecByID(int id) {
         JCraftSpec spec = null;
 
-        switch (playerNbt.getInt("SpecID")) {
+        switch (id) {
             case (1) -> spec = new BrawlerSpec();
             case (2) -> spec = new AnubisSpec();
         }
+
+        return spec;
+    }
+
+    public static void assignSpec(PlayerEntity player, NbtCompound playerNbt, ISpec playerSpec) {
+        JCraftSpec spec = getSpecByID(playerNbt.getInt("SpecID"));
         if (spec != null)
             spec.player = player;
-
         playerSpec.setSpec(spec);
     }
 
@@ -297,13 +300,9 @@ public final class JCraftUtils {
     }
 
     public static int getTicksIfInTSRange(BlockPos pos) {
-        for (DimValues timeStop : activeTimestops) {
-            if (timeStop != null) {
-                if (timeStop.pos.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) <= 65536) {
-                    return ((StandEntity) timeStop.user).getTSTime();
-                }
-            }
-        }
+        for (DimValues timeStop : activeTimestops)
+            if (timeStop != null && timeStop.pos.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) <= 65536)
+                    return timeStop.timer;
 
         return 0;
     }
@@ -315,51 +314,6 @@ public final class JCraftUtils {
                 ent.getZ() - ent.prevZ
         );
     }
-
-    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, float partialTick) {
-        animateGenericHumanoid(model, entity, player, partialTick, false, false);
-    }
-
-    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, float partialTick, boolean flipBody, boolean flipHead) {
-        animateGenericHumanoid(model, entity, player, partialTick, flipBody, flipHead, 0, 0, 90f);
-    }
-
-    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, float partialTick, boolean flipBody, boolean flipHead, float tPO, float hPO) {
-        animateGenericHumanoid(model, entity, player, partialTick, flipBody, flipHead, tPO, hPO, 90f);
-    }
-
-    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, float partialTick, boolean flipBody, boolean flipHead, float tPO, float hPO, float velInfluence) {
-        float overVel = 0;
-
-        if (entity.getMoveStun() < 1) {
-            Vec3d playerVel = deltaPos(player);
-            overVel = MathHelper.clamp((float) playerVel.horizontalLength() - 0.05f, -1f, 1f);
-
-            // If going backwards
-            if (playerVel.normalize().add(entity.getRotationVector()).horizontalLengthSquared() < playerVel.normalize().horizontalLengthSquared())
-                velInfluence *= -1;
-
-            IBone torso = model.getAnimationProcessor().getBone("torso");
-            if (torso != null) {
-                float pitch = (180f + overVel * velInfluence) * 3.1415f / 180f;
-                if (flipBody) {
-                    pitch += 3.1415f;
-                    pitch = -pitch;
-                }
-                torso.setRotationX(pitch + tPO);
-            }
-        }
-
-        if (entity.getState() == 3 || entity.getState() < 2) { // if in/going to idle, or blocking
-            IBone head = model.getAnimationProcessor().getBone("head");
-            if (head != null) {
-                float headPitch = (player.getPitch() - overVel * velInfluence) * 3.1415f / 180f;
-                if (flipHead) headPitch = -headPitch;
-                head.setRotationX(headPitch + hPO);
-            }
-        }
-    }
-
 
     public static List<BlockInfo> collectBlockInfo(World world, BlockPos origin, int radius) {
         List<BlockInfo> infoList = new ArrayList<>();

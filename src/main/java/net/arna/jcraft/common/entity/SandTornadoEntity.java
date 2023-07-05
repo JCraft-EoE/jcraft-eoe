@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.common.util.IOwnable;
-import net.arna.jcraft.common.util.JCraftUtils;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -97,14 +97,14 @@ public class SandTornadoEntity extends LivingEntity implements IAnimatable, IOwn
                 return;
             }
 
-            List<LivingEntity> toHurt = JCraftUtils.generateHitbox(world, getEyePos(), 1.8, List.of(this, master));
+            List<LivingEntity> toHurt = JUtils.generateHitbox(world, getEyePos(), 1.8, List.of(this, master));
 
             if (toHurt.isEmpty()) {
                 setVelocity( getVelocity().add( getRotationVector().multiply(0.5) ).multiply(0.25) );
             } else {
                 setVelocity( getVelocity().multiply(0.25) );
                 for (LivingEntity living : toHurt) {
-                    LivingEntity target = JCraftUtils.getUserIfStand(living);
+                    LivingEntity target = JUtils.getUserIfStand(living);
                     if (target.isConnectedThroughVehicle(master)) return;
                     StandEntity.damageLogic(world, target, circulation, 10, 1, false, 2f, true, 6, DamageSource.mob(master), master);
                 }

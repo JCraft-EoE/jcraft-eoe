@@ -1,16 +1,14 @@
 package net.arna.jcraft.common.entity;
 
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.util.IEntityDataSaver;
-import net.arna.jcraft.common.util.JCraftUtils;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.damage.EntityDamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -166,7 +164,7 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
                 if (ownerStand != null) except = List.of(owner, ownerStand);
                 else except = List.of(owner);
 
-                for (LivingEntity living : JCraftUtils.generateHitbox(world, getPos(), 1.5, except)) {
+                for (LivingEntity living : JUtils.generateHitbox(world, getPos(), 1.5, except)) {
                     living.addStatusEffect(new StatusEffectInstance(JStatusRegister.WSPOISON, 20, 0, true, false));
                     living.damage(JDamageSources.whitesnakePoison(owner), 2f);
                 }

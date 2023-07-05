@@ -7,7 +7,7 @@ import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.AttackQueue;
 import net.arna.jcraft.common.util.IEntityDataSaver;
-import net.arna.jcraft.common.util.JCraftUtils;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -120,7 +120,7 @@ public class StandControlPacket {
                     if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking())
                         stand.queuedAttack = AttackQueue.HEAVY;
                 } else {
-                    JCraftSpec spec = JCraftUtils.getSpec(player);
+                    JCraftSpec spec = JUtils.getSpec(player);
                     if (spec != null) {
                         spec.InitHeavyAttack(world);
                         if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT)
@@ -138,7 +138,7 @@ public class StandControlPacket {
                     if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking())
                         stand.queuedAttack = AttackQueue.BARRAGE;
                 } else {
-                    JCraftSpec spec = JCraftUtils.getSpec(player);
+                    JCraftSpec spec = JUtils.getSpec(player);
                     if (spec != null) {
                         spec.InitBarrage(world);
                         if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT)
@@ -156,7 +156,7 @@ public class StandControlPacket {
                     if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking())
                         stand.queuedAttack = AttackQueue.SPECIAL1;
                 } else {
-                    JCraftSpec spec = JCraftUtils.getSpec(player);
+                    JCraftSpec spec = JUtils.getSpec(player);
                     if (spec != null) {
                         spec.InitSpecial1(world);
                         if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT)
@@ -174,7 +174,7 @@ public class StandControlPacket {
                     if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking())
                         stand.queuedAttack = AttackQueue.ULTIMATE;
                 } else {
-                    JCraftSpec spec = JCraftUtils.getSpec(player);
+                    JCraftSpec spec = JUtils.getSpec(player);
                     if (spec != null) {
                         spec.InitUlt(world);
                         if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT)
@@ -192,7 +192,7 @@ public class StandControlPacket {
                     if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking())
                         stand.queuedAttack = AttackQueue.SPECIAL2;
                 } else {
-                    JCraftSpec spec = JCraftUtils.getSpec(player);
+                    JCraftSpec spec = JUtils.getSpec(player);
                     if (spec != null) {
                         spec.InitSpecial2(world);
                         if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT)
@@ -210,7 +210,7 @@ public class StandControlPacket {
                     if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking())
                         stand.queuedAttack = AttackQueue.SPECIAL3;
                 } else {
-                    JCraftSpec spec = JCraftUtils.getSpec(player);
+                    JCraftSpec spec = JUtils.getSpec(player);
                     if (spec != null) {
                         spec.InitSpecial3(world);
                         if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT)
@@ -236,7 +236,7 @@ public class StandControlPacket {
             // 11 - Combo Breaker
             case 11 -> server.execute(() -> {
                 StatusEffectInstance stun = player.getStatusEffect(JStatusRegister.DAZED);
-                if (JCraftUtils.isBlocking(player)) return;
+                if (JUtils.isBlocking(player)) return;
                 if (stun != null)
                     ComboBreak(world, player, stun);
             });
