@@ -260,8 +260,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
             if (getMoveStun() < 1) {
                 if (user.isSneaking())
                     handleAttack(epitaph, JCraft.standS3CD, 9);
-                else {
-                    handleAttack(prediction, JCraft.standS3CD, 12);
+                else if (handleAttack(prediction, JCraft.standS3CD, 12)) {
                     predictionInfo.clear();
                     playSound(JSoundRegister.KC_EPITAPH, 1, 1);
                 }
@@ -576,7 +575,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                 if (attack.id == overhead.id)
                     this.queuedAttack = null;
                 if (attack.id == prediction.id && age % 3 == 0) {
-                    user.addStatusEffect( new StatusEffectInstance(StatusEffects.SLOWNESS, 3, 2, true, false) );
+                    user.addStatusEffect( new StatusEffectInstance(StatusEffects.SLOWNESS, 10, 2, true, false) );
 
                     int timeLeft = prediction.moveStun - getMoveStun();
                     for (TimeEraseData data : predictionInfo) {

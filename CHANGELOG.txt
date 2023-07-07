@@ -1071,6 +1071,16 @@ King Crimson
     New Move - Predict
         >Extrapolates future position of nearby entities, can use Time Erase to force them into it
 
+● 7/7/2023
+Whitesnake
+    >Leg Crusher damage increased (5->7)
+    >Donut damage reduced (12->10)
+    >Melt your Heart
+        >projectile direct damage increased (2->5)
+        >added crouching variation (more startup, 5 slower shots)
+    >Stand Disc damage increased (6->8)
+    >Memory Disc damage increased (6->7)
+
 priority (top to bottom)
 TODO: AI flags for unblockables and shouldn't-blockables
 TODO: stand summon particles

@@ -42,16 +42,21 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
         super(entityType, world);
     }
 
+    private static final TrackedData<Boolean> MYH; // Melt your Heart variant
     private static final TrackedData<Boolean> SPLAT;
     private static final TrackedData<Float> FINALPITCH;
     private static final TrackedData<Float> FINALYAW;
 
     static {
+        MYH = DataTracker.registerData(WSAcidProjectile.class, TrackedDataHandlerRegistry.BOOLEAN);
         SPLAT = DataTracker.registerData(WSAcidProjectile.class, TrackedDataHandlerRegistry.BOOLEAN);
         FINALPITCH = DataTracker.registerData(WSAcidProjectile.class, TrackedDataHandlerRegistry.FLOAT);
         FINALYAW = DataTracker.registerData(WSAcidProjectile.class, TrackedDataHandlerRegistry.FLOAT);
     }
 
+    public void markMeltYourHeart() {
+        dataTracker.set(MYH, true);
+    }
     private void splat() {
         dataTracker.set(SPLAT, true);
         setNoGravity(true);
@@ -74,6 +79,7 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
         setSound(SoundEvents.ITEM_BUCKET_EMPTY);
         setOwner(owner);
         pickupType = PickupPermission.DISALLOWED;
+        ignoreCameraFrustum = true;
     }
 
     @Override
@@ -82,13 +88,18 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
         dataTracker.startTracking(FINALPITCH, 0.0F);
         dataTracker.startTracking(FINALYAW, 0.0F);
         dataTracker.startTracking(SPLAT, false);
+        dataTracker.startTracking(MYH, false);
     }
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
         if (world.isClient) return;
+
         Entity owner = getOwner();
         if (owner == null) return;
+
+        if (dataTracker.get(MYH)) return; // Melt your Heart variants of this phase through entities
+
         Entity entity = entityHitResult.getEntity();
         if (owner.hasPassenger(entity) || entity == owner) return;
 
@@ -96,7 +107,7 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
             LivingEntity target = living;
             if (entity instanceof StandEntity stand && stand.hasUser())
                 target = stand.getUser();
-            damageLogic(world, target, Vec3d.ZERO, 10, 1, false, 2f, false, 6, DamageSource.thrownProjectile(this, owner), owner);
+            damageLogic(world, target, Vec3d.ZERO, 10, 1, false, 5f, false, 6, DamageSource.thrownProjectile(this, owner), owner);
             target.addStatusEffect(new StatusEffectInstance(JStatusRegister.WSPOISON, 60, 0, false, true));
             discard();
         }
@@ -216,7 +227,7 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
         event.getController().setAnimation(
                 dataTracker.get(SPLAT) ?
                 new AnimationBuilder().playAndHold("animation.wsacid.splat") :
-                new AnimationBuilder().loop("animation.wsacid.idle")
+                new AnimationBuilder().loop(dataTracker.get(MYH) ? "animation.wsacid.meltidle" : "animation.wsacid.idle")
         );
         return PlayState.CONTINUE;
     }

@@ -28,27 +28,34 @@ import java.util.List;
 public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnimationTickable {
     public static final Attack light = new Attack(0, 2, 0.75f, 14, 7, 1.5, 5f, 0.75f, AttackType.BOX, 0.6f, 0.2f, 0, JSoundRegister.IMPACT_3)
             .setInfo("Punch", "quick combo starter");
-    public static final Attack legcrusher = new Attack(4, 20, 0.75f, 22, 16, 1.5, 5f, 0.25f, AttackType.BOX, 1.6f, 0.2f, 0, JSoundRegister.TW_KICK_HIT)
+    public static final Attack legcrusher = new Attack(4, 20, 0.75f, 22, 16, 1.5, 7f, 0.25f, AttackType.BOX, 1.6f, 0.2f, 0, JSoundRegister.TW_KICK_HIT)
             .setHitspark(2)
             .setInfo("Leg Crusher", "high stun, medium windup");
     public static final Attack poisonspew = new Attack(5, 20, 0.75f, 14, 10, 2, 0f, 0, AttackType.BOX)
             .setUB(true)
-            .setInfo("Melt your Heart", "fires an acid projectile that slows enemies and persists on the surface it hits for 5s");
+            .setInfo("Poison Spew", "fires an acid projectile that slows enemies and persists on the surface it hits for 5s/crouch for a charged variation that fires 5 slower shots");
+    public static final Attack chargedspew = new Attack(7, 30, 0.75f, 26, 20, 2, 0f, 0, AttackType.BOX)
+            .setUB(true)
+            .setInfo("Charged Spew", "");
     public static final Attack barrage = new Attack(2, 17, 0.75f, 60, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 1, 0, 3, JSoundRegister.IMPACT_3)
             .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
-    public static final Attack donut = new Attack(1, 18, 1f, 36, 17, 2, 12f, 0.0f, AttackType.BOX, 1.4f, 0, 0, JSoundRegister.TW_DONUT_HIT)
+    public static final Attack donut = new Attack(1, 18, 1f, 36, 17, 2, 10f, 0.0f, AttackType.BOX, 1.4f, 0, 0, JSoundRegister.TW_DONUT_HIT)
             .setHitspark(2)
             .setInfo("Donut", "slow combo starter/extender");
-    public static final Attack memorydisk = new Attack(6, 30, 1f, 34, 22, 2, 6f, 0.0f, AttackType.BOX, 1f, 0, 0, JSoundRegister.IMPACT_2)
+    public static final Attack memorydisk = new Attack(6, 30, 1f, 34, 22, 2, 7f, 0.0f, AttackType.BOX, 1f, 0, 0, JSoundRegister.IMPACT_2)
             .setHitspark(2)
             .setArmor(true)
             .setUB(true)
             .setInfo("Memory Disk", "uninterruptable, mining fatigue & weakness for 30s");
-    public static final Attack standdisk = new Attack(3, 30, 1f, 34, 22, 2, 6f, 0.0f, AttackType.BOX, 1f, 0, 0, JSoundRegister.IMPACT_2)
+    public static final Attack standdisk = new Attack(3, 30, 1f, 34, 22, 2, 8f, 0.0f, AttackType.BOX, 1f, 0, 0, JSoundRegister.IMPACT_2)
             .setHitspark(2)
             .setArmor(true)
             .setUB(true)
-            .setInfo("Stand Disk", "uninterruptable, removes enemy stand for 8s");
+            .setInfo("Stand Disk/Melt your Heart", "uninterruptable, removes enemy stand for 8s/in remote mode, long windup, creates a sphere of poison projectiles");
+    public static final Attack meltyourheart = new Attack(8, 40, 1f, 50, 40, 2, 3f, 1.0f, AttackType.BOX, 1f, 0, 0, JSoundRegister.IMPACT_2)
+            .setUB(true)
+            .setLaunch()
+            .setInfo("", "");
 
     //public static Attack gun = new Attack(-1,20, 21, 15, 1, 0.75f, AttackType.BOX).setRanged(true).setInfo("Gun", "fully aimable, combo starter");
 
@@ -58,14 +65,14 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
         idleRotation = 220f;
 
         pros = List.of(
-                "fast m1",
+                "coverage on all ranges",
                 "high versatility",
                 "accessible win condition"
         );
 
         cons = List.of(
                 "no mobility options",
-                "unsafe pokes"
+                "slow pokes"
         );
 
         description = "All Range DISABLER";
@@ -74,7 +81,7 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
                 "BNBs:\n" +
                         "    (Memory Disk/Stand Disk>)M1>Barrage>Leg Crusher>Donut>Poison";
 
-        moves = List.of(light, donut, barrage, standdisk, memorydisk, legcrusher, poisonspew,
+        moves = List.of(light, donut, barrage, memorydisk, standdisk, legcrusher, poisonspew,
                 new Attack().setInfo("Pilot Mode", ""));
     }
 
@@ -109,7 +116,9 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        if (handleAttack(standdisk, JCraft.standUltCD, 8))
+        if (getRemote() && handleAttack(meltyourheart, JCraft.standUltCD, 18))
+            playSound(JSoundRegister.WS_DISK, 1, 1);
+        else if (handleAttack(standdisk, JCraft.standUltCD, 8))
             playSound(JSoundRegister.WS_DISK, 1, 1);
     }
 
@@ -123,7 +132,11 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
     @Override
     public void initSpecial3() {
         if (!canAttack()) return;
-        handleAttack(poisonspew, JCraft.standS3CD, 7);
+
+        if (getUser().isSneaking())
+            handleAttack(chargedspew, JCraft.standS3CD, 17);
+        else
+            handleAttack(poisonspew, JCraft.standS3CD, 7);
     }
 
     @Override
@@ -138,13 +151,13 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
+        LivingEntity user = getUser();
         switch (attack.id) {
             case (3) -> { // Stand Disc
                 for (LivingEntity ent : entities)
                     ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.STANDLESS, 160, 0, true, false));
             }
             case (5) -> { // Poison Spew
-                LivingEntity user = getUser();
                 WSAcidProjectile acidProjectile = new WSAcidProjectile(world, user);
                 acidProjectile.setVelocity(user, user.getPitch(), user.getYaw(), 0, 1.33F, 0);
                 acidProjectile.setPosition(getEyePos());
@@ -154,6 +167,26 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
                 for (LivingEntity ent : entities) {
                     ent.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 600, 0));
                     ent.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 600, 0));
+                }
+            }
+            case (7) -> { // Charged Spew
+                for (int i = 0; i < 5; i++) {
+                    WSAcidProjectile acidProjectile = new WSAcidProjectile(world, user);
+                    acidProjectile.setVelocity(user, user.getPitch(), user.getYaw() - 90F + i * 45F, 0, 0.66F, 0);
+                    acidProjectile.setPosition(getEyePos());
+                    world.spawnEntity(acidProjectile);
+                }
+            }
+            case (8) -> { // Melt your Heart
+                for (int i = 0; i < 10; i++) {
+                    float yaw = i * 36F - 180F;
+                    for (int j = 0; j < 10; j++) {
+                        WSAcidProjectile acidProjectile = new WSAcidProjectile(world, user);
+                        acidProjectile.markMeltYourHeart();
+                        acidProjectile.setVelocity(user, j * 36F - 180F, yaw, 0, 0.66F, 0);
+                        acidProjectile.setPosition(getEyePos());
+                        world.spawnEntity(acidProjectile);
+                    }
                 }
             }
         }
@@ -267,6 +300,9 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
             case 14 -> controller.setAnimation(builder.loop("animation.whitesnake.bdash"));
             case 15 -> controller.setAnimation(builder.loop("animation.whitesnake.ldash"));
             case 16 -> controller.setAnimation(builder.loop("animation.whitesnake.rdash"));
+
+            case 17 -> controller.setAnimation(builder.playAndHold("animation.whitesnake.acidspew_charged"));
+            case 18 -> controller.setAnimation(builder.playAndHold("animation.whitesnake.meltyourheart"));
         }
         controller.setAnimationSpeed(state > 8 ? 1.2 : 1);
         return PlayState.CONTINUE;

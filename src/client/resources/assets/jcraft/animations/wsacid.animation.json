@@ -22,6 +22,22 @@
 				}
 			}
 		},
+		"animation.wsacid.meltidle": {
+			"loop": true,
+			"animation_length": 1.44,
+			"bones": {
+				"base": {
+					"scale": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"splat": {
+					"scale": {
+						"vector": [0, 0, 0]
+					}
+				}
+			}
+		},
 		"animation.wsacid.splat": {
 			"loop": "hold_on_last_frame",
 			"animation_length": 5.04,
