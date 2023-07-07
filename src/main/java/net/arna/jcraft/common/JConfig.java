@@ -15,4 +15,7 @@ public class JConfig extends MidnightConfig {
 
     @Entry
     public static boolean ICON_HUD = true;
+
+    @Entry
+    public static boolean TE_SHADER = true;
 }

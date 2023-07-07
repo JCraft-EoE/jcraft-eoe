@@ -252,8 +252,14 @@ public interface JEntityTypeRegister {
         );
 
         FabricDefaultAttributeRegistry.register(D4C, D4CEntity.createMobAttributes());
-        FabricDefaultAttributeRegistry.register(PLAYER_ENTITY_CLONE, D4CEntity.createMobAttributes().add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 2).add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3));
-        FabricDefaultAttributeRegistry.register(PLAYER_ENTITY_CLONE_SLIM, D4CEntity.createMobAttributes().add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 2).add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3));
+        FabricDefaultAttributeRegistry.register(PLAYER_ENTITY_CLONE, D4CEntity.createMobAttributes()
+                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 2)
+                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3)
+        );
+        FabricDefaultAttributeRegistry.register(PLAYER_ENTITY_CLONE_SLIM, D4CEntity.createMobAttributes()
+                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 2)
+                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3)
+        );
 
         FabricDefaultAttributeRegistry.register(LIFE_DETECTOR, LifeDetectorEntity.createDetectorAttributes());
         FabricDefaultAttributeRegistry.register(BLOCK_PROJECTILE, BlockProjectile.createBlockAttributes());

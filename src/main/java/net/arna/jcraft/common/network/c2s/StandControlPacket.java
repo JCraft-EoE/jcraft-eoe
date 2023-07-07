@@ -251,7 +251,14 @@ public class StandControlPacket {
                             LOGGER.error("Failed to convert clone " + clone + " into slim variation in world " + clone.world);
                             return;
                         }
+
+                        // Copy additional data (not handled in convertTo)
                         slimClone.setMaster(ownerReference);
+
+                        slimClone.setHeadYaw(clone.getHeadYaw());
+                        slimClone.setBodyYaw(clone.getBodyYaw());
+
+                        slimClone.setTarget(clone.getTarget());
 
                         clone.switched = true;
                         clone.switchedTo = slimClone;

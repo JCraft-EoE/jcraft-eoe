@@ -102,6 +102,7 @@
   "jcraft.midnightconfig.enum.UIPos.LEFT": "Left",
   "jcraft.midnightconfig.enum.UIPos.MIDDLE": "Middle",
   "jcraft.midnightconfig.ICON_HUD": "Icon HUD",
+  "jcraft.midnightconfig.TE_SHADER": "Use Time Erase Shader",
 
   "jcraft.disc.error": "Cannot use disc while in combat!",
   "jcraft.anubis.unsheathe": "Unsheathing Anubis will override your spec, are you sure?",

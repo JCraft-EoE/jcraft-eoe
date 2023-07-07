@@ -134,8 +134,9 @@ public abstract class StandEntity extends MobEntity {
      * Sets the stands user if there isn't one
      */
     public void setUser(LivingEntity user) {
-        if (this.user == null)
-            this.user = user;
+        //if (this.user != null)
+        //    JCraft.LOGGER.info("Overriding stand user for stand: " + this);
+        this.user = user;
     }
     public LivingEntity getUser() {
         return user;

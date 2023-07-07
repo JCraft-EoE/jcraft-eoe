@@ -1053,6 +1053,24 @@ Timestops
     >Fixed bug where particles were not stopped in timestop
     >Newly created entities now move for one tick before stopping
 
+● 6/7/2023
+>Fixed crash when timestopping a non-spec user
+
+King Crimson
+    Blood Throw
+        >Blood speed now depends on whether the user is standing when it comes out (standing: 0.66, crouching: 1.33 m/s)
+    Time Erase
+        >Fixed bug where the shader would trigger before the move
+        >No longer returns enemies to their original position
+        >Now creates a doppelgänger of the one erasing time
+        >Added config option to disable shader
+    Timeskip
+        >Now cancels Time Erase when used inside it
+    Epitaph Counter
+        >Now the crouching variation to the main move, Predict
+    New Move - Predict
+        >Extrapolates future position of nearby entities, can use Time Erase to force them into it
+
 priority (top to bottom)
 TODO: AI flags for unblockables and shouldn't-blockables
 TODO: stand summon particles

@@ -44,6 +44,11 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
         navigation = getNavigation();
     }
 
+    public void disableDrops() {
+        Arrays.fill(this.armorDropChances, 0);
+        Arrays.fill(this.handDropChances, 0);
+    }
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     private final BowAttackGoal<PlayerCloneEntity> bowAttackGoal = new BowAttackGoal(this, 1.0, 30, 15.0F);
     private final CloneAttackGoal cloneAttackGoal = new CloneAttackGoal(this, 1) {
@@ -57,6 +62,11 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
             PlayerCloneEntity.this.setAttacking(true);
         }
     };
+
+    private boolean allowItemExchange = true;
+    public void disableItemExchange() {
+        allowItemExchange = false;
+    }
 
     public boolean switched = false; // Has this clone switched to a thin version?
     public PlayerCloneEntity switchedTo; // The thin clone instance
@@ -154,7 +164,7 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
 
     @Override
     public ActionResult interactAt(PlayerEntity player, Vec3d hitPos, Hand hand) {
-        if (player != master)
+        if (player != master || !allowItemExchange)
             return ActionResult.FAIL;
 
         ItemStack itemStack = player.getStackInHand(hand);

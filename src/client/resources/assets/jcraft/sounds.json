@@ -156,9 +156,15 @@
     ]
   },
 
-  "eyechop": {
+  "kceyechop": {
     "sounds": [
       "jcraft:stands/kingcrimson/eyechop"
+    ]
+  },
+
+  "kcepitaph": {
+    "sounds": [
+      "jcraft:stands/kingcrimson/epitaph"
     ]
   },
 

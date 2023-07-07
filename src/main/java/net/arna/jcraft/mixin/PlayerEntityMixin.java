@@ -47,7 +47,7 @@ public abstract class PlayerEntityMixin implements ISpec, IComboCounter {
     public void setSpec(JCraftSpec spec) {
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeShort(5);
-        buf.writeInt(spec.getId());
+        buf.writeInt(spec == null ? 0 : spec.getId());
         ServerChannelFeedbackPacket.send( ((ServerPlayerEntity)(Object)this), buf );
 
         this.spec = spec;

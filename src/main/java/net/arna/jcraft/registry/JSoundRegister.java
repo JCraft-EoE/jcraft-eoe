@@ -45,7 +45,8 @@ public interface JSoundRegister {
     SoundEvent KC_BARRAGE = registerSound("kcbarrage");
     SoundEvent KC_HEAVY = registerSound("kcheavy");
     SoundEvent KC_HEAVY2 = registerSound("kcheavy2");
-    SoundEvent EYE_CHOP = registerSound("eyechop");
+    SoundEvent KC_EYE_CHOP = registerSound("kceyechop");
+    SoundEvent KC_EPITAPH = registerSound("kcepitaph");
     SoundEvent TE_TP = registerSound("tetp");
     SoundEvent TIME_ERASE = registerSound("timeerase");
     SoundEvent TIME_ERASE_EXIT = registerSound("kcteexit");
