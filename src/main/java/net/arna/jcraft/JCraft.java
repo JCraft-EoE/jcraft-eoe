@@ -111,6 +111,7 @@ public class JCraft implements ModInitializer {
      * Puts nearby players' items on cooldown.
      * @param position    in world
      */
+    //todo: make TS stop animated textures
     public static void stopTime(Entity timestopper, Vec3d position, ServerWorld world, int duration) {
         // Registration
         RegistryKey<World> worldRegistryKey = world.getRegistryKey();

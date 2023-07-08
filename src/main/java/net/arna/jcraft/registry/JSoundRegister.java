@@ -107,6 +107,7 @@ public interface JSoundRegister {
     SoundEvent WS_DONUT = registerSound("wsdonut");
     SoundEvent WS_DISK = registerSound("wsdisk");
     SoundEvent WS_GUN = registerSound("wsgun");
+    SoundEvent WS_MYH = registerSound("wsmeltyourheart");
 
     //Magician's Red
     SoundEvent MR_SUMMON = registerSound("mrsummon");

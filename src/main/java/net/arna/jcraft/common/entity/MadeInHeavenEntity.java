@@ -339,24 +339,7 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
             Vec3d vec1 = curPos.add(-size, -size, -size);
             Vec3d vec2 = curPos.add(size, size, size);
 
-            if (this.world.getGameRules().getBoolean(JCraft.SHOW_HITBOXES)) {
-                PacketByteBuf buf = PacketByteBufs.create();
-                buf.writeShort(1);
-
-                buf.writeDouble(vec1.x);
-                buf.writeDouble(vec2.x);
-
-                buf.writeDouble(vec1.y);
-                buf.writeDouble(vec2.y);
-
-                buf.writeDouble(vec1.z);
-                buf.writeDouble(vec2.z);
-                for (PlayerEntity serverPlayer : this.world.getPlayers()) {
-                    if (serverPlayer instanceof ServerPlayerEntity serverPlayerEntity) {
-                        ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
-                    }
-                }
-            }
+            JUtils.displayHitbox(getWorld(), vec1, vec2);
 
             List<LivingEntity> hurt = this.world.getEntitiesByClass(LivingEntity.class, new Box(vec1, vec2), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
             hurt.removeIf(hurtAll::contains);

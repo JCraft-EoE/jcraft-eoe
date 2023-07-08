@@ -36,6 +36,25 @@ import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 public final class JUtils {
     public static List<DimValues> activeTimestops = new ArrayList<>();
 
+    public static void displayHitbox(World world, Vec3d v1, Vec3d v2) {
+        if (v1 == v2) return;
+        if (!world.getGameRules().getBoolean(JCraft.SHOW_HITBOXES)) return;
+
+        //TODO: (sterner) convert this hitbox display from particle rendering to 0.5s cube outline
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeShort(1);
+        buf.writeDouble(v1.x);
+        buf.writeDouble(v2.x);
+        buf.writeDouble(v1.y);
+        buf.writeDouble(v2.y);
+        buf.writeDouble(v1.z);
+        buf.writeDouble(v2.z);
+
+        for (PlayerEntity player : world.getPlayers())
+            if (player instanceof ServerPlayerEntity serverPlayerEntity)
+                ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
+    }
+
     // Specify what type the hitbox searches for
     public static List<? extends Entity> generateHitbox(World world, Vec3d center, double hitboxSize, Class<? extends Entity> entityClass, List<Entity> except) {
         double size = hitboxSize / 2;
@@ -43,19 +62,7 @@ public final class JUtils {
         Vec3d v1 = center.subtract(size, size, size);
         Vec3d v2 = center.add(size, size, size);
 
-        if (world.getGameRules().getBoolean(JCraft.SHOW_HITBOXES) && v1 != v2 && size > 0) {
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(1);
-            buf.writeDouble(v1.x);
-            buf.writeDouble(v2.x);
-            buf.writeDouble(v1.y);
-            buf.writeDouble(v2.y);
-            buf.writeDouble(v1.z);
-            buf.writeDouble(v2.z);
-            for (PlayerEntity player : world.getPlayers())
-                if (player instanceof ServerPlayerEntity serverPlayerEntity)
-                    ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
-        }
+        if (size > 0) displayHitbox(world, v1, v2);
 
         List<? extends Entity> hit = world.getEntitiesByClass(entityClass, new Box(v1, v2), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
         ArrayList<Entity> toReturn = new ArrayList<>(List.copyOf(hit));
@@ -84,19 +91,7 @@ public final class JUtils {
         Vec3d v1 = center.subtract(size, size, size);
         Vec3d v2 = center.add(size, size, size);
 
-        if (world.getGameRules().getBoolean(JCraft.SHOW_HITBOXES) && v1 != v2 && size > 0) {
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(1);
-            buf.writeDouble(v1.x);
-            buf.writeDouble(v2.x);
-            buf.writeDouble(v1.y);
-            buf.writeDouble(v2.y);
-            buf.writeDouble(v1.z);
-            buf.writeDouble(v2.z);
-            for (PlayerEntity player : world.getPlayers())
-                if (player instanceof ServerPlayerEntity serverPlayerEntity)
-                    ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
-        }
+        if (size > 0) displayHitbox(world, v1, v2);
 
         List<LivingEntity> hit = world.getEntitiesByClass(LivingEntity.class, new Box(v1, v2), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
         ArrayList<LivingEntity> toReturn = new ArrayList<>(List.copyOf(hit));

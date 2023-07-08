@@ -5,10 +5,10 @@
   "plugin": "net.arna.jcraft.client.JClientMixinPlugin",
   "compatibilityLevel": "JAVA_16",
   "client": [
-    "IntegratedServerLoaderMixin",
     "ArmorFeatureRendererMixin",
     "BackgroundRenderMixin",
     "BipedEntityModelMixin",
+    "BlockEntityRenderDispatcherMixin",
     "CameraInvoker",
     "CameraMixin",
     "ClientPlayerEntityMixin",
@@ -16,12 +16,13 @@
     "EffectProgramMixin",
     "GameRendererMixin",
     "HeldItemFeatureRendererMixin",
+    "IntegratedServerLoaderMixin",
     "ItemRendererMixin",
     "ParticleAccessor",
     "ParticleManagerMixin",
     "WorldRendererMixin",
-    "sodium.vanilla.WorldRendererVanillaMixin",
-    "sodium.sodium.SodiumWorldRendererMixin"
+    "sodium.sodium.SodiumWorldRendererMixin",
+    "sodium.vanilla.WorldRendererVanillaMixin"
   ],
   "injectors": {
     "defaultRequire": 1

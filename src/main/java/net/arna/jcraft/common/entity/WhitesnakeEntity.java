@@ -117,7 +117,7 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
     public void initUlt() {
         if (!canAttack()) return;
         if (getRemote() && handleAttack(meltyourheart, JCraft.standUltCD, 18))
-            playSound(JSoundRegister.WS_DISK, 1, 1);
+            playSound(JSoundRegister.WS_MYH, 1, 1);
         else if (handleAttack(standdisk, JCraft.standUltCD, 8))
             playSound(JSoundRegister.WS_DISK, 1, 1);
     }

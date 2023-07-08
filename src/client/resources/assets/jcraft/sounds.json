@@ -442,6 +442,12 @@
     ]
   },
 
+  "wsmeltyourheart": {
+    "sounds": [
+      "jcraft:stands/whitesnake/meltyourheart"
+    ]
+  },
+
   "wsdonut": {
     "sounds": [
       "jcraft:stands/whitesnake/donut"

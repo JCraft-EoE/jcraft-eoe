@@ -214,16 +214,16 @@ public class JCraftClient implements ClientModInitializer {
 
                 String keyBindText = switch (i) {
                     case (1) -> "M1";
-                    case (12), (2) -> GenerateName(heavyKey.getBoundKeyTranslationKey());
-                    case (13), (3) -> GenerateName(barrageKey.getBoundKeyTranslationKey());
-                    case (14), (4) -> GenerateName(ultKey.getBoundKeyTranslationKey());
-                    case (15), (5) -> GenerateName(special1Key.getBoundKeyTranslationKey());
-                    case (16), (6) -> GenerateName(special2Key.getBoundKeyTranslationKey());
-                    case (17), (7) -> GenerateName(special3Key.getBoundKeyTranslationKey());
-                    case (8) -> GenerateName(utility.getBoundKeyTranslationKey());
-                    case (9) -> GenerateName(comboBreaker.getBoundKeyTranslationKey());
-                    case (10) -> GenerateName(cooldownCancel.getBoundKeyTranslationKey());
-                    case (11) -> GenerateName(dash.getBoundKeyTranslationKey());
+                    case (12), (2) -> generateName(heavyKey.getBoundKeyTranslationKey());
+                    case (13), (3) -> generateName(barrageKey.getBoundKeyTranslationKey());
+                    case (14), (4) -> generateName(ultKey.getBoundKeyTranslationKey());
+                    case (15), (5) -> generateName(special1Key.getBoundKeyTranslationKey());
+                    case (16), (6) -> generateName(special2Key.getBoundKeyTranslationKey());
+                    case (17), (7) -> generateName(special3Key.getBoundKeyTranslationKey());
+                    case (8) -> generateName(utility.getBoundKeyTranslationKey());
+                    case (9) -> generateName(comboBreaker.getBoundKeyTranslationKey());
+                    case (10) -> generateName(cooldownCancel.getBoundKeyTranslationKey());
+                    case (11) -> generateName(dash.getBoundKeyTranslationKey());
                     default -> "unknown";
                 };
 
@@ -295,6 +295,7 @@ public class JCraftClient implements ClientModInitializer {
             StandEntity stand = ((IEntityDataSaver)player).getStand();
             boolean standOn = stand != null;
 
+            //todo: reformat this into 3 packets (input packet, stand block packet, attack packet)
             if (player.isAlive()) { // Send movement inputs to server
                 PacketByteBuf buf = PacketByteBufs.create();
                 buf.writeShort(0);
@@ -309,6 +310,15 @@ public class JCraftClient implements ClientModInitializer {
                 clientCooldowns = DefaultedList.ofSize(JCraft.cooldowns.size(), 0.0);
             }
 
+            // Block (3)
+            if (standOn) {
+                PacketByteBuf buf = PacketByteBufs.create();
+                boolean rmb = go.useKey.wasPressed() || go.useKey.isPressed();
+                buf.writeShort(3);
+                buf.writeBoolean(rmb);
+                sendStandControlPacket(buf);
+            }
+
             // (De)summon (1)
             if (standSummon.wasPressed()) {
                 PacketByteBuf buf = PacketByteBufs.create();
@@ -319,14 +329,6 @@ public class JCraftClient implements ClientModInitializer {
             if (go.attackKey.isPressed()) { // wasPressed() simply doesn't work
                 PacketByteBuf buf = PacketByteBufs.create();
                 buf.writeShort(2);
-                sendStandControlPacket(buf);
-            }
-            // Block (3)
-            if (standOn) {
-                PacketByteBuf buf = PacketByteBufs.create();
-                boolean rmb = go.useKey.wasPressed() || go.useKey.isPressed();
-                buf.writeShort(3);
-                buf.writeBoolean(rmb);
                 sendStandControlPacket(buf);
             }
             // Heavy (4)
@@ -399,14 +401,14 @@ public class JCraftClient implements ClientModInitializer {
         ClientPlayNetworking.send(StandControlPacket.ID, buf);
     }
 
-    private String GenerateName(String str) {
+    /**
+     * @return cleaned up version of TranslatableText name of button
+     */
+    private String generateName(String str) {
         String[] components = str.split("\\.");
         String last = components[components.length - 1];
         String secondLast = components[components.length - 2] + " ";
-        if (components[components.length - 2].equals("keyboard")) {
-            secondLast = "";
-        }
-
+        if (components[components.length - 2].equals("keyboard")) secondLast = "";
         return StringUtils.capitalize(secondLast) + StringUtils.capitalize(last);
     }
 }

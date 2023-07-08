@@ -15,6 +15,7 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
 
     private ClientEntityHandlerImpl() {}
 
+    //todo: tell the server nicely that you are thin instead of running this schizo routine to make the clone thin
     @Override
     public void playerCloneEntityClientTick(PlayerCloneEntity entity) {
         if (entity.age != 1 || entity.getType() != JEntityTypeRegister.PLAYER_ENTITY_CLONE) return;
