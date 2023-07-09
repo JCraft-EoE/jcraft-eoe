@@ -16,6 +16,7 @@
     "EffectProgramMixin",
     "GameRendererMixin",
     "HeldItemFeatureRendererMixin",
+    "InGameHudMixin",
     "IntegratedServerLoaderMixin",
     "ItemRendererMixin",
     "ParticleAccessor",

@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.entity;
 
+import io.netty.buffer.Unpooled;
 import lombok.Data;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
@@ -10,6 +11,7 @@ import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -258,8 +260,9 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                 return;
 
             NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
+            boolean start = getMoveStun() < 1;
 
-            if (getMoveStun() < 1) {
+            if (start) {
                 if (user.isSneaking())
                     handleAttack(epitaph, JCraft.standS3CD, 9);
                 else if (handleAttack(prediction, JCraft.standS3CD, 12)) {
@@ -290,6 +293,9 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                     ServerChannelFeedbackPacket.send(serverPlayer, buf);
                 }
             }
+
+            if (getUser() instanceof ServerPlayerEntity player) ServerPlayNetworking.send(player, JCraft.id("epitath_state"),
+                    new PacketByteBuf(Unpooled.buffer().writeBoolean(start)));
         }
     }
 

@@ -2,6 +2,7 @@ package net.arna.jcraft.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.hud.EpitathOverlay;
 import net.arna.jcraft.client.hud.JCraftAbilityHud;
 import net.arna.jcraft.client.hud.JCraftHudOverlay;
 import net.arna.jcraft.client.net.ClientPacketHandler;
@@ -130,10 +131,15 @@ public class JCraftClient implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(ShaderActivationPacket.ID, (client, handler, buf, sender) -> ClientPacketHandler.handleShaderActivation(client, buf));
         ClientPlayNetworking.registerGlobalReceiver(ShaderDeactivationPacket.ID, (client, handler, buf, sender) -> ClientPacketHandler.handleShaderDeactivation(client, buf));
         ClientPlayNetworking.registerGlobalReceiver(TimeAccelStatePacket.ID, (client, handler, buf, sender) -> ClientPacketHandler.handleTimeAccelState(client, buf));
+        ClientPlayNetworking.registerGlobalReceiver(JCraft.id("epitath_state"), (client, handler, buf, responseSender) -> ClientPacketHandler.handleEpitathOverlayState(buf));
 
         HudRenderCallback.EVENT.register(new JCraftHudOverlay());
         HudRenderCallback.EVENT.register(this::renderHud);
         HudRenderCallback.EVENT.register(new JCraftAbilityHud());
+//        HudRenderCallback.EVENT.register((matrices, tickDelta) -> EpitathOverlay.render(matrices));
+
+        // Run when the MinecraftClient instance is fully initialized.
+        MinecraftClient.getInstance().submit(EpitathOverlay::preload);
 
         Identifier itemId = JObjectRegistry.ITEMS.get(JObjectRegistry.DEBUG_WAND);
         BigItemRenderer itemRenderer = new BigItemRenderer(itemId);

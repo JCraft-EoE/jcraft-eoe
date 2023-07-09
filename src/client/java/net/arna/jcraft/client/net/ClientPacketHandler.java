@@ -8,6 +8,7 @@ import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import lombok.experimental.UtilityClass;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.JCraftClient;
+import net.arna.jcraft.client.hud.EpitathOverlay;
 import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
 import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
 import net.arna.jcraft.client.util.JClientUtils;
@@ -402,5 +403,11 @@ public class ClientPacketHandler {
             case START -> TimeAccelStatePacket.accelerations.put(mih.getId(), new TimeAccelStatePacket.TimeAcceleration(buf.readVarInt(), mih.getId()));
             case STOP -> TimeAccelStatePacket.accelerations.remove(mih.getId());
         }
+    }
+
+    public static void handleEpitathOverlayState(PacketByteBuf buf) {
+        boolean start = buf.readBoolean();
+        if (start) EpitathOverlay.start();
+        else EpitathOverlay.stop();
     }
 }
