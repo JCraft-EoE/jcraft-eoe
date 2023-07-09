@@ -261,11 +261,13 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
 
             NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
             boolean start = getMoveStun() < 1;
+            boolean didAttack = true;
 
             if (start) {
                 if (user.isSneaking())
-                    handleAttack(epitaph, JCraft.standS3CD, 9);
-                else if (handleAttack(prediction, JCraft.standS3CD, 12)) {
+                    didAttack = handleAttack(epitaph, JCraft.standS3CD, 9);
+                else //noinspection AssignmentUsedAsCondition // That is correct
+                    if (didAttack = handleAttack(prediction, JCraft.standS3CD, 12)) {
                     predictionInfo.clear();
                     playSound(JSoundRegister.KC_EPITAPH, 1, 1);
                 }
@@ -294,7 +296,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                 }
             }
 
-            if (getUser() instanceof ServerPlayerEntity player) ServerPlayNetworking.send(player, JCraft.id("epitath_state"),
+            if (didAttack && getUser() instanceof ServerPlayerEntity player) ServerPlayNetworking.send(player, JCraft.id("epitath_state"),
                     new PacketByteBuf(Unpooled.buffer().writeBoolean(start)));
         }
     }
