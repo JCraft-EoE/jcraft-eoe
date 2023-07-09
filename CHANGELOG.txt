@@ -1075,11 +1075,46 @@ King Crimson
 Whitesnake
     >Leg Crusher damage increased (5->7)
     >Donut damage reduced (12->10)
-    >Melt your Heart
+    >Poison spew
         >projectile direct damage increased (2->5)
-        >added crouching variation (more startup, 5 slower shots)
+        >added crouching variation (more startup, 5 slower shots
+    >New ultimate in remote mode - Melt your Heart
     >Stand Disc damage increased (6->8)
     >Memory Disc damage increased (6->7)
+
+● 8/7/2023
+>Timestops now stop liquids
+
+Brawler
+    >All attacks reanimated
+
+Star Platinum
+    >Added second hitbox to Star Breaker
+
+The World
+    >Added second hitbox to Donut
+
+King Crimson
+    >Added second hitbox to Eye Chop
+    >Added second hitbox to Heavy (first hit)
+    >Donut hitbox size reduced (2->1.75), stun reduced (6->4s)
+
+Whitesnake
+    >Poison puddles now disappear when moved off-ground
+    >Melt your Heart
+        >is now armored
+        >improved spread pattern
+    >Decreased spread on Poison Spew (charged) from 180° to 150°
+    >Leg Crusher hitbox size expanded (1.5->1.75)
+
+The Fool
+    >Added second hitbox to Swipe
+
+Golden Experience
+    >Added second hitbox to Shoulder Smash
+
+C-Moon
+    >Added second hitbox to Gut Punch
 
 priority (top to bottom)
 TODO: AI flags for unblockables and shouldn't-blockables

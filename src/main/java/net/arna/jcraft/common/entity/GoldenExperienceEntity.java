@@ -32,6 +32,7 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
             .setInfo("Punch", "quick combo starter");
     public static final Attack heavy = new Attack(1, 17, 1f, 22, 13, 1.5, 9f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_2)
             .setHitspark(2)
+            .appendHitbox(new Attack.HitboxData(0, 0, 1.25))
             .setArmor(true)
             .setLaunch()
             .setInfo("Shoulder Smash", "slow, uninterruptable combo finisher");

@@ -181,6 +181,8 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
                 }
             }
         } else if (world.isClient) {
+            if (dataTracker.get(SPLAT)) discard(); // Remove if splatted and not on ground
+
             Vec3d vel = getVelocity();
             world.addParticle(
                     ParticleTypes.SPIT,

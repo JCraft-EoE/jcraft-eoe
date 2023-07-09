@@ -28,7 +28,7 @@ import java.util.List;
 public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnimationTickable {
     public static final Attack light = new Attack(0, 2, 0.75f, 14, 7, 1.5, 5f, 0.75f, AttackType.BOX, 0.6f, 0.2f, 0, JSoundRegister.IMPACT_3)
             .setInfo("Punch", "quick combo starter");
-    public static final Attack legcrusher = new Attack(4, 20, 0.75f, 22, 16, 1.5, 7f, 0.25f, AttackType.BOX, 1.6f, 0.2f, 0, JSoundRegister.TW_KICK_HIT)
+    public static final Attack legcrusher = new Attack(4, 20, 0.75f, 22, 16, 1.75, 7f, 0.25f, AttackType.BOX, 1.6f, 0.2f, 0, JSoundRegister.TW_KICK_HIT)
             .setHitspark(2)
             .setInfo("Leg Crusher", "high stun, medium windup");
     public static final Attack poisonspew = new Attack(5, 20, 0.75f, 14, 10, 2, 0f, 0, AttackType.BOX)
@@ -53,6 +53,7 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
             .setUB(true)
             .setInfo("Stand Disk/Melt your Heart", "uninterruptable, removes enemy stand for 8s/in remote mode, long windup, creates a sphere of poison projectiles");
     public static final Attack meltyourheart = new Attack(8, 40, 1f, 50, 40, 2, 3f, 1.0f, AttackType.BOX, 1f, 0, 0, JSoundRegister.IMPACT_2)
+            .setArmor(true)
             .setUB(true)
             .setLaunch()
             .setInfo("", "");
@@ -172,14 +173,14 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
             case (7) -> { // Charged Spew
                 for (int i = 0; i < 5; i++) {
                     WSAcidProjectile acidProjectile = new WSAcidProjectile(world, user);
-                    acidProjectile.setVelocity(user, user.getPitch(), user.getYaw() - 90F + i * 45F, 0, 0.66F, 0);
+                    acidProjectile.setVelocity(user, user.getPitch(), user.getYaw() - 75F + i * 37.5F, 0, 0.66F, 0);
                     acidProjectile.setPosition(getEyePos());
                     world.spawnEntity(acidProjectile);
                 }
             }
             case (8) -> { // Melt your Heart
                 for (int i = 0; i < 10; i++) {
-                    float yaw = i * 36F - 180F;
+                    float yaw = i * 36F - 180F + i * 3.6F;
                     for (int j = 0; j < 10; j++) {
                         WSAcidProjectile acidProjectile = new WSAcidProjectile(world, user);
                         acidProjectile.markMeltYourHeart();

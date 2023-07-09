@@ -31,6 +31,7 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
             .setInfo("Punch", "quick combo starter");
     public static final Attack heavy = new Attack(1, 17, 1f, 30, 20, 2.0, 10f, 1.5f, AttackType.BOX, 0.5f)
             .setHitspark(2)
+            .appendHitbox(new Attack.HitboxData(0, 0, 1.5))
             .setArmor(true)
             .setLaunch()
             .setInfo("Star Breaker", "uninterruptable launcher");

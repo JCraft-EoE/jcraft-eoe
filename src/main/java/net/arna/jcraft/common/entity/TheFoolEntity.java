@@ -53,6 +53,7 @@ import java.util.List;
 
 public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimationTickable {
     public static final Attack light = new Attack(0, 2, 1.5f, 14, 7, 2, 6f, 0.8f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_2)
+            .appendHitbox(new Attack.HitboxData(0, 0.25, 1))
             .setInfo("Swipe", "slow, long-reaching poke");
     public static final Attack airbarrage = new Attack(3, 17, 1f, 30, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 0.5f, 0, 3);
     public static final Attack combo = new Attack(2, 15, 1.5f, 29, 0, 1.75, 4.5f, 0.1f, AttackType.MULTIHIT, 1f, -0.1f, List.of(6, 14, 18, 19), JSoundRegister.IMPACT_2)

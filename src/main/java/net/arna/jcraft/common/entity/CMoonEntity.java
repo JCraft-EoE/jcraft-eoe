@@ -48,6 +48,7 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
     public static final Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 0.75f, 0.25f, AttackType.BARRAGE, 1, 0, 4, JSoundRegister.IMPACT_3)
             .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
     public static final Attack gutpunch = new Attack(1, 17, 1f, 30, 19, 2.0, 8f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.TW_KICK_HIT).setHitspark(2).setArmor(true).setLaunch()
+            .appendHitbox(new Attack.HitboxData(0, 0.25, 1.25))
             .setInfo("Gut Punch", "slow, uninterruptable combo finisher");
     public static final Attack launch = new Attack(4, 22, 0.75f, 21, 14, 1.75, 5f, 0.9f, AttackType.BOX, 0.95f, 0.3f, 0, JSoundRegister.IMPACT_5)
             .setHitspark(2)

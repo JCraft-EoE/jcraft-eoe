@@ -37,6 +37,7 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
     public static final Attack donut = new Attack(1, 14, 1f, 48, 26, 2, 9f, 0.0f, AttackType.BOX, 4, 0, 0, JSoundRegister.TW_DONUT_HIT)
             .setHitspark(2)
+            .appendHitbox(new Attack.HitboxData(0, 0, 1.5))
             .setArmor(true)
             .setInfo("Donut", "slow, uninterruptable combo starter/extender, 1.5s stun on whiff");
     public static final Attack charge = new Attack(4, 20, 7.5f, 19, 5, 1.5, 5f, 0.25f, AttackType.CHARGE, 1, 0, 9, JSoundRegister.TW_CHARGE_HIT)
