@@ -34,6 +34,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import java.util.Arrays;
+import java.util.Optional;
+import java.util.UUID;
 
 public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob, IOwnable {
     public PlayerCloneEntity(EntityType<? extends HostileEntity> entityType, World world) {
@@ -78,7 +80,7 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
 
 
     static {
-        MASTERNAME = DataTracker.registerData(PlayerCloneEntity.class, TrackedDataHandlerRegistry.STRING);
+        MASTER = DataTracker.registerData(PlayerCloneEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
         SAND = DataTracker.registerData(PlayerCloneEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     }
 
@@ -91,11 +93,10 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
         this.master = m;
         Text mName = m.getName();
         setCustomName(mName);
-        setMasterName(mName.getString());
+        dataTracker.set(MASTER, Optional.of(m.getUuid()));
     }
-    private static final TrackedData<String> MASTERNAME;
-    public String getMasterName() { return dataTracker.get(MASTERNAME); }
-    private void setMasterName(String state) { dataTracker.set(MASTERNAME, state); }
+    private static final TrackedData<Optional<UUID>> MASTER;
+    public UUID getMasterId() { return dataTracker.get(MASTER).orElse(null); }
 
     private static final TrackedData<Boolean> SAND;
     public boolean isSand() { return dataTracker.get(SAND); }
@@ -104,10 +105,9 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
         TheFoolEntity.applySandCloneModifiers(this);
     }
 
-    private static final String unsetMasterName = "%unset_master_name";
     protected void initDataTracker() {
         super.initDataTracker();
-        dataTracker.startTracking(MASTERNAME, unsetMasterName);
+        dataTracker.startTracking(MASTER, Optional.empty());
         dataTracker.startTracking(SAND, false);
     }
 
@@ -131,13 +131,13 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
-        nbt.putString("MasterName", getMasterName());
+        nbt.putUuid("Master", getMasterId());
         nbt.putInt("DisabledSlots", disabledSlots);
     }
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        setMasterName(nbt.getString("MasterName"));
+        dataTracker.set(MASTER, Optional.of(nbt.getUuid("Master")));
         disabledSlots = nbt.getInt("DisabledSlots");
         updateAttackType();
     }
@@ -259,11 +259,11 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
         } else if (master == null) {
             // Run every 2 seconds (player lists are rather expensive)
             if (age % 40 == 0) {
-                // If the master name is set, but the master isn't (when loaded via NBT data), find master
-                String masterName = this.getMasterName();
-                if (!masterName.equals(unsetMasterName))
+                // If the master id is set, but the master isn't (when loaded via NBT data), find master
+                UUID master = this.getMasterId();
+                if (master != null)
                     for (ServerPlayerEntity serverPlayerEntity : PlayerLookup.world((ServerWorld) world))
-                        if (serverPlayerEntity.getName().getString().equals(masterName))
+                        if (serverPlayerEntity.getUuid().equals(master))
                             this.master = serverPlayerEntity;
             }
 

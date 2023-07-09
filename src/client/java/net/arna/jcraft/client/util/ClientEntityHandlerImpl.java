@@ -24,7 +24,7 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
         // This is in fact an entirely clientside process and can be considered a "security flaw",
         // but I really doubt anyone would care if someone turned all their clones thin
         ClientPlayerEntity clientPlayer = MinecraftClient.getInstance().player;
-        if (clientPlayer == null || !entity.getMasterName().equals(clientPlayer.getName().getString()) || !clientPlayer.getModel().equals("slim"))
+        if (clientPlayer == null || !entity.getMasterId().equals(clientPlayer.getName().getString()) || !clientPlayer.getModel().equals("slim"))
             return;
 
         PacketByteBuf buf = PacketByteBufs.create();

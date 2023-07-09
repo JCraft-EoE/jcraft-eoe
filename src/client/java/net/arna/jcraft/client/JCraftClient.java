@@ -10,6 +10,7 @@ import net.arna.jcraft.client.particle.*;
 import net.arna.jcraft.client.registry.JClientEventsRegistry;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
 import net.arna.jcraft.common.JConfig;
+import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.ShaderDeactivationPacket;
@@ -416,5 +417,10 @@ public class JCraftClient implements ClientModInitializer {
         String secondLast = components[components.length - 2] + " ";
         if (components[components.length - 2].equals("keyboard")) secondLast = "";
         return StringUtils.capitalize(secondLast) + StringUtils.capitalize(last);
+    }
+
+    public static boolean shouldRenderClone(PlayerCloneEntity clone) {
+        ClientPlayerEntity player = MinecraftClient.getInstance().player;
+        return player == null || !clone.getMasterId().equals(player.getUuid());
     }
 }
