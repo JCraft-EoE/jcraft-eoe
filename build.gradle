@@ -12,13 +12,13 @@ sourceSets.main.resources.srcDirs += ['src/main/generated']
 
 repositories {
 	maven {
-		name "GeckoLib"
-		url "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/"
+		name = "GeckoLib"
+		url = "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/"
 	}
 
 	maven {
-		name "Player Animator"
-		url "https://maven.kosmx.dev/"
+		name = "KosmX's maven"
+		url = "https://maven.kosmx.dev/"
 	}
 
 	maven {
@@ -30,9 +30,12 @@ repositories {
 		name = "Ladysnake"
 		url = "https://ladysnake.jfrog.io/artifactory/mods"
 	}
+
 	maven {
 		url = "https://jitpack.io"
 	}
+
+	mavenCentral()
 }
 
 dependencies {
@@ -63,6 +66,9 @@ dependencies {
 	runtimeOnly('org.joml:joml:1.10.4')
 	modImplementation("maven.modrinth:sodium:${project.sodium}")
 	modImplementation "com.ptsmods:devlogin:3.2.2" // To login into your Minecraft account
+
+	// Bendylib
+	include modImplementation("io.github.kosmx.bendy-lib:bendy-lib-fabric:${project.bendylib_version}")
 }
 
 processResources {

@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.effects;
 
 import net.arna.jcraft.common.entity.StandEntity;
+import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
@@ -18,8 +19,8 @@ public class StandlessEffect extends StatusEffect {
 
     @Override
     public void applyUpdateEffect(LivingEntity entity, int amplifier) {
-        if (entity.getFirstPassenger() instanceof StandEntity stand) {
+        StandEntity stand = ((IEntityDataSaver)entity).getStand();
+        if (stand != null)
             stand.desummon();
-        }
     }
 }

@@ -10,11 +10,13 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.JCraftClient;
 import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
 import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
+import net.arna.jcraft.client.util.JClientUtils;
+import net.arna.jcraft.common.JConfig;
 import net.arna.jcraft.common.entity.MadeInHeavenEntity;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
-import net.arna.jcraft.common.util.IJCraftAnimatedPlayer;
-import net.arna.jcraft.common.util.ITimeStop;
+import net.arna.jcraft.common.spec.JCraftSpec;
+import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.block.Blocks;
@@ -25,11 +27,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.util.Arm;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 
@@ -59,8 +62,9 @@ public class ClientPacketHandler {
     }
 
     public static void handleChannelFeedback(MinecraftClient client, PacketByteBuf buf) {
-        short control = buf.readShort();
+        if (client == null || client.world == null || client.player == null) return;
 
+        short control = buf.readShort();
         // Show hitboxes gamerule
         switch (control) {
             case (1) -> {
@@ -187,29 +191,16 @@ public class ClientPacketHandler {
                 });
             }
 
-            // WS acid spew
+            // Spec synchronization
             case (5) -> {
-                double epx = buf.readDouble();
-                double epy = buf.readDouble();
-                double epz = buf.readDouble();
-
-                double hpx = buf.readDouble();
-                double hpy = buf.readDouble();
-                double hpz = buf.readDouble();
-
+                int specID = buf.readInt();
                 client.execute(() -> {
-                    Random random = new Random();
-                    for (int h = 0; h < 256; ++h) {
-                        double x = hpx + random.nextDouble(2) - 1;
-                        double y = hpy + random.nextDouble(2) - 1;
-                        double z = hpz + random.nextDouble(2) - 1;
-                        Vec3d awayVector = new Vec3d(x, y, z).subtract(epx, epy + 0.5, epz).normalize().multiply(0.3);
+                    JCraftSpec spec = JUtils.getSpecByID(specID);
 
-                        client.world.addParticle(
-                                ParticleTypes.SPIT,
-                                x, y, z,
-                                awayVector.x, awayVector.y, awayVector.z);
-                    }
+                    if (spec != null)
+                        spec.player = client.player;
+
+                    ((ISpec)(client.player)).setClientSpec(spec);
                 });
             }
 
@@ -219,19 +210,22 @@ public class ClientPacketHandler {
                 JCraftClient.ticksSinceCounted = 0;
             }
 
-            // Anubis swings
+            // Return to Zero trackers
             case (7) -> {
-                int state = buf.readInt();
                 int entID = buf.readInt();
+                Vec3d originalPos = new Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
 
                 client.execute(() -> {
                     Entity ent = client.world.getEntityById(entID);
-                    if (ent instanceof PlayerEntity player) {
-                        String arm = (player.getMainArm() == Arm.RIGHT) ? "r" : "l";
-                        var animationContainer = ((IJCraftAnimatedPlayer) player).jcraft_getModAnimation();
-                        //ex. swing1L - standing thrust w/ left arm
-                        var anim = PlayerAnimationRegistry.getAnimation(new Identifier(JCraft.MOD_ID, "animation.anubis.swing" + state + arm));
-                        animationContainer.setAnimation(new KeyframeAnimationPlayer(anim));
+                    if (ent == null) return;
+                    Vec3d currentPos = ent.getEyePos();
+                    Vec3d originalToCurrent = currentPos.subtract(originalPos).normalize();
+                    for (double h = 0; h < currentPos.distanceTo(originalPos); ++h) {
+                        client.world.addParticle(
+                                ParticleTypes.ELECTRIC_SPARK,
+                                originalPos.x + originalToCurrent.x * h, originalPos.y + originalToCurrent.y * h, originalPos.z + originalToCurrent.z * h,
+                                -originalToCurrent.x, -originalToCurrent.y, -originalToCurrent.z
+                        );
                     }
                 });
             }
@@ -271,15 +265,16 @@ public class ClientPacketHandler {
                 double x = buf.readDouble();
                 double y = buf.readDouble();
                 double z = buf.readDouble();
+                double size = buf.readDouble();
 
                 client.execute(() -> {
                     Random random = new Random();
-                    for (int h = 0; h < 256; ++h) {
+                    for (int h = 0; h < size * 128; ++h) {
                         client.world.addParticle(
                                 new BlockStateParticleEffect(ParticleTypes.FALLING_DUST, Blocks.SAND.getDefaultState()),
-                                x + random.nextGaussian() * 2,
-                                y + random.nextGaussian() * 2,
-                                z + random.nextGaussian() * 2,
+                                x + random.nextGaussian() * size,
+                                y + random.nextGaussian() * size,
+                                z + random.nextGaussian() * size,
                                 0, 0, 0);
                     }
                 });
@@ -288,13 +283,17 @@ public class ClientPacketHandler {
             // Spec Animations
             case (12) -> {
                 int entID = buf.readInt();
-                String animPath = buf.readString(); // i know exactly how unoptimized this is but i fail to care
+                String animPath = buf.readString(); // I know exactly how unoptimized this is, but I fail to care
 
                 client.execute(() -> {
                     Entity ent = client.world.getEntityById(entID);
                     if (ent instanceof PlayerEntity player) {
                         ModifierLayer<IAnimation> animationContainer = ((IJCraftAnimatedPlayer) player).jcraft_getModAnimation();
                         KeyframeAnimation anim = PlayerAnimationRegistry.getAnimation(new Identifier(JCraft.MOD_ID, "animation." + animPath));
+                        if (anim == null) {
+                            JCraft.LOGGER.error("Tried to play null animation on player " + player + " in world " + client.world);
+                            return;
+                        }
                         animationContainer.setAnimation(new KeyframeAnimationPlayer(anim));
                     }
                 });
@@ -320,9 +319,22 @@ public class ClientPacketHandler {
 
                 client.execute(() -> {
                     Entity ent = client.world.getEntityById(entID);
-                    if (ent != null) {
-                        ((ITimeStop) ent).setTimeStopTicks(ticks);
-                    }
+                    if (ent == null) return;
+                    ((ITimeStop) ent).setTimeStopTicks(ticks);
+                });
+            }
+
+            // TS Synchronization (see JCraft.java startTrackingTimestop())
+            case (15) -> {
+                int entID = buf.readInt();
+                Vec3d position = new Vec3d( buf.readDouble(), buf.readDouble(), buf.readDouble() );
+                RegistryKey<World> registryKey = buf.readRegistryKey(Registry.WORLD_KEY);
+                int time = buf.readInt();
+
+                client.execute(() -> {
+                    Entity ent = client.world.getEntityById(entID);
+                    if (ent == null) return;
+                    JClientUtils.activeTimestops.add( new DimValues(ent, position, registryKey, time) );
                 });
             }
         }
@@ -350,13 +362,12 @@ public class ClientPacketHandler {
                     }
                 });
             }
-            case CRIMSON -> {
-                client.execute(() -> {
-                    CrimsonShaderHandler crimsonShaderHandler = CrimsonShaderHandler.INSTANCE;
-                    crimsonShaderHandler.effectLength = 300;
-                    crimsonShaderHandler.shouldRender = true;
-                });
-            }
+            case CRIMSON -> client.execute(() -> {
+                if (!JConfig.TE_SHADER) return;
+                CrimsonShaderHandler crimsonShaderHandler = CrimsonShaderHandler.INSTANCE;
+                crimsonShaderHandler.effectLength = duration;
+                crimsonShaderHandler.shouldRender = true;
+            });
         }
     }
 

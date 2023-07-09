@@ -42,24 +42,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable, IAnimationTickable {
-    public static Attack light = new Attack(0, 2, 0.75f, 7, 4, 1.5, 6f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0, JSoundRegister.IMPACT_1)
+    public static final Attack light = new Attack(0, 2, 0.75f, 7, 4, 1.5, 6f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
-    public static Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 2, 0, 3, JSoundRegister.IMPACT_1)
+    public static final Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 2, 0, 3, JSoundRegister.IMPACT_1)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public static Attack heavy = new Attack(1, 19, 1f, 22, 10, 2, 0f, 0.0f, AttackType.BOX, 1, 0, 0, JSoundRegister.IMPACT_5)
+    public static final Attack heavy = new Attack(1, 19, 1f, 22, 10, 2, 0f, 0.0f, AttackType.BOX, 1, 0, 0, JSoundRegister.IMPACT_5)
             .setHitspark(2)
             .setUB(false)
             .setInfo("Singularity", "block bypass, low stun, medium windup");
-    public static Attack smite = new Attack(3, 21, 1f, 20, 10, 0, 6f, 0.0f, AttackType.BOX, 1.05f, 0, 0)
+    public static final Attack smite = new Attack(3, 21, 1f, 20, 10, 0, 6f, 0.0f, AttackType.BOX, 1.05f, 0, 0)
             .setBlockstun(13)
             .setInfo("You won't run away!", "summons a stunning lightning bolt at the user/in air summons one at aimed position, launches on hit");
-    public static Attack overwrite = new Attack(6, 0, 1f, 23, 7, 2, 0f, 1.0f, AttackType.BOX, 2, 0, 0, JSoundRegister.IMPACT_5)
+    public static final Attack overwrite = new Attack(6, 0, 1f, 23, 7, 2, 0f, 1.0f, AttackType.BOX, 2, 0, 0, JSoundRegister.IMPACT_5)
             .setHitspark(2)
             .setLaunch()
             .setArmor(true)
             .setUB(false)
             .setInfo("Overwrite (Hit)", "", AttackQueue.SPECIAL1);
-    public static Attack chargeoverwrite = new Attack(8, 30, 70, 71, 0, AttackType.BOX)
+    public static final Attack chargeoverwrite = new Attack(8, 30, 70, 71, 0, AttackType.BOX)
             .disableBackstab()
             .setFollowup(overwrite)
             .setInfo("Reality Overwrite",
@@ -69,31 +69,40 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
                             SPECIAL 1 - makes victims unable to look at you
                             SPECIAL 2 - applies every damage over time effect to victims
                             SPECIAL 3 - heals and enslaves mobs""");
-    public static Attack knives = new Attack(4, 19, 0.75f, 22, 16, 1.5, 0f, 0.0f, AttackType.BOX, 1)
+    public static final Attack knives = new Attack(4, 19, 0.75f, 22, 16, 1.5, 0f, 0.0f, AttackType.BOX, 1)
             .setBlockstun(6)
             .setRanged(true)
             .setInfo("Divine Finisher", "fires 4 stunning knives that launch at a delay/in air summons and launches 8 knives");
-    public static Attack airknives = new Attack(5, 19, 0.75f, 22, 16, 1.5, 0f, 0.0f, AttackType.BOX, 1)
+    public static final Attack airknives = new Attack(5, 19, 0.75f, 22, 16, 1.5, 0f, 0.0f, AttackType.BOX, 1)
             .setBlockstun(6)
             .setRanged(true)
             .setInfo("Aerial Divine Finisher", "you shouldn't be able to read this");
 
-    public static Attack timestop = new Attack(7, 70, 50, 45, 5, AttackType.TIMESTOP)
+    public static final Attack timestop = new Attack(7, 70, 50, 45, 5, AttackType.TIMESTOP)
             .setUB(true)
             .setInfo("Timestop", "5 seconds");
 
     private Vec3d lightningPos;
-    public ArrayList<LivingEntity> overwriteEnts = new ArrayList<>();
-    public ArrayList<Integer> overwriteTimes = new ArrayList<>();
-    public static TrackedData<Integer> OVERWRITETYPE;
+    public final ArrayList<LivingEntity> overwriteEnts = new ArrayList<>();
+    public final ArrayList<Integer> overwriteTimes = new ArrayList<>();
+    public static final TrackedData<Integer> OVERWRITETYPE;
+
     static {
         OVERWRITETYPE = DataTracker.registerData(TheWorldOverHeavenEntity.class, TrackedDataHandlerRegistry.INTEGER);
     }
+
     public int getOverwriteType() {
         return dataTracker.get(OVERWRITETYPE);
     }
+
     public void setOverwriteType(int type) {
         dataTracker.set(OVERWRITETYPE, type);
+    }
+
+    @Override
+    public void desummon() {
+        if (tsTime > 0) return;
+        super.desummon();
     }
 
     @Override
@@ -126,12 +135,8 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
         freespace =
                 """
                         BNBs:
-                            the
-                            Knives>(Timeskip/M1>)Smite>M1>Heavy>M1>Barrage>Timestop
-                            dijon mustard
-                            jump.Smite>(Timeskip)>Knives>M1>Heavy>M1>Barrage>Timestop
-                            the superlord 2
-                            M1>Barrage>Timestop{ M1>M1>M1 delay.Heavy }>Knives>M1>Smite>M1""";
+                            the ultrakill
+                            M1>Barrage>M1>Knives>Overwrite~S2/S3>dash>Smite>Heavy>M1""";
 
         moves = List.of(light, heavy, barrage, smite, timestop, knives, chargeoverwrite,
                 new Attack().setMobility(MobilityType.TELEPORT).setInfo("Timeskip", "14m range")
@@ -149,7 +154,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
     public void initBarrage() {
         if (!this.canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, 5))
-            this.playSound(JSoundRegister.TW_BARRAGE, 1, 1);
+            this.playSound(JSoundRegister.TWOH_BARRAGE, 1, 1);
     }
 
     @Override
@@ -166,6 +171,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
     }
 
     private float smiteDamage = 6f;
+
     @Override
     public void initSpecial1() {
         if (curAttack == chargeoverwrite && getMoveStun() < 50) {
@@ -246,7 +252,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
     @Override
     public void initMiddleClick() {
         CanAttackData data = canAttackWithData();
-        if (!data.canAttack || getTSTime() > 0) return;
+        if (!data.canAttack || tsTime > 0) return;
         NbtCompound userData = ((IEntityDataSaver) data.user).getPersistentData();
         if (userData.getInt(JCraft.utilCD) > 0) return;
         Vec3d eP = data.user.getEyePos();
@@ -299,10 +305,10 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
                 lightning.setCosmetic(true);
                 lightning.setPosition(lP);
 
-                List<? extends Entity> hit = JCraftUtils.generateHitbox(world, lP, 3, Entity.class, List.of(this, user));
+                List<? extends Entity> hit = JUtils.generateHitbox(world, lP, 3, Entity.class, List.of(this, user));
                 for (Entity ent : hit) {
                     if (ent instanceof LivingEntity living) {
-                        LivingEntity target = JCraftUtils.getUserIfStand(living);
+                        LivingEntity target = JUtils.getUserIfStand(living);
                         target.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 10, 9, true, false));
                         damageLogic(world, target, Vec3d.ZERO, 21, 1, false, smiteDamage, false, 13, damageSource, user);
                     }
@@ -374,11 +380,6 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
     }
 
     @Override
-    public void desummon() {
-        if (getTSTime() < 1) super.desummon();
-    }
-
-    @Override
     public void tick() {
         super.tick();
 
@@ -415,6 +416,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
                     if (time < 1) {
                         overwriteTimes.remove(i);
                         overwriteEnts.remove(i);
+                        i--;
                     } else {
                         LivingEntity entity = overwriteEnts.get(i);
 
@@ -429,9 +431,8 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
                                 mob.setTarget(victim);
                             }
 
-                            if (mob.distanceTo(this) > 16) {
+                            if (mob.squaredDistanceTo(this) > 256)
                                 mob.getNavigation().startMovingTo(this, 1);
-                            }
                         }
 
                         // Inability to look at master
@@ -469,28 +470,32 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
     }
 
     // Animation code
-    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+
     @Override
     public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController(this, "controller", 0, this::predicate));
+        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
     }
+
     @Override
     public AnimationFactory getFactory() {
         return this.animationFactory;
     }
+
     @Override
     public int tickTimer() {
         return age;
     }
+
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        AnimationController controller = event.getController();
+        AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
         if (playSummonAnim) {
             controller.setAnimation(builder.loop("animation.twoh.summon"));
             return PlayState.CONTINUE;
         }
-        if (this.getSameState()) controller.markNeedsReload();
-        switch (this.getState()) {
+        if (getSameState()) controller.markNeedsReload();
+        switch (getState()) {
             default -> controller.setAnimation(builder.loop("animation.twoh.idle"));
             case 2 -> controller.setAnimation(builder.playAndHold("animation.twoh.light"));
             case 3 -> controller.setAnimation(builder.loop("animation.twoh.block"));

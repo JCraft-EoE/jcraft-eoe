@@ -1,6 +1,6 @@
 package net.arna.jcraft.client.mixin;
 
-import net.arna.jcraft.common.util.JCraftUtils;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.feature.ArmorFeatureRenderer;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
@@ -17,7 +17,7 @@ public class ArmorFeatureRendererMixin<T extends LivingEntity, M extends BipedEn
 
     @Inject(method = "renderArmor", at = @At("HEAD"), cancellable = true)
     private void jcraft$renderArmor(MatrixStack matrices, VertexConsumerProvider vertexConsumers, T livingEntity, EquipmentSlot equipmentSlot, int i, A bipedEntityModel, CallbackInfo ci) {
-        if (!JCraftUtils.shouldRender(livingEntity)) {
+        if (JUtils.shouldNotRender(livingEntity)) {
             ci.cancel();
         }
     }

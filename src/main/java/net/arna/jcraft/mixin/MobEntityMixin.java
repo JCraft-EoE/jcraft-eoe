@@ -20,6 +20,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,8 +35,10 @@ import static net.arna.jcraft.JCraft.CHANCE_MOB_SPAWNS_WITH_STAND;
 
 @Mixin(MobEntity.class)
 public class MobEntityMixin {
+    @Final
     @Shadow
     private DefaultedList<ItemStack> handItems;
+    @Final
     @Shadow
     private DefaultedList<ItemStack> armorItems;
 

@@ -4,8 +4,8 @@
 		{
 			"description": {
 				"identifier": "geometry.bubble",
-				"texture_width": 32,
-				"texture_height": 16,
+				"texture_width": 8,
+				"texture_height": 8,
 				"visible_bounds_width": 3,
 				"visible_bounds_height": 1.5,
 				"visible_bounds_offset": [0, 0.25, 0]
@@ -16,7 +16,18 @@
 					"pivot": [0, 0, 0],
 					"rotation": [45, 0, 0],
 					"cubes": [
-						{"origin": [-4, -3, -3], "size": [8, 8, 8], "uv": [0, 0]}
+						{
+							"origin": [-4, -3, -3],
+							"size": [8, 8, 8],
+							"uv": {
+								"north": {"uv": [0, 0], "uv_size": [8, 8]},
+								"east": {"uv": [0, 0], "uv_size": [8, 8]},
+								"south": {"uv": [0, 0], "uv_size": [8, 8]},
+								"west": {"uv": [0, 0], "uv_size": [8, 8]},
+								"up": {"uv": [0, 0], "uv_size": [8, 8]},
+								"down": {"uv": [0, 8], "uv_size": [8, -8]}
+							}
+						}
 					]
 				}
 			]

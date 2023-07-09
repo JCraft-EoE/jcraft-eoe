@@ -21,7 +21,6 @@ import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
@@ -43,35 +42,34 @@ import java.util.List;
 //todo: 3d, rotatable shockwave particle effect
 //todo: particles on gravpunch and both slams
 public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
-    public static Attack light = new Attack(0, 2, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
+    public static final Attack light = new Attack(0, 2, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
 
-    public static Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 1, 0, 4, JSoundRegister.IMPACT_3)
+    public static final Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 0.75f, 0.25f, AttackType.BARRAGE, 1, 0, 4, JSoundRegister.IMPACT_3)
             .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
-    public static Attack gutpunch = new Attack(1, 17, 1f, 30, 19, 2.0, 8f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.TW_KICK_HIT).setHitspark(2).setArmor(true).setLaunch()
+    public static final Attack gutpunch = new Attack(1, 17, 1f, 30, 19, 2.0, 8f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.TW_KICK_HIT).setHitspark(2).setArmor(true).setLaunch()
+            .appendHitbox(new Attack.HitboxData(0, 0.25, 1.25))
             .setInfo("Gut Punch", "slow, uninterruptable combo finisher");
-    public static Attack launch = new Attack(4, 22, 0.75f, 21, 14, 1.75, 5f, 0.9f, AttackType.BOX, 0.95f, 0.3f, 0, JSoundRegister.IMPACT_5)
+    public static final Attack launch = new Attack(4, 22, 0.75f, 21, 14, 1.75, 5f, 0.9f, AttackType.BOX, 0.95f, 0.3f, 0, JSoundRegister.IMPACT_5)
             .setHitspark(2)
             .setRanged(true)
             .setInfo("Block Launch", "lifts a block from the ground and launches it at a delay/crouching and using this button resets the delay on nearby blocks");
-    public static Attack gravpunch = new Attack(3, 24, 1f, 32, 20, 1.75, 6f, 0.35f, AttackType.BOX, 2.25f, -0.3f, 0, JSoundRegister.CMOON_GRAVPUNCHHIT).setHitspark(2).setArmor(true)
+    public static final Attack gravpunch = new Attack(3, 24, 1f, 32, 20, 1.75, 6f, 0.35f, AttackType.BOX, 2.25f, -0.3f, 0, JSoundRegister.CMOON_GRAVPUNCHHIT).setHitspark(2).setArmor(true)
             .setUB(true)
             .appendHitbox(new Attack.HitboxData(1))
             .setInfo("Only One Punch", "lifts enemy on hit");
-    public static Attack groundslam = new Attack(5, 23, 1f, 18, 10, 3, 7f, 0.2f, AttackType.BOX, 0.85f, 1.4f, 0, JSoundRegister.CMOON_GRAVPUNCHHIT)
+    public static final Attack groundslam = new Attack(5, 23, 1f, 18, 10, 3, 7f, 0.2f, AttackType.BOX, 0.85f, 1.4f, 0, JSoundRegister.CMOON_GRAVPUNCHHIT)
             .setUB(true)
             .setInfo("Ground Slam", "lifts the ground, combo starter/extender, knockdown when used while crouching");
-    public static Attack gravshift = new Attack(6, 70, 32, 20, 7, AttackType.BOX)
+    public static final Attack gravshift = new Attack(6, 70, 32, 20, 7, AttackType.BOX)
             .setInfo("Gravity Shift", """
                     increases user jump height, changes the gravity of everything in a 64 block radius
                     Types: HYPER-GRAVITY, ATTRACT, REPULSE
                     swap between types by tapping the key during the shift""");
 
-    public ArrayList<Float> invertDamages = new ArrayList<>();
-    public ArrayList<LivingEntity> invertEntities = new ArrayList<>();
-    public ArrayList<Integer> invertTimes = new ArrayList<>();
+    public final ArrayList<Float> invertDamages = new ArrayList<>();
+    public final ArrayList<LivingEntity> invertEntities = new ArrayList<>();
+    public final ArrayList<Integer> invertTimes = new ArrayList<>();
 
     public CMoonEntity(World worldIn) {
         super(StandType.C_MOON, worldIn);
@@ -101,8 +99,8 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
                 , new Attack().setMobility(MobilityType.HIGHJUMP).setInfo("Gravitational Hop", "jumps up and grants 2s slow falling"));
     }
 
-    public static TrackedData<Integer> SHIFTTYPE;
-    public static TrackedData<Integer> SHIFTTIME;
+    public static final TrackedData<Integer> SHIFTTYPE;
+    public static final TrackedData<Integer> SHIFTTIME;
     static {
         SHIFTTIME = DataTracker.registerData(CMoonEntity.class, TrackedDataHandlerRegistry.INTEGER);
         SHIFTTYPE = DataTracker.registerData(CMoonEntity.class, TrackedDataHandlerRegistry.INTEGER);
@@ -154,7 +152,7 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
                 List<BlockProjectile> blocks = world.getEntitiesByClass(BlockProjectile.class, getBoundingBox().expand(16), EntityPredicates.VALID_LIVING_ENTITY);
                 for (BlockProjectile block :
                         blocks) {
-                    if (((IOwnable) block).getMaster() != user) continue;
+                    if (block.getMaster() != user) continue;
                     block.markRefresh();
                 }
             } else if (canAttack() && handleAttack(launch, JCraft.standS2CD, 9))
@@ -224,7 +222,7 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
         LivingEntity user = this.getUser();
         for (LivingEntity ent : entities) {
-            invertDamages.add(attack == barrage ? 0.25f : 2f);
+            invertDamages.add(attack == barrage ? 0.25f : 0.5f);
             invertEntities.add(ent);
             invertTimes.add(40);
 
@@ -276,13 +274,13 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
         } else if (attack.id == gravshift.id) {
             user.addStatusEffect(new StatusEffectInstance(StatusEffects.JUMP_BOOST, 350, 1));
             user.onLanding();
-            this.setShiftTime(350);
+            setShiftTime(200);
         }
     }
 
     @Override
     public void tick() {
-        if (age == 1) this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.CMOON_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
+        if (age == 1) playSound(JSoundRegister.CMOON_SUMMON, 1f, 1f);
         super.tick();
 
         if (hasUser()) {
@@ -320,6 +318,7 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
                         invertTimes.remove(i);
                         invertEntities.remove(i);
                         invertDamages.remove(i);
+                        i--;
                     }
                 }
 
@@ -356,9 +355,11 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
     }
 
     // Animation code
+    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+
     @Override
     public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController(this, "controller", 0, this::predicate));
+        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
     }
 
     @Override
@@ -372,7 +373,7 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
     }
 
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        AnimationController controller = event.getController();
+        AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 
         if (playSummonAnim) {

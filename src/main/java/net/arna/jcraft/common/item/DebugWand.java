@@ -1,8 +1,6 @@
 package net.arna.jcraft.common.item;
 
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
-import net.arna.jcraft.common.util.BlockInfo;
-import net.arna.jcraft.common.util.JCraftUtils;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -13,8 +11,6 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
 public class DebugWand extends Item {

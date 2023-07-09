@@ -45,7 +45,8 @@ public interface JSoundRegister {
     SoundEvent KC_BARRAGE = registerSound("kcbarrage");
     SoundEvent KC_HEAVY = registerSound("kcheavy");
     SoundEvent KC_HEAVY2 = registerSound("kcheavy2");
-    SoundEvent EYE_CHOP = registerSound("eyechop");
+    SoundEvent KC_EYE_CHOP = registerSound("kceyechop");
+    SoundEvent KC_EPITAPH = registerSound("kcepitaph");
     SoundEvent TE_TP = registerSound("tetp");
     SoundEvent TIME_ERASE = registerSound("timeerase");
     SoundEvent TIME_ERASE_EXIT = registerSound("kcteexit");
@@ -73,6 +74,8 @@ public interface JSoundRegister {
     SoundEvent REVOLVER_FIRE = registerSound("revolverfire");
     SoundEvent D4C_THROW = registerSound("d4cthrow");
     SoundEvent D4C_COUNTER = registerSound("d4ccounter");
+    SoundEvent D4C_UTILITY = registerSound("d4cutility");
+    SoundEvent D4C_ALT_UNIVERSE_AMBIENCE = registerSound("altuniverseambience");
 
     //Cream
     SoundEvent CREAM_SUMMON = registerSound("creamsummon");
@@ -104,6 +107,7 @@ public interface JSoundRegister {
     SoundEvent WS_DONUT = registerSound("wsdonut");
     SoundEvent WS_DISK = registerSound("wsdisk");
     SoundEvent WS_GUN = registerSound("wsgun");
+    SoundEvent WS_MYH = registerSound("wsmeltyourheart");
 
     //Magician's Red
     SoundEvent MR_SUMMON = registerSound("mrsummon");
@@ -121,8 +125,9 @@ public interface JSoundRegister {
     SoundEvent SC_CHARGE = registerSound("sccharge");
     SoundEvent SC_HEAVY = registerSound("scheavy");
     SoundEvent SC_SPIN = registerSound("scspin");
-
-    //Magicians Red
+    SoundEvent SC_CLEAVE = registerSound("sccleave");
+    SoundEvent SC_ARMOROFF = registerSound("scarmoroff");
+    SoundEvent SC_POKE = registerSound("scpoke");
 
     //Golden Experience
     SoundEvent GE_SUMMON = registerSound("gesummon");
@@ -137,14 +142,19 @@ public interface JSoundRegister {
     SoundEvent GER_SUMMON = registerSound("gersummon");
     SoundEvent GER_HEAVY = registerSound("gerheavy");
     SoundEvent GER_LASER = registerSound("gerlaser");
+    SoundEvent GER_SLOW_LASER = registerSound("gerslowlaser");
     SoundEvent GER_KICKBARRAGE = registerSound("gerkickbarrage");
     SoundEvent GER_SETUP = registerSound("gersetup");
+    SoundEvent GER_FLY = registerSound("gerfly");
+    SoundEvent GER_RTZ = registerSound("gerrtz");
 
     //The Fool
     SoundEvent FOOL_BARK1 = registerSound("foolbark1");
     SoundEvent FOOL_BARK2 = registerSound("foolbark2");
     SoundEvent FOOL_LAUNCH = registerSound("foollaunch");
     SoundEvent FOOL_CHARGE = registerSound("foolcharge");
+    SoundEvent FOOL_ULT = registerSound("foolultimate");
+    SoundEvent FOOL_GLIDE = registerSound("foolglide");
 
     //C-Moon
     SoundEvent CMOON_SUMMON = registerSound("cmoonsummon");
@@ -170,7 +180,9 @@ public interface JSoundRegister {
     SoundEvent MIH_CIRCLE = registerSound("mihcircle");
 
     //The World: Over Heaven
+
     SoundEvent TWOH_SUMMON = registerSound("twohsummon");
+    SoundEvent TWOH_BARRAGE = registerSound("twohbarrage");
     SoundEvent TWOH_SHOOT = registerSound("twohshoot");
     SoundEvent TWOH_TIMESKIP = registerSound("twohtimeskip");
     SoundEvent TWOH_TS = registerSound("twohtimestop");

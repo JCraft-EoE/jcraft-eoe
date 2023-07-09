@@ -1,6 +1,7 @@
 package net.arna.jcraft.client.mixin;
 
 import net.arna.jcraft.common.entity.StandEntity;
+import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.minecraft.client.render.Camera;
 import net.minecraft.entity.Entity;
@@ -11,6 +12,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.RaycastContext;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,19 +22,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Camera.class)
 public abstract class CameraMixin {
     @Shadow
-    protected BlockView area;
+    private BlockView area;
     @Shadow
-    protected Vec3d pos;
+    private Vec3d pos;
+    @Final
     @Shadow
-    protected Vec3f verticalPlane;
+    private Vec3f verticalPlane;
     @Shadow
-    protected Entity focusedEntity;
+    private Entity focusedEntity;
     @Shadow
-    protected boolean thirdPerson;
+    private boolean thirdPerson;
     @Shadow
-    protected float lastCameraY;
+    private float lastCameraY;
     @Shadow
-    protected float cameraY;
+    private float cameraY;
 
     //todo: fix camera
     private double clipToSpaceVertical(double desiredCameraDistance) {
@@ -69,7 +72,8 @@ public abstract class CameraMixin {
 
     @Inject(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;setPos(DDD)V", shift = At.Shift.AFTER))
     public void jcraft$afterSetPosUpdate(BlockView area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta, CallbackInfo info) {
-        if (focusedEntity.getFirstPassenger() instanceof StandEntity stand && stand.getRemote()) {
+        StandEntity stand = ((IEntityDataSaver)focusedEntity).getStand();
+        if (stand != null && stand.getRemote()) {
             CameraInvoker cameraInvoker = (CameraInvoker) this;
             cameraInvoker.invokeSetPos(
                     new Vec3d(
@@ -88,9 +92,5 @@ public abstract class CameraMixin {
             cameraInvoker.invokeMoveBy(0, clipToSpaceVertical(0.75D), 0);
             info.cancel();
         }*/
-    }
-
-    public void jcraft$() {
-
     }
 }

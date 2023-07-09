@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.common.util.IOwnable;
-import net.arna.jcraft.common.util.JCraftUtils;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
@@ -38,9 +38,15 @@ import java.util.List;
 public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOwnable {
     public LivingEntity target;
 
-    public static TrackedData<Boolean> EXPLODED;
-    static { EXPLODED = DataTracker.registerData(LifeDetectorEntity.class, TrackedDataHandlerRegistry.BOOLEAN); }
-    public boolean hasExploded() { return this.dataTracker.get(EXPLODED); }
+    public static final TrackedData<Boolean> EXPLODED;
+
+    static {
+        EXPLODED = DataTracker.registerData(LifeDetectorEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    }
+
+    public boolean hasExploded() {
+        return this.dataTracker.get(EXPLODED);
+    }
 
     @Override
     protected void initDataTracker() {
@@ -53,9 +59,15 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
     }
 
     private LivingEntity master;
+
     @Override
-    public LivingEntity getMaster() { return master; }
-    public void setMaster(LivingEntity l) { this.master = l; }
+    public LivingEntity getMaster() {
+        return master;
+    }
+
+    public void setMaster(LivingEntity l) {
+        this.master = l;
+    }
 
     @Override
     public boolean canTarget(LivingEntity target) {
@@ -70,16 +82,16 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
         velocityModified = true;
 
         Vec3d pos = getPos();
-        List<LivingEntity> hurt = JCraftUtils.generateHitbox(world, pos, 2.25, null);
+        List<LivingEntity> hurt = JUtils.generateHitbox(world, pos, 2.25, null);
         for (LivingEntity living :
                 hurt) {
             if (!canTarget(living)) continue;
-            LivingEntity target = JCraftUtils.getUserIfStand(living);
+            LivingEntity target = JUtils.getUserIfStand(living);
             Vec3d kbVec = target.getPos().subtract(pos).normalize();
             StandEntity.damageLogic(world, target, kbVec, 10, 1, false, 5f, true, 9, DamageSource.mob(master), master);
         }
 
-        this.dataTracker.set(EXPLODED, true);
+        dataTracker.set(EXPLODED, true);
 
         playSound(SoundEvents.ITEM_FIRECHARGE_USE, 1f, 1f);
 
@@ -128,28 +140,38 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
                 target = null;
             }
 
-            if ( !hasExploded() && (this.age >= 300 || getHealth() <= 0f) ) Explode();
+            if (!hasExploded() && (this.age >= 300 || getHealth() <= 0f)) Explode();
 
             // Lerp velocity to simulate inertia
             this.setVelocity(
-                    getVelocity().add( getRotationVector().multiply(0.5) ).multiply(0.25)
+                    getVelocity().add(getRotationVector().multiply(0.5)).multiply(0.25)
             );
             this.velocityModified = true;
         }
     }
 
     @Override
-    public boolean isFireImmune() { return true; }
+    public boolean isFireImmune() {
+        return true;
+    }
+
     @Nullable
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.BLOCK_LAVA_EXTINGUISH;
     }
+
     @Nullable
     @Override
-    protected SoundEvent getDeathSound() { return SoundEvents.BLOCK_LAVA_EXTINGUISH; }
+    protected SoundEvent getDeathSound() {
+        return SoundEvents.BLOCK_LAVA_EXTINGUISH;
+    }
+
     @Override
-    public boolean hasNoGravity() { return true; }
+    public boolean hasNoGravity() {
+        return true;
+    }
+
     public static DefaultAttributeContainer.Builder createDetectorAttributes() {
         return DefaultAttributeContainer.builder()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 10)
@@ -158,6 +180,7 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
                 .add(EntityAttributes.GENERIC_ARMOR)
                 .add(EntityAttributes.GENERIC_ARMOR_TOUGHNESS);
     }
+
     @Override
     protected Box calculateBoundingBox() { // Centered around 0,0,0 instead of 0,0.5,0
         double x = getX();
@@ -178,6 +201,7 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
         else
             tag.putInt("ownerID", master.getId());
     }
+
     @Override
     public void readCustomDataFromNbt(NbtCompound tag) {
         super.readCustomDataFromNbt(tag);
@@ -187,27 +211,41 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
         else
             master = (LivingEntity) world.getEntityById(tag.getInt("ownerID")); // Always is living
     }
-    @Override
-    public Iterable<ItemStack> getArmorItems() { return List.of(); }
-    @Override
-    public ItemStack getEquippedStack(EquipmentSlot slot) { return ItemStack.EMPTY; }
-    @Override
-    public void equipStack(EquipmentSlot slot, ItemStack stack) { }
-    @Override
-    public Arm getMainArm() { return null; }
 
+    @Override
+    public Iterable<ItemStack> getArmorItems() {
+        return List.of();
+    }
+
+    @Override
+    public ItemStack getEquippedStack(EquipmentSlot slot) {
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public void equipStack(EquipmentSlot slot, ItemStack stack) {
+    }
+
+    @Override
+    public Arm getMainArm() {
+        return null;
+    }
+
+    // Animations
     private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+
     @Override
     public void registerControllers(AnimationData animationData) {
         animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
     }
+
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        if (hasExploded())
-            event.getController().setAnimation(new AnimationBuilder().playOnce("animation.detector.explode"));
-        else
-            event.getController().setAnimation(new AnimationBuilder().loop("animation.detector.idle"));
+        event.getController().setAnimation(new AnimationBuilder().loop(hasExploded() ? "animation.detector.explode" : "animation.detector.idle"));
         return PlayState.CONTINUE;
     }
+
     @Override
-    public AnimationFactory getFactory() { return this.factory; }
+    public AnimationFactory getFactory() {
+        return this.factory;
+    }
 }

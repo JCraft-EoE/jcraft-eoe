@@ -1,6 +1,5 @@
 package net.arna.jcraft.common.block;
 
-import net.arna.jcraft.JCraft;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FallingBlock;

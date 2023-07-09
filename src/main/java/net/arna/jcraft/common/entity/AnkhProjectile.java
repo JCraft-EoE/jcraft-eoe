@@ -1,7 +1,6 @@
 package net.arna.jcraft.common.entity;
 
-import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.util.JCraftUtils;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -22,7 +21,6 @@ import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
 public class AnkhProjectile extends PersistentProjectileEntity implements IAnimatable {
-
     private int ticksInAir;
     private boolean variation = false;
     private double orbitRange = 3;
@@ -60,13 +58,14 @@ public class AnkhProjectile extends PersistentProjectileEntity implements IAnima
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
-        Entity owner = this.getOwner();
+        if (world.isClient) return;
+        Entity owner = getOwner();
         if (owner == null) return;
         Entity entity = entityHitResult.getEntity();
         if (owner.hasPassenger(entity) || entity == owner) return;
 
         entity.setOnFireFor(3);
-        JCraftUtils.projectileDamageLogic(this, world, entity, Vec3d.ZERO, 5, 1, false, 3.5f, 8);
+        JUtils.projectileDamageLogic(this, world, entity, Vec3d.ZERO, 5, 1, false, 3.5f, 8);
         discard();
     }
 

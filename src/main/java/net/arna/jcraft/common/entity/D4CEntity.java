@@ -35,31 +35,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
-    public static Attack light = new Attack(0, 2, 0.75f, 15, 9, 1.5, 5f, 0.75f, AttackType.BOX, 1.5f, -0.1f, 0, JSoundRegister.IMPACT_2)
+    public static final Attack light = new Attack(0, 2, 0.75f, 15, 9, 1.5, 5f, 0.75f, AttackType.BOX, 1.5f, -0.1f, 0, JSoundRegister.IMPACT_2)
             .setInfo("Chop", "quick combo starter");
-    public static Attack barrage = new Attack(2, 17, 0.75f, 70, 0, 2, 0.8f, 0.25f, AttackType.BARRAGE, 2, 0, 3, JSoundRegister.IMPACT_2)
+    public static final Attack barrage = new Attack(2, 17, 0.75f, 70, 0, 2, 0.8f, 0.25f, AttackType.BARRAGE, 2, 0, 3, JSoundRegister.IMPACT_2)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public static Attack heavy = new Attack(1, 15, 1, 25, 14, 2, 8f, 1.5f, AttackType.BOX, 0.5f, -0.2f, 0, JSoundRegister.IMPACT_2)
+    public static final Attack heavy = new Attack(1, 15, 1, 25, 14, 2, 8f, 1.5f, AttackType.BOX, 0.5f, -0.2f, 0, JSoundRegister.IMPACT_2)
             .setHitspark(2)
             .setArmor(true)
             .setLaunch()
             .setInfo("Charge", "user & stand charge forward, uninterruptable launcher");
-    public static Attack dimhop_others = new Attack(3, 60, 1, 60, 40, 1.5, 0f, 0.0f, AttackType.BOX)
+    public static final Attack dimhop_others = new Attack(3, 60, 1, 60, 40, 1.5, 0f, 0.0f, AttackType.BOX)
             .setInfo("Dimensional Hop", "travels to a random dimension at exact coordinates, if user was hit in the last 30s, he is forced back, certified death button");
-    public static Attack grab = new Attack(4, 25, 0.75f, 21, 12, 1.5, 0f, 0.0f, AttackType.BOX, 1, 0, 0, null)
+    public static final Attack grab = new Attack(4, 25, 0.75f, 21, 12, 1.5, 0f, 0.0f, AttackType.BOX, 1, 0, 0, null)
             .setUB(false)
             .setInfo("Grab/Summon Gun", "unblockable, combo finisher/crouch to give yourself the gun");
-    public static Attack grabhit = new Attack(5, 0, 0.75f, 34, 0, 2, 4f, 0f, AttackType.MULTIHIT, 0.5f, 0, List.of(11, 17, 26), JSoundRegister.IMPACT_1);
-    public static Attack givegun = new Attack(6, 25, 14, 10, 0, 0.75f, AttackType.BOX)
+    public static final Attack grabhit = new Attack(5, 0, 0.75f, 34, 0, 2, 4f, 0f, AttackType.MULTIHIT, 0.5f, 0, List.of(11, 17, 26), JSoundRegister.IMPACT_1);
+    public static final Attack givegun = new Attack(6, 25, 14, 10, 0, 0.75f, AttackType.BOX)
             .setInfo("Grab", "unblockable, combo finisher");
-    public static Attack counter = new Attack(7, 30, 50, 5, 0, 0.75f, AttackType.COUNTER)
+    public static final Attack counter = new Attack(7, 30, 50, 5, 0, 0.75f, AttackType.COUNTER)
             .setInfo("Counter", "high damage, knocks back when hit");
-    public static Attack clonespawn = new Attack(8, 40, 1, 50, 40, 0, 0f, 0.0f, AttackType.BOX)
+    public static final Attack clonespawn = new Attack(8, 40, 1, 50, 40, 0, 0f, 0.0f, AttackType.BOX)
             .setRanged(true)
             .setInfo("Dimensional Clone", "summons an unlimited number of servants");
-    public static Attack flag = new Attack(9, 20, 60, 10, 0, 0, AttackType.BOX)
+    public static final Attack flag = new Attack(9, 20, 60, 10, 0, 0, AttackType.BOX)
             .setInfo("Dimensional Phase", "hides in a flag in an un-stunnable, floating state")
             .setMobility(MobilityType.HIGHJUMP);
     public static ServerWorld auWorld;
@@ -92,7 +90,7 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
         moves = List.of(light, heavy, barrage, dimhop_others, clonespawn, grab, counter, flag);
 
         if (world.isClient) return;
-        auWorld = this.getServer().getWorld(JDimensionRegister.AU_DIMENSION_KEY);
+        auWorld = getServer().getWorld(JDimensionRegister.AU_DIMENSION_KEY);
     }
 
     @Override
@@ -208,6 +206,7 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
         if (handleAttack(flag, JCraft.utilCD, 11)) {
             getUser().addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, flag.moveStun, 0, true, false));
             getUser().addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, flag.moveStun, 0, true, false));
+            playSound(JSoundRegister.D4C_UTILITY, 1, 1);
         }
     }
 
@@ -239,7 +238,7 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
         Entity player = this.getUser();
         switch (attack.id) {
             case (3) -> {
-                ChunkPos origin = this.getChunkPos();
+                ChunkPos origin = getChunkPos();
                 ServerWorld world = (ServerWorld) getWorld();
 
                 for (int x = -3; x < 4; x++) {
@@ -298,14 +297,18 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
                 if (player instanceof PlayerEntity playerEntity) {
                     PlayerCloneEntity playerCloneEntity = new PlayerCloneEntity(JEntityTypeRegister.PLAYER_ENTITY_CLONE, this.world);
                     playerCloneEntity.copyPositionAndRotation(playerEntity);
-                    playerCloneEntity.setOwner(playerEntity);
-                    this.world.spawnEntity(playerCloneEntity);
+                    playerCloneEntity.setMaster(playerEntity);
 
+                    world.spawnEntity(playerCloneEntity);
                     playerCloneEntity.equipStack(EquipmentSlot.MAINHAND, weapon);
-                } else if (player instanceof MobEntity mob) {
-                    //Code sourced from MobEntity.class convertTo()
+                } else if (player instanceof MobEntity mob) { //Code sourced from MobEntity.class convertTo()
                     EntityType<?> entityType = mob.getType();
-                    MobEntity newMob = (MobEntity) entityType.create(this.world);
+                    MobEntity newMob = (MobEntity) entityType.create(world);
+
+                    if (newMob == null) {
+                        JCraft.LOGGER.error("Failed to create D4C clone mob of type " + entityType + " in world " + world);
+                        return;
+                    }
 
                     newMob.copyPositionAndRotation(mob);
                     newMob.setBaby(mob.isBaby());
@@ -315,11 +318,11 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
                         newMob.setCustomNameVisible(mob.isCustomNameVisible());
                     }
 
-                    this.world.spawnEntity(newMob);
                     newMob.age = mob.age;
                     IEntityDataSaver newMobData = (IEntityDataSaver) newMob;
                     newMobData.getPersistentData().putInt("StandID", 0);
 
+                    world.spawnEntity(newMob);
                     newMob.equipStack(EquipmentSlot.MAINHAND, weapon);
                 }
             }
@@ -348,9 +351,10 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
             if (entity instanceof LivingEntity livingEntity) {
                 livingEntity.damage(DamageSource.mob(user), 10);
                 stun(livingEntity, 20, 3);
-                if (entity.getFirstPassenger() instanceof StandEntity stand) {
+
+                StandEntity stand = ( (IEntityDataSaver)livingEntity ).getStand();
+                if (stand != null)
                     stand.cancelAttack();
-                }
             }
 
             this.world.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1f, 1f);
@@ -372,9 +376,11 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
     }
 
     // Animation code
+    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+
     @Override
     public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController(this, "controller", 0, this::predicate));
+        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
     }
 
     @Override
@@ -388,7 +394,7 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
     }
 
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        AnimationController controller = event.getController();
+        AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 
         if (playSummonAnim) {

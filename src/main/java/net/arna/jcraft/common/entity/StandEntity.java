@@ -4,7 +4,6 @@ import lombok.Getter;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.mixin.LivingEntityInvoker;
@@ -36,10 +35,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -75,25 +71,24 @@ public abstract class StandEntity extends MobEntity {
     private static final TrackedData<Boolean> FREE;
     private static final TrackedData<Boolean> REMOTE;
 
-    public static TrackedData<Integer> TIMESTOPTIME;
+    protected int tsTime = 0;
+
+
     public Boolean blocking = false;
     public Boolean idleOverride = false;
 
     public Float idleDistance = 1.25f;
     public Float idleRotation = -45f;
-    public float attackRotation = 90f;
+    public final float attackRotation = 90f;
     public float blockDistance = 0.75f;
 
     public float maxStandGauge = 90f;
-
-    //public int tsRes = 20;
 
     public AttackQueue queuedAttack;
     public Attack curAttack;
     public Attack previousAttack;
 
-    public static List<String> attackCooldowns = List.of(JCraft.standLightCD, JCraft.standHeavyCD, JCraft.standBarrageCD, JCraft.standS1CD, JCraft.standUltCD, JCraft.standS2CD, JCraft.standS3CD, JCraft.utilCD);
-    static Attack unusable = new Attack(-1,999, 999, 999, 0, AttackType.BOX).setInfo("NONE", "NONE");
+    public static final List<String> attackCooldowns = List.of(JCraft.standLightCD, JCraft.standHeavyCD, JCraft.standBarrageCD, JCraft.standS1CD, JCraft.standUltCD, JCraft.standS2CD, JCraft.standS3CD, JCraft.utilCD);
 
     // Info
     public List<String> pros;
@@ -132,8 +127,6 @@ public abstract class StandEntity extends MobEntity {
         FREEX = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.FLOAT);
         FREEY = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.FLOAT);
         FREEZ = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.FLOAT);
-
-        TIMESTOPTIME = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.INTEGER);
     }
 
     private LivingEntity user = null;
@@ -141,8 +134,9 @@ public abstract class StandEntity extends MobEntity {
      * Sets the stands user if there isn't one
      */
     public void setUser(LivingEntity user) {
-        if (this.user == null)
-            this.user = user;
+        //if (this.user != null)
+        //    JCraft.LOGGER.info("Overriding stand user for stand: " + this);
+        this.user = user;
     }
     public LivingEntity getUser() {
         return user;
@@ -267,11 +261,8 @@ public abstract class StandEntity extends MobEntity {
 
     public void setRemote(boolean r) {
         this.dataTracker.set(REMOTE, r);
-        if (r) {
-            beginRemote();
-        } else {
-            endRemote();
-        }
+        if (r) beginRemote();
+        else endRemote();
     }
 
     /**
@@ -279,11 +270,19 @@ public abstract class StandEntity extends MobEntity {
      */
     protected void beginRemote() {
         setFree(true);
-        Vec3d fPos = user.getPos().add(user.getRotationVector());
-        setFreePos(new Vec3f(fPos));
-        setPos(fPos.x, fPos.y + 0.5, fPos.z);
+
+        Vec3d fPos = user.getPos().add( user.getRotationVector() );
         remoteSpeed = user.getVelocity(); // Inertia
+        remoteSpeed = new Vec3d(remoteSpeed.x * 5, remoteSpeed.y / 2, remoteSpeed.z * 5);
+
         setAlpha(0.1f);
+
+        detach();
+
+        this.noClip = false;
+
+        this.velocityDirty = true;
+        setPos(fPos.x, user.getY() + 0.5, fPos.z);
     }
 
     /**
@@ -291,7 +290,12 @@ public abstract class StandEntity extends MobEntity {
      */
     protected void endRemote() {
         setFree(false);
+
         setAlpha(1);
+
+        startRiding(user);
+
+        this.noClip = true;
     }
 
     /*
@@ -322,16 +326,6 @@ public abstract class StandEntity extends MobEntity {
         this.dataTracker.set(FREEZ, freePos.getZ());
     }
 
-    public int getTSTime() {
-        return this.dataTracker.get(TIMESTOPTIME);
-    }
-    /**
-     * Sets the time in ticks time will be stopped for on account of this stand
-     */
-    public void setTSTime(int tsTime) {
-        this.dataTracker.set(TIMESTOPTIME, tsTime);
-    }
-
     @Override
     public SoundCategory getSoundCategory() {
         return SoundCategory.PLAYERS;
@@ -358,14 +352,12 @@ public abstract class StandEntity extends MobEntity {
         this.dataTracker.startTracking(FREEX, 0f);
         this.dataTracker.startTracking(FREEY, 0f);
         this.dataTracker.startTracking(FREEZ, 0f);
-
-        this.dataTracker.startTracking(TIMESTOPTIME, 0);
     }
 
     public void initialize() {
         this.noClip = true;
-        this.setInvulnerable(true);
-        this.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 999999, 9, false, false));
+        setInvulnerable(true);
+        addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 999999, 9, false, false));
     }
 
     // Attack controls
@@ -391,8 +383,8 @@ public abstract class StandEntity extends MobEntity {
      * Struct used for storing extra information relating to the stands ability to attack
      */
     public class CanAttackData {
-        public LivingEntity user;
-        public boolean canAttack;
+        public final LivingEntity user;
+        public final boolean canAttack;
 
         public CanAttackData(LivingEntity l, boolean b) {
             this.user = l;
@@ -530,8 +522,10 @@ public abstract class StandEntity extends MobEntity {
 
     // Define desummon conditions
     public void desummon() {
-        if (this.curAttack == null && this.getMoveStun() <= 0)
-            this.discard();
+        if (curAttack != null || getMoveStun() > 0) return;
+        discard();
+        if (user != null)
+            ((IEntityDataSaver)user).setStand(null);
     }
 
     // Define idle override
@@ -570,22 +564,6 @@ public abstract class StandEntity extends MobEntity {
         return super.hasNoGravity();
     }
 
-    /*
-    @Override
-    public void tickRiding() {
-        this.tick();
-        if (hasUser()) {
-            if (getFree()) {
-                Vec3f freePos = getFreePos();
-                setPosition(freePos.getX(), freePos.getY(), freePos.getZ());
-            } else {
-                user.updatePassengerPosition(this);
-                setVelocity(0, 0, 0);
-            }
-        }
-    }
-     */
-
     /**
      * does evrything :)
      */
@@ -593,16 +571,18 @@ public abstract class StandEntity extends MobEntity {
     public void tick() {
         super.tick();
 
-        if (this.isDead()) return;
+        if (isDead()) return;
 
-        if (this.user == null) {
-            if (world.isClient && this.getVehicle() instanceof LivingEntity living)
+        boolean client = world.isClient;
+
+        if (user == null) {
+            if (client && getVehicle() instanceof LivingEntity living)
                 user = living;
             return;
         } //else if (this.owner == null) { this.owner = player; }
         Entity vehicle = user.getVehicle();
 
-        this.setMoveStun(this.getMoveStun() - 1);
+        setMoveStun(getMoveStun() - 1); // Counting down animation time or similar
         if (playSummonAnim && (getMoveStun() > 0 || age > summonAnimDuration) )
             playSummonAnim = false;
 
@@ -614,41 +594,60 @@ public abstract class StandEntity extends MobEntity {
         boolean isFree = getFree();
         boolean isRemote = getRemote();
 
-        boolean client = this.world.isClient();
-        if (client) {
-            if (isRemote)
-                user.setBodyYaw(user.getHeadYaw());
-        } else {
+        // Common code for remote mode
+        if (isRemote) {
+            if (hasVehicle()) detach();
+            if (!user.isAlive())
+                kill();
+
+            // Clientside rotational sync for remote mode
+            user.setBodyYaw(user.getHeadYaw());
+
+            setHeadYaw(user.getHeadYaw());
+            setRotation(user.getYaw(), user.getPitch());
+        } else if (!hasVehicle() && !getFree())
+            startRiding(user, true);
+
+        /*
+        JCraft.LOGGER.info(
+                (client ? "CLIENT:" : "SERVER:") + " Ticking stand " + this +
+                        "\nUser: " + user +
+                        "\nVehicle (stand): " + getVehicle() +
+                        "\nFree: " + getFree() +
+                        "\nRemote: " + getRemote()
+        );
+         */
+
+        if (!client) {
             // Reset samestate
-            if (this.getSameState()) {
-                this.setSameState(false);
-            }
+            if (getSameState()) setSameState(false);
+
+            // Make sure the user is using this stand
+            if (((IEntityDataSaver)user).getStand() != this) discard();
 
             // Block break check
-            if (this.getStandGauge() < 1) {
+            if (getStandGauge() < 1) {
                 user.addStatusEffect(new StatusEffectInstance(JStatusRegister.DAZED, 40, 2));
-                this.playSound(SoundEvents.ITEM_TOTEM_USE, 1, 0.5f);
-                this.kill();
+                playSound(SoundEvents.ITEM_TOTEM_USE, 1, 0.5f);
+                kill();
             }
 
             // Return to user after stand detach move, provided it's finished recovering and there's no queued followup
-            if (this.defaultToNear() && this.getMoveStun() < 1 && this.queuedAttack == null && attack == null) {
-                this.setFree(false);
-            }
+            if (defaultToNear() && getMoveStun() < 1 && this.queuedAttack == null && attack == null) setFree(false);
 
             // Rotate with user
             if (!isFree || isRemote) {
-                this.setHeadYaw(user.getHeadYaw());
-                this.setRotation(user.getYaw(), user.getPitch());
+                setHeadYaw(user.getHeadYaw());
+                setRotation(user.getYaw(), user.getPitch());
             }
 
             // Remote mode
-            if (isRemote) {
-                user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 5, 9, true, false));
-            }
+            if (isRemote) user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 5, 9, true, false));
+
+            int curMoveStun = this.getMoveStun();
 
             // Attack logic
-            if (this.getMoveStun() >= 0 && !this.blocking && attack != null) {
+            if (curMoveStun >= 0 && !this.blocking && attack != null) {
                 int stunTicks = (int) (attack.stun * 20f);
                 //LOGGER.info("Stun ticks: " + stunTicks);
 
@@ -661,8 +660,8 @@ public abstract class StandEntity extends MobEntity {
                 boolean isChargeAttack = attack.attackType == AttackType.CHARGE || attack.attackType == AttackType.CHARGEBARRAGE;
                 // Positioning
                 if (isChargeAttack) {
-                    if (this.getMoveStun() <= realInitTime) {
-                        //float t = 1f - (float) this.getMoveStun() / (float) realInitTime;
+                    if (curMoveStun <= realInitTime) {
+                        //float t = 1f - (float) curMoveStun / (float) realInitTime;
                         Vec3d newPos = pos.add(rotVec.multiply(attackDist / realInitTime));
                         //this.setDistanceOffset(1 + attackDist * t * t);
                         this.setFreePos(new Vec3f((float) newPos.x, (float) newPos.y, (float) newPos.z));
@@ -678,45 +677,25 @@ public abstract class StandEntity extends MobEntity {
                     this.setDistanceOffset(attackDist);
                 }
 
-                if (attack.attackType == AttackType.TIMESTOP && this.getMoveStun() == realInitTime) {
-                    this.setTSTime(stunTicks);
+                if (attack.attackType == AttackType.TIMESTOP && curMoveStun == realInitTime) {
+                    tsTime = stunTicks;
                     this.curAttack = null;
 
                     StatusEffectInstance tsBlind = new StatusEffectInstance(StatusEffects.BLINDNESS, 19, 0, false, false, false);
                     user.addStatusEffect(tsBlind);
 
-                    JCraftUtils.activeTimestops.add(new DimValues(this, pos, this.world.getRegistryKey()));
-
-                    List<PlayerEntity> toCooldown = world.getEntitiesByClass(PlayerEntity.class,
-                            new Box(eyePos.add(96.0, 96.0, 96.0), eyePos.subtract(96.0, 96.0, 96.0)), EntityPredicates.VALID_LIVING_ENTITY);
-
-                    for (PlayerEntity player : toCooldown) {
-
-                        // Shader handling
-                        if(player instanceof ServerPlayerEntity serverPlayerEntity){
-                            if(!world.isClient()){
-                                ShaderActivationPacket.send(serverPlayerEntity, this, 0, stunTicks, ShaderActivationPacket.Type.ZA_WARUDO);
-                            }
-                            if (serverPlayerEntity == user || serverPlayerEntity.isCreative()) continue;
-                            // Puts all player items besides armor into cooldown for entire duration of timestop
-                            for (int i = 0; i < serverPlayerEntity.getInventory().main.size(); i++){
-                                serverPlayerEntity.getItemCooldownManager().set(serverPlayerEntity.getInventory().main.get(i).getItem(), stunTicks);
-                            }
-                            serverPlayerEntity.getItemCooldownManager().set(serverPlayerEntity.getOffHandStack().getItem(), stunTicks);
-                        }
-
-                    }
+                    JCraft.stopTime(user, pos, (ServerWorld) world, stunTicks);
                 }
 
                 boolean isBarrage = attack.attackType == AttackType.BARRAGE || attack.attackType == AttackType.CHARGEBARRAGE;
 
                 if (
-                        (attack.attackType == AttackType.BOX && this.getMoveStun() == realInitTime)
-                                || (isBarrage && this.getMoveStun() % attack.interval == 0 && this.getMoveStun() <= realInitTime)
-                                || (attack.attackType == AttackType.CHARGE && this.getMoveStun() <= realInitTime)
-                                || (attack.attackType == AttackType.MULTIHIT && attack.attackTimes.contains(moveStun - this.getMoveStun()))
+                        (attack.attackType == AttackType.BOX && curMoveStun == realInitTime)
+                                || (isBarrage && curMoveStun % attack.interval == 0 && curMoveStun <= realInitTime)
+                                || (attack.attackType == AttackType.CHARGE && curMoveStun <= realInitTime)
+                                || (attack.attackType == AttackType.MULTIHIT && attack.attackTimes.contains(moveStun - curMoveStun))
                 ) {
-                    //JCraft.LOGGER.info(this.getMoveStun() + " ACTIVE " + attack.interval);
+                    //JCraft.LOGGER.info(curMoveStun + " ACTIVE " + attack.interval);
                     List<LivingEntity> hurt = new ArrayList<>();
 
                     if (attack.hitboxSize > 0) {
@@ -727,9 +706,9 @@ public abstract class StandEntity extends MobEntity {
                         List<Entity> filter = new ArrayList<>(List.of(this, user));
                         if (vehicle != null) filter.add(vehicle);
 
-                        hurt = JCraftUtils.generateHitbox(world, fPos, attack.hitboxSize, filter);
+                        hurt = JUtils.generateHitbox(world, fPos, attack.hitboxSize, filter);
                         for (Attack.HitboxData data : attack.extraHitboxes) {
-                            List<LivingEntity> extraHurt = JCraftUtils.generateHitbox(world,
+                            List<LivingEntity> extraHurt = JUtils.generateHitbox(world,
                                     hPos.add(rotVec.multiply(data.forwardOffset)).add(0, data.verticalOffset, 0), data.hitboxSize, filter);
                             for (LivingEntity hurtEntity : extraHurt)
                                 if (!hurt.contains(hurtEntity)) hurt.add(hurtEntity);
@@ -796,7 +775,7 @@ public abstract class StandEntity extends MobEntity {
                  */
             }
 
-            if (this.getMoveStun() <= 0 && !this.blocking) {
+            if (curMoveStun <= 0 && !this.blocking) {
                 // Attack buffering
                 if (this.queuedAttack != null) {
                     switch (this.queuedAttack) {
@@ -834,56 +813,34 @@ public abstract class StandEntity extends MobEntity {
                 this.curAttack = null;
                 this.setStateNoReset(3);
 
-                if (this.getMoveStun() < 4) setMoveStun(4);
+                if (curMoveStun < 4) setMoveStun(4);
                 setDistanceOffset(this.blockDistance);
                 setRotationOffset(this.attackRotation);
                 standBlock();
             }
         }
 
-        // JCraft.LOGGER.info( "State: " + this.getState() + " Movestun: " + this.getMoveStun() + " Currently attacking: " + (this.curAttack != null)); // Massive debug log
+        // JCraft.LOGGER.info( "State: " + this.getState() + " Movestun: " + curMoveStun + " Currently attacking: " + (this.curAttack != null)); // Massive debug log
 
-        int tsTime = this.getTSTime();
-
+        // Minor aspects of timestop logic, actual stopping is handled at JServerTickEvents
         if (tsTime > 0) {
             user.stopRiding();
 
-            for (int h = 0; h < 1500 / tsTime; ++h) {
-                this.world.addParticle(
+            for (int h = 0; h < 1500 / tsTime; ++h)
+                world.addParticle(
                         ParticleTypes.MYCELIUM,
                         eyePos.x + random.nextTriangular(0, tsTime),
                         eyePos.y + random.nextTriangular(0, tsTime) / 4,
                         eyePos.z + random.nextTriangular(0, tsTime),
                         0.0, 0.0, 0.0
                 );
-            }
 
-            List<Entity> toStop = world.getEntitiesByClass(Entity.class,
-                    new Box(eyePos.add(96.0, 96.0, 96.0), eyePos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
-
-            toStop.remove(this);
-            toStop.remove(user);
-
-            for (Entity entity : toStop) {
-                /*
-                if (entity.getFirstPassenger() instanceof StandEntity stand) {
-                    JCraft.LOGGER.info("TSing stand: " + stand.getName());
-                    if (tsTime - stand.tsRes > 0)
-                }
-                 */
-                ITimeStop ts = ((ITimeStop) entity);
-                ts.setTimeStopTicks(2);
-            }
-
-            if (!client) {
-                this.setTSTime(tsTime - 1);
-            }
+            if (!client) tsTime--;
         }
 
-        if (this.curAttack != this.previousAttack && this.curAttack != null) {
+        if (this.curAttack != this.previousAttack && this.curAttack != null)
             //JCraft.LOGGER.info("Logged previous attack change: " + this.curAttack + " " + this.previousAttack);
             this.previousAttack = this.curAttack;
-        }
 
         //this.pastAttack = this.curAttack;
     }
@@ -899,7 +856,7 @@ public abstract class StandEntity extends MobEntity {
      * @param lift will the attack lift the victim upon an aerial hit?
      */
     public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, boolean canBackstab) {
-        if (world == null || ent == null) return;
+        if (world == null || world.isClient || ent == null) return;
         if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && attacker instanceof PlayerEntity playerEntity)
             comboCounterLogic(playerEntity, ent);
 
@@ -917,7 +874,7 @@ public abstract class StandEntity extends MobEntity {
      * @param lift will the attack lift the victim upon an aerial hit?
      */
     public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker) {
-        if (world == null || ent == null) return;
+        if (world == null || world.isClient || ent == null) return;
         if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && attacker instanceof PlayerEntity playerEntity)
             comboCounterLogic(playerEntity, ent);
         baseDamageLogic(ent, kbVec, stunTicks, stunType, overrideStun, damage, lift, blockstun, source, attacker, false);
@@ -959,7 +916,8 @@ public abstract class StandEntity extends MobEntity {
         boolean hit = true;
         boolean tsHit = ( (ITimeStop)ent ).getTimeStopTicks() > 0;
 
-        if (ent.getFirstPassenger() instanceof StandEntity stand) {
+        StandEntity stand = ((IEntityDataSaver)ent).getStand();
+        if (stand != null) {
             Attack standAttack = stand.curAttack;
             if (standAttack != null) {
                 // Counter check
@@ -974,7 +932,7 @@ public abstract class StandEntity extends MobEntity {
 
             if (stand.blocking && !stand.getRemote()) {
                 double delta = Math.abs((ent.headYaw + 90.0f) % 360.0f - (attacker.getHeadYaw() + 90.0f) % 360.0f);
-                if ( canBackstab && (360.0 - delta % 360.0 < 90 || delta % 360.0 < 90) && ent.squaredDistanceTo(attacker.getPos()) >= 2.25 ) { // Backstab logic
+                if ( canBackstab && (360.0 - delta % 360.0 < 90 || delta % 360.0 < 90) && ent.squaredDistanceTo(attacker.getPos()) >= 1.5625 ) { // Backstab logic
                     JCraft.CreateParticle((ServerWorld) attacker.getWorld(), ent.getX(), attacker.getEyeY(), ent.getZ(), -2);
                     stand.playSound(SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, 1, 1);
                     stand.blocking = false;
@@ -1011,7 +969,7 @@ public abstract class StandEntity extends MobEntity {
 
         // Interrupting spec moves
         if (ent instanceof PlayerEntity playerEntity) {
-            JCraftSpec spec = JCraftUtils.getSpec(playerEntity);
+            JCraftSpec spec = JUtils.getSpec(playerEntity);
             if (spec != null && spec.curAttack != null && !spec.curAttack.hasArmor) spec.cancelAttack();
         }
 
@@ -1036,8 +994,8 @@ public abstract class StandEntity extends MobEntity {
     @Override
     public void stopRiding() {
         if (!getRemote()) {
-            this.playSound(JSoundRegister.STAND_DESUMMON, 1, 1);
-            this.kill();
+            playSound(JSoundRegister.STAND_DESUMMON, 1, 1);
+            kill();
         }
         super.stopRiding();
     }
@@ -1050,62 +1008,48 @@ public abstract class StandEntity extends MobEntity {
 
     @Override
     public boolean damage(DamageSource source, float amount) {
-        if (source.isMagic() || source.isExplosive()) {
-            return false;
-        }
+        if (source.isMagic() || source.isExplosive()) return false;
         return super.damage(source, amount);
     }
 
     // Physical properties
     @Override
     public void pushAwayFrom(Entity entity) { }
-
     @Override
     public boolean collidesWith(Entity other) { return false; }
 
     @Override
     public boolean addStatusEffect(StatusEffectInstance effect, @Nullable Entity source) {
-        if (!hasUser()) return false;
-        return getUser().addStatusEffect(effect, source);
+        if (world.isClient || user == null) return false;
+        return user.addStatusEffect(effect, source);
     }
 
     /**
      * Handles AI for mob stand users
      */
-    public void mobAI(MobEntity mob, LivingEntity target) {
-        if (mob == target) {
-            return;
-        }
-        if (target == null) {
-            return;
-        }
-        if (!target.isAlive()) {
-            return;
-        }
+    public static void standUserAI(MobEntity mob, LivingEntity target, StandEntity stand) {
+        if (mob == target) return;
+        if (target == null || !target.isAlive() || target.isRemoved()) return;
 
         mob.lookAtEntity(target, 30, 30); // Point body at enemy
         mob.getLookControl().lookAt(target); // Usually detrimental not to
 
         JCraftSpec enemySpec;
-        StandEntity enemyStand = null;
+        StandEntity enemyStand = ((IEntityDataSaver)target).getStand();
         Attack enemyAttack = null;
-        boolean enemyHasStand = false;
+        boolean enemyHasStand = enemyStand != null;
 
         double distance = target.distanceTo(mob);
         int enemyMoveStun = 0;
         int blockPlusTicks = 0;
 
         // Get enemy stand attack (most common)
-        if (target.getFirstPassenger() instanceof StandEntity stand) {
-            enemyHasStand = true;
-            enemyStand = stand;
-
+        if (enemyHasStand) {
             enemyMoveStun = enemyStand.getMoveStun();
             enemyAttack = enemyStand.curAttack;
 
-            if (enemyStand.blocking) {
+            if (enemyStand.blocking)
                 blockPlusTicks = enemyMoveStun;
-            }
 
             distance = enemyStand.distanceTo(mob);
         }
@@ -1128,77 +1072,73 @@ public abstract class StandEntity extends MobEntity {
             if (enemyAttack.isRanged || enemyAttack.attackType == AttackType.BARRAGE)
                 wantToBlock = true;
             // Block if the attack isn't ranged, but is within hitting distance, and doesn't block break
-            if (enemyAttack.attackDist + enemyAttack.hitboxSize * 0.66 > distance && enemyAttack.damage * 2 < this.getStandGauge())
+            if (enemyAttack.attackDist + enemyAttack.hitboxSize * 0.66 > distance && enemyAttack.damage * 2 < stand.getStandGauge())
                 wantToBlock = true;
         }
 
         // Block if falling or there are projectiles nearby
         // 2 tick check interval is efficient because block doesn't run out by then, and finding entities is expensive
-        if (this.age % 2 == 0) {
-            List<ProjectileEntity> nearbyProjectiles = this.world.getEntitiesByClass(ProjectileEntity.class, mob.getBoundingBox().expand(3), EntityPredicates.VALID_ENTITY);
+        if (stand.age % 2 == 0) {
+            List<ProjectileEntity> nearbyProjectiles = stand.world.getEntitiesByClass(ProjectileEntity.class, mob.getBoundingBox().expand(3), EntityPredicates.VALID_ENTITY);
             boolean anyInAir = false;
+            Vec3d pos = stand.getPos();
             for (ProjectileEntity projectile : nearbyProjectiles) {
                 if (projectile.getOwner() == mob) continue;
                 // Is it moving towards the stand?
-                if (projectile.squaredDistanceTo(getPos()) < new Vec3d(projectile.prevX, projectile.prevY, projectile.prevZ).squaredDistanceTo(getPos())) {
+                if (projectile.squaredDistanceTo(pos) < new Vec3d(projectile.prevX, projectile.prevY, projectile.prevZ).squaredDistanceTo(pos)) {
                     anyInAir = true;
                     break;
                 }
             }
 
-            if (mob.fallDistance > 2 || anyInAir) {
-                wantToBlock = true;
-            }
-        }
-        //JCraft.LOGGER.info("WTB: " + wantToBlock);
-
-        if (wantToBlock) {
-            if (this.canAttack()) blocking = true;
-        } else {
-            blocking = false;
+            if (mob.fallDistance > 2 || anyInAir) wantToBlock = true;
         }
 
-        boolean stunned = mob.hasStatusEffect(JStatusRegister.DAZED);
+        //JCraft.LOGGER.info("Want to block: " + wantToBlock);
+        stand.blocking = wantToBlock && stand.canAttack();
+
+        StatusEffectInstance mobStun = mob.getStatusEffect(JStatusRegister.DAZED);
         // If stunned, and about to get hit by another move, combo break sometimes
-        if (stunned) {
-            StatusEffectInstance mobStun = mob.getStatusEffect(JStatusRegister.DAZED);
-            if (!this.blocking && enemyAttack != null && enemyMoveStun > enemyAttack.initTime && this.random.nextFloat() < 0.1f) {
-                ComboBreak((ServerWorld) this.world, mob, mobStun);
-            }
-        }
+        if (mobStun != null)
+            if (!stand.blocking && enemyAttack != null && enemyMoveStun > enemyAttack.initTime && stand.random.nextFloat() < 0.1f)
+                ComboBreak((ServerWorld) stand.world, mob, mobStun);
 
-        if (!this.blocking) {
+        if (!stand.blocking) {
             StatusEffectInstance stun = target.getStatusEffect(JStatusRegister.DAZED);
             // Overestimating stun up to 1/4 of a second for longer combos and frametraps
-            int stunTicks = stun != null ? stun.getDuration() + random.nextInt(5) : 0;
+            int stunTicks = stun != null ? stun.getDuration() + stand.random.nextInt(5) : 0;
             stunTicks += blockPlusTicks;
             stunTicks += ((ITimeStop) target).getTimeStopTicks();
-            int move = selectMove(mob, target, stunTicks, enemyMoveStun, distance, enemyStand, enemyAttack);
+            int move = stand.selectMove(mob, target, stunTicks, enemyMoveStun, distance, enemyStand, enemyAttack);
             Attack selectedAttack = null;
 
-            boolean shouldPerformMove = this.getMoveStun() < 1;
-            if (curAttack != null && curAttack.hasFollowup()) {
+            boolean shouldPerformMove = stand.getMoveStun() < 1;
+            if (stand.curAttack != null && stand.curAttack.hasFollowup())
                 shouldPerformMove = true;
-            }
 
             if (move != -1) {
-                selectedAttack = this.moves.get(move);
+                selectedAttack = stand.moves.get(move);
 
                 if (shouldPerformMove) {
                     switch (move) {
-                        case 0 -> this.initLightAttack();
-                        case 1 -> this.initHeavyAttack();
-                        case 2 -> this.initBarrage();
-                        case 3 -> this.initSpecial1();
-                        case 4 -> this.initUlt();
-                        case 5 -> this.initSpecial2();
-                        case 6 -> this.initSpecial3();
-                        case 7 -> this.initMiddleClick();
+                        case 0 -> stand.initLightAttack();
+                        case 1 -> stand.initHeavyAttack();
+                        case 2 -> stand.initBarrage();
+                        case 3 -> stand.initSpecial1();
+                        case 4 -> stand.initUlt();
+                        case 5 -> stand.initSpecial2();
+                        case 6 -> stand.initSpecial3();
+                        case 7 -> stand.initMiddleClick();
                     }
                 } else {
-                    this.queuedAttack = AttackQueue.values()[move];
+                    stand.queuedAttack = AttackQueue.values()[move];
                 }
             }
+
+            // Dash to targeted location
+            BlockPos targetPos = mob.getNavigation().getTargetPos();
+            if (targetPos != null && mob.isOnGround() && targetPos.getSquaredDistance(target.getPos()) > 4)
+                JCraft.tryDash(1, 0, mob);
 
             double sideswitchDistance = 1.25;
 
@@ -1211,7 +1151,7 @@ public abstract class StandEntity extends MobEntity {
                 mob.getNavigation().setSpeed(distance < sideswitchDistance && selectedAttack == null ? 0.25 : -0.25);
             }
 
-            float sStrafe = MathHelper.sin(this.age * 0.02f) / 3f;
+            float sStrafe = MathHelper.sin(stand.age * 0.02f) / 3f;
 
             // Move away during combo to prevent point-blank misses
             if (stunTicks > 0) {
@@ -1232,9 +1172,9 @@ public abstract class StandEntity extends MobEntity {
                 mob.getMoveControl().strafeTo(fStrafe, sStrafe);
             }
 
-        } else if (this.getMoveStun() > 4) { // if blocking & movestun > 4 means the enemy made you block
+        } else if (stand.getMoveStun() > 4) { // if blocking & movestun > 4 means the enemy made you block
             // Don't buffer any attacks as you are minus and will DIE
-            this.queuedAttack = null;
+            stand.queuedAttack = null;
         }
     }
 

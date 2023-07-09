@@ -10,7 +10,6 @@ import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
@@ -20,178 +19,195 @@ public interface JEntityTypeRegister {
 
     EntityType<StarPlatinumEntity> STAR_PLATINUM = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "starplatinum"),
+            JCraft.id("starplatinum"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(StarPlatinumEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     EntityType<KingCrimsonEntity> KING_CRIMSON = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "kingcrimson"),
+            JCraft.id("kingcrimson"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(KingCrimsonEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     EntityType<TheWorldEntity> THE_WORLD = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "theworld"),
+            JCraft.id("theworld"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(TheWorldEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     EntityType<D4CEntity> D4C = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "d4c"),
+            JCraft.id("d4c"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(D4CEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     EntityType<CreamEntity> CREAM = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "cream"),
+            JCraft.id("cream"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(CreamEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     EntityType<KillerQueenEntity> KILLER_QUEEN = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "killerqueen"),
+            JCraft.id("killerqueen"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(KillerQueenEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     EntityType<KQBTDEntity> KILLER_QUEEN_BITES_THE_DUST = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "kqbtd"),
+            JCraft.id("kqbtd"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(KQBTDEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
     EntityType<SheerHeartAttackEntity> SHEER_HEART_ATTACK = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "sha"),
+            JCraft.id("sha"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, SheerHeartAttackEntity::new).dimensions(EntityDimensions.fixed(0.5f, 0.5f)).build()
     );
 
     EntityType<WhitesnakeEntity> WHITE_SNAKE = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "whitesnake"),
+            JCraft.id("whitesnake"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(WhitesnakeEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     EntityType<CMoonEntity> C_MOON = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "cmoon"),
+            JCraft.id("cmoon"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(CMoonEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     EntityType<MadeInHeavenEntity> MADE_IN_HEAVEN = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "mih"),
+            JCraft.id("mih"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(MadeInHeavenEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 2.1f)).build()
     );
 
     EntityType<TheWorldOverHeavenEntity> THE_WORLD_OVER_HEAVEN = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "twoh"),
+            JCraft.id("twoh"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(TheWorldOverHeavenEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     EntityType<SilverChariotEntity> SILVER_CHARIOT = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "silverchariot"),
+            JCraft.id("silverchariot"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(SilverChariotEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     EntityType<MagiciansRedEntity> MAGICIANS_RED = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "mr"),
+            JCraft.id("mr"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(MagiciansRedEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     EntityType<TheFoolEntity> THE_FOOL = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "thefool"),
-            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(TheFoolEntity::new)).dimensions(EntityDimensions.fixed(2f, 2f)).build()
+            JCraft.id("thefool"),
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(TheFoolEntity::new))
+                    .dimensions(EntityDimensions.fixed(2f, 2f))
+                    .fireImmune()
+                    .build()
     );
 
     EntityType<GoldenExperienceEntity> GOLDEN_EXPERIENCE = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "goldenexperience"),
+            JCraft.id("goldenexperience"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(GoldenExperienceEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
     EntityType<GETreeEntity> GE_TREE = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "getree"),
+            JCraft.id("getree"),
             FabricEntityTypeBuilder.create(SpawnGroup.MISC, GETreeEntity::new).dimensions(EntityDimensions.fixed(0.6f, 0.8f)).build()
     );
     EntityType<GESnakeEntity> GE_SNAKE = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "gesnake"),
+            JCraft.id("gesnake"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, GESnakeEntity::new).dimensions(EntityDimensions.fixed(1f, 0.3f)).build()
     );
     EntityType<GEFrogEntity> GE_FROG = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "gefrog"),
+            JCraft.id("gefrog"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, GEFrogEntity::new).dimensions(EntityDimensions.fixed(0.3f, 0.3f)).build()
     );
     EntityType<GEREntity> GER = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "ger"),
+            JCraft.id("ger"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(GEREntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
     EntityType<GERScorpionEntity> GER_SCORPION = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "gerscorpion"),
+            JCraft.id("gerscorpion"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, GERScorpionEntity::new).dimensions(EntityDimensions.fixed(0.4f, 0.4f)).build()
     );
 
     // D4C clone fuckery
     EntityType<PlayerCloneEntity> PLAYER_ENTITY_CLONE = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "playerclone"),
+            JCraft.id("playerclone"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, PlayerCloneEntity::new).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     EntityType<PlayerCloneEntity> PLAYER_ENTITY_CLONE_SLIM = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "playerclone_slim"),
+            JCraft.id("playerclone_slim"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, PlayerCloneEntity::new).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     // Take note of the extra <KnifeProjectile> and tracked values
     EntityType<KnifeProjectile> KNIFE = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "knife"),
+            JCraft.id("knife"),
             FabricEntityTypeBuilder.<KnifeProjectile>create(SpawnGroup.MISC, KnifeProjectile::new)
                     .dimensions(EntityDimensions.fixed(0.5f, 0.5f)).trackRangeChunks(6).trackedUpdateRate(10).build()
     );
 
     EntityType<AnkhProjectile> ANKH = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "ankh"),
+            JCraft.id("ankh"),
             FabricEntityTypeBuilder.<AnkhProjectile>create(SpawnGroup.MISC, AnkhProjectile::new)
                     .dimensions(EntityDimensions.fixed(0.75f, 0.75f)).trackRangeChunks(6).trackedUpdateRate(20).build()
     );
 
     EntityType<BubbleProjectile> BUBBLE = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "bubble"),
+            JCraft.id("bubble"),
             FabricEntityTypeBuilder.<BubbleProjectile>create(SpawnGroup.MISC, BubbleProjectile::new)
                     .dimensions(EntityDimensions.fixed(0.5f, 0.5f)).trackRangeChunks(8).trackedUpdateRate(20).build()
     );
 
     EntityType<BloodProjectile> BLOOD_PROJECTILE = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "bloodprojectile"),
+            JCraft.id("bloodprojectile"),
             FabricEntityTypeBuilder.<BloodProjectile>create(SpawnGroup.MISC, BloodProjectile::new)
                     .dimensions(EntityDimensions.fixed(0.5f, 0.5f)).trackRangeChunks(4).trackedUpdateRate(10).build()
     );
 
     EntityType<LifeDetectorEntity> LIFE_DETECTOR = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "lifedetector"),
+            JCraft.id("lifedetector"),
                 FabricEntityTypeBuilder.create(SpawnGroup.MISC, LifeDetectorEntity::new)
                         .dimensions(EntityDimensions.fixed(1f, 1f)).build()
     );
 
     EntityType<BlockProjectile> BLOCK_PROJECTILE = Registry.register(
             Registry.ENTITY_TYPE,
-            new Identifier(JCraft.MOD_ID, "blockprojectile"),
+            JCraft.id("blockprojectile"),
             FabricEntityTypeBuilder.create(SpawnGroup.MISC, BlockProjectile::new)
                     .dimensions(EntityDimensions.fixed(0.5f, 0.5f)).build()
+    );
+
+    EntityType<SandTornadoEntity> SAND_TORNADO = Registry.register(
+            Registry.ENTITY_TYPE,
+            JCraft.id("sandtornado"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MISC, SandTornadoEntity::new)
+                    .dimensions(EntityDimensions.fixed(1f, 2f)).build()
+    );
+
+    EntityType<WSAcidProjectile> WS_ACID_PROJECTILE = Registry.register(
+            Registry.ENTITY_TYPE,
+            JCraft.id("wsacidprojectile"),
+            FabricEntityTypeBuilder.<WSAcidProjectile>create(SpawnGroup.MISC, WSAcidProjectile::new)
+                    .dimensions(EntityDimensions.fixed(0.5f, 0.5f)).trackRangeChunks(4).trackedUpdateRate(10).build()
     );
 
     static void registerEntities() {
@@ -236,11 +252,18 @@ public interface JEntityTypeRegister {
         );
 
         FabricDefaultAttributeRegistry.register(D4C, D4CEntity.createMobAttributes());
-        FabricDefaultAttributeRegistry.register(PLAYER_ENTITY_CLONE, D4CEntity.createMobAttributes().add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 2).add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3));
-        FabricDefaultAttributeRegistry.register(PLAYER_ENTITY_CLONE_SLIM, D4CEntity.createMobAttributes().add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 2).add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3));
+        FabricDefaultAttributeRegistry.register(PLAYER_ENTITY_CLONE, D4CEntity.createMobAttributes()
+                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 2)
+                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3)
+        );
+        FabricDefaultAttributeRegistry.register(PLAYER_ENTITY_CLONE_SLIM, D4CEntity.createMobAttributes()
+                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 2)
+                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3)
+        );
 
         FabricDefaultAttributeRegistry.register(LIFE_DETECTOR, LifeDetectorEntity.createDetectorAttributes());
         FabricDefaultAttributeRegistry.register(BLOCK_PROJECTILE, BlockProjectile.createBlockAttributes());
+        FabricDefaultAttributeRegistry.register(SAND_TORNADO, SandTornadoEntity.createTornadoAttributes());
     }
 
     @RequiredArgsConstructor(staticName = "from")

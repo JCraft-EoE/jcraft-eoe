@@ -3,7 +3,6 @@ package net.arna.jcraft.client.util;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.render.*;
-import net.minecraft.client.render.block.entity.EndPortalBlockEntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
@@ -27,6 +26,17 @@ public class RenderUtils {
             }
         }
         return null;
+    }
+
+    //TODO: get sterner to explain this
+    public static void renderGuiQuad(BufferBuilder buffer, int x, int y, int width, int height, int red, int green, int blue, int alpha) {
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        buffer.vertex((x + 0), (double)(y + 0), 0.0).color(red, green, blue, alpha).next();
+        buffer.vertex((x + 0), (double)(y + height), 0.0).color(red, green, blue, alpha).next();
+        buffer.vertex((double)(x + width), (double)(y + height), 0.0).color(red, green, blue, alpha).next();
+        buffer.vertex((double)(x + width), (double)(y + 0), 0.0).color(red, green, blue, alpha).next();
+        BufferRenderer.drawWithShader(buffer.end());
     }
 
     public static void vertexPos(VertexConsumer vertexConsumer, Matrix4f last, float x, float y, float z) {

@@ -1,6 +1,6 @@
 package net.arna.jcraft.client.mixin;
 
-import net.arna.jcraft.common.util.JCraftUtils;
+import net.arna.jcraft.client.util.JClientUtils;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.client.world.ClientWorld;
@@ -19,7 +19,11 @@ public class ParticleManagerMixin {
     @Inject(method = "tickParticle", at = @At("HEAD"), cancellable = true)
     void jcraft$tickParticle(Particle particle, CallbackInfo info) {
         ParticleAccessor particleAccessor = (ParticleAccessor) particle;
-        if (JCraftUtils.isInTSRange(new Vec3d(particleAccessor.getX(), particleAccessor.getY(), particleAccessor.getZ()))) {
+        if (
+                JClientUtils.isInTSRange(
+                new Vec3d( particleAccessor.getX(), particleAccessor.getY(), particleAccessor.getZ() )
+                )
+        ) {
             particleAccessor.setPrevX(particleAccessor.getX());
             particleAccessor.setPrevY(particleAccessor.getY());
             particleAccessor.setPrevZ(particleAccessor.getZ());

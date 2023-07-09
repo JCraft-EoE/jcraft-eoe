@@ -11,7 +11,6 @@ import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Quaternion;
 import software.bernie.geckolib3.renderers.geo.GeoProjectilesRenderer;
 
 public class BlockProjectileRenderer extends GeoProjectilesRenderer<BlockProjectile> {

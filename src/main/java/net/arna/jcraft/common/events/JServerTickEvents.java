@@ -6,7 +6,8 @@ import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.util.DimValues;
 import net.arna.jcraft.common.util.IEntityDataSaver;
-import net.arna.jcraft.common.util.JCraftUtils;
+import net.arna.jcraft.common.util.ITimeStop;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -28,13 +29,13 @@ import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.GameRules;
 import net.minecraft.world.explosion.Explosion;
 
 import java.util.*;
 
+import static net.arna.jcraft.common.entity.StandEntity.standUserAI;
 import static net.arna.jcraft.common.entity.StandEntity.stun;
-import static net.arna.jcraft.common.util.JCraftUtils.activeTimestops;
+import static net.arna.jcraft.common.util.JUtils.activeTimestops;
 
 public class JServerTickEvents {
     public static void serverTick(MinecraftServer server) {
@@ -102,14 +103,30 @@ public class JServerTickEvents {
         JCraft.pastDimensions = newPastDimensions;
 
         // Timestop handling
-        for (DimValues dimValues : activeTimestops) {
-            if (dimValues.user instanceof StandEntity stand && dimValues.user.isAlive()) {
-                if (stand.getTSTime() > 0) continue;
-            }
+        ArrayList<DimValues> newActiveTimestops = new ArrayList<>();
 
-            activeTimestops.remove(dimValues);
-            break;
+        for (DimValues timestop : activeTimestops) {
+            Entity user = timestop.user;
+            //JCraft.LOGGER.info("SERVER: Ticking timestop " + timestop + " with user " + user + " and duration " + timestop.timer);
+
+            if (user != null && user.isAlive() && timestop.timer-- > 0) {
+                ServerWorld world = server.getWorld(timestop.worldKey);
+                Vec3d pos = timestop.pos;
+
+                List<? extends Entity> toStop = world.getEntitiesByClass(Entity.class,
+                        new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+
+                for (Entity entity : toStop) {
+                    if ( entity == user || entity == ((IEntityDataSaver)user).getStand() ) continue;
+                    ITimeStop ts = ((ITimeStop) entity);
+                    ts.setTimeStopTicks(2);
+                }
+
+                newActiveTimestops.add(timestop);
+            }
         }
+
+        activeTimestops = newActiveTimestops;
 
         // Burst handling
         Iterator<Map.Entry<LivingEntity, Integer>> burstIter = JCraft.burstTimers.entrySet().iterator();
@@ -133,7 +150,7 @@ public class JServerTickEvents {
                 player.removeStatusEffect(JStatusRegister.DAZED);
                 stun(player, 10, 1);
                 Vec3d pPos = player.getEyePos();
-                List<? extends Entity> toPush = JCraftUtils.generateHitbox(player.world, pPos, 4, Entity.class, filter);
+                List<? extends Entity> toPush = JUtils.generateHitbox(player.world, pPos, 4, Entity.class, filter);
 
                 for (Entity ent : toPush) {
                     Vec3d awayVector = ent.getPos().subtract(pPos).normalize();
@@ -181,8 +198,8 @@ public class JServerTickEvents {
         JCraft.dashes = newDashes;
 
         for (ServerWorld serverWorld : server.getWorlds()) {
-            //TODO: make mob stand control logic use a static void and not require them to have their stand active
-            List<MobEntity> mobEntities = (List<MobEntity>) serverWorld.getEntitiesByType(TypeFilter.instanceOf(MobEntity.class), EntityPredicates.VALID_ENTITY);
+            //TODO: make MobAI not be dependent on having an active stand
+            List<? extends MobEntity> mobEntities = serverWorld.getEntitiesByType(TypeFilter.instanceOf(MobEntity.class), EntityPredicates.VALID_ENTITY);
 
             for (MobEntity mob : mobEntities) {
                 IEntityDataSaver user = (IEntityDataSaver) mob;
@@ -205,9 +222,9 @@ public class JServerTickEvents {
                                 LivingEntity primeAdversary = mob.getPrimeAdversary();
                                 LivingEntity target = mob.getTarget();
                                 if (primeAdversary != null && primeAdversary.isAlive()) {
-                                    stand.mobAI(mob, primeAdversary);
+                                    standUserAI(mob, primeAdversary, stand);
                                 } else if (target != null && target.isAlive()) {
-                                    stand.mobAI(mob, target);
+                                    standUserAI(mob, target, stand);
                                 } else if (biggestAttacker != null && biggestAttacker.isAlive()) {
                                     mob.setTarget(biggestAttacker);
                                 }
@@ -230,7 +247,7 @@ public class JServerTickEvents {
             }
 
             // Item attaction logic
-            List<ItemEntity> itemEntities = (List<ItemEntity>) serverWorld.getEntitiesByType(TypeFilter.instanceOf(ItemEntity.class), EntityPredicates.VALID_ENTITY);
+            List<? extends ItemEntity> itemEntities = serverWorld.getEntitiesByType(TypeFilter.instanceOf(ItemEntity.class), EntityPredicates.VALID_ENTITY);
 
             for (ItemEntity item : itemEntities) {
                 if (item.getStack().isOf(JObjectRegistry.ANUBIS))

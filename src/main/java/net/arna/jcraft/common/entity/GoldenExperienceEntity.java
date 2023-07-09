@@ -12,7 +12,6 @@ import net.minecraft.entity.mob.Angerable;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -29,40 +28,39 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 import java.util.List;
 
 public class GoldenExperienceEntity extends StandEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
-    public static Attack light = new Attack(0, 2, 0.75f, 9, 6, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
+    public static final Attack light = new Attack(0, 2, 0.75f, 9, 6, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
-    public static Attack heavy = new Attack(1, 17, 1f, 22, 13, 1.5, 9f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_2)
+    public static final Attack heavy = new Attack(1, 17, 1f, 22, 13, 1.5, 9f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_2)
             .setHitspark(2)
+            .appendHitbox(new Attack.HitboxData(0, 0, 1.25))
             .setArmor(true)
             .setLaunch()
             .setInfo("Shoulder Smash", "slow, uninterruptable combo finisher");
-    public static Attack barrage = new Attack(2, 14, 0.75f, 30, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 2, 0, 3)
+    public static final Attack barrage = new Attack(2, 14, 0.75f, 30, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 2, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public static Attack healself = new Attack(3, 26, 1f, 14, 10, 0, 0f, 0f, AttackType.BOX)
+    public static final Attack healself = new Attack(3, 26, 1f, 14, 10, 0, 0f, 0f, AttackType.BOX)
             .setInfo("Healing Hand", "standing: heals user for 2 hearts, crouching: heals others for 2 hearts, pacifies angered mobs");
-    public static Attack heal = new Attack(4, 26, 1f, 16, 10, 1.25, 0f, 0f, AttackType.BOX);
-    public static Attack tree = new Attack(5, 20, 1f, 24, 14, 1.25, 5f, 0.2f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_2)
+    public static final Attack heal = new Attack(4, 26, 1f, 16, 10, 1.25, 0f, 0f, AttackType.BOX);
+    public static final Attack tree = new Attack(5, 20, 1f, 24, 14, 1.25, 5f, 0.2f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_2)
             .setHitspark(2)
             .setInfo("Tree Summon", "two-hitting launch");
-    public static Attack lifegiver = new Attack(6, 36, 1f, 25, 16, 0, 0f, 0f, AttackType.BOX).setRanged(true)
+    public static final Attack lifegiver = new Attack(6, 36, 1f, 25, 16, 0, 0f, 0f, AttackType.BOX).setRanged(true)
             .setInfo("Life Giver",
                     """
-                    turns a held item into a:
-                    STANDING: snake which lasts for 25s and stuns for 0.5s on hit
-                    CROUCHING: frog which lasts for 15s and reflects damage while following you""");
-    public static Attack overclock = new Attack(10, 46, 1f, 31, 22, 2, 9f, 0.9f, AttackType.BOX, 3, 0, 0, JSoundRegister.IMPACT_5)
+                            turns a held item into a:
+                            STANDING: snake which lasts for 25s and stuns for 0.5s on hit
+                            CROUCHING: frog which lasts for 15s and reflects damage while following you""");
+    public static final Attack overclock = new Attack(10, 46, 1f, 31, 22, 2, 9f, 0.9f, AttackType.BOX, 3, 0, 0, JSoundRegister.IMPACT_5)
             .setHitspark(2)
             .setUB(false)
             .setInfo("Overclock", "slow, unblockable, devastating stun");
-    public static Attack rekka3 = new Attack(9, 23, 1f, 24, 12, 2, 7f, 0.5f, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.TW_KICK_HIT)
+    public static final Attack rekka3 = new Attack(9, 23, 1f, 24, 12, 2, 7f, 0.5f, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.TW_KICK_HIT)
             .setHitspark(2);
-    public static Attack rekka2 = new Attack(8, 23, 1f, 18, 10, 1.75, 5f, 0.5f, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.IMPACT_2)
+    public static final Attack rekka2 = new Attack(8, 23, 1f, 18, 10, 1.75, 5f, 0.5f, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.IMPACT_2)
             .setInfo("how did you", "get here", AttackQueue.SPECIAL2)
             .setHitspark(2)
             .setFollowup(rekka3);
-    public static Attack rekka1 = new Attack(7, 23, 1f, 20, 8, 1.5, 5f, 0.5f, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.IMPACT_2)
+    public static final Attack rekka1 = new Attack(7, 23, 1f, 20, 8, 1.5, 5f, 0.5f, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.IMPACT_2)
             .appendHitbox(new Attack.HitboxData(1.25))
             .setInfo("Rekka Series", "a set of three attacks, which cancel into each other during recovery", AttackQueue.SPECIAL2)
             .setFollowup(rekka2);
@@ -169,7 +167,9 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
         FROG,
         FISH
     }
+
     private LifeGiverType toSummon;
+
     @Override
     public void initSpecial3() {
         if (!this.canAttack()) return;
@@ -242,10 +242,14 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
                 }
                 if (toSummon == LifeGiverType.FROG) {
                     GEFrogEntity frog = new GEFrogEntity(JEntityTypeRegister.GE_FROG, world);
-                    ((IOwnable) frog).setMaster(user);
+                    frog.setMaster(user);
                     animal = frog;
                 }
 
+                if (animal == null) {
+                    JCraft.LOGGER.error("Failed to create animal of type " + toSummon + " from item " + animalItem);
+                    return;
+                }
                 item.decrement(1);
                 animal.refreshPositionAndAngles(this.getX(), this.getY() + 0.5f, this.getZ(), this.getYaw(), this.getPitch());
                 animal.setStackInHand(Hand.MAIN_HAND, animalItem);
@@ -254,7 +258,7 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
             case (9) -> {
                 for (LivingEntity ent :
                         entities) {
-                    if (!JCraftUtils.isBlocking(ent)) {
+                    if (!JUtils.isBlocking(ent)) {
                         ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 50, 0, true, false));
                     }
                 }
@@ -283,23 +287,23 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
 
     @Override
     public void tick() {
-        if (age == 1) this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.GE_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
+        if (age == 1) playSound(JSoundRegister.GE_SUMMON, 1f, 1f);
 
         super.tick();
+        if (!hasUser()) return;
 
-        if (hasUser()) {
-            if (world.isClient) {
-                this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(getUser()) / 2, 0.0, 255.0) / 255f);
-            } else if (this.curAttack == rekka2 && this.queuedAttack == AttackQueue.SPECIAL2) {
-                this.queuedAttack = null;
-            }
-        }
+        if (world.isClient)
+            setAlpha((float) MathHelper.clamp(255.0 * squaredDistanceTo(getUser()) / 2, 0.0, 255.0) / 255f);
+        else if (curAttack == rekka2 && queuedAttack == AttackQueue.SPECIAL2)
+            queuedAttack = null;
     }
 
     // Animation code
+    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+
     @Override
     public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController(this, "controller", 0, this::predicate));
+        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
     }
 
     @Override
@@ -313,7 +317,7 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
     }
 
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        AnimationController controller = event.getController();
+        AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 
         if (this.getSameState()) controller.markNeedsReload();

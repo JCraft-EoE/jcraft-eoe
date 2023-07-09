@@ -17,7 +17,6 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
@@ -44,33 +43,31 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 import java.util.List;
 
 public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+    public static final Attack low = new Attack(1, 0, 0.85f, 13, 8, 1.5, 4f, 0.5f, AttackType.BOX, 0.5f, 0.1f, 0, JSoundRegister.IMPACT_1);
 
-    public static Attack low = new Attack(1, 0, 0.85f, 13, 8, 1.5, 4f, 0.5f, AttackType.BOX, 0.5f, 0.1f, 0, JSoundRegister.IMPACT_1);
-
-    public static Attack light = new Attack(0, 2, 0.75f, 19, 0, 1.5, 3f, 0.75f, AttackType.MULTIHIT, 1f, 0, List.of(6, 11), JSoundRegister.IMPACT_4)
+    public static final Attack light = new Attack(0, 2, 0.75f, 19, 0, 1.5, 3f, 0.75f, AttackType.MULTIHIT, 1f, 0, List.of(6, 11), JSoundRegister.IMPACT_4)
             .setFollowup(low)
             .setInfo("Dual Punch", "combo starter, decent speed, has followup with more blockstun");
 
-    public static Attack heavy = new Attack(2, 12, 0.75f, 24, 16, 2, 9f, 1.75f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_4)
+    public static final Attack heavy = new Attack(2, 12, 0.75f, 24, 16, 2, 9f, 1.75f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_4)
             .setHitspark(2)
             .setArmor(true)
             .setLaunch()
             .setInfo("Haymaker", "slow, uninterruptable launcher");
-    public static Attack barrage = new Attack(3, 17, 0.75f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3, JSoundRegister.IMPACT_4)
+    public static final Attack barrage = new Attack(3, 17, 0.75f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3, JSoundRegister.IMPACT_4)
             .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
-    public static Attack bombplant = new Attack(4, 30, 1, 20, 12, 1.5, 0f, 0.0f, AttackType.BOX, 0.45f)
+    public static final Attack bombplant = new Attack(4, 30, 1, 20, 12, 1.5, 0f, 0.0f, AttackType.BOX, 0.45f)
             .setUB(true)
             .setInfo("Bomb Plant", "crouch to plant on the ground below you, stealthily");
-    public static Attack sha = new Attack(5, 45, 20, 16, 0, AttackType.BOX)
+    public static final Attack sha = new Attack(5, 45, 20, 16, 0, AttackType.BOX)
             .setRanged(true)
             .setInfo("Sheer Heart Attack", "creates an automatic, heat-seeking sub-stand that explodes on contact, reflects 25% damage back to owner");
-    public static Attack detonate = new Attack(6, 1, 1, 6, 5, 0, 0f, 0.0f, AttackType.BOX)
+    public static final Attack detonate = new Attack(6, 1, 1, 6, 5, 0, 0f, 0.0f, AttackType.BOX)
             .setInfo("Detonate", "slight windup");
 
-    public ItemEntity coin;
-    public Entity bombEntity;
-    public Vec3d bombBlock;
+    private ItemEntity coin;
+    private Entity bombEntity;
+    private Vec3d bombBlock;
 
     public KillerQueenEntity(World world) {
         this(StandType.KILLER_QUEEN, world);
@@ -109,16 +106,11 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
                 , new Attack().setMobility(MobilityType.DASH).setInfo("Explosive Dash", "slight aoe damage, 3D movement tool"));
     }
 
-    @Override
-    protected void initDataTracker() {
-        super.initDataTracker();
-    }
-
     public Vec3d getBombPos() {
-        if (this.bombEntity != null)
-            return this.bombEntity.getPos();
-        if (this.bombBlock != null)
-            return this.bombBlock;
+        if (bombEntity != null)
+            return bombEntity.getPos();
+        if (bombBlock != null)
+            return bombBlock;
         return null;
     }
 
@@ -140,24 +132,24 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
 
     @Override
     public void initHeavyAttack() {
-        if (!this.canAttack())
+        if (!canAttack())
             return;
         if (handleAttack(heavy, JCraft.standHeavyCD, 4)) {
-            this.playSound(JSoundRegister.KQ_UPPERCUT, 1, 1);
-            this.playSound(JSoundRegister.KQ_HEAVY, 1, 1);
+            playSound(JSoundRegister.KQ_UPPERCUT, 1, 1);
+            playSound(JSoundRegister.KQ_HEAVY, 1, 1);
         }
     }
 
     @Override
     public void initBarrage() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, 5))
-            this.playSound(JSoundRegister.KQ_BARRAGE, 1, 1);
+            playSound(JSoundRegister.KQ_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         LivingEntity user = this.getUser();
         NbtCompound userData = ((IEntityDataSaver) user).getPersistentData();
         if (user.isInSneakingPose() && userData.getInt(JCraft.standS1CD) < 1) {
@@ -179,22 +171,21 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
 
     @Override
     public void initUlt() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(detonate, JCraft.standUltCD, 6))
-            this.playSound(JSoundRegister.KQ_DETONATE, 1, 1);
+            playSound(JSoundRegister.KQ_DETONATE, 1, 1);
     }
 
     @Override
     public void initSpecial2() {
-        if (!this.canAttack()) return;
-        if (handleAttack(sha, JCraft.standS2CD, 8)) {
-            //this.playSound(ModSoundRegister.KQ_SHA,1, 1);
-        }
+        if (!canAttack()) return;
+        handleAttack(sha, JCraft.standS2CD, 8);
+        //playSound(ModSoundRegister.KQ_SHA,1, 1);
     }
 
     @Override
     public void initSpecial3() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         LivingEntity user = this.getUser();
         NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
         if (playerData.getInt(JCraft.standS3CD) > 0) return;
@@ -216,7 +207,7 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
 
     @Override
     public void initMiddleClick() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         LivingEntity user = this.getUser();
         NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
         if (playerData.getInt(JCraft.utilCD) > 0) return;
@@ -232,7 +223,7 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
         user.velocityModified = true;
 
         playerData.putInt(JCraft.utilCD, 360); // 18s explosive dash cooldown
-        this.playSound(JSoundRegister.KQ_DETONATE, 1, 1);
+        playSound(JSoundRegister.KQ_DETONATE, 1, 1);
     }
 
     @Override
@@ -276,9 +267,8 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
 
                     if (bombEntity != null) {
                         bombPos = bombEntity.getPos();
-                        if (bombEntity instanceof ItemEntity) {
+                        if (bombEntity instanceof ItemEntity)
                             bombEntity.kill();
-                        }
                     }
                     if (bombBlock != null) {
                         bombPos = bombBlock;
@@ -324,90 +314,87 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
 
     @Override
     public void tick() {
-        if (age == 1) {
-            this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.STAND_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
-        }
-
+        if (age == 1) playSound(JSoundRegister.STAND_SUMMON, 1f, 1f);
         super.tick();
 
         if (hasUser()) {
-            LivingEntity user = this.getUser();
-            if (world.isClient) {
-                this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
-            } else {
-                if (user instanceof PlayerEntity playerEntity) {
-                    boolean bombExists = (bombEntity != null || bombBlock != null);
-
-                    double dX1 = 0;
-                    double dY1 = 0;
-                    double dZ1 = 0;
-                    double dX2 = 0;
-                    double dY2 = 0;
-                    double dZ2 = 0;
-
-                    Box bBox = null;
-
-                    if (bombEntity != null) { // If the bomb isn't a block
-                        dX1 = bombEntity.getX();
-                        dY1 = bombEntity.getY();
-                        dZ1 = bombEntity.getZ();
-
-                        bBox = bombEntity.getBoundingBox();
-
-                        dX2 = bBox.getXLength();
-                        dY2 = bBox.getYLength();
-                        dZ2 = bBox.getZLength();
-                    } else if (bombBlock != null) { // If the bomb is a block
-                        dX1 = bombBlock.getX();
-                        dY1 = bombBlock.getY();
-                        dZ1 = bombBlock.getZ();
-
-                        dX2 = dY2 = dZ2 = 1.41;
-                    }
-
-                    if (bombExists) {
-                        PacketByteBuf buf = PacketByteBufs.create();
-                        buf.writeShort(4);
-
-                        buf.writeDouble(dX1);
-                        buf.writeDouble(dY1);
-                        buf.writeDouble(dZ1);
-
-                        buf.writeDouble(dX2);
-                        buf.writeDouble(dY2);
-                        buf.writeDouble(dZ2);
-
-                        boolean anyInRange = false;
-                        Vec3d bPos = this.getBombPos();
-                        Vec3d v1 = bPos.add(3, 3, 3);
-                        Vec3d v2 = bPos.add(-3, -3, -3);
-                        List<LivingEntity> list = this.world.getEntitiesByClass(LivingEntity.class, new Box(v1, v2), EntityPredicates.VALID_LIVING_ENTITY);
-                        list.remove(bombEntity);
-                        for (LivingEntity l :
-                                list) {
-                            if (l.squaredDistanceTo(bPos) < 9) {
-                                anyInRange = true;
-                                break;
-                            }
-                        }
-
-                        buf.writeBoolean(anyInRange);
-
-                        if (bBox == null || bBox.getAverageSideLength() > 0) {
-                            if (playerEntity instanceof ServerPlayerEntity serverPlayerEntity) {
-                                ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
-                            }
-                        }
-                    }
-                }
-            }
+            LivingEntity user = getUser();
+            if (world.isClient)
+                setAlpha((float) MathHelper.clamp(255.0 * squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
+            else if (user instanceof ServerPlayerEntity playerEntity)
+                displayBombParticles(playerEntity, this.bombBlock, this.bombEntity);
         }
     }
 
-    // Animation code
+    @SuppressWarnings("SuspiciousMethodCalls")
+    protected void displayBombParticles(ServerPlayerEntity playerEntity, Vec3d bombBlock, Entity bombEntity) {
+        boolean bombIsBlock = bombBlock != null;
+        boolean bombExists = (bombEntity != null || bombIsBlock);
+
+        double dX1 = 0;
+        double dY1 = 0;
+        double dZ1 = 0;
+        double dX2 = 0;
+        double dY2 = 0;
+        double dZ2 = 0;
+
+        Box bBox = null;
+
+        if (bombEntity != null) { // If the bomb isn't a block
+            dX1 = bombEntity.getX();
+            dY1 = bombEntity.getY();
+            dZ1 = bombEntity.getZ();
+
+            bBox = bombEntity.getBoundingBox();
+
+            dX2 = bBox.getXLength();
+            dY2 = bBox.getYLength();
+            dZ2 = bBox.getZLength();
+        } else if (bombIsBlock) { // If the bomb is a block
+            dX1 = bombBlock.getX();
+            dY1 = bombBlock.getY();
+            dZ1 = bombBlock.getZ();
+
+            dX2 = dY2 = dZ2 = 1.41;
+        }
+
+        if (bombExists) {
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeShort(4);
+
+            buf.writeDouble(dX1);
+            buf.writeDouble(dY1);
+            buf.writeDouble(dZ1);
+
+            buf.writeDouble(dX2);
+            buf.writeDouble(dY2);
+            buf.writeDouble(dZ2);
+
+            boolean anyInRange = false;
+            Vec3d bPos = getBombPos();
+            Vec3d v1 = bPos.add(3, 3, 3);
+            Vec3d v2 = bPos.add(-3, -3, -3);
+            List<LivingEntity> list = world.getEntitiesByClass(LivingEntity.class, new Box(v1, v2), EntityPredicates.VALID_LIVING_ENTITY);
+            list.remove(bombEntity);
+            for (LivingEntity l : list)
+                if (l.squaredDistanceTo(bPos) < 9) {
+                    anyInRange = true;
+                    break;
+                }
+
+            buf.writeBoolean(anyInRange);
+
+            if ((bBox != null && bBox.getAverageSideLength() > 0) || bombIsBlock)
+                ServerChannelFeedbackPacket.send(playerEntity, buf);
+        }
+    }
+
+    // Animations
+    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+
     @Override
     public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController(this, "controller", 0, this::predicate));
+        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
     }
 
     @Override
@@ -421,15 +408,15 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
     }
 
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        AnimationController controller = event.getController();
+        AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 
         if (playSummonAnim) {
             controller.setAnimation(builder.playOnce("animation.killerqueen.summon"));
             return PlayState.CONTINUE;
         }
-        if (this.getSameState()) controller.markNeedsReload();
-        switch (this.getState()) {
+        if (getSameState()) controller.markNeedsReload();
+        switch (getState()) {
             default -> controller.setAnimation(builder.loop("animation.killerqueen.idle"));
             case 2 -> controller.setAnimation(builder.playAndHold("animation.killerqueen.light"));
             case 3 -> controller.setAnimation(builder.loop("animation.killerqueen.block"));

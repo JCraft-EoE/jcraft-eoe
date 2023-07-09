@@ -27,29 +27,35 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 import java.util.List;
 
 public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAnimationTickable {
-
-    public static Attack light = new Attack(0, 2, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
+    public static final Attack light = new Attack(0, 2, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
-    public static Attack heavy = new Attack(1, 17, 1f, 30, 20, 2.0, 10f, 1.5f, AttackType.BOX, 0.5f)
+    public static final Attack heavy = new Attack(1, 17, 1f, 30, 20, 2.0, 10f, 1.5f, AttackType.BOX, 0.5f)
             .setHitspark(2)
+            .appendHitbox(new Attack.HitboxData(0, 0, 1.5))
             .setArmor(true)
             .setLaunch()
             .setInfo("Star Breaker", "uninterruptable launcher");
-    public static Attack barrage = new Attack(2, 17, 0.75f, 60, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 2, 0, 3)
+    public static final Attack barrage = new Attack(2, 17, 0.75f, 60, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 2, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public static Attack starfinger = new Attack(3, 20, 0.75f, 20, 12, 1.75, 6f, -0.25f, AttackType.BOX, 1.5f, -0.25f)
+    public static final Attack starfinger = new Attack(3, 20, 0.75f, 20, 12, 1.75, 5f, -0.25f, AttackType.BOX, 1.5f, -0.25f)
             .setHitspark(2)
             .appendHitbox(new Attack.HitboxData(2, 0.5, 1))
             .setInfo("Star Finger", "medium windup, combo starter/extender");
-    public static Attack lowkick = new Attack(4, 12, 0.75f, 12, 7, 1.5, 7f, 0.25f, AttackType.BOX, 0.4f, 0)
+    public static final Attack lowkick = new Attack(4, 12, 0.75f, 12, 7, 1.5, 6f, 0.25f, AttackType.BOX, 0.4f, 0)
             .setInfo("Roundhouse", "fast poke, low stun");
-    public static Attack chargebarrage = new Attack(5, 26, 5f, 55, 5, 1.5, 0.6f, 0.4f, AttackType.CHARGEBARRAGE, 1, 0, 3)
+    public static final Attack chargebarrage = new Attack(5, 26, 5f, 55, 5, 1.5, 0.6f, 0.4f, AttackType.CHARGEBARRAGE, 1, 0, 3)
             .setRanged(true)
             .disableBackstab()
             .setInfo("Advancing Barrage", "fast combo starter/extender, medium stun, extremely punishable on whiff");
-    public static Attack timestop = new Attack(6, 60, 40, 39, 3, AttackType.TIMESTOP) // TS = (moveStun-initTime)/20
+    public static final Attack timestop = new Attack(6, 60, 40, 39, 3, AttackType.TIMESTOP) // TS = (moveStun-initTime)/20
             .setUB(true)
             .setInfo("Timestop", "3 seconds");
+
+    @Override
+    public void desummon() {
+        if (tsTime > 0) return;
+        super.desummon();
+    }
 
     public StarPlatinumEntity(World worldIn) {
         super(StandType.STAR_PLATINUM, worldIn);
@@ -74,7 +80,7 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
                 """
                         BNBs:
                         ~ represents a queued attack
-                        
+                                                
                             -the classic
                             M1>Barrage>M1>Low Kick>Advancing Barrage~M1~Star Finger~Star Breaker
                             
@@ -152,7 +158,7 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
         CanAttackData data = this.canAttackWithData();
         if (!data.canAttack)
             return;
-        if (this.getTSTime() > 0)
+        if (tsTime > 0)
             return;
         IEntityDataSaver user = (IEntityDataSaver) data.user;
         if (user.getPersistentData().getInt(JCraft.utilCD) > 0)
@@ -170,11 +176,6 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
             user.getPersistentData().putInt(JCraft.standUltCD, 60); // 3 second timestop cooldown
 
         world.playSound(null, pos.x, pos.y, pos.z, JSoundRegister.STAR_PLATINUM_TIMESKIP, SoundCategory.PLAYERS, 1f, 1f);
-    }
-
-    @Override
-    public void desummon() {
-        if (this.getTSTime() < 1) super.desummon();
     }
 
     @Override
@@ -197,22 +198,30 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
     public void tick() {
         if (age == 1) this.playSound(JSoundRegister.STAR_PLATINUM_SUMMON, 1f, 1f);
         super.tick();
-        if (hasUser()) this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(getUser()) / 2, 0.0, 255.0) / 255f);
+        if (hasUser())
+            this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(getUser()) / 2, 0.0, 255.0) / 255f);
     }
 
     // Animation code
-    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
     @Override
     public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController(this, "controller", 0, this::predicate));
+        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
     }
+
     @Override
-    public AnimationFactory getFactory() { return this.animationFactory; }
+    public AnimationFactory getFactory() {
+        return this.animationFactory;
+    }
+
     @Override
-    public int tickTimer() { return age; }
+    public int tickTimer() {
+        return age;
+    }
+
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        AnimationController controller = event.getController();
+        AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 
         if (playSummonAnim) {

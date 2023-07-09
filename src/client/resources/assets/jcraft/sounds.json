@@ -156,9 +156,15 @@
     ]
   },
 
-  "eyechop": {
+  "kceyechop": {
     "sounds": [
       "jcraft:stands/kingcrimson/eyechop"
+    ]
+  },
+
+  "kcepitaph": {
+    "sounds": [
+      "jcraft:stands/kingcrimson/epitaph"
     ]
   },
 
@@ -303,6 +309,18 @@
     ]
   },
 
+  "d4cutility": {
+    "sounds": [
+      "jcraft:stands/d4c/utility"
+    ]
+  },
+
+  "altuniverseambience": {
+    "sounds": [
+      "jcraft:stands/d4c/altuniverse"
+    ]
+  },
+
   "creamsummon": {
     "sounds": [
       "jcraft:stands/cream/summon"
@@ -421,6 +439,12 @@
   "wslegcrush": {
     "sounds": [
       "jcraft:stands/whitesnake/legcrush"
+    ]
+  },
+
+  "wsmeltyourheart": {
+    "sounds": [
+      "jcraft:stands/whitesnake/meltyourheart"
     ]
   },
 
@@ -610,6 +634,12 @@
     ]
   },
 
+  "twohbarrage": {
+    "sounds": [
+      "jcraft:stands/theworldoverheaven/barrage"
+    ]
+  },
+
   "twohshoot": {
     "sounds": [
       "jcraft:stands/theworldoverheaven/shoot"
@@ -695,6 +725,18 @@
     ]
   },
 
+  "foolultimate": {
+    "sounds": [
+      "jcraft:stands/fool/ultimate"
+    ]
+  },
+
+  "foolglide": {
+    "sounds": [
+      "jcraft:stands/fool/glide"
+    ]
+  },
+
   "gesummon": {
     "sounds": [
       "jcraft:stands/goldexperience/summon"
@@ -749,6 +791,13 @@
     ]
   },
 
+  "gerslowlaser": {
+    "sounds": [
+      "jcraft:stands/goldexperiencerequiem/slowlaser"
+    ]
+  },
+
+
   "gerlaser": {
     "sounds": [
       "jcraft:stands/goldexperiencerequiem/laser"
@@ -764,6 +813,18 @@
   "gersetup": {
     "sounds": [
       "jcraft:stands/goldexperiencerequiem/setup"
+    ]
+  },
+
+  "gerfly": {
+    "sounds": [
+      "jcraft:stands/goldexperiencerequiem/flight"
+    ]
+  },
+
+  "gerrtz": {
+    "sounds": [
+      "jcraft:stands/goldexperiencerequiem/rtz"
     ]
   },
 
@@ -794,6 +855,24 @@
   "scspin": {
     "sounds": [
       "jcraft:stands/silverchariot/spin"
+    ]
+  },
+
+  "sccleave": {
+    "sounds": [
+      "jcraft:stands/silverchariot/cleave"
+    ]
+  },
+
+  "scarmoroff": {
+    "sounds": [
+      "jcraft:stands/silverchariot/armoroff"
+    ]
+  },
+
+  "scpoke": {
+    "sounds": [
+      "jcraft:stands/silverchariot/poke"
     ]
   }
 }

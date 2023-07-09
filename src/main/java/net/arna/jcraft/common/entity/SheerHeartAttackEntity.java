@@ -31,7 +31,7 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 import java.util.List;
 
 public class SheerHeartAttackEntity extends MobEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
     public SheerHeartAttackEntity(EntityType<? extends MobEntity> entityType, World world) {
         super(entityType, world);

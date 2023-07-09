@@ -6,7 +6,7 @@ import net.arna.jcraft.client.rendering.skybox.CrimsonSkyBoxCool;
 import net.arna.jcraft.common.util.BlockInfo;
 import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
 
-import net.arna.jcraft.common.util.JCraftUtils;
+import net.arna.jcraft.common.util.JUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
@@ -14,6 +14,7 @@ import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,11 +26,11 @@ public class CrimsonShaderHandler extends StandShaderHandler {
     public List<BlockInfo> list = new ArrayList<>();
 
     @Override
-    public void onWorldRendered(MatrixStack matrices, Camera camera, float tickDelta, long nanoTime) {
+    public void onWorldRendered(@NotNull MatrixStack matrices, @NotNull Camera camera, float tickDelta, long nanoTime) {
         if (renderingEffect) {
             World world = camera.getFocusedEntity().getWorld();
             if(list.isEmpty()){
-                list = JCraftUtils.collectBlockInfo(world, camera.getBlockPos(), 8);
+                list = JUtils.collectBlockInfo(world, camera.getBlockPos(), 8);
             }
             BlockRenderManager manager = MinecraftClient.getInstance().getBlockRenderManager();
 

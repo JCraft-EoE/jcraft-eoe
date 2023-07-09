@@ -1,7 +1,9 @@
 package net.arna.jcraft.client.renderer.entity;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.arna.jcraft.client.model.entity.MadeInHeavenModel;
 import net.arna.jcraft.common.entity.MadeInHeavenEntity;
+import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -9,7 +11,8 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.math.Matrix4f;
+import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.geo.render.built.GeoModel;
 import software.bernie.geckolib3.renderers.geo.GeoEntityRenderer;
@@ -39,18 +42,37 @@ public class MadeInHeavenRenderer extends GeoEntityRenderer<MadeInHeavenEntity> 
 
         MinecraftClient mcClient = MinecraftClient.getInstance();
         if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null)
-            if (mcClient.player.getFirstPassenger() == animatable) a = animatable.getAlpha();
+            if ( ((IEntityDataSaver)mcClient.player).getStand() == animatable )
+                a = animatable.getAlpha();
 
         super.render(model, animatable, partialTicks, type, matrixStack, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, a);
 
-        /*
+        //todo: sterner
         if (animatable.getAfterimage()) {
             float aa = a - 0.5f;
             if (aa < 0) aa = 0;
+
             matrixStack.push();
-            super.render(model, animatable, partialTicks, RenderLayer.getEntityNoOutline( getTextureLocation(animatable) ), matrixStack, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, aa);
+            /*
+            matrixStack.multiplyPositionMatrix(
+                    mcClient.gameRenderer.getBasicProjectionMatrix(
+                            mcClient.options.getFov().getValue()
+                    )
+            );
+             */
+            Vec3d velocity = animatable.getUser().getVelocity();
+            matrixStack.translate(velocity.x, velocity.y, velocity.z);
+            super.render(
+                    model,
+                    animatable,
+                    partialTicks,
+                    RenderLayer.getEntityNoOutline( getTextureLocation(animatable) ),
+                    matrixStack,
+                    renderTypeBuffer,
+                    vertexBuilder,
+                    packedLightIn,
+                    packedOverlayIn, red, green, blue, aa);
             matrixStack.pop();
         }
-         */
     }
 }

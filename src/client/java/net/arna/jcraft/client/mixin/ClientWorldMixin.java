@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
-import static net.arna.jcraft.common.util.JCraftUtils.stopTick;
+import static net.arna.jcraft.common.util.JUtils.stopTick;
 
 @Mixin(ClientWorld.class)
 public class ClientWorldMixin {

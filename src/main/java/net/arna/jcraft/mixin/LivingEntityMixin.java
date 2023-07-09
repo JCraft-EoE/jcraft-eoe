@@ -35,11 +35,12 @@ public abstract class LivingEntityMixin {
     @Inject(cancellable = true, method = "getJumpBoostVelocityModifier", at = @At("HEAD"))
     public void jcraft$getJumpBoostVelocityModifier(CallbackInfoReturnable<Double> cir) {
         LivingEntity player = ((LivingEntity) (Object) this);
+        StandEntity stand = ((IEntityDataSaver)this).getStand();
         StatusEffectInstance stun = player.getStatusEffect(JStatusRegister.DAZED);
         if (
                 player.hasStatusEffect(JStatusRegister.KNOCKDOWN)
                         || (stun != null && stun.getAmplifier() != 2)
-                        || player.getFirstPassenger() instanceof StandEntity stand && stand.getRemote()) {
+                        || (stand != null && stand.getRemote()) ) {
             cir.setReturnValue(-1.0D);
         }
     }
@@ -67,7 +68,7 @@ public abstract class LivingEntityMixin {
         LivingEntity livingEntity = (LivingEntity) (Object) this;
         IEntityDataSaver entityDataSaver = (IEntityDataSaver) livingEntity;
 
-        if ((livingEntity.hasStatusEffect(JStatusRegister.DAZED) && !JCraftUtils.isBlocking(livingEntity)) || livingEntity.hasStatusEffect(JStatusRegister.KNOCKDOWN)) {
+        if ((livingEntity.hasStatusEffect(JStatusRegister.DAZED) && !JUtils.isBlocking(livingEntity)) || livingEntity.hasStatusEffect(JStatusRegister.KNOCKDOWN)) {
             cir.setReturnValue(false);
         }
 
@@ -90,7 +91,7 @@ public abstract class LivingEntityMixin {
         IEntityDataSaver entityDataSaver = (IEntityDataSaver) livingEntity;
         StatusEffectInstance stun = livingEntity.getStatusEffect(JStatusRegister.DAZED);
 
-        if ((livingEntity.hasStatusEffect(JStatusRegister.DAZED) && !JCraftUtils.isBlocking(livingEntity)) || livingEntity.hasStatusEffect(JStatusRegister.KNOCKDOWN)) {
+        if ((livingEntity.hasStatusEffect(JStatusRegister.DAZED) && !JUtils.isBlocking(livingEntity)) || livingEntity.hasStatusEffect(JStatusRegister.KNOCKDOWN)) {
             cir.setReturnValue(false);
         }
 

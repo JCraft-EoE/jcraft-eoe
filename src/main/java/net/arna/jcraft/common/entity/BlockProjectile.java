@@ -1,10 +1,8 @@
 package net.arna.jcraft.common.entity;
 
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.util.IOwnable;
-import net.arna.jcraft.common.util.JCraftUtils;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JSoundRegister;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -57,12 +55,12 @@ public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatab
     private boolean launched = false;
     private boolean hit = false;
 
-    public static TrackedData<Integer> EFFECT;
-    public static TrackedData<ItemStack> BLOCKSTACK;
+    public static final TrackedData<Integer> EFFECT;
+    public static final TrackedData<ItemStack> BLOCKSTACK;
 
     static {
         EFFECT = DataTracker.registerData(BlockProjectile.class, TrackedDataHandlerRegistry.INTEGER);
-        BLOCKSTACK  = DataTracker.registerData(BlockProjectile.class, TrackedDataHandlerRegistry.ITEM_STACK);
+        BLOCKSTACK = DataTracker.registerData(BlockProjectile.class, TrackedDataHandlerRegistry.ITEM_STACK);
     }
 
     @Override
@@ -167,9 +165,9 @@ public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatab
 
             if (launched && timeLaunched < 20 && !hit) {
                 timeLaunched++;
-                List<LivingEntity> toHurt = JCraftUtils.generateHitbox(world, getPos(), 1, List.of(master));
+                List<LivingEntity> toHurt = JUtils.generateHitbox(world, getPos(), 1, List.of(master));
                 for (LivingEntity living : toHurt) {
-                    LivingEntity target = JCraftUtils.getUserIfStand(living);
+                    LivingEntity target = JUtils.getUserIfStand(living);
                     if (target == master || target == this) continue;
                     hit = true;
                     StandEntity.damageLogic(world, target, getVelocity(), 15, 1, true, 6, false, 11, DamageSource.mob(master), master, false);
@@ -188,21 +186,28 @@ public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatab
                 .add(EntityAttributes.GENERIC_ARMOR, 10)
                 .add(EntityAttributes.GENERIC_ARMOR_TOUGHNESS);
     }
+
     @Override
-    public void pushAwayFrom(Entity entity) { }
+    public void pushAwayFrom(Entity entity) {
+    }
+
     @Override
     public boolean damage(DamageSource source, float amount) {
         if (source.getSource() != null) return false;
         return super.damage(source, amount);
     }
+
     @Nullable
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.BLOCK_STONE_STEP;
     }
+
     @Nullable
     @Override
-    protected SoundEvent getDeathSound() { return SoundEvents.BLOCK_STONE_BREAK; }
+    protected SoundEvent getDeathSound() {
+        return SoundEvents.BLOCK_STONE_BREAK;
+    }
 
     @Override
     protected Box calculateBoundingBox() { // Centered around 0,0,0 instead of 0,0.5,0
@@ -212,6 +217,7 @@ public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatab
         double s = 0.5;
         return new Box(x + s, y + s, z + s, x - s, y - s, z - s);
     }
+
     @Override
     public void writeCustomDataToNbt(NbtCompound tag) {
         super.writeCustomDataToNbt(tag);
@@ -223,6 +229,7 @@ public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatab
         else
             tag.putInt("ownerID", master.getId());
     }
+
     @Override
     public void readCustomDataFromNbt(NbtCompound tag) {
         super.readCustomDataFromNbt(tag);
@@ -232,30 +239,53 @@ public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatab
         else
             master = (LivingEntity) world.getEntityById(tag.getInt("ownerID")); // Always is living
     }
+
     @Override
-    public Iterable<ItemStack> getArmorItems() { return List.of(); }
+    public Iterable<ItemStack> getArmorItems() {
+        return List.of();
+    }
+
     @Override
-    public ItemStack getEquippedStack(EquipmentSlot slot) { return dataTracker.get(BLOCKSTACK); }
+    public ItemStack getEquippedStack(EquipmentSlot slot) {
+        return dataTracker.get(BLOCKSTACK);
+    }
+
     @Override
-    public void equipStack(EquipmentSlot slot, ItemStack stack) { }
+    public void equipStack(EquipmentSlot slot, ItemStack stack) {
+    }
+
     @Override
-    public Arm getMainArm() { return null; }
+    public Arm getMainArm() {
+        return null;
+    }
 
     private LivingEntity master;
+
     @Override
-    public LivingEntity getMaster() { return master; }
-    public void setMaster(LivingEntity l) { this.master = l; }
+    public LivingEntity getMaster() {
+        return master;
+    }
+
+    public void setMaster(LivingEntity l) {
+        this.master = l;
+    }
 
     // Animations
     private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+
     @Override
     public void registerControllers(AnimationData animationData) {
         animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
     }
+
+    @SuppressWarnings("SameReturnValue")
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         event.getController().setAnimation(new AnimationBuilder().loop("animation.block.idle"));
         return PlayState.CONTINUE;
     }
+
     @Override
-    public AnimationFactory getFactory() { return this.factory; }
+    public AnimationFactory getFactory() {
+        return this.factory;
+    }
 }

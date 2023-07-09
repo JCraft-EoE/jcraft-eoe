@@ -5,7 +5,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.ISpec;
-import net.arna.jcraft.common.util.JCraftUtils;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -35,7 +35,7 @@ public class SetSpecCommand {
             for (PlayerEntity playerTarget : targets) {
                 NbtCompound playerNbt = ((IEntityDataSaver) playerTarget).getPersistentData();
                 playerNbt.putInt("SpecID", id);
-                JCraftUtils.assignSpec(playerTarget, playerNbt, (ISpec) playerTarget);
+                JUtils.assignSpec(playerTarget, playerNbt, (ISpec) playerTarget);
             }
             return 1;
         }

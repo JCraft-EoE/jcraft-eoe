@@ -2,6 +2,7 @@ package net.arna.jcraft.client.renderer.entity;
 
 import net.arna.jcraft.client.model.entity.SilverChariotModel;
 import net.arna.jcraft.common.entity.SilverChariotEntity;
+import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -25,11 +26,9 @@ public class SilverChariotRenderer extends GeoEntityRenderer<SilverChariotEntity
                                      int packedLightIn, Identifier textureLocation) {
 
         MinecraftClient mcClient = MinecraftClient.getInstance();
-        if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null) {
-            if (mcClient.player.getFirstPassenger() == animatable) {
+        if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null)
+            if (mcClient.player.getFirstPassenger() == animatable)
                 return RenderLayer.getEntityNoOutline(this.getTextureLocation(animatable));
-            }
-        }
 
         return RenderLayer.getEntityTranslucent(this.getTextureLocation(animatable));
     }
@@ -39,11 +38,9 @@ public class SilverChariotRenderer extends GeoEntityRenderer<SilverChariotEntity
     public void render(GeoModel model, SilverChariotEntity animatable, float partialTicks, RenderLayer type, MatrixStack matrixStackIn, VertexConsumerProvider renderTypeBuffer, VertexConsumer vertexBuilder, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
         float a = 1f;
         MinecraftClient mcClient = MinecraftClient.getInstance();
-        if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null) {
-            if (mcClient.player.getFirstPassenger() == animatable) {
+        if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null)
+            if ( ((IEntityDataSaver)mcClient.player).getStand() == animatable )
                 a = animatable.getAlpha();
-            }
-        }
         super.render(model, animatable, partialTicks, type, matrixStackIn, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, a);
     }
 }

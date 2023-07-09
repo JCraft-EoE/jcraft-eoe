@@ -1,11 +1,8 @@
 package net.arna.jcraft.client.rendering.skybox;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import ladysnake.satin.api.managed.ManagedCoreShader;
 import net.arna.jcraft.client.registry.JShaderRegistry;
-import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
 import net.arna.jcraft.client.rendering.shader.JShader;
-import net.arna.jcraft.client.rendering.shader.ShaderHolder;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;

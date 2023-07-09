@@ -10,6 +10,8 @@ import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
@@ -26,19 +28,23 @@ import java.util.Random;
 
 import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 
-/*
-Specs -
-classes that need to be instantiated per-player to contain temporary data relating to their current state
-they will handle stand-off attacks
+/**
+ * Class that needs to be instantiated per-player to contain temporary data relating to their current state.
+ * Used to handle stand-off attacks.
  */
-
 public abstract class JCraftSpec {
     public PlayerEntity player;
 
-    public int moveStun;
+    public int moveStun = 0;
     public Attack curAttack;
     public Attack previousAttack;
     public AttackQueue queuedAttack;
+
+    public String getName() { return "UNNAMED"; }
+    public String getDescription() { return "UNDESCRIBED"; }
+    public String getDetails() { return "UNFINISHED"; }
+    public List<Attack> getAttacks() { return null; }
+    public int getId() { return 0; }
 
     public void InitHeavyAttack(ServerWorld serverWorld) {
     }
@@ -66,9 +72,7 @@ public abstract class JCraftSpec {
     public boolean handleAttack(ServerWorld serverWorld, Attack attack, String cooldownName) {
         NbtCompound playerData = ((IEntityDataSaver) player).getPersistentData();
         int cd = playerData.getInt(cooldownName);
-        if (cd > 0) {
-            return false;
-        }
+        if (cd > 0) return false;
         moveStun = attack.moveStun;
         playerData.putInt(cooldownName, attack.cooldown * 20);
         curAttack = attack;
@@ -77,9 +81,8 @@ public abstract class JCraftSpec {
         buf.writeShort(12);
         buf.writeInt(player.getId());
         buf.writeString(attack.animation);
-        for (ServerPlayerEntity sendPlayer : serverWorld.getPlayers()) {
+        for (ServerPlayerEntity sendPlayer : serverWorld.getPlayers())
             ServerChannelFeedbackPacket.send(sendPlayer, buf);
-        }
         return true;
     }
 
@@ -88,17 +91,14 @@ public abstract class JCraftSpec {
         queuedAttack = null;
         moveStun = 0;
 
-        if (player == null) {
-            return;
-        }
+        if (player == null) return;
 
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeShort(13);
         buf.writeInt(player.getId());
         ServerWorld serverWorld = (ServerWorld) player.getWorld();
-        for (ServerPlayerEntity sendPlayer : serverWorld.getPlayers()) {
+        for (ServerPlayerEntity sendPlayer : serverWorld.getPlayers())
             ServerChannelFeedbackPacket.send(sendPlayer, buf);
-        }
     }
 
     public void specialAttack(Attack attack, List<LivingEntity> hurt) {
@@ -106,25 +106,27 @@ public abstract class JCraftSpec {
     }
 
     public void tickSpec() {
-        //JCraft.LOGGER.info("ticking spec");
         World world = player.getWorld();
 
         if (world.isClient()) {
-
+            //JCraft.LOGGER.info("CLIENT: Ticking spec " + this);
         } else {
-            ServerWorld serverWorld = (ServerWorld) world;
-            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+            //JCraft.LOGGER.info("SERVER: Ticking spec " + this);
 
+            ServerWorld serverWorld = (ServerWorld) world;
             Attack attack = this.curAttack;
 
             if (moveStun > 0) {
                 moveStun -= 1;
 
-                Entity passenger = player.getFirstPassenger();
+                //Entity passenger = player.getFirstPassenger();
+
                 //StandEntity stand = null;
                 //if (passenger instanceof StandEntity s) { stand = s; }
 
                 if (attack != null) {
+                    player.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 5, 9, true, false));
+
                     int realInitTime = attack.moveStun - attack.initTime;
                     int stunS = (int) (attack.stun * 20f);
 
@@ -134,12 +136,17 @@ public abstract class JCraftSpec {
                         Vec3d hitPos = player.getPos().add(0, player.getHeight() / 2 - attack.offset, 0).add(rotVec.multiply(attack.attackDist));
                         ArrayList<Entity> exclude = new ArrayList<>(player.getPassengerList());
                         exclude.add(player);
-                        List<LivingEntity> hurt = JCraftUtils.generateHitbox(world,
+                        List<LivingEntity> hurt = JUtils.generateHitbox(world,
                                 hitPos,
                                 attack.hitboxSize,
                                 List.copyOf(exclude)
                         );
-
+                        for (Attack.HitboxData data : attack.extraHitboxes) {
+                            List<LivingEntity> extraHurt = JUtils.generateHitbox(world,
+                                    hitPos.add(rotVec.multiply(data.forwardOffset)).add(0, data.verticalOffset, 0), data.hitboxSize, exclude);
+                            for (LivingEntity hurtEntity : extraHurt)
+                                if (!hurt.contains(hurtEntity)) hurt.add(hurtEntity);
+                        }
                         if (!hurt.isEmpty()) {
                             Random random = new Random();
                             JCraft.CreateParticle((ServerWorld) world,
@@ -186,4 +193,5 @@ public abstract class JCraftSpec {
             }
         }
     }
+
 }

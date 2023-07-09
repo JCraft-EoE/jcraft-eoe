@@ -1,0 +1,55 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.wsacid",
+				"texture_width": 64,
+				"texture_height": 64,
+				"visible_bounds_width": 3,
+				"visible_bounds_height": 3,
+				"visible_bounds_offset": [0, 0.5, 0]
+			},
+			"bones": [
+				{
+					"name": "base",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{
+							"origin": [-4, -4, -4],
+							"size": [8, 8, 8],
+							"uv": {
+								"north": {"uv": [32, 16], "uv_size": [8, 8]},
+								"east": {"uv": [32, 24], "uv_size": [8, 8]},
+								"south": {"uv": [32, 32], "uv_size": [8, 8]},
+								"west": {"uv": [40, 16], "uv_size": [8, 8]},
+								"up": {"uv": [40, 24], "uv_size": [8, 8]},
+								"down": {"uv": [32, 48], "uv_size": [8, -8]}
+							}
+						}
+					]
+				},
+				{
+					"name": "splat",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{
+							"origin": [-16, -2, -16],
+							"size": [32, 4, 32],
+							"pivot": [0, 0, 0],
+							"rotation": [0, 0, 90],
+							"uv": {
+								"north": {"uv": [32, 0], "uv_size": [32, 4]},
+								"east": {"uv": [32, 4], "uv_size": [32, 4]},
+								"south": {"uv": [32, 8], "uv_size": [32, 4]},
+								"west": {"uv": [32, 12], "uv_size": [32, 4]},
+								"up": {"uv": [0, 0], "uv_size": [32, 32]},
+								"down": {"uv": [0, 64], "uv_size": [32, -32]}
+							}
+						}
+					]
+				}
+			]
+		}
+	]
+}

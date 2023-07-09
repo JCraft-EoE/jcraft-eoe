@@ -34,13 +34,12 @@ public class BloodProjectile extends PersistentProjectileEntity implements IAnim
     }
 
     @Override
-    protected void age() {
-        this.remove(RemovalReason.DISCARDED);
-    }
+    protected void age() { discard(); } // Disappear instantly upon contact with the ground
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
-        Entity owner = this.getOwner();
+        if (world.isClient) return;
+        Entity owner = getOwner();
         if (owner == null) return;
         Entity entity = entityHitResult.getEntity();
         if (owner.hasPassenger(entity) || entity == owner) return;
@@ -55,7 +54,7 @@ public class BloodProjectile extends PersistentProjectileEntity implements IAnim
         }
 
         if (entity instanceof EndCrystalEntity endCrystal)
-            endCrystal.damage(DamageSource.thrownProjectile(this, this.getOwner()), 2f);
+            endCrystal.damage(DamageSource.thrownProjectile(this, owner), 2f);
 
         playSound(SoundEvents.ITEM_BUCKET_EMPTY, 1, 0.5f);
     }

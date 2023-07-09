@@ -22,8 +22,6 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 import java.util.Arrays;
 
 public class GESnakeEntity extends TameableEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
     public GESnakeEntity(EntityType<? extends TameableEntity> entityType, World world) {
         super(entityType, world);
         Arrays.fill(this.handDropChances, 1F);
@@ -33,10 +31,6 @@ public class GESnakeEntity extends TameableEntity implements IAnimatable, IAnima
     @Override
     public PassiveEntity createChild(ServerWorld world, PassiveEntity entity) {
         return null;
-    }
-
-    protected void initDataTracker() {
-        super.initDataTracker();
     }
 
     @Override
@@ -50,43 +44,6 @@ public class GESnakeEntity extends TameableEntity implements IAnimatable, IAnima
 
         this.targetSelector.add(1, new TrackOwnerAttackerGoal(this));
         this.targetSelector.add(2, new AttackWithOwnerGoal(this));
-        this.targetSelector.add(8, new UniversalAngerGoal(this, true));
-    }
-
-    @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController(this, "movement", 10, this::predicate));
-        animationData.addAnimationController(new AnimationController(this, "attack", 0, this::attackPredicate));
-    }
-
-    @Override
-    public AnimationFactory getFactory() {
-        return this.animationFactory;
-    }
-
-    @Override
-    public int tickTimer() {
-        return age;
-    }
-
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        AnimationController controller = event.getController();
-        if (event.isMoving()) {
-            controller.setAnimation(new AnimationBuilder().loop("animation.gesnake.move"));
-            controller.setAnimationSpeed(1 + this.getVelocity().length());
-        } else {
-            controller.setAnimation(new AnimationBuilder().loop("animation.gesnake.idle"));
-        }
-
-        return PlayState.CONTINUE;
-    }
-
-    private <E extends IAnimatable> PlayState attackPredicate(AnimationEvent<E> event) {
-        if (!this.handSwinging) {
-            return PlayState.STOP;
-        }
-        event.getController().setAnimation(new AnimationBuilder().loop("animation.gesnake.attack"));
-        return PlayState.CONTINUE;
     }
 
     @Override
@@ -108,5 +65,44 @@ public class GESnakeEntity extends TameableEntity implements IAnimatable, IAnima
         } else if (this.isAlive() && this.age > 500) { // Edge case, mostly dealing with unloading
             this.discard();
         }
+    }
+
+    // Animations
+    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+
+    @Override
+    public void registerControllers(AnimationData animationData) {
+        animationData.addAnimationController(new AnimationController<>(this, "movement", 10, this::predicate));
+        animationData.addAnimationController(new AnimationController<>(this, "attack", 0, this::attackPredicate));
+    }
+
+    @Override
+    public AnimationFactory getFactory() {
+        return this.animationFactory;
+    }
+
+    @Override
+    public int tickTimer() {
+        return age;
+    }
+
+    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+        AnimationController<E> controller = event.getController();
+        if (event.isMoving()) {
+            controller.setAnimation(new AnimationBuilder().loop("animation.gesnake.move"));
+            controller.setAnimationSpeed(1 + this.getVelocity().length());
+        } else {
+            controller.setAnimation(new AnimationBuilder().loop("animation.gesnake.idle"));
+        }
+
+        return PlayState.CONTINUE;
+    }
+
+    private <E extends IAnimatable> PlayState attackPredicate(AnimationEvent<E> event) {
+        if (!this.handSwinging) {
+            return PlayState.STOP;
+        }
+        event.getController().setAnimation(new AnimationBuilder().loop("animation.gesnake.attack"));
+        return PlayState.CONTINUE;
     }
 }

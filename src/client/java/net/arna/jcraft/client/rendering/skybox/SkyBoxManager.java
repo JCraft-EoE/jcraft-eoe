@@ -1,6 +1,5 @@
 package net.arna.jcraft.client.rendering.skybox;
 
-import net.arna.jcraft.common.JConfig;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.util.math.MatrixStack;

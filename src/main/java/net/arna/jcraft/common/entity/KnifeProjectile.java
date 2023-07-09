@@ -1,8 +1,6 @@
 package net.arna.jcraft.common.entity;
 
-import net.arna.jcraft.common.util.JCraftUtils;
-import net.arna.jcraft.registry.JEntityTypeRegister;
-import net.arna.jcraft.registry.JSoundRegister;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
@@ -150,7 +148,7 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
             dropStack(this.asItemStack(), 0.1F);
         }
 
-        JCraftUtils.projectileDamageLogic(this, world, entity, Vec3d.ZERO, stunT, 1, false, 2, blockstun);
+        JUtils.projectileDamageLogic(this, world, entity, Vec3d.ZERO, stunT, 1, false, 2, blockstun);
         playSound(SoundEvents.ITEM_TRIDENT_HIT, 1, 1);
         discard();
     }

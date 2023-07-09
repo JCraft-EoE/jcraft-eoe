@@ -3,7 +3,7 @@ package net.arna.jcraft.common.network.s2c;
 import net.arna.jcraft.JCraft;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
@@ -22,7 +22,7 @@ public class ShaderActivationPacket {
      * @param duration           duration of the shader
      * @param type               which shader to use
      */
-    public static void send(ServerPlayerEntity serverPlayerEntity, @Nullable LivingEntity sourceShader, int tickDelay, int duration, Type type) {
+    public static void send(ServerPlayerEntity serverPlayerEntity, @Nullable Entity sourceShader, int tickDelay, int duration, Type type) {
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeInt(tickDelay);
         buf.writeInt(duration);

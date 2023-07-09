@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.util.JCraftUtils;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.block.Blocks;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.Entity;
@@ -11,6 +11,8 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.BlockStateParticleEffect;
@@ -37,9 +39,7 @@ import java.util.UUID;
 
 import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 
-public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
+public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimationTickable { //todo: implement IOwnable
     public GERScorpionEntity(EntityType<? extends MobEntity> entityType, World world) {
         super(entityType, world);
         this.setNoDrag(true);
@@ -56,10 +56,12 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
     private int landedTimer;
     private static final TrackedData<Optional<UUID>> OWNERUUID;
     private static final TrackedData<Boolean> ISROCK;
+    private static final TrackedData<Boolean> CHARGED;
 
     static {
         OWNERUUID = DataTracker.registerData(GERScorpionEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
         ISROCK = DataTracker.registerData(GERScorpionEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+        CHARGED = DataTracker.registerData(GERScorpionEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     }
 
     public LivingEntity getOwner() {
@@ -72,49 +74,33 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
     }
 
     public Optional<UUID> getOwnerUUID() {
-        return this.dataTracker.get(OWNERUUID);
+        return dataTracker.get(OWNERUUID);
     }
-
     public void setOwnerUUID(UUID uuid) {
-        this.dataTracker.set(OWNERUUID, Optional.of(uuid));
+        dataTracker.set(OWNERUUID, Optional.of(uuid));
     }
 
     public boolean isRock() {
-        return this.dataTracker.get(ISROCK);
+        return dataTracker.get(ISROCK);
+    }
+    public void setRock(boolean r) {
+        dataTracker.set(ISROCK, r);
     }
 
-    public void setRock(boolean r) {
-        this.dataTracker.set(ISROCK, r);
+    public boolean isCharged() {
+        return dataTracker.get(CHARGED);
+    }
+    private int rockStun = 15;
+    public void charge() {
+        dataTracker.set(CHARGED, true);
+        rockStun = 21;
     }
 
     protected void initDataTracker() {
         super.initDataTracker();
-        this.dataTracker.startTracking(OWNERUUID, Optional.empty());
-        this.dataTracker.startTracking(ISROCK, true);
-    }
-
-    @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController(this, "controller", 0, this::predicate));
-    }
-
-    @Override
-    public AnimationFactory getFactory() {
-        return this.animationFactory;
-    }
-
-    @Override
-    public int tickTimer() {
-        return age;
-    }
-
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        if (this.isRock()) {
-            event.getController().setAnimation(new AnimationBuilder().loop("animation.gerscorpion.rock"));
-        } else {
-            event.getController().setAnimation(new AnimationBuilder().playOnce("animation.gerscorpion.transform").playAndHold("animation.gerscorpion.attack"));
-        }
-        return PlayState.CONTINUE;
+        dataTracker.startTracking(OWNERUUID, Optional.empty());
+        dataTracker.startTracking(ISROCK, true);
+        dataTracker.startTracking(CHARGED, false);
     }
 
     @Override
@@ -164,17 +150,18 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
         Vec3d curPos = getPos();
 
         if (world.isClient) {
-            if (!isRock()) {
-                landedTimer += 1;
-            }
+            if (!isRock()) landedTimer += 1;
             double x = getX();
             double y = getY();
             double z = getZ();
             if (landedTimer < 1) { // Laser
-                Vec3d towardsVec = curPos.subtract(new Vec3d(prevX, prevY, prevZ));
+                Vec3d towardsVec = JUtils.deltaPos(this);
                 for (double i = 0; i < 6; i++) {
                     double lerp = i / 6;
-                    world.addParticle(ParticleTypes.COMPOSTER, x + towardsVec.x * lerp, y + towardsVec.y * lerp, z + towardsVec.z * lerp, 0, 0, 0);
+                    world.addParticle(
+                            isCharged() ? ParticleTypes.WITCH : ParticleTypes.COMPOSTER
+                            , x + towardsVec.x * lerp, y + towardsVec.y * lerp, z + towardsVec.z * lerp
+                            , towardsVec.x, towardsVec.y, towardsVec.z);
                 }
             } else if (landedTimer == 1) { // Landing burst
                 for (int i = 0; i < 8; i++) {
@@ -202,7 +189,7 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                     Vec3d towardsVec = curPos.subtract(new Vec3d(prevX, prevY, prevZ));
                     List<LivingEntity> hurtAll = new ArrayList<>();
                     for (double i = 0; i < 3; i++) {
-                        List<LivingEntity> hurt = JCraftUtils.generateHitbox(world, curPos.add(towardsVec.multiply(i / 3)), 0.5, filter);
+                        List<LivingEntity> hurt = JUtils.generateHitbox(world, curPos.add(towardsVec.multiply(i / 3)), 0.5, filter);
                         hurt.removeIf(hurtAll::contains);
                         hurtAll.addAll(hurt);
                     }
@@ -211,8 +198,8 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                         jumpTarget = hurtAll.get(0);
                         for (LivingEntity l :
                                 hurtAll) {
-                            LivingEntity target = JCraftUtils.getUserIfStand(l);
-                            damageLogic(world, target, getVelocity(), 15, 1, false, 6f, true, 10, DamageSource.mob(owner), owner);
+                            LivingEntity target = JUtils.getUserIfStand(l);
+                            damageLogic(world, target, getVelocity(), rockStun, 1, false, 6f, true, 10, DamageSource.mob(owner), owner);
                         }
                         Transform();
                         JCraft.CreateParticle((ServerWorld) this.world,
@@ -238,17 +225,25 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                         velocityModified = true;
                     }
                     if (landedTimer == 20) { // Sting followup, 5t gap
-                        List<LivingEntity> hurt = JCraftUtils.generateHitbox(world, getPos(), 1.5, filter);
-                        for (LivingEntity l :
-                                hurt) {
-                            LivingEntity target = JCraftUtils.getUserIfStand(l);
-                            damageLogic(world, target, Vec3d.ZERO, 15, 1, false, 3f, true, 7, DamageSource.mob(owner), owner);
-                        }
+                        List<LivingEntity> hurt = JUtils.generateHitbox(world, getPos(), 1.5, filter);
+                        if (isCharged())
+                            for (LivingEntity l :
+                                    hurt) {
+                                LivingEntity target = JUtils.getUserIfStand(l);
+                                target.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 60, 0, false, true));
+                                damageLogic(world, target, Vec3d.ZERO, 15, 1, false, 3f, true, 7, DamageSource.mob(owner), owner);
+                            }
+                        else
+                            for (LivingEntity l :
+                                    hurt) {
+                                LivingEntity target = JUtils.getUserIfStand(l);
+                                damageLogic(world, target, Vec3d.ZERO, 15, 1, false, 3f, true, 7, DamageSource.mob(owner), owner);
+                            }
                     }
                 }
                 if (age > 30)
                     kill();
-            } else if (getOwnerUUID().isPresent()) { //todo: make an OwnableMobEntity - ie TamedEntity but dumbed down and ownable by other mobs
+            } else if (getOwnerUUID().isPresent()) {
                 UUID searchID = getOwnerUUID().get();
                 Box box = Box.of(this.getPos(), 64, 64, 64);
                 boolean found = false;
@@ -266,5 +261,31 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                     kill();
             }
         }
+    }
+
+    // Animations
+    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+
+    @Override
+    public void registerControllers(AnimationData animationData) {
+        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
+    }
+
+    @Override
+    public AnimationFactory getFactory() {
+        return this.animationFactory;
+    }
+
+    @Override
+    public int tickTimer() {
+        return age;
+    }
+
+    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+        if (this.isRock())
+            event.getController().setAnimation(new AnimationBuilder().loop("animation.gerscorpion.rock"));
+        else
+            event.getController().setAnimation(new AnimationBuilder().playOnce("animation.gerscorpion.transform").playAndHold("animation.gerscorpion.attack"));
+        return PlayState.CONTINUE;
     }
 }

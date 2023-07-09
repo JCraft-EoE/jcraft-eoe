@@ -3,6 +3,7 @@ package net.arna.jcraft.common.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.util.Attack;
 import net.minecraft.command.CommandRegistryAccess;
@@ -19,19 +20,23 @@ public class AboutStandCommand {
                 .then(CommandManager.literal("about").executes(AboutStandCommand::run)));
     }
 
+    private static final List<String> buttons = List.of(
+            "Light",
+            "Heavy",
+            "Barrage",
+            "Special 1",
+            "Ultimate",
+            "Special 2",
+            "Special 3",
+            "Utility"
+    );
+
     public static int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         PlayerEntity playerEntity = context.getSource().getPlayer();
-
-        List<String> buttons = List.of(
-                "Light",
-                "Heavy",
-                "Barrage",
-                "Special 1",
-                "Ultimate",
-                "Special 2",
-                "Special 3",
-                "Utility"
-        );
+        if (playerEntity == null) {
+            JCraft.LOGGER.error("Tried to run /stand about command on invalid player, source: " + context.getSource());
+            return 0;
+        }
 
         if (playerEntity.getFirstPassenger() instanceof StandEntity stand) {
             StringBuilder readout = new StringBuilder("Name: §e");
@@ -68,6 +73,7 @@ public class AboutStandCommand {
             playerEntity.sendMessage(Text.of(readout.toString()));
         } else {
             playerEntity.sendMessage(Text.of("No stand found!"), false);
+            return 0;
         }
 
         return 1;

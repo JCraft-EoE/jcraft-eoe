@@ -2,6 +2,7 @@ package net.arna.jcraft.client.renderer.entity;
 
 import net.arna.jcraft.client.model.entity.D4CModel;
 import net.arna.jcraft.common.entity.D4CEntity;
+import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
@@ -49,7 +50,8 @@ public class D4CRenderer extends ExtendedGeoEntityRenderer<D4CEntity> {
         float a = 1f;
         MinecraftClient mcClient = MinecraftClient.getInstance();
         if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null)
-            if (mcClient.player.getFirstPassenger() == animatable) a = animatable.getAlpha();
+            if ( ((IEntityDataSaver)mcClient.player).getStand() == animatable )
+                a = animatable.getAlpha();
         float gR = 1.0f - a;
         super.render(model, animatable, partialTicks, type, matrixStackIn, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green - gR, blue, a);
     }

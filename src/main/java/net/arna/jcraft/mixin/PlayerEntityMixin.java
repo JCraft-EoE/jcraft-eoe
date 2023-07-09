@@ -34,7 +34,22 @@ public abstract class PlayerEntityMixin implements ISpec, IComboCounter {
     }
 
     @Override
+    public void setClientSpec(JCraftSpec spec) {
+        this.spec = spec;
+    }
+
+    /**
+     * Sets the player's spec on the serverside.
+     * Also handles synchronization with client.
+     */
+    @SuppressWarnings("DataFlowIssue")
+    @Override
     public void setSpec(JCraftSpec spec) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeShort(5);
+        buf.writeInt(spec == null ? 0 : spec.getId());
+        ServerChannelFeedbackPacket.send( ((ServerPlayerEntity)(Object)this), buf );
+
         this.spec = spec;
     }
 

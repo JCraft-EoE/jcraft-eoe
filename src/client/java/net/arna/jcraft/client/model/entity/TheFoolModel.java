@@ -2,12 +2,9 @@ package net.arna.jcraft.client.model.entity;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.TheFoolEntity;
-import net.arna.jcraft.common.util.JCraftUtils;
-import net.minecraft.entity.LivingEntity;
+import net.arna.jcraft.client.util.JClientUtils;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3d;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.processor.IBone;
 import software.bernie.geckolib3.model.AnimatedTickingGeoModel;
 
 public class TheFoolModel extends AnimatedTickingGeoModel<TheFoolEntity> {
@@ -32,6 +29,6 @@ public class TheFoolModel extends AnimatedTickingGeoModel<TheFoolEntity> {
     public void setCustomAnimations(TheFoolEntity animatable, int instanceId, AnimationEvent animationEvent) {
         super.setCustomAnimations(animatable, instanceId, animationEvent);
         if (animatable.hasUser())
-            JCraftUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), animationEvent.getPartialTick(), true, true, 0.445329251f, -0.1745329251f, 30f);
+            JClientUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), animationEvent.getPartialTick(), true, true, 0.7854f, -0.349f, 30f);
     }
 }

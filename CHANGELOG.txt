@@ -882,12 +882,242 @@ Silver Chariot
 The Fool
     >Updated /stand about
 
+● 14/6/2023
+>Backstab distance requirement decreased to 1.25m
+
+Whitesnake
+    >Finalized remote mode movement
+
+Silver Chariot
+    >Updated sounds
+
 The World: Over Heaven
-    >
+    >Updated sounds
+
+● 15/6/2023
+>fixed a shitton of minor bugs
+>Fixed bug where dash animation would cancel spec attack animation
+
+Whitesnake
+    >Fixed bug where remote mode was not semitransparent
+    >Remote mode cooldown reduced (1.5s->1s)
+
+Silver Chariot
+    >Added sounds
+
+Golden Experience
+    >Life Giver (frog)
+        >increased speed by 25%
+        >now correctly redirects damage from all sources
+
+Killer Queen: Bites the Dust
+    >Fixed bug where thrown coins do not disappear when desummoned
+
+● 16/6/2023
+>Added vertical dashes
+
+● 19/6/2023
+>Stand user mobs now use dashes
+>Added /spec about
+
+Silver Chariot
+    >Cooldown reduced on God of Death (60->50s)
+
+Anubis
+    >Updated model
+    >Converted to a Spec
+    >Overrides current Spec when unsheathed
+    >Can no longer block while Anubis is unsheathed
+    >No longer disables buffs/debuffs when sheathed
+    >Now has sword attack attributes
+
+● 20/6/2023
+Golden Experience: Requiem
+    >Remodeled and reanimated
+    >Added second hitbox to aerial Light and Heavy
+    >Added crouching variant to Life Beam
+    >Counter now stops remote stands' attacks
+
+● 21/6/2023
+>Many small optimizations
+
+Player Clones
+    >No longer attack their master when they come too close
+    >Now attack those that attack their master (lower priority than what the master is attacking)
+
+King Crimson
+    >Epitaph no longer swaps positions if the opponent is inside a wall
+    >Added shader to Time Erase
+
+Silver Chariot
+    >Armor Off
+        >Added hitbox
+        >Added animation
+        >Cooldown reduced (70->60s)
+
+The Fool
+    >Updated textures
+    >All summoned sand entities now do damage
+    >It is no longer possible to queue moves during the Pound followups that create sand
+    >Charge
+        >Cooldown reduced (22->20s)
+        >Increased speed
+        >Increased range (5->7m)
+        >Added visual effects on hit
+        >Added aerial variant (Sand Tornado)
+    >Combo
+        >Decreased startup (8->6t) and duration (31->29t)
+        >Added second hitbox
+
+Killer Queen: Bites the Dust
+    >Increased stun on Bomb Plant
+
+● 25/6/2023
+>Fixed bug where certain status effects persist after being hit in a specific way
+>Fixed bug where remote mode stands persisted after the user died
+
+Star Platinum
+    >Star Finger damage reduced (6->5)
+    >Roundhouse damage reduced (7-6)
+
+King Crimson
+    >Removed sprinting particles during Time Erase
+
+Cream
+    >Added 2 ticks of stun to black hole hits
+
+Killer Queen
+    >Fixed particles not displaying for grounded bomb plant
+
+Whitesnake
+    >Pilot mode
+        >Increased speed by 20%
+    >Disc moves
+        >Memory Disc swapped with Stand Disc
+        >Memory Disc cooldown reduced (45->30s)
+        >Stand Disc cooldown reduced (35->30s)
+        >Timing adjusted on sound effect and animation
+    >Melt your Heart
+        >Now fires a projectile that sticks to the wall it hits
+        >Cooldown reduced (23->20s)
+
+The Fool
+    >Now fireproof
+
+C-Moon
+    >Inversion followup damage reduced (2->0.5)
+    >Barrage damage reduced (1->0.75)
+    >Gravity Shift duration reduced (17.5->10s)
+
+Golden Experience: Requiem
+    >Return to Zero
+        >Now displays particles moving towards the original position of each entity
+
+● 27/6/2023
+>Fixed bug where Sheathed Anubis had sword attack attributes
+
+Silver Chariot
+    >M1 startup reduced (5->4t)
+    >Heavy cooldown reduced (18->15s)
+    >Cleave cooldown reduced (26->23s)
+    >Ray Dart
+        >Startup reduced (14->12t)
+        >Now accessible during Possessed state
+        >Increased speed
+    >Shooting Star
+        >Replaces Ray Dart in normal state
+        >New can be aimed in any direction
+
+● 30/6/2023
+Killer Queen: Bites the Dust
+    >Reanimated and remodeled
+
+● 4/7/2023
+>Dash animation updated
+>Added icon HUD for cooldown and attack display
+
+Killer Queen: Bites the Dust
+    >Added followup to M1
+    >Added crouching variation to Stray Cat
+
+● 5/7/2023
+HUD
+    >Updated Icon HUD
+    >Improved text/icon placement logic
+
+Anubis
+    >Added sheathed Special 3 - Sweep
+
+Timestops
+    >Updated logic
+    >Fixed bug where particles were not stopped in timestop
+    >Newly created entities now move for one tick before stopping
+
+● 6/7/2023
+>Fixed crash when timestopping a non-spec user
+
+King Crimson
+    Blood Throw
+        >Blood speed now depends on whether the user is standing when it comes out (standing: 0.66, crouching: 1.33 m/s)
+    Time Erase
+        >Fixed bug where the shader would trigger before the move
+        >No longer returns enemies to their original position
+        >Now creates a doppelgänger of the one erasing time
+        >Added config option to disable shader
+    Timeskip
+        >Now cancels Time Erase when used inside it
+    Epitaph Counter
+        >Now the crouching variation to the main move, Predict
+    New Move - Predict
+        >Extrapolates future position of nearby entities, can use Time Erase to force them into it
+
+● 7/7/2023
+Whitesnake
+    >Leg Crusher damage increased (5->7)
+    >Donut damage reduced (12->10)
+    >Poison spew
+        >projectile direct damage increased (2->5)
+        >added crouching variation (more startup, 5 slower shots
+    >New ultimate in remote mode - Melt your Heart
+    >Stand Disc damage increased (6->8)
+    >Memory Disc damage increased (6->7)
+
+● 8/7/2023
+>Timestops now stop liquids
+
+Brawler
+    >All attacks reanimated
+
+Star Platinum
+    >Added second hitbox to Star Breaker
+
+The World
+    >Added second hitbox to Donut
+
+King Crimson
+    >Added second hitbox to Eye Chop
+    >Added second hitbox to Heavy (first hit)
+    >Donut hitbox size reduced (2->1.75), stun reduced (6->4s)
+
+Whitesnake
+    >Poison puddles now disappear when moved off-ground
+    >Melt your Heart
+        >is now armored
+        >improved spread pattern
+    >Decreased spread on Poison Spew (charged) from 180° to 150°
+    >Leg Crusher hitbox size expanded (1.5->1.75)
+
+The Fool
+    >Added second hitbox to Swipe
+
+Golden Experience
+    >Added second hitbox to Shoulder Smash
+
+C-Moon
+    >Added second hitbox to Gut Punch
 
 priority (top to bottom)
-TODO: ability to position the HUD
 TODO: AI flags for unblockables and shouldn't-blockables
 TODO: stand summon particles
 TODO: patchouli and the stand users manual
-TODO: Knockback() method
+TODO: Knockdown() method

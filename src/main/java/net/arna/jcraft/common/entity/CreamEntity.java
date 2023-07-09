@@ -3,7 +3,7 @@ package net.arna.jcraft.common.entity;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
-import net.arna.jcraft.common.util.JCraftUtils;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
@@ -23,7 +23,6 @@ import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
@@ -42,50 +41,50 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
 
-public class CreamEntity extends StandEntity implements IAnimatable, IAnimationTickable {
-    AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+import static net.arna.jcraft.common.util.Attack.unusable;
 
-    public static Attack light = new Attack(0, 2, 0.75f, 14, 6, 1.5, 5f, 0.75f, AttackType.BOX, 1f, 0.1f, 0, JSoundRegister.IMPACT_3)
+public class CreamEntity extends StandEntity implements IAnimatable, IAnimationTickable {
+    public static final Attack light = new Attack(0, 2, 0.75f, 14, 6, 1.5, 5f, 0.75f, AttackType.BOX, 1f, 0.1f, 0, JSoundRegister.IMPACT_3)
             .setInfo("Punch", "quick combo starter");
-    public static Attack heavy = new Attack(1, 14, 1f, 30, 20, 1.5, 10f, 0.1f, AttackType.BOX, 2, 0, 0, JSoundRegister.IMPACT_3)
+    public static final Attack heavy = new Attack(1, 14, 1f, 30, 20, 1.5, 10f, 0.1f, AttackType.BOX, 2, 0, 0, JSoundRegister.IMPACT_3)
             .setHitspark(2)
             .setArmor(true)
             .setInfo("Vertical Chop", "slow, uninterruptable combo starter");
-    public static Attack combo = new Attack(2, 17, 0.75f, 36, 0, 2.0, 7f, 0.1f, AttackType.MULTIHIT, 1, 0, List.of(10, 17, 25), JSoundRegister.IMPACT_3)
+    public static final Attack combo = new Attack(2, 17, 0.75f, 36, 0, 2.0, 7f, 0.1f, AttackType.MULTIHIT, 1, 0, List.of(10, 17, 25), JSoundRegister.IMPACT_3)
             .setInfo("3-hit Combo", "medium windup, good stun");
-    public static Attack grab = new Attack(3, 20, 1f, 20, 8, 1.5, 3f, 0f, AttackType.BOX, 1.5f, 0, 0)
+    public static final Attack grab = new Attack(3, 20, 1f, 20, 8, 1.5, 3f, 0f, AttackType.BOX, 1.5f, 0, 0)
             .setUB(false)
             .setInfo("Grab", "unblockable, knocks back");
-    public static Attack grabhit = new Attack(4, 0, 1f, 20, 13, 2.0, 6f, 1.5f, AttackType.BOX, 0.25f)
+    public static final Attack grabhit = new Attack(4, 0, 1f, 20, 13, 2.0, 6f, 1.5f, AttackType.BOX, 0.25f)
             .setLaunch();
-    public static Attack charge = new Attack(5, 20, 4f, 13, 5, 1.5, 8f, 0.25f, AttackType.CHARGE, 1, 0, 8, JSoundRegister.IMPACT_3)
+    public static final Attack charge = new Attack(5, 20, 4f, 13, 5, 1.5, 8f, 0.25f, AttackType.CHARGE, 1, 0, 8, JSoundRegister.IMPACT_3)
             .setRanged(true)
             .setInfo("Charge", "3.5 block range, combo starter/extender");
-    public static Attack destroy = new Attack(6, 25, 1f, 30, 21, 2, 0f, 1.25f, AttackType.BOX, 0f, 0f, 0, JSoundRegister.IMPACT_5)
+    public static final Attack destroy = new Attack(6, 25, 1f, 30, 21, 2, 0f, 1.25f, AttackType.BOX, 0f, 0f, 0, JSoundRegister.IMPACT_5)
             .setHitspark(2)
             .setArmor(true)
             .setUB(true)
             .setInfo("Destroy", "slow, uninterruptable, unblockable knockdown");
-    public static Attack consume = new Attack(7, 32, 1f, 40, 35, 2.0, 2f, 0f, AttackType.BOX)
+    public static final Attack consume = new Attack(7, 32, 1f, 40, 35, 2.0, 2f, 0f, AttackType.BOX)
             .setRanged(true)
             .setInfo("Void", "high windup, 6 seconds");
-    public static Attack enter = new Attack(8, 2, 15, 10, 0, 0f, AttackType.BOX)
+    public static final Attack enter = new Attack(8, 2, 15, 10, 0, 0f, AttackType.BOX)
             .setInfo("Enter Cream", "cream consumes itself and the user halfway, increasing mobility and decreasing defense").setMobility(MobilityType.FLIGHT);
-    public static Attack exit = new Attack(9, 2, 15, 5, 0, 0f, AttackType.BOX)
+    public static final Attack exit = new Attack(9, 2, 15, 5, 0, 0f, AttackType.BOX)
             .setInfo("Exit Cream", "cream and its user return from the void");
 
-    public static Attack balllight = new Attack(10, 2, 0.1f, 14, 7, 2, 5f, 0.75f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegister.IMPACT_3)
+    public static final Attack balllight = new Attack(10, 2, 0.1f, 14, 7, 2, 5f, 0.75f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegister.IMPACT_3)
             .setInfo("Swipe", "quick air-to-ground poke");
-    public static Attack ballheavy = new Attack(11, 14, 0.1f, 20, 14, 2, 9f, 1.25f, AttackType.BOX, 0.75f, 0.3f, 0, JSoundRegister.TW_KICK_HIT)
+    public static final Attack ballheavy = new Attack(11, 14, 0.1f, 20, 14, 2, 9f, 1.25f, AttackType.BOX, 0.75f, 0.3f, 0, JSoundRegister.TW_KICK_HIT)
             .setHitspark(2).setArmor(true).setLaunch()
             .setInfo("Overhead Smash", "slow, uninterruptable launcher");
-    public static Attack ballcombo = new Attack(12, 14, 0.1f, 36, 0, 2, 7f, 0.1f, AttackType.MULTIHIT, 0.75f, 0.3f, List.of(10, 17, 25), JSoundRegister.IMPACT_3)
+    public static final Attack ballcombo = new Attack(12, 14, 0.1f, 36, 0, 2, 7f, 0.1f, AttackType.MULTIHIT, 0.75f, 0.3f, List.of(10, 17, 25), JSoundRegister.IMPACT_3)
             .setInfo("3-hit Combo", "less stun than grounded version");
-    public static Attack ballcharge = new Attack(13, 20, 28, 13, 0, AttackType.BOX)
+    public static final Attack ballcharge = new Attack(13, 20, 28, 13, 0, AttackType.BOX)
             .setInfo("Void Charge", "cream quickly transforms into a black hole and charges in the looked direction");
 
-    public static TrackedData<Integer> VOIDTIME;
-    public static TrackedData<Boolean> HALFBALL;
+    public static final TrackedData<Integer> VOIDTIME;
+    public static final TrackedData<Boolean> HALFBALL;
 
     public void beginHalfBall() {
         this.dataTracker.set(HALFBALL, true);
@@ -327,7 +326,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
             case (9) -> endHalfBall();
             case (11) -> {
                 for (LivingEntity ent : entities)
-                    if (!JCraftUtils.isBlocking(ent))
+                    if (!JUtils.isBlocking(ent))
                         ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0));
             }
             case (13) -> {
@@ -364,7 +363,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
 
     @Override
     public void tick() {
-        if (age == 1) this.world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.CREAM_SUMMON, SoundCategory.PLAYERS, 1f, 1f);
+        if (age == 1) playSound(JSoundRegister.CREAM_SUMMON, 1f, 1f);
         super.tick();
         boolean server = !this.world.isClient();
 
@@ -399,7 +398,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
 
             if (voiding) {
                 if (server) {
-                    if (this.world.getGameRules().getBoolean(JCraft.STAND_GRIEFING)) {
+                    if (world.getGameRules().getBoolean(JCraft.STAND_GRIEFING)) {
                         // Unfun 3x4x3 void code
                         for (int x = -1; x < 2; x++) {
                             for (int y = -1; y < 3; y++) {
@@ -418,17 +417,19 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
                         if (user instanceof ServerPlayerEntity player)
                             player.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(user));
                     } else {
-                        this.setState(0);
+                        setState(0);
 
                         if (!isPlayer) {
                             double y = user.getY();
                             Vec3d vel = new Vec3d(user.getVelocity().x, 0.0, user.getVelocity().z);
+
                             // Targetting priority
                             LivingEntity targetEntity = user.getDamageTracker().getBiggestAttacker();
                             if (targetEntity == null && user instanceof MobEntity mob)
                                 targetEntity = mob.getTarget();
                             if (targetEntity == null)
                                 targetEntity = user.getAttacker();
+
                             // If target wasn't found, thrash around
                             Vec3d target = targetEntity != null ? targetEntity.getPos() : this.getPos().add(Math.sin(this.age * 0.2) * 2, Math.sin(this.age * 0.2) / 4, Math.cos(this.age * 0.2) * 2);
 
@@ -445,34 +446,35 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
                         }
                     }
 
-                    List<LivingEntity> toDamage = this.world.getEntitiesByClass(LivingEntity.class,
+                    List<LivingEntity> toDamage = world.getEntitiesByClass(LivingEntity.class,
                             new Box(pos.add(1.5, 1.5, 1.5), pos.subtract(1.5, 1.5, 1.5)), EntityPredicates.VALID_ENTITY);
 
                     toDamage.remove(user);
                     toDamage.remove(this);
 
-                    //todo: FALL DAMAGE!!!!!!
-
-                    for (LivingEntity ent : toDamage)
+                    for (LivingEntity ent : toDamage) {
+                        if (age % 4 == 0)
+                            stun(ent, 2, 1);
                         ent.damage(DamageSource.OUT_OF_WORLD, charging ? 4 : 2.5f);
+                    }
+
                     if (notCorS)
                         user.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 25, 0, false, false));
                 } else {
-                    for (int i = 0; i < 16; i++) {
-                        this.world.addParticle(ParticleTypes.MYCELIUM,
+                    for (int i = 0; i < 16; i++)
+                        world.addParticle(ParticleTypes.MYCELIUM,
                                 pos.x + (random.nextFloat() - 0.5f) * 2f,
                                 pos.y + (random.nextFloat() - 0.5f) * 2f,
                                 pos.z + (random.nextFloat() - 0.5f) * 2f,
                                 0, 0, 0);
-                    }
                 }
 
-                this.setVoidTime(vTime - 1);
-                this.setDistanceOffset(0);
-                this.setAlpha(1f);
+                setVoidTime(vTime - 1);
+                setDistanceOffset(0);
+                setAlpha(0);
             } else {
                 if (getHalfBall()) {
-                    this.setAlpha(0.1f);
+                    setAlpha(0.1f);
                     user.onLanding();
                     user.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 5, 9, true, false));
 
@@ -506,17 +508,18 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
                             serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(user));
                         }
                     }
-                } else {
-                    this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
-                }
+                } else
+                    setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
             }
         }
     }
 
     // Animation code
+    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+
     @Override
     public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController(this, "controller", 0, this::predicate));
+        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
     }
 
     @Override
@@ -530,7 +533,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
     }
 
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        AnimationController controller = event.getController();
+        AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 
         if (playSummonAnim) {

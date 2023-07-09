@@ -1,8 +1,8 @@
 package net.arna.jcraft.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import eu.midnightdust.lib.config.MidnightConfig;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.hud.JCraftAbilityHud;
 import net.arna.jcraft.client.hud.JCraftHudOverlay;
 import net.arna.jcraft.client.net.ClientPacketHandler;
 import net.arna.jcraft.client.particle.*;
@@ -24,7 +24,7 @@ import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
 import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.network.c2s.StandControlPacket;
-import net.arna.jcraft.common.util.ColorUtils;
+import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.*;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -47,17 +47,22 @@ import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static net.arna.jcraft.JCraft.MOD_ID;
+import static net.arna.jcraft.client.util.JClientUtils.activeTimestops;
 
 public class JCraftClient implements ClientModInitializer {
 
@@ -119,6 +124,8 @@ public class JCraftClient implements ClientModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(this::tickClient);
         ClientTickEvents.END_WORLD_TICK.register(new SkyBoxManager());
+        ClientTickEvents.END_CLIENT_TICK.register(new JCraftAbilityHud());
+
         ClientPlayNetworking.registerGlobalReceiver(ServerChannelFeedbackPacket.ID, (client, handler, buf, sender) -> ClientPacketHandler.handleChannelFeedback(client, buf));
         ClientPlayNetworking.registerGlobalReceiver(ShaderActivationPacket.ID, (client, handler, buf, sender) -> ClientPacketHandler.handleShaderActivation(client, buf));
         ClientPlayNetworking.registerGlobalReceiver(ShaderDeactivationPacket.ID, (client, handler, buf, sender) -> ClientPacketHandler.handleShaderDeactivation(client, buf));
@@ -126,6 +133,7 @@ public class JCraftClient implements ClientModInitializer {
 
         HudRenderCallback.EVENT.register(new JCraftHudOverlay());
         HudRenderCallback.EVENT.register(this::renderHud);
+        HudRenderCallback.EVENT.register(new JCraftAbilityHud());
 
         Identifier itemId = JObjectRegistry.ITEMS.get(JObjectRegistry.DEBUG_WAND);
         BigItemRenderer itemRenderer = new BigItemRenderer(itemId);
@@ -137,28 +145,39 @@ public class JCraftClient implements ClientModInitializer {
         });
     }
 
+    private static int getHudX(int scaledX) {
+        switch (JConfig.UI_POSITION) {
+            case LEFT -> {
+                return 2;
+            }
+            case RIGHT -> {
+                return scaledX - 128;
+            }
+            case MIDDLE -> {
+                return (int) (scaledX * 0.55f);
+            }
+            default -> {
+                JCraft.LOGGER.error("JCraft UI position is set to an invalid value!");
+                return 10;
+            }
+        }
+    }
+
+    @SuppressWarnings("DataFlowIssue") // If the player is null, we have much larger problems than that
     private void renderHud(MatrixStack matrixStack, float v) {
         MinecraftClient client = MinecraftClient.getInstance();
         ClientPlayerEntity player = client.player;
-        ticksSinceCounted += 1;
-        int selectedX = client.getWindow().getScaledWidth();
+        ticksSinceCounted++;
+
+        int selectedX = getHudX(client.getWindow().getScaledWidth());
         int selectedY = client.getWindow().getScaledHeight();
 
+        boolean useIcons = JConfig.ICON_HUD;
+
         switch (JConfig.UI_POSITION) {
-            case LEFT -> {
-                selectedX *= 0.1f;
-                selectedY /= 20f;
-            }
-
-            case MIDDLE -> {
-                selectedX *= 0.55f;
-                selectedY /= 3f;
-            }
-
-            case RIGHT -> {
-                selectedX *= 0.75f;
-                selectedY /= 2.25f;
-            }
+            case LEFT -> selectedY /= 20f;
+            case MIDDLE -> selectedY /= 3f;
+            case RIGHT -> selectedY /= 2.25f;
         }
 
         int i = 0;
@@ -174,66 +193,39 @@ public class JCraftClient implements ClientModInitializer {
             textRenderer.drawWithShadow(
                     matrixStack,
                     remark + " - " + comboCounter,
-                    selectedX + (ticksSinceCounted < 5 ? player.getRandom().nextFloat() * 5f : 0),
+                    selectedX + (ticksSinceCounted < 5 ? player.getRandom().nextFloat() * 5f : 0) +
+                            ( (JConfig.UI_POSITION == JConfig.UIPos.MIDDLE && useIcons) ? 54f : 0 ),
                     selectedY * (1.15f) + (ticksSinceCounted < 5 ? player.getRandom().nextFloat() * 5f : 0),
                     ColorUtils.HSBAtoRGBA(comboCounter / 360f - 1f, 1f, 1f, 0.8f)
                     , true
             );
         }
 
-        boolean standOn = player.getFirstPassenger() instanceof StandEntity;
+        // Cooldown rendering, for icon hud see JCraftHudOverlay
+        if (useIcons) return;
+        boolean standOn = ((IEntityDataSaver)player).getStand() != null;
 
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1, 1, 1, 1);
 
-        // Cooldown rendering
         for (Double cooldown : clientCooldowns) {
             i++;
             if (cooldown != 0) {
 
-                String keyBindText = "unknown";
-                switch (i) {
-                    case (1):
-                        keyBindText = "M1";
-                        break;
-                    case (12):
-                    case (2):
-                        keyBindText = GenerateName(heavyKey.getBoundKeyTranslationKey());
-                        break;
-                    case (13):
-                    case (3):
-                        keyBindText = GenerateName(barrageKey.getBoundKeyTranslationKey());
-                        break;
-                    case (14):
-                    case (4):
-                        keyBindText = GenerateName(ultKey.getBoundKeyTranslationKey());
-                        break;
-                    case (15):
-                    case (5):
-                        keyBindText = GenerateName(special1Key.getBoundKeyTranslationKey());
-                        break;
-                    case (16):
-                    case (6):
-                        keyBindText = GenerateName(special2Key.getBoundKeyTranslationKey());
-                        break;
-                    case (17):
-                    case (7):
-                        keyBindText = GenerateName(special3Key.getBoundKeyTranslationKey());
-                        break;
-
-                    case (8):
-                        keyBindText = GenerateName(utility.getBoundKeyTranslationKey());
-                        break;
-                    case (9):
-                        keyBindText = GenerateName(comboBreaker.getBoundKeyTranslationKey());
-                        break;
-                    case (10):
-                        keyBindText = GenerateName(cooldownCancel.getBoundKeyTranslationKey());
-                        break;
-                    case (11):
-                        keyBindText = GenerateName(dash.getBoundKeyTranslationKey());
-                        break;
-                }
+                String keyBindText = switch (i) {
+                    case (1) -> "M1";
+                    case (12), (2) -> generateName(heavyKey.getBoundKeyTranslationKey());
+                    case (13), (3) -> generateName(barrageKey.getBoundKeyTranslationKey());
+                    case (14), (4) -> generateName(ultKey.getBoundKeyTranslationKey());
+                    case (15), (5) -> generateName(special1Key.getBoundKeyTranslationKey());
+                    case (16), (6) -> generateName(special2Key.getBoundKeyTranslationKey());
+                    case (17), (7) -> generateName(special3Key.getBoundKeyTranslationKey());
+                    case (8) -> generateName(utility.getBoundKeyTranslationKey());
+                    case (9) -> generateName(comboBreaker.getBoundKeyTranslationKey());
+                    case (10) -> generateName(cooldownCancel.getBoundKeyTranslationKey());
+                    case (11) -> generateName(dash.getBoundKeyTranslationKey());
+                    default -> "unknown";
+                };
 
                 boolean isSpec = i > 11;
                 float defaultAlpha = 0.65f;
@@ -267,17 +259,43 @@ public class JCraftClient implements ClientModInitializer {
     }
 
     private void tickClient(MinecraftClient minecraftClient) {
-        GameOptions go = MinecraftClient.getInstance().options;
-        ClientPlayerEntity player = MinecraftClient.getInstance().player;
+        ClientPlayerEntity player = minecraftClient.player;
 
-        if (player != null) {
-            boolean standOn = false;
-            StandEntity stand = null;
-            if (player.getFirstPassenger() instanceof StandEntity s) {
-                standOn = true;
-                stand = s;
+        if (minecraftClient.isPaused() && minecraftClient.isInSingleplayer()) return;
+
+        // Timestop handling (nearly identical to serverside, but toStop is obtained in user.world instead of server world)
+        ArrayList<DimValues> newActiveTimestops = new ArrayList<>();
+
+        for (DimValues timestop : activeTimestops) {
+            Entity user = timestop.user;
+            //JCraft.LOGGER.info("CLIENT: Ticking timestop " + timestop + " with user " + user + " and duration " + timestop.timer);
+
+            if (user != null && user.isAlive() && timestop.timer-- > 0) {
+                Vec3d pos = timestop.pos;
+
+                List<? extends Entity> toStop = user.world.getEntitiesByClass(Entity.class,
+                        new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+
+                for (Entity entity : toStop) {
+                    if ( entity == user || entity == ((IEntityDataSaver)user).getStand() ) continue;
+                    ITimeStop ts = ((ITimeStop) entity);
+                    ts.setTimeStopTicks(2);
+                }
+
+                newActiveTimestops.add(timestop);
             }
+        }
 
+        activeTimestops = newActiveTimestops;
+
+        // Handle JCraft inputs (stand, spec, universal controls)
+        if (player != null) {
+            GameOptions go = minecraftClient.options;
+
+            StandEntity stand = ((IEntityDataSaver)player).getStand();
+            boolean standOn = stand != null;
+
+            //todo: reformat this into 3 packets (input packet, stand block packet, attack packet)
             if (player.isAlive()) { // Send movement inputs to server
                 PacketByteBuf buf = PacketByteBufs.create();
                 buf.writeShort(0);
@@ -292,6 +310,15 @@ public class JCraftClient implements ClientModInitializer {
                 clientCooldowns = DefaultedList.ofSize(JCraft.cooldowns.size(), 0.0);
             }
 
+            // Block (3)
+            if (standOn) {
+                PacketByteBuf buf = PacketByteBufs.create();
+                boolean rmb = go.useKey.wasPressed() || go.useKey.isPressed();
+                buf.writeShort(3);
+                buf.writeBoolean(rmb);
+                sendStandControlPacket(buf);
+            }
+
             // (De)summon (1)
             if (standSummon.wasPressed()) {
                 PacketByteBuf buf = PacketByteBufs.create();
@@ -302,14 +329,6 @@ public class JCraftClient implements ClientModInitializer {
             if (go.attackKey.isPressed()) { // wasPressed() simply doesn't work
                 PacketByteBuf buf = PacketByteBufs.create();
                 buf.writeShort(2);
-                sendStandControlPacket(buf);
-            }
-            // Block (3)
-            if (standOn) {
-                PacketByteBuf buf = PacketByteBufs.create();
-                boolean rmb = go.useKey.wasPressed() || go.useKey.isPressed();
-                buf.writeShort(3);
-                buf.writeBoolean(rmb);
                 sendStandControlPacket(buf);
             }
             // Heavy (4)
@@ -382,14 +401,14 @@ public class JCraftClient implements ClientModInitializer {
         ClientPlayNetworking.send(StandControlPacket.ID, buf);
     }
 
-    private String GenerateName(String str) {
+    /**
+     * @return cleaned up version of TranslatableText name of button
+     */
+    private String generateName(String str) {
         String[] components = str.split("\\.");
         String last = components[components.length - 1];
         String secondLast = components[components.length - 2] + " ";
-        if (components[components.length - 2].equals("keyboard")) {
-            secondLast = "";
-        }
-
+        if (components[components.length - 2].equals("keyboard")) secondLast = "";
         return StringUtils.capitalize(secondLast) + StringUtils.capitalize(last);
     }
 }

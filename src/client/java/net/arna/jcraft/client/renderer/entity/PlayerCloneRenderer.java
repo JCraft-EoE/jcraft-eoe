@@ -19,11 +19,11 @@ public class PlayerCloneRenderer extends BipedEntityRenderer<PlayerCloneEntity, 
     protected final static Identifier TEXTURE = new Identifier("textures/entity/steve.png");
 
     public PlayerCloneRenderer(EntityRendererFactory.Context ctx, boolean slim) {
-        super(ctx, new PlayerEntityModel(ctx.getPart(slim ? EntityModelLayers.PLAYER_SLIM : EntityModelLayers.PLAYER), slim), 0.5f);
+        super(ctx, new PlayerEntityModel<>(ctx.getPart(slim ? EntityModelLayers.PLAYER_SLIM : EntityModelLayers.PLAYER), slim), 0.5f);
         this.addFeature(
-                new ArmorFeatureRenderer(this,
-                        new BipedEntityModel(ctx.getPart(slim ? EntityModelLayers.PLAYER_SLIM_INNER_ARMOR : EntityModelLayers.PLAYER_INNER_ARMOR))
-                        , new BipedEntityModel(ctx.getPart(slim ? EntityModelLayers.PLAYER_SLIM_OUTER_ARMOR : EntityModelLayers.PLAYER_OUTER_ARMOR))
+                new ArmorFeatureRenderer<>(this,
+                        new BipedEntityModel<>(ctx.getPart(slim ? EntityModelLayers.PLAYER_SLIM_INNER_ARMOR : EntityModelLayers.PLAYER_INNER_ARMOR))
+                        , new BipedEntityModel<>(ctx.getPart(slim ? EntityModelLayers.PLAYER_SLIM_OUTER_ARMOR : EntityModelLayers.PLAYER_OUTER_ARMOR))
                 )
         );
     }
@@ -37,15 +37,14 @@ public class PlayerCloneRenderer extends BipedEntityRenderer<PlayerCloneEntity, 
     }
 
 
+    @SuppressWarnings("DataFlowIssue") // If the client instance or network handler are null, something has gone very wrong
     @Override
     public Identifier getTexture(PlayerCloneEntity mobEntity) {
-        String ownerName = mobEntity.getOwnerName();
+        String ownerName = mobEntity.getMasterName();
         if (!Objects.equals(ownerName, "%unset_owner_name")) {
             PlayerListEntry playerListEntry = MinecraftClient.getInstance().getNetworkHandler().getPlayerListEntry(String.valueOf(ownerName));
-            if (playerListEntry != null) {
-                // Not null handling done inside function
-                return playerListEntry.getSkinTexture();
-            }
+            if (playerListEntry != null)
+                return playerListEntry.getSkinTexture(); // Not null handling done inside function
         }
 
         return TEXTURE;

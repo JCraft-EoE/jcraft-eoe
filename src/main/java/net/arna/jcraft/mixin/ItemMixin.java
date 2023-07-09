@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin({Item.class, EnderPearlItem.class, PotionItem.class, ThrowablePotionItem.class})
+@Mixin({Item.class, EnderPearlItem.class, PotionItem.class, ThrowablePotionItem.class, MilkBucketItem.class})
 public class ItemMixin {
     @Inject(cancellable = true, at = @At("HEAD"), method = "use") // Inability to use items while stunned
     private void jcraft$use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<TypedActionResult<ItemStack>> cir) {

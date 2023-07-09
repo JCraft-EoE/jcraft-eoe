@@ -6,18 +6,16 @@ import net.arna.jcraft.common.util.IClientEntityHandler;
 import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.particle.BlockStateParticleEffect;
-import net.minecraft.particle.ParticleTypes;
 
 public class ClientEntityHandlerImpl implements IClientEntityHandler {
     public static final ClientEntityHandlerImpl INSTANCE = new ClientEntityHandlerImpl();
 
     private ClientEntityHandlerImpl() {}
 
+    //todo: tell the server nicely that you are thin instead of running this schizo routine to make the clone thin
     @Override
     public void playerCloneEntityClientTick(PlayerCloneEntity entity) {
         if (entity.age != 1 || entity.getType() != JEntityTypeRegister.PLAYER_ENTITY_CLONE) return;
@@ -26,7 +24,7 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
         // This is in fact an entirely clientside process and can be considered a "security flaw",
         // but I really doubt anyone would care if someone turned all their clones thin
         ClientPlayerEntity clientPlayer = MinecraftClient.getInstance().player;
-        if (clientPlayer == null || !entity.getOwnerName().equals(clientPlayer.getName().getString()) || !clientPlayer.getModel().equals("slim"))
+        if (clientPlayer == null || !entity.getMasterName().equals(clientPlayer.getName().getString()) || !clientPlayer.getModel().equals("slim"))
             return;
 
         PacketByteBuf buf = PacketByteBufs.create();

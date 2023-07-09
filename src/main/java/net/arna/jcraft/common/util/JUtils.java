@@ -6,8 +6,7 @@ import net.arna.jcraft.common.entity.CreamEntity;
 import net.arna.jcraft.common.entity.D4CEntity;
 import net.arna.jcraft.common.entity.KingCrimsonEntity;
 import net.arna.jcraft.common.entity.StandEntity;
-import net.arna.jcraft.common.spec.Brawler;
-import net.arna.jcraft.common.spec.JCraftSpec;
+import net.arna.jcraft.common.spec.*;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SideShapeType;
@@ -27,8 +26,6 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.processor.IBone;
-import software.bernie.geckolib3.model.AnimatedTickingGeoModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,9 +33,27 @@ import java.util.Objects;
 
 import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 
-public final class JCraftUtils {
-    //TODO: synchronise this with clients
+public final class JUtils {
     public static List<DimValues> activeTimestops = new ArrayList<>();
+
+    public static void displayHitbox(World world, Vec3d v1, Vec3d v2) {
+        if (v1 == v2) return;
+        if (!world.getGameRules().getBoolean(JCraft.SHOW_HITBOXES)) return;
+
+        //TODO: (sterner) convert this hitbox display from particle rendering to 0.5s cube outline
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeShort(1);
+        buf.writeDouble(v1.x);
+        buf.writeDouble(v2.x);
+        buf.writeDouble(v1.y);
+        buf.writeDouble(v2.y);
+        buf.writeDouble(v1.z);
+        buf.writeDouble(v2.z);
+
+        for (PlayerEntity player : world.getPlayers())
+            if (player instanceof ServerPlayerEntity serverPlayerEntity)
+                ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
+    }
 
     // Specify what type the hitbox searches for
     public static List<? extends Entity> generateHitbox(World world, Vec3d center, double hitboxSize, Class<? extends Entity> entityClass, List<Entity> except) {
@@ -47,19 +62,7 @@ public final class JCraftUtils {
         Vec3d v1 = center.subtract(size, size, size);
         Vec3d v2 = center.add(size, size, size);
 
-        if (world.getGameRules().getBoolean(JCraft.SHOW_HITBOXES) && v1 != v2 && size > 0) {
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(1);
-            buf.writeDouble(v1.x);
-            buf.writeDouble(v2.x);
-            buf.writeDouble(v1.y);
-            buf.writeDouble(v2.y);
-            buf.writeDouble(v1.z);
-            buf.writeDouble(v2.z);
-            for (PlayerEntity player : world.getPlayers())
-                if (player instanceof ServerPlayerEntity serverPlayerEntity)
-                    ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
-        }
+        if (size > 0) displayHitbox(world, v1, v2);
 
         List<? extends Entity> hit = world.getEntitiesByClass(entityClass, new Box(v1, v2), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
         ArrayList<Entity> toReturn = new ArrayList<>(List.copyOf(hit));
@@ -88,19 +91,7 @@ public final class JCraftUtils {
         Vec3d v1 = center.subtract(size, size, size);
         Vec3d v2 = center.add(size, size, size);
 
-        if (world.getGameRules().getBoolean(JCraft.SHOW_HITBOXES) && v1 != v2 && size > 0) {
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(1);
-            buf.writeDouble(v1.x);
-            buf.writeDouble(v2.x);
-            buf.writeDouble(v1.y);
-            buf.writeDouble(v2.y);
-            buf.writeDouble(v1.z);
-            buf.writeDouble(v2.z);
-            for (PlayerEntity player : world.getPlayers())
-                if (player instanceof ServerPlayerEntity serverPlayerEntity)
-                    ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
-        }
+        if (size > 0) displayHitbox(world, v1, v2);
 
         List<LivingEntity> hit = world.getEntitiesByClass(LivingEntity.class, new Box(v1, v2), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
         ArrayList<LivingEntity> toReturn = new ArrayList<>(List.copyOf(hit));
@@ -123,14 +114,22 @@ public final class JCraftUtils {
         return toReturn;
     }
 
-    public static void assignSpec(PlayerEntity player, NbtCompound playerNbt, ISpec playerSpec) {
+    //TODO: Int2ObjectHashmap for specs
+    public static JCraftSpec getSpecByID(int id) {
         JCraftSpec spec = null;
 
-        if (playerNbt.getInt("SpecID") == 1)
-            spec = new Brawler();
+        switch (id) {
+            case (1) -> spec = new BrawlerSpec();
+            case (2) -> spec = new AnubisSpec();
+        }
+
+        return spec;
+    }
+
+    public static void assignSpec(PlayerEntity player, NbtCompound playerNbt, ISpec playerSpec) {
+        JCraftSpec spec = getSpecByID(playerNbt.getInt("SpecID"));
         if (spec != null)
             spec.player = player;
-
         playerSpec.setSpec(spec);
     }
 
@@ -140,9 +139,8 @@ public final class JCraftUtils {
         // Autogenerate spec data when necessary
         NbtCompound playerNbt = ((IEntityDataSaver) player).getPersistentData();
         if (playerNbt.contains("SpecID")) {
-            if (playerSpec.getSpec() == null) {
+            if (playerSpec.getSpec() == null)
                 assignSpec(player, playerNbt, playerSpec);
-            }
         } else {
             playerNbt.putInt("SpecID", player.world.getGameRules().getInt(JCraft.DEFAULT_SPEC));
             return getSpec(player);
@@ -169,15 +167,12 @@ public final class JCraftUtils {
         );
         HitResult bHit = world.raycast(new RaycastContext(start, end, RaycastContext.ShapeType.COLLIDER, fluidHandling, entity));
 
-        switch (priority) {
-            default -> {
-                if (eHit != null) return eHit.getPos();
-                return bHit.getPos();
-            }
-            case BLOCK -> {
-                if (bHit.getType() != HitResult.Type.MISS) return bHit.getPos();
-                // STOPPED HERE
-            }
+        if (Objects.requireNonNull(priority) == RaycastPriority.BLOCK) {
+            if (bHit.getType() != HitResult.Type.MISS) return bHit.getPos();
+            // STOPPED HERE
+        } else {
+            if (eHit != null) return eHit.getPos();
+            return bHit.getPos();
         }
 
         return Vec3d.ZERO; //THIS IS A TERRIBLE IDEA!!!!!
@@ -190,6 +185,16 @@ public final class JCraftUtils {
         if (ent instanceof StandEntity stand && stand.hasUser())
             return stand.getUser();
         return ent;
+    }
+
+    /**
+     * @param data NBT data of the entity in question
+     * @return whether an entity is a stand user based on its NBT data
+     */
+    public static boolean isStandUser(NbtCompound data) {
+        if (data.contains("StandID"))
+            return data.getInt("StandID") != 0;
+        return false;
     }
 
     public static void projectileDamageLogic(ProjectileEntity proj, World world, Entity ent, Vec3d kb, int stunT, int stunType, boolean overrideStun, float damage, int blockstun) {
@@ -220,13 +225,13 @@ public final class JCraftUtils {
         return false;
     }
 
-    public static boolean shouldRender(LivingEntity entity) {
+    public static boolean shouldNotRender(LivingEntity entity) {
         Entity passenger = entity.getFirstPassenger();
         if (passenger instanceof KingCrimsonEntity kc && kc.getTETime() > 0)
-            return false;
+            return true;
         if (passenger instanceof D4CEntity d4c && d4c.getState() == 11)
-            return false;
-        return !(passenger instanceof CreamEntity cream) || !cream.getHalfBall();
+            return true;
+        return passenger instanceof CreamEntity cream && cream.getHalfBall();
     }
 
     public static boolean isTimestopped(Entity entity) {
@@ -290,13 +295,9 @@ public final class JCraftUtils {
     }
 
     public static int getTicksIfInTSRange(BlockPos pos) {
-        for (DimValues timeStop : activeTimestops) {
-            if (timeStop != null) {
-                if (timeStop.pos.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) <= 65536) {
-                    return ((StandEntity) timeStop.user).getTSTime();
-                }
-            }
-        }
+        for (DimValues timeStop : activeTimestops)
+            if (timeStop != null && timeStop.pos.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) <= 65536)
+                    return timeStop.timer;
 
         return 0;
     }
@@ -308,51 +309,6 @@ public final class JCraftUtils {
                 ent.getZ() - ent.prevZ
         );
     }
-
-    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, float partialTick) {
-        animateGenericHumanoid(model, entity, player, partialTick, false, false);
-    }
-
-    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, float partialTick, boolean flipBody, boolean flipHead) {
-        animateGenericHumanoid(model, entity, player, partialTick, flipBody, flipHead, 0, 0, 90f);
-    }
-
-    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, float partialTick, boolean flipBody, boolean flipHead, float tPO, float hPO) {
-        animateGenericHumanoid(model, entity, player, partialTick, flipBody, flipHead, tPO, hPO, 90f);
-    }
-
-    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, float partialTick, boolean flipBody, boolean flipHead, float tPO, float hPO, float velInfluence) {
-        float overVel = 0;
-
-        if (entity.getMoveStun() < 1) {
-            Vec3d playerVel = deltaPos(player);
-            overVel = MathHelper.clamp((float) playerVel.horizontalLength() - 0.05f, -1f, 1f);
-
-            // If going backwards
-            if (playerVel.normalize().add(entity.getRotationVector()).horizontalLengthSquared() < playerVel.normalize().horizontalLengthSquared())
-                velInfluence *= -1;
-
-            IBone torso = model.getAnimationProcessor().getBone("torso");
-            if (torso != null) {
-                float pitch = (180f + overVel * velInfluence) * 3.1415f / 180f;
-                if (flipBody) {
-                    pitch += 3.1415f;
-                    pitch = -pitch;
-                }
-                torso.setRotationX(pitch + tPO);
-            }
-        }
-
-        if (entity.getState() == 3 || entity.getState() < 2) { // if in/going to idle, or blocking
-            IBone head = model.getAnimationProcessor().getBone("head");
-            if (head != null) {
-                float headPitch = (player.getPitch() - overVel * velInfluence) * 3.1415f / 180f;
-                if (flipHead) headPitch = -headPitch;
-                head.setRotationX(headPitch + hPO);
-            }
-        }
-    }
-
 
     public static List<BlockInfo> collectBlockInfo(World world, BlockPos origin, int radius) {
         List<BlockInfo> infoList = new ArrayList<>();

@@ -4,7 +4,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import lombok.Data;
-import lombok.Synchronized;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.MadeInHeavenEntity;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
