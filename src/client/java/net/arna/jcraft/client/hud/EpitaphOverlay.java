@@ -1,7 +1,5 @@
 package net.arna.jcraft.client.hud;
 
-import lombok.Getter;
-import lombok.Setter;
 import net.arna.jcraft.JCraft;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
@@ -20,8 +18,6 @@ import java.util.stream.IntStream;
 
 public class EpitaphOverlay extends DrawableHelper {
     public static final long FRAME_TIME = 1000000000 / 60; // Time of one frame in nanoseconds.
-    @Getter @Setter
-    private static boolean enabled;
     private static int frame;
     private static long lastRender;
     private static State state = State.NONE;
@@ -51,6 +47,7 @@ public class EpitaphOverlay extends DrawableHelper {
     public static void stop() {
         if (state == State.NONE) return;
         shouldStop = true;
+        countdown = -1;
     }
 
     public static void render(Consumer<Identifier> renderFunction) {
@@ -119,13 +116,12 @@ public class EpitaphOverlay extends DrawableHelper {
          * If the end of this state has not yet been reached, this state is returned.
          * Otherwise, the next state is returned unless the current state is {@link State#LOOP LOOP}.
          * @param frame The current frame
-         * @param force Whether to move to the next state regardless of what our current state is.
-         *              I.e. whether to move to outro if we've reached the end of loop.
+         * @param forceOutro Whether to move to the outro state regardless of what our current state is.
          * @return The next state
          */
-        public State nextState(int frame, boolean force) {
+        public State nextState(int frame, boolean forceOutro) {
             if (frames == null || frame != frames.size() - 1) return this;
-            return !force && this == LOOP ? this : values()[(ordinal() + 1) % values().length];
+            return forceOutro ? OUTRO : this == LOOP ? this : values()[(ordinal() + 1) % values().length];
         }
 
         private static List<Identifier> getFrames(String path, int count) {
