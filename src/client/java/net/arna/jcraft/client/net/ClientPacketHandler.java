@@ -22,6 +22,7 @@ import net.arna.jcraft.registry.JParticleTypeRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -59,6 +60,49 @@ public class ClientPacketHandler {
             ctx.world().setTimeOfDay((long) (ctx.world().getTimeOfDay() + acceleration * multiplier));
 
             TimeAccelStatePacket.lastUpdate = currentTime;
+        });
+    }
+
+    public static void handleAnimation(MinecraftClient client, PacketByteBuf buf) {
+        if (client == null || client.world == null || client.player == null) return;
+
+        int entID = buf.readInt();
+        String animID = buf.readString(); // I know exactly how unoptimized this is, but I fail to care
+        boolean isSpec = buf.readBoolean();
+
+        int moveStun;
+        int attackID;
+        if (isSpec) {
+            moveStun = buf.readInt();
+            attackID = buf.readInt();
+        } else {
+            attackID = 0;
+            moveStun = 0;
+        }
+
+        client.execute(() -> {
+            Entity ent = client.world.getEntityById(entID);
+            if (ent instanceof ClientPlayerEntity player) {
+                // Animate
+                ModifierLayer<IAnimation> animationContainer = ((IJCraftAnimatedPlayer) player).jcraft_getModAnimation();
+                KeyframeAnimation anim = PlayerAnimationRegistry.getAnimation(new Identifier(JCraft.MOD_ID, "animation." + animID));
+                if (anim == null) {
+                    JCraft.LOGGER.error("Tried to play null animation on player: " + player + ", in world " + client.world);
+                    return;
+                }
+                animationContainer.setAnimation(new KeyframeAnimationPlayer(anim));
+
+                // Synchronize spec values
+                if (isSpec) {
+                    JCraftSpec spec = JClientUtils.getSpec(player);
+                    if (spec == null) {
+                        JCraft.LOGGER.error("Tried to set spec animation values on player without spec: " + player + ", in world " + client.world);
+                        return;
+                    }
+                    spec.moveStun = moveStun;
+                    spec.attackID = attackID;
+                }
+            }
         });
     }
 
@@ -281,23 +325,9 @@ public class ClientPacketHandler {
                 });
             }
 
-            // Spec Animations
+            // WAS Spec Animations
             case (12) -> {
-                int entID = buf.readInt();
-                String animPath = buf.readString(); // I know exactly how unoptimized this is, but I fail to care
 
-                client.execute(() -> {
-                    Entity ent = client.world.getEntityById(entID);
-                    if (ent instanceof PlayerEntity player) {
-                        ModifierLayer<IAnimation> animationContainer = ((IJCraftAnimatedPlayer) player).jcraft_getModAnimation();
-                        KeyframeAnimation anim = PlayerAnimationRegistry.getAnimation(new Identifier(JCraft.MOD_ID, "animation." + animPath));
-                        if (anim == null) {
-                            JCraft.LOGGER.error("Tried to play null animation on player " + player + " in world " + client.world);
-                            return;
-                        }
-                        animationContainer.setAnimation(new KeyframeAnimationPlayer(anim));
-                    }
-                });
             }
 
             // Reset Player Animation

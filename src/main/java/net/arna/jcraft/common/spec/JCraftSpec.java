@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.spec;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.network.s2c.PlayerAnimPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.util.*;
@@ -36,6 +37,7 @@ public abstract class JCraftSpec {
     public PlayerEntity player;
 
     public int moveStun = 0;
+    public int attackID = -1; // Client-only
     public Attack curAttack;
     public Attack previousAttack;
     public AttackQueue queuedAttack;
@@ -77,12 +79,8 @@ public abstract class JCraftSpec {
         playerData.putInt(cooldownName, attack.cooldown * 20);
         curAttack = attack;
 
-        PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeShort(12);
-        buf.writeInt(player.getId());
-        buf.writeString(attack.animation);
         for (ServerPlayerEntity sendPlayer : serverWorld.getPlayers())
-            ServerChannelFeedbackPacket.send(sendPlayer, buf);
+            PlayerAnimPacket.sendSpec((ServerPlayerEntity) player, sendPlayer, attack.animation, moveStun, attack.id);
         return true;
     }
 
@@ -105,11 +103,26 @@ public abstract class JCraftSpec {
 
     }
 
+    public boolean shouldSneak() {
+        return false;
+    }
+
+    public void processAttackClient() {
+    }
+
     public void tickSpec() {
         World world = player.getWorld();
 
         if (world.isClient()) {
             //JCraft.LOGGER.info("CLIENT: Ticking spec " + this);
+
+            if (moveStun > 0) {
+                player.setSneaking(shouldSneak());
+
+                // Process attack
+                moveStun--;
+                processAttackClient();
+            }
         } else {
             //JCraft.LOGGER.info("SERVER: Ticking spec " + this);
 
@@ -117,13 +130,11 @@ public abstract class JCraftSpec {
             Attack attack = this.curAttack;
 
             if (moveStun > 0) {
-                moveStun -= 1;
+                // Likely will be changed later, but at the moment this serves to prevent animations breaking
+                player.setSneaking(shouldSneak());
 
-                //Entity passenger = player.getFirstPassenger();
-
-                //StandEntity stand = null;
-                //if (passenger instanceof StandEntity s) { stand = s; }
-
+                // Process attack
+                moveStun--;
                 if (attack != null) {
                     player.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 5, 9, true, false));
 
@@ -132,7 +143,8 @@ public abstract class JCraftSpec {
 
                     if ((attack.attackType == AttackType.BOX && this.moveStun == realInitTime)
                             || (attack.attackType == AttackType.MULTIHIT && attack.attackTimes.contains(attack.moveStun - this.moveStun))) {
-                        Vec3d rotVec = player.getRotationVector();
+                        double yawRad = Math.toRadians(player.getYaw() + 90);
+                        Vec3d rotVec = new Vec3d(Math.cos(yawRad), 0, Math.sin(yawRad)); // Previously player.getRotationVector() but that allowed them to aim vertically
                         Vec3d hitPos = player.getPos().add(0, player.getHeight() / 2 - attack.offset, 0).add(rotVec.multiply(attack.attackDist));
                         ArrayList<Entity> exclude = new ArrayList<>(player.getPassengerList());
                         exclude.add(player);

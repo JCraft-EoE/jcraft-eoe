@@ -454,9 +454,15 @@
     ]
   },
 
-  "wsdisk": {
+  "wsstanddisc": {
     "sounds": [
-      "jcraft:stands/whitesnake/disk"
+      "jcraft:stands/whitesnake/standdisc"
+    ]
+  },
+
+  "wsmemorydisc": {
+    "sounds": [
+      "jcraft:stands/whitesnake/memorydisc"
     ]
   },
 

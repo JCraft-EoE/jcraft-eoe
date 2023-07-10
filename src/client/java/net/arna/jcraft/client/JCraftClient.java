@@ -11,10 +11,7 @@ import net.arna.jcraft.client.registry.JClientEventsRegistry;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
 import net.arna.jcraft.common.JConfig;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
-import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
-import net.arna.jcraft.common.network.s2c.ShaderDeactivationPacket;
-import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
+import net.arna.jcraft.common.network.s2c.*;
 import net.arna.jcraft.client.registry.JArmorRendererRegister;
 import net.arna.jcraft.client.registry.JEntityRendererRegister;
 import net.arna.jcraft.client.registry.JRenderLayerRegistry;
@@ -129,6 +126,7 @@ public class JCraftClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(new JCraftAbilityHud());
 
         ClientPlayNetworking.registerGlobalReceiver(ServerChannelFeedbackPacket.ID, (client, handler, buf, sender) -> ClientPacketHandler.handleChannelFeedback(client, buf));
+        ClientPlayNetworking.registerGlobalReceiver(PlayerAnimPacket.ID, (client, handler, buf, sender) -> ClientPacketHandler.handleAnimation(client, buf));
         ClientPlayNetworking.registerGlobalReceiver(ShaderActivationPacket.ID, (client, handler, buf, sender) -> ClientPacketHandler.handleShaderActivation(client, buf));
         ClientPlayNetworking.registerGlobalReceiver(ShaderDeactivationPacket.ID, (client, handler, buf, sender) -> ClientPacketHandler.handleShaderDeactivation(client, buf));
         ClientPlayNetworking.registerGlobalReceiver(TimeAccelStatePacket.ID, (client, handler, buf, sender) -> ClientPacketHandler.handleTimeAccelState(client, buf));

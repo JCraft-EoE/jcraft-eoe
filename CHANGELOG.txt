@@ -1116,6 +1116,13 @@ Golden Experience
 C-Moon
     >Added second hitbox to Gut Punch
 
+● 10/7/2023
+Specs
+    >Attacks no longer have hitbox height influenced by where the spec user is looking
+
+Whitesnake
+    >Updated sounds
+
 priority (top to bottom)
 TODO: AI flags for unblockables and shouldn't-blockables
 TODO: stand summon particles

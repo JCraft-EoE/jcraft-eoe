@@ -1,6 +1,7 @@
 package net.arna.jcraft.client.mixin;
 
 import net.arna.jcraft.client.hud.EpitaphOverlay;
+import net.arna.jcraft.common.JConfig;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
@@ -16,6 +17,7 @@ public abstract class InGameHudMixin {
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;getFrozenTicks()I"))
     private void renderEpitaph(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
-        EpitaphOverlay.render(id -> renderOverlay(id, 1f));
+        if (JConfig.EPITAPH_OVERLAY)
+            EpitaphOverlay.render(id -> renderOverlay(id, 1f));
     }
 }

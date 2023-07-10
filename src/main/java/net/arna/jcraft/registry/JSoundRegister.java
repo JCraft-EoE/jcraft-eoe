@@ -2,7 +2,6 @@ package net.arna.jcraft.registry;
 
 import net.arna.jcraft.JCraft;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 public interface JSoundRegister {
@@ -105,7 +104,8 @@ public interface JSoundRegister {
     SoundEvent WS_BARRAGE = registerSound("wsbarrage");
     SoundEvent WS_LEGCRUSH = registerSound("wslegcrush");
     SoundEvent WS_DONUT = registerSound("wsdonut");
-    SoundEvent WS_DISK = registerSound("wsdisk");
+    SoundEvent WS_MEMORY_DISC = registerSound("wsmemorydisc");
+    SoundEvent WS_STAND_DISC = registerSound("wsstanddisc");
     SoundEvent WS_GUN = registerSound("wsgun");
     SoundEvent WS_MYH = registerSound("wsmeltyourheart");
 

@@ -7,8 +7,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 public class ServerChannelFeedbackPacket {
-    public static final Identifier ID = new Identifier(JCraft.MOD_ID, "sfchannel");
-
+    public static final Identifier ID = JCraft.id("sfchannel");
     public static void send(ServerPlayerEntity serverPlayerEntity, PacketByteBuf buf) {
         ServerPlayNetworking.send(serverPlayerEntity, ID, buf);
     }

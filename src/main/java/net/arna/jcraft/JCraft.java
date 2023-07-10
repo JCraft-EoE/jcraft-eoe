@@ -3,6 +3,7 @@ package net.arna.jcraft;
 import eu.midnightdust.lib.config.MidnightConfig;
 import lombok.Getter;
 import lombok.Setter;
+import net.arna.jcraft.common.network.s2c.PlayerAnimPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.JConfig;
 import net.arna.jcraft.common.entity.StandEntity;
@@ -216,17 +217,13 @@ public class JCraft implements ModInitializer {
         dashes.add(new DashData(dashDir.normalize().multiply(dashSpeed), entity));
 
         // Syncs dash anim (unless already attacking with a spec) with every player in the vicinity
-        if (entity instanceof PlayerEntity player) {
+        if (entity instanceof ServerPlayerEntity player) {
             JCraftSpec spec = JUtils.getSpec(player);
-            if (spec == null || spec.moveStun < 1) {
-                PacketByteBuf buf = PacketByteBufs.create();
-                buf.writeShort(12);
-                buf.writeInt(entity.getId());
-                buf.writeString("dash");
+
+            if (spec == null || spec.moveStun < 1)
                 PlayerLookup.around((ServerWorld) entity.getWorld(), entity.getPos(), 96).forEach( //todo: find a less arbitrary number for radius here
-                        serverPlayer -> ServerChannelFeedbackPacket.send(serverPlayer, buf)
+                        serverPlayer -> PlayerAnimPacket.send(player, serverPlayer, "dash")
                 );
-            }
         }
     }
 
