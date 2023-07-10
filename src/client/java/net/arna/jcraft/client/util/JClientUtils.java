@@ -3,8 +3,8 @@ import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.DimValues;
 import net.arna.jcraft.common.util.ISpec;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -17,7 +17,7 @@ import java.util.List;
 import static net.arna.jcraft.common.util.JUtils.deltaPos;
 
 public class JClientUtils {
-    public static JCraftSpec getSpec(ClientPlayerEntity player) {
+    public static JCraftSpec getSpec(PlayerEntity player) {
         return ((ISpec)player).getSpec();
     }
 

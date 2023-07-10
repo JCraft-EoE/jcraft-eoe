@@ -79,8 +79,8 @@ public abstract class JCraftSpec {
         playerData.putInt(cooldownName, attack.cooldown * 20);
         curAttack = attack;
 
-        for (ServerPlayerEntity sendPlayer : serverWorld.getPlayers())
-            PlayerAnimPacket.sendSpec((ServerPlayerEntity) player, sendPlayer, attack.animation, moveStun, attack.id);
+        PlayerLookup.world(serverWorld).forEach(
+                serverPlayer -> PlayerAnimPacket.sendSpec(player, serverPlayer, curAttack.animation, moveStun, curAttack.id));
         return true;
     }
 
@@ -90,7 +90,7 @@ public abstract class JCraftSpec {
         moveStun = 0;
 
         if (player == null) return;
-
+        // Cancel player animation if he exists
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeShort(13);
         buf.writeInt(player.getId());

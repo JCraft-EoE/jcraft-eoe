@@ -1,7 +1,7 @@
 {
 	"format_version": "1.8.0",
 	"animations": {
-		"animation.an.slsh": {
+		"an.slsh": {
 			"animation_length": 0.96,
 			"bones": {
 				"body": {
@@ -51,7 +51,7 @@
 				}
 			}
 		},
-		"animation.an.swp": {
+		"an.swp": {
 			"animation_length": 0.88,
 			"bones": {
 				"body": {
@@ -150,7 +150,7 @@
 				}
 			}
 		},
-		"animation.an.pom": {
+		"an.pom": {
 			"animation_length": 0.6,
 			"bones": {
 				"body": {
@@ -225,7 +225,7 @@
 				}
 			}
 		},
-		"animation.an.pmi": {
+		"an.pmi": {
 			"animation_length": 0.6,
 			"bones": {
 				"body": {
@@ -300,7 +300,7 @@
 				}
 			}
 		},
-		"animation.an.2hit": {
+		"an.2hit": {
 			"animation_length": 1.32,
 			"bones": {
 				"body": {
@@ -411,7 +411,7 @@
 				}
 			}
 		},
-		"animation.an.3hit": {
+		"an.3hit": {
 			"animation_length": 1.92,
 			"bones": {
 				"body": {

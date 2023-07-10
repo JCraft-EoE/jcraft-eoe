@@ -70,11 +70,14 @@ public class ClientPacketHandler {
         String animID = buf.readString(); // I know exactly how unoptimized this is, but I fail to care
         boolean isSpec = buf.readBoolean();
 
+        //JCraft.LOGGER.info("JCRAFT CLIENT:\nRecieving animation packet of animID: " + animID + " for entity ID: " + entID);
+
         int moveStun;
         int attackID;
         if (isSpec) {
             moveStun = buf.readInt();
             attackID = buf.readInt();
+            //JCraft.LOGGER.info("Animation packet is for specs, and has attached moveStun: " + moveStun + " and attackID: " + attackID);
         } else {
             attackID = 0;
             moveStun = 0;
@@ -82,14 +85,16 @@ public class ClientPacketHandler {
 
         client.execute(() -> {
             Entity ent = client.world.getEntityById(entID);
-            if (ent instanceof ClientPlayerEntity player) {
+            //JCraft.LOGGER.info("Animation is to be applied to: " + ent);
+            if (ent instanceof PlayerEntity player) {
                 // Animate
                 ModifierLayer<IAnimation> animationContainer = ((IJCraftAnimatedPlayer) player).jcraft_getModAnimation();
-                KeyframeAnimation anim = PlayerAnimationRegistry.getAnimation(new Identifier(JCraft.MOD_ID, "animation." + animID));
+                KeyframeAnimation anim = PlayerAnimationRegistry.getAnimation(JCraft.id(animID));
                 if (anim == null) {
                     JCraft.LOGGER.error("Tried to play null animation on player: " + player + ", in world " + client.world);
                     return;
                 }
+                //JCraft.LOGGER.info("Animation to be applied: " + anim);
                 animationContainer.setAnimation(new KeyframeAnimationPlayer(anim));
 
                 // Synchronize spec values
@@ -99,6 +104,7 @@ public class ClientPacketHandler {
                         JCraft.LOGGER.error("Tried to set spec animation values on player without spec: " + player + ", in world " + client.world);
                         return;
                     }
+                    //JCraft.LOGGER.info("Spec: " + spec.getName());
                     spec.moveStun = moveStun;
                     spec.attackID = attackID;
                 }

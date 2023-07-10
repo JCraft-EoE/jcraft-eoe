@@ -222,8 +222,7 @@ public class JCraft implements ModInitializer {
 
             if (spec == null || spec.moveStun < 1)
                 PlayerLookup.around((ServerWorld) entity.getWorld(), entity.getPos(), 96).forEach( //todo: find a less arbitrary number for radius here
-                        serverPlayer -> PlayerAnimPacket.send(player, serverPlayer, "dash")
-                );
+                        serverPlayer -> PlayerAnimPacket.send(player, serverPlayer, "dash"));
         }
     }
 
