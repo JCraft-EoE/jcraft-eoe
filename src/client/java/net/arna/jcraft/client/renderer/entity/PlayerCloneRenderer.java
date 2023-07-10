@@ -31,7 +31,7 @@ public class PlayerCloneRenderer extends BipedEntityRenderer<PlayerCloneEntity, 
 
     @Override
     public void render(PlayerCloneEntity mobEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
-        if (!JCraftClient.shouldRenderClone(mobEntity)) return;
+        if (JCraftClient.shouldNotRenderClone(mobEntity)) return;
 
         matrixStack.push();
         matrixStack.scale(0.9375F, 0.9375F, 0.9375F); // Player scale

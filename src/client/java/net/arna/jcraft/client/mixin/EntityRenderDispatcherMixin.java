@@ -16,7 +16,7 @@ public class EntityRenderDispatcherMixin {
     private <E extends Entity> void shouldNotRenderIfRidingInvisibleClone(E entity, Frustum frustum, double x, double y, double z, CallbackInfoReturnable<Boolean> cir) {
         Entity e = entity;
         do {
-            if (e instanceof PlayerCloneEntity clone && !JCraftClient.shouldRenderClone(clone)) {
+            if (e instanceof PlayerCloneEntity clone && JCraftClient.shouldNotRenderClone(clone)) {
                 cir.cancel();
                 return;
             }

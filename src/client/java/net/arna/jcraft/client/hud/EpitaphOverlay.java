@@ -18,7 +18,7 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
-public class EpitathOverlay extends DrawableHelper {
+public class EpitaphOverlay extends DrawableHelper {
     public static final long FRAME_TIME = 1000000000 / 60; // Time of one frame in nanoseconds.
     @Getter @Setter
     private static boolean enabled;
@@ -130,7 +130,7 @@ public class EpitathOverlay extends DrawableHelper {
 
         private static List<Identifier> getFrames(String path, int count) {
             return IntStream.rangeClosed(1, count)
-                    .mapToObj(i -> JCraft.id("textures/gui/epitath_overlay/" + path + "/frame" + i + ".png"))
+                    .mapToObj(i -> JCraft.id("textures/gui/epitaph_overlay/" + path + "/frame" + i + ".png"))
                     .toList();
         }
     }

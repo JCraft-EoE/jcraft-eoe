@@ -8,7 +8,7 @@ import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import lombok.experimental.UtilityClass;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.JCraftClient;
-import net.arna.jcraft.client.hud.EpitathOverlay;
+import net.arna.jcraft.client.hud.EpitaphOverlay;
 import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
 import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
 import net.arna.jcraft.client.util.JClientUtils;
@@ -405,9 +405,9 @@ public class ClientPacketHandler {
         }
     }
 
-    public static void handleEpitathOverlayState(PacketByteBuf buf) {
+    public static void handleEpitaphOverlayState(PacketByteBuf buf) {
         boolean start = buf.readBoolean();
-        if (start) EpitathOverlay.start();
-        else EpitathOverlay.stop();
+        if (start) EpitaphOverlay.start();
+        else EpitaphOverlay.stop();
     }
 }

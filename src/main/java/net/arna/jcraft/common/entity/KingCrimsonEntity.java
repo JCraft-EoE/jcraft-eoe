@@ -296,7 +296,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                 }
             }
 
-            if (didAttack && getUser() instanceof ServerPlayerEntity player) ServerPlayNetworking.send(player, JCraft.id("epitath_state"),
+            if (didAttack && getUser() instanceof ServerPlayerEntity player) ServerPlayNetworking.send(player, JCraft.id("epitaph_state"),
                     new PacketByteBuf(Unpooled.buffer().writeBoolean(start)));
         }
     }

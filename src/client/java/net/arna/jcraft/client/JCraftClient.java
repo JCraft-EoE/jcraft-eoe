@@ -2,7 +2,7 @@ package net.arna.jcraft.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.hud.EpitathOverlay;
+import net.arna.jcraft.client.hud.EpitaphOverlay;
 import net.arna.jcraft.client.hud.JCraftAbilityHud;
 import net.arna.jcraft.client.hud.JCraftHudOverlay;
 import net.arna.jcraft.client.net.ClientPacketHandler;
@@ -132,15 +132,15 @@ public class JCraftClient implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(ShaderActivationPacket.ID, (client, handler, buf, sender) -> ClientPacketHandler.handleShaderActivation(client, buf));
         ClientPlayNetworking.registerGlobalReceiver(ShaderDeactivationPacket.ID, (client, handler, buf, sender) -> ClientPacketHandler.handleShaderDeactivation(client, buf));
         ClientPlayNetworking.registerGlobalReceiver(TimeAccelStatePacket.ID, (client, handler, buf, sender) -> ClientPacketHandler.handleTimeAccelState(client, buf));
-        ClientPlayNetworking.registerGlobalReceiver(JCraft.id("epitath_state"), (client, handler, buf, responseSender) -> ClientPacketHandler.handleEpitathOverlayState(buf));
+        ClientPlayNetworking.registerGlobalReceiver(JCraft.id("epitaph_state"), (client, handler, buf, responseSender) -> ClientPacketHandler.handleEpitaphOverlayState(buf));
 
         HudRenderCallback.EVENT.register(new JCraftHudOverlay());
         HudRenderCallback.EVENT.register(this::renderHud);
         HudRenderCallback.EVENT.register(new JCraftAbilityHud());
-//        HudRenderCallback.EVENT.register((matrices, tickDelta) -> EpitathOverlay.render(matrices));
+//        HudRenderCallback.EVENT.register((matrices, tickDelta) -> EpitaphOverlay.render(matrices));
 
         // Run when the MinecraftClient instance is fully initialized.
-        MinecraftClient.getInstance().submit(EpitathOverlay::preload);
+        MinecraftClient.getInstance().submit(EpitaphOverlay::preload);
 
         Identifier itemId = JObjectRegistry.ITEMS.get(JObjectRegistry.DEBUG_WAND);
         BigItemRenderer itemRenderer = new BigItemRenderer(itemId);
@@ -419,8 +419,8 @@ public class JCraftClient implements ClientModInitializer {
         return StringUtils.capitalize(secondLast) + StringUtils.capitalize(last);
     }
 
-    public static boolean shouldRenderClone(PlayerCloneEntity clone) {
+    public static boolean shouldNotRenderClone(PlayerCloneEntity clone) {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
-        return player == null || !clone.getMasterId().equals(player.getUuid());
+        return player != null && clone.getMasterId().equals(player.getUuid());
     }
 }
