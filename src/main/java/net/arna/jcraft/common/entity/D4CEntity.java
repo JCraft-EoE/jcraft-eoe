@@ -41,7 +41,7 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
     public static final Attack heavy = new Attack(1, 15, 1, 25, 14, 2, 8f, 1.5f, AttackType.BOX, 0.5f, -0.2f, 0, JSoundRegister.IMPACT_2)
             .setHitspark(2)
-            .setArmor(true)
+            .hyperArmor()
             .setLaunch()
             .setInfo("Charge", "user & stand charge forward, uninterruptable launcher");
     public static final Attack dimhop_others = new Attack(3, 60, 1, 60, 40, 1.5, 0f, 0.0f, AttackType.BOX)
@@ -201,7 +201,7 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
     }
 
     @Override
-    public void initMiddleClick() {
+    public void initUtil() {
         if (!this.canAttack()) return;
         if (handleAttack(flag, JCraft.utilCD, 11)) {
             getUser().addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, flag.moveStun, 0, true, false));

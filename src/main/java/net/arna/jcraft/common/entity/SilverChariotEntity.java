@@ -39,7 +39,7 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
     public final Attack heavy = new Attack(1, 15, 0.65f, 28, 20, 2.0, 8f, 1.5f, AttackType.BOX, 0.5f)
             .setHitspark(2)
-            .setArmor(true)
+            .hyperArmor()
             .setLaunch()
             .setInfo("Impaling Thrust", "slow, uninterruptable launcher");
     public final Attack spinbarrage = new Attack(3, 25, 0.65f, 24, 7, 2, 1f, 0.1f, AttackType.BARRAGE, 0.50f, 0, 2)
@@ -51,7 +51,7 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
             .setInfo("Ray Dart", "Silver Chariot and the user charge forward, combo finisher");
     public final Attack cleave = new Attack(5, 23, 0.75f, 21, 12, 2.5, 9f, 0.8f, AttackType.BOX, 1f, 0, 0)
             .setHitspark(2)
-            .setArmor(true)
+            .hyperArmor()
             .setInfo("Cleave", "Silver Chariot detaches from the user, delivering an uninterruptable, combo-starting slice");
     public final Attack charge = new Attack(6, 22, 8f, 19, 5, 1.5, 5f, 0.25f, AttackType.CHARGE, 0.85f, 0, 9)
             .setRanged(true)

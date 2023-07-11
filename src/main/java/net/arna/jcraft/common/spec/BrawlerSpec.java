@@ -16,7 +16,7 @@ public class BrawlerSpec extends JCraftSpec {
     public static final Attack heavy = new Attack(0, 17, 1f, 21, 10, 1.5, 6f, 0.8f, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.IMPACT_2)
             .setAnimation("br.upct")
             .setHitspark(2)
-            .setArmor(true)
+            .hyperArmor()
             .setInfo("Uppercut", "uninterruptable, medium speed");
     public static final Attack combo = new Attack(1, 22, 1f, 26, 0, 1.5, 4f, 0.6f, AttackType.MULTIHIT, 0.75f, -0.1f, List.of(5, 10, 19), JSoundRegister.IMPACT_2)
             .setAnimation("br.3hit")

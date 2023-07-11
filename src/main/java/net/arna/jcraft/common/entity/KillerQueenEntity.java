@@ -51,7 +51,7 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
 
     public static final Attack heavy = new Attack(2, 12, 0.75f, 24, 16, 2, 9f, 1.75f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_4)
             .setHitspark(2)
-            .setArmor(true)
+            .hyperArmor()
             .setLaunch()
             .setInfo("Haymaker", "slow, uninterruptable launcher");
     public static final Attack barrage = new Attack(3, 17, 0.75f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3, JSoundRegister.IMPACT_4)
@@ -206,7 +206,7 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
     }
 
     @Override
-    public void initMiddleClick() {
+    public void initUtil() {
         if (!canAttack()) return;
         LivingEntity user = this.getUser();
         NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();

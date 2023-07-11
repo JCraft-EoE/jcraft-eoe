@@ -56,7 +56,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
     public static final Attack overwrite = new Attack(6, 0, 1f, 23, 7, 2, 0f, 1.0f, AttackType.BOX, 2, 0, 0, JSoundRegister.IMPACT_5)
             .setHitspark(2)
             .setLaunch()
-            .setArmor(true)
+            .hyperArmor()
             .setUB(false)
             .setInfo("Overwrite (Hit)", "", AttackQueue.SPECIAL1);
     public static final Attack chargeoverwrite = new Attack(8, 30, 70, 71, 0, AttackType.BOX)
@@ -249,24 +249,11 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
             this.playSound(JSoundRegister.TWOH_TS, 1, 1);
     }
 
+    private static final Attack timeskip = new Attack(-2, 18, 2, 2);
     @Override
-    public void initMiddleClick() {
-        CanAttackData data = canAttackWithData();
-        if (!data.canAttack || tsTime > 0) return;
-        NbtCompound userData = ((IEntityDataSaver) data.user).getPersistentData();
-        if (userData.getInt(JCraft.utilCD) > 0) return;
-        Vec3d eP = data.user.getEyePos();
-
-        HitResult hitResult = world.raycast(new RaycastContext(eP, eP.add(data.user.getRotationVector().multiply(14)), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, data.user));
-        Vec3d pos = hitResult.getPos();
-
-        data.user.teleport(pos.x, pos.y, pos.z);
-
-        userData.putInt(JCraft.utilCD, 360); // 18 second timeskip cooldown
-        if (userData.getInt(JCraft.standUltCD) < 60)
-            userData.putInt(JCraft.standUltCD, 60); // 3 second timestop cooldown
-
-        world.playSound(null, pos.x, pos.y, pos.z, JSoundRegister.TWOH_TIMESKIP, SoundCategory.PLAYERS, 1f, 1f);
+    public void initUtil() {
+        if (!canAttack()) return;
+        handleAttack(timeskip, JCraft.utilCD, 0);
     }
 
     @Override
@@ -275,6 +262,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
         DamageSource damageSource = JDamageSources.stand(this, user);
 
         switch (attack.id) {
+            case (-2) -> timeSkip(14, JSoundRegister.TWOH_TIMESKIP);
             case (1) -> { // TWOH's heavy is a mini-overwrite that ignores block
                 for (LivingEntity ent : entities) {
                     stun(ent, 20, 1);

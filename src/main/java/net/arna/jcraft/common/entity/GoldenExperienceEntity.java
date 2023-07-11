@@ -33,14 +33,15 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
     public static final Attack heavy = new Attack(1, 17, 1f, 22, 13, 1.5, 9f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_2)
             .setHitspark(2)
             .appendHitbox(new Attack.HitboxData(0, 0, 1.25))
-            .setArmor(true)
+            .hyperArmor()
             .setLaunch()
             .setInfo("Shoulder Smash", "slow, uninterruptable combo finisher");
     public static final Attack barrage = new Attack(2, 14, 0.75f, 30, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 2, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
     public static final Attack healself = new Attack(3, 26, 1f, 14, 10, 0, 0f, 0f, AttackType.BOX)
             .setInfo("Healing Hand", "standing: heals user for 2 hearts, crouching: heals others for 2 hearts, pacifies angered mobs");
-    public static final Attack heal = new Attack(4, 26, 1f, 16, 10, 1.25, 0f, 0f, AttackType.BOX);
+    public static final Attack heal = new Attack(4, 26, 1f, 16, 10, 1.25, 0f, 0f, AttackType.BOX)
+            .setInfo("Healing Hand (Others)", "");
     public static final Attack tree = new Attack(5, 20, 1f, 24, 14, 1.25, 5f, 0.2f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_2)
             .setHitspark(2)
             .setInfo("Tree Summon", "two-hitting launch");
@@ -55,11 +56,12 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
             .setUB(false)
             .setInfo("Overclock", "slow, unblockable, devastating stun");
     public static final Attack rekka3 = new Attack(9, 23, 1f, 24, 12, 2, 7f, 0.5f, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.TW_KICK_HIT)
-            .setHitspark(2);
-    public static final Attack rekka2 = new Attack(8, 23, 1f, 18, 10, 1.75, 5f, 0.5f, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.IMPACT_2)
-            .setInfo("how did you", "get here", AttackQueue.SPECIAL2)
             .setHitspark(2)
-            .setFollowup(rekka3);
+            .setInfo("Rekka (Final Hit)", "knockdown", AttackQueue.SPECIAL2);
+    public static final Attack rekka2 = new Attack(8, 23, 1f, 18, 10, 1.75, 5f, 0.5f, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.IMPACT_2)
+            .setHitspark(2)
+            .setFollowup(rekka3)
+            .setInfo("Rekka (2nd Hit)", "links into Light", AttackQueue.SPECIAL2);
     public static final Attack rekka1 = new Attack(7, 23, 1f, 20, 8, 1.5, 5f, 0.5f, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.IMPACT_2)
             .appendHitbox(new Attack.HitboxData(1.25))
             .setInfo("Rekka Series", "a set of three attacks, which cancel into each other during recovery", AttackQueue.SPECIAL2)
@@ -179,7 +181,7 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
     }
 
     @Override
-    public void initMiddleClick() {
+    public void initUtil() {
         if (!this.canAttack()) return;
         if (handleAttack(tree, JCraft.utilCD, 8))
             this.playSound(JSoundRegister.GE_TREE, 1, 1);

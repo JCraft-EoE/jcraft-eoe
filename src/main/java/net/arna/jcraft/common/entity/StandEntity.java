@@ -34,9 +34,13 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -512,8 +516,29 @@ public abstract class StandEntity extends MobEntity {
         user.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 5, 3, false, false, true));
     }
 
-    // Define Middle Click action
-    public void initMiddleClick() {
+    protected Vec3d timeSkip(double distance, @NotNull SoundEvent sound) {
+        Vec3d eyePos = user.getEyePos();
+        HitResult hitResult = world.raycast(
+                new RaycastContext(
+                        eyePos,
+                        eyePos.add(user.getRotationVector().multiply(distance)),
+                        RaycastContext.ShapeType.COLLIDER,
+                        RaycastContext.FluidHandling.NONE, user));
+        Vec3d telePos = hitResult.getPos();
+
+        // 3s minimum ult cooldown
+        NbtCompound userData = ((IEntityDataSaver) user).getPersistentData();
+        if (userData.getInt(JCraft.standUltCD) < 60)
+            userData.putInt(JCraft.standUltCD, 60);
+
+        user.teleport(telePos.x, telePos.y, telePos.z);
+        world.playSound(null, telePos.x, telePos.y, telePos.z, sound, SoundCategory.PLAYERS, 1f, 1f);
+
+        return telePos;
+    }
+
+    // Define utility
+    public void initUtil() {
     }
 
     // Define special attack actions
@@ -657,7 +682,7 @@ public abstract class StandEntity extends MobEntity {
 
                 int realInitTime = (moveStun - attack.initTime);
 
-                boolean isChargeAttack = attack.attackType == AttackType.CHARGE || attack.attackType == AttackType.CHARGEBARRAGE;
+                boolean isChargeAttack = attack.isCharge();
                 // Positioning
                 if (isChargeAttack) {
                     if (curMoveStun <= realInitTime) {
@@ -687,7 +712,11 @@ public abstract class StandEntity extends MobEntity {
                     JCraft.stopTime(user, pos, (ServerWorld) world, stunTicks);
                 }
 
-                boolean isBarrage = attack.attackType == AttackType.BARRAGE || attack.attackType == AttackType.CHARGEBARRAGE;
+                boolean isBarrage = attack.isBarrage();
+
+                if (attack.attackType == AttackType.BARRAGE) { // Excludes charge barrages
+                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 10, 2, true, false));
+                }
 
                 if (
                         (attack.attackType == AttackType.BOX && curMoveStun == realInitTime)
@@ -786,7 +815,7 @@ public abstract class StandEntity extends MobEntity {
                         case ULTIMATE -> this.initUlt();
                         case SPECIAL2 -> this.initSpecial2();
                         case SPECIAL3 -> this.initSpecial3();
-                        case MIDDLEMOUSE -> this.initMiddleClick();
+                        case MIDDLEMOUSE -> this.initUtil();
                         case STANDSUMMON -> {
                             this.curAttack = null;
                             this.desummon();
@@ -927,7 +956,7 @@ public abstract class StandEntity extends MobEntity {
                     return;
                 }
 
-                if (!standAttack.hasArmor) stand.cancelAttack();
+                if (standAttack.armor-- < 0) stand.cancelAttack();
             }
 
             if (stand.blocking && !stand.getRemote()) {
@@ -970,7 +999,7 @@ public abstract class StandEntity extends MobEntity {
         // Interrupting spec moves
         if (ent instanceof PlayerEntity playerEntity) {
             JCraftSpec spec = JUtils.getSpec(playerEntity);
-            if (spec != null && spec.curAttack != null && !spec.curAttack.hasArmor) spec.cancelAttack();
+            if (spec != null && spec.curAttack != null && spec.curAttack.armor-- < 0) spec.cancelAttack();
         }
 
         // Aerial hits keep the victim up
@@ -1128,7 +1157,7 @@ public abstract class StandEntity extends MobEntity {
                         case 4 -> stand.initUlt();
                         case 5 -> stand.initSpecial2();
                         case 6 -> stand.initSpecial3();
-                        case 7 -> stand.initMiddleClick();
+                        case 7 -> stand.initUtil();
                     }
                 } else {
                     stand.queuedAttack = AttackQueue.values()[move];

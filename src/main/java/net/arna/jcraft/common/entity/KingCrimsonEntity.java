@@ -11,6 +11,7 @@ import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.Entity;
@@ -59,31 +60,34 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
             .setInfo("Barrage", "fast reliable combo starter/extender/finisher, medium stun, knocks back");
     public static final Attack overhead = new Attack(2, 8, 0.85f, 32, 22, 2, 9f, 1.5f, AttackType.BOX, 0.5f)
             .setHitspark(2)
-            .setArmor(true)
+            .hyperArmor()
             .setLaunch()
             .setInfo("Overhead Hook", "long windup, knockdown", AttackQueue.HEAVY);
     public static final Attack heavy = new Attack(1, 13, 0.85f, 19, 12, 1.5, 6f, 0.2f, AttackType.BOX, 1.25f, 0, 0)
             .appendHitbox(new Attack.HitboxData(0, 0.5, 1))
             .setInfo("Vertical Chop", "medium windup combo starter, has a true followup in the form of a slow, armored knockdown", AttackQueue.HEAVY)
             .setFollowup(overhead);
+    public static final Attack bloodthrow = new Attack(5, 25, 15, 10, 10, AttackType.BOX)
+            .setRanged(true)
+            .setInfo("Blood Throw", "");
     public static final Attack eyechop = new Attack(4, 20, 1f, 50, 37, 1.75, 9f, 0.3f, AttackType.BOX, 3, -0.3f)
             .setHitspark(2)
             .appendHitbox(new Attack.HitboxData(0, 0.5, 1))
+            .crouchingVariation(bloodthrow)
             .setInfo("Eye Chop/Blood Throw", "blindness on hit, donut combo extender/crouch to throw a stunning, blinding blood projectile");
-    public static final Attack bloodthrow = new Attack(5, 25, 15, 10, 10, AttackType.BOX)
-            .setInfo("Blood Throw", "");
     public static final Attack donut = new Attack(6, 15, 1f, 60, 42, 1.75, 14f, 0.0f, AttackType.BOX, 4, 0.1f)
             .setHitspark(2)
-            .setArmor(true)
-            .setInfo("Donut", "huge windup, 6s hitstun");
+            .hyperArmor()
+            .setInfo("Donut", "huge windup, 4s hitstun");
+    public static final Attack prediction = new Attack(9, 30, 104, 4, 0, -1, AttackType.BOX)
+            .setInfo("Prediction", "");
     public static final Attack epitaph = new Attack(7, 30, 34, 4, 0, -1, AttackType.COUNTER)
+            .crouchingVariation(prediction)
             .setInfo("Prediction/Epitaph/Move Cancel", """
                     standing: shows future location of nearby entities, said entities can be forced into it using Time Erase (20s cooldown)
                               you are slowed down while predicting
                     crouching: 0.2s windup, 1.5s counter
                     during a move: cancels it (puts Time Erase on a 7 second cooldown but doesn't require it to be usable)""");
-    public static final Attack prediction = new Attack(9, 30, 104, 4, 0, -1, AttackType.BOX)
-            .setInfo("Prediction", "");
     public static final Attack timeerase = new Attack(8, 50, 15, 5, 6, AttackType.BOX)
             .setInfo("Time Erase", "6 seconds duration, cancellable by doing anything with King Crimson"); // TE = (moveStun-initTime)/20
 
@@ -261,15 +265,17 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
 
             NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
             boolean start = getMoveStun() < 1;
-            boolean didAttack = true;
 
             if (start) {
                 if (user.isSneaking())
-                    didAttack = handleAttack(epitaph, JCraft.standS3CD, 9);
-                else //noinspection AssignmentUsedAsCondition // That is correct
-                    if (didAttack = handleAttack(prediction, JCraft.standS3CD, 12)) {
+                    handleAttack(epitaph, JCraft.standS3CD, 9);
+                else if (handleAttack(prediction, JCraft.standS3CD, 12)) {
                     predictionInfo.clear();
                     playSound(JSoundRegister.KC_EPITAPH, 1, 1);
+
+                    // Send epitaph state start
+                    if (user instanceof ServerPlayerEntity player)
+                        ServerPlayNetworking.send(player, JCraft.id("epitaph_state"), new PacketByteBuf( Unpooled.buffer().writeBoolean(true)) );
                 }
             } else {
                 // When used during a move, cancels it and puts time erase on cooldown
@@ -294,70 +300,36 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                     buf.writeDouble(bBox.getZLength());
                     ServerChannelFeedbackPacket.send(serverPlayer, buf);
                 }
-            }
 
-            if (didAttack && getUser() instanceof ServerPlayerEntity player) ServerPlayNetworking.send(player, JCraft.id("epitaph_state"),
-                    new PacketByteBuf(Unpooled.buffer().writeBoolean(start)));
+                // Send epitaph state stop
+                if (user instanceof ServerPlayerEntity player)
+                    ServerPlayNetworking.send(player, JCraft.id("epitaph_state"), new PacketByteBuf( Unpooled.buffer().writeBoolean(false)) );
+            }
         }
     }
 
+    private static final Attack timeskip = new Attack(-2, 15, 2, 2).setInfo("Timeskip", "");
     @Override
-    public void initMiddleClick() {
+    public void initUtil() {
         if (!canAttack()) return;
-
-        if (hasUser()) {
+        if (handleAttack(timeskip, JCraft.utilCD, 0)) {
             LivingEntity user = getUser();
-            NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
-            if (playerData.getInt(JCraft.utilCD) > 0) return;
-            Vec3d oPos = user.getPos();
 
-            HitResult hitResult = world.raycast(new RaycastContext(user.getEyePos(), user.getEyePos().add(user.getRotationVector().multiply(16)), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user));
-            Vec3d pos = hitResult.getPos();
-
-            user.teleport(pos.x, pos.y, pos.z);
-
-            playerData.putInt(JCraft.utilCD, 300); // 15 second timeskip cooldown
-
-            if (playerData.getInt(JCraft.standUltCD) < 60)
-                playerData.putInt(JCraft.standUltCD, 60); // 3 second time erase cooldown
-
-            // Move everything around user slightly
-            if (world.getGameRules().getBoolean(JCraft.KINGCRIMSON_TELEPORT_EFFECT)) {
-                Vec3d vec = new Vec3d(8, 8, 8);
-
-                List<LivingEntity> toMove = world.getEntitiesByClass(LivingEntity.class, new Box(pos.subtract(vec), pos.add(vec)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
-                for (LivingEntity entity : toMove) {
-                    Vec3d ePos = entity.getPos();
-
-                    entity.setYaw(entity.getYaw() + random.nextFloat() * 10);
-                    entity.setPitch(entity.getPitch() + random.nextFloat() * 10);
-
-                    Vec3d tPos = ePos.add(new Vec3d(random.nextDouble() * 2, random.nextDouble() * 2, random.nextDouble() * 2));
-
-                    entity.teleport(tPos.x, tPos.y, tPos.z);
-                    if (!world.isSpaceEmpty(entity))
-                        entity.teleport(ePos.x, ePos.y, ePos.z);
-                }
-            }
-
+            Vec3d pos = user.getPos();
             Box bBox = user.getBoundingBox();
-            for (ServerPlayerEntity serverPlayer :
-                    ((ServerWorld) world).getPlayers()) {
-                PacketByteBuf buf = PacketByteBufs.create();
-                buf.writeShort(2);
-                buf.writeDouble(oPos.x);
-                buf.writeDouble(oPos.y);
-                buf.writeDouble(oPos.z);
-                buf.writeDouble(bBox.getXLength());
-                buf.writeDouble(bBox.getYLength());
-                buf.writeDouble(bBox.getZLength());
-                ServerChannelFeedbackPacket.send(serverPlayer, buf);
-            }
 
-            world.playSound(null, pos.x, pos.y, pos.z, JSoundRegister.TE_TP, SoundCategory.PLAYERS, 1f, 1f);
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeShort(2);
+            buf.writeDouble(pos.x);
+            buf.writeDouble(pos.y);
+            buf.writeDouble(pos.z);
+            buf.writeDouble(bBox.getXLength());
+            buf.writeDouble(bBox.getYLength());
+            buf.writeDouble(bBox.getZLength());
 
-            if (getTETime() > 0)
-                cancelTE();
+            PlayerLookup.world((ServerWorld) world).forEach(
+                    serverPlayer -> ServerChannelFeedbackPacket.send(serverPlayer, buf)
+            );
         }
     }
 
@@ -368,11 +340,15 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
         setState(0); // Basically state 1, but runs logic once
     }
 
-    private static final Attack barrageFinisher = new Attack(9, 17, 0.85f, 50, 0, 1.5, 1f, 1.1f, AttackType.BARRAGE, 0.5f, 0, 3).setHitspark(2).setLaunch();
+    private static final Attack barrageFinisher = new Attack(10, 17, 0.85f, 50, 0, 1.5, 1f, 1.1f, AttackType.BARRAGE, 0.5f, 0, 3)
+            .setHitspark(2)
+            .setLaunch()
+            .setInfo("Barrage (Final Hit)", "");
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
         switch (attack.id) {
+            case (-2) -> timeSkip(16, JSoundRegister.TE_TP);
             case (2) -> {
                 for (LivingEntity ent : entities)
                     ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0));

@@ -1123,6 +1123,27 @@ Specs
 Whitesnake
     >Updated sounds
 
+● 11/7/2023
+Armor (move property)
+    >Now split into Hyper and regular Armor
+    >Hyper Armored moves are uninterruptable
+    >Armored moves are interruptable after some amount of hits
+
+/framedata
+    >Renamed to /movedata
+    >Now displays additional information (attack distance, stun type, armor points)
+
+All Timeskips
+    >Now have two ticks of startup
+
+All (Stand ON) Barrages
+    >Now grant Slowness III while active
+    >Now halve jump height while active
+
+King Crimson
+    >Removed kingCrimsonTeleportEffect gamerule
+    >Fixed bug where Barrage finisher caused Prediction
+
 priority (top to bottom)
 TODO: AI flags for unblockables and shouldn't-blockables
 TODO: stand summon particles

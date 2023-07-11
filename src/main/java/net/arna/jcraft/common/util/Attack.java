@@ -2,9 +2,7 @@ package net.arna.jcraft.common.util;
 
 import net.minecraft.sound.SoundEvent;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public final class Attack {
     public int id = -1; // Unique ID
@@ -24,18 +22,26 @@ public final class Attack {
     public AttackType attackType; // Attack type
     public float stun = 0f; // How long is the opponent stunned for after being hit
     public float offset = 0; // Hitbox Y offset (inverted)
-    public int interval = 1; // For barrages; attack interval | For charges; hit state ID
     public SoundEvent impactSound;
     public List<Integer> attackTimes;
 
-    public static final Attack unusable = new Attack(-1,999, 999, 999, 0, AttackType.BOX).setInfo("NONE", "NONE");
+    public byte interval = 1; // For barrages; attack interval | For charges; hit state ID
 
-    public boolean hasArmor = false; // For (un)interruptable attacks
+    public static final Attack unusable = new Attack(-1,32767, 32767, 32767, 0, AttackType.BOX).setInfo("NONE", "NONE");
+
+    public byte armor = 0; // For (un)interruptable attacks
     /**
-     * Assigns whether attack is armored
+     * Marks an attack as unstoppable
      */
-    public Attack setArmor(boolean armor) {
-        this.hasArmor = armor;
+    public Attack hyperArmor() {
+        this.armor = Byte.MAX_VALUE;
+        return this;
+    }
+    /**
+     * Gives an attack an amount of hits it can withstand before being stopped (max 127)
+     */
+    public Attack armorPoints(byte armor) {
+        this.armor = armor;
         return this;
     }
 
@@ -68,6 +74,26 @@ public final class Attack {
     public Attack setStunOverride(boolean o) {
         this.overrideStun = o;
         return this;
+    }
+
+    public String stunTypeName() {
+        switch (this.stunType) {
+            default -> {
+                return "Unknown";
+            }
+            case 0 -> {
+                return "Unburstable";
+            }
+            case 1 -> {
+                return "Burstable";
+            }
+            case 2 -> {
+                return "Block";
+            }
+            case 3 -> {
+                return "Launch";
+            }
+        }
     }
 
     /**
@@ -103,7 +129,7 @@ public final class Attack {
     // Info
     public AttackQueue button;
     public String name = "UNNAMED";
-    public String description = "UNDESCRIBED";
+    public String description = "";
     /**
      * Assigns information to attack
      * @param name name of attack
@@ -233,39 +259,79 @@ public final class Attack {
         return this.followup != null;
     }
 
+    public HashMap<VariationType, Attack> variations = new LinkedHashMap<>();
+    /**
+     * Assigns an attack as the aerial variation to this attack
+     */
+    public Attack aerialVariation(Attack air) {
+        this.variations.put(VariationType.AERIAL, air);
+        return this;
+    }
+    /**
+     * Assigns an attack as the crouching variation to this attack
+     */
+    public Attack crouchingVariation(Attack cr) {
+        this.variations.put(VariationType.CROUCHING, cr);
+        return this;
+    }
+
     public int realInitTime() {
         return this.attackType == AttackType.MULTIHIT ? attackTimes.get(0) : initTime;
     }
 
     public static Attack copyOf(Attack attack) {
-        Attack attackCopy = new Attack();
-        attackCopy.id = attack.id;
-        attackCopy.cooldown = attack.cooldown;
-        attackCopy.attackDist = attack.attackDist;
-        attackCopy.moveStun = attack.moveStun;
-        attackCopy.initTime = attack.initTime;
-        attackCopy.hitboxSize = attack.hitboxSize;
-        attackCopy.damage = attack.damage;
-        attackCopy.knockback = attack.knockback;
-        attackCopy.attackType = attack.attackType;
-        attackCopy.stun = attack.stun;
-        attackCopy.offset = attack.offset;
-        attackCopy.interval = attack.interval;
-        attackCopy.impactSound = attack.impactSound;
+        Attack attackCopy = new Attack(
+                attack.id,
+                attack.cooldown,
+                attack.attackDist,
+                attack.moveStun,
+                attack.initTime,
+                attack.hitboxSize,
+                attack.damage,
+                attack.knockback,
+                attack.attackType,
+                attack.stun,
+                attack.offset,
+                attack.interval,
+                attack.impactSound
+        );
+
         attackCopy.attackTimes = attack.attackTimes;
-        attackCopy.hasArmor = attack.hasArmor;
+        attackCopy.armor = attack.armor;
         attackCopy.lift = attack.lift;
         attackCopy.hitspark = attack.hitspark;
+
         attackCopy.stunType = attack.stunType;
         attackCopy.overrideStun = attack.overrideStun;
+
         attackCopy.animation = attack.animation;
         attackCopy.canBackstab = attack.canBackstab;
         attackCopy.extraHitboxes = attack.extraHitboxes;
+
+        attackCopy.blockstun = attack.blockstun;
+        attackCopy.overrideBlockstun = attack.overrideBlockstun;
+
+        attackCopy.button = attack.button;
         return attackCopy;
+    }
+
+    public boolean isCharge() {
+        return attackType == AttackType.CHARGE || attackType == AttackType.CHARGEBARRAGE;
+    }
+
+    public boolean isBarrage() {
+        return attackType == AttackType.BARRAGE || attackType == AttackType.CHARGEBARRAGE;
     }
 
     // For non-physicals
     public Attack() { }
+    public Attack(int id, int cooldown, int moveStun, int initTime) {
+        this.id = id;
+        this.cooldown = cooldown;
+        this.moveStun = moveStun;
+        this.initTime = initTime;
+        this.attackType = AttackType.BOX;
+    }
 
     public Attack(int id, int cooldown, int moveStun, int initTime, float stun, AttackType attackType) {
         this.id = id;
@@ -341,7 +407,7 @@ public final class Attack {
         this.attackType = attackType;
         this.stun = stun;
         this.offset = offset;
-        this.interval = intervalOrHitAnim;
+        this.interval = (byte)intervalOrHitAnim;
     }
 
     public Attack(int id, int cooldown, float attackDist, int moveStun, int initTime, double hitboxSize, float damage, float knockback, AttackType attackType, float stun, float offset, int interval, SoundEvent impactSound) {
@@ -356,7 +422,7 @@ public final class Attack {
         this.attackType = attackType;
         this.stun = stun;
         this.offset = offset;
-        this.interval = interval;
+        this.interval = (byte)interval;
         this.impactSound = impactSound;
     }
 

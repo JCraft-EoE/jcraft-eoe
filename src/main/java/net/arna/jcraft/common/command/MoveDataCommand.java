@@ -15,9 +15,9 @@ import net.minecraft.text.Text;
 
 import java.util.List;
 
-public class FrameDataCommand {
+public class MoveDataCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment) {
-        dispatcher.register(CommandManager.literal("framedata")
+        dispatcher.register(CommandManager.literal("movedata")
                 .then(CommandManager.literal("stand")
                         .executes(
                                 context -> run(context.getSource(), true)
@@ -152,16 +152,27 @@ public class FrameDataCommand {
         }
 
         boolean effectOnlyUB = attack.ubEffectsOnly;
-        String advOnBlock = (attack.unblockable && !effectOnlyUB) ? "§5UNBLOCKABLE" : "Advantage on block: §5" + (attack.getEffectiveBlockstun() - recovery) + "§r ticks";
+        String advOnHit = "No physical hit\n";
+        String advOnBlock = "";
+        if (attack.hitboxSize > 0) {
+            advOnHit = "Advantage on hit: §c" + (stun - recovery - 1) + "§r ticks of " + attack.stunTypeName() + " Stun\n";
+            advOnBlock = (attack.unblockable && !effectOnlyUB) ? "§5Unblockable§r\n" : "Advantage on block: §5" + (attack.getEffectiveBlockstun() - recovery) + "§r ticks\n";
+        }
+
         String mainFDMessage =
-                "======== ATTACK STATS ========\n" +
+                "======== Attack Stats for: §2" + attack.name + "§r ========\n" +
                         "Startup: §b" + startup + "§r ticks\n" +
                         "Active: " + frames + " ticks\n" +
                         "Recovery: §a" + recovery + "§r ticks\n" +
-                        "Advantage on hit: §c" + (stun - recovery - 1) + "§r ticks\n" +
-                        advOnBlock;
+                        advOnHit +
+                        advOnBlock +
+                        "Attack distance: §6" + attack.attackDist;
+
         if (effectOnlyUB)
-            mainFDMessage = mainFDMessage.concat("\n§5Effects on hit are UNBLOCKABLE");
+            mainFDMessage = mainFDMessage.concat("§r\nEffects on hit are §5UNBLOCKABLE");
+        byte armor = attack.armor;
+        if (armor > 0)
+            mainFDMessage = mainFDMessage.concat("§r\nAttack has: §7" + (armor == Byte.MAX_VALUE ? "Hyper Armor" : armor + " Armor Points") );
 
         player.sendMessage(Text.of(mainFDMessage), false);
         return 1;

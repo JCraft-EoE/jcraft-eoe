@@ -1,6 +1,6 @@
 package net.arna.jcraft.client.renderer.entity;
 
-import net.arna.jcraft.client.JCraftClient;
+import net.arna.jcraft.client.util.JClientUtils;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.PlayerListEntry;
@@ -31,7 +31,7 @@ public class PlayerCloneRenderer extends BipedEntityRenderer<PlayerCloneEntity, 
 
     @Override
     public void render(PlayerCloneEntity mobEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
-        if (JCraftClient.shouldNotRenderClone(mobEntity)) return;
+        if (JClientUtils.shouldNotRenderClone(mobEntity)) return;
 
         matrixStack.push();
         matrixStack.scale(0.9375F, 0.9375F, 0.9375F); // Player scale

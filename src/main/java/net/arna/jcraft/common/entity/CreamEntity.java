@@ -48,7 +48,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
             .setInfo("Punch", "quick combo starter");
     public static final Attack heavy = new Attack(1, 14, 1f, 30, 20, 1.5, 10f, 0.1f, AttackType.BOX, 2, 0, 0, JSoundRegister.IMPACT_3)
             .setHitspark(2)
-            .setArmor(true)
+            .hyperArmor()
             .setInfo("Vertical Chop", "slow, uninterruptable combo starter");
     public static final Attack combo = new Attack(2, 17, 0.75f, 36, 0, 2.0, 7f, 0.1f, AttackType.MULTIHIT, 1, 0, List.of(10, 17, 25), JSoundRegister.IMPACT_3)
             .setInfo("3-hit Combo", "medium windup, good stun");
@@ -62,7 +62,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
             .setInfo("Charge", "3.5 block range, combo starter/extender");
     public static final Attack destroy = new Attack(6, 25, 1f, 30, 21, 2, 0f, 1.25f, AttackType.BOX, 0f, 0f, 0, JSoundRegister.IMPACT_5)
             .setHitspark(2)
-            .setArmor(true)
+            .hyperArmor()
             .setUB(true)
             .setInfo("Destroy", "slow, uninterruptable, unblockable knockdown");
     public static final Attack consume = new Attack(7, 32, 1f, 40, 35, 2.0, 2f, 0f, AttackType.BOX)
@@ -76,12 +76,12 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
     public static final Attack balllight = new Attack(10, 2, 0.1f, 14, 7, 2, 5f, 0.75f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegister.IMPACT_3)
             .setInfo("Swipe", "quick air-to-ground poke");
     public static final Attack ballheavy = new Attack(11, 14, 0.1f, 20, 14, 2, 9f, 1.25f, AttackType.BOX, 0.75f, 0.3f, 0, JSoundRegister.TW_KICK_HIT)
-            .setHitspark(2).setArmor(true).setLaunch()
+            .setHitspark(2).hyperArmor().setLaunch()
             .setInfo("Overhead Smash", "slow, uninterruptable launcher");
     public static final Attack ballcombo = new Attack(12, 14, 0.1f, 36, 0, 2, 7f, 0.1f, AttackType.MULTIHIT, 0.75f, 0.3f, List.of(10, 17, 25), JSoundRegister.IMPACT_3)
             .setInfo("3-hit Combo", "less stun than grounded version");
     public static final Attack ballcharge = new Attack(13, 20, 28, 13, 0, AttackType.BOX)
-            .setInfo("Void Charge", "cream quickly transforms into a black hole and charges in the looked direction");
+            .setInfo("Void Charge", "cream quickly transforms into a black hole and charges in the pointed direction");
 
     public static final TrackedData<Integer> VOIDTIME;
     public static final TrackedData<Boolean> HALFBALL;
@@ -243,7 +243,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
     }
 
     @Override
-    public void initMiddleClick() {
+    public void initUtil() {
         if (!this.canAttack()) {
             return;
         }

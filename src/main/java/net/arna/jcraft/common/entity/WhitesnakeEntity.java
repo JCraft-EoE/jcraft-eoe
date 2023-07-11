@@ -44,21 +44,19 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
             .setInfo("Donut", "slow combo starter/extender");
     public static final Attack memorydisk = new Attack(6, 30, 1f, 34, 22, 2, 7f, 0.0f, AttackType.BOX, 1f, 0, 0, JSoundRegister.IMPACT_2)
             .setHitspark(2)
-            .setArmor(true)
+            .hyperArmor()
             .setUB(true)
             .setInfo("Memory Disk", "uninterruptable, mining fatigue & weakness for 30s");
     public static final Attack standdisk = new Attack(3, 30, 1f, 34, 22, 2, 8f, 0.0f, AttackType.BOX, 1f, 0, 0, JSoundRegister.IMPACT_2)
             .setHitspark(2)
-            .setArmor(true)
+            .hyperArmor()
             .setUB(true)
             .setInfo("Stand Disk/Melt your Heart", "uninterruptable, removes enemy stand for 8s/in remote mode, long windup, creates a sphere of poison projectiles");
     public static final Attack meltyourheart = new Attack(8, 40, 1f, 50, 40, 2, 3f, 1.0f, AttackType.BOX, 1f, 0, 0, JSoundRegister.IMPACT_2)
-            .setArmor(true)
+            .hyperArmor()
             .setUB(true)
             .setLaunch()
-            .setInfo("", "");
-
-    //public static Attack gun = new Attack(-1,20, 21, 15, 1, 0.75f, AttackType.BOX).setRanged(true).setInfo("Gun", "fully aimable, combo starter");
+            .setInfo("Melt your Heart", "remote-only and armored, expels a sphere of poison");
 
     public WhitesnakeEntity(World worldIn) {
         super(StandType.WHITE_SNAKE, worldIn);
@@ -79,8 +77,12 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
         description = "All Range DISABLER";
 
         freespace =
-                "BNBs:\n" +
-                        "    (Memory Disk/Stand Disk>)M1>Barrage>Leg Crusher>Donut>Poison";
+                """
+                        BNBs:
+                            the el mayo
+                            Memory Disk>M1>Barrage>Leg Crusher>Stand Disk>M1
+                            the gazebo
+                            M1>Barrage>Leg Crusher>M1>Donut>M1""";
 
         moves = List.of(light, donut, barrage, memorydisk, standdisk, legcrusher, poisonspew,
                 new Attack().setInfo("Pilot Mode", ""));
@@ -141,7 +143,7 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
     }
 
     @Override
-    public void initMiddleClick() {
+    public void initUtil() {
         if (!canAttack()) return;
         NbtCompound userData = ((IEntityDataSaver) getUser()).getPersistentData();
         if (userData.getInt(JCraft.utilCD) > 0) return;

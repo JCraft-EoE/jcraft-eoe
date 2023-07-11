@@ -1,13 +1,11 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -17,9 +15,7 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -63,18 +59,19 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
             .setHitspark(2)
             .setInfo("Fury Chop", "combo extender, on hit gives haste(8s) to user and mining fatigue(8s) to victim, on whiff the fatigue goes to user");
     public static final Attack donut = new Attack(1, 23, 0.75f, 32, 26, 2.5, 8.5f, 0.0f, AttackType.BOX, 3f, 0.2f, 0, JSoundRegister.IMPACT_4)
-            .setArmor(true)
+            .hyperArmor()
             .setHitspark(2)
             .setInfo("Roundabout Donut", "feigns stand desummon, uninterruptable combo starter");
     public static final Attack timeaccel = new Attack(6, 70, 40, 20, 0, AttackType.BOX)
             .setInfo("Time Acceleration", "2s windup, 15s t. accel, enemies standless for 15s after finishing");
     private int circleTime = 0;
+    public static final Attack judgement = new Attack(5, 33, 1.25f, 60, 20, 0, 0f, 0.5f, AttackType.BARRAGE, 0, 0, 2, null)
+            .setInfo("Heaven's Judgement (Crouching)", "Made in Heaven rapidly speed slices an area, then finishes with a large, launching slice");
     public static final Attack circle = new Attack(8, 40, 14, 13, 0, 1.25f, AttackType.BOX)
             .setRanged(true)
             .setMobility(MobilityType.DASH)
+            .crouchingVariation(judgement)
             .setInfo("Heaven's Judgement", "rapidly circles a looked-at target within 4m at a radius of 7m/crouch to repeatedly speed slice an area");
-    public static final Attack judgement = new Attack(5, 33, 1.25f, 60, 20, 0, 0f, 0.5f, AttackType.BARRAGE, 0, 0, 2, null)
-            .setInfo("", "mih rapidly speed slices an area and finishes with a larger one, knocks back");
 
     public Vec3d judgementInitPos = Vec3d.ZERO;
     public Vec3d judgementInitRot = Vec3d.ZERO;
@@ -231,7 +228,7 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
 
 
     @Override
-    public void initMiddleClick() {
+    public void initUtil() {
         if (!this.canAttack()) return;
         if (handleAttack(speedslice, JCraft.utilCD, 6)) {
             this.playSound(JSoundRegister.MIH_SPEEDSLICE, 1, 1);
@@ -255,7 +252,10 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
         return true;
     }
 
-    private static final Attack barrageFinisher = new Attack(8, 17, 0.85f, 9, 6, 1.5, 1f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.TW_KICK_HIT).setHitspark(2).setLaunch();
+    private static final Attack barrageFinisher = new Attack(8, 17, 0.85f, 9, 6, 1.5, 1f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.TW_KICK_HIT)
+            .setHitspark(2)
+            .setLaunch()
+            .setInfo("Barrage (Final Hit)", "");
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {

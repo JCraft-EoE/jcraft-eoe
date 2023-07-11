@@ -38,7 +38,7 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
     public static final Attack donut = new Attack(1, 14, 1f, 48, 26, 2, 9f, 0.0f, AttackType.BOX, 4, 0, 0, JSoundRegister.TW_DONUT_HIT)
             .setHitspark(2)
             .appendHitbox(new Attack.HitboxData(0, 0, 1.5))
-            .setArmor(true)
+            .hyperArmor()
             .setInfo("Donut", "slow, uninterruptable combo starter/extender, 1.5s stun on whiff");
     public static final Attack charge = new Attack(4, 20, 7.5f, 19, 5, 1.5, 5f, 0.25f, AttackType.CHARGE, 1, 0, 9, JSoundRegister.TW_CHARGE_HIT)
             .setRanged(true)
@@ -55,8 +55,9 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
             .setInfo("Feign Barrage", "counter, 0.25s windup, teleports behind attacker");
     public static final Attack counterfollowup = new Attack(7, 0, 0.75f, 9, 5, 1.75, 6f, 0.7f, AttackType.BOX, 0.8f, 0.1f, 0, JSoundRegister.IMPACT_4)
             .appendHitbox(new Attack.HitboxData(1.25))
-            .setArmor(true)
-            .setLaunch();
+            .hyperArmor()
+            .setLaunch()
+            .setInfo("Counter (Hit)", "quick, armored knockdown");
 
     @Override
     public void desummon() {
@@ -100,92 +101,80 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
     // Moveset
     @Override
     public void initLightAttack() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
     public void initHeavyAttack() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(donut, JCraft.standHeavyCD, 4))
-            this.playSound(JSoundRegister.TW_DONUT, 1, 1);
+            playSound(JSoundRegister.TW_DONUT, 1, 1);
     }
 
     @Override
     public void initBarrage() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, 5))
-            this.playSound(JSoundRegister.TW_BARRAGE, 1, 1);
+            playSound(JSoundRegister.TW_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(roundhouse, JCraft.standS1CD, 10))
-            this.playSound(JSoundRegister.TW_KICK, 1, 1);
+            playSound(JSoundRegister.TW_KICK, 1, 1);
     }
 
     @Override
     public void initUlt() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(timestop, JCraft.standUltCD, 7))
-            this.playSound(JSoundRegister.TW_TS, 1, 1);
+            playSound(JSoundRegister.TW_TS, 1, 1);
     }
 
     @Override
     public void initSpecial2() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(charge, JCraft.standS2CD, 8))
-            this.playSound(JSoundRegister.TW_CHARGE, 1, 1);
+            playSound(JSoundRegister.TW_CHARGE, 1, 1);
     }
 
     @Override
     public void initSpecial3() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(feignbarrage, JCraft.standS3CD, 5))
-            this.playSound(JSoundRegister.TW_BARRAGE, 1, 1);
+            playSound(JSoundRegister.TW_BARRAGE, 1, 1);
     }
 
+    private static final Attack timeskip = new Attack(-2, 18, 2, 2).setInfo("Timeskip", "");
     @Override
-    public void initMiddleClick() {
-        CanAttackData data = this.canAttackWithData();
-        if (!data.canAttack) return;
-        if (tsTime > 0) return;
-        IEntityDataSaver user = (IEntityDataSaver) data.user;
-        if (user.getPersistentData().getInt(JCraft.utilCD) > 0) return;
-        Vec3d eP = data.user.getEyePos();
-
-        HitResult hitResult = this.world.raycast(new RaycastContext(eP, eP.add(data.user.getRotationVector().multiply(14)), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, data.user));
-        Vec3d pos = hitResult.getPos();
-
-        data.user.teleport(pos.x, pos.y, pos.z);
-
-        user.getPersistentData().putInt(JCraft.utilCD, 360); // 18 second timeskip cooldown
-
-        if (user.getPersistentData().getInt(JCraft.standUltCD) < 60)
-            user.getPersistentData().putInt(JCraft.standUltCD, 60); // 3 second timestop cooldown
-
-        world.playSound(null, pos.x, pos.y, pos.z, JSoundRegister.TIME_SKIP, SoundCategory.PLAYERS, 1f, 1f);
+    public void initUtil() {
+        if (!canAttack()) return;
+        handleAttack(timeskip, JCraft.utilCD, 0);
     }
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
-        if (attack.id == 1) {
-            LivingEntity user = this.getUser();
-            // If missed, stun the user for 1.5 seconds
-            if (entities.isEmpty()) {
-                stun(user, 30, 0);
-            } else {
-                // If hit, impale and set position to middle of arm
-                for (LivingEntity entity : entities) {
-                    Vec3d pos = this.getPos().add(this.getRotationVector().multiply(1.5));
-                    entity.teleport(pos.x, entity.getY(), pos.z);
+        switch (attack.id) {
+            case (-2) -> timeSkip(14, JSoundRegister.TIME_SKIP);
+            case (1) -> {
+                LivingEntity user = this.getUser();
+                // If missed, stun the user for 1.5 seconds
+                if (entities.isEmpty()) {
+                    stun(user, 30, 0);
+                } else {
+                    // If hit, impale and set position to middle of arm
+                    for (LivingEntity entity : entities) {
+                        Vec3d pos = this.getPos().add(this.getRotationVector().multiply(1.5));
+                        entity.teleport(pos.x, entity.getY(), pos.z);
+                    }
                 }
             }
-        }
-        if (attack.id == 7) {
-            for (LivingEntity entity : entities)
-                entity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
+            case (7) -> {
+                for (LivingEntity entity : entities)
+                    entity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
+            }
         }
     }
 
@@ -198,25 +187,30 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
         LivingEntity user = this.getUser();
         Vec3d behind = entity.getPos().subtract(entity.getRotationVector());
 
+        user.setVelocity(0, 0, 0);
+        user.velocityModified = true;
+
         user.teleport(behind.x, behind.y, behind.z);
+
         user.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, entity.getEyePos());
 
         if (entity instanceof LivingEntity livingEntity) {
+            livingEntity.removeStatusEffect(JStatusRegister.DAZED);
             stun(livingEntity, 20, 0);
             if (entity.getFirstPassenger() instanceof StandEntity stand) stand.cancelAttack();
         }
 
         setAttack(counterfollowup, 11);
 
-        world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.TIME_SKIP, SoundCategory.PLAYERS, 1f, 1f);
-        world.playSound(null, this.getX(), this.getY(), this.getZ(), JSoundRegister.TW_COUNTER, SoundCategory.PLAYERS, 1f, 1f);
+        playSound(JSoundRegister.TIME_SKIP, 1, 1);
+        playSound(JSoundRegister.TW_COUNTER, 1, 1);
     }
 
     @Override
     public void tick() {
         if (age == 1) {
-            this.playSound(JSoundRegister.TW_SUMMON, 1f, 1f);
-            this.playSound(JSoundRegister.MUDA_DA, 1f, 1f);
+            playSound(JSoundRegister.TW_SUMMON, 1f, 1f);
+            playSound(JSoundRegister.MUDA_DA, 1f, 1f);
         }
 
         super.tick();

@@ -117,6 +117,8 @@ public abstract class JCraftSpec {
             //JCraft.LOGGER.info("CLIENT: Ticking spec " + this);
 
             if (moveStun > 0) {
+                //JCraft.LOGGER.info("CLIENT: Movestun is " + moveStun);
+
                 player.setSneaking(shouldSneak());
 
                 // Process attack
@@ -130,6 +132,8 @@ public abstract class JCraftSpec {
             Attack attack = this.curAttack;
 
             if (moveStun > 0) {
+                //JCraft.LOGGER.info("SERVER: Movestun is " + moveStun);
+
                 // Likely will be changed later, but at the moment this serves to prevent animations breaking
                 player.setSneaking(shouldSneak());
 

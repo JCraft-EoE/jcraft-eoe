@@ -10,7 +10,6 @@ import net.arna.jcraft.client.particle.*;
 import net.arna.jcraft.client.registry.JClientEventsRegistry;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
 import net.arna.jcraft.common.JConfig;
-import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.network.s2c.*;
 import net.arna.jcraft.client.registry.JArmorRendererRegister;
 import net.arna.jcraft.client.registry.JEntityRendererRegister;
@@ -117,7 +116,7 @@ public class JCraftClient implements ClientModInitializer {
         special2Key = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.special2", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_G, "key.category.jcraft"));
         special3Key = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.special3", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_M, "key.category.jcraft"));
         comboBreaker = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.combobreaker", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_ALT, "key.category.jcraft"));
-        cooldownCancel = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.cooldowncancel", InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_4, "key.category.jcraft"));
+        cooldownCancel = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.cooldowncancel", InputUtil.Type.MOUSE, GLFW.GLFW_KEY_RIGHT_ALT, "key.category.jcraft"));
         utility = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.utility", InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_5, "key.category.jcraft"));
         dash = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.dash", InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_4, "key.category.jcraft"));
 
@@ -415,10 +414,5 @@ public class JCraftClient implements ClientModInitializer {
         String secondLast = components[components.length - 2] + " ";
         if (components[components.length - 2].equals("keyboard")) secondLast = "";
         return StringUtils.capitalize(secondLast) + StringUtils.capitalize(last);
-    }
-
-    public static boolean shouldNotRenderClone(PlayerCloneEntity clone) {
-        ClientPlayerEntity player = MinecraftClient.getInstance().player;
-        return player != null && clone.getMasterId().equals(player.getUuid());
     }
 }

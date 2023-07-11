@@ -19,7 +19,7 @@ public class AnubisSpec extends JCraftSpec {
     public static final Attack slash = new Attack(0, 17, 1f, 20, 9, 1.75, 6f, 0.9f, AttackType.BOX, 0.75f, 0, 0, SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP)
             .setAnimation("an.slsh")
             .setHitspark(-4)
-            .setArmor(true)
+            .hyperArmor()
             .setInfo("Slash", "uninterruptable get-off-me tool");
     public static final Attack pommel = new Attack(1, 14, 1f, 8, 5, 1.25, 4f, 0.3f, AttackType.BOX, 0.35f, 0, 0, JSoundRegister.IMPACT_3)
             .setAnimation("an.pom")

@@ -47,14 +47,14 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
 
     public static final Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 0.75f, 0.25f, AttackType.BARRAGE, 1, 0, 4, JSoundRegister.IMPACT_3)
             .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
-    public static final Attack gutpunch = new Attack(1, 17, 1f, 30, 19, 2.0, 8f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.TW_KICK_HIT).setHitspark(2).setArmor(true).setLaunch()
+    public static final Attack gutpunch = new Attack(1, 17, 1f, 30, 19, 2.0, 8f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.TW_KICK_HIT).setHitspark(2).hyperArmor().setLaunch()
             .appendHitbox(new Attack.HitboxData(0, 0.25, 1.25))
             .setInfo("Gut Punch", "slow, uninterruptable combo finisher");
     public static final Attack launch = new Attack(4, 22, 0.75f, 21, 14, 1.75, 5f, 0.9f, AttackType.BOX, 0.95f, 0.3f, 0, JSoundRegister.IMPACT_5)
             .setHitspark(2)
             .setRanged(true)
             .setInfo("Block Launch", "lifts a block from the ground and launches it at a delay/crouching and using this button resets the delay on nearby blocks");
-    public static final Attack gravpunch = new Attack(3, 24, 1f, 32, 20, 1.75, 6f, 0.35f, AttackType.BOX, 2.25f, -0.3f, 0, JSoundRegister.CMOON_GRAVPUNCHHIT).setHitspark(2).setArmor(true)
+    public static final Attack gravpunch = new Attack(3, 24, 1f, 32, 20, 1.75, 6f, 0.35f, AttackType.BOX, 2.25f, -0.3f, 0, JSoundRegister.CMOON_GRAVPUNCHHIT).setHitspark(2).hyperArmor()
             .setUB(true)
             .appendHitbox(new Attack.HitboxData(1))
             .setInfo("Only One Punch", "lifts enemy on hit");
@@ -183,7 +183,7 @@ public class CMoonEntity extends StandEntity implements IAnimatable, IAnimationT
     }
 
     @Override
-    public void initMiddleClick() {
+    public void initUtil() {
         if (!this.canAttack()) return;
         LivingEntity user = getUser();
 

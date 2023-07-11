@@ -1,8 +1,12 @@
 package net.arna.jcraft.client.util;
+import net.arna.jcraft.common.entity.KingCrimsonEntity;
+import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.DimValues;
 import net.arna.jcraft.common.util.ISpec;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
@@ -13,6 +17,7 @@ import software.bernie.geckolib3.model.AnimatedTickingGeoModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static net.arna.jcraft.common.util.JUtils.deltaPos;
 
@@ -87,5 +92,16 @@ public class JClientUtils {
                 head.setRotationX(headPitch + hPO);
             }
         }
+    }
+
+    public static boolean shouldNotRenderClone(PlayerCloneEntity clone) {
+        ClientPlayerEntity player = MinecraftClient.getInstance().player;
+        // It's recommended to use ((IEntityDataSaver)player).getStand(), but in this case it doesn't matter
+        if (player != null && player.getFirstPassenger() instanceof KingCrimsonEntity) {
+            UUID masterId = clone.getMasterId();
+            if (masterId == null) return false;
+            return masterId.equals(player.getUuid());
+        }
+        return false;
     }
 }

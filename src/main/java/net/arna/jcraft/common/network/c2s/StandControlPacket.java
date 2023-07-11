@@ -224,12 +224,12 @@ public class StandControlPacket {
                 StandEntity stand = playerData.getStand();
                 if (stand != null) {
                     int moveStun = stand.getMoveStun();
-                    stand.initMiddleClick();
+                    stand.initUtil();
                     if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking())
                         stand.queuedAttack = AttackQueue.MIDDLEMOUSE;
                 } else {
                     StandEntity stand2 = JCraft.summon(world, player);
-                    if (stand2 != null) stand2.initMiddleClick();
+                    if (stand2 != null) stand2.initUtil();
                     playerData.setStand(stand2);
                 }
             });

@@ -47,30 +47,33 @@ import java.util.Map;
 public class GEREntity extends StandEntity implements IAnimatable, IAnimationTickable {
     public static final Attack light = new Attack(0, 2, 0.75f, 9, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch/Downward Kick", "quick combo starter, in air: more hitstun, less blockstun");
-    public static final Attack heavy = new Attack(2, 17, 1f, 19, 10, 1.5, 9f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_2).setHitspark(2).setArmor(true).setLaunch()
+    public static final Attack heavy = new Attack(2, 17, 1f, 19, 10, 1.5, 9f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_2).setHitspark(2).hyperArmor().setLaunch()
             .setInfo("Overhead Smash/Overhead Kick", "slow, uninterruptable knockdown, in air: slow combo starter");
     public static final Attack barrage = new Attack(4, 14, 0.75f, 30, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 2, 0, 3)
             .setInfo("Barrage/Kick Barrage", "fast reliable combo starter/extender, high stun, in air: fast combo finisher, knocks back");
     public static final Attack healself = new Attack(6, 26, 1f, 14, 10, 0, 0f, 0f, AttackType.BOX)
             .setInfo("Healing Hand", "standing: heals user for 2 hearts, crouching: heals others for 3 hearts, pacifies angered mobs");
-    public static final Attack heal = new Attack(7, 26, 1f, 16, 10, 1.25, 0f, 0f, AttackType.BOX);
+    public static final Attack heal = new Attack(7, 26, 1f, 16, 10, 1.25, 0f, 0f, AttackType.BOX)
+            .setInfo("Healing Hand (Others)", "");
+    public static final Attack chargelaser = new Attack(8, 24, 1.1f, 28, 18, 0, 0f, 0f, AttackType.BOX)
+            .setRanged(true)
+            .setInfo("Life Beam (Charged)", "");
     public static final Attack laser = new Attack(8, 24, 1f, 20, 10, 0, 0f, 0f, AttackType.BOX)
             .setRanged(true)
+            .crouchingVariation(chargelaser)
             .setInfo("Life Beam", "summons a quick, stunning rock projectile that turns into a scorpion a small time after landing/crouch to unleash a slower, poisoning variant");
-    public static final Attack chargelaser = new Attack(8, 24, 1.1f, 28, 18, 0, 0f, 0f, AttackType.BOX)
-            .setRanged(true);
 
     public static final Attack counter = new Attack(9, 26, 1f, 35, 5, 0, 0f, 0f, AttackType.COUNTER)
             .setInfo("Nullification", "0.25s windup, 1.5s counter, stuns on hit");
 
     public static final Attack airlight = new Attack(1, 2, 0.75f, 12, 5, 1.25, 4f, 0.75f, AttackType.BOX, 1, 0.33f, 0, JSoundRegister.IMPACT_1)
             .appendHitbox(new Attack.HitboxData(0, -1, 1))
-            .setInfo("Downward Kick", "");
+            .setInfo("Downward Kick", "medium stun combo starter, low hitbox");
     public static final Attack airheavy = new Attack(3, 17, 1f, 24, 14, 1.5, 9f, 0.8f, AttackType.BOX, 2, 0.25f, 0, JSoundRegister.IMPACT_1).setHitspark(2)
             .appendHitbox(new Attack.HitboxData(0, -1, 1))
-            .setInfo("Overhead Kick", "");
+            .setInfo("Overhead Kick", "high stun combo starter");
     public static final Attack airbarrage = new Attack(5, 14, 1f, 48, 0, 1.5, 1f, 0.3f, AttackType.BARRAGE, 1, 0, 3)
-            .setInfo("Kick Barrage", ""); //fast combo finisher, knocks back
+            .setInfo("Kick Barrage", "fast combo finisher");
     public static final Attack rtz = new Attack(10, 60, 32, 30, 0, 1, AttackType.BOX)
             .setInfo("Return to Zero", "initial press: saves the state of every entity in a 4 chunk radius, second press: reverts all states except users\nDoesn't affect player inventories");
     private final HashMap<Entity, NbtCompound> rtzEntityData = new HashMap<>();
@@ -189,7 +192,7 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
     }
 
     @Override
-    public void initMiddleClick() {
+    public void initUtil() {
         if (!canAttack()) return;
 
         NbtCompound data = ((IEntityDataSaver) getUser()).getPersistentData();

@@ -50,12 +50,13 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
             .setInfo("Elbow", "fast, short-range knockback");
     public static final Attack barrage = Attack.copyOf(KillerQueenEntity.barrage);
     public static final Attack bombplant = Attack.copyOf(KillerQueenEntity.bombplant);
+    public static final Attack bubblecounter = new Attack(7, 27, 20, 5, 0, 1, AttackType.COUNTER)
+            .setInfo("Stray Cat Counter", "");
     public static final Attack bubble = new Attack(5, 23, 0.75f, 18, 15, 0, 0f, 0.0f, AttackType.BOX).setRanged(true)
+            .crouchingVariation(bubblecounter)
             .setInfo("Stray Cat", "launches an explosive bubble/crouch for a 0.25s windup counter");
     public static final Attack detonate = new Attack(6, 1, 0.75f, 6, 5, 0, 0f, 0.0f, AttackType.BOX)
             .setInfo("Detonate", "crouch with a bomb planted within 20s on a living being to activate Bites the Dust");
-    public static final Attack bubblecounter = new Attack(7, 27, 20, 5, 0, 1, AttackType.COUNTER)
-            .setInfo("Stray Cat Counter", "");
 
     private ItemEntity coin;
     private BubbleProjectile bubbleProjectile;
@@ -316,7 +317,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
     }
 
     @Override
-    public void initMiddleClick() {
+    public void initUtil() {
         if (!canAttack()) return;
         LivingEntity user = this.getUser();
         NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();

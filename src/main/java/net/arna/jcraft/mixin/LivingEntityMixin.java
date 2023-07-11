@@ -1,5 +1,6 @@
 package net.arna.jcraft.mixin;
 
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.KingCrimsonEntity;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.util.*;
@@ -31,18 +32,24 @@ public abstract class LivingEntityMixin {
         }
     }
 
-    // Inability to jump during hitstun and knockdown
+    // Inability to jump in specific circumstances
     @Inject(cancellable = true, method = "getJumpBoostVelocityModifier", at = @At("HEAD"))
     public void jcraft$getJumpBoostVelocityModifier(CallbackInfoReturnable<Double> cir) {
         LivingEntity player = ((LivingEntity) (Object) this);
-        StandEntity stand = ((IEntityDataSaver)this).getStand();
+        StandEntity stand = ((IEntityDataSaver) this).getStand();
         StatusEffectInstance stun = player.getStatusEffect(JStatusRegister.DAZED);
         if (
-                player.hasStatusEffect(JStatusRegister.KNOCKDOWN)
-                        || (stun != null && stun.getAmplifier() != 2)
-                        || (stand != null && stand.getRemote()) ) {
-            cir.setReturnValue(-1.0D);
+                player.hasStatusEffect(JStatusRegister.KNOCKDOWN) || // Knocked down
+                        (stun != null && stun.getAmplifier() != 2) || // Stunned (not blocking)
+                        (stand != null && stand.getRemote()) // Stand ON in remote mode
+        ) {
+            cir.setReturnValue(-1.0D); // Nullify jump
         }
+        /*
+        else if (stand != null && (stand.curAttack != null && stand.curAttack.attackType == AttackType.BARRAGE)) { // Stand ON and barraging
+            cir.setReturnValue(-0.5D); // Reduce jump
+        }
+         */
     }
 
     // Counter hook - Living entity

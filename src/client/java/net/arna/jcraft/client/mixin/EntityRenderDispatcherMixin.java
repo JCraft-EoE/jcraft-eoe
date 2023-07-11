@@ -1,6 +1,6 @@
 package net.arna.jcraft.client.mixin;
 
-import net.arna.jcraft.client.JCraftClient;
+import net.arna.jcraft.client.util.JClientUtils;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.minecraft.client.render.Frustum;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
@@ -16,7 +16,7 @@ public class EntityRenderDispatcherMixin {
     private <E extends Entity> void shouldNotRenderIfRidingInvisibleClone(E entity, Frustum frustum, double x, double y, double z, CallbackInfoReturnable<Boolean> cir) {
         Entity e = entity;
         do {
-            if (e instanceof PlayerCloneEntity clone && JCraftClient.shouldNotRenderClone(clone)) {
+            if (e instanceof PlayerCloneEntity clone && JClientUtils.shouldNotRenderClone(clone)) {
                 cir.cancel();
                 return;
             }

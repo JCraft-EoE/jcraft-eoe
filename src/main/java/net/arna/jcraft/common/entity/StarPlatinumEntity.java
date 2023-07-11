@@ -32,7 +32,7 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
     public static final Attack heavy = new Attack(1, 17, 1f, 30, 20, 2.0, 10f, 1.5f, AttackType.BOX, 0.5f)
             .setHitspark(2)
             .appendHitbox(new Attack.HitboxData(0, 0, 1.5))
-            .setArmor(true)
+            .hyperArmor()
             .setLaunch()
             .setInfo("Star Breaker", "uninterruptable launcher");
     public static final Attack barrage = new Attack(2, 17, 0.75f, 60, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 2, 0, 3)
@@ -153,34 +153,17 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
         }
     }
 
+    private static final Attack timeskip = new Attack(-2, 18, 2, 2).setInfo("Timeskip", "");
     @Override
-    public void initMiddleClick() {
-        CanAttackData data = this.canAttackWithData();
-        if (!data.canAttack)
-            return;
-        if (tsTime > 0)
-            return;
-        IEntityDataSaver user = (IEntityDataSaver) data.user;
-        if (user.getPersistentData().getInt(JCraft.utilCD) > 0)
-            return;
-        Vec3d eP = data.user.getEyePos();
-
-        HitResult hitResult = this.world.raycast(new RaycastContext(eP, eP.add(data.user.getRotationVector().multiply(14)), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, data.user));
-        Vec3d pos = hitResult.getPos();
-
-        data.user.teleport(pos.x, pos.y, pos.z);
-
-        user.getPersistentData().putInt(JCraft.utilCD, 360); // 18 second timeskip cooldown
-
-        if (user.getPersistentData().getInt(JCraft.standUltCD) < 60)
-            user.getPersistentData().putInt(JCraft.standUltCD, 60); // 3 second timestop cooldown
-
-        world.playSound(null, pos.x, pos.y, pos.z, JSoundRegister.STAR_PLATINUM_TIMESKIP, SoundCategory.PLAYERS, 1f, 1f);
+    public void initUtil() {
+        if (!canAttack()) return;
+        handleAttack(timeskip, JCraft.utilCD, 0);
     }
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
-        if (curAttack != null && !entities.isEmpty() && attack.id == chargebarrage.id) { // Lock-on
+        if (attack.id == chargebarrage.id) { // Lock-on
+            if (entities.isEmpty()) return;
             Vec3d avgPos = Vec3d.ZERO;
             float c = 0;
             for (LivingEntity ent : entities) {
@@ -191,6 +174,8 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
             avgPos = avgPos.multiply(1f / c);
             lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, avgPos);
             curAttack.attackDist = (float) avgPos.distanceTo(getPos());
+        } else if (attack.id == -2) {
+            timeSkip(14, JSoundRegister.TIME_SKIP);
         }
     }
 

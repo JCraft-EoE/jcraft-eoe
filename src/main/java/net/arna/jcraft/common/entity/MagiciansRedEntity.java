@@ -53,11 +53,12 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
     // and so begins my terrible misuse of my own AI flags, the tldr here being that its simply called whenever the enemy is >3 blocks away, which is great here
     public static final Attack crossfirehurricane = new Attack(6, 60, 0.75f, 22, 18, 0, 0f, 0f, AttackType.BOX)
             .setInfo("Crossfire Hurricane", "summons slow, homing fire hurricane that knocks down, lasts for 3 seconds after hitting anything");
-    public static final Attack detector = new Attack(7, 25, 0.75f, 20, 13, 0, 0f, 0f, AttackType.BOX)
-            .setRanged(true)
-            .setInfo("Life Detector/Red Bind", "tracks down nearby life, lasts 15s/crouch for a whip attack");
     public static final Attack redbind = new Attack(8, 20, 0.75f, 22, 12, 1.5, 5, 0, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.IMPACT_3)
             .setInfo("Red Bind", "medium windup, good stun");
+    public static final Attack detector = new Attack(7, 25, 0.75f, 20, 13, 0, 0f, 0f, AttackType.BOX)
+            .setRanged(true)
+            .crouchingVariation(redbind)
+            .setInfo("Life Detector/Red Bind", "tracks down nearby life, lasts 15s/crouch for a whip attack");
 
     private Vec3d hurricanePos;
     private int hurricaneTime;
@@ -142,7 +143,7 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
     }
 
     @Override
-    public void initMiddleClick() {
+    public void initUtil() {
         if (!this.canAttack()) return;
         if (getUser().isSneaking() && handleAttack(redbind, JCraft.utilCD, 10)) {
             playSound(JSoundRegister.MR_REDBIND, 1, 1);
