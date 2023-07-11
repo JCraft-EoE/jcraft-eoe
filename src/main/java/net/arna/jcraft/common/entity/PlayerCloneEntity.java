@@ -38,6 +38,24 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob, IOwnable {
+    private static final TrackedData<Optional<UUID>> MASTER;
+    private static final TrackedData<Boolean> SAND, RENDER_FOR_MASTER;
+    private final BowAttackGoal<PlayerCloneEntity> bowAttackGoal = new BowAttackGoal<>(this, 1.0, 30, 15.0F);
+    private boolean allowItemExchange = true;
+    public boolean switched = false; // Has this clone switched to a thin version?
+    public PlayerCloneEntity switchedTo; // The thin clone instance
+
+    private LivingEntity persistTarget = null;
+    private LivingEntity master;
+    private final EntityNavigation navigation;
+    private int disabledSlots;
+
+    static {
+        MASTER = DataTracker.registerData(PlayerCloneEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
+        SAND = DataTracker.registerData(PlayerCloneEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+        RENDER_FOR_MASTER = DataTracker.registerData(PlayerCloneEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    }
+
     public PlayerCloneEntity(EntityType<? extends HostileEntity> entityType, World world) {
         super(entityType, world);
         Arrays.fill(this.armorDropChances, 1F);
@@ -51,8 +69,6 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
         Arrays.fill(this.handDropChances, 0);
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private final BowAttackGoal<PlayerCloneEntity> bowAttackGoal = new BowAttackGoal(this, 1.0, 30, 15.0F);
     private final CloneAttackGoal cloneAttackGoal = new CloneAttackGoal(this, 1) {
         public void stop() {
             super.stop();
@@ -65,29 +81,15 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
         }
     };
 
-    private boolean allowItemExchange = true;
     public void disableItemExchange() {
         allowItemExchange = false;
-    }
-
-    public boolean switched = false; // Has this clone switched to a thin version?
-    public PlayerCloneEntity switchedTo; // The thin clone instance
-
-    private LivingEntity persistTarget = null;
-    private LivingEntity master;
-    private final EntityNavigation navigation;
-    private int disabledSlots;
-
-
-    static {
-        MASTER = DataTracker.registerData(PlayerCloneEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
-        SAND = DataTracker.registerData(PlayerCloneEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     }
 
     @Override
     public LivingEntity getMaster() {
         return master;
     }
+
     @Override
     public void setMaster(LivingEntity m) {
         this.master = m;
@@ -95,11 +97,23 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
         setCustomName(mName);
         dataTracker.set(MASTER, Optional.of(m.getUuid()));
     }
-    private static final TrackedData<Optional<UUID>> MASTER;
-    public UUID getMasterId() { return dataTracker.get(MASTER).orElse(null); }
 
-    private static final TrackedData<Boolean> SAND;
-    public boolean isSand() { return dataTracker.get(SAND); }
+    public UUID getMasterId() {
+        return dataTracker.get(MASTER).orElse(null);
+    }
+
+    public boolean shouldRenderForMaster() {
+        return dataTracker.get(RENDER_FOR_MASTER);
+    }
+
+    public void setShouldRenderForMaster(boolean shouldRenderForMaster) {
+        dataTracker.set(RENDER_FOR_MASTER, shouldRenderForMaster);
+    }
+
+    public boolean isSand() {
+        return dataTracker.get(SAND);
+    }
+
     public void markSand() {
         dataTracker.set(SAND, true);
         TheFoolEntity.applySandCloneModifiers(this);
@@ -109,6 +123,7 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
         super.initDataTracker();
         dataTracker.startTracking(MASTER, Optional.empty());
         dataTracker.startTracking(SAND, false);
+        dataTracker.startTracking(RENDER_FOR_MASTER, true);
     }
 
     @Override

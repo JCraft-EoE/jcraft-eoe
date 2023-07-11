@@ -419,6 +419,6 @@ public class JCraftClient implements ClientModInitializer {
 
     public static boolean shouldNotRenderClone(PlayerCloneEntity clone) {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
-        return player != null && clone.getMasterId().equals(player.getUuid());
+        return !clone.shouldRenderForMaster() && player != null && clone.getMasterId().equals(player.getUuid());
     }
 }

@@ -423,6 +423,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
 
                     PlayerCloneEntity playerCloneEntity = new PlayerCloneEntity(JEntityTypeRegister.PLAYER_ENTITY_CLONE, world);
 
+                    playerCloneEntity.setShouldRenderForMaster(false);
                     playerCloneEntity.disableDrops();
                     playerCloneEntity.disableItemExchange();
 
