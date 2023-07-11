@@ -301,7 +301,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                     ServerChannelFeedbackPacket.send(serverPlayer, buf);
                 }
 
-                // Send epitaph state stop
+                // Stop epitaph state
                 if (user instanceof ServerPlayerEntity player)
                     ServerPlayNetworking.send(player, JCraft.id("epitaph_state"), new PacketByteBuf( Unpooled.buffer().writeBoolean(false)) );
             }
@@ -471,6 +471,9 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
 
                 for (Entity entity : toCatch)
                     predictionInfo.add( new TimeEraseData(entity, entity.getPos()) );
+
+                if (getUser() instanceof ServerPlayerEntity player)
+                    ServerPlayNetworking.send(player, JCraft.id("epitaph_state"), new PacketByteBuf( Unpooled.buffer().writeBoolean(false)) );
             }
         }
     }

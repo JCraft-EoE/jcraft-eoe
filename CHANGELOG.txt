@@ -1126,6 +1126,7 @@ Whitesnake
 ● 11/7/2023
 >Added achievement for getting a stand
 >Spec attacks no longer hit entities ridden by the spec user
+>Hitboxes are now viewable with F3+B and have been upgraded from particle display (thanks planet)
 
 Armor (move property)
     >Now split into Hyper and regular Armor
@@ -1146,11 +1147,15 @@ All (Stand ON) Barrages
 King Crimson
     >Removed kingCrimsonTeleportEffect gamerule
     >Fixed bug where Barrage finisher caused Prediction
+    >Fixed Prediction overlay
 
 Magician's Red
     >Crossfire Hurricane no longer tracks/damages ridden entity
 
 priority (top to bottom)
+todo: fix predict not working with new projectiles
+todo:
+
 TODO: AI flags for unblockables and shouldn't-blockables
 TODO: stand summon particles
 TODO: patchouli and the stand users manual
