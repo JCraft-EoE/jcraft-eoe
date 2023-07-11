@@ -1,12 +1,14 @@
 package net.arna.jcraft.common.util;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.entity.CreamEntity;
 import net.arna.jcraft.common.entity.D4CEntity;
 import net.arna.jcraft.common.entity.KingCrimsonEntity;
 import net.arna.jcraft.common.entity.StandEntity;
-import net.arna.jcraft.common.spec.*;
+import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
+import net.arna.jcraft.common.spec.AnubisSpec;
+import net.arna.jcraft.common.spec.BrawlerSpec;
+import net.arna.jcraft.common.spec.JCraftSpec;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SideShapeType;
@@ -23,7 +25,10 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
@@ -37,22 +42,24 @@ public final class JUtils {
     public static List<DimValues> activeTimestops = new ArrayList<>();
 
     public static void displayHitbox(World world, Vec3d v1, Vec3d v2) {
-        if (v1 == v2) return;
-        if (!world.getGameRules().getBoolean(JCraft.SHOW_HITBOXES)) return;
+        if (v1.equals(v2)) return;
 
-        //TODO: (sterner) convert this hitbox display from particle rendering to 0.5s cube outline
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeShort(1);
         buf.writeDouble(v1.x);
-        buf.writeDouble(v2.x);
         buf.writeDouble(v1.y);
-        buf.writeDouble(v2.y);
         buf.writeDouble(v1.z);
+
+        buf.writeDouble(v2.x);
+        buf.writeDouble(v2.y);
         buf.writeDouble(v2.z);
 
-        for (PlayerEntity player : world.getPlayers())
-            if (player instanceof ServerPlayerEntity serverPlayerEntity)
-                ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
+        Vec3d center = new Box(v1, v2).getCenter();
+        world.getPlayers().stream()
+                .filter(p -> p instanceof ServerPlayerEntity)
+                .map(p -> (ServerPlayerEntity) p)
+                .filter(p -> p.getPos().squaredDistanceTo(center) < 48 * 48)
+                .forEach(p -> ServerChannelFeedbackPacket.send(p, buf));
     }
 
     // Specify what type the hitbox searches for

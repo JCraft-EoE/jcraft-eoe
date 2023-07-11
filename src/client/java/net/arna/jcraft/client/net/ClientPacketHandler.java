@@ -1,10 +1,12 @@
 package net.arna.jcraft.client.net;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import dev.kosmx.playerAnim.api.layered.IAnimation;
 import dev.kosmx.playerAnim.api.layered.KeyframeAnimationPlayer;
 import dev.kosmx.playerAnim.api.layered.ModifierLayer;
 import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
 import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
+import it.unimi.dsi.fastutil.objects.ObjectLongPair;
 import lombok.experimental.UtilityClass;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.JCraftClient;
@@ -22,15 +24,18 @@ import net.arna.jcraft.registry.JParticleTypeRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
@@ -38,11 +43,11 @@ import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 @UtilityClass
 public class ClientPacketHandler {
+    private static final List<ObjectLongPair<Box>> hitBoxes = new ArrayList<>();
 
     static {
         WorldRenderEvents.START.register(ctx -> {
@@ -60,6 +65,24 @@ public class ClientPacketHandler {
             ctx.world().setTimeOfDay((long) (ctx.world().getTimeOfDay() + acceleration * multiplier));
 
             TimeAccelStatePacket.lastUpdate = currentTime;
+        });
+
+        WorldRenderEvents.AFTER_ENTITIES.register(ctx -> {
+            if (!MinecraftClient.getInstance().getEntityRenderDispatcher().shouldRenderHitboxes()) return;
+
+            for (Iterator<ObjectLongPair<Box>> iterator = hitBoxes.iterator(); iterator.hasNext();) {
+                ObjectLongPair<Box> pair = iterator.next();
+
+                Vec3d camPos = ctx.camera().getPos();
+                MatrixStack matrices = ctx.matrixStack();
+                matrices.push();
+                matrices.translate(-camPos.x, -camPos.y, -camPos.z);
+                VertexConsumer vc = Objects.requireNonNull(ctx.consumers()).getBuffer(RenderLayer.LINES);
+                WorldRenderer.drawBox(matrices, vc, pair.left(), 1f, 0f, 0f, 1f);
+                matrices.pop();
+
+                if (Util.getEpochTimeMs() - pair.rightLong() > 2000) iterator.remove();
+            }
         });
     }
 
@@ -119,66 +142,16 @@ public class ClientPacketHandler {
         // Show hitboxes gamerule
         switch (control) {
             case (1) -> {
-                double v1x = buf.readDouble();
-                double v2x = buf.readDouble();
+                double x1 = buf.readDouble();
+                double y1 = buf.readDouble();
+                double z1 = buf.readDouble();
 
-                double v1y = buf.readDouble();
-                double v2y = buf.readDouble();
+                double x2 = buf.readDouble();
+                double y2 = buf.readDouble();
+                double z2 = buf.readDouble();
 
-                double v1z = buf.readDouble();
-                double v2z = buf.readDouble();
-
-                client.execute(() -> {
-                    Random random = new Random();
-                    for (int h = 0; h < 128; ++h) {
-                        client.world.addParticle(
-                                ParticleTypes.WAX_ON,
-                                v1x,
-                                random.nextDouble(v1y, v2y),
-                                random.nextDouble(v1z, v2z),
-                                0.0, 0.0, 0.0);
-                    }
-                    for (int h = 0; h < 128; ++h) {
-                        client.world.addParticle(
-                                ParticleTypes.WAX_ON,
-                                v2x,
-                                random.nextDouble(v1y, v2y),
-                                random.nextDouble(v1z, v2z),
-                                0.0, 0.0, 0.0);
-                    }
-                    for (int h = 0; h < 128; ++h) {
-                        client.world.addParticle(
-                                ParticleTypes.WAX_ON,
-                                random.nextDouble(v1x, v2x),
-                                v1y,
-                                random.nextDouble(v1z, v2z),
-                                0.0, 0.0, 0.0);
-                    }
-                    for (int h = 0; h < 128; ++h) {
-                        client.world.addParticle(
-                                ParticleTypes.WAX_ON,
-                                random.nextDouble(v1x, v2x),
-                                v2y,
-                                random.nextDouble(v1z, v2z),
-                                0.0, 0.0, 0.0);
-                    }
-                    for (int h = 0; h < 128; ++h) {
-                        client.world.addParticle(
-                                ParticleTypes.WAX_ON,
-                                random.nextDouble(v1x, v2x),
-                                random.nextDouble(v1y, v2y),
-                                v1z,
-                                0.0, 0.0, 0.0);
-                    }
-                    for (int h = 0; h < 128; ++h) {
-                        client.world.addParticle(
-                                ParticleTypes.WAX_ON,
-                                random.nextDouble(v1x, v2x),
-                                random.nextDouble(v1y, v2y),
-                                v2z,
-                                0.0, 0.0, 0.0);
-                    }
-                });
+                // Run on render thread to avoid concurrency issues.
+                RenderSystem.recordRenderCall(() -> hitBoxes.add(ObjectLongPair.of(new Box(x1, y1, z1, x2, y2, z2), Util.getEpochTimeMs())));
             }
 
             // Time erase trackers

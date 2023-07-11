@@ -3,12 +3,12 @@ package net.arna.jcraft;
 import eu.midnightdust.lib.config.MidnightConfig;
 import lombok.Getter;
 import lombok.Setter;
-import net.arna.jcraft.common.network.s2c.PlayerAnimPacket;
-import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.JConfig;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.entity.StandType;
 import net.arna.jcraft.common.network.c2s.StandControlPacket;
+import net.arna.jcraft.common.network.s2c.PlayerAnimPacket;
+import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.*;
@@ -23,7 +23,6 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -94,7 +93,6 @@ public class JCraft implements ModInitializer {
             heavyCD, barrageCD, ultCD, s1CD, s2CD, s3CD);
 
     // Gamerules
-    public static final GameRules.Key<GameRules.BooleanRule> SHOW_HITBOXES = GameRuleRegistry.register("showHitboxes", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(false));
     //public static final GameRules.Key<GameRules.BooleanRule> KINGCRIMSON_TELEPORT_EFFECT = GameRuleRegistry.register("kingCrimsonTeleportEffect", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(false));
     public static final GameRules.Key<GameRules.BooleanRule> COMBO_COUNTER = GameRuleRegistry.register("comboCounter", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
     public static final GameRules.Key<GameRules.IntRule> CHANCE_MOB_SPAWNS_WITH_STAND = GameRuleRegistry.register("chanceMobSpawnsWithStand", GameRules.Category.MOBS, GameRuleFactory.createIntRule(5, 0, 100));
