@@ -1,20 +1,21 @@
 package net.arna.jcraft.client.hud;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import lombok.Getter;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.rendering.HUDAnimation;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.render.*;
 import net.minecraft.client.texture.TextureManager;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.util.Window;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
-import java.util.stream.IntStream;
 
 public class EpitaphOverlay extends DrawableHelper {
     public static final long FRAME_TIME = 1000000000 / 60; // Time of one frame in nanoseconds.
@@ -50,10 +51,43 @@ public class EpitaphOverlay extends DrawableHelper {
         countdown = -1;
     }
 
-    public static void render(Consumer<Identifier> renderFunction) {
-        if (state == State.NONE) return;
+    public static void render() {
+        if (state == State.NONE || state.getAnimation() == null) return;
 
-        renderFunction.accept(state.getFrame(frame));
+        Window window = MinecraftClient.getInstance().getWindow();
+        HUDAnimation.Frame frameData = state.getFrame(frame);
+
+        RenderSystem.disableDepthTest();
+        RenderSystem.depthMask(false);
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        RenderSystem.setShaderTexture(0, state.getAnimation().getAtlas());
+
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferBuilder = tessellator.getBuffer();
+        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+
+        bufferBuilder
+                .vertex(0.0, window.getScaledHeight(), -90.0)
+                .texture(frameData.getUvMin().x, frameData.getUvMax().y)
+                .next();
+        bufferBuilder
+                .vertex(window.getScaledWidth(), window.getScaledHeight(), -90.0)
+                .texture(frameData.getUvMax().x, frameData.getUvMax().y)
+                .next();
+        bufferBuilder
+                .vertex(window.getScaledWidth(), 0.0, -90.0)
+                .texture(frameData.getUvMax().x, frameData.getUvMin().y)
+                .next();
+        bufferBuilder
+                .vertex(0.0, 0.0, -90.0)
+                .texture(frameData.getUvMin().x, frameData.getUvMin().y)
+                .next();
+
+        tessellator.draw();
+        RenderSystem.depthMask(true);
+        RenderSystem.enableDepthTest();
 
         State nextState = state.nextState(frame, shouldStop);
         if (nextState == state) {
@@ -70,14 +104,17 @@ public class EpitaphOverlay extends DrawableHelper {
 
     public enum State {
         NONE(null),
-        OPENING(getFrames("opening", 31)),
-        LOOP(getFrames("loop", 60)),
-        OUTRO(getFrames("outro", 22));
+        OPENING("opening"),
+        LOOP("loop"),
+        OUTRO("outro");
 
-        private final @Nullable List<Identifier> frames;
+        @Getter
+        private final @Nullable HUDAnimation animation;
 
-        State(@Nullable List<Identifier> frames) {
-            this.frames = frames;
+        State(@Nullable String path) {
+            final String prefix = "textures/gui/epitaph_overlay/";
+            animation = path == null ? null : HUDAnimation.create(JCraft.id(prefix + path + "/atlas.png"),
+                    JCraft.id(prefix + path + "/atlas.json"));
         }
 
         /**
@@ -86,8 +123,8 @@ public class EpitaphOverlay extends DrawableHelper {
          * @param executor The executor to load the textures with.
          */
         private void preload(TextureManager textureManager, Executor executor) {
-            if (frames == null) return;
-            frames.forEach(frame -> textureManager.loadTextureAsync(frame, executor));
+            if (animation == null) return;
+            animation.preload(textureManager, executor);
         }
 
         /**
@@ -95,9 +132,9 @@ public class EpitaphOverlay extends DrawableHelper {
          * @param index The index of the frame to get
          * @return the frame at the given index.
          */
-        public Identifier getFrame(int index) {
-            if (frames == null) throw new IllegalStateException("NONE state has no frames.");
-            return frames.get(index);
+        public HUDAnimation.Frame getFrame(int index) {
+            if (animation == null) throw new IllegalStateException("NONE state has no animation.");
+            return animation.getFrame(index);
         }
 
         /**
@@ -107,8 +144,8 @@ public class EpitaphOverlay extends DrawableHelper {
          * @return the next frame
          */
         public int nextFrame(int frame) {
-            if (frames == null) throw new IllegalStateException("NONE state has no frames.");
-            return (frame + 1) % frames.size();
+            if (animation == null) throw new IllegalStateException("NONE state has no animation.");
+            return (frame + 1) % animation.getFrameCount();
         }
 
         /**
@@ -120,14 +157,8 @@ public class EpitaphOverlay extends DrawableHelper {
          * @return The next state
          */
         public State nextState(int frame, boolean forceOutro) {
-            if (frames == null || frame != frames.size() - 1) return this;
+            if (animation == null || frame != animation.getFrameCount() - 1) return this;
             return forceOutro ? OUTRO : this == LOOP ? this : values()[(ordinal() + 1) % values().length];
-        }
-
-        private static List<Identifier> getFrames(String path, int count) {
-            return IntStream.rangeClosed(1, count)
-                    .mapToObj(i -> JCraft.id("textures/gui/epitaph_overlay/" + path + "/frame" + i + ".png"))
-                    .toList();
         }
     }
 }
