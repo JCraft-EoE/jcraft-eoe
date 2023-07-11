@@ -152,6 +152,9 @@ public abstract class JCraftSpec {
                         Vec3d hitPos = player.getPos().add(0, player.getHeight() / 2 - attack.offset, 0).add(rotVec.multiply(attack.attackDist));
                         ArrayList<Entity> exclude = new ArrayList<>(player.getPassengerList());
                         exclude.add(player);
+                        if (player.hasVehicle())
+                            exclude.add(player.getVehicle());
+
                         List<LivingEntity> hurt = JUtils.generateHitbox(world,
                                 hitPos,
                                 attack.hitboxSize,

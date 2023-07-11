@@ -7,6 +7,7 @@ import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -246,6 +247,8 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
             } else {
                 user.addStatusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 20, 0, true, false));
 
+                Entity vehicle = user.getVehicle();
+
                 // Run every four ticks because the hurricane's meant to be slow, and it's convenient for CPU usage
                 if (this.age % 4 == 0) {
                     if (hurricaneTime > 0) {
@@ -256,6 +259,8 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
                                 new Box(hurricanePos.add(32.0, 32.0, 32.0), hurricanePos.subtract(32.0, 32.0, 32.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
                         nearbyEnts.remove(this);
                         nearbyEnts.remove(user);
+                        if (vehicle != null)
+                            nearbyEnts.remove(vehicle);
 
                         if (!nearbyEnts.isEmpty()) {
                             Vec3d avgPos = Vec3d.ZERO;
@@ -271,6 +276,8 @@ public class MagiciansRedEntity extends StandEntity implements IAnimatable, IAni
                                 new Box(hurricanePos.add(2.5, 1, 2.5), hurricanePos.subtract(2.5, 1, 2.5)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
                         toHurt.remove(this);
                         toHurt.remove(user);
+                        if (vehicle != null)
+                            toHurt.remove(vehicle);
 
                         for (LivingEntity living : toHurt) {
                             LivingEntity target = JUtils.getUserIfStand(living);

@@ -1124,6 +1124,8 @@ Whitesnake
     >Updated sounds
 
 ● 11/7/2023
+>Spec attacks no longer hit entities ridden by the spec user
+
 Armor (move property)
     >Now split into Hyper and regular Armor
     >Hyper Armored moves are uninterruptable
@@ -1143,6 +1145,9 @@ All (Stand ON) Barrages
 King Crimson
     >Removed kingCrimsonTeleportEffect gamerule
     >Fixed bug where Barrage finisher caused Prediction
+
+Magician's Red
+    >Crossfire Hurricane no longer tracks/damages ridden entity
 
 priority (top to bottom)
 TODO: AI flags for unblockables and shouldn't-blockables
