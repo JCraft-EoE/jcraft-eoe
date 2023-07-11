@@ -4,6 +4,7 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.block.*;
 import net.arna.jcraft.common.item.*;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
 import net.minecraft.block.Material;
@@ -23,7 +24,7 @@ public interface JObjectRegistry {
     Map<Block, Identifier> BLOCKS = new LinkedHashMap<>();
     Map<Item, Identifier> ITEMS = new LinkedHashMap<>();
 
-    Item DEBUG_WAND = register("debug_wand", new DebugWand(settings()));
+    Item DEBUG_WAND = FabricLoader.getInstance().isDevelopmentEnvironment() ? register("debug_wand", new DebugWand(settings())) : null;
 
     Item STANDARROW = register("stand_arrow", new StandArrowItem(settings().rarity(Rarity.RARE).fireproof()));
 
