@@ -1,16 +1,15 @@
 package net.arna.jcraft.client.hud;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import lombok.Getter;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.rendering.HUDAnimation;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.render.*;
+import net.minecraft.client.option.Perspective;
 import net.minecraft.client.texture.TextureManager;
-import net.minecraft.client.util.Window;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.Executor;
@@ -19,8 +18,11 @@ import java.util.concurrent.Executors;
 
 public class EpitaphOverlay extends DrawableHelper {
     public static final long FRAME_TIME = 1000000000 / 60; // Time of one frame in nanoseconds.
+    private static final float VIGNETTE_INTENSITY = 5f;
+    private static final float VIGNETTE_EXTEND = 0.5f;
     private static int frame;
     private static long lastRender;
+    @Getter
     private static State state = State.NONE;
     private static boolean shouldStop = false;
     private static int countdown;
@@ -40,7 +42,7 @@ public class EpitaphOverlay extends DrawableHelper {
     }
 
     public static void start() {
-        state = State.OPENING;
+        state = State.INTRO;
         frame = 0;
         countdown = 100; // Play animation for 5 seconds.
     }
@@ -52,47 +54,15 @@ public class EpitaphOverlay extends DrawableHelper {
     }
 
     public static void render() {
-        if (state == State.NONE || state.getAnimation() == null) return;
+        if (!shouldRender() || state.getAnimation() == null) return;
 
-        Window window = MinecraftClient.getInstance().getWindow();
-        HUDAnimation.Frame frameData = state.getFrame(frame);
-
-        RenderSystem.disableDepthTest();
-        RenderSystem.depthMask(false);
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        RenderSystem.setShaderTexture(0, state.getAnimation().getAtlas());
-
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuffer();
-        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
-
-        bufferBuilder
-                .vertex(0.0, window.getScaledHeight(), -90.0)
-                .texture(frameData.getUvMin().x, frameData.getUvMax().y)
-                .next();
-        bufferBuilder
-                .vertex(window.getScaledWidth(), window.getScaledHeight(), -90.0)
-                .texture(frameData.getUvMax().x, frameData.getUvMax().y)
-                .next();
-        bufferBuilder
-                .vertex(window.getScaledWidth(), 0.0, -90.0)
-                .texture(frameData.getUvMax().x, frameData.getUvMin().y)
-                .next();
-        bufferBuilder
-                .vertex(0.0, 0.0, -90.0)
-                .texture(frameData.getUvMin().x, frameData.getUvMin().y)
-                .next();
-
-        tessellator.draw();
-        RenderSystem.depthMask(true);
-        RenderSystem.enableDepthTest();
+        state.getFrame(frame).render();
+        if (Util.getMeasuringTimeNano() - lastRender < FRAME_TIME || MinecraftClient.getInstance().isPaused()) return;
 
         State nextState = state.nextState(frame, shouldStop);
         if (nextState == state) {
             // If the state did not change, move to the next frame.
-            if (Util.getMeasuringTimeNano() - lastRender >= FRAME_TIME) frame = state.nextFrame(frame);
+            frame = state.nextFrame(frame);
         } else {
             // If the state changed, reset frame.
             state = nextState;
@@ -102,9 +72,37 @@ public class EpitaphOverlay extends DrawableHelper {
         lastRender = Util.getMeasuringTimeNano();
     }
 
+    public static boolean shouldRender() {
+        return state != State.NONE && MinecraftClient.getInstance().options.getPerspective() == Perspective.FIRST_PERSON;
+    }
+
+    public static boolean shouldRenderVignette() {
+        return shouldRender() && (state != State.INTRO || frame > 10);
+    }
+
+    public static float getVignetteIntensity() {
+        return state == State.INTRO ? MathHelper.lerp(getIntroProgress(), 0f, VIGNETTE_INTENSITY) :
+                state == State.OUTRO ? MathHelper.lerp(getOutroProgress(), VIGNETTE_INTENSITY, 150f) :
+                VIGNETTE_INTENSITY;
+    }
+
+    public static float getVignetteExtend() {
+        return state == State.INTRO ? MathHelper.lerp(getIntroProgress(), 0f, VIGNETTE_EXTEND) :
+                state == State.OUTRO ? MathHelper.lerp(getOutroProgress(), VIGNETTE_EXTEND, 0f) :
+                        VIGNETTE_EXTEND;
+    }
+
+    private static float getIntroProgress() {
+        return (frame - 11) / 9f;
+    }
+
+    private static float getOutroProgress() {
+        return frame / 9f;
+    }
+
     public enum State {
         NONE(null),
-        OPENING("opening"),
+        INTRO("intro"),
         LOOP("loop"),
         OUTRO("outro");
 

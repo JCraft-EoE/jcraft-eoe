@@ -4,12 +4,15 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.blaze3d.systems.RenderSystem;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.*;
 import net.minecraft.client.texture.TextureManager;
+import net.minecraft.client.util.Window;
 import net.minecraft.resource.Resource;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec2f;
@@ -65,7 +68,7 @@ public class HUDAnimation {
         int atlasHeight = sizeData.get("h").getAsInt();
         List<Frame> frames = StreamSupport.stream(framesData.spliterator(), false)
                 .peek(HUDAnimation::validateFrame)
-                .map(frame -> Frame.parse(frame.getAsJsonObject(), atlasWidth, atlasHeight))
+                .map(frame -> Frame.parse(frame.getAsJsonObject(), atlas, atlasWidth, atlasHeight))
                 .sorted(Comparator.comparingInt(Frame::getIndex))
                 .toList();
 
@@ -99,12 +102,13 @@ public class HUDAnimation {
     @Data
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Frame {
+        private final Identifier atlas;
         private final int index;
         private final int width, height;
         private final int xOffset, yOffset;
         private final Vec2f uvMin, uvMax;
 
-        private static Frame parse(JsonObject frame, int atlasWidth, int atlasHeight) {
+        private static Frame parse(JsonObject frame, Identifier atlas, int atlasWidth, int atlasHeight) {
             JsonObject frameData = frame.getAsJsonObject("frame");
 
             int index = Integer.parseInt(frame.get("filename").getAsString().substring(5));
@@ -117,7 +121,43 @@ public class HUDAnimation {
             float uMax = (float) (xOffset + width) / atlasWidth;
             float vMax = (float) (yOffset + height) / atlasHeight;
 
-            return new Frame(index, width, height, xOffset, yOffset, new Vec2f(uMin, vMin), new Vec2f(uMax, vMax));
+            return new Frame(atlas, index, width, height, xOffset, yOffset, new Vec2f(uMin, vMin), new Vec2f(uMax, vMax));
+        }
+
+        public void render() {
+            Window window = MinecraftClient.getInstance().getWindow();
+
+            RenderSystem.disableDepthTest();
+            RenderSystem.depthMask(false);
+            RenderSystem.defaultBlendFunc();
+            RenderSystem.setShader(GameRenderer::getPositionTexShader);
+            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+            RenderSystem.setShaderTexture(0, getAtlas());
+
+            Tessellator tessellator = Tessellator.getInstance();
+            BufferBuilder bufferBuilder = tessellator.getBuffer();
+            bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+
+            bufferBuilder
+                    .vertex(0.0, window.getScaledHeight(), -90.0)
+                    .texture(getUvMin().x, getUvMax().y)
+                    .next();
+            bufferBuilder
+                    .vertex(window.getScaledWidth(), window.getScaledHeight(), -90.0)
+                    .texture(getUvMax().x, getUvMax().y)
+                    .next();
+            bufferBuilder
+                    .vertex(window.getScaledWidth(), 0.0, -90.0)
+                    .texture(getUvMax().x, getUvMin().y)
+                    .next();
+            bufferBuilder
+                    .vertex(0.0, 0.0, -90.0)
+                    .texture(getUvMin().x, getUvMin().y)
+                    .next();
+
+            tessellator.draw();
+            RenderSystem.depthMask(true);
+            RenderSystem.enableDepthTest();
         }
     }
 }

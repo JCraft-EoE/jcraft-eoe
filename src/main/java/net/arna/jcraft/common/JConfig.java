@@ -20,5 +20,5 @@ public class JConfig extends MidnightConfig {
     public static boolean TE_SHADER = true;
 
     @Entry
-    public static boolean EPITAPH_OVERLAY = false;
+    public static boolean EPITAPH_OVERLAY = true;
 }

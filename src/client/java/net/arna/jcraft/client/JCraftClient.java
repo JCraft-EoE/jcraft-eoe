@@ -8,6 +8,7 @@ import net.arna.jcraft.client.hud.JCraftHudOverlay;
 import net.arna.jcraft.client.net.ClientPacketHandler;
 import net.arna.jcraft.client.particle.*;
 import net.arna.jcraft.client.registry.JClientEventsRegistry;
+import net.arna.jcraft.client.rendering.handler.EpitaphVignetteShaderHandler;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
 import net.arna.jcraft.common.JConfig;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
@@ -92,6 +93,7 @@ public class JCraftClient implements ClientModInitializer {
         JClientEventsRegistry.registerClientEvents();
         ZaWarudoShaderHandler.INSTANCE.init();
         CrimsonShaderHandler.INSTANCE.init();
+        EpitaphVignetteShaderHandler.INSTANCE.init();
 
         // Particle registration
         ParticleFactoryRegistry particleFactoryRegistry = ParticleFactoryRegistry.getInstance();
