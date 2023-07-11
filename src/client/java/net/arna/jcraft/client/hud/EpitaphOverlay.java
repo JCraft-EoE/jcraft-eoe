@@ -62,8 +62,20 @@ public class EpitaphOverlay extends DrawableHelper {
         State nextState = state.nextState(frame, shouldStop);
         if (nextState == state) {
             // If the state did not change, move to the next frame.
-            frame = state.nextFrame(frame);
-        } else {
+            int dFrame = (int) ((Util.getMeasuringTimeNano() - lastRender) / FRAME_TIME);
+            for (int i = 0; i < dFrame; i++) {
+                int prevFrame = frame;
+                frame = state.nextFrame(frame);
+
+                // If we skipped enough frames to get to the end of the state, move to the next state
+                // unless the current state is loop.
+                if (frame > prevFrame || state == State.LOOP && !shouldStop) continue;
+                nextState = state.nextState(frame, shouldStop);
+                if (nextState != state) break; // Stop if the state changed.
+            }
+        }
+
+        if (nextState != state) {
             // If the state changed, reset frame.
             state = nextState;
             frame = 0;
