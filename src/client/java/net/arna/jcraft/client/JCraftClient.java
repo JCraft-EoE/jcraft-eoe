@@ -138,7 +138,7 @@ public class JCraftClient implements ClientModInitializer {
 //        HudRenderCallback.EVENT.register((matrices, tickDelta) -> EpitaphOverlay.render(matrices));
 
         // Run when the MinecraftClient instance is fully initialized.
-        MinecraftClient.getInstance().submit(EpitaphOverlay::preload);
+        MinecraftClient.getInstance().send(EpitaphOverlay::preload);
 
         Identifier itemId = JObjectRegistry.ITEMS.get(JObjectRegistry.DEBUG_WAND);
         BigItemRenderer itemRenderer = new BigItemRenderer(itemId);
