@@ -1124,6 +1124,7 @@ Whitesnake
     >Updated sounds
 
 ● 11/7/2023
+>Added achievement for getting a stand
 >Spec attacks no longer hit entities ridden by the spec user
 
 Armor (move property)

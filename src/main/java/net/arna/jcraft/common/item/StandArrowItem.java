@@ -6,6 +6,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.UseAction;
@@ -44,10 +45,7 @@ public class StandArrowItem extends Item {
                 newID = rand.nextInt(1, JCraft.STAND_COUNT + 1);
             }
             playerData.putInt("StandID", newID);
-
-            if (user.hasPassengers()) {
-                user.detach();
-            }
+            user.detach();
             JCraft.summon(world, user);
         }
 

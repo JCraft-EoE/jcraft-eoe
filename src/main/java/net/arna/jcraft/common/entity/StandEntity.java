@@ -91,6 +91,7 @@ public abstract class StandEntity extends MobEntity {
     public AttackQueue queuedAttack;
     public Attack curAttack;
     public Attack previousAttack;
+    public int armorPoints;
 
     public static final List<String> attackCooldowns = List.of(JCraft.standLightCD, JCraft.standHeavyCD, JCraft.standBarrageCD, JCraft.standS1CD, JCraft.standUltCD, JCraft.standS2CD, JCraft.standS3CD, JCraft.utilCD);
 
@@ -433,6 +434,7 @@ public abstract class StandEntity extends MobEntity {
         this.curAttack = attack;
         this.setMoveStun(attack.moveStun);
         this.setState(animState);
+        this.armorPoints = attack.armor;
     }
 
     /**
@@ -956,7 +958,7 @@ public abstract class StandEntity extends MobEntity {
                     return;
                 }
 
-                if (standAttack.armor-- < 0) stand.cancelAttack();
+                if (--stand.armorPoints < 0) stand.cancelAttack();
             }
 
             if (stand.blocking && !stand.getRemote()) {
@@ -999,7 +1001,7 @@ public abstract class StandEntity extends MobEntity {
         // Interrupting spec moves
         if (ent instanceof PlayerEntity playerEntity) {
             JCraftSpec spec = JUtils.getSpec(playerEntity);
-            if (spec != null && spec.curAttack != null && spec.curAttack.armor-- < 0) spec.cancelAttack();
+            if (spec != null && spec.curAttack != null && --spec.armorPoints < 0) spec.cancelAttack();
         }
 
         // Aerial hits keep the victim up

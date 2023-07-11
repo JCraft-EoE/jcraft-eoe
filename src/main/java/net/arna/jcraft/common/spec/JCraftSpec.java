@@ -41,6 +41,7 @@ public abstract class JCraftSpec {
     public Attack curAttack;
     public Attack previousAttack;
     public AttackQueue queuedAttack;
+    public int armorPoints = 0;
 
     public String getName() { return "UNNAMED"; }
     public String getDescription() { return "UNDESCRIBED"; }
@@ -78,6 +79,7 @@ public abstract class JCraftSpec {
         moveStun = attack.moveStun;
         playerData.putInt(cooldownName, attack.cooldown * 20);
         curAttack = attack;
+        armorPoints = attack.armor;
 
         PlayerLookup.world(serverWorld).forEach(
                 serverPlayer -> PlayerAnimPacket.sendSpec(player, serverPlayer, curAttack.animation, moveStun, curAttack.id));
