@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.hud.EpitaphOverlay;
 import net.arna.jcraft.client.hud.JCraftAbilityHud;
-import net.arna.jcraft.client.hud.JCraftHudOverlay;
 import net.arna.jcraft.client.net.ClientPacketHandler;
 import net.arna.jcraft.client.particle.*;
 import net.arna.jcraft.client.registry.JArmorRendererRegister;
@@ -140,7 +139,6 @@ public class JCraftClient implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(TimeAccelStatePacket.ID, (client, handler, buf, sender) -> ClientPacketHandler.handleTimeAccelState(client, buf));
         ClientPlayNetworking.registerGlobalReceiver(JCraft.id("epitaph_state"), (client, handler, buf, responseSender) -> ClientPacketHandler.handleEpitaphOverlayState(buf));
 
-        HudRenderCallback.EVENT.register(new JCraftHudOverlay());
         HudRenderCallback.EVENT.register(this::renderHud);
         HudRenderCallback.EVENT.register(new JCraftAbilityHud());
 
