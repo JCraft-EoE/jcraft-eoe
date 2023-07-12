@@ -1,5 +1,6 @@
 package net.arna.jcraft.client.net;
 
+import com.google.common.collect.EvictingQueue;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.kosmx.playerAnim.api.layered.IAnimation;
 import dev.kosmx.playerAnim.api.layered.KeyframeAnimationPlayer;
@@ -24,9 +25,7 @@ import net.arna.jcraft.registry.JParticleTypeRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -37,6 +36,7 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
@@ -47,7 +47,10 @@ import java.util.*;
 
 @UtilityClass
 public class ClientPacketHandler {
-    private static final List<ObjectLongPair<Box>> hitBoxes = new ArrayList<>();
+    // Use an evicting queue to limit the amount of hit boxes rendered at a time to 8.
+    // If there are already 8 hit boxes and we wish to add more, old ones will be removed.
+    @SuppressWarnings("UnstableApiUsage") // I do not care.
+    private static final Queue<ObjectLongPair<Box>> hitBoxes = EvictingQueue.create(8);
 
     static {
         WorldRenderEvents.START.register(ctx -> {
@@ -77,11 +80,75 @@ public class ClientPacketHandler {
                 MatrixStack matrices = ctx.matrixStack();
                 matrices.push();
                 matrices.translate(-camPos.x, -camPos.y, -camPos.z);
-                VertexConsumer vc = Objects.requireNonNull(ctx.consumers()).getBuffer(RenderLayer.LINES);
-                WorldRenderer.drawBox(matrices, vc, pair.left(), 1f, 0f, 0f, 1f);
+
+                // Draw faces
+                Tessellator tess = Tessellator.getInstance();
+                BufferBuilder quadsVc = tess.getBuffer();
+                quadsVc.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+                RenderSystem.setShader(GameRenderer::getPositionColorShader);
+                RenderSystem.enableBlend();
+                RenderSystem.enableCull();
+                RenderSystem.enableDepthTest();
+
+                Matrix4f m = matrices.peek().getPositionMatrix();
+                int c = 0x54FF0000;
+
+                Box box = pair.left();
+                float minX = (float) box.minX;
+                float minY = (float) box.minY;
+                float minZ = (float) box.minZ;
+                float maxX = (float) box.maxX;
+                float maxY = (float) box.maxY;
+                float maxZ = (float) box.maxZ;
+
+                // Up
+                quadsVc.vertex(m, minX, maxY, minZ).color(c).next();
+                quadsVc.vertex(m, minX, maxY, maxZ).color(c).next();
+                quadsVc.vertex(m, maxX, maxY, maxZ).color(c).next();
+                quadsVc.vertex(m, maxX, maxY, minZ).color(c).next();
+
+                // Down
+                quadsVc.vertex(m, minX, minY, minZ).color(c).next();
+                quadsVc.vertex(m, maxX, minY, minZ).color(c).next();
+                quadsVc.vertex(m, maxX, minY, maxZ).color(c).next();
+                quadsVc.vertex(m, minX, minY, maxZ).color(c).next();
+
+                // North
+                quadsVc.vertex(m, minX, minY, minZ).color(c).next();
+                quadsVc.vertex(m, minX, maxY, minZ).color(c).next();
+                quadsVc.vertex(m, maxX, maxY, minZ).color(c).next();
+                quadsVc.vertex(m, maxX, minY, minZ).color(c).next();
+
+                // East
+                quadsVc.vertex(m, maxX, minY, minZ).color(c).next();
+                quadsVc.vertex(m, maxX, maxY, minZ).color(c).next();
+                quadsVc.vertex(m, maxX, maxY, maxZ).color(c).next();
+                quadsVc.vertex(m, maxX, minY, maxZ).color(c).next();
+
+                // South
+                quadsVc.vertex(m, minX, minY, maxZ).color(c).next();
+                quadsVc.vertex(m, maxX, minY, maxZ).color(c).next();
+                quadsVc.vertex(m, maxX, maxY, maxZ).color(c).next();
+                quadsVc.vertex(m, minX, maxY, maxZ).color(c).next();
+
+                // West
+                quadsVc.vertex(m, minX, minY, minZ).color(c).next();
+                quadsVc.vertex(m, minX, minY, maxZ).color(c).next();
+                quadsVc.vertex(m, minX, maxY, maxZ).color(c).next();
+                quadsVc.vertex(m, minX, maxY, minZ).color(c).next();
+
+                tess.draw();
+
+                RenderSystem.disableBlend();
+                RenderSystem.disableDepthTest();
+
+                // Draw lines
+                VertexConsumer linesVc = Objects.requireNonNull(ctx.consumers()).getBuffer(RenderLayer.LINES);
+                WorldRenderer.drawBox(matrices, linesVc, pair.left(), 1f, 0f, 0f, 1f);
+
                 matrices.pop();
 
-                if (Util.getEpochTimeMs() - pair.rightLong() > 2000) iterator.remove();
+                if (Util.getEpochTimeMs() - pair.rightLong() > 2500) iterator.remove();
             }
         });
     }
