@@ -21,12 +21,15 @@ public class JShaderRegistry {
     //Core
     public static ShaderHolder TEST = new ShaderHolder("DiffuseSampler", "DepthSampler", "OutSize", "ViewPort");
 
+    public static ShaderHolder RREDE = new ShaderHolder();
+
     //Post Processed
     public static final TimestopShaderPostProcessor ZA_WARUDO = new TimestopShaderPostProcessor();
 
     public static void init(ResourceManager manager) throws IOException {
         shaderList = new ArrayList<>();
         registerShader(JShader.createShaderInstance(TEST, manager, JCraft.id("space"), VertexFormats.POSITION_TEXTURE));
+        registerShader(JShader.createShaderInstance(RREDE, manager, JCraft.id("rrede"), VertexFormats.POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL));
 
         PostProcessHandler.addInstance(ZA_WARUDO);
     }

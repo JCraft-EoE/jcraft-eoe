@@ -290,8 +290,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                 // Particle effects
                 Vec3d oPos = user.getPos();
                 Box bBox = user.getBoundingBox();
-                for (ServerPlayerEntity serverPlayer :
-                        ((ServerWorld) world).getPlayers()) {
+                for (ServerPlayerEntity serverPlayer : ((ServerWorld) world).getPlayers()) {
                     PacketByteBuf buf = PacketByteBufs.create();
                     buf.writeShort(2);
                     buf.writeDouble(oPos.x);
