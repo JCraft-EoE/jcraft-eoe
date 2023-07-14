@@ -81,9 +81,9 @@ public class MadeInHeavenRenderer extends GeoEntityRenderer<MadeInHeavenEntity> 
         matrixStack.push();
 
         matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(animatable.getUser().bodyYaw));
-        matrixStack.translate(velocity.x, velocity.y, velocity.z);
+        matrixStack.translate(velocity.x, -velocity.y, velocity.z);
         matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(-animatable.getUser().bodyYaw));
-        super.render(model, animatable, partialTicks, RenderLayer.getEntityNoOutline( getTextureLocation(animatable) ), matrixStack, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, aa);
+        super.render(model, animatable, partialTicks, type, matrixStack, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, aa);
         matrixStack.pop();
     }
 }

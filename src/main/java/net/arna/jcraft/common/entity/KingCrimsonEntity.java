@@ -25,6 +25,7 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
@@ -101,7 +102,6 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
             this.position = position;
         }
     }
-    public List<TimeEraseData> timeEraseInfo;
     public List<TimeEraseData> predictionInfo;
 
     public KingCrimsonEntity(World worldIn) {
@@ -111,7 +111,6 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
         idleDistance = 1f;
         idleRotation = -65f;
 
-        timeEraseInfo = new LinkedList<>();
         predictionInfo = new LinkedList<>();
 
         ignoreCameraFrustum = true;
@@ -207,6 +206,14 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
         } else if (handleAttack(eyechop, JCraft.standS1CD, 7)) {
             playSound(JSoundRegister.KC_EYE_CHOP, 1, 1);
         }
+    }
+
+    private void beginPrediction() {
+        List<Entity> toCatch = world.getEntitiesByClass(Entity.class, getBoundingBox().expand(64), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+        toCatch.remove(this);
+        toCatch.remove(getUser());
+        for (Entity entity : toCatch)
+            predictionInfo.add( new TimeEraseData(entity, entity.getPos()) );
     }
 
     private void finishPrediction() {
@@ -392,10 +399,6 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                 toCatch.remove(this);
                 toCatch.remove(user);
 
-                timeEraseInfo = new LinkedList<>();
-                for (Entity entity : toCatch)
-                    timeEraseInfo.add( new TimeEraseData(entity, entity.getPos()) );
-
                 if (user instanceof ServerPlayerEntity player) {
                     // Shader handling
                     ShaderActivationPacket.send(player, this, 0, 120, ShaderActivationPacket.Type.CRIMSON);
@@ -463,18 +466,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
 
                 world.spawnEntity(doppelganger);
             }
-            case (9) -> {
-                Vec3d pos = getEyePos();
-
-                List<Entity> toCatch = world.getEntitiesByClass(Entity.class,
-                        new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
-
-                toCatch.remove(this);
-                toCatch.remove(getUser());
-
-                for (Entity entity : toCatch)
-                    predictionInfo.add( new TimeEraseData(entity, entity.getPos()) );
-            }
+            case (9) -> beginPrediction();
         }
     }
 
@@ -546,16 +538,60 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
 
         LivingEntity user = this.getUser();
         if (user == null) return;
-
         Attack attack = curAttack;
-        if (!world.isClient) {
-            boolean userIsPlayer = false;
-            ServerPlayerEntity serverPlayerEntity = null;
-            if (user instanceof ServerPlayerEntity serverPlayer) {
-                userIsPlayer = true;
-                serverPlayerEntity = serverPlayer;
-            }
 
+        boolean userIsPlayer = false;
+        ServerPlayerEntity playerEntity = null;
+        if (user instanceof ServerPlayerEntity serverPlayer) {
+            userIsPlayer = true;
+            playerEntity = serverPlayer;
+        }
+
+        if (getState() == 12) {
+            if (getMoveStun() == prediction.moveStun - prediction.initTime) beginPrediction(); // Clientside prediction, serverside is in specialAttack()
+
+            if (age % 2 == 0) {
+                user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 10, 2, true, false));
+
+                int timeLeft = getMoveStun();
+                for (TimeEraseData data : predictionInfo) {
+                    Entity entity = data.getEntity();
+                    if (entity == null) continue;
+
+                    Vec3d currentPos = entity.getPos().add(0, 0.1, 0);
+                    Vec3d futurePos = currentPos;
+                    boolean changed = false;
+
+                    // If in air and not in a liquid, account for drop
+                    if (!entity.isOnGround() && !entity.isSubmergedInWater() && !entity.isInLava()) {
+                        //JCraft.LOGGER.info("Target is in air");
+                        futurePos = futurePos.add(0, (-9.81 / 400) * timeLeft * timeLeft, 0);
+                        changed = true;
+                    }
+
+                    // If moving faster than 0.01 m/s, account for distance traveled
+                    Vec3d velocity = entity.getVelocity();
+                    if (entity instanceof ServerPlayerEntity player) // EXTREMELY cursed implementation of player velocity because NOTHING ELSE WORKS
+                        velocity = ((IEntityDataSaver) player).getDesiredVelocity();
+                    //JCraft.LOGGER.info("Target is moving at a velocity of: " + velocity);
+                    if (velocity.lengthSquared() > 0.0001) {
+                        Vec3d velocityComp = new Vec3d(velocity.x * timeLeft, Math.max(0, velocity.y * timeLeft), velocity.z * timeLeft);
+                        //JCraft.LOGGER.info("Modified velocity: " + velocityComp);
+                        futurePos = futurePos.add(velocityComp);
+                        changed = true;
+                    }
+
+                    // Collision check between current and extrapolated future position
+                    if (changed) {
+                        //JCraft.LOGGER.info("Predicted position changed, time left: " + timeLeft);
+                        BlockHitResult hitResult = world.raycast(new RaycastContext(currentPos, futurePos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, entity));
+                        data.setPosition(hitResult.getPos());
+                    }
+                }
+            }
+        }
+
+        if (!world.isClient) {
             if (doppelganger instanceof PlayerCloneEntity clone && clone.switched) {
                 doppelganger = clone.switchedTo;
                 summonFakeKC();
@@ -564,65 +600,6 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
             if (attack != null) {
                 if (attack.id == overhead.id)
                     this.queuedAttack = null;
-                if (attack.id == prediction.id && age % 2 == 0) {
-                    user.addStatusEffect( new StatusEffectInstance(StatusEffects.SLOWNESS, 10, 2, true, false) );
-
-                    int timeLeft = getMoveStun();
-                    for (TimeEraseData data : predictionInfo) {
-                        Entity entity = data.getEntity();
-                        if (entity == null) continue;
-
-                        Vec3d currentPos = entity.getPos().add(0, 0.1, 0);
-                        Vec3d futurePos = currentPos;
-                        boolean changed = false;
-
-                        // If in air and not in a liquid, account for drop
-                        if (!entity.isOnGround() && !entity.isSubmergedInWater() && !entity.isInLava()) {
-                            //JCraft.LOGGER.info("Target is in air");
-                            futurePos = futurePos.add(0, (-9.81 / 400) * timeLeft * timeLeft, 0);
-                            changed = true;
-                        }
-
-                        // If moving faster than 0.01 m/s, account for distance traveled
-                        Vec3d velocity = entity.getVelocity();
-                        if (entity instanceof ServerPlayerEntity player) // EXTREMELY cursed implementation of player velocity because NOTHING ELSE WORKS
-                            velocity = ((IEntityDataSaver)player).getDesiredVelocity();
-                        //JCraft.LOGGER.info("Target is moving at a velocity of: " + velocity);
-                        if (velocity.lengthSquared() > 0.0001) {
-                            Vec3d velocityComp = new Vec3d(velocity.x * timeLeft, Math.max(0, velocity.y * timeLeft), velocity.z * timeLeft);
-                            //JCraft.LOGGER.info("Modified velocity: " + velocityComp);
-                            futurePos = futurePos.add(velocityComp);
-                            changed = true;
-                        }
-
-                        // Collision check between current and extrapolated future position
-                        if (changed) {
-                            //JCraft.LOGGER.info("Predicted position changed, time left: " + timeLeft);
-                            BlockHitResult hitResult = world.raycast(new RaycastContext(currentPos, futurePos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, entity));
-                            data.setPosition(hitResult.getPos());
-                        }
-
-                        if (!userIsPlayer) continue;
-
-                        // Display future position
-                        Vec3d position = data.getPosition();
-                        Box box = entity.getBoundingBox();
-                        if (box.getAverageSideLength() > 0.1) {
-                            PacketByteBuf buf = PacketByteBufs.create();
-                            buf.writeShort(2);
-
-                            buf.writeDouble(position.x);
-                            buf.writeDouble(position.y);
-                            buf.writeDouble(position.z);
-
-                            buf.writeDouble(box.getXLength());
-                            buf.writeDouble(box.getYLength());
-                            buf.writeDouble(box.getZLength());
-
-                            ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
-                        }
-                    }
-                }
             }
 
             // Handle time erase
@@ -637,32 +614,6 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                     if (getMoveStun() < (attack.moveStun - attack.realInitTime() * 2 / 3))
                         cancelTE();
 
-                /* Only a player user has to see the time erase trackers
-                if (age % 2 == 0 && userIsPlayer) {
-                    for (TimeEraseData timeEraseData : timeEraseInfo) {
-                        Entity entity = timeEraseData.getEntity();
-                        if (entity == null) continue;
-
-                        Vec3d position = timeEraseData.getPosition();
-                        Box box = entity.getBoundingBox();
-                        if (box.getAverageSideLength() > 0.1) {
-                            PacketByteBuf buf = PacketByteBufs.create();
-                            buf.writeShort(2);
-
-                            buf.writeDouble(position.x);
-                            buf.writeDouble(position.y);
-                            buf.writeDouble(position.z);
-
-                            buf.writeDouble(box.getXLength());
-                            buf.writeDouble(box.getYLength());
-                            buf.writeDouble(box.getZLength());
-
-                            ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
-                        }
-                    }
-                }
-                 */
-
                 // Invulnerability and invisibility
                 user.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 10, 9, true, false));
                 user.addStatusEffect(new StatusEffectInstance(StatusEffects.INVISIBILITY, 10, 0, true, false));
@@ -676,7 +627,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                 if (getTETime() < 1) {
                     // Play exit noise
                     if (userIsPlayer)
-                        serverPlayerEntity.networkHandler.sendPacket(new PlaySoundS2CPacket(JSoundRegister.TIME_ERASE_EXIT, SoundCategory.PLAYERS, getX(), getY(), getZ(), 1, 1, 0));
+                        playerEntity.networkHandler.sendPacket(new PlaySoundS2CPacket(JSoundRegister.TIME_ERASE_EXIT, SoundCategory.PLAYERS, getX(), getY(), getZ(), 1, 1, 0));
 
                     // Doppelgänger disappears at the end of Time Erase
                     doppelganger.discard();
@@ -698,6 +649,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                 user.setCustomNameVisible(teTime <= 0);
         }
     }
+
 
     // Animations
     final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
