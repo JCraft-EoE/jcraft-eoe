@@ -8,6 +8,7 @@ import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.ISpec;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JObjectRegistry;
+import net.arna.jcraft.registry.JSoundRegister;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
@@ -16,6 +17,8 @@ import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
@@ -58,16 +61,23 @@ public class SheathedAnubisItem extends AnubisItem {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack itemStack = user.getStackInHand(hand);
-        if (world.isClient) return TypedActionResult.fail(itemStack);
-        if (!user.isSneaking()) user.setCurrentHand(hand);
+
+        if (!user.isSneaking() || world.isClient)
+            return TypedActionResult.fail(itemStack);
         else {
+            ServerWorld serverWorld = (ServerWorld)world;
             JCraftSpec spec = JUtils.getSpec(user);
-            if (spec instanceof AnubisSpec)
+
+            if (spec instanceof AnubisSpec) {
+                JUtils.serverPlaySound(JSoundRegister.ANUBIS_UNSHEATHE, serverWorld, user.getPos());
                 user.setStackInHand(hand, new ItemStack(JObjectRegistry.ANUBIS));
-            else if (warned) {
-                NbtCompound data = ((IEntityDataSaver)user).getPersistentData();
+            } else if (warned) {
+                JUtils.serverPlaySound(JSoundRegister.ANUBIS_UNSHEATHE, serverWorld, user.getPos());
+                JUtils.serverPlaySound(JSoundRegister.ANUBIS_SPECCHANGE, serverWorld, user.getPos());
+
+                NbtCompound data = ((IEntityDataSaver) user).getPersistentData();
                 data.putInt("SpecID", 2);
-                JUtils.assignSpec(user, data, (ISpec)user);
+                JUtils.assignSpec(user, data, (ISpec) user);
                 user.setStackInHand(hand, new ItemStack(JObjectRegistry.ANUBIS));
                 warned = false;
             } else {

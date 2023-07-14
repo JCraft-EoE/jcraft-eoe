@@ -2,7 +2,9 @@ package net.arna.jcraft.common.item;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JObjectRegistry;
+import net.arna.jcraft.registry.JSoundRegister;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
@@ -15,6 +17,8 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
@@ -62,8 +66,12 @@ public class AnubisItem extends Item {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack item = user.getStackInHand(hand);
-        if (!user.isSneaking()) return TypedActionResult.fail(item);
+
+        if (!user.isSneaking() || world.isClient) return TypedActionResult.fail(item);
+
+        JUtils.serverPlaySound(JSoundRegister.ANUBIS_SHEATHE, (ServerWorld) world, user.getPos());
         user.setStackInHand(hand, new ItemStack(JObjectRegistry.ANUBISSHEATHED));
+
         return TypedActionResult.success(item);
     }
 

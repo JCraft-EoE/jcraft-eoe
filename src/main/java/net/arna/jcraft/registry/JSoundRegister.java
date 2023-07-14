@@ -180,7 +180,6 @@ public interface JSoundRegister {
     SoundEvent MIH_CIRCLE = registerSound("mihcircle");
 
     //The World: Over Heaven
-
     SoundEvent TWOH_SUMMON = registerSound("twohsummon");
     SoundEvent TWOH_BARRAGE = registerSound("twohbarrage");
     SoundEvent TWOH_SHOOT = registerSound("twohshoot");
@@ -193,6 +192,18 @@ public interface JSoundRegister {
     SoundEvent TWOH_OVERWRITE = registerSound("twohoverwrite");
     SoundEvent TWOH_KNIFETHROW = registerSound("twohowarida");
     SoundEvent TWOH_AIRKNIVES = registerSound("twohairknives");
+
+    //// SPECS
+    // Brawler
+
+    // Anubis
+    SoundEvent ANUBIS_SLASH = registerSound("anubisslash");
+    SoundEvent ANUBIS_POMMEL = registerSound("anubispommel");
+    SoundEvent ANUBIS_SHEATHE = registerSound("anubissheathe");
+    SoundEvent ANUBIS_UNSHEATHE = registerSound("anubisunsheathe");
+    SoundEvent ANUBIS_SPECCHANGE = registerSound("anubisspecchange");
+    SoundEvent ANUBIS_REKKA2 = registerSound("anubisrekka2");
+    SoundEvent ANUBIS_REKKA3 = registerSound("anubisrekka3"); //todo: 3 hit rekka sound for anubis
 
     static void registerSounds() {
 

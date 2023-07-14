@@ -176,13 +176,8 @@ public abstract class JCraftSpec {
                                     hitPos.z + random.nextDouble(-0.5, 0.5),
                                     attack.hitspark + 1);
 
-                            if (attack.impactSound != null) {
-                                for (ServerPlayerEntity serverPlayerEntity : PlayerLookup.around(serverWorld, hitPos, 32)) {
-                                    serverPlayerEntity.networkHandler.sendPacket(
-                                            new PlaySoundS2CPacket(attack.impactSound, SoundCategory.PLAYERS, hitPos.x, hitPos.y, hitPos.z, 1, 1, 0)
-                                    );
-                                }
-                            }
+                            if (attack.impactSound != null)
+                                JUtils.serverPlaySound(attack.impactSound, serverWorld, hitPos);
 
                             float kb = attack.knockback;
                             Vec3d kbVec = rotVec.multiply(kb).add(new Vec3d(0.0, Math.abs(attack.knockback) / 4, 0.0));

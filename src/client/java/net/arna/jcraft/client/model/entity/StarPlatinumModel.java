@@ -5,6 +5,8 @@ import net.arna.jcraft.common.entity.StarPlatinumEntity;
 import net.arna.jcraft.client.util.JClientUtils;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.processor.IBone;
@@ -38,23 +40,7 @@ public class StarPlatinumModel extends AnimatedTickingGeoModel<StarPlatinumEntit
     @Override
     public void setCustomAnimations(StarPlatinumEntity animatable, int instanceId, AnimationEvent animationEvent) {
         super.setCustomAnimations(animatable, instanceId, animationEvent);
-        if (animatable.hasUser()) {
+        if (animatable.hasUser())
             JClientUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), animationEvent.getPartialTick(), true, true);
-
-            if (animatable.getInhaleTime() > 0) {
-                IBone head = getAnimationProcessor().getBone("head");
-
-                World world = animatable.getWorld();
-                for (int i = 0; i < 3; i++) {
-                    /*
-                    world.addParticle(
-                            ParticleTypes.POOF,
-                            fPos.x + random.nextDouble() - 0.5, fPos.y + random.nextDouble() - 0.5, fPos.z + random.nextDouble() - 0.5,
-                            -rotVec.x / 3.0, -rotVec.y / 3.0, -rotVec.z / 3.0
-                    );
-                     */
-                }
-            }
-        }
     }
 }

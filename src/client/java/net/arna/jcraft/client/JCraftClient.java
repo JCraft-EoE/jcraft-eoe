@@ -49,6 +49,7 @@ import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
+import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
@@ -146,10 +147,12 @@ public class JCraftClient implements ClientModInitializer {
         MinecraftClient.getInstance().send(EpitaphOverlay::preload);
 
         if (!FabricLoader.getInstance().isDevelopmentEnvironment()) return;
+
         Identifier itemId = JObjectRegistry.ITEMS.get(JObjectRegistry.DEBUG_WAND);
         BigItemRenderer itemRenderer = new BigItemRenderer(itemId);
         ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(itemRenderer);
         BuiltinItemRendererRegistry.INSTANCE.register(JObjectRegistry.DEBUG_WAND, itemRenderer);
+
         ModelLoadingRegistry.INSTANCE.registerModelProvider((manager, out) -> {
             out.accept(new ModelIdentifier(itemId + "_gui", "inventory"));
             out.accept(new ModelIdentifier(itemId + "_handheld", "inventory"));
@@ -193,7 +196,7 @@ public class JCraftClient implements ClientModInitializer {
 
         int i = 0;
         TextRenderer textRenderer = client.inGameHud.getTextRenderer();
-        if (player.world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && comboCounter > 0) {
+        if (comboCounter > 0 && player.world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && ticksSinceCounted <= 60) {
 
             String remark = "epic tod free download";
             if (comboCounter < comboRemarks.size() * 7) {
@@ -289,7 +292,7 @@ public class JCraftClient implements ClientModInitializer {
                         new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
 
                 for (Entity entity : toStop) {
-                    if ( entity == user || entity == ((IEntityDataSaver)user).getStand() ) continue;
+                    if ( entity == user || entity == ((IEntityDataSaver)user).getStand() || entity == user.getVehicle() ) continue;
                     ITimeStop ts = ((ITimeStop) entity);
                     ts.setTimeStopTicks(2);
                 }

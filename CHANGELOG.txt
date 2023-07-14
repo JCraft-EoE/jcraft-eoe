@@ -1172,6 +1172,8 @@ The Fool
 >Added descriptions to many items (Green Baby, Revolver, DIO's Diary...)
 >Updated all hard-coded texts to translatable texts
 >Fixed bug where certain projectiles could ride entities
+>Combo Counter text now only persists for 3 seconds
+>You can now ride entities during Timestop
 
 Knives
     >Now must be charged (Single - 0.5s, Bundle - 1s) to obtain maximum velocity
@@ -1179,7 +1181,13 @@ Knives
 King Crimson
     Predict
         >Decreased prediction interval
-        >Fixed velocity compensation for pla
+        >Fixed velocity compensation for players
+
+Golden Experience: Requiem
+    >Added second hitbox to Overhead Smash
+
+Anubis
+    >Added sounds
 
 priority (top to bottom)
 todo: fix predict not working with new projectiles

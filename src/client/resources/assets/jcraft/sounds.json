@@ -202,14 +202,7 @@
   "twtimestop": {
     "subtitle": "subtitles.jcraft.twts",
     "sounds": [
-      "jcraft:stands/theworld/ts"
-    ]
-  },
-
-  "twtimestop_clean": {
-    "subtitle": "subtitles.jcraft.twts_clean",
-    "sounds": [
-      "jcraft:stands/theworld/ts_clean"
+      "jcraft:stands/theworld/timestop"
     ]
   },
 
@@ -879,6 +872,48 @@
   "scpoke": {
     "sounds": [
       "jcraft:stands/silverchariot/poke"
+    ]
+  },
+
+  "anubisslash": {
+    "sounds": [
+      "jcraft:specs/anubis/slash"
+    ]
+  },
+
+  "anubispommel": {
+    "sounds": [
+      "jcraft:specs/anubis/pommel"
+    ]
+  },
+
+  "anubissheathe": {
+    "sounds": [
+      "jcraft:specs/anubis/sheathe"
+    ]
+  },
+
+  "anubisunsheathe": {
+    "sounds": [
+      "jcraft:specs/anubis/unsheathe"
+    ]
+  },
+
+  "anubisspecchange": {
+    "sounds": [
+      "jcraft:specs/anubis/specchange"
+    ]
+  },
+
+  "anubisrekka2": {
+    "sounds": [
+      "jcraft:specs/anubis/rekka2"
+    ]
+  },
+
+  "anubisrekka3": {
+    "sounds": [
+      "jcraft:specs/anubis/rekka2"
     ]
   }
 }

@@ -47,7 +47,11 @@ import java.util.Map;
 public class GEREntity extends StandEntity implements IAnimatable, IAnimationTickable {
     public static final Attack light = new Attack(0, 2, 0.75f, 9, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch/Downward Kick", "quick combo starter, in air: more hitstun, less blockstun");
-    public static final Attack heavy = new Attack(2, 17, 1f, 19, 10, 1.5, 9f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_2).setHitspark(2).hyperArmor().setLaunch()
+    public static final Attack heavy = new Attack(2, 17, 1f, 19, 10, 1.5, 9f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_2)
+            .setHitspark(2)
+            .hyperArmor()
+            .setLaunch()
+            .appendHitbox(new Attack.HitboxData(0, 0, 1.5))
             .setInfo("Overhead Smash/Overhead Kick", "slow, uninterruptable knockdown, in air: slow combo starter");
     public static final Attack barrage = new Attack(4, 14, 0.75f, 30, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 2, 0, 3)
             .setInfo("Barrage/Kick Barrage", "fast reliable combo starter/extender, high stun, in air: fast combo finisher, knocks back");

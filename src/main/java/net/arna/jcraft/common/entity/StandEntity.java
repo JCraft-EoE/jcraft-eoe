@@ -855,8 +855,6 @@ public abstract class StandEntity extends MobEntity {
 
         // Minor aspects of timestop logic, actual stopping is handled at JServerTickEvents
         if (tsTime > 0) {
-            user.stopRiding();
-
             for (int h = 0; h < 1500 / tsTime; ++h)
                 world.addParticle(
                         ParticleTypes.MYCELIUM,

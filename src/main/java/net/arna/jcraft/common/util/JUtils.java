@@ -10,6 +10,7 @@ import net.arna.jcraft.common.spec.AnubisSpec;
 import net.arna.jcraft.common.spec.BrawlerSpec;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SideShapeType;
 import net.minecraft.entity.Entity;
@@ -21,8 +22,12 @@ import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -160,6 +165,18 @@ public final class JUtils {
         ENTITY,
         BLOCK,
         NEAREST
+    }
+
+    public static void serverPlaySound(SoundEvent sound, ServerWorld serverWorld, Vec3d pos) {
+        serverPlaySound(sound, serverWorld, pos, 32);
+    }
+
+    public static void serverPlaySound(SoundEvent sound, ServerWorld serverWorld, Vec3d pos, double radius) {
+        PlayerLookup.around(serverWorld, pos, radius).forEach(
+                serverPlayer -> serverPlayer.networkHandler.sendPacket(
+                        new PlaySoundS2CPacket(sound, SoundCategory.PLAYERS, pos.x, pos.y, pos.z, 1, 1, 0)
+                )
+        );
     }
 
     //todo: generic raycast that hits entities and blocks

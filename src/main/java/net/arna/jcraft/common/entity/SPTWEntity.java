@@ -27,7 +27,7 @@ import java.util.List;
 public class SPTWEntity extends StarPlatinumEntity implements IAnimatable, IAnimationTickable {
     public static final Attack light = new Attack(0, 2, 0.75f, 7, 5, 1.5, 5f, 0.25f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter, low knockback");
-    public static final Attack heavy = new Attack(1, 17, 1f, 30, 20, 2.0, 10f, 1.5f, AttackType.BOX, 0.7f)
+    public static final Attack heavy = new Attack(1, 17, 1f, 30, 20, 2.0, 10f, 1.5f, AttackType.BOX, 0.7f, 0, 0, JSoundRegister.IMPACT_1)
             .setHitspark(2)
             .appendHitbox(new Attack.HitboxData(0, 0, 1.5))
             .hyperArmor()
@@ -35,9 +35,10 @@ public class SPTWEntity extends StarPlatinumEntity implements IAnimatable, IAnim
             .setInfo("Star Breaker", "uninterruptable launcher");
     public static final Attack barrage = new Attack(2, 17, 0.75f, 60, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 2, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public static final Attack timestrike = new Attack(3, 20, 0.75f, 11, 7, 1.5, 5f, 0.75f, AttackType.BOX, 0.6f, -0.25f)
+    public static final Attack timestrike = new Attack(3, 20, 0.75f, 11, 7, 1.5, 5f, 0.75f, AttackType.BOX, 0.6f, -0.25f, 0, JSoundRegister.IMPACT_1)
+            .appendHitbox(new Attack.HitboxData(0, 0, 1))
             .setInfo("Time Strike", "teleports forward 2.5m after a short windup, then delivers a fast, low stun hit/crouch to turn around after teleport");
-    public static final Attack backhand = new Attack(4, 12, 0.75f, 12, 7, 1.5, 6f, 0.25f, AttackType.BOX, 1f, 0)
+    public static final Attack backhand = new Attack(4, 12, 0.75f, 12, 7, 1.5, 6f, 0.25f, AttackType.BOX, 1f, 0, 0, JSoundRegister.IMPACT_1)
             .appendHitbox(new Attack.HitboxData(0, 0, 1))
             .setInfo("Backhand", "fast poke, decent stun");
     public static final Attack grab = new Attack(5, 26, 1f, 20, 8, 1.5, 2f, 0.4f, AttackType.BOX, 1, 0, 0)
@@ -47,7 +48,8 @@ public class SPTWEntity extends StarPlatinumEntity implements IAnimatable, IAnim
             .setStunType(0)
             .setBlockstun(4)
             .setInfo("What an Ugly Watch", "grab, high recovery");
-    public static final Attack grabhit = new Attack(7, 0, 1f, 24, 16, 1.75, 9f, 0.4f, AttackType.BOX, 1, 0, 0)
+    public static final Attack grabhit = new Attack(7, 0, 1f, 24, 16, 1.75, 9f, 0.4f, AttackType.BOX, 1, 0, 0, JSoundRegister.IMPACT_1)
+            .setHitspark(2)
             .setLaunch()
             .hyperArmor()
             .setInfo("What an Ugly Watch (Hit)", "");
@@ -178,7 +180,6 @@ public class SPTWEntity extends StarPlatinumEntity implements IAnimatable, IAnim
 
     @Override
     public void tick() {
-        if (age == 1) playSound(JSoundRegister.STAR_PLATINUM_SUMMON, 1f, 1f);
         super.tick();
 
         LivingEntity user = getUser();

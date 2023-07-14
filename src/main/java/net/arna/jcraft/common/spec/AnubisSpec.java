@@ -69,7 +69,8 @@ public class AnubisSpec extends JCraftSpec {
     @Override
     public void InitHeavyAttack(ServerWorld serverWorld) {
         if (!canAttack()) return;
-        handleAttack(serverWorld, player.isHolding(JObjectRegistry.ANUBIS) ? pommel : pommelIn, JCraft.heavyCD);
+        if (handleAttack(serverWorld, player.isHolding(JObjectRegistry.ANUBIS) ? pommel : pommelIn, JCraft.heavyCD))
+            JUtils.serverPlaySound(JSoundRegister.ANUBIS_POMMEL, serverWorld, player.getPos());
     }
 
     /*
@@ -84,21 +85,23 @@ public class AnubisSpec extends JCraftSpec {
     public void InitSpecial1(ServerWorld serverWorld) {
         if (!canAttack()) return;
         if (!player.isHolding(JObjectRegistry.ANUBIS)) return;
-        handleAttack(serverWorld, slash, JCraft.s1CD);
+        if (handleAttack(serverWorld, slash, JCraft.s1CD))
+            JUtils.serverPlaySound(JSoundRegister.ANUBIS_SLASH, serverWorld, player.getPos());
     }
 
     @Override
     public void InitSpecial2(ServerWorld serverWorld) {
         if (!canAttack()) return;
         if (!player.isHolding(JObjectRegistry.ANUBIS)) return;
-        handleAttack(serverWorld, rekkas2, JCraft.s2CD);
+        if (handleAttack(serverWorld, rekkas2, JCraft.s2CD))
+            JUtils.serverPlaySound(JSoundRegister.ANUBIS_REKKA2, serverWorld, player.getPos());
     }
 
     @Override
     public void InitSpecial3(ServerWorld serverWorld) {
         if (!canAttack()) return;
-        if (player.isHolding(JObjectRegistry.ANUBIS)) {
-            handleAttack(serverWorld, rekkas3, JCraft.s2CD);
+        if (player.isHolding(JObjectRegistry.ANUBIS) && handleAttack(serverWorld, rekkas3, JCraft.s2CD)) {
+            JUtils.serverPlaySound(JSoundRegister.ANUBIS_REKKA3, serverWorld, player.getPos());
         } else {
             handleAttack(serverWorld, sweep, JCraft.s3CD);
             player.addStatusEffect(

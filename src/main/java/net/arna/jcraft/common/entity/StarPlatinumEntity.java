@@ -49,9 +49,9 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
             .setRanged(true)
             .disableBackstab()
             .setInfo("Advancing Barrage", "fast combo starter/extender, medium stun, extremely punishable on whiff");
-    public static final Attack inhale = new Attack(6, 50, 5, 5, 0, AttackType.BOX)
+    public static final Attack inhale = new Attack(6, 50, 5, 5, 4, AttackType.BOX)
             .setUB(true)
-            .setInfo("Inhale", "vacuums nearby entities for 3 seconds");
+            .setInfo("Inhale", "vacuums nearby entities for 4 seconds");
     private static final Attack jump = new Attack(-2, 18, 14, 5)
             .setMobility(MobilityType.HIGHJUMP)
             .setInfo("Stand Jump", "jumps in looked direction with slight upward bias, you must stay on the ground until Star Platinum jumps");
@@ -210,7 +210,7 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
                 lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, avgPos);
                 curAttack.attackDist = (float) avgPos.distanceTo(getPos());
             }
-            case (6) -> setInhaleTime(60);
+            case (6) -> setInhaleTime((int) (inhale.stun * 20));
         }
     }
 
@@ -222,13 +222,18 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
 
         if (user != null) {
             Vec3d rotVec = getRotationVector();
-            Vec3d fPos = getEyePos().add(rotVec);
+            Vec3d fPos = getEyePos().add(rotVec.multiply(1.5));
 
             if (world.isClient) {
                 setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(getUser()) / 2, 0.0, 255.0) / 255f);
             } else {
                 if (getInhaleTime() > 0) {
                     setInhaleTime(getInhaleTime() - 1);
+
+                    if (getInhaleTime() > 0)
+                        setRotationOffset(90);
+                    else
+                        setRotationOffset(225);
 
                     if (age % 2 == 0) {
                         List<Entity> filter = new ArrayList<>(List.of(this, user));
@@ -237,7 +242,7 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
                         List<? extends Entity> toInhale = JUtils.generateHitbox(world, fPos, 2, LivingEntity.class, filter);
                         for (Entity entity : toInhale) {
                             entity.setVelocity(
-                                    entity.getVelocity().subtract(rotVec).multiply(0.5)
+                                    entity.getVelocity().subtract(rotVec).multiply(0.25)
                             );
 
                             entity.velocityModified = true;
@@ -281,13 +286,13 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
 
         if (getSameState()) controller.markNeedsReload();
         switch (getState()) {
-            default -> controller.setAnimation(builder.loop("animation.starplatinum.idle"));
+            default -> controller.setAnimation(builder.loop(getInhaleTime() > 0 ? "animation.starplatinum.inhaleidle" : "animation.starplatinum.idle"));
             case 2 -> controller.setAnimation(builder.playAndHold("animation.starplatinum.punch"));
             case 3 -> controller.setAnimation(builder.loop("animation.starplatinum.block"));
             case 4 -> controller.setAnimation(builder.playAndHold("animation.starplatinum.heavy"));
             case 5 -> controller.setAnimation(builder.loop("animation.starplatinum.barrage"));
             case 6 -> controller.setAnimation(builder.playAndHold("animation.starplatinum.star_finger"));
-            case 7 -> controller.setAnimation(builder.playAndHold("animation.starplatinum.timestop"));
+            case 7 -> controller.setAnimation(builder.playAndHold("animation.starplatinum.inhale"));
             case 8 -> controller.setAnimation(builder.playAndHold("animation.starplatinum.low_kick"));
             case 9 -> controller.setAnimation(builder.playAndHold("animation.starplatinum.jump"));
         }
