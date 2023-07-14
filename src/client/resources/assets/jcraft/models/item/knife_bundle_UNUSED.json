@@ -1,0 +1,14 @@
+{
+  "parent": "item/handheld",
+  "base": {
+    "parent": "jcraft:item/knife_bundle_handheld"
+  },
+  "perspectives": {
+    "gui": {
+      "parent": "jcraft:item/knife_bundle_gui"
+    },
+    "fixed": {
+      "parent": "jcraft:item/knife_bundle_gui"
+    }
+  }
+}
