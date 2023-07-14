@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CrimsonShaderHandler extends StandShaderHandler {
-    public static CrimsonShaderHandler INSTANCE = new CrimsonShaderHandler();
+    public static final CrimsonShaderHandler INSTANCE = new CrimsonShaderHandler();
 
     public long effectLength = 0;
     public List<BlockInfo> list = new ArrayList<>();

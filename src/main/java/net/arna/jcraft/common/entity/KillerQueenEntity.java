@@ -407,6 +407,7 @@ public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnim
         return age;
     }
 
+    @SuppressWarnings("SameReturnValue")
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();

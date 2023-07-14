@@ -1,18 +1,19 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.util.Attack;
-import net.arna.jcraft.common.util.AttackType;
-import net.arna.jcraft.common.util.IEntityDataSaver;
-import net.arna.jcraft.common.util.MobilityType;
+import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.util.hit.HitResult;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.IAnimationTickable;
@@ -24,6 +25,7 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAnimationTickable {
@@ -47,18 +49,43 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
             .setRanged(true)
             .disableBackstab()
             .setInfo("Advancing Barrage", "fast combo starter/extender, medium stun, extremely punishable on whiff");
-    public static final Attack timestop = new Attack(6, 60, 40, 39, 3, AttackType.TIMESTOP) // TS = (moveStun-initTime)/20
+    public static final Attack inhale = new Attack(6, 50, 5, 5, 0, AttackType.BOX)
             .setUB(true)
-            .setInfo("Timestop", "3 seconds");
+            .setInfo("Inhale", "vacuums nearby entities for 3 seconds");
+    private static final Attack jump = new Attack(-2, 18, 14, 5)
+            .setMobility(MobilityType.HIGHJUMP)
+            .setInfo("Stand Jump", "jumps in looked direction with slight upward bias, you must stay on the ground until Star Platinum jumps");
+
+    // Inhale
+    public static final TrackedData<Integer> INHALETIME;
+
+    static {
+        INHALETIME = DataTracker.registerData(StarPlatinumEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    }
+    @Override
+    protected void initDataTracker() {
+        super.initDataTracker();
+        dataTracker.startTracking(INHALETIME, 0);
+    }
+    private void setInhaleTime(int time) {
+        dataTracker.set(INHALETIME, time);
+    }
+    public int getInhaleTime() {
+        return dataTracker.get(INHALETIME);
+    }
 
     @Override
     public void desummon() {
         if (tsTime > 0) return;
         super.desummon();
     }
-
+    
     public StarPlatinumEntity(World worldIn) {
-        super(StandType.STAR_PLATINUM, worldIn);
+        this(StandType.STAR_PLATINUM, worldIn);
+    }
+
+    protected StarPlatinumEntity(StandType type, World worldIn) {
+        super(type, worldIn);
         super.initialize();
         idleRotation = 225f;
 
@@ -84,107 +111,144 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
                             -the classic
                             M1>Barrage>M1>Low Kick>Advancing Barrage~M1~Star Finger~Star Breaker
                             
-                            -the "omg you can confirm ts??"
-                            M1>Advancing Barrage~M1~Star Finger>Barrage>Timestop{ M1>Low Kick>Star Breaker }
+                            -the "omg where did ts go"
+                            M1>...
 
                             -the poke
                             Star Finger>Low Kick>M1>Advancing Barrage~M1~Low Kick>Barrage>M1>Star Breaker""";
 
-        moves = List.of(light, heavy, barrage, starfinger, timestop, lowkick, starfinger,
-                new Attack().setMobility(MobilityType.TELEPORT).setInfo("Timeskip", "14m range")
-        );
+        moves = List.of(light, heavy, barrage, starfinger, inhale, lowkick, starfinger, jump);
     }
 
     // Moveset
     @Override
     public void initLightAttack() {
-        if (!this.canAttack()) {
-            return;
-        }
+        if (!canAttack()) return;
         handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
     public void initHeavyAttack() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(heavy, JCraft.standHeavyCD, 4)) {
-            this.playSound(JSoundRegister.STAR_BREAKER, 1, 1);
+            playSound(JSoundRegister.STAR_BREAKER, 1, 1);
         }
     }
 
     @Override
     public void initBarrage() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
-            this.playSound(JSoundRegister.STAR_PLATINUM_BARRAGE, 1, 1);
+            playSound(JSoundRegister.STAR_PLATINUM_BARRAGE, 1, 1);
         }
     }
 
     @Override
     public void initSpecial1() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(starfinger, JCraft.standS1CD, 6)) {
-            this.playSound(JSoundRegister.STAR_FINGER, 1, 1);
+            playSound(JSoundRegister.STAR_FINGER, 1, 1);
         }
     }
 
     @Override
     public void initUlt() {
-        if (!this.canAttack()) return;
-        if (handleAttack(timestop, JCraft.standUltCD, 7)) {
-            this.playSound(JSoundRegister.STAR_PLATINUM_THE_WORLD, 1, 1);
+        if (!canAttack()) return;
+        if (handleAttack(inhale, JCraft.standUltCD, 7)) {
+            //playSound(JSoundRegister.STAR_SUCK, 1, 1);
         }
     }
 
     @Override
     public void initSpecial2() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(lowkick, JCraft.standS2CD, 8)) {
-            this.playSound(JSoundRegister.STAR_PLATINUM_KICK, 1, 1);
+            playSound(JSoundRegister.STAR_PLATINUM_KICK, 1, 1);
         }
     }
 
     @Override
     public void initSpecial3() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         // Uses a copy because otherwise the main one gets overwritten by specialAttack()
         if (handleAttack(Attack.copyOf(chargebarrage), JCraft.standS3CD, 5)) {
-            this.playSound(JSoundRegister.STAR_PLATINUM_ADVANCING_BARRAGE, 1, 1);
+            playSound(JSoundRegister.STAR_PLATINUM_ADVANCING_BARRAGE, 1, 1);
         }
     }
 
-    private static final Attack timeskip = new Attack(-2, 18, 2, 2).setInfo("Timeskip", "");
     @Override
     public void initUtil() {
-        if (!canAttack()) return;
-        handleAttack(timeskip, JCraft.utilCD, 0);
+        if (!canAttack() || !getUser().isOnGround()) return;
+        handleAttack(jump, JCraft.utilCD, 9);
     }
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
-        if (attack.id == chargebarrage.id) { // Lock-on
-            if (entities.isEmpty()) return;
-            Vec3d avgPos = Vec3d.ZERO;
-            float c = 0;
-            for (LivingEntity ent : entities) {
-                if (ent instanceof StandEntity) continue;
-                avgPos = avgPos.add(ent.getPos());
-                c += 1f;
+        switch (attack.id) {
+            case (-2) -> {
+                LivingEntity user = getUser();
+                if (!user.isOnGround()) return;
+
+                Vec3d jumpVel = getRotationVector().multiply(1.5).add(0, 0.5, 0);
+
+                user.addVelocity(jumpVel.x, jumpVel.y, jumpVel.z);
+                user.velocityModified = true;
+
+                if (user instanceof ServerPlayerEntity player)
+                    player.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(player));
             }
-            avgPos = avgPos.multiply(1f / c);
-            lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, avgPos);
-            curAttack.attackDist = (float) avgPos.distanceTo(getPos());
-        } else if (attack.id == -2) {
-            timeSkip(14, JSoundRegister.TIME_SKIP);
+            case (5) -> {
+                if (entities.isEmpty()) return;
+                Vec3d avgPos = Vec3d.ZERO;
+                float c = 0;
+                for (LivingEntity ent : entities) {
+                    if (ent instanceof StandEntity) continue;
+                    avgPos = avgPos.add(ent.getPos());
+                    c += 1f;
+                }
+                avgPos = avgPos.multiply(1f / c);
+                lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, avgPos);
+                curAttack.attackDist = (float) avgPos.distanceTo(getPos());
+            }
+            case (6) -> setInhaleTime(60);
         }
     }
 
     @Override
     public void tick() {
-        if (age == 1) this.playSound(JSoundRegister.STAR_PLATINUM_SUMMON, 1f, 1f);
+        if (age == 1) playSound(JSoundRegister.STAR_PLATINUM_SUMMON, 1f, 1f);
         super.tick();
-        if (hasUser())
-            this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(getUser()) / 2, 0.0, 255.0) / 255f);
+        LivingEntity user = getUser();
+
+        if (user != null) {
+            Vec3d rotVec = getRotationVector();
+            Vec3d fPos = getEyePos().add(rotVec);
+
+            if (world.isClient) {
+                setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(getUser()) / 2, 0.0, 255.0) / 255f);
+            } else {
+                if (getInhaleTime() > 0) {
+                    setInhaleTime(getInhaleTime() - 1);
+
+                    if (age % 2 == 0) {
+                        List<Entity> filter = new ArrayList<>(List.of(this, user));
+                        if (user.hasVehicle()) filter.add(user.getVehicle());
+
+                        List<? extends Entity> toInhale = JUtils.generateHitbox(world, fPos, 2, LivingEntity.class, filter);
+                        for (Entity entity : toInhale) {
+                            entity.setVelocity(
+                                    entity.getVelocity().subtract(rotVec).multiply(0.5)
+                            );
+
+                            entity.velocityModified = true;
+
+                            if (entity instanceof ServerPlayerEntity player)
+                                player.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(player));
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // Animation code
@@ -205,6 +269,7 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
         return age;
     }
 
+    @SuppressWarnings("SameReturnValue")
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
@@ -224,6 +289,7 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
             case 6 -> controller.setAnimation(builder.playAndHold("animation.starplatinum.star_finger"));
             case 7 -> controller.setAnimation(builder.playAndHold("animation.starplatinum.timestop"));
             case 8 -> controller.setAnimation(builder.playAndHold("animation.starplatinum.low_kick"));
+            case 9 -> controller.setAnimation(builder.playAndHold("animation.starplatinum.jump"));
         }
 
         return PlayState.CONTINUE;

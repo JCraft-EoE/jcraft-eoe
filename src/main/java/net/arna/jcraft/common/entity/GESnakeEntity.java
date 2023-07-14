@@ -86,6 +86,7 @@ public class GESnakeEntity extends TameableEntity implements IAnimatable, IAnima
         return age;
     }
 
+    @SuppressWarnings("SameReturnValue")
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         AnimationController<E> controller = event.getController();
         if (event.isMoving()) {

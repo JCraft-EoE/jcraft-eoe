@@ -46,8 +46,10 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
             .setInfo("Charge", "user & stand charge forward, uninterruptable launcher");
     public static final Attack dimhop_others = new Attack(3, 60, 1, 60, 40, 1.5, 0f, 0.0f, AttackType.BOX)
             .setInfo("Dimensional Hop", "travels to a random dimension at exact coordinates, if user was hit in the last 30s, he is forced back, certified death button");
-    public static final Attack grab = new Attack(4, 25, 0.75f, 21, 12, 1.5, 0f, 0.0f, AttackType.BOX, 1, 0, 0, null)
+    public static final Attack grab = new Attack(4, 25, 0.75f, 21, 12, 1.5, 0f, 0.0f, AttackType.BOX, 2, 0, 0, null)
             .setUB(false)
+            .setStunOverride(true)
+            .setStunType(0)
             .setInfo("Grab/Summon Gun", "unblockable, combo finisher/crouch to give yourself the gun");
     public static final Attack grabhit = new Attack(5, 0, 0.75f, 34, 0, 2, 4f, 0f, AttackType.MULTIHIT, 0.5f, 0, List.of(11, 17, 26), JSoundRegister.IMPACT_1);
     public static final Attack givegun = new Attack(6, 25, 14, 10, 0, 0.75f, AttackType.BOX)
@@ -266,15 +268,11 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
                     // Grab bypasses and disables block
                     for (LivingEntity ent : entities) {
                         stun(ent, 34, 0);
-
-                        if (ent.getFirstPassenger() instanceof StandEntity stand) {
+                        if (ent.getFirstPassenger() instanceof StandEntity stand)
                             stand.blocking = false;
-                        }
                     }
 
-                    this.curAttack = grabhit;
-                    this.setMoveStun(34);
-                    this.setState(9);
+                    setAttack(grabhit, 9);
                 } else {
                     this.getMainHandStack().decrement(1);
                 }
@@ -393,6 +391,7 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
         return age;
     }
 
+    @SuppressWarnings("SameReturnValue")
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();

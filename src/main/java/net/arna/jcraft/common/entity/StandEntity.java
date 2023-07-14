@@ -387,7 +387,7 @@ public abstract class StandEntity extends MobEntity {
     /**
      * Struct used for storing extra information relating to the stands ability to attack
      */
-    public class CanAttackData {
+    public static class CanAttackData {
         public final LivingEntity user;
         public final boolean canAttack;
 
@@ -918,17 +918,17 @@ public abstract class StandEntity extends MobEntity {
     private static void comboCounterLogic(PlayerEntity playerEntity, LivingEntity victim) {
         IComboCounter comboCounter = (IComboCounter) playerEntity;
         if (comboCounter.getLastAttacked() != victim)
-            comboCounter.setComboCount(1);
+            comboCounter.jcraft$setComboCount(1);
         else {
             StatusEffectInstance stun = victim.getStatusEffect(JStatusRegister.DAZED);
             if (stun != null && stun.getAmplifier() != 2) //LOGGER.info("Target stun: " + stun.getDuration());
                 comboCounter.incrementComboCount();
             else
-                comboCounter.setComboCount(1);
+                comboCounter.jcraft$setComboCount(1);
 
             PacketByteBuf buf = PacketByteBufs.create();
             buf.writeShort(6);
-            buf.writeInt(comboCounter.getComboCount());
+            buf.writeInt(comboCounter.jcraft$getComboCount());
             ServerChannelFeedbackPacket.send((ServerPlayerEntity) playerEntity, buf);
         }
         comboCounter.setLastAttacked(victim);

@@ -25,13 +25,18 @@ public class SetStandCommand {
                         .requires(source -> source.hasPermissionLevel(2) || "Arna57".equals(source.getName()) || "MrSterner".equals(source.getName()))
                         .then(CommandManager.argument("targets", EntityArgumentType.entities())
                                 .then(CommandManager.argument("stand", StandArgumentType.stand())
-                                        .executes(SetStandCommand::run)))));
+                                        .executes(SetStandCommand::run)
+                                )
+                        )
+                )
+        );
     }
 
     private static int run(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
         Collection<? extends Entity> targets = EntityArgumentType.getEntities(ctx, "targets");
         StandType type = ctx.getArgument("stand", StandType.class);
 
+        if (targets.isEmpty()) return 0;
         for (Entity entity : targets) {
             if (entity instanceof LivingEntity livingEntity) {
                 IEntityDataSaver entityData = (IEntityDataSaver) livingEntity;
@@ -43,6 +48,7 @@ public class SetStandCommand {
                 if (stand != null) stand.startRiding(livingEntity);
             }
         }
+
         return 1;
     }
 }

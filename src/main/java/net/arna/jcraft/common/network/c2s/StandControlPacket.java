@@ -38,7 +38,7 @@ public class StandControlPacket {
         //...You will get errors related to the ref count if you try to read data on either server or client thread
 
         switch (control) {
-            // 0 - MOVEMENT INPUT SYNC
+            //todo: convert 0 - MOVEMENT INPUT SYNC into a mixin or something
             case 0 -> {
                 int forward = 0;
                 int side = 0;
@@ -59,11 +59,16 @@ public class StandControlPacket {
                 dash = buf.readBoolean();
 
                 server.execute(() -> {
-                    StandEntity stand = ((IEntityDataSaver)player).getStand();
+                    IEntityDataSaver playerData = ((IEntityDataSaver)player);
+                    playerData.updateRemoteInputs(fF, fS, jump);
+
+                    StandEntity stand = playerData.getStand();
                     if (stand != null) stand.updateRemoteInputs(fF, fS, jump);
+
                     if (dash) JCraft.tryDash(fF, fS, player);
+
                     if (jump && JCraft.isDashing(player))
-                        ((IEntityDataSaver)player).getPersistentData().putInt(dashCD, 100); // 5s cooldown for superjumping
+                        playerData.getPersistentData().putInt(dashCD, 100); // 5s cooldown for superjumping
                 });
             }
             // 1 - STAND SUMMON & DESUMMON

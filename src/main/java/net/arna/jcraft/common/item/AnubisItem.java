@@ -47,11 +47,10 @@ public class AnubisItem extends Item {
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        tooltip.add(Text.of("§9The sword/stand named after the Egyptian god of death."));
-        tooltip.add(Text.of("§eBloodthirsty. §9Fuels itself on any and all violence."));
-        tooltip.add(Text.of("§eHard to get rid of."));
-        tooltip.add(Text.of("§9Can §esheathed §9with §eCrouch + RMB."));
-
+        tooltip.add(Text.translatable("jcraft.anubis.namedesc"));
+        tooltip.add(Text.translatable("jcraft.anubis.bloodthirstdesc"));
+        tooltip.add(Text.translatable("jcraft.anubis.removaldesc"));
+        tooltip.add(Text.translatable("jcraft.anubis.desc"));
         super.appendTooltip(stack, world, tooltip, context);
     }
 

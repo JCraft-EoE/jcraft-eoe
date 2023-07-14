@@ -219,6 +219,11 @@ public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatab
     }
 
     @Override
+    public boolean startRiding(Entity entity, boolean force) {
+        return false;
+    }
+
+    @Override
     public void writeCustomDataToNbt(NbtCompound tag) {
         super.writeCustomDataToNbt(tag);
         if (master == null) return;

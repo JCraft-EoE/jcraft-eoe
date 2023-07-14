@@ -157,6 +157,11 @@ public class SandTornadoEntity extends LivingEntity implements IAnimatable, IOwn
         return true;
     }
 
+    @Override
+    public boolean startRiding(Entity entity, boolean force) {
+        return false;
+    }
+
     public static DefaultAttributeContainer.Builder createTornadoAttributes() {
         return DefaultAttributeContainer.builder()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 20)
@@ -215,6 +220,7 @@ public class SandTornadoEntity extends LivingEntity implements IAnimatable, IOwn
         animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
     }
 
+    @SuppressWarnings("SameReturnValue")
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         event.getController().setAnimation(new AnimationBuilder().loop(hasDisappeared() ? "animation.sandtornado.disappear" : "animation.sandtornado.idle"));
         return PlayState.CONTINUE;

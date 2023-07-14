@@ -98,21 +98,20 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
     // Moveset
     @Override
     public void initLightAttack() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
     public void initHeavyAttack() {
-        if (!this.canAttack()) return;
-        if (handleAttack(heavy, JCraft.standHeavyCD, 4)) {
-            //this.playSound(ModSoundRegister.STAR_BREAKER,1, 1);
-        }
+        if (!canAttack()) return;
+        handleAttack(heavy, JCraft.standHeavyCD, 4);
+        //this.playSound(ModSoundRegister.GE_HEAVY,1, 1);
     }
 
     @Override
     public void initBarrage() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, 5))
             this.playSound(JSoundRegister.GE_BARRAGE, 1, 1);
     }
@@ -132,10 +131,9 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
 
     @Override
     public void initUlt() {
-        if (!this.canAttack()) return;
-        if (handleAttack(overclock, JCraft.standUltCD, 13)) {
-            //this.playSound(ModSoundRegister.STAR_PLATINUM_THE_WORLD, 1, 1);
-        }
+        if (!canAttack()) return;
+        handleAttack(overclock, JCraft.standUltCD, 13);
+        //this.playSound(ModSoundRegister.GE_ULT, 1, 1);
     }
 
     @Override
@@ -174,7 +172,7 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
 
     @Override
     public void initSpecial3() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         toSummon = getUser().isSneaking() ? LifeGiverType.FROG : LifeGiverType.SNAKE;
         if (handleAttack(lifegiver, JCraft.standS3CD, 9))
             this.playSound(JSoundRegister.GE_HEAL, 1, 1);
@@ -182,7 +180,7 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
 
     @Override
     public void initUtil() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(tree, JCraft.utilCD, 8))
             this.playSound(JSoundRegister.GE_TREE, 1, 1);
     }
@@ -318,6 +316,7 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
         return age;
     }
 
+    @SuppressWarnings("SameReturnValue")
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();

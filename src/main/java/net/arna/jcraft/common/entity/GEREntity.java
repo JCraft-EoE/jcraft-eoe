@@ -78,7 +78,7 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
             .setInfo("Return to Zero", "initial press: saves the state of every entity in a 4 chunk radius, second press: reverts all states except users\nDoesn't affect player inventories");
     private final HashMap<Entity, NbtCompound> rtzEntityData = new HashMap<>();
     @Data
-    private class ReturnData {
+    private static class ReturnData {
         Vec3d originalPos;
         Entity entity;
         public ReturnData(Vec3d originalPos, Entity entity) {
@@ -445,6 +445,7 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
         return age;
     }
 
+    @SuppressWarnings("SameReturnValue")
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();

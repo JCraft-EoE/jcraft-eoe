@@ -57,16 +57,19 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
     public void markMeltYourHeart() {
         dataTracker.set(MYH, true);
     }
+
     private void splat() {
         dataTracker.set(SPLAT, true);
         setNoGravity(true);
     }
+
     @Override
     public float getPitch() {
         if (dataTracker.get(SPLAT))
             return dataTracker.get(FINALPITCH);
         return super.getPitch();
     }
+
     @Override
     public float getYaw() {
         if (dataTracker.get(SPLAT))
@@ -130,6 +133,7 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
     }
 
     private int timeOnSurface = 0;
+
     @Override
     protected void age() {
         super.age();
@@ -215,24 +219,35 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
     }
 
     @Override
-    public ItemStack asItemStack() { return ItemStack.EMPTY; }
+    public ItemStack asItemStack() {
+        return ItemStack.EMPTY;
+    }
+
     @Override
-    public boolean hasNoGravity() { return false; }
+    public boolean hasNoGravity() {
+        return false;
+    }
 
     // Animations
     private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+
     @Override
     public void registerControllers(AnimationData data) {
         data.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
     }
+
+    @SuppressWarnings("SameReturnValue")
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         event.getController().setAnimation(
                 dataTracker.get(SPLAT) ?
-                new AnimationBuilder().playAndHold("animation.wsacid.splat") :
-                new AnimationBuilder().loop(dataTracker.get(MYH) ? "animation.wsacid.meltidle" : "animation.wsacid.idle")
+                        new AnimationBuilder().playAndHold("animation.wsacid.splat") :
+                        new AnimationBuilder().loop(dataTracker.get(MYH) ? "animation.wsacid.meltidle" : "animation.wsacid.idle")
         );
         return PlayState.CONTINUE;
     }
+
     @Override
-    public AnimationFactory getFactory() { return this.factory; }
+    public AnimationFactory getFactory() {
+        return this.factory;
+    }
 }

@@ -207,9 +207,8 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
     public void initSpecial3() {
         if (!canAttack()) return;
         if (this.getMode() == 3) {
-            if (handleAttack(this.counter, JCraft.standS3CD, 10)) {
-                //playSound(ModSoundRegister.PSC_CHARGE,1, 1);
-            }
+            handleAttack(this.counter, JCraft.standS3CD, 10);
+            //playSound(ModSoundRegister.PSC_CHARGE,1, 1);
         } else {
             if (handleAttack(this.cleave, JCraft.standS3CD, 13)) {
                 this.setFreePos(new Vec3f(getUser().getPos().add(getUser().getRotationVector().multiply(1.5))));
@@ -361,6 +360,7 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
         return age;
     }
 
+    @SuppressWarnings("SameReturnValue")
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         String idleAnim = "animation.silverchariot.idle";
         if (getMode() == 2)

@@ -495,6 +495,7 @@ public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAni
         return age;
     }
 
+    @SuppressWarnings("SameReturnValue")
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();

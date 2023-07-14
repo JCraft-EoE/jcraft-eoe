@@ -27,6 +27,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -48,15 +49,16 @@ import java.util.*;
 @UtilityClass
 public class ClientPacketHandler {
     // Use an evicting queue to limit the amount of hit boxes rendered at a time to 8.
-    // If there are already 8 hit boxes and we wish to add more, old ones will be removed.
-    @SuppressWarnings("UnstableApiUsage") // I do not care.
+    // If there are already 8 hit boxes, and we wish to add more, old ones will be removed.
+    @SuppressWarnings("UnstableApiUsage") // I do not care. (based)
     private static final Queue<ObjectLongPair<Box>> hitBoxes = EvictingQueue.create(8);
 
     static {
         WorldRenderEvents.START.register(ctx -> {
-            if (!ctx.world().getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)) return;
+            ClientWorld clientWorld = ctx.world();
+            if (!clientWorld.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)) return;
 
-            double acceleration = TimeAccelStatePacket.getAcceleration(ctx.world());
+            double acceleration = TimeAccelStatePacket.getAcceleration(clientWorld);
 
             long currentTime = Util.getMeasuringTimeMs();
             if (acceleration == 0) {
@@ -65,7 +67,7 @@ public class ClientPacketHandler {
             }
 
             double multiplier = (currentTime - TimeAccelStatePacket.lastUpdate) / 1000d;
-            ctx.world().setTimeOfDay((long) (ctx.world().getTimeOfDay() + acceleration * multiplier));
+            clientWorld.setTimeOfDay((long) (clientWorld.getTimeOfDay() + acceleration * multiplier));
 
             TimeAccelStatePacket.lastUpdate = currentTime;
         });

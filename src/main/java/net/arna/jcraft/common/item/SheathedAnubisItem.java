@@ -47,11 +47,12 @@ public class SheathedAnubisItem extends AnubisItem {
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        tooltip.add(Text.of("§9The sword/stand named after the Egyptian god of death."));
-        tooltip.add(Text.of("§eBloodthirsty. §9Fuels itself on any and all violence."));
-        tooltip.add(Text.of("§9Can used to §eblock."));
-        tooltip.add(Text.of("§eHard to get rid of."));
-        tooltip.add(Text.of("§9Can §eunsheathed §9with §eCrouch + RMB."));
+        tooltip.add(Text.translatable("jcraft.anubis.namedesc"));
+        tooltip.add(Text.translatable("jcraft.anubis.bloodthirstdesc"));
+        tooltip.add(Text.translatable("jcraft.anubis.removaldesc"));
+        tooltip.add(Text.translatable("jcraft.sheathedanubis.blockdesc"));
+        tooltip.add(Text.translatable("jcraft.sheathedanubis.desc"));
+        //super.appendTooltip(stack, world, tooltip, context); // Doubles the previous Anubis description
     }
 
     @Override

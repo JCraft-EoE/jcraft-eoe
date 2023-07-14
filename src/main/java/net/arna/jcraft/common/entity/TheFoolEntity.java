@@ -92,6 +92,7 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
     public static final Attack charge = new Attack(5, 20, 7f, 20, 5, 1.5, 6f, 1.2f, AttackType.CHARGE, 0.5f, 0, 11, JSoundRegister.IMPACT_2)
             .setRanged(true)
             .setLaunch()
+            .disableBackstab()
             .aerialVariation(tornado)
             .setInfo("Charge/Sand Tornado", "The Fool detaches from the user and charges forward, dealing knockback on hit/in air summons a slow, stunning sand tornado");
     public static final Attack sandstorm = new Attack(7, 40, 1.5f, 41, 28, 2, 7f, 0.1f, AttackType.BOX, 1, 0, 0, JSoundRegister.TW_KICK_HIT)
@@ -641,6 +642,7 @@ public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimatio
         return age;
     }
 
+    @SuppressWarnings("SameReturnValue")
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         String blockAnim = isSand() ? "animation.thefool.crouchblock" : "animation.thefool.block";
 

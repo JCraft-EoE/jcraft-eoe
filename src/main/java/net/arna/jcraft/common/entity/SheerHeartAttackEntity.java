@@ -86,6 +86,7 @@ public class SheerHeartAttackEntity extends MobEntity implements IAnimatable, IA
         return age;
     }
 
+    @SuppressWarnings("SameReturnValue")
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         event.getController().setAnimation(
                 event.isMoving() ? new AnimationBuilder().loop("animation.sha.walk") : new AnimationBuilder().loop("animation.sha.idle")

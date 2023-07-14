@@ -2,6 +2,7 @@ package net.arna.jcraft.common.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.ISpec;
@@ -19,27 +20,27 @@ public class SetSpecCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment) {
         dispatcher.register(CommandManager.literal("spec")
                 .then(CommandManager.literal("set")
+                        .requires(source -> source.hasPermissionLevel(2) || "Arna57".equals(source.getName()) || "MrSterner".equals(source.getName()))
                         .then(CommandManager.argument("players", EntityArgumentType.players())
                                 .then(CommandManager.argument("id", IntegerArgumentType.integer(-10))
-                                        .executes(
-                                                context -> run(context.getSource(), IntegerArgumentType.getInteger(context, "id"), EntityArgumentType.getPlayers(context, "players"))
-                                        )
+                                        .executes(SetSpecCommand::run)
                                 )
                         )
                 )
         );
     }
 
-    public static int run(ServerCommandSource source, int id, Collection<? extends PlayerEntity> targets) throws CommandSyntaxException {
-        if (source.hasPermissionLevel(2) || "Arna57".equals(source.getName())) {
-            for (PlayerEntity playerTarget : targets) {
-                NbtCompound playerNbt = ((IEntityDataSaver) playerTarget).getPersistentData();
-                playerNbt.putInt("SpecID", id);
-                JUtils.assignSpec(playerTarget, playerNbt, (ISpec) playerTarget);
-            }
-            return 1;
+    public static int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        int specId = IntegerArgumentType.getInteger(context, "id");
+        Collection<? extends PlayerEntity> targets = EntityArgumentType.getPlayers(context, "players");
+
+        if (targets.isEmpty()) return 0;
+        for (PlayerEntity playerTarget : targets) {
+            NbtCompound playerNbt = ((IEntityDataSaver) playerTarget).getPersistentData();
+            playerNbt.putInt("SpecID", specId);
+            JUtils.assignSpec(playerTarget, playerNbt, (ISpec) playerTarget);
         }
 
-        return 0;
+        return 1;
     }
 }

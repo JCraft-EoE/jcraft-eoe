@@ -1,4 +1,4 @@
-started really late into development (after kqbtd went into production) on, but it's before release so i dont really care
+started really late into development (after kqbtd went into production) on, but it's before release, so I don't really care
 by this time the stands that were (mostly) finished are
 Star Platinum, The World, King Crimson, D4C, Cream, Killer Queen
 Whitesnake, C-Moon, Made in Heaven, The World: Over Heaven
@@ -312,7 +312,7 @@ C-Moon
 >blocking no longer makes you immobile
 
 The Fool
->Sandwave now forces your stand back
+>Sandwave now forces your stand near the user
 
 King Crimson - RECODED
 >many code optimizations
@@ -1123,6 +1123,7 @@ Specs
 Whitesnake
     >Updated sounds
 
+
 ● 11/7/2023
 >Added achievement for getting a stand
 >Spec attacks no longer hit entities ridden by the spec user
@@ -1152,11 +1153,38 @@ King Crimson
 Magician's Red
     >Crossfire Hurricane no longer tracks/damages ridden entity
 
+● 13/7/2023
+>Fixed mixin conflict with BetterCombat (PlayerEntityMixin#get/setComboCount)
+
+>Added Star Platinum: The World
+
+Star Platinum
+    >Timeskip replaced with Stand Jump
+    >Timestop replaced with Inhale
+
+King Crimson
+    >Updated animations
+
+The Fool
+    >Charge can no longer backstab
+
+● 14/7/2023
+>Added descriptions to many items (Green Baby, Revolver, DIO's Diary...)
+>Updated all hard-coded texts to translatable texts
+>Fixed bug where certain projectiles could ride entities
+
+Knives
+    >Now must be charged (Single - 0.5s, Bundle - 1s) to obtain maximum velocity
+
+King Crimson
+    Predict
+        >Decreased prediction interval
+        >Fixed velocity compensation for pla
+
 priority (top to bottom)
 todo: fix predict not working with new projectiles
-todo:
 
-TODO: AI flags for unblockables and shouldn't-blockables
+TODO: AI improvements (general)
 TODO: stand summon particles
 TODO: patchouli and the stand users manual
 TODO: Knockdown() method

@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 public interface JEntityRendererRegister {
     static void registerEntityRenderers() {
         EntityRendererRegistry.register(JEntityTypeRegister.STAR_PLATINUM, StarPlatinumRenderer::new);
+        EntityRendererRegistry.register(JEntityTypeRegister.SPTW, SPTWRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegister.KING_CRIMSON, KingCrimsonRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegister.D4C, D4CRenderer::new);
 

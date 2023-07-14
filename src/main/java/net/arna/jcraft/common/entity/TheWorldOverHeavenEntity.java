@@ -22,7 +22,6 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -138,9 +137,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
                             the ultrakill
                             M1>Barrage>M1>Knives>Overwrite~S2/S3>dash>Smite>Heavy>M1""";
 
-        moves = List.of(light, heavy, barrage, smite, timestop, knives, chargeoverwrite,
-                new Attack().setMobility(MobilityType.TELEPORT).setInfo("Timeskip", "14m range")
-        );
+        moves = List.of(light, heavy, barrage, smite, timestop, knives, chargeoverwrite, timeskip);
     }
 
     // Moveset
@@ -249,7 +246,9 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
             this.playSound(JSoundRegister.TWOH_TS, 1, 1);
     }
 
-    private static final Attack timeskip = new Attack(-2, 18, 2, 2);
+    private static final Attack timeskip = new Attack(-2, 18, 2, 2)
+            .setMobility(MobilityType.TELEPORT)
+            .setInfo("Timeskip", "14m range");
     @Override
     public void initUtil() {
         if (!canAttack()) return;
@@ -262,7 +261,10 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
         DamageSource damageSource = JDamageSources.stand(this, user);
 
         switch (attack.id) {
-            case (-2) -> timeSkip(14, JSoundRegister.TWOH_TIMESKIP);
+            case (-2) -> {
+                if (tsTime > 0) return;
+                timeSkip(14, JSoundRegister.TWOH_TIMESKIP);
+            }
             case (1) -> { // TWOH's heavy is a mini-overwrite that ignores block
                 for (LivingEntity ent : entities) {
                     stun(ent, 20, 1);
@@ -475,6 +477,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
         return age;
     }
 
+    @SuppressWarnings("SameReturnValue")
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();

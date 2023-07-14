@@ -46,6 +46,7 @@
   "key.jcraft.utility": "Utility",
 
   "entity.jcraft.starplatinum": "Star Platinum",
+  "entity.jcraft.sptw": "Star Platinum: The World",
   "entity.jcraft.kingcrimson": "King Crimson",
   "entity.jcraft.d4c": "Dirty Deeds Done Dirt Cheap",
   "entity.jcraft.cream": "Cream",
@@ -105,8 +106,35 @@
   "jcraft.midnightconfig.TE_SHADER": "Use Time Erase Shader",
   "jcraft.midnightconfig.EPITAPH_OVERLAY": "Epitaph Overlay",
 
-  "jcraft.disc.error": "Cannot use disc while in combat!",
   "jcraft.anubis.unsheathe": "Unsheathing Anubis will override your spec, are you sure?",
+  "jcraft.anubis.namedesc": "§9The sword/stand named after the Egyptian god of death",
+  "jcraft.anubis.bloodthirstdesc": "§eBloodthirsty. §9Fuels itself on any and all violence.",
+  "jcraft.anubis.removaldesc": "§eHard to get rid of.",
+  "jcraft.anubis.desc": "§9Can §esheathed §9with §eCrouch + RMB.",
+  "jcraft.sheathedanubis.blockdesc": "§9Can used to §eblock.",
+  "jcraft.sheathedanubis.desc" : "§9Can §eunsheathed §9with §eCrouch + RMB.",
+
+  "jcraft.requiemarrow.desc": "§eAble to grant immense power to those worthy.",
+
+  "jcraft.livingarrow.desc": "§9An arrow with a mind of its own.",
+  "jcraft.livingarrow.evodesc": "§9(§eKiller Queen & Star Platinum §9evolution item)",
+
+  "jcraft.greenbaby.desc": "§9A peculiar green child.",
+  "jcraft.greenbaby.evodesc": "§9(§eWhitesnake §9evolution item)",
+
+  "jcraft.diosdiary.desc": "§9Contains the musings of a long dead man.",
+  "jcraft.diosdiary.evodesc": "§9(§eC-Moon & The World §9evolution item)",
+
+  "jcraft.disc.error": "Cannot use disc while in combat!",
+
+  "jcraft.revolver.shots": "Shots:",
+
+  "jcraft.knife.chargetime": "§9Maximum charge time:",
+
+  "jcraft.boxinggloves.desc": "§eBrawler §9spec obtainment item",
+
+  "jcraft.commands.error.nospec": "No spec found!",
+  "jcraft.commands.error.nostand": "No stand found!",
 
   "death.attack.stand": "%1$s was retired",
   "death.attack.stand.item": "%1$s was retired by %2$s while wielding %3$s",

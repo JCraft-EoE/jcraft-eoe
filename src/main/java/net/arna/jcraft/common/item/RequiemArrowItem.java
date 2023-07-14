@@ -27,7 +27,7 @@ public class RequiemArrowItem extends Item {
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        tooltip.add(Text.of("§eAble to grant immense power to those worthy."));
+        tooltip.add(Text.translatable("jcraft.requiemarrow.desc"));
         super.appendTooltip(stack, world, tooltip, context);
     }
 

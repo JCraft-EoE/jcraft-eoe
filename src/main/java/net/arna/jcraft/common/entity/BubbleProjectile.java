@@ -86,6 +86,7 @@ public class BubbleProjectile extends PersistentProjectileEntity implements IAni
     public AnimationFactory getFactory() {
         return this.factory;
     }
+    @SuppressWarnings("SameReturnValue")
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         event.getController().setAnimation(new AnimationBuilder().loop("animation.bubble.idle"));
         return PlayState.CONTINUE;

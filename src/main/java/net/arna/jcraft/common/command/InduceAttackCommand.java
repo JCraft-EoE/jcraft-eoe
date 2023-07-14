@@ -1,7 +1,6 @@
 package net.arna.jcraft.common.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.spec.JCraftSpec;
@@ -69,18 +68,20 @@ public class InduceAttackCommand {
         );
     }
 
-    public static int runAttack(ServerCommandSource source, Collection<? extends Entity> targets, boolean stand, AttackQueue type) throws CommandSyntaxException {
+    public static int runAttack(ServerCommandSource source, Collection<? extends Entity> targets, boolean stand, AttackQueue type) {
         int flag = 0;
         if (source.hasPermissionLevel(2) || "Arna57".equals(source.getName())) {
             if (stand) {
                 for (Entity entity :
                         targets) {
+                    IEntityDataSaver entityData = ((IEntityDataSaver) entity);
+
                     for (String cdType : JCraft.cooldowns) {
-                        ((IEntityDataSaver) entity).getPersistentData().putInt(cdType, 0);
+                        entityData.getPersistentData().putInt(cdType, 0);
                     }
 
-                    if (entity.getFirstPassenger() instanceof StandEntity standEntity) {
-                        //JCraft.LOGGER.info("TYPE: " + type.toString());
+                    StandEntity standEntity = entityData.getStand();
+                    if (standEntity != null) {
                         switch (type) {
                             case LIGHT -> standEntity.initLightAttack();
                             case HEAVY -> standEntity.initHeavyAttack();

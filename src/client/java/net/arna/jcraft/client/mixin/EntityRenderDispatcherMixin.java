@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(EntityRenderDispatcher.class)
 public class EntityRenderDispatcherMixin {
+    @SuppressWarnings("CancellableInjectionUsage") // Compiler is lying
     @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
     private <E extends Entity> void shouldNotRenderIfRidingInvisibleClone(E entity, Frustum frustum, double x, double y, double z, CallbackInfoReturnable<Boolean> cir) {
         Entity e = entity;

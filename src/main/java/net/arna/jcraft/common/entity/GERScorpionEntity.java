@@ -281,6 +281,7 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
         return age;
     }
 
+    @SuppressWarnings("SameReturnValue")
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         if (this.isRock())
             event.getController().setAnimation(new AnimationBuilder().loop("animation.gerscorpion.rock"));

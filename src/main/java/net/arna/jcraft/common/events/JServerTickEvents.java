@@ -111,10 +111,17 @@ public class JServerTickEvents {
 
             if (user != null && user.isAlive() && timestop.timer-- > 0) {
                 ServerWorld world = server.getWorld(timestop.worldKey);
+                if (world == null) {
+                    JCraft.LOGGER.fatal("World that timestop belongs to no longer exists! Key: " + timestop.worldKey + " Timestopper: " + user);
+                    continue;
+                }
+
                 Vec3d pos = timestop.pos;
 
-                List<? extends Entity> toStop = world.getEntitiesByClass(Entity.class,
+                List<? extends Entity> toStop = null;
+                toStop = world.getEntitiesByClass(Entity.class,
                         new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+
 
                 for (Entity entity : toStop) {
                     if ( entity == user || entity == ((IEntityDataSaver)user).getStand() ) continue;

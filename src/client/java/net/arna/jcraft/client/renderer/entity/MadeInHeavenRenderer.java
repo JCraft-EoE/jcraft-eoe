@@ -1,6 +1,5 @@
 package net.arna.jcraft.client.renderer.entity;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.arna.jcraft.client.model.entity.MadeInHeavenModel;
 import net.arna.jcraft.common.entity.MadeInHeavenEntity;
 import net.arna.jcraft.common.util.IEntityDataSaver;
@@ -11,7 +10,6 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.geo.render.built.GeoModel;

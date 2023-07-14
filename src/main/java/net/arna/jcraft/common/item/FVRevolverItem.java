@@ -2,6 +2,7 @@ package net.arna.jcraft.common.item;
 
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -12,13 +13,16 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.UseAction;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 
@@ -27,8 +31,14 @@ public class FVRevolverItem extends Item {
         super(settings);
     }
 
-    public UseAction getUseAction(ItemStack stack) {
-        return UseAction.EAT;
+    @Override
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        NbtCompound itemData = stack.getNbt();
+
+        if (itemData != null && itemData.contains("Shots"))
+            tooltip.add(Text.translatable("jcraft.revolver.shots").append(" " + itemData.get("Shots")));
+
+        super.appendTooltip(stack, world, tooltip, context);
     }
 
     @Override

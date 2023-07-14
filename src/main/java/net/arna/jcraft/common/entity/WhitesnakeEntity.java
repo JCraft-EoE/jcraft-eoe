@@ -82,7 +82,7 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
                             the el mayo
                             Memory Disk>M1>Barrage>Leg Crusher>Stand Disk>M1
                             the gazebo
-                            M1>Barrage>Leg Crusher>M1>Donut>M1""";
+                            M1>Barrage>Leg Crusher>Donut>M1""";
 
         moves = List.of(light, donut, barrage, memorydisk, standdisk, legcrusher, poisonspew,
                 new Attack().setInfo("Pilot Mode", ""));
@@ -273,9 +273,9 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
         return age;
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings("SameReturnValue")
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        AnimationController controller = event.getController();
+        AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 
         if (playSummonAnim) {

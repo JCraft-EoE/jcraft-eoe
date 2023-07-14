@@ -65,6 +65,11 @@ public class GETreeEntity extends Entity implements IAnimatable, IAnimationTicka
     }
 
     @Override
+    public boolean startRiding(Entity entity, boolean force) {
+        return false;
+    }
+
+    @Override
     public Packet<?> createSpawnPacket() {
         return new EntitySpawnS2CPacket(this);
     }
@@ -87,6 +92,7 @@ public class GETreeEntity extends Entity implements IAnimatable, IAnimationTicka
         return age;
     }
 
+    @SuppressWarnings("SameReturnValue")
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         AnimationController<E> controller = event.getController();
         if (controller.getCurrentAnimation() == null) {

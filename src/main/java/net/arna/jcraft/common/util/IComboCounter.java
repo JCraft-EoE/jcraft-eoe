@@ -7,9 +7,9 @@ public interface IComboCounter {
 
     void setLastAttacked(LivingEntity l);
 
-    int getComboCount();
+    int jcraft$getComboCount();
 
-    void setComboCount(int i);
+    void jcraft$setComboCount(int i);
 
     void incrementComboCount();
 }

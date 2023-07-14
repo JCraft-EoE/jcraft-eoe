@@ -13,6 +13,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stat;
+import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,6 +25,26 @@ public abstract class PlayerEntityMixin implements ISpec, IComboCounter {
 
     @Shadow
     public abstract void increaseStat(Stat<?> stat, int amount);
+
+    // Remote input sync (serverside)
+    private Vec3d desiredVelocity = Vec3d.ZERO;
+    public Vec3d getDesiredVelocity() {
+        return desiredVelocity;
+    }
+    public void updateRemoteInputs(int f, int s, boolean j) {
+        PlayerEntity player = ((PlayerEntity) (Object) this);
+
+        Vec3d v = new Vec3d(f, 0, s).normalize();
+
+        Vec3d rotVec = player.getRotationVector();
+        rotVec = new Vec3d(rotVec.x, 0, rotVec.z).normalize();
+
+        float moveSpeed = player.getMovementSpeed();
+        desiredVelocity = rotVec.multiply(v.x * moveSpeed) // W/S
+                .add(rotVec.rotateY(1.5707963f).multiply(v.z * moveSpeed)); // A/D
+        if (j && player.isOnGround())
+            desiredVelocity = desiredVelocity.add(0, player.getJumpBoostVelocityModifier() * 0.42F, 0);
+    }
 
     // Spec instance storage
     private JCraftSpec spec;
@@ -68,12 +89,12 @@ public abstract class PlayerEntityMixin implements ISpec, IComboCounter {
     }
 
     @Override
-    public int getComboCount() {
+    public int jcraft$getComboCount() {
         return comboCount;
     }
 
     @Override
-    public void setComboCount(int i) {
+    public void jcraft$setComboCount(int i) {
         comboCount = i;
     }
 

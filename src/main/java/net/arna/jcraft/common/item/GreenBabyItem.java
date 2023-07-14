@@ -2,22 +2,29 @@ package net.arna.jcraft.common.item;
 
 import net.arna.jcraft.common.entity.StandType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.UseAction;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class GreenBabyItem extends Item {
     public GreenBabyItem(Settings settings) {
         super(settings);
     }
 
-    public UseAction getUseAction(ItemStack stack) {
-        return UseAction.EAT;
+    @Override
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        tooltip.add(Text.translatable("jcraft.greenbaby.desc"));
+        tooltip.add(Text.translatable("jcraft.greenbaby.evodesc"));
+        super.appendTooltip(stack, world, tooltip, context);
     }
 
     @Override

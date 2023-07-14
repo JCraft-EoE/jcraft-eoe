@@ -20,6 +20,7 @@ public class DIOArmorItem extends ArmorItem implements IAnimatable {
     }
 
     // Predicate runs every frame
+    @SuppressWarnings("SameReturnValue")
     private <P extends IAnimatable> PlayState predicate(AnimationEvent<P> event) {
         return PlayState.STOP;
     }

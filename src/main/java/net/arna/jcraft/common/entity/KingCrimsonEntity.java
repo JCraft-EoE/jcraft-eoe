@@ -34,7 +34,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -94,7 +93,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
     public static final TrackedData<Integer> TIMEERASETIME;
 
     @Data
-    private class TimeEraseData {
+    private static class TimeEraseData {
         Entity entity;
         Vec3d position;
         public TimeEraseData(Entity entity, Vec3d position) {
@@ -146,8 +145,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                     ...Move Cancel>M1>Heavy~Overhead
                     ...Time Erase""";
 
-        moves = List.of(light, heavy, barrage, eyechop, timeerase, donut, epitaph
-                , new Attack().setMobility(MobilityType.TELEPORT).setInfo("Timeskip", "15m range"));
+        moves = List.of(light, heavy, barrage, eyechop, timeerase, donut, epitaph, timeskip);
     }
 
     static {
@@ -218,6 +216,10 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
             Vec3d pos = data.getPosition();
             entity.teleport(pos.x, pos.y, pos.z);
         }
+
+        if (getUser() instanceof ServerPlayerEntity player)
+            ServerPlayNetworking.send(player, JCraft.id("epitaph_state"), new PacketByteBuf( Unpooled.buffer().writeBoolean(false)) );
+
         predictionInfo.clear();
         moveCancel();
     }
@@ -308,7 +310,9 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
         }
     }
 
-    private static final Attack timeskip = new Attack(-2, 15, 2, 2).setInfo("Timeskip", "");
+    private static final Attack timeskip = new Attack(-2, 15, 2, 2)
+            .setMobility(MobilityType.TELEPORT)
+            .setInfo("Timeskip", "16m range");
     @Override
     public void initUtil() {
         if (!canAttack()) return;
@@ -471,9 +475,6 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
 
                 for (Entity entity : toCatch)
                     predictionInfo.add( new TimeEraseData(entity, entity.getPos()) );
-
-                if (getUser() instanceof ServerPlayerEntity player)
-                    ServerPlayNetworking.send(player, JCraft.id("epitaph_state"), new PacketByteBuf( Unpooled.buffer().writeBoolean(false)) );
             }
         }
     }
@@ -564,10 +565,10 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
             if (attack != null) {
                 if (attack.id == overhead.id)
                     this.queuedAttack = null;
-                if (attack.id == prediction.id && age % 3 == 0) {
+                if (attack.id == prediction.id && age % 2 == 0) {
                     user.addStatusEffect( new StatusEffectInstance(StatusEffects.SLOWNESS, 10, 2, true, false) );
 
-                    int timeLeft = prediction.moveStun - getMoveStun();
+                    int timeLeft = getMoveStun();
                     for (TimeEraseData data : predictionInfo) {
                         Entity entity = data.getEntity();
                         if (entity == null) continue;
@@ -585,9 +586,12 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
 
                         // If moving faster than 0.01 m/s, account for distance traveled
                         Vec3d velocity = entity.getVelocity();
+                        if (entity instanceof ServerPlayerEntity player) // EXTREMELY cursed implementation of player velocity because NOTHING ELSE WORKS
+                            velocity = ((IEntityDataSaver)player).getDesiredVelocity();
+                        //JCraft.LOGGER.info("Target is moving at a velocity of: " + velocity);
                         if (velocity.lengthSquared() > 0.0001) {
                             Vec3d velocityComp = new Vec3d(velocity.x * timeLeft, Math.max(0, velocity.y * timeLeft), velocity.z * timeLeft);
-                            //JCraft.LOGGER.info("Target is moving at a velocity of: " + velocityComp);
+                            //JCraft.LOGGER.info("Modified velocity: " + velocityComp);
                             futurePos = futurePos.add(velocityComp);
                             changed = true;
                         }
@@ -714,6 +718,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
         return age;
     }
 
+    @SuppressWarnings("SameReturnValue")
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();

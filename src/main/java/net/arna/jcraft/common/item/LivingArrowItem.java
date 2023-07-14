@@ -27,8 +27,8 @@ public class LivingArrowItem extends Item {
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        tooltip.add(Text.of("§9An arrow with a mind of its own."));
-        tooltip.add(Text.of("§9(§eKiller Queen §9evolution item)"));
+        tooltip.add(Text.translatable("jcraft.livingarrow.desc"));
+        tooltip.add(Text.translatable("jcraft.livingarrow.evodesc"));
         super.appendTooltip(stack, world, tooltip, context);
     }
 
@@ -39,11 +39,12 @@ public class LivingArrowItem extends Item {
         if (!world.isClient) {
             NbtCompound playerNbt = ((IEntityDataSaver) user).getPersistentData();
             int standID = playerNbt.getInt("StandID");
+            if (!user.isCreative()) itemStack.decrement(1);
+
             if (standID == StandType.KILLER_QUEEN.getId()) {
-                if (!user.isCreative()) {
-                    itemStack.decrement(1);
-                }
                 playerNbt.putInt("StandID", StandType.KILLER_QUEEN_BITES_THE_DUST.getId());
+            } else if (standID == StandType.STAR_PLATINUM.getId()) {
+                playerNbt.putInt("StandID", StandType.SPTW.getId());
             }
         }
 

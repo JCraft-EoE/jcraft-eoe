@@ -3,7 +3,6 @@ package net.arna.jcraft.common.entity;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
-import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
@@ -12,11 +11,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.IAnimationTickable;
@@ -93,9 +89,7 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
                             the no ts racist
                             Donut>Roundhouse>Charge>M1>Barrage>M1""";
 
-        moves = List.of(light, donut, barrage, roundhouse, timestop, charge, feignbarrage,
-                new Attack().setMobility(MobilityType.TELEPORT).setMobility(MobilityType.TELEPORT).setInfo("Timeskip", "14m range")
-        );
+        moves = List.of(light, donut, barrage, roundhouse, timestop, charge, feignbarrage, timeskip);
     }
 
     // Moveset
@@ -147,7 +141,9 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
             playSound(JSoundRegister.TW_BARRAGE, 1, 1);
     }
 
-    private static final Attack timeskip = new Attack(-2, 18, 2, 2).setInfo("Timeskip", "");
+    private static final Attack timeskip = new Attack(-2, 18, 2, 2)
+            .setMobility(MobilityType.TELEPORT)
+            .setInfo("Timeskip", "14m range");
     @Override
     public void initUtil() {
         if (!canAttack()) return;
@@ -157,7 +153,10 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
         switch (attack.id) {
-            case (-2) -> timeSkip(14, JSoundRegister.TIME_SKIP);
+            case (-2) -> {
+                if (tsTime > 0) return;
+                timeSkip(14, JSoundRegister.TIME_SKIP);
+            }
             case (1) -> {
                 LivingEntity user = this.getUser();
                 // If missed, stun the user for 1.5 seconds
@@ -237,6 +236,7 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
         return age;
     }
 
+    @SuppressWarnings("SameReturnValue")
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();

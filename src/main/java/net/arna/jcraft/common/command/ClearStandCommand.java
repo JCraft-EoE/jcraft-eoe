@@ -3,6 +3,7 @@ package net.arna.jcraft.common.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
@@ -27,15 +28,17 @@ public class ClearStandCommand {
         Collection<? extends Entity> targets = EntityArgumentType.getEntities(ctx, "targets");
 
         for (Entity entity : targets) {
-            if (!(entity instanceof LivingEntity livingEntity)) continue;
+            if (entity instanceof LivingEntity livingEntity) {
+                IEntityDataSaver entityData = (IEntityDataSaver) livingEntity;
+                NbtCompound data = entityData.getPersistentData();
 
-            IEntityDataSaver entityData = (IEntityDataSaver) livingEntity;
-            NbtCompound data = entityData.getPersistentData();
-            if (!data.contains("StandID") || data.getInt("StandID") == 0) continue;
+                if (!data.contains("StandID") || data.getInt("StandID") == 0) continue;
+                data.putInt("StandID", 0);
 
-            data.putInt("StandID", 0);
-
-            livingEntity.detach();
+                StandEntity stand = entityData.getStand();
+                if (stand != null)
+                    stand.detach();
+            }
         }
         return 1;
     }

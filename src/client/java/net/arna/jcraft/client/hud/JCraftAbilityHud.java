@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class JCraftAbilityHud extends DrawableHelper implements HudRenderCallback, ClientTickEvents.EndTick {
-    public static DefaultedList<Double> cachedCooldowns = DefaultedList.ofSize(JCraft.cooldowns.size(), 0.0);
+    public static final DefaultedList<Double> cachedCooldowns = DefaultedList.ofSize(JCraft.cooldowns.size(), 0.0);
 
     public static final Identifier GUI_ICONS_TEXTURE = new Identifier("textures/gui/icons.png");
 

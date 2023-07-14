@@ -3,6 +3,7 @@ package net.arna.jcraft.common.entity;
 import net.arna.jcraft.common.util.IOwnable;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -172,6 +173,11 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
         return true;
     }
 
+    @Override
+    public boolean startRiding(Entity entity, boolean force) {
+        return false;
+    }
+
     public static DefaultAttributeContainer.Builder createDetectorAttributes() {
         return DefaultAttributeContainer.builder()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 10)
@@ -239,6 +245,7 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
         animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
     }
 
+    @SuppressWarnings("SameReturnValue")
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         event.getController().setAnimation(new AnimationBuilder().loop(hasExploded() ? "animation.detector.explode" : "animation.detector.idle"));
         return PlayState.CONTINUE;

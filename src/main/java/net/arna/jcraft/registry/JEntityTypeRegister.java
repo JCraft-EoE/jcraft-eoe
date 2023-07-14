@@ -23,6 +23,12 @@ public interface JEntityTypeRegister {
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(StarPlatinumEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
+    EntityType<SPTWEntity> SPTW = Registry.register(
+            Registry.ENTITY_TYPE,
+            JCraft.id("sptw"),
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(SPTWEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
+    );
+
     EntityType<KingCrimsonEntity> KING_CRIMSON = Registry.register(
             Registry.ENTITY_TYPE,
             JCraft.id("kingcrimson"),
@@ -212,6 +218,8 @@ public interface JEntityTypeRegister {
 
     static void registerEntities() {
         FabricDefaultAttributeRegistry.register(STAR_PLATINUM, StarPlatinumEntity.createMobAttributes());
+        FabricDefaultAttributeRegistry.register(SPTW, SPTWEntity.createMobAttributes());
+
         FabricDefaultAttributeRegistry.register(KING_CRIMSON, KingCrimsonEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(CREAM, CreamEntity.createMobAttributes());
 

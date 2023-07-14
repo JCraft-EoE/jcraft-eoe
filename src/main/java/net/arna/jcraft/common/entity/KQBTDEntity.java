@@ -108,12 +108,6 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
         return null;
     }
 
-    // Moveset
-    @Override
-    public void initLightAttack() {
-        super.initLightAttack();
-    }
-
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
@@ -420,6 +414,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
         return age;
     }
 
+    @SuppressWarnings("SameReturnValue")
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();

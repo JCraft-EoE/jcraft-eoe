@@ -14,10 +14,10 @@ import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.geo.render.built.GeoModel;
 import software.bernie.geckolib3.renderers.geo.GeoEntityRenderer;
 
-public class StarPlatinumRenderer extends GeoEntityRenderer<StarPlatinumEntity> {
+public class SPTWRenderer extends GeoEntityRenderer<StarPlatinumEntity> {
 
-    public StarPlatinumRenderer(EntityRendererFactory.Context context) {
-        super(context, new StarPlatinumModel("textures/entity/starplatinum.png", "animations/starplatinum.animation.json"));
+    public SPTWRenderer(EntityRendererFactory.Context context) {
+        super(context, new StarPlatinumModel("textures/entity/sptw.png", "animations/sptw.animation.json"));
     }
 
     @Override

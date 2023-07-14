@@ -2,7 +2,6 @@ package net.arna.jcraft.common.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.util.Attack;
@@ -31,7 +30,7 @@ public class AboutStandCommand {
             "Utility"
     );
 
-    public static int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    public static int run(CommandContext<ServerCommandSource> context) {
         PlayerEntity playerEntity = context.getSource().getPlayer();
         if (playerEntity == null) {
             JCraft.LOGGER.error("Tried to run /stand about command on invalid player, source: " + context.getSource());
@@ -72,7 +71,7 @@ public class AboutStandCommand {
 
             playerEntity.sendMessage(Text.of(readout.toString()));
         } else {
-            playerEntity.sendMessage(Text.of("No stand found!"), false);
+            playerEntity.sendMessage(Text.translatable("jcraft.commands.error.nostand"), false);
             return 0;
         }
 

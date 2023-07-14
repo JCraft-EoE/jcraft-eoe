@@ -1,8 +1,6 @@
 package net.arna.jcraft.common.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.Attack;
@@ -31,12 +29,10 @@ public class MoveDataCommand {
         );
     }
 
-    public static int run(ServerCommandSource source, boolean stand) throws CommandSyntaxException {
+    public static int run(ServerCommandSource source, boolean stand) {
         PlayerEntity player = source.getPlayer();
-        if (player == null) {
-            JCraft.LOGGER.error("Tried to run /framedata command on invalid player, source: " + source);
+        if (player == null)
             return 0;
-        }
 
         Attack attack;
 
