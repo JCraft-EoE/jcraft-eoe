@@ -9,8 +9,11 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.util.math.Vector3d;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3f;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.geo.render.built.GeoModel;
 import software.bernie.geckolib3.renderers.geo.GeoEntityRenderer;
@@ -45,32 +48,42 @@ public class MadeInHeavenRenderer extends GeoEntityRenderer<MadeInHeavenEntity> 
 
         super.render(model, animatable, partialTicks, type, matrixStack, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, a);
 
-        //todo: sterner
         if (animatable.getAfterimage()) {
             float aa = a - 0.5f;
             if (aa < 0) aa = 0;
 
-            matrixStack.push();
-            /*
-            matrixStack.multiplyPositionMatrix(
-                    mcClient.gameRenderer.getBasicProjectionMatrix(
-                            mcClient.options.getFov().getValue()
-                    )
-            );
-             */
-            Vec3d velocity = animatable.getUser().getVelocity();
-            matrixStack.translate(velocity.x, velocity.y, velocity.z);
-            super.render(
-                    model,
-                    animatable,
-                    partialTicks,
-                    RenderLayer.getEntityNoOutline( getTextureLocation(animatable) ),
-                    matrixStack,
-                    renderTypeBuffer,
-                    vertexBuilder,
-                    packedLightIn,
-                    packedOverlayIn, red, green, blue, aa);
-            matrixStack.pop();
+            for (int i = 0; i <= 3; ++i) {
+
+                Vec3d velocity = animatable.getUser().getVelocity().multiply(i);
+
+                renderAfter(
+                        velocity,
+                        aa * (1f / i),
+                        model,
+                        animatable,
+                        partialTicks,
+                        RenderLayer.getEntityNoOutline(getTextureLocation(animatable)),
+                        matrixStack,
+                        renderTypeBuffer,
+                        vertexBuilder,
+                        packedLightIn,
+                        packedOverlayIn,
+                        red,
+                        green,
+                        blue,
+                        alpha
+                );
+            }
         }
+    }
+
+    private void renderAfter(Vec3d velocity, float aa, GeoModel model, MadeInHeavenEntity animatable, float partialTicks, RenderLayer type, MatrixStack matrixStack, VertexConsumerProvider renderTypeBuffer, VertexConsumer vertexBuilder, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha){
+        matrixStack.push();
+
+        matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(animatable.getUser().bodyYaw));
+        matrixStack.translate(velocity.x, velocity.y, velocity.z);
+        matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(-animatable.getUser().bodyYaw));
+        super.render(model, animatable, partialTicks, RenderLayer.getEntityNoOutline( getTextureLocation(animatable) ), matrixStack, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, aa);
+        matrixStack.pop();
     }
 }

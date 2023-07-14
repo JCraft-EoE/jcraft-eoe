@@ -27,6 +27,16 @@ public class JRenderLayerRegistry extends RenderPhase {
                     Phases.NORMAL_TRANSPARENCY,
                     SpriteAtlasTexture.PARTICLE_ATLAS_TEXTURE);
 
+    public static final RenderLayer RED_SHIZZLEMAGIZZLE =
+            createGenericRenderLayer(
+                    JCraft.MOD_ID,
+                    "red",
+                    VertexFormats.POSITION,
+                    VertexFormat.DrawMode.QUADS,
+                    new Shader(() -> JShaderRegistry.TEST.getInstance().get()),
+                    Phases.NORMAL_TRANSPARENCY,
+                    SpriteAtlasTexture.PARTICLE_ATLAS_TEXTURE);
+
 
     public static void init() {
 
