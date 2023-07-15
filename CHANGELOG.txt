@@ -1194,6 +1194,16 @@ Anubis
 
 Star Platinum
     >Inhale improved
+    >Added +4t launch stun to Star Breaker
+
+King Crimson
+    >Added +1t launch stun to Overhead Hook
+
+D4C
+    >Added +2 launch stun to Charge
+
+Star Platinum: The World
+    >Added sounds
 
 Counters
     >Added whiff recovery (0.5s for knockback/down counters, 1s for combo starting counters)

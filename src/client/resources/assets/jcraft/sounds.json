@@ -114,9 +114,32 @@
   },
 
   "sptw": {
-    "subtitle": "subtitles.jcraft.sptw",
     "sounds": [
       "jcraft:stands/sptw/theworld"
+    ]
+  },
+
+  "sptwgrab": {
+    "sounds": [
+      "jcraft:stands/sptw/grab"
+    ]
+  },
+
+  "sptwgrabhit": {
+    "sounds": [
+      "jcraft:stands/sptw/grabhit"
+    ]
+  },
+
+  "sptwuppercut": {
+    "sounds": [
+      "jcraft:stands/sptw/uppercut"
+    ]
+  },
+
+  "sptwbackhand": {
+    "sounds": [
+      "jcraft:stands/sptw/backhand"
     ]
   },
 
@@ -165,6 +188,12 @@
   "kcepitaph": {
     "sounds": [
       "jcraft:stands/kingcrimson/epitaph"
+    ]
+  },
+
+  "kcrage": {
+    "sounds": [
+      "jcraft:stands/kingcrimson/rage"
     ]
   },
 

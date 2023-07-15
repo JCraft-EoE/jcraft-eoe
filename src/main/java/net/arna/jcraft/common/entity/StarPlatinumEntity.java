@@ -31,7 +31,7 @@ import java.util.List;
 public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAnimationTickable {
     public static final Attack light = new Attack(0, 2, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
-    public static final Attack heavy = new Attack(1, 17, 1f, 30, 20, 2.0, 10f, 1.5f, AttackType.BOX, 0.5f)
+    public static final Attack heavy = new Attack(1, 17, 1f, 30, 20, 2.0, 10f, 1.5f, AttackType.BOX, 0.7f)
             .setHitspark(2)
             .appendHitbox(new Attack.HitboxData(0, 0, 1.5))
             .hyperArmor()

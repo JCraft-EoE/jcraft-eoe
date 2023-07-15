@@ -58,7 +58,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
             .setInfo("Dual Chop", "quick combo starter");
     public static final Attack barrage = new Attack(3, 17, 0.85f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender/finisher, medium stun, knocks back");
-    public static final Attack overhead = new Attack(2, 8, 0.85f, 32, 22, 2, 9f, 1.5f, AttackType.BOX, 0.5f)
+    public static final Attack overhead = new Attack(2, 8, 0.85f, 32, 22, 2, 9f, 1.5f, AttackType.BOX, 0.55f)
             .setHitspark(2)
             .hyperArmor()
             .setLaunch()
@@ -502,11 +502,12 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
         world.playSound(null, ePos.x, ePos.y, ePos.z, JSoundRegister.TE_TP, SoundCategory.PLAYERS, 1f, 1f);
     }
 
-    private static final Attack counterMiss = new Attack(8, 0, 20, 21);
+    private static final Attack counterMiss = new Attack(8, 0, 20, 21, -1, AttackType.BOX);
     @Override
     public void whiffCounter() {
         setAttack(counterMiss, 13);
         stun(getUser(), counterMiss.moveStun, 0);
+        playSound(JSoundRegister.KC_RAGE, 1, 1);
     }
 
     @Override

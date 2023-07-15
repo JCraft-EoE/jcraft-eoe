@@ -32,7 +32,7 @@ public interface JSoundRegister {
     SoundEvent STAR_PLATINUM_TIMESKIP = registerSound("sptimeskip");
     SoundEvent STAR_PLATINUM_BARRAGE = registerSound("spbarrage");
     SoundEvent STAR_PLATINUM_ADVANCING_BARRAGE = registerSound("spadvbarrage");
-    SoundEvent STAR_PLATINUM_THE_WORLD = registerSound("sptw");
+        SoundEvent STAR_PLATINUM_THE_WORLD = registerSound("sptw");
     SoundEvent STAR_PLATINUM_KICK = registerSound("spkick");
     SoundEvent STAR_BREAKER = registerSound("starbreaker");
     SoundEvent STAR_FINGER = registerSound("starfinger");
@@ -46,6 +46,7 @@ public interface JSoundRegister {
     SoundEvent KC_HEAVY2 = registerSound("kcheavy2");
     SoundEvent KC_EYE_CHOP = registerSound("kceyechop");
     SoundEvent KC_EPITAPH = registerSound("kcepitaph");
+    SoundEvent KC_RAGE = registerSound("kcrage");
     SoundEvent TE_TP = registerSound("tetp");
     SoundEvent TIME_ERASE = registerSound("timeerase");
     SoundEvent TIME_ERASE_EXIT = registerSound("kcteexit");
@@ -192,6 +193,12 @@ public interface JSoundRegister {
     SoundEvent TWOH_OVERWRITE = registerSound("twohoverwrite");
     SoundEvent TWOH_KNIFETHROW = registerSound("twohowarida");
     SoundEvent TWOH_AIRKNIVES = registerSound("twohairknives");
+
+    // Star Platinum: The World
+    SoundEvent SPTW_GRAB = registerSound("sptwgrab");
+    SoundEvent SPTW_GRABHIT = registerSound("sptwgrabhit");
+    SoundEvent SPTW_UPPERCUT = registerSound("sptwuppercut");
+    SoundEvent SPTW_BACKHAND = registerSound("sptwbackhand");
 
     //// SPECS
     // Brawler

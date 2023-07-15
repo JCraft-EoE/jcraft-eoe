@@ -79,7 +79,7 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
 
     public WSAcidProjectile(World world, LivingEntity owner) {
         super(JEntityTypeRegister.WS_ACID_PROJECTILE, owner, world);
-        setSound(SoundEvents.ITEM_BUCKET_EMPTY);
+        setSound(SoundEvents.BLOCK_SLIME_BLOCK_FALL);
         setOwner(owner);
         pickupType = PickupPermission.DISALLOWED;
         ignoreCameraFrustum = true;

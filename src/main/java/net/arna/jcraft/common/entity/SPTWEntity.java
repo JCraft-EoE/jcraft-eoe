@@ -41,7 +41,7 @@ public class SPTWEntity extends StarPlatinumEntity implements IAnimatable, IAnim
     public static final Attack backhand = new Attack(4, 12, 0.75f, 12, 7, 1.5, 6f, 0.25f, AttackType.BOX, 1f, 0, 0, JSoundRegister.IMPACT_1)
             .appendHitbox(new Attack.HitboxData(0, 0, 1))
             .setInfo("Backhand", "fast poke, decent stun");
-    public static final Attack grab = new Attack(5, 26, 1f, 20, 8, 1.5, 2f, 0.4f, AttackType.BOX, 1, 0, 0)
+    public static final Attack grab = new Attack(5, 26, 1f, 20, 8, 1.5, 2f, 0.4f, AttackType.BOX, 1, 0, 0, JSoundRegister.SPTW_GRABHIT)
             .appendHitbox(new Attack.HitboxData(0, 0, 1))
             .setUB(false)
             .setStunOverride(true)
@@ -134,7 +134,7 @@ public class SPTWEntity extends StarPlatinumEntity implements IAnimatable, IAnim
     public void initSpecial2() {
         if (!canAttack()) return;
         if (handleAttack(backhand, JCraft.standS2CD, 8)) {
-            //playSound(JSoundRegister.SPTW_BACKHAND, 1, 1);
+            playSound(JSoundRegister.SPTW_BACKHAND, 1, 1);
         }
     }
 
@@ -143,7 +143,7 @@ public class SPTWEntity extends StarPlatinumEntity implements IAnimatable, IAnim
         if (!canAttack()) return;
         // Uses a copy because otherwise the main one gets overwritten by specialAttack()
         if (handleAttack(grab, JCraft.standS3CD, 9)) {
-            //playSound(JSoundRegister.SPTW_GRAB, 1, 1);
+            playSound(JSoundRegister.SPTW_GRAB, 1, 1);
         }
     }
 
@@ -166,6 +166,7 @@ public class SPTWEntity extends StarPlatinumEntity implements IAnimatable, IAnim
             case (5) -> {
                 if (entities.isEmpty()) return;
                 setAttack(grabhit, 10);
+                playSound(JSoundRegister.SPTW_UPPERCUT, 1, 1);
 
                 for (LivingEntity ent : entities)
                     if (ent.getFirstPassenger() instanceof StandEntity stand)

@@ -29,7 +29,7 @@ public class BloodProjectile extends PersistentProjectileEntity implements IAnim
 
     public BloodProjectile(World world, LivingEntity owner) {
         super(JEntityTypeRegister.BLOOD_PROJECTILE, owner, world);
-        this.setSound(SoundEvents.ITEM_BUCKET_EMPTY);
+        this.setSound(SoundEvents.BLOCK_SLIME_BLOCK_FALL);
         this.setOwner(owner);
     }
 
@@ -56,7 +56,7 @@ public class BloodProjectile extends PersistentProjectileEntity implements IAnim
         if (entity instanceof EndCrystalEntity endCrystal)
             endCrystal.damage(DamageSource.thrownProjectile(this, owner), 2f);
 
-        playSound(SoundEvents.ITEM_BUCKET_EMPTY, 1, 0.5f);
+        playSound(SoundEvents.BLOCK_SLIME_BLOCK_FALL, 1, 0.5f);
     }
 
     @Override

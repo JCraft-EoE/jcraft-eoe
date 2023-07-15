@@ -285,7 +285,7 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
         }
     }
 
-    private static final Attack counterMiss = new Attack(8, 0, 20, 21);
+    private static final Attack counterMiss = new Attack(8, 0, 20, 21, 0.5f, AttackType.BOX);
     @Override
     public void whiffCounter() {
         setAttack(counterMiss, 15);
