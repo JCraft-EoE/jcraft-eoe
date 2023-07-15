@@ -502,6 +502,13 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
         world.playSound(null, ePos.x, ePos.y, ePos.z, JSoundRegister.TE_TP, SoundCategory.PLAYERS, 1f, 1f);
     }
 
+    private static final Attack counterMiss = new Attack(8, 0, 20, 21);
+    @Override
+    public void whiffCounter() {
+        setAttack(counterMiss, 13);
+        stun(getUser(), counterMiss.moveStun, 0);
+    }
+
     @Override
     protected Box calculateBoundingBox() {
         if (getTETime() > 0) {
@@ -587,6 +594,21 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
                         BlockHitResult hitResult = world.raycast(new RaycastContext(currentPos, futurePos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, entity));
                         data.setPosition(hitResult.getPos());
                     }
+
+                    if (!userIsPlayer || world.isClient) continue;
+
+                    Vec3d pos = data.getPosition();
+                    Box box = entity.getBoundingBox();
+
+                    PacketByteBuf buf = PacketByteBufs.create();
+                    buf.writeShort(2);
+                    buf.writeDouble(pos.x);
+                    buf.writeDouble(pos.y);
+                    buf.writeDouble(pos.z);
+                    buf.writeDouble(box.getXLength());
+                    buf.writeDouble(box.getYLength());
+                    buf.writeDouble(box.getZLength());
+                    ServerChannelFeedbackPacket.send(playerEntity, buf);
                 }
             }
         }
@@ -692,6 +714,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
             case 10 -> controller.setAnimation(builder.playAndHold("animation.kingcrimson.heavy"));
             case 11 -> controller.setAnimation(builder.playAndHold("animation.kingcrimson.bloodthrow"));
             case 12 -> controller.setAnimation(builder.playAndHold("animation.kingcrimson.predict"));
+            case 13 -> controller.setAnimation(builder.playAndHold("animation.kingcrimson.counter_miss"));
         }
         return PlayState.CONTINUE;
     }

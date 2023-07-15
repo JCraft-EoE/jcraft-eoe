@@ -568,6 +568,9 @@ public abstract class StandEntity extends MobEntity {
         this.curAttack = null;
         this.setMoveStun(0);
     }
+    public void whiffCounter() {
+        JCraft.LOGGER.info("SERVER: Counter whiffed for " + this);
+    }
 
     /**
      * Cancels the stands attack instantly
@@ -659,8 +662,14 @@ public abstract class StandEntity extends MobEntity {
                 kill();
             }
 
-            // Return to user after stand detach move, provided it's finished recovering and there's no queued followup
-            if (defaultToNear() && getMoveStun() < 1 && this.queuedAttack == null && attack == null) setFree(false);
+
+            if (defaultToNear() && getMoveStun() < 1 && this.queuedAttack == null) {
+                if (attack == null)
+                    setFree(false);
+                else if (attack.attackType == AttackType.COUNTER) {
+                    whiffCounter();
+                }
+            }
 
             // Rotate with user
             if (!isFree || isRemote) {

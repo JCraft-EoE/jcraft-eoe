@@ -41,7 +41,7 @@ public abstract class LivingEntityRenderMixin<T extends LivingEntity, M extends 
     private void suckmahballs(T livingEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci){
         if (false && MinecraftClient.getInstance().player instanceof IEntityDataSaver entityDataSaver) {
             if (entityDataSaver.getStand() instanceof KingCrimsonEntity kc && kc.getState() == 12 && kc.getMoveStun() <= (KingCrimsonEntity.prediction.moveStun - KingCrimsonEntity.prediction.initTime)) {
-                RenderLayer renderLayer = JRenderLayerRegistry.RRRE.apply(this.getTexture(livingEntity));
+                RenderLayer renderLayer = JRenderLayerRegistry.RRRE;
                 if (renderLayer != null) {
                     VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(renderLayer);
                     int o = LivingEntityRenderer.getOverlay(livingEntity, this.getAnimationProgress(livingEntity, g));

@@ -226,6 +226,17 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
 
             if (world.isClient) {
                 setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(getUser()) / 2, 0.0, 255.0) / 255f);
+
+                if (getInhaleTime() > 0) {
+                    Vec3d addVel = getRotationVector().add(random.nextDouble() * 2 - 1, random.nextDouble() * 2 - 1, random.nextDouble() * 2 - 1);
+                    Vec3d particlePos = fPos.add(addVel);
+
+                    world.addParticle(ParticleTypes.POOF,
+                            particlePos.x,
+                            particlePos.y,
+                            particlePos.z,
+                            -addVel.x / 10.0, -addVel.y / 10.0, -addVel.z / 10.0);
+                }
             } else {
                 if (getInhaleTime() > 0) {
                     setInhaleTime(getInhaleTime() - 1);
@@ -239,10 +250,10 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
                         List<Entity> filter = new ArrayList<>(List.of(this, user));
                         if (user.hasVehicle()) filter.add(user.getVehicle());
 
-                        List<? extends Entity> toInhale = JUtils.generateHitbox(world, fPos, 2, LivingEntity.class, filter);
+                        List<? extends Entity> toInhale = JUtils.generateHitbox(world, fPos, 2, Entity.class, filter);
                         for (Entity entity : toInhale) {
                             entity.setVelocity(
-                                    entity.getVelocity().subtract(rotVec).multiply(0.25)
+                                    entity.getVelocity().subtract(rotVec.x, 0, rotVec.z).multiply(0.2 * entity.distanceTo(this))
                             );
 
                             entity.velocityModified = true;

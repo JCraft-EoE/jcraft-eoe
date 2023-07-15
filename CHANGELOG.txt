@@ -1156,8 +1156,6 @@ Magician's Red
 ● 13/7/2023
 >Fixed mixin conflict with BetterCombat (PlayerEntityMixin#get/setComboCount)
 
->Added Star Platinum: The World
-
 Star Platinum
     >Timeskip replaced with Stand Jump
     >Timestop replaced with Inhale
@@ -1175,6 +1173,8 @@ The Fool
 >Combo Counter text now only persists for 3 seconds
 >You can now ride entities during Timestop
 
+>Added Star Platinum: The World
+
 Knives
     >Now must be charged (Single - 0.5s, Bundle - 1s) to obtain maximum velocity
 
@@ -1188,6 +1188,16 @@ Golden Experience: Requiem
 
 Anubis
     >Added sounds
+
+● 15/7/2023
+>Fixed Knife Bundle rendering
+
+Star Platinum
+    >Inhale improved
+
+Counters
+    >Added whiff recovery (0.5s for knockback/down counters, 1s for combo starting counters)
+    >D4C counter duration reduced (2.25s->1.5s)
 
 priority (top to bottom)
 todo: fix predict not working with new projectiles

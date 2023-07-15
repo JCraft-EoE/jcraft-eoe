@@ -54,8 +54,8 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
     public static final Attack grabhit = new Attack(5, 0, 0.75f, 34, 0, 2, 4f, 0f, AttackType.MULTIHIT, 0.5f, 0, List.of(11, 17, 26), JSoundRegister.IMPACT_1);
     public static final Attack givegun = new Attack(6, 25, 14, 10, 0, 0.75f, AttackType.BOX)
             .setInfo("Grab", "unblockable, combo finisher");
-    public static final Attack counter = new Attack(7, 30, 50, 5, 0, 0.75f, AttackType.COUNTER)
-            .setInfo("Counter", "high damage, knocks back when hit");
+    public static final Attack counter = new Attack(7, 30, 35, 5, 0, 0.75f, AttackType.COUNTER)
+            .setInfo("Counter", "0.25s startup, 1.5s duration, high damage, knocks back when hit");
     public static final Attack clonespawn = new Attack(8, 40, 1, 50, 40, 0, 0f, 0.0f, AttackType.BOX)
             .setRanged(true)
             .setInfo("Dimensional Clone", "summons an unlimited number of servants");
@@ -360,6 +360,13 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
         }
     }
 
+    private static final Attack counterMiss = new Attack(8, 0, 10, 11);
+    @Override
+    public void whiffCounter() {
+        setAttack(counterMiss, 12);
+        stun(getUser(), counterMiss.moveStun, 0);
+    }
+
     @Override
     public void tick() {
         if (age == 1) {
@@ -413,6 +420,7 @@ public class D4CEntity extends StandEntity implements IAnimatable, IAnimationTic
             case 9 -> controller.setAnimation(builder.playAndHold("animation.d4c.throwhit"));
             case 10 -> controller.setAnimation(builder.playAndHold("animation.d4c.givegun"));
             case 11 -> controller.setAnimation(builder.playAndHold("animation.d4c.flag"));
+            case 12 -> controller.setAnimation(builder.playAndHold("animation.d4c.counter_miss"));
         }
         return PlayState.CONTINUE;
     }

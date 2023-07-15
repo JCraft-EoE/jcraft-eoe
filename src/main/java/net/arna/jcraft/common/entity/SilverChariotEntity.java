@@ -57,8 +57,8 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
             .setRanged(true)
             .disableBackstab()
             .setInfo("Shooting Star", "Silver Chariot detaches from the user and charges in the looked direction, combo starter/extender");
-    public final Attack counter = new Attack(7, 32, 0.5f, 44, 4, 0, 0, 0, AttackType.COUNTER)
-            .setInfo("Counter", "0.2s windup, 2s duration, stuns when hit");
+    public final Attack counter = new Attack(7, 32, 0.5f, 34, 4, 0, 0, 0, AttackType.COUNTER)
+            .setInfo("Counter", "0.2s windup, 1.5s duration, stuns when hit");
     public final Attack pbeatdown = new Attack(8, 50, 0.65f, 28, 23, 1.75, 4f, 0f, AttackType.BOX, 2, 0, 0)
             .setHitspark(-4)
             .setStunType(0)
@@ -285,6 +285,13 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
         }
     }
 
+    private static final Attack counterMiss = new Attack(8, 0, 20, 21);
+    @Override
+    public void whiffCounter() {
+        setAttack(counterMiss, 15);
+        stun(getUser(), counterMiss.moveStun, 0);
+    }
+
     @Override
     public void tick() {
         if (age == 1) playSound(JSoundRegister.SC_SUMMON, 1f, 1f);
@@ -392,6 +399,7 @@ public class SilverChariotEntity extends StandEntity implements IAnimatable, IAn
             case 12 -> controller.setAnimation(builder.playAndHold("animation.silverchariot.beatdown"));
             case 13 -> controller.setAnimation(builder.playAndHold("animation.silverchariot.cleave"));
             case 14 -> controller.setAnimation(builder.playAndHold("animation.silverchariot.armor_off"));
+            case 15 -> controller.setAnimation(builder.playAndHold("animation.silverchariot.counter_miss"));
         }
         controller.setAnimationSpeed(this.getMode() == 2 ? 1.5 : 1);
         return PlayState.CONTINUE;

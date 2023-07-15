@@ -48,7 +48,7 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
             .setUB(true)
             .setInfo("Timestop", "4 seconds");
     public static final Attack feignbarrage = new Attack(5, 30, 0.75f, 50, 5, 0, 0f, 0f, AttackType.COUNTER)
-            .setInfo("Feign Barrage", "counter, 0.25s windup, teleports behind attacker");
+            .setInfo("Feign Barrage", "counter, 0.25s windup, 2.25s duration, teleports and knocks down on hit");
     public static final Attack counterfollowup = new Attack(7, 0, 0.75f, 9, 5, 1.75, 6f, 0.7f, AttackType.BOX, 0.8f, 0.1f, 0, JSoundRegister.IMPACT_4)
             .appendHitbox(new Attack.HitboxData(1.25))
             .hyperArmor()
@@ -205,6 +205,13 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
         playSound(JSoundRegister.TW_COUNTER, 1, 1);
     }
 
+    private static final Attack counterMiss = new Attack(8, 0, 10, 11);
+    @Override
+    public void whiffCounter() {
+        setAttack(counterMiss, 12);
+        stun(getUser(), counterMiss.moveStun, 0);
+    }
+
     @Override
     public void tick() {
         if (age == 1) {
@@ -258,6 +265,7 @@ public class TheWorldEntity extends StandEntity implements IAnimatable, IAnimati
             case 9 -> controller.setAnimation(builder.playAndHold("animation.theworld.charge_hit"));
             case 10 -> controller.setAnimation(builder.playAndHold("animation.theworld.roundhouse"));
             case 11 -> controller.setAnimation(builder.playAndHold("animation.theworld.counter_hit"));
+            case 12 -> controller.setAnimation(builder.playAndHold("animation.theworld.counter_miss"));
         }
         return PlayState.CONTINUE;
     }
