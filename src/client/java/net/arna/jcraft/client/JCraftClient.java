@@ -23,7 +23,6 @@ import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.network.c2s.InputSyncPacket;
 import net.arna.jcraft.common.network.c2s.StandControlPacket;
-import net.arna.jcraft.common.network.s2c.*;
 import net.arna.jcraft.common.util.ColorUtils;
 import net.arna.jcraft.common.util.DimValues;
 import net.arna.jcraft.common.util.IEntityDataSaver;
@@ -63,6 +62,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -133,12 +133,11 @@ public class JCraftClient implements ClientModInitializer {
         ClientTickEvents.END_WORLD_TICK.register(new SkyBoxManager());
         ClientTickEvents.END_CLIENT_TICK.register(new JCraftAbilityHud());
 
-        ClientPlayNetworking.registerGlobalReceiver(ServerChannelFeedbackPacket.ID, (client, handler, buf, sender) -> ClientPacketHandler.handleChannelFeedback(client, buf));
-        ClientPlayNetworking.registerGlobalReceiver(PlayerAnimPacket.ID, (client, handler, buf, sender) -> ClientPacketHandler.handleAnimation(client, buf));
-        ClientPlayNetworking.registerGlobalReceiver(ShaderActivationPacket.ID, (client, handler, buf, sender) -> ClientPacketHandler.handleShaderActivation(client, buf));
-        ClientPlayNetworking.registerGlobalReceiver(ShaderDeactivationPacket.ID, (client, handler, buf, sender) -> ClientPacketHandler.handleShaderDeactivation(client, buf));
-        ClientPlayNetworking.registerGlobalReceiver(TimeAccelStatePacket.ID, (client, handler, buf, sender) -> ClientPacketHandler.handleTimeAccelState(client, buf));
-        ClientPlayNetworking.registerGlobalReceiver(JCraft.id("epitaph_state"), (client, handler, buf, responseSender) -> ClientPacketHandler.handleEpitaphOverlayState(buf));
+        ClientPacketHandler.init();
+
+        AttackHitBoxEffectRenderer.init();
+        TimeAccelerationEffectRenderer.init();
+        TimeErasePredictionEffectRenderer.init();
 
         HudRenderCallback.EVENT.register(this::renderHud);
         HudRenderCallback.EVENT.register(new JCraftAbilityHud());
@@ -427,5 +426,17 @@ public class JCraftClient implements ClientModInitializer {
     public static boolean shouldNotRenderClone(PlayerCloneEntity clone) {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         return !clone.shouldRenderForMaster() && player != null && clone.getMasterId().equals(player.getUuid());
+    }
+    
+    @Nullable
+    public static StandEntity getStandEntity() {
+        ClientPlayerEntity player = MinecraftClient.getInstance().player;
+        if (player == null) return null;
+        
+        return player.getPassengerList().stream()
+                .filter(e -> e instanceof StandEntity)
+                .map(e -> (StandEntity) e)
+                .findFirst()
+                .orElse(null);
     }
 }

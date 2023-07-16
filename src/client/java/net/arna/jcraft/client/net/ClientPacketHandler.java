@@ -1,17 +1,17 @@
 package net.arna.jcraft.client.net;
 
-import com.google.common.collect.EvictingQueue;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.kosmx.playerAnim.api.layered.IAnimation;
 import dev.kosmx.playerAnim.api.layered.KeyframeAnimationPlayer;
 import dev.kosmx.playerAnim.api.layered.ModifierLayer;
 import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
 import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
-import it.unimi.dsi.fastutil.objects.ObjectLongPair;
 import lombok.experimental.UtilityClass;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.JCraftClient;
 import net.arna.jcraft.client.hud.EpitaphOverlay;
+import net.arna.jcraft.client.renderer.effects.AttackHitBoxEffectRenderer;
+import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer;
 import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
 import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
 import net.arna.jcraft.client.util.JClientUtils;
@@ -22,137 +22,49 @@ import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.*;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.util.Util;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 
-import java.util.*;
+import java.util.Optional;
+import java.util.Random;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
+import static net.arna.jcraft.registry.JPacketRegistry.*;
+import static net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.registerGlobalReceiver;
 
 @UtilityClass
 public class ClientPacketHandler {
-    // Use an evicting queue to limit the amount of hit boxes rendered at a time to 8.
-    // If there are already 8 hit boxes, and we wish to add more, old ones will be removed.
-    @SuppressWarnings("UnstableApiUsage") // I do not care. (based)
-    private static final Queue<ObjectLongPair<Box>> hitBoxes = EvictingQueue.create(8);
 
-    static {
-        WorldRenderEvents.START.register(ctx -> {
-            ClientWorld clientWorld = ctx.world();
-            if (!clientWorld.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)) return;
+    public static void init() {
+        register(S2C_SERVER_CHANNEL_FEEDBACK, ClientPacketHandler::handleChannelFeedback);
+        register(S2C_PLAYER_ANIMATION, ClientPacketHandler::handleAnimation);
+        register(S2C_SHADER_ACTIVATION, ClientPacketHandler::handleShaderActivation);
+        register(S2C_SHADER_DEACTIVATION, ClientPacketHandler::handleShaderDeactivation);
+        register(S2C_TIME_ACCELERATION_STATE, ClientPacketHandler::handleTimeAccelState);
+        register(S2C_EPITAPH_STATE, ClientPacketHandler::handleEpitaphOverlayState);
+        register(S2C_TIME_ERASE_PREDICTION_STATE, ClientPacketHandler::handlePredictionState);
+    }
+    
+    private static void register(Identifier id, Consumer<PacketByteBuf> handler) {
+        registerGlobalReceiver(id, (client, handler1, buf, responseSender) -> handler.accept(buf));
+    }
 
-            double acceleration = TimeAccelStatePacket.getAcceleration(clientWorld);
-
-            long currentTime = Util.getMeasuringTimeMs();
-            if (acceleration == 0) {
-                TimeAccelStatePacket.lastUpdate = currentTime;
-                return;
-            }
-
-            double multiplier = (currentTime - TimeAccelStatePacket.lastUpdate) / 1000d;
-            clientWorld.setTimeOfDay((long) (clientWorld.getTimeOfDay() + acceleration * multiplier));
-
-            TimeAccelStatePacket.lastUpdate = currentTime;
-        });
-
-        WorldRenderEvents.AFTER_ENTITIES.register(ctx -> {
-            if (!MinecraftClient.getInstance().getEntityRenderDispatcher().shouldRenderHitboxes()) return;
-
-            for (Iterator<ObjectLongPair<Box>> iterator = hitBoxes.iterator(); iterator.hasNext();) {
-                ObjectLongPair<Box> pair = iterator.next();
-
-                Vec3d camPos = ctx.camera().getPos();
-                MatrixStack matrices = ctx.matrixStack();
-                matrices.push();
-                matrices.translate(-camPos.x, -camPos.y, -camPos.z);
-
-                // Draw faces
-                Tessellator tess = Tessellator.getInstance();
-                BufferBuilder quadsVc = tess.getBuffer();
-                quadsVc.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-                RenderSystem.setShader(GameRenderer::getPositionColorShader);
-                RenderSystem.enableBlend();
-                RenderSystem.enableCull();
-                RenderSystem.enableDepthTest();
-
-                Matrix4f m = matrices.peek().getPositionMatrix();
-                int c = 0x54FF0000;
-
-                Box box = pair.left();
-                float minX = (float) box.minX;
-                float minY = (float) box.minY;
-                float minZ = (float) box.minZ;
-                float maxX = (float) box.maxX;
-                float maxY = (float) box.maxY;
-                float maxZ = (float) box.maxZ;
-
-                // Up
-                quadsVc.vertex(m, minX, maxY, minZ).color(c).next();
-                quadsVc.vertex(m, minX, maxY, maxZ).color(c).next();
-                quadsVc.vertex(m, maxX, maxY, maxZ).color(c).next();
-                quadsVc.vertex(m, maxX, maxY, minZ).color(c).next();
-
-                // Down
-                quadsVc.vertex(m, minX, minY, minZ).color(c).next();
-                quadsVc.vertex(m, maxX, minY, minZ).color(c).next();
-                quadsVc.vertex(m, maxX, minY, maxZ).color(c).next();
-                quadsVc.vertex(m, minX, minY, maxZ).color(c).next();
-
-                // North
-                quadsVc.vertex(m, minX, minY, minZ).color(c).next();
-                quadsVc.vertex(m, minX, maxY, minZ).color(c).next();
-                quadsVc.vertex(m, maxX, maxY, minZ).color(c).next();
-                quadsVc.vertex(m, maxX, minY, minZ).color(c).next();
-
-                // East
-                quadsVc.vertex(m, maxX, minY, minZ).color(c).next();
-                quadsVc.vertex(m, maxX, maxY, minZ).color(c).next();
-                quadsVc.vertex(m, maxX, maxY, maxZ).color(c).next();
-                quadsVc.vertex(m, maxX, minY, maxZ).color(c).next();
-
-                // South
-                quadsVc.vertex(m, minX, minY, maxZ).color(c).next();
-                quadsVc.vertex(m, maxX, minY, maxZ).color(c).next();
-                quadsVc.vertex(m, maxX, maxY, maxZ).color(c).next();
-                quadsVc.vertex(m, minX, maxY, maxZ).color(c).next();
-
-                // West
-                quadsVc.vertex(m, minX, minY, minZ).color(c).next();
-                quadsVc.vertex(m, minX, minY, maxZ).color(c).next();
-                quadsVc.vertex(m, minX, maxY, maxZ).color(c).next();
-                quadsVc.vertex(m, minX, maxY, minZ).color(c).next();
-
-                tess.draw();
-
-                RenderSystem.disableBlend();
-                RenderSystem.disableDepthTest();
-
-                // Draw lines
-                VertexConsumer linesVc = Objects.requireNonNull(ctx.consumers()).getBuffer(RenderLayer.LINES);
-                WorldRenderer.drawBox(matrices, linesVc, pair.left(), 1f, 0f, 0f, 1f);
-
-                matrices.pop();
-
-                if (Util.getEpochTimeMs() - pair.rightLong() > 2500) iterator.remove();
-            }
-        });
+    private static void register(Identifier id, BiConsumer<MinecraftClient, PacketByteBuf> handler) {
+        registerGlobalReceiver(id, (client, handler1, buf, responseSender) -> handler.accept(client, buf));
     }
 
     public static void handleAnimation(MinecraftClient client, PacketByteBuf buf) {
@@ -208,8 +120,8 @@ public class ClientPacketHandler {
         if (client == null || client.world == null || client.player == null) return;
 
         short control = buf.readShort();
-        // Show hitboxes gamerule
         switch (control) {
+            // Attack hit boxes
             case (1) -> {
                 double x1 = buf.readDouble();
                 double y1 = buf.readDouble();
@@ -220,7 +132,7 @@ public class ClientPacketHandler {
                 double z2 = buf.readDouble();
 
                 // Run on render thread to avoid concurrency issues.
-                RenderSystem.recordRenderCall(() -> hitBoxes.add(ObjectLongPair.of(new Box(x1, y1, z1, x2, y2, z2), Util.getEpochTimeMs())));
+                RenderSystem.recordRenderCall(() -> AttackHitBoxEffectRenderer.addHitBox(new Box(x1, y1, z1, x2, y2, z2)));
             }
 
             // Time erase trackers
@@ -487,5 +399,15 @@ public class ClientPacketHandler {
         boolean start = buf.readBoolean();
         if (start) EpitaphOverlay.start();
         else EpitaphOverlay.stop();
+    }
+    
+    public static void handlePredictionState(MinecraftClient client, PacketByteBuf buf) {
+        boolean start = buf.readBoolean();
+        int length = start ? buf.readVarInt() : 0;
+        
+        client.execute(() -> {
+            if (start) TimeErasePredictionEffectRenderer.startEffect(length);
+            else TimeErasePredictionEffectRenderer.stopEffect();
+        });
     }
 }

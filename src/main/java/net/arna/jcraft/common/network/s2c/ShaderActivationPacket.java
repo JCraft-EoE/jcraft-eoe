@@ -1,17 +1,15 @@
 package net.arna.jcraft.common.network.s2c;
 
-import net.arna.jcraft.JCraft;
+import net.arna.jcraft.registry.JPacketRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.StringIdentifiable;
 import org.jetbrains.annotations.Nullable;
 
 public class ShaderActivationPacket {
-    public static final Identifier ID = new Identifier(JCraft.MOD_ID, "shader_packet");
 
     /**
      * Send a packet S2C to start rendering a shader of a specific {@link Type}
@@ -30,7 +28,7 @@ public class ShaderActivationPacket {
         if (sourceShader != null) {
             buf.writeInt(sourceShader.getId());
         }
-        ServerPlayNetworking.send(serverPlayerEntity, ID, buf);
+        ServerPlayNetworking.send(serverPlayerEntity, JPacketRegistry.S2C_SHADER_ACTIVATION, buf);
     }
 
     public enum Type implements StringIdentifiable {

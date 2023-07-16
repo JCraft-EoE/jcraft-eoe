@@ -4,14 +4,13 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import lombok.Data;
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.MadeInHeavenEntity;
+import net.arna.jcraft.registry.JPacketRegistry;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.PlayerManager;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
@@ -27,7 +26,6 @@ import java.util.Map;
  * Also sent to clients who joined during the use of the ult. (Or at least, it should be)
  */
 public class TimeAccelStatePacket {
-    public static final Identifier ID = JCraft.id("time_accel_state");
     public static final Int2ObjectMap<TimeAcceleration> accelerations = new Int2ObjectOpenHashMap<>();
     public static long lastUpdate = 0;
     private static final Object lock = new Object();
@@ -59,7 +57,7 @@ public class TimeAccelStatePacket {
         buf.writeVarInt(mih.getId());
         buf.writeVarInt(duration);
 
-        playerManager.getPlayerList().forEach(player -> ServerPlayNetworking.send(player, ID, buf));
+        playerManager.getPlayerList().forEach(player -> ServerPlayNetworking.send(player, JPacketRegistry.S2C_TIME_ACCELERATION_STATE, buf));
 
         synchronized (lock) {
             accelerations.put(mih.getId(), new TimeAcceleration(duration, mih.getId()));
@@ -72,7 +70,7 @@ public class TimeAccelStatePacket {
         buf.writeVarInt(State.STOP.ordinal());
         buf.writeVarInt(mih.getId());
 
-        playerManager.getPlayerList().forEach(player -> ServerPlayNetworking.send(player, ID, buf));
+        playerManager.getPlayerList().forEach(player -> ServerPlayNetworking.send(player, JPacketRegistry.S2C_TIME_ACCELERATION_STATE, buf));
 
         synchronized (lock) {
             accelerations.remove(mih.getId());

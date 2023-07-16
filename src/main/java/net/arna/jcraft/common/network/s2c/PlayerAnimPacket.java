@@ -1,15 +1,13 @@
 package net.arna.jcraft.common.network.s2c;
 
-import net.arna.jcraft.JCraft;
+import net.arna.jcraft.registry.JPacketRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
 
 public class PlayerAnimPacket {
-    public static final Identifier ID = JCraft.id("animpacket");
 
     /**
      * Animates player (from) on player (to)'s end, while updating spec values
@@ -25,7 +23,7 @@ public class PlayerAnimPacket {
         buf.writeInt(moveStun);
         buf.writeInt(attackID);
 
-        ServerPlayNetworking.send(to, ID, buf);
+        ServerPlayNetworking.send(to, JPacketRegistry.S2C_PLAYER_ANIMATION, buf);
     }
 
     /**
@@ -38,6 +36,6 @@ public class PlayerAnimPacket {
         buf.writeString(animID);
         buf.writeBoolean(false);
 
-        ServerPlayNetworking.send(to, ID, buf);
+        ServerPlayNetworking.send(to, JPacketRegistry.S2C_PLAYER_ANIMATION, buf);
     }
 }
