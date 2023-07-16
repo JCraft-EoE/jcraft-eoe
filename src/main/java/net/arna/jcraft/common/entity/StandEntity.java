@@ -663,10 +663,11 @@ public abstract class StandEntity extends MobEntity {
             }
 
 
-            if (defaultToNear() && getMoveStun() < 1 && this.queuedAttack == null) {
-                if (attack == null)
-                    setFree(false);
-                else if (attack.attackType == AttackType.COUNTER) {
+            if (defaultToNear() && getMoveStun() < 1) {
+                if (attack == null) {
+                    if (this.queuedAttack == null)
+                        setFree(false);
+                } else if (attack.attackType == AttackType.COUNTER) {
                     whiffCounter();
                 }
             }
