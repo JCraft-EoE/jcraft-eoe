@@ -44,7 +44,7 @@ public class LivingArrowItem extends Item {
             if (standID == StandType.KILLER_QUEEN.getId()) {
                 playerNbt.putInt("StandID", StandType.KILLER_QUEEN_BITES_THE_DUST.getId());
             } else if (standID == StandType.STAR_PLATINUM.getId()) {
-                playerNbt.putInt("StandID", StandType.SPTW.getId());
+                playerNbt.putInt("StandID", StandType.STAR_PLATINUM_THE_WORLD.getId());
             }
         }
 

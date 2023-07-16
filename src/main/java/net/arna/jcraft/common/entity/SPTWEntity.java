@@ -62,7 +62,7 @@ public class SPTWEntity extends StarPlatinumEntity implements IAnimatable, IAnim
     }
 
     public SPTWEntity(World worldIn) {
-        super(StandType.SPTW, worldIn);
+        super(StandType.STAR_PLATINUM_THE_WORLD, worldIn);
         super.initialize();
         idleRotation = 315f;
 

@@ -34,7 +34,7 @@ public enum StandType {
     THE_WORLD_OVER_HEAVEN(JEntityTypeRegister.THE_WORLD_OVER_HEAVEN, TheWorldOverHeavenEntity::new, "twoh", true),  // -3
     KILLER_QUEEN_BITES_THE_DUST(JEntityTypeRegister.KILLER_QUEEN_BITES_THE_DUST, KQBTDEntity::new, "kqbtd",true),  // -4
     GER(JEntityTypeRegister.GER, GEREntity::new, "ger", true),                                              // -5
-    SPTW(JEntityTypeRegister.SPTW, SPTWEntity::new, "sptw", true);                                              // -6
+    STAR_PLATINUM_THE_WORLD(JEntityTypeRegister.SPTW, SPTWEntity::new, "sptw", true);                     // -6
 
 
     @Getter(lazy = true)
