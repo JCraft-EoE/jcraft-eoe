@@ -631,7 +631,7 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
     public static void updatePredictions(Set<Map.Entry<Entity, Vec3d>> predictionsSet, int ticksLeft) {
         for (Map.Entry<Entity, Vec3d> prediction : predictionsSet) {
             Entity entity = prediction.getKey();
-            if (entity == null) continue;
+            if (entity == null || !entity.isAlive()) continue;
             World world = entity.getWorld();
 
             Vec3d currentPos = entity.getPos().add(0, 0.1, 0);

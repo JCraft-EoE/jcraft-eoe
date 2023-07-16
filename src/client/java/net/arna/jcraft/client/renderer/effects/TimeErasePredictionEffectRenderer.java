@@ -25,7 +25,10 @@ public class TimeErasePredictionEffectRenderer {
     public static void init() {
         WorldRenderEvents.BEFORE_ENTITIES.register(TimeErasePredictionEffectRenderer::render);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (ticksLeft < 0) return;
+            if (ticksLeft < 0) {
+                predictions.clear();
+                return;
+            }
             ticksLeft--;
             
             synchronized (predictions) {
@@ -45,6 +48,7 @@ public class TimeErasePredictionEffectRenderer {
     
     public static void stopEffect() {
         ticksLeft = -1;
+        predictions.clear();
     }
     
     private static void render(WorldRenderContext ctx) {
@@ -59,7 +63,7 @@ public class TimeErasePredictionEffectRenderer {
 
         for (Map.Entry<Entity, Vec3d> prediction : predictionsSet) {
             Entity entity = prediction.getKey();
-            if (entity == null) return;
+            if (entity == null || !entity.isAlive()) return;
             
             Vec3d pos = prediction.getValue().subtract(camPos);
             BlockPos bPos = new BlockPos(prediction.getValue());
