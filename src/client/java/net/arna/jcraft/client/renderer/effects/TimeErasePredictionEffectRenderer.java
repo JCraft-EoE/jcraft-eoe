@@ -2,7 +2,6 @@ package net.arna.jcraft.client.renderer.effects;
 
 import net.arna.jcraft.client.JCraftClient;
 import net.arna.jcraft.common.entity.KingCrimsonEntity;
-import net.arna.jcraft.common.entity.StandEntity;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
@@ -10,13 +9,14 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.entity.Entity;
-import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.LightType;
-import net.minecraft.world.World;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 public class TimeErasePredictionEffectRenderer {
     private static int ticksLeft = 0;
@@ -38,13 +38,8 @@ public class TimeErasePredictionEffectRenderer {
         if (length <= 0) throw new IllegalArgumentException("Length must be at least 1.");
         ticksLeft = length;
 
-        World world = MinecraftClient.getInstance().world;
-        StandEntity stand = JCraftClient.getStandEntity();
-        if (world == null || stand == null) return;
-        
-        List<Entity> toCatch = world.getEntitiesByClass(Entity.class, stand.getBoundingBox().expand(64),
-                EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e -> e != stand && e != MinecraftClient.getInstance().player));
-        for (Entity entity : toCatch)
+        MinecraftClient client = MinecraftClient.getInstance();
+        for (Entity entity : KingCrimsonEntity.getEntitiesToCatch(client.world, JCraftClient.getStandEntity(), client.player))
             predictions.put(entity, entity.getPos());
     }
     

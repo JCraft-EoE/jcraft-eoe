@@ -25,6 +25,7 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
@@ -199,6 +200,9 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
 
     private void beginPrediction() {
         if (!(getUser() instanceof ServerPlayerEntity player)) return;
+
+        for (Entity entity : KingCrimsonEntity.getEntitiesToCatch(world, this, player))
+            predictionInfo.put(entity, entity.getPos());
         
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeBoolean(true);
@@ -660,6 +664,13 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
             case 13 -> controller.setAnimation(builder.playAndHold("animation.kingcrimson.counter_miss"));
         }
         return PlayState.CONTINUE;
+    }
+    
+    public static List<Entity> getEntitiesToCatch(World world, StandEntity stand, PlayerEntity player) {
+        if (world == null || stand == null) return List.of();
+
+        return world.getEntitiesByClass(Entity.class, stand.getBoundingBox().expand(64),
+                EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e -> e != stand && e != player));
     }
     
     public static void updatePredictions(Set<Map.Entry<Entity, Vec3d>> predictionsSet, int ticksLeft) {
