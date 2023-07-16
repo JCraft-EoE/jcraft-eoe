@@ -352,6 +352,13 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
         }
     }
 
+    private static final Attack counterMiss = new Attack(8, 0, 15, 16, 1, AttackType.BOX);
+    @Override
+    public void whiffCounter() {
+        setAttack(counterMiss, 11);
+        stun(getUser(), counterMiss.moveStun, 0);
+    }
+
     @Override
     public void desummon() {
         clearCoin();
@@ -435,6 +442,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
             case 8 -> controller.setAnimation(builder.playAndHold("animation.kqbtd.bubble"));
             case 9 -> controller.setAnimation(builder.playAndHold("animation.kqbtd.low"));
             case 10 -> controller.setAnimation(builder.playAndHold("animation.kqbtd.bubblecounter"));
+            case 11 -> controller.setAnimation(builder.playAndHold("animation.kqbtd.counter_miss"));
         }
         return PlayState.CONTINUE;
     }

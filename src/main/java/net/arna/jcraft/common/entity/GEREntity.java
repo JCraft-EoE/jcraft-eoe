@@ -253,6 +253,13 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
         JCraft.CreateParticle((ServerWorld) world, eP.x, eP.y, eP.z, -1);
     }
 
+    private static final Attack counterMiss = new Attack(11, 0, 20, 21, 1, AttackType.BOX);
+    @Override
+    public void whiffCounter() {
+        setAttack(counterMiss, 15);
+        stun(getUser(), counterMiss.moveStun, 0);
+    }
+
     @Override
     public void initUlt() {
         if (!canAttack()) return;
@@ -479,6 +486,7 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
             case 12 -> controller.setAnimation(builder.playAndHold("animation.ger.airbarrage"));
 
             case 13 -> controller.setAnimation(builder.playAndHold("animation.ger.setup"));
+            case 15 -> controller.setAnimation(builder.playAndHold("animation.ger.counter_miss"));
         }
 
         return PlayState.CONTINUE;

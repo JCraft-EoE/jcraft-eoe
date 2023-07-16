@@ -1193,6 +1193,7 @@ Anubis
 >Fixed Knife Bundle rendering
 
 Star Platinum
+    >Updated animations
     >Inhale improved
     >Added +4t launch stun to Star Breaker
 
@@ -1203,6 +1204,7 @@ D4C
     >Added +2 launch stun to Charge
 
 Star Platinum: The World
+    >Updated animations
     >Added sounds
 
 Counters
