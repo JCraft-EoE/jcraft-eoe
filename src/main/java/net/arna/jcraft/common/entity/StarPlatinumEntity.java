@@ -53,7 +53,7 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
             .setUB(true)
             .setInfo("Inhale", "vacuums nearby entities for 4 seconds");
     private static final Attack jump = new Attack(-2, 18, 14, 5)
-            .setMobility(MobilityType.HIGHJUMP)
+            .setMobility(MobilityType.DASH)
             .setInfo("Stand Jump", "jumps in looked direction with slight upward bias, you must stay on the ground until Star Platinum jumps");
 
     // Inhale
@@ -111,11 +111,11 @@ public class StarPlatinumEntity extends StandEntity implements IAnimatable, IAni
                             -the classic
                             M1>Barrage>M1>Low Kick>Advancing Barrage~M1~Star Finger~Star Breaker
                             
-                            -the "omg where did ts go"
-                            M1>...
+                            -the blowback
+                            Inhale>...>Star Finger>Star Breaker>Barrage>...
 
                             -the poke
-                            Star Finger>Low Kick>M1>Advancing Barrage~M1~Low Kick>Barrage>M1>Star Breaker""";
+                            Star Finger>Low Kick>M1>Advancing Barrage~M1>Barrage>M1>Star Breaker""";
 
         moves = List.of(light, heavy, barrage, starfinger, inhale, lowkick, starfinger, jump);
     }

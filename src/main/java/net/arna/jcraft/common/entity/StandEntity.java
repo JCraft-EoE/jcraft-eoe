@@ -14,6 +14,8 @@ import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.pathing.EntityNavigation;
+import net.minecraft.entity.ai.pathing.MobNavigation;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
@@ -798,7 +800,8 @@ public abstract class StandEntity extends MobEntity {
                                 }
                                 continue;
                             }
-                            damageLogic(world, livingEntity, kbVec, stunTicks, attack.stunType, attack.overrideStun, damage, attack.lift, attack.getEffectiveBlockstun(), JDamageSources.stand(this, user), user, attack.canBackstab);
+
+                            damageLogic(world, livingEntity, kbVec, stunTicks, attack.stunType, attack.overrideStun, damage, attack.lift, attack.getEffectiveBlockstun(), JDamageSources.stand(this, user), user, attack.canBackstab, attack.unblockable && !attack.ubEffectsOnly);
                         }
 
                         for (LivingEntity livingEntity : clashed) {
@@ -885,7 +888,25 @@ public abstract class StandEntity extends MobEntity {
     }
 
     /**
-     * Highest level damage method, handles combo counting
+     * Highest level damage method, handles combo counting, DEFAULTS unblockable TO FALSE
+     * @param world world to process damage in
+     * @param ent victim
+     * @param kbVec knockback vector to apply
+     * @param stunTicks stun duration in ticks
+     * @param overrideStun will the attack override all other types of stun?
+     * @param damage damage in half hearts
+     * @param lift will the attack lift the victim upon an aerial hit?
+     */
+    public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, boolean canBackstab, boolean unblockable) {
+        if (world == null || world.isClient || ent == null) return;
+        if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && attacker instanceof PlayerEntity playerEntity)
+            comboCounterLogic(playerEntity, ent);
+
+        baseDamageLogic(ent, kbVec, stunTicks, stunType, overrideStun, damage, lift, blockstun, source, attacker, canBackstab, unblockable);
+    }
+
+    /**
+     * Highest level damage method, handles combo counting, DEFAULTS unblockable TO FALSE
      * @param world world to process damage in
      * @param ent victim
      * @param kbVec knockback vector to apply
@@ -899,11 +920,11 @@ public abstract class StandEntity extends MobEntity {
         if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && attacker instanceof PlayerEntity playerEntity)
             comboCounterLogic(playerEntity, ent);
 
-        baseDamageLogic(ent, kbVec, stunTicks, stunType, overrideStun, damage, lift, blockstun, source, attacker, canBackstab);
+        baseDamageLogic(ent, kbVec, stunTicks, stunType, overrideStun, damage, lift, blockstun, source, attacker, canBackstab, false);
     }
 
     /**
-     * Highest level damage method, handles combo counting, DEFAULTS canBackstab TO FALSE
+     * Highest level damage method, handles combo counting, DEFAULTS canBackstab and unblockable TO FALSE
      * @param world world to process damage in
      * @param ent victim
      * @param kbVec knockback vector to apply
@@ -916,7 +937,7 @@ public abstract class StandEntity extends MobEntity {
         if (world == null || world.isClient || ent == null) return;
         if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && attacker instanceof PlayerEntity playerEntity)
             comboCounterLogic(playerEntity, ent);
-        baseDamageLogic(ent, kbVec, stunTicks, stunType, overrideStun, damage, lift, blockstun, source, attacker, false);
+        baseDamageLogic(ent, kbVec, stunTicks, stunType, overrideStun, damage, lift, blockstun, source, attacker, false, false);
     }
 
     /**
@@ -951,7 +972,7 @@ public abstract class StandEntity extends MobEntity {
      * @param damage damage in half hearts
      * @param lift will the attack lift the victim upon an aerial hit?
      */
-    public static void baseDamageLogic(LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, boolean canBackstab) {
+    public static void baseDamageLogic(LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, boolean canBackstab, boolean unblockable) {
         boolean hit = true;
         boolean tsHit = ( (ITimeStop)ent ).getTimeStopTicks() > 0;
 
@@ -976,12 +997,13 @@ public abstract class StandEntity extends MobEntity {
                     stand.playSound(SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, 1, 1);
                     stand.blocking = false;
                     overrideStun = true;
-
-                } else {
+                } else if (!unblockable) {
                     stand.setMoveStun(blockstun);
                     stand.setStandGauge(stand.getStandGauge() - 2 * damage);
                     stand.playSound(JSoundRegister.STAND_BLOCK, 1, 1);
                     hit = false;
+                } else {
+                    stand.blocking = false;
                 }
             }
         }
@@ -1110,8 +1132,8 @@ public abstract class StandEntity extends MobEntity {
             // Block regardless of range if the attack is ranged, or is a barrage
             if (enemyAttack.isRanged || enemyAttack.attackType == AttackType.BARRAGE)
                 wantToBlock = true;
-            // Block if the attack isn't ranged, but is within hitting distance, and doesn't block break
-            if (enemyAttack.attackDist + enemyAttack.hitboxSize * 0.66 > distance && enemyAttack.damage * 2 < stand.getStandGauge())
+            // Block if the attack isn't ranged, but is within hitting distance, and doesn't block break/bypass
+            if ( enemyAttack.attackDist + enemyAttack.hitboxSize * 0.66 > distance && enemyAttack.damage * 2 < stand.getStandGauge() && !enemyAttack.unblockable )
                 wantToBlock = true;
         }
 
@@ -1174,25 +1196,27 @@ public abstract class StandEntity extends MobEntity {
                 }
             }
 
-            // Dash to targeted location
-            BlockPos targetPos = mob.getNavigation().getTargetPos();
-            if (targetPos != null && mob.isOnGround() && targetPos.getSquaredDistance(target.getPos()) > 4)
-                JCraft.tryDash(1, 0, mob);
-
             double sideswitchDistance = 1.25;
 
-            // If in range
+            EntityNavigation entityNavigation = mob.getNavigation();
+
+            boolean evade = enemyAttack != null;
+            // If in range (to attack or get hit)
             if (
                     (selectedAttack != null && distance < selectedAttack.attackDist + selectedAttack.hitboxSize * 0.75) ||
                             (enemyAttack != null && !enemyAttack.isRanged && distance < enemyAttack.attackDist + enemyAttack.hitboxSize * 1.5)
             ) {
                 // Move towards or away depending on distance and intent
-                mob.getNavigation().setSpeed(distance < sideswitchDistance && selectedAttack == null ? 0.25 : -0.25);
+                entityNavigation.setSpeed(evade ? -0.25 : 0.25);
             }
 
-            float sStrafe = MathHelper.sin(stand.age * 0.02f) / 3f;
+            // Dash to targeted location/evasion
+            BlockPos targetPos = entityNavigation.getTargetPos();
+            if (targetPos != null && mob.isOnGround() && targetPos.getSquaredDistance(target.getPos()) > 2.25)
+                JCraft.tryDash(evade ? -1 : 1, evade ? stand.random.nextInt(2) - 1 : 0 , mob);
 
             // Move away during combo to prevent point-blank misses
+            float sStrafe = MathHelper.sin(stand.age * 0.02f) / 3f;
             if (stunTicks > 0) {
                 float back = -0.5f;
                 if (enemyHasStand && enemyStand.blocking) {

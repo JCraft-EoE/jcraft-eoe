@@ -28,7 +28,6 @@ public class RenderUtils {
         return null;
     }
 
-    //TODO: get sterner to explain this
     public static void renderGuiQuad(BufferBuilder buffer, int x, int y, int width, int height, int red, int green, int blue, int alpha) {
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
         buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);

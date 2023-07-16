@@ -43,9 +43,7 @@ public class SPTWEntity extends StarPlatinumEntity implements IAnimatable, IAnim
             .setInfo("Backhand", "fast poke, decent stun");
     public static final Attack grab = new Attack(5, 26, 1f, 20, 8, 1.5, 2f, 0.4f, AttackType.BOX, 1, 0, 0, JSoundRegister.SPTW_GRABHIT)
             .appendHitbox(new Attack.HitboxData(0, 0, 1))
-            .setUB(false)
-            .setStunOverride(true)
-            .setStunType(0)
+            .setGrab()
             .setBlockstun(4)
             .setInfo("What an Ugly Watch", "grab, high recovery");
     public static final Attack grabhit = new Attack(7, 0, 1f, 24, 16, 1.75, 9f, 0.4f, AttackType.BOX, 1, 0, 0, JSoundRegister.IMPACT_1)
@@ -71,20 +69,23 @@ public class SPTWEntity extends StarPlatinumEntity implements IAnimatable, IAnim
         description = "High Speed RUSHDOWN";
 
         pros = List.of(
-                "UNKNOWN"
+                "high whiff punish power",
+                "high mobility",
+                "excellent mixups",
+                "near-instant timestop"
         );
 
         cons = List.of(
-                "UNKNOWN"
+                "burns through options quickly",
+                "hard to hitconfirm important options without using TS"
         );
 
         freespace =
                 """
-                        BNBs:
-                        ~ represents a queued attack
-                                                
-                            -the racial slur
-                            M1""";
+                BNBs:
+                                        
+                    -the
+                    M1>cr.Time Strike>Backhand>What an Ugly Watch>delay M1>Timestop~Star Breaker>dash/Timeskip>Barrage>M1""";
 
         moves = List.of(light, heavy, barrage, timestrike, timestop, backhand, timestrike, timeskip);
     }

@@ -203,7 +203,6 @@ public class JServerTickEvents {
         JCraft.dashes = newDashes;
 
         for (ServerWorld serverWorld : server.getWorlds()) {
-            //TODO: make MobAI not be dependent on having an active stand
             List<? extends MobEntity> mobEntities = serverWorld.getEntitiesByType(TypeFilter.instanceOf(MobEntity.class), EntityPredicates.VALID_ENTITY);
 
             for (MobEntity mob : mobEntities) {

@@ -1211,6 +1211,21 @@ Counters
     >Added whiff recovery (0.5s for knockback/down counters, 1s for combo starting counters)
     >D4C counter duration reduced (2.25s->1.5s)
 
+● 16/7/2023
+>Combo Counter text now disappears after 3s instead of 1s of inactivity
+
+Cream
+    >Fixed grab being combo breakable
+    >Destroy now disables block on hit
+
+Star Platinum: The World
+    >Wrote /stand about
+    >Fixed minor animation errors
+    >Fixed What an Ugly Watch not properly stunning through block
+
+The World: Over Heaven
+    >Reduced launch on Smite
+
 priority (top to bottom)
 todo: fix predict not working with new projectiles
 

@@ -21,6 +21,7 @@ import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
 import net.arna.jcraft.common.JConfig;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.entity.StandEntity;
+import net.arna.jcraft.common.network.c2s.InputSyncPacket;
 import net.arna.jcraft.common.network.c2s.StandControlPacket;
 import net.arna.jcraft.common.network.s2c.*;
 import net.arna.jcraft.common.util.ColorUtils;
@@ -49,7 +50,6 @@ import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
-import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
@@ -75,7 +75,7 @@ public class JCraftClient implements ClientModInitializer {
     private final List<String> comboRemarks = List.of("admin rdm!!!", "baby combo", "caught lackin", "kinda ez", "skill issue", "cancelled on twitter", "sent to bulgaria", "down bad");
     public static DefaultedList<Double> clientCooldowns = DefaultedList.ofSize(JCraft.cooldowns.size(), 0.0);
     public static int comboCounter = 0;
-    public static int ticksSinceCounted = 0;
+    public static int framesSinceCounted = 0;
 
     public static KeyBinding standSummon;
     public static KeyBinding heavyKey;
@@ -181,7 +181,7 @@ public class JCraftClient implements ClientModInitializer {
     private void renderHud(MatrixStack matrixStack, float v) {
         MinecraftClient client = MinecraftClient.getInstance();
         ClientPlayerEntity player = client.player;
-        ticksSinceCounted++;
+        framesSinceCounted++;
 
         int selectedX = getHudX(client.getWindow().getScaledWidth());
         int selectedY = client.getWindow().getScaledHeight();
@@ -196,7 +196,7 @@ public class JCraftClient implements ClientModInitializer {
 
         int i = 0;
         TextRenderer textRenderer = client.inGameHud.getTextRenderer();
-        if (comboCounter > 0 && player.world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && ticksSinceCounted <= 60) {
+        if (comboCounter > 0 && player.world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && framesSinceCounted <= 180) {
 
             String remark = "epic tod free download";
             if (comboCounter < comboRemarks.size() * 7) {
@@ -207,9 +207,9 @@ public class JCraftClient implements ClientModInitializer {
             textRenderer.drawWithShadow(
                     matrixStack,
                     remark + " - " + comboCounter,
-                    selectedX + (ticksSinceCounted < 5 ? player.getRandom().nextFloat() * 5f : 0) +
+                    selectedX + (framesSinceCounted < 5 ? player.getRandom().nextFloat() * 5f : 0) +
                             ( (JConfig.UI_POSITION == JConfig.UIPos.MIDDLE && useIcons) ? 54f : 0 ),
-                    selectedY * (1.15f) + (ticksSinceCounted < 5 ? player.getRandom().nextFloat() * 5f : 0),
+                    selectedY * (1.15f) + (framesSinceCounted < 5 ? player.getRandom().nextFloat() * 5f : 0),
                     ColorUtils.HSBAtoRGBA(comboCounter / 360f - 1f, 1f, 1f, 0.8f)
                     , true
             );
@@ -309,17 +309,16 @@ public class JCraftClient implements ClientModInitializer {
         StandEntity stand = ((IEntityDataSaver)player).getStand();
         boolean standOn = stand != null;
 
-        //todo: reformat this into 3 packets (input packet, stand block packet, attack packet)
+        //todo: reformat this into 2 more packets (stand block packet, attack packet)
         if (player.isAlive()) { // Send movement inputs to server
             PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(0);
             buf.writeBoolean(go.forwardKey.isPressed()); // W
             buf.writeBoolean(go.leftKey.isPressed()); // A
             buf.writeBoolean(go.backKey.isPressed()); // S
             buf.writeBoolean(go.rightKey.isPressed()); // D
             buf.writeBoolean(go.jumpKey.isPressed()); // Space
             buf.writeBoolean(dash.isPressed()); // Dash
-            sendStandControlPacket(buf);
+            ClientPlayNetworking.send(InputSyncPacket.ID, buf);
         } else { // Reset cooldowns on death
             clientCooldowns = DefaultedList.ofSize(JCraft.cooldowns.size(), 0.0);
         }

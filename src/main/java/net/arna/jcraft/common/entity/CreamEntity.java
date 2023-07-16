@@ -53,7 +53,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
     public static final Attack combo = new Attack(2, 17, 0.75f, 36, 0, 2.0, 7f, 0.1f, AttackType.MULTIHIT, 1, 0, List.of(10, 17, 25), JSoundRegister.IMPACT_3)
             .setInfo("3-hit Combo", "medium windup, good stun");
     public static final Attack grab = new Attack(3, 20, 1f, 20, 8, 1.5, 3f, 0f, AttackType.BOX, 1.5f, 0, 0)
-            .setUB(false)
+            .setGrab()
             .setInfo("Grab", "unblockable, knocks back");
     public static final Attack grabhit = new Attack(4, 0, 1f, 20, 13, 2.0, 6f, 1.5f, AttackType.BOX, 0.25f)
             .setLaunch();
@@ -63,7 +63,7 @@ public class CreamEntity extends StandEntity implements IAnimatable, IAnimationT
     public static final Attack destroy = new Attack(6, 25, 1f, 30, 21, 2, 0f, 1.25f, AttackType.BOX, 0f, 0f, 0, JSoundRegister.IMPACT_5)
             .setHitspark(2)
             .hyperArmor()
-            .setUB(true)
+            .setUB(false)
             .setInfo("Destroy", "slow, uninterruptable, unblockable knockdown");
     public static final Attack consume = new Attack(7, 32, 1f, 40, 35, 2.0, 2f, 0f, AttackType.BOX)
             .setRanged(true)

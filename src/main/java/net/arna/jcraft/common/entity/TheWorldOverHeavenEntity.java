@@ -47,7 +47,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
     public static final Attack heavy = new Attack(1, 19, 1f, 22, 10, 2, 0f, 0.0f, AttackType.BOX, 1, 0, 0, JSoundRegister.IMPACT_5)
             .setHitspark(2)
-            .setUB(false)
+            .setUB(true)
             .setInfo("Singularity", "block bypass, low stun, medium windup");
     public static final Attack smite = new Attack(3, 21, 1f, 20, 10, 0, 6f, 0.0f, AttackType.BOX, 1.05f, 0, 0)
             .setBlockstun(13)
@@ -71,11 +71,12 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
     public static final Attack knives = new Attack(4, 19, 0.75f, 22, 16, 1.5, 0f, 0.0f, AttackType.BOX, 1)
             .setBlockstun(6)
             .setRanged(true)
-            .setInfo("Divine Finisher", "fires 4 stunning knives that launch at a delay/in air summons and launches 8 knives");
-    public static final Attack airknives = new Attack(5, 19, 0.75f, 22, 16, 1.5, 0f, 0.0f, AttackType.BOX, 1)
+            .setInfo("Aerial Divine Finisher", "");
+    public static final Attack delayknives = new Attack(5, 19, 0.75f, 22, 16, 1.5, 0f, 0.0f, AttackType.BOX, 1)
             .setBlockstun(6)
             .setRanged(true)
-            .setInfo("Aerial Divine Finisher", "you shouldn't be able to read this");
+            .aerialVariation(knives)
+            .setInfo("Divine Finisher", "fires 4 stunning knives that launch at a delay/in air summons and launches 8 knives");
 
     public static final Attack timestop = new Attack(7, 70, 50, 45, 5, AttackType.TIMESTOP)
             .setUB(true)
@@ -120,12 +121,11 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
                 "fast m1",
                 "longest timestop",
                 "unblockable heavy",
-                "timestop & timeskip"
+                "good ranged coverage"
         );
 
         cons = List.of(
                 "no knockdowns or knockbacks",
-                "unconfirmable overwrite",
                 "unsafe pressure"
         );
 
@@ -137,7 +137,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
                             the ultrakill
                             M1>Barrage>M1>Knives>Overwrite~S2/S3>dash>Smite>Heavy>M1""";
 
-        moves = List.of(light, heavy, barrage, smite, timestop, knives, chargeoverwrite, timeskip);
+        moves = List.of(light, heavy, barrage, smite, timestop, delayknives, chargeoverwrite, timeskip);
     }
 
     // Moveset
@@ -221,7 +221,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
         CanAttackData cad = this.canAttackWithData();
         if (!cad.canAttack)
             return;
-        if (cad.user.isOnGround() && handleAttack(airknives, JCraft.standS2CD, 11)) {
+        if (cad.user.isOnGround() && handleAttack(delayknives, JCraft.standS2CD, 11)) {
             playSound(JSoundRegister.TWOH_AIRKNIVES, 1, 1);
         } else if (handleAttack(knives, JCraft.standS2CD, 9)) {
             playSound(JSoundRegister.TWOH_KNIFETHROW, 1, 1);
@@ -299,7 +299,7 @@ public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable
                 for (Entity ent : hit) {
                     if (ent instanceof LivingEntity living) {
                         LivingEntity target = JUtils.getUserIfStand(living);
-                        target.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 10, 9, true, false));
+                        target.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 7, 9, true, false));
                         damageLogic(world, target, Vec3d.ZERO, 21, 1, false, smiteDamage, false, 13, damageSource, user);
                     }
 

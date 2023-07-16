@@ -96,6 +96,10 @@ public final class Attack {
         }
     }
 
+    public Attack setGrab() {
+        return this.setStunType(0).setStunOverride(true).setUB(false);
+    }
+
     /**
      * Marks attack as a launcher
      */

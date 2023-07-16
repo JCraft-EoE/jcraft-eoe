@@ -300,7 +300,7 @@ public class ClientPacketHandler {
             // Combo counter
             case (6) -> {
                 JCraftClient.comboCounter = buf.readInt();
-                JCraftClient.ticksSinceCounted = 0;
+                JCraftClient.framesSinceCounted = 0;
             }
 
             // Return to Zero trackers
