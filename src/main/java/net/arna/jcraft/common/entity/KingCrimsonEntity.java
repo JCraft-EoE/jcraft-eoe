@@ -219,8 +219,10 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
             entity.teleport(pos.x, pos.y, pos.z);
         }
 
-        if (getUser() instanceof ServerPlayerEntity player)
-            ServerPlayNetworking.send(player, JPacketRegistry.S2C_EPITAPH_STATE, new PacketByteBuf( Unpooled.buffer().writeBoolean(false)) );
+        if (getUser() instanceof ServerPlayerEntity player) {
+            ServerPlayNetworking.send(player, JPacketRegistry.S2C_EPITAPH_STATE, new PacketByteBuf(Unpooled.buffer().writeBoolean(false)));
+            ServerPlayNetworking.send(player, JPacketRegistry.S2C_TIME_ERASE_PREDICTION_STATE, new PacketByteBuf(Unpooled.buffer().writeBoolean(false)));
+        }
 
         predictionInfo.clear();
         moveCancel();
@@ -619,6 +621,51 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
         }
     }
 
+    public static List<Entity> getEntitiesToCatch(World world, StandEntity stand, PlayerEntity player) {
+        if (world == null || stand == null) return List.of();
+
+        return world.getEntitiesByClass(Entity.class, stand.getBoundingBox().expand(64),
+                EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e -> e != stand && e != player));
+    }
+
+    public static void updatePredictions(Set<Map.Entry<Entity, Vec3d>> predictionsSet, int ticksLeft) {
+        for (Map.Entry<Entity, Vec3d> prediction : predictionsSet) {
+            Entity entity = prediction.getKey();
+            if (entity == null) continue;
+            World world = entity.getWorld();
+
+            Vec3d currentPos = entity.getPos().add(0, 0.1, 0);
+            Vec3d futurePos = currentPos;
+            boolean changed = false;
+
+            // If in air and not in a liquid, account for drop
+            if (!entity.isOnGround() && !entity.isSubmergedInWater() && !entity.isInLava()) {
+                //JCraft.LOGGER.info("Target is in air");
+                futurePos = futurePos.add(0, (-9.81 / 400) * ticksLeft * ticksLeft, 0);
+                changed = true;
+            }
+
+            // If moving faster than 0.01 m/s, account for distance traveled
+            Vec3d velocity = entity.getVelocity();
+            if (entity instanceof ServerPlayerEntity player) // EXTREMELY cursed implementation of player velocity because NOTHING ELSE WORKS
+                velocity = ((IEntityDataSaver) player).getDesiredVelocity();
+            //JCraft.LOGGER.info("Target is moving at a velocity of: " + velocity);
+            if (velocity.lengthSquared() > 0.0001) {
+                Vec3d velocityComp = new Vec3d(velocity.x * ticksLeft, Math.max(0, velocity.y * ticksLeft), velocity.z * ticksLeft);
+                //JCraft.LOGGER.info("Modified velocity: " + velocityComp);
+                futurePos = futurePos.add(velocityComp);
+                changed = true;
+            }
+
+            // Collision check between current and extrapolated future position
+            if (changed) {
+                //JCraft.LOGGER.info("Predicted position changed, time left: " + timeLeft);
+                BlockHitResult hitResult = world.raycast(new RaycastContext(currentPos, futurePos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, entity));
+                prediction.setValue(hitResult.getPos());
+            }
+        }
+    }
+
 
     // Animations
     final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
@@ -664,50 +711,5 @@ public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnim
             case 13 -> controller.setAnimation(builder.playAndHold("animation.kingcrimson.counter_miss"));
         }
         return PlayState.CONTINUE;
-    }
-    
-    public static List<Entity> getEntitiesToCatch(World world, StandEntity stand, PlayerEntity player) {
-        if (world == null || stand == null) return List.of();
-
-        return world.getEntitiesByClass(Entity.class, stand.getBoundingBox().expand(64),
-                EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e -> e != stand && e != player));
-    }
-    
-    public static void updatePredictions(Set<Map.Entry<Entity, Vec3d>> predictionsSet, int ticksLeft) {
-        for (Map.Entry<Entity, Vec3d> prediction : predictionsSet) {
-            Entity entity = prediction.getKey();
-            if (entity == null) continue;
-            World world = entity.getWorld();
-
-            Vec3d currentPos = entity.getPos().add(0, 0.1, 0);
-            Vec3d futurePos = currentPos;
-            boolean changed = false;
-
-            // If in air and not in a liquid, account for drop
-            if (!entity.isOnGround() && !entity.isSubmergedInWater() && !entity.isInLava()) {
-                //JCraft.LOGGER.info("Target is in air");
-                futurePos = futurePos.add(0, (-9.81 / 400) * ticksLeft * ticksLeft, 0);
-                changed = true;
-            }
-
-            // If moving faster than 0.01 m/s, account for distance traveled
-            Vec3d velocity = entity.getVelocity();
-            if (entity instanceof ServerPlayerEntity player) // EXTREMELY cursed implementation of player velocity because NOTHING ELSE WORKS
-                velocity = ((IEntityDataSaver) player).getDesiredVelocity();
-            //JCraft.LOGGER.info("Target is moving at a velocity of: " + velocity);
-            if (velocity.lengthSquared() > 0.0001) {
-                Vec3d velocityComp = new Vec3d(velocity.x * ticksLeft, Math.max(0, velocity.y * ticksLeft), velocity.z * ticksLeft);
-                //JCraft.LOGGER.info("Modified velocity: " + velocityComp);
-                futurePos = futurePos.add(velocityComp);
-                changed = true;
-            }
-
-            // Collision check between current and extrapolated future position
-            if (changed) {
-                //JCraft.LOGGER.info("Predicted position changed, time left: " + timeLeft);
-                BlockHitResult hitResult = world.raycast(new RaycastContext(currentPos, futurePos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, entity));
-                prediction.setValue(hitResult.getPos());
-            }
-        }
     }
 }
