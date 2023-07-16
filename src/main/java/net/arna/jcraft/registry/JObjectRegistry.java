@@ -73,6 +73,8 @@ public interface JObjectRegistry {
     Item JOTAROPANTS = register("jotaro_pants", new JotaroArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.LEGS, settings()));
 
     Item JOTAROBOOTS = register("jotaro_boots", new JotaroArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.FEET, settings()));
+    
+    Item CINDERELLA_MASK = register("cinderella_mask", new CinderellaMaskItem());
 
     //Block
     Block FOOLISH_SAND_BLOCK = register("foolish_sand_block", new FoolishSandBlock(FabricBlockSettings.of(Material.AGGREGATE, MapColor.PALE_YELLOW)

@@ -13,6 +13,7 @@
     "MobEntityMixin",
     "ModEntityDataSaver",
     "PlayerEntityMixin",
+    "RecipeManagerMixin",
     "ServerNetworkHandlerMixin",
     "ServerWorldMixin",
     "TimestopBlockEntityMixin",

@@ -320,6 +320,7 @@ public class JCraft implements ModInitializer {
         JEntityTypeRegister.registerEntities();
         JDimensionRegister.registerDimensions();
         JArgumentTypeRegistry.registerArgumentTypes();
+        JEnchantmentRegistry.init();
 
         ServerPlayNetworking.registerGlobalReceiver(StandControlPacket.ID, StandControlPacket::handle);
         ServerPlayNetworking.registerGlobalReceiver(InputSyncPacket.ID, InputSyncPacket::handle);

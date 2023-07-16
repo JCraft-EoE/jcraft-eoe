@@ -74,6 +74,10 @@ public enum StandType {
     public StandEntity createNew(World world) {
         return ctor.apply(world);
     }
+    
+    public boolean isEvolution() {
+        return id < 0;
+    }
 
     // Can't access static fields in enum constructor, blah blah blah.
     private static class StaticFields {

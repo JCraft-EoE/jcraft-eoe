@@ -16,6 +16,7 @@
   "item.jcraft.knife_bundle": "Knife Bundle",
   "item.jcraft.anubis": "Anubis",
   "item.jcraft.anubis_sheathed": "Sheathed Anubis",
+  "item.jcraft.cinderella_mask": "Cinderella Mask",
 
   "item.jcraft.dio_headband": "DIO's Headband",
   "item.jcraft.dio_jacket": "DIO's Jacket",
@@ -32,6 +33,8 @@
 
   "block.jcraft.soul_block": "Block of Suffering",
   "block.jcraft.foolish_sand_block": "Foolish Sand",
+  
+  "enchantment.jcraft.cinderellas_kiss": "Cinderella's Kiss",
 
   "key.category.jcraft": "JCraft Binds",
   "key.jcraft.standsummon": "Stand Summon",
