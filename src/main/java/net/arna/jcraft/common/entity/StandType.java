@@ -17,7 +17,7 @@ import java.util.function.Function;
 
 public enum StandType {
     STAR_PLATINUM(JEntityTypeRegister.STAR_PLATINUM, StarPlatinumEntity::new, "starplatinum",                   // 1
-            Text.literal("OVA"), Text.literal("Manga")),
+            Text.literal("Manga"), Text.literal("OVA")),
     THE_WORLD(JEntityTypeRegister.THE_WORLD, TheWorldEntity::new, "theworld",                                   // 2
             Text.literal("Heritage for the Future"), Text.literal("Manga"), Text.literal("OVA")),
     KING_CRIMSON(JEntityTypeRegister.KING_CRIMSON, KingCrimsonEntity::new, "kingcrimson",                       // 3
