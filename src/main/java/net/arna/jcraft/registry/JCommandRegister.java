@@ -12,5 +12,6 @@ public interface JCommandRegister {
         CommandRegistrationCallback.EVENT.register(ClearStandCommand::register);
         CommandRegistrationCallback.EVENT.register(SetSpecCommand::register);
         CommandRegistrationCallback.EVENT.register(MoveDataCommand::register);
+        CommandRegistrationCallback.EVENT.register(StandSkinCommand::register);
     }
 }
