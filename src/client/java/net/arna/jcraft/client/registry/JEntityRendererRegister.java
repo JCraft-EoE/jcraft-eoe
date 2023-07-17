@@ -19,7 +19,7 @@ public interface JEntityRendererRegister {
         EntityRendererRegistry.register(JEntityTypeRegister.KILLER_QUEEN_BITES_THE_DUST, KQBTDRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegister.SHEER_HEART_ATTACK, SheerHeartAttackRenderer::new);
 
-        EntityRendererRegistry.register(JEntityTypeRegister.WHITE_SNAKE, WhitesnakeRenderer::new);
+        EntityRendererRegistry.register(JEntityTypeRegister.WHITE_SNAKE, WhiteSnakeRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegister.C_MOON, CMoonRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegister.MADE_IN_HEAVEN, MadeInHeavenRenderer::new);
 
@@ -32,7 +32,7 @@ public interface JEntityRendererRegister {
 
         EntityRendererRegistry.register(JEntityTypeRegister.THE_FOOL, TheFoolRenderer::new);
 
-        EntityRendererRegistry.register(JEntityTypeRegister.GOLDEN_EXPERIENCE, GoldenExperienceRenderer::new);
+        EntityRendererRegistry.register(JEntityTypeRegister.GOLD_EXPERIENCE, GoldenExperienceRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegister.GE_TREE, GETreeRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegister.GE_FROG, GEFrogRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegister.GE_SNAKE, GESnakeRenderer::new);

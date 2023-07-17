@@ -1,30 +1,27 @@
 package net.arna.jcraft.client.model.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.entity.SilverChariotEntity;
 import net.arna.jcraft.client.util.JClientUtils;
+import net.arna.jcraft.common.entity.SilverChariotEntity;
+import net.arna.jcraft.common.entity.StandType;
 import net.minecraft.util.Identifier;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.model.AnimatedTickingGeoModel;
 
-public class SilverChariotModel extends AnimatedTickingGeoModel<SilverChariotEntity> {
+public class SilverChariotModel extends StandEntityModel<SilverChariotEntity> {
+    private static final Identifier NO_ARMOR_TEXTURE = JCraft.id("textures/entity/stands/silver_chariot/no_armor.png");
+    private static final Identifier POSSESSED_TEXTURE = JCraft.id("textures/entity/stands/silver_chariot/possessed.png");
 
-    @Override
-    public Identifier getModelResource(SilverChariotEntity object) {
-        return new Identifier(JCraft.MOD_ID, "geo/silverchariot.geo.json");
+    public SilverChariotModel() {
+        super(StandType.SILVER_CHARIOT);
     }
 
     @Override
-    public Identifier getTextureResource(SilverChariotEntity chariot) {
-        int mode = chariot.getMode();
-        if (mode == 3) return new Identifier(JCraft.MOD_ID, "textures/entity/possessedchariot.png");
-        if (mode == 2) return new Identifier(JCraft.MOD_ID, "textures/entity/noarmorchariot.png");
-        return new Identifier(JCraft.MOD_ID, "textures/entity/silverchariot.png");
-    }
-
-    @Override
-    public Identifier getAnimationResource(SilverChariotEntity animatable) {
-        return new Identifier(JCraft.MOD_ID, "animations/silverchariot.animation.json");
+    public Identifier getTextureResource(SilverChariotEntity entity) {
+        return switch (entity.getMode()) {
+            case 2 -> NO_ARMOR_TEXTURE;
+            case 3 -> POSSESSED_TEXTURE;
+            default -> super.getTextureResource(entity);
+        };
     }
 
     @Override

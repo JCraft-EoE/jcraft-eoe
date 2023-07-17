@@ -32,7 +32,7 @@ import java.util.List;
 
 import static net.arna.jcraft.common.util.Attack.unusable;
 
-public class SilverChariotEntity extends StandEntity implements IAnimatable, IAnimationTickable {
+public class SilverChariotEntity extends StandEntity {
     public final Attack light = new Attack(0, 2, 0.65f, 9, 5, 1.75, 5f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0)
             .setInfo("Stab", "quick combo starter, links into Spinning Blade while armor is off");
     public final Attack barrage = new Attack(2, 17, 0.65f, 60, 0, 2.25, 0.9f, 0.1f, AttackType.BARRAGE, 1.25f, 0, 3)

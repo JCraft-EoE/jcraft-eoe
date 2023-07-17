@@ -40,7 +40,7 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TheWorldOverHeavenEntity extends StandEntity implements IAnimatable, IAnimationTickable {
+public class TheWorldOverHeavenEntity extends StandEntity {
     public static final Attack light = new Attack(0, 2, 0.75f, 7, 4, 1.5, 6f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
     public static final Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 2, 0, 3, JSoundRegister.IMPACT_1)

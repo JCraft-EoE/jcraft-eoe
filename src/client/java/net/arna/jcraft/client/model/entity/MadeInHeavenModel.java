@@ -1,32 +1,10 @@
 package net.arna.jcraft.client.model.entity;
 
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.MadeInHeavenEntity;
-import net.arna.jcraft.client.util.JClientUtils;
-import net.minecraft.util.Identifier;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.model.AnimatedTickingGeoModel;
+import net.arna.jcraft.common.entity.StandType;
 
-public class MadeInHeavenModel extends AnimatedTickingGeoModel<MadeInHeavenEntity> {
-    @Override
-    public Identifier getModelResource(MadeInHeavenEntity object) {
-        return new Identifier(JCraft.MOD_ID, "geo/mih.geo.json");
-    }
-
-    @Override
-    public Identifier getTextureResource(MadeInHeavenEntity object) {
-        return new Identifier(JCraft.MOD_ID, "textures/entity/mih.png");
-    }
-
-    @Override
-    public Identifier getAnimationResource(MadeInHeavenEntity animatable) {
-        return new Identifier(JCraft.MOD_ID, "animations/mih.animation.json");
-    }
-
-    @Override
-    public void setCustomAnimations(MadeInHeavenEntity animatable, int instanceId, AnimationEvent animationEvent) {
-        super.setCustomAnimations(animatable, instanceId, animationEvent);
-        if (animatable.hasUser())
-            JClientUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), animationEvent.getPartialTick(), true, true, -0.1745329251f, -0.1745329251f);
+public class MadeInHeavenModel extends StandEntityModel<MadeInHeavenEntity> {
+    public MadeInHeavenModel() {
+        super(StandType.MADE_IN_HEAVEN, -0.1745329251f, -0.1745329251f);
     }
 }

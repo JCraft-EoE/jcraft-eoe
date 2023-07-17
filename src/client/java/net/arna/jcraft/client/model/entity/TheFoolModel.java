@@ -1,34 +1,20 @@
 package net.arna.jcraft.client.model.entity;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.entity.StandType;
 import net.arna.jcraft.common.entity.TheFoolEntity;
-import net.arna.jcraft.client.util.JClientUtils;
 import net.minecraft.util.Identifier;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.model.AnimatedTickingGeoModel;
 
-public class TheFoolModel extends AnimatedTickingGeoModel<TheFoolEntity> {
+public class TheFoolModel extends StandEntityModel<TheFoolEntity> {
+    private static final Identifier SAND_TEXTURE = JCraft.id("textures/entity/stands/the_fool/sand.png");
     //EntityModelData extraData = (EntityModelData) customPredicate.getExtraDataOfType(EntityModelData.class).get(0);
-
-    @Override
-    public Identifier getModelResource(TheFoolEntity object) {
-        return new Identifier(JCraft.MOD_ID, "geo/thefool.geo.json");
+    
+    public TheFoolModel() {
+        super(StandType.THE_FOOL, 0.7854f, -0.349f, 30f);
     }
 
     @Override
-    public Identifier getTextureResource(TheFoolEntity object) {
-        return new Identifier(JCraft.MOD_ID, object.isSand() ? "textures/entity/thefoolsand.png" : "textures/entity/thefool.png");
-    }
-
-    @Override
-    public Identifier getAnimationResource(TheFoolEntity animatable) {
-        return new Identifier(JCraft.MOD_ID, "animations/thefool.animation.json");
-    }
-
-    @Override
-    public void setCustomAnimations(TheFoolEntity animatable, int instanceId, AnimationEvent animationEvent) {
-        super.setCustomAnimations(animatable, instanceId, animationEvent);
-        if (animatable.hasUser())
-            JClientUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), animationEvent.getPartialTick(), true, true, 0.7854f, -0.349f, 30f);
+    public Identifier getTextureResource(TheFoolEntity entity) {
+        return entity.isSand() ? SAND_TEXTURE : super.getTextureResource(entity);
     }
 }

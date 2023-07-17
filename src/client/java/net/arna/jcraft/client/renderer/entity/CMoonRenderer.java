@@ -1,7 +1,8 @@
 package net.arna.jcraft.client.renderer.entity;
 
-import net.arna.jcraft.client.model.entity.CMoonModel;
+import net.arna.jcraft.client.model.entity.StandEntityModel;
 import net.arna.jcraft.common.entity.CMoonEntity;
+import net.arna.jcraft.common.entity.StandType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
@@ -17,7 +18,7 @@ import software.bernie.geckolib3.renderers.geo.GeoEntityRenderer;
 public class CMoonRenderer extends GeoEntityRenderer<CMoonEntity> {
 
     public CMoonRenderer(EntityRendererFactory.Context context) {
-        super(context, new CMoonModel());
+        super(context, new StandEntityModel<>(StandType.C_MOON));
     }
 
     @Override

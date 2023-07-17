@@ -42,7 +42,7 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
 
-public class KillerQueenEntity extends StandEntity implements IAnimatable, IAnimationTickable {
+public class KillerQueenEntity extends StandEntity {
     public static final Attack low = new Attack(1, 0, 0.85f, 13, 8, 1.5, 4f, 0.5f, AttackType.BOX, 0.5f, 0.1f, 0, JSoundRegister.IMPACT_1);
 
     public static final Attack light = new Attack(0, 2, 0.75f, 19, 0, 1.5, 3f, 0.75f, AttackType.MULTIHIT, 1f, 0, List.of(6, 11), JSoundRegister.IMPACT_4)

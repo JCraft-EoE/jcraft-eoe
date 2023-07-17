@@ -70,10 +70,10 @@ public interface JEntityTypeRegister {
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, SheerHeartAttackEntity::new).dimensions(EntityDimensions.fixed(0.5f, 0.5f)).build()
     );
 
-    EntityType<WhitesnakeEntity> WHITE_SNAKE = Registry.register(
+    EntityType<WhiteSnakeEntity> WHITE_SNAKE = Registry.register(
             Registry.ENTITY_TYPE,
             JCraft.id("whitesnake"),
-            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(WhitesnakeEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(WhiteSnakeEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     EntityType<CMoonEntity> C_MOON = Registry.register(
@@ -115,7 +115,7 @@ public interface JEntityTypeRegister {
                     .build()
     );
 
-    EntityType<GoldenExperienceEntity> GOLDEN_EXPERIENCE = Registry.register(
+    EntityType<GoldenExperienceEntity> GOLD_EXPERIENCE = Registry.register(
             Registry.ENTITY_TYPE,
             JCraft.id("goldenexperience"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(GoldenExperienceEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
@@ -231,7 +231,7 @@ public interface JEntityTypeRegister {
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.15)
         );
 
-        FabricDefaultAttributeRegistry.register(WHITE_SNAKE, WhitesnakeEntity.createMobAttributes());
+        FabricDefaultAttributeRegistry.register(WHITE_SNAKE, WhiteSnakeEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(C_MOON, CMoonEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(MADE_IN_HEAVEN, MadeInHeavenEntity.createMobAttributes());
 
@@ -242,7 +242,7 @@ public interface JEntityTypeRegister {
         FabricDefaultAttributeRegistry.register(MAGICIANS_RED, MagiciansRedEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(THE_FOOL, TheFoolEntity.createMobAttributes());
 
-        FabricDefaultAttributeRegistry.register(GOLDEN_EXPERIENCE, GoldenExperienceEntity.createMobAttributes());
+        FabricDefaultAttributeRegistry.register(GOLD_EXPERIENCE, GoldenExperienceEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(GER, GEREntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(GE_FROG, GEFrogEntity.createFrogAttributes());
         FabricDefaultAttributeRegistry.register(GE_SNAKE, SheerHeartAttackEntity.createMobAttributes()

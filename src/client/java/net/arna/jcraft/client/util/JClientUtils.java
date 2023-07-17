@@ -1,4 +1,6 @@
 package net.arna.jcraft.client.util;
+
+import net.arna.jcraft.client.model.entity.StandEntityModel;
 import net.arna.jcraft.common.entity.KingCrimsonEntity;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.entity.StandEntity;
@@ -13,7 +15,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import software.bernie.geckolib3.core.processor.IBone;
-import software.bernie.geckolib3.model.AnimatedTickingGeoModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,19 +51,19 @@ public class JClientUtils {
     }
 
     // Torso/Head rotation for stands
-    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, float partialTick) {
+    public static void animateGenericHumanoid(StandEntityModel<?> model, StandEntity entity, LivingEntity player, float partialTick) {
         animateGenericHumanoid(model, entity, player, partialTick, false, false);
     }
 
-    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, float partialTick, boolean flipBody, boolean flipHead) {
+    public static void animateGenericHumanoid(StandEntityModel<?> model, StandEntity entity, LivingEntity player, float partialTick, boolean flipBody, boolean flipHead) {
         animateGenericHumanoid(model, entity, player, partialTick, flipBody, flipHead, 0, 0, 90f);
     }
 
-    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, float partialTick, boolean flipBody, boolean flipHead, float tPO, float hPO) {
+    public static void animateGenericHumanoid(StandEntityModel<?> model, StandEntity entity, LivingEntity player, float partialTick, boolean flipBody, boolean flipHead, float tPO, float hPO) {
         animateGenericHumanoid(model, entity, player, partialTick, flipBody, flipHead, tPO, hPO, 90f);
     }
 
-    public static void animateGenericHumanoid(AnimatedTickingGeoModel<? extends StandEntity> model, StandEntity entity, LivingEntity player, float partialTick, boolean flipBody, boolean flipHead, float tPO, float hPO, float velInfluence) {
+    public static void animateGenericHumanoid(StandEntityModel<?> model, StandEntity entity, LivingEntity player, float partialTick, boolean flipBody, boolean flipHead, float tPO, float hPO, float velInfluence) {
         float overVel = 0;
 
         if (entity.getMoveStun() < 1) {

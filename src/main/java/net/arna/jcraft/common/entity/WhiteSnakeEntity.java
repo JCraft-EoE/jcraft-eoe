@@ -14,7 +14,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.IAnimationTickable;
 import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.controller.AnimationController;
@@ -25,7 +24,7 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
 
-public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnimationTickable {
+public class WhiteSnakeEntity extends StandEntity {
     public static final Attack light = new Attack(0, 2, 0.75f, 14, 7, 1.5, 5f, 0.75f, AttackType.BOX, 0.6f, 0.2f, 0, JSoundRegister.IMPACT_3)
             .setInfo("Punch", "quick combo starter");
     public static final Attack legcrusher = new Attack(4, 20, 0.75f, 22, 16, 1.75, 7f, 0.25f, AttackType.BOX, 1.6f, 0.2f, 0, JSoundRegister.TW_KICK_HIT)
@@ -58,7 +57,7 @@ public class WhitesnakeEntity extends StandEntity implements IAnimatable, IAnima
             .setLaunch()
             .setInfo("Melt your Heart", "remote-only and armored, expels a sphere of poison");
 
-    public WhitesnakeEntity(World worldIn) {
+    public WhiteSnakeEntity(World worldIn) {
         super(StandType.WHITE_SNAKE, worldIn);
         super.initialize();
         idleRotation = 220f;

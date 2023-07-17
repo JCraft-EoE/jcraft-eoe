@@ -15,7 +15,6 @@ import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
-import net.minecraft.entity.ai.pathing.MobNavigation;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
@@ -39,11 +38,16 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib3.core.IAnimatable;
+import software.bernie.geckolib3.core.IAnimationTickable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +55,7 @@ import java.util.List;
 import static net.arna.jcraft.JCraft.ComboBreak;
 import static net.arna.jcraft.JCraft.CooldownCancel;
 
-public abstract class StandEntity extends MobEntity {
+public abstract class StandEntity extends MobEntity implements IAnimatable, IAnimationTickable {
 
     // TODO: finish custom player idle poses for all stands
     // TODO: add skin select
@@ -63,6 +67,7 @@ public abstract class StandEntity extends MobEntity {
     private static final TrackedData<Boolean> SAMESTATE; // Marks if the state was set to what it already was during the last setState() call
     private static final TrackedData<Integer> MOVESTUN;
 
+    private static final TrackedData<Integer> SKIN;
     private static final TrackedData<Float> ROTATIONOFFSET;
     private static final TrackedData<Float> DISTANCEOFFSET;
 
@@ -121,6 +126,7 @@ public abstract class StandEntity extends MobEntity {
 
         MOVESTUN = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.INTEGER);
 
+        SKIN = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.INTEGER);
         ROTATIONOFFSET = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.FLOAT);
         DISTANCEOFFSET = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.FLOAT);
 
@@ -185,6 +191,15 @@ public abstract class StandEntity extends MobEntity {
      */
     public void setMoveStun(int moveStun) {
         this.dataTracker.set(MOVESTUN, moveStun);
+    }
+    
+    public int getSkin() {
+        return dataTracker.get(SKIN);
+    }
+    
+    public void setSkin(int skin) {
+        if (skin < 0 || skin > getStandType().getSkinCount()) skin = 0;
+        dataTracker.set(SKIN, skin);
     }
 
     public float getRotationOffset() {
@@ -346,6 +361,7 @@ public abstract class StandEntity extends MobEntity {
 
         this.dataTracker.startTracking(MOVESTUN, 0);
 
+        this.dataTracker.startTracking(SKIN, 0);
         this.dataTracker.startTracking(ROTATIONOFFSET, -90f);
         this.dataTracker.startTracking(DISTANCEOFFSET, 1f);
 

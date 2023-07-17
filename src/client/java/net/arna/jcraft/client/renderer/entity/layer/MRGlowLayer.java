@@ -11,8 +11,8 @@ import software.bernie.geckolib3.renderers.geo.GeoLayerRenderer;
 import software.bernie.geckolib3.renderers.geo.IGeoRenderer;
 
 public class MRGlowLayer extends GeoLayerRenderer<MagiciansRedEntity> {
-    private static final Identifier LAYER = new Identifier(JCraft.MOD_ID, "textures/entity/mr_glow.png");
-    private static final Identifier MODEL = new Identifier(JCraft.MOD_ID, "geo/mr.geo.json");
+    private static final Identifier LAYER = new Identifier(JCraft.MOD_ID, "textures/entity/stands/magicians_red/glow.png");
+    private static final Identifier MODEL = new Identifier(JCraft.MOD_ID, "geo/magicians_red.geo.json");
 
     public MRGlowLayer(IGeoRenderer<MagiciansRedEntity> entityRendererIn) {
         super(entityRendererIn);

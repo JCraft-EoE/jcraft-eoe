@@ -1,7 +1,8 @@
 package net.arna.jcraft.client.renderer.entity;
 
-import net.arna.jcraft.client.model.entity.GERModel;
+import net.arna.jcraft.client.model.entity.StandEntityModel;
 import net.arna.jcraft.common.entity.GEREntity;
+import net.arna.jcraft.common.entity.StandType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
@@ -17,7 +18,7 @@ import software.bernie.geckolib3.renderers.geo.GeoEntityRenderer;
 public class GERRenderer extends GeoEntityRenderer<GEREntity> {
 
     public GERRenderer(EntityRendererFactory.Context context) {
-        super(context, new GERModel());
+        super(context, new StandEntityModel<>(StandType.GOLD_EXPERIENCE_REQUIEM));
     }
 
     @Override

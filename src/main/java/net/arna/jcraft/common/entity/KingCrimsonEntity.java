@@ -55,7 +55,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-public class KingCrimsonEntity extends StandEntity implements IAnimatable, IAnimationTickable {
+public class KingCrimsonEntity extends StandEntity {
     public static final Attack light = new Attack(0, 3, 0.85f, 23, 0, 1.5, 4f, 0.1f, AttackType.MULTIHIT, 2f, -0.1f, List.of(10, 16), JSoundRegister.IMPACT_4)
             .setInfo("Dual Chop", "quick combo starter");
     public static final Attack barrage = new Attack(3, 17, 0.85f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3)

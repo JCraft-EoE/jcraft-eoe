@@ -16,31 +16,39 @@ import java.util.List;
 import java.util.function.Function;
 
 public enum StandType {
-    STAR_PLATINUM(JEntityTypeRegister.STAR_PLATINUM, StarPlatinumEntity::new, "starplatinum"),                  // 1
-    THE_WORLD(JEntityTypeRegister.THE_WORLD, TheWorldEntity::new, "theworld"),                                  // 2
-    KING_CRIMSON(JEntityTypeRegister.KING_CRIMSON, KingCrimsonEntity::new, "kingcrimson"),                      // 3
+    STAR_PLATINUM(JEntityTypeRegister.STAR_PLATINUM, StarPlatinumEntity::new, "starplatinum",                   // 1
+            Text.literal("OVA"), Text.literal("Manga")),
+    THE_WORLD(JEntityTypeRegister.THE_WORLD, TheWorldEntity::new, "theworld",                                   // 2
+            Text.literal("Heritage for the Future"), Text.literal("Manga"), Text.literal("OVA")),
+    KING_CRIMSON(JEntityTypeRegister.KING_CRIMSON, KingCrimsonEntity::new, "kingcrimson",                       // 3
+            Text.literal("Concept"), Text.literal("Manga"), Text.literal("Royal")),
     D4C(JEntityTypeRegister.D4C, D4CEntity::new, "d4c"),                                                        // 4
     CREAM(JEntityTypeRegister.CREAM, CreamEntity::new, "cream"),                                                // 5
-    KILLER_QUEEN(JEntityTypeRegister.KILLER_QUEEN, KillerQueenEntity::new, "killerqueen"),                      // 6
-    WHITE_SNAKE(JEntityTypeRegister.WHITE_SNAKE, WhitesnakeEntity::new, "whitesnake"),                          // 7
-    SILVER_CHARIOT(JEntityTypeRegister.SILVER_CHARIOT, SilverChariotEntity::new, "silverchariot"),              // 8
+    KILLER_QUEEN(JEntityTypeRegister.KILLER_QUEEN, KillerQueenEntity::new, "killerqueen",                       // 6
+            Text.literal("Shadow"), Text.literal("Skull"), Text.literal("Summer")),
+    WHITE_SNAKE(JEntityTypeRegister.WHITE_SNAKE, WhiteSnakeEntity::new, "whitesnake"),                          // 7
+    SILVER_CHARIOT(JEntityTypeRegister.SILVER_CHARIOT, SilverChariotEntity::new, "silverchariot",               // 8
+            Text.literal("Gold Chariot"), Text.literal("OVA")),
     MAGICIANS_RED(JEntityTypeRegister.MAGICIANS_RED, MagiciansRedEntity::new, "mr"),                            // 9
     THE_FOOL(JEntityTypeRegister.THE_FOOL, TheFoolEntity::new, "thefool"),                                      // 10
-    GOLDEN_EXPERIENCE(JEntityTypeRegister.GOLDEN_EXPERIENCE, GoldenExperienceEntity::new, "goldenexperience"),  // 11
+    GOLD_EXPERIENCE(JEntityTypeRegister.GOLD_EXPERIENCE, GoldenExperienceEntity::new, "goldenexperience",       // 11
+            Text.literal("Red"), Text.literal("Piercing"), Text.literal("Life Energy")),
 
     // Evolutions
-    C_MOON(JEntityTypeRegister.C_MOON, CMoonEntity::new, "cmoon", true),                                  // -1
-    MADE_IN_HEAVEN(JEntityTypeRegister.MADE_IN_HEAVEN, MadeInHeavenEntity::new, "mih", true),               // -2
-    THE_WORLD_OVER_HEAVEN(JEntityTypeRegister.THE_WORLD_OVER_HEAVEN, TheWorldOverHeavenEntity::new, "twoh", true),  // -3
-    KILLER_QUEEN_BITES_THE_DUST(JEntityTypeRegister.KILLER_QUEEN_BITES_THE_DUST, KQBTDEntity::new, "kqbtd",true),  // -4
-    GER(JEntityTypeRegister.GER, GEREntity::new, "ger", true),                                              // -5
-    STAR_PLATINUM_THE_WORLD(JEntityTypeRegister.SPTW, SPTWEntity::new, "sptw", true);                     // -6
+    C_MOON(JEntityTypeRegister.C_MOON, CMoonEntity::new, "cmoon", true),                                            // -1
+    MADE_IN_HEAVEN(JEntityTypeRegister.MADE_IN_HEAVEN, MadeInHeavenEntity::new, "mih", true),                       // -2
+    THE_WORLD_OVER_HEAVEN(JEntityTypeRegister.THE_WORLD_OVER_HEAVEN, TheWorldOverHeavenEntity::new, "twoh", true,   // -3
+            Text.literal("Shadow"), Text.literal("Gone to Heaven"), Text.literal("Greatest High")),
+    KILLER_QUEEN_BITES_THE_DUST(JEntityTypeRegister.KILLER_QUEEN_BITES_THE_DUST, KQBTDEntity::new, "kqbtd",true),   // -4
+    GOLD_EXPERIENCE_REQUIEM(JEntityTypeRegister.GER, GEREntity::new, "ger", true),                                                      // -5
+    STAR_PLATINUM_THE_WORLD(JEntityTypeRegister.SPTW, SPTWEntity::new, "sptw", true,                                // -6
+            Text.literal("Over Heaven"), Text.literal("Stone Ocean"));
 
 
     @Getter(lazy = true)
-    private static final List<StandType> regularStandTypes = Arrays.stream(values()).filter(t -> t.getId() > 0).collect(ImmutableList.toImmutableList());
+    private static final List<StandType> regularStandTypes = Arrays.stream(values()).filter(t -> !t.isEvolution()).collect(ImmutableList.toImmutableList());
     @Getter(lazy = true)
-    private static final List<StandType> evoStandTypes = Arrays.stream(values()).filter(t -> t.getId() < 0).collect(ImmutableList.toImmutableList());
+    private static final List<StandType> evoStandTypes = Arrays.stream(values()).filter(StandType::isEvolution).collect(ImmutableList.toImmutableList());
     @Getter(lazy = true)
     private static final List<StandType> allStandTypes = ImmutableList.copyOf(values());
 
@@ -51,16 +59,19 @@ public enum StandType {
     private final Function<World, StandEntity> ctor;
     @Getter
     private final Text nameText;
+    @Getter
+    private final List<Text> skinNames;
 
-    StandType(EntityType<? extends StandEntity> entityType, Function<World, StandEntity> ctor, String nameKey) {
-        this(entityType, ctor, nameKey, false);
+    StandType(EntityType<? extends StandEntity> entityType, Function<World, StandEntity> ctor, String nameKey, Text... skinNames) {
+        this(entityType, ctor, nameKey, false, skinNames);
     }
 
-    StandType(EntityType<? extends StandEntity> entityType, Function<World, StandEntity> ctor, String nameKey, boolean isEvo) {
+    StandType(EntityType<? extends StandEntity> entityType, Function<World, StandEntity> ctor, String nameKey, boolean isEvo, Text... skinNames) {
         this.entityType = entityType;
         id = isEvo ? --StaticFields.nextEvoId : ++StaticFields.nextId;
         this.ctor = ctor;
         this.nameText = Text.translatable("entity.jcraft." + nameKey);
+        this.skinNames = ImmutableList.copyOf(skinNames);
 
         StaticFields.fromId.put(id, this);
     }
@@ -77,6 +88,10 @@ public enum StandType {
     
     public boolean isEvolution() {
         return id < 0;
+    }
+    
+    public int getSkinCount() {
+        return skinNames.size();
     }
 
     // Can't access static fields in enum constructor, blah blah blah.

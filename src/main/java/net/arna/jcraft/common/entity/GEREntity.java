@@ -44,7 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class GEREntity extends StandEntity implements IAnimatable, IAnimationTickable {
+public class GEREntity extends StandEntity {
     public static final Attack light = new Attack(0, 2, 0.75f, 9, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch/Downward Kick", "quick combo starter, in air: more hitstun, less blockstun");
     public static final Attack heavy = new Attack(2, 17, 1f, 19, 10, 1.5, 9f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_2)
@@ -104,7 +104,7 @@ public class GEREntity extends StandEntity implements IAnimatable, IAnimationTic
 
 
     public GEREntity(World worldIn) {
-        super(StandType.GER, worldIn);
+        super(StandType.GOLD_EXPERIENCE_REQUIEM, worldIn);
         super.initialize();
         idleRotation = 0f;
 

@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.renderer.entity;
 
-import net.arna.jcraft.client.model.entity.WhitesnakeModel;
-import net.arna.jcraft.common.entity.WhitesnakeEntity;
+import net.arna.jcraft.client.model.entity.WhiteSnakeModel;
+import net.arna.jcraft.common.entity.WhiteSnakeEntity;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
@@ -14,10 +14,10 @@ import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.geo.render.built.GeoModel;
 import software.bernie.geckolib3.renderers.geo.GeoEntityRenderer;
 
-public class WhitesnakeRenderer extends GeoEntityRenderer<WhitesnakeEntity> {
+public class WhiteSnakeRenderer extends GeoEntityRenderer<WhiteSnakeEntity> {
 
-    public WhitesnakeRenderer(EntityRendererFactory.Context context) {
-        super(context, new WhitesnakeModel());
+    public WhiteSnakeRenderer(EntityRendererFactory.Context context) {
+        super(context, new WhiteSnakeModel());
     }
 
     /*
@@ -33,7 +33,7 @@ public class WhitesnakeRenderer extends GeoEntityRenderer<WhitesnakeEntity> {
      */
 
     @Override
-    public RenderLayer getRenderType(WhitesnakeEntity animatable, float partialTicks, MatrixStack stack,
+    public RenderLayer getRenderType(WhiteSnakeEntity animatable, float partialTicks, MatrixStack stack,
                                      @Nullable VertexConsumerProvider renderTypeBuffer, @Nullable VertexConsumer vertexBuilder,
                                      int packedLightIn, Identifier textureLocation) {
 
@@ -47,7 +47,7 @@ public class WhitesnakeRenderer extends GeoEntityRenderer<WhitesnakeEntity> {
 
     // Adds ability to change render alpha
     @Override
-    public void render(GeoModel model, WhitesnakeEntity animatable, float partialTicks, RenderLayer type, MatrixStack matrixStackIn, VertexConsumerProvider renderTypeBuffer, VertexConsumer vertexBuilder, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+    public void render(GeoModel model, WhiteSnakeEntity animatable, float partialTicks, RenderLayer type, MatrixStack matrixStackIn, VertexConsumerProvider renderTypeBuffer, VertexConsumer vertexBuilder, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
         float a = 1f;
 
         MinecraftClient mcClient = MinecraftClient.getInstance();

@@ -17,7 +17,7 @@ import software.bernie.geckolib3.renderers.geo.GeoEntityRenderer;
 public class SPTWRenderer extends GeoEntityRenderer<StarPlatinumEntity> {
 
     public SPTWRenderer(EntityRendererFactory.Context context) {
-        super(context, new StarPlatinumModel("textures/entity/sptw.png", "animations/sptw.animation.json"));
+        super(context, new StarPlatinumModel(true));
     }
 
     @Override

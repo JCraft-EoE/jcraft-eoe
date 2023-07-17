@@ -51,7 +51,7 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TheFoolEntity extends StandEntity implements IAnimatable, IAnimationTickable {
+public class TheFoolEntity extends StandEntity {
     public static final Attack light = new Attack(0, 2, 1.5f, 14, 7, 2, 6f, 0.8f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_2)
             .appendHitbox(new Attack.HitboxData(0, 0.25, 1))
             .setInfo("Swipe", "slow, long-reaching poke");

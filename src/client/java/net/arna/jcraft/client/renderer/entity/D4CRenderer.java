@@ -1,7 +1,8 @@
 package net.arna.jcraft.client.renderer.entity;
 
-import net.arna.jcraft.client.model.entity.D4CModel;
+import net.arna.jcraft.client.model.entity.StandEntityModel;
 import net.arna.jcraft.common.entity.D4CEntity;
+import net.arna.jcraft.common.entity.StandType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
@@ -28,7 +29,7 @@ public class D4CRenderer extends ExtendedGeoEntityRenderer<D4CEntity> {
     protected ItemStack offHandItem;
 
     public D4CRenderer(EntityRendererFactory.Context context) {
-        super(context, new D4CModel());
+        super(context, new StandEntityModel<>(StandType.D4C));
     }
 
     @Override

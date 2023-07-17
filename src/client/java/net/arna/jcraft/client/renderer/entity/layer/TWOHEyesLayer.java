@@ -14,8 +14,8 @@ import software.bernie.geckolib3.renderers.geo.IGeoRenderer;
 import java.util.Map;
 
 public class TWOHEyesLayer extends GeoLayerRenderer<TheWorldOverHeavenEntity> {
-    private static final Identifier LAYER = new Identifier(JCraft.MOD_ID, "textures/entity/twoh_eyes.png");
-    private static final Identifier MODEL = new Identifier(JCraft.MOD_ID, "geo/twoh.geo.json");
+    private static final Identifier LAYER = new Identifier(JCraft.MOD_ID, "textures/entity/stands/the_world_over_heaven/eyes.png");
+    private static final Identifier MODEL = new Identifier(JCraft.MOD_ID, "geo/the_world_over_heaven.geo.json");
     private static final Map<Integer, Vec3f> overwriteColors =
             Map.ofEntries(
               Map.entry(0, new Vec3f(1f, 1f, 1f)), // Default, WHITE

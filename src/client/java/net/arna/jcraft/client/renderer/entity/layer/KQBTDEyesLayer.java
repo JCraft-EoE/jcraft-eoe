@@ -11,8 +11,8 @@ import software.bernie.geckolib3.renderers.geo.GeoLayerRenderer;
 import software.bernie.geckolib3.renderers.geo.IGeoRenderer;
 
 public class KQBTDEyesLayer extends GeoLayerRenderer<KQBTDEntity> {
-    private static final Identifier LAYER = new Identifier(JCraft.MOD_ID, "textures/entity/kqbtd_eyes.png");
-    private static final Identifier MODEL = new Identifier(JCraft.MOD_ID, "geo/kqbtd.geo.json");
+    private static final Identifier LAYER = new Identifier(JCraft.MOD_ID, "textures/entity/stands/killer_queen_bites_the_dust/eyes.png");
+    private static final Identifier MODEL = new Identifier(JCraft.MOD_ID, "geo/killer_queen_bites_the_dust.geo.json");
 
     public KQBTDEyesLayer(IGeoRenderer<KQBTDEntity> entityRendererIn) {
         super(entityRendererIn);

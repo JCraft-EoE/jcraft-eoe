@@ -9,22 +9,15 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector3d;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib3.core.processor.IBone;
-import software.bernie.geckolib3.geo.render.built.GeoBone;
 import software.bernie.geckolib3.geo.render.built.GeoModel;
 import software.bernie.geckolib3.renderers.geo.GeoEntityRenderer;
 
 public class StarPlatinumRenderer extends GeoEntityRenderer<StarPlatinumEntity> {
 
     public StarPlatinumRenderer(EntityRendererFactory.Context context) {
-        super(context, new StarPlatinumModel("textures/entity/starplatinum.png", "animations/starplatinum.animation.json"));
+        super(context, new StarPlatinumModel(false));
     }
 
     @Override

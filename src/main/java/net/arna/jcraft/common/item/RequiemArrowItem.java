@@ -38,11 +38,11 @@ public class RequiemArrowItem extends Item {
         if (!world.isClient) {
             NbtCompound playerNbt = ((IEntityDataSaver) user).getPersistentData();
             int standID = playerNbt.getInt("StandID");
-            if (standID == StandType.GOLDEN_EXPERIENCE.getId()) {
+            if (standID == StandType.GOLD_EXPERIENCE.getId()) {
                 if (!user.isCreative()) {
                     itemStack.decrement(1);
                 }
-                playerNbt.putInt("StandID", StandType.GER.getId());
+                playerNbt.putInt("StandID", StandType.GOLD_EXPERIENCE_REQUIEM.getId());
                 if (!user.isCreative()) {
                     itemStack.decrement(1);
                 }

@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Objects;
 
 //TODO: give MiH a trail during speed slice and heaven's judgement
-public class MadeInHeavenEntity extends StandEntity implements IAnimatable, IAnimationTickable {
+public class MadeInHeavenEntity extends StandEntity {
     // placeholder sound
     public static final Attack light = new Attack(0, 2, 0.75f, 8, 5, 1.5, 4f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, SoundEvents.ITEM_TRIDENT_HIT)
             .setInfo("Slice", "quick combo starter");

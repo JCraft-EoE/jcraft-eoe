@@ -27,7 +27,7 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
 
-public class GoldenExperienceEntity extends StandEntity implements IAnimatable, IAnimationTickable {
+public class GoldenExperienceEntity extends StandEntity {
     public static final Attack light = new Attack(0, 2, 0.75f, 9, 6, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
     public static final Attack heavy = new Attack(1, 17, 1f, 22, 13, 1.5, 9f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_2)
@@ -68,7 +68,7 @@ public class GoldenExperienceEntity extends StandEntity implements IAnimatable, 
             .setFollowup(rekka2);
 
     public GoldenExperienceEntity(World worldIn) {
-        super(StandType.GOLDEN_EXPERIENCE, worldIn);
+        super(StandType.GOLD_EXPERIENCE, worldIn);
         super.initialize();
         idleRotation = 0f;
 
