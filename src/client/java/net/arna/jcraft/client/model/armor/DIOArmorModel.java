@@ -8,16 +8,16 @@ import software.bernie.geckolib3.model.AnimatedGeoModel;
 public class DIOArmorModel extends AnimatedGeoModel<DIOArmorItem> {
     @Override
     public Identifier getModelResource(DIOArmorItem object) {
-        return new Identifier(JCraft.MOD_ID, "geo/diooutfit.geo.json");
+        return JCraft.id("geo/diooutfit.geo.json");
     }
 
     @Override
     public Identifier getTextureResource(DIOArmorItem object) {
-        return new Identifier(JCraft.MOD_ID, "textures/item/diooutfit.png");
+        return JCraft.id("textures/item/diooutfit.png");
     }
 
     @Override
     public Identifier getAnimationResource(DIOArmorItem animatable) {
-        return new Identifier(JCraft.MOD_ID, "animations/diooutfit.animation.json");
+        return JCraft.id("animations/diooutfit.animation.json");
     }
 }

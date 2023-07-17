@@ -280,6 +280,8 @@ public class JCraft implements ModInitializer {
 
                 itemStacks.add(new ItemStack(JObjectRegistry.KQCOIN));
                 itemStacks.add(new ItemStack(JObjectRegistry.FOOLISH_SAND_BLOCK.asItem()));
+
+                itemStacks.add(new ItemStack(JObjectRegistry.CINDERELLA_MASK));
             }))
             .build();
 
@@ -331,7 +333,7 @@ public class JCraft implements ModInitializer {
     }
 
 
-    public static void CreateParticle(ServerWorld world, double x, double y, double z, int id) {
+    public static void createParticle(ServerWorld world, double x, double y, double z, int id) {
         PacketByteBuf buf = PacketByteBufs.create();
 
         buf.writeShort(8);
@@ -347,7 +349,12 @@ public class JCraft implements ModInitializer {
 
     public static final List<String> unresettableCooldowns = List.of(standBarrageCD, standUltCD, barrageCD, ultCD, comboBreakerCD, cooldownCancelCD, dashCD);
 
-    public static void CooldownCancel(ServerWorld world, LivingEntity player) {
+    /**
+     * Resets specific cooldowns, or all cooldowns if player is in creative.
+     */
+    public static void cooldownCancel(ServerWorld world, LivingEntity player) {
+        if (player.isSpectator()) return;
+
         NbtCompound data = ((IEntityDataSaver) player).getPersistentData();
 
         if (data.getInt(cooldownCancelCD) <= 0) {
@@ -362,15 +369,20 @@ public class JCraft implements ModInitializer {
 
             Vec3d pPos = player.getEyePos();
             world.playSoundFromEntity(null, player, JSoundRegister.COOLDOWN_CANCEL, SoundCategory.PLAYERS, 1, 1);
-            CreateParticle(world, pPos.x, pPos.y, pPos.z, 1);
+            createParticle(world, pPos.x, pPos.y, pPos.z, 1);
         }
     }
 
     public static HashMap<LivingEntity, Integer> burstTimers = new HashMap<>();
 
-    public static void ComboBreak(ServerWorld world, LivingEntity player, StatusEffectInstance stun) {
+    /**
+     * Breaks out of a combo using a slightly delayed attack centered at the player.
+     * This attack is blockable, launches and stuns on hit.
+     */
+    public static void comboBreak(ServerWorld world, LivingEntity player, StatusEffectInstance stun) {
+        if (player.isSpectator()) return;
         NbtCompound data = ((IEntityDataSaver) player).getPersistentData();
-        //if (!user.getPersistentData().contains(JCraft.standCBCD)) { user.getPersistentData().putInt(JCraft.standCBCD, 0); } // Handled elsewhere
+
         if (stun.getDuration() > 1 && stun.getAmplifier() == 1 && data.getInt(comboBreakerCD) <= 0) {
             data.putInt(comboBreakerCD, 1200); // 60s
 
@@ -380,7 +392,7 @@ public class JCraft implements ModInitializer {
 
             Vec3d pPos = player.getEyePos();
             burstTimers.put(player, 4);
-            CreateParticle(world, pPos.x, pPos.y, pPos.z, 0);
+            createParticle(world, pPos.x, pPos.y, pPos.z, 0);
         }
     }
 
@@ -401,7 +413,7 @@ public class JCraft implements ModInitializer {
         return null;
     }
 
-    public static void DimensionHop(Entity entity, int heightOffset) {
+    public static void dimensionHop(Entity entity, int heightOffset) {
         ServerWorld original = (ServerWorld) entity.getWorld();
         MinecraftServer server = original.getServer();
         ServerWorld au = server.getWorld(JDimensionRegister.AU_DIMENSION_KEY);

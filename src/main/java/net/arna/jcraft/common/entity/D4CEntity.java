@@ -258,7 +258,7 @@ public class D4CEntity extends StandEntity {
                 for (Entity entity : toHop) {
                     if (entity instanceof LivingEntity living)
                         living.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 300, 4, true, false));
-                    JCraft.DimensionHop(entity, heightOffset / 2);
+                    JCraft.dimensionHop(entity, heightOffset / 2);
                 }
             }
             case (4) -> {

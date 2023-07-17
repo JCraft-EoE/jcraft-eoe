@@ -8,16 +8,16 @@ import software.bernie.geckolib3.model.AnimatedGeoModel;
 public class GESnakeModel extends AnimatedGeoModel<GESnakeEntity> {
     @Override
     public Identifier getModelResource(GESnakeEntity object) {
-        return new Identifier(JCraft.MOD_ID, "geo/gesnake.geo.json");
+        return JCraft.id("geo/gesnake.geo.json");
     }
 
     @Override
     public Identifier getTextureResource(GESnakeEntity object) {
-        return new Identifier(JCraft.MOD_ID, "textures/entity/gesnake.png");
+        return JCraft.id("textures/entity/gesnake.png");
     }
 
     @Override
     public Identifier getAnimationResource(GESnakeEntity animatable) {
-        return new Identifier(JCraft.MOD_ID, "animations/gesnake.animation.json");
+        return JCraft.id("animations/gesnake.animation.json");
     }
 }

@@ -250,7 +250,7 @@ public class GEREntity extends StandEntity {
             stun(living, 10, 0);
 
         Vec3d eP = this.getEyePos();
-        JCraft.CreateParticle((ServerWorld) world, eP.x, eP.y, eP.z, -1);
+        JCraft.createParticle((ServerWorld) world, eP.x, eP.y, eP.z, -1);
     }
 
     private static final Attack counterMiss = new Attack(11, 0, 20, 21, 1, AttackType.BOX);

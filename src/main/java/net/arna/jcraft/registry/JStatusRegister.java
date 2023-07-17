@@ -18,7 +18,7 @@ public interface JStatusRegister {
 
     static void registerStatuses() {
         Registry.register(
-                Registry.STATUS_EFFECT, new Identifier(JCraft.MOD_ID, "dazed_effect"),
+                Registry.STATUS_EFFECT, JCraft.id("dazed_effect"),
                 DAZED.addAttributeModifier(
                         EntityAttributes.GENERIC_ATTACK_DAMAGE,
                         "FE04CA6A-A3D1-E22B-CB00-EDA6A853F90E",
@@ -37,7 +37,7 @@ public interface JStatusRegister {
         );
 
         Registry.register(
-                Registry.STATUS_EFFECT, new Identifier(JCraft.MOD_ID, "knockdown"),
+                Registry.STATUS_EFFECT, JCraft.id("knockdown"),
                 KNOCKDOWN.addAttributeModifier(
                         EntityAttributes.GENERIC_ARMOR,
                         "BB2CA307-EEA6-B54C-B324-F7EB036289BF",
@@ -55,7 +55,7 @@ public interface JStatusRegister {
                         EntityAttributeModifier.Operation.MULTIPLY_TOTAL)
         );
 
-        Registry.register(Registry.STATUS_EFFECT, new Identifier(JCraft.MOD_ID, "ws_poison"), WSPOISON);
+        Registry.register(Registry.STATUS_EFFECT, JCraft.id("ws_poison"), WSPOISON);
         Registry.register(Registry.STATUS_EFFECT, new Identifier(JCraft.MOD_ID, "standless"), STANDLESS);
         Registry.register(Registry.STATUS_EFFECT, new Identifier(JCraft.MOD_ID, "outofbody"), OUTOFBODY);
         Registry.register(Registry.STATUS_EFFECT, new Identifier(JCraft.MOD_ID, "weightless"), WEIGHTLESS);

@@ -54,9 +54,11 @@ public class StandDiscItem extends Item {
         int itemSkin = 0;
         int userStandID = 0;
         int userSkin = 0;
+
+        IEntityDataSaver userDataSaver = ((IEntityDataSaver) user);
         
         NbtCompound data = itemStack.getOrCreateNbt();
-        NbtCompound userData = ((IEntityDataSaver) user).getPersistentData();
+        NbtCompound userData = userDataSaver.getPersistentData();
 
         if (userData.contains("StandID", NbtElement.INT_TYPE)) userStandID = userData.getInt("StandID");
         if (userData.contains("StandSkin", NbtElement.INT_TYPE)) userSkin = userData.getInt("StandSkin");
@@ -67,6 +69,8 @@ public class StandDiscItem extends Item {
         userData.putInt("StandSkin", itemSkin);
         data.putInt("StandID", userStandID);
         data.putInt("Skin", userSkin);
+
+
 
         return TypedActionResult.success(itemStack);
     }

@@ -202,7 +202,7 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                             damageLogic(world, target, getVelocity(), rockStun, 1, false, 6f, true, 10, DamageSource.mob(owner), owner);
                         }
                         Transform();
-                        JCraft.CreateParticle((ServerWorld) this.world,
+                        JCraft.createParticle((ServerWorld) this.world,
                                 curPos.x + random.nextGaussian() * 0.25,
                                 curPos.y + random.nextGaussian() * 0.25,
                                 curPos.z + random.nextGaussian() * 0.25,

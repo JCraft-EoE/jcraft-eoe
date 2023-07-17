@@ -28,7 +28,7 @@ import static net.arna.jcraft.JCraft.*;
 
 
 public class StandControlPacket {
-    public static final Identifier ID = new Identifier(JCraft.MOD_ID, "scchannel");
+    public static final Identifier ID = JCraft.id("scchannel");
 
     public static void handle(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler network, PacketByteBuf buf, PacketSender sender) {
         short control = buf.readShort();
@@ -210,7 +210,7 @@ public class StandControlPacket {
                 StatusEffectInstance stun = player.getStatusEffect(JStatusRegister.DAZED);
                 if (JUtils.isBlocking(player)) return;
                 if (stun != null)
-                    ComboBreak(world, player, stun);
+                    comboBreak(world, player, stun);
             });
             // 12 - D4C Clone Thinning
             case 12 -> {
@@ -244,7 +244,7 @@ public class StandControlPacket {
                         ((IEntityDataSaver) player).getPersistentData().putInt(cooldownType, 0);
                 } else {
                     if (!player.hasStatusEffect(JStatusRegister.DAZED))
-                        CooldownCancel(world, player);
+                        cooldownCancel(world, player);
                 }
             });
         }

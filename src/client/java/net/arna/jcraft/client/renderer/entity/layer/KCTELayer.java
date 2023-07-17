@@ -13,7 +13,7 @@ import software.bernie.geckolib3.renderers.geo.IGeoRenderer;
 
 @SuppressWarnings("rawtypes")
 public class KCTELayer extends GeoLayerRenderer {
-    private static final Identifier MODEL = new Identifier(JCraft.MOD_ID, "geo/box.geo.json");
+    private static final Identifier MODEL = JCraft.id("geo/box.geo.json");
 
     @SuppressWarnings("unchecked")
     public KCTELayer(IGeoRenderer<?> entityRendererIn) {

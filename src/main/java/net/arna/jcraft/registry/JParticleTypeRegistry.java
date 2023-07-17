@@ -31,9 +31,9 @@ public interface JParticleTypeRegistry {
     );
 
     static void initParticleTypes() {
-        Registry.register(Registry.PARTICLE_TYPE, new Identifier(JCraft.MOD_ID, "combo_break"), COMBO_BREAK);
-        Registry.register(Registry.PARTICLE_TYPE, new Identifier(JCraft.MOD_ID, "cooldown_cancel"), COOLDOWN_CANCEL);
-        Registry.register(Registry.PARTICLE_TYPE, new Identifier(JCraft.MOD_ID, "hitspark_1"), HITSPARK_1);
+        Registry.register(Registry.PARTICLE_TYPE, JCraft.id("combo_break"), COMBO_BREAK);
+        Registry.register(Registry.PARTICLE_TYPE, JCraft.id("cooldown_cancel"), COOLDOWN_CANCEL);
+        Registry.register(Registry.PARTICLE_TYPE, JCraft.id("hitspark_1"), HITSPARK_1);
         Registry.register(Registry.PARTICLE_TYPE, new Identifier(JCraft.MOD_ID, "hitspark_2"), HITSPARK_2);
         Registry.register(Registry.PARTICLE_TYPE, new Identifier(JCraft.MOD_ID, "kcparticle"), KCPARTICLE);
         Registry.register(Registry.PARTICLE_TYPE, new Identifier(JCraft.MOD_ID, "backstab"), BACKSTAB);

@@ -1,23 +1,23 @@
 package net.arna.jcraft.common.item;
 
 import net.arna.jcraft.common.entity.StandType;
-import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.minecraft.client.item.TooltipContext;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Map;
 
-public class DIOsDiaryItem extends Item {
+public class DIOsDiaryItem extends StandObtainmentItem {
     public DIOsDiaryItem(Settings settings) {
         super(settings);
+
+        standIOMap = Map.ofEntries(
+                Map.entry(StandType.C_MOON.getId(), StandType.MADE_IN_HEAVEN.getId()),
+                Map.entry(StandType.THE_WORLD.getId(), StandType.THE_WORLD_OVER_HEAVEN.getId())
+        );
     }
 
     @Override
@@ -25,31 +25,5 @@ public class DIOsDiaryItem extends Item {
         tooltip.add(Text.translatable("jcraft.diosdiary.desc"));
         tooltip.add(Text.translatable("jcraft.diosdiary.evodesc"));
         super.appendTooltip(stack, world, tooltip, context);
-    }
-
-    @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        // Check for correct stand id
-        ItemStack itemStack = user.getStackInHand(hand);
-        if (!world.isClient) {
-            NbtCompound playerNbt = ((IEntityDataSaver) user).getPersistentData();
-            int standID = playerNbt.getInt("StandID");
-
-            if (standID == StandType.C_MOON.getId()) {
-                if (!user.isCreative()) {
-                    itemStack.decrement(1);
-                }
-                playerNbt.putInt("StandID", StandType.MADE_IN_HEAVEN.getId());
-            }
-
-            if (standID == StandType.THE_WORLD.getId()) {
-                if (!user.isCreative()) {
-                    itemStack.decrement(1);
-                }
-                playerNbt.putInt("StandID", StandType.THE_WORLD_OVER_HEAVEN.getId());
-            }
-        }
-
-        return TypedActionResult.consume(itemStack);
     }
 }

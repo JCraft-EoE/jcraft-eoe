@@ -1218,6 +1218,9 @@ Cream
     >Fixed grab being combo breakable
     >Destroy now disables block on hit
 
+King Crimson
+    >Updated visuals during Prediction
+
 Star Platinum: The World
     >Wrote /stand about
     >Fixed minor animation errors
@@ -1225,6 +1228,15 @@ Star Platinum: The World
 
 The World: Over Heaven
     >Reduced launch on Smite
+
+● 17/7/2023
+>Fixed bug where people in spectator could use specs and stands
+>All items that alter your stand now automatically de/resummon it
+
+Added Skins
+    >Obtained via Cinderella Masks
+
+
 
 priority (top to bottom)
 todo: fix predict not working with new projectiles

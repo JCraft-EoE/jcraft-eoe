@@ -8,17 +8,17 @@ import software.bernie.geckolib3.model.AnimatedGeoModel;
 public class AnkhModel extends AnimatedGeoModel<AnkhProjectile> {
     @Override
     public Identifier getModelResource(AnkhProjectile object) {
-        return new Identifier(JCraft.MOD_ID, "geo/ankh.geo.json");
+        return JCraft.id("geo/ankh.geo.json");
     }
 
     @Override
     public Identifier getTextureResource(AnkhProjectile object) {
-        return new Identifier(JCraft.MOD_ID, "textures/entity/projectiles/ankh.png");
+        return JCraft.id("textures/entity/projectiles/ankh.png");
     }
 
     @Override
     public Identifier getAnimationResource(AnkhProjectile animatable) {
-        return new Identifier(JCraft.MOD_ID, "animations/knife.animation.json");
+        return JCraft.id("animations/knife.animation.json");
     }
 
 }

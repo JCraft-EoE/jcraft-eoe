@@ -16,10 +16,8 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -113,6 +111,8 @@ public abstract class JCraftSpec {
     }
 
     public void tickSpec() {
+        if (player.isSpectator()) return;
+
         World world = player.getWorld();
 
         if (world.isClient()) {
@@ -170,7 +170,7 @@ public abstract class JCraftSpec {
                         }
                         if (!hurt.isEmpty()) {
                             Random random = new Random();
-                            JCraft.CreateParticle((ServerWorld) world,
+                            JCraft.createParticle((ServerWorld) world,
                                     hitPos.x + random.nextDouble(-0.5, 0.5),
                                     hitPos.y + random.nextDouble(-0.5, 0.5),
                                     hitPos.z + random.nextDouble(-0.5, 0.5),
