@@ -22,14 +22,17 @@ public enum StandType {
             Text.literal("Heritage for the Future"), Text.literal("Manga"), Text.literal("OVA")),
     KING_CRIMSON(JEntityTypeRegister.KING_CRIMSON, KingCrimsonEntity::new, "kingcrimson",                       // 3
             Text.literal("Concept"), Text.literal("Manga"), Text.literal("Royal")),
-    D4C(JEntityTypeRegister.D4C, D4CEntity::new, "d4c"),                                                        // 4
-    CREAM(JEntityTypeRegister.CREAM, CreamEntity::new, "cream"),                                                // 5
+    D4C(JEntityTypeRegister.D4C, D4CEntity::new, "d4c",                                                         // 4
+            Text.literal("Pride"), Text.literal("Europe"), Text.literal("Spangled")),
+    CREAM(JEntityTypeRegister.CREAM, CreamEntity::new, "cream",                                                 // 5
+            Text.literal("Shift"), Text.literal("Love")),
     KILLER_QUEEN(JEntityTypeRegister.KILLER_QUEEN, KillerQueenEntity::new, "killerqueen",                       // 6
-            Text.literal("Shadow"), Text.literal("Skull"), Text.literal("Summer")),
+            Text.literal("Gray"), Text.literal("Skull"), Text.literal("Summer")),
     WHITE_SNAKE(JEntityTypeRegister.WHITE_SNAKE, WhiteSnakeEntity::new, "whitesnake"),                          // 7
     SILVER_CHARIOT(JEntityTypeRegister.SILVER_CHARIOT, SilverChariotEntity::new, "silverchariot",               // 8
-            Text.literal("Gold Chariot"), Text.literal("OVA")),
-    MAGICIANS_RED(JEntityTypeRegister.MAGICIANS_RED, MagiciansRedEntity::new, "mr"),                            // 9
+            Text.literal("Gold Chariot"), Text.literal("OVA"), Text.literal("Awakening")),
+    MAGICIANS_RED(JEntityTypeRegister.MAGICIANS_RED, MagiciansRedEntity::new, "mr",
+            Text.literal("Purple"), Text.literal("Moltres"), Text.literal("Fried")),                  // 9
     THE_FOOL(JEntityTypeRegister.THE_FOOL, TheFoolEntity::new, "thefool"),                                      // 10
     GOLD_EXPERIENCE(JEntityTypeRegister.GOLD_EXPERIENCE, GoldenExperienceEntity::new, "goldenexperience",       // 11
             Text.literal("Red"), Text.literal("Piercing"), Text.literal("Life Energy")),
@@ -39,8 +42,9 @@ public enum StandType {
     MADE_IN_HEAVEN(JEntityTypeRegister.MADE_IN_HEAVEN, MadeInHeavenEntity::new, "mih", true),                       // -2
     THE_WORLD_OVER_HEAVEN(JEntityTypeRegister.THE_WORLD_OVER_HEAVEN, TheWorldOverHeavenEntity::new, "twoh", true,   // -3
             Text.literal("Shadow"), Text.literal("Gone to Heaven"), Text.literal("Greatest High")),
-    KILLER_QUEEN_BITES_THE_DUST(JEntityTypeRegister.KILLER_QUEEN_BITES_THE_DUST, KQBTDEntity::new, "kqbtd",true),   // -4
-    GOLD_EXPERIENCE_REQUIEM(JEntityTypeRegister.GER, GEREntity::new, "ger", true),                                                      // -5
+    KILLER_QUEEN_BITES_THE_DUST(JEntityTypeRegister.KILLER_QUEEN_BITES_THE_DUST, KQBTDEntity::new, "kqbtd",true,    // -4
+            Text.literal("Shift"), Text.literal("Shadow"), Text.literal("Garf")),
+    GOLD_EXPERIENCE_REQUIEM(JEntityTypeRegister.GER, GEREntity::new, "ger", true),                                  // -5
     STAR_PLATINUM_THE_WORLD(JEntityTypeRegister.SPTW, SPTWEntity::new, "sptw", true,                                // -6
             Text.literal("Over Heaven"), Text.literal("Diamond is Unbreakable"));
 
