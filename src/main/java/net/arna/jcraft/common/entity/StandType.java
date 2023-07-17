@@ -42,7 +42,7 @@ public enum StandType {
     KILLER_QUEEN_BITES_THE_DUST(JEntityTypeRegister.KILLER_QUEEN_BITES_THE_DUST, KQBTDEntity::new, "kqbtd",true),   // -4
     GOLD_EXPERIENCE_REQUIEM(JEntityTypeRegister.GER, GEREntity::new, "ger", true),                                                      // -5
     STAR_PLATINUM_THE_WORLD(JEntityTypeRegister.SPTW, SPTWEntity::new, "sptw", true,                                // -6
-            Text.literal("Over Heaven"), Text.literal("Stone Ocean"));
+            Text.literal("Over Heaven"), Text.literal("Diamond is Unbreakable"));
 
 
     @Getter(lazy = true)
