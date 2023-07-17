@@ -71,11 +71,16 @@ public class StandDiscItem extends Item {
         if (data == null || !data.contains("StandID")) return;
 
         StandType type = StandType.fromId(data.getInt("StandID"));
-        if (type != null) tooltip.add(type.getNameText().copy().styled(s -> s.withColor(type.isEvolution() ? Formatting.LIGHT_PURPLE : Formatting.GRAY)));
+        if (type == null) return;
+        tooltip.add(type.getNameText().copy().styled(s -> s.withColor(type.isEvolution() ? Formatting.LIGHT_PURPLE : Formatting.GRAY)));
         
         // TODO add skin name to tooltip rather than just a number.
         int skin = getSkin(stack);
         tooltip.add(Text.literal("Skin " + skin).styled(s -> s.withColor(SKIN_LEVEL_COLORS[skin])));
+    }
+    
+    public static boolean isEmptyDisc(ItemStack stack) {
+        return stack.getNbt() == null || !stack.getNbt().contains("StandID", NbtElement.INT_TYPE);
     }
     
     public static void setSkin(ItemStack stack, int skin) {

@@ -7,6 +7,8 @@
   "mixins": [
     "AnvilScreenHandlerMixin",
     "EntityMixin",
+    "GrindstoneScreenHandlerAnon2and3Mixin",
+    "GrindstoneScreenHandlerMixin",
     "ItemMixin",
     "ItemUsageMixin",
     "LivingEntityInvoker",
