@@ -64,6 +64,7 @@ public interface JEntityTypeRegister {
             JCraft.id("kqbtd"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(KQBTDEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
+
     EntityType<SheerHeartAttackEntity> SHEER_HEART_ATTACK = Registry.register(
             Registry.ENTITY_TYPE,
             JCraft.id("sha"),
@@ -135,6 +136,7 @@ public interface JEntityTypeRegister {
             JCraft.id("gefrog"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, GEFrogEntity::new).dimensions(EntityDimensions.fixed(0.3f, 0.3f)).build()
     );
+
     EntityType<GEREntity> GER = Registry.register(
             Registry.ENTITY_TYPE,
             JCraft.id("ger"),

@@ -52,8 +52,8 @@ import software.bernie.geckolib3.core.IAnimationTickable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.arna.jcraft.JCraft.ComboBreak;
-import static net.arna.jcraft.JCraft.CooldownCancel;
+import static net.arna.jcraft.JCraft.comboBreak;
+import static net.arna.jcraft.JCraft.cooldownCancel;
 
 public abstract class StandEntity extends MobEntity implements IAnimatable, IAnimationTickable {
 
@@ -772,7 +772,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
                                 if (!hurt.contains(hurtEntity)) hurt.add(hurtEntity);
                         }
                         if (!hurt.isEmpty()) {
-                            JCraft.CreateParticle((ServerWorld) this.world,
+                            JCraft.createParticle((ServerWorld) this.world,
                                     fPos.x + random.nextGaussian() * 0.25,
                                     fPos.y + random.nextGaussian() * 0.25,
                                     fPos.z + random.nextGaussian() * 0.25,
@@ -1008,7 +1008,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
             if (stand.blocking && !stand.getRemote()) {
                 double delta = Math.abs((ent.headYaw + 90.0f) % 360.0f - (attacker.getHeadYaw() + 90.0f) % 360.0f);
                 if ( canBackstab && (360.0 - delta % 360.0 < 90 || delta % 360.0 < 90) && ent.squaredDistanceTo(attacker.getPos()) >= 1.5625 ) { // Backstab logic
-                    JCraft.CreateParticle((ServerWorld) attacker.getWorld(), ent.getX(), attacker.getEyeY(), ent.getZ(), -2);
+                    JCraft.createParticle((ServerWorld) attacker.getWorld(), ent.getX(), attacker.getEyeY(), ent.getZ(), -2);
                     stand.playSound(SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, 1, 1);
                     stand.blocking = false;
                     overrideStun = true;
@@ -1177,7 +1177,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
         // If stunned, and about to get hit by another move, combo break sometimes
         if (mobStun != null)
             if (!stand.blocking && enemyAttack != null && enemyMoveStun > enemyAttack.initTime && stand.random.nextFloat() < 0.1f)
-                ComboBreak((ServerWorld) stand.world, mob, mobStun);
+                comboBreak((ServerWorld) stand.world, mob, mobStun);
 
         if (!stand.blocking) {
             StatusEffectInstance stun = target.getStatusEffect(JStatusRegister.DAZED);
@@ -1386,7 +1386,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
         }
 
         if (movesOnCooldown > 5) { // >5 = 80+%
-            CooldownCancel((ServerWorld) this.world, mob);
+            cooldownCancel((ServerWorld) this.world, mob);
         }
 
         // Non ranged offensive attacks are cancelled if the opponent is too far (and -1 causes an out-of-bounds error)

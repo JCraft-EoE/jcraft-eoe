@@ -17,11 +17,11 @@ import java.util.function.Function;
 
 public enum StandType {
     STAR_PLATINUM(JEntityTypeRegister.STAR_PLATINUM, StarPlatinumEntity::new, "starplatinum",                   // 1
-            Text.literal("Manga"), Text.literal("OVA")),
+            Text.literal("Manga"), Text.literal("Arcade"), Text.literal("OVA")),
     THE_WORLD(JEntityTypeRegister.THE_WORLD, TheWorldEntity::new, "theworld",                                   // 2
-            Text.literal("Heritage for the Future"), Text.literal("Manga"), Text.literal("OVA")),
+            Text.literal("Arcade"), Text.literal("Manga"), Text.literal("OVA")),
     KING_CRIMSON(JEntityTypeRegister.KING_CRIMSON, KingCrimsonEntity::new, "kingcrimson",                       // 3
-            Text.literal("Concept"), Text.literal("Manga"), Text.literal("Royal")),
+            Text.literal("Royal"), Text.literal("Manga"), Text.literal("Concept")),
     D4C(JEntityTypeRegister.D4C, D4CEntity::new, "d4c",                                                         // 4
             Text.literal("Pride"), Text.literal("Europe"), Text.literal("Spangled")),
     CREAM(JEntityTypeRegister.CREAM, CreamEntity::new, "cream",                                                 // 5
@@ -39,7 +39,8 @@ public enum StandType {
 
     // Evolutions
     C_MOON(JEntityTypeRegister.C_MOON, CMoonEntity::new, "cmoon", true),                                            // -1
-    MADE_IN_HEAVEN(JEntityTypeRegister.MADE_IN_HEAVEN, MadeInHeavenEntity::new, "mih", true),                       // -2
+    MADE_IN_HEAVEN(JEntityTypeRegister.MADE_IN_HEAVEN, MadeInHeavenEntity::new, "mih", true,                       // -2
+            Text.literal("Nightmare")),
     THE_WORLD_OVER_HEAVEN(JEntityTypeRegister.THE_WORLD_OVER_HEAVEN, TheWorldOverHeavenEntity::new, "twoh", true,   // -3
             Text.literal("Shadow"), Text.literal("Gone to Heaven"), Text.literal("Greatest High")),
     KILLER_QUEEN_BITES_THE_DUST(JEntityTypeRegister.KILLER_QUEEN_BITES_THE_DUST, KQBTDEntity::new, "kqbtd",true,    // -4
