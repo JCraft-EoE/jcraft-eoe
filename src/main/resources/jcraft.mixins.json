@@ -5,6 +5,7 @@
   "plugin": "net.arna.jcraft.JMixinPlugin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
+    "AnvilScreenHandlerMixin",
     "EntityMixin",
     "ItemMixin",
     "ItemUsageMixin",
