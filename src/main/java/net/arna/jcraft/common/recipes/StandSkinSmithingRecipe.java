@@ -2,6 +2,7 @@ package net.arna.jcraft.common.recipes;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.enchantments.CinderellasKissEnchantment;
+import net.arna.jcraft.common.entity.StandType;
 import net.arna.jcraft.common.item.StandDiscItem;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.minecraft.inventory.Inventory;
@@ -23,12 +24,13 @@ public class StandSkinSmithingRecipe extends SmithingRecipe {
     public boolean matches(Inventory inventory, World world) {
         ItemStack discStack = inventory.getStack(0);
         ItemStack maskStack = inventory.getStack(1);
-        
-        // TODO check if the stand of this disc has enough skins for this mask.
-        // I.e. if this mask has cinderellas kiss 3, but the stand of this disc
-        // only has 2 alternate skins, this is invalid.
+
+        StandType standType = StandDiscItem.getStandType(discStack);
+        if (standType == null) return false;
+
         return discStack.getItem() == JObjectRegistry.STANDDISC && 
-                maskStack.getItem() == JObjectRegistry.CINDERELLA_MASK;
+                maskStack.getItem() == JObjectRegistry.CINDERELLA_MASK &&
+                CinderellasKissEnchantment.getCKLevel(maskStack) <= standType.getSkinCount();
     }
 
     @Override

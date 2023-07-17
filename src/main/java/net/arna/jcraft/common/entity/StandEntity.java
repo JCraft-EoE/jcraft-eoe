@@ -58,7 +58,6 @@ import static net.arna.jcraft.JCraft.CooldownCancel;
 public abstract class StandEntity extends MobEntity implements IAnimatable, IAnimationTickable {
 
     // TODO: finish custom player idle poses for all stands
-    // TODO: add skin select
 
     // All variables that the player can see in action (i.e. time erase time, timestop time, alpha, state) have to be tracked.
     public List<Attack> moves = List.of();

@@ -26,6 +26,7 @@ public class StandDiscItem extends Item {
             TextColor.fromFormatting(Formatting.BLUE),
             TextColor.fromFormatting(Formatting.LIGHT_PURPLE)
     };
+    private static final Text DEFAULT_SKIN = Text.literal("Default");
     
     public StandDiscItem(Settings settings) {
         super(settings);
@@ -50,37 +51,44 @@ public class StandDiscItem extends Item {
 
         // Get NBT and swap stands
         int itemStandID = 0;
+        int itemSkin = 0;
         int userStandID = 0;
+        int userSkin = 0;
+        
         NbtCompound data = itemStack.getOrCreateNbt();
         NbtCompound userData = ((IEntityDataSaver) user).getPersistentData();
 
-        if (userData.contains("StandID"))
-            userStandID = userData.getInt("StandID");
-        if (data.contains("StandID"))
-            itemStandID = data.getInt("StandID");
+        if (userData.contains("StandID", NbtElement.INT_TYPE)) userStandID = userData.getInt("StandID");
+        if (userData.contains("StandSkin", NbtElement.INT_TYPE)) userSkin = userData.getInt("StandSkin");
+        if (data.contains("StandID", NbtElement.INT_TYPE)) itemStandID = data.getInt("StandID");
+        if (data.contains("Skin", NbtElement.INT_TYPE)) itemSkin = data.getInt("Skin");
 
         userData.putInt("StandID", itemStandID);
+        userData.putInt("StandSkin", itemSkin);
         data.putInt("StandID", userStandID);
+        data.putInt("Skin", userSkin);
 
         return TypedActionResult.success(itemStack);
     }
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        NbtCompound data = stack.getNbt();
-        if (data == null || !data.contains("StandID")) return;
-
-        StandType type = StandType.fromId(data.getInt("StandID"));
+        StandType type = getStandType(stack);
         if (type == null) return;
         tooltip.add(type.getNameText().copy().styled(s -> s.withColor(type.isEvolution() ? Formatting.LIGHT_PURPLE : Formatting.GRAY)));
         
-        // TODO add skin name to tooltip rather than just a number.
         int skin = getSkin(stack);
-        tooltip.add(Text.literal("Skin " + skin).styled(s -> s.withColor(SKIN_LEVEL_COLORS[skin])));
+        tooltip.add((skin == 0 || skin > type.getSkinCount() ? DEFAULT_SKIN : type.getSkinNames().get(skin - 1)).copy()
+                .styled(s -> s.withColor(SKIN_LEVEL_COLORS[skin])));
     }
     
     public static boolean isEmptyDisc(ItemStack stack) {
         return stack.getNbt() == null || !stack.getNbt().contains("StandID", NbtElement.INT_TYPE);
+    }
+    
+    public static StandType getStandType(ItemStack stack) {
+        NbtCompound nbt = stack.getNbt();
+        return nbt == null || !nbt.contains("StandID", NbtElement.INT_TYPE) ? null : StandType.fromId(nbt.getInt("StandID"));
     }
     
     public static void setSkin(ItemStack stack, int skin) {

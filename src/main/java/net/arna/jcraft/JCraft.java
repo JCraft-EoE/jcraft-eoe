@@ -27,6 +27,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
@@ -285,11 +286,14 @@ public class JCraft implements ModInitializer {
     public static StandEntity summon(World world, LivingEntity player) {
         if (player.hasStatusEffect(JStatusRegister.STANDLESS)) return null;
 
-        StandType type = StandType.fromId(((IEntityDataSaver) player).getPersistentData().getInt("StandID"));
+        NbtCompound data = ((IEntityDataSaver) player).getPersistentData();
+        StandType type = StandType.fromId(data.getInt("StandID"));
         StandEntity stand = type == null ? null : type.createNew(world);
 
         if (stand == null) return null;
 
+        int skin = data.contains("StandSkin", NbtElement.INT_TYPE) ? data.getInt("StandSkin") : 0;
+        stand.setSkin(skin);
         stand.setPosition(player.getPos().subtract(player.getRotationVector()));
         stand.startRiding(player);
         stand.setUser(player);
