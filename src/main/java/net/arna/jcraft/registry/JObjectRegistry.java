@@ -52,8 +52,6 @@ public interface JObjectRegistry {
 
     Item ANUBISSHEATHED = register("anubis_sheathed", new SheathedAnubisItem(settings().rarity(Rarity.RARE).maxCount(1)));
 
-    Item KNUCKLEDUSTER = register("knuckleduster", new KnuckledusterItem(settings()));
-
     Item BOXINGGLOVES = register("boxing_gloves", new BoxingGlovesItem(settings().maxCount(1)));
 
     Item REQUIEMRUBY = register("requiem_ruby", new Item(settings().rarity(Rarity.EPIC).fireproof()));
@@ -77,7 +75,7 @@ public interface JObjectRegistry {
     Item JOTAROPANTS = register("jotaro_pants", new JotaroArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.LEGS, settings()));
 
     Item JOTAROBOOTS = register("jotaro_boots", new JotaroArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.FEET, settings()));
-    
+
     Item CINDERELLA_MASK = register("cinderella_mask", new CinderellaMaskItem());
 
     //Block
