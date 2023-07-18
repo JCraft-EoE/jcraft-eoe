@@ -23,7 +23,6 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.particle.BlockStateParticleEffect;
@@ -39,7 +38,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.IAnimationTickable;
 import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.controller.AnimationController;
@@ -401,10 +399,10 @@ public class TheFoolEntity extends StandEntity {
                     }
                 } else {
                     // Summon clone
-                    if (user instanceof PlayerEntity playerEntity) {
-                        PlayerCloneEntity playerCloneEntity = new PlayerCloneEntity(JEntityTypeRegister.PLAYER_ENTITY_CLONE, world);
-                        playerCloneEntity.copyPositionAndRotation(playerEntity);
-                        playerCloneEntity.setMaster(playerEntity);
+                    if (user instanceof ServerPlayerEntity player) {
+                        PlayerCloneEntity playerCloneEntity = new PlayerCloneEntity(PlayerCloneEntity.getCloneType(player), world);
+                        playerCloneEntity.copyPositionAndRotation(player);
+                        playerCloneEntity.setMaster(player);
                         playerCloneEntity.markSand();
 
                         setSandClone(playerCloneEntity);
@@ -610,14 +608,8 @@ public class TheFoolEntity extends StandEntity {
                 }
 
                 // Sand clone logic
-                if (sandClone != null) {
-                    if (sandClone.age > 200)
+                if (sandClone != null && sandClone.age > 200)
                         setSandClone(null);
-                    if (this.sandClone instanceof PlayerCloneEntity playerClone && playerClone.switched) { // Detect if clone switched to thin
-                        playerClone.switchedTo.markSand();
-                        setSandClone(playerClone.switchedTo);
-                    }
-                }
             }
 
             setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);

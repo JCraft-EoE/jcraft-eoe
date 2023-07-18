@@ -1,7 +1,6 @@
 package net.arna.jcraft.client.mixin;
 
 import net.arna.jcraft.common.item.DebugWand;
-import net.arna.jcraft.common.item.KnifeBundleItem;
 import net.minecraft.client.render.item.ItemModels;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;

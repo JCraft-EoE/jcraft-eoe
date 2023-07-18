@@ -5,9 +5,14 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.Vec3d;
 
 public interface IEntityDataSaver {
+    boolean isThin();
+    void markThin();
+
     Vec3d getDesiredVelocity();
     void updateRemoteInputs(int f, int s, boolean j);
+
     NbtCompound getPersistentData();
+
     void setStand(StandEntity standEntity);
     StandEntity getStand();
 }

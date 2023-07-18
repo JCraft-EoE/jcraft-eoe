@@ -2,7 +2,10 @@ package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.util.*;
-import net.arna.jcraft.registry.*;
+import net.arna.jcraft.registry.JDimensionRegister;
+import net.arna.jcraft.registry.JObjectRegistry;
+import net.arna.jcraft.registry.JSoundRegister;
+import net.arna.jcraft.registry.JStatusRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
@@ -22,7 +25,6 @@ import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkSection;
 import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.IAnimationTickable;
 import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.controller.AnimationController;
@@ -290,8 +292,8 @@ public class D4CEntity extends StandEntity {
                 ItemStack weapon = new ItemStack(Items.IRON_SWORD);
                 weapon.setDamage(249);
 
-                if (player instanceof PlayerEntity playerEntity) {
-                    PlayerCloneEntity playerCloneEntity = new PlayerCloneEntity(JEntityTypeRegister.PLAYER_ENTITY_CLONE, this.world);
+                if (player instanceof ServerPlayerEntity playerEntity) {
+                    PlayerCloneEntity playerCloneEntity = new PlayerCloneEntity(PlayerCloneEntity.getCloneType(playerEntity), this.world);
                     playerCloneEntity.copyPositionAndRotation(playerEntity);
                     playerCloneEntity.setMaster(playerEntity);
 

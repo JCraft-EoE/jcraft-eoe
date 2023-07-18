@@ -1,8 +1,8 @@
 package net.arna.jcraft.client.mixin;
 
 import com.mojang.datafixers.util.Pair;
-import net.arna.jcraft.client.rendering.PostProcessHandler;
 import net.arna.jcraft.client.registry.JShaderRegistry;
+import net.arna.jcraft.client.rendering.PostProcessHandler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Shader;

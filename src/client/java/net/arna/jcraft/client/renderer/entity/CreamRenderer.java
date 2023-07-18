@@ -18,6 +18,7 @@ public class CreamRenderer extends GeoEntityRenderer<CreamEntity> {
 
     public CreamRenderer(EntityRendererFactory.Context context) {
         super(context, new CreamModel());
+
     }
 
     @Override
@@ -25,14 +26,15 @@ public class CreamRenderer extends GeoEntityRenderer<CreamEntity> {
                                      @Nullable VertexConsumerProvider renderTypeBuffer, @Nullable VertexConsumer vertexBuilder,
                                      int packedLightIn, Identifier textureLocation) {
 
-        MinecraftClient mcClient = MinecraftClient.getInstance();
-        if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null) {
-            if (mcClient.player.getFirstPassenger() == animatable) {
-                return animatable.getVoidTime() > 0 ? RenderLayer.getEntityTranslucent(this.getTextureLocation(animatable)) : RenderLayer.getEntityNoOutline(this.getTextureLocation(animatable));
-            }
-        }
+        if (animatable.getVoidTime() > 0)
+            return RenderLayer.getEntitySolid(textureLocation);
 
-        return RenderLayer.getEntityCutout(this.getTextureLocation(animatable));
+        MinecraftClient mcClient = MinecraftClient.getInstance();
+        if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null)
+            if (mcClient.player.getFirstPassenger() == animatable)
+                return RenderLayer.getEntityNoOutline(textureLocation);
+
+        return RenderLayer.getEntityCutout(textureLocation);
     }
 
     // Adds ability to change render alpha

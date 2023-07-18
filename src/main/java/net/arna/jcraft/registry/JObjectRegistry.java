@@ -1,7 +1,9 @@
 package net.arna.jcraft.registry;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.block.*;
+import net.arna.jcraft.common.block.FoolishSandBlock;
+import net.arna.jcraft.common.block.ShaderTestBlock;
+import net.arna.jcraft.common.block.SoulBlock;
 import net.arna.jcraft.common.item.*;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.loader.api.FabricLoader;
@@ -31,6 +33,8 @@ public interface JObjectRegistry {
     Item STANDDISC = register("stand_disc", new StandDiscItem(settings().rarity(Rarity.RARE).fireproof().maxCount(1)));
 
     Item FVREVOLVER = register("fv_revolver", new FVRevolverItem(settings().rarity(Rarity.UNCOMMON).maxDamage(1200)));
+
+    Item BULLET = register("bullet", new BulletItem(settings()));
 
     Item KQCOIN = register("kq_coin", new KQCoinItem(settings()));
 

@@ -1,8 +1,6 @@
 package net.arna.jcraft.client.renderer.entity;
 
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.model.entity.SilverChariotModel;
-import net.arna.jcraft.common.entity.MadeInHeavenEntity;
 import net.arna.jcraft.common.entity.SilverChariotEntity;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.JUtils;

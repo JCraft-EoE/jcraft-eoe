@@ -1235,6 +1235,11 @@ The World: Over Heaven
 
 Added Skins
     >Obtained via Cinderella Masks
+    >Swappable using /stand skin @s [0-3]
+
+● 18/7/2023
+>Improved PlayerCloneEntity logic
+>Updated skin textures
 
 
 

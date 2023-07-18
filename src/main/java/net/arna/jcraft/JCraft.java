@@ -8,6 +8,7 @@ import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.entity.StandType;
 import net.arna.jcraft.common.loot.JLootTableHelper;
 import net.arna.jcraft.common.network.c2s.InputSyncPacket;
+import net.arna.jcraft.common.network.c2s.OnConnectedPacket;
 import net.arna.jcraft.common.network.c2s.StandControlPacket;
 import net.arna.jcraft.common.network.s2c.PlayerAnimPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
@@ -259,6 +260,7 @@ public class JCraft implements ModInitializer {
                 itemStacks.add(new ItemStack(JObjectRegistry.KNIFE));
                 itemStacks.add(new ItemStack(JObjectRegistry.KNIFEBUNDLE));
                 itemStacks.add(JObjectRegistry.FVREVOLVER.getDefaultStack());
+                itemStacks.add(JObjectRegistry.BULLET.getDefaultStack());
 
                 itemStacks.add(new ItemStack(JObjectRegistry.SINNERSSOUL));
                 itemStacks.add(new ItemStack(JObjectRegistry.SOUL_BLOCK.asItem()));
@@ -330,6 +332,7 @@ public class JCraft implements ModInitializer {
 
         ServerPlayNetworking.registerGlobalReceiver(StandControlPacket.ID, StandControlPacket::handle);
         ServerPlayNetworking.registerGlobalReceiver(InputSyncPacket.ID, InputSyncPacket::handle);
+        ServerPlayNetworking.registerGlobalReceiver(OnConnectedPacket.ID, OnConnectedPacket::handle);
     }
 
 

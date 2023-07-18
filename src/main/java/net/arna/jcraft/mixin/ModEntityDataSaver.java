@@ -16,8 +16,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class ModEntityDataSaver implements IEntityDataSaver {
     @Shadow @Nullable public abstract Entity getFirstPassenger();
 
+    // Server data tracking
+    private boolean thin = false;
+
+    public void markThin() {
+        this.thin = true;
+    }
+
+    public boolean isThin() {
+        return this.thin;
+    }
+
+    // Stand tracking
     @Nullable private StandEntity stand;
-    private NbtCompound persistentData;
 
     public void setStand(@Nullable StandEntity standEntity) {
         this.stand = standEntity;
@@ -31,6 +42,9 @@ public abstract class ModEntityDataSaver implements IEntityDataSaver {
         }
         return this.stand;
     }
+
+    // JCraft NBT data implementation
+    private NbtCompound persistentData;
 
     @Override
     public NbtCompound getPersistentData() {

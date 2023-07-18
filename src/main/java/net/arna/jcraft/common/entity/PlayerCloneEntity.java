@@ -1,8 +1,9 @@
 package net.arna.jcraft.common.entity;
 
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.ai.goal.CloneAttackGoal;
+import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.IOwnable;
+import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
@@ -11,6 +12,8 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
+import net.minecraft.entity.attribute.DefaultAttributeContainer;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -42,8 +45,6 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
     private static final TrackedData<Boolean> SAND, RENDER_FOR_MASTER;
     private final BowAttackGoal<PlayerCloneEntity> bowAttackGoal = new BowAttackGoal<>(this, 1.0, 30, 15.0F);
     private boolean allowItemExchange = true;
-    public boolean switched = false; // Has this clone switched to a thin version?
-    public PlayerCloneEntity switchedTo; // The thin clone instance
 
     private LivingEntity persistTarget = null;
     private LivingEntity master;
@@ -141,6 +142,10 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
     @Override
     public boolean canPickUpLoot() {
         return true;
+    }
+
+    public static EntityType<PlayerCloneEntity> getCloneType(ServerPlayerEntity player) {
+        return ((IEntityDataSaver)player).isThin() ? JEntityTypeRegister.PLAYER_ENTITY_CLONE_SLIM : JEntityTypeRegister.PLAYER_ENTITY_CLONE;
     }
 
     @Override
@@ -253,14 +258,8 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
     @Override
     public void tick() {
         super.tick();
-        if (switched && switchedTo.age > 10) { // Remove outdated clones
-            discard();
-            return;
-        }
 
-        boolean client = this.world.isClient();
-
-        if (client) {
+        if (world.isClient()) {
             if (isSand() && age % 4 == 0)
                 world.addParticle(
                         new BlockStateParticleEffect(ParticleTypes.BLOCK, Blocks.SAND.getDefaultState()),
@@ -270,7 +269,7 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
                         , 0, 0, 0
                 );
 
-            JCraft.getClientEntityHandler().playerCloneEntityClientTick(this);
+            //JCraft.getClientEntityHandler().playerCloneEntityClientTick(this);
         } else if (master == null) {
             // Run every 2 seconds (player lists are rather expensive)
             if (age % 40 == 0) {
@@ -341,5 +340,13 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
 
     protected PersistentProjectileEntity createArrowProjectile(ItemStack arrow, float damageModifier) {
         return ProjectileUtil.createArrowProjectile(this, arrow, damageModifier);
+    }
+
+    public static DefaultAttributeContainer.Builder createCloneAttributes() {
+        return LivingEntity.createLivingAttributes()
+                .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 16.0)
+                .add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK)
+                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 2)
+                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3);
     }
 }

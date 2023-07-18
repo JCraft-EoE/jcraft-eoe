@@ -25,7 +25,7 @@ public enum StandType {
     D4C(JEntityTypeRegister.D4C, D4CEntity::new, "d4c",                                                         // 4
             Text.literal("Pride"), Text.literal("Europe"), Text.literal("Spangled")),
     CREAM(JEntityTypeRegister.CREAM, CreamEntity::new, "cream",                                                 // 5
-            Text.literal("Shift"), Text.literal("Love")),
+            Text.literal("Shift"), Text.literal("Love"), Text.literal("White Void")),
     KILLER_QUEEN(JEntityTypeRegister.KILLER_QUEEN, KillerQueenEntity::new, "killerqueen",                       // 6
             Text.literal("Gray"), Text.literal("Skull"), Text.literal("Summer")),
     WHITE_SNAKE(JEntityTypeRegister.WHITE_SNAKE, WhiteSnakeEntity::new, "whitesnake"),                          // 7

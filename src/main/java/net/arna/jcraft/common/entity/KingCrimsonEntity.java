@@ -6,7 +6,6 @@ import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.ShaderDeactivationPacket;
 import net.arna.jcraft.common.util.*;
-import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.arna.jcraft.registry.JPacketRegistry;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
@@ -41,7 +40,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.IAnimationTickable;
 import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.controller.AnimationController;
@@ -400,7 +398,7 @@ public class KingCrimsonEntity extends StandEntity {
                     // Shader handling
                     ShaderActivationPacket.send(player, this, 0, 120, ShaderActivationPacket.Type.CRIMSON);
 
-                    PlayerCloneEntity playerCloneEntity = new PlayerCloneEntity(JEntityTypeRegister.PLAYER_ENTITY_CLONE, world);
+                    PlayerCloneEntity playerCloneEntity = new PlayerCloneEntity(PlayerCloneEntity.getCloneType(player), world);
 
                     playerCloneEntity.setShouldRenderForMaster(false);
                     playerCloneEntity.disableDrops();
@@ -562,12 +560,7 @@ public class KingCrimsonEntity extends StandEntity {
             }
         }
 
-        if (!world.isClient) {
-            if (doppelganger instanceof PlayerCloneEntity clone && clone.switched) {
-                doppelganger = clone.switchedTo;
-                summonFakeKC();
-            }
-
+        if (!world.isClient()) {
             if (attack != null) {
                 if (attack.id == overhead.id)
                     this.queuedAttack = null;

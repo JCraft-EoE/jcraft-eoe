@@ -1,5 +1,6 @@
 package net.arna.jcraft.client.renderer.entity;
 
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.model.entity.StandEntityModel;
 import net.arna.jcraft.common.entity.D4CEntity;
 import net.arna.jcraft.common.entity.StandType;
@@ -54,18 +55,21 @@ public class D4CRenderer extends ExtendedGeoEntityRenderer<D4CEntity> {
             if ( ((IEntityDataSaver)mcClient.player).getStand() == animatable )
                 a = animatable.getAlpha();
         float gR = 1.0f - a;
+
         super.render(model, animatable, partialTicks, type, matrixStackIn, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green - gR, blue, a);
     }
 
     /*
         /execute as @e[type=jcraft:d4c] run data merge entity @s {HandItems:[{id:"jcraft:fv_revolver", Count:1b},{id:"jcraft:fv_revolver", Count:1b}]}
      */
+    protected float partialTick = 0f;
     @Override
     public void renderEarly(D4CEntity animatable, MatrixStack poseStack, float partialTick, VertexConsumerProvider bufferSource, VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float partialTicks) {
-        super.renderEarly(animatable, poseStack, partialTick, bufferSource, buffer, packedLight, packedOverlay, red, green, blue, partialTicks);
-
         this.mainHandItem = animatable.getEquippedStack(EquipmentSlot.MAINHAND);
         this.offHandItem = animatable.getEquippedStack(EquipmentSlot.OFFHAND);
+        this.partialTick = partialTick;
+
+        super.renderEarly(animatable, poseStack, partialTick, bufferSource, buffer, packedLight, packedOverlay, red, green, blue, partialTicks);
     }
 
     @Override
@@ -90,8 +94,13 @@ public class D4CRenderer extends ExtendedGeoEntityRenderer<D4CEntity> {
 
     @Override
     protected void preRenderItem(MatrixStack stack, ItemStack item, String boneName, D4CEntity currentEntity, IBone bone) {
-        //todo: fix d4c revolver rotation; theres a hack using currentEntity.getState() and currentEntity.age, but id prefer NOT to do this.
-        stack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(-90f));
+        //todo: fix d4c revolver rotation; a hack is currently implemented due to something (sodium?) breaking hand rotation for d4c
+        float ang = -90f;
+        int state = currentEntity.getState();
+        if (state == 7 || state == 10) {
+            ang += ( currentEntity.getMoveStun() + 1f - this.partialTick ) * 65f;
+        }
+        stack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(ang));
     }
 
     @Override

@@ -36,7 +36,7 @@ public class FVRevolverItem extends Item {
         NbtCompound itemData = stack.getNbt();
 
         if (itemData != null && itemData.contains("Shots"))
-            tooltip.add(Text.translatable("jcraft.revolver.shots").append(" " + itemData.get("Shots")));
+            tooltip.add(Text.translatable("jcraft.revolver.shots").append(" §e" + itemData.get("Shots")));
 
         super.appendTooltip(stack, world, tooltip, context);
     }

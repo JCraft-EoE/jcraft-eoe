@@ -148,13 +148,12 @@ public interface JEntityTypeRegister {
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, GERScorpionEntity::new).dimensions(EntityDimensions.fixed(0.4f, 0.4f)).build()
     );
 
-    // D4C clone fuckery
+    // D4C clone variants
     EntityType<PlayerCloneEntity> PLAYER_ENTITY_CLONE = Registry.register(
             Registry.ENTITY_TYPE,
             JCraft.id("playerclone"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, PlayerCloneEntity::new).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
-
     EntityType<PlayerCloneEntity> PLAYER_ENTITY_CLONE_SLIM = Registry.register(
             Registry.ENTITY_TYPE,
             JCraft.id("playerclone_slim"),
@@ -167,6 +166,13 @@ public interface JEntityTypeRegister {
             JCraft.id("knife"),
             FabricEntityTypeBuilder.<KnifeProjectile>create(SpawnGroup.MISC, KnifeProjectile::new)
                     .dimensions(EntityDimensions.fixed(0.5f, 0.5f)).trackRangeChunks(6).trackedUpdateRate(10).build()
+    );
+
+    EntityType<BulletProjectile> BULLET = Registry.register(
+            Registry.ENTITY_TYPE,
+            JCraft.id("bullet"),
+            FabricEntityTypeBuilder.<BulletProjectile>create(SpawnGroup.MISC, BulletProjectile::new)
+                    .dimensions(EntityDimensions.fixed(0.1f, 0.1f)).trackRangeChunks(6).trackedUpdateRate(20).build()
     );
 
     EntityType<AnkhProjectile> ANKH = Registry.register(
@@ -247,14 +253,14 @@ public interface JEntityTypeRegister {
         FabricDefaultAttributeRegistry.register(GOLD_EXPERIENCE, GoldenExperienceEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(GER, GEREntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(GE_FROG, GEFrogEntity.createFrogAttributes());
-        FabricDefaultAttributeRegistry.register(GE_SNAKE, SheerHeartAttackEntity.createMobAttributes()
+        FabricDefaultAttributeRegistry.register(GE_SNAKE, GESnakeEntity.createMobAttributes()
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3)
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 10)
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 4)
                 .add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK, 0)
         );
 
-        FabricDefaultAttributeRegistry.register(GER_SCORPION, SheerHeartAttackEntity.createMobAttributes()
+        FabricDefaultAttributeRegistry.register(GER_SCORPION, GERScorpionEntity.createMobAttributes()
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3)
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 10)
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 0)
@@ -262,14 +268,8 @@ public interface JEntityTypeRegister {
         );
 
         FabricDefaultAttributeRegistry.register(D4C, D4CEntity.createMobAttributes());
-        FabricDefaultAttributeRegistry.register(PLAYER_ENTITY_CLONE, D4CEntity.createMobAttributes()
-                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 2)
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3)
-        );
-        FabricDefaultAttributeRegistry.register(PLAYER_ENTITY_CLONE_SLIM, D4CEntity.createMobAttributes()
-                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 2)
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3)
-        );
+        FabricDefaultAttributeRegistry.register(PLAYER_ENTITY_CLONE, PlayerCloneEntity.createCloneAttributes());
+        FabricDefaultAttributeRegistry.register(PLAYER_ENTITY_CLONE_SLIM, PlayerCloneEntity.createCloneAttributes());
 
         FabricDefaultAttributeRegistry.register(LIFE_DETECTOR, LifeDetectorEntity.createDetectorAttributes());
         FabricDefaultAttributeRegistry.register(BLOCK_PROJECTILE, BlockProjectile.createBlockAttributes());

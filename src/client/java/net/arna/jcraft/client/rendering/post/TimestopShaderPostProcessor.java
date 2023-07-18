@@ -1,10 +1,8 @@
 package net.arna.jcraft.client.rendering.post;
 
-import ladysnake.satin.api.util.GlMatrices;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.rendering.PostProcessor;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 

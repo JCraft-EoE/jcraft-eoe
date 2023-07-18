@@ -212,31 +212,6 @@ public class StandControlPacket {
                 if (stun != null)
                     comboBreak(world, player, stun);
             });
-            // 12 - D4C Clone Thinning
-            case 12 -> {
-                UUID uuid = buf.readUuid();
-                server.execute(() -> {
-                    if (world.getEntity(uuid) instanceof PlayerCloneEntity clone) {
-                        LivingEntity ownerReference = clone.getMaster();
-                        PlayerCloneEntity slimClone = clone.convertTo(JEntityTypeRegister.PLAYER_ENTITY_CLONE_SLIM, true);
-                        if (slimClone == null) {
-                            LOGGER.error("Failed to convert clone " + clone + " into slim variation in world " + clone.world);
-                            return;
-                        }
-
-                        // Copy additional data (not handled in convertTo)
-                        slimClone.setMaster(ownerReference);
-
-                        slimClone.setHeadYaw(clone.getHeadYaw());
-                        slimClone.setBodyYaw(clone.getBodyYaw());
-
-                        slimClone.setTarget(clone.getTarget());
-
-                        clone.switched = true;
-                        clone.switchedTo = slimClone;
-                    }
-                });
-            }
             // 13 - Cooldown Cancel
             case 13 -> server.execute(() -> {
                 if (player.isCreative()) {

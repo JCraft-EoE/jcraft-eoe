@@ -1,9 +1,9 @@
 package net.arna.jcraft.common.spec;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.network.s2c.PlayerAnimPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;

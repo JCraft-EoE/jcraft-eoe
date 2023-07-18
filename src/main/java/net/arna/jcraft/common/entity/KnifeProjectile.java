@@ -1,6 +1,9 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.registry.JEntityTypeRegister;
+import net.arna.jcraft.registry.JObjectRegistry;
+import net.arna.jcraft.registry.JSoundRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
@@ -25,7 +28,6 @@ import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
-import net.arna.jcraft.registry.*;
 
 public class KnifeProjectile extends PersistentProjectileEntity implements IAnimatable {
     private int ticksInAir;

@@ -1,5 +1,7 @@
 package net.arna.jcraft.common.item;
 
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.entity.StandType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.registry.JObjectRegistry;
@@ -71,7 +73,11 @@ public class StandDiscItem extends Item {
         data.putInt("StandID", userStandID);
         data.putInt("Skin", userSkin);
 
+        StandEntity stand = userDataSaver.getStand();
+        if (stand != null)
+            stand.discard();
 
+        JCraft.summon(world, user);
 
         return TypedActionResult.success(itemStack);
     }

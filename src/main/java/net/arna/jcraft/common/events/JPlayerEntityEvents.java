@@ -9,10 +9,15 @@ import net.minecraft.server.network.ServerPlayerEntity;
 public class JPlayerEntityEvents implements ServerPlayerEvents.CopyFrom {
     @Override
     public void copyFromPlayer(ServerPlayerEntity oldPlayer, ServerPlayerEntity newPlayer, boolean alive) {
-        NbtCompound original = ((IEntityDataSaver) oldPlayer).getPersistentData();
-        NbtCompound player = ((IEntityDataSaver) newPlayer).getPersistentData();
+        IEntityDataSaver oldDataSaver = ((IEntityDataSaver) oldPlayer);
+        IEntityDataSaver newDataSaver = ((IEntityDataSaver) newPlayer);
+        NbtCompound original = oldDataSaver.getPersistentData();
+        NbtCompound player = newDataSaver.getPersistentData();
 
         player.putInt("StandID", original.getInt("StandID"));
+        player.putInt("StandSkin", original.getInt("StandSkin"));
         player.putInt("SpecID", original.getInt("SpecID"));
+
+        if (oldDataSaver.isThin()) newDataSaver.markThin();
     }
 }

@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.renderer.block;
 
-import net.arna.jcraft.common.block.entity.ShaderTestBlockEntity;
 import net.arna.jcraft.client.registry.JRenderLayerRegistry;
+import net.arna.jcraft.common.block.entity.ShaderTestBlockEntity;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;

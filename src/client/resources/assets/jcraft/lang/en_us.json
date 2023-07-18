@@ -130,9 +130,11 @@
 
   "jcraft.disc.error": "Cannot use disc while in combat!",
 
-  "jcraft.revolver.shots": "Shots:",
+  "jcraft.revolver.shots": "§9Shots:",
 
   "jcraft.knife.chargetime": "§9Maximum charge time:",
+
+  "jcraft.bullet.caliber": "§9Caliber:",
 
   "jcraft.boxinggloves.desc": "§eBrawler §9spec obtainment item",
 
