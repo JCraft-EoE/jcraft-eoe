@@ -18,6 +18,7 @@ import net.arna.jcraft.client.renderer.item.BigItemRenderer;
 import net.arna.jcraft.client.rendering.RenderHandler;
 import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
 import net.arna.jcraft.client.rendering.handler.EpitaphVignetteShaderHandler;
+import net.arna.jcraft.client.rendering.handler.UIShaderHandler;
 import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
 import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
@@ -103,6 +104,7 @@ public class JCraftClient implements ClientModInitializer {
         ZaWarudoShaderHandler.INSTANCE.init();
         CrimsonShaderHandler.INSTANCE.init();
         EpitaphVignetteShaderHandler.INSTANCE.init();
+        UIShaderHandler.INSTANCE.init();
 
         // Particle registration
         ParticleFactoryRegistry particleFactoryRegistry = ParticleFactoryRegistry.getInstance();
@@ -134,7 +136,7 @@ public class JCraftClient implements ClientModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(this::tickClient);
         ClientTickEvents.END_WORLD_TICK.register(new SkyBoxManager());
-        ClientTickEvents.END_CLIENT_TICK.register(new JCraftAbilityHud());
+        ClientTickEvents.END_CLIENT_TICK.register(JCraftAbilityHud.INSTANCE);
 
         ClientPacketHandler.init();
 
@@ -143,7 +145,6 @@ public class JCraftClient implements ClientModInitializer {
         TimeErasePredictionEffectRenderer.init();
 
         HudRenderCallback.EVENT.register(this::renderHud);
-        HudRenderCallback.EVENT.register(new JCraftAbilityHud());
 
         // Run when the MinecraftClient instance is fully initialized.
         MinecraftClient.getInstance().send(EpitaphOverlay::preload);
@@ -430,12 +431,12 @@ public class JCraftClient implements ClientModInitializer {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         return !clone.shouldRenderForMaster() && player != null && clone.getMasterId().equals(player.getUuid());
     }
-    
+
     @Nullable
     public static StandEntity getStandEntity() {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         if (player == null) return null;
-        
+
         return player.getPassengerList().stream()
                 .filter(e -> e instanceof StandEntity)
                 .map(e -> (StandEntity) e)

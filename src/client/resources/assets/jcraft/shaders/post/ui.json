@@ -1,0 +1,29 @@
+{
+  "targets": [
+    "input",
+    "overlay",
+    "final"
+  ],
+  "passes": [
+    {
+      "name": "jcraft:ui",
+      "intarget": "minecraft:main",
+      "outtarget": "final",
+      "auxtargets": [
+        {
+          "name": "InputSampler",
+          "id": "input"
+        },
+        {
+          "name": "OverlaySampler",
+          "id": "overlay"
+        }
+      ]
+    },
+    {
+      "name": "minecraft:blit",
+      "intarget": "final",
+      "outtarget": "minecraft:main"
+    }
+  ]
+}
