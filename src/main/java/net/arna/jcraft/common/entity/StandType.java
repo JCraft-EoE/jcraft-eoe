@@ -25,9 +25,9 @@ public enum StandType {
     D4C(JEntityTypeRegister.D4C, D4CEntity::new, "d4c",                                                         // 4
             Text.literal("Pride"), Text.literal("Europe"), Text.literal("Spangled")),
     CREAM(JEntityTypeRegister.CREAM, CreamEntity::new, "cream",                                                 // 5
-            Text.literal("Shift"), Text.literal("Love"), Text.literal("White Void")),
+            Text.literal("Menace"), Text.literal("Eraser"), Text.literal("White Void")),
     KILLER_QUEEN(JEntityTypeRegister.KILLER_QUEEN, KillerQueenEntity::new, "killerqueen",                       // 6
-            Text.literal("Gray"), Text.literal("Skull"), Text.literal("Summer")),
+            Text.literal("Gunpowder"), Text.literal("Deadly"), Text.literal("1999")),
     WHITE_SNAKE(JEntityTypeRegister.WHITE_SNAKE, WhiteSnakeEntity::new, "whitesnake"),                          // 7
     SILVER_CHARIOT(JEntityTypeRegister.SILVER_CHARIOT, SilverChariotEntity::new, "silverchariot",               // 8
             Text.literal("Gold Chariot"), Text.literal("OVA"), Text.literal("Awakening")),
@@ -35,7 +35,7 @@ public enum StandType {
             Text.literal("Purple"), Text.literal("Moltres"), Text.literal("Fried")),
     THE_FOOL(JEntityTypeRegister.THE_FOOL, TheFoolEntity::new, "thefool"),                                      // 10
     GOLD_EXPERIENCE(JEntityTypeRegister.GOLD_EXPERIENCE, GoldenExperienceEntity::new, "goldenexperience",       // 11
-            Text.literal("Red"), Text.literal("Piercing"), Text.literal("Life Energy")),
+            Text.literal("Passione"), Text.literal("Chosen One"), Text.literal("Life Energy")),
 
     // Evolutions
     C_MOON(JEntityTypeRegister.C_MOON, CMoonEntity::new, "cmoon", true),                                            // -1
@@ -44,10 +44,10 @@ public enum StandType {
     THE_WORLD_OVER_HEAVEN(JEntityTypeRegister.THE_WORLD_OVER_HEAVEN, TheWorldOverHeavenEntity::new, "twoh", true,   // -3
             Text.literal("Shadow"), Text.literal("Gone to Heaven"), Text.literal("Greatest High")),
     KILLER_QUEEN_BITES_THE_DUST(JEntityTypeRegister.KILLER_QUEEN_BITES_THE_DUST, KQBTDEntity::new, "kqbtd",true,    // -4
-            Text.literal("Shift"), Text.literal("Shadow"), Text.literal("Garf")),
+            Text.literal("Gelatin"), Text.literal("Veiled"), Text.literal("Garf")),
     GOLD_EXPERIENCE_REQUIEM(JEntityTypeRegister.GER, GEREntity::new, "ger", true),                                  // -5
     STAR_PLATINUM_THE_WORLD(JEntityTypeRegister.SPTW, SPTWEntity::new, "sptw", true,                                // -6
-            Text.literal("Over Heaven"), Text.literal("Diamond is Unbreakable"));
+            Text.literal("Judge, Jury, Executioner"), Text.literal("Diamond"), Text.literal("Over Heaven"));
 
 
     @Getter(lazy = true)
