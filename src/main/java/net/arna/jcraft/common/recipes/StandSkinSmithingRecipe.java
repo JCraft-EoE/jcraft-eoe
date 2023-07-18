@@ -15,7 +15,7 @@ import net.minecraft.world.World;
 public class StandSkinSmithingRecipe extends SmithingRecipe {
     public static final Identifier ID = JCraft.id("stand_skin");
     public static final StandSkinSmithingRecipe INSTANCE = new StandSkinSmithingRecipe();
-    
+
     private StandSkinSmithingRecipe() {
         super(ID, Ingredient.EMPTY, Ingredient.EMPTY, ItemStack.EMPTY);
     }
@@ -28,7 +28,7 @@ public class StandSkinSmithingRecipe extends SmithingRecipe {
         StandType standType = StandDiscItem.getStandType(discStack);
         if (standType == null) return false;
 
-        return discStack.getItem() == JObjectRegistry.STANDDISC && 
+        return discStack.getItem() == JObjectRegistry.STAND_DISC &&
                 maskStack.getItem() == JObjectRegistry.CINDERELLA_MASK &&
                 CinderellasKissEnchantment.getCKLevel(maskStack) <= standType.getSkinCount();
     }
@@ -37,7 +37,7 @@ public class StandSkinSmithingRecipe extends SmithingRecipe {
     public ItemStack craft(Inventory inventory) {
         ItemStack discStack = inventory.getStack(0);
         ItemStack maskStack = inventory.getStack(1);
-        
+
         ItemStack res = discStack.copy();
         res.setCount(1);
         int skin = CinderellasKissEnchantment.getCKLevel(maskStack); // 0 is default skin

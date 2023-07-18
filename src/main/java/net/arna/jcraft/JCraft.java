@@ -6,6 +6,7 @@ import lombok.Setter;
 import net.arna.jcraft.common.JConfig;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.entity.StandType;
+import net.arna.jcraft.common.item.StandDiscItem;
 import net.arna.jcraft.common.loot.JLootTableHelper;
 import net.arna.jcraft.common.network.c2s.InputSyncPacket;
 import net.arna.jcraft.common.network.c2s.OnConnectedPacket;
@@ -94,6 +95,11 @@ public class JCraft implements ModInitializer {
             utilCD, comboBreakerCD, cooldownCancelCD, dashCD,
             heavyCD, barrageCD, ultCD, s1CD, s2CD, s3CD);
 
+    public static final ItemGroup JCRAFT_GROUP = FabricItemGroupBuilder.create(new Identifier(MOD_ID, "main"))
+            .icon(() -> new ItemStack(JObjectRegistry.STANDARROW))
+            .appendItems(JCraft::appendJcraftGroupStacks)
+            .build();
+
     // Gamerules
     //public static final GameRules.Key<GameRules.BooleanRule> KINGCRIMSON_TELEPORT_EFFECT = GameRuleRegistry.register("kingCrimsonTeleportEffect", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(false));
     public static final GameRules.Key<GameRules.BooleanRule> COMBO_COUNTER = GameRuleRegistry.register("comboCounter", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
@@ -146,6 +152,44 @@ public class JCraft implements ModInitializer {
                 serverPlayerEntity.getItemCooldownManager().set(serverPlayerEntity.getInventory().main.get(i).getItem(), duration);
             serverPlayerEntity.getItemCooldownManager().set(serverPlayerEntity.getOffHandStack().getItem(), duration);
         }
+    }
+
+    private static void appendJcraftGroupStacks(List<ItemStack> stacks) {
+        stacks.add(new ItemStack(JObjectRegistry.STANDARROW));
+        stacks.add(new ItemStack(JObjectRegistry.LIVINGARROW));
+        stacks.add(new ItemStack(JObjectRegistry.REQUIEMARROW));
+        stacks.add(new ItemStack(JObjectRegistry.REQUIEMRUBY));
+
+        stacks.add(new ItemStack(JObjectRegistry.ANUBIS));
+        stacks.add(new ItemStack(JObjectRegistry.ANUBISSHEATHED));
+        stacks.add(new ItemStack(JObjectRegistry.KNIFE));
+        stacks.add(new ItemStack(JObjectRegistry.KNIFEBUNDLE));
+        stacks.add(JObjectRegistry.FVREVOLVER.getDefaultStack());
+        stacks.add(JObjectRegistry.BULLET.getDefaultStack());
+
+        stacks.add(new ItemStack(JObjectRegistry.SINNERSSOUL));
+        stacks.add(new ItemStack(JObjectRegistry.SOUL_BLOCK.asItem()));
+        stacks.add(new ItemStack(JObjectRegistry.GREENBABY));
+        stacks.add(new ItemStack(JObjectRegistry.DIOSDIARY));
+
+        stacks.add(new ItemStack(JObjectRegistry.BOXINGGLOVES));
+
+        stacks.add(new ItemStack(JObjectRegistry.DIOHEADBAND));
+        stacks.add(new ItemStack(JObjectRegistry.DIOJACKET));
+        stacks.add(new ItemStack(JObjectRegistry.DIOPANTS));
+        stacks.add(new ItemStack(JObjectRegistry.DIOBOOTS));
+
+        stacks.add(new ItemStack(JObjectRegistry.JOTAROCAP));
+        stacks.add(new ItemStack(JObjectRegistry.JOTAROJACKET));
+        stacks.add(new ItemStack(JObjectRegistry.JOTAROPANTS));
+        stacks.add(new ItemStack(JObjectRegistry.JOTAROBOOTS));
+
+        stacks.add(new ItemStack(JObjectRegistry.KQCOIN));
+        stacks.add(new ItemStack(JObjectRegistry.FOOLISH_SAND_BLOCK.asItem()));
+
+        stacks.add(new ItemStack(JObjectRegistry.CINDERELLA_MASK));
+
+        StandDiscItem.appendStacks(JCRAFT_GROUP, stacks);
     }
 
     // Dashes
@@ -243,48 +287,6 @@ public class JCraft implements ModInitializer {
         preloadedChunks.add(new ChunkPos(chunkX, chunkY));
         auWorld.setChunkForced(chunkX, chunkY, true);
     }
-
-    // Item group
-    public static final ItemGroup JCRAFT_GROUP = FabricItemGroupBuilder.create(new Identifier(MOD_ID, "main"))
-            .icon(() -> new ItemStack(JObjectRegistry.STANDARROW))
-            .appendItems((itemStacks -> {
-                itemStacks.add(new ItemStack(JObjectRegistry.STANDDISC));
-
-                itemStacks.add(new ItemStack(JObjectRegistry.STANDARROW));
-                itemStacks.add(new ItemStack(JObjectRegistry.LIVINGARROW));
-                itemStacks.add(new ItemStack(JObjectRegistry.REQUIEMARROW));
-                itemStacks.add(new ItemStack(JObjectRegistry.REQUIEMRUBY));
-
-                itemStacks.add(new ItemStack(JObjectRegistry.ANUBIS));
-                itemStacks.add(new ItemStack(JObjectRegistry.ANUBISSHEATHED));
-                itemStacks.add(new ItemStack(JObjectRegistry.KNIFE));
-                itemStacks.add(new ItemStack(JObjectRegistry.KNIFEBUNDLE));
-                itemStacks.add(JObjectRegistry.FVREVOLVER.getDefaultStack());
-                itemStacks.add(JObjectRegistry.BULLET.getDefaultStack());
-
-                itemStacks.add(new ItemStack(JObjectRegistry.SINNERSSOUL));
-                itemStacks.add(new ItemStack(JObjectRegistry.SOUL_BLOCK.asItem()));
-                itemStacks.add(new ItemStack(JObjectRegistry.GREENBABY));
-                itemStacks.add(new ItemStack(JObjectRegistry.DIOSDIARY));
-
-                itemStacks.add(new ItemStack(JObjectRegistry.BOXINGGLOVES));
-
-                itemStacks.add(new ItemStack(JObjectRegistry.DIOHEADBAND));
-                itemStacks.add(new ItemStack(JObjectRegistry.DIOJACKET));
-                itemStacks.add(new ItemStack(JObjectRegistry.DIOPANTS));
-                itemStacks.add(new ItemStack(JObjectRegistry.DIOBOOTS));
-
-                itemStacks.add(new ItemStack(JObjectRegistry.JOTAROCAP));
-                itemStacks.add(new ItemStack(JObjectRegistry.JOTAROJACKET));
-                itemStacks.add(new ItemStack(JObjectRegistry.JOTAROPANTS));
-                itemStacks.add(new ItemStack(JObjectRegistry.JOTAROBOOTS));
-
-                itemStacks.add(new ItemStack(JObjectRegistry.KQCOIN));
-                itemStacks.add(new ItemStack(JObjectRegistry.FOOLISH_SAND_BLOCK.asItem()));
-
-                itemStacks.add(new ItemStack(JObjectRegistry.CINDERELLA_MASK));
-            }))
-            .build();
 
     public static StandEntity summon(World world, LivingEntity player) {
         if (player.hasStatusEffect(JStatusRegister.STANDLESS)) return null;

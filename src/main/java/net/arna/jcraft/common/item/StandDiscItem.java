@@ -8,6 +8,7 @@ import net.arna.jcraft.registry.JObjectRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -17,6 +18,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.UseAction;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -93,26 +95,51 @@ public class StandDiscItem extends Item {
                 .styled(s -> s.withColor(SKIN_LEVEL_COLORS[skin])));
     }
 
+    @Override
+    public void appendStacks(ItemGroup group, DefaultedList<ItemStack> stacks) {
+        appendStacks(group, (List<ItemStack>) stacks);
+    }
+
+    public static void appendStacks(ItemGroup group, List<ItemStack> stacks) {
+        boolean full = group == ItemGroup.SEARCH;
+        if (!full && group != JCraft.JCRAFT_GROUP) return;
+
+        for (StandType standType : StandType.values())
+            for (int skin = 0; skin <= (full ? standType.getSkinCount() : 0); skin++)
+                stacks.add(StandDiscItem.createDiscStack(standType, skin));
+    }
+
+    public static ItemStack createDiscStack(StandType type, int skin) {
+        if (skin < 0 || skin > type.getSkinCount()) throw new IllegalArgumentException("Skin out of bounds");
+
+        ItemStack stack = new ItemStack(JObjectRegistry.STAND_DISC);
+        NbtCompound nbt = stack.getOrCreateNbt();
+        nbt.putInt("StandID", type.getId());
+        nbt.putInt("Skin", skin);
+
+        return stack;
+    }
+
     public static boolean isEmptyDisc(ItemStack stack) {
         return stack.getNbt() == null || !stack.getNbt().contains("StandID", NbtElement.INT_TYPE);
     }
 
     public static StandType getStandType(ItemStack stack) {
-        if (!stack.isOf(JObjectRegistry.STANDDISC)) return null;
+        if (!stack.isOf(JObjectRegistry.STAND_DISC)) return null;
 
         NbtCompound nbt = stack.getNbt();
         return nbt == null || !nbt.contains("StandID", NbtElement.INT_TYPE) ? null : StandType.fromId(nbt.getInt("StandID"));
     }
 
     public static void setSkin(ItemStack stack, int skin) {
-        if (!stack.isOf(JObjectRegistry.STANDDISC)) return;
+        if (!stack.isOf(JObjectRegistry.STAND_DISC)) return;
 
         NbtCompound nbt = stack.getOrCreateNbt();
         nbt.putInt("Skin", skin);
     }
 
     public static int getSkin(ItemStack stack) {
-        if (!stack.isOf(JObjectRegistry.STANDDISC)) return 0;
+        if (!stack.isOf(JObjectRegistry.STAND_DISC)) return 0;
 
         NbtCompound nbt = stack.getNbt();
         return nbt == null || !nbt.contains("Skin", NbtElement.INT_TYPE) ? 0 : nbt.getInt("Skin");
