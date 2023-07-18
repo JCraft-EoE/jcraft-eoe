@@ -65,7 +65,7 @@ dependencies {
 
 	runtimeOnly('org.joml:joml:1.10.4')
 	modImplementation("maven.modrinth:sodium:${project.sodium}")
-	modImplementation "com.ptsmods:devlogin:3.2.2" // To login into your Minecraft account
+	modImplementation "com.ptsmods:devlogin:3.3" // To login into your Minecraft account
 
 	// Bendylib
 	include modImplementation("io.github.kosmx.bendy-lib:bendy-lib-fabric:${project.bendylib_version}")
