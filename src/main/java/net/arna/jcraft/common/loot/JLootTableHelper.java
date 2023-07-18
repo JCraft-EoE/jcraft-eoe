@@ -59,7 +59,7 @@ public class JLootTableHelper {
                                 // Add up to 2 levels to the kiss enchantment
                                 // n = 2, p = 0.25
                                 // P(0) = 56.25%; P(1) = 37.5%; P(2) = 6.25%
-                                .enchantment(CinderellasKissEnchantment.INSTANCE, BinomialLootNumberProvider.create(2, 0.25f)))
-                        .conditionally(RandomChanceLootCondition.builder(0.08f))));
+                                .enchantment(CinderellasKissEnchantment.INSTANCE, BinomialLootNumberProvider.create(2, 0.25f))))
+                .conditionally(RandomChanceLootCondition.builder(0.08f)));
     }
 }
