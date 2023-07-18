@@ -191,11 +191,11 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
     public void setMoveStun(int moveStun) {
         this.dataTracker.set(MOVESTUN, moveStun);
     }
-    
+
     public int getSkin() {
         return dataTracker.get(SKIN);
     }
-    
+
     public void setSkin(int skin) {
         if (skin < 0 || skin > getStandType().getSkinCount()) skin = 0;
         dataTracker.set(SKIN, skin);
@@ -645,7 +645,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
         if (isRemote) {
             if (hasVehicle()) detach();
             if (!user.isAlive())
-                kill();
+                discard();
 
             // Clientside rotational sync for remote mode
             user.setBodyYaw(user.getHeadYaw());
@@ -676,7 +676,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
             if (getStandGauge() < 1) {
                 user.addStatusEffect(new StatusEffectInstance(JStatusRegister.DAZED, 40, 2));
                 playSound(SoundEvents.ITEM_TOTEM_USE, 1, 0.5f);
-                kill();
+                discard();
             }
 
 
@@ -1069,17 +1069,19 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
 
     @Override
     public void stopRiding() {
-        if (!getRemote()) {
-            playSound(JSoundRegister.STAND_DESUMMON, 1, 1);
-            kill();
-        }
+        if (getVehicle() == null) return;
+
         super.stopRiding();
+        if (getRemote() || world.isClient) return;
+
+        playSound(JSoundRegister.STAND_DESUMMON, 1, 1);
+        discard();
     }
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         if (hasUser() && getUser() instanceof ArmorStandEntity) return;
-        kill(); // Whenever the stand is being loaded, kill it, it'll break
+        discard(); // Whenever the stand is being loaded, discard it, it'll break
     }
 
     @Override
