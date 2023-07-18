@@ -291,9 +291,9 @@ public class MadeInHeavenEntity extends StandEntity {
                 }
             }
             case (6) -> {
-                this.setAccelTime(800);
+                this.setAccelTime(300);
                 setAfterimage(true);
-                TimeAccelStatePacket.sendStart(Objects.requireNonNull(world.getServer()).getPlayerManager(), this, 800);
+                TimeAccelStatePacket.sendStart(Objects.requireNonNull(world.getServer()).getPlayerManager(), this, 300);
             }
             case (7) -> {
                 this.curAttack = null;
