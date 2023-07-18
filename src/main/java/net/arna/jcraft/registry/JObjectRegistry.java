@@ -78,6 +78,8 @@ public interface JObjectRegistry {
 
     Item CINDERELLA_MASK = register("cinderella_mask", new CinderellaMaskItem());
 
+    Item MOCK_ITEM = register("mock_item", new MockItem());
+
     //Block
     Block FOOLISH_SAND_BLOCK = register("foolish_sand_block", new FoolishSandBlock(FabricBlockSettings.of(Material.AGGREGATE, MapColor.PALE_YELLOW)
             .strength(0.5f)
