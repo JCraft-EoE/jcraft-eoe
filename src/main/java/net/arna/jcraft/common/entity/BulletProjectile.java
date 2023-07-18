@@ -14,6 +14,8 @@ public class BulletProjectile extends PersistentProjectileEntity {
     private int stunTicks = 0;
     private int damage;
 
+    //62.5 mm/px
+
     public BulletProjectile(EntityType<? extends BulletProjectile> entityType, World world) {
         super(entityType, world);
     }
