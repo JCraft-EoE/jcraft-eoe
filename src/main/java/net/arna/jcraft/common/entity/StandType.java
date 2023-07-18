@@ -31,15 +31,15 @@ public enum StandType {
     WHITE_SNAKE(JEntityTypeRegister.WHITE_SNAKE, WhiteSnakeEntity::new, "whitesnake"),                          // 7
     SILVER_CHARIOT(JEntityTypeRegister.SILVER_CHARIOT, SilverChariotEntity::new, "silverchariot",               // 8
             Text.literal("Gold Chariot"), Text.literal("OVA"), Text.literal("Awakening")),
-    MAGICIANS_RED(JEntityTypeRegister.MAGICIANS_RED, MagiciansRedEntity::new, "mr",
-            Text.literal("Purple"), Text.literal("Moltres"), Text.literal("Fried")),                  // 9
+    MAGICIANS_RED(JEntityTypeRegister.MAGICIANS_RED, MagiciansRedEntity::new, "mr",                             // 9
+            Text.literal("Purple"), Text.literal("Moltres"), Text.literal("Fried")),
     THE_FOOL(JEntityTypeRegister.THE_FOOL, TheFoolEntity::new, "thefool"),                                      // 10
     GOLD_EXPERIENCE(JEntityTypeRegister.GOLD_EXPERIENCE, GoldenExperienceEntity::new, "goldenexperience",       // 11
             Text.literal("Red"), Text.literal("Piercing"), Text.literal("Life Energy")),
 
     // Evolutions
     C_MOON(JEntityTypeRegister.C_MOON, CMoonEntity::new, "cmoon", true),                                            // -1
-    MADE_IN_HEAVEN(JEntityTypeRegister.MADE_IN_HEAVEN, MadeInHeavenEntity::new, "mih", true,                       // -2
+    MADE_IN_HEAVEN(JEntityTypeRegister.MADE_IN_HEAVEN, MadeInHeavenEntity::new, "mih", true,                        // -2
             Text.literal("Nightmare")),
     THE_WORLD_OVER_HEAVEN(JEntityTypeRegister.THE_WORLD_OVER_HEAVEN, TheWorldOverHeavenEntity::new, "twoh", true,   // -3
             Text.literal("Shadow"), Text.literal("Gone to Heaven"), Text.literal("Greatest High")),
