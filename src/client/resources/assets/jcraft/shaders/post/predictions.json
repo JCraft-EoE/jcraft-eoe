@@ -1,0 +1,24 @@
+{
+  "targets": [
+    "predictions",
+    "intermediary"
+  ],
+  "passes": [
+    {
+      "name": "jcraft:predictions",
+      "intarget": "minecraft:main",
+      "outtarget": "intermediary",
+      "auxtargets": [
+        {
+          "name": "PredictionsSampler",
+          "id": "predictions"
+        }
+      ]
+    },
+    {
+      "name": "minecraft:blit",
+      "intarget": "intermediary",
+      "outtarget": "minecraft:main"
+    }
+  ]
+}

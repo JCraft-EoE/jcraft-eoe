@@ -16,10 +16,7 @@ import net.arna.jcraft.client.renderer.effects.TimeAccelerationEffectRenderer;
 import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer;
 import net.arna.jcraft.client.renderer.item.BigItemRenderer;
 import net.arna.jcraft.client.rendering.RenderHandler;
-import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
-import net.arna.jcraft.client.rendering.handler.EpitaphVignetteShaderHandler;
-import net.arna.jcraft.client.rendering.handler.UIShaderHandler;
-import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
+import net.arna.jcraft.client.rendering.handler.*;
 import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
 import net.arna.jcraft.common.JConfig;
@@ -101,10 +98,12 @@ public class JCraftClient implements ClientModInitializer {
         JRenderLayerRegistry.init();
         RenderHandler.init();
         JClientEventsRegistry.registerClientEvents();
+
         ZaWarudoShaderHandler.INSTANCE.init();
         CrimsonShaderHandler.INSTANCE.init();
         EpitaphVignetteShaderHandler.INSTANCE.init();
-        UIShaderHandler.INSTANCE.init();
+        PredictionsShaderHandler.INSTANCE.init();
+        UIShaderHandler.INSTANCE.init(); // Should be last
 
         // Particle registration
         ParticleFactoryRegistry particleFactoryRegistry = ParticleFactoryRegistry.getInstance();
