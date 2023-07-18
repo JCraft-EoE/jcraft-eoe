@@ -6,6 +6,7 @@ import lombok.Setter;
 import net.arna.jcraft.common.JConfig;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.entity.StandType;
+import net.arna.jcraft.common.loot.JLootTableHelper;
 import net.arna.jcraft.common.network.c2s.InputSyncPacket;
 import net.arna.jcraft.common.network.c2s.StandControlPacket;
 import net.arna.jcraft.common.network.s2c.PlayerAnimPacket;
@@ -327,6 +328,7 @@ public class JCraft implements ModInitializer {
         JDimensionRegister.registerDimensions();
         JArgumentTypeRegistry.registerArgumentTypes();
         JEnchantmentRegistry.init();
+        JLootTableHelper.init();
 
         ServerPlayNetworking.registerGlobalReceiver(StandControlPacket.ID, StandControlPacket::handle);
         ServerPlayNetworking.registerGlobalReceiver(InputSyncPacket.ID, InputSyncPacket::handle);
