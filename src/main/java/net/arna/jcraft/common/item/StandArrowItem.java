@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.item;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.entity.StandType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -36,13 +37,14 @@ public class StandArrowItem extends Item {
         // Roll for stand (can't roll the same one twice)
         if (!world.isClient) {
             NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
+
             Random rand = new Random();
             int oldID = playerData.getInt("StandID");
-            int newID = rand.nextInt(1, JCraft.STAND_COUNT + 1);
-            while (newID == oldID) {
-                //JCraft.LOGGER.info("NEW ID MATCHED OLD: " + newID + " " + oldID);
-                newID = rand.nextInt(1, JCraft.STAND_COUNT + 1);
-            }
+            int newID;
+            do {
+                newID = rand.nextInt(1, StandType.getRegularStandCount() + 1);
+            } while (newID == oldID);
+
             playerData.putInt("StandID", newID);
             user.detach();
             JCraft.summon(world, user);

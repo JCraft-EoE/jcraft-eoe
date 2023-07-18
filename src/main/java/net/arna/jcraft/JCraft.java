@@ -59,8 +59,6 @@ public class JCraft implements ModInitializer {
 
     // Unchanging mod values
     public static final String MOD_ID = "jcraft";
-    public static final int STAND_COUNT = 11;
-    public static final int EVOLUTION_COUNT = 5;
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
 

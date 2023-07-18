@@ -58,6 +58,10 @@ public enum StandType {
     private static final List<StandType> allStandTypes = ImmutableList.copyOf(values());
 
     @Getter
+    private static final int regularStandCount = getRegularStandTypes().size(), evoStandCount = getEvoStandTypes().size(),
+            totalStandCount = regularStandCount + evoStandCount;
+
+    @Getter
     private final EntityType<? extends StandEntity> entityType;
     @Getter
     private final int id;
@@ -90,11 +94,11 @@ public enum StandType {
     public StandEntity createNew(World world) {
         return ctor.apply(world);
     }
-    
+
     public boolean isEvolution() {
         return id < 0;
     }
-    
+
     public int getSkinCount() {
         return skinNames.size();
     }
