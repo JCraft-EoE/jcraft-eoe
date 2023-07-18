@@ -28,6 +28,8 @@ public class UIShaderHandler implements ShaderEffectRenderCallback {
 
     @Override
     public void renderShaderEffects(float tickDelta) {
+        if (MinecraftClient.getInstance().options.hudHidden) return;
+
         // Do necessary initialisation to render HUD stuff at this stage.
         // HUD stuff should generally be rendered somewhere in InGameHud,
         // but we do it here, so we can use different frame-buffers.
