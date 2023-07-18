@@ -1,5 +1,6 @@
 package net.arna.jcraft.mixin;
 
+import lombok.Getter;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.minecraft.entity.Entity;
@@ -7,6 +8,7 @@ import net.minecraft.nbt.NbtCompound;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -14,17 +16,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
 public abstract class ModEntityDataSaver implements IEntityDataSaver {
-    @Shadow @Nullable public abstract Entity getFirstPassenger();
-
     // Server data tracking
-    private boolean thin = false;
+    @Getter
+    private @Unique boolean thin = false;
+    private @Unique NbtCompound persistentData; // JCraft NBT data implementation
 
     public void markThin() {
         this.thin = true;
-    }
-
-    public boolean isThin() {
-        return this.thin;
     }
 
     // Stand tracking
@@ -43,13 +41,16 @@ public abstract class ModEntityDataSaver implements IEntityDataSaver {
         return this.stand;
     }
 
-    // JCraft NBT data implementation
-    private NbtCompound persistentData;
-
     @Override
     public NbtCompound getPersistentData() {
         if (this.persistentData == null) this.persistentData = new NbtCompound();
         return persistentData;
+    }
+
+    @Override
+    public void copyFrom(IEntityDataSaver dataSaver) {
+        this.persistentData = dataSaver.getPersistentData().copy();
+        if (dataSaver.isThin()) markThin();
     }
 
     @Inject(method = "writeNbt", at = @At("HEAD"))
@@ -65,4 +66,6 @@ public abstract class ModEntityDataSaver implements IEntityDataSaver {
             persistentData = nbt.getCompound("JCraftData");
         }
     }
+
+    @Shadow @Nullable public abstract Entity getFirstPassenger();
 }

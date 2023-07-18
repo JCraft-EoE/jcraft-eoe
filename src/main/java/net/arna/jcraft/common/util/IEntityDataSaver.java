@@ -15,4 +15,6 @@ public interface IEntityDataSaver {
 
     void setStand(StandEntity standEntity);
     StandEntity getStand();
+
+    void copyFrom(IEntityDataSaver dataSaver);
 }
