@@ -4,12 +4,15 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 public class MockItem extends Item {
+    private static final ItemStack FALLBACK = new ItemStack(Items.DIRT);
+
     public MockItem() {
         super(new Settings()
                 .group(JCraft.JCRAFT_GROUP));
@@ -21,7 +24,7 @@ public class MockItem extends Item {
 
     public static ItemStack getMockedStack(ItemStack mockItemStack) {
         NbtCompound nbt = mockItemStack.getNbt();
-        if (nbt == null || !nbt.contains("MockItem", NbtElement.STRING_TYPE)) return ItemStack.EMPTY;
+        if (nbt == null || !nbt.contains("MockItem", NbtElement.STRING_TYPE)) return FALLBACK;
 
         String mockItemId = nbt.getString("MockItem");
         Item mockItem = Registry.ITEM.get(new Identifier(mockItemId));
