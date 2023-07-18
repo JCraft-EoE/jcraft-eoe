@@ -39,10 +39,9 @@ public class MockItem extends Item {
 
     public static ItemStack createMockStack(ItemStack stack) {
         ItemStack mockStack = new ItemStack(JObjectRegistry.MOCK_ITEM, stack.getCount());
-        NbtCompound nbt = new NbtCompound();
+        NbtCompound nbt = mockStack.getOrCreateNbt();
         nbt.putString("MockItem", Registry.ITEM.getId(stack.getItem()).toString());
         if (stack.getNbt() != null) nbt.put("MockData", stack.getNbt());
-        mockStack.setNbt(nbt);
 
         return mockStack;
     }
