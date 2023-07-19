@@ -2,7 +2,9 @@ package net.arna.jcraft.client.util;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
+import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
@@ -135,5 +137,24 @@ public class RenderUtils {
         tessellator.draw();
 
         matrixStack.pop();
+    }
+
+    public static void startOverlayRender() {
+        Window window = MinecraftClient.getInstance().getWindow();
+        RenderSystem.backupProjectionMatrix();
+        Matrix4f matrix4f = Matrix4f.projectionMatrix(0.0f, window.getScaledWidth(), 0.0f,
+                window.getScaledHeight(), 1000.0f, 3000.0f);
+        RenderSystem.setProjectionMatrix(matrix4f);
+
+        MatrixStack mvStack = RenderSystem.getModelViewStack();
+        mvStack.push();
+        mvStack.loadIdentity();
+        mvStack.translate(0.0, 0.0, -2000.0);
+        RenderSystem.applyModelViewMatrix();
+    }
+
+    public static void endOverlayRender() {
+        RenderSystem.restoreProjectionMatrix();
+        RenderSystem.getModelViewStack().pop();
     }
 }

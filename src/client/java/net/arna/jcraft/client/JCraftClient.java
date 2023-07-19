@@ -102,7 +102,6 @@ public class JCraftClient implements ClientModInitializer {
         ZaWarudoShaderHandler.INSTANCE.init();
         CrimsonShaderHandler.INSTANCE.init();
         EpitaphVignetteShaderHandler.INSTANCE.init();
-        PredictionsShaderHandler.INSTANCE.init();
         UIShaderHandler.INSTANCE.init(); // Should be last
 
         // Particle registration

@@ -1,19 +1,19 @@
 package net.arna.jcraft.client.renderer.effects;
 
-import ladysnake.satin.api.managed.ManagedFramebuffer;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.arna.jcraft.client.JCraftClient;
-import net.arna.jcraft.client.rendering.handler.PredictionsShaderHandler;
+import net.arna.jcraft.client.util.RenderUtils;
 import net.arna.jcraft.common.entity.KingCrimsonEntity;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.TexturedRenderLayers;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.gl.Framebuffer;
+import net.minecraft.client.gl.SimpleFramebuffer;
+import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.Window;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -24,6 +24,7 @@ import java.util.*;
 public class TimeErasePredictionEffectRenderer {
     private static int ticksLeft = 0;
     private static final Map<Entity, Vec3d> predictions = new WeakHashMap<>();
+    private static Framebuffer predictionsBuffer;
 
     public static void init() {
         WorldRenderEvents.AFTER_ENTITIES.register(TimeErasePredictionEffectRenderer::render);
@@ -37,6 +38,11 @@ public class TimeErasePredictionEffectRenderer {
             synchronized (predictions) {
                 updatePredictions();
             }
+        });
+
+        RenderSystem.recordRenderCall(() -> {
+            Window window = MinecraftClient.getInstance().getWindow();
+            predictionsBuffer = new SimpleFramebuffer(window.getFramebufferWidth(), window.getFramebufferHeight(), true, true);
         });
     }
 
@@ -58,7 +64,7 @@ public class TimeErasePredictionEffectRenderer {
     private static void render(WorldRenderContext ctx) {
         if (ticksLeft < 0) {
             if (ticksLeft == -1) {
-                PredictionsShaderHandler.getPredictionsBuffer().clear();
+                predictionsBuffer.clear(false);
                 ticksLeft--;
             }
             return;
@@ -76,8 +82,7 @@ public class TimeErasePredictionEffectRenderer {
         }
 
         // Init frame-buffer
-        ManagedFramebuffer predictionsBuffer = PredictionsShaderHandler.getPredictionsBuffer();
-        predictionsBuffer.clear();
+        predictionsBuffer.clear(false);
         predictionsBuffer.beginWrite(true);
 
         // Render entities
@@ -108,6 +113,30 @@ public class TimeErasePredictionEffectRenderer {
 
         // Restore framebuffer
         MinecraftClient.getInstance().getFramebuffer().beginWrite(true);
+
+        // Draw predictions buffer on top of main buffer
+        Window window = MinecraftClient.getInstance().getWindow();
+        RenderSystem.enableBlend();
+        RenderSystem.disableCull();
+        RenderSystem.disableDepthTest();
+        RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
+        RenderSystem.setShaderTexture(0, predictionsBuffer.getColorAttachment());
+        RenderUtils.startOverlayRender();
+
+        Tessellator tess = Tessellator.getInstance();
+        BufferBuilder buffer = tess.getBuffer();
+        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
+
+        final float r = 1, g = 0, b = 0, a = 0.33f;
+        buffer.vertex(0, 0, 0).color(r, g, b, a).texture(0, 1).next();
+        buffer.vertex(window.getScaledWidth(), 0, 0).color(r, g, b, a).texture(1, 1).next();
+        buffer.vertex(window.getScaledWidth(), window.getScaledHeight(), 0).color(r, g, b, a).texture(1, 0).next();
+        buffer.vertex(0, window.getScaledHeight(), 0).color(r, g, b, a).texture(0, 0).next();
+        BufferRenderer.drawWithShader(buffer.end());
+
+        RenderSystem.disableBlend();
+        RenderSystem.enableDepthTest();
+        RenderUtils.endOverlayRender();
     }
 
     private static void updatePredictions() {
