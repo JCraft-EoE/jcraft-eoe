@@ -13,6 +13,7 @@
     "ItemUsageMixin",
     "LivingEntityInvoker",
     "LivingEntityMixin",
+    "LongUsageItemMixin",
     "MobEntityMixin",
     "ModEntityDataSaver",
     "PlayerEntityMixin",

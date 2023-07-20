@@ -1,22 +1,13 @@
 package net.arna.jcraft.common.item;
 
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
-import net.arna.jcraft.common.spec.AnubisSpec;
 import net.arna.jcraft.common.spec.JCraftSpec;
-import net.arna.jcraft.common.util.IEntityDataSaver;
-import net.arna.jcraft.common.util.ISpec;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.attribute.EntityAttribute;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
@@ -27,22 +18,14 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class SheathedAnubisItem extends AnubisItem {
-    boolean warned = false; // This warning resets every time you join the world
-
-    public SheathedAnubisItem(Settings settings) {
-        super(settings);
+public class SheathedAnubisItem extends SpecObtainmentItem {
+    public SheathedAnubisItem(Settings settings, JCraftSpec spec) {
+        super(settings, spec);
     }
 
     public UseAction getUseAction(ItemStack stack) {
         return UseAction.BLOCK;
     }
-
-    @Override
-    public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot slot) {
-        return ImmutableMultimap.of();
-    }
-
     public int getMaxUseTime(ItemStack stack) {
         return 72000;
     }
@@ -54,7 +37,7 @@ public class SheathedAnubisItem extends AnubisItem {
         tooltip.add(Text.translatable("jcraft.anubis.removaldesc"));
         tooltip.add(Text.translatable("jcraft.sheathedanubis.blockdesc"));
         tooltip.add(Text.translatable("jcraft.sheathedanubis.desc"));
-        //super.appendTooltip(stack, world, tooltip, context); // Doubles the previous Anubis description
+        super.appendTooltip(stack, world, tooltip, context); // Doubles the previous Anubis description
     }
 
     @Override
@@ -65,23 +48,15 @@ public class SheathedAnubisItem extends AnubisItem {
             return TypedActionResult.fail(itemStack);
         else {
             ServerWorld serverWorld = (ServerWorld)world;
-            JCraftSpec spec = JUtils.getSpec(user);
 
-            if (spec instanceof AnubisSpec) {
-                JUtils.serverPlaySound(JSoundRegister.ANUBIS_UNSHEATHE, serverWorld, user.getPos());
-                user.setStackInHand(hand, new ItemStack(JObjectRegistry.ANUBIS));
-            } else if (warned) {
+            boolean specChanged = tryGetSpec(user);
+            if (specChanged) {
                 JUtils.serverPlaySound(JSoundRegister.ANUBIS_UNSHEATHE, serverWorld, user.getPos());
                 JUtils.serverPlaySound(JSoundRegister.ANUBIS_SPECCHANGE, serverWorld, user.getPos());
-
-                NbtCompound data = ((IEntityDataSaver) user).getPersistentData();
-                data.putInt("SpecID", 2);
-                JUtils.assignSpec(user, data, (ISpec) user);
                 user.setStackInHand(hand, new ItemStack(JObjectRegistry.ANUBIS));
-                warned = false;
-            } else {
-                user.sendMessage(Text.translatable("jcraft.anubis.unsheathe"));
-                warned = true;
+            } else if (!warned) {
+                JUtils.serverPlaySound(JSoundRegister.ANUBIS_UNSHEATHE, serverWorld, user.getPos());
+                user.setStackInHand(hand, new ItemStack(JObjectRegistry.ANUBIS));
             }
         }
         return TypedActionResult.consume(itemStack);
@@ -92,6 +67,6 @@ public class SheathedAnubisItem extends AnubisItem {
         super.inventoryTick(stack, world, entity, slot, selected);
         if (world.isClient) return;
         if (entity instanceof PlayerEntity player) // Bloodlust
-            handleAnubisEffects(player.getLastAttackTime() - player.age, player);
+            AnubisItem.handleAnubisEffects(player.getLastAttackTime() - player.age, player);
     }
 }

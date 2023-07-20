@@ -1,13 +1,9 @@
 package net.arna.jcraft.common.item;
 
-import net.arna.jcraft.common.util.IEntityDataSaver;
-import net.arna.jcraft.common.util.ISpec;
-import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.common.spec.JCraftSpec;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
@@ -16,9 +12,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class BoxingGlovesItem extends Item {
-    public BoxingGlovesItem(Settings settings) {
-        super(settings);
+public class BoxingGlovesItem extends SpecObtainmentItem {
+    public BoxingGlovesItem(Settings settings, JCraftSpec spec) {
+        super(settings, spec);
     }
 
     @Override
@@ -32,13 +28,11 @@ public class BoxingGlovesItem extends Item {
         ItemStack itemStack = user.getStackInHand(hand);
 
         if (!world.isClient) {
-            if (!user.isCreative()) itemStack.decrement(1);
-
-            user.getItemCooldownManager().set(this, 20);
-
-            NbtCompound data = ((IEntityDataSaver) user).getPersistentData();
-            data.putInt("SpecID", 1);
-            JUtils.assignSpec(user, data, (ISpec)user);
+            boolean specChanged = tryGetSpec(user);
+            if (specChanged) {
+                if (!user.isCreative()) itemStack.decrement(1);
+                user.getItemCooldownManager().set(this, 20);
+            }
         }
 
         return TypedActionResult.consume(itemStack);

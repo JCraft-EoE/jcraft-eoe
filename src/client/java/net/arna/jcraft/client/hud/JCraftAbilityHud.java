@@ -105,7 +105,7 @@ public class JCraftAbilityHud extends DrawableHelper implements ClientTickEvents
 
             if (stand == null) {
                 // Render cooldown HUD for specs
-                if (spec != null) renderIcons(matrices, SPEC_ICONS, selectedX, selectedY, 11, spec.getName().toLowerCase(), renderCooldownOverlay);
+                if (spec != null) renderIcons(matrices, SPEC_ICONS, selectedX, selectedY, 11, spec.getInternalName().toLowerCase(), renderCooldownOverlay);
             } else {
                 // Render cooldown HUD for stands
                 renderIcons(matrices, isMid ? STAND_MID_ICONS : STAND_ICONS, selectedX, selectedY, 0, stand.getType().getUntranslatedName(), renderCooldownOverlay);

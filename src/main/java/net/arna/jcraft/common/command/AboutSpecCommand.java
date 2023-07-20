@@ -41,7 +41,7 @@ public class AboutSpecCommand {
             StringBuilder readout = new StringBuilder("Name: §e");
 
             // Name
-            readout.append(spec.getName()).append("§r\n");
+            readout.append(spec.getTranslatableName().getString()).append("§r\n");
 
             // Description
             readout.append("§a").append(spec.getDescription()).append("§r\n\n");

@@ -31,8 +31,8 @@ public class BrawlerSpec extends JCraftSpec {
 
     // Info
     @Override
-    public String getName() {
-        return "Brawler";
+    public String getInternalName() {
+        return "brawler";
     }
     @Override
     public String getDescription() {

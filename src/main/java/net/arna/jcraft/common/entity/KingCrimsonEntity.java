@@ -593,9 +593,6 @@ public class KingCrimsonEntity extends StandEntity {
                     if (userIsPlayer)
                         playerEntity.networkHandler.sendPacket(new PlaySoundS2CPacket(JSoundRegister.TIME_ERASE_EXIT, SoundCategory.PLAYERS, getX(), getY(), getZ(), 1, 1, 0));
 
-                    // Doppelgänger disappears at the end of Time Erase
-                    doppelganger.discard();
-
                     /* Return targets to position
                     for (TimeEraseData timeEraseData : timeEraseInfo) {
                         Vec3d tePos = timeEraseData.getPosition();
@@ -606,6 +603,9 @@ public class KingCrimsonEntity extends StandEntity {
             } else {
                 setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
             }
+
+            if (getTETime() < 1 && doppelganger != null) // Doppelgänger disappears at the end of Time Erase
+                doppelganger.discard();
 
             setSilent(teTime > 0);
 

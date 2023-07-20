@@ -18,6 +18,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -41,7 +42,10 @@ public abstract class JCraftSpec {
     public AttackQueue queuedAttack;
     public int armorPoints = 0;
 
-    public String getName() { return "UNNAMED"; }
+    public Text getTranslatableName() {
+        return Text.translatable("spec.jcraft." + getInternalName());
+    }
+    public String getInternalName() { return "unnamed"; }
     public String getDescription() { return "UNDESCRIBED"; }
     public String getDetails() { return "UNFINISHED"; }
     public List<Attack> getAttacks() { return null; }

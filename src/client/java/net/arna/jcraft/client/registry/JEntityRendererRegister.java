@@ -48,5 +48,6 @@ public interface JEntityRendererRegister {
         EntityRendererRegistry.register(JEntityTypeRegister.LIFE_DETECTOR, LifeDetectorRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegister.SAND_TORNADO, SandTornadoRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegister.WS_ACID_PROJECTILE, WSAcidRenderer::new);
+        EntityRendererRegistry.register(JEntityTypeRegister.BULLET, BulletRenderer::new);
     }
 }

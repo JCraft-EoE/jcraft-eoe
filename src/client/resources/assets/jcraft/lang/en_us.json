@@ -30,6 +30,8 @@
   "item.jcraft.jotaro_boots": "Jotaro's Boots",
   "item.jcraft.debug_wand": "Debug Wand",
 
+  "item.jcraft.bullet": "Bullet",
+
   "itemGroup.jcraft.main": "JCraft Items",
 
   "block.jcraft.soul_block": "Block of Suffering",
@@ -81,6 +83,8 @@
   "entity.jcraft.playerclone": "Clone",
   "entity.jcraft.playerclone_slim": "Clone",
 
+  "entity.jcraft.bullet": "Bullet",
+
   "effect.jcraft.dazed_effect": "Dazed",
   "effect.jcraft.ws_poison": "Melting",
   "effect.jcraft.standless": "Standless",
@@ -100,6 +104,10 @@
   "subtitles.jcraft.timeerase": "King Crimson!",
   "subtitles.jcraft.sptw": "Star Platinum: The World!",
   "subtitles.jcraft.twohts": "The World: Over Heaven!",
+
+  "spec.jcraft.brawler": "Brawler",
+  "spec.jcraft.anubis": "Anubis",
+  "spec.jcraft.unnamed": "No Spec",
 
   "jcraft.midnightconfig.title": "JCraft Config",
   "jcraft.midnightconfig.ANIME_VOICES": "Enable Anime Voicelines",
@@ -142,6 +150,8 @@
 
   "jcraft.commands.error.nospec": "No spec found!",
   "jcraft.commands.error.nostand": "No stand found!",
+
+  "warning.jcraft.spec.change": "Using this will change your spec, are you sure?",
 
   "death.attack.stand": "%1$s was retired",
   "death.attack.stand.item": "%1$s was retired by %2$s while wielding %3$s",

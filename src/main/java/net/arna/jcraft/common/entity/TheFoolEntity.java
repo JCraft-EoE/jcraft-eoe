@@ -437,7 +437,7 @@ public class TheFoolEntity extends StandEntity {
 
                 superTarget = JUtils.getUserIfStand(entities.get(0));
                 for (int i = 0; i < 8; i++) {
-                    FallingBlockEntity sand = FallingBlockEntity.spawnFromBlock(world, superTarget.getBlockPos(), sandState);
+                    FallingBlockEntity sand = FallingBlockEntity.spawnFromBlock(world, superTarget.getBlockPos(), JObjectRegistry.FOOLISH_SAND_BLOCK.getDefaultState());
                     sand.timeFalling = -32767;
                     sand.noClip = true;
                     sand.dropItem = false;
@@ -585,20 +585,31 @@ public class TheFoolEntity extends StandEntity {
                     superTarget = null;
                 } else {
                     superTarget.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 10, 0, true, false));
+                    superTarget.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 40, 0, true, false));
 
-                    // Every second, a sand block from the grab disappears
-                    if (this.age % 20 == 0) {
+                    if (age % 20 == 0) {
                         sands.get(0).discard();
                         sands.remove(0);
                     }
 
                     Vec3d targetPos = superTarget.getPos().add(0, superTarget.getHeight() / 2, 0);
+
+                    int i = 0;
+                    int j = 1;
                     for (FallingBlockEntity sand : sands) {
+                        if (sand == null || sand.isRemoved())
+                            continue;
+                        i++;
+                        j *= -1;
+
                         Vec3d newVel = sand.getVelocity().multiply(0.25).add( // Suppress current velocity
                                 // And add tracking
                                 targetPos.subtract(
                                         // MathHelper.sin(t) * 2, (isEven ? MathHelper.sin(t) : MathHelper.cos(t)) * 2, MathHelper.cos(t) * 2
-                                        sand.getPos().add(random.nextDouble() - 0.5, random.nextDouble() - 0.5, random.nextDouble() - 0.5)
+                                        sand.getPos().add(
+                                                random.nextDouble() - 0.5 + Math.sin(age * i / 10.0 * j),
+                                                random.nextDouble() * 2 - 1,
+                                                random.nextDouble() - 0.5 + Math.cos(age * i / 10.0 * j))
                                 ).normalize().multiply(0.5)
                         );
 

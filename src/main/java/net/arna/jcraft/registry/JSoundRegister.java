@@ -7,7 +7,7 @@ import net.minecraft.util.registry.Registry;
 public interface JSoundRegister {
 
     static SoundEvent registerSound(String id) {
-//        JCraft.LOGGER.info("Registering sound: " + id); // Probably unnecessary
+        //JCraft.LOGGER.info("Registering sound: " + id); // Probably unnecessary
         SoundEvent event = new SoundEvent(JCraft.id(id));
         Registry.register(Registry.SOUND_EVENT, event.getId(), event);
         return event;
@@ -32,7 +32,7 @@ public interface JSoundRegister {
     SoundEvent STAR_PLATINUM_TIMESKIP = registerSound("sptimeskip");
     SoundEvent STAR_PLATINUM_BARRAGE = registerSound("spbarrage");
     SoundEvent STAR_PLATINUM_ADVANCING_BARRAGE = registerSound("spadvbarrage");
-        SoundEvent STAR_PLATINUM_THE_WORLD = registerSound("sptw");
+    SoundEvent STAR_PLATINUM_THE_WORLD = registerSound("sptw");
     SoundEvent STAR_PLATINUM_KICK = registerSound("spkick");
     SoundEvent STAR_BREAKER = registerSound("starbreaker");
     SoundEvent STAR_FINGER = registerSound("starfinger");
@@ -211,6 +211,9 @@ public interface JSoundRegister {
     SoundEvent ANUBIS_SPECCHANGE = registerSound("anubisspecchange");
     SoundEvent ANUBIS_REKKA2 = registerSound("anubisrekka2");
     SoundEvent ANUBIS_REKKA3 = registerSound("anubisrekka3"); //todo: 3 hit rekka sound for anubis
+
+    //// OTHER
+    SoundEvent BULLET_LODGE = registerSound("bulletlodge");
 
     static void registerSounds() {
 

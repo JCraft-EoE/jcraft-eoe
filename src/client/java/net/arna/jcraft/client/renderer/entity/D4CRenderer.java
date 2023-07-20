@@ -1,6 +1,5 @@
 package net.arna.jcraft.client.renderer.entity;
 
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.model.entity.StandEntityModel;
 import net.arna.jcraft.common.entity.D4CEntity;
 import net.arna.jcraft.common.entity.StandType;

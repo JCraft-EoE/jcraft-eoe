@@ -1240,8 +1240,25 @@ Added Skins
 ● 18/7/2023
 >Improved PlayerCloneEntity logic
 >Updated skin textures
+>Fixed skins resetting upon death
 
+King Crimson
+    >Epitaph visuals improved
 
+● 20/7/2023
+>Added Bullets
+>Rebound default Cooldown Cancel key to Right Alt
+>Added universal warning before using an item that would change your spec
+
+King Crimson
+    >Fixed bug relating to the Time Erase doppelgänger persisting after it finishes
+
+D4C
+    >Revolver now uses Bullets (remains unreloadable due to balancing reasons)
+
+The Fool
+    >Increased speed of Sand Tornadoes by 60%
+    >Suffocating Sandstorm now blinds while the sand remains active
 
 priority (top to bottom)
 todo: fix predict not working with new projectiles

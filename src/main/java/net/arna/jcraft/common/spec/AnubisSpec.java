@@ -41,8 +41,8 @@ public class AnubisSpec extends JCraftSpec {
 
     // Info
     @Override
-    public String getName() {
-        return "Anubis";
+    public String getInternalName() {
+        return "anubis";
     }
     @Override
     public String getDescription() {

@@ -47,6 +47,8 @@ public class GoldenExperienceEntity extends StandEntity {
     public static final Attack tree = new Attack(5, 20, 1f, 24, 14, 1.25, 5f, 0.2f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_2)
             .setHitspark(2)
             .setInfo("Tree Summon", "two-hitting launch");
+
+    //todo: convert lifegiver to move with followup
     public static final Attack lifegiver = new Attack(6, 36, 1f, 25, 16, 0, 0f, 0f, AttackType.BOX).setRanged(true)
             .setInfo("Life Giver",
                     """

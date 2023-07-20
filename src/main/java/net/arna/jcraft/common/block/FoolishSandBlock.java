@@ -40,6 +40,11 @@ public class FoolishSandBlock extends FallingBlock {
         }
     }
 
+    @Override
+    public int getColor(BlockState state, BlockView world, BlockPos pos) {
+        return 16777216;
+    }
+
     private boolean increaseAge(BlockState state, World world, BlockPos pos) {
         int i = state.get(AGE);
         if (i < MAX_AGE) {

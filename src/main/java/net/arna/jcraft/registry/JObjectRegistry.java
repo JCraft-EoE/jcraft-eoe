@@ -5,6 +5,8 @@ import net.arna.jcraft.common.block.FoolishSandBlock;
 import net.arna.jcraft.common.block.ShaderTestBlock;
 import net.arna.jcraft.common.block.SoulBlock;
 import net.arna.jcraft.common.item.*;
+import net.arna.jcraft.common.spec.AnubisSpec;
+import net.arna.jcraft.common.spec.BrawlerSpec;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
@@ -50,9 +52,11 @@ public interface JObjectRegistry {
 
     Item ANUBIS = register("anubis", new AnubisItem(settings().rarity(Rarity.RARE).maxCount(1)));
 
-    Item ANUBISSHEATHED = register("anubis_sheathed", new SheathedAnubisItem(settings().rarity(Rarity.RARE).maxCount(1)));
+    // Spec Obtainment Items
+    Item ANUBISSHEATHED = register("anubis_sheathed", new SheathedAnubisItem(settings().rarity(Rarity.RARE).maxCount(1), new AnubisSpec()));
 
-    Item BOXINGGLOVES = register("boxing_gloves", new BoxingGlovesItem(settings().maxCount(1)));
+    Item BOXINGGLOVES = register("boxing_gloves", new BoxingGlovesItem(settings().maxCount(1), new BrawlerSpec()));
+
 
     Item REQUIEMRUBY = register("requiem_ruby", new Item(settings().rarity(Rarity.EPIC).fireproof()));
 

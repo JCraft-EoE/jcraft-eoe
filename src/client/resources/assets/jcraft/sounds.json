@@ -944,5 +944,11 @@
     "sounds": [
       "jcraft:specs/anubis/rekka2"
     ]
+  },
+
+  "bulletlodge": {
+    "sounds": [
+      "jcraft:projectiles/bulletlodge"
+    ]
   }
 }

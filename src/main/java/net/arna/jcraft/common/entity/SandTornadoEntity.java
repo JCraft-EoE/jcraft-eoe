@@ -100,7 +100,7 @@ public class SandTornadoEntity extends LivingEntity implements IAnimatable, IOwn
             List<LivingEntity> toHurt = JUtils.generateHitbox(world, getEyePos(), 1.8, List.of(this, master));
 
             if (toHurt.isEmpty()) {
-                setVelocity( getVelocity().add( getRotationVector().multiply(0.5) ).multiply(0.25) );
+                setVelocity( getVelocity().add( getRotationVector().multiply(0.5) ).multiply(0.4) );
             } else {
                 setVelocity( getVelocity().multiply(0.25) );
                 for (LivingEntity living : toHurt) {

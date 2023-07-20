@@ -172,7 +172,7 @@ public interface JEntityTypeRegister {
             Registry.ENTITY_TYPE,
             JCraft.id("bullet"),
             FabricEntityTypeBuilder.<BulletProjectile>create(SpawnGroup.MISC, BulletProjectile::new)
-                    .dimensions(EntityDimensions.fixed(0.1f, 0.1f)).trackRangeChunks(6).trackedUpdateRate(20).build()
+                    .dimensions(EntityDimensions.fixed(0.1f, 0.1f)).trackRangeChunks(6).trackedUpdateRate(10).build()
     );
 
     EntityType<AnkhProjectile> ANKH = Registry.register(
