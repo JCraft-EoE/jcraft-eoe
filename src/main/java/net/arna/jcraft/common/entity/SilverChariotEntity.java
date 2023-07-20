@@ -91,7 +91,7 @@ public class SilverChariotEntity extends StandEntity {
                             (Armor OFF) Impaling Thrust>dash>Barrage>...
                         """;
 
-        moves = List.of(light, heavy, barrage, spinbarrage, armoroff, charge, cleave, unusable);
+        moves = List.of(light, heavy, barrage, spinbarrage, armoroff, charge, cleave, lastshot);
     }
 
     private void setPossessedDesc() {
