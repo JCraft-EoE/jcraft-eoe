@@ -34,7 +34,8 @@ public enum StandType {
             Text.literal("Gold Chariot"), Text.literal("OVA"), Text.literal("Awakening")),
     MAGICIANS_RED(JEntityTypeRegister.MAGICIANS_RED, MagiciansRedEntity::new, "mr",                             // 9
             Text.literal("Purple"), Text.literal("Moltres"), Text.literal("Fried")),
-    THE_FOOL(JEntityTypeRegister.THE_FOOL, TheFoolEntity::new, "thefool"),                                      // 10
+    THE_FOOL(JEntityTypeRegister.THE_FOOL, TheFoolEntity::new, "thefool",                                       // 10
+            Text.literal("Chilled"), Text.literal("OVA"), Text.literal("Manga")),
     GOLD_EXPERIENCE(JEntityTypeRegister.GOLD_EXPERIENCE, GoldenExperienceEntity::new, "goldenexperience",       // 11
             Text.literal("Passione"), Text.literal("Chosen One"), Text.literal("Life Energy")),
 
