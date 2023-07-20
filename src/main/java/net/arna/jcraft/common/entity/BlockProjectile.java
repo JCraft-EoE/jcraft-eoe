@@ -55,8 +55,8 @@ public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatab
     private boolean launched = false;
     private boolean hit = false;
 
-    public static final TrackedData<Integer> EFFECT;
-    public static final TrackedData<ItemStack> BLOCKSTACK;
+    private static final TrackedData<Integer> EFFECT;
+    private static final TrackedData<ItemStack> BLOCKSTACK;
 
     static {
         EFFECT = DataTracker.registerData(BlockProjectile.class, TrackedDataHandlerRegistry.INTEGER);

@@ -1256,6 +1256,10 @@ King Crimson
 D4C
     >Revolver now uses Bullets (remains unreloadable due to balancing reasons)
 
+Silver Chariot
+    >Rapier is now fully opaque for the user while in first person
+    >Added Last Shot
+
 The Fool
     >Increased speed of Sand Tornadoes by 60%
     >Suffocating Sandstorm now blinds while the sand remains active

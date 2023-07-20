@@ -101,8 +101,8 @@ public class CMoonEntity extends StandEntity {
                 , new Attack().setMobility(MobilityType.HIGHJUMP).setInfo("Gravitational Hop", "jumps up and grants 2s slow falling"));
     }
 
-    public static final TrackedData<Integer> SHIFTTYPE;
-    public static final TrackedData<Integer> SHIFTTIME;
+    private static final TrackedData<Integer> SHIFTTYPE;
+    private static final TrackedData<Integer> SHIFTTIME;
     static {
         SHIFTTIME = DataTracker.registerData(CMoonEntity.class, TrackedDataHandlerRegistry.INTEGER);
         SHIFTTYPE = DataTracker.registerData(CMoonEntity.class, TrackedDataHandlerRegistry.INTEGER);

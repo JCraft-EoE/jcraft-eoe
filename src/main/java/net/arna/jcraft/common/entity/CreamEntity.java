@@ -82,8 +82,8 @@ public class CreamEntity extends StandEntity {
     public static final Attack ballcharge = new Attack(13, 20, 28, 13, 0, AttackType.BOX)
             .setInfo("Void Charge", "cream quickly transforms into a black hole and charges in the pointed direction");
 
-    public static final TrackedData<Integer> VOIDTIME;
-    public static final TrackedData<Boolean> HALFBALL;
+    private static final TrackedData<Integer> VOIDTIME;
+    private static final TrackedData<Boolean> HALFBALL;
 
     public void beginHalfBall() {
         this.dataTracker.set(HALFBALL, true);

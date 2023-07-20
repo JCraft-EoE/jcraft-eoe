@@ -84,7 +84,7 @@ public class TheWorldOverHeavenEntity extends StandEntity {
     private Vec3d lightningPos;
     public final ArrayList<LivingEntity> overwriteEnts = new ArrayList<>();
     public final ArrayList<Integer> overwriteTimes = new ArrayList<>();
-    public static final TrackedData<Integer> OVERWRITETYPE;
+    private static final TrackedData<Integer> OVERWRITETYPE;
 
     static {
         OVERWRITETYPE = DataTracker.registerData(TheWorldOverHeavenEntity.class, TrackedDataHandlerRegistry.INTEGER);

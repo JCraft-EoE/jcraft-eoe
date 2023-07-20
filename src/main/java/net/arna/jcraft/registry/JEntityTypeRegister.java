@@ -175,6 +175,13 @@ public interface JEntityTypeRegister {
                     .dimensions(EntityDimensions.fixed(0.1f, 0.1f)).trackRangeChunks(6).trackedUpdateRate(10).build()
     );
 
+    EntityType<RapierProjectile> RAPIER = Registry.register(
+            Registry.ENTITY_TYPE,
+            JCraft.id("rapier"),
+            FabricEntityTypeBuilder.<RapierProjectile>create(SpawnGroup.MISC, RapierProjectile::new)
+                    .dimensions(EntityDimensions.fixed(0.5f, 0.5f)).trackRangeChunks(6).trackedUpdateRate(10).build()
+    );
+
     EntityType<AnkhProjectile> ANKH = Registry.register(
             Registry.ENTITY_TYPE,
             JCraft.id("ankh"),

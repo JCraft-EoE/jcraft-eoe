@@ -101,8 +101,8 @@ public class TheFoolEntity extends StandEntity {
             .setInfo("Suffocating Sandstorm", "very slow, traps the opponent in a cloud of slowing sand");
     //todo: replace this with a funny local storm?
 
-    public static final TrackedData<Boolean> ISSAND;
-    public static final TrackedData<Boolean> ISWAVE;
+    private static final TrackedData<Boolean> ISSAND;
+    private static final TrackedData<Boolean> ISWAVE;
 
     private LivingEntity superTarget;
     private final ArrayList<FallingBlockEntity> sands = new ArrayList<>();

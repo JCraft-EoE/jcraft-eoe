@@ -39,7 +39,7 @@ import java.util.List;
 public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOwnable {
     public LivingEntity target;
 
-    public static final TrackedData<Boolean> EXPLODED;
+    private static final TrackedData<Boolean> EXPLODED;
 
     static {
         EXPLODED = DataTracker.registerData(LifeDetectorEntity.class, TrackedDataHandlerRegistry.BOOLEAN);

@@ -75,9 +75,9 @@ public class MadeInHeavenEntity extends StandEntity {
     public Vec3d judgementInitPos = Vec3d.ZERO;
     public Vec3d judgementInitRot = Vec3d.ZERO;
 
-    public static final TrackedData<Integer> ACCELTIME;
-    public static final TrackedData<Boolean> AFTERIMAGE;
-    public static final TrackedData<Integer> TARGETID;
+    private static final TrackedData<Integer> ACCELTIME;
+    private static final TrackedData<Boolean> AFTERIMAGE;
+    private static final TrackedData<Integer> TARGETID;
 
     public MadeInHeavenEntity(World worldIn) {
         super(StandType.MADE_IN_HEAVEN, worldIn);

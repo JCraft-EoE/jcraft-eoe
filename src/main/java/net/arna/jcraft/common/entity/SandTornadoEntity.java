@@ -41,7 +41,7 @@ public class SandTornadoEntity extends LivingEntity implements IAnimatable, IOwn
         super(entityType, world);
     }
 
-    public static final TrackedData<Boolean> DISAPPEARED;
+    private static final TrackedData<Boolean> DISAPPEARED;
 
     static {
         DISAPPEARED = DataTracker.registerData(SandTornadoEntity.class, TrackedDataHandlerRegistry.BOOLEAN);

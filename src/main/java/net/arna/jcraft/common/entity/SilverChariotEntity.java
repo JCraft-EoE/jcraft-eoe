@@ -14,6 +14,7 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3f;
@@ -63,13 +64,18 @@ public class SilverChariotEntity extends StandEntity {
             .setStunType(0)
             .setInfo("God of Death", "high-damage beatdown, 1.5s stun on whiff, cannot be combo broken");
     public final Attack mainbeatdown = new Attack(9, 0, 0.65f, 59, 0, 2.0, 4.5f, 0.75f, AttackType.MULTIHIT, 1.6f, 0, List.of(13, 23), JSoundRegister.IMPACT_1)
-            .setStunType(0);
+            .setStunType(0)
+            .setInfo("God of Death (hit)", "");
     public final Attack beatdownfinish = new Attack(10, 0, 0.65f, 59, 0, 2.5, 6f, 1.25f, AttackType.MULTIHIT, 1, 0, List.of(54), JSoundRegister.TW_KICK_HIT)
             .setLaunch()
-            .setHitspark(2);
+            .setHitspark(2)
+            .setInfo("God of Death (final hit)", "");
     public final Attack armoroff = new Attack(11, 60, 0.65f, 15, 6, 1.75, 4f, 0.75f, AttackType.BOX, 0.35f, 0f, 0)
             .setLaunch()
             .setInfo("Armor Off", "25s of faster moves");
+    public final Attack lastshot = new Attack(12, 24, 1f, 15, 12, 0, 0f, 0f,  AttackType.BOX)
+            .setRanged(true)
+            .setInfo("Last Shot", "Chariot fires his rapier, which can bounce 5 times off walls, nerfs all hitboxes and damage by 25% until returned");
     private int armorTime;
 
     private void setNormalDesc() {
@@ -78,9 +84,11 @@ public class SilverChariotEntity extends StandEntity {
         freespace =
                 """
                         BNBs:
-                            (Armor ON) M1>Barrage>M1>Cleave>Spin
-                            (Armor OFF) Charge>M1>Spin>Barrage>M1>Cleave>Impale
-                            (Armor OFF) Spin>M1>Barrage>Charge>Cleave>M1
+                            (Armor ON) M1>Barrage>M1>Cleave>Spinning Blade>Shooting Star>M1
+                            (Armor ON) Shooting Star>M1>Barrage>Impaling Thrust
+                            (Armor OFF) Shooting Star>M1>Spinning Blade>Barrage>M1>Cleave>Impaling Thrust
+                            (Armor OFF) M1>Spinning Blade>Barrage>Shooting Star>Cleave>M1
+                            (Armor OFF) Impaling Thrust>dash>Barrage>...
                         """;
 
         moves = List.of(light, heavy, barrage, spinbarrage, armoroff, charge, cleave, unusable);
@@ -121,23 +129,25 @@ public class SilverChariotEntity extends StandEntity {
         setNormalDesc();
     }
 
-    public static final TrackedData<Integer> MODE;
-
+    private static final TrackedData<Boolean> HASRAPIER;
+    private static final TrackedData<Integer> MODE;
     static {
         MODE = DataTracker.registerData(SilverChariotEntity.class, TrackedDataHandlerRegistry.INTEGER);
+        HASRAPIER = DataTracker.registerData(SilverChariotEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     }
-
     public int getMode() {
         return dataTracker.get(MODE);
     }
-
     public void setMode(int m) {
         dataTracker.set(MODE, m);
     }
+    public boolean hasRapier() { return dataTracker.get(HASRAPIER); }
+    public void setHasRapier(boolean hasRapier) { dataTracker.set(HASRAPIER, hasRapier); }
 
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
+        dataTracker.startTracking(HASRAPIER, true);
         dataTracker.startTracking(MODE, 1);
     }
 
@@ -217,39 +227,38 @@ public class SilverChariotEntity extends StandEntity {
         }
     }
 
-    /*
     @Override
-    public void InitMiddleClick() {
-        if (!this.CanAttack()) { return; }
-        if (this.getVehicle() instanceof LivingEntity player) { }
+    public void initUtil() {
+        if (!canAttack()) { return; }
+        handleAttack(this.lastshot, JCraft.utilCD, 16);
     }
-     */
 
     @Override
     public boolean handleAttack(Attack attack, String cooldownName, int animState) {
         LivingEntity user = this.getUser();
-        IEntityDataSaver userData = (IEntityDataSaver) user;
-        int cooldown = userData.getPersistentData().getInt(cooldownName);
+        NbtCompound userData = ((IEntityDataSaver) user).getPersistentData();
+        int cooldown = userData.getInt(cooldownName);
 
         if (cooldown > 0) return false;
 
         // Can't be compacted due to == check in SpecialAttack()
         if (getMode() == 2) {
             Attack attackRef = Attack.copyOf(attack);
-
             attackRef.initTime *= 0.67;
             attackRef.moveStun *= 0.67;
 
-            curAttack = attackRef;
-            setMoveStun(attackRef.moveStun);
+            setAttack(attackRef, animState);
+        } else if (!hasRapier()) {
+            Attack attackRef = Attack.copyOf(attack);
+            attackRef.hitboxSize *= 0.75;
+            attackRef.damage *= 0.75;
+
+            setAttack(attackRef, animState);
         } else {
-            curAttack = attack;
-            setMoveStun(attack.moveStun);
+            setAttack(attack, animState);
         }
 
-        userData.getPersistentData().putInt(cooldownName, attack.cooldown * 20);
-
-        setState(animState);
+        userData.putInt(cooldownName, attack.cooldown * 20);
         return true;
     }
 
@@ -270,6 +279,21 @@ public class SilverChariotEntity extends StandEntity {
             case (11) -> {
                 setMode(2);
                 armorTime = 500;
+            }
+            case (12) -> {
+                if (hasRapier()) {
+                    LivingEntity user = getUser();
+                    RapierProjectile rapier = new RapierProjectile(getWorld(), user, this);
+                    rapier.setVelocity(this, user.getPitch(), user.getYaw(), 0, 2, 1);
+                    rapier.setSkin(
+                            getMode() != 1 ?
+                                    -getMode() + 1 // Modes 2 and 3 output -1 and -2
+                                    : getSkin()
+                    );
+                    world.spawnEntity(rapier);
+                    setHasRapier(false);
+                    //playSound();
+                }
             }
         }
     }
@@ -399,6 +423,7 @@ public class SilverChariotEntity extends StandEntity {
             case 13 -> controller.setAnimation(builder.playAndHold("animation.silverchariot.cleave"));
             case 14 -> controller.setAnimation(builder.playAndHold("animation.silverchariot.armor_off"));
             case 15 -> controller.setAnimation(builder.playAndHold("animation.silverchariot.counter_miss"));
+            case 16 -> controller.setAnimation(builder.playAndHold("animation.silverchariot.lastshot"));
         }
         controller.setAnimationSpeed(this.getMode() == 2 ? 1.5 : 1);
         return PlayState.CONTINUE;

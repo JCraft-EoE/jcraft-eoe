@@ -59,7 +59,7 @@ public class StarPlatinumEntity extends StandEntity {
             .setInfo("Stand Jump", "jumps in looked direction with slight upward bias, you must stay on the ground until Star Platinum jumps");
 
     // Inhale
-    public static final TrackedData<Integer> INHALETIME;
+    private static final TrackedData<Integer> INHALETIME;
 
     static {
         INHALETIME = DataTracker.registerData(StarPlatinumEntity.class, TrackedDataHandlerRegistry.INTEGER);

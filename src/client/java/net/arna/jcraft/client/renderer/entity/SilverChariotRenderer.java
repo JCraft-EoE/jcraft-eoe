@@ -1,6 +1,7 @@
 package net.arna.jcraft.client.renderer.entity;
 
 import net.arna.jcraft.client.model.entity.SilverChariotModel;
+import net.arna.jcraft.client.renderer.entity.layer.SCRapierLayer;
 import net.arna.jcraft.common.entity.SilverChariotEntity;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.JUtils;
@@ -21,6 +22,7 @@ public class SilverChariotRenderer extends GeoEntityRenderer<SilverChariotEntity
 
     public SilverChariotRenderer(EntityRendererFactory.Context context) {
         super(context, new SilverChariotModel());
+        addLayer(new SCRapierLayer(this));
     }
 
     @Override

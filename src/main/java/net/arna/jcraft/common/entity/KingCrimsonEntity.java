@@ -91,7 +91,7 @@ public class KingCrimsonEntity extends StandEntity {
     public static final Attack timeerase = new Attack(8, 50, 15, 5, 6, AttackType.BOX)
             .setInfo("Time Erase", "6 seconds duration, cancellable by doing anything with King Crimson"); // TE = (moveStun-initTime)/20
 
-    public static final TrackedData<Integer> TIMEERASETIME;
+    private static final TrackedData<Integer> TIMEERASETIME;
     private final Map<Entity, Vec3d> predictionInfo = new WeakHashMap<>();
 
     public KingCrimsonEntity(World worldIn) {
