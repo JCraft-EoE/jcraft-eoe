@@ -31,7 +31,11 @@ public class RapierModel extends AnimatedGeoModel<RapierProjectile> {
 
     @Override
     public Identifier getTextureResource(RapierProjectile object) {
-        return skins.get(object.getSkin());
+        int skin = object.getSkin();
+        if (skins.containsKey(skin))
+            return skins.get(skin);
+
+        return skins.get(-1);
     }
 
     @Override
