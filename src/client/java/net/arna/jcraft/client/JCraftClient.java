@@ -293,7 +293,7 @@ public class JCraftClient implements ClientModInitializer {
                         new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
 
                 for (Entity entity : toStop) {
-                    if ( entity == user || entity == ((IEntityDataSaver)user).getStand() || entity == user.getVehicle() ) continue;
+                    if ( entity.hasVehicle() || entity == user || entity == ((IEntityDataSaver)user).getStand() || entity == user.getVehicle() ) continue;
                     ITimeStop ts = ((ITimeStop) entity);
                     ts.setTimeStopTicks(2);
                 }

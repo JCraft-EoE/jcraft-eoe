@@ -200,7 +200,7 @@ public class StarPlatinumEntity extends StandEntity {
                     player.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(player));
             }
             case (5) -> {
-                if (entities.isEmpty()) return;
+                if (curAttack == null || entities.isEmpty()) return;
                 Vec3d avgPos = Vec3d.ZERO;
                 float c = 0;
                 for (LivingEntity ent : entities) {

@@ -1249,9 +1249,13 @@ King Crimson
 >Added Bullets
 >Rebound default Cooldown Cancel key to Right Alt
 >Added universal warning before using an item that would change your spec
+>Fixed bug where getting timestopped while riding
+>Knockdowns now detach you from any ridden/riding entities
 
 King Crimson
     >Fixed bug relating to the Time Erase doppelgänger persisting after it finishes
+    >Fixed bug where the doppelgänger's King Crimson uses the wrong skin
+    >Fixed crash while countering Star Platinum's Advancing Barrage
 
 D4C
     >Revolver now uses Bullets (remains unreloadable due to balancing reasons)

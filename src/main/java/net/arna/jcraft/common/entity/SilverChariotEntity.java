@@ -104,7 +104,7 @@ public class SilverChariotEntity extends StandEntity {
                             (M1>)Charge~Barrage>God of Death""";
 
         // Possessed moveset
-        moves = List.of(light, heavy, barrage, spinbarrage, pbeatdown, pcharge, counter, unusable);
+        moves = List.of(light, heavy, barrage, spinbarrage, pbeatdown, pcharge, counter, lastshot);
     }
 
     public SilverChariotEntity(World worldIn) {

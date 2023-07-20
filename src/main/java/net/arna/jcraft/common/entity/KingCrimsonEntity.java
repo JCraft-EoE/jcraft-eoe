@@ -518,7 +518,9 @@ public class KingCrimsonEntity extends StandEntity {
 
     private MobEntity doppelganger;
     private void summonFakeKC() {
-        ((IEntityDataSaver) doppelganger).getPersistentData().putInt("StandID", 3);
+        NbtCompound fakeUserData = ((IEntityDataSaver) doppelganger).getPersistentData();
+        fakeUserData.putInt("StandID", 3);
+        fakeUserData.putInt("StandSkin", getSkin());
         StandEntity kingCrimson = JCraft.summon(world, doppelganger);
         kingCrimson.blocking = true;
         kingCrimson.setMoveStun(32767);

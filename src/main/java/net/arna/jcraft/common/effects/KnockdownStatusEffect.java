@@ -20,6 +20,7 @@ public class KnockdownStatusEffect extends StatusEffect {
     @Override
     public void onApplied(LivingEntity entity, AttributeContainer attributes, int amplifier) {
         super.onApplied(entity, attributes, amplifier);
+        entity.detach();
         entity.setPose(entity instanceof PlayerEntity ? EntityPose.SWIMMING : EntityPose.SLEEPING);
     }
     @Override

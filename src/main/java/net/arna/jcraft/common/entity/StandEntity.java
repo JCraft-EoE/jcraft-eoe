@@ -536,6 +536,11 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
     }
 
     protected Vec3d timeSkip(double distance, @NotNull SoundEvent sound) {
+        boolean hasVehicle = user.hasVehicle();
+
+        if (hasVehicle)
+            distance /= 3;
+
         Vec3d eyePos = user.getEyePos();
         HitResult hitResult = world.raycast(
                 new RaycastContext(
@@ -550,7 +555,11 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
         if (userData.getInt(JCraft.standUltCD) < 60)
             userData.putInt(JCraft.standUltCD, 60);
 
-        user.teleport(telePos.x, telePos.y, telePos.z);
+        if (hasVehicle) {
+            user.getRootVehicle().setPosition(telePos.x, telePos.y, telePos.z);
+        } else {
+            user.teleport(telePos.x, telePos.y, telePos.z);
+        }
         world.playSound(null, telePos.x, telePos.y, telePos.z, sound, SoundCategory.PLAYERS, 1f, 1f);
 
         return telePos;
