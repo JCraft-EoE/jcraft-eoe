@@ -10,6 +10,7 @@
     "GrindstoneScreenHandlerAnon2and3Mixin",
     "GrindstoneScreenHandlerMixin",
     "ItemMixin",
+    "ItemStackMixin",
     "ItemUsageMixin",
     "LivingEntityInvoker",
     "LivingEntityMixin",

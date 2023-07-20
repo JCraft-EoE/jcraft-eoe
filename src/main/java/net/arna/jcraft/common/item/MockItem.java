@@ -19,7 +19,7 @@ public class MockItem extends Item {
     }
 
     public static boolean isMockItem(ItemStack stack) {
-        return stack.isOf(JObjectRegistry.MOCK_ITEM);
+        return stack.getItem() == JObjectRegistry.MOCK_ITEM;
     }
 
     public static ItemStack getMockedStack(ItemStack mockItemStack) {

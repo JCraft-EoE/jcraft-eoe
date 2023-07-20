@@ -37,7 +37,18 @@ public class ItemRendererMixin {
     }
 
     @ModifyVariable(method = "getModel", at = @At("HEAD"), argsOnly = true, ordinal = 0)
-    private ItemStack mockModel(ItemStack stack) {
+    private ItemStack mockModelInGetModel(ItemStack stack) {
+        return MockItem.isMockItem(stack) ? MockItem.getMockedStack(stack) : stack;
+    }
+
+    @ModifyVariable(method = "renderGuiItemIcon", at = @At("HEAD"), argsOnly = true, ordinal = 0)
+    private ItemStack mockModelInRenderGuiIcon(ItemStack stack) {
+        return MockItem.isMockItem(stack) ? MockItem.getMockedStack(stack) : stack;
+    }
+
+    @ModifyVariable(method = "renderItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformation$Mode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/world/World;III)V",
+            at = @At("HEAD"), argsOnly = true, ordinal = 0)
+    private ItemStack mockModelInRenderItem(ItemStack stack) {
         return MockItem.isMockItem(stack) ? MockItem.getMockedStack(stack) : stack;
     }
 }
