@@ -33,7 +33,8 @@ public class TimeErasePredictionEffectRenderer {
                 predictions.clear();
                 return;
             }
-            ticksLeft--;
+
+            if (!MinecraftClient.getInstance().isPaused()) ticksLeft--;
 
             synchronized (predictions) {
                 updatePredictions();

@@ -2,16 +2,17 @@ package net.arna.jcraft.client.hud;
 
 import lombok.Getter;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.rendering.FrameCounter;
 import net.arna.jcraft.client.rendering.HUDAnimation;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.texture.TextureManager;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -20,8 +21,8 @@ public class EpitaphOverlay extends DrawableHelper {
     public static final long FRAME_TIME = 1000000000 / 60; // Time of one frame in nanoseconds.
     private static final float VIGNETTE_INTENSITY = 5f;
     private static final float VIGNETTE_EXTEND = 0.5f;
-    private static int frame;
-    private static long lastRender;
+    private static FrameCounter frameCounter;
+    private static int lastFrame;
     @Getter
     private static State state = State.NONE;
     private static boolean shouldStop = false;
@@ -43,7 +44,8 @@ public class EpitaphOverlay extends DrawableHelper {
 
     public static void start() {
         state = State.INTRO;
-        frame = 0;
+        frameCounter = state.getFrameCounter();
+        Objects.requireNonNull(frameCounter).start();
         countdown = 100; // Play animation for 5 seconds.
     }
 
@@ -54,34 +56,22 @@ public class EpitaphOverlay extends DrawableHelper {
     }
 
     public static void render() {
-        if (!shouldRender() || state.getAnimation() == null) return;
+        if (!shouldRender() || frameCounter == null || state.getAnimation() == null) return;
+        if (MinecraftClient.getInstance().isPaused()) frameCounter.pause();
+        else frameCounter.unpause();
 
-        state.getFrame(frame).render();
-        if (Util.getMeasuringTimeNano() - lastRender < FRAME_TIME || MinecraftClient.getInstance().isPaused()) return;
-
-        State nextState = state.nextState(frame, shouldStop);
-        if (nextState == state) {
-            // If the state did not change, move to the next frame.
-            int dFrame = (int) ((Util.getMeasuringTimeNano() - lastRender) / FRAME_TIME);
-            for (int i = 0; i < dFrame; i++) {
-                int prevFrame = frame;
-                frame = state.nextFrame(frame);
-
-                // If we skipped enough frames to get to the end of the state, move to the next state
-                // unless the current state is loop.
-                if (frame > prevFrame || state == State.LOOP && !shouldStop) continue;
-                nextState = state.nextState(frame, shouldStop);
-                if (nextState != state) break; // Stop if the state changed.
-            }
-        }
-
-        if (nextState != state) {
-            // If the state changed, reset frame.
-            state = nextState;
-            frame = 0;
+        int currentFrame = frameCounter.getCurrentFrame();
+        if (currentFrame < 0 || shouldStop && currentFrame < lastFrame) {
+            // Move to next state.
+            state = state.nextState(shouldStop);
+            frameCounter = state.getFrameCounter();
+            if (frameCounter != null) frameCounter.start();
+            currentFrame = 0;
             shouldStop = false;
         }
-        lastRender = Util.getMeasuringTimeNano();
+
+        if (state == State.NONE) return;
+        state.getFrame(lastFrame = currentFrame).render();
     }
 
     public static boolean shouldRender() {
@@ -89,7 +79,7 @@ public class EpitaphOverlay extends DrawableHelper {
     }
 
     public static boolean shouldRenderVignette() {
-        return shouldRender() && (state != State.INTRO || frame > 10);
+        return shouldRender() && (state != State.INTRO || lastFrame > 10);
     }
 
     public static float getVignetteIntensity() {
@@ -105,26 +95,29 @@ public class EpitaphOverlay extends DrawableHelper {
     }
 
     private static float getIntroProgress() {
-        return (frame - 11) / 9f;
+        return (lastFrame - 11) / 9f;
     }
 
     private static float getOutroProgress() {
-        return frame / 9f;
+        return lastFrame / 9f;
     }
 
     public enum State {
-        NONE(null),
-        INTRO("intro"),
-        LOOP("loop"),
-        OUTRO("outro");
+        NONE(null, false),
+        INTRO("intro", false),
+        LOOP("loop", true),
+        OUTRO("outro", false);
 
         @Getter
         private final @Nullable HUDAnimation animation;
+        @Getter
+        private final @Nullable FrameCounter frameCounter;
 
-        State(@Nullable String path) {
+        State(@Nullable String path, boolean looping) {
             final String prefix = "textures/gui/epitaph_overlay/";
             animation = path == null ? null : HUDAnimation.create(JCraft.id(prefix + path + "/atlas.png"),
                     JCraft.id(prefix + path + "/atlas.json"));
+            frameCounter = animation == null ? null : animation.createFrameCounter(60, looping);
         }
 
         /**
@@ -148,27 +141,15 @@ public class EpitaphOverlay extends DrawableHelper {
         }
 
         /**
-         * Acquires the index of the next frame based on the current frame.
-         * Loops around to the first frame when the last one is reached.
-         * @param frame The current frame
-         * @return the next frame
-         */
-        public int nextFrame(int frame) {
-            if (animation == null) throw new IllegalStateException("NONE state has no animation.");
-            return (frame + 1) % animation.getFrameCount();
-        }
-
-        /**
          * Acquires the next state.
          * If the end of this state has not yet been reached, this state is returned.
          * Otherwise, the next state is returned unless the current state is {@link State#LOOP LOOP}.
-         * @param frame The current frame
          * @param forceOutro Whether to move to the outro state regardless of what our current state is.
          * @return The next state
          */
-        public State nextState(int frame, boolean forceOutro) {
-            if (animation == null || frame != animation.getFrameCount() - 1) return this;
-            return forceOutro ? OUTRO : this == LOOP ? this : values()[(ordinal() + 1) % values().length];
+        public State nextState(boolean forceOutro) {
+            if (animation == null) return this;
+            return forceOutro ? this == OUTRO ? NONE : OUTRO : this == LOOP ? this : values()[(ordinal() + 1) % values().length];
         }
     }
 }

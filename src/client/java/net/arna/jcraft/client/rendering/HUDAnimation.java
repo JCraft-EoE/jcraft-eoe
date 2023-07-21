@@ -99,6 +99,18 @@ public class HUDAnimation {
         return frames.get(i);
     }
 
+    /**
+     * Creates a new frame-counter that fits this animation.
+     * @param framerate The framerate of this animation. Probably 60 fps.
+     * @param shouldLoop Whether the frame-counter should wrap around
+     *                   when it has reached the end of the animation.
+     * @return A new frame-counter for this animation.
+     * @see FrameCounter
+     */
+    public FrameCounter createFrameCounter(float framerate, boolean shouldLoop) {
+        return new FrameCounter(framerate, getFrameCount(), shouldLoop);
+    }
+
     @Data
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Frame {
