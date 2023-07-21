@@ -48,10 +48,8 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class KingCrimsonEntity extends StandEntity {
     public static final Attack light = new Attack(0, 3, 0.85f, 23, 0, 1.5, 4f, 0.1f, AttackType.MULTIHIT, 2f, -0.1f, List.of(10, 16), JSoundRegister.IMPACT_4)
@@ -201,7 +199,7 @@ public class KingCrimsonEntity extends StandEntity {
 
         for (Entity entity : KingCrimsonEntity.getEntitiesToCatch(world, this, player))
             predictionInfo.put(entity, entity.getPos());
-        
+
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeBoolean(true);
         buf.writeVarInt(prediction.moveStun - prediction.initTime);
@@ -212,7 +210,7 @@ public class KingCrimsonEntity extends StandEntity {
         for (Map.Entry<Entity, Vec3d> prediction : predictionInfo.entrySet()) {
             Entity entity = prediction.getKey();
             if (entity == null) continue;
-            
+
             Vec3d pos = prediction.getValue();
             entity.teleport(pos.x, pos.y, pos.z);
         }
@@ -519,7 +517,7 @@ public class KingCrimsonEntity extends StandEntity {
     private MobEntity doppelganger;
     private void summonFakeKC() {
         NbtCompound fakeUserData = ((IEntityDataSaver) doppelganger).getPersistentData();
-        fakeUserData.putInt("StandID", 3);
+        fakeUserData.putInt("StandID", getStandType().getId());
         fakeUserData.putInt("StandSkin", getSkin());
         StandEntity kingCrimson = JCraft.summon(world, doppelganger);
         kingCrimson.blocking = true;
@@ -558,7 +556,10 @@ public class KingCrimsonEntity extends StandEntity {
             if (age % 2 == 0) {
                 user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 10, 2, true, false));
 
-                updatePredictions(predictionInfo.entrySet(), getMoveStun());
+                Map<Entity, Vec3d> predictions = new HashMap<>(predictionInfo);
+                updatePredictions(predictions.entrySet(), getMoveStun());
+                predictionInfo.clear();
+                predictionInfo.putAll(predictions);
             }
         }
 
@@ -624,41 +625,64 @@ public class KingCrimsonEntity extends StandEntity {
     }
 
     public static void updatePredictions(Set<Map.Entry<Entity, Vec3d>> predictionsSet, int ticksLeft) {
-        for (Map.Entry<Entity, Vec3d> prediction : predictionsSet) {
-            Entity entity = prediction.getKey();
-            if (entity == null || !entity.isAlive()) continue;
-            World world = entity.getWorld();
+        Map<Entity, Map.Entry<Entity, Vec3d>> predictions = predictionsSet.stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e));
+        Set<Entity> updated = new HashSet<>();
 
-            Vec3d currentPos = entity.getPos().add(0, 0.1, 0);
-            Vec3d futurePos = currentPos;
-            boolean changed = false;
+        for (Map.Entry<Entity, Map.Entry<Entity, Vec3d>> prediction : predictions.entrySet())
+            updatePrediction(predictions, prediction.getValue(), updated, ticksLeft);
+    }
 
-            // If in air and not in a liquid, account for drop
-            if (!entity.isOnGround() && !entity.isSubmergedInWater() && !entity.isInLava()) {
-                //JCraft.LOGGER.info("Target is in air");
-                futurePos = futurePos.add(0, (-9.81 / 400) * ticksLeft * ticksLeft, 0);
-                changed = true;
-            }
+    private static void updatePrediction(Map<Entity, Map.Entry<Entity, Vec3d>> predictions, Map.Entry<Entity, Vec3d> prediction,
+                                         Set<Entity> updated, int ticksLeft) {
+        Entity entity = prediction.getKey();
+        if (updated.contains(entity)) return;
 
-            // If moving faster than 0.01 m/s, account for distance traveled
-            Vec3d velocity = entity.getVelocity();
-            if (entity instanceof ServerPlayerEntity player) // EXTREMELY cursed implementation of player velocity because NOTHING ELSE WORKS
-                velocity = ((IEntityDataSaver) player).getDesiredVelocity();
-            //JCraft.LOGGER.info("Target is moving at a velocity of: " + velocity);
-            if (velocity.lengthSquared() > 0.0001) {
-                Vec3d velocityComp = new Vec3d(velocity.x * ticksLeft, Math.max(0, velocity.y * ticksLeft), velocity.z * ticksLeft);
-                //JCraft.LOGGER.info("Modified velocity: " + velocityComp);
-                futurePos = futurePos.add(velocityComp);
-                changed = true;
-            }
+        updated.add(entity);
+        if (entity == null || !entity.isAlive()) return;
 
-            // Collision check between current and extrapolated future position
-            if (changed) {
-                //JCraft.LOGGER.info("Predicted position changed, time left: " + timeLeft);
-                BlockHitResult hitResult = world.raycast(new RaycastContext(currentPos, futurePos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, entity));
-                prediction.setValue(hitResult.getPos());
-            }
+        World world = entity.getWorld();
+
+        Vec3d currentPos = entity.getPos().add(0, 0.1, 0);
+        Vec3d futurePos = currentPos;
+        boolean changed = false;
+
+        // If in air and not in a liquid, account for drop
+        if (!entity.isOnGround() && !entity.isSubmergedInWater() && !entity.isInLava()) {
+            //JCraft.LOGGER.info("Target is in air");
+            futurePos = futurePos.add(0, (-9.81 / 400) * ticksLeft * ticksLeft, 0);
+            changed = true;
         }
+
+        // If moving faster than 0.01 m/s, account for distance traveled
+        Vec3d velocity = entity.getVelocity();
+        if (entity instanceof ServerPlayerEntity player) // EXTREMELY cursed implementation of player velocity because NOTHING ELSE WORKS
+            velocity = ((IEntityDataSaver) player).getDesiredVelocity();
+        //JCraft.LOGGER.info("Target is moving at a velocity of: " + velocity);
+        if (velocity.lengthSquared() > 0.0001) {
+            Vec3d velocityComp = new Vec3d(velocity.x * ticksLeft, Math.max(0, velocity.y * ticksLeft), velocity.z * ticksLeft);
+            //JCraft.LOGGER.info("Modified velocity: " + velocityComp);
+            futurePos = futurePos.add(velocityComp);
+            changed = true;
+        }
+
+        Entity vehicle = entity.getVehicle();
+        if (vehicle != null) {
+            if (!predictions.containsKey(vehicle)) return;
+
+            // Ensure vehicle is updated.
+            Map.Entry<Entity, Vec3d> vehiclePrediction = predictions.get(vehicle);
+            updatePrediction(predictions, vehiclePrediction, updated, ticksLeft);
+            // Account for change in position of vehicle.
+            futurePos = futurePos.add(vehiclePrediction.getValue().subtract(vehiclePrediction.getKey().getPos()));
+        }
+
+        // Collision check between current and extrapolated future position
+        if (!changed) return;
+
+        //JCraft.LOGGER.info("Predicted position changed, time left: " + timeLeft);
+        BlockHitResult hitResult = world.raycast(new RaycastContext(currentPos, futurePos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, entity));
+        prediction.setValue(hitResult.getPos());
     }
 
 
