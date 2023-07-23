@@ -161,5 +161,10 @@
   "death.attack.wsacid": "%1$s was melted",
   "death.attack.wsacid.item": "%1$s was melted by %2$s while wielding %3$s",
   "death.attack.wsacid.player": "%1$s was melted by %2$s",
-  "death.attack.wsacid.player.item": "%1$s was melted by %2$s while wielding %3$s"
+  "death.attack.wsacid.player.item": "%1$s was melted by %2$s while wielding %3$s",
+
+  "commands.gravity.get.self": "Your gravity is %s",
+  "commands.gravity.get.other": "%s's gravity is %s",
+  "commands.gravity.set.self": "Set own gravity to %s",
+  "commands.gravity.set.other": "Set %s's gravity to %s"
 }
