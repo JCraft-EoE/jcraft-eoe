@@ -1276,6 +1276,9 @@ The Fool
 
 >Removed Combo Breaker bind, now inputted by Jump while stunned
 
+Silver Chariot
+    >Updated model and textures
+
 Killer Queen: Bites the Dust
     >Replaced Coin Toss with Bites the Dust Plant
 
