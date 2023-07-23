@@ -225,11 +225,11 @@ public class JServerTickEvents {
                                 LivingEntity biggestAttacker = mob.getDamageTracker().getBiggestAttacker();
                                 LivingEntity primeAdversary = mob.getPrimeAdversary();
                                 LivingEntity target = mob.getTarget();
-                                if (primeAdversary != null && primeAdversary.isAlive()) {
+                                if (primeAdversary != null && primeAdversary.isAlive() && stand.canTarget(primeAdversary)) {
                                     standUserAI(mob, primeAdversary, stand);
-                                } else if (target != null && target.isAlive()) {
+                                } else if (target != null && target.isAlive() && stand.canTarget(target)) {
                                     standUserAI(mob, target, stand);
-                                } else if (biggestAttacker != null && biggestAttacker.isAlive()) {
+                                } else if (biggestAttacker != null && biggestAttacker.isAlive() && stand.canTarget(biggestAttacker)) {
                                     mob.setTarget(biggestAttacker);
                                 }
                             } else if (mobData.contains("StandID")) {
