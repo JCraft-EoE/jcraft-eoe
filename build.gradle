@@ -28,7 +28,7 @@ repositories {
 
 	maven {
 		name = "Ladysnake"
-		url = "https://ladysnake.jfrog.io/artifactory/mods"
+		url = "https://maven.ladysnake.org/releases"
 	}
 
 	maven {
@@ -68,6 +68,9 @@ dependencies {
 
 	// Bendylib
 	include modImplementation("io.github.kosmx.bendy-lib:bendy-lib-fabric:${project.bendylib_version}")
+
+	include modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.0.2")
+	include modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.0.2")
 }
 
 processResources {

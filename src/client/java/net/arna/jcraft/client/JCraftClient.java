@@ -1,5 +1,6 @@
 package net.arna.jcraft.client;
 
+import net.arna.jcraft.client.gravity.util.GravityChannelClient;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.hud.EpitaphOverlay;
@@ -16,7 +17,10 @@ import net.arna.jcraft.client.renderer.effects.TimeAccelerationEffectRenderer;
 import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer;
 import net.arna.jcraft.client.renderer.item.BigItemRenderer;
 import net.arna.jcraft.client.rendering.RenderHandler;
-import net.arna.jcraft.client.rendering.handler.*;
+import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
+import net.arna.jcraft.client.rendering.handler.EpitaphVignetteShaderHandler;
+import net.arna.jcraft.client.rendering.handler.UIShaderHandler;
+import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
 import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
 import net.arna.jcraft.common.JConfig;
@@ -93,6 +97,8 @@ public class JCraftClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         JCraft.setClientEntityHandler(ClientEntityHandlerImpl.INSTANCE);
+
+        GravityChannelClient.init();
 
         //Rendering
         JRenderLayerRegistry.init();

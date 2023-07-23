@@ -6,6 +6,8 @@ import lombok.Setter;
 import net.arna.jcraft.common.JConfig;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.entity.StandType;
+import net.arna.jcraft.common.gravity.config.GravityChangerConfig;
+import net.arna.jcraft.common.gravity.util.GravityChannel;
 import net.arna.jcraft.common.item.StandDiscItem;
 import net.arna.jcraft.common.loot.JLootTableHelper;
 import net.arna.jcraft.common.network.c2s.InputSyncPacket;
@@ -99,6 +101,8 @@ public class JCraft implements ModInitializer {
             .icon(() -> new ItemStack(JObjectRegistry.STANDARROW))
             .appendItems(JCraft::appendJcraftGroupStacks)
             .build();
+
+    public static final GravityChangerConfig gravityConfig = new GravityChangerConfig(); // TODO incorporate this into our own config
 
     // Gamerules
     //public static final GameRules.Key<GameRules.BooleanRule> KINGCRIMSON_TELEPORT_EFFECT = GameRuleRegistry.register("kingCrimsonTeleportEffect", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(false));
@@ -313,6 +317,8 @@ public class JCraft implements ModInitializer {
     @Override
     public void onInitialize() {
         MidnightConfig.init(MOD_ID, JConfig.class);
+        GravityChannel.init();
+
         // Particle registration (serverside)
         JParticleTypeRegistry.initParticleTypes();
 

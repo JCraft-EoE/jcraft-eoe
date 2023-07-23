@@ -30,6 +30,9 @@
     ],
     "fabric-datagen": [
       "net.arna.jcraft.datagen.JDataGen"
+    ],
+    "cardinal-components": [
+      "net.arna.jcraft.common.gravity.util.GravityChangerComponents"
     ]
   },
   "mixins": [
@@ -37,6 +40,11 @@
     {
       "environment": "client",
       "config": "jcraft.client.mixins.json"
+    },
+    "jgravity.mixins.json",
+    {
+      "environment": "client",
+      "config": "jgravity.client.mixins.json"
     }
   ],
 
@@ -45,6 +53,14 @@
     "fabric": "*",
     "minecraft": "~1.19.2",
     "java": ">=17",
-    "player-animator": ">=0.3"
+    "player-animator": ">=0.3",
+    "cardinal-components-base": "*",
+    "cardinal-components-entity": "*"
+  },
+
+  "custom": {
+    "cardinal-components": [
+      "jcraft:gravity_direction"
+    ]
   }
 }

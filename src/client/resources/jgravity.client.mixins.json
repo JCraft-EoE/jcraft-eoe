@@ -1,0 +1,23 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.arna.jcraft.client.mixin.gravity",
+  "compatibilityLevel": "JAVA_16",
+  "client": [
+    "BiomeEffectSoundPlayerMixin",
+    "CameraMixin",
+    "ClientPlayerEntityMixin",
+    "ClientPlayNetworkHandlerMixin",
+    "EntityRenderDispatcherMixin",
+    "EntityRenderMixin",
+    "FishingBobberEntityRendererMixin",
+    "GameRendererMixin",
+    "InGameOverlayRendererMixin",
+    "ItemPickupParticleMixin",
+    "OtherClientPlayerEntityMixin",
+    "PlayerEntityRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,6 +1,7 @@
 package net.arna.jcraft.registry;
 
 import net.arna.jcraft.common.command.*;
+import net.arna.jcraft.common.command.GravityCommand;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 
 public interface JCommandRegister {
@@ -13,5 +14,6 @@ public interface JCommandRegister {
         CommandRegistrationCallback.EVENT.register(SetSpecCommand::register);
         CommandRegistrationCallback.EVENT.register(MoveDataCommand::register);
         CommandRegistrationCallback.EVENT.register(StandSkinCommand::register);
+        CommandRegistrationCallback.EVENT.register(GravityCommand::register);
     }
 }
