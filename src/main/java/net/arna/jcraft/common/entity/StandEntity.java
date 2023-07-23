@@ -924,7 +924,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
      * @param lift will the attack lift the victim upon an aerial hit?
      */
     public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, boolean canBackstab, boolean unblockable) {
-        if (world == null || world.isClient || ent == null) return;
+        if (world == null || world.isClient || ent == null || !ent.canTakeDamage()) return;
         if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && attacker instanceof PlayerEntity playerEntity)
             comboCounterLogic(playerEntity, ent);
 
@@ -942,7 +942,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
      * @param lift will the attack lift the victim upon an aerial hit?
      */
     public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, boolean canBackstab) {
-        if (world == null || world.isClient || ent == null) return;
+        if (world == null || world.isClient || ent == null || !ent.canTakeDamage()) return;
         if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && attacker instanceof PlayerEntity playerEntity)
             comboCounterLogic(playerEntity, ent);
 
@@ -960,7 +960,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
      * @param lift will the attack lift the victim upon an aerial hit?
      */
     public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker) {
-        if (world == null || world.isClient || ent == null) return;
+        if (world == null || world.isClient || ent == null || !ent.canTakeDamage()) return;
         if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && attacker instanceof PlayerEntity playerEntity)
             comboCounterLogic(playerEntity, ent);
         baseDamageLogic(ent, kbVec, stunTicks, stunType, overrideStun, damage, lift, blockstun, source, attacker, false, false);
@@ -998,7 +998,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
      * @param damage damage in half hearts
      * @param lift will the attack lift the victim upon an aerial hit?
      */
-    public static void baseDamageLogic(LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, boolean canBackstab, boolean unblockable) {
+    private static void baseDamageLogic(LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, boolean canBackstab, boolean unblockable) {
         boolean hit = true;
         boolean tsHit = ( (ITimeStop)ent ).getTimeStopTicks() > 0;
 
