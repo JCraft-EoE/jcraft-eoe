@@ -1268,6 +1268,20 @@ The Fool
     >Increased speed of Sand Tornadoes by 60%
     >Suffocating Sandstorm now blinds while the sand remains active
 
+● 22/7/2023
+>Fixed Made in Heaven and Silver Chariot rendering crash
+>Fixed cooldowns persisting after death
+
+>Killing players now restores your Combo Breaker cooldown fully
+
+>Removed Combo Breaker bind, now inputted by Jump while stunned
+
+Silver Chariot
+    >Updated model and textures
+
+Killer Queen: Bites the Dust
+    >Replaced Coin Toss with Bites the Dust Plant
+
 priority (top to bottom)
 todo: fix predict not working with new projectiles
 

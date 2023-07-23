@@ -16,6 +16,7 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.projectile.ProjectileUtil;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -237,17 +238,16 @@ public class MadeInHeavenEntity extends StandEntity {
     @Override
     public boolean handleAttack(Attack attack, String cooldownName, int animState) {
         LivingEntity player = this.getUser();
-        IEntityDataSaver user = (IEntityDataSaver) player;
-        int cooldown = user.getPersistentData().getInt(cooldownName);
-        if (cooldown > 0) return false;
+        NbtCompound userData = ((IEntityDataSaver) player).getPersistentData();
+        int cooldown = userData.getInt(cooldownName);
 
-        this.curAttack = attack;
-        this.setMoveStun(attack.moveStun);
+        if (cooldown > 0)
+            return false;
+
         int cdMult = (this.getAccelTime() > 0) ? 10 : 20;
+        userData.putInt(cooldownName, attack.cooldown * cdMult);
 
-        user.getPersistentData().putInt(cooldownName, attack.cooldown * cdMult);
-
-        this.setState(animState);
+        setAttack(attack, animState);
         return true;
     }
 

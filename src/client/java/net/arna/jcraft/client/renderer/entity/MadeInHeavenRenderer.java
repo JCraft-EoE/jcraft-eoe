@@ -50,9 +50,13 @@ public class MadeInHeavenRenderer extends GeoEntityRenderer<MadeInHeavenEntity> 
             float aa = a - 0.5f;
             if (aa < 0) aa = 0;
 
+            Vec3d baseVel = Vec3d.ZERO;
+            if (animatable.hasUser())
+                baseVel = animatable.getUser().getVelocity();
+
             for (int i = 0; i <= 3; ++i) {
 
-                Vec3d velocity = animatable.getUser().getVelocity().multiply(i);
+                Vec3d velocity = baseVel.multiply(i);
 
                 renderAfter(
                         velocity,

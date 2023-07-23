@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.Attack;
 import net.arna.jcraft.common.util.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
@@ -8,6 +9,7 @@ import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
@@ -21,9 +23,11 @@ import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
@@ -57,15 +61,17 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
             .setInfo("Stray Cat", "launches an explosive bubble/crouch for a 0.25s windup counter");
     public static final Attack detonate = new Attack(6, 1, 0.75f, 6, 5, 0, 0f, 0.0f, AttackType.BOX)
             .setInfo("Detonate", "crouch with a bomb planted within 20s on a living being to activate Bites the Dust");
+    public static final Attack btdplant = new Attack(7, 50, 1, 24, 14, 1.5, 0f, 0.0f, AttackType.BOX, 0.5f)
+            .setUB(true)
+            .setInfo("Bites the Dust Plant", "press the same button to detonate, sending the affected enemy back to their ");
 
-    private ItemEntity coin;
     private BubbleProjectile bubbleProjectile;
-    private Entity bombEntity;
-    private Vec3d bombBlock;
+    private Entity bombEntity, btdEntity;
+    private Vec3d bombBlock, btdPos;
 
     private int ticksDataStored = 0;
-    private NbtCompound userData;
-    private NbtCompound targetData;
+    //private NbtCompound userData;
+    //private NbtCompound targetData;
 
     public KQBTDEntity(World worldIn) {
         super(StandType.KILLER_QUEEN_BITES_THE_DUST, worldIn);
@@ -91,11 +97,6 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
         moves = List.of(KillerQueenEntity.light, heavy, KillerQueenEntity.barrage, KillerQueenEntity.bombplant, detonate, bubble
                 , new Attack().setRanged(true).setInfo("Coin Toss", "overrides current bomb with an aimable coin")
                 , new Attack().setMobility(MobilityType.DASH).setInfo("Explosive Dash", "slight aoe damage, 3D movement tool"));
-    }
-
-    private void clearCoin() {
-        if (coin != null)
-            coin.discard();
     }
 
     // Necessary, otherwise it simply doesn't reference the correct ones
@@ -140,15 +141,15 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
             handleAttack(bombplant, JCraft.standS1CD, 7);
             this.bombBlock = null;
         }
-
-        clearCoin();
     }
 
+    boolean detonateBTD = false;
     @Override
     public void initUlt() {
         if (!canAttack()) return;
         if (handleAttack(detonate, JCraft.standUltCD, 6)) {
             playSound(JSoundRegister.KQ_DETONATE, 1, 1);
+            detonateBTD = false;
         }
     }
 
@@ -163,26 +164,36 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
 
     @Override
     public void initSpecial3() {
+        if (btdEntity != null && handleAttack(detonate, JCraft.ultCD, 6)) {
+            playSound(JSoundRegister.KQ_DETONATE, 1, 1);
+            detonateBTD = true;
+            return;
+        }
+        if (!canAttack()) return;
+        if (handleAttack(btdplant, JCraft.standS3CD, 12)) {
+            //playSound(JSoundRegister.KQ_UPPERCUT, 1 ,1);
+        }
+    }
+
+    @Override
+    public void initUtil() {
         if (!canAttack()) return;
         LivingEntity user = this.getUser();
         NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
-        if (playerData.getInt(JCraft.standS3CD) > 0) return;
+        if (playerData.getInt(JCraft.utilCD) > 0) return;
 
-        Vec3d lookVec = user.getRotationVector().multiply(0.75);
+        Vec3d lookVec = user.getRotationVector().multiply(0.9);
+        world.createExplosion(user,
+                user.getX() - lookVec.x,
+                user.getY() + user.getHeight() / 2 - lookVec.y,
+                user.getZ() - lookVec.z,
+                1f, Explosion.DestructionType.NONE);
 
-        clearCoin();
+        user.setVelocity(user.getVelocity().add(lookVec));
+        user.velocityModified = true;
 
-        this.coin = new ItemEntity(world, user.getX(), user.getY() + user.getHeight() * 2 / 3, user.getZ(), new ItemStack(JObjectRegistry.KQCOIN, 1), lookVec.x, lookVec.y, lookVec.z);
-        this.coin.setPickupDelayInfinite();
-
-        world.spawnEntity(this.coin);
-
-        this.bombEntity = this.coin;
-        this.bombBlock = null;
-
-        playSound(JSoundRegister.COIN_TOSS, 1, 1);
-        playerData.putInt(JCraft.standS3CD, 500); // 25s coin toss cd
-        playerData.putInt(JCraft.standUltCD, 20); // 1s detonate cd (prevents IUB)
+        playerData.putInt(JCraft.utilCD, 360); // 18s explosive dash cooldown
+        playSound(JSoundRegister.KQ_DETONATE, 1, 1);
     }
 
     @Override
@@ -198,11 +209,13 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
                     bombEntity = entities.get(0);
                     bombBlock = null;
 
+                    /*
                     targetData = new NbtCompound();
                     userData = new NbtCompound();
 
                     bombEntity.writeNbt(targetData);
                     user.writeNbt(userData);
+                     */
                 } else { // If none are found, re-do an optimized hitbox check for any entity type
                     Vec3d rotVec = getRotationVector();
                     Vec3d boxCenter = getPos().add(0, user.getHeight() / 2, 0).add(rotVec);
@@ -231,7 +244,40 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
                 bombBlock = null;
             }
             case (6) -> {
-                if (bombEntity instanceof LivingEntity livingEntity) {
+                if (detonateBTD) {
+                    if (btdEntity instanceof LivingEntity livingEntity) {
+                        world.createExplosion(user, livingEntity.getX(), livingEntity.getY() + livingEntity.getHeight() / 2, livingEntity.getZ(), 2f, Explosion.DestructionType.NONE);
+                        livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
+                        livingEntity.teleport(btdPos.x, btdPos.y, btdPos.z);
+
+                        JCraft.createParticle((ServerWorld) getWorld(), btdPos.x, btdPos.y + 2, btdPos.z, -4);
+
+                        Vec3d pos = btdEntity.getPos();
+                        Vec3d v1 = pos.add(3, 3, 3);
+                        Vec3d v2 = pos.add(-3, -3, -3);
+                        List<LivingEntity> list = world.getEntitiesByClass(LivingEntity.class, new Box(v1, v2), EntityPredicates.VALID_LIVING_ENTITY);
+
+                        if (user.hasVehicle())
+                            list.remove(user.getVehicle());
+                        list.remove(user);
+                        list.remove(this);
+
+                        for (LivingEntity l : list)
+                            if (l.squaredDistanceTo(pos) < 9) {
+                                if (l.squaredDistanceTo(pos) < 2.25) {
+                                    world.createExplosion(user, l.getX(), l.getY() + l.getHeight() / 2, l.getZ(), 1.5f, Explosion.DestructionType.NONE);
+                                } else {
+                                    world.createExplosion(user, l.getX(), l.getY() + l.getHeight() / 2, l.getZ(), 1f, Explosion.DestructionType.NONE);
+                                }
+                            }
+
+                        btdEntity = null;
+                    }
+                } else {
+                    if (bombEntity instanceof LivingEntity livingEntity) {
+                        world.createExplosion(user, livingEntity.getX(), livingEntity.getY() + livingEntity.getHeight() / 2, livingEntity.getZ(), 2f, Explosion.DestructionType.NONE);
+                        livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
+                    /*
                     if (user.isSneaking()) {
                         if (targetData != null && userData != null) {
                             if (bombEntity.isAlive()) {
@@ -273,62 +319,48 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
                                     + user + "\n" + bombEntity);
                         }
                     } else {
-                        world.createExplosion(user, livingEntity.getX(), livingEntity.getY() + livingEntity.getHeight() / 2, livingEntity.getZ(), 2f, Explosion.DestructionType.NONE);
-                        livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
+
                     }
-                } else {
-                    Vec3d bombPos = null;
+                    */
+                    } else {
+                        Vec3d bombPos = null;
 
-                    if (bombEntity != null) {
-                        bombPos = bombEntity.getPos();
-                        if (bombEntity instanceof ItemEntity || bombEntity == bubbleProjectile)
-                            bombEntity.kill();
-                    }
-                    if (bombBlock != null)
-                        bombPos = bombBlock;
-
-                    if (bombPos != null) {
-                        world.createExplosion(user, bombPos.x, bombPos.y, bombPos.z, 2f, Explosion.DestructionType.NONE);
-
-                        List<LivingEntity> toKD = world.getEntitiesByClass(
-                                LivingEntity.class,
-                                new Box(bombPos.add(2.2, 2.2, 2.2), bombPos.add(-2.2, -2.2, -2.2)),
-                                EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR
-                        );
-
-                        for (LivingEntity livingEntity : toKD) {
-                            livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
+                        if (bombEntity != null) {
+                            bombPos = bombEntity.getPos();
+                            if (bombEntity instanceof ItemEntity || bombEntity == bubbleProjectile)
+                                bombEntity.kill();
                         }
+                        if (bombBlock != null)
+                            bombPos = bombBlock;
 
-                        world.playSound(bombPos.x, bombPos.y, bombPos.z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.75f, 1, true);
+                        if (bombPos != null) {
+                            world.createExplosion(user, bombPos.x, bombPos.y, bombPos.z, 2f, Explosion.DestructionType.NONE);
+
+                            List<LivingEntity> toKD = world.getEntitiesByClass(
+                                    LivingEntity.class,
+                                    new Box(bombPos.add(2.2, 2.2, 2.2), bombPos.add(-2.2, -2.2, -2.2)),
+                                    EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR
+                            );
+
+                            for (LivingEntity livingEntity : toKD) {
+                                livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
+                            }
+
+                            world.playSound(bombPos.x, bombPos.y, bombPos.z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.75f, 1, true);
+                        }
                     }
-                }
 
-                bombEntity = null;
-                bombBlock = null;
+                    bombEntity = null;
+                    bombBlock = null;
+                }
+            }
+            case (7) -> {
+                if (entities.isEmpty()) return;
+
+                btdEntity = entities.get(0);
+                btdPos = btdEntity.getPos();
             }
         }
-    }
-
-    @Override
-    public void initUtil() {
-        if (!canAttack()) return;
-        LivingEntity user = this.getUser();
-        NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
-        if (playerData.getInt(JCraft.utilCD) > 0) return;
-
-        Vec3d lookVec = user.getRotationVector().multiply(0.9);
-        world.createExplosion(user,
-                user.getX() - lookVec.x,
-                user.getY() + user.getHeight() / 2 - lookVec.y,
-                user.getZ() - lookVec.z,
-                1f, Explosion.DestructionType.NONE);
-
-        user.setVelocity(user.getVelocity().add(lookVec));
-        user.velocityModified = true;
-
-        playerData.putInt(JCraft.utilCD, 360); // 18s explosive dash cooldown
-        playSound(JSoundRegister.KQ_DETONATE, 1, 1);
     }
 
     @Override
@@ -345,7 +377,6 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
                     stand.cancelAttack();
             }
 
-            clearCoin();
             bombEntity = entity;
             bombBlock = null;
             //playSound(JSoundRegister.BTD_COUNTER_HIT, 1, 1);
@@ -361,14 +392,15 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
 
     @Override
     public void desummon() {
-        clearCoin();
         super.desummon();
     }
 
     @Override
     public MoveSelectionResult specificMoveSelectionCriterion(Attack attack, MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity enemyStand, Attack enemyAttack) {
         Vec3d bombPos = this.getBombPos();
-        if (bombPos != null && attack == detonate && target.squaredDistanceTo(bombPos) < 9.0D) {
+        if (attack == detonate && bombPos != null && target.squaredDistanceTo(bombPos) < 9.0D) {
+            return MoveSelectionResult.USE;
+        } else if (attack == btdplant && btdEntity != null) {
             return MoveSelectionResult.USE;
         }
         return MoveSelectionResult.PASS;
@@ -381,6 +413,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
 
         if (hasUser()) {
             LivingEntity user = getUser();
+
             if (world.isClient)
                 setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
             else {
@@ -389,6 +422,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
                     bubbleProjectile.velocityModified = true;
                 }
 
+                /*
                 if (userData != null && !userData.isEmpty()) {
                     if (ticksDataStored++ > 400) {
                         ticksDataStored = 0;
@@ -396,10 +430,72 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
                         targetData = null;
                     }
                 }
+                 */
 
-                if (user instanceof ServerPlayerEntity playerEntity)
+                if (user instanceof ServerPlayerEntity playerEntity) {
                     super.displayBombParticles(playerEntity, this.bombBlock, this.bombEntity);
+                    displayBTDParticles(playerEntity, this.btdEntity);
+                }
             }
+        }
+    }
+
+    @SuppressWarnings("SuspiciousMethodCalls")
+    protected void displayBTDParticles(ServerPlayerEntity playerEntity, Entity bombEntity) {
+        boolean bombExists = bombEntity != null;
+
+        double dX1 = 0;
+        double dY1 = 0;
+        double dZ1 = 0;
+        double dX2 = 0;
+        double dY2 = 0;
+        double dZ2 = 0;
+
+        Box bBox = null;
+
+        if (bombEntity != null) { // If the bomb isn't a block
+            dX1 = bombEntity.getX();
+            dY1 = bombEntity.getY();
+            dZ1 = bombEntity.getZ();
+
+            bBox = bombEntity.getBoundingBox();
+
+            dX2 = bBox.getXLength();
+            dY2 = bBox.getYLength();
+            dZ2 = bBox.getZLength();
+        }
+
+        if (bombExists) {
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeShort(9);
+
+            buf.writeDouble(dX1);
+            buf.writeDouble(dY1);
+            buf.writeDouble(dZ1);
+            buf.writeDouble(dX2);
+            buf.writeDouble(dY2);
+            buf.writeDouble(dZ2);
+
+            buf.writeDouble(btdPos.x);
+            buf.writeDouble(btdPos.y);
+            buf.writeDouble(btdPos.z);
+
+            boolean anyInRange = false;
+            Vec3d pos = btdEntity.getPos();
+            Vec3d v1 = pos.add(3, 3, 3);
+            Vec3d v2 = pos.add(-3, -3, -3);
+            List<LivingEntity> list = world.getEntitiesByClass(LivingEntity.class, new Box(v1, v2), EntityPredicates.VALID_LIVING_ENTITY);
+            list.remove(bombEntity);
+            for (LivingEntity l : list)
+                if (l.squaredDistanceTo(pos) < 9) {
+                    anyInRange = true;
+                    break;
+                }
+
+            buf.writeBoolean(anyInRange);
+
+            if (bBox.getAverageSideLength() > 0)
+                ServerChannelFeedbackPacket.send(playerEntity, buf);
         }
     }
 
@@ -443,6 +539,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
             case 9 -> controller.setAnimation(builder.playAndHold("animation.kqbtd.low"));
             case 10 -> controller.setAnimation(builder.playAndHold("animation.kqbtd.bubblecounter"));
             case 11 -> controller.setAnimation(builder.playAndHold("animation.kqbtd.counter_miss"));
+            case 12 -> controller.setAnimation(builder.playAndHold("animation.kqbtd.btdplant"));
         }
         return PlayState.CONTINUE;
     }

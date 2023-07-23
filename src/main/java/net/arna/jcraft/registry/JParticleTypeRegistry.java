@@ -19,8 +19,10 @@ public interface JParticleTypeRegistry {
     DefaultParticleType KCPARTICLE = FabricParticleTypes.simple();
     DefaultParticleType BACKSTAB = FabricParticleTypes.simple();
     DefaultParticleType SPEEDPARTICLE = FabricParticleTypes.simple();
+    DefaultParticleType BITES_THE_DUST = FabricParticleTypes.simple();
 
     Map<Integer, DefaultParticleType> particles = Map.ofEntries(
+            Map.entry(-4, JParticleTypeRegistry.BITES_THE_DUST),
             Map.entry(-3, ParticleTypes.SWEEP_ATTACK),
             Map.entry(-2, BACKSTAB),
             Map.entry(-1, ParticleTypes.FLASH),
@@ -34,9 +36,10 @@ public interface JParticleTypeRegistry {
         Registry.register(Registry.PARTICLE_TYPE, JCraft.id("combo_break"), COMBO_BREAK);
         Registry.register(Registry.PARTICLE_TYPE, JCraft.id("cooldown_cancel"), COOLDOWN_CANCEL);
         Registry.register(Registry.PARTICLE_TYPE, JCraft.id("hitspark_1"), HITSPARK_1);
-        Registry.register(Registry.PARTICLE_TYPE, new Identifier(JCraft.MOD_ID, "hitspark_2"), HITSPARK_2);
-        Registry.register(Registry.PARTICLE_TYPE, new Identifier(JCraft.MOD_ID, "kcparticle"), KCPARTICLE);
-        Registry.register(Registry.PARTICLE_TYPE, new Identifier(JCraft.MOD_ID, "backstab"), BACKSTAB);
-        Registry.register(Registry.PARTICLE_TYPE, new Identifier(JCraft.MOD_ID, "speedparticle"), SPEEDPARTICLE);
+        Registry.register(Registry.PARTICLE_TYPE, JCraft.id("hitspark_2"), HITSPARK_2);
+        Registry.register(Registry.PARTICLE_TYPE, JCraft.id("kcparticle"), KCPARTICLE);
+        Registry.register(Registry.PARTICLE_TYPE, JCraft.id("backstab"), BACKSTAB);
+        Registry.register(Registry.PARTICLE_TYPE, JCraft.id("speedparticle"), SPEEDPARTICLE);
+        Registry.register(Registry.PARTICLE_TYPE, JCraft.id("btd"), BITES_THE_DUST);
     }
 }

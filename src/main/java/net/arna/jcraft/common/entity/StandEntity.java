@@ -140,16 +140,17 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
         FREEY = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.FLOAT);
         FREEZ = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.FLOAT);
     }
-
+    @Nullable
     private LivingEntity user = null;
     /**
      * Sets the stands user if there isn't one
      */
-    public void setUser(LivingEntity user) {
+    public void setUser(@Nullable LivingEntity user) {
         //if (this.user != null)
         //    JCraft.LOGGER.info("Overriding stand user for stand: " + this);
         this.user = user;
     }
+    @Nullable
     public LivingEntity getUser() {
         return user;
     }
@@ -434,9 +435,10 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
     public boolean handleAttack(Attack attack, String cooldownName, int animState) {
         NbtCompound userData = ((IEntityDataSaver) user).getPersistentData();
         int cooldown = userData.getInt(cooldownName);
-        if (cooldown > 0) {
+
+        if (cooldown > 0)
             return false;
-        }
+
         userData.putInt(cooldownName, attack.cooldown * 20);
         this.setAttack(attack, animState);
         return true;
