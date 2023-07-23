@@ -200,13 +200,6 @@ public class StandControlPacket {
                     playerData.setStand(stand2);
                 }
             });
-            // 11 - Combo Breaker
-            case 11 -> server.execute(() -> {
-                StatusEffectInstance stun = player.getStatusEffect(JStatusRegister.DAZED);
-                if (JUtils.isBlocking(player)) return;
-                if (stun != null)
-                    comboBreak(world, player, stun);
-            });
             // 13 - Cooldown Cancel
             case 13 -> server.execute(() -> {
                 if (player.isCreative()) {

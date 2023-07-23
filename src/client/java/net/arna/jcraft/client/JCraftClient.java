@@ -113,6 +113,7 @@ public class JCraftClient implements ClientModInitializer {
         particleFactoryRegistry.register(JParticleTypeRegistry.KCPARTICLE, KCParticle.Factory::new);
         particleFactoryRegistry.register(JParticleTypeRegistry.BACKSTAB, BackstabParticle.Factory::new);
         particleFactoryRegistry.register(JParticleTypeRegistry.SPEEDPARTICLE, SpeedParticle.Factory::new);
+        particleFactoryRegistry.register(JParticleTypeRegistry.BITES_THE_DUST, BitesTheDustParticle.Factory::new);
 
         // Renderer registration
         JEntityRendererRegister.registerEntityRenderers();
@@ -127,7 +128,7 @@ public class JCraftClient implements ClientModInitializer {
         special1Key = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.special1", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_V, "key.category.jcraft"));
         special2Key = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.special2", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_G, "key.category.jcraft"));
         special3Key = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.special3", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_M, "key.category.jcraft"));
-        comboBreaker = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.combobreaker", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_ALT, "key.category.jcraft"));
+        //comboBreaker = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.combobreaker", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_ALT, "key.category.jcraft"));
         cooldownCancel = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.cooldowncancel", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_ALT, "key.category.jcraft"));
         utility = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.utility", InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_5, "key.category.jcraft"));
         dash = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.dash", InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_4, "key.category.jcraft"));
@@ -236,7 +237,7 @@ public class JCraftClient implements ClientModInitializer {
                     case (16), (6) -> generateName(special2Key.getBoundKeyTranslationKey());
                     case (17), (7) -> generateName(special3Key.getBoundKeyTranslationKey());
                     case (8) -> generateName(utility.getBoundKeyTranslationKey());
-                    case (9) -> generateName(comboBreaker.getBoundKeyTranslationKey());
+                    case (9) -> "Combo Breaker";
                     case (10) -> generateName(cooldownCancel.getBoundKeyTranslationKey());
                     case (11) -> generateName(dash.getBoundKeyTranslationKey());
                     default -> "unknown";
@@ -395,12 +396,6 @@ public class JCraftClient implements ClientModInitializer {
              */
                 sendStandControlPacket(buf);
             //}
-        }
-        // Combo Breaker (11)
-        if (comboBreaker.isPressed()) {
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(11);
-            sendStandControlPacket(buf);
         }
         // Cooldown Cancel (13)
         if (cooldownCancel.wasPressed()) {

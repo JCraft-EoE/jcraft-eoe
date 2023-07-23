@@ -347,9 +347,9 @@ public class JCraft implements ModInitializer {
         buf.writeDouble(z);
         buf.writeInt(id); // Combo breaker particle ID
 
-        for (ServerPlayerEntity serverPlayer : world.getPlayers()) {
-            ServerChannelFeedbackPacket.send(serverPlayer, buf);
-        }
+        PlayerLookup.around(world, new Vec3d(x, y, z), 128).forEach(
+                serverPlayer -> ServerChannelFeedbackPacket.send(serverPlayer, buf)
+        );
     }
 
     public static final List<String> unresettableCooldowns = List.of(standBarrageCD, standUltCD, barrageCD, ultCD, comboBreakerCD, cooldownCancelCD, dashCD);
