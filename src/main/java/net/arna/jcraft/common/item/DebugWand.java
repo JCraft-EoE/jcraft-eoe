@@ -20,11 +20,9 @@ public class DebugWand extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if (!world.isClient()) {
-            if (user.isSneaking()) {
-                world.playSound(null, user.getBlockPos(), JSoundRegister.TW_TS_CLEAN, SoundCategory.PLAYERS, 1.2f, 1);
-                ShaderActivationPacket.send((ServerPlayerEntity) user, user, 0, 20 * 6, ShaderActivationPacket.Type.ZA_WARUDO);
-            }
+        if (!world.isClient() && user.isSneaking()) {
+            world.playSound(null, user.getBlockPos(), JSoundRegister.TW_TS_CLEAN, SoundCategory.PLAYERS, 1.2f, 1);
+            ShaderActivationPacket.send((ServerPlayerEntity) user, user, 0, 20 * 6, ShaderActivationPacket.Type.ZA_WARUDO);
         }
         return super.use(world, user, hand);
     }
@@ -32,14 +30,11 @@ public class DebugWand extends Item {
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
         PlayerEntity player = context.getPlayer();
-        World world = context.getWorld();
-        if(player.isSneaking()){
+        if (player == null) return ActionResult.PASS;
 
-        } else {
-            if (!world.isClient()) {
-                ShaderActivationPacket.send((ServerPlayerEntity) player, player, 0, 20 * 6, ShaderActivationPacket.Type.CRIMSON);
-            }
-        }
+        World world = context.getWorld();
+        if (!player.isSneaking() && !world.isClient())
+            ShaderActivationPacket.send((ServerPlayerEntity) player, player, 0, 20 * 6, ShaderActivationPacket.Type.CRIMSON);
 
         return super.useOnBlock(context);
     }

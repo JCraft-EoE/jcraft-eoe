@@ -33,11 +33,16 @@ import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
 public class RapierProjectile extends PersistentProjectileEntity implements IAnimatable {
-    private static final TrackedData<Integer> SKIN;
-    private StandEntity origin;
-
     public static final Identifier POSSESSED_TEXTURE = JCraft.id("textures/entity/stands/silver_chariot/rapier_possessed.png");
     public static final Identifier ARMOR_OFF_TEXTURE = JCraft.id("textures/entity/stands/silver_chariot/rapier_no_armor.png");
+    private static final TrackedData<Integer> SKIN;
+    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+    private StandEntity origin;
+    private int ticksInAir, bouncesLeft = 5;
+
+    static {
+        SKIN = DataTracker.registerData(RapierProjectile.class, TrackedDataHandlerRegistry.INTEGER);
+    }
 
     public RapierProjectile(EntityType<? extends RapierProjectile> entityType, World world) {
         super(entityType, world);
@@ -47,10 +52,6 @@ public class RapierProjectile extends PersistentProjectileEntity implements IAni
         super(JEntityTypeRegister.RAPIER, owner, world);
         this.setOwner(owner);
         this.origin = silverChariot;
-    }
-
-    static {
-        SKIN = DataTracker.registerData(RapierProjectile.class, TrackedDataHandlerRegistry.INTEGER);
     }
 
     public int getSkin() {
@@ -72,7 +73,6 @@ public class RapierProjectile extends PersistentProjectileEntity implements IAni
         return new ItemStack(JObjectRegistry.KNIFE);
     }
 
-    private int ticksInAir;
     @Override
     public void tick() {
         super.tick();
@@ -90,12 +90,11 @@ public class RapierProjectile extends PersistentProjectileEntity implements IAni
             discard();
     }
 
-    private int bouncesLeft = 5;
     @Override
     protected void onCollision(HitResult hitResult) {
         HitResult.Type type = hitResult.getType();
         if (type == HitResult.Type.ENTITY) {
-            this.onEntityHit((EntityHitResult)hitResult);
+            this.onEntityHit((EntityHitResult) hitResult);
             this.world.emitGameEvent(GameEvent.PROJECTILE_LAND, hitResult.getPos(), GameEvent.Emitter.of(this, null));
         } else if (type == HitResult.Type.BLOCK) {
             BlockHitResult blockHitResult = (BlockHitResult) hitResult;
@@ -127,7 +126,7 @@ public class RapierProjectile extends PersistentProjectileEntity implements IAni
     @Override
     protected boolean tryPickup(PlayerEntity player) {
         if (player == getOwner()) {
-            if ( ((IEntityDataSaver)player).getStand() instanceof SilverChariotEntity silverChariot) {
+            if (((IEntityDataSaver) player).getStand() instanceof SilverChariotEntity silverChariot) {
                 silverChariot.setHasRapier(true);
                 return true;
             }
@@ -148,9 +147,12 @@ public class RapierProjectile extends PersistentProjectileEntity implements IAni
     }
 
     // Animations
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
     @Override
-    public void registerControllers(AnimationData data) { }
+    public void registerControllers(AnimationData data) {
+    }
+
     @Override
-    public AnimationFactory getFactory() { return this.factory; }
+    public AnimationFactory getFactory() {
+        return this.factory;
+    }
 }

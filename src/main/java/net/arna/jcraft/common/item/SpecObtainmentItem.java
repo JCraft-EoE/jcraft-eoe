@@ -34,13 +34,9 @@ public abstract class SpecObtainmentItem extends Item {
                 if (!warned) {
                     player.sendMessage(Text.translatable("warning.jcraft.spec.change"));
                     warned = true;
-                } else {
-                    return setSpec(player);
-                }
+                } else return setSpec(player);
             }
-        } else {
-            return setSpec(player);
-        }
+        } else return setSpec(player);
 
         return false;
     }

@@ -2,8 +2,8 @@ package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.common.util.Attack;
-import net.arna.jcraft.common.util.AttackType;
+import net.arna.jcraft.common.attack.Attack;
+import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.registry.JEntityTypeRegister;
@@ -31,9 +31,6 @@ import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
 
@@ -63,6 +60,7 @@ public class MagiciansRedEntity extends StandEntity {
             .crouchingVariation(redbind)
             .setInfo("Life Detector/Red Bind", "tracks down nearby life, lasts 15s/crouch for a whip attack");
 
+    private static final int variationAnkhs = 6;
     private Vec3d hurricanePos;
     private int hurricaneTime;
 
@@ -99,67 +97,64 @@ public class MagiciansRedEntity extends StandEntity {
     // Moveset
     @Override
     public void initLightAttack() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
     public void initHeavyAttack() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(heavy, JCraft.standHeavyCD, 4))
             playSound(JSoundRegister.MR_HEAVY, 1, 1);
     }
 
     @Override
     public void initBarrage() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, 5))
             playSound(JSoundRegister.MR_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(crossfire, JCraft.standS1CD, 6))
             playSound(JSoundRegister.MR_CROSSFIRE, 1, 1);
     }
 
     @Override
     public void initUlt() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(crossfirehurricane, JCraft.standUltCD, 7))
             playSound(JSoundRegister.MR_ULT, 1, 1);
     }
 
     @Override
     public void initSpecial2() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(crossfirevariation, JCraft.standS2CD, 8))
             playSound(JSoundRegister.MR_CROSSFIRE, 1, 1);
     }
 
     @Override
     public void initSpecial3() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(redirect, JCraft.standS3CD, 9))
             playSound(JSoundRegister.MR_REDIRECT, 1, 1);
     }
 
     @Override
     public void initUtil() {
-        if (!this.canAttack()) return;
-        if (getUser().isSneaking() && handleAttack(redbind, JCraft.utilCD, 10)) {
+        if (!canAttack() || !hasUser()) return;
+        if (getUserOrThrow().isSneaking() && handleAttack(redbind, JCraft.utilCD, 10))
             playSound(JSoundRegister.MR_REDBIND, 1, 1);
-        } else if (handleAttack(detector, JCraft.utilCD, 11)) {
-            playSound(JSoundRegister.MR_DETECTOR, 1, 1);
-        }
+        else if (handleAttack(detector, JCraft.utilCD, 11)) playSound(JSoundRegister.MR_DETECTOR, 1, 1);
     }
-
-    private static final int variationAnkhs = 6;
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
-        LivingEntity user = this.getUser();
+        if (!hasUser()) return;
+        LivingEntity user = getUserOrThrow();
         Vec3d eyePos = user.getEyePos();
 
         switch (attack.id) {
@@ -226,7 +221,7 @@ public class MagiciansRedEntity extends StandEntity {
         super.tick();
 
         if (hasUser()) {
-            LivingEntity user = this.getUser();
+            LivingEntity user = getUserOrThrow();
             if (world.isClient) {
                 if (this.getState() == 5) {
                     Vec3d rotVec = getRotationVector();
@@ -258,11 +253,8 @@ public class MagiciansRedEntity extends StandEntity {
 
                         // Homing
                         List<LivingEntity> nearbyEnts = world.getEntitiesByClass(LivingEntity.class,
-                                new Box(hurricanePos.add(32.0, 32.0, 32.0), hurricanePos.subtract(32.0, 32.0, 32.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
-                        nearbyEnts.remove(this);
-                        nearbyEnts.remove(user);
-                        if (vehicle != null)
-                            nearbyEnts.remove(vehicle);
+                                new Box(hurricanePos.add(32.0, 32.0, 32.0), hurricanePos.subtract(32.0, 32.0, 32.0)),
+                                EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e -> e != vehicle && e != this && e != user));
 
                         if (!nearbyEnts.isEmpty()) {
                             Vec3d avgPos = Vec3d.ZERO;
@@ -275,11 +267,10 @@ public class MagiciansRedEntity extends StandEntity {
 
                         // Damage
                         List<LivingEntity> toHurt = world.getEntitiesByClass(LivingEntity.class,
-                                new Box(hurricanePos.add(2.5, 1, 2.5), hurricanePos.subtract(2.5, 1, 2.5)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+                                new Box(hurricanePos.add(2.5, 1, 2.5), hurricanePos.subtract(2.5, 1, 2.5)),
+                                EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e -> e != this && e != user && e != vehicle));
                         toHurt.remove(this);
                         toHurt.remove(user);
-                        if (vehicle != null)
-                            toHurt.remove(vehicle);
 
                         for (LivingEntity living : toHurt) {
                             LivingEntity target = JUtils.getUserIfStand(living);
@@ -305,31 +296,14 @@ public class MagiciansRedEntity extends StandEntity {
                     }
                 }
 
-                this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
+                this.setAlpha((float) MathHelper.clamp(255.0 * squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
             }
         }
     }
 
     // Animation code
-    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
     @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
-    }
-
-    @Override
-    public AnimationFactory getFactory() {
-        return this.animationFactory;
-    }
-
-    @Override
-    public int tickTimer() {
-        return age;
-    }
-
-    @SuppressWarnings("SameReturnValue")
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+    protected <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
         AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
         if (playSummonAnim) {

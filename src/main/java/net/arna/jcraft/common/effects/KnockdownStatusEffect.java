@@ -16,7 +16,10 @@ public class KnockdownStatusEffect extends StatusEffect {
     }
 
     @Override
-    public boolean canApplyUpdateEffect(int duration, int amplifier) { return duration <= 5; }
+    public boolean canApplyUpdateEffect(int duration, int amplifier) {
+        return duration <= 5;
+    }
+
     @Override
     public void onApplied(LivingEntity entity, AttributeContainer attributes, int amplifier) {
         super.onApplied(entity, attributes, amplifier);
@@ -24,11 +27,13 @@ public class KnockdownStatusEffect extends StatusEffect {
             entity.stopRiding();
         entity.setPose(entity instanceof PlayerEntity ? EntityPose.SWIMMING : EntityPose.SLEEPING);
     }
+
     @Override
     public void onRemoved(LivingEntity entity, AttributeContainer attributes, int amplifier) {
         super.onRemoved(entity, attributes, amplifier);
         entity.setPose(EntityPose.STANDING);
     }
+
     @Override
     public void applyUpdateEffect(LivingEntity entity, int amplifier) {// 5 tick (0.25s) stun immunity window after knockdown
         entity.removeStatusEffect(JStatusRegister.DAZED);

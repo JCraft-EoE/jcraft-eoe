@@ -2,6 +2,9 @@ package net.arna.jcraft.common.entity;
 
 import lombok.Data;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.attack.Attack;
+import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JEntityTypeRegister;
@@ -34,9 +37,6 @@ import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,7 +50,7 @@ public class GEREntity extends StandEntity {
             .setHitspark(2)
             .hyperArmor()
             .setLaunch()
-            .appendHitbox(new Attack.HitboxData(0, 0, 1.5))
+            .appendHitbox(new HitBoxData(0, 0, 1.5))
             .setInfo("Overhead Smash/Overhead Kick", "slow, uninterruptable knockdown, in air: slow combo starter");
     public static final Attack barrage = new Attack(4, 14, 0.75f, 30, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 2, 0, 3)
             .setInfo("Barrage/Kick Barrage", "fast reliable combo starter/extender, high stun, in air: fast combo finisher, knocks back");
@@ -70,25 +70,28 @@ public class GEREntity extends StandEntity {
             .setInfo("Nullification", "0.25s windup, 1.5s counter, stuns on hit");
 
     public static final Attack airlight = new Attack(1, 2, 0.75f, 12, 5, 1.25, 4f, 0.75f, AttackType.BOX, 1, 0.33f, 0, JSoundRegister.IMPACT_1)
-            .appendHitbox(new Attack.HitboxData(0, -1, 1))
+            .appendHitbox(new HitBoxData(0, -1, 1))
             .setInfo("Downward Kick", "medium stun combo starter, low hitbox");
     public static final Attack airheavy = new Attack(3, 17, 1f, 24, 14, 1.5, 9f, 0.8f, AttackType.BOX, 2, 0.25f, 0, JSoundRegister.IMPACT_1).setHitspark(2)
-            .appendHitbox(new Attack.HitboxData(0, -1, 1))
+            .appendHitbox(new HitBoxData(0, -1, 1))
             .setInfo("Overhead Kick", "high stun combo starter");
     public static final Attack airbarrage = new Attack(5, 14, 1f, 48, 0, 1.5, 1f, 0.3f, AttackType.BARRAGE, 1, 0, 3)
             .setInfo("Kick Barrage", "fast combo finisher");
     public static final Attack rtz = new Attack(10, 60, 32, 30, 0, 1, AttackType.BOX)
             .setInfo("Return to Zero", "initial press: saves the state of every entity in a 4 chunk radius, second press: reverts all states except users\nDoesn't affect player inventories");
     private final HashMap<Entity, NbtCompound> rtzEntityData = new HashMap<>();
+
     @Data
     private static class ReturnData {
         Vec3d originalPos;
         Entity entity;
+
         public ReturnData(Vec3d originalPos, Entity entity) {
             this.originalPos = originalPos;
             this.entity = entity;
         }
     }
+
     private final ArrayList<ReturnData> returnInformation = new ArrayList<>();
 
     private static final TrackedData<Integer> FLIGHTTIME;
@@ -175,9 +178,9 @@ public class GEREntity extends StandEntity {
         if (!data.canAttack) return;
 
         if (data.user.isOnGround() && handleAttack(barrage, JCraft.standBarrageCD, 5))
-                playSound(JSoundRegister.GE_BARRAGE, 1, 1);
+            playSound(JSoundRegister.GE_BARRAGE, 1, 1);
         else if (handleAttack(airbarrage, JCraft.standBarrageCD, 12))
-                playSound(JSoundRegister.GER_KICKBARRAGE, 1, 1);
+            playSound(JSoundRegister.GER_KICKBARRAGE, 1, 1);
     }
 
     @Override
@@ -196,9 +199,9 @@ public class GEREntity extends StandEntity {
 
     @Override
     public void initUtil() {
-        if (!canAttack()) return;
+        if (!canAttack() || !hasUser()) return;
 
-        NbtCompound data = ((IEntityDataSaver) getUser()).getPersistentData();
+        NbtCompound data = ((IEntityDataSaver) getUserOrThrow()).getPersistentData();
         if (data.getInt(JCraft.utilCD) > 0) return;
         data.putInt(JCraft.utilCD, 360); // 18 second flight cd
         setFlightTime(20);
@@ -241,7 +244,7 @@ public class GEREntity extends StandEntity {
                 ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
         ((ITimeStop) entity).setTimeStopTicks(counterStopTime);
 
-        StandEntity stand = ((IEntityDataSaver)entity).getStand();
+        StandEntity stand = ((IEntityDataSaver) entity).getStand();
         if (stand != null)
             stand.cancelAttack();
 
@@ -253,6 +256,7 @@ public class GEREntity extends StandEntity {
     }
 
     private static final Attack counterMiss = new Attack(11, 0, 20, 21, 1, AttackType.BOX);
+
     @Override
     public void whiffCounter() {
         setAttack(counterMiss, 15);
@@ -310,7 +314,7 @@ public class GEREntity extends StandEntity {
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
-        LivingEntity user = this.getUser();
+        LivingEntity user = getUser();
         switch (attack.id) {
             case (2) -> {
                 for (LivingEntity l : entities)
@@ -326,7 +330,9 @@ public class GEREntity extends StandEntity {
             case (5) -> {
                 if (getMoveStun() < 12) this.curAttack = barrageFinisher;
             }
-            case (6) -> user.heal(4f);
+            case (6) -> {
+                if (user != null) user.heal(4f);
+            }
             case (7) -> {
                 for (LivingEntity ent : entities) {
                     ent.heal(6f);
@@ -342,12 +348,14 @@ public class GEREntity extends StandEntity {
                 }
             }
             case (8) -> {
+                if (user == null) return;
+
                 GERScorpionEntity scorpion = new GERScorpionEntity(JEntityTypeRegister.GER_SCORPION, world);
                 if (attack.moveStun == 28) scorpion.charge(); // If it's the slow variation
                 scorpion.setInitialVel(user.getRotationVector().multiply(2));
                 Vec3d ePos = this.getEyePos();
                 scorpion.refreshPositionAndAngles(ePos.x, ePos.y, ePos.z, -user.getYaw() - 90f, getPitch());
-                scorpion.setOwner(user);
+                scorpion.setMaster(user);
                 world.spawnEntity(scorpion);
             }
             case (10) -> {
@@ -372,7 +380,7 @@ public class GEREntity extends StandEntity {
 
         if (hasUser()) {
             PlayerEntity userPlayer = null;
-            LivingEntity user = this.getUser();
+            LivingEntity user = getUserOrThrow();
             // Must be run on client and server because of fun mod compatibility
             int flightTime = getFlightTime();
             flightTime -= 1;
@@ -438,25 +446,9 @@ public class GEREntity extends StandEntity {
     }
 
     // Animation code
-    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
-    @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
-    }
-
-    @Override
-    public AnimationFactory getFactory() {
-        return this.animationFactory;
-    }
-
-    @Override
-    public int tickTimer() {
-        return age;
-    }
-
     @SuppressWarnings("SameReturnValue")
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+    @Override
+    protected <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
         AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 

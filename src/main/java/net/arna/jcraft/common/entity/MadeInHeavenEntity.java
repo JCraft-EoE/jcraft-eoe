@@ -1,6 +1,9 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.attack.Attack;
+import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
@@ -33,9 +36,6 @@ import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +53,7 @@ public class MadeInHeavenEntity extends StandEntity {
             .setMobility(MobilityType.TELEPORT)
             .setInfo("Speed Slice", "short windup, harming teleport with hitstun and light knockback");
     public static final Attack legcrusher = new Attack(3, 16, 0.85f, 17, 8, 1.5, 7f, 0.25f, AttackType.BOX, 1.5f, 0.2f, 0, JSoundRegister.TW_KICK_HIT)
-            .appendHitbox(new Attack.HitboxData(0, -0.5, 1))
+            .appendHitbox(new HitBoxData(0, -0.5, 1))
             .setInfo("Leg Crusher", "combo starter/extender, mih hoofs the enemies legs in a quick, stunning attack");
     public static final Attack furychop = new Attack(4, 19, 0.85f, 24, 15, 1.6, 7f, 0.25f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegister.IMPACT_2)
             .setHitspark(2)
@@ -205,8 +205,8 @@ public class MadeInHeavenEntity extends StandEntity {
 
     @Override
     public void initSpecial3() {
-        if (!this.canAttack()) return;
-        LivingEntity user = getUser();
+        if (!this.canAttack() || !hasUser()) return;
+        LivingEntity user = getUserOrThrow();
         if (user.isSneaking() && handleAttack(judgement, JCraft.standS3CD, 7)) {
             playSound(JSoundRegister.MIH_JUDGEMENT, 1, 1);
         } else {
@@ -237,7 +237,8 @@ public class MadeInHeavenEntity extends StandEntity {
 
     @Override
     public boolean handleAttack(Attack attack, String cooldownName, int animState) {
-        LivingEntity player = this.getUser();
+        if (!hasUser()) return false;
+        LivingEntity player = getUserOrThrow();
         NbtCompound userData = ((IEntityDataSaver) player).getPersistentData();
         int cooldown = userData.getInt(cooldownName);
 
@@ -261,21 +262,21 @@ public class MadeInHeavenEntity extends StandEntity {
         LivingEntity user = this.getUser();
         switch (attack.id) {
             case (2) -> {
-                if (this.getMoveStun() < 10) this.curAttack = barrageFinisher;
+                if (getMoveStun() < 10) curAttack = barrageFinisher;
             }
             case (4) -> {
+                if (user == null) return;
+
                 if (entities.size() > 0) {
-                    for (LivingEntity ent : entities) {
+                    for (LivingEntity ent : entities)
                         ent.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 160, 0));
-                    }
                     user.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE, 160, 0));
-                } else {
-                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 160, 0));
-                }
+                } else user.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 160, 0));
             }
             case (5) -> {
-                if (this.getMoveStun() > 1) {
-                    if (this.getMoveStun() < 40) {
+                if (user == null) return;
+                if (getMoveStun() > 1) {
+                    if (getMoveStun() < 40) {
                         speedSlice(user,
                                 judgementInitPos.add(judgementInitRot.multiply(random.nextTriangular(2, 2))),
                                 judgementInitPos.add(random.nextTriangular(0, 5), random.nextTriangular(0, 5), random.nextTriangular(0, 5)),
@@ -291,12 +292,13 @@ public class MadeInHeavenEntity extends StandEntity {
                 }
             }
             case (6) -> {
-                this.setAccelTime(300);
+                setAccelTime(300);
                 setAfterimage(true);
                 TimeAccelStatePacket.sendStart(Objects.requireNonNull(world.getServer()).getPlayerManager(), this, 300);
             }
             case (7) -> {
-                this.curAttack = null;
+                if (user == null) return;
+                curAttack = null;
                 speedSlice(user, user.getEyePos(), user.getEyePos().add(user.getRotationVector().multiply(8)), 6, 1, 1.5);
             }
             case (8) -> startCircle();
@@ -359,14 +361,12 @@ public class MadeInHeavenEntity extends StandEntity {
 
     private void createSpeedParticles(Entity entity) {
         Box box = entity.getBoundingBox();
-        for (int i = 0; i < box.getAverageSideLength(); i++) {
+        for (int i = 0; i < box.getAverageSideLength(); i++)
             world.addParticle(JParticleTypeRegistry.SPEEDPARTICLE,
                     random.nextDouble() * box.getXLength() + box.minX,
                     random.nextDouble() * box.getYLength() + box.minY,
                     random.nextDouble() * box.getZLength() + box.minZ,
-                    0, 0, 0
-            );
-        }
+                    0, 0, 0);
     }
 
     @Override
@@ -375,8 +375,8 @@ public class MadeInHeavenEntity extends StandEntity {
         super.tick();
 
         if (!hasUser()) return;
-        LivingEntity user = this.getUser();
-        setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
+        LivingEntity user = getUserOrThrow();
+        setAlpha((float) MathHelper.clamp(255.0 * squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
         int aTime = getAccelTime();
 
         if (world.isClient) {
@@ -477,25 +477,8 @@ public class MadeInHeavenEntity extends StandEntity {
     }
 
     // Animations
-    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
     @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
-    }
-
-    @Override
-    public AnimationFactory getFactory() {
-        return this.animationFactory;
-    }
-
-    @Override
-    public int tickTimer() {
-        return age;
-    }
-
-    @SuppressWarnings("SameReturnValue")
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+    protected <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
         AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
         if (this.getSameState()) {

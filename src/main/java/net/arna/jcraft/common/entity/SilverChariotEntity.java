@@ -1,8 +1,9 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.util.Attack;
-import net.arna.jcraft.common.util.AttackType;
+import net.arna.jcraft.common.attack.Attack;
+import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.attack.StunType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.registry.JObjectRegistry;
@@ -24,13 +25,8 @@ import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
-
-import static net.arna.jcraft.common.util.Attack.unusable;
 
 public class SilverChariotEntity extends StandEntity {
     public final Attack light = new Attack(0, 2, 0.65f, 9, 5, 1.75, 5f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0)
@@ -61,10 +57,10 @@ public class SilverChariotEntity extends StandEntity {
             .setInfo("Counter", "0.2s windup, 1.5s duration, stuns when hit");
     public final Attack pbeatdown = new Attack(8, 50, 0.65f, 28, 23, 1.75, 4f, 0f, AttackType.BOX, 2, 0, 0)
             .setHitspark(-4)
-            .setStunType(0)
+            .setStunType(StunType.UNBURSTABLE)
             .setInfo("God of Death", "high-damage beatdown, 1.5s stun on whiff, cannot be combo broken");
     public final Attack mainbeatdown = new Attack(9, 0, 0.65f, 59, 0, 2.0, 4.5f, 0.75f, AttackType.MULTIHIT, 1.6f, 0, List.of(13, 23), JSoundRegister.IMPACT_1)
-            .setStunType(0)
+            .setStunType(StunType.UNBURSTABLE)
             .setInfo("God of Death (hit)", "");
     public final Attack beatdownfinish = new Attack(10, 0, 0.65f, 59, 0, 2.5, 6f, 1.25f, AttackType.MULTIHIT, 1, 0, List.of(54), JSoundRegister.TW_KICK_HIT)
             .setLaunch()
@@ -73,7 +69,7 @@ public class SilverChariotEntity extends StandEntity {
     public final Attack armoroff = new Attack(11, 60, 0.65f, 15, 6, 1.75, 4f, 0.75f, AttackType.BOX, 0.35f, 0f, 0)
             .setLaunch()
             .setInfo("Armor Off", "25s of faster moves");
-    public final Attack lastshot = new Attack(12, 24, 1f, 15, 12, 0, 0f, 0f,  AttackType.BOX)
+    public final Attack lastshot = new Attack(12, 24, 1f, 15, 12, 0, 0f, 0f, AttackType.BOX)
             .setRanged(true)
             .setInfo("Last Shot", "Chariot fires his rapier, which can bounce 5 times off walls, nerfs all hitboxes and damage by 25% until returned");
     private int armorTime;
@@ -131,18 +127,27 @@ public class SilverChariotEntity extends StandEntity {
 
     private static final TrackedData<Boolean> HASRAPIER;
     private static final TrackedData<Integer> MODE;
+
     static {
         MODE = DataTracker.registerData(SilverChariotEntity.class, TrackedDataHandlerRegistry.INTEGER);
         HASRAPIER = DataTracker.registerData(SilverChariotEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     }
+
     public int getMode() {
         return dataTracker.get(MODE);
     }
+
     public void setMode(int m) {
         dataTracker.set(MODE, m);
     }
-    public boolean hasRapier() { return dataTracker.get(HASRAPIER); }
-    public void setHasRapier(boolean hasRapier) { dataTracker.set(HASRAPIER, hasRapier); }
+
+    public boolean hasRapier() {
+        return dataTracker.get(HASRAPIER);
+    }
+
+    public void setHasRapier(boolean hasRapier) {
+        dataTracker.set(HASRAPIER, hasRapier);
+    }
 
     @Override
     protected void initDataTracker() {
@@ -192,21 +197,21 @@ public class SilverChariotEntity extends StandEntity {
 
     @Override
     public void initSpecial2() {
-        if (!canAttack()) return;
-        Entity ent = getUser();
+        if (!canAttack() || !hasUser()) return;
+        LivingEntity user = getUserOrThrow();
         if (getMode() == 3) {
             if (handleAttack(this.pcharge, JCraft.standS2CD, 7)) {
                 //playSound(ModSoundRegister.PSC_CHARGE,1, 1);
-                if (ent.isOnGround()) {
-                    ent.setVelocity(ent.getVelocity().add(getRotationVector().multiply(0.85)).add(0.0, 0.15, 0.0));
-                    ent.velocityModified = true;
+                if (user.isOnGround()) {
+                    user.setVelocity(user.getVelocity().add(getRotationVector().multiply(0.85)).add(0.0, 0.15, 0.0));
+                    user.velocityModified = true;
                 }
                 playSound(JSoundRegister.SC_CHARGE, 1, 1);
 
             }
         } else {
             if (handleAttack(this.charge, JCraft.standS2CD, 8)) {
-                lookDirY = (float) ent.getRotationVector().y;
+                lookDirY = (float) user.getRotationVector().y;
                 lookDirY *= MathHelper.abs(lookDirY);
             }
         }
@@ -214,13 +219,13 @@ public class SilverChariotEntity extends StandEntity {
 
     @Override
     public void initSpecial3() {
-        if (!canAttack()) return;
-        if (this.getMode() == 3) {
+        if (!canAttack() || !hasUser()) return;
+        if (getMode() == 3) {
             handleAttack(this.counter, JCraft.standS3CD, 10);
             //playSound(ModSoundRegister.PSC_CHARGE,1, 1);
         } else {
             if (handleAttack(this.cleave, JCraft.standS3CD, 13)) {
-                this.setFreePos(new Vec3f(getUser().getPos().add(getUser().getRotationVector().multiply(1.5))));
+                this.setFreePos(new Vec3f(getUserOrThrow().getPos().add(getUserOrThrow().getRotationVector().multiply(1.5))));
                 this.setFree(true);
                 playSound(JSoundRegister.SC_CLEAVE, 1, 1);
             }
@@ -229,13 +234,15 @@ public class SilverChariotEntity extends StandEntity {
 
     @Override
     public void initUtil() {
-        if (!canAttack()) { return; }
+        if (!canAttack()) return;
         handleAttack(this.lastshot, JCraft.utilCD, 16);
     }
 
     @Override
     public boolean handleAttack(Attack attack, String cooldownName, int animState) {
-        LivingEntity user = this.getUser();
+        if (!hasUser()) return false;
+
+        LivingEntity user = getUserOrThrow();
         NbtCompound userData = ((IEntityDataSaver) user).getPersistentData();
         int cooldown = userData.getInt(cooldownName);
 
@@ -254,46 +261,42 @@ public class SilverChariotEntity extends StandEntity {
             attackRef.damage *= 0.75;
 
             setAttack(attackRef, animState);
-        } else {
-            setAttack(attack, animState);
-        }
+        } else setAttack(attack, animState);
 
         userData.putInt(cooldownName, attack.cooldown * 20);
         return true;
     }
 
     private float lookDirY = 0.0F;
+
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
         switch (attack.id) {
             case (8) -> {
-                if (entities.isEmpty())
-                    stun(getUser(), 30, 1);
-                else
-                    setAttack(mainbeatdown, 12);
+                if (entities.isEmpty()) stun(getUser(), 30, 1);
+                else setAttack(mainbeatdown, 12);
             }
             case (9) -> {
-                if (getMoveStun() == 36)
-                    curAttack = beatdownfinish;
+                if (getMoveStun() == 36) curAttack = beatdownfinish;
             }
             case (11) -> {
                 setMode(2);
                 armorTime = 500;
             }
             case (12) -> {
-                if (hasRapier()) {
-                    LivingEntity user = getUser();
-                    RapierProjectile rapier = new RapierProjectile(getWorld(), user, this);
-                    rapier.setVelocity(this, user.getPitch(), user.getYaw(), 0, 2, 1);
-                    rapier.setSkin(
-                            getMode() != 1 ?
-                                    -getMode() + 1 // Modes 2 and 3 output -1 and -2
-                                    : getSkin()
-                    );
-                    world.spawnEntity(rapier);
-                    setHasRapier(false);
-                    //playSound();
-                }
+                if (!hasRapier() || !hasUser()) return;
+
+                LivingEntity user = getUserOrThrow();
+                RapierProjectile rapier = new RapierProjectile(getWorld(), user, this);
+                rapier.setVelocity(this, user.getPitch(), user.getYaw(), 0, 2, 1);
+                rapier.setSkin(
+                        getMode() != 1 ?
+                                -getMode() + 1 // Modes 2 and 3 output -1 and -2
+                                : getSkin()
+                );
+                world.spawnEntity(rapier);
+                setHasRapier(false);
+                //playSound();
             }
         }
     }
@@ -301,14 +304,15 @@ public class SilverChariotEntity extends StandEntity {
     @Override
     public void counter(Entity entity, DamageSource source) {
         super.counter(entity, source);
-        if (entity instanceof LivingEntity ent) {
-            stun(ent, 30, 0);
-            StandEntity stand = ((IEntityDataSaver)ent).getStand();
-            if (stand != null) stand.cancelAttack();
-        }
+        if (!(entity instanceof LivingEntity ent)) return;
+
+        stun(ent, 30, 0);
+        StandEntity stand = ((IEntityDataSaver) ent).getStand();
+        if (stand != null) stand.cancelAttack();
     }
 
     private static final Attack counterMiss = new Attack(8, 0, 20, 21, 0.5f, AttackType.BOX);
+
     @Override
     public void whiffCounter() {
         setAttack(counterMiss, 15);
@@ -321,7 +325,7 @@ public class SilverChariotEntity extends StandEntity {
         super.tick();
 
         if (hasUser()) {
-            LivingEntity user = getUser();
+            LivingEntity user = getUserOrThrow();
             int mode = getMode();
 
             if (world.isClient) {
@@ -373,25 +377,8 @@ public class SilverChariotEntity extends StandEntity {
     }
 
     // Animation code
-    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
     @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
-    }
-
-    @Override
-    public AnimationFactory getFactory() {
-        return this.animationFactory;
-    }
-
-    @Override
-    public int tickTimer() {
-        return age;
-    }
-
-    @SuppressWarnings("SameReturnValue")
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+    protected <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
         String idleAnim = "animation.silverchariot.idle";
         if (getMode() == 2)
             idleAnim = "animation.silverchariot.idle_armorless";

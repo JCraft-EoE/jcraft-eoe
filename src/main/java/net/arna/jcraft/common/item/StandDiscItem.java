@@ -87,7 +87,11 @@ public class StandDiscItem extends Item {
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         StandType type = getStandType(stack);
-        if (type == null) return;
+        if (type == null) {
+            tooltip.add(Text.literal("Empty").styled(s -> s.withFormatting(Formatting.GRAY)));
+            return;
+        }
+
         tooltip.add(type.getNameText().copy().styled(s -> s.withColor(type.isEvolution() ? Formatting.LIGHT_PURPLE : Formatting.GRAY)));
 
         int skin = getSkin(stack);

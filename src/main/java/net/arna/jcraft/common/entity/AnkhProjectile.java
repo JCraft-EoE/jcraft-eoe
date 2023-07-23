@@ -36,8 +36,13 @@ public class AnkhProjectile extends PersistentProjectileEntity implements IAnima
         this.pickupType = PickupPermission.DISALLOWED;
     }
 
-    public void setOrbitRange(double range) { this.orbitRange = range; }
-    public void setOrbitOffset(double offset) { this.orbitOffset = offset; }
+    public void setOrbitRange(double range) {
+        this.orbitRange = range;
+    }
+
+    public void setOrbitOffset(double offset) {
+        this.orbitOffset = offset;
+    }
 
     public void setVariation(boolean variation) {
         this.variation = variation;
@@ -47,14 +52,26 @@ public class AnkhProjectile extends PersistentProjectileEntity implements IAnima
     public ItemStack asItemStack() {
         return new ItemStack(Items.AIR);
     }
+
     @Override
-    public boolean hasNoGravity() { return true; }
+    public boolean hasNoGravity() {
+        return true;
+    }
+
     @Override
-    protected boolean updateWaterState() { return false; }
+    protected boolean updateWaterState() {
+        return false;
+    }
+
     @Override
-    public boolean isNoClip() { return this.variation; }
+    public boolean isNoClip() {
+        return this.variation;
+    }
+
     @Override
-    protected SoundEvent getHitSound() { return SoundEvents.ITEM_FIRECHARGE_USE; }
+    protected SoundEvent getHitSound() {
+        return SoundEvents.ITEM_FIRECHARGE_USE;
+    }
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
@@ -126,7 +143,7 @@ public class AnkhProjectile extends PersistentProjectileEntity implements IAnima
 
                         // Entity hit logic, due to variations being noclipped
                         Vec3d pos = this.getPos();
-                        Vec3d nextPos = pos.add( this.getVelocity() );
+                        Vec3d nextPos = pos.add(this.getVelocity());
                         //HitResult hitResult = this.world.raycast(new RaycastContext(pos, nextPos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
                         //if (hitResult.getType() != HitResult.Type.MISS) nextPos = hitResult.getPos();
                         EntityHitResult entityHitResult = this.getEntityCollision(pos, nextPos);
@@ -143,8 +160,11 @@ public class AnkhProjectile extends PersistentProjectileEntity implements IAnima
 
     // Animations
     private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+
     @Override
-    public void registerControllers(AnimationData data) { }
+    public void registerControllers(AnimationData data) {
+    }
+
     @Override
     public AnimationFactory getFactory() {
         return this.factory;

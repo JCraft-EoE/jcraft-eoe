@@ -1,8 +1,9 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.util.Attack;
-import net.arna.jcraft.common.util.AttackType;
+import net.arna.jcraft.common.attack.Attack;
+import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.registry.JSoundRegister;
@@ -23,9 +24,6 @@ import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +33,7 @@ public class StarPlatinumEntity extends StandEntity {
             .setInfo("Punch", "quick combo starter");
     public static final Attack heavy = new Attack(1, 17, 1f, 30, 20, 2.0, 10f, 1.5f, AttackType.BOX, 0.7f)
             .setHitspark(2)
-            .appendHitbox(new Attack.HitboxData(0, 0, 1.5))
+            .appendHitbox(new HitBoxData(0, 0, 1.5))
             .hyperArmor()
             .setLaunch()
             .setInfo("Star Breaker", "uninterruptable launcher");
@@ -43,7 +41,7 @@ public class StarPlatinumEntity extends StandEntity {
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
     public static final Attack starfinger = new Attack(3, 20, 0.75f, 20, 12, 1.75, 5f, -0.25f, AttackType.BOX, 1.5f, -0.25f)
             .setHitspark(2)
-            .appendHitbox(new Attack.HitboxData(2, 0.5, 1))
+            .appendHitbox(new HitBoxData(2, 0.5, 1))
             .setInfo("Star Finger", "medium windup, combo starter/extender");
     public static final Attack lowkick = new Attack(4, 12, 0.75f, 12, 7, 1.5, 6f, 0.25f, AttackType.BOX, 0.4f, 0)
             .setInfo("Roundhouse", "fast poke, low stun");
@@ -64,24 +62,7 @@ public class StarPlatinumEntity extends StandEntity {
     static {
         INHALETIME = DataTracker.registerData(StarPlatinumEntity.class, TrackedDataHandlerRegistry.INTEGER);
     }
-    @Override
-    protected void initDataTracker() {
-        super.initDataTracker();
-        dataTracker.startTracking(INHALETIME, 0);
-    }
-    private void setInhaleTime(int time) {
-        dataTracker.set(INHALETIME, time);
-    }
-    public int getInhaleTime() {
-        return dataTracker.get(INHALETIME);
-    }
 
-    @Override
-    public void desummon() {
-        if (tsTime > 0) return;
-        super.desummon();
-    }
-    
     public StarPlatinumEntity(World worldIn) {
         this(StandType.STAR_PLATINUM, worldIn);
     }
@@ -122,6 +103,26 @@ public class StarPlatinumEntity extends StandEntity {
         moves = List.of(light, heavy, barrage, starfinger, inhale, lowkick, starfinger, jump);
     }
 
+    @Override
+    protected void initDataTracker() {
+        super.initDataTracker();
+        dataTracker.startTracking(INHALETIME, 0);
+    }
+
+    private void setInhaleTime(int time) {
+        dataTracker.set(INHALETIME, time);
+    }
+
+    public int getInhaleTime() {
+        return dataTracker.get(INHALETIME);
+    }
+
+    @Override
+    public void desummon() {
+        if (tsTime > 0) return;
+        super.desummon();
+    }
+
     // Moveset
     @Override
     public void initLightAttack() {
@@ -132,25 +133,22 @@ public class StarPlatinumEntity extends StandEntity {
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        if (handleAttack(heavy, JCraft.standHeavyCD, 4)) {
+        if (handleAttack(heavy, JCraft.standHeavyCD, 4))
             playSound(JSoundRegister.STAR_BREAKER, 1, 1);
-        }
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
+        if (handleAttack(barrage, JCraft.standBarrageCD, 5))
             playSound(JSoundRegister.STAR_PLATINUM_BARRAGE, 1, 1);
-        }
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack()) return;
-        if (handleAttack(starfinger, JCraft.standS1CD, 6)) {
+        if (handleAttack(starfinger, JCraft.standS1CD, 6))
             playSound(JSoundRegister.STAR_FINGER, 1, 1);
-        }
     }
 
     @Override
@@ -164,23 +162,21 @@ public class StarPlatinumEntity extends StandEntity {
     @Override
     public void initSpecial2() {
         if (!canAttack()) return;
-        if (handleAttack(lowkick, JCraft.standS2CD, 8)) {
+        if (handleAttack(lowkick, JCraft.standS2CD, 8))
             playSound(JSoundRegister.STAR_PLATINUM_KICK, 1, 1);
-        }
     }
 
     @Override
     public void initSpecial3() {
         if (!canAttack()) return;
         // Uses a copy because otherwise the main one gets overwritten by specialAttack()
-        if (handleAttack(Attack.copyOf(chargebarrage), JCraft.standS3CD, 5)) {
+        if (handleAttack(Attack.copyOf(chargebarrage), JCraft.standS3CD, 5))
             playSound(JSoundRegister.STAR_PLATINUM_ADVANCING_BARRAGE, 1, 1);
-        }
     }
 
     @Override
     public void initUtil() {
-        if (!canAttack() || !getUser().isOnGround()) return;
+        if (!canAttack() || !hasUser() || !getUserOrThrow().isOnGround()) return;
         handleAttack(jump, JCraft.utilCD, 9);
     }
 
@@ -188,7 +184,8 @@ public class StarPlatinumEntity extends StandEntity {
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
         switch (attack.id) {
             case (-2) -> {
-                LivingEntity user = getUser();
+                if (!hasUser()) return;
+                LivingEntity user = getUserOrThrow();
                 if (!user.isOnGround()) return;
 
                 Vec3d jumpVel = getRotationVector().multiply(1.5).add(0, 0.5, 0);
@@ -270,25 +267,8 @@ public class StarPlatinumEntity extends StandEntity {
     }
 
     // Animation code
-    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
     @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
-    }
-
-    @Override
-    public AnimationFactory getFactory() {
-        return this.animationFactory;
-    }
-
-    @Override
-    public int tickTimer() {
-        return age;
-    }
-
-    @SuppressWarnings("SameReturnValue")
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+    protected <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
         AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 
@@ -299,7 +279,6 @@ public class StarPlatinumEntity extends StandEntity {
 
         if (getSameState()) controller.markNeedsReload();
         switch (getState()) {
-            default -> controller.setAnimation(builder.loop(getInhaleTime() > 0 ? "animation.starplatinum.inhaleidle" : "animation.starplatinum.idle"));
             case 2 -> controller.setAnimation(builder.playAndHold("animation.starplatinum.punch"));
             case 3 -> controller.setAnimation(builder.loop("animation.starplatinum.block"));
             case 4 -> controller.setAnimation(builder.playAndHold("animation.starplatinum.heavy"));
@@ -308,6 +287,7 @@ public class StarPlatinumEntity extends StandEntity {
             case 7 -> controller.setAnimation(builder.playAndHold("animation.starplatinum.inhale"));
             case 8 -> controller.setAnimation(builder.playAndHold("animation.starplatinum.low_kick"));
             case 9 -> controller.setAnimation(builder.playAndHold("animation.starplatinum.jump"));
+            default -> controller.setAnimation(builder.loop(getInhaleTime() > 0 ? "animation.starplatinum.inhaleidle" : "animation.starplatinum.idle"));
         }
 
         return PlayState.CONTINUE;

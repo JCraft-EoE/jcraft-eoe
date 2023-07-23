@@ -33,6 +33,7 @@ public class KnifeBundleItem extends KnifeItem {
     protected float getChargeTime() {
         return 20F;
     }
+
     @Override
     public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
         if (user.hasStatusEffect(JStatusRegister.DAZED))

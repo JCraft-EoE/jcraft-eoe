@@ -35,56 +35,43 @@ public class StunningMeleeAttackGoal extends Goal {
 
     public boolean canStart() {
         long l = this.mob.world.getTime();
-        if (l - this.lastUpdateTime < 20L) {
-            return false;
-        } else {
-            this.lastUpdateTime = l;
-            LivingEntity livingEntity = this.mob.getTarget();
-            if (livingEntity == null) {
-                return false;
-            } else if (!livingEntity.isAlive()) {
-                return false;
-            } else {
-                this.path = this.mob.getNavigation().findPathTo(livingEntity, 0);
-                if (this.path != null) {
-                    return true;
-                } else {
-                    return this.getSquaredMaxAttackDistance(livingEntity) >= this.mob.squaredDistanceTo(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ());
-                }
-            }
-        }
+        if (l - this.lastUpdateTime < 20L) return false;
+
+        lastUpdateTime = l;
+        LivingEntity livingEntity = this.mob.getTarget();
+        if (livingEntity == null) return false;
+        if (!livingEntity.isAlive()) return false;
+
+        path = mob.getNavigation().findPathTo(livingEntity, 0);
+        if (path != null) return true;
+
+        return this.getSquaredMaxAttackDistance(livingEntity) >=
+                mob.squaredDistanceTo(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ());
     }
 
     public boolean shouldContinue() {
-        LivingEntity livingEntity = this.mob.getTarget();
-        if (livingEntity == null) {
-            return false;
-        } else if (!livingEntity.isAlive()) {
-            return false;
-        } else if (!this.pauseWhenMobIdle) {
-            return !this.mob.getNavigation().isIdle();
-        } else if (!this.mob.isInWalkTargetRange(livingEntity.getBlockPos())) {
-            return false;
-        } else {
-            return !(livingEntity instanceof PlayerEntity) || !livingEntity.isSpectator() && !((PlayerEntity) livingEntity).isCreative();
-        }
+        LivingEntity livingEntity = mob.getTarget();
+        if (livingEntity == null) return false;
+        if (!livingEntity.isAlive()) return false;
+        if (!pauseWhenMobIdle) return !mob.getNavigation().isIdle();
+        if (!mob.isInWalkTargetRange(livingEntity.getBlockPos())) return false;
+
+        return !(livingEntity instanceof PlayerEntity) || !livingEntity.isSpectator() && !((PlayerEntity) livingEntity).isCreative();
     }
 
     public void start() {
-        this.mob.getNavigation().startMovingAlong(this.path, this.speed);
-        this.mob.setAttacking(true);
-        this.updateCountdownTicks = 0;
-        this.cooldown = 0;
+        mob.getNavigation().startMovingAlong(path, speed);
+        mob.setAttacking(true);
+        updateCountdownTicks = 0;
+        cooldown = 0;
     }
 
     public void stop() {
-        LivingEntity livingEntity = this.mob.getTarget();
-        if (!EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.test(livingEntity)) {
-            this.mob.setTarget(null);
-        }
+        LivingEntity livingEntity = mob.getTarget();
+        if (!EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.test(livingEntity)) mob.setTarget(null);
 
-        this.mob.setAttacking(false);
-        this.mob.getNavigation().stop();
+        mob.setAttacking(false);
+        mob.getNavigation().stop();
     }
 
     public boolean shouldRunEveryTick() {
@@ -92,44 +79,38 @@ public class StunningMeleeAttackGoal extends Goal {
     }
 
     public void tick() {
-        LivingEntity livingEntity = this.mob.getTarget();
-        if (livingEntity != null) {
-            this.mob.getLookControl().lookAt(livingEntity, 30.0F, 30.0F);
-            double d = this.mob.squaredDistanceTo(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ());
-            this.updateCountdownTicks = Math.max(this.updateCountdownTicks - 1, 0);
-            if ((this.pauseWhenMobIdle || this.mob.getVisibilityCache().canSee(livingEntity)) && this.updateCountdownTicks <= 0 && (this.targetX == 0.0 && this.targetY == 0.0 && this.targetZ == 0.0 || livingEntity.squaredDistanceTo(this.targetX, this.targetY, this.targetZ) >= 1.0 || this.mob.getRandom().nextFloat() < 0.05F)) {
-                this.targetX = livingEntity.getX();
-                this.targetY = livingEntity.getY();
-                this.targetZ = livingEntity.getZ();
-                this.updateCountdownTicks = 4 + this.mob.getRandom().nextInt(7);
-                if (d > 1024.0) {
-                    this.updateCountdownTicks += 10;
-                } else if (d > 256.0) {
-                    this.updateCountdownTicks += 5;
-                }
+        LivingEntity target = mob.getTarget();
+        if (target == null) return;
 
-                if (!this.mob.getNavigation().startMovingTo(livingEntity, this.speed)) {
-                    this.updateCountdownTicks += 15;
-                }
+        mob.getLookControl().lookAt(target, 30.0F, 30.0F);
+        double d = mob.squaredDistanceTo(target.getX(), target.getY(), target.getZ());
+        updateCountdownTicks = Math.max(updateCountdownTicks - 1, 0);
+        if ((pauseWhenMobIdle || mob.getVisibilityCache().canSee(target)) && updateCountdownTicks <= 0 &&
+                (targetX == 0.0 && targetY == 0.0 && targetZ == 0.0 ||
+                        target.squaredDistanceTo(targetX, targetY, targetZ) >= 1.0 ||
+                        mob.getRandom().nextFloat() < 0.05F)) {
+            targetX = target.getX();
+            targetY = target.getY();
+            targetZ = target.getZ();
+            updateCountdownTicks = 4 + mob.getRandom().nextInt(7) + (d > 256 ? d > 1024 ? 10 : 5 : 0);
 
-                this.updateCountdownTicks = this.getTickCount(this.updateCountdownTicks);
-            }
+            if (!mob.getNavigation().startMovingTo(target, speed)) updateCountdownTicks += 15;
 
-            this.cooldown = Math.max(this.cooldown - 1, 0);
-            this.attack(livingEntity, d);
+            updateCountdownTicks = getTickCount(updateCountdownTicks);
         }
+
+        cooldown = Math.max(cooldown - 1, 0);
+        attack(target, d);
     }
 
     protected void attack(LivingEntity target, double squaredDistance) {
-        double d = this.getSquaredMaxAttackDistance(target);
-        if (squaredDistance <= d && this.cooldown <= 0) {
-            this.resetCooldown();
-            this.mob.swingHand(Hand.MAIN_HAND);
-            if (this.mob.tryAttack(target)) {
-                target.addStatusEffect(new StatusEffectInstance(JStatusRegister.DAZED, this.stunT, 1, true, false));
-            }
-        }
+        double d = getSquaredMaxAttackDistance(target);
+        if (!(squaredDistance <= d) || cooldown > 0) return;
 
+        resetCooldown();
+        mob.swingHand(Hand.MAIN_HAND);
+        if (mob.tryAttack(target))
+            target.addStatusEffect(new StatusEffectInstance(JStatusRegister.DAZED, this.stunT, 1, true, false));
     }
 
     protected void resetCooldown() {

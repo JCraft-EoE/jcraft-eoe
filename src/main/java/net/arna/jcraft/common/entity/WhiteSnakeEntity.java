@@ -1,8 +1,8 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.util.Attack;
-import net.arna.jcraft.common.util.AttackType;
+import net.arna.jcraft.common.attack.Attack;
+import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
@@ -18,9 +18,6 @@ import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
 
@@ -133,18 +130,17 @@ public class WhiteSnakeEntity extends StandEntity {
 
     @Override
     public void initSpecial3() {
-        if (!canAttack()) return;
+        if (!canAttack() || !hasUser()) return;
 
-        if (getUser().isSneaking())
+        if (getUserOrThrow().isSneaking())
             handleAttack(chargedspew, JCraft.standS3CD, 17);
-        else
-            handleAttack(poisonspew, JCraft.standS3CD, 7);
+        else handleAttack(poisonspew, JCraft.standS3CD, 7);
     }
 
     @Override
     public void initUtil() {
-        if (!canAttack()) return;
-        NbtCompound userData = ((IEntityDataSaver) getUser()).getPersistentData();
+        if (!canAttack() || !hasUser()) return;
+        NbtCompound userData = ((IEntityDataSaver) getUserOrThrow()).getPersistentData();
         if (userData.getInt(JCraft.utilCD) > 0) return;
         setRemote(!getRemote());
         userData.putInt(JCraft.utilCD, 20);
@@ -153,7 +149,9 @@ public class WhiteSnakeEntity extends StandEntity {
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
-        LivingEntity user = getUser();
+        if (!hasUser()) return;
+
+        LivingEntity user = getUserOrThrow();
         switch (attack.id) {
             case (3) -> { // Stand Disc
                 for (LivingEntity ent : entities)
@@ -199,81 +197,65 @@ public class WhiteSnakeEntity extends StandEntity {
         if (age == 1) playSound(JSoundRegister.WS_SUMMON, 1f, 1f);
         super.tick();
 
-        if (getRemote()) {
-            if (!world.isClient) {
-                double f = getRemoteForwardInput();
-                double s = getRemoteSideInput();
-                boolean jump = getRemoteJumpInput();
+        if (!getRemote()) {
+            if (hasUser()) setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(getUser()) / 2, 0.0, 255.0) / 255f);
+            return;
+        }
 
-                Vec3d pos = getPos();
+        if (world.isClient) return;
 
-                // 3 ticks of inertia, helping movement be fluid as well as dealing with packet drops
-                if (lastRemoteInputTime - age > 4) updateRemoteInputs(0, 0, false);
-                Vec3d rotVec = new Vec3d(getRotationVector().x, 0, getRotationVector().z).normalize();
+        double f = getRemoteForwardInput();
+        double s = getRemoteSideInput();
+        boolean jump = getRemoteJumpInput();
 
-                double dragMult = getMoveStun() > 0 ? 0.2 : 0.4;
-                double moveSpeed = 0.24;
-                //HitResult groundCheck = this.world.raycast(new RaycastContext(getEyePos(), pos.add(0, -1.0E-5F, 0), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
-                boolean onGround = isOnGround();
+        Vec3d pos = getPos();
 
-                if (getState() < 2) { // Replace idle anim
-                    if (s > 0) setStateNoReset(onGround ? 12 : 16);
-                    if (s < 0) setStateNoReset(onGround ? 11 : 15);
-                    if (f < 0) setStateNoReset(onGround ? 10 : 14);
-                    if (f > 0) setStateNoReset(onGround ? 9 : 13);
-                }
+        // 3 ticks of inertia, helping movement be fluid as well as dealing with packet drops
+        if (lastRemoteInputTime - age > 4) updateRemoteInputs(0, 0, false);
+        Vec3d rotVec = new Vec3d(getRotationVector().x, 0, getRotationVector().z).normalize();
 
-                if (onGround) { // If grounded
-                    if (jump && getMoveStun() < 1) {
-                        remoteSpeed = new Vec3d(remoteSpeed.x, 0.25, remoteSpeed.z);
-                        setRemoteJumpInput(false);
-                    }
-                } else {
-                    //JCraft.LOGGER.info("Airborne");
-                    moveSpeed = 0.024;
-                    remoteSpeed = remoteSpeed.add(0, -9.81 / 200, 0); // Account for gravity
-                    dragMult = 0.4;
-                }
+        double dragMult = getMoveStun() > 0 ? 0.2 : 0.4;
+        double moveSpeed = 0.24;
+        //HitResult groundCheck = this.world.raycast(new RaycastContext(getEyePos(), pos.add(0, -1.0E-5F, 0), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+        boolean onGround = isOnGround();
 
-                remoteSpeed = remoteSpeed
-                        .add(rotVec.multiply(f * moveSpeed)) // Forward movement
-                        .add(rotVec.rotateY(1.5707963f).multiply(s * moveSpeed)) // Side movement
-                ;
+        if (getState() < 2) { // Replace idle anim
+            if (s > 0) setStateNoReset(onGround ? 12 : 16);
+            if (s < 0) setStateNoReset(onGround ? 11 : 15);
+            if (f < 0) setStateNoReset(onGround ? 10 : 14);
+            if (f > 0) setStateNoReset(onGround ? 9 : 13);
+        }
 
-                remoteSpeed = remoteSpeed.multiply(dragMult, 1, dragMult);
-
-                if (pos.add(remoteSpeed).squaredDistanceTo(getUser().getPos()) > 400)
-                    remoteSpeed.multiply(-1);
-
-                addVelocity(remoteSpeed.x, remoteSpeed.y, remoteSpeed.z);
+        if (onGround) { // If grounded
+            if (jump && getMoveStun() < 1) {
+                remoteSpeed = new Vec3d(remoteSpeed.x, 0.25, remoteSpeed.z);
+                setRemoteJumpInput(false);
             }
+        } else {
+            //JCraft.LOGGER.info("Airborne");
+            moveSpeed = 0.024;
+            remoteSpeed = remoteSpeed.add(0, -9.81 / 200, 0); // Account for gravity
+            dragMult = 0.4;
+        }
 
-            velocityDirty = true;
-            velocityModified = true;
-        } else if (hasUser())
-            setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(getUser()) / 2, 0.0, 255.0) / 255f);
+        remoteSpeed = remoteSpeed
+                .add(rotVec.multiply(f * moveSpeed)) // Forward movement
+                .add(rotVec.rotateY(1.5707963f).multiply(s * moveSpeed)) // Side movement
+        ;
+
+        remoteSpeed = remoteSpeed.multiply(dragMult, 1, dragMult);
+
+        if (pos.add(remoteSpeed).squaredDistanceTo(getUserOrThrow().getPos()) > 400)
+            remoteSpeed.multiply(-1);
+
+        addVelocity(remoteSpeed.x, remoteSpeed.y, remoteSpeed.z);
+        velocityDirty = true;
+        velocityModified = true;
     }
 
     // Animation code
-    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
     @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
-    }
-
-    @Override
-    public AnimationFactory getFactory() {
-        return this.animationFactory;
-    }
-
-    @Override
-    public int tickTimer() {
-        return age;
-    }
-
-    @SuppressWarnings("SameReturnValue")
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+    protected <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
         AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 

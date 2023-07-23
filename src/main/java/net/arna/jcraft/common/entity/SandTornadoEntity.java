@@ -37,14 +37,17 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 import java.util.List;
 
 public class SandTornadoEntity extends LivingEntity implements IAnimatable, IOwnable {
-    public SandTornadoEntity(EntityType<? extends LivingEntity> entityType, World world) {
-        super(entityType, world);
-    }
-
     private static final TrackedData<Boolean> DISAPPEARED;
+    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+    private LivingEntity master;
+    private int hitsLeft = 5;
 
     static {
         DISAPPEARED = DataTracker.registerData(SandTornadoEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    }
+
+    public SandTornadoEntity(EntityType<? extends LivingEntity> entityType, World world) {
+        super(entityType, world);
     }
 
     public boolean hasDisappeared() {
@@ -56,8 +59,6 @@ public class SandTornadoEntity extends LivingEntity implements IAnimatable, IOwn
         super.initDataTracker();
         dataTracker.startTracking(DISAPPEARED, false);
     }
-
-    private LivingEntity master;
 
     @Override
     public LivingEntity getMaster() {
@@ -72,8 +73,6 @@ public class SandTornadoEntity extends LivingEntity implements IAnimatable, IOwn
         dataTracker.set(DISAPPEARED, true);
         kill();
     }
-
-    private int hitsLeft = 5;
 
     @Override
     public void tick() {
@@ -100,9 +99,9 @@ public class SandTornadoEntity extends LivingEntity implements IAnimatable, IOwn
             List<LivingEntity> toHurt = JUtils.generateHitbox(world, getEyePos(), 1.8, List.of(this, master));
 
             if (toHurt.isEmpty()) {
-                setVelocity( getVelocity().add( getRotationVector().multiply(0.5) ).multiply(0.4) );
+                setVelocity(getVelocity().add(getRotationVector().multiply(0.5)).multiply(0.4));
             } else {
-                setVelocity( getVelocity().multiply(0.25) );
+                setVelocity(getVelocity().multiply(0.25));
                 for (LivingEntity living : toHurt) {
                     LivingEntity target = JUtils.getUserIfStand(living);
                     if (target.isConnectedThroughVehicle(master)) return;
@@ -127,9 +126,11 @@ public class SandTornadoEntity extends LivingEntity implements IAnimatable, IOwn
     @Override
     protected void pushAway(Entity entity) {
     }
+
     @Override
     public void pushAwayFrom(Entity entity) {
     }
+
     @Override
     public boolean collidesWith(Entity other) {
         return false;
@@ -213,8 +214,6 @@ public class SandTornadoEntity extends LivingEntity implements IAnimatable, IOwn
     }
 
     // Animations
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
-
     @Override
     public void registerControllers(AnimationData animationData) {
         animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));

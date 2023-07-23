@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.common.entity.ai.goal.SHAAttackGoal;
+import net.arna.jcraft.common.util.IOwnable;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -32,37 +33,41 @@ import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-public class SheerHeartAttackEntity extends MobEntity implements IAnimatable, IAnimationTickable {
-    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+public class SheerHeartAttackEntity extends MobEntity implements IAnimatable, IAnimationTickable, IOwnable {
+    private static final TrackedData<Optional<UUID>> OWNER_ID = DataTracker.registerData(SheerHeartAttackEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
+    private final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+    private LivingEntity master;
 
     public SheerHeartAttackEntity(EntityType<? extends MobEntity> entityType, World world) {
         super(entityType, world);
     }
 
-    private LivingEntity owner;
-    private static final TrackedData<String> OWNERNAME = DataTracker.registerData(SheerHeartAttackEntity.class, TrackedDataHandlerRegistry.STRING);
-
-    public LivingEntity getOwner() {
-        return this.owner;
+    @Override
+    public LivingEntity getMaster() {
+        return this.master;
     }
 
-    public void setOwner(LivingEntity owner) {
-        this.owner = owner;
-        this.setOwnerName(owner.getName().getString());
+    @Override
+    public void setMaster(LivingEntity owner) {
+        this.master = owner;
+        setOwnerId(owner.getUuid());
     }
 
-    public String getOwnerName() {
-        return this.dataTracker.get(OWNERNAME);
+    private UUID getOwnerId() {
+        return this.dataTracker.get(OWNER_ID).orElse(null);
     }
 
-    public void setOwnerName(String state) {
-        this.dataTracker.set(OWNERNAME, state);
+    private void setOwnerId(UUID id) {
+        this.dataTracker.set(OWNER_ID, Optional.of(id));
     }
 
+    @Override
     protected void initDataTracker() {
         super.initDataTracker();
-        this.dataTracker.startTracking(OWNERNAME, "%unset_owner_name");
+        dataTracker.startTracking(OWNER_ID, Optional.empty());
     }
 
     @Override
@@ -106,20 +111,20 @@ public class SheerHeartAttackEntity extends MobEntity implements IAnimatable, IA
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
-        nbt.putString("OwnerName", this.getOwnerName());
+        nbt.putUuid("Owner", getOwnerId());
     }
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        this.setOwnerName(nbt.getString("OwnerName"));
+        setOwnerId(nbt.getUuid("Owner"));
     }
 
     @Override
     public boolean damage(DamageSource source, float amount) {
-        if (this.owner != null && amount < 256) { // 256 value is arbitrary, to stop /kill from also killing the owner
-            this.owner.damage(source, amount / 4); // Reflect damage to owner (SHA is the right hand of KQ)
-        }
+        // 256 value is arbitrary, to stop /kill from also killing the owner
+        if (master != null && amount < 256)
+            master.damage(source, amount / 4); // Reflect damage to owner (SHA is the right hand of KQ)
         return super.damage(source, amount);
     }
 
@@ -127,83 +132,65 @@ public class SheerHeartAttackEntity extends MobEntity implements IAnimatable, IA
     public void tick() {
         super.tick();
 
-        boolean client = this.world.isClient();
-        if (!client) {
-            if (this.owner == null) {
-                // Run every 2 seconds (player lists are rather expensive)
-                if (this.age % 40 == 0) {
-                    // If the owner name is set, but the owner isn't (when loaded via NBT data), find owner
-                    String ownerName = this.getOwnerName();
-                    if (!ownerName.equals("%unset_owner_name")) {
-                        ServerWorld serverWorld = (ServerWorld) this.world;
-                        for (ServerPlayerEntity serverPlayerEntity : PlayerLookup.world(serverWorld)) {
-                            if (serverPlayerEntity.getName().getString().equals(ownerName)) {
-                                this.owner = serverPlayerEntity;
-                            }
-                        }
+        if (world.isClient()) return;
+
+        if (master == null) {
+            // Run every 2 seconds (player lists are rather expensive)
+            if (age % 40 == 0) {
+                // If the owner name is set, but the owner isn't (when loaded via NBT data), find owner
+                UUID ownerId = getOwnerId();
+                if (ownerId != null) {
+                    ServerWorld serverWorld = (ServerWorld) world;
+                    for (ServerPlayerEntity serverPlayerEntity : PlayerLookup.world(serverWorld)) {
+                        if (serverPlayerEntity.getUuid().equals(ownerId))
+                            master = serverPlayerEntity;
                     }
-                }
-
-                this.setTarget(this.getAttacking());
-            } else {
-                //45s is the cooldown period
-                //18s is how long SHA can be out for
-                if (this.age > 360 || !this.owner.isAlive()) {
-                    this.kill();
-                }
-
-                Vec3d pos = this.getPos();
-                LivingEntity target = this.getTarget();
-
-                if (target == null) {
-                    if (this.age % 10 == 0) { // Entity lists are still expensive
-                        List<LivingEntity> toTrack = world.getEntitiesByClass(
-                                LivingEntity.class,
-                                new Box(pos.add(16, 16, 16), pos.add(-16, -16, -16)),
-                                EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR
-                        );
-
-                        toTrack.remove(this);
-                        toTrack.remove(this.owner);
-
-                        LivingEntity coldTarget = null;
-                        LivingEntity hotTarget = null;
-
-                        for (LivingEntity living : toTrack) {
-                            if (!this.canTarget(living)) {
-                                continue;
-                            }
-                            if (living.hasVehicle() && living.getVehicle() == this.owner) {
-                                continue;
-                            }
-
-                            // Prioritize heat
-                            if (living.isOnFire()) {
-                                this.setTarget(living);
-                                coldTarget = null;
-                                hotTarget = null;
-                                break;
-                            }
-                            // Discourage undead (cold)
-                            if (coldTarget == null || hotTarget == null) {
-                                if (living.isUndead()) {
-                                    coldTarget = living;
-                                } else {
-                                    hotTarget = living;
-                                }
-                            }
-                        }
-
-                        if (hotTarget != null) {
-                            this.setTarget(hotTarget);
-                        } else if (coldTarget != null) {
-                            this.setTarget(coldTarget);
-                        }
-                    }
-                } else if (!this.canTarget(this.getTarget())) {
-                    this.setTarget(null);
                 }
             }
+
+            setTarget(getAttacking());
+        } else {
+            //45s is the cooldown period
+            //18s is how long SHA can be out for
+            if (age > 360 || !master.isAlive()) kill();
+
+            Vec3d pos = getPos();
+            LivingEntity target = getTarget();
+
+            if (target == null) {
+                if (this.age % 10 == 0) { // Entity lists are still expensive
+                    List<LivingEntity> toTrack = world.getEntitiesByClass(
+                            LivingEntity.class,
+                            new Box(pos.add(16, 16, 16), pos.add(-16, -16, -16)),
+                            EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e -> e != this && e != master)
+                    );
+
+                    LivingEntity coldTarget = null;
+                    LivingEntity hotTarget = null;
+
+                    for (LivingEntity living : toTrack) {
+                        if (!canTarget(living)) continue;
+                        if (living.hasVehicle() && living.getVehicle() == master) continue;
+
+                        // Prioritize heat
+                        if (living.isOnFire()) {
+                            setTarget(living);
+                            coldTarget = null;
+                            hotTarget = null;
+                            break;
+                        }
+
+                        // Discourage undead (cold)
+                        if (coldTarget == null || hotTarget == null) {
+                            if (living.isUndead()) coldTarget = living;
+                            else hotTarget = living;
+                        }
+                    }
+
+                    if (hotTarget != null) setTarget(hotTarget);
+                    else if (coldTarget != null) setTarget(coldTarget);
+                }
+            } else if (!canTarget(getTarget())) setTarget(null);
         }
     }
 

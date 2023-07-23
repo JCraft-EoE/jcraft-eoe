@@ -1,8 +1,8 @@
 package net.arna.jcraft.common.spec;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.util.Attack;
-import net.arna.jcraft.common.util.AttackType;
+import net.arna.jcraft.common.attack.Attack;
+import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegister;
@@ -44,14 +44,17 @@ public class AnubisSpec extends JCraftSpec {
     public String getInternalName() {
         return "anubis";
     }
+
     @Override
     public String getDescription() {
         return "Counterpoking tool";
     }
+
     @Override
     public String getDetails() {
         return "untested";
     }
+
     @Override
     public List<Attack> getAttacks() {
         return List.of(pommel, Attack.unusable,
@@ -60,6 +63,7 @@ public class AnubisSpec extends JCraftSpec {
                 rekkas3
         );
     }
+
     @Override
     public int getId() {
         return 2;
@@ -67,7 +71,7 @@ public class AnubisSpec extends JCraftSpec {
 
     // Attacks
     @Override
-    public void InitHeavyAttack(ServerWorld serverWorld) {
+    public void initHeavyAttack(ServerWorld serverWorld) {
         if (!canAttack()) return;
         if (handleAttack(serverWorld, player.isHolding(JObjectRegistry.ANUBIS) ? pommel : pommelIn, JCraft.heavyCD))
             JUtils.serverPlaySound(JSoundRegister.ANUBIS_POMMEL, serverWorld, player.getPos());
@@ -82,7 +86,7 @@ public class AnubisSpec extends JCraftSpec {
      */
 
     @Override
-    public void InitSpecial1(ServerWorld serverWorld) {
+    public void initSpecial1(ServerWorld serverWorld) {
         if (!canAttack()) return;
         if (!player.isHolding(JObjectRegistry.ANUBIS)) return;
         if (handleAttack(serverWorld, slash, JCraft.s1CD))
@@ -90,7 +94,7 @@ public class AnubisSpec extends JCraftSpec {
     }
 
     @Override
-    public void InitSpecial2(ServerWorld serverWorld) {
+    public void initSpecial2(ServerWorld serverWorld) {
         if (!canAttack()) return;
         if (!player.isHolding(JObjectRegistry.ANUBIS)) return;
         if (handleAttack(serverWorld, rekkas2, JCraft.s2CD))
@@ -98,7 +102,7 @@ public class AnubisSpec extends JCraftSpec {
     }
 
     @Override
-    public void InitSpecial3(ServerWorld serverWorld) {
+    public void initSpecial3(ServerWorld serverWorld) {
         if (!canAttack()) return;
         if (player.isHolding(JObjectRegistry.ANUBIS) && handleAttack(serverWorld, rekkas3, JCraft.s2CD)) {
             JUtils.serverPlaySound(JSoundRegister.ANUBIS_REKKA3, serverWorld, player.getPos());

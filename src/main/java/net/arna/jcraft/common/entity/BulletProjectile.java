@@ -1,6 +1,5 @@
 package net.arna.jcraft.common.entity;
 
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.arna.jcraft.registry.JSoundRegister;
@@ -14,8 +13,6 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.particle.BlockStateParticleEffect;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -31,21 +28,25 @@ import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
 public class BulletProjectile extends PersistentProjectileEntity implements IAnimatable {
-
+    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
     private int stunTicks = 0;
     private int damage = 0;
     private float mass = 1f; // Used for penetration calculation
 
     private static final TrackedData<Float> CALIBER; //mm
+
     static {
         CALIBER = DataTracker.registerData(BulletProjectile.class, TrackedDataHandlerRegistry.FLOAT);
     }
+
     public void setCaliber(float cal) {
         dataTracker.set(CALIBER, cal);
     }
+
     public float getCaliber() {
         return dataTracker.get(CALIBER);
     }
+
     @Override
     protected void initDataTracker() {
         dataTracker.startTracking(CALIBER, 9f);
@@ -73,10 +74,10 @@ public class BulletProjectile extends PersistentProjectileEntity implements IAni
         HitResult.Type type = hitResult.getType();
 
         if (type == HitResult.Type.ENTITY) {
-            this.onEntityHit((EntityHitResult)hitResult);
+            this.onEntityHit((EntityHitResult) hitResult);
             this.world.emitGameEvent(GameEvent.PROJECTILE_LAND, hitResult.getPos(), GameEvent.Emitter.of(this, null));
         } else if (type == HitResult.Type.BLOCK) {
-            BlockHitResult blockHitResult = (BlockHitResult)hitResult;
+            BlockHitResult blockHitResult = (BlockHitResult) hitResult;
             BlockPos blockPos = blockHitResult.getBlockPos();
             BlockState blockState = world.getBlockState(blockPos);
             if (blockState.isAir()) return;
@@ -87,8 +88,8 @@ public class BulletProjectile extends PersistentProjectileEntity implements IAni
             Vec3d impactVec = getVelocity();
 
             // a*b = |a|*|b|*cos(φ) , a*b = a.dotProduct(b)
-            double impactAngleRad = Math.acos( normal.dotProduct(impactVec.normalize()) ) - Math.PI/2.0;
-            double impactAngleDeg = Math.toDegrees( impactAngleRad );
+            double impactAngleRad = Math.acos(normal.dotProduct(impactVec.normalize())) - Math.PI / 2.0;
+            double impactAngleDeg = Math.toDegrees(impactAngleRad);
             //JCraft.LOGGER.info("Impact Angle: " + impactAngle + "");
 
             // Ek = mv^2/2
@@ -126,7 +127,8 @@ public class BulletProjectile extends PersistentProjectileEntity implements IAni
         if (entity instanceof LivingEntity living) {
             Entity owner = getOwner();
             LivingEntity target = JUtils.getUserIfStand(living);
-            StandEntity.damageLogic(getWorld(), target, getVelocity().normalize(), stunTicks, 1, false, damage, true, 4 + damage, DamageSource.thrownProjectile(this, owner), owner);
+            StandEntity.damageLogic(getWorld(), target, getVelocity().normalize(), stunTicks, 1,
+                    false, damage, true, 4 + damage, DamageSource.thrownProjectile(this, owner), owner);
 
             discard(); //todo: pen calc (entities)
         } else
@@ -185,9 +187,10 @@ public class BulletProjectile extends PersistentProjectileEntity implements IAni
     }
 
     // Animations
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
     @Override
-    public void registerControllers(AnimationData data) { }
+    public void registerControllers(AnimationData data) {
+    }
+
     @Override
     public AnimationFactory getFactory() {
         return this.factory;

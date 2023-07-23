@@ -4,7 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.StandEntity;
-import net.arna.jcraft.common.util.Attack;
+import net.arna.jcraft.common.attack.Attack;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandManager;
@@ -14,11 +14,6 @@ import net.minecraft.text.Text;
 import java.util.List;
 
 public class AboutStandCommand {
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment) {
-        dispatcher.register(CommandManager.literal("stand")
-                .then(CommandManager.literal("about").executes(AboutStandCommand::run)));
-    }
-
     private static final List<String> buttons = List.of(
             "Light",
             "Heavy",
@@ -29,6 +24,11 @@ public class AboutStandCommand {
             "Special 3",
             "Utility"
     );
+
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment) {
+        dispatcher.register(CommandManager.literal("stand")
+                .then(CommandManager.literal("about").executes(AboutStandCommand::run)));
+    }
 
     public static int run(CommandContext<ServerCommandSource> context) {
         PlayerEntity playerEntity = context.getSource().getPlayer();

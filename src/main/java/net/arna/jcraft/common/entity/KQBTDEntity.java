@@ -2,11 +2,10 @@ package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.common.util.Attack;
-import net.arna.jcraft.common.util.AttackType;
+import net.arna.jcraft.common.attack.Attack;
+import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.MobilityType;
-import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -18,13 +17,9 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -42,9 +37,6 @@ import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
 
@@ -70,7 +62,6 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
     private Entity bombEntity, btdEntity;
     private Vec3d bombBlock, btdPos;
 
-    private int ticksDataStored = 0;
     //private NbtCompound userData;
     //private NbtCompound targetData;
 
@@ -126,10 +117,10 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
 
     @Override
     public void initSpecial1() {
-        if (!canAttack())
-            return;
-        LivingEntity user = this.getUser();
+        if (!canAttack() || !hasUser()) return;
+        LivingEntity user = getUserOrThrow();
         NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
+
         if (user.isInSneakingPose() && playerData.getInt(JCraft.standS1CD) < 1) {
             BlockPos downBlock = user.getBlockPos().down();
             boolean notAir = (world.getBlockState(downBlock).getBlock() != Blocks.AIR && world.getBlockState(downBlock).getBlock() != Blocks.CAVE_AIR && world.getBlockState(downBlock).getBlock() != Blocks.VOID_AIR);
@@ -145,6 +136,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
     }
 
     boolean detonateBTD = false;
+
     @Override
     public void initUlt() {
         if (!canAttack()) return;
@@ -156,8 +148,8 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
 
     @Override
     public void initSpecial2() {
-        if (!canAttack()) return;
-        if (getUser().isSneaking() && handleAttack(bubblecounter, JCraft.standS2CD, 10)) {
+        if (!canAttack() || !hasUser()) return;
+        if (getUserOrThrow().isSneaking() && handleAttack(bubblecounter, JCraft.standS2CD, 10)) {
             //playSound(JSoundRegister.KQBTD_COUNTER, 1, 1);
         } else if (handleAttack(bubble, JCraft.standS2CD, 8))
             playSound(JSoundRegister.KQ_UPPERCUT, 1, 1);
@@ -177,27 +169,6 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
     }
 
     @Override
-    public void initUtil() {
-        if (!canAttack()) return;
-        LivingEntity user = this.getUser();
-        NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
-        if (playerData.getInt(JCraft.utilCD) > 0) return;
-
-        Vec3d lookVec = user.getRotationVector().multiply(0.9);
-        world.createExplosion(user,
-                user.getX() - lookVec.x,
-                user.getY() + user.getHeight() / 2 - lookVec.y,
-                user.getZ() - lookVec.z,
-                1f, Explosion.DestructionType.NONE);
-
-        user.setVelocity(user.getVelocity().add(lookVec));
-        user.velocityModified = true;
-
-        playerData.putInt(JCraft.utilCD, 360); // 18s explosive dash cooldown
-        playSound(JSoundRegister.KQ_DETONATE, 1, 1);
-    }
-
-    @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
         LivingEntity user = this.getUser();
         switch (attack.id) {
@@ -206,6 +177,8 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
                     ent.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 5, 4, true, false));
             }
             case (4) -> {
+                if (user == null) return;
+
                 if (entities.size() > 0) { // Living entities take priority
                     bombEntity = entities.get(0);
                     bombBlock = null;
@@ -235,6 +208,8 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
                 }
             }
             case (5) -> {
+                if (user == null) return;
+
                 bubbleProjectile = new BubbleProjectile(world, user);
                 bubbleProjectile.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
                 bubbleProjectile.setVelocity(user, user.getPitch(), user.getYaw(), 0, 0.5f, 0f);
@@ -245,6 +220,8 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
                 bombBlock = null;
             }
             case (6) -> {
+                if (user == null) return;
+
                 if (detonateBTD) {
                     if (btdEntity instanceof LivingEntity livingEntity) {
                         world.createExplosion(user, livingEntity.getX(), livingEntity.getY() + livingEntity.getHeight() / 2, livingEntity.getZ(), 2f, Explosion.DestructionType.NONE);
@@ -256,11 +233,12 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
                         Vec3d v2 = pos.add(-3, -3, -3);
                         List<LivingEntity> list = world.getEntitiesByClass(LivingEntity.class, new Box(v1, v2), EntityPredicates.VALID_LIVING_ENTITY);
 
-                        if (user.hasVehicle())
-                            list.remove(user.getVehicle());
+                        if (user.getVehicle() instanceof LivingEntity livingVehicle)
+                            list.remove(livingVehicle);
+
                         list.remove(user);
                         list.remove(this);
-                        list.remove(btdEntity);
+                        list.remove(livingEntity);
 
                         for (LivingEntity l : list)
                             if (l.squaredDistanceTo(pos) < 9) {
@@ -373,7 +351,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
             if (entity instanceof LivingEntity livingEntity) {
                 stun(livingEntity, 10, 3);
 
-                StandEntity stand = ( (IEntityDataSaver)livingEntity ).getStand();
+                StandEntity stand = ((IEntityDataSaver) livingEntity).getStand();
                 if (stand != null)
                     stand.cancelAttack();
             }
@@ -385,6 +363,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
     }
 
     private static final Attack counterMiss = new Attack(8, 0, 15, 16, 1, AttackType.BOX);
+
     @Override
     public void whiffCounter() {
         setAttack(counterMiss, 11);
@@ -413,10 +392,9 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
         super.tick();
 
         if (hasUser()) {
-            LivingEntity user = getUser();
+            LivingEntity user = getUserOrThrow();
 
-            if (world.isClient)
-                setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
+            if (world.isClient) setAlpha((float) MathHelper.clamp(255.0 * squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
             else {
                 if (bubbleProjectile != null && !bubbleProjectile.isInGround()) {
                     bubbleProjectile.setVelocity(user.getRotationVector().multiply(0.5));
@@ -501,25 +479,8 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
     }
 
     // Animations
-    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
-    @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
-    }
-
-    @Override
-    public AnimationFactory getFactory() {
-        return this.animationFactory;
-    }
-
-    @Override
-    public int tickTimer() {
-        return age;
-    }
-
     @SuppressWarnings("SameReturnValue")
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+    protected <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
         AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 

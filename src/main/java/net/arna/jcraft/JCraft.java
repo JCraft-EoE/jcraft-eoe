@@ -54,6 +54,7 @@ import software.bernie.example.GeckoLibMod;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static net.arna.jcraft.common.entity.StandEntity.stun;
 
@@ -112,15 +113,23 @@ public class JCraft implements ModInitializer {
     public static final GameRules.Key<GameRules.BooleanRule> STAND_GRIEFING = GameRuleRegistry.register("standGriefing", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
     public static final GameRules.Key<GameRules.IntRule> DEFAULT_SPEC = GameRuleRegistry.register("defaultSpec", GameRules.Category.PLAYER, GameRuleFactory.createIntRule(0, 0, 2));
     //public static GameRules.Key<GameRules.IntRule> DAMAGE_MULT = GameRuleRegistry.register("jcraftDamageMult", GameRules.Category.MISC, GameRuleFactory.createIntRule(0, 0, 100));
+    // Dimensional travel bullshit
+    public static final List<DimValues> pastDimensions = new ArrayList<>();
+    private static final List<ChunkPos> preloadedChunks = new ArrayList<>();
+    public static final Map<LivingEntity, Integer> burstTimers = new HashMap<>();
+    public static final List<DashData> dashes = new ArrayList<>();
+    public static final int dashCooldown = 40;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private static IClientEntityHandler clientEntityHandler = DummyClientEntityHandler.INSTANCE;
 
     /**
      * Starts tracking a timestop on the server.
      * Synchronizes with clients (upon timestop creation, not repeatedly)
      * Puts nearby players' items on cooldown.
-     * @param position    in world
+     *
+     * @param position in world
      */
     //todo: make TS stop animated textures
     public static void stopTime(Entity timestopper, Vec3d position, ServerWorld world, int duration) {
@@ -197,6 +206,7 @@ public class JCraft implements ModInitializer {
     }
 
     // Dashes
+
     /**
      * Holds the data of an individual entities dash ({@link DashData#entity}, {@link DashData#dashVector}, {@link DashData#finished}, {@link DashData#duration})
      */
@@ -221,26 +231,28 @@ public class JCraft implements ModInitializer {
                 if (duration <= 0) finished = true;
                 return;
             }
-            entity.setVelocity( entity.getVelocity().add(dashVector).multiply(0.5) );
+            entity.setVelocity(entity.getVelocity().add(dashVector).multiply(0.5));
             entity.velocityModified = true;
         }
     }
-    public static ArrayList<DashData> dashes = new ArrayList<>();
-    public static final int dashCooldown = 40;
+
     public static boolean isDashing(LivingEntity player) {
         for (DashData dash : dashes)
             if (player == dash.entity) return true;
         return false;
     }
+
     public static DashData getDash(LivingEntity player) {
         for (DashData dash : dashes)
             if (player == dash.entity) return dash;
         return null;
     }
+
     public static void tryDash(int forward, int side, LivingEntity entity) {
-        NbtCompound data = ((IEntityDataSaver)entity).getPersistentData();
+        NbtCompound data = ((IEntityDataSaver) entity).getPersistentData();
         //todo: make a JCraftUtils method for checking if the player should be effectively disabled? like when stunned or knocked down as shown here:
-        if ( data.getInt(dashCD) > 0 || !entity.isOnGround() || entity.hasStatusEffect(JStatusRegister.DAZED) || entity.hasStatusEffect(JStatusRegister.KNOCKDOWN) ) return;
+        if (data.getInt(dashCD) > 0 || !entity.isOnGround() || entity.hasStatusEffect(JStatusRegister.DAZED) || entity.hasStatusEffect(JStatusRegister.KNOCKDOWN))
+            return;
         data.putInt(dashCD, dashCooldown);
 
         double dashSpeed = 0.75;
@@ -273,10 +285,6 @@ public class JCraft implements ModInitializer {
                         serverPlayer -> PlayerAnimPacket.send(player, serverPlayer, "dash"));
         }
     }
-
-    // Dimensional travel bullshit
-    public static ArrayList<DimValues> pastDimensions = new ArrayList<>();
-    private static final List<ChunkPos> preloadedChunks = new ArrayList<>();
 
     public static void clearPreloadedChunks(ServerWorld auWorld) {
         if (preloadedChunks.isEmpty()) {
@@ -383,8 +391,6 @@ public class JCraft implements ModInitializer {
             createParticle(world, pPos.x, pPos.y, pPos.z, 1);
         }
     }
-
-    public static HashMap<LivingEntity, Integer> burstTimers = new HashMap<>();
 
     /**
      * Breaks out of a combo using a slightly delayed attack centered at the player.

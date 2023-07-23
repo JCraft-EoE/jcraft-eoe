@@ -22,6 +22,8 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 import java.util.Arrays;
 
 public class GESnakeEntity extends TameableEntity implements IAnimatable, IAnimationTickable {
+    private final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+
     public GESnakeEntity(EntityType<? extends TameableEntity> entityType, World world) {
         super(entityType, world);
         Arrays.fill(this.handDropChances, 1F);
@@ -68,8 +70,6 @@ public class GESnakeEntity extends TameableEntity implements IAnimatable, IAnima
     }
 
     // Animations
-    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
     @Override
     public void registerControllers(AnimationData animationData) {
         animationData.addAnimationController(new AnimationController<>(this, "movement", 10, this::predicate));

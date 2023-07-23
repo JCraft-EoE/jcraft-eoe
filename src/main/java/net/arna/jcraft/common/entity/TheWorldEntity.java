@@ -1,8 +1,9 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.util.Attack;
-import net.arna.jcraft.common.util.AttackType;
+import net.arna.jcraft.common.attack.Attack;
+import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
@@ -19,9 +20,6 @@ import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
 
@@ -32,7 +30,7 @@ public class TheWorldEntity extends StandEntity {
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
     public static final Attack donut = new Attack(1, 14, 1f, 48, 26, 2, 9f, 0.0f, AttackType.BOX, 4, 0, 0, JSoundRegister.TW_DONUT_HIT)
             .setHitspark(2)
-            .appendHitbox(new Attack.HitboxData(0, 0, 1.5))
+            .appendHitbox(new HitBoxData(0, 0, 1.5))
             .hyperArmor()
             .setInfo("Donut", "slow, uninterruptable combo starter/extender, 1.5s stun on whiff");
     public static final Attack charge = new Attack(4, 20, 7.5f, 19, 5, 1.5, 5f, 0.25f, AttackType.CHARGE, 1, 0, 9, JSoundRegister.TW_CHARGE_HIT)
@@ -49,16 +47,14 @@ public class TheWorldEntity extends StandEntity {
     public static final Attack feignbarrage = new Attack(5, 30, 0.75f, 50, 5, 0, 0f, 0f, AttackType.COUNTER)
             .setInfo("Feign Barrage", "counter, 0.25s windup, 2.25s duration, teleports and knocks down on hit");
     public static final Attack counterfollowup = new Attack(7, 0, 0.75f, 9, 5, 1.75, 6f, 0.7f, AttackType.BOX, 0.8f, 0.1f, 0, JSoundRegister.IMPACT_4)
-            .appendHitbox(new Attack.HitboxData(1.25))
+            .appendHitbox(new HitBoxData(1.25))
             .hyperArmor()
             .setLaunch()
             .setInfo("Counter (Hit)", "quick, armored knockdown");
-
-    @Override
-    public void desummon() {
-        if (tsTime > 0) return;
-        super.desummon();
-    }
+    private static final Attack timeskip = new Attack(-2, 18, 2, 2)
+            .setMobility(MobilityType.TELEPORT)
+            .setInfo("Timeskip", "14m range");
+    private static final Attack counterMiss = new Attack(8, 0, 10, 11);
 
     public TheWorldEntity(World worldIn) {
         super(StandType.THE_WORLD, worldIn);
@@ -89,6 +85,12 @@ public class TheWorldEntity extends StandEntity {
                             Donut>Roundhouse>Charge>M1>Barrage>M1""";
 
         moves = List.of(light, donut, barrage, roundhouse, timestop, charge, feignbarrage, timeskip);
+    }
+
+    @Override
+    public void desummon() {
+        if (tsTime > 0) return;
+        super.desummon();
     }
 
     // Moveset
@@ -140,9 +142,6 @@ public class TheWorldEntity extends StandEntity {
             playSound(JSoundRegister.TW_BARRAGE, 1, 1);
     }
 
-    private static final Attack timeskip = new Attack(-2, 18, 2, 2)
-            .setMobility(MobilityType.TELEPORT)
-            .setInfo("Timeskip", "14m range");
     @Override
     public void initUtil() {
         if (!canAttack()) return;
@@ -159,14 +158,11 @@ public class TheWorldEntity extends StandEntity {
             case (1) -> {
                 LivingEntity user = this.getUser();
                 // If missed, stun the user for 1.5 seconds
-                if (entities.isEmpty()) {
-                    stun(user, 30, 0);
-                } else {
+                if (entities.isEmpty()) stun(user, 30, 0);
                     // If hit, impale and set position to middle of arm
-                    for (LivingEntity entity : entities) {
-                        Vec3d pos = this.getPos().add(this.getRotationVector().multiply(1.5));
-                        entity.teleport(pos.x, entity.getY(), pos.z);
-                    }
+                else for (LivingEntity entity : entities) {
+                    Vec3d pos = this.getPos().add(this.getRotationVector().multiply(1.5));
+                    entity.teleport(pos.x, entity.getY(), pos.z);
                 }
             }
             case (7) -> {
@@ -180,9 +176,8 @@ public class TheWorldEntity extends StandEntity {
     public void counter(Entity entity, DamageSource source) {
         super.counter(entity, source);
 
-        if (entity == null || !hasUser())
-            return;
-        LivingEntity user = this.getUser();
+        if (entity == null || !hasUser()) return;
+        LivingEntity user = getUserOrThrow();
         Vec3d behind = entity.getPos().subtract(entity.getRotationVector());
 
         user.setVelocity(0, 0, 0);
@@ -204,7 +199,6 @@ public class TheWorldEntity extends StandEntity {
         playSound(JSoundRegister.TW_COUNTER, 1, 1);
     }
 
-    private static final Attack counterMiss = new Attack(8, 0, 10, 11);
     @Override
     public void whiffCounter() {
         setAttack(counterMiss, 12);
@@ -225,25 +219,8 @@ public class TheWorldEntity extends StandEntity {
     }
 
     // Animation code
-    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
     @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
-    }
-
-    @Override
-    public AnimationFactory getFactory() {
-        return this.animationFactory;
-    }
-
-    @Override
-    public int tickTimer() {
-        return age;
-    }
-
-    @SuppressWarnings("SameReturnValue")
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+    protected <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
         AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 
@@ -252,9 +229,8 @@ public class TheWorldEntity extends StandEntity {
             return PlayState.CONTINUE;
         }
 
-        if (this.getSameState()) controller.markNeedsReload();
-        switch (this.getState()) {
-            default -> controller.setAnimation(builder.loop("animation.theworld.idle"));
+        if (getSameState()) controller.markNeedsReload();
+        switch (getState()) {
             case 2 -> controller.setAnimation(builder.playAndHold("animation.theworld.light"));
             case 3 -> controller.setAnimation(builder.loop("animation.theworld.block"));
             case 4 -> controller.setAnimation(builder.playAndHold("animation.theworld.donut"));
@@ -265,6 +241,7 @@ public class TheWorldEntity extends StandEntity {
             case 10 -> controller.setAnimation(builder.playAndHold("animation.theworld.roundhouse"));
             case 11 -> controller.setAnimation(builder.playAndHold("animation.theworld.counter_hit"));
             case 12 -> controller.setAnimation(builder.playAndHold("animation.theworld.counter_miss"));
+            default -> controller.setAnimation(builder.loop("animation.theworld.idle"));
         }
         return PlayState.CONTINUE;
     }

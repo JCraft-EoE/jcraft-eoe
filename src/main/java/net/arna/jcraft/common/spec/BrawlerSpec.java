@@ -1,9 +1,9 @@
 package net.arna.jcraft.common.spec;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.util.Attack;
-import net.arna.jcraft.common.util.AttackQueue;
-import net.arna.jcraft.common.util.AttackType;
+import net.arna.jcraft.common.attack.Attack;
+import net.arna.jcraft.common.attack.AttackQueue;
+import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.minecraft.entity.LivingEntity;
@@ -34,18 +34,22 @@ public class BrawlerSpec extends JCraftSpec {
     public String getInternalName() {
         return "brawler";
     }
+
     @Override
     public String getDescription() {
         return "Close-range pressure and combo extension tool";
     }
+
     @Override
     public String getDetails() {
         return "Important hitconfirm in the form of (any stand move)~stand.OFF>Combo>stand.ON+(any stand move)";
     }
+
     @Override
     public List<Attack> getAttacks() {
         return List.of(heavy, combo, gut, low);
     }
+
     @Override
     public int getId() {
         return 1;
@@ -53,25 +57,25 @@ public class BrawlerSpec extends JCraftSpec {
 
     // Attacks
     @Override
-    public void InitHeavyAttack(ServerWorld serverWorld) {
+    public void initHeavyAttack(ServerWorld serverWorld) {
         if (!canAttack()) return;
         handleAttack(serverWorld, heavy, JCraft.heavyCD);
     }
 
     @Override
-    public void InitBarrage(ServerWorld serverWorld) {
+    public void initBarrage(ServerWorld serverWorld) {
         if (!canAttack()) return;
         handleAttack(serverWorld, combo, JCraft.barrageCD);
     }
 
     @Override
-    public void InitSpecial1(ServerWorld serverWorld) {
+    public void initSpecial1(ServerWorld serverWorld) {
         if (!canAttack()) return;
         handleAttack(serverWorld, gut, JCraft.s1CD);
     }
 
     @Override
-    public void InitSpecial2(ServerWorld serverWorld) {
+    public void initSpecial2(ServerWorld serverWorld) {
         if (!canAttack()) return;
         handleAttack(serverWorld, low, JCraft.s2CD);
     }

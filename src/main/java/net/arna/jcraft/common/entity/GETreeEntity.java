@@ -25,6 +25,7 @@ import java.util.List;
 
 public class GETreeEntity extends Entity implements IAnimatable, IAnimationTickable {
     public LivingEntity owner;
+    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
     public GETreeEntity(EntityType<? extends Entity> type, World world) {
         super(type, world);
@@ -40,12 +41,15 @@ public class GETreeEntity extends Entity implements IAnimatable, IAnimationTicka
 
         if (owner != null) {
             if (age == 4) {
+                DamageSource ds = DamageSource.mob(owner);
                 List<LivingEntity> hurt = JUtils.generateHitbox(world, getPos().add(0, 1, 0), 2.5, null);
-                for (LivingEntity living :
-                        hurt) {
+                for (LivingEntity living : hurt) {
+                    if (living.isInvulnerableTo(ds)) continue;
+
                     LivingEntity target = JUtils.getUserIfStand(living);
                     if (owner != target)
-                        StandEntity.damageLogic(world, target, new Vec3d(0, 1, 0), 25, 1, false, 7f, true, 11, DamageSource.mob(owner), owner);
+                        StandEntity.damageLogic(world, target, new Vec3d(0, 1, 0), 25, 1,
+                                false, 7f, true, 11, ds, owner);
 
                     target.setVelocity(0, 1, 0);
                     target.velocityModified = true;
@@ -75,8 +79,6 @@ public class GETreeEntity extends Entity implements IAnimatable, IAnimationTicka
     }
 
     // Animations
-    final AnimationFactory factory = GeckoLibUtil.createFactory(this);
-
     @Override
     public AnimationFactory getFactory() {
         return this.factory;

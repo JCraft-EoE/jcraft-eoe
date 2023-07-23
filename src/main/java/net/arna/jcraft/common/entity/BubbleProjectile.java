@@ -24,6 +24,8 @@ import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
 public class BubbleProjectile extends PersistentProjectileEntity implements IAnimatable {
+    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+
     public BubbleProjectile(EntityType<? extends BubbleProjectile> entityType, World world) {
         super(entityType, world);
         this.pickupType = PersistentProjectileEntity.PickupPermission.DISALLOWED;
@@ -67,25 +69,28 @@ public class BubbleProjectile extends PersistentProjectileEntity implements IAni
     public boolean shouldRender(double distance) {
         return true;
     }
+
     @Override
     public boolean hasNoGravity() {
         return true;
     }
+
     @Override
     protected SoundEvent getHitSound() {
         return SoundEvents.BLOCK_BUBBLE_COLUMN_BUBBLE_POP;
     }
 
     // Animations
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
     @Override
     public void registerControllers(AnimationData data) {
         data.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
     }
+
     @Override
     public AnimationFactory getFactory() {
         return this.factory;
     }
+
     @SuppressWarnings("SameReturnValue")
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         event.getController().setAnimation(new AnimationBuilder().loop("animation.bubble.idle"));

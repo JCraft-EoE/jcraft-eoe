@@ -44,20 +44,18 @@ public class SheathedAnubisItem extends SpecObtainmentItem {
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack itemStack = user.getStackInHand(hand);
 
-        if (!user.isSneaking() || world.isClient)
-            return TypedActionResult.fail(itemStack);
-        else {
-            ServerWorld serverWorld = (ServerWorld)world;
+        if (!user.isSneaking() || world.isClient) return TypedActionResult.fail(itemStack);
 
-            boolean specChanged = tryGetSpec(user);
-            if (specChanged) {
-                JUtils.serverPlaySound(JSoundRegister.ANUBIS_UNSHEATHE, serverWorld, user.getPos());
-                JUtils.serverPlaySound(JSoundRegister.ANUBIS_SPECCHANGE, serverWorld, user.getPos());
-                user.setStackInHand(hand, new ItemStack(JObjectRegistry.ANUBIS));
-            } else if (!warned) {
-                JUtils.serverPlaySound(JSoundRegister.ANUBIS_UNSHEATHE, serverWorld, user.getPos());
-                user.setStackInHand(hand, new ItemStack(JObjectRegistry.ANUBIS));
-            }
+        ServerWorld serverWorld = (ServerWorld)world;
+
+        boolean specChanged = tryGetSpec(user);
+        if (specChanged) {
+            JUtils.serverPlaySound(JSoundRegister.ANUBIS_UNSHEATHE, serverWorld, user.getPos());
+            JUtils.serverPlaySound(JSoundRegister.ANUBIS_SPECCHANGE, serverWorld, user.getPos());
+            user.setStackInHand(hand, new ItemStack(JObjectRegistry.ANUBIS));
+        } else if (!warned) {
+            JUtils.serverPlaySound(JSoundRegister.ANUBIS_UNSHEATHE, serverWorld, user.getPos());
+            user.setStackInHand(hand, new ItemStack(JObjectRegistry.ANUBIS));
         }
         return TypedActionResult.consume(itemStack);
     }

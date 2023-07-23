@@ -2,8 +2,8 @@ package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.common.util.Attack;
-import net.arna.jcraft.common.util.AttackType;
+import net.arna.jcraft.common.attack.Attack;
+import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.registry.JEntityTypeRegister;
@@ -35,9 +35,6 @@ import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
 
@@ -118,15 +115,14 @@ public class KillerQueenEntity extends StandEntity {
     @Override
     public void initLightAttack() {
         if (hasUser()) {
-            LivingEntity user = this.getUser();
+            LivingEntity user = getUserOrThrow();
             if (user.hasStatusEffect(JStatusRegister.DAZED))
                 return;
-            boolean idling = this.getMoveStun() < 1;
+
+            boolean idling = getMoveStun() < 1;
             if (curAttack != light) {
                 if (idling) handleAttack(light, JCraft.standLightCD, 2);
-            } else if (this.getMoveStun() < 7) {
-                setAttack(low, 9);
-            }
+            } else if (getMoveStun() < 7) setAttack(low, 9);
         }
     }
 
@@ -149,20 +145,21 @@ public class KillerQueenEntity extends StandEntity {
 
     @Override
     public void initSpecial1() {
-        if (!canAttack()) return;
-        LivingEntity user = this.getUser();
+        if (!canAttack() || !hasUser()) return;
+
+        LivingEntity user = getUserOrThrow();
         NbtCompound userData = ((IEntityDataSaver) user).getPersistentData();
         if (user.isInSneakingPose() && userData.getInt(JCraft.standS1CD) < 1) {
             BlockPos downBlock = user.getBlockPos().down();
             boolean notAir = (world.getBlockState(downBlock).getBlock() != Blocks.AIR && world.getBlockState(downBlock).getBlock() != Blocks.CAVE_AIR && world.getBlockState(downBlock).getBlock() != Blocks.VOID_AIR);
             if (notAir) {
-                this.bombEntity = null;
-                this.bombBlock = user.getPos().add(0, -0.5, 0);
+                bombEntity = null;
+                bombBlock = user.getPos().add(0, -0.5, 0);
                 userData.putInt(JCraft.standS1CD, bombplant.cooldown * 20);
             }
         } else {
             handleAttack(bombplant, JCraft.standS1CD, 7);
-            this.bombBlock = null;
+            bombBlock = null;
         }
 
         if (this.coin != null)
@@ -185,8 +182,9 @@ public class KillerQueenEntity extends StandEntity {
 
     @Override
     public void initSpecial3() {
-        if (!canAttack()) return;
-        LivingEntity user = this.getUser();
+        if (!canAttack() || !hasUser()) return;
+
+        LivingEntity user = getUserOrThrow();
         NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
         if (playerData.getInt(JCraft.standS3CD) > 0) return;
 
@@ -207,8 +205,9 @@ public class KillerQueenEntity extends StandEntity {
 
     @Override
     public void initUtil() {
-        if (!canAttack()) return;
-        LivingEntity user = this.getUser();
+        if (!canAttack() || !hasUser()) return;
+
+        LivingEntity user = getUserOrThrow();
         NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
         if (playerData.getInt(JCraft.utilCD) > 0) return;
 
@@ -228,7 +227,9 @@ public class KillerQueenEntity extends StandEntity {
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
-        LivingEntity user = this.getUser();
+        if (!hasUser()) return;
+
+        LivingEntity user = getUserOrThrow();
         switch (attack.id) {
             case (4) -> {
                 if (entities.size() > 0) { // Living entities take priority
@@ -253,7 +254,7 @@ public class KillerQueenEntity extends StandEntity {
             }
             case (5) -> {
                 SheerHeartAttackEntity sha = new SheerHeartAttackEntity(JEntityTypeRegister.SHEER_HEART_ATTACK, world);
-                sha.setOwner(user);
+                sha.setMaster(user);
                 sha.refreshPositionAndAngles(getX(), getY() + 0.5, getZ(), getYaw(), getPitch());
 
                 world.spawnEntity(sha);
@@ -270,9 +271,7 @@ public class KillerQueenEntity extends StandEntity {
                         if (bombEntity instanceof ItemEntity)
                             bombEntity.kill();
                     }
-                    if (bombBlock != null) {
-                        bombPos = bombBlock;
-                    }
+                    if (bombBlock != null) bombPos = bombBlock;
 
                     if (bombPos != null) {
                         world.createExplosion(user, bombPos.x, bombPos.y, bombPos.z, 2f, Explosion.DestructionType.NONE);
@@ -283,9 +282,8 @@ public class KillerQueenEntity extends StandEntity {
                                 EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR
                         );
 
-                        for (LivingEntity livingEntity : toKD) {
+                        for (LivingEntity livingEntity : toKD)
                             livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
-                        }
 
                         world.playSound(bombPos.x, bombPos.y, bombPos.z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.75f, 1, true);
                     }
@@ -326,7 +324,6 @@ public class KillerQueenEntity extends StandEntity {
         }
     }
 
-    @SuppressWarnings("SuspiciousMethodCalls")
     protected void displayBombParticles(ServerPlayerEntity playerEntity, Vec3d bombBlock, Entity bombEntity) {
         boolean bombIsBlock = bombBlock != null;
         boolean bombExists = (bombEntity != null || bombIsBlock);
@@ -375,7 +372,7 @@ public class KillerQueenEntity extends StandEntity {
             Vec3d v1 = bPos.add(3, 3, 3);
             Vec3d v2 = bPos.add(-3, -3, -3);
             List<LivingEntity> list = world.getEntitiesByClass(LivingEntity.class, new Box(v1, v2), EntityPredicates.VALID_LIVING_ENTITY);
-            list.remove(bombEntity);
+            if (bombEntity instanceof LivingEntity) list.remove(bombEntity);
             for (LivingEntity l : list)
                 if (l.squaredDistanceTo(bPos) < 9) {
                     anyInRange = true;
@@ -390,25 +387,9 @@ public class KillerQueenEntity extends StandEntity {
     }
 
     // Animations
-    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
-    @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
-    }
-
-    @Override
-    public AnimationFactory getFactory() {
-        return this.animationFactory;
-    }
-
-    @Override
-    public int tickTimer() {
-        return age;
-    }
-
     @SuppressWarnings("SameReturnValue")
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+    @Override
+    protected <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
         AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 

@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class DazedStatusEffect extends StatusEffect {
+    private static final UUID slowUUID = UUID.fromString("778B48FC-485B-5BA7-58C7-E0D755CE354D");
 
     public DazedStatusEffect() {
         super(StatusEffectCategory.NEUTRAL, 0x444444);
@@ -38,27 +39,21 @@ public class DazedStatusEffect extends StatusEffect {
             yVel = MathHelper.clamp(yVel, -0.5, 0.5);
             horizontalMult = 0.2;
         }
-        if (amplifier == 3) {
-            horizontalMult = 1;
-        }
+
+        if (amplifier == 3) horizontalMult = 1;
         entity.setVelocity(eVel.x * horizontalMult, yVel, eVel.z * horizontalMult);
 
-        if (entity instanceof MobEntity mob) {
-            mob.setTarget(null);
-            mob.setAttacking(false);
-        }
+        if (!(entity instanceof MobEntity mob)) return;
+        mob.setTarget(null);
+        mob.setAttacking(false);
     }
-
-    private static final UUID slowUUID = UUID.fromString("778B48FC-485B-5BA7-58C7-E0D755CE354D");
 
     @Override
     public double adjustModifierAmount(int amplifier, EntityAttributeModifier modifier) {
-        if (Objects.equals(modifier.getId(), slowUUID)) {
-            return switch (amplifier) {
-                case 3, 1, 0 -> -1;
-                default -> 0;
-            };
-        }
+        if (Objects.equals(modifier.getId(), slowUUID)) return switch (amplifier) {
+            case 3, 1, 0 -> -1;
+            default -> 0;
+        };
 
         return super.adjustModifierAmount(amplifier, modifier);
     }

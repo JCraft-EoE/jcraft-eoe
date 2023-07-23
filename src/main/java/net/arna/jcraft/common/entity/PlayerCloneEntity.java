@@ -44,6 +44,17 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
     private static final TrackedData<Optional<UUID>> MASTER;
     private static final TrackedData<Boolean> SAND, RENDER_FOR_MASTER;
     private final BowAttackGoal<PlayerCloneEntity> bowAttackGoal = new BowAttackGoal<>(this, 1.0, 30, 15.0F);
+    private final CloneAttackGoal cloneAttackGoal = new CloneAttackGoal(this, 1) {
+        public void stop() {
+            super.stop();
+            PlayerCloneEntity.this.setAttacking(false);
+        }
+
+        public void start() {
+            super.start();
+            PlayerCloneEntity.this.setAttacking(true);
+        }
+    };
     private boolean allowItemExchange = true;
 
     private LivingEntity persistTarget = null;
@@ -59,28 +70,16 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
 
     public PlayerCloneEntity(EntityType<? extends HostileEntity> entityType, World world) {
         super(entityType, world);
-        Arrays.fill(this.armorDropChances, 1F);
-        Arrays.fill(this.handDropChances, 1F);
+        Arrays.fill(armorDropChances, 1F);
+        Arrays.fill(handDropChances, 1F);
         updateAttackType();
         navigation = getNavigation();
     }
 
     public void disableDrops() {
-        Arrays.fill(this.armorDropChances, 0);
-        Arrays.fill(this.handDropChances, 0);
+        Arrays.fill(armorDropChances, 0);
+        Arrays.fill(handDropChances, 0);
     }
-
-    private final CloneAttackGoal cloneAttackGoal = new CloneAttackGoal(this, 1) {
-        public void stop() {
-            super.stop();
-            PlayerCloneEntity.this.setAttacking(false);
-        }
-
-        public void start() {
-            super.start();
-            PlayerCloneEntity.this.setAttacking(true);
-        }
-    };
 
     public void disableItemExchange() {
         allowItemExchange = false;
@@ -139,13 +138,14 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
     protected boolean isDisallowedInPeaceful() {
         return false;
     }
+
     @Override
     public boolean canPickUpLoot() {
         return true;
     }
 
     public static EntityType<PlayerCloneEntity> getCloneType(ServerPlayerEntity player) {
-        return ((IEntityDataSaver)player).isThin() ? JEntityTypeRegister.PLAYER_ENTITY_CLONE_SLIM : JEntityTypeRegister.PLAYER_ENTITY_CLONE;
+        return ((IEntityDataSaver) player).isThin() ? JEntityTypeRegister.PLAYER_ENTITY_CLONE_SLIM : JEntityTypeRegister.PLAYER_ENTITY_CLONE;
     }
 
     @Override
@@ -154,6 +154,7 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
         nbt.putUuid("Master", getMasterId());
         nbt.putInt("DisabledSlots", disabledSlots);
     }
+
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);

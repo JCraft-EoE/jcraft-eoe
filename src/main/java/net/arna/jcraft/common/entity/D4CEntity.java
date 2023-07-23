@@ -1,6 +1,8 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.attack.Attack;
+import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JDimensionRegister;
 import net.arna.jcraft.registry.JObjectRegistry;
@@ -29,12 +31,10 @@ import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class D4CEntity extends StandEntity {
     public static final Attack light = new Attack(0, 2, 0.75f, 15, 9, 1.5, 5f, 0.75f, AttackType.BOX, 1.5f, -0.1f, 0, JSoundRegister.IMPACT_2)
@@ -92,7 +92,7 @@ public class D4CEntity extends StandEntity {
         moves = List.of(light, heavy, barrage, dimhop_others, clonespawn, grab, counter, flag);
 
         if (world.isClient) return;
-        auWorld = getServer().getWorld(JDimensionRegister.AU_DIMENSION_KEY);
+        auWorld = Objects.requireNonNull(getServer()).getWorld(JDimensionRegister.AU_DIMENSION_KEY);
     }
 
     @Override
@@ -105,15 +105,14 @@ public class D4CEntity extends StandEntity {
 
     @Override
     public void initHeavyAttack() {
-        if (!this.canAttack()) return;
-        if (handleAttack(heavy, JCraft.standHeavyCD, 4)) {
-            this.playSound(JSoundRegister.D4C_HEAVY, 1, 1);
-            Entity ent = this.getUser();
-            if (ent.isOnGround()) {
-                ent.setVelocity(ent.getVelocity().add(this.getRotationVector().multiply(0.75)).add(0.0, 0.15, 0.0));
-                ent.velocityModified = true;
-            }
-        }
+        if (!this.canAttack() || !hasUser() || !handleAttack(heavy, JCraft.standHeavyCD, 4)) return;
+
+        this.playSound(JSoundRegister.D4C_HEAVY, 1, 1);
+        Entity ent = getUserOrThrow();
+
+        if (!ent.isOnGround()) return;
+        ent.setVelocity(ent.getVelocity().add(this.getRotationVector().multiply(0.75)).add(0.0, 0.15, 0.0));
+        ent.velocityModified = true;
     }
 
     @Override
@@ -135,12 +134,12 @@ public class D4CEntity extends StandEntity {
     @Override
     public void initUlt() {
         // Ability to cancel dimension hop
-        if (this.curAttack == dimhop_others) {
-            this.setMoveStun(0);
-            this.curAttack = null;
+        if (curAttack == dimhop_others) {
+            setMoveStun(0);
+            curAttack = null;
         }
 
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
 
         LivingEntity user = getUser();
         if (user instanceof ServerPlayerEntity serverPlayer) { // Logic for cancelling dimhop early, and generating failsafe data
@@ -155,39 +154,33 @@ public class D4CEntity extends StandEntity {
 
                 if (!isStored) { // If not stored, force your way back
                     BlockPos spawnPos = serverPlayer.getSpawnPointPosition(); // Prioritize spawn point
-                    if (spawnPos == null) {
-                        spawnPos = serverPlayer.getBlockPos();
-                    } // Use current position if all else fails
-                    JCraft.pastDimensions.add(
-                            new DimValues(user
-                                    , new Vec3d(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ())
-                                    , serverPlayer.getSpawnPointDimension()
-                            )
-                    );
+                    // Use current position if all else fails
+                    if (spawnPos == null) spawnPos = serverPlayer.getBlockPos();
+                    JCraft.pastDimensions.add(new DimValues(user,
+                            new Vec3d(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()),
+                            serverPlayer.getSpawnPointDimension()));
                 }
             }
         }
 
-        if (handleAttack(dimhop_others, JCraft.standUltCD, 6)) {
-            this.playSound(JSoundRegister.D4C_DIMHOP, 1, 1);
-        }
+        if (handleAttack(dimhop_others, JCraft.standUltCD, 6)) playSound(JSoundRegister.D4C_DIMHOP, 1, 1);
     }
 
     @Override
     public void initSpecial2() {
-        if (!this.canAttack()) return;
-        if (getUser().isSneaking() && handleAttack(givegun, JCraft.standS2CD, 10)) {
-            this.playSound(JSoundRegister.D4C_THROW, 1, 1);
-            this.equipStack(EquipmentSlot.MAINHAND, JObjectRegistry.FVREVOLVER.getDefaultStack());
+        if (!canAttack() || !hasUser()) return;
+        if (getUserOrThrow().isSneaking() && handleAttack(givegun, JCraft.standS2CD, 10)) {
+            playSound(JSoundRegister.D4C_THROW, 1, 1);
+            equipStack(EquipmentSlot.MAINHAND, JObjectRegistry.FVREVOLVER.getDefaultStack());
         } else if (handleAttack(grab, JCraft.standS2CD, 7)) {
-            this.playSound(JSoundRegister.D4C_THROW, 1, 1);
-            this.equipStack(EquipmentSlot.MAINHAND, JObjectRegistry.FVREVOLVER.getDefaultStack());
+            playSound(JSoundRegister.D4C_THROW, 1, 1);
+            equipStack(EquipmentSlot.MAINHAND, JObjectRegistry.FVREVOLVER.getDefaultStack());
         }
     }
 
     @Override
     public void initSpecial3() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         handleAttack(counter, JCraft.standS3CD, 8);
     }
 
@@ -204,10 +197,10 @@ public class D4CEntity extends StandEntity {
 
     @Override
     public void initUtil() {
-        if (!this.canAttack()) return;
+        if (!canAttack() || !hasUser()) return;
         if (handleAttack(flag, JCraft.utilCD, 11)) {
-            getUser().addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, flag.moveStun, 0, true, false));
-            getUser().addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, flag.moveStun, 0, true, false));
+            getUserOrThrow().addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, flag.moveStun, 0, true, false));
+            getUserOrThrow().addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, flag.moveStun, 0, true, false));
             playSound(JSoundRegister.D4C_UTILITY, 1, 1);
         }
     }
@@ -235,6 +228,7 @@ public class D4CEntity extends StandEntity {
     private static final Attack grabhitfinal = new Attack(10, 0, 0.75f, 34, 0, 2, 4f, 1.2f, AttackType.MULTIHIT, 0.45f, 0, List.of(11, 17, 26), JSoundRegister.IMPACT_1)
             .setHitspark(2)
             .setLaunch();
+
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
         Entity player = this.getUser();
@@ -325,11 +319,13 @@ public class D4CEntity extends StandEntity {
                 }
             }
             case (9) -> {
+                if (!hasUser()) return;
+
                 int duration = flag.moveStun - flag.initTime;
-                getUser().addStatusEffect(new StatusEffectInstance(StatusEffects.INVISIBILITY, duration, 0, true, false));
-                getUser().addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, duration, 2, true, false));
+                getUserOrThrow().addStatusEffect(new StatusEffectInstance(StatusEffects.INVISIBILITY, duration, 0, true, false));
+                getUserOrThrow().addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, duration, 2, true, false));
             }
-            case (10) -> this.getMainHandStack().decrement(1);
+            case (10) -> getMainHandStack().decrement(1);
         }
     }
 
@@ -337,10 +333,8 @@ public class D4CEntity extends StandEntity {
     public void counter(Entity entity, DamageSource source) {
         super.counter(entity, source);
 
-        if (entity == null || !hasUser()) {
-            return;
-        }
-        LivingEntity user = this.getUser();
+        if (entity == null || !hasUser()) return;
+        LivingEntity user = getUserOrThrow();
         if (!source.isProjectile() && !source.isMagic()) {
             Vec3d trueKnockback = entity.getPos().subtract(user.getPos()).normalize().multiply(1.5);
             entity.addVelocity(trueKnockback.x, 0.5, trueKnockback.z);
@@ -350,17 +344,18 @@ public class D4CEntity extends StandEntity {
                 livingEntity.damage(DamageSource.mob(user), 10);
                 stun(livingEntity, 20, 3);
 
-                StandEntity stand = ( (IEntityDataSaver)livingEntity ).getStand();
+                StandEntity stand = ((IEntityDataSaver) livingEntity).getStand();
                 if (stand != null)
                     stand.cancelAttack();
             }
 
-            this.world.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1f, 1f);
-            this.playSound(JSoundRegister.D4C_COUNTER, 1, 1);
+            world.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1f, 1f);
+            playSound(JSoundRegister.D4C_COUNTER, 1, 1);
         }
     }
 
     private static final Attack counterMiss = new Attack(8, 0, 10, 11);
+
     @Override
     public void whiffCounter() {
         setAttack(counterMiss, 12);
@@ -381,25 +376,9 @@ public class D4CEntity extends StandEntity {
     }
 
     // Animation code
-    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
-    @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
-    }
-
-    @Override
-    public AnimationFactory getFactory() {
-        return this.animationFactory;
-    }
-
-    @Override
-    public int tickTimer() {
-        return age;
-    }
-
     @SuppressWarnings("SameReturnValue")
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+    @Override
+    protected  <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
         AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 

@@ -1,7 +1,11 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.util.*;
+import net.arna.jcraft.common.attack.Attack;
+import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.minecraft.block.Block;
@@ -31,13 +35,10 @@ import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
 
-import static net.arna.jcraft.common.util.Attack.unusable;
+import static net.arna.jcraft.common.attack.Attack.unusable;
 
 public class CreamEntity extends StandEntity {
     public static final Attack light = new Attack(0, 2, 0.75f, 14, 6, 1.5, 5f, 0.75f, AttackType.BOX, 1f, 0.1f, 0, JSoundRegister.IMPACT_3)
@@ -79,29 +80,14 @@ public class CreamEntity extends StandEntity {
     public static final Attack ballcharge = new Attack(13, 20, 28, 13, 0, AttackType.BOX)
             .setInfo("Void Charge", "cream quickly transforms into a black hole and charges in the pointed direction");
 
-    private static final TrackedData<Integer> VOIDTIME;
-    private static final TrackedData<Boolean> HALFBALL;
+    private static final TrackedData<Integer> VOID_TIME;
+    private static final TrackedData<Boolean> HALF_BALL;
+    private Vec3d chargeDir;
+    private boolean charging = false;
 
-    public void beginHalfBall() {
-        this.dataTracker.set(HALFBALL, true);
-        idleDistance = 0f;
-        blockDistance = 0f;
-        maxStandGauge = 45f;
-
-        moves = List.of(balllight, ballheavy, ballcombo, ballcharge, consume, unusable, unusable, exit);
-    }
-
-    public void endHalfBall() {
-        this.dataTracker.set(HALFBALL, false);
-        idleDistance = 1.25f;
-        blockDistance = 0.75f;
-        maxStandGauge = 90f;
-
-        moves = List.of(light, heavy, combo, destroy, consume, charge, grab, enter);
-    }
-
-    public boolean getHalfBall() {
-        return this.dataTracker.get(HALFBALL);
+    static {
+        VOID_TIME = DataTracker.registerData(CreamEntity.class, TrackedDataHandlerRegistry.INTEGER);
+        HALF_BALL = DataTracker.registerData(CreamEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     }
 
     public CreamEntity(World worldIn) {
@@ -133,23 +119,41 @@ public class CreamEntity extends StandEntity {
         moves = List.of(light, heavy, combo, destroy, consume, charge, grab, enter);
     }
 
-    static {
-        VOIDTIME = DataTracker.registerData(CreamEntity.class, TrackedDataHandlerRegistry.INTEGER);
-        HALFBALL = DataTracker.registerData(CreamEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    public void beginHalfBall() {
+        this.dataTracker.set(HALF_BALL, true);
+        idleDistance = 0f;
+        blockDistance = 0f;
+        maxStandGauge = 45f;
+
+        moves = List.of(balllight, ballheavy, ballcombo, ballcharge, consume, unusable, unusable, exit);
+    }
+
+    public void endHalfBall() {
+        this.dataTracker.set(HALF_BALL, false);
+        idleDistance = 1.25f;
+        blockDistance = 0.75f;
+        maxStandGauge = 90f;
+
+        moves = List.of(light, heavy, combo, destroy, consume, charge, grab, enter);
+    }
+
+    public boolean getHalfBall() {
+        return this.dataTracker.get(HALF_BALL);
     }
 
     public int getVoidTime() {
-        return this.dataTracker.get(VOIDTIME);
+        return this.dataTracker.get(VOID_TIME);
     }
+
     public void setVoidTime(int vTime) {
-        this.dataTracker.set(VOIDTIME, vTime);
+        this.dataTracker.set(VOID_TIME, vTime);
     }
 
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
-        this.getDataTracker().startTracking(VOIDTIME, 0);
-        this.getDataTracker().startTracking(HALFBALL, false);
+        this.getDataTracker().startTracking(VOID_TIME, 0);
+        this.getDataTracker().startTracking(HALF_BALL, false);
     }
 
     @Override
@@ -252,8 +256,6 @@ public class CreamEntity extends StandEntity {
         }
     }
 
-    private Vec3d chargeDir;
-    private boolean charging = false;
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
         switch (attack.id) {
@@ -273,14 +275,12 @@ public class CreamEntity extends StandEntity {
                     for (LivingEntity ent : entities) {
                         stun(ent, 20, 0);
 
-                        if (ent.getFirstPassenger() instanceof StandEntity stand) {
-                            stand.blocking = false;
-                        }
+                        if (ent.getFirstPassenger() instanceof StandEntity stand) stand.blocking = false;
                     }
 
-                    this.curAttack = grabhit;
-                    this.setMoveStun(20);
-                    this.setState(10);
+                    curAttack = grabhit;
+                    setMoveStun(20);
+                    setState(10);
                 }
             }
             case (6) -> {
@@ -326,9 +326,11 @@ public class CreamEntity extends StandEntity {
                         ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0));
             }
             case (13) -> {
+                if (!hasUser()) return;
+
                 this.playSound(JSoundRegister.CREAM_CHARGE, 1, 1);
                 charging = true;
-                chargeDir = getUser().getRotationVector().multiply(0.5);
+                chargeDir = getUserOrThrow().getRotationVector().multiply(0.5);
                 setVoidTime(15);
             }
         }
@@ -364,7 +366,7 @@ public class CreamEntity extends StandEntity {
         boolean server = !this.world.isClient();
 
         if (hasUser()) {
-            LivingEntity user = this.getUser();
+            LivingEntity user = getUserOrThrow();
             boolean isPlayer = false;
             boolean notCorS = false;
 
@@ -400,7 +402,8 @@ public class CreamEntity extends StandEntity {
                             for (int y = -1; y < 3; y++) {
                                 for (int z = -1; z < 2; z++) {
                                     BlockPos curPos = this.getBlockPos().add(x, y, z);
-                                    if (this.world.getBlockState(curPos).getBlock().getBlastResistance() > 100.1f) continue;
+                                    if (this.world.getBlockState(curPos).getBlock().getBlastResistance() > 100.1f)
+                                        continue;
                                     this.world.setBlockState(curPos, Block.getStateFromRawId(0));
                                 }
                             }
@@ -450,9 +453,9 @@ public class CreamEntity extends StandEntity {
 
                     for (LivingEntity ent : toDamage) {
                         if (age % 4 == 0) {
-                            stun(ent, 2, 1);
+                            stun(ent, 2, 0);
 
-                            StandEntity enemyStand = ((IEntityDataSaver)ent).getStand();
+                            StandEntity enemyStand = ((IEntityDataSaver) ent).getStand();
                             if (enemyStand != null)
                                 enemyStand.cancelAttack();
                         }
@@ -498,7 +501,8 @@ public class CreamEntity extends StandEntity {
                             if (getRemoteJumpInput()) {
                                 if (groundDist < 5) {
                                     user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 10, 2, true, false));
-                                    if (groundDist < 3) finalSpeed = finalSpeed.add(0, 0.25 / groundDist + stabilization, 0);
+                                    if (groundDist < 3)
+                                        finalSpeed = finalSpeed.add(0, 0.25 / groundDist + stabilization, 0);
                                 }
                             }
 
@@ -516,25 +520,9 @@ public class CreamEntity extends StandEntity {
     }
 
     // Animation code
-    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
-    @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
-    }
-
-    @Override
-    public AnimationFactory getFactory() {
-        return this.animationFactory;
-    }
-
-    @Override
-    public int tickTimer() {
-        return age;
-    }
-
     @SuppressWarnings("SameReturnValue")
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+    @Override
+    protected <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
         AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 

@@ -4,13 +4,12 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
-import net.arna.jcraft.common.util.AttackQueue;
+import net.arna.jcraft.common.attack.AttackQueue;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -89,7 +88,7 @@ public class StandControlPacket {
                 } else {
                     JCraftSpec spec = JUtils.getSpec(player);
                     if (spec != null) {
-                        spec.InitHeavyAttack(world);
+                        spec.initHeavyAttack(world);
                         if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT)
                             spec.queuedAttack = AttackQueue.HEAVY;
                     }
@@ -107,7 +106,7 @@ public class StandControlPacket {
                 } else {
                     JCraftSpec spec = JUtils.getSpec(player);
                     if (spec != null) {
-                        spec.InitBarrage(world);
+                        spec.initBarrage(world);
                         if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT)
                             spec.queuedAttack = AttackQueue.BARRAGE;
                     }
@@ -125,7 +124,7 @@ public class StandControlPacket {
                 } else {
                     JCraftSpec spec = JUtils.getSpec(player);
                     if (spec != null) {
-                        spec.InitSpecial1(world);
+                        spec.initSpecial1(world);
                         if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT)
                             spec.queuedAttack = AttackQueue.SPECIAL1;
                     }
@@ -143,7 +142,7 @@ public class StandControlPacket {
                 } else {
                     JCraftSpec spec = JUtils.getSpec(player);
                     if (spec != null) {
-                        spec.InitUlt(world);
+                        spec.initUlt(world);
                         if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT)
                             spec.queuedAttack = AttackQueue.ULTIMATE;
                     }
@@ -161,7 +160,7 @@ public class StandControlPacket {
                 } else {
                     JCraftSpec spec = JUtils.getSpec(player);
                     if (spec != null) {
-                        spec.InitSpecial2(world);
+                        spec.initSpecial2(world);
                         if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT)
                             spec.queuedAttack = AttackQueue.SPECIAL2;
                     }
@@ -179,7 +178,7 @@ public class StandControlPacket {
                 } else {
                     JCraftSpec spec = JUtils.getSpec(player);
                     if (spec != null) {
-                        spec.InitSpecial3(world);
+                        spec.initSpecial3(world);
                         if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT)
                             spec.queuedAttack = AttackQueue.SPECIAL3;
                     }

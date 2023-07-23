@@ -30,12 +30,15 @@ import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
 public class KnifeProjectile extends PersistentProjectileEntity implements IAnimatable {
-    private int ticksInAir;
-
     private static final TrackedData<Boolean> LIGHTNING;
+    private int ticksInAir;
     private boolean delayed = false;
     private boolean delayFired = false;
     private int delayTime;
+
+    static {
+        LIGHTNING = DataTracker.registerData(KnifeProjectile.class, TrackedDataHandlerRegistry.BOOLEAN);
+    }
 
     public KnifeProjectile(EntityType<? extends KnifeProjectile> entityType, World world) {
         super(entityType, world);
@@ -45,10 +48,6 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
     public KnifeProjectile(World world, LivingEntity owner) {
         super(JEntityTypeRegister.KNIFE, owner, world);
         this.setOwner(owner);
-    }
-
-    static {
-        LIGHTNING = DataTracker.registerData(KnifeProjectile.class, TrackedDataHandlerRegistry.BOOLEAN);
     }
 
     public Boolean getLightning() {
@@ -171,8 +170,13 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
 
     // Animations
     private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+
     @Override
-    public void registerControllers(AnimationData data) { }
+    public void registerControllers(AnimationData data) {
+    }
+
     @Override
-    public AnimationFactory getFactory() { return this.factory; }
+    public AnimationFactory getFactory() {
+        return this.factory;
+    }
 }

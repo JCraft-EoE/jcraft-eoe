@@ -26,8 +26,6 @@ public class WSPoisonEffect extends StatusEffect {
 
             mob.setTarget(null);
             mob.setAttacking(false);
-        } else {
-            entity.setPose(EntityPose.SWIMMING);
-        }
+        } else entity.setPose(EntityPose.SWIMMING);
     }
 }

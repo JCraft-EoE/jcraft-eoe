@@ -1,8 +1,9 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.util.Attack;
-import net.arna.jcraft.common.util.AttackType;
+import net.arna.jcraft.common.attack.Attack;
+import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.registry.JEntityTypeRegister;
@@ -34,9 +35,6 @@ import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +48,7 @@ public class CMoonEntity extends StandEntity {
     public static final Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 0.75f, 0.25f, AttackType.BARRAGE, 1, 0, 4, JSoundRegister.IMPACT_3)
             .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
     public static final Attack gutpunch = new Attack(1, 17, 1f, 30, 19, 2.0, 8f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.TW_KICK_HIT).setHitspark(2).hyperArmor().setLaunch()
-            .appendHitbox(new Attack.HitboxData(0, 0.25, 1.25))
+            .appendHitbox(new HitBoxData(0, 0.25, 1.25))
             .setInfo("Gut Punch", "slow, uninterruptable combo finisher");
     public static final Attack launch = new Attack(4, 22, 0.75f, 21, 14, 1.75, 5f, 0.9f, AttackType.BOX, 0.95f, 0.3f, 0, JSoundRegister.IMPACT_5)
             .setHitspark(2)
@@ -58,7 +56,7 @@ public class CMoonEntity extends StandEntity {
             .setInfo("Block Launch", "lifts a block from the ground and launches it at a delay/crouching and using this button resets the delay on nearby blocks");
     public static final Attack gravpunch = new Attack(3, 24, 1f, 32, 20, 1.75, 6f, 0.35f, AttackType.BOX, 2.25f, -0.3f, 0, JSoundRegister.CMOON_GRAVPUNCHHIT).setHitspark(2).hyperArmor()
             .setUB(true)
-            .appendHitbox(new Attack.HitboxData(1))
+            .appendHitbox(new HitBoxData(1))
             .setInfo("Only One Punch", "lifts enemy on hit");
     public static final Attack groundslam = new Attack(5, 23, 1f, 18, 10, 3, 7f, 0.2f, AttackType.BOX, 0.85f, 1.4f, 0, JSoundRegister.CMOON_GRAVPUNCHHIT)
             .setUB(true)
@@ -150,18 +148,18 @@ public class CMoonEntity extends StandEntity {
 
     @Override
     public void initSpecial2() {
-        if (hasUser()) {
-            LivingEntity user = getUser();
-            if (user.isSneaking()) {
-                List<BlockProjectile> blocks = world.getEntitiesByClass(BlockProjectile.class, getBoundingBox().expand(16), EntityPredicates.VALID_LIVING_ENTITY);
-                for (BlockProjectile block :
-                        blocks) {
-                    if (block.getMaster() != user) continue;
-                    block.markRefresh();
-                }
-            } else if (canAttack() && handleAttack(launch, JCraft.standS2CD, 9))
-                playSound(JSoundRegister.CMOON_GROUNDSHOOT, 1, 1);
-        }
+        if (!hasUser()) return;
+
+        LivingEntity user = getUserOrThrow();
+        if (user.isSneaking()) {
+            List<BlockProjectile> blocks = world.getEntitiesByClass(BlockProjectile.class, getBoundingBox().expand(16), EntityPredicates.VALID_LIVING_ENTITY);
+            for (BlockProjectile block :
+                    blocks) {
+                if (block.getMaster() != user) continue;
+                block.markRefresh();
+            }
+        } else if (canAttack() && handleAttack(launch, JCraft.standS2CD, 9))
+            playSound(JSoundRegister.CMOON_GROUNDSHOOT, 1, 1);
     }
 
     @Override
@@ -188,9 +186,9 @@ public class CMoonEntity extends StandEntity {
 
     @Override
     public void initUtil() {
-        if (!this.canAttack()) return;
-        LivingEntity user = getUser();
+        if (!this.canAttack() || !hasUser()) return;
 
+        LivingEntity user = getUserOrThrow();
         IEntityDataSaver userData = (IEntityDataSaver) user;
         if (userData.getPersistentData().getInt(JCraft.utilCD) > 0) return;
 
@@ -224,7 +222,9 @@ public class CMoonEntity extends StandEntity {
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
-        LivingEntity user = this.getUser();
+        if (!hasUser()) return;
+        LivingEntity user = getUserOrThrow();
+
         for (LivingEntity ent : entities) {
             invertDamages.add(attack == barrage ? 0.25f : 0.5f);
             invertEntities.add(ent);
@@ -288,9 +288,9 @@ public class CMoonEntity extends StandEntity {
         super.tick();
 
         if (hasUser()) {
-            LivingEntity user = this.getUser();
-            Vec3d pos = this.getPos();
-            int sTime = this.getShiftTime();
+            LivingEntity user = getUserOrThrow();
+            Vec3d pos = getPos();
+            int sTime = getShiftTime();
 
             if (world.isClient) {
                 setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
@@ -359,25 +359,9 @@ public class CMoonEntity extends StandEntity {
     }
 
     // Animation code
-    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
-    @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
-    }
-
-    @Override
-    public AnimationFactory getFactory() {
-        return this.animationFactory;
-    }
-
-    @Override
-    public int tickTimer() {
-        return age;
-    }
-
     @SuppressWarnings("SameReturnValue")
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+    @Override
+    protected <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
         AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 

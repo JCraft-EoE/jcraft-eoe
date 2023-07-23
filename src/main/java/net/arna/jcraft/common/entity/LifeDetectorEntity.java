@@ -37,9 +37,9 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 import java.util.List;
 
 public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOwnable {
-    public LivingEntity target;
-
     private static final TrackedData<Boolean> EXPLODED;
+    public LivingEntity target;
+    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
     static {
         EXPLODED = DataTracker.registerData(LifeDetectorEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
@@ -105,15 +105,13 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
         if (master == null) kill();
         if (hasExploded()) return;
 
-        if (world.isClient) {
-            this.world.addParticle(
-                    ParticleTypes.FLAME,
-                    this.getX() + random.nextFloat() - 0.5f,
-                    this.getY() + random.nextFloat() - 0.5f,
-                    this.getZ() + random.nextFloat() - 0.5f,
-                    0.0, 0.0, 0.0
-            );
-        } else {
+        if (world.isClient) world.addParticle(
+                ParticleTypes.FLAME,
+                this.getX() + random.nextFloat() - 0.5f,
+                this.getY() + random.nextFloat() - 0.5f,
+                this.getZ() + random.nextFloat() - 0.5f,
+                0.0, 0.0, 0.0);
+        else {
             if (target == null) {
                 if (this.age % 2 == 0) {
                     LivingEntity finalTarget = null;
@@ -137,9 +135,7 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
                 Vec3d eyePos = target.getEyePos();
                 lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, eyePos);
                 if (this.squaredDistanceTo(eyePos) < 2.5) Explode(); //If closer than 1.58m
-            } else {
-                target = null;
-            }
+            } else target = null;
 
             if (!hasExploded() && (this.age >= 300 || getHealth() <= 0f)) Explode();
 
@@ -202,20 +198,16 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
         if (master == null) return;
         boolean ownerIsPlayer = master instanceof PlayerEntity;
         tag.putBoolean("playerOwner", ownerIsPlayer);
-        if (ownerIsPlayer)
-            tag.putUuid("ownerUUID", master.getUuid());
-        else
-            tag.putInt("ownerID", master.getId());
+        if (ownerIsPlayer) tag.putUuid("ownerUUID", master.getUuid());
+        else tag.putInt("ownerID", master.getId());
     }
 
     @Override
     public void readCustomDataFromNbt(NbtCompound tag) {
         super.readCustomDataFromNbt(tag);
         boolean ownerIsPlayer = tag.getBoolean("playerOwner");
-        if (ownerIsPlayer)
-            master = world.getPlayerByUuid(tag.getUuid("ownerUUID"));
-        else
-            master = (LivingEntity) world.getEntityById(tag.getInt("ownerID")); // Always is living
+        if (ownerIsPlayer) master = world.getPlayerByUuid(tag.getUuid("ownerUUID"));
+        else master = (LivingEntity) world.getEntityById(tag.getInt("ownerID")); // Always is living
     }
 
     @Override
@@ -238,8 +230,6 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
     }
 
     // Animations
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
-
     @Override
     public void registerControllers(AnimationData animationData) {
         animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));

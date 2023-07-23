@@ -22,6 +22,8 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 
 public class BloodProjectile extends PersistentProjectileEntity implements IAnimatable {
+    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+
     public BloodProjectile(EntityType<? extends BloodProjectile> entityType, World world) {
         super(entityType, world);
         this.pickupType = PickupPermission.DISALLOWED;
@@ -34,7 +36,9 @@ public class BloodProjectile extends PersistentProjectileEntity implements IAnim
     }
 
     @Override
-    protected void age() { discard(); } // Disappear instantly upon contact with the ground
+    protected void age() {
+        discard();
+    } // Disappear instantly upon contact with the ground
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
@@ -47,8 +51,9 @@ public class BloodProjectile extends PersistentProjectileEntity implements IAnim
         if (entity instanceof LivingEntity living) {
             LivingEntity target = living;
             if (entity instanceof StandEntity stand && stand.hasUser())
-                target = stand.getUser();
-            damageLogic(world, target, Vec3d.ZERO, 10, 1, false, 2f, false, 6, DamageSource.thrownProjectile(this, owner), owner);
+                target = stand.getUserOrThrow();
+            damageLogic(world, target, Vec3d.ZERO, 10, 1, false, 2f,
+                    false, 6, DamageSource.thrownProjectile(this, owner), owner);
             target.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 60, 0, false, true));
             discard();
         }
@@ -60,14 +65,22 @@ public class BloodProjectile extends PersistentProjectileEntity implements IAnim
     }
 
     @Override
-    public ItemStack asItemStack() { return ItemStack.EMPTY; }
+    public ItemStack asItemStack() {
+        return ItemStack.EMPTY;
+    }
+
     @Override
-    public boolean hasNoGravity() { return false; }
+    public boolean hasNoGravity() {
+        return false;
+    }
 
     // Animations
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
     @Override
-    public void registerControllers(AnimationData data) { }
+    public void registerControllers(AnimationData data) {
+    }
+
     @Override
-    public AnimationFactory getFactory() { return this.factory; }
+    public AnimationFactory getFactory() {
+        return this.factory;
+    }
 }

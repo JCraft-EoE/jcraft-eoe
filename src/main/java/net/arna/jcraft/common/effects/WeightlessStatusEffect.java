@@ -13,6 +13,7 @@ import java.util.Random;
 public class WeightlessStatusEffect extends StatusEffect {
     private boolean previouslyNoGravved = false;
     private final Random random = new Random();
+
     public WeightlessStatusEffect() {
         super(StatusEffectCategory.NEUTRAL, 0x000011);
     }
@@ -42,8 +43,7 @@ public class WeightlessStatusEffect extends StatusEffect {
         this.previouslyNoGravved = entity.hasNoGravity();
         if (amplifier == 1)
             GravityChangerAPI.addGravity(entity, new Gravity(entity.getMovementDirection(), 1, 60, "command"));
-        else
-            entity.setNoGravity(true);
+        else entity.setNoGravity(true);
     }
 
     @Override

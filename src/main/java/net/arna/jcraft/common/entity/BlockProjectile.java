@@ -43,11 +43,7 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 import java.util.List;
 
 public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatable {
-    public BlockProjectile(EntityType<? extends LivingEntity> entityType, World world) {
-        super(entityType, world);
-        setNoGravity(true);
-    }
-
+    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
     private final int maxTimeToLaunch = 15;
     private int timeToLaunch = maxTimeToLaunch;
     private int timeLaunched = 0;
@@ -61,6 +57,11 @@ public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatab
     static {
         EFFECT = DataTracker.registerData(BlockProjectile.class, TrackedDataHandlerRegistry.INTEGER);
         BLOCKSTACK = DataTracker.registerData(BlockProjectile.class, TrackedDataHandlerRegistry.ITEM_STACK);
+    }
+
+    public BlockProjectile(EntityType<? extends LivingEntity> entityType, World world) {
+        super(entityType, world);
+        setNoGravity(true);
     }
 
     @Override
@@ -170,7 +171,8 @@ public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatab
                     LivingEntity target = JUtils.getUserIfStand(living);
                     if (target == master || target == this) continue;
                     hit = true;
-                    StandEntity.damageLogic(world, target, getVelocity(), 15, 1, true, 6, false, 11, DamageSource.mob(master), master, false);
+                    StandEntity.damageLogic(world, target, getVelocity(), 15, 1, true,
+                            6, false, 11, DamageSource.mob(master), master, false);
                 }
             }
 
@@ -276,8 +278,6 @@ public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatab
     }
 
     // Animations
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
-
     @Override
     public void registerControllers(AnimationData animationData) {
         animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));

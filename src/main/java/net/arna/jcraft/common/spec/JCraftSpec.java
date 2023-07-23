@@ -1,6 +1,10 @@
 package net.arna.jcraft.common.spec;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.attack.Attack;
+import net.arna.jcraft.common.attack.AttackQueue;
+import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.network.s2c.PlayerAnimPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
@@ -45,28 +49,43 @@ public abstract class JCraftSpec {
     public Text getTranslatableName() {
         return Text.translatable("spec.jcraft." + getInternalName());
     }
-    public String getInternalName() { return "unnamed"; }
-    public String getDescription() { return "UNDESCRIBED"; }
-    public String getDetails() { return "UNFINISHED"; }
-    public List<Attack> getAttacks() { return null; }
-    public int getId() { return 0; }
 
-    public void InitHeavyAttack(ServerWorld serverWorld) {
+    public String getInternalName() {
+        return "unnamed";
     }
 
-    public void InitBarrage(ServerWorld serverWorld) {
+    public String getDescription() {
+        return "UNDESCRIBED";
     }
 
-    public void InitSpecial1(ServerWorld serverWorld) {
+    public String getDetails() {
+        return "UNFINISHED";
     }
 
-    public void InitSpecial2(ServerWorld serverWorld) {
+    public List<Attack> getAttacks() {
+        return null;
     }
 
-    public void InitSpecial3(ServerWorld serverWorld) {
+    public int getId() {
+        return 0;
     }
 
-    public void InitUlt(ServerWorld serverWorld) {
+    public void initHeavyAttack(ServerWorld serverWorld) {
+    }
+
+    public void initBarrage(ServerWorld serverWorld) {
+    }
+
+    public void initSpecial1(ServerWorld serverWorld) {
+    }
+
+    public void initSpecial2(ServerWorld serverWorld) {
+    }
+
+    public void initSpecial3(ServerWorld serverWorld) {
+    }
+
+    public void initUlt(ServerWorld serverWorld) {
     }
 
     public boolean canAttack() {
@@ -131,101 +150,88 @@ public abstract class JCraftSpec {
                 moveStun--;
                 processAttackClient();
             }
-        } else {
-            //JCraft.LOGGER.info("SERVER: Ticking spec " + this);
 
-            ServerWorld serverWorld = (ServerWorld) world;
-            Attack attack = this.curAttack;
+            return;
+        }
 
-            if (moveStun > 0) {
-                //JCraft.LOGGER.info("SERVER: Movestun is " + moveStun);
+        //JCraft.LOGGER.info("SERVER: Ticking spec " + this);
 
-                // Likely will be changed later, but at the moment this serves to prevent animations breaking
-                player.setSneaking(shouldSneak());
+        ServerWorld serverWorld = (ServerWorld) world;
+        Attack attack = this.curAttack;
 
-                // Process attack
-                moveStun--;
-                if (attack != null) {
-                    player.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 5, 9, true, false));
+        if (moveStun > 0) {
+            //JCraft.LOGGER.info("SERVER: Movestun is " + moveStun);
 
-                    int realInitTime = attack.moveStun - attack.initTime;
-                    int stunS = (int) (attack.stun * 20f);
+            // Likely will be changed later, but at the moment this serves to prevent animations breaking
+            player.setSneaking(shouldSneak());
 
-                    if ((attack.attackType == AttackType.BOX && this.moveStun == realInitTime)
-                            || (attack.attackType == AttackType.MULTIHIT && attack.attackTimes.contains(attack.moveStun - this.moveStun))) {
-                        double yawRad = Math.toRadians(player.getYaw() + 90);
-                        Vec3d rotVec = new Vec3d(Math.cos(yawRad), 0, Math.sin(yawRad)); // Previously player.getRotationVector() but that allowed them to aim vertically
-                        Vec3d hitPos = player.getPos().add(0, player.getHeight() / 2 - attack.offset, 0).add(rotVec.multiply(attack.attackDist));
-                        ArrayList<Entity> exclude = new ArrayList<>(player.getPassengerList());
-                        exclude.add(player);
-                        if (player.hasVehicle())
-                            exclude.add(player.getVehicle());
+            // Process attack
+            moveStun--;
+            if (attack != null) {
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 5, 9, true, false));
 
-                        List<LivingEntity> hurt = JUtils.generateHitbox(world,
-                                hitPos,
-                                attack.hitboxSize,
-                                List.copyOf(exclude)
-                        );
-                        for (Attack.HitboxData data : attack.extraHitboxes) {
-                            List<LivingEntity> extraHurt = JUtils.generateHitbox(world,
-                                    hitPos.add(rotVec.multiply(data.forwardOffset)).add(0, data.verticalOffset, 0), data.hitboxSize, exclude);
-                            for (LivingEntity hurtEntity : extraHurt)
-                                if (!hurt.contains(hurtEntity)) hurt.add(hurtEntity);
+                int realInitTime = attack.moveStun - attack.initTime;
+                int stunS = (int) (attack.stun * 20f);
+
+                if ((attack.attackType == AttackType.BOX && this.moveStun == realInitTime)
+                        || (attack.attackType == AttackType.MULTIHIT && attack.attackTimes.contains(attack.moveStun - this.moveStun))) {
+                    double yawRad = Math.toRadians(player.getYaw() + 90);
+                    Vec3d rotVec = new Vec3d(Math.cos(yawRad), 0, Math.sin(yawRad)); // Previously player.getRotationVector() but that allowed them to aim vertically
+                    Vec3d hitPos = player.getPos().add(0, player.getHeight() / 2 - attack.offset, 0).add(rotVec.multiply(attack.attackDist));
+
+                    List<Entity> exclude = new ArrayList<>(player.getPassengerList());
+                    exclude.add(player);
+
+                    if (player.hasVehicle())
+                        exclude.add(player.getVehicle());
+
+                    List<LivingEntity> hurt = JUtils.generateHitbox(world, hitPos, attack.hitboxSize, List.copyOf(exclude));
+
+                    for (HitBoxData data : attack.extraHitboxes) {
+                        List<LivingEntity> extraHurt = JUtils.generateHitbox(world,
+                                hitPos.add(rotVec.multiply(data.forwardOffset)).add(0, data.verticalOffset, 0), data.hitboxSize, exclude);
+                        for (LivingEntity hurtEntity : extraHurt)
+                            if (!hurt.contains(hurtEntity)) hurt.add(hurtEntity);
+                    }
+
+                    if (!hurt.isEmpty()) {
+                        Random random = new Random();
+                        JCraft.createParticle((ServerWorld) world,
+                                hitPos.x + random.nextDouble(-0.5, 0.5),
+                                hitPos.y + random.nextDouble(-0.5, 0.5),
+                                hitPos.z + random.nextDouble(-0.5, 0.5),
+                                attack.hitspark + 1);
+
+                        if (attack.impactSound != null)
+                            JUtils.serverPlaySound(attack.impactSound, serverWorld, hitPos);
+
+                        float kb = attack.knockback;
+                        Vec3d kbVec = rotVec.multiply(kb).add(new Vec3d(0.0, Math.abs(attack.knockback) / 4, 0.0));
+
+                        DamageSource playerSource = DamageSource.player(player);
+                        for (LivingEntity livingEntity : hurt) {
+                            if (livingEntity instanceof StandEntity) continue;
+                            damageLogic(world, livingEntity, kbVec, stunS, attack.stunType.ordinal(), attack.overrideStun,
+                                    attack.damage, attack.lift, attack.getEffectiveBlockstun(), playerSource,
+                                    player, attack.canBackstab, attack.unblockable && !attack.ubEffectsOnly);
                         }
-                        if (!hurt.isEmpty()) {
-                            Random random = new Random();
-                            JCraft.createParticle((ServerWorld) world,
-                                    hitPos.x + random.nextDouble(-0.5, 0.5),
-                                    hitPos.y + random.nextDouble(-0.5, 0.5),
-                                    hitPos.z + random.nextDouble(-0.5, 0.5),
-                                    attack.hitspark + 1);
 
-                            if (attack.impactSound != null)
-                                JUtils.serverPlaySound(attack.impactSound, serverWorld, hitPos);
-
-                            float kb = attack.knockback;
-                            Vec3d kbVec = rotVec.multiply(kb).add(new Vec3d(0.0, Math.abs(attack.knockback) / 4, 0.0));
-
-                            DamageSource playerSource = DamageSource.player(player);
-                            for (LivingEntity livingEntity : hurt) {
-                                if (livingEntity instanceof StandEntity) continue;
-                                damageLogic(
-                                        world,
-                                        livingEntity,
-                                        kbVec,
-                                        stunS,
-                                        attack.stunType,
-                                        attack.overrideStun,
-                                        attack.damage,
-                                        attack.lift,
-                                        attack.getEffectiveBlockstun(),
-                                        playerSource,
-                                        player,
-                                        attack.canBackstab,
-                                        attack.unblockable && !attack.ubEffectsOnly
-                                );
-                            }
-
-                            this.specialAttack(attack, hurt);
-                        }
+                        specialAttack(attack, hurt);
                     }
                 }
-            } else if (this.queuedAttack != null) {
-                switch (this.queuedAttack) {
-                    case HEAVY -> this.InitHeavyAttack(serverWorld);
-                    case BARRAGE -> this.InitBarrage(serverWorld);
-                    case ULTIMATE -> this.InitUlt(serverWorld);
-                    case SPECIAL1 -> this.InitSpecial1(serverWorld);
-                    case SPECIAL2 -> this.InitSpecial2(serverWorld);
-                    case SPECIAL3 -> this.InitSpecial3(serverWorld);
-                }
-                this.queuedAttack = null;
             }
-
-            if (this.curAttack != this.previousAttack && this.curAttack != null) {
-                this.previousAttack = this.curAttack;
+        } else if (queuedAttack != null) {
+            switch (queuedAttack) {
+                case HEAVY -> initHeavyAttack(serverWorld);
+                case BARRAGE -> initBarrage(serverWorld);
+                case ULTIMATE -> initUlt(serverWorld);
+                case SPECIAL1 -> initSpecial1(serverWorld);
+                case SPECIAL2 -> initSpecial2(serverWorld);
+                case SPECIAL3 -> initSpecial3(serverWorld);
             }
+            queuedAttack = null;
         }
-    }
 
+        if (curAttack != previousAttack && curAttack != null) previousAttack = curAttack;
+    }
 }

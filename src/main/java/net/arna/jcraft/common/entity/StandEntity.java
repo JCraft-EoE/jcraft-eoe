@@ -1,7 +1,9 @@
 package net.arna.jcraft.common.entity;
 
 import lombok.Getter;
+import lombok.Setter;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.attack.*;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
@@ -48,6 +50,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.IAnimationTickable;
+import software.bernie.geckolib3.core.PlayState;
+import software.bernie.geckolib3.core.controller.AnimationController;
+import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
+import software.bernie.geckolib3.core.manager.AnimationData;
+import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -110,6 +118,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
     @Getter
     private final StandType standType;
 
+    private final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
     protected int summonAnimDuration = 19;
     protected boolean playSummonAnim = true;
 
@@ -140,20 +149,18 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
         FREEY = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.FLOAT);
         FREEZ = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.FLOAT);
     }
+
+    @Getter
+    @Setter
     @Nullable
     private LivingEntity user = null;
-    /**
-     * Sets the stands user if there isn't one
-     */
-    public void setUser(@Nullable LivingEntity user) {
-        //if (this.user != null)
-        //    JCraft.LOGGER.info("Overriding stand user for stand: " + this);
-        this.user = user;
-    }
-    @Nullable
-    public LivingEntity getUser() {
+
+    @NotNull
+    public LivingEntity getUserOrThrow() {
+        if (user == null) throw new NullPointerException("No user set");
         return user;
     }
+
     public boolean hasUser() {
         return user != null;
     }
@@ -161,12 +168,14 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
     public int getState() {
         return this.dataTracker.get(STATE);
     }
+
     /**
      * Sets the stands state directly
      */
     public void setStateNoReset(int s) {
         this.dataTracker.set(STATE, s);
     }
+
     /**
      * Sets the stands state with extra processing
      */
@@ -179,6 +188,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
     public boolean getSameState() {
         return this.dataTracker.get(SAMESTATE);
     }
+
     public void setSameState(boolean samestate) {
         this.dataTracker.set(SAMESTATE, samestate);
     }
@@ -186,6 +196,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
     public int getMoveStun() {
         return this.dataTracker.get(MOVESTUN);
     }
+
     /**
      * Sets how many ticks the stand will be occupied doing an animation for
      */
@@ -205,6 +216,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
     public float getRotationOffset() {
         return this.dataTracker.get(ROTATIONOFFSET);
     }
+
     /**
      * Sets the angle of the offset the stand is at relative to the user, used in the cylindrical coordinates system in {@link net.arna.jcraft.mixin.EntityMixin}
      */
@@ -215,6 +227,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
     public float getDistanceOffset() {
         return this.dataTracker.get(DISTANCEOFFSET);
     }
+
     /**
      * Sets the distance between the stand and user
      */
@@ -225,6 +238,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
     public float getAlpha() {
         return this.dataTracker.get(ALPHA);
     }
+
     public void setAlpha(float alpha) {
         this.dataTracker.set(ALPHA, alpha);
     }
@@ -232,6 +246,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
     public float getStandGauge() {
         return this.dataTracker.get(STANDGAUGE);
     }
+
     public void setStandGauge(float standGauge) {
         this.dataTracker.set(STANDGAUGE, standGauge);
     }
@@ -239,6 +254,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
     public boolean getFree() {
         return this.dataTracker.get(FREE);
     }
+
     /**
      * Changes whether the stand is detached from the user
      */
@@ -255,12 +271,15 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
     public double getRemoteForwardInput() {
         return remoteForwardInput;
     }
+
     public double getRemoteSideInput() {
         return remoteSideInput;
     }
+
     public void setRemoteJumpInput(boolean b) {
         remoteJumpInput = b;
     }
+
     public boolean getRemoteJumpInput() {
         return remoteJumpInput;
     }
@@ -291,9 +310,11 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
      * Puts the stand into remote mode
      */
     protected void beginRemote() {
+        if (user == null) return;
+
         setFree(true);
 
-        Vec3d fPos = user.getPos().add( user.getRotationVector() );
+        Vec3d fPos = user.getPos().add(user.getRotationVector());
         remoteSpeed = user.getVelocity(); // Inertia
         remoteSpeed = new Vec3d(remoteSpeed.x * 5, remoteSpeed.y / 2, remoteSpeed.z * 5);
 
@@ -338,8 +359,10 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
     public Vec3f getFreePos() {
         return new Vec3f(this.dataTracker.get(FREEX), this.dataTracker.get(FREEY), this.dataTracker.get(FREEZ));
     }
+
     /**
      * Sets the stands position while detached
+     *
      * @param freePos new position
      */
     public void setFreePos(Vec3f freePos) {
@@ -384,13 +407,14 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
     }
 
     // Attack controls
+
     /**
      * @return whether the stand should be able to attack
      */
     public boolean canAttack() {
         if (hasUser()) {
-            ITimeStop timeStop = (ITimeStop) user;
-            return this.getMoveStun() < 1 && timeStop.getTimeStopTicks() < 1 && !user.hasStatusEffect(JStatusRegister.DAZED);
+            ITimeStop timeStop = (ITimeStop) getUserOrThrow();
+            return this.getMoveStun() < 1 && timeStop.getTimeStopTicks() < 1 && !getUserOrThrow().hasStatusEffect(JStatusRegister.DAZED);
         }
         return false;
     }
@@ -420,20 +444,22 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
      */
     public CanAttackData canAttackWithData() {
         if (hasUser()) {
-            ITimeStop timeStop = (ITimeStop) user;
-            return new CanAttackData(user, this.getMoveStun() < 1 && timeStop.getTimeStopTicks() < 1 && !user.hasStatusEffect(JStatusRegister.DAZED));
+            ITimeStop timeStop = (ITimeStop) getUserOrThrow();
+            return new CanAttackData(user, this.getMoveStun() < 1 && timeStop.getTimeStopTicks() < 1 &&
+                    !getUserOrThrow().hasStatusEffect(JStatusRegister.DAZED));
         }
         return new CanAttackData(null, false);
     }
 
     /**
      * Initiates an attack with the stand
-     * @param attack attack to handle
+     *
+     * @param attack       attack to handle
      * @param cooldownName string identifier for which cooldown to start
-     * @param animState int identifier for which state to put the stand into
+     * @param animState    int identifier for which state to put the stand into
      */
     public boolean handleAttack(Attack attack, String cooldownName, int animState) {
-        NbtCompound userData = ((IEntityDataSaver) user).getPersistentData();
+        NbtCompound userData = ((IEntityDataSaver) getUserOrThrow()).getPersistentData();
         int cooldown = userData.getInt(cooldownName);
 
         if (cooldown > 0)
@@ -446,7 +472,8 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
 
     /**
      * Instantly sets the stands attack
-     * @param attack attack to set
+     *
+     * @param attack    attack to set
      * @param animState int identifier for which state to put the stand into
      */
     public void setAttack(Attack attack, int animState) {
@@ -458,9 +485,10 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
 
     /**
      * Stuns specified {@link LivingEntity}
-     * @param entity victim to stun
-     * @param duration in ticks
-     * @param amplifier type of stun
+     *
+     * @param entity    victim to stun
+     * @param duration  in ticks
+     * @param amplifier level of stun
      */
     public static void stun(LivingEntity entity, int duration, int amplifier) {
         if (entity == null || duration == 0) return;
@@ -470,12 +498,15 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
 
     /**
      * Basic damage method, you likely want to use baseDamageLogic or damageLogic instead
-     * @param damage damage in half hearts
+     *
+     * @param damage       damage in half hearts
      * @param damageSource source of damage
-     * @param ent entity to harm
+     * @param ent          entity to harm
      */
     public static void damage(float damage, DamageSource damageSource, LivingEntity ent) {
-        if (ent == null || ent.isRemoved() || ent.isDead()) { return; }
+        if (ent == null || ent.isRemoved() || ent.isDead()) {
+            return;
+        }
         ent.damage(damageSource, 0.001f);
 
         // All stands ignore 10% of armor & armor toughness
@@ -533,11 +564,12 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
             projectile.velocityModified = true;
         }
 
-        stun(user, 2, 2);
-        user.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 5, 3, false, false, true));
+        stun(user, 2, 1);
+        getUserOrThrow().addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 5, 3, false, false, true));
     }
 
     protected Vec3d timeSkip(double distance, @NotNull SoundEvent sound) {
+        LivingEntity user = getUserOrThrow();
         boolean hasVehicle = user.hasVehicle();
 
         if (hasVehicle)
@@ -557,11 +589,8 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
         if (userData.getInt(JCraft.standUltCD) < 60)
             userData.putInt(JCraft.standUltCD, 60);
 
-        if (hasVehicle) {
-            user.getRootVehicle().setPosition(telePos.x, telePos.y, telePos.z);
-        } else {
-            user.teleport(telePos.x, telePos.y, telePos.z);
-        }
+        if (hasVehicle) user.getRootVehicle().setPosition(telePos.x, telePos.y, telePos.z);
+        else user.teleport(telePos.x, telePos.y, telePos.z);
         world.playSound(null, telePos.x, telePos.y, telePos.z, sound, SoundCategory.PLAYERS, 1f, 1f);
 
         return telePos;
@@ -580,15 +609,15 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
         if (curAttack != null || getMoveStun() > 0) return;
         discard();
         if (user != null)
-            ((IEntityDataSaver)user).setStand(null);
+            ((IEntityDataSaver) user).setStand(null);
     }
 
     // Define idle override
-    public void idleOverride(LivingEntity player) {
-    }
+    public void idleOverride(LivingEntity player) {} // TODO this isn't used.
 
     /**
      * Defines what happens if the stand successfully countered something
+     *
      * @param entity countered entity
      * @param source exact source of damage
      */
@@ -596,6 +625,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
         this.curAttack = null;
         this.setMoveStun(0);
     }
+
     public void whiffCounter() {
         JCraft.LOGGER.info("SERVER: Counter whiffed for " + this);
     }
@@ -641,7 +671,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
         Entity vehicle = user.getVehicle();
 
         setMoveStun(getMoveStun() - 1); // Counting down animation time or similar
-        if (playSummonAnim && (getMoveStun() > 0 || age > summonAnimDuration) )
+        if (playSummonAnim && (getMoveStun() > 0 || age > summonAnimDuration))
             playSummonAnim = false;
 
         Attack attack = this.curAttack;
@@ -681,7 +711,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
             if (getSameState()) setSameState(false);
 
             // Make sure the user is using this stand
-            if (((IEntityDataSaver)user).getStand() != this) discard();
+            if (((IEntityDataSaver) user).getStand() != this) discard();
 
             // Block break check
             if (getStandGauge() < 1) {
@@ -776,7 +806,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
                         if (vehicle != null) filter.add(vehicle);
 
                         hurt = JUtils.generateHitbox(world, fPos, attack.hitboxSize, filter);
-                        for (Attack.HitboxData data : attack.extraHitboxes) {
+                        for (HitBoxData data : attack.extraHitboxes) {
                             List<LivingEntity> extraHurt = JUtils.generateHitbox(world,
                                     hPos.add(rotVec.multiply(data.forwardOffset)).add(0, data.verticalOffset, 0), data.hitboxSize, filter);
                             for (LivingEntity hurtEntity : extraHurt)
@@ -827,7 +857,9 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
                                 continue;
                             }
 
-                            damageLogic(world, livingEntity, kbVec, stunTicks, attack.stunType, attack.overrideStun, damage, attack.lift, attack.getEffectiveBlockstun(), JDamageSources.stand(this, user), user, attack.canBackstab, attack.unblockable && !attack.ubEffectsOnly);
+                            damageLogic(world, livingEntity, kbVec, stunTicks, attack.stunType.ordinal(), attack.overrideStun,
+                                    damage, attack.lift, attack.getEffectiveBlockstun(), JDamageSources.stand(this),
+                                    user, attack.canBackstab, attack.unblockable && !attack.ubEffectsOnly);
                         }
 
                         for (LivingEntity livingEntity : clashed) {
@@ -876,9 +908,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
                         this.setDistanceOffset(this.idleDistance);
                         this.setRotationOffset(this.idleRotation);
                     }
-                } else {
-                    idleOverride(user);
-                }
+                } else idleOverride(user);
             } else if (this.blocking) { // Process block
                 this.curAttack = null;
                 this.setStateNoReset(3);
@@ -915,59 +945,63 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
 
     /**
      * Highest level damage method, handles combo counting, DEFAULTS unblockable TO FALSE
-     * @param world world to process damage in
-     * @param ent victim
-     * @param kbVec knockback vector to apply
-     * @param stunTicks stun duration in ticks
+     *
+     * @param world        world to process damage in
+     * @param ent          victim
+     * @param kbVec        knockback vector to apply
+     * @param stunTicks    stun duration in ticks
      * @param overrideStun will the attack override all other types of stun?
-     * @param damage damage in half hearts
-     * @param lift will the attack lift the victim upon an aerial hit?
+     * @param damage       damage in half hearts
+     * @param lift         will the attack lift the victim upon an aerial hit?
      */
-    public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, boolean canBackstab, boolean unblockable) {
+    public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunLevel, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, boolean canBackstab, boolean unblockable) {
         if (world == null || world.isClient || ent == null || !ent.canTakeDamage()) return;
         if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && attacker instanceof PlayerEntity playerEntity)
             comboCounterLogic(playerEntity, ent);
 
-        baseDamageLogic(ent, kbVec, stunTicks, stunType, overrideStun, damage, lift, blockstun, source, attacker, canBackstab, unblockable);
+        baseDamageLogic(ent, kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, canBackstab, unblockable);
     }
 
     /**
      * Highest level damage method, handles combo counting, DEFAULTS unblockable TO FALSE
-     * @param world world to process damage in
-     * @param ent victim
-     * @param kbVec knockback vector to apply
-     * @param stunTicks stun duration in ticks
+     *
+     * @param world        world to process damage in
+     * @param ent          victim
+     * @param kbVec        knockback vector to apply
+     * @param stunTicks    stun duration in ticks
      * @param overrideStun will the attack override all other types of stun?
-     * @param damage damage in half hearts
-     * @param lift will the attack lift the victim upon an aerial hit?
+     * @param damage       damage in half hearts
+     * @param lift         will the attack lift the victim upon an aerial hit?
      */
-    public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, boolean canBackstab) {
+    public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunLevel, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, boolean canBackstab) {
         if (world == null || world.isClient || ent == null || !ent.canTakeDamage()) return;
         if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && attacker instanceof PlayerEntity playerEntity)
             comboCounterLogic(playerEntity, ent);
 
-        baseDamageLogic(ent, kbVec, stunTicks, stunType, overrideStun, damage, lift, blockstun, source, attacker, canBackstab, false);
+        baseDamageLogic(ent, kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, canBackstab, false);
     }
 
     /**
      * Highest level damage method, handles combo counting, DEFAULTS canBackstab and unblockable TO FALSE
-     * @param world world to process damage in
-     * @param ent victim
-     * @param kbVec knockback vector to apply
-     * @param stunTicks stun duration in ticks
+     *
+     * @param world        world to process damage in
+     * @param ent          victim
+     * @param kbVec        knockback vector to apply
+     * @param stunTicks    stun duration in ticks
      * @param overrideStun will the attack override all other types of stun?
-     * @param damage damage in half hearts
-     * @param lift will the attack lift the victim upon an aerial hit?
+     * @param damage       damage in half hearts
+     * @param lift         will the attack lift the victim upon an aerial hit?
      */
-    public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker) {
+    public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunLevel, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker) {
         if (world == null || world.isClient || ent == null || !ent.canTakeDamage()) return;
         if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && attacker instanceof PlayerEntity playerEntity)
             comboCounterLogic(playerEntity, ent);
-        baseDamageLogic(ent, kbVec, stunTicks, stunType, overrideStun, damage, lift, blockstun, source, attacker, false, false);
+        baseDamageLogic(ent, kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, false, false);
     }
 
     /**
      * Handles combo counting for specific player
+     *
      * @param playerEntity attacker
      */
     private static void comboCounterLogic(PlayerEntity playerEntity, LivingEntity victim) {
@@ -991,18 +1025,19 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
 
     /**
      * Mid-level damage method, handles blocking, lifting, counters, velocity modification
-     * @param ent victim
-     * @param kbVec knockback vector to apply
-     * @param stunTicks stun duration in ticks
+     *
+     * @param ent          victim
+     * @param kbVec        knockback vector to apply
+     * @param stunTicks    stun duration in ticks
      * @param overrideStun will the attack override all other types of stun?
-     * @param damage damage in half hearts
-     * @param lift will the attack lift the victim upon an aerial hit?
+     * @param damage       damage in half hearts
+     * @param lift         will the attack lift the victim upon an aerial hit?
      */
-    private static void baseDamageLogic(LivingEntity ent, Vec3d kbVec, int stunTicks, int stunType, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, boolean canBackstab, boolean unblockable) {
+    private static void baseDamageLogic(LivingEntity ent, Vec3d kbVec, int stunTicks, int stunLevel, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, boolean canBackstab, boolean unblockable) {
         boolean hit = true;
-        boolean tsHit = ( (ITimeStop)ent ).getTimeStopTicks() > 0;
+        boolean tsHit = ((ITimeStop) ent).getTimeStopTicks() > 0;
 
-        StandEntity stand = ((IEntityDataSaver)ent).getStand();
+        StandEntity stand = ((IEntityDataSaver) ent).getStand();
         if (stand != null) {
             Attack standAttack = stand.curAttack;
             if (standAttack != null) {
@@ -1018,7 +1053,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
 
             if (stand.blocking && !stand.getRemote()) {
                 double delta = Math.abs((ent.headYaw + 90.0f) % 360.0f - (attacker.getHeadYaw() + 90.0f) % 360.0f);
-                if ( canBackstab && (360.0 - delta % 360.0 < 90 || delta % 360.0 < 90) && ent.squaredDistanceTo(attacker.getPos()) >= 1.5625 ) { // Backstab logic
+                if (canBackstab && (360.0 - delta % 360.0 < 90 || delta % 360.0 < 90) && ent.squaredDistanceTo(attacker.getPos()) >= 1.5625) { // Backstab logic
                     JCraft.createParticle((ServerWorld) attacker.getWorld(), ent.getX(), attacker.getEyeY(), ent.getZ(), -2);
                     stand.playSound(SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, 1, 1);
                     stand.blocking = false;
@@ -1035,7 +1070,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
         }
 
         if (tsHit) {
-            stunType = 3;
+            stunLevel = 3;
             if (stunTicks > 20) stunTicks = 20;
             lift = false;
         } else {
@@ -1050,7 +1085,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
         if (hit) {
             if (overrideStun)
                 ent.removeStatusEffect(JStatusRegister.DAZED);
-            stun(ent, stunTicks, stunType);
+            stun(ent, stunTicks, stunLevel);
             ent.addVelocity(kbVec.x, kbVec.y, kbVec.z);
         }
 
@@ -1103,9 +1138,13 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
 
     // Physical properties
     @Override
-    public void pushAwayFrom(Entity entity) { }
+    public void pushAwayFrom(Entity entity) {
+    }
+
     @Override
-    public boolean collidesWith(Entity other) { return false; }
+    public boolean collidesWith(Entity other) {
+        return false;
+    }
 
     @Override
     public boolean addStatusEffect(StatusEffectInstance effect, @Nullable Entity source) {
@@ -1124,7 +1163,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
         mob.getLookControl().lookAt(target); // Usually detrimental not to
 
         JCraftSpec enemySpec;
-        StandEntity enemyStand = ((IEntityDataSaver)target).getStand();
+        StandEntity enemyStand = ((IEntityDataSaver) target).getStand();
         Attack enemyAttack = null;
         boolean enemyHasStand = enemyStand != null;
 
@@ -1161,7 +1200,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
             if (enemyAttack.isRanged || enemyAttack.attackType == AttackType.BARRAGE)
                 wantToBlock = true;
             // Block if the attack isn't ranged, but is within hitting distance, and doesn't block break/bypass
-            if ( enemyAttack.attackDist + enemyAttack.hitboxSize * 0.66 > distance && enemyAttack.damage * 2 < stand.getStandGauge() && !enemyAttack.unblockable )
+            if (enemyAttack.attackDist + enemyAttack.hitboxSize * 0.66 > distance && enemyAttack.damage * 2 < stand.getStandGauge() && !enemyAttack.unblockable)
                 wantToBlock = true;
         }
 
@@ -1241,7 +1280,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
             // Dash to targeted location/evasion
             BlockPos targetPos = entityNavigation.getTargetPos();
             if (targetPos != null && mob.isOnGround() && targetPos.getSquaredDistance(target.getPos()) > 2.25)
-                JCraft.tryDash(evade ? -1 : 1, evade ? stand.random.nextInt(2) - 1 : 0 , mob);
+                JCraft.tryDash(evade ? -1 : 1, evade ? stand.random.nextInt(2) - 1 : 0, mob);
 
             // Move away during combo to prevent point-blank misses
             float sStrafe = MathHelper.sin(stand.age * 0.02f) / 3f;
@@ -1412,4 +1451,22 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
 
         return chosenMove;
     }
+
+    // Animations
+    @Override
+    public void registerControllers(AnimationData animationData) {
+        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::animationPredicate));
+    }
+
+    @Override
+    public AnimationFactory getFactory() {
+        return this.animationFactory;
+    }
+
+    @Override
+    public int tickTimer() {
+        return age;
+    }
+
+    protected abstract <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event);
 }

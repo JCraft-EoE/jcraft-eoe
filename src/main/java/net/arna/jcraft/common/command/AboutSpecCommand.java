@@ -2,24 +2,19 @@ package net.arna.jcraft.common.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
-import net.arna.jcraft.JCraft;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.arna.jcraft.common.spec.JCraftSpec;
-import net.arna.jcraft.common.util.Attack;
+import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 import java.util.List;
 
 public class AboutSpecCommand {
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment) {
-        dispatcher.register(CommandManager.literal("spec")
-                .then(CommandManager.literal("about").executes(AboutSpecCommand::run)));
-    }
-
     private static final List<String> buttons = List.of(
             "Heavy",
             "Barrage",
@@ -29,14 +24,15 @@ public class AboutSpecCommand {
             "Ultimate"
     );
 
-    public static int run(CommandContext<ServerCommandSource> context) {
-        PlayerEntity playerEntity = context.getSource().getPlayer();
-        if (playerEntity == null) {
-            JCraft.LOGGER.error("Tried to run /spec about command on invalid player, source: " + context.getSource());
-            return 0;
-        }
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment) {
+        dispatcher.register(CommandManager.literal("spec")
+                .then(CommandManager.literal("about").executes(AboutSpecCommand::run)));
+    }
 
-        JCraftSpec spec = JUtils.getSpec(playerEntity);
+    public static int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
+
+        JCraftSpec spec = JUtils.getSpec(player);
         if (spec != null) {
             StringBuilder readout = new StringBuilder("Name: §e");
 
@@ -71,9 +67,9 @@ public class AboutSpecCommand {
             // Details
             readout.append(spec.getDetails());
 
-            playerEntity.sendMessage(Text.of(readout.toString()));
+            player.sendMessage(Text.of(readout.toString()));
         } else {
-            playerEntity.sendMessage(Text.translatable("jcraft.commands.error.nospec"), false);
+            player.sendMessage(Text.translatable("jcraft.commands.error.nospec"), false);
             return 0;
         }
 

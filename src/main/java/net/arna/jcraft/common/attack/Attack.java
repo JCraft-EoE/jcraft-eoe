@@ -1,5 +1,7 @@
-package net.arna.jcraft.common.util;
+package net.arna.jcraft.common.attack;
 
+import net.arna.jcraft.common.util.MobilityType;
+import net.arna.jcraft.common.util.VariationType;
 import net.minecraft.sound.SoundEvent;
 
 import java.util.*;
@@ -7,13 +9,7 @@ import java.util.*;
 public final class Attack {
     public int id = -1; // Unique ID
     public int cooldown = 0; // Ability cooldown
-
     public float attackDist = 1f; // Distance your stand is at while attacking
-    public Attack setDist(float attackDist) {
-        this.attackDist = attackDist;
-        return this;
-    }
-
     public int moveStun = 0; // Duration you can't use another move
     public int initTime = 0; // Time during movestun the move initiates
     public double hitboxSize = 0; // Hitbox size in meters cubed
@@ -27,310 +23,38 @@ public final class Attack {
 
     public byte interval = 1; // For barrages; attack interval | For charges; hit state ID
 
-    public static final Attack unusable = new Attack(-1,32767, 32767, 32767, 0, AttackType.BOX).setInfo("NONE", "NONE");
+    public static final Attack unusable = new Attack(-1, 32767, 32767, 32767, 0, AttackType.BOX).setInfo("NONE", "NONE");
 
     public byte armor = 0; // For (un)interruptable attacks
-    /**
-     * Marks an attack as unstoppable
-     */
-    public Attack hyperArmor() {
-        this.armor = Byte.MAX_VALUE;
-        return this;
-    }
-    /**
-     * Gives an attack an amount of hits it can withstand before being stopped (max 127)
-     */
-    public Attack armorPoints(byte armor) {
-        this.armor = armor;
-        return this;
-    }
-
     public boolean lift = true; // If set to true, attack will attempt to keep the victim in air on hit
-    /**
-     * Assigns whether the attack will attempt to lift the victim on hit
-     */
-    public Attack setLift(boolean lift) {
-        this.lift = lift;
-        return this;
-    }
-
-    public int hitspark = 1; // Particle that appears on hit
-    /**
-     * Assigns the particle the attack will generate on hit
-     * @param hitspark id of particle (see: net.arna.jcraft.client.net.ClientPacketHandler)
-     */
-    public Attack setHitspark(int hitspark) {
-        this.hitspark = hitspark;
-        return this;
-    }
-
-    public int stunType = 1; // 1 - HITSTUN, 2 - BLOCKSTUN, 3 - NO MOVEMENT PENALTY
-    public Attack setStunType(int st) {
-        this.stunType = st;
-        return this;
-    }
-
+    public StunType stunType = StunType.UNBURSTABLE; // 1 - HITSTUN, 2 - BLOCKSTUN, 3 - NO MOVEMENT PENALTY
     public boolean overrideStun = false; // If set to true, attack will override current stun on victim
-    public Attack setStunOverride(boolean o) {
-        this.overrideStun = o;
-        return this;
-    }
-
-    public String stunTypeName() {
-        switch (this.stunType) {
-            default -> {
-                return "Unknown";
-            }
-            case 0 -> {
-                return "Unburstable";
-            }
-            case 1 -> {
-                return "Burstable";
-            }
-            case 2 -> {
-                return "Block";
-            }
-            case 3 -> {
-                return "Launch";
-            }
-        }
-    }
-
-    public Attack setGrab() {
-        return this.setStunType(0).setStunOverride(true).setUB(false);
-    }
-
-    /**
-     * Marks attack as a launcher
-     */
-    public Attack setLaunch() { // Shorthand
-        this.stunType = 3;
-        this.overrideStun = true;
-        return this;
-    }
-
     public boolean unblockable = false;
     public boolean ubEffectsOnly = false;
-    /**
-     * Marks the attack as unblockable
-     * @param effectsOnly is the effect of the attack the only unblockable feature?
-     */
-    public Attack setUB(boolean effectsOnly) {
-        this.unblockable = true;
-        this.ubEffectsOnly = effectsOnly;
-        return this;
-    }
-
     public boolean canBackstab = true;
-    /**
-     * @return attack with backstabs disabled
-     */
-    public Attack disableBackstab() {
-        this.canBackstab = false;
-        return this;
-    }
 
     // Info
     public AttackQueue button;
     public String name = "UNNAMED";
     public String description = "";
-    /**
-     * Assigns information to attack
-     * @param name name of attack
-     * @param desc description
-     */
-    public Attack setInfo(String name, String desc) {
-        this.name = name;
-        this.description = desc;
-        return this;
-    }
-    /**
-     * Assigns information to attack
-     * @param name name of attack
-     * @param desc description
-     * @param b which type of button the attack corresponds to
-     */
-    public Attack setInfo(String name, String desc, AttackQueue b) {
-        this.name = name;
-        this.description = desc;
-        this.button = b;
-        return this;
-    }
 
     // Spec-exclusive
     public String animation;
-    /**
-     * Assigns {@link net.minecraft.entity.player.PlayerEntity} animation id to attack, used for spec moves
-     * @param anim string id for animation
-     */
-    public Attack setAnimation(String anim) {
-        this.animation = anim;
-        return this;
-    }
 
     // AI Flags, mostly
     public boolean isRanged = false;
-    /**
-     * Marks attack as ranged or not
-     */
-    public Attack setRanged(boolean ranged) {
-        this.isRanged = ranged;
-        return this;
-    }
 
-    public Attack setDamage(float damage) {
-        this.damage = damage;
-        return this;
-    }
-
-    public static class HitboxData {
-        public double forwardOffset = 0.0;
-        public double verticalOffset = 0.0;
-        public final double hitboxSize;
-
-        public HitboxData(double size) {
-            this.hitboxSize = size;
-        }
-
-        public HitboxData(double fO, double vO, double size) {
-            this.forwardOffset = fO;
-            this.verticalOffset = vO;
-            this.hitboxSize = size;
-        }
-    }
-
-    public List<HitboxData> extraHitboxes = new ArrayList<>();
-    /**
-     * Adds new hitboxes to the attack
-     * @param list hitboxes to add
-     */
-    public Attack appendHitboxes(Collection<? extends HitboxData> list) {
-        extraHitboxes.addAll(list);
-        return this;
-    }
-    /**
-     * Adds a new hitbox to the attack
-     * @param data hitbox to add
-     */
-    public Attack appendHitbox(HitboxData data) {
-        extraHitboxes.add(data);
-        return this;
-    }
-
+    public List<HitBoxData> extraHitboxes = new ArrayList<>();
     public MobilityType mobilityType = null;
-    /**
-     * Assigns a specified mobility type to the attack
-     * @param mobility type of mobility
-     */
-    public Attack setMobility(MobilityType mobility) {
-        this.mobilityType = mobility;
-        return this;
-    }
-
     public boolean overrideBlockstun = false;
     public int blockstun;
-
-    /**
-     * Disables automatic blockstun calculation, and forces baseDamageLogic to use the specified value
-     */
-    public Attack setBlockstun(int blockstun) {
-        overrideBlockstun = true;
-        this.blockstun = blockstun;
-        return this;
-    }
-
-    /**
-     * @return effective blockstun (in ticks) for attack (4 + damage OR assigned blockstun)
-     */
-    public int getEffectiveBlockstun() {
-        if (overrideBlockstun)
-            return blockstun;
-        return (int) (4 + damage);
-    }
-
     public Attack followup;
-    /**
-     * Assigns a followup to the attack
-     */
-    public Attack setFollowup(Attack followup) {
-        this.followup = followup;
-        return this;
-    }
-    /**
-     * @return whether the attack has a followup
-     */
-    public boolean hasFollowup() {
-        return this.followup != null;
-    }
-
-    public HashMap<VariationType, Attack> variations = new LinkedHashMap<>();
-    /**
-     * Assigns an attack as the aerial variation to this attack
-     */
-    public Attack aerialVariation(Attack air) {
-        this.variations.put(VariationType.AERIAL, air);
-        return this;
-    }
-    /**
-     * Assigns an attack as the crouching variation to this attack
-     */
-    public Attack crouchingVariation(Attack cr) {
-        this.variations.put(VariationType.CROUCHING, cr);
-        return this;
-    }
-
-    public int realInitTime() {
-        return this.attackType == AttackType.MULTIHIT ? attackTimes.get(0) : initTime;
-    }
-
-    public static Attack copyOf(Attack attack) {
-        Attack attackCopy = new Attack(
-                attack.id,
-                attack.cooldown,
-                attack.attackDist,
-                attack.moveStun,
-                attack.initTime,
-                attack.hitboxSize,
-                attack.damage,
-                attack.knockback,
-                attack.attackType,
-                attack.stun,
-                attack.offset,
-                attack.interval,
-                attack.impactSound
-        );
-
-        attackCopy.attackTimes = attack.attackTimes;
-        attackCopy.armor = attack.armor;
-        attackCopy.lift = attack.lift;
-        attackCopy.hitspark = attack.hitspark;
-
-        attackCopy.stunType = attack.stunType;
-        attackCopy.overrideStun = attack.overrideStun;
-
-        attackCopy.animation = attack.animation;
-        attackCopy.canBackstab = attack.canBackstab;
-        attackCopy.extraHitboxes = attack.extraHitboxes;
-
-        attackCopy.blockstun = attack.blockstun;
-        attackCopy.overrideBlockstun = attack.overrideBlockstun;
-
-        attackCopy.name = attack.name;
-        attackCopy.description = attack.description;
-        attackCopy.button = attack.button;
-        return attackCopy;
-    }
-
-    public boolean isCharge() {
-        return attackType == AttackType.CHARGE || attackType == AttackType.CHARGEBARRAGE;
-    }
-
-    public boolean isBarrage() {
-        return attackType == AttackType.BARRAGE || attackType == AttackType.CHARGEBARRAGE;
-    }
+    public Map<VariationType, Attack> variations = new LinkedHashMap<>();
 
     // For non-physicals
-    public Attack() { }
+    public Attack() {
+    }
+
     public Attack(int id, int cooldown, int moveStun, int initTime) {
         this.id = id;
         this.cooldown = cooldown;
@@ -413,7 +137,7 @@ public final class Attack {
         this.attackType = attackType;
         this.stun = stun;
         this.offset = offset;
-        this.interval = (byte)intervalOrHitAnim;
+        this.interval = (byte) intervalOrHitAnim;
     }
 
     public Attack(int id, int cooldown, float attackDist, int moveStun, int initTime, double hitboxSize, float damage, float knockback, AttackType attackType, float stun, float offset, int interval, SoundEvent impactSound) {
@@ -428,7 +152,7 @@ public final class Attack {
         this.attackType = attackType;
         this.stun = stun;
         this.offset = offset;
-        this.interval = (byte)interval;
+        this.interval = (byte) interval;
         this.impactSound = impactSound;
     }
 
@@ -447,5 +171,286 @@ public final class Attack {
         this.offset = offset;
         this.attackTimes = attackTimes;
         this.impactSound = impactSound;
+    }
+
+    public Attack setDist(float attackDist) {
+        this.attackDist = attackDist;
+        return this;
+    }
+
+    /**
+     * Marks an attack as unstoppable
+     */
+    public Attack hyperArmor() {
+        this.armor = Byte.MAX_VALUE;
+        return this;
+    }
+
+    /**
+     * Gives an attack an amount of hits it can withstand before being stopped (max 127)
+     */
+    public Attack armorPoints(byte armor) {
+        this.armor = armor;
+        return this;
+    }
+
+    /**
+     * Assigns whether the attack will attempt to lift the victim on hit
+     */
+    public Attack setLift(boolean lift) {
+        this.lift = lift;
+        return this;
+    }
+
+    public int hitspark = 1; // Particle that appears on hit
+
+    /**
+     * Assigns the particle the attack will generate on hit
+     *
+     * @param hitspark id of particle (see: net.arna.jcraft.client.net.ClientPacketHandler)
+     */
+    public Attack setHitspark(int hitspark) {
+        this.hitspark = hitspark;
+        return this;
+    }
+
+    public Attack setStunType(StunType stunType) {
+        this.stunType = stunType;
+        return this;
+    }
+
+    public Attack setStunOverride(boolean o) {
+        this.overrideStun = o;
+        return this;
+    }
+
+    public String stunTypeName() {
+        switch (this.stunType) {
+            default -> {
+                return "Unknown";
+            }
+            case UNBURSTABLE -> {
+                return "Unburstable";
+            }
+            case BURSTABLE -> {
+                return "Burstable";
+            }
+            case BLOCK -> {
+                return "Block";
+            }
+            case LAUNCH -> {
+                return "Launch";
+            }
+        }
+    }
+
+    public Attack setGrab() {
+        return this.setStunType(StunType.UNBURSTABLE).setStunOverride(true).setUB(false);
+    }
+
+    /**
+     * Marks attack as a launcher
+     */
+    public Attack setLaunch() { // Shorthand
+        this.stunType = StunType.LAUNCH;
+        this.overrideStun = true;
+        return this;
+    }
+
+    /**
+     * Marks the attack as unblockable
+     *
+     * @param effectsOnly is the effect of the attack the only unblockable feature?
+     */
+    public Attack setUB(boolean effectsOnly) {
+        this.unblockable = true;
+        this.ubEffectsOnly = effectsOnly;
+        return this;
+    }
+
+    /**
+     * @return attack with backstabs disabled
+     */
+    public Attack disableBackstab() {
+        this.canBackstab = false;
+        return this;
+    }
+
+    /**
+     * Assigns information to attack
+     *
+     * @param name name of attack
+     * @param desc description
+     */
+    public Attack setInfo(String name, String desc) {
+        this.name = name;
+        this.description = desc;
+        return this;
+    }
+
+    /**
+     * Assigns information to attack
+     *
+     * @param name name of attack
+     * @param desc description
+     * @param b    which type of button the attack corresponds to
+     */
+    public Attack setInfo(String name, String desc, AttackQueue b) {
+        this.name = name;
+        this.description = desc;
+        this.button = b;
+        return this;
+    }
+
+    /**
+     * Assigns {@link net.minecraft.entity.player.PlayerEntity} animation id to attack, used for spec moves
+     *
+     * @param anim string id for animation
+     */
+    public Attack setAnimation(String anim) {
+        this.animation = anim;
+        return this;
+    }
+
+    /**
+     * Marks attack as ranged or not
+     */
+    public Attack setRanged(boolean ranged) {
+        this.isRanged = ranged;
+        return this;
+    }
+
+    public Attack setDamage(float damage) {
+        this.damage = damage;
+        return this;
+    }
+
+    /**
+     * Adds new hitboxes to the attack
+     *
+     * @param list hitboxes to add
+     */
+    public Attack appendHitboxes(Collection<? extends HitBoxData> list) {
+        extraHitboxes.addAll(list);
+        return this;
+    }
+
+    /**
+     * Adds a new hitbox to the attack
+     *
+     * @param data hitbox to add
+     */
+    public Attack appendHitbox(HitBoxData data) {
+        extraHitboxes.add(data);
+        return this;
+    }
+
+    /**
+     * Assigns a specified mobility type to the attack
+     *
+     * @param mobility type of mobility
+     */
+    public Attack setMobility(MobilityType mobility) {
+        this.mobilityType = mobility;
+        return this;
+    }
+
+    /**
+     * Disables automatic blockstun calculation, and forces baseDamageLogic to use the specified value
+     */
+    public Attack setBlockstun(int blockstun) {
+        overrideBlockstun = true;
+        this.blockstun = blockstun;
+        return this;
+    }
+
+    /**
+     * @return effective blockstun (in ticks) for attack (4 + damage OR assigned blockstun)
+     */
+    public int getEffectiveBlockstun() {
+        if (overrideBlockstun)
+            return blockstun;
+        return (int) (4 + damage);
+    }
+
+    /**
+     * Assigns a followup to the attack
+     */
+    public Attack setFollowup(Attack followup) {
+        this.followup = followup;
+        return this;
+    }
+
+    /**
+     * @return whether the attack has a followup
+     */
+    public boolean hasFollowup() {
+        return this.followup != null;
+    }
+
+    /**
+     * Assigns an attack as the aerial variation to this attack
+     */
+    public Attack aerialVariation(Attack air) {
+        this.variations.put(VariationType.AERIAL, air);
+        return this;
+    }
+
+    /**
+     * Assigns an attack as the crouching variation to this attack
+     */
+    public Attack crouchingVariation(Attack cr) {
+        this.variations.put(VariationType.CROUCHING, cr);
+        return this;
+    }
+
+    public int realInitTime() {
+        return this.attackType == AttackType.MULTIHIT ? attackTimes.get(0) : initTime;
+    }
+
+    public static Attack copyOf(Attack attack) {
+        Attack attackCopy = new Attack(
+                attack.id,
+                attack.cooldown,
+                attack.attackDist,
+                attack.moveStun,
+                attack.initTime,
+                attack.hitboxSize,
+                attack.damage,
+                attack.knockback,
+                attack.attackType,
+                attack.stun,
+                attack.offset,
+                attack.interval,
+                attack.impactSound
+        );
+
+        attackCopy.attackTimes = attack.attackTimes;
+        attackCopy.armor = attack.armor;
+        attackCopy.lift = attack.lift;
+        attackCopy.hitspark = attack.hitspark;
+
+        attackCopy.stunType = attack.stunType;
+        attackCopy.overrideStun = attack.overrideStun;
+
+        attackCopy.animation = attack.animation;
+        attackCopy.canBackstab = attack.canBackstab;
+        attackCopy.extraHitboxes = attack.extraHitboxes;
+
+        attackCopy.blockstun = attack.blockstun;
+        attackCopy.overrideBlockstun = attack.overrideBlockstun;
+
+        attackCopy.name = attack.name;
+        attackCopy.description = attack.description;
+        attackCopy.button = attack.button;
+        return attackCopy;
+    }
+
+    public boolean isCharge() {
+        return attackType == AttackType.CHARGE || attackType == AttackType.CHARGEBARRAGE;
+    }
+
+    public boolean isBarrage() {
+        return attackType == AttackType.BARRAGE || attackType == AttackType.CHARGEBARRAGE;
     }
 }

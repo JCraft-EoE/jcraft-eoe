@@ -38,20 +38,21 @@ import java.util.List;
 import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 
 public class WSAcidProjectile extends PersistentProjectileEntity implements IAnimatable {
-    public WSAcidProjectile(EntityType<? extends WSAcidProjectile> entityType, World world) {
-        super(entityType, world);
-    }
-
     private static final TrackedData<Boolean> MYH; // Melt your Heart variant
     private static final TrackedData<Boolean> SPLAT;
     private static final TrackedData<Float> FINALPITCH;
     private static final TrackedData<Float> FINALYAW;
+    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
     static {
         MYH = DataTracker.registerData(WSAcidProjectile.class, TrackedDataHandlerRegistry.BOOLEAN);
         SPLAT = DataTracker.registerData(WSAcidProjectile.class, TrackedDataHandlerRegistry.BOOLEAN);
         FINALPITCH = DataTracker.registerData(WSAcidProjectile.class, TrackedDataHandlerRegistry.FLOAT);
         FINALYAW = DataTracker.registerData(WSAcidProjectile.class, TrackedDataHandlerRegistry.FLOAT);
+    }
+
+    public WSAcidProjectile(EntityType<? extends WSAcidProjectile> entityType, World world) {
+        super(entityType, world);
     }
 
     public void markMeltYourHeart() {
@@ -109,7 +110,7 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
         if (entity instanceof LivingEntity living) {
             LivingEntity target = living;
             if (entity instanceof StandEntity stand && stand.hasUser())
-                target = stand.getUser();
+                target = stand.getUserOrThrow();
             damageLogic(world, target, Vec3d.ZERO, 10, 1, false, 5f, false, 6, DamageSource.thrownProjectile(this, owner), owner);
             target.addStatusEffect(new StatusEffectInstance(JStatusRegister.WSPOISON, 60, 0, false, true));
             discard();
@@ -138,10 +139,8 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
     protected void age() {
         super.age();
         if (world.isClient) return;
-        if (timeOnSurface++ >= 100)
-            discard();
-        if (!dataTracker.get(SPLAT))
-            splat();
+        if (timeOnSurface++ >= 100) discard();
+        if (!dataTracker.get(SPLAT)) splat();
     }
 
     @Override
@@ -229,8 +228,6 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
     }
 
     // Animations
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
-
     @Override
     public void registerControllers(AnimationData data) {
         data.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));

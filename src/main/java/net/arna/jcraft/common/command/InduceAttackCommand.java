@@ -4,7 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.spec.JCraftSpec;
-import net.arna.jcraft.common.util.AttackQueue;
+import net.arna.jcraft.common.attack.AttackQueue;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.command.CommandRegistryAccess;
@@ -106,12 +106,12 @@ public class InduceAttackCommand {
                         if (spec != null) {
                             ServerWorld serverWorld = source.getWorld();
                             switch (type) {
-                                case HEAVY -> spec.InitHeavyAttack(serverWorld);
-                                case BARRAGE -> spec.InitBarrage(serverWorld);
-                                case SPECIAL1 -> spec.InitSpecial1(serverWorld);
-                                case ULTIMATE -> spec.InitUlt(serverWorld);
-                                case SPECIAL2 -> spec.InitSpecial2(serverWorld);
-                                case SPECIAL3 -> spec.InitSpecial3(serverWorld);
+                                case HEAVY -> spec.initHeavyAttack(serverWorld);
+                                case BARRAGE -> spec.initBarrage(serverWorld);
+                                case SPECIAL1 -> spec.initSpecial1(serverWorld);
+                                case ULTIMATE -> spec.initUlt(serverWorld);
+                                case SPECIAL2 -> spec.initSpecial2(serverWorld);
+                                case SPECIAL3 -> spec.initSpecial3(serverWorld);
                             }
                             flag = 1;
                         }

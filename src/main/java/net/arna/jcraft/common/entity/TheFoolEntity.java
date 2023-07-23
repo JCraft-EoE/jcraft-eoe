@@ -1,6 +1,10 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.attack.Attack;
+import net.arna.jcraft.common.attack.AttackQueue;
+import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JEntityTypeRegister;
@@ -42,24 +46,22 @@ import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class TheFoolEntity extends StandEntity {
     public static final Attack light = new Attack(0, 2, 1.5f, 14, 7, 2, 6f, 0.8f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_2)
-            .appendHitbox(new Attack.HitboxData(0, 0.25, 1))
+            .appendHitbox(new HitBoxData(0, 0.25, 1))
             .setInfo("Swipe", "slow, long-reaching poke");
     public static final Attack airbarrage = new Attack(3, 17, 1f, 30, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 0.5f, 0, 3);
     public static final Attack combo = new Attack(2, 15, 1.5f, 29, 0, 1.75, 4.5f, 0.1f, AttackType.MULTIHIT, 1f, -0.1f, List.of(6, 14, 18, 19), JSoundRegister.IMPACT_2)
-            .appendHitbox(new Attack.HitboxData(0.5, 0, 1.25))
+            .appendHitbox(new HitBoxData(0.5, 0, 1.25))
             .aerialVariation(airbarrage)
             .setInfo("3-hit combo (grounded) / Burn Rubber (aerial)", "knockdown on final hit / slows down all movement, combo starter/extender");
     public static final Attack launch = new Attack(1, 16, 1.25f, 20, 16, 2, 8f, 0.5f, AttackType.BOX, 1.25f, -0.3f, 0, JSoundRegister.IMPACT_2)
-            .appendHitbox(new Attack.HitboxData(1.5))
+            .appendHitbox(new HitBoxData(1.5))
             .setHitspark(2)
             .hyperArmor()
             .setInfo("Launch", "uninterruptable, slow, launching uppercut");
@@ -94,7 +96,7 @@ public class TheFoolEntity extends StandEntity {
             .aerialVariation(tornado)
             .setInfo("Charge/Sand Tornado", "The Fool detaches from the user and charges forward, dealing knockback on hit/in air summons a slow, stunning sand tornado");
     public static final Attack sandstorm = new Attack(7, 40, 1.5f, 41, 28, 2, 7f, 0.1f, AttackType.BOX, 1, 0, 0, JSoundRegister.TW_KICK_HIT)
-            .appendHitbox(new Attack.HitboxData(1.5))
+            .appendHitbox(new HitBoxData(1.5))
             .setHitspark(2)
             .hyperArmor()
             .setUB(true)
@@ -213,10 +215,9 @@ public class TheFoolEntity extends StandEntity {
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (getUser().isOnGround())
+        if (getUser() != null && getUser().isOnGround())
             handleAttack(combo, JCraft.standBarrageCD, 4);
-        else
-            handleAttack(airbarrage, JCraft.standBarrageCD, 5);
+        else handleAttack(airbarrage, JCraft.standBarrageCD, 5);
     }
 
     @Override
@@ -256,7 +257,7 @@ public class TheFoolEntity extends StandEntity {
 
         if (!canAttack()) return;
 
-        if (getUser().isOnGround() && handleAttack(charge, JCraft.standS2CD, 8))
+        if (getUser() != null && getUser().isOnGround() && handleAttack(charge, JCraft.standS2CD, 8))
             playSound(JSoundRegister.FOOL_CHARGE, 1, 1);
         else if (handleAttack(tornado, JCraft.standS2CD, 15)) {
             setSand(true);
@@ -277,7 +278,7 @@ public class TheFoolEntity extends StandEntity {
     public void initUtil() {
         if (!canAttack()) return;
         LivingEntity user = getUser();
-        if (user.isOnGround() && handleAttack(sandwave, JCraft.utilCD, 10)) {
+        if (user != null && user.isOnGround() && handleAttack(sandwave, JCraft.utilCD, 10)) {
             setSand(true);
             setWave(true);
             setFree(false);
@@ -301,7 +302,7 @@ public class TheFoolEntity extends StandEntity {
     public boolean canAttack() {
         LivingEntity user = getUser();
         if (hasUser()) {
-            ITimeStop timeStop = (ITimeStop) user;
+            ITimeStop timeStop = Objects.requireNonNull((ITimeStop) user);
             if (timeStop.getTimeStopTicks() > 0 || user.hasStatusEffect(JStatusRegister.DAZED)) return false;
             if (curAttack != null && curAttack.id == glide.id) return true;
             return getMoveStun() < 1;
@@ -311,14 +312,10 @@ public class TheFoolEntity extends StandEntity {
 
     @Override
     public void setAttack(Attack attack, int state) {
-        if (getUser().isSneaking()) {
+        if (getUser() != null && getUser().isSneaking()) {
             setSand(true);
-            super.setAttack(
-                    Attack.copyOf(attack).setDist(attack.attackDist / 2f)
-                    , state);
-        } else {
-            super.setAttack(attack, state);
-        }
+            super.setAttack(Attack.copyOf(attack).setDist(attack.attackDist / 2f), state);
+        } else super.setAttack(attack, state);
     }
 
     @Override
@@ -332,6 +329,7 @@ public class TheFoolEntity extends StandEntity {
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
         LivingEntity user = this.getUser();
+
         switch (attack.id) {
             case (1) -> {
                 for (LivingEntity ent : entities)
@@ -368,6 +366,8 @@ public class TheFoolEntity extends StandEntity {
                     ServerChannelFeedbackPacket.send(sendPlayer, buf);
             }
             case (6) -> {
+                if (user == null) return;
+
                 Vec3d pos = user.getEyePos();
 
                 // Display sand effect
@@ -452,6 +452,8 @@ public class TheFoolEntity extends StandEntity {
             }
             case (9) -> setSand(false); // Ends transformation state
             case (10) -> {
+                if (user == null) return;
+
                 switch (slamType) {
                     case (2) -> {
                         Vec3d leftVec = user.getRotationVector().rotateY(1.75f);
@@ -518,6 +520,7 @@ public class TheFoolEntity extends StandEntity {
     }
 
     private static final BlockState sandState = Blocks.SAND.getDefaultState();
+
     @Override
     public void tick() {
         if (age == 1) playSound(JSoundRegister.STAND_SUMMON, 1f, 1f);
@@ -525,13 +528,14 @@ public class TheFoolEntity extends StandEntity {
         super.tick();
 
         if (hasUser()) {
-            LivingEntity user = getUser();
+            LivingEntity user = Objects.requireNonNull(getUser());
+
             if (world.isClient) {
                 if (age % 2 == 0) {
                     Vec3d pos = getPos();
                     // If the fool is using any morphing attack, the amount of sand multiplies, and the stand itself changes color
                     int particleNum = isWave() ? 32 : 1 + MathHelper.clamp(getMoveStun() / 2, 0, 5) * (isSand() ? 2 : 1);
-                    int height =  isWave() || blocking ? 1 : 2;
+                    int height = isWave() || blocking ? 1 : 2;
 
                     for (int i = 0; i < particleNum; i++) {
                         ParticleEffect effect = (isWave() && random.nextFloat() * 0.5f > 0) ?
@@ -620,7 +624,7 @@ public class TheFoolEntity extends StandEntity {
 
                 // Sand clone logic
                 if (sandClone != null && sandClone.age > 200)
-                        setSandClone(null);
+                    setSandClone(null);
             }
 
             setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
@@ -628,25 +632,8 @@ public class TheFoolEntity extends StandEntity {
     }
 
     // Animation code
-    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
     @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
-    }
-
-    @Override
-    public AnimationFactory getFactory() {
-        return this.animationFactory;
-    }
-
-    @Override
-    public int tickTimer() {
-        return age;
-    }
-
-    @SuppressWarnings("SameReturnValue")
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+    protected <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
         String blockAnim = isSand() ? "animation.thefool.crouchblock" : "animation.thefool.block";
 
         AnimationController<E> controller = event.getController();

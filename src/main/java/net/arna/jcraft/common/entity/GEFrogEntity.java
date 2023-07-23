@@ -9,7 +9,9 @@ import net.minecraft.entity.passive.FrogEntity;
 import net.minecraft.world.World;
 
 public class GEFrogEntity extends FrogEntity implements IOwnable {
-    public GEFrogEntity(EntityType<? extends AnimalEntity> entityType, World world) { super(entityType, world); }
+    public GEFrogEntity(EntityType<? extends AnimalEntity> entityType, World world) {
+        super(entityType, world);
+    }
 
     @Override
     public boolean damage(DamageSource source, float amount) {
@@ -23,12 +25,19 @@ public class GEFrogEntity extends FrogEntity implements IOwnable {
     }
 
     private LivingEntity master;
+
     @Override
-    public LivingEntity getMaster() { return master; }
+    public LivingEntity getMaster() {
+        return master;
+    }
+
     @Override
-    public void setMaster(LivingEntity m) { master = m; }
+    public void setMaster(LivingEntity m) {
+        master = m;
+    }
 
     private int timeToLive = 300;
+
     @Override
     public void tick() {
         timeToLive--;
@@ -38,9 +47,8 @@ public class GEFrogEntity extends FrogEntity implements IOwnable {
         }
 
         if (!world.isClient) {
-            if (master == null) {
-                kill();
-            } else {
+            if (master == null) kill();
+            else {
                 // Covers any edge cases, including stand damage (which uses a separate damage routine
                 float deltaHealth = getMaxHealth() - getHealth();
                 if (deltaHealth > 0) {

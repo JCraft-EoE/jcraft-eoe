@@ -35,25 +35,25 @@ public class FVRevolverItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if (!world.isClient()) {
-            ItemStack itemStack = user.getStackInHand(hand);
-            if (user.hasStatusEffect(JStatusRegister.DAZED))
-                return TypedActionResult.fail(itemStack);
+        if (world.isClient()) return TypedActionResult.success(user.getStackInHand(hand));
 
-            NbtCompound data = itemStack.getOrCreateNbt();
-            int shots = data.getInt("Shots");
-            if (shots < 1)
-                return TypedActionResult.fail(user.getStackInHand(hand));
-            data.putInt("Shots", shots - 1);
-            user.getItemCooldownManager().set(this, 8);
-            world.playSound(null, user.getX(), user.getY(), user.getZ(), JSoundRegister.REVOLVER_FIRE, SoundCategory.PLAYERS, 1f, 1f);
+        ItemStack itemStack = user.getStackInHand(hand);
+        if (user.hasStatusEffect(JStatusRegister.DAZED))
+            return TypedActionResult.fail(itemStack);
 
-            BulletProjectile bullet = new BulletProjectile(world, user, 9f, 10f, 10, 5);
-            bullet.setVelocity(user, user.getPitch(), user.getYaw(), 0f,  10, 0F);
-            world.spawnEntity(bullet);
+        NbtCompound data = itemStack.getOrCreateNbt();
+        int shots = data.getInt("Shots");
+        if (shots < 1) return TypedActionResult.fail(user.getStackInHand(hand));
 
-            //damageLogic(world, livingEntity, dir, 10, 1, false, 5, true, 4, DamageSource.mob(user), user);
-        }
+        data.putInt("Shots", shots - 1);
+        user.getItemCooldownManager().set(this, 8);
+        world.playSound(null, user.getX(), user.getY(), user.getZ(), JSoundRegister.REVOLVER_FIRE, SoundCategory.PLAYERS, 1f, 1f);
+
+        BulletProjectile bullet = new BulletProjectile(world, user, 9f, 10f, 10, 5);
+        bullet.setVelocity(user, user.getPitch(), user.getYaw(), 0f,  10, 0F);
+        world.spawnEntity(bullet);
+
+        //damageLogic(world, livingEntity, dir, 10, 1, false, 5, true, 4, DamageSource.mob(user), user);
 
         return TypedActionResult.success(user.getStackInHand(hand));
     }

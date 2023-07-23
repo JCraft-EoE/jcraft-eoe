@@ -25,33 +25,32 @@ public abstract class StandObtainmentItem extends Item {
      */
     public Map<Integer, Integer> standIOMap;
 
-    boolean canEvolve(World world, PlayerEntity user, NbtCompound playerData) {
+    protected boolean canEvolve(World world, PlayerEntity user, NbtCompound playerData) {
         return true;
     }
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack itemStack = user.getStackInHand(hand);
+        if (world.isClient) return TypedActionResult.consume(itemStack);
 
-        if (!world.isClient) {
-            IEntityDataSaver userDataSaver = ((IEntityDataSaver) user);
-            NbtCompound playerData = userDataSaver.getPersistentData();
-            int standID = playerData.getInt("StandID");
+        IEntityDataSaver userDataSaver = ((IEntityDataSaver) user);
+        NbtCompound playerData = userDataSaver.getPersistentData();
+        int standID = playerData.getInt("StandID");
 
-            // Does the user have the appropriate stand and does he meet the evolution requirements?
-            if (standIOMap.containsKey(standID) && canEvolve(world, user, playerData)) {
-                if (!user.isCreative())
-                    itemStack.decrement(1);
+        // Does the user have the appropriate stand and does he meet the evolution requirements?
+        if (standIOMap.containsKey(standID) && canEvolve(world, user, playerData)) {
+            if (!user.isCreative())
+                itemStack.decrement(1);
 
-                playerData.putInt("StandID", standIOMap.get(standID));
+            playerData.putInt("StandID", standIOMap.get(standID));
 
-                // Re-summon users stand
-                StandEntity stand = userDataSaver.getStand();
-                if (stand != null)
-                    stand.desummon();
+            // Re-summon users stand
+            StandEntity stand = userDataSaver.getStand();
+            if (stand != null)
+                stand.desummon();
 
-                JCraft.summon(world, user);
-            }
+            JCraft.summon(world, user);
         }
 
         return TypedActionResult.consume(itemStack);

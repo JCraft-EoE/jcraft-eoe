@@ -25,18 +25,18 @@ public class FoolishSandBlock extends FallingBlock {
 
     @Override
     public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        if (this.increaseAge(state, world, pos)) {
-            super.scheduledTick(state, world, pos, random);
-            BlockPos.Mutable mutable = new BlockPos.Mutable();
-            Direction[] var6 = Direction.values();
-            for (Direction direction : var6) {
-                mutable.set(pos, direction);
-                BlockState blockState = world.getBlockState(mutable);
-                if (blockState.isOf(this) && !this.increaseAge(blockState, world, mutable))
-                    world.createAndScheduleBlockTick(mutable, this, 20);
-            }
-        } else {
+        if (!increaseAge(state, world, pos)) {
             world.createAndScheduleBlockTick(pos, this, 20, TickPriority.NORMAL);
+            return;
+        }
+
+        super.scheduledTick(state, world, pos, random);
+        BlockPos.Mutable blockPos = new BlockPos.Mutable();
+        for (Direction direction : Direction.values()) {
+            blockPos.set(pos, direction);
+            BlockState blockState = world.getBlockState(blockPos);
+            if (blockState.isOf(this) && !increaseAge(blockState, world, blockPos))
+                world.createAndScheduleBlockTick(blockPos, this, 20);
         }
     }
 

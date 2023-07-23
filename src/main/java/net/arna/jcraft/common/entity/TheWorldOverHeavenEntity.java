@@ -1,6 +1,9 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.attack.Attack;
+import net.arna.jcraft.common.attack.AttackQueue;
+import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JSoundRegister;
@@ -32,9 +35,6 @@ import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,34 +80,18 @@ public class TheWorldOverHeavenEntity extends StandEntity {
     public static final Attack timestop = new Attack(7, 70, 50, 45, 5, AttackType.TIMESTOP)
             .setUB(true)
             .setInfo("Timestop", "5 seconds");
+    private static final Attack timeskip = new Attack(-2, 18, 2, 2)
+            .setMobility(MobilityType.TELEPORT)
+            .setInfo("Timeskip", "14m range");
 
+    private static final TrackedData<Integer> OVERWRITE_TYPE;
     private Vec3d lightningPos;
-    public final ArrayList<LivingEntity> overwriteEnts = new ArrayList<>();
-    public final ArrayList<Integer> overwriteTimes = new ArrayList<>();
-    private static final TrackedData<Integer> OVERWRITETYPE;
+    private final List<LivingEntity> overwriteEnts = new ArrayList<>();
+    private final List<Integer> overwriteTimes = new ArrayList<>();
+    private float smiteDamage = 6f;
 
     static {
-        OVERWRITETYPE = DataTracker.registerData(TheWorldOverHeavenEntity.class, TrackedDataHandlerRegistry.INTEGER);
-    }
-
-    public int getOverwriteType() {
-        return dataTracker.get(OVERWRITETYPE);
-    }
-
-    public void setOverwriteType(int type) {
-        dataTracker.set(OVERWRITETYPE, type);
-    }
-
-    @Override
-    public void desummon() {
-        if (tsTime > 0) return;
-        super.desummon();
-    }
-
-    @Override
-    protected void initDataTracker() {
-        super.initDataTracker();
-        dataTracker.startTracking(OVERWRITETYPE, 0);
+        OVERWRITE_TYPE = DataTracker.registerData(TheWorldOverHeavenEntity.class, TrackedDataHandlerRegistry.INTEGER);
     }
 
     public TheWorldOverHeavenEntity(World worldIn) {
@@ -139,25 +123,45 @@ public class TheWorldOverHeavenEntity extends StandEntity {
         moves = List.of(light, heavy, barrage, smite, timestop, delayknives, chargeoverwrite, timeskip);
     }
 
+    public int getOverwriteType() {
+        return dataTracker.get(OVERWRITE_TYPE);
+    }
+
+    public void setOverwriteType(int type) {
+        dataTracker.set(OVERWRITE_TYPE, type);
+    }
+
+    @Override
+    public void desummon() {
+        if (tsTime > 0) return;
+        super.desummon();
+    }
+
+    @Override
+    protected void initDataTracker() {
+        super.initDataTracker();
+        dataTracker.startTracking(OVERWRITE_TYPE, 0);
+    }
+
     // Moveset
     @Override
     public void initLightAttack() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
     public void initBarrage() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, 5))
-            this.playSound(JSoundRegister.TWOH_BARRAGE, 1, 1);
+            playSound(JSoundRegister.TWOH_BARRAGE, 1, 1);
     }
 
     @Override
     public void initHeavyAttack() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(heavy, JCraft.standHeavyCD, 4))
-            this.playSound(JSoundRegister.TWOH_HEAVY, 1, 1);
+            playSound(JSoundRegister.TWOH_HEAVY, 1, 1);
     }
 
     private void initOverwrite(int type) {
@@ -166,16 +170,15 @@ public class TheWorldOverHeavenEntity extends StandEntity {
         playSound(JSoundRegister.TWOH_OVERWRITE, 1, 1);
     }
 
-    private float smiteDamage = 6f;
-
     @Override
     public void initSpecial1() {
         if (curAttack == chargeoverwrite && getMoveStun() < 50) {
             initOverwrite(1);
             return;
         }
-        if (canAttack() && handleAttack(smite, JCraft.standS1CD, 6)) {
-            LivingEntity user = this.getUser();
+
+        if (canAttack() && handleAttack(smite, JCraft.standS1CD, 6) && hasUser()) {
+            LivingEntity user = getUserOrThrow();
             if (user.isOnGround()) {
                 smiteDamage = 8f;
                 this.lightningPos = user.getPos();
@@ -189,13 +192,10 @@ public class TheWorldOverHeavenEntity extends StandEntity {
                         576 // Squared
                 );
 
-                if (eHit != null) {
-                    this.lightningPos = eHit.getPos();
-                } else {
-                    this.lightningPos = world.raycast(
-                            new RaycastContext(eP, eP.add(rangeMod), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user)
-                    ).getPos();
-                }
+                if (eHit != null) lightningPos = eHit.getPos();
+                else
+                    lightningPos = world.raycast(new RaycastContext(eP, eP.add(rangeMod), RaycastContext.ShapeType.COLLIDER,
+                            RaycastContext.FluidHandling.NONE, user)).getPos();
             }
 
             AreaEffectCloudEntity effectCloud = new AreaEffectCloudEntity(world, lightningPos.x, lightningPos.y, lightningPos.z);
@@ -217,14 +217,13 @@ public class TheWorldOverHeavenEntity extends StandEntity {
             initOverwrite(2);
             return;
         }
+
         CanAttackData cad = this.canAttackWithData();
-        if (!cad.canAttack)
-            return;
-        if (cad.user.isOnGround() && handleAttack(delayknives, JCraft.standS2CD, 11)) {
+        if (!cad.canAttack) return;
+
+        if (cad.user.isOnGround() && handleAttack(delayknives, JCraft.standS2CD, 11))
             playSound(JSoundRegister.TWOH_AIRKNIVES, 1, 1);
-        } else if (handleAttack(knives, JCraft.standS2CD, 9)) {
-            playSound(JSoundRegister.TWOH_KNIFETHROW, 1, 1);
-        }
+        else if (handleAttack(knives, JCraft.standS2CD, 9)) playSound(JSoundRegister.TWOH_KNIFETHROW, 1, 1);
     }
 
     @Override
@@ -233,21 +232,18 @@ public class TheWorldOverHeavenEntity extends StandEntity {
             initOverwrite(3);
             return;
         }
+
         if (canAttack() && handleAttack(chargeoverwrite, JCraft.standS3CD, 8))
             playSound(JSoundRegister.TWOH_CHARGEOVERWRITE, 1, 1);
     }
 
     @Override
     public void initUlt() {
-        if (!this.canAttack())
-            return;
+        if (!canAttack()) return;
         if (handleAttack(timestop, JCraft.standUltCD, 7))
-            this.playSound(JSoundRegister.TWOH_TS, 1, 1);
+            playSound(JSoundRegister.TWOH_TS, 1, 1);
     }
 
-    private static final Attack timeskip = new Attack(-2, 18, 2, 2)
-            .setMobility(MobilityType.TELEPORT)
-            .setInfo("Timeskip", "14m range");
     @Override
     public void initUtil() {
         if (!canAttack()) return;
@@ -256,8 +252,9 @@ public class TheWorldOverHeavenEntity extends StandEntity {
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
-        LivingEntity user = getUser();
-        DamageSource damageSource = JDamageSources.stand(this, user);
+        if (!hasUser()) return;
+        LivingEntity user = getUserOrThrow();
+        DamageSource damageSource = JDamageSources.stand(this);
 
         switch (attack.id) {
             case (-2) -> {
@@ -288,7 +285,7 @@ public class TheWorldOverHeavenEntity extends StandEntity {
                 }
             }
             case (3) -> {
-                Vec3d lP = this.lightningPos;
+                Vec3d lP = lightningPos;
 
                 LightningEntity lightning = new LightningEntity(EntityType.LIGHTNING_BOLT, this.world);
                 lightning.setCosmetic(true);
@@ -316,8 +313,7 @@ public class TheWorldOverHeavenEntity extends StandEntity {
                     knife.setPosition(user.getPos().add(
                             random.nextTriangular(0, 0.5),
                             random.nextTriangular(1.5, 0.5),
-                            random.nextTriangular(0, 0.5)
-                    ));
+                            random.nextTriangular(0, 0.5)));
                     world.spawnEntity(knife);
                 }
             }
@@ -329,9 +325,7 @@ public class TheWorldOverHeavenEntity extends StandEntity {
                     knife.setDelayedLightning(10 + i * 5);
                     knife.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
                     knife.setNoGravity(true);
-                    knife.setVelocity(
-                            new Vec3d(rotVec.x * 0.7, 0, rotVec.z * 0.7).rotateY(1.5708f * i)
-                    );
+                    knife.setVelocity(new Vec3d(rotVec.x * 0.7, 0, rotVec.z * 0.7).rotateY(1.5708f * i));
                     knife.setPosition(getEyePos());
                     world.spawnEntity(knife);
                 }
@@ -353,16 +347,14 @@ public class TheWorldOverHeavenEntity extends StandEntity {
                         ent.addStatusEffect(new StatusEffectInstance(StatusEffects.WITHER, 100, 1, false, true));
                     }
 
-                    if (getOverwriteType() == 3) {
-                        ent.heal(4f);
+                    if (getOverwriteType() != 3) continue;
+                    ent.heal(4f);
 
-                        if (ent instanceof MobEntity) {
-                            IEntityDataSaver entityDataSaver = (IEntityDataSaver) ent;
-                            entityDataSaver.getPersistentData().putUuid("SlavedTo", user.getUuid());
-                            overwriteTimes.add(1048576);
-                            overwriteEnts.add(ent);
-                        }
-                    }
+                    if (!(ent instanceof MobEntity)) continue;
+                    IEntityDataSaver entityDataSaver = (IEntityDataSaver) ent;
+                    entityDataSaver.getPersistentData().putUuid("SlavedTo", user.getUuid());
+                    overwriteTimes.add(1048576);
+                    overwriteEnts.add(ent);
                 }
             }
         }
@@ -372,112 +364,90 @@ public class TheWorldOverHeavenEntity extends StandEntity {
     public void tick() {
         super.tick();
 
-        if (hasUser()) {
-            LivingEntity user = this.getUser();
-            if (age == 1) {
-                this.playSound(JSoundRegister.TWOH_SUMMON, 1f, 1f);
-                this.playSound(JSoundRegister.TW_SUMMON, 1f, 1f);
+        if (!hasUser()) return;
+        LivingEntity user = getUserOrThrow();
+        if (age == 1) {
+            this.playSound(JSoundRegister.TWOH_SUMMON, 1f, 1f);
+            this.playSound(JSoundRegister.TW_SUMMON, 1f, 1f);
 
-                List<LivingEntity> hit = this.world.getEntitiesByClass(LivingEntity.class, new Box(this.getPos().add(-64, -64, -64), this.getPos().add(64, 64, 64)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
-                hit.remove(this);
-                hit.remove(user);
+            List<LivingEntity> hit = world.getEntitiesByClass(LivingEntity.class, new Box(
+                            getPos().add(-64, -64, -64), getPos().add(64, 64, 64)),
+                    EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e -> e != this && e != user));
 
-                for (LivingEntity ent : hit) {
-                    NbtCompound entityData = ((IEntityDataSaver) ent).getPersistentData();
-                    if (entityData.contains("SlavedTo")) {
-                        if (entityData.getUuid("SlavedTo").equals(user.getUuid())) {
-                            overwriteEnts.add(ent);
-                            overwriteTimes.add(1048576); // 2 to the whatever
-                        }
+            for (LivingEntity ent : hit) {
+                NbtCompound entityData = ((IEntityDataSaver) ent).getPersistentData();
+                if (entityData.contains("SlavedTo")) {
+                    if (entityData.getUuid("SlavedTo").equals(user.getUuid())) {
+                        overwriteEnts.add(ent);
+                        overwriteTimes.add(1048576); // 2 to the whatever
                     }
                 }
             }
+        }
 
-            if (world.isClient) {
-                setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
+        if (world.isClient) {
+            setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
+            return;
+        }
+
+        if (getOverwriteType() != 0 && getMoveStun() <= 0) setOverwriteType(0);
+
+        for (int i = 0; i < overwriteTimes.size(); i++) {
+            int time = overwriteTimes.get(i);
+            overwriteTimes.set(i, time - 1);
+
+            if (time < 1) {
+                overwriteTimes.remove(i);
+                overwriteEnts.remove(i);
+                i--;
             } else {
-                if (getOverwriteType() != 0 && getMoveStun() <= 0)
-                    setOverwriteType(0);
-                for (int i = 0; i < overwriteTimes.size(); i++) {
-                    int time = overwriteTimes.get(i);
-                    overwriteTimes.set(i, time - 1);
+                LivingEntity entity = overwriteEnts.get(i);
 
-                    if (time < 1) {
-                        overwriteTimes.remove(i);
-                        overwriteEnts.remove(i);
-                        i--;
-                    } else {
-                        LivingEntity entity = overwriteEnts.get(i);
-
-                        if (entity instanceof MobEntity mob && time > 200) { // Targetting and movement for mobs
-                            LivingEntity victim = user.getAttacking();
-                            if (victim == null) {
-                                LivingEntity adv = user.getPrimeAdversary();
-                                if (adv != null && adv.isAlive()) {
-                                    mob.setTarget(adv);
-                                }
-                            } else if (victim.isAlive()) {
-                                mob.setTarget(victim);
-                            }
-
-                            if (mob.squaredDistanceTo(this) > 256)
-                                mob.getNavigation().startMovingTo(this, 1);
+                if (entity instanceof MobEntity mob && time > 200) { // Targeting and movement for mobs
+                    LivingEntity victim = user.getAttacking();
+                    if (victim == null) {
+                        LivingEntity adv = user.getPrimeAdversary();
+                        if (adv != null && adv.isAlive()) {
+                            mob.setTarget(adv);
                         }
-
-                        // Inability to look at master
-                        double range = 1024.0;
-
-                        Box box = entity
-                                .getBoundingBox()
-                                .stretch(entity.getRotationVec(1.0F).multiply(range))
-                                .expand(1.0D);
-                        EntityHitResult hitResult = ProjectileUtil.raycast(
-                                entity,
-                                entity.getEyePos(),
-                                entity.getEyePos().add(entity.getRotationVector().multiply(range)),
-                                box,
-                                EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR,
-                                range
-                        );
-
-                        if (hitResult != null) {
-                            Entity lookEntity = hitResult.getEntity();
-                            if (lookEntity == user || lookEntity == this) {
-                                entity.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES,
-                                        getEyePos().add(
-                                                random.nextInt() * 10,
-                                                random.nextInt() * 10,
-                                                random.nextInt() * 10
-                                        )
-                                );
-                            }
-                        }
+                    } else if (victim.isAlive()) {
+                        mob.setTarget(victim);
                     }
+
+                    if (mob.squaredDistanceTo(this) > 256)
+                        mob.getNavigation().startMovingTo(this, 1);
                 }
+
+                // Inability to look at master
+                double range = 1024.0;
+
+                Box box = entity
+                        .getBoundingBox()
+                        .stretch(entity.getRotationVec(1.0F).multiply(range))
+                        .expand(1.0D);
+                EntityHitResult hitResult = ProjectileUtil.raycast(
+                        entity,
+                        entity.getEyePos(),
+                        entity.getEyePos().add(entity.getRotationVector().multiply(range)),
+                        box,
+                        EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR,
+                        range);
+
+                if (hitResult == null) continue;
+                Entity lookEntity = hitResult.getEntity();
+
+                if (lookEntity != user && lookEntity != this) continue;
+                entity.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, getEyePos().add(
+                        random.nextInt() * 10,
+                        random.nextInt() * 10,
+                        random.nextInt() * 10));
             }
         }
     }
 
     // Animation code
-    final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
     @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
-    }
-
-    @Override
-    public AnimationFactory getFactory() {
-        return this.animationFactory;
-    }
-
-    @Override
-    public int tickTimer() {
-        return age;
-    }
-
-    @SuppressWarnings("SameReturnValue")
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+    protected <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
         AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
         if (playSummonAnim) {

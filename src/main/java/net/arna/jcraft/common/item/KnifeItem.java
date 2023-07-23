@@ -66,9 +66,11 @@ public class KnifeItem extends Item {
         speedMult /= getChargeTime();
         return speedMult;
     }
+
     protected float getChargeTime() {
         return 10F;
     }
+
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         tooltip.add(Text.translatable("jcraft.knife.chargetime").append(" §e" + getChargeTime() / 20F + "§9s"));
@@ -95,6 +97,7 @@ public class KnifeItem extends Item {
         }
     }
 
+    @Override
     public boolean canMine(BlockState state, World world, BlockPos pos, PlayerEntity miner) {
         return !miner.isCreative();
     }

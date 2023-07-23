@@ -17,31 +17,28 @@ public class SHAAttackGoal extends Goal {
     private LivingEntity target;
 
     public SHAAttackGoal(SheerHeartAttackEntity mob, double speed) {
-        this.sha = mob;
-        this.shaLookControl = sha.getLookControl();
-        this.shaNavigation = sha.getNavigation();
+        sha = mob;
+        shaLookControl = sha.getLookControl();
+        shaNavigation = sha.getNavigation();
         this.speed = speed;
-        this.setControls(EnumSet.of(Control.MOVE, Control.LOOK));
+        setControls(EnumSet.of(Control.MOVE, Control.LOOK));
     }
 
     @Override
     public boolean canStart() {
-        this.target = this.sha.getTarget();
-        return this.target != null;
+        target = sha.getTarget();
+        return target != null;
     }
 
     public boolean shouldContinue() {
-        if (!this.target.isAlive() || this.target.isRemoved())
-            return false;
-        else if (this.sha.squaredDistanceTo(this.target) > 1024.0D)
-            return false;
-        else
-            return !this.sha.getNavigation().isIdle() || this.canStart();
+        if (!target.isAlive() || target.isRemoved()) return false;
+        else if (sha.squaredDistanceTo(target) > 1024.0D) return false;
+        else return !sha.getNavigation().isIdle() || canStart();
     }
 
     public void stop() {
-        this.target = null;
-        this.sha.getNavigation().stop();
+        target = null;
+        sha.getNavigation().stop();
     }
 
     public boolean shouldRunEveryTick() {
@@ -49,11 +46,11 @@ public class SHAAttackGoal extends Goal {
     }
 
     public void tick() {
-        shaLookControl.lookAt(this.target, 30.0F, 30.0F);
-        shaNavigation.startMovingTo(this.target, this.speed);
+        shaLookControl.lookAt(target, 30.0F, 30.0F);
+        shaNavigation.startMovingTo(target, speed);
 
         double d = 3.0; // SHA_width^2 * 4
-        double e = sha.squaredDistanceTo(this.target);
+        double e = sha.squaredDistanceTo(target);
 
         if (e <= d && cooldown-- <= 0) {
             cooldown = 200;
