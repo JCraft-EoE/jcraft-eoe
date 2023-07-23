@@ -29,9 +29,9 @@ public class GravityCommand {
                     literal(direction.getName())
                             .then(argument("priority", IntegerArgumentType.integer())
                                     .then(argument("duration", IntegerArgumentType.integer())
-                                            .executes(context -> executeSet(context.getSource(), direction,IntegerArgumentType.getInteger(context, "priority"), IntegerArgumentType.getInteger(context, "duration"), Collections.singleton(context.getSource().getPlayer())))
-                                                .then(argument("entities", EntityArgumentType.entities())
-                                                        .executes(context -> executeSet(context.getSource(), direction, IntegerArgumentType.getInteger(context, "priority"), IntegerArgumentType.getInteger(context, "duration"), EntityArgumentType.getEntities(context, "entities"))))))
+                                            .executes(context -> executeSet(context.getSource(), direction, IntegerArgumentType.getInteger(context, "priority"), IntegerArgumentType.getInteger(context, "duration"), Collections.singleton(context.getSource().getPlayer())))
+                                            .then(argument("entities", EntityArgumentType.entities())
+                                                    .executes(context -> executeSet(context.getSource(), direction, IntegerArgumentType.getInteger(context, "priority"), IntegerArgumentType.getInteger(context, "duration"), EntityArgumentType.getEntities(context, "entities"))))))
             );
         }
 
@@ -79,13 +79,13 @@ public class GravityCommand {
         return gravityDirection.getId();
     }
 
-    private static int executeSet(ServerCommandSource source, Direction gravityDirection,int priority, int durration, Collection<? extends Entity> entities) {
+    private static int executeSet(ServerCommandSource source, Direction gravityDirection, int priority, int duration, Collection<? extends Entity> entities) {
         int i = 0;
         for (Entity entity : entities) {
             //if (GravityChangerAPI.getGravityDirection(entity) != gravityDirection) {
-                GravityChangerAPI.addGravity(entity,new Gravity(gravityDirection,priority,durration,"command"));
-                //getSendFeedback(source, entity, gravityDirection);
-                i++;
+            GravityChangerAPI.addGravity(entity, new Gravity(gravityDirection, priority, duration, "command"));
+            //getSendFeedback(source, entity, gravityDirection);
+            i++;
             //}
         }
         return i;
@@ -108,7 +108,7 @@ public class GravityCommand {
         int i = 0;
         for (Entity entity : entities) {
             Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
-            Direction combinedRelativeDirection = switch(relativeDirection) {
+            Direction combinedRelativeDirection = switch (relativeDirection) {
                 case DOWN -> Direction.DOWN;
                 case UP -> Direction.UP;
                 case FORWARD, BACKWARD, LEFT, RIGHT -> Direction.fromHorizontal(relativeDirection.getHorizontalOffset() + Direction.fromRotation(entity.getYaw()).getHorizontal());

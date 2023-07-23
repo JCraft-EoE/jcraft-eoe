@@ -1276,11 +1276,21 @@ The Fool
 
 >Removed Combo Breaker bind, now inputted by Jump while stunned
 
+Cream
+    >Hits made in void form now cancel ANY move
+
 Silver Chariot
     >Updated model and textures
 
+Killer Queen
+    >Increased blockstun on Bomb Plant
+
 Killer Queen: Bites the Dust
+    >Increased blockstun on Bomb Plant
     >Replaced Coin Toss with Bites the Dust Plant
+
+C-Moon
+    >Crouching Utility now changes gravitational direction for the user
 
 priority (top to bottom)
 todo: fix predict not working with new projectiles

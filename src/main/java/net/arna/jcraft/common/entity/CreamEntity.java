@@ -1,10 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.util.Attack;
-import net.arna.jcraft.common.util.AttackType;
-import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.common.util.MobilityType;
+import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.minecraft.block.Block;
@@ -452,8 +449,13 @@ public class CreamEntity extends StandEntity {
                     toDamage.remove(this);
 
                     for (LivingEntity ent : toDamage) {
-                        if (age % 4 == 0)
+                        if (age % 4 == 0) {
                             stun(ent, 2, 1);
+
+                            StandEntity enemyStand = ((IEntityDataSaver)ent).getStand();
+                            if (enemyStand != null)
+                                enemyStand.cancelAttack();
+                        }
                         ent.damage(DamageSource.OUT_OF_WORLD, charging ? 4 : 2.5f);
                     }
 

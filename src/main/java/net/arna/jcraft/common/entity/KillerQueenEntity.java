@@ -57,6 +57,7 @@ public class KillerQueenEntity extends StandEntity {
             .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
     public static final Attack bombplant = new Attack(4, 30, 1, 20, 12, 1.5, 0f, 0.0f, AttackType.BOX, 0.45f)
             .setUB(true)
+            .setBlockstun(8)
             .setInfo("Bomb Plant", "crouch to plant on the ground below you, stealthily");
     public static final Attack sha = new Attack(5, 45, 20, 16, 0, AttackType.BOX)
             .setRanged(true)

@@ -315,6 +315,8 @@ public final class Attack {
         attackCopy.blockstun = attack.blockstun;
         attackCopy.overrideBlockstun = attack.overrideBlockstun;
 
+        attackCopy.name = attack.name;
+        attackCopy.description = attack.description;
         attackCopy.button = attack.button;
         return attackCopy;
     }

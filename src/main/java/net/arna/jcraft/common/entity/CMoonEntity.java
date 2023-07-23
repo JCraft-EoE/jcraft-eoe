@@ -98,7 +98,9 @@ public class CMoonEntity extends StandEntity {
                     M1>Barrage>jump>Block Launch>M1>Only One Punch>Block hits>Grav. Hop>Ground Slam""";
 
         moves = List.of(light, gutpunch, barrage, gravpunch, gravshift, launch, groundslam
-                , new Attack().setMobility(MobilityType.HIGHJUMP).setInfo("Gravitational Hop", "jumps up and grants 2s slow falling"));
+                , new Attack().setMobility(MobilityType.HIGHJUMP)
+                        .setInfo("Gravitational Hop/Local Gravity Change", "jumps up and grants 2s slow falling/crouch to change your gravitational direction")
+        );
     }
 
     private static final TrackedData<Integer> SHIFTTYPE;
@@ -193,7 +195,7 @@ public class CMoonEntity extends StandEntity {
         if (userData.getPersistentData().getInt(JCraft.utilCD) > 0) return;
 
         if (user.isSneaking()) {
-            user.addStatusEffect(new StatusEffectInstance(JStatusRegister.WEIGHTLESS, 30, 1));
+            user.addStatusEffect(new StatusEffectInstance(JStatusRegister.WEIGHTLESS, 60, 1));
         } else {
             user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 60, 1));
             user.addVelocity(0, 1.0, 0);

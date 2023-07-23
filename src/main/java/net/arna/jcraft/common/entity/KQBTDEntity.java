@@ -63,6 +63,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
             .setInfo("Detonate", "crouch with a bomb planted within 20s on a living being to activate Bites the Dust");
     public static final Attack btdplant = new Attack(7, 50, 1, 24, 14, 1.5, 0f, 0.0f, AttackType.BOX, 0.5f)
             .setUB(true)
+            .setBlockstun(8)
             .setInfo("Bites the Dust Plant", "press the same button to detonate, sending the affected enemy back to their ");
 
     private BubbleProjectile bubbleProjectile;
@@ -248,11 +249,9 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
                     if (btdEntity instanceof LivingEntity livingEntity) {
                         world.createExplosion(user, livingEntity.getX(), livingEntity.getY() + livingEntity.getHeight() / 2, livingEntity.getZ(), 2f, Explosion.DestructionType.NONE);
                         livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
-                        livingEntity.teleport(btdPos.x, btdPos.y, btdPos.z);
-
-                        JCraft.createParticle((ServerWorld) getWorld(), btdPos.x, btdPos.y + 2, btdPos.z, -4);
 
                         Vec3d pos = btdEntity.getPos();
+                        JCraft.createParticle((ServerWorld) getWorld(), pos.x, pos.y + 2, pos.z, -4);
                         Vec3d v1 = pos.add(3, 3, 3);
                         Vec3d v2 = pos.add(-3, -3, -3);
                         List<LivingEntity> list = world.getEntitiesByClass(LivingEntity.class, new Box(v1, v2), EntityPredicates.VALID_LIVING_ENTITY);
@@ -261,6 +260,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
                             list.remove(user.getVehicle());
                         list.remove(user);
                         list.remove(this);
+                        list.remove(btdEntity);
 
                         for (LivingEntity l : list)
                             if (l.squaredDistanceTo(pos) < 9) {
@@ -271,6 +271,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
                                 }
                             }
 
+                        livingEntity.teleport(btdPos.x, btdPos.y, btdPos.z);
                         btdEntity = null;
                     }
                 } else {
