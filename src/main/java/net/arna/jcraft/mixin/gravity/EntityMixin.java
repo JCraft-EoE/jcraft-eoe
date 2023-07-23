@@ -1,7 +1,7 @@
 package net.arna.jcraft.mixin.gravity;
 
+import com.google.common.collect.ImmutableList;
 import net.arna.jcraft.JCraft;
-
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.minecraft.block.BlockRenderType;
@@ -24,8 +24,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
-
 
 import java.util.List;
 
@@ -405,9 +405,13 @@ public abstract class EntityMixin {
     @Inject(
             method = "adjustMovementForCollisions(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Lnet/minecraft/world/World;Ljava/util/List;)Lnet/minecraft/util/math/Vec3d;",
             at = @At("RETURN"),
-            cancellable = true
+            cancellable = true,
+            locals = LocalCapture.CAPTURE_FAILHARD
     )
-    private static void redirect_adjustMovementForCollisions_adjustMovementForCollisions_0(@Nullable Entity entity, Vec3d movement, Box entityBoundingBox, World world, List<VoxelShape> collisions, CallbackInfoReturnable<Vec3d> cir) {
+    private static void redirect_adjustMovementForCollisions_adjustMovementForCollisions_0(@Nullable Entity entity, Vec3d movement,
+                                                                                           Box entityBoundingBox, World world, List<VoxelShape> collisions, CallbackInfoReturnable<Vec3d> cir,
+                                                                                           ImmutableList.Builder<VoxelShape> shapeListBuilder) {
+        collisions = shapeListBuilder.build();
         Direction gravityDirection;
         if (entity == null || (gravityDirection = GravityChangerAPI.getGravityDirection(entity)) == Direction.DOWN)
             return;
