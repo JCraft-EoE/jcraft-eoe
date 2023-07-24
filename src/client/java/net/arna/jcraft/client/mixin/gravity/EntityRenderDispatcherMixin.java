@@ -109,8 +109,8 @@ public abstract class EntityRenderDispatcherMixin {
         double x = MathHelper.lerp(tickDelta, entity.lastRenderX, entity.getX());
         double y = MathHelper.lerp(tickDelta, entity.lastRenderY, entity.getY());
         double z = MathHelper.lerp(tickDelta, entity.lastRenderZ, entity.getZ());
-        Vec3d minShadowPos = RotationUtil.vecPlayerToWorld((double) -radius, (double) -radius, (double) -radius, gravityDirection).add(x, y, z);
-        Vec3d maxShadowPos = RotationUtil.vecPlayerToWorld((double) radius, 0.0D, (double) radius, gravityDirection).add(x, y, z);
+        Vec3d minShadowPos = RotationUtil.vecPlayerToWorld(-radius, -radius, (double) -radius, gravityDirection).add(x, y, z);
+        Vec3d maxShadowPos = RotationUtil.vecPlayerToWorld(radius, 0.0D, radius, gravityDirection).add(x, y, z);
         MatrixStack.Entry entry = matrices.peek();
         VertexConsumer vertexConsumer = vertexConsumers.getBuffer(SHADOW_LAYER);
 

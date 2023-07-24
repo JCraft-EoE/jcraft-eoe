@@ -251,11 +251,8 @@ public class D4CEntity extends StandEntity {
                 List<Entity> toHop = new ArrayList<>(entities);
                 toHop.add(player);
                 int heightOffset = auWorld.getHeight() - world.getHeight();
-                for (Entity entity : toHop) {
-                    if (entity instanceof LivingEntity living)
-                        living.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 300, 4, true, false));
+                for (Entity entity : toHop)
                     JCraft.dimensionHop(entity, heightOffset / 2);
-                }
             }
             case (4) -> {
                 if (entities.size() > 0) {

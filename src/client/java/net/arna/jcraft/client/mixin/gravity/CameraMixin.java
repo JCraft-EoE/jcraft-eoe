@@ -62,9 +62,9 @@ public abstract class CameraMixin {
         Quaternion gravityRotation = animation.getCurrentGravityRotation(gravityDirection, timeMs).copy();
         gravityRotation.conjugate();
 
-        double entityX = MathHelper.lerp((double) tickDelta, focusedEntity.prevX, focusedEntity.getX());
-        double entityY = MathHelper.lerp((double) tickDelta, focusedEntity.prevY, focusedEntity.getY());
-        double entityZ = MathHelper.lerp((double) tickDelta, focusedEntity.prevZ, focusedEntity.getZ());
+        double entityX = MathHelper.lerp(tickDelta, focusedEntity.prevX, focusedEntity.getX());
+        double entityY = MathHelper.lerp(tickDelta, focusedEntity.prevY, focusedEntity.getY());
+        double entityZ = MathHelper.lerp(tickDelta, focusedEntity.prevZ, focusedEntity.getZ());
 
         double currentCameraY = MathHelper.lerp(tickDelta, this.lastCameraY, this.cameraY);
 

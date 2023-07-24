@@ -11,7 +11,7 @@ import net.minecraft.text.Text;
 
 public abstract class SpecObtainmentItem extends Item {
     protected boolean warned = false;
-    protected JCraftSpec switchTo;
+    protected final JCraftSpec switchTo;
 
     public SpecObtainmentItem(Settings settings, JCraftSpec switchTo) {
         super(settings);

@@ -5,7 +5,6 @@ import net.arna.jcraft.common.effects.*;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 public interface JStatusRegister {
@@ -56,8 +55,8 @@ public interface JStatusRegister {
         );
 
         Registry.register(Registry.STATUS_EFFECT, JCraft.id("ws_poison"), WSPOISON);
-        Registry.register(Registry.STATUS_EFFECT, new Identifier(JCraft.MOD_ID, "standless"), STANDLESS);
-        Registry.register(Registry.STATUS_EFFECT, new Identifier(JCraft.MOD_ID, "outofbody"), OUTOFBODY);
-        Registry.register(Registry.STATUS_EFFECT, new Identifier(JCraft.MOD_ID, "weightless"), WEIGHTLESS);
+        Registry.register(Registry.STATUS_EFFECT, JCraft.id("standless"), STANDLESS);
+        Registry.register(Registry.STATUS_EFFECT, JCraft.id("outofbody"), OUTOFBODY);
+        Registry.register(Registry.STATUS_EFFECT, JCraft.id("weightless"), WEIGHTLESS);
     }
 }

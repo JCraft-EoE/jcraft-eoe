@@ -4,6 +4,7 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.HitBoxData;
+import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.registry.JEntityTypeRegister;
@@ -25,10 +26,7 @@ import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
@@ -179,21 +177,29 @@ public class CMoonEntity extends StandEntity {
             int shiftType = getShiftType();
             if (shiftType++ > 2)
                 shiftType = 0;
-            JCraft.LOGGER.info(shiftType);
             setShiftType(shiftType);
         }
     }
 
     @Override
     public void initUtil() {
-        if (!this.canAttack() || !hasUser()) return;
-
+        if (!hasUser()) return;
         LivingEntity user = getUserOrThrow();
+
+        if (user.isOnGround()) {
+            StatusEffectInstance weightless = user.getStatusEffect(JStatusRegister.WEIGHTLESS);
+            if (weightless != null && weightless.getAmplifier() == 1) {
+                user.removeStatusEffect(JStatusRegister.WEIGHTLESS);
+                user.addStatusEffect(new StatusEffectInstance(JStatusRegister.WEIGHTLESS, weightless.getDuration(), 1));
+            }
+        }
+
+        if (!this.canAttack()) return;
         IEntityDataSaver userData = (IEntityDataSaver) user;
         if (userData.getPersistentData().getInt(JCraft.utilCD) > 0) return;
 
-        if (user.isSneaking()) {
-            user.addStatusEffect(new StatusEffectInstance(JStatusRegister.WEIGHTLESS, 60, 1));
+        if (user.isOnGround()) {
+            user.addStatusEffect(new StatusEffectInstance(JStatusRegister.WEIGHTLESS, 200, 1));
         } else {
             user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 60, 1));
             user.addVelocity(0, 1.0, 0);
@@ -244,9 +250,12 @@ public class CMoonEntity extends StandEntity {
                 block.setBlockStack(Items.STONE.getDefaultStack());
             else
                 block.setBlockStack(steppingState.getBlock().asItem().getDefaultStack());
+
+            Vec3i hoverDir = GravityChangerAPI.getGravityDirection(user).getVector().multiply(-1);
+
             block.setMaster(user);
-            block.refreshPositionAndAngles(getX(), getY() + 1.5, getZ(), getYaw(), getPitch());
-            block.setVelocity(0, 0.4, 0);
+            block.refreshPositionAndAngles(getX() + hoverDir.getX() * 1.5, getY() + hoverDir.getY() * 1.5, getZ() + hoverDir.getZ() * 1.5, getYaw(), getPitch());
+            block.setVelocity(hoverDir.getX() * 0.4, hoverDir.getY() * 0.4, hoverDir.getZ() * 0.4);
             world.spawnEntity(block);
         } else if (attack.id == groundslam.id) {
             for (LivingEntity ent : entities) {

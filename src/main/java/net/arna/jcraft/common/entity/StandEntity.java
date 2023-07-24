@@ -5,6 +5,8 @@ import lombok.Setter;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.*;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
+import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.*;
@@ -40,10 +42,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
@@ -676,9 +675,13 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
 
         Attack attack = this.curAttack;
 
+        Direction gravDir = GravityChangerAPI.getGravityDirection(user);
+
         Vec3d pos = this.getPos();
-        Vec3d rotVec = this.getRotationVector();
-        Vec3d eyePos = this.getEyePos();
+        Vec3d rotVec = getRotationVector();
+        if (gravDir == Direction.UP)
+            rotVec = new Vec3d(rotVec.x, -rotVec.y, rotVec.z);
+        Vec3d eyePos = pos.add(GravityChangerAPI.getEyeOffset(this));
         boolean isFree = getFree();
         boolean isRemote = getRemote();
 
@@ -798,9 +801,14 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
                     List<LivingEntity> hurt = new ArrayList<>();
 
                     if (attack.hitboxSize > 0) {
-                        Vec3d hPos = pos.add(0.0, user.getHeight() / 2, 0.0);
+                        Vec3d upVec = GravityChangerAPI.getEyeOffset(user);
+                        Vec3d heightOffset = upVec.multiply(0.5);
+                        Vec3d hPos = pos.add(heightOffset);
+
                         Vec3d fPos = (isChargeAttack) ? hPos.add(rotVec) :
-                                hPos.add(rotVec.multiply(attackDist)).subtract(0, attack.offset, 0);
+                                hPos.add(rotVec.multiply(attackDist)).add(
+                                        upVec.multiply(-attack.offset)
+                                );
 
                         List<Entity> filter = new ArrayList<>(List.of(this, user));
                         if (vehicle != null) filter.add(vehicle);
@@ -808,7 +816,10 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
                         hurt = JUtils.generateHitbox(world, fPos, attack.hitboxSize, filter);
                         for (HitBoxData data : attack.extraHitboxes) {
                             List<LivingEntity> extraHurt = JUtils.generateHitbox(world,
-                                    hPos.add(rotVec.multiply(data.forwardOffset)).add(0, data.verticalOffset, 0), data.hitboxSize, filter);
+                                    hPos.add(
+                                            rotVec.multiply(data.forwardOffset))
+                                            .add(upVec.multiply(data.verticalOffset))
+                                    , data.hitboxSize, filter);
                             for (LivingEntity hurtEntity : extraHurt)
                                 if (!hurt.contains(hurtEntity)) hurt.add(hurtEntity);
                         }

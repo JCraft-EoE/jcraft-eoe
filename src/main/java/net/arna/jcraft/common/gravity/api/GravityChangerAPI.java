@@ -50,9 +50,9 @@ public abstract class GravityChangerAPI {
 
     public static ArrayList<Gravity> getGravityList(Entity entity) {
         if (EntityTags.canChangeGravity(entity)) {
-            return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getGravity).orElse(new ArrayList<Gravity>());
+            return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getGravity).orElse(new ArrayList<>());
         }
-        return new ArrayList<Gravity>();
+        return new ArrayList<>();
     }
 
     public static Direction getPrevGravtityDirection(Entity entity) {

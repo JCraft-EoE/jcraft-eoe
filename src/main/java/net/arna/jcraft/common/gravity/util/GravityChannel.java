@@ -43,15 +43,13 @@ public class GravityChannel<P extends GravityPacket> {
         Identifier verifier = buf.readIdentifier();
         PacketByteBuf verifierInfoBuf = PacketByteBufs.create();
         verifierInfoBuf.writeBytes(buf.readByteArray());
-        server.execute(() -> {
-            getGravityComponent(player).ifPresent(gc -> {
-                GravityVerifierRegistry.VerifierFunction<P> v = gravityVerifierRegistry.get(verifier);
-                if (v != null && v.check(player, verifierInfoBuf, packet)) {
-                    packet.run(gc);
-                    sendToClient(player, packet, PacketMode.EVERYONE_BUT_SELF);
-                } else sendFullStatePacket(player, PacketMode.ONLY_SELF, packet.getRotationParameters(), false);
-            });
-        });
+        server.execute(() -> getGravityComponent(player).ifPresent(gc -> {
+            GravityVerifierRegistry.VerifierFunction<P> v = gravityVerifierRegistry.get(verifier);
+            if (v != null && v.check(player, verifierInfoBuf, packet)) {
+                packet.run(gc);
+                sendToClient(player, packet, PacketMode.EVERYONE_BUT_SELF);
+            } else sendFullStatePacket(player, PacketMode.ONLY_SELF, packet.getRotationParameters(), false);
+        }));
     }
 
     public static void sendFullStatePacket(Entity entity, PacketMode mode, RotationParameters rp, boolean initialGravity) {

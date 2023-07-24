@@ -39,7 +39,7 @@ public abstract class PiglinEntityMixin implements CrossbowUser {
         double f = Math.sqrt(Math.sqrt(d * d + e * e));
         double g = targetPos.y - projectile.getY() + f * 0.20000000298023224D;
         Vec3f vec3f = this.getProjectileLaunchVelocity(entity, new Vec3d(d, g, e), multishotSpray);
-        projectile.setVelocity((double) vec3f.getX(), (double) vec3f.getY(), (double) vec3f.getZ(), speed, (float) (14 - entity.world.getDifficulty().getId() * 4));
+        projectile.setVelocity(vec3f.getX(), vec3f.getY(), vec3f.getZ(), speed, (float) (14 - entity.world.getDifficulty().getId() * 4));
         entity.playSound(SoundEvents.ITEM_CROSSBOW_SHOOT, 1.0F, 1.0F / (entity.getRandom().nextFloat() * 0.4F + 0.8F));
     }
 }

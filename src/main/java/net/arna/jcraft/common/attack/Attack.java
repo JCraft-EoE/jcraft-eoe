@@ -27,7 +27,7 @@ public final class Attack {
 
     public byte armor = 0; // For (un)interruptable attacks
     public boolean lift = true; // If set to true, attack will attempt to keep the victim in air on hit
-    public StunType stunType = StunType.UNBURSTABLE; // 1 - HITSTUN, 2 - BLOCKSTUN, 3 - NO MOVEMENT PENALTY
+    public StunType stunType = StunType.BURSTABLE; // 1 - HITSTUN, 2 - BLOCKSTUN, 3 - NO MOVEMENT PENALTY
     public boolean overrideStun = false; // If set to true, attack will override current stun on victim
     public boolean unblockable = false;
     public boolean ubEffectsOnly = false;

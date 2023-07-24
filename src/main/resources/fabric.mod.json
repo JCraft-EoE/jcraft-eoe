@@ -7,12 +7,13 @@
   "description": "so yeah i wanted to add jojo stands to mc",
   "authors": [
     "Arna",
-    "MrSterner"
+    "MrSterner",
+    "PlanetTeamSpeak"
   ],
 
   "contact": {
     "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "sources": "https://github.com/Arna577/jcraft-eoe/"
   },
 
   "accessWidener" : "jcraft.accesswidener",
@@ -35,6 +36,7 @@
       "net.arna.jcraft.common.gravity.util.GravityChangerComponents"
     ]
   },
+
   "mixins": [
     "jcraft.mixins.json",
     {
@@ -47,6 +49,10 @@
       "config": "jgravity.client.mixins.json"
     }
   ],
+
+  "suggests": {
+    "BetterCombat": ""
+  },
 
   "depends": {
     "fabricloader": ">=0.14.14",

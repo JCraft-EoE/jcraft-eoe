@@ -2,10 +2,13 @@ package net.arna.jcraft.mixin;
 
 import net.arna.jcraft.common.entity.KingCrimsonEntity;
 import net.arna.jcraft.common.entity.StandEntity;
+import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.ITimeStop;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -42,14 +45,19 @@ public class EntityMixin implements ITimeStop {
             }
 
             Entity e = ((Entity) (Object) this);
-            double d = e.getY() + passenger.getHeightOffset();
             double dist = stand.getDistanceOffset();
 
             float y = e.getYaw() + stand.getRotationOffset();
             y *= (float) Math.PI / 180;
 
             double heightOffset = stand.shouldOffsetHeight() ? e.getRotationVector().y : 0;
-            positionUpdater.accept(passenger, e.getX() + MathHelper.cos(y) * dist, d + heightOffset, e.getZ() + MathHelper.sin(y) * dist);
+            Vec3d adjustedOffset = RotationUtil.vecPlayerToWorld(
+                    MathHelper.cos(y) * dist,
+                    passenger.getHeightOffset() + heightOffset,
+                    MathHelper.sin(y) * dist,
+                    GravityChangerAPI.getGravityDirection(e)
+            );
+            positionUpdater.accept(passenger, e.getX() + adjustedOffset.x, e.getY() + adjustedOffset.y, e.getZ() + adjustedOffset.z);
             info.cancel();
         }
     }

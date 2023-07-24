@@ -46,6 +46,29 @@ import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 public final class JUtils {
     public static List<DimValues> activeTimestops = new ArrayList<>();
 
+    public static Vec3d adjustForGravity(Vec3d vec, Direction gravDir) {
+        switch (gravDir) {
+            case UP -> {
+                return new Vec3d(vec.x, -vec.y, vec.z);
+            }
+            case NORTH -> {
+                return new Vec3d(vec.x, vec.y, vec.z);
+            }
+            case SOUTH -> {
+                return new Vec3d(vec.x, vec.y, vec.z);
+            }
+            case WEST -> {
+                return new Vec3d(vec.x, vec.y, vec.z);
+            }
+            case EAST -> {
+                return new Vec3d(vec.x, vec.y, vec.z);
+            }
+            default -> {
+                return vec;
+            }
+        }
+    }
+
     public static void displayHitbox(World world, Vec3d v1, Vec3d v2) {
         if (v1.equals(v2)) return;
 

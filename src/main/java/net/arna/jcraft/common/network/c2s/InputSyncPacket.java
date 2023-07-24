@@ -56,11 +56,13 @@ public class InputSyncPacket {
                     playerData.getPersistentData().putInt(dashCD, 100); // 5s cooldown for superjumping
                 }
 
-                // Combo break if stunned
-                StatusEffectInstance stun = player.getStatusEffect(JStatusRegister.DAZED);
-                if (JUtils.isBlocking(player)) return;
-                if (stun != null)
-                    comboBreak(world, player, stun);
+                // Combo break if stunned, jumping and crouching
+                if (player.isSneaking()) {
+                    StatusEffectInstance stun = player.getStatusEffect(JStatusRegister.DAZED);
+                    if (JUtils.isBlocking(player)) return;
+                    if (stun != null)
+                        comboBreak(world, player, stun);
+                }
             }
         });
     }

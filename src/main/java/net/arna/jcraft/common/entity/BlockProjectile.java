@@ -27,6 +27,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Arm;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
@@ -156,7 +157,7 @@ public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatab
                         ).getPos();
                     }
 
-                    setVelocity(targetPos.subtract(getPos()).normalize().multiply(1));
+                    setVelocity(targetPos.subtract(getPos()).normalize()); //.multiply(1)
 
                     playSound(JSoundRegister.CMOON_BLOCKLAUNCH, 1, 1);
                     launched = true;

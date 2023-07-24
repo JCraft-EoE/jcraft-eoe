@@ -6,6 +6,8 @@ import net.arna.jcraft.common.attack.AttackQueue;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.entity.StandEntity;
+import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.network.s2c.PlayerAnimPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.*;
@@ -23,6 +25,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -175,9 +178,16 @@ public abstract class JCraftSpec {
 
                 if ((attack.attackType == AttackType.BOX && this.moveStun == realInitTime)
                         || (attack.attackType == AttackType.MULTIHIT && attack.attackTimes.contains(attack.moveStun - this.moveStun))) {
+                    Direction gravDir = GravityChangerAPI.getGravityDirection(player);
+
                     double yawRad = Math.toRadians(player.getYaw() + 90);
                     Vec3d rotVec = new Vec3d(Math.cos(yawRad), 0, Math.sin(yawRad)); // Previously player.getRotationVector() but that allowed them to aim vertically
-                    Vec3d hitPos = player.getPos().add(0, player.getHeight() / 2 - attack.offset, 0).add(rotVec.multiply(attack.attackDist));
+                    Vec3d hitPos = player.getPos()
+                            .add(
+                                    RotationUtil.vecPlayerToWorld(
+                                            new Vec3d (0, player.getHeight() / 2 - attack.offset, 0).add(rotVec.multiply(attack.attackDist)), gravDir
+                                    )
+                            );
 
                     List<Entity> exclude = new ArrayList<>(player.getPassengerList());
                     exclude.add(player);
@@ -189,7 +199,10 @@ public abstract class JCraftSpec {
 
                     for (HitBoxData data : attack.extraHitboxes) {
                         List<LivingEntity> extraHurt = JUtils.generateHitbox(world,
-                                hitPos.add(rotVec.multiply(data.forwardOffset)).add(0, data.verticalOffset, 0), data.hitboxSize, exclude);
+                                hitPos.add(
+                                        RotationUtil.vecPlayerToWorld(
+                                                rotVec.multiply(data.forwardOffset).add(0, data.verticalOffset, 0), gravDir)
+                                ), data.hitboxSize, exclude);
                         for (LivingEntity hurtEntity : extraHurt)
                             if (!hurt.contains(hurtEntity)) hurt.add(hurtEntity);
                     }

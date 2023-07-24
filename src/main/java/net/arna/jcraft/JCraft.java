@@ -6,8 +6,10 @@ import lombok.Setter;
 import net.arna.jcraft.common.JConfig;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.entity.StandType;
+import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.config.GravityChangerConfig;
 import net.arna.jcraft.common.gravity.util.GravityChannel;
+import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.item.StandDiscItem;
 import net.arna.jcraft.common.loot.JLootTableHelper;
 import net.arna.jcraft.common.network.c2s.InputSyncPacket;
@@ -272,7 +274,7 @@ public class JCraft implements ModInitializer {
             dashDir = new Vec3d(0, rotVec.y, 0);
             dashSpeed *= 0.75;
         } else
-            dashDir = new Vec3d(rotVec.x, 0, rotVec.z);
+            dashDir = RotationUtil.vecPlayerToWorld( rotVec, GravityChangerAPI.getGravityDirection(entity) ); //todo: fix diagonal dashes while in custom gravity
 
         dashes.add(new DashData(dashDir.normalize().multiply(dashSpeed), entity));
 

@@ -198,9 +198,9 @@ public abstract class EntityMixin {
 
         Vec3d vec3d = RotationUtil.vecPlayerToWorld(0.0D, this.standingEyeHeight, 0.0D, gravityDirection);
 
-        double d = MathHelper.lerp((double) tickDelta, this.prevX, this.getX()) + vec3d.x;
-        double e = MathHelper.lerp((double) tickDelta, this.prevY, this.getY()) + vec3d.y;
-        double f = MathHelper.lerp((double) tickDelta, this.prevZ, this.getZ()) + vec3d.z;
+        double d = MathHelper.lerp(tickDelta, this.prevX, this.getX()) + vec3d.x;
+        double e = MathHelper.lerp(tickDelta, this.prevY, this.getY()) + vec3d.y;
+        double f = MathHelper.lerp(tickDelta, this.prevZ, this.getZ()) + vec3d.z;
         cir.setReturnValue(new Vec3d(d, e, f));
     }
 

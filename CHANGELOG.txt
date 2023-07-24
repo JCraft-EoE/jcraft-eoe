@@ -1292,6 +1292,25 @@ Killer Queen: Bites the Dust
 C-Moon
     >Crouching Utility now changes gravitational direction for the user
 
+● 22/7/2023
+>Combo Breaker is now input by crouching and jumping while in hitstun, to prevent misinputs
+
+/spec set
+    >Now uses named specs instead of IDs
+
+D4C
+    >Enabled mining in the Alternate Universe
+    >Items spawned in the Alternate Universe are now incompatible with their real-world counterparts
+
+C-Moon
+    >Block Launch now launches relative to current gravitational direction
+    >Improved all handling in altered gravity
+    >High Jump -> Air Utility
+    >Crouching Utility -> Utility
+        >now lasts 10 seconds
+        >dissipates if there is nothing below you for more than 5 blocks
+        >can change gravity by pressing utility (while grounded) again
+
 priority (top to bottom)
 todo: fix predict not working with new projectiles
 
