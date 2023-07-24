@@ -7,6 +7,7 @@
   "mixins": [
     "AnvilScreenHandlerMixin",
     "EntityMixin",
+    "ExplosionMixin",
     "GrindstoneScreenHandlerAnon2and3Mixin",
     "GrindstoneScreenHandlerMixin",
     "ItemMixin",
