@@ -36,10 +36,12 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.Explosion;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 
@@ -396,5 +398,12 @@ public final class JUtils {
         }
 
         return infoList;
+    }
+
+    public static void explode(World world, double x, double y, double z, float power, Consumer<IJExplosion> modifier) {
+        Explosion explosion = new Explosion(world, null, x, y, z, power);
+        modifier.accept((IJExplosion) explosion);
+        explosion.collectBlocksAndDamageEntities();
+        explosion.affectWorld(true);
     }
 }
