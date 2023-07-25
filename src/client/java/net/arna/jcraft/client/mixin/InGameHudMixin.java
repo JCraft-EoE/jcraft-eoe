@@ -1,8 +1,8 @@
 package net.arna.jcraft.client.mixin;
 
 import net.arna.jcraft.client.JClientConfig;
-import net.arna.jcraft.client.hud.EpitaphOverlay;
-import net.arna.jcraft.client.hud.JCraftHudOverlay;
+import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
+import net.arna.jcraft.client.gui.hud.JCraftHudOverlay;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.util.math.MatrixStack;
 import org.spongepowered.asm.mixin.Mixin;

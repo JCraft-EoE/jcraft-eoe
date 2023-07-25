@@ -5,7 +5,7 @@ import ladysnake.satin.api.event.ShaderEffectRenderCallback;
 import ladysnake.satin.api.managed.ManagedShaderEffect;
 import ladysnake.satin.api.managed.ShaderEffectManager;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.hud.EpitaphOverlay;
+import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;

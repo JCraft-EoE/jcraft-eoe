@@ -1,4 +1,4 @@
-package net.arna.jcraft.client.hud;
+package net.arna.jcraft.client.gui.hud;
 
 import lombok.Getter;
 import net.arna.jcraft.JCraft;

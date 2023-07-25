@@ -1,4 +1,4 @@
-package net.arna.jcraft.client.hud;
+package net.arna.jcraft.client.gui.hud;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.arna.jcraft.JCraft;

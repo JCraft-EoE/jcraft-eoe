@@ -10,12 +10,14 @@ import lombok.experimental.UtilityClass;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.JCraftClient;
-import net.arna.jcraft.client.hud.EpitaphOverlay;
+import net.arna.jcraft.client.gui.ServerConfigUI;
+import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
 import net.arna.jcraft.client.renderer.effects.AttackHitBoxEffectRenderer;
 import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer;
 import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
 import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
 import net.arna.jcraft.client.util.JClientUtils;
+import net.arna.jcraft.common.config.ConfigOption;
 import net.arna.jcraft.common.entity.MadeInHeavenEntity;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
@@ -57,6 +59,7 @@ public class ClientPacketHandler {
         register(S2C_TIME_ACCELERATION_STATE, ClientPacketHandler::handleTimeAccelState);
         register(S2C_EPITAPH_STATE, ClientPacketHandler::handleEpitaphOverlayState);
         register(S2C_TIME_ERASE_PREDICTION_STATE, ClientPacketHandler::handlePredictionState);
+        register(S2C_SERVER_CONFIG, ClientPacketHandler::handleServerConfig);
     }
 
     private static void register(Identifier id, Consumer<PacketByteBuf> handler) {
@@ -455,5 +458,14 @@ public class ClientPacketHandler {
             if (start) TimeErasePredictionEffectRenderer.startEffect(length);
             else TimeErasePredictionEffectRenderer.stopEffect();
         });
+    }
+
+    public static void handleServerConfig(MinecraftClient client, PacketByteBuf buf) {
+        boolean editable = buf.readBoolean();
+        boolean show = buf.readBoolean();
+
+        ConfigOption.readOptions(buf);
+
+        if (show) client.execute(() -> ServerConfigUI.show(editable));
     }
 }

@@ -1,14 +1,19 @@
 package net.arna.jcraft.registry;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.config.ConfigOption;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.events.JPlayerEntityEvents;
 import net.arna.jcraft.common.events.JServerTickEvents;
 import net.arna.jcraft.common.item.MockItem;
+import net.arna.jcraft.common.network.c2s.ConfigUpdatePacket;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
@@ -59,5 +64,11 @@ public interface JEventsRegister {
         ServerPlayerEvents.COPY_FROM.register(new JPlayerEntityEvents());
 
         ServerTickEvents.END_SERVER_TICK.register(JServerTickEvents::serverTick);
+
+        // Send initial values of server config options to the player.
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) ->
+            ConfigUpdatePacket.sendOptionsToClient(handler.getPlayer(), ConfigOption.getImmutableOptions().values()));
+
+        ServerLifecycleEvents.SERVER_STARTING.register(JServerConfig::load);
     }
 }

@@ -171,5 +171,31 @@
   "text.autoconfig.jcraft.option.uiPosition": "UI Position",
   "text.autoconfig.jcraft.option.iconHud": "Icon HUD",
   "text.autoconfig.jcraft.option.timeEraseShader": "Time Erase Shader",
-  "text.autoconfig.jcraft.option.epitaphOverlay": "Epitaph Overlay"
+  "text.autoconfig.jcraft.option.epitaphOverlay": "Epitaph Overlay",
+
+  "jcraft.serverconfig.category.balance": "Balance",
+  "jcraft.serverconfig.option.sptwTimeStopDuration": "Star Platinum The World Timestop Duration",
+  "jcraft.serverconfig.option.twTimeStopDuration": "The World Timestop Duration",
+  "jcraft.serverconfig.option.twohTimeStopDuration": "The World Over Heaven Timestop Duration",
+  "jcraft.serverconfig.option.mihTimeAccelerationDuration": "Made in Heaven Time Accel Duration",
+  "jcraft.serverconfig.option.kcTimeErasureDuration": "King Crimson Time Erasure Duration",
+  "jcraft.serverconfig.option.cmoonUtilDuration": "C-moon Util Duration",
+  "jcraft.serverconfig.option.standDamageMultiplier": "Stand Damage Multiplier",
+  "jcraft.serverconfig.option.cmoonUltRange": "C-moon Ult Range",
+  "jcraft.serverconfig.option.defSpec": "Default Spec",
+  "jcraft.serverconfig.option.ignoreArmor": "Stands Ignore Armor",
+  "jcraft.serverconfig.option.invisCreamVoid": "Cream's Void Invisible",
+  "jcraft.serverconfig.option.timeSkipUseUtil": "Time Skip uses Util",
+
+  "jcraft.serverconfig.category.interaction": "Interaction",
+  "jcraft.serverconfig.option.universalAbilities": "Universal Abilities",
+  "jcraft.serverconfig.option.exclusiveStands": "Exclusive Stands",
+  "jcraft.serverconfig.option.barrageMining": "Barrage Mining",
+  "jcraft.serverconfig.option.barrageMiningSpeed": "Barrage Mining Speed",
+  "jcraft.serverconfig.option.standGriefing": "Stand Griefing",
+  "jcraft.serverconfig.option.sptwIgniteCampfires": "Star Platinum The World ignites Campfires",
+  "jcraft.serverconfig.option.wsStealStands": "Whitesnake Steals Stands",
+  "jcraft.serverconfig.option.shaSearchRadius": "Sheer Heart Attack search radius",
+  "jcraft.serverconfig.option.mihAccelerateTicks": "Made in Heaven time accel duration",
+  "jcraft.serverconfig.option.useFoolishSand": "Use Foolish Sand"
 }

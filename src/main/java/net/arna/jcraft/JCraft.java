@@ -10,6 +10,7 @@ import net.arna.jcraft.common.gravity.util.GravityChannel;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.item.StandDiscItem;
 import net.arna.jcraft.common.loot.JLootTableHelper;
+import net.arna.jcraft.common.network.c2s.ConfigUpdatePacket;
 import net.arna.jcraft.common.network.c2s.InputSyncPacket;
 import net.arna.jcraft.common.network.c2s.OnConnectedPacket;
 import net.arna.jcraft.common.network.c2s.StandControlPacket;
@@ -344,6 +345,7 @@ public class JCraft implements ModInitializer {
         ServerPlayNetworking.registerGlobalReceiver(StandControlPacket.ID, StandControlPacket::handle);
         ServerPlayNetworking.registerGlobalReceiver(InputSyncPacket.ID, InputSyncPacket::handle);
         ServerPlayNetworking.registerGlobalReceiver(OnConnectedPacket.ID, OnConnectedPacket::handle);
+        ServerPlayNetworking.registerGlobalReceiver(ConfigUpdatePacket.ID, ConfigUpdatePacket::handle);
     }
 
 
