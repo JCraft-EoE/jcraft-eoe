@@ -1,8 +1,10 @@
 package net.arna.jcraft.client;
 
-import net.arna.jcraft.client.gravity.util.GravityChannelClient;
 import com.mojang.blaze3d.systems.RenderSystem;
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.gravity.util.GravityChannelClient;
 import net.arna.jcraft.client.hud.EpitaphOverlay;
 import net.arna.jcraft.client.hud.JCraftAbilityHud;
 import net.arna.jcraft.client.net.ClientPacketHandler;
@@ -23,7 +25,6 @@ import net.arna.jcraft.client.rendering.handler.UIShaderHandler;
 import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
 import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
-import net.arna.jcraft.common.JConfig;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.network.c2s.InputSyncPacket;
@@ -97,6 +98,10 @@ public class JCraftClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         JCraft.setClientEntityHandler(ClientEntityHandlerImpl.INSTANCE);
+//        MidnightConfig.init(JCraft.MOD_ID, JConfig.class);
+
+        AutoConfig.register(JClientConfig.class, JanksonConfigSerializer::new);
+        JClientConfig.load();
 
         GravityChannelClient.init();
 
@@ -169,7 +174,7 @@ public class JCraftClient implements ClientModInitializer {
     }
 
     private static int getHudX(int scaledX) {
-        switch (JConfig.UI_POSITION) {
+        switch (JClientConfig.getInstance().getUiPosition()) {
             case LEFT -> {
                 return 2;
             }
@@ -195,9 +200,9 @@ public class JCraftClient implements ClientModInitializer {
         int selectedX = getHudX(client.getWindow().getScaledWidth());
         int selectedY = client.getWindow().getScaledHeight();
 
-        boolean useIcons = JConfig.ICON_HUD;
+        boolean useIcons = JClientConfig.getInstance().isIconHud();
 
-        switch (JConfig.UI_POSITION) {
+        switch (JClientConfig.getInstance().getUiPosition()) {
             case LEFT -> selectedY /= 20f;
             case MIDDLE -> selectedY /= 3f;
             case RIGHT -> selectedY /= 2.25f;
@@ -217,16 +222,16 @@ public class JCraftClient implements ClientModInitializer {
                     matrixStack,
                     remark + " - " + comboCounter,
                     selectedX + (framesSinceCounted < 5 ? player.getRandom().nextFloat() * 5f : 0) +
-                            ( (JConfig.UI_POSITION == JConfig.UIPos.MIDDLE && useIcons) ? 54f : 0 ),
+                            ((JClientConfig.getInstance().getUiPosition() == JClientConfig.UIPos.MIDDLE && useIcons) ? 54f : 0),
                     selectedY * (1.15f) + (framesSinceCounted < 5 ? player.getRandom().nextFloat() * 5f : 0),
-                    ColorUtils.HSBAtoRGBA(comboCounter / 360f - 1f, 1f, 1f, 0.8f)
-                    , true
+                    ColorUtils.HSBAtoRGBA(comboCounter / 360f - 1f, 1f, 1f, 0.8f),
+                    true
             );
         }
 
         // Cooldown rendering, for icon hud see JCraftHudOverlay
         if (useIcons) return;
-        boolean standOn = ((IEntityDataSaver)player).getStand() != null;
+        boolean standOn = ((IEntityDataSaver) player).getStand() != null;
 
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -301,7 +306,8 @@ public class JCraftClient implements ClientModInitializer {
                         new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
 
                 for (Entity entity : toStop) {
-                    if ( entity.hasVehicle() || entity == user || entity == ((IEntityDataSaver)user).getStand() || entity == user.getVehicle() ) continue;
+                    if (entity.hasVehicle() || entity == user || entity == ((IEntityDataSaver) user).getStand() || entity == user.getVehicle())
+                        continue;
                     ITimeStop ts = ((ITimeStop) entity);
                     ts.setTimeStopTicks(2);
                 }
@@ -315,7 +321,7 @@ public class JCraftClient implements ClientModInitializer {
         // Handle JCraft inputs (stand, spec, universal controls)
         GameOptions go = minecraftClient.options;
 
-        StandEntity stand = ((IEntityDataSaver)player).getStand();
+        StandEntity stand = ((IEntityDataSaver) player).getStand();
         boolean standOn = stand != null;
 
         //todo: reformat this into 2 more packets (stand block packet, attack packet)
@@ -401,7 +407,7 @@ public class JCraftClient implements ClientModInitializer {
                     stand.initClientUtility();
             } else {
              */
-                sendStandControlPacket(buf);
+            sendStandControlPacket(buf);
             //}
         }
         // Cooldown Cancel (13)

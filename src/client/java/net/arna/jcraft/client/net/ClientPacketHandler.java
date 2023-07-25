@@ -8,6 +8,7 @@ import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
 import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import lombok.experimental.UtilityClass;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.JCraftClient;
 import net.arna.jcraft.client.hud.EpitaphOverlay;
 import net.arna.jcraft.client.renderer.effects.AttackHitBoxEffectRenderer;
@@ -15,7 +16,6 @@ import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer
 import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
 import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
 import net.arna.jcraft.client.util.JClientUtils;
-import net.arna.jcraft.common.JConfig;
 import net.arna.jcraft.common.entity.MadeInHeavenEntity;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
@@ -58,7 +58,7 @@ public class ClientPacketHandler {
         register(S2C_EPITAPH_STATE, ClientPacketHandler::handleEpitaphOverlayState);
         register(S2C_TIME_ERASE_PREDICTION_STATE, ClientPacketHandler::handlePredictionState);
     }
-    
+
     private static void register(Identifier id, Consumer<PacketByteBuf> handler) {
         registerGlobalReceiver(id, (client, handler1, buf, responseSender) -> handler.accept(buf));
     }
@@ -400,7 +400,7 @@ public class ClientPacketHandler {
                 });
             }
             case CRIMSON -> client.execute(() -> {
-                if (!JConfig.TE_SHADER) return;
+                if (!JClientConfig.getInstance().isTimeEraseShader()) return;
                 CrimsonShaderHandler crimsonShaderHandler = CrimsonShaderHandler.INSTANCE;
                 crimsonShaderHandler.effectLength = duration;
                 crimsonShaderHandler.shouldRender = true;
@@ -446,11 +446,11 @@ public class ClientPacketHandler {
         if (start) EpitaphOverlay.start();
         else EpitaphOverlay.stop();
     }
-    
+
     public static void handlePredictionState(MinecraftClient client, PacketByteBuf buf) {
         boolean start = buf.readBoolean();
         int length = start ? buf.readVarInt() : 0;
-        
+
         client.execute(() -> {
             if (start) TimeErasePredictionEffectRenderer.startEffect(length);
             else TimeErasePredictionEffectRenderer.stopEffect();

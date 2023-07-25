@@ -166,5 +166,10 @@
   "commands.gravity.get.self": "Your gravity is %s",
   "commands.gravity.get.other": "%s's gravity is %s",
   "commands.gravity.set.self": "Set own gravity to %s",
-  "commands.gravity.set.other": "Set %s's gravity to %s"
+  "commands.gravity.set.other": "Set %s's gravity to %s",
+
+  "text.autoconfig.jcraft.option.uiPosition": "UI Position",
+  "text.autoconfig.jcraft.option.iconHud": "Icon HUD",
+  "text.autoconfig.jcraft.option.timeEraseShader": "Time Erase Shader",
+  "text.autoconfig.jcraft.option.epitaphOverlay": "Epitaph Overlay"
 }

@@ -2,10 +2,10 @@ package net.arna.jcraft.client.hud;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.JCraftClient;
 import net.arna.jcraft.client.util.JClientUtils;
 import net.arna.jcraft.client.util.RenderUtils;
-import net.arna.jcraft.common.JConfig;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.IEntityDataSaver;
@@ -71,7 +71,7 @@ public class JCraftAbilityHud extends DrawableHelper implements ClientTickEvents
     private JCraftAbilityHud() {}
 
     private static int getHudX(int scaledX) {
-        switch (JConfig.UI_POSITION) {
+        switch (JClientConfig.getInstance().getUiPosition()) {
             case LEFT -> {
                 return 2;
             }
@@ -89,12 +89,12 @@ public class JCraftAbilityHud extends DrawableHelper implements ClientTickEvents
     }
 
     public static void render(MatrixStack matrices, boolean renderCooldownOverlay) {
-        if (!JConfig.ICON_HUD) return;
+        if (!JClientConfig.getInstance().isIconHud()) return;
 
         MinecraftClient client = MinecraftClient.getInstance();
         ClientPlayerEntity player = client.player;
 
-        boolean isMid = JConfig.UI_POSITION == JConfig.UIPos.MIDDLE;
+        boolean isMid = JClientConfig.getInstance().getUiPosition() == JClientConfig.UIPos.MIDDLE;
 
         int selectedX = getHudX(client.getWindow().getScaledWidth());
         int selectedY = isMid ? iconSpacing * 11 : 0;

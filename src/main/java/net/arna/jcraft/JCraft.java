@@ -1,9 +1,7 @@
 package net.arna.jcraft;
 
-import eu.midnightdust.lib.config.MidnightConfig;
 import lombok.Getter;
 import lombok.Setter;
-import net.arna.jcraft.common.JConfig;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.entity.StandType;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
@@ -322,7 +320,6 @@ public class JCraft implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        MidnightConfig.init(MOD_ID, JConfig.class);
         GravityChannel.init();
 
         // Particle registration (serverside)

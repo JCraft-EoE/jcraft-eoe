@@ -34,6 +34,9 @@
     ],
     "cardinal-components": [
       "net.arna.jcraft.common.gravity.util.GravityChangerComponents"
+    ],
+    "modmenu": [
+      "net.arna.jcraft.client.JModMenuIntegration"
     ]
   },
 
