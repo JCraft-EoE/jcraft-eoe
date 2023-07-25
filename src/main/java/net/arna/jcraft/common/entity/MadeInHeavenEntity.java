@@ -158,45 +158,45 @@ public class MadeInHeavenEntity extends StandEntity {
     // Moveset
     @Override
     public void initLightAttack() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
     public void initHeavyAttack() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         handleAttack(donut, JCraft.standHeavyCD, 4);
     }
 
     @Override
     public void initBarrage() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
-            this.playSound(JSoundRegister.MIH_BARRAGE, 1, 1);
+            playSound(JSoundRegister.MIH_BARRAGE, 1, 1);
         }
     }
 
     @Override
     public void initSpecial1() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(legcrusher, JCraft.standS1CD, 8)) {
-            this.playSound(JSoundRegister.MIH_LEGCRUSHER, 1, 1);
+            playSound(JSoundRegister.MIH_LEGCRUSHER, 1, 1);
         }
     }
 
     @Override
     public void initUlt() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(timeaccel, JCraft.standUltCD, 10)) {
-            this.playSound(JSoundRegister.MIH_TACCEL, 1, 1);
+            playSound(JSoundRegister.MIH_TACCEL, 1, 1);
         }
     }
 
     @Override
     public void initSpecial2() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(furychop, JCraft.standS2CD, 9)) {
-            this.playSound(JSoundRegister.MIH_FURYCHOP, 1, 1);
+            playSound(JSoundRegister.MIH_FURYCHOP, 1, 1);
         }
     }
 
@@ -205,20 +205,19 @@ public class MadeInHeavenEntity extends StandEntity {
 
     @Override
     public void initSpecial3() {
-        if (!this.canAttack() || !hasUser()) return;
+        if (!canAttack()) return;
         LivingEntity user = getUserOrThrow();
         if (user.isSneaking() && handleAttack(judgement, JCraft.standS3CD, 7)) {
             playSound(JSoundRegister.MIH_JUDGEMENT, 1, 1);
         } else {
-            Vec3d eP = user.getEyePos();
-            Vec3d rangeMod = user.getRotationVector().multiply(4);
-            EntityHitResult eHit = ProjectileUtil.raycast(user, eP, eP.add(rangeMod),
-                    user.getBoundingBox().expand(4),
-                    EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR,
-                    16 // Squared
-            );
-            if (eHit != null && eHit.getEntity() instanceof LivingEntity living && handleAttack(circle, JCraft.standS3CD, 11)) {
-                circleTarget = living;
+            List<? extends LivingEntity> targets = JUtils.generateHitbox(world, user.getEyePos().add(getRotationVector()), 2, List.of(this, user));
+            LivingEntity target = null;
+            for (LivingEntity living : targets) {
+                target = JUtils.getUserIfStand(living);
+                break;
+            }
+            if (target != null && handleAttack(circle, JCraft.standS3CD, 11)) {
+                circleTarget = target;
                 circleOrbitProg = user.getHeadYaw();
                 setTargetId(circleTarget.getId());
                 playSound(JSoundRegister.MIH_CIRCLE, 1f, 1f);
@@ -229,9 +228,9 @@ public class MadeInHeavenEntity extends StandEntity {
 
     @Override
     public void initUtil() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(speedslice, JCraft.utilCD, 6)) {
-            this.playSound(JSoundRegister.MIH_SPEEDSLICE, 1, 1);
+            playSound(JSoundRegister.MIH_SPEEDSLICE, 1, 1);
         }
     }
 

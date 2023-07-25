@@ -1,13 +1,16 @@
 package net.arna.jcraft.common.effects;
 
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.Gravity;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.AttributeContainer;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -67,36 +70,18 @@ public class WeightlessStatusEffect extends StatusEffect {
     @Override
     public void onApplied(LivingEntity entity, AttributeContainer attributes, int amplifier) {
         super.onApplied(entity, attributes, amplifier);
-
         if (entity.getWorld().isClient) return;
         this.previouslyNoGravved = entity.hasNoGravity();
-        if (amplifier == 1) {
-            Vec3d rotVec = entity.getRotationVector();
-            Direction direction = entity.getMovementDirection();
-            boolean isUpright = GravityChangerAPI.getGravityDirection(entity) == Direction.UP;
-
-            double viewPitch = Math.acos(rotVec.y);
-            if (viewPitch > 2.3562) // 135°
-                direction = isUpright ? Direction.DOWN : Direction.UP;
-            else if (viewPitch < 0.7854) // 45°
-                direction = isUpright ? Direction.UP : Direction.DOWN;
-
-            GravityChangerAPI.addGravity(entity, new Gravity(
-                    direction, 1, 200, "effect")
-            );
-        }
+        if (amplifier == 1)
+            GravityChangerAPI.addGravity(entity, new Gravity(JUtils.getLookDirection(entity), 1, 200, "effect") );
         else entity.setNoGravity(true);
     }
 
     @Override
     public void onRemoved(LivingEntity entity, AttributeContainer attributes, int amplifier) {
         super.onRemoved(entity, attributes, amplifier);
-
         if (entity.getWorld().isClient) return;
-
-        if (amplifier == 1)
-            GravityChangerAPI.clearGravity(entity);
-        else if (!previouslyNoGravved)
+        if (!previouslyNoGravved)
             entity.setNoGravity(false);
     }
 }

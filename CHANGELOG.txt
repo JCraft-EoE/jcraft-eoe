@@ -1323,7 +1323,14 @@ D4C
 Cream
     >Updated Grab animation
 
+C-Moon
+    >Improved gravity shifting for Utility
+    >Only One Punch
+        >Now flips enemy gravity (instead of applying levitation)
+        >Effect length reduced (4->3s)
 
+Made in Heaven
+    >Improved initiation detection for Heaven's Judgement (normal)
 
 priority (top to bottom)
 todo: fix predict not working with new projectiles

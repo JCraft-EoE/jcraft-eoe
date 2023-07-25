@@ -227,6 +227,29 @@ public final class JUtils {
         return Vec3d.ZERO; //THIS IS A TERRIBLE IDEA!!!!!
     }
 
+    public static Direction getLookDirection(Entity entity) {
+        Vec3d rotVec = entity.getRotationVector();
+
+        double x = rotVec.x;
+        double y = rotVec.y;
+        double z = rotVec.z;
+
+        double absX = Math.abs(x);
+        double absY = Math.abs(y);
+        double absZ = Math.abs(z);
+
+        Direction direction = Direction.DOWN;
+        if (absX > absY && absX > absZ) {
+            direction = x > 0 ? Direction.EAST : Direction.WEST;
+        } else if (absY > absX && absY > absZ) {
+            direction = y > 0 ? Direction.UP : Direction.DOWN;
+        } else if (absZ > absX && absZ > absY) {
+            direction = z > 0 ? Direction.SOUTH : Direction.NORTH;
+        }
+
+        return direction;
+    }
+
     /**
      * @return the stand user if the specified entity is a {@link StandEntity}
      */

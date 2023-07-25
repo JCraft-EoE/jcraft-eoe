@@ -5,6 +5,7 @@ import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.gravity.util.Gravity;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.registry.JEntityTypeRegister;
@@ -181,17 +182,21 @@ public class CMoonEntity extends StandEntity {
         }
     }
 
+    private int directionChangeCooldown = 0;
     @Override
     public void initUtil() {
         if (!hasUser()) return;
         LivingEntity user = getUserOrThrow();
 
-        if (user.isOnGround()) {
+        if (user.isOnGround() && directionChangeCooldown <= 0) {
             StatusEffectInstance weightless = user.getStatusEffect(JStatusRegister.WEIGHTLESS);
             if (weightless != null && weightless.getAmplifier() == 1) {
                 user.removeStatusEffect(JStatusRegister.WEIGHTLESS);
                 user.addStatusEffect(new StatusEffectInstance(JStatusRegister.WEIGHTLESS, weightless.getDuration(), 1));
             }
+
+            directionChangeCooldown = 10;
+            return;
         }
 
         if (!this.canAttack()) return;
@@ -237,8 +242,8 @@ public class CMoonEntity extends StandEntity {
             invertTimes.add(40);
 
             if (attack.id == gravpunch.id) {
-                ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.WEIGHTLESS, 80, 0));
-                ent.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 10, 4, true, false));
+                GravityChangerAPI.addGravity(ent, new Gravity(Direction.UP, 2, 60, "stand"));
+                ent.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 60, 2, true, false));
                 ent.velocityModified = true;
             }
         }
@@ -322,6 +327,8 @@ public class CMoonEntity extends StandEntity {
                     }
                 }
             } else {
+                directionChangeCooldown--;
+
                 for (int i = 0; i < invertTimes.size(); i++) {
                     int time = invertTimes.get(i);
                     invertTimes.set(i, time - 1);
