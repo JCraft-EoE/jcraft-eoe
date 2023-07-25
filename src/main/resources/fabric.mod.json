@@ -54,7 +54,7 @@
   ],
 
   "suggests": {
-    "BetterCombat": ""
+    "bettercombat": "*"
   },
 
   "depends": {
@@ -64,7 +64,8 @@
     "java": ">=17",
     "player-animator": ">=0.3",
     "cardinal-components-base": "*",
-    "cardinal-components-entity": "*"
+    "cardinal-components-entity": "*",
+    "cloth-config": "*"
   },
 
   "custom": {
