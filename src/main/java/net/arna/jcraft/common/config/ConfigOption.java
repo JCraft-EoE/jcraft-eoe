@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.config;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.JsonElement;
 import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
@@ -61,6 +62,10 @@ public abstract class ConfigOption {
     public abstract void write(PacketByteBuf buf);
 
     public abstract void read(PacketByteBuf buf);
+
+    public abstract JsonElement write();
+
+    public abstract void read(JsonElement element);
 
     public enum Type {
         INTEGER, FLOAT, BOOLEAN, ENUM

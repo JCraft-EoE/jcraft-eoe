@@ -1,13 +1,15 @@
 package net.arna.jcraft.common.config;
 
-import io.netty.buffer.Unpooled;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import lombok.SneakyThrows;
 import net.arna.jcraft.common.spec.SpecType;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.WorldSavePath;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -42,25 +44,34 @@ public class JServerConfig {
     public static final IntOption SHA_SEARCH_RADIUS = new IntOption("shaSearchRadius", INTERACTION, 10, 3, 32);
     public static final BooleanOption MIH_ACCELERATE_TICKS = new BooleanOption("mihAccelerateTicks", INTERACTION, true);
     public static final BooleanOption USE_FOOLISH_SAND = new BooleanOption("useFoolishSand", INTERACTION, true);
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     @SneakyThrows
     public static void load(MinecraftServer server) {
-        Path path = server.getSavePath(WorldSavePath.ROOT).resolve("jcraft.dat");
-        if (!Files.exists(path)) return;
+        Path path = server.getSavePath(WorldSavePath.ROOT).resolve("jcraft.json");
+        if (!Files.exists(path)) {
+            save(server);
+            return;
+        }
 
-        byte[] data = Files.readAllBytes(path);
-        PacketByteBuf buf = new PacketByteBuf(Unpooled.wrappedBuffer(data));
-        ConfigOption.readOptions(buf);
+        try (BufferedReader reader = Files.newBufferedReader(path)) {
+            JsonObject data = gson.fromJson(reader, JsonObject.class);
+            for (String key : data.keySet()) {
+                ConfigOption option = ConfigOption.getImmutableOptions().get(key);
+                option.read(data.get(key));
+            }
+        }
     }
 
     @SneakyThrows
     public static void save(MinecraftServer server) {
-        Path path = server.getSavePath(WorldSavePath.ROOT).resolve("jcraft.dat");
-        PacketByteBuf buf = PacketByteBufs.create();
-        ConfigOption.writeOptions(buf, ConfigOption.getImmutableOptions().values());
+        Path path = server.getSavePath(WorldSavePath.ROOT).resolve("jcraft.json");
 
-        byte[] bytes = new byte[buf.writerIndex()];
-        buf.getBytes(0, bytes);
-        Files.write(path, bytes, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+        JsonObject data = new JsonObject();
+        ConfigOption.getImmutableOptions().forEach((key, option) -> data.add(key, option.write()));
+
+        try (BufferedWriter writer = Files.newBufferedWriter(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
+            gson.toJson(data, writer);
+        }
     }
 }

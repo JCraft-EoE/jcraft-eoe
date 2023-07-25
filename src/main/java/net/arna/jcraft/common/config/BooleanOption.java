@@ -1,5 +1,7 @@
 package net.arna.jcraft.common.config;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import lombok.Setter;
 import net.minecraft.network.PacketByteBuf;
 
@@ -30,5 +32,15 @@ public class BooleanOption extends ConfigOption {
     @Override
     public void read(PacketByteBuf buf) {
         value = buf.readBoolean();
+    }
+
+    @Override
+    public JsonElement write() {
+        return new JsonPrimitive(value);
+    }
+
+    @Override
+    public void read(JsonElement element) {
+        value = element.getAsBoolean();
     }
 }

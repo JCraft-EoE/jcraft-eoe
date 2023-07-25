@@ -1,7 +1,11 @@
 package net.arna.jcraft.common.config;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import lombok.Getter;
 import net.minecraft.network.PacketByteBuf;
+
+import java.util.Arrays;
 
 public class EnumOption<E extends Enum<?>> extends ConfigOption {
     @Getter
@@ -33,5 +37,19 @@ public class EnumOption<E extends Enum<?>> extends ConfigOption {
     @Override
     public void read(PacketByteBuf buf) {
         setValue(buf.readVarInt());
+    }
+
+    @Override
+    public JsonElement write() {
+        return new JsonPrimitive(value.name());
+    }
+
+    @Override
+    public void read(JsonElement element) {
+        String name = element.getAsString();
+        value = Arrays.stream(clazz.getEnumConstants())
+                .filter(e -> e.name().equals(name))
+                .findFirst()
+                .orElseThrow();
     }
 }
