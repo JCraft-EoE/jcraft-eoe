@@ -29,6 +29,7 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemGroup;
@@ -118,6 +119,7 @@ public class JCraft implements ModInitializer {
     // Dimensional travel bullshit
     public static final List<DimValues> pastDimensions = new ArrayList<>();
     private static final List<ChunkPos> preloadedChunks = new ArrayList<>();
+    private static final List<ItemEntity> itemsOfInterest = new ArrayList<>();
     public static final Map<LivingEntity, Integer> burstTimers = new HashMap<>();
     public static final List<DashData> dashes = new ArrayList<>();
     public static final int dashCooldown = 40;
@@ -269,13 +271,7 @@ public class JCraft implements ModInitializer {
             dashSpeed *= 0.75; // Backwards speed nerf
         }
 
-        Vec3d dashDir;
-        if (rotVec.x == 0 && rotVec.z == 0) {
-            dashDir = new Vec3d(0, rotVec.y, 0);
-            dashSpeed *= 0.75;
-        } else
-            dashDir = RotationUtil.vecPlayerToWorld( rotVec, GravityChangerAPI.getGravityDirection(entity) ); //todo: fix diagonal dashes while in custom gravity
-
+        Vec3d dashDir = RotationUtil.vecPlayerToWorld( rotVec, GravityChangerAPI.getGravityDirection(entity) ); //todo: fix diagonal dashes while in custom gravity
         dashes.add(new DashData(dashDir.normalize().multiply(dashSpeed), entity));
 
         // Syncs dash anim (unless already attacking with a spec) with every player in the vicinity

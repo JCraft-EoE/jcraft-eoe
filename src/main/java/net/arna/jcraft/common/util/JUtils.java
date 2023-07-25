@@ -37,6 +37,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -273,13 +274,20 @@ public final class JUtils {
         return false;
     }
 
-    public static boolean shouldNotRender(LivingEntity entity) {
+    public static boolean shouldForceRender(Entity entity) {
+        return entity instanceof CreamEntity cream && cream.getHalfBall();
+    }
+
+    public static boolean shouldNotRender(Entity entity) {
         Entity passenger = entity.getFirstPassenger();
         if (passenger instanceof KingCrimsonEntity kc && kc.getTETime() > 0)
             return true;
         if (passenger instanceof D4CEntity d4c && d4c.getState() == 11)
             return true;
-        return passenger instanceof CreamEntity cream && cream.getHalfBall();
+        if (passenger instanceof CreamEntity cream && cream.getHalfBall()) {
+            return true;
+        }
+        return false;
     }
 
     public static boolean isTimestopped(Entity entity) {
@@ -400,6 +408,10 @@ public final class JUtils {
     }
 
     public static void explode(World world, double x, double y, double z, float power, JExplosionModifier modifier) {
+        explode(world, null, x, y, z, power, modifier);
+    }
+
+    public static void explode(World world, @Nullable Entity entity, double x, double y, double z, float power, JExplosionModifier modifier) {
         Explosion explosion = new Explosion(world, null, x, y, z, power);
         ((IJExplosion) explosion).jcraft$setModifier(modifier);
         explosion.collectBlocksAndDamageEntities();

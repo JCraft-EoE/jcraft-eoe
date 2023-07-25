@@ -563,7 +563,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
             projectile.velocityModified = true;
         }
 
-        stun(user, 2, 1);
+        stun(user, 2, 2);
         getUserOrThrow().addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 5, 3, false, false, true));
     }
 
@@ -720,7 +720,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
             if (getStandGauge() < 1) {
                 user.addStatusEffect(new StatusEffectInstance(JStatusRegister.DAZED, 40, 2));
                 playSound(SoundEvents.ITEM_TOTEM_USE, 1, 0.5f);
-                discard();
+                kill();
             }
 
 

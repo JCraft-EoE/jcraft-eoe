@@ -5,11 +5,10 @@ import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.util.JExplosionModifier;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
-import net.arna.jcraft.registry.JEntityTypeRegister;
-import net.arna.jcraft.registry.JObjectRegistry;
-import net.arna.jcraft.registry.JSoundRegister;
-import net.arna.jcraft.registry.JStatusRegister;
+import net.arna.jcraft.registry.*;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
@@ -50,15 +49,19 @@ public class KillerQueenEntity extends StandEntity {
             .hyperArmor()
             .setLaunch()
             .setInfo("Haymaker", "slow, uninterruptable launcher");
+
     public static final Attack barrage = new Attack(3, 17, 0.75f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3, JSoundRegister.IMPACT_4)
             .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
+
     public static final Attack bombplant = new Attack(4, 30, 1, 20, 12, 1.5, 0f, 0.0f, AttackType.BOX, 0.45f)
             .setUB(true)
             .setBlockstun(8)
             .setInfo("Bomb Plant", "crouch to plant on the ground below you, stealthily");
+
     public static final Attack sha = new Attack(5, 45, 20, 16, 0, AttackType.BOX)
             .setRanged(true)
             .setInfo("Sheer Heart Attack", "creates an automatic, heat-seeking sub-stand that explodes on contact, reflects 25% damage back to owner");
+
     public static final Attack detonate = new Attack(6, 1, 1, 6, 5, 0, 0f, 0.0f, AttackType.BOX)
             .setInfo("Detonate", "slight windup");
 
@@ -261,7 +264,16 @@ public class KillerQueenEntity extends StandEntity {
             }
             case (6) -> {
                 if (bombEntity instanceof LivingEntity livingEntity) {
-                    world.createExplosion(user, livingEntity.getX(), livingEntity.getY() + livingEntity.getHeight() / 2, livingEntity.getZ(), 2f, Explosion.DestructionType.NONE);
+
+                    JUtils.explode(
+                            world, user,
+                            livingEntity.getX(),
+                            livingEntity.getY() + livingEntity.getHeight() / 2,
+                            livingEntity.getZ(),
+                            2f,
+                            JExplosionModifier.builder().particle(JParticleTypeRegistry.BOOM_1).destructionType(Explosion.DestructionType.NONE).build()
+                    );
+
                     livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
                 } else {
                     Vec3d bombPos = null;
@@ -274,7 +286,14 @@ public class KillerQueenEntity extends StandEntity {
                     if (bombBlock != null) bombPos = bombBlock;
 
                     if (bombPos != null) {
-                        world.createExplosion(user, bombPos.x, bombPos.y, bombPos.z, 2f, Explosion.DestructionType.NONE);
+                        JUtils.explode(
+                                world, user,
+                                bombPos.getX(),
+                                bombPos.getY(),
+                                bombPos.getZ(),
+                                2f,
+                                JExplosionModifier.builder().particle(JParticleTypeRegistry.BOOM_1).destructionType(Explosion.DestructionType.NONE).build()
+                        );
 
                         List<LivingEntity> toKD = world.getEntitiesByClass(
                                 LivingEntity.class,
@@ -284,8 +303,6 @@ public class KillerQueenEntity extends StandEntity {
 
                         for (LivingEntity livingEntity : toKD)
                             livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
-
-                        world.playSound(bombPos.x, bombPos.y, bombPos.z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.75f, 1, true);
                     }
                 }
 

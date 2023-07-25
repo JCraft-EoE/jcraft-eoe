@@ -2,6 +2,7 @@ package net.arna.jcraft.client.mixin;
 
 import net.arna.jcraft.client.util.JClientUtils;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.render.Frustum;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.entity.Entity;
@@ -12,12 +13,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(EntityRenderDispatcher.class)
 public class EntityRenderDispatcherMixin {
-    @SuppressWarnings("CancellableInjectionUsage") // Compiler is lying
     @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
-    private <E extends Entity> void shouldNotRenderIfRidingInvisibleClone(E entity, Frustum frustum, double x, double y, double z, CallbackInfoReturnable<Boolean> cir) {
+    private <E extends Entity> void jcraft$shouldRender(E entity, Frustum frustum, double x, double y, double z, CallbackInfoReturnable<Boolean> cir) {
         Entity e = entity;
         do {
+            if (JUtils.shouldForceRender(e)) {
+                cir.setReturnValue(true);
+                return;
+            }
+
+            // Do not render PlayerCloneEntity (fated self) if it's a Time Erase clone and the user is the viewer
             if (e instanceof PlayerCloneEntity clone && JClientUtils.shouldNotRenderClone(clone)) {
+                cir.cancel();
+                return;
+            }
+
+            if (JUtils.shouldNotRender(e)) {
                 cir.cancel();
                 return;
             }

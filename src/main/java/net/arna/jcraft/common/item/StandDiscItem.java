@@ -108,6 +108,8 @@ public class StandDiscItem extends Item {
         boolean full = group == ItemGroup.SEARCH;
         if (!full && group != JCraft.JCRAFT_GROUP) return;
 
+        stacks.add(new ItemStack(JObjectRegistry.STAND_DISC));
+
         for (StandType standType : StandType.values())
             for (int skin = 0; skin <= (full ? standType.getSkinCount() : 0); skin++)
                 stacks.add(StandDiscItem.createDiscStack(standType, skin));

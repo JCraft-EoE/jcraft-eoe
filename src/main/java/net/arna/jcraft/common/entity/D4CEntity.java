@@ -3,6 +3,7 @@ package net.arna.jcraft.common.entity;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.attack.StunType;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JDimensionRegister;
 import net.arna.jcraft.registry.JObjectRegistry;
@@ -51,7 +52,8 @@ public class D4CEntity extends StandEntity {
     public static final Attack grab = new Attack(4, 25, 0.75f, 21, 12, 1.5, 0f, 0.0f, AttackType.BOX, 2, 0, 0, null)
             .setGrab()
             .setInfo("Grab/Summon Gun", "unblockable, combo finisher/crouch to give yourself the gun");
-    public static final Attack grabhit = new Attack(5, 0, 0.75f, 34, 0, 2, 4f, 0f, AttackType.MULTIHIT, 0.5f, 0, List.of(11, 17, 26), JSoundRegister.IMPACT_1);
+    public static final Attack grabhit = new Attack(5, 0, 0.75f, 34, 0, 2, 4f, 0f, AttackType.MULTIHIT, 0.5f, 0, List.of(11, 17, 26), JSoundRegister.IMPACT_1)
+            .setStunType(StunType.UNBURSTABLE);
     public static final Attack givegun = new Attack(6, 25, 14, 10, 0, 0.75f, AttackType.BOX)
             .setInfo("Grab", "unblockable, combo finisher");
     public static final Attack counter = new Attack(7, 30, 35, 5, 0, 0.75f, AttackType.COUNTER)

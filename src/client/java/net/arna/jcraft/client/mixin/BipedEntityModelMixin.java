@@ -55,25 +55,6 @@ public abstract class BipedEntityModelMixin<T extends LivingEntity> {
 
     @Inject(method = "setAngles(Lnet/minecraft/entity/LivingEntity;FFFFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/ModelPart;copyTransform(Lnet/minecraft/client/model/ModelPart;)V", shift = At.Shift.BEFORE), cancellable = true)
     public void jcraft$setAngles(T livingEntity, float f, float g, float h, float i, float j, CallbackInfo info) {
-        if (JUtils.shouldNotRender(livingEntity)) {
-            setScale(head, 0f);
-            setScale(hat, 0f);
-            setScale(body, 0f);
-            setScale(rightArm, 0f);
-            setScale(leftArm, 0f);
-            setScale(rightLeg, 0f);
-            setScale(leftLeg, 0f);
-            info.cancel();
-        } else {
-            setScale(head, 1f);
-            setScale(hat, 1f);
-            setScale(body, 1f);
-            setScale(rightArm, 1f);
-            setScale(leftArm, 1f);
-            setScale(rightLeg, 1f);
-            setScale(leftLeg, 1f);
-        }
-
         if (livingEntity.isHolding(JObjectRegistry.FVREVOLVER))
             CrossbowPosing.hold(rightArm, leftArm, head, livingEntity.getMainArm() == Arm.RIGHT);
 

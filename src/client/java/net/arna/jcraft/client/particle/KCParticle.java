@@ -6,7 +6,6 @@ import net.minecraft.client.particle.*;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.DefaultParticleType;
 
-@Environment(EnvType.CLIENT)
 public class KCParticle extends AbstractSlowingParticle {
     private final SpriteProvider spriteProvider;
 
@@ -37,7 +36,6 @@ public class KCParticle extends AbstractSlowingParticle {
         return 255;
     }
 
-    @Environment(EnvType.CLIENT)
     public static class Factory implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 

@@ -239,8 +239,7 @@ public class JServerTickEvents {
             List<? extends ItemEntity> itemEntities = serverWorld.getEntitiesByType(TypeFilter.instanceOf(ItemEntity.class), EntityPredicates.VALID_ENTITY);
 
             for (ItemEntity item : itemEntities) {
-                if (item.getStack().isOf(JObjectRegistry.ANUBIS))
-                    item.setPickupDelay(0);
+
 
                 if (item.getStack().isOf(JObjectRegistry.FVREVOLVER)) {
                     if (item.age < 10) item.setPickupDelay(100);
@@ -261,8 +260,8 @@ public class JServerTickEvents {
                         if (item2.equals(item) || !(item2.distanceTo(item) < 1.0)) continue;
                         Explosion explosion = serverWorld.createExplosion(null, iPos.x, iPos.y, iPos.z, 1f,
                                 serverWorld.getGameRules().getBoolean(JCraft.STAND_GRIEFING) ? Explosion.DestructionType.BREAK : Explosion.DestructionType.NONE);
-                        item.kill();
-                        item2.kill();
+                        item.discard();
+                        item2.discard();
 
                         List<LivingEntity> toDamage = serverWorld.getEntitiesByClass(LivingEntity.class,
                                 new Box(iPos.add(2, 2, 2), iPos.subtract(2, 2, 2)),

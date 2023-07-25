@@ -6,7 +6,6 @@ import net.minecraft.client.particle.*;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.DefaultParticleType;
 
-@Environment(EnvType.CLIENT)
 public class SpeedParticle extends AbstractSlowingParticle {
     private final SpriteProvider spriteProvider;
 
@@ -17,7 +16,11 @@ public class SpeedParticle extends AbstractSlowingParticle {
         this.maxAge = 3;
         this.setSpriteForAge(spriteProvider);
     }
-    public ParticleTextureSheet getType() { return ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT; }
+
+    public ParticleTextureSheet getType() {
+        return ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT;
+    }
+
     public void tick() {
         super.tick();
         float c = 1f - (float) age / (float) maxAge;
@@ -26,9 +29,12 @@ public class SpeedParticle extends AbstractSlowingParticle {
         if (!this.dead)
             this.setSprite(spriteProvider.getSprite(random));
     }
+
     @Override
-    protected int getBrightness(float tint) { return 255; }
-    @Environment(EnvType.CLIENT)
+    protected int getBrightness(float tint) {
+        return 255;
+    }
+
     public static class Factory implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 

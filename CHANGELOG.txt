@@ -1311,6 +1311,20 @@ C-Moon
         >dissipates if there is nothing below you for more than 5 blocks
         >can change gravity by pressing utility (while grounded) again
 
+● 25/7/2023
+>Updated some skins
+>Fixed arrows, fire & others still rendering while entities should be invisible (Cream: Void, King Crimson: Time Erase...)
+>Fixed PlanetTeamSpeak (pts0)
+>Added unset Stand Disc to creative mode menu
+
+D4C
+    >Grab is now unburstable until the final hit
+
+Cream
+    >Updated Grab animation
+
+
+
 priority (top to bottom)
 todo: fix predict not working with new projectiles
 

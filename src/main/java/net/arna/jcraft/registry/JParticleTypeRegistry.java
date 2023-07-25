@@ -10,7 +10,6 @@ import java.util.Map;
 
 public interface JParticleTypeRegistry {
 
-
     DefaultParticleType COMBO_BREAK = FabricParticleTypes.simple();
     DefaultParticleType COOLDOWN_CANCEL = FabricParticleTypes.simple();
     DefaultParticleType HITSPARK_1 = FabricParticleTypes.simple();
@@ -19,6 +18,7 @@ public interface JParticleTypeRegistry {
     DefaultParticleType BACKSTAB = FabricParticleTypes.simple();
     DefaultParticleType SPEEDPARTICLE = FabricParticleTypes.simple();
     DefaultParticleType BITES_THE_DUST = FabricParticleTypes.simple();
+    DefaultParticleType BOOM_1 = FabricParticleTypes.simple();
 
     Map<Integer, DefaultParticleType> particles = Map.ofEntries(
             Map.entry(-4, JParticleTypeRegistry.BITES_THE_DUST),
@@ -31,14 +31,19 @@ public interface JParticleTypeRegistry {
             Map.entry(3, JParticleTypeRegistry.HITSPARK_2)
     );
 
+    private static void registerParticle(String identifier, DefaultParticleType type) {
+        Registry.register(Registry.PARTICLE_TYPE, JCraft.id(identifier), type);
+    }
+
     static void initParticleTypes() {
-        Registry.register(Registry.PARTICLE_TYPE, JCraft.id("combo_break"), COMBO_BREAK);
-        Registry.register(Registry.PARTICLE_TYPE, JCraft.id("cooldown_cancel"), COOLDOWN_CANCEL);
-        Registry.register(Registry.PARTICLE_TYPE, JCraft.id("hitspark_1"), HITSPARK_1);
-        Registry.register(Registry.PARTICLE_TYPE, JCraft.id("hitspark_2"), HITSPARK_2);
-        Registry.register(Registry.PARTICLE_TYPE, JCraft.id("kcparticle"), KCPARTICLE);
-        Registry.register(Registry.PARTICLE_TYPE, JCraft.id("backstab"), BACKSTAB);
-        Registry.register(Registry.PARTICLE_TYPE, JCraft.id("speedparticle"), SPEEDPARTICLE);
-        Registry.register(Registry.PARTICLE_TYPE, JCraft.id("btd"), BITES_THE_DUST);
+        registerParticle("combo_break", COMBO_BREAK);
+        registerParticle("cooldown_cancel", COOLDOWN_CANCEL);
+        registerParticle("hitspark_1", HITSPARK_1);
+        registerParticle("hitspark_2", HITSPARK_2);
+        registerParticle("kcparticle", KCPARTICLE);
+        registerParticle("backstab", BACKSTAB);
+        registerParticle("speedparticle", SPEEDPARTICLE);
+        registerParticle("btd", BITES_THE_DUST);
+        registerParticle("boom_1", BOOM_1);
     }
 }

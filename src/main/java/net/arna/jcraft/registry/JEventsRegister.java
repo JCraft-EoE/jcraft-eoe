@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -18,14 +19,24 @@ public interface JEventsRegister {
     static void registerEvents() {
         ServerEntityEvents.ENTITY_LOAD.register(
                 (entity, world) -> {
-                    // If an item was spawned in the AU
-                    if (world.getRegistryKey().equals(JDimensionRegister.AU_DIMENSION_KEY) && entity instanceof ItemEntity item) {
-                        // And it isn't a mock item, and it wasn't thrown out by a player
-                        if (item.getThrower() != null) return;
-                        // Convert it to a mock item (incompatible and useless)
-                        item.setStack(
-                                MockItem.createMockStack(item.getStack())
-                        );
+                    // If an item was spawned
+                    if (entity instanceof ItemEntity item) {
+                        ItemStack stack = item.getStack();
+
+                        if (stack.isOf(JObjectRegistry.ANUBIS))
+                            item.setPickupDelay(0);
+
+                        // ... in the AU
+                        if (world.getRegistryKey().equals(JDimensionRegister.AU_DIMENSION_KEY)) {
+                            // , and it wasn't thrown out by a player, and it isn't a mock item
+                            if (item.getThrower() != null || MockItem.isMockItem(stack)) return;
+                            // Convert it to a mock item (incompatible and useless)
+                            item.setStack( MockItem.createMockStack(stack) );
+                        } else {
+                            if (MockItem.isMockItem(stack)) {
+
+                            }
+                        }
                     }
                 }
         );

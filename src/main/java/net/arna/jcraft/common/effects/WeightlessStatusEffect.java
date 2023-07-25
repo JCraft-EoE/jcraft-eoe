@@ -73,12 +73,13 @@ public class WeightlessStatusEffect extends StatusEffect {
         if (amplifier == 1) {
             Vec3d rotVec = entity.getRotationVector();
             Direction direction = entity.getMovementDirection();
+            boolean isUpright = GravityChangerAPI.getGravityDirection(entity) == Direction.UP;
 
             double viewPitch = Math.acos(rotVec.y);
             if (viewPitch > 2.3562) // 135°
-                direction = Direction.DOWN;
+                direction = isUpright ? Direction.DOWN : Direction.UP;
             else if (viewPitch < 0.7854) // 45°
-                direction = Direction.UP;
+                direction = isUpright ? Direction.UP : Direction.DOWN;
 
             GravityChangerAPI.addGravity(entity, new Gravity(
                     direction, 1, 200, "effect")
