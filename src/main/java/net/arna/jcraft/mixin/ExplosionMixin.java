@@ -39,7 +39,7 @@ public class ExplosionMixin implements IJExplosion {
 
     @Redirect(method = "affectWorld", at = @At(value = "FIELD", target = "Lnet/minecraft/world/explosion/Explosion;createFire:Z"))
     private boolean overrideCreateFire(Explosion thiz) {
-        return modifier == null || modifier.getDestructionType() == null ? createFire : modifier.getCreateFire();
+        return modifier == null || modifier.getCreateFire() == null ? createFire : modifier.getCreateFire();
     }
 
     @ModifyVariable(method = "affectWorld", at = @At("HEAD"), argsOnly = true)
