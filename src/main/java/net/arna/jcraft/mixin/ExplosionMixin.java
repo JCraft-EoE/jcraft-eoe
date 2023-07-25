@@ -1,121 +1,74 @@
 package net.arna.jcraft.mixin;
 
 import net.arna.jcraft.common.util.IJExplosion;
+import net.arna.jcraft.common.util.JExplosionModifier;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
-import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-
-import java.util.function.Function;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(Explosion.class)
 public class ExplosionMixin implements IJExplosion {
-    @Shadow @Final @Mutable
+    @Shadow @Final
     private boolean createFire;
-    @Shadow @Final @Mutable
+    @Shadow @Final
     private Explosion.DestructionType destructionType;
     @Shadow @Final private World world;
-    private @Unique ParticleEffect particle;
-    private @Unique SoundEvent sound;
-    private @Unique SoundCategory soundCategory;
-    private @Unique Function<Random, Float> volumeGetter;
-    private @Unique Function<Random, Float> pitchGetter;
+    private @Unique JExplosionModifier modifier;
 
     // Interface implementation
     @Override
-    public void jcraft$setCreateFire(boolean createFire) {
-        this.createFire = createFire;
-    }
-
-    @Override
-    public boolean jcraft$isCreateFire() {
-        return createFire;
-    }
-
-    @Override
-    public void jcraft$setDestructionType(Explosion.DestructionType destructionType) {
-        this.destructionType = destructionType;
-    }
-
-    @Override
-    public Explosion.DestructionType jcraft$getDestructionType() {
-        return destructionType;
-    }
-
-    @Override
-    public void jcraft$setParticle(ParticleEffect particle) {
-        this.particle = particle;
-    }
-
-    @Override
-    public ParticleEffect jcraft$getParticle() {
-        return particle;
-    }
-
-    @Override
-    public void jcraft$setSound(SoundEvent sound) {
-        this.sound = sound;
-    }
-
-    @Override
-    public SoundEvent jcraft$getSound() {
-        return sound;
-    }
-
-    @Override
-    public void jcraft$setSoundCategory(SoundCategory category) {
-        soundCategory = category;
-    }
-
-    @Override
-    public SoundCategory jcraft$getSoundCategory() {
-        return soundCategory;
-    }
-
-    @Override
-    public void jcraft$setVolume(Function<Random, Float> volumeGetter) {
-        this.volumeGetter = volumeGetter;
-    }
-
-    @Override
-    public void jcraft$setPitch(Function<Random, Float> pitchGetter) {
-        this.pitchGetter = pitchGetter;
+    public void jcraft$setModifier(JExplosionModifier modifier) {
+        this.modifier = modifier;
     }
 
     // Functionality
+    @Redirect(method = "affectWorld", at = @At(value = "FIELD", target = "Lnet/minecraft/world/explosion/Explosion;destructionType:Lnet/minecraft/world/explosion/Explosion$DestructionType;"), require = 2)
+    private Explosion.DestructionType overrideDestructionType(Explosion thiz) {
+        return modifier == null || modifier.getDestructionType() == null ? destructionType : modifier.getDestructionType();
+    }
+
+    @Redirect(method = "affectWorld", at = @At(value = "FIELD", target = "Lnet/minecraft/world/explosion/Explosion;createFire:Z"))
+    private boolean overrideCreateFire(Explosion thiz) {
+        return modifier == null || modifier.getDestructionType() == null ? createFire : modifier.getCreateFire();
+    }
+
     @ModifyVariable(method = "affectWorld", at = @At("HEAD"), argsOnly = true)
     private boolean overrideParticlesArgument(boolean particles) {
-        return particles || particle != null;
+        return particles || modifier != null && modifier.getParticle() != null;
     }
 
     @ModifyArg(method = "affectWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;addParticle(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V"), require = 2)
     private ParticleEffect overrideParticleEffect(ParticleEffect particle) {
-        return this.particle == null ? particle : this.particle;
+        return modifier == null || modifier.getParticle() == null ? particle : modifier.getParticle();
     }
 
     @ModifyArg(method = "affectWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;playSound(DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FFZ)V"))
     private SoundEvent overrideSound(SoundEvent sound) {
-        return this.sound == null ? sound : this.sound;
+        return modifier == null || modifier.getSound() == null ? sound : modifier.getSound();
     }
 
     @ModifyArg(method = "affectWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;playSound(DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FFZ)V"))
     private SoundCategory overrideSoundCategory(SoundCategory category) {
-        return soundCategory == null ? category : soundCategory;
+        return modifier == null || modifier.getSoundCategory() == null ? category : modifier.getSoundCategory();
     }
 
     @ModifyArg(method = "affectWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;playSound(DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FFZ)V"), index = 5)
     private float overrideVolume(float volume) {
-        return volumeGetter == null ? volume : volumeGetter.apply(world.random);
+        return modifier == null || modifier.getVolumeGetter() == null ? volume : modifier.getVolumeGetter().apply(world.random);
     }
 
     @ModifyArg(method = "affectWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;playSound(DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FFZ)V"), index = 6)
     private float overridePitch(float pitch) {
-        return pitchGetter == null ? pitch : pitchGetter.apply(world.random);
+        return modifier == null || modifier.getPitchGetter() == null ? pitch : modifier.getPitchGetter().apply(world.random);
     }
 }
