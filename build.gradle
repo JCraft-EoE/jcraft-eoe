@@ -64,9 +64,6 @@ dependencies {
 	//Player Anim
 	modImplementation("dev.kosmx.player-anim:player-animation-lib-fabric:${project.player_anim}")
 
-	//MidnightLib
-	modImplementation include("maven.modrinth:midnightlib:${project.midnightlib_version}-fabric")
-
 	//Satin
 	modImplementation include("io.github.ladysnake:satin:${project.satin_version}")
 
