@@ -16,4 +16,15 @@ public class ItemStackMixin {
         ItemStack thiz = (ItemStack) (Object) this;
         if (MockItem.isMockItem(thiz)) cir.setReturnValue(MockItem.getMockedStack(thiz).isOf(item));
     }
+
+    @Inject(method = "isEqual", at = @At("HEAD"), cancellable = true)
+    private void mockItemEqualsCheck(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
+        ItemStack thiz = (ItemStack) (Object) this;
+        if (!MockItem.isMockItem(thiz) && !MockItem.isMockItem(stack)) return;
+
+        ItemStack stack1 = MockItem.isMockItem(thiz) ? MockItem.getMockedStack(thiz) : thiz;
+        ItemStack stack2 = MockItem.isMockItem(stack) ? MockItem.getMockedStack(stack) : stack;
+
+        cir.setReturnValue(ItemStack.areEqual(stack1, stack2));
+    }
 }
