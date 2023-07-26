@@ -1,9 +1,9 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.JExplosionModifier;
 import net.arna.jcraft.common.util.JUtils;
@@ -21,8 +21,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
@@ -271,7 +269,11 @@ public class KillerQueenEntity extends StandEntity {
                             livingEntity.getY() + livingEntity.getHeight() / 2,
                             livingEntity.getZ(),
                             2f,
-                            JExplosionModifier.builder().particle(JParticleTypeRegistry.BOOM_1).destructionType(Explosion.DestructionType.NONE).build()
+                            JExplosionModifier.builder()
+                                    .particle(JParticleTypeRegistry.BOOM_1)
+                                    .destructionType(Explosion.DestructionType.NONE)
+                                    .particleVelocity(Vec3d.ZERO)
+                                    .build()
                     );
 
                     livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
@@ -292,7 +294,11 @@ public class KillerQueenEntity extends StandEntity {
                                 bombPos.getY(),
                                 bombPos.getZ(),
                                 2f,
-                                JExplosionModifier.builder().particle(JParticleTypeRegistry.BOOM_1).destructionType(Explosion.DestructionType.NONE).build()
+                                JExplosionModifier.builder()
+                                        .particle(JParticleTypeRegistry.BOOM_1)
+                                        .destructionType(Explosion.DestructionType.NONE)
+                                        .particleVelocity(Vec3d.ZERO)
+                                        .build()
                         );
 
                         List<LivingEntity> toKD = world.getEntitiesByClass(
