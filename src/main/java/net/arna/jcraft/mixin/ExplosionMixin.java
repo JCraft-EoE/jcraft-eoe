@@ -52,6 +52,24 @@ public class ExplosionMixin implements IJExplosion {
         return modifier == null || modifier.getParticle() == null ? particle : modifier.getParticle();
     }
 
+    @ModifyArg(method = "affectWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;addParticle(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V"),
+            require = 2, index = 4)
+    private double overrideParticleVelocityX(double x) {
+        return modifier == null || modifier.getParticleVelocity() == null ? x : modifier.getParticleVelocity().x;
+    }
+
+    @ModifyArg(method = "affectWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;addParticle(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V"),
+            require = 2, index = 5)
+    private double overrideParticleVelocityY(double y) {
+        return modifier == null || modifier.getParticleVelocity() == null ? y : modifier.getParticleVelocity().y;
+    }
+
+    @ModifyArg(method = "affectWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;addParticle(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V"),
+            require = 2, index = 6)
+    private double overrideParticleVelocityZ(double z) {
+        return modifier == null || modifier.getParticleVelocity() == null ? z : modifier.getParticleVelocity().z;
+    }
+
     @ModifyArg(method = "affectWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;playSound(DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FFZ)V"))
     private SoundEvent overrideSound(SoundEvent sound) {
         return modifier == null || modifier.getSound() == null ? sound : modifier.getSound();

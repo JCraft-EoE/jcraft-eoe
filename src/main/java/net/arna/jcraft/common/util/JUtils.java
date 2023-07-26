@@ -5,6 +5,7 @@ import net.arna.jcraft.common.entity.CreamEntity;
 import net.arna.jcraft.common.entity.D4CEntity;
 import net.arna.jcraft.common.entity.KingCrimsonEntity;
 import net.arna.jcraft.common.entity.StandEntity;
+import net.arna.jcraft.common.network.s2c.JExplosionPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.spec.AnubisSpec;
 import net.arna.jcraft.common.spec.BrawlerSpec;
@@ -424,9 +425,18 @@ public final class JUtils {
     }
 
     public static void explode(World world, @Nullable Entity entity, double x, double y, double z, float power, JExplosionModifier modifier) {
-        Explosion explosion = new Explosion(world, null, x, y, z, power);
+        if (modifier == null) {
+            world.createExplosion(entity, x, y, z, power, Explosion.DestructionType.DESTROY);
+            return;
+        }
+
+        Explosion explosion = new Explosion(world, entity, x, y, z, power);
         ((IJExplosion) explosion).jcraft$setModifier(modifier);
         explosion.collectBlocksAndDamageEntities();
         explosion.affectWorld(true);
+
+        if (world.isClient) return;
+        for (ServerPlayerEntity player : PlayerLookup.around((ServerWorld) world, new Vec3d(x, y, z), 64))
+            JExplosionPacket.send(player, x, y, z, power, explosion, modifier);
     }
 }

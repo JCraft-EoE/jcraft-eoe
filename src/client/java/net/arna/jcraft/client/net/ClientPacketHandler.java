@@ -31,6 +31,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.Identifier;
@@ -40,7 +41,9 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.Explosion;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.BiConsumer;
@@ -61,6 +64,7 @@ public class ClientPacketHandler {
         register(S2C_EPITAPH_STATE, ClientPacketHandler::handleEpitaphOverlayState);
         register(S2C_TIME_ERASE_PREDICTION_STATE, ClientPacketHandler::handlePredictionState);
         register(S2C_SERVER_CONFIG, ClientPacketHandler::handleServerConfig);
+        register(S2C_J_EXPLOSION, ClientPacketHandler::handleJExplosion);
     }
 
     private static void register(Identifier id, Consumer<PacketByteBuf> handler) {
@@ -469,5 +473,19 @@ public class ClientPacketHandler {
         ConfigOption.readOptions(buf);
 
         if (show) client.execute(() -> ServerConfigUI.show(editable));
+    }
+
+    private static void handleJExplosion(MinecraftClient client, PacketByteBuf buf) {
+        ExplosionS2CPacket nativePacket = new ExplosionS2CPacket(buf);
+        JExplosionModifier modifier = buf.readBoolean() ? JExplosionModifier.read(buf) : null;
+
+        client.execute(() -> {
+            Explosion explosion = new Explosion(client.world, null, nativePacket.getX(), nativePacket.getY(), nativePacket.getZ(),
+                    nativePacket.getRadius(), nativePacket.getAffectedBlocks());
+            ((IJExplosion) explosion).jcraft$setModifier(modifier);
+            explosion.affectWorld(true);
+            Objects.requireNonNull(client.player).setVelocity(client.player.getVelocity()
+                    .add(nativePacket.getPlayerVelocityX(), nativePacket.getPlayerVelocityY(), nativePacket.getPlayerVelocityZ()));
+        });
     }
 }

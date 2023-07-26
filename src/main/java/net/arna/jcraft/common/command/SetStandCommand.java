@@ -22,9 +22,9 @@ import java.util.Collection;
 import static net.arna.jcraft.JCraft.summon;
 
 public class SetStandCommand {
-    private static final DynamicCommandExceptionType INVALID_SKIN = new DynamicCommandExceptionType(s -> 
+    private static final DynamicCommandExceptionType INVALID_SKIN = new DynamicCommandExceptionType(s ->
             Text.literal("The given stand only has " + s + " skins."));
-    
+
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
         dispatcher.register(CommandManager.literal("stand")
                 .then(CommandManager.literal("set")
@@ -32,7 +32,7 @@ public class SetStandCommand {
                         .then(CommandManager.argument("targets", EntityArgumentType.entities())
                                 .then(CommandManager.argument("stand", StandArgumentType.stand())
                                         .executes(ctx -> executeSet(ctx, 0))
-                                        .then(CommandManager.argument("skin", IntegerArgumentType.integer(0, 4))
+                                        .then(CommandManager.argument("skin", IntegerArgumentType.integer(0, 3))
                                                 .executes(ctx -> executeSet(ctx, ctx.getArgument("skin", Integer.class))))))));
     }
 
