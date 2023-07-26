@@ -7,6 +7,7 @@ import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.Gravity;
 import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.arna.jcraft.registry.JSoundRegister;
@@ -41,7 +42,7 @@ import java.util.List;
 //todo: 3d, rotatable shockwave particle effect
 //todo: particles on gravpunch and both slams
 public class CMoonEntity extends StandEntity {
-    public static final Attack light = new Attack(0, 2, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
+    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
 
     public static final Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 0.75f, 0.25f, AttackType.BARRAGE, 1, 0, 4, JSoundRegister.IMPACT_3)
@@ -63,8 +64,12 @@ public class CMoonEntity extends StandEntity {
     public static final Attack gravshift = new Attack(6, 70, 32, 20, 7, AttackType.BOX)
             .setInfo("Gravity Shift", """
                     increases user jump height, changes the gravity of everything in a 64 block radius
-                    Types: HYPER-GRAVITY, ATTRACT, REPULSE
-                    swap between types by tapping the key during the shift""");
+                    Types: REPULSE, ATTRACT, NONE
+                    swap between types by pressing the key again""");
+    public static final Attack directionalshift = new Attack(7, 70, 32, 20, 7, AttackType.BOX)
+            .crouchingVariation(gravshift)
+            .setInfo("Gravity Shift Pulse", """
+                    changes the gravitational direction of nearby entities to the users looked direction""");
 
     public final ArrayList<Float> invertDamages = new ArrayList<>();
     public final ArrayList<LivingEntity> invertEntities = new ArrayList<>();
@@ -94,7 +99,7 @@ public class CMoonEntity extends StandEntity {
                     the mean green bean
                     M1>Barrage>jump>Block Launch>M1>Only One Punch>Block hits>Grav. Hop>Ground Slam""";
 
-        moves = List.of(light, gutpunch, barrage, gravpunch, gravshift, launch, groundslam
+        moves = List.of(light, gutpunch, barrage, gravpunch, directionalshift, launch, groundslam
                 , new Attack().setMobility(MobilityType.HIGHJUMP)
                         .setInfo("Gravitational Hop/Local Gravity Change", "jumps up and grants 2s slow falling/crouch to change your gravitational direction")
         );
@@ -172,11 +177,14 @@ public class CMoonEntity extends StandEntity {
     public void initUlt() {
         if (!this.canAttack()) return;
         if (getShiftTime() <= 0) {
-            if (handleAttack(gravshift, JCraft.standUltCD, 10))
+            if (getUserOrThrow().isSneaking() && handleAttack(gravshift, JCraft.standUltCD, 10))
                 playSound(JSoundRegister.CMOON_GRAVSHIFT, 1, 1);
+            else if (handleAttack(directionalshift, JCraft.standUltCD, 11))
+                playSound(JSoundRegister.CMOON_GRAVSHIFT_DIRECTIONAL, 1, 1);
+
         } else {
             int shiftType = getShiftType();
-            if (shiftType++ > 2)
+            if (++shiftType > 2)
                 shiftType = 0;
             setShiftType(shiftType);
         }
@@ -243,58 +251,83 @@ public class CMoonEntity extends StandEntity {
 
             if (attack.id == gravpunch.id) {
                 GravityChangerAPI.addGravity(ent, new Gravity(Direction.UP, 2, 60, "stand"));
-                ent.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 60, 2, true, false));
+                ent.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 60, 0, true, false));
                 ent.velocityModified = true;
             }
         }
 
-        if (attack.id == launch.id) {
-            BlockProjectile block = new BlockProjectile(JEntityTypeRegister.BLOCK_PROJECTILE, world);
-            BlockState steppingState = getSteppingBlockState();
-            if (steppingState.isAir() || !steppingState.isOpaque())
-                block.setBlockStack(Items.STONE.getDefaultStack());
-            else
-                block.setBlockStack(steppingState.getBlock().asItem().getDefaultStack());
+        switch (attack.id) {
+            case (4) -> { // Block Launch
+                BlockProjectile block = new BlockProjectile(JEntityTypeRegister.BLOCK_PROJECTILE, world);
+                BlockState steppingState = getSteppingBlockState();
+                if (steppingState.isAir() || !steppingState.isOpaque())
+                    block.setBlockStack(Items.STONE.getDefaultStack());
+                else
+                    block.setBlockStack(steppingState.getBlock().asItem().getDefaultStack());
 
-            Vec3i hoverDir = GravityChangerAPI.getGravityDirection(user).getVector().multiply(-1);
+                Vec3i hoverDir = GravityChangerAPI.getGravityDirection(user).getVector().multiply(-1);
 
-            block.setMaster(user);
-            block.refreshPositionAndAngles(getX() + hoverDir.getX() * 1.5, getY() + hoverDir.getY() * 1.5, getZ() + hoverDir.getZ() * 1.5, getYaw(), getPitch());
-            block.setVelocity(hoverDir.getX() * 0.4, hoverDir.getY() * 0.4, hoverDir.getZ() * 0.4);
-            world.spawnEntity(block);
-        } else if (attack.id == groundslam.id) {
-            for (LivingEntity ent : entities) {
-                ent.setVelocity(new Vec3d(0.0, -0.75, 0.0));
-                ent.velocityModified = true;
-                if (user.isSneaking())
-                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 30, 0));
+                block.setMaster(user);
+                block.refreshPositionAndAngles(getX() + hoverDir.getX() * 1.5, getY() + hoverDir.getY() * 1.5, getZ() + hoverDir.getZ() * 1.5, getYaw(), getPitch());
+                block.setVelocity(hoverDir.getX() * 0.4, hoverDir.getY() * 0.4, hoverDir.getZ() * 0.4);
+                world.spawnEntity(block);
             }
+            case (5) -> { // Ground Slam
+                for (LivingEntity ent : entities) {
+                    ent.setVelocity(new Vec3d(0.0, -0.75, 0.0));
+                    ent.velocityModified = true;
+                    if (user.isSneaking())
+                        ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 30, 0));
+                }
 
-            if (world.getGameRules().getBoolean(JCraft.STAND_GRIEFING)) {
-                BlockPos bPos = getBlockPos();
-                for (int x = -2; x < 3; x++) {
-                    for (int y = -1; y < 1; y++) {
-                        for (int z = -2; z < 3; z++) {
-                            BlockPos curPos = bPos.add(x, y, z);
-                            BlockState curState = world.getBlockState(curPos);
+                if (world.getGameRules().getBoolean(JCraft.STAND_GRIEFING)) {
+                    BlockPos bPos = getBlockPos();
+                    for (int x = -2; x < 3; x++) {
+                        for (int y = -1; y < 1; y++) {
+                            for (int z = -2; z < 3; z++) {
+                                BlockPos curPos = bPos.add(x, y, z);
+                                BlockState curState = world.getBlockState(curPos);
 
-                            if (curState.getBlock().getBlastResistance() > 10f || curState.isAir()) continue;
+                                if (curState.getBlock().getBlastResistance() > 10f || curState.isAir()) continue;
 
-                            FallingBlockEntity fallingBlock = FallingBlockEntity.spawnFromBlock(world, curPos, curState);
-                            fallingBlock.setVelocity(0, 0.5, 0);
-                            fallingBlock.timeFalling = -120;
-                            fallingBlock.velocityModified = true;
-                            fallingBlock.velocityDirty = true;
+                                FallingBlockEntity fallingBlock = FallingBlockEntity.spawnFromBlock(world, curPos, curState);
+                                fallingBlock.setVelocity(0, 0.5, 0);
+                                fallingBlock.timeFalling = -120;
+                                fallingBlock.velocityModified = true;
+                                fallingBlock.velocityDirty = true;
+                            }
                         }
                     }
                 }
             }
-        } else if (attack.id == gravshift.id) {
-            user.addStatusEffect(new StatusEffectInstance(StatusEffects.JUMP_BOOST, 350, 1));
-            user.onLanding();
-            setShiftTime(200);
+            case (6) -> { // Area Gravity Shift
+                user.addStatusEffect(new StatusEffectInstance(StatusEffects.JUMP_BOOST, 350, 1));
+                user.onLanding();
+                setShiftTime(200);
+            }
+            case (7) -> { // Directional Gravity Shift
+                Direction lookDir = JUtils.getLookDirection(user);
+                List<Entity> toCatch = world.getEntitiesByClass(Entity.class, getBoundingBox().expand(64), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+
+                toCatch.remove(this);
+                toCatch.remove(user);
+
+                directionShiftAge = age;
+
+                for (Entity entity : toCatch) {
+                    directionShiftedEntities.add(entity);
+
+                    GravityChangerAPI.addGravity(entity, new Gravity(lookDir, 3, gravityChangeDuration, "stand_ultimate"));
+                    if (entity instanceof LivingEntity living)
+                        living.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, gravityChangeDuration, 0, true, false));
+                }
+            }
         }
     }
+
+    private static final int gravityChangeDuration = 600;
+    private int directionShiftAge;
+    private final List<Entity> directionShiftedEntities = new ArrayList<>();
 
     @Override
     public void tick() {
@@ -316,9 +349,8 @@ public class CMoonEntity extends StandEntity {
                         double y = pos.y + random.nextTriangular(0, 10);
                         double z = pos.z + random.nextTriangular(0, 100);
                         switch (getShiftType()) {
-                            case (0) -> vel = new Vec3d(0.0, 64 / new Vec3d(x, y, z).squaredDistanceTo(pos), 0.0);
-                            case (1) -> vel = new Vec3d(x, y, z).subtract(pos);
-                            case (2) -> vel = pos.subtract(x, y, z);
+                            case (0) -> vel = new Vec3d(x, y, z).subtract(pos);
+                            case (1) -> vel = pos.subtract(x, y, z);
                         }
                         this.world.addParticle(
                                 ParticleTypes.REVERSE_PORTAL,
@@ -342,9 +374,16 @@ public class CMoonEntity extends StandEntity {
                     }
                 }
 
+                if (age - directionShiftAge >= gravityChangeDuration && !directionShiftedEntities.isEmpty())
+                    directionShiftedEntities.clear();
+                else
+                    for (Entity entity : directionShiftedEntities) {
+                        if (entity.squaredDistanceTo(this) > 10000) // 100m
+                            GravityChangerAPI.clearGravity(entity); // todo: this interferes with other gravities, solve later
+                    }
+
                 if (sTime > 0 && !user.hasStatusEffect(JStatusRegister.DAZED)) {
-                    List<Entity> toCatch = world.getEntitiesByClass(Entity.class,
-                            new Box(pos.add(64.0, 64.0, 64.0), pos.subtract(64.0, 64.0, 64.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+                    List<Entity> toCatch = world.getEntitiesByClass(Entity.class, getBoundingBox().expand(64), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
 
                     toCatch.remove(this);
                     toCatch.remove(user);
@@ -352,13 +391,13 @@ public class CMoonEntity extends StandEntity {
                     for (Entity entity : toCatch) {
                         if ( entity instanceof BlockProjectile block && block.getMaster() == user)
                             continue;
-                        Vec3d vel = entity.getVelocity();
+                        //Vec3d vel = entity.getVelocity();
                         switch (getShiftType()) {
-                            case (0) -> entity.addVelocity(-vel.x / 3.0, -0.1, -vel.z / 3.0);
-                            case (1) -> entity.setVelocity(
+                            //case (0) -> entity.addVelocity(-vel.x / 3.0, -0.1, -vel.z / 3.0);
+                            case (0) -> entity.setVelocity(
                                     entity.getVelocity().add( entity.getPos().subtract(pos).normalize().multiply(0.1) )
                             );
-                            case (2) -> entity.setVelocity(
+                            case (1) -> entity.setVelocity(
                                     entity.getVelocity().add( pos.subtract(entity.getPos()).normalize().multiply(0.1) )
                             );
                         }
@@ -397,7 +436,7 @@ public class CMoonEntity extends StandEntity {
             case 7 -> controller.setAnimation(builder.playAndHold("animation.cmoon.groundslam"));
             case 9 -> controller.setAnimation(builder.playAndHold("animation.cmoon.groundshoot"));
             case 10 -> controller.setAnimation(builder.playAndHold("animation.cmoon.gravshift"));
-
+            case 11 -> controller.setAnimation(builder.playAndHold("animation.cmoon.directionalshift"));
             //default -> throw new IllegalStateException("Unexpected value: " + this.getState());
         }
         return PlayState.CONTINUE;

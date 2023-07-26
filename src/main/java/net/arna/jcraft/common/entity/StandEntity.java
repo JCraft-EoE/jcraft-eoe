@@ -6,7 +6,6 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.*;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
-import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.*;
@@ -464,7 +463,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
         if (cooldown > 0)
             return false;
 
-        userData.putInt(cooldownName, attack.cooldown * 20);
+        userData.putInt(cooldownName, (int) (attack.cooldown * 20));
         this.setAttack(attack, animState);
         return true;
     }

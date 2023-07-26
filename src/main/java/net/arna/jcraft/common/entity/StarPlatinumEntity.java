@@ -29,7 +29,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StarPlatinumEntity extends StandEntity {
-    public static final Attack light = new Attack(0, 2, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
+    public static final Attack crm1 = new Attack(7, JCraft.lightCooldown, 0.75f, 14, 8, 1.5, 6f, 0.25f, AttackType.BOX, 1f, -0.4f, 0, JSoundRegister.IMPACT_1)
+            .setLaunch()
+            .appendHitbox(new HitBoxData(0, 0.35, 1.25))
+            .setInfo("Uppercut", "slower combo starter, launches");
+    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
+            .crouchingVariation(crm1)
             .setInfo("Punch", "quick combo starter");
     public static final Attack heavy = new Attack(1, 17, 1f, 30, 20, 2.0, 10f, 1.5f, AttackType.BOX, 0.7f)
             .setHitspark(2)
@@ -127,7 +132,10 @@ public class StarPlatinumEntity extends StandEntity {
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        handleAttack(light, JCraft.standLightCD, 2);
+        if (getUserOrThrow().isSneaking())
+            handleAttack(crm1, JCraft.standLightCD, 10);
+        else
+            handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
@@ -210,6 +218,14 @@ public class StarPlatinumEntity extends StandEntity {
                 curAttack.attackDist = (float) avgPos.distanceTo(getPos());
             }
             case (6) -> setInhaleTime((int) (inhale.stun * 20));
+            case (7) -> {
+                for (LivingEntity living : entities) {
+                    living.addVelocity(0, 0.25, 0);
+                    living.velocityModified = true;
+                    if (living instanceof ServerPlayerEntity serverPlayerEntity)
+                        serverPlayerEntity.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(serverPlayerEntity));
+                }
+            }
         }
     }
 
@@ -287,6 +303,7 @@ public class StarPlatinumEntity extends StandEntity {
             case 7 -> controller.setAnimation(builder.playAndHold("animation.starplatinum.inhale"));
             case 8 -> controller.setAnimation(builder.playAndHold("animation.starplatinum.low_kick"));
             case 9 -> controller.setAnimation(builder.playAndHold("animation.starplatinum.jump"));
+            case 10 -> controller.setAnimation(builder.playAndHold("animation.starplatinum.uppercut"));
             default -> controller.setAnimation(builder.loop(getInhaleTime() > 0 ? "animation.starplatinum.inhaleidle" : "animation.starplatinum.idle"));
         }
 

@@ -41,7 +41,7 @@ import java.util.List;
 import static net.arna.jcraft.common.attack.Attack.unusable;
 
 public class CreamEntity extends StandEntity {
-    public static final Attack light = new Attack(0, 2, 0.75f, 14, 6, 1.5, 5f, 0.75f, AttackType.BOX, 1f, 0.1f, 0, JSoundRegister.IMPACT_3)
+    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 14, 6, 1.5, 5f, 0.75f, AttackType.BOX, 1f, 0.1f, 0, JSoundRegister.IMPACT_3)
             .setInfo("Punch", "quick combo starter");
     public static final Attack heavy = new Attack(1, 14, 1f, 30, 20, 1.5, 10f, 0.1f, AttackType.BOX, 2, 0, 0, JSoundRegister.IMPACT_3)
             .setHitspark(2)

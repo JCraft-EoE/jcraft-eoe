@@ -22,6 +22,7 @@ import net.arna.jcraft.common.entity.MadeInHeavenEntity;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
+import net.arna.jcraft.common.spec.SpecType;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
 import net.minecraft.block.Blocks;
@@ -201,9 +202,10 @@ public class ClientPacketHandler {
 
             // Spec synchronization
             case (5) -> {
-                int specID = buf.readInt();
+                int specId = buf.readInt();
                 client.execute(() -> {
-                    JCraftSpec spec = JUtils.getSpecByID(specID);
+                    JCraftSpec spec = SpecType.fromId(specId);
+                    JCraft.LOGGER.info(spec);
 
                     if (spec != null)
                         spec.player = client.player;

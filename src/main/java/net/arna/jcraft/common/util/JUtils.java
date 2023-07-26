@@ -9,6 +9,7 @@ import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.spec.AnubisSpec;
 import net.arna.jcraft.common.spec.BrawlerSpec;
 import net.arna.jcraft.common.spec.JCraftSpec;
+import net.arna.jcraft.common.spec.SpecType;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.block.BlockState;
@@ -151,20 +152,8 @@ public final class JUtils {
         return toReturn;
     }
 
-    //TODO: Int2ObjectHashmap for specs
-    public static JCraftSpec getSpecByID(int id) {
-        JCraftSpec spec = null;
-
-        switch (id) {
-            case (1) -> spec = new BrawlerSpec();
-            case (2) -> spec = new AnubisSpec();
-        }
-
-        return spec;
-    }
-
     public static void assignSpec(PlayerEntity player, NbtCompound playerNbt, ISpec playerSpec) {
-        JCraftSpec spec = getSpecByID(playerNbt.getInt("SpecID"));
+        JCraftSpec spec = SpecType.fromId(playerNbt.getInt("SpecID"));
         if (spec != null)
             spec.player = player;
         playerSpec.setSpec(spec);

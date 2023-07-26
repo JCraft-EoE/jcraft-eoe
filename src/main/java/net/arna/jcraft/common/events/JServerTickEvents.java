@@ -4,14 +4,13 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.JCraft.DashData;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.common.util.DimValues;
-import net.arna.jcraft.common.util.IEntityDataSaver;
-import net.arna.jcraft.common.util.ITimeStop;
-import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
@@ -26,10 +25,9 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.TypeFilter;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.explosion.Explosion;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -129,7 +127,8 @@ public class JServerTickEvents {
             }
         }
 
-        activeTimestops = newActiveTimestops;
+        activeTimestops.clear();
+        activeTimestops.addAll(newActiveTimestops);
 
         // Burst handling
         Map<LivingEntity, Integer> newBurstTimers = new HashMap<>();
@@ -234,46 +233,81 @@ public class JServerTickEvents {
                     mobData.putInt(cooldownType, reducedCd);
                 }
             }
+        }
 
-            // Item attraction logic
-            List<? extends ItemEntity> itemEntities = serverWorld.getEntitiesByType(TypeFilter.instanceOf(ItemEntity.class), EntityPredicates.VALID_ENTITY);
+        // Handle items of interest
+        HashMap<ItemEntity, ItemInterest> itemsOfInterest = JCraft.getItemsOfInterest();
+        HashMap<ItemEntity, ItemInterest> newItemsOfInterest = new HashMap<>();
 
-            for (ItemEntity item : itemEntities) {
+        for (Map.Entry<ItemEntity, ItemInterest> itemAndInterest : itemsOfInterest.entrySet()) {
+            ItemEntity item = itemAndInterest.getKey();
+            if (item == null || !item.isAlive()) continue;
+            ItemInterest interest = itemAndInterest.getValue();
+            ServerWorld itemWorld = (ServerWorld) item.getWorld();
 
-
-                if (item.getStack().isOf(JObjectRegistry.FVREVOLVER)) {
-                    if (item.age < 10) item.setPickupDelay(100);
-                    Vec3d iPos = item.getPos();
-
-                    // Item attraction logic
-                    List<ItemEntity> nearbyItems = serverWorld.getEntitiesByClass(ItemEntity.class,
-                            new Box(iPos.add(16, 16, 16), iPos.subtract(16, 16, 16)),
-                            EntityPredicates.VALID_ENTITY);
-
-                    for (ItemEntity item2 : nearbyItems) {
-                        if (!item2.getStack().isOf(JObjectRegistry.FVREVOLVER)) continue;
-                        Vec3d converge = item2.getPos().subtract(iPos);
-                        Vec3d towardsVector = converge.normalize().multiply(0.25);
-                        item.addVelocity(towardsVector.x, towardsVector.y, towardsVector.z);
+            switch (interest.getType()) {
+                default -> {
+                    continue;
+                }
+                case BLOCK_ATTRACTION -> {
+                    BlockPos attractionBlockPos = interest.getAttractionBlockPos();
+                    if (item.squaredDistanceTo(attractionBlockPos.getX(), attractionBlockPos.getY(), attractionBlockPos.getZ()) < 4) {
+                        dimensionalExplosion(itemWorld, item);
+                        itemWorld.setBlockState(attractionBlockPos, Blocks.AIR.getDefaultState());
+                    } else {
+                        BlockPos delta = attractionBlockPos.subtract(item.getBlockPos());
+                        Vec3d towardsVel = new Vec3d(delta.getX(), delta.getY(), delta.getZ()).normalize();
+                        item.addVelocity(towardsVel.x, towardsVel.y, towardsVel.z);
                         item.velocityModified = true;
+                    }
+                }
+                case REVOLVER_ATTRACTION -> {
+                    for (Map.Entry<ItemEntity, ItemInterest> itemAndInterest2 : itemsOfInterest.entrySet()) {
+                        ItemEntity item2 = itemAndInterest2.getKey();
+                        if (item2 == null || item2 == item || item2.squaredDistanceTo(item) > 256) continue;
+                        if (itemAndInterest2.getValue().getType() == ItemInterest.ItemInterestType.REVOLVER_ATTRACTION) {
+                            Vec3d converge = item2.getPos().subtract(item.getPos());
+                            Vec3d towardsVector = converge.normalize().multiply(0.25);
+                            item.addVelocity(towardsVector.x, towardsVector.y, towardsVector.z);
+                            item.velocityModified = true;
 
-                        if (item2.equals(item) || !(item2.distanceTo(item) < 1.0)) continue;
-                        Explosion explosion = serverWorld.createExplosion(null, iPos.x, iPos.y, iPos.z, 1f,
-                                serverWorld.getGameRules().getBoolean(JCraft.STAND_GRIEFING) ? Explosion.DestructionType.BREAK : Explosion.DestructionType.NONE);
-                        item.discard();
-                        item2.discard();
-
-                        List<LivingEntity> toDamage = serverWorld.getEntitiesByClass(LivingEntity.class,
-                                new Box(iPos.add(2, 2, 2), iPos.subtract(2, 2, 2)),
-                                EntityPredicates.VALID_ENTITY);
-
-                        for (LivingEntity ent : toDamage) {
-                            ent.damage(DamageSource.explosion(explosion), 10);
-                            ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 30, 0));
+                            if (item2.distanceTo(item) <= 1.0)
+                                dimensionalExplosion(itemWorld, item, item2);
                         }
                     }
                 }
             }
+
+            newItemsOfInterest.put(item, interest);
+        }
+
+        itemsOfInterest.clear();
+        itemsOfInterest.putAll(newItemsOfInterest);
+    }
+
+    private static void dimensionalExplosion(ServerWorld serverWorld, Entity one) {
+        dimensionalExplosion(serverWorld, one, null);
+    }
+
+    private static void dimensionalExplosion(ServerWorld serverWorld, Entity one, @Nullable Entity other) {
+        Vec3d midPos = one.getPos();
+        if (other != null) {
+            midPos = midPos.add(other.getPos()).multiply(0.5);
+            other.discard();
+        }
+
+        one.discard();
+
+        Explosion explosion = serverWorld.createExplosion(null, midPos.x, midPos.y, midPos.z, 1f,
+                serverWorld.getGameRules().getBoolean(JCraft.STAND_GRIEFING) ? Explosion.DestructionType.BREAK : Explosion.DestructionType.NONE);
+
+        List<LivingEntity> toDamage = serverWorld.getEntitiesByClass(LivingEntity.class,
+                new Box(midPos.add(2, 2, 2), midPos.subtract(2, 2, 2)),
+                EntityPredicates.VALID_ENTITY);
+
+        for (LivingEntity ent : toDamage) {
+            ent.damage(explosion.getDamageSource(), 10);
+            ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 30, 0));
         }
     }
 }

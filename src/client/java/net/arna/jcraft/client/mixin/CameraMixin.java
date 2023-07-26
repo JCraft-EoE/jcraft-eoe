@@ -37,7 +37,6 @@ public abstract class CameraMixin {
     @Shadow
     private float cameraY;
 
-    //todo: fix camera
     private double clipToSpaceVertical(double desiredCameraDistance) {
         for (int i = 0; i < 8; ++i) {
             float f = (float) ((i & 1) * 2 - 1);

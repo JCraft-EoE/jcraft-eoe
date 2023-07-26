@@ -22,17 +22,20 @@ import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import java.util.List;
 
 public class WhiteSnakeEntity extends StandEntity {
-    public static final Attack light = new Attack(0, 2, 0.75f, 14, 7, 1.5, 5f, 0.75f, AttackType.BOX, 0.6f, 0.2f, 0, JSoundRegister.IMPACT_3)
+    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 14, 7, 1.5, 5f, 0.75f, AttackType.BOX, 0.6f, 0.2f, 0, JSoundRegister.IMPACT_3)
             .setInfo("Punch", "quick combo starter");
     public static final Attack legcrusher = new Attack(4, 20, 0.75f, 22, 16, 1.75, 7f, 0.25f, AttackType.BOX, 1.6f, 0.2f, 0, JSoundRegister.TW_KICK_HIT)
             .setHitspark(2)
             .setInfo("Leg Crusher", "high stun, medium windup");
-    public static final Attack poisonspew = new Attack(5, 20, 0.75f, 14, 10, 2, 0f, 0, AttackType.BOX)
-            .setUB(true)
-            .setInfo("Poison Spew", "fires an acid projectile that slows enemies and persists on the surface it hits for 5s/crouch for a charged variation that fires 5 slower shots");
+
     public static final Attack chargedspew = new Attack(7, 30, 0.75f, 26, 20, 2, 0f, 0, AttackType.BOX)
             .setUB(true)
-            .setInfo("Charged Spew", "");
+            .setInfo("Charged Spew", "fires 5, slower acid balls");
+    public static final Attack poisonspew = new Attack(5, 20, 0.75f, 14, 10, 2, 0f, 0, AttackType.BOX)
+            .setUB(true)
+            .crouchingVariation(chargedspew)
+            .setInfo("Poison Spew", "fires an acid projectile that slows enemies and persists on the surface it hits for 5s");
+
     public static final Attack barrage = new Attack(2, 17, 0.75f, 60, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 1, 0, 3, JSoundRegister.IMPACT_3)
             .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
     public static final Attack donut = new Attack(1, 18, 1f, 36, 17, 2, 10f, 0.0f, AttackType.BOX, 1.4f, 0, 0, JSoundRegister.TW_DONUT_HIT)

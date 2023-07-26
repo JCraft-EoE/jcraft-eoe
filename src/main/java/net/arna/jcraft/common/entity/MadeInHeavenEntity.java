@@ -18,13 +18,11 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
@@ -44,7 +42,7 @@ import java.util.Objects;
 //TODO: give MiH a trail during speed slice and heaven's judgement
 public class MadeInHeavenEntity extends StandEntity {
     // placeholder sound
-    public static final Attack light = new Attack(0, 2, 0.75f, 8, 5, 1.5, 4f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, SoundEvents.ITEM_TRIDENT_HIT)
+    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 8, 5, 1.5, 4f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, SoundEvents.ITEM_TRIDENT_HIT)
             .setInfo("Slice", "quick combo starter");
     public static final Attack barrage = new Attack(2, 17, 0.85f, 32, 0, 2, 1.5f, 0.1f, AttackType.BARRAGE, 0.5f, 0, 3, JSoundRegister.IMPACT_1)
             .setInfo("Barrage", "short, knocks back");
@@ -66,12 +64,12 @@ public class MadeInHeavenEntity extends StandEntity {
             .setInfo("Time Acceleration", "2s windup, 15s t. accel, enemies standless for 15s after finishing");
     private int circleTime = 0;
     public static final Attack judgement = new Attack(5, 33, 1.25f, 60, 20, 0, 0f, 0.5f, AttackType.BARRAGE, 0, 0, 2, null)
-            .setInfo("Heaven's Judgement (Crouching)", "Made in Heaven rapidly speed slices an area, then finishes with a large, launching slice");
+            .setInfo("Divine Severance", "Made in Heaven rapidly speed slices an area, then finishes with a large, launching slice");
     public static final Attack circle = new Attack(8, 40, 14, 13, 0, 1.25f, AttackType.BOX)
             .setRanged(true)
             .setMobility(MobilityType.DASH)
             .crouchingVariation(judgement)
-            .setInfo("Heaven's Judgement", "rapidly circles a looked-at target within 4m at a radius of 7m/crouch to repeatedly speed slice an area");
+            .setInfo("Heaven's Judgement", "rapidly circles a looked-at target within 4m at a radius of 7m");
 
     public Vec3d judgementInitPos = Vec3d.ZERO;
     public Vec3d judgementInitRot = Vec3d.ZERO;
@@ -245,7 +243,7 @@ public class MadeInHeavenEntity extends StandEntity {
             return false;
 
         int cdMult = (this.getAccelTime() > 0) ? 10 : 20;
-        userData.putInt(cooldownName, attack.cooldown * cdMult);
+        userData.putInt(cooldownName, (int) (attack.cooldown * cdMult));
 
         setAttack(attack, animState);
         return true;

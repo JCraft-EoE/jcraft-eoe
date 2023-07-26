@@ -21,8 +21,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
@@ -40,7 +38,7 @@ import java.util.List;
 public class KillerQueenEntity extends StandEntity {
     public static final Attack low = new Attack(1, 0, 0.85f, 13, 8, 1.5, 4f, 0.5f, AttackType.BOX, 0.5f, 0.1f, 0, JSoundRegister.IMPACT_1);
 
-    public static final Attack light = new Attack(0, 2, 0.75f, 19, 0, 1.5, 3f, 0.75f, AttackType.MULTIHIT, 1f, 0, List.of(6, 11), JSoundRegister.IMPACT_4)
+    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 19, 0, 1.5, 3f, 0.75f, AttackType.MULTIHIT, 1f, 0, List.of(6, 11), JSoundRegister.IMPACT_4)
             .setFollowup(low)
             .setInfo("Dual Punch", "combo starter, decent speed, has followup with more blockstun");
 
@@ -146,6 +144,7 @@ public class KillerQueenEntity extends StandEntity {
             playSound(JSoundRegister.KQ_BARRAGE, 1, 1);
     }
 
+    private static final int bombplantCD = (int) (bombplant.cooldown * 20);
     @Override
     public void initSpecial1() {
         if (!canAttack() || !hasUser()) return;
@@ -158,7 +157,7 @@ public class KillerQueenEntity extends StandEntity {
             if (notAir) {
                 bombEntity = null;
                 bombBlock = user.getPos().add(0, -0.5, 0);
-                userData.putInt(JCraft.standS1CD, bombplant.cooldown * 20);
+                userData.putInt(JCraft.standS1CD, bombplantCD);
             }
         } else {
             handleAttack(bombplant, JCraft.standS1CD, 7);

@@ -53,7 +53,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class KingCrimsonEntity extends StandEntity {
-    public static final Attack light = new Attack(0, 3, 0.85f, 23, 0, 1.5, 4f, 0.1f, AttackType.MULTIHIT, 2f, -0.1f, List.of(10, 16), JSoundRegister.IMPACT_4)
+    public static final Attack crm1 = new Attack(11, JCraft.lightCooldown + 1, 0.85f, 20, 10, 1.5, 5f, 0.1f, AttackType.BOX, 1f, 0.3f, 0, JSoundRegister.IMPACT_4)
+            .setBlockstun(6)
+            .appendHitbox(new HitBoxData(0, 0, 1))
+            .setInfo("Sweep", "quick combo finisher, knocks down");
+    public static final Attack light = new Attack(0, JCraft.lightCooldown + 1, 0.85f, 23, 0, 1.5, 4f, 0.1f, AttackType.MULTIHIT, 2f, -0.1f, List.of(10, 16), JSoundRegister.IMPACT_4)
+            .crouchingVariation(crm1)
             .setInfo("Dual Chop", "quick combo starter");
     public static final Attack barrage = new Attack(3, 17, 0.85f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender/finisher, medium stun, knocks back");
@@ -68,25 +73,24 @@ public class KingCrimsonEntity extends StandEntity {
             .setFollowup(overhead);
     public static final Attack bloodthrow = new Attack(5, 25, 15, 10, 10, AttackType.BOX)
             .setRanged(true)
-            .setInfo("Blood Throw", "");
+            .setInfo("Blood Throw", "throws a stunning, blinding blood projectile");
     public static final Attack eyechop = new Attack(4, 20, 1f, 50, 37, 1.75, 9f, 0.3f, AttackType.BOX, 3, -0.3f)
             .setHitspark(2)
             .appendHitbox(new HitBoxData(0, 0.5, 1))
             .crouchingVariation(bloodthrow)
-            .setInfo("Eye Chop/Blood Throw", "blindness on hit, donut combo extender/crouch to throw a stunning, blinding blood projectile");
+            .setInfo("Eye Chop", "blindness on hit, donut combo extender");
     public static final Attack donut = new Attack(6, 15, 1f, 60, 42, 1.75, 14f, 0.0f, AttackType.BOX, 4, 0.1f)
             .setHitspark(2)
             .hyperArmor()
             .setInfo("Donut", "huge windup, 4s hitstun");
-    public static final Attack prediction = new Attack(9, 30, 104, 4, 0, -1, AttackType.BOX)
-            .setInfo("Prediction", "");
     public static final Attack epitaph = new Attack(7, 30, 34, 4, 0, -1, AttackType.COUNTER)
-            .crouchingVariation(prediction)
-            .setInfo("Prediction/Epitaph/Move Cancel", """
-                    standing: shows future location of nearby entities, said entities can be forced into it using Time Erase (20s cooldown)
+            .setInfo("Epitaph", "0.2s windup, 1.5s counter");
+    public static final Attack prediction = new Attack(9, 30, 104, 4, 0, -1, AttackType.BOX)
+            .crouchingVariation(epitaph)
+            .setInfo("Prediction/Move Cancel", """
+                              shows future location of nearby entities, said entities can be forced into it using Time Erase (20s cooldown)
                               you are slowed down while predicting
-                    crouching: 0.2s windup, 1.5s counter
-                    during a move: cancels it (puts Time Erase on a 7 second cooldown but doesn't require it to be usable)""");
+                              during a move: cancels it (puts Time Erase on a 7 second cooldown but doesn't require it to be usable)""");
     public static final Attack timeerase = new Attack(8, 50, 15, 5, 6, AttackType.BOX)
             .setInfo("Time Erase", "6 seconds duration, cancellable by doing anything with King Crimson"); // TE = (moveStun-initTime)/20
     private static final Attack barrageFinisher = new Attack(10, 17, 0.85f, 50, 0, 1.5, 1f, 1.1f, AttackType.BARRAGE, 0.5f, 0, 3)
@@ -135,7 +139,7 @@ public class KingCrimsonEntity extends StandEntity {
                     ...Move Cancel>M1>Heavy~Overhead
                     ...Time Erase""";
 
-        moves = List.of(light, heavy, barrage, eyechop, timeerase, donut, epitaph, timeskip);
+        moves = List.of(light, heavy, barrage, eyechop, timeerase, donut, prediction, timeskip);
     }
 
     static {
@@ -160,7 +164,10 @@ public class KingCrimsonEntity extends StandEntity {
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        if (handleAttack(light, JCraft.standLightCD, 2))
+
+        if (getUserOrThrow().isSneaking())
+            handleAttack(crm1, JCraft.standLightCD, 14);
+        else if (handleAttack(light, JCraft.standLightCD, 2))
             playSound(JSoundRegister.KC_DUAL_CHOP, 1, 1);
     }
 
@@ -347,7 +354,7 @@ public class KingCrimsonEntity extends StandEntity {
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
         switch (attack.id) {
             case (-2) -> timeSkip(16, JSoundRegister.TE_TP);
-            case (2) -> {
+            case (2), (11) -> {
                 for (LivingEntity ent : entities)
                     ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0));
             }
@@ -694,7 +701,7 @@ public class KingCrimsonEntity extends StandEntity {
     // Animations
     @SuppressWarnings("SameReturnValue")
     @Override
-    protected  <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
+    protected <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
         AnimationController<E> controller = event.getController();
         AnimationBuilder builder = new AnimationBuilder();
 
@@ -717,6 +724,7 @@ public class KingCrimsonEntity extends StandEntity {
             case 11 -> controller.setAnimation(builder.playAndHold("animation.kingcrimson.bloodthrow"));
             case 12 -> controller.setAnimation(builder.playAndHold("animation.kingcrimson.predict"));
             case 13 -> controller.setAnimation(builder.playAndHold("animation.kingcrimson.counter_miss"));
+            case 14 -> controller.setAnimation(builder.playAndHold("animation.kingcrimson.sweep"));
         }
         return PlayState.CONTINUE;
     }

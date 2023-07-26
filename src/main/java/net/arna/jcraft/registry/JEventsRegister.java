@@ -8,6 +8,7 @@ import net.arna.jcraft.common.events.JServerTickEvents;
 import net.arna.jcraft.common.item.MockItem;
 import net.arna.jcraft.common.network.c2s.ConfigUpdatePacket;
 import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.util.ItemInterest;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
@@ -16,9 +17,14 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
+
+import static net.arna.jcraft.common.util.ItemInterest.blockAttractionInterest;
 
 public interface JEventsRegister {
     static void registerEvents() {
@@ -28,18 +34,40 @@ public interface JEventsRegister {
                     if (entity instanceof ItemEntity item) {
                         ItemStack stack = item.getStack();
 
-                        if (stack.isOf(JObjectRegistry.ANUBIS))
+                        if (stack.isOf(JObjectRegistry.ANUBIS)) {
                             item.setPickupDelay(0);
+                            return;
+                        }
+
+                        if (stack.isOf(JObjectRegistry.FVREVOLVER)) {
+                            JCraft.markItemOfInterest(item, ItemInterest.revolverAttractionInterest());
+                            return;
+                        }
 
                         // ... in the AU
                         if (world.getRegistryKey().equals(JDimensionRegister.AU_DIMENSION_KEY)) {
-                            // , and it wasn't thrown out by a player, and it isn't a mock item
                             if (item.getThrower() != null || MockItem.isMockItem(stack)) return;
-                            // Convert it to a mock item (incompatible and useless)
-                            item.setStack( MockItem.createMockStack(stack) );
-                        } else {
-                            if (MockItem.isMockItem(stack)) {
 
+                            ItemStack mockStack = MockItem.createMockStack(stack); // Convert it to a mock item (incompatible and useless)
+                            if (stack.getItem() instanceof BlockItem) // ... and mark down all relevant data
+                                // getNbt() is never null because MockItem.createMockStack runs .getOrCreateNbt() upon creation
+                                mockStack.getNbt().putIntArray("AttractPos", new int[]{item.getBlockX(), item.getBlockY(), item.getBlockZ()});
+                            item.setStack(mockStack);
+                        } else { // ... outside the AU
+                            if (MockItem.isMockItem(stack)) {
+                                // Mark it as an item of interest, and save relevant data
+                                NbtCompound stackData = stack.getNbt();
+                                if (stackData.contains("AttractPos")) {
+                                    String itemId = stackData.getString("MockItem");
+                                    int[] attractPos = stackData.getIntArray("AttractPos");
+                                    BlockPos attractBlockPos = new BlockPos(attractPos[0], attractPos[1], attractPos[2]);
+                                    if ( // ... if the world has the specified block item
+                                            Registry.ITEM.getId(
+                                                    world.getBlockState(attractBlockPos).getBlock().asItem()
+                                            ).toString().equals(itemId)
+                                    )
+                                        JCraft.markItemOfInterest(item, blockAttractionInterest(attractBlockPos));
+                                }
                             }
                         }
                     }

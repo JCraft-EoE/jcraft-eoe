@@ -51,12 +51,10 @@ import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import software.bernie.example.GeckoLibMod;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static net.arna.jcraft.common.entity.StandEntity.stun;
 
@@ -118,14 +116,28 @@ public class JCraft implements ModInitializer {
     // Dimensional travel bullshit
     public static final List<DimValues> pastDimensions = new ArrayList<>();
     private static final List<ChunkPos> preloadedChunks = new ArrayList<>();
-    private static final List<ItemEntity> itemsOfInterest = new ArrayList<>();
+
     public static final Map<LivingEntity, Integer> burstTimers = new HashMap<>();
+
     public static final List<DashData> dashes = new ArrayList<>();
+
+    private static final HashMap<ItemEntity, ItemInterest> itemsOfInterest = new HashMap<>();
+
+    // Standardized cooldowns
     public static final int dashCooldown = 40;
+
+    public static final double lightCooldown = 1.5;
 
     @Getter
     @Setter
     private static IClientEntityHandler clientEntityHandler = DummyClientEntityHandler.INSTANCE;
+
+    public static HashMap<ItemEntity, ItemInterest> getItemsOfInterest() {
+        return itemsOfInterest;
+    }
+    public static void markItemOfInterest(@NotNull ItemEntity item, @NotNull ItemInterest interest) {
+        itemsOfInterest.put(item, interest);
+    }
 
     /**
      * Starts tracking a timestop on the server.

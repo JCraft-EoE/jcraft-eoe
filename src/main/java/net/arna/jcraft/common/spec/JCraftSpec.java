@@ -101,7 +101,7 @@ public abstract class JCraftSpec {
         int cd = playerData.getInt(cooldownName);
         if (cd > 0) return false;
         moveStun = attack.moveStun;
-        playerData.putInt(cooldownName, attack.cooldown * 20);
+        playerData.putInt(cooldownName, (int) (attack.cooldown * 20));
         curAttack = attack;
         armorPoints = attack.armor;
 

@@ -24,7 +24,11 @@ import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import java.util.List;
 
 public class TheWorldEntity extends StandEntity {
-    public static final Attack light = new Attack(0, 2, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
+    public static final Attack crm1 = new Attack(0, JCraft.lightCooldown, 0.75f, 14, 8, 1.5, 6f, 1f, AttackType.BOX, 0.85f, 0.25f, 0, JSoundRegister.IMPACT_1)
+            .appendHitbox(new HitBoxData(0, 0, 1))
+            .setInfo("Low Kick", "slower, higher stun");
+    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
+            .crouchingVariation(crm1)
             .setInfo("Punch", "quick combo starter");
     public static final Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 2, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
@@ -97,7 +101,10 @@ public class TheWorldEntity extends StandEntity {
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        handleAttack(light, JCraft.standLightCD, 2);
+        if (getUserOrThrow().isSneaking())
+            handleAttack(crm1, JCraft.standLightCD, 13);
+        else
+            handleAttack(light, JCraft.standLightCD, 2);
     }
 
     @Override
@@ -241,6 +248,7 @@ public class TheWorldEntity extends StandEntity {
             case 10 -> controller.setAnimation(builder.playAndHold("animation.theworld.roundhouse"));
             case 11 -> controller.setAnimation(builder.playAndHold("animation.theworld.counter_hit"));
             case 12 -> controller.setAnimation(builder.playAndHold("animation.theworld.counter_miss"));
+            case 13 -> controller.setAnimation(builder.playAndHold("animation.theworld.low"));
             default -> controller.setAnimation(builder.loop("animation.theworld.idle"));
         }
         return PlayState.CONTINUE;

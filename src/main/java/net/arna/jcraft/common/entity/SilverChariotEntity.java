@@ -29,7 +29,7 @@ import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import java.util.List;
 
 public class SilverChariotEntity extends StandEntity {
-    public final Attack light = new Attack(0, 2, 0.65f, 9, 5, 1.75, 5f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0)
+    public final Attack light = new Attack(0, JCraft.lightCooldown, 0.65f, 9, 5, 1.75, 5f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0)
             .setInfo("Stab", "quick combo starter, links into Spinning Blade while armor is off");
     public final Attack barrage = new Attack(2, 17, 0.65f, 60, 0, 2.25, 0.9f, 0.1f, AttackType.BARRAGE, 1.25f, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
@@ -263,7 +263,7 @@ public class SilverChariotEntity extends StandEntity {
             setAttack(attackRef, animState);
         } else setAttack(attack, animState);
 
-        userData.putInt(cooldownName, attack.cooldown * 20);
+        userData.putInt(cooldownName, (int) (attack.cooldown * 20));
         return true;
     }
 

@@ -23,7 +23,7 @@ import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import java.util.List;
 
 public class SPTWEntity extends StarPlatinumEntity implements IAnimatable, IAnimationTickable {
-    public static final Attack light = new Attack(0, 2, 0.75f, 7, 5, 1.5, 5f, 0.25f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
+    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 5, 1.5, 5f, 0.25f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter, low knockback");
     public static final Attack heavy = new Attack(1, 17, 1f, 30, 20, 2.0, 10f, 1.5f, AttackType.BOX, 0.7f, 0, 0, JSoundRegister.IMPACT_1)
             .setHitspark(2)

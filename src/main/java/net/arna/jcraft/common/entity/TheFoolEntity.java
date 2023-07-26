@@ -52,14 +52,15 @@ import java.util.List;
 import java.util.Objects;
 
 public class TheFoolEntity extends StandEntity {
-    public static final Attack light = new Attack(0, 2, 1.5f, 14, 7, 2, 6f, 0.8f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_2)
+    public static final Attack light = new Attack(0, JCraft.lightCooldown, 1.5f, 14, 7, 2, 6f, 0.8f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_2)
             .appendHitbox(new HitBoxData(0, 0.25, 1))
             .setInfo("Swipe", "slow, long-reaching poke");
-    public static final Attack airbarrage = new Attack(3, 17, 1f, 30, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 0.5f, 0, 3);
+    public static final Attack airbarrage = new Attack(3, 17, 1f, 30, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 0.5f, 0, 3)
+            .setInfo("Burn Rubber", "slows down all movement, combo starter/extender");
     public static final Attack combo = new Attack(2, 15, 1.5f, 29, 0, 1.75, 4.5f, 0.1f, AttackType.MULTIHIT, 1f, -0.1f, List.of(6, 14, 18, 19), JSoundRegister.IMPACT_2)
             .appendHitbox(new HitBoxData(0.5, 0, 1.25))
             .aerialVariation(airbarrage)
-            .setInfo("3-hit combo (grounded) / Burn Rubber (aerial)", "knockdown on final hit / slows down all movement, combo starter/extender");
+            .setInfo("3-hit Combo", "fast knockdown provider");
     public static final Attack launch = new Attack(1, 16, 1.25f, 20, 16, 2, 8f, 0.5f, AttackType.BOX, 1.25f, -0.3f, 0, JSoundRegister.IMPACT_2)
             .appendHitbox(new HitBoxData(1.5))
             .setHitspark(2)
@@ -85,16 +86,16 @@ public class TheFoolEntity extends StandEntity {
             .setRanged(true)
             .disableBackstab()
             .aerialVariation(glide)
-            .setInfo("Sandwave/Glider", "The Fool turns into a quick sandwave that knocks anything it touches down/in air turns into a glider");
+            .setInfo("Sandwave", "The Fool turns into a quick sandwave that knocks anything it touches down");
     public static final Attack tornado = new Attack(11, 25, 1, 13, 12, 0, 0f, 0.0f, AttackType.BOX)
             .setRanged(true)
-            .setInfo("Sand Tornado", "");
+            .setInfo("Sand Tornado", "summons a slow, stunning sand tornado");
     public static final Attack charge = new Attack(5, 20, 7f, 20, 5, 1.5, 6f, 1.2f, AttackType.CHARGE, 0.5f, 0, 11, JSoundRegister.IMPACT_2)
             .setRanged(true)
             .setLaunch()
             .disableBackstab()
             .aerialVariation(tornado)
-            .setInfo("Charge/Sand Tornado", "The Fool detaches from the user and charges forward, dealing knockback on hit/in air summons a slow, stunning sand tornado");
+            .setInfo("Charge", "The Fool detaches from the user and charges forward, dealing knockback on hit");
     public static final Attack sandstorm = new Attack(7, 40, 1.5f, 41, 28, 2, 7f, 0.1f, AttackType.BOX, 1, 0, 0, JSoundRegister.TW_KICK_HIT)
             .appendHitbox(new HitBoxData(1.5))
             .setHitspark(2)

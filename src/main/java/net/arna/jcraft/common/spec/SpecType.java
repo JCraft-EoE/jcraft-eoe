@@ -3,10 +3,14 @@ package net.arna.jcraft.common.spec;
 import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import net.minecraft.text.Text;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public enum SpecType {
+    NONE(null),
     BRAWLER(new BrawlerSpec()),
     ANUBIS(new AnubisSpec());
 
@@ -22,10 +26,31 @@ public enum SpecType {
     @Getter(lazy = true)
     private static final List<SpecType> allSpecTypes = ImmutableList.copyOf(values());
 
-    SpecType(JCraftSpec spec) {
+    // has to return a new one every time
+    public static JCraftSpec fromId(int id) {
+        switch (id) {
+            default -> {
+                return null;
+            }
+            case 1 -> {
+                return new BrawlerSpec();
+            }
+            case 2 -> {
+                return new AnubisSpec();
+            }
+        }
+    }
+
+    SpecType(@Nullable JCraftSpec spec) {
         this.spec = spec;
-        this.id = spec.getId();
-        this.internalName = spec.getInternalName();
-        this.translatablename = spec.getTranslatableName();
+        if (spec != null) {
+            this.id = spec.getId();
+            this.internalName = spec.getInternalName();
+            this.translatablename = spec.getTranslatableName();
+        } else {
+            this.id = 0;
+            this.internalName = "none";
+            this.translatablename = Text.of("none");
+        }
     }
 }

@@ -47,10 +47,10 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
     public static final Attack barrage = Attack.copyOf(KillerQueenEntity.barrage);
     public static final Attack bombplant = Attack.copyOf(KillerQueenEntity.bombplant);
     public static final Attack bubblecounter = new Attack(7, 27, 20, 5, 0, 1, AttackType.COUNTER)
-            .setInfo("Stray Cat Counter", "");
+            .setInfo("Stray Cat Counter", "0.25s windup counter, turns opponent into your primary bomb");
     public static final Attack bubble = new Attack(5, 23, 0.75f, 18, 15, 0, 0f, 0.0f, AttackType.BOX).setRanged(true)
             .crouchingVariation(bubblecounter)
-            .setInfo("Stray Cat", "launches an explosive bubble/crouch for a 0.25s windup counter");
+            .setInfo("Stray Cat Bubble", "launches an explosive bubble");
     public static final Attack detonate = new Attack(6, 1, 0.75f, 6, 5, 0, 0f, 0.0f, AttackType.BOX)
             .setInfo("Detonate", "crouch with a bomb planted within 20s on a living being to activate Bites the Dust");
     public static final Attack btdplant = new Attack(7, 50, 1, 24, 14, 1.5, 0f, 0.0f, AttackType.BOX, 0.5f)
@@ -115,6 +115,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
             playSound(JSoundRegister.KQ_BARRAGE, 1, 1);
     }
 
+    private static final int bombplantCD = (int) (bombplant.cooldown * 20);
     @Override
     public void initSpecial1() {
         if (!canAttack() || !hasUser()) return;
@@ -127,7 +128,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
             if (notAir) {
                 this.bombEntity = null;
                 this.bombBlock = user.getPos().add(0, -0.5, 0);
-                playerData.putInt(JCraft.standS1CD, bombplant.cooldown * 20);
+                playerData.putInt(JCraft.standS1CD, bombplantCD);
             }
         } else {
             handleAttack(bombplant, JCraft.standS1CD, 7);

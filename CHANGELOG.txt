@@ -1312,13 +1312,28 @@ C-Moon
         >can change gravity by pressing utility (while grounded) again
 
 ● 25/7/2023
+>Reduced Light cooldown by 0.5s
+
 >Updated some skins
 >Fixed arrows, fire & others still rendering while entities should be invisible (Cream: Void, King Crimson: Time Erase...)
 >Fixed PlanetTeamSpeak (pts0)
 >Added unset Stand Disc to creative mode menu
 
+/stand about & /spec about
+    >Improved variation display
+
+Star Platinum
+    >Added crouching variant to Light
+
+The World
+    >Added crouching variant to Light
+
+King Crimson
+    >Added crouching variant to Light
+
 D4C
     >Grab is now unburstable until the final hit
+    >Blocks mined in Alternate Universe now attract to their main universe counterpart
 
 Cream
     >Updated Grab animation
@@ -1328,6 +1343,9 @@ C-Moon
     >Only One Punch
         >Now flips enemy gravity (instead of applying levitation)
         >Effect length reduced (4->3s)
+    >Gravity Shift
+        >Moved to crouching ultimate, replaced with Gravity Shift Pulse
+        >Gravity Shift Pulse - changes the gravity of all nearby entities to conform with the direction the C-Moon user is looking in
 
 Made in Heaven
     >Improved initiation detection for Heaven's Judgement (normal)

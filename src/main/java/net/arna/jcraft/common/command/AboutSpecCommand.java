@@ -61,6 +61,10 @@ public class AboutSpecCommand {
             int i = 0;
             for (Attack a : spec.getAttacks()) {
                 readout.append("§2● ").append(buttons.get(i)).append("§r - §5").append(a.name).append("§r - ").append(a.description).append("\n");
+                if (a.getCrouchingVariation() != null)
+                    readout.append("§3  ●CROUCHING ").append(buttons.get(i)).append("§r - §5").append(a.name).append("§r - ").append(a.description).append("\n");
+                if (a.getAerialVariation() != null)
+                    readout.append("§4  ●AERIAL ").append(buttons.get(i)).append("§r - §5").append(a.name).append("§r - ").append(a.description).append("\n");
                 i++;
             }
 

@@ -26,6 +26,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
@@ -38,7 +39,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class D4CEntity extends StandEntity {
-    public static final Attack light = new Attack(0, 2, 0.75f, 15, 9, 1.5, 5f, 0.75f, AttackType.BOX, 1.5f, -0.1f, 0, JSoundRegister.IMPACT_2)
+    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 15, 9, 1.5, 5f, 0.75f, AttackType.BOX, 1.5f, -0.1f, 0, JSoundRegister.IMPACT_2)
             .setInfo("Chop", "quick combo starter");
     public static final Attack barrage = new Attack(2, 17, 0.75f, 70, 0, 2, 0.8f, 0.25f, AttackType.BARRAGE, 2, 0, 3, JSoundRegister.IMPACT_2)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
@@ -244,7 +245,7 @@ public class D4CEntity extends StandEntity {
                         int cX = origin.x + x;
                         int cZ = origin.z + z;
                         JCraft.preloadChunk(auWorld, cX, cZ);
-                        ChunkSection[] orSec = world.getChunk(cX, cZ).getSectionArray();
+                        ChunkSection[] orSec = world.getChunk(cX, cZ).getSectionArray().clone(); //TODO: fix changes in AU creating ghost blocks in main worlds (probably caused by this and next 2 lines)
                         ChunkSection[] auSec = auWorld.getChunk(cX, cZ).getSectionArray();
                         System.arraycopy(orSec, 0, auSec, 0, Math.min(orSec.length, auSec.length));
                     }
