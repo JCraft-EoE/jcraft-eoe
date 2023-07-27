@@ -526,7 +526,7 @@
 			}
 		},
 		"animation.d4c.light": {
-			"animation_length": 0.76,
+			"animation_length": 0.84,
 			"bones": {
 				"bipedArmLeft": {
 					"rotation": {
@@ -555,38 +555,6 @@
 						"0.76": {
 							"vector": [9.76758, -2.15393, 32.31594],
 							"easing": "easeOutBack"
-						}
-					}
-				},
-				"rightleg": {
-					"rotation": {
-						"0.0": {
-							"vector": [17.5, 0, 0]
-						},
-						"0.36": {
-							"vector": [42.5, 0, 0]
-						},
-						"0.52": {
-							"vector": [30, 0, 0]
-						},
-						"0.76": {
-							"vector": [12.5, 0, 0]
-						}
-					}
-				},
-				"leftleg": {
-					"rotation": {
-						"0.0": {
-							"vector": [7.5, 0, 0]
-						},
-						"0.36": {
-							"vector": [15, 0, 0]
-						},
-						"0.52": {
-							"vector": [57.5, 0, 0]
-						},
-						"0.76": {
-							"vector": [7.5, 0, 0]
 						}
 					}
 				},
@@ -761,6 +729,181 @@
 				"BAM": {
 					"scale": {
 						"vector": [0, 0, 0]
+					}
+				}
+			}
+		},
+		"animation.d4c.itemplace": {
+			"animation_length": 0.84,
+			"bones": {
+				"bipedArmLeft": {
+					"rotation": {
+						"0.0": {
+							"vector": [12.2127, 2.68507, -32.2127]
+						},
+						"0.2": {
+							"vector": [-31.29142, -13.00484, -36.69554],
+							"easing": "easeInOutSine"
+						},
+						"0.36": {
+							"vector": [-64.56508, -14.98741, -25.17711],
+							"easing": "linear"
+						},
+						"0.56": {
+							"vector": [-54.14717, -17.01917, -26.69263]
+						}
+					}
+				},
+				"bipedArmRight": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 20]
+						},
+						"0.36": {
+							"vector": [-37.26251, 4.55749, 25.96275],
+							"easing": "easeInOutSine"
+						},
+						"0.52": {
+							"vector": [-36.83829, 7.57131, 29.97528],
+							"easing": "easeOutSine"
+						}
+					}
+				},
+				"upperBody": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 2.5, 0]
+						},
+						"0.36": {
+							"vector": [20, -5, 0],
+							"easing": "easeInOutSine"
+						},
+						"0.56": {
+							"vector": [20.18536, 9.09657, 5.1434],
+							"easing": "easeInOutSine"
+						}
+					}
+				},
+				"head": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.36": {
+							"vector": [0, -17.5, 0]
+						}
+					}
+				},
+				"lowerRight": {
+					"rotation": {
+						"0.0": {
+							"vector": [-32.5, 0, 0]
+						},
+						"0.48": {
+							"vector": [-65, 0, 0],
+							"easing": "easeInOutSine"
+						}
+					}
+				},
+				"lowerLeft": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 10]
+						},
+						"0.2": {
+							"vector": [0.13375, 0.59587, 23.32198],
+							"easing": "easeInOutSine"
+						},
+						"0.36": {
+							"vector": [-0.0701, 1.70818, 5.30014],
+							"easing": "easeInSine"
+						}
+					}
+				},
+				"legRight": {
+					"rotation": {
+						"0.0": {
+							"vector": [12.5, 0, 0]
+						},
+						"0.36": {
+							"vector": [-40, 0, 0],
+							"easing": "easeOutSine"
+						},
+						"0.56": {
+							"vector": [-52.5, 0, 0]
+						}
+					}
+				},
+				"kneeR": {
+					"rotation": {
+						"0.0": {
+							"vector": [15, 0, 0]
+						},
+						"0.36": {
+							"vector": [67.5, 0, 0],
+							"easing": "easeOutSine"
+						}
+					}
+				},
+				"legLeft": {
+					"rotation": {
+						"0.0": {
+							"vector": [-15, 0, 0]
+						},
+						"0.56": {
+							"vector": [43.41006, -20.71501, -18.50097],
+							"easing": "easeInOutSine"
+						}
+					}
+				},
+				"kneeL": {
+					"rotation": {
+						"0.0": {
+							"vector": [20, 0, 0]
+						},
+						"0.56": {
+							"vector": [27.5, 0, 0],
+							"easing": "easeInOutSine"
+						}
+					}
+				},
+				"bone": {
+					"scale": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"torso": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.56": {
+							"vector": [3.3607, 19.78054, 7.94271]
+						}
+					},
+					"position": {
+						"0.0": {
+							"vector": [0, 0, 7]
+						},
+						"0.56": {
+							"vector": [0, -4, 7]
+						}
+					}
+				},
+				"BAM": {
+					"scale": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"body": {
+					"rotation": {
+						"0.24": {
+							"vector": [15, 0, 0]
+						},
+						"0.56": {
+							"vector": [40.67815, 9.54385, 8.11019],
+							"easing": "easeInOutSine"
+						}
 					}
 				}
 			}

@@ -28,7 +28,6 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemGroup;
@@ -54,7 +53,10 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.example.GeckoLibMod;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static net.arna.jcraft.common.entity.StandEntity.stun;
 
@@ -121,7 +123,7 @@ public class JCraft implements ModInitializer {
 
     public static final List<DashData> dashes = new ArrayList<>();
 
-    private static final HashMap<ItemEntity, ItemInterest> itemsOfInterest = new HashMap<>();
+    private static final HashMap<Entity, EntityInterest> entitiesOfInterest = new HashMap<>();
 
     // Standardized cooldowns
     public static final int dashCooldown = 40;
@@ -132,11 +134,11 @@ public class JCraft implements ModInitializer {
     @Setter
     private static IClientEntityHandler clientEntityHandler = DummyClientEntityHandler.INSTANCE;
 
-    public static HashMap<ItemEntity, ItemInterest> getItemsOfInterest() {
-        return itemsOfInterest;
+    public static HashMap<Entity, EntityInterest> getEntitiesOfInterest() {
+        return entitiesOfInterest;
     }
-    public static void markItemOfInterest(@NotNull ItemEntity item, @NotNull ItemInterest interest) {
-        itemsOfInterest.put(item, interest);
+    public static void markItemOfInterest(@NotNull Entity entity, @NotNull EntityInterest interest) {
+        entitiesOfInterest.put(entity, interest);
     }
 
     /**
@@ -368,7 +370,7 @@ public class JCraft implements ModInitializer {
         buf.writeDouble(x);
         buf.writeDouble(y);
         buf.writeDouble(z);
-        buf.writeInt(id); // Combo breaker particle ID
+        buf.writeInt(id);
 
         PlayerLookup.around(world, new Vec3d(x, y, z), 128).forEach(
                 serverPlayer -> ServerChannelFeedbackPacket.send(serverPlayer, buf)

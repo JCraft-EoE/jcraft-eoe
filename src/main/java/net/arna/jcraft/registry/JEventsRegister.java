@@ -8,7 +8,7 @@ import net.arna.jcraft.common.events.JServerTickEvents;
 import net.arna.jcraft.common.item.MockItem;
 import net.arna.jcraft.common.network.c2s.ConfigUpdatePacket;
 import net.arna.jcraft.common.util.IEntityDataSaver;
-import net.arna.jcraft.common.util.ItemInterest;
+import net.arna.jcraft.common.util.EntityInterest;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
@@ -24,7 +24,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 
-import static net.arna.jcraft.common.util.ItemInterest.blockAttractionInterest;
+import static net.arna.jcraft.common.util.EntityInterest.blockAttractionInterest;
+import static net.arna.jcraft.common.util.EntityInterest.itemAttractionInterest;
 
 public interface JEventsRegister {
     static void registerEvents() {
@@ -40,7 +41,7 @@ public interface JEventsRegister {
                         }
 
                         if (stack.isOf(JObjectRegistry.FVREVOLVER)) {
-                            JCraft.markItemOfInterest(item, ItemInterest.revolverAttractionInterest());
+                            JCraft.markItemOfInterest(item, EntityInterest.itemAttractionInterest(JObjectRegistry.FVREVOLVER));
                             return;
                         }
 
@@ -50,14 +51,13 @@ public interface JEventsRegister {
 
                             ItemStack mockStack = MockItem.createMockStack(stack); // Convert it to a mock item (incompatible and useless)
                             if (stack.getItem() instanceof BlockItem) // ... and mark down all relevant data
-                                // getNbt() is never null because MockItem.createMockStack runs .getOrCreateNbt() upon creation
-                                mockStack.getNbt().putIntArray("AttractPos", new int[]{item.getBlockX(), item.getBlockY(), item.getBlockZ()});
+                                mockStack.getOrCreateNbt().putIntArray("AttractPos", new int[]{item.getBlockX(), item.getBlockY(), item.getBlockZ()});
                             item.setStack(mockStack);
                         } else { // ... outside the AU
                             if (MockItem.isMockItem(stack)) {
                                 // Mark it as an item of interest, and save relevant data
-                                NbtCompound stackData = stack.getNbt();
-                                if (stackData.contains("AttractPos")) {
+                                NbtCompound stackData = stack.getOrCreateNbt();
+                                if (stackData.contains("AttractPos")) { // if attracted to a specific position
                                     String itemId = stackData.getString("MockItem");
                                     int[] attractPos = stackData.getIntArray("AttractPos");
                                     BlockPos attractBlockPos = new BlockPos(attractPos[0], attractPos[1], attractPos[2]);
@@ -67,6 +67,8 @@ public interface JEventsRegister {
                                             ).toString().equals(itemId)
                                     )
                                         JCraft.markItemOfInterest(item, blockAttractionInterest(attractBlockPos));
+                                } else { // if not attracted to a specific position, it's a general item to attract
+                                    JCraft.markItemOfInterest(item, itemAttractionInterest(stack.getItem()));
                                 }
                             }
                         }

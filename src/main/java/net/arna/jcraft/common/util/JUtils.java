@@ -288,6 +288,8 @@ public final class JUtils {
     }
 
     public static boolean shouldForceRender(Entity entity) {
+        if (entity instanceof D4CEntity d4c && d4c.getState() == 11)
+            return true;
         return entity instanceof CreamEntity cream && cream.getHalfBall();
     }
 

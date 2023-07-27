@@ -4,15 +4,13 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.StunType;
+import net.arna.jcraft.common.item.MockItem;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JDimensionRegister;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -39,7 +37,10 @@ import java.util.List;
 import java.util.Objects;
 
 public class D4CEntity extends StandEntity {
-    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 15, 9, 1.5, 5f, 0.75f, AttackType.BOX, 1.5f, -0.1f, 0, JSoundRegister.IMPACT_2)
+    public static final Attack crm1 = new Attack(11, JCraft.lightCooldown, 0.75f, 15, 11, 0, 0, 0f, AttackType.BOX)
+            .setInfo("Item Place", "places an item from an alternate universe on the ground, attracts other such items");
+    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 15, 9, 1.5, 5f, 0.75f, AttackType.BOX, 1.1f, -0.1f, 0, JSoundRegister.IMPACT_2)
+            .crouchingVariation(crm1)
             .setInfo("Chop", "quick combo starter");
     public static final Attack barrage = new Attack(2, 17, 0.75f, 70, 0, 2, 0.8f, 0.25f, AttackType.BARRAGE, 2, 0, 3, JSoundRegister.IMPACT_2)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
@@ -50,13 +51,22 @@ public class D4CEntity extends StandEntity {
             .setInfo("Charge", "user & stand charge forward, uninterruptable launcher");
     public static final Attack dimhop_others = new Attack(3, 60, 1, 60, 40, 1.5, 0f, 0.0f, AttackType.BOX)
             .setInfo("Dimensional Hop", "travels to a random dimension at exact coordinates, if user was hit in the last 30s, he is forced back, certified death button");
+
+    public static final Attack givegun = new Attack(6, 25, 14, 10, 0, 0.75f, AttackType.BOX)
+            .setInfo("Summon Gun", "gives the user a revolver");
     public static final Attack grab = new Attack(4, 25, 0.75f, 21, 12, 1.5, 0f, 0.0f, AttackType.BOX, 2, 0, 0, null)
             .setGrab()
-            .setInfo("Grab/Summon Gun", "unblockable, combo finisher/crouch to give yourself the gun");
-    public static final Attack grabhit = new Attack(5, 0, 0.75f, 34, 0, 2, 4f, 0f, AttackType.MULTIHIT, 0.5f, 0, List.of(11, 17, 26), JSoundRegister.IMPACT_1)
-            .setStunType(StunType.UNBURSTABLE);
-    public static final Attack givegun = new Attack(6, 25, 14, 10, 0, 0.75f, AttackType.BOX)
+            .crouchingVariation(givegun)
             .setInfo("Grab", "unblockable, combo finisher");
+    public static final Attack grabhit = new Attack(5, 0, 0.75f, 34, 0, 2, 4f, 0f, AttackType.MULTIHIT, 0.5f, 0, List.of(11, 17, 26), JSoundRegister.IMPACT_1)
+            .setStunType(StunType.UNBURSTABLE)
+            .setInfo("Grab (Hit)", "");
+    private static final Attack grabhitfinal = new Attack(10, 0, 0.75f, 34, 0, 2, 4f, 1.2f, AttackType.MULTIHIT, 0.45f, 0, List.of(11, 17, 26), JSoundRegister.IMPACT_1)
+            .setHitspark(2)
+            .setLaunch()
+            .setInfo("Grab (Final Hit)", "");
+
+
     public static final Attack counter = new Attack(7, 30, 35, 5, 0, 0.75f, AttackType.COUNTER)
             .setInfo("Counter", "0.25s startup, 1.5s duration, high damage, knocks back when hit");
     public static final Attack clonespawn = new Attack(8, 40, 1, 50, 40, 0, 0f, 0.0f, AttackType.BOX)
@@ -65,6 +75,7 @@ public class D4CEntity extends StandEntity {
     public static final Attack flag = new Attack(9, 20, 60, 10, 0, 0, AttackType.BOX)
             .setInfo("Dimensional Phase", "hides in a flag in an un-stunnable, floating state")
             .setMobility(MobilityType.HIGHJUMP);
+
     public static ServerWorld auWorld;
 
     public D4CEntity(World worldIn) {
@@ -77,20 +88,23 @@ public class D4CEntity extends StandEntity {
         pros = List.of(
                 "good combo tools",
                 "counter",
-                "easy setups",
+                "extensive setups",
                 "good pressure"
         );
 
         cons = List.of(
-                "requires preparation",
-                "slow barrage with less damage"
+                "optimal setups and combos require preparation",
+                "slower than average"
         );
 
         freespace =
                 """
-                        Passive - multiversal guns attract and blow up, including ones obtained via M3
-                        BNB:
-                            (M1)>Gun>M1>Barrage>M1>Grab""";
+                        BNBs:
+                            the lazy zoner
+                            M1>Barrage>M1>Grab/Charge
+                            
+                            the western
+                            M1>Summon Gun>Barrage>M1~stand.OFF>M2>M2>M2>M2>M2>M2~s.ON+M1>Charge""";
 
         moves = List.of(light, heavy, barrage, dimhop_others, clonespawn, grab, counter, flag);
 
@@ -98,19 +112,33 @@ public class D4CEntity extends StandEntity {
         auWorld = Objects.requireNonNull(getServer()).getWorld(JDimensionRegister.AU_DIMENSION_KEY);
     }
 
+    private static final List<ItemStack> placeableStacks = List.of(
+            Items.STICK.getDefaultStack(),
+            Items.COBBLESTONE.getDefaultStack(),
+            Items.DEAD_BUSH.getDefaultStack(),
+            Items.APPLE.getDefaultStack(),
+            Items.OAK_SAPLING.getDefaultStack()
+    );
+    private boolean placingFirstStack = true;
+    private ItemStack placing;
     @Override
     public void initLightAttack() {
-        if (!this.canAttack()) return;
-        if (handleAttack(light, JCraft.standLightCD, 2)) {
-            this.playSound(JSoundRegister.D4C_LIGHT, 1, 1);
-        }
+        if (!canAttack()) return;
+        if (getUserOrThrow().isSneaking() && handleAttack(crm1, JCraft.standLightCD, 13)) {
+            if (placingFirstStack) {
+                placing = MockItem.createMockStack( placeableStacks.get(random.nextInt(placeableStacks.size())) );
+            }
+            equipStack(EquipmentSlot.OFFHAND, placing.copy());
+            placingFirstStack = !placingFirstStack;
+        } else if (handleAttack(light, JCraft.standLightCD, 2))
+            playSound(JSoundRegister.D4C_LIGHT, 1, 1);
     }
 
     @Override
     public void initHeavyAttack() {
-        if (!this.canAttack() || !hasUser() || !handleAttack(heavy, JCraft.standHeavyCD, 4)) return;
+        if (!canAttack() || !handleAttack(heavy, JCraft.standHeavyCD, 4)) return;
 
-        this.playSound(JSoundRegister.D4C_HEAVY, 1, 1);
+        playSound(JSoundRegister.D4C_HEAVY, 1, 1);
         Entity ent = getUserOrThrow();
 
         if (!ent.isOnGround()) return;
@@ -120,17 +148,17 @@ public class D4CEntity extends StandEntity {
 
     @Override
     public void initBarrage() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
-            this.playSound(JSoundRegister.D4C_BARRAGE, 1, 1);
+            playSound(JSoundRegister.D4C_BARRAGE, 1, 1);
         }
     }
 
     @Override
     public void initSpecial1() {
-        if (!this.canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(clonespawn, JCraft.standS1CD, 6)) {
-            this.playSound(JSoundRegister.D4C_DIMHOP, 1, 1);
+            playSound(JSoundRegister.D4C_DIMHOP, 1, 1);
         }
     }
 
@@ -228,10 +256,6 @@ public class D4CEntity extends StandEntity {
                 world.spawnEntity(revolver2);
     */
 
-    private static final Attack grabhitfinal = new Attack(10, 0, 0.75f, 34, 0, 2, 4f, 1.2f, AttackType.MULTIHIT, 0.45f, 0, List.of(11, 17, 26), JSoundRegister.IMPACT_1)
-            .setHitspark(2)
-            .setLaunch();
-
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
         Entity player = this.getUser();
@@ -274,7 +298,7 @@ public class D4CEntity extends StandEntity {
             case (5) -> {
                 if (this.getMoveStun() == 17)
                     this.curAttack = grabhitfinal;
-                this.playSound(JSoundRegister.REVOLVER_FIRE, 1, 1);
+                playSound(JSoundRegister.REVOLVER_FIRE, 1, 1);
             }
             case (6) -> {
                 if (player instanceof PlayerEntity playerEntity) {
@@ -326,6 +350,13 @@ public class D4CEntity extends StandEntity {
                 getUserOrThrow().addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, duration, 2, true, false));
             }
             case (10) -> getMainHandStack().decrement(1);
+            case (11) -> {
+                ItemStack offHandStack = getOffHandStack();
+                ItemEntity item = new ItemEntity(getWorld(), getX(), getY() + 0.2, getZ(), placing.copy(), 0, 0, 0);
+                item.setPickupDelay(200);
+                world.spawnEntity(item);
+                offHandStack.decrement(1);
+            }
         }
     }
 
@@ -354,8 +385,7 @@ public class D4CEntity extends StandEntity {
         }
     }
 
-    private static final Attack counterMiss = new Attack(8, 0, 10, 11);
-
+    private static final Attack counterMiss = new Attack(14, 0, 10, 11);
     @Override
     public void whiffCounter() {
         setAttack(counterMiss, 12);
@@ -365,8 +395,8 @@ public class D4CEntity extends StandEntity {
     @Override
     public void tick() {
         if (age == 1) {
-            this.playSound(JSoundRegister.STAND_SUMMON, 1, 1);
-            this.playSound(JSoundRegister.D4C_SUMMON, 1, 1);
+            playSound(JSoundRegister.STAND_SUMMON, 1, 1);
+            playSound(JSoundRegister.D4C_SUMMON, 1, 1);
         }
 
         super.tick();
@@ -400,6 +430,7 @@ public class D4CEntity extends StandEntity {
             case 10 -> controller.setAnimation(builder.playAndHold("animation.d4c.givegun"));
             case 11 -> controller.setAnimation(builder.playAndHold("animation.d4c.flag"));
             case 12 -> controller.setAnimation(builder.playAndHold("animation.d4c.counter_miss"));
+            case 13 -> controller.setAnimation(builder.playAndHold("animation.d4c.itemplace"));
         }
         return PlayState.CONTINUE;
     }

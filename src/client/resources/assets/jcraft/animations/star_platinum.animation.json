@@ -3007,7 +3007,7 @@
 							"easing": "easeOutSine"
 						},
 						"0.72": {
-							"vector": [-52.5, 0, 0],
+							"vector": [-57.84828, -20.43663, 29.0527],
 							"easing": "easeOutBack"
 						}
 					}

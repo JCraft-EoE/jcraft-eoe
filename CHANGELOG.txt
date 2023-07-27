@@ -1350,6 +1350,16 @@ C-Moon
 Made in Heaven
     >Improved initiation detection for Heaven's Judgement (normal)
 
+● 27/7/2023
+
+D4C
+    >Chop stun reduced (1.5->1.1s)
+    >Dimensional Explosions changed
+        >Reduced range by 25%
+        >Increased knockdown time (1.25->1.5s)
+        >Reduced damage (10->7)
+        >Added 0.5s of launch stun
+
 priority (top to bottom)
 todo: fix predict not working with new projectiles
 

@@ -5,16 +5,13 @@ import net.arna.jcraft.JCraft.DashData;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.*;
-import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.nbt.NbtCompound;
@@ -236,60 +233,70 @@ public class JServerTickEvents {
         }
 
         // Handle items of interest
-        HashMap<ItemEntity, ItemInterest> itemsOfInterest = JCraft.getItemsOfInterest();
-        HashMap<ItemEntity, ItemInterest> newItemsOfInterest = new HashMap<>();
+        HashMap<Entity, EntityInterest> entitiesOfInterest = JCraft.getEntitiesOfInterest();
+        HashMap<Entity, EntityInterest> newItemsOfInterest = new HashMap<>();
 
-        for (Map.Entry<ItemEntity, ItemInterest> itemAndInterest : itemsOfInterest.entrySet()) {
-            ItemEntity item = itemAndInterest.getKey();
-            if (item == null || !item.isAlive()) continue;
-            ItemInterest interest = itemAndInterest.getValue();
-            ServerWorld itemWorld = (ServerWorld) item.getWorld();
+        for (Map.Entry<Entity, EntityInterest> entityAndInterest : entitiesOfInterest.entrySet()) {
+            Entity entity = entityAndInterest.getKey();
+            if (entity == null || !entity.isAlive()) continue;
+            EntityInterest interest = entityAndInterest.getValue();
+            ServerWorld serverWorld = (ServerWorld) entity.getWorld();
+            boolean saveForNextIteration = true;
 
             switch (interest.getType()) {
-                default -> {
-                    continue;
-                }
+                default -> saveForNextIteration = false;
                 case BLOCK_ATTRACTION -> {
                     BlockPos attractionBlockPos = interest.getAttractionBlockPos();
-                    if (item.squaredDistanceTo(attractionBlockPos.getX(), attractionBlockPos.getY(), attractionBlockPos.getZ()) < 4) {
-                        dimensionalExplosion(itemWorld, item);
-                        itemWorld.setBlockState(attractionBlockPos, Blocks.AIR.getDefaultState());
+                    if (entity.squaredDistanceTo(attractionBlockPos.getX(), attractionBlockPos.getY(), attractionBlockPos.getZ()) < 4) {
+                        boolean griefing = serverWorld.getGameRules().getBoolean(JCraft.STAND_GRIEFING);
+                        dimensionalExplosion(serverWorld, griefing, entity);
+                        if (griefing) serverWorld.setBlockState(attractionBlockPos, Blocks.AIR.getDefaultState());
                     } else {
-                        BlockPos delta = attractionBlockPos.subtract(item.getBlockPos());
+                        BlockPos delta = attractionBlockPos.subtract(entity.getBlockPos());
                         Vec3d towardsVel = new Vec3d(delta.getX(), delta.getY(), delta.getZ()).normalize();
-                        item.addVelocity(towardsVel.x, towardsVel.y, towardsVel.z);
-                        item.velocityModified = true;
+                        entity.addVelocity(towardsVel.x, towardsVel.y, towardsVel.z);
+                        entity.velocityModified = true;
                     }
                 }
-                case REVOLVER_ATTRACTION -> {
-                    for (Map.Entry<ItemEntity, ItemInterest> itemAndInterest2 : itemsOfInterest.entrySet()) {
-                        ItemEntity item2 = itemAndInterest2.getKey();
-                        if (item2 == null || item2 == item || item2.squaredDistanceTo(item) > 256) continue;
-                        if (itemAndInterest2.getValue().getType() == ItemInterest.ItemInterestType.REVOLVER_ATTRACTION) {
-                            Vec3d converge = item2.getPos().subtract(item.getPos());
-                            Vec3d towardsVector = converge.normalize().multiply(0.25);
-                            item.addVelocity(towardsVector.x, towardsVector.y, towardsVector.z);
-                            item.velocityModified = true;
+                case ITEM_ATTRACTION -> {
+                    if (!(entity instanceof ItemEntity item)) continue;
+                    for (Map.Entry<Entity, EntityInterest> entityAndInterest2 : entitiesOfInterest.entrySet()) {
+                        Entity entity2 = entityAndInterest2.getKey();
+                        if (entity2 instanceof ItemEntity item2) {
+                            if (
+                                    entityAndInterest2.getValue().getType() == EntityInterest.ItemInterestType.ITEM_ATTRACTION &&
+                                    item2 != entity &&
+                                    item2.getWorld() == serverWorld &&
+                                    item2.getStack().getItem() == item.getStack().getItem() &&
+                                    item2.squaredDistanceTo(entity) <= 256
+                            ) {
+                                Vec3d converge = item2.getPos().subtract(entity.getPos());
+                                Vec3d towardsVector = converge.normalize().multiply(0.25);
+                                entity.addVelocity(towardsVector.x, towardsVector.y, towardsVector.z);
+                                entity.velocityModified = true;
 
-                            if (item2.distanceTo(item) <= 1.0)
-                                dimensionalExplosion(itemWorld, item, item2);
+                                if (item2.distanceTo(entity) <= 1.0) {
+                                    dimensionalExplosion(serverWorld, serverWorld.getGameRules().getBoolean(JCraft.STAND_GRIEFING), entity, item2);
+                                    saveForNextIteration = false;
+                                }
+                            }
                         }
                     }
                 }
             }
 
-            newItemsOfInterest.put(item, interest);
+            if (saveForNextIteration) newItemsOfInterest.put(entity, interest);
         }
 
-        itemsOfInterest.clear();
-        itemsOfInterest.putAll(newItemsOfInterest);
+        entitiesOfInterest.clear();
+        entitiesOfInterest.putAll(newItemsOfInterest);
     }
 
-    private static void dimensionalExplosion(ServerWorld serverWorld, Entity one) {
-        dimensionalExplosion(serverWorld, one, null);
+    private static void dimensionalExplosion(ServerWorld serverWorld, boolean griefing, Entity one) {
+        dimensionalExplosion(serverWorld, griefing, one, null);
     }
 
-    private static void dimensionalExplosion(ServerWorld serverWorld, Entity one, @Nullable Entity other) {
+    private static void dimensionalExplosion(ServerWorld serverWorld, boolean griefing, Entity one, @Nullable Entity other) {
         Vec3d midPos = one.getPos();
         if (other != null) {
             midPos = midPos.add(other.getPos()).multiply(0.5);
@@ -299,15 +306,16 @@ public class JServerTickEvents {
         one.discard();
 
         Explosion explosion = serverWorld.createExplosion(null, midPos.x, midPos.y, midPos.z, 1f,
-                serverWorld.getGameRules().getBoolean(JCraft.STAND_GRIEFING) ? Explosion.DestructionType.BREAK : Explosion.DestructionType.NONE);
+                griefing ? Explosion.DestructionType.BREAK : Explosion.DestructionType.NONE);
 
         List<LivingEntity> toDamage = serverWorld.getEntitiesByClass(LivingEntity.class,
-                new Box(midPos.add(2, 2, 2), midPos.subtract(2, 2, 2)),
+                new Box(midPos.add(1.5, 1.5, 1.5), midPos.subtract(1.5, 1.5, 1.5)),
                 EntityPredicates.VALID_ENTITY);
 
         for (LivingEntity ent : toDamage) {
-            ent.damage(explosion.getDamageSource(), 10);
-            ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 30, 0));
+            ent.damage(explosion.getDamageSource(), 7);
+            StandEntity.stun(ent, 10, 3);
+            ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0));
         }
     }
 }
