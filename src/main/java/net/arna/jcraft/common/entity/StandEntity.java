@@ -3,7 +3,10 @@ package net.arna.jcraft.common.entity;
 import lombok.Getter;
 import lombok.Setter;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.attack.*;
+import net.arna.jcraft.common.attack.Attack;
+import net.arna.jcraft.common.attack.AttackQueue;
+import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
@@ -49,8 +52,8 @@ import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.IAnimationTickable;
 import software.bernie.geckolib3.core.PlayState;
+import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
@@ -61,7 +64,7 @@ import java.util.List;
 import static net.arna.jcraft.JCraft.comboBreak;
 import static net.arna.jcraft.JCraft.cooldownCancel;
 
-public abstract class StandEntity extends MobEntity implements IAnimatable, IAnimationTickable {
+public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S> & StandAnimationState<E>> extends MobEntity implements IAnimatable, IAnimationTickable {
 
     // TODO: finish custom player idle poses for all stands
 
@@ -70,6 +73,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
 
     private static final TrackedData<Integer> STATE;
     private static final TrackedData<Boolean> SAMESTATE; // Marks if the state was set to what it already was during the last setState() call
+    private static final TrackedData<Boolean> RESET; // Set to true when state is set to idle. Set back to false when the after-idle reset code has ran.
     private static final TrackedData<Integer> MOVESTUN;
 
     private static final TrackedData<Integer> SKIN;
@@ -113,6 +117,14 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
     public String description = "UNDESCRIBED";
     public String freespace;
 
+    public int lastRemoteInputTime;
+    public Vec3d remoteSpeed = Vec3d.ZERO;
+    @Getter
+    private double remoteForwardInput = 0;
+    @Getter
+    private double remoteSideInput = 0;
+    private boolean remoteJumpInput = false;
+
     @Getter
     private final StandType standType;
 
@@ -127,8 +139,9 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
 
     // State controls
     static {
-        SAMESTATE = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
         STATE = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.INTEGER);
+        SAMESTATE = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+        RESET = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 
         MOVESTUN = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.INTEGER);
 
@@ -163,43 +176,66 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
         return user != null;
     }
 
-    public int getState() {
-        return this.dataTracker.get(STATE);
+    public S getState() {
+        return boxState(getRawState());
+    }
+
+    public int getRawState() {
+        return dataTracker.get(STATE);
+    }
+
+    private boolean isReset() {
+        return dataTracker.get(RESET);
+    }
+
+    private void setReset(boolean reset) {
+        dataTracker.set(RESET, reset);
     }
 
     /**
      * Sets the stands state directly
      */
-    public void setStateNoReset(int s) {
-        this.dataTracker.set(STATE, s);
+    public void setStateNoReset(S state) {
+        setRawStateNoReset(state.ordinal());
+    }
+
+    public void setRawStateNoReset(int state) {
+        dataTracker.set(STATE, state);
     }
 
     /**
      * Sets the stands state with extra processing
      */
-    public void setState(int s) {
-        int state = this.getState();
-        this.dataTracker.set(SAMESTATE, state == s || state == 1); // Pretty much just an animation reset flag
-        this.dataTracker.set(STATE, s);
+    public void setState(S state) {
+        setRawState(state.ordinal());
     }
 
-    public boolean getSameState() {
-        return this.dataTracker.get(SAMESTATE);
+    public void setRawState(int state) {
+        int oldState = getRawState();
+        boolean sameState = oldState == state || oldState == 1;
+        dataTracker.set(STATE, state);
+        dataTracker.set(SAMESTATE, sameState); // Pretty much just an animation reset flag
+        // If we're switched states and are moving to idle, perform reset logic.
+        setReset(!sameState && state == getIdleState().ordinal());
     }
 
-    public void setSameState(boolean samestate) {
-        this.dataTracker.set(SAMESTATE, samestate);
+    public boolean isSameState() {
+        return dataTracker.get(SAMESTATE);
+    }
+
+    public void setSameState(boolean sameState) {
+        dataTracker.set(SAMESTATE, sameState);
     }
 
     public int getMoveStun() {
-        return this.dataTracker.get(MOVESTUN);
+        return dataTracker.get(MOVESTUN);
     }
 
     /**
      * Sets how many ticks the stand will be occupied doing an animation for
      */
     public void setMoveStun(int moveStun) {
-        this.dataTracker.set(MOVESTUN, moveStun);
+        dataTracker.set(MOVESTUN, moveStun);
     }
 
     public int getSkin() {
@@ -258,20 +294,6 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
      */
     public void setFree(boolean free) {
         this.dataTracker.set(FREE, free);
-    }
-
-    public int lastRemoteInputTime;
-    public Vec3d remoteSpeed = Vec3d.ZERO;
-    private double remoteForwardInput = 0;
-    private double remoteSideInput = 0;
-    private boolean remoteJumpInput = false;
-
-    public double getRemoteForwardInput() {
-        return remoteForwardInput;
-    }
-
-    public double getRemoteSideInput() {
-        return remoteSideInput;
     }
 
     public void setRemoteJumpInput(boolean b) {
@@ -377,25 +399,26 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
-        this.dataTracker.startTracking(STATE, 0);
-        this.dataTracker.startTracking(SAMESTATE, false);
+        dataTracker.startTracking(STATE, 0);
+        dataTracker.startTracking(SAMESTATE, false);
+        dataTracker.startTracking(RESET, false);
 
-        this.dataTracker.startTracking(MOVESTUN, 0);
+        dataTracker.startTracking(MOVESTUN, 0);
 
-        this.dataTracker.startTracking(SKIN, 0);
-        this.dataTracker.startTracking(ROTATIONOFFSET, -90f);
-        this.dataTracker.startTracking(DISTANCEOFFSET, 1f);
+        dataTracker.startTracking(SKIN, 0);
+        dataTracker.startTracking(ROTATIONOFFSET, -90f);
+        dataTracker.startTracking(DISTANCEOFFSET, 1f);
 
-        this.dataTracker.startTracking(ALPHA, 0f);
+        dataTracker.startTracking(ALPHA, 0f);
 
-        this.dataTracker.startTracking(STANDGAUGE, 45f);
+        dataTracker.startTracking(STANDGAUGE, 45f);
 
-        this.dataTracker.startTracking(FREE, false);
-        this.dataTracker.startTracking(REMOTE, false);
+        dataTracker.startTracking(FREE, false);
+        dataTracker.startTracking(REMOTE, false);
 
-        this.dataTracker.startTracking(FREEX, 0f);
-        this.dataTracker.startTracking(FREEY, 0f);
-        this.dataTracker.startTracking(FREEZ, 0f);
+        dataTracker.startTracking(FREEX, 0f);
+        dataTracker.startTracking(FREEY, 0f);
+        dataTracker.startTracking(FREEZ, 0f);
     }
 
     public void initialize() {
@@ -421,21 +444,13 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
      * @return whether the stand should change its height depending on the user's look pitch
      */
     public boolean shouldOffsetHeight() {
-        return getState() > 1;
+        return getState().ordinal() > 1;
     }
 
     /**
      * Struct used for storing extra information relating to the stands ability to attack
      */
-    public static class CanAttackData {
-        public final LivingEntity user;
-        public final boolean canAttack;
-
-        public CanAttackData(LivingEntity l, boolean b) {
-            this.user = l;
-            this.canAttack = b;
-        }
-    }
+    public record CanAttackData(LivingEntity user, boolean canAttack) {}
 
     /**
      * Returns a {@link CanAttackData} with information relating to the stands ability to attack
@@ -456,7 +471,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
      * @param cooldownName string identifier for which cooldown to start
      * @param animState    int identifier for which state to put the stand into
      */
-    public boolean handleAttack(Attack attack, String cooldownName, int animState) {
+    public boolean handleAttack(Attack attack, String cooldownName, S animState) {
         NbtCompound userData = ((IEntityDataSaver) getUserOrThrow()).getPersistentData();
         int cooldown = userData.getInt(cooldownName);
 
@@ -474,7 +489,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
      * @param attack    attack to set
      * @param animState int identifier for which state to put the stand into
      */
-    public void setAttack(Attack attack, int animState) {
+    public void setAttack(Attack attack, S animState) {
         this.curAttack = attack;
         this.setMoveStun(attack.moveStun);
         this.setState(animState);
@@ -620,8 +635,8 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
      * @param source exact source of damage
      */
     public void counter(Entity entity, DamageSource source) {
-        this.curAttack = null;
-        this.setMoveStun(0);
+        curAttack = null;
+        setMoveStun(0);
     }
 
     public void whiffCounter() {
@@ -632,9 +647,9 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
      * Cancels the stands attack instantly
      */
     public void cancelAttack() {
-        this.curAttack = null;
-        this.setMoveStun(0);
-        this.setState(0);
+        curAttack = null;
+        setMoveStun(0);
+        setState(getIdleState());
     }
 
     /**
@@ -710,7 +725,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
 
         if (!client) {
             // Reset samestate
-            if (getSameState()) setSameState(false);
+            if (isSameState()) setSameState(false);
 
             // Make sure the user is using this stand
             if (((IEntityDataSaver) user).getStand() != this) discard();
@@ -832,9 +847,9 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
                             if (attack.impactSound != null) playSound(attack.impactSound, 1, 1);
 
                             if (attack.attackType == AttackType.CHARGE) {
-                                this.setMoveStun(10);
-                                this.setState(attack.interval); // Interval is hitAnim for charges
-                                this.curAttack = null;
+                                setMoveStun(10);
+                                setState(boxState(attack.interval)); // Interval is hitAnim for charges
+                                curAttack = null;
                             }
                         }
 
@@ -844,7 +859,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
                         List<LivingEntity> clashed = new ArrayList<>();
 
                         for (LivingEntity livingEntity : hurt) {
-                            if (livingEntity instanceof StandEntity stand) {
+                            if (livingEntity instanceof StandEntity<?, ?> stand) {
                                 // Barrage clashing
                                 if (isBarrage && stand.curAttack != null && stand.curAttack.attackType == AttackType.BARRAGE) {
                                     // Override stun with high priority 0.5s stun, also stops all current sounds for cleaner audio cue
@@ -912,20 +927,21 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
 
                     this.setStandGauge(MathHelper.clamp(this.getStandGauge() + 0.5f, 0, maxStandGauge));
 
-                    if (this.getState() != 1) {
-                        this.setState(1);
+                    if (getRawState() != 0 || isReset()) {
+                        setRawState(0);
+                        setReset(false);
 
-                        this.setDistanceOffset(this.idleDistance);
-                        this.setRotationOffset(this.idleRotation);
+                        setDistanceOffset(idleDistance);
+                        setRotationOffset(idleRotation);
                     }
                 } else idleOverride(user);
             } else if (this.blocking) { // Process block
-                this.curAttack = null;
-                this.setStateNoReset(3);
+                curAttack = null;
+                setStateNoReset(getBlockState());
 
                 if (curMoveStun < 4) setMoveStun(4);
-                setDistanceOffset(this.blockDistance);
-                setRotationOffset(this.attackRotation);
+                setDistanceOffset(blockDistance);
+                setRotationOffset(attackRotation);
                 standBlock();
             }
         }
@@ -1047,7 +1063,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
         boolean hit = true;
         boolean tsHit = ((ITimeStop) ent).getTimeStopTicks() > 0;
 
-        StandEntity stand = ((IEntityDataSaver) ent).getStand();
+        StandEntity<?, ?> stand = ((IEntityDataSaver) ent).getStand();
         if (stand != null) {
             Attack standAttack = stand.curAttack;
             if (standAttack != null) {
@@ -1165,7 +1181,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
     /**
      * Handles AI for mob stand users
      */
-    public static void standUserAI(MobEntity mob, LivingEntity target, StandEntity stand) {
+    public static void standUserAI(MobEntity mob, LivingEntity target, StandEntity<?, ?> stand) {
         if (mob == target) return;
         if (target == null || !target.isAlive() || target.isRemoved()) return;
 
@@ -1173,7 +1189,7 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
         mob.getLookControl().lookAt(target); // Usually detrimental not to
 
         JCraftSpec enemySpec;
-        StandEntity enemyStand = ((IEntityDataSaver) target).getStand();
+        StandEntity<?, ?> enemyStand = ((IEntityDataSaver) target).getStand();
         Attack enemyAttack = null;
         boolean enemyHasStand = enemyStand != null;
 
@@ -1334,11 +1350,12 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
     /**
      * Used to help AIs that use stands with unique moves
      */
-    public MoveSelectionResult specificMoveSelectionCriterion(Attack attack, MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity enemyStand, Attack enemyAttack) {
+    public MoveSelectionResult specificMoveSelectionCriterion(Attack attack, MobEntity mob, LivingEntity target, int stunTicks,
+                                                              int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand, Attack enemyAttack) {
         return MoveSelectionResult.PASS;
     }
 
-    private int selectMove(MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity enemyStand, Attack enemyAttack) {
+    private int selectMove(MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand, Attack enemyAttack) {
         int chosenMove = 0; //random.nextInt(0, 4);
         int chosenMoveInitTime = this.moves.get(chosenMove).initTime;
         int movesOnCooldown = 0;
@@ -1462,15 +1479,32 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
         return chosenMove;
     }
 
-    // Animations
+    // Animation code
+    @SuppressWarnings("unchecked") // Fine here
     @Override
     public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::animationPredicate));
+        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, event -> {
+            AnimationController<StandEntity<E, S>> controller = event.getController();
+            AnimationBuilder builder = new AnimationBuilder();
+
+            String summonAnimation = getSummonAnimation();
+            if (playSummonAnim && summonAnimation != null) {
+                controller.setAnimation(builder.playOnce(summonAnimation));
+                return PlayState.CONTINUE;
+            }
+
+            if (isSameState()) controller.markNeedsReload();
+
+            getState().playAnimation((E) this, builder);
+            controller.setAnimation(builder);
+
+            return PlayState.CONTINUE;
+        }));
     }
 
     @Override
     public AnimationFactory getFactory() {
-        return this.animationFactory;
+        return animationFactory;
     }
 
     @Override
@@ -1478,5 +1512,31 @@ public abstract class StandEntity extends MobEntity implements IAnimatable, IAni
         return age;
     }
 
-    protected abstract <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event);
+    /**
+     * Needed because the super constructor invokes some things that need this.
+     * Meaning we can't use a constructor parameter.
+     * @return literally just {@code State.values()}
+     */
+    protected abstract S[] getStateValues();
+
+    public S boxState(int rawState) {
+        return getStateValues()[rawState];
+    }
+
+    public S getIdleState() {
+        return boxState(0);
+    }
+
+    public abstract S getBlockState();
+
+    public boolean isIdle() {
+        return getRawState() <= 1;
+    }
+
+    public boolean isBlocking() {
+        return getState() == getBlockState();
+    }
+
+    @Nullable
+    protected abstract String getSummonAnimation();
 }

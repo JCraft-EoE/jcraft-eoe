@@ -71,7 +71,7 @@ public abstract class CameraMixin {
 
     @Inject(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;setPos(DDD)V", shift = At.Shift.AFTER))
     public void jcraft$afterSetPosUpdate(BlockView area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta, CallbackInfo info) {
-        StandEntity stand = ((IEntityDataSaver)focusedEntity).getStand();
+        StandEntity<?, ?> stand = ((IEntityDataSaver)focusedEntity).getStand();
         if (stand != null && stand.getRemote()) {
             CameraInvoker cameraInvoker = (CameraInvoker) this;
             cameraInvoker.invokeSetPos(

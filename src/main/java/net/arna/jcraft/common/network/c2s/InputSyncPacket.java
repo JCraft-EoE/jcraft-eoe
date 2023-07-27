@@ -46,7 +46,7 @@ public class InputSyncPacket {
             IEntityDataSaver playerData = ((IEntityDataSaver) player);
             playerData.updateRemoteInputs(fF, fS, jump);
 
-            StandEntity stand = playerData.getStand();
+            StandEntity<?, ?> stand = playerData.getStand();
             if (stand != null) stand.updateRemoteInputs(fF, fS, jump);
 
             if (dash) JCraft.tryDash(fF, fS, player);

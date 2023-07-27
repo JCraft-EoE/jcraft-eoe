@@ -95,10 +95,9 @@ public class D4CRenderer extends ExtendedGeoEntityRenderer<D4CEntity> {
     protected void preRenderItem(MatrixStack stack, ItemStack item, String boneName, D4CEntity currentEntity, IBone bone) {
         //todo: fix d4c revolver rotation; a hack is currently implemented due to something (sodium?) breaking hand rotation for d4c
         float ang = -90f;
-        int state = currentEntity.getState();
-        if (state == 7 || state == 10) {
-            ang += ( currentEntity.getMoveStun() + 1f - this.partialTick ) * 65f;
-        }
+        D4CEntity.State state = currentEntity.getState();
+        if (state == D4CEntity.State.THROW || state == D4CEntity.State.GIVE_GUN)
+            ang += (currentEntity.getMoveStun() + 1f - this.partialTick) * 65f;
         stack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(ang));
     }
 

@@ -154,12 +154,12 @@ public class JServerTickEvents {
                 boolean pushAway = true;
 
                 // If the stand was hit, the attack will stop and the user will be hit remotely
-                if (ent instanceof StandEntity stand) {
+                if (ent instanceof StandEntity<?, ?> stand) {
                     if (stand.hasUser()) {
                         stun(stand.getUser(), 10, 3);
                         stand.cancelAttack();
                     }
-                } else if (ent.getFirstPassenger() instanceof StandEntity stand) { // Stands should not have passengers
+                } else if (ent.getFirstPassenger() instanceof StandEntity<?, ?> stand) { // Stands should not have passengers
                     if (stand.blocking) pushAway = false;
                     else if (ent instanceof LivingEntity living) { // Stand users that aren't blocking get launched and their stand attacks are cancelled
                         //awayVector = awayVector.multiply(0.5);
@@ -209,7 +209,7 @@ public class JServerTickEvents {
                 if (mob.isAiDisabled()) continue;
 
                 // Target priority
-                if (mob.getFirstPassenger() instanceof StandEntity stand) {
+                if (mob.getFirstPassenger() instanceof StandEntity<?, ?> stand) {
                     LivingEntity biggestAttacker = mob.getDamageTracker().getBiggestAttacker();
                     LivingEntity primeAdversary = mob.getPrimeAdversary();
                     LivingEntity target = mob.getTarget();

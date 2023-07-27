@@ -6,6 +6,7 @@ import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.StunType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.MobilityType;
+import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.minecraft.entity.Entity;
@@ -20,15 +21,14 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.PlayState;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-public class SilverChariotEntity extends StandEntity {
+public class SilverChariotEntity extends StandEntity<SilverChariotEntity, SilverChariotEntity.State> {
     public final Attack light = new Attack(0, JCraft.lightCooldown, 0.65f, 9, 5, 1.75, 5f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0)
             .setInfo("Stab", "quick combo starter, links into Spinning Blade while armor is off");
     public final Attack barrage = new Attack(2, 17, 0.65f, 60, 0, 2.25, 0.9f, 0.1f, AttackType.BARRAGE, 1.25f, 0, 3)
@@ -49,7 +49,7 @@ public class SilverChariotEntity extends StandEntity {
             .setHitspark(2)
             .hyperArmor()
             .setInfo("Cleave", "Silver Chariot detaches from the user, delivering an uninterruptable, combo-starting slice");
-    public final Attack charge = new Attack(6, 22, 8f, 19, 5, 1.5, 5f, 0.25f, AttackType.CHARGE, 0.85f, 0, 9)
+    public final Attack charge = new Attack(6, 22, 8f, 19, 5, 1.5, 5f, 0.25f, AttackType.CHARGE, 0.85f, 0, State.P_CHARGE_HIT.ordinal())
             .setRanged(true)
             .disableBackstab()
             .setInfo("Shooting Star", "Silver Chariot detaches from the user and charges in the looked direction, combo starter/extender");
@@ -125,12 +125,12 @@ public class SilverChariotEntity extends StandEntity {
         setNormalDesc();
     }
 
-    private static final TrackedData<Boolean> HASRAPIER;
+    private static final TrackedData<Boolean> HAS_RAPIER;
     private static final TrackedData<Integer> MODE;
 
     static {
         MODE = DataTracker.registerData(SilverChariotEntity.class, TrackedDataHandlerRegistry.INTEGER);
-        HASRAPIER = DataTracker.registerData(SilverChariotEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+        HAS_RAPIER = DataTracker.registerData(SilverChariotEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     }
 
     public int getMode() {
@@ -142,17 +142,17 @@ public class SilverChariotEntity extends StandEntity {
     }
 
     public boolean hasRapier() {
-        return dataTracker.get(HASRAPIER);
+        return dataTracker.get(HAS_RAPIER);
     }
 
     public void setHasRapier(boolean hasRapier) {
-        dataTracker.set(HASRAPIER, hasRapier);
+        dataTracker.set(HAS_RAPIER, hasRapier);
     }
 
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
-        dataTracker.startTracking(HASRAPIER, true);
+        dataTracker.startTracking(HAS_RAPIER, true);
         dataTracker.startTracking(MODE, 1);
     }
 
@@ -160,28 +160,28 @@ public class SilverChariotEntity extends StandEntity {
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        if (handleAttack(this.light, JCraft.standLightCD, 2))
+        if (handleAttack(this.light, JCraft.standLightCD, State.STAB))
             playSound(JSoundRegister.SC_POKE, 1, 1);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        if (handleAttack(this.heavy, JCraft.standHeavyCD, 4))
+        if (handleAttack(this.heavy, JCraft.standHeavyCD, State.HEAVY))
             playSound(JSoundRegister.SC_HEAVY, 1, 1);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(this.barrage, JCraft.standBarrageCD, 5))
+        if (handleAttack(this.barrage, JCraft.standBarrageCD, State.BARRAGE))
             playSound(JSoundRegister.SC_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack()) return;
-        if (handleAttack(this.spinbarrage, JCraft.standS1CD, 6))
+        if (handleAttack(this.spinbarrage, JCraft.standS1CD, State.SPIN))
             playSound(JSoundRegister.SC_SPIN, 1, 1);
     }
 
@@ -189,9 +189,9 @@ public class SilverChariotEntity extends StandEntity {
     public void initUlt() {
         if (!canAttack()) return;
         if (this.getMode() == 3)
-            handleAttack(pbeatdown, JCraft.standUltCD, 11);
+            handleAttack(pbeatdown, JCraft.standUltCD, State.BEAT_DOWN_START);
             //playSound(ModSoundRegister.PSC_BEATDOWN,1, 1);
-        else if (handleAttack(armoroff, JCraft.standUltCD, 14))
+        else if (handleAttack(armoroff, JCraft.standUltCD, State.ARMOR_OFF))
             playSound(JSoundRegister.SC_ARMOROFF, 1, 1);
     }
 
@@ -200,7 +200,7 @@ public class SilverChariotEntity extends StandEntity {
         if (!canAttack() || !hasUser()) return;
         LivingEntity user = getUserOrThrow();
         if (getMode() == 3) {
-            if (handleAttack(this.pcharge, JCraft.standS2CD, 7)) {
+            if (handleAttack(this.pcharge, JCraft.standS2CD, State.CHARGE)) {
                 //playSound(ModSoundRegister.PSC_CHARGE,1, 1);
                 if (user.isOnGround()) {
                     user.setVelocity(user.getVelocity().add(getRotationVector().multiply(0.85)).add(0.0, 0.15, 0.0));
@@ -209,11 +209,9 @@ public class SilverChariotEntity extends StandEntity {
                 playSound(JSoundRegister.SC_CHARGE, 1, 1);
 
             }
-        } else {
-            if (handleAttack(this.charge, JCraft.standS2CD, 8)) {
-                lookDirY = (float) user.getRotationVector().y;
-                lookDirY *= MathHelper.abs(lookDirY);
-            }
+        } else if (handleAttack(charge, JCraft.standS2CD, State.P_CHARGE)) {
+            lookDirY = (float) user.getRotationVector().y;
+            lookDirY *= MathHelper.abs(lookDirY);
         }
     }
 
@@ -221,12 +219,12 @@ public class SilverChariotEntity extends StandEntity {
     public void initSpecial3() {
         if (!canAttack() || !hasUser()) return;
         if (getMode() == 3) {
-            handleAttack(this.counter, JCraft.standS3CD, 10);
+            handleAttack(counter, JCraft.standS3CD, State.COUNTER);
             //playSound(ModSoundRegister.PSC_CHARGE,1, 1);
         } else {
-            if (handleAttack(this.cleave, JCraft.standS3CD, 13)) {
-                this.setFreePos(new Vec3f(getUserOrThrow().getPos().add(getUserOrThrow().getRotationVector().multiply(1.5))));
-                this.setFree(true);
+            if (handleAttack(cleave, JCraft.standS3CD, State.CLEAVE)) {
+                setFreePos(new Vec3f(getUserOrThrow().getPos().add(getUserOrThrow().getRotationVector().multiply(1.5))));
+                setFree(true);
                 playSound(JSoundRegister.SC_CLEAVE, 1, 1);
             }
         }
@@ -235,11 +233,11 @@ public class SilverChariotEntity extends StandEntity {
     @Override
     public void initUtil() {
         if (!canAttack()) return;
-        handleAttack(this.lastshot, JCraft.utilCD, 16);
+        handleAttack(lastshot, JCraft.utilCD, State.LAST_SHOT);
     }
 
     @Override
-    public boolean handleAttack(Attack attack, String cooldownName, int animState) {
+    public boolean handleAttack(Attack attack, String cooldownName, State animState) {
         if (!hasUser()) return false;
 
         LivingEntity user = getUserOrThrow();
@@ -251,14 +249,14 @@ public class SilverChariotEntity extends StandEntity {
         // Can't be compacted due to == check in SpecialAttack()
         if (getMode() == 2) {
             Attack attackRef = Attack.copyOf(attack);
-            attackRef.initTime *= 0.67;
-            attackRef.moveStun *= 0.67;
+            attackRef.initTime = (int) (attackRef.initTime * 0.67);
+            attackRef.moveStun = (int) (attackRef.moveStun * 0.67);
 
             setAttack(attackRef, animState);
         } else if (!hasRapier()) {
             Attack attackRef = Attack.copyOf(attack);
             attackRef.hitboxSize *= 0.75;
-            attackRef.damage *= 0.75;
+            attackRef.damage = (float) (attackRef.damage * 0.75);
 
             setAttack(attackRef, animState);
         } else setAttack(attack, animState);
@@ -274,7 +272,7 @@ public class SilverChariotEntity extends StandEntity {
         switch (attack.id) {
             case (8) -> {
                 if (entities.isEmpty()) stun(getUser(), 30, 1);
-                else setAttack(mainbeatdown, 12);
+                else setAttack(mainbeatdown, State.BEAT_DOWN);
             }
             case (9) -> {
                 if (getMoveStun() == 36) curAttack = beatdownfinish;
@@ -307,7 +305,7 @@ public class SilverChariotEntity extends StandEntity {
         if (!(entity instanceof LivingEntity ent)) return;
 
         stun(ent, 30, 0);
-        StandEntity stand = ((IEntityDataSaver) ent).getStand();
+        StandEntity<?, ?> stand = ((IEntityDataSaver) ent).getStand();
         if (stand != null) stand.cancelAttack();
     }
 
@@ -315,7 +313,7 @@ public class SilverChariotEntity extends StandEntity {
 
     @Override
     public void whiffCounter() {
-        setAttack(counterMiss, 15);
+        setAttack(counterMiss, State.COUNTER_MISS);
         stun(getUser(), counterMiss.moveStun, 0);
     }
 
@@ -377,42 +375,57 @@ public class SilverChariotEntity extends StandEntity {
     }
 
     // Animation code
+    public enum State implements StandAnimationState<SilverChariotEntity> {
+        IDLE((silverChariot, builder) -> builder.loop("animation.silverchariot.idle" + switch (silverChariot.getMode()) {
+            case 0 -> "";
+            case 1 -> "_armorless";
+            case 3 -> "_possessed";
+            default -> throw new IllegalStateException("Unexpected value: " + silverChariot.getMode());
+        })),
+        STAB(builder -> builder.playAndHold("animation.silverchariot.stab")),
+        BLOCK(builder -> builder.loop("animation.silverchariot.block")),
+        HEAVY(builder -> builder.playAndHold("animation.silverchariot.heavy")),
+        BARRAGE(builder -> builder.loop("animation.silverchariot.barrage")),
+        SPIN(builder -> builder.loop("animation.silverchariot.spin")),
+        CHARGE(builder -> builder.loop("animation.silverchariot.charge")),
+        P_CHARGE(builder -> builder.loop("animation.silverchariot.pcharge")),
+        P_CHARGE_HIT(builder -> builder.playAndHold("animation.silverchariot.pchargehit")),
+        COUNTER(builder -> builder.loop("animation.silverchariot.counter")),
+        BEAT_DOWN_START(builder -> builder.playAndHold("animation.silverchariot.beatdownstart")),
+        BEAT_DOWN(builder -> builder.playAndHold("animation.silverchariot.beatdown")),
+        CLEAVE(builder -> builder.playAndHold("animation.silverchariot.cleave")),
+        ARMOR_OFF(builder -> builder.playAndHold("animation.silverchariot.armor_off")),
+        COUNTER_MISS(builder -> builder.playAndHold("animation.silverchariot.counter_miss")),
+        LAST_SHOT(builder -> builder.playAndHold("animation.silverchariot.lastshot"));
+
+        private final BiConsumer<SilverChariotEntity, AnimationBuilder> animator;
+
+        State(Consumer<AnimationBuilder> animator) {
+            this((silverChariot, builder) -> animator.accept(builder));
+        }
+
+        State(BiConsumer<SilverChariotEntity, AnimationBuilder> animator) {
+            this.animator = animator;
+        }
+
+        @Override
+        public void playAnimation(SilverChariotEntity stand, AnimationBuilder builder) {
+            animator.accept(stand, builder);
+        }
+    }
+
     @Override
-    protected <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
-        String idleAnim = "animation.silverchariot.idle";
-        if (getMode() == 2)
-            idleAnim = "animation.silverchariot.idle_armorless";
-        if (getMode() == 3)
-            idleAnim = "animation.silverchariot.idle_possessed";
+    protected State[] getStateValues() {
+        return State.values();
+    }
 
-        AnimationController<E> controller = event.getController();
-        AnimationBuilder builder = new AnimationBuilder();
+    @Override
+    protected @Nullable String getSummonAnimation() {
+        return "animation.silverchariot.summon" + (getMode() == 3 ? "_possessed" : "");
+    }
 
-        if (playSummonAnim) {
-            controller.setAnimation(builder.playOnce(getMode() == 3 ? "animation.silverchariot.summon_possessed" : "animation.silverchariot.summon"));
-            return PlayState.CONTINUE;
-        }
-
-        if (getSameState()) controller.markNeedsReload();
-        switch (getState()) {
-            default -> controller.setAnimation(builder.loop(idleAnim));
-            case 2 -> controller.setAnimation(builder.playAndHold("animation.silverchariot.stab"));
-            case 3 -> controller.setAnimation(builder.loop("animation.silverchariot.block"));
-            case 4 -> controller.setAnimation(builder.playAndHold("animation.silverchariot.heavy"));
-            case 5 -> controller.setAnimation(builder.loop("animation.silverchariot.barrage"));
-            case 6 -> controller.setAnimation(builder.loop("animation.silverchariot.spin"));
-            case 7 -> controller.setAnimation(builder.loop("animation.silverchariot.charge"));
-            case 8 -> controller.setAnimation(builder.loop("animation.silverchariot.pcharge"));
-            case 9 -> controller.setAnimation(builder.playAndHold("animation.silverchariot.pchargehit"));
-            case 10 -> controller.setAnimation(builder.loop("animation.silverchariot.counter"));
-            case 11 -> controller.setAnimation(builder.playAndHold("animation.silverchariot.beatdownstart"));
-            case 12 -> controller.setAnimation(builder.playAndHold("animation.silverchariot.beatdown"));
-            case 13 -> controller.setAnimation(builder.playAndHold("animation.silverchariot.cleave"));
-            case 14 -> controller.setAnimation(builder.playAndHold("animation.silverchariot.armor_off"));
-            case 15 -> controller.setAnimation(builder.playAndHold("animation.silverchariot.counter_miss"));
-            case 16 -> controller.setAnimation(builder.playAndHold("animation.silverchariot.lastshot"));
-        }
-        controller.setAnimationSpeed(this.getMode() == 2 ? 1.5 : 1);
-        return PlayState.CONTINUE;
+    @Override
+    public State getBlockState() {
+        return State.BLOCK;
     }
 }

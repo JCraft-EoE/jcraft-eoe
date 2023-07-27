@@ -37,7 +37,7 @@ public class RapierProjectile extends PersistentProjectileEntity implements IAni
     public static final Identifier ARMOR_OFF_TEXTURE = JCraft.id("textures/entity/stands/silver_chariot/rapier_no_armor.png");
     private static final TrackedData<Integer> SKIN;
     private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
-    private StandEntity origin;
+    private StandEntity<?, ?> origin;
     private int ticksInAir, bouncesLeft = 5;
 
     static {
@@ -48,7 +48,7 @@ public class RapierProjectile extends PersistentProjectileEntity implements IAni
         super(entityType, world);
     }
 
-    public RapierProjectile(World world, LivingEntity owner, StandEntity silverChariot) {
+    public RapierProjectile(World world, LivingEntity owner, StandEntity<?, ?> silverChariot) {
         super(JEntityTypeRegister.RAPIER, owner, world);
         this.setOwner(owner);
         this.origin = silverChariot;

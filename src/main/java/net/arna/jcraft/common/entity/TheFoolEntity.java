@@ -41,17 +41,16 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.PlayState;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-public class TheFoolEntity extends StandEntity {
+public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.State> {
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 1.5f, 14, 7, 2, 6f, 0.8f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_2)
             .appendHitbox(new HitBoxData(0, 0.25, 1))
             .setInfo("Swipe", "slow, long-reaching poke");
@@ -90,7 +89,7 @@ public class TheFoolEntity extends StandEntity {
     public static final Attack tornado = new Attack(11, 25, 1, 13, 12, 0, 0f, 0.0f, AttackType.BOX)
             .setRanged(true)
             .setInfo("Sand Tornado", "summons a slow, stunning sand tornado");
-    public static final Attack charge = new Attack(5, 20, 7f, 20, 5, 1.5, 6f, 1.2f, AttackType.CHARGE, 0.5f, 0, 11, JSoundRegister.IMPACT_2)
+    public static final Attack charge = new Attack(5, 20, 7f, 20, 5, 1.5, 6f, 1.2f, AttackType.CHARGE, 0.5f, 0, State.CHARGE_HIT.ordinal(), JSoundRegister.IMPACT_2)
             .setRanged(true)
             .setLaunch()
             .disableBackstab()
@@ -111,6 +110,7 @@ public class TheFoolEntity extends StandEntity {
     private final ArrayList<FallingBlockEntity> sands = new ArrayList<>();
 
     private MobEntity sandClone;
+    private int slamType = 0;
 
     public TheFoolEntity(World worldIn) {
         super(StandType.THE_FOOL, worldIn);
@@ -210,21 +210,21 @@ public class TheFoolEntity extends StandEntity {
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        handleAttack(light, JCraft.standLightCD, 2);
+        handleAttack(light, JCraft.standLightCD, State.SWIPE);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
         if (getUser() != null && getUser().isOnGround())
-            handleAttack(combo, JCraft.standBarrageCD, 4);
-        else handleAttack(airbarrage, JCraft.standBarrageCD, 5);
+            handleAttack(combo, JCraft.standBarrageCD, State.COMBO);
+        else handleAttack(airbarrage, JCraft.standBarrageCD, State.AIR_BARRAGE);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        if (handleAttack(launch, JCraft.standHeavyCD, 6)) {
+        if (handleAttack(launch, JCraft.standHeavyCD, State.LAUNCH)) {
             setSand(true);
             playSound(JSoundRegister.FOOL_LAUNCH, 1, 1);
         }
@@ -233,22 +233,20 @@ public class TheFoolEntity extends StandEntity {
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        if (handleAttack(sandstorm, JCraft.standUltCD, 12))
+        if (handleAttack(sandstorm, JCraft.standUltCD, State.SANDSTORM))
             playSound(JSoundRegister.FOOL_ULT, 1, 1);
     }
 
-    private int slamType = 0;
-
     private void initSlam(int type) {
         slamType = type;
-        setAttack(slam, 14);
+        setAttack(slam, State.POUND_DOWN);
         playSound(JSoundRegister.FOOL_BARK1, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (curAttack != null && curAttack.id == pound.id && getMoveStun() < 12) initSlam(1);
-        if (canAttack() && handleAttack(pound, JCraft.standS1CD, 7))
+        if (canAttack() && handleAttack(pound, JCraft.standS1CD, State.POUND_UP))
             playSound(JSoundRegister.FOOL_BARK2, 1, 1);
     }
 
@@ -258,9 +256,9 @@ public class TheFoolEntity extends StandEntity {
 
         if (!canAttack()) return;
 
-        if (getUser() != null && getUser().isOnGround() && handleAttack(charge, JCraft.standS2CD, 8))
+        if (getUser() != null && getUser().isOnGround() && handleAttack(charge, JCraft.standS2CD, State.CHARGE))
             playSound(JSoundRegister.FOOL_CHARGE, 1, 1);
-        else if (handleAttack(tornado, JCraft.standS2CD, 15)) {
+        else if (handleAttack(tornado, JCraft.standS2CD, State.TORNADO)) {
             setSand(true);
             playSound(JSoundRegister.FOOL_LAUNCH, 1, 1);
         }
@@ -269,7 +267,7 @@ public class TheFoolEntity extends StandEntity {
     @Override
     public void initSpecial3() {
         if (curAttack != null && curAttack.id == pound.id && getMoveStun() < 12) initSlam(3);
-        if (canAttack() && handleAttack(sandclone, JCraft.standS3CD, 9)) {
+        if (canAttack() && handleAttack(sandclone, JCraft.standS3CD, State.CREATE)) {
             setSand(true);
             playSound(SoundEvents.BLOCK_SAND_PLACE, 1, 1);
         }
@@ -279,13 +277,13 @@ public class TheFoolEntity extends StandEntity {
     public void initUtil() {
         if (!canAttack()) return;
         LivingEntity user = getUser();
-        if (user != null && user.isOnGround() && handleAttack(sandwave, JCraft.utilCD, 10)) {
+        if (user != null && user.isOnGround() && handleAttack(sandwave, JCraft.utilCD, State.SAND_WAVE)) {
             setSand(true);
             setWave(true);
             setFree(false);
 
             playSound(JSoundRegister.FOOL_BARK1, 1, 1);
-        } else if (handleAttack(glide, JCraft.utilCD, 13)) {
+        } else if (handleAttack(glide, JCraft.utilCD, State.GLIDE)) {
             setSand(true);
             setFree(false);
 
@@ -295,7 +293,7 @@ public class TheFoolEntity extends StandEntity {
 
     @Override
     public boolean shouldOffsetHeight() {
-        if (getState() == 13 || getState() == 10 || getState() == 3) return false;
+        if (getState() == State.GLIDE || getState() == State.SAND_WAVE || getState() == State.BLOCK) return false;
         return super.shouldOffsetHeight();
     }
 
@@ -312,7 +310,7 @@ public class TheFoolEntity extends StandEntity {
     }
 
     @Override
-    public void setAttack(Attack attack, int state) {
+    public void setAttack(Attack attack, State state) {
         if (getUser() != null && getUser().isSneaking()) {
             setSand(true);
             super.setAttack(Attack.copyOf(attack).setDist(attack.attackDist / 2f), state);
@@ -633,36 +631,52 @@ public class TheFoolEntity extends StandEntity {
     }
 
     // Animation code
+    public enum State implements StandAnimationState<TheFoolEntity> {
+        IDLE(builder -> builder.loop("animation.thefool.idle")),
+        SWIPE(builder -> builder.playAndHold("animation.thefool.swipe")),
+        BLOCK((theFool, builder) -> builder.loop("animation.thefool." +
+                (theFool.isSand() ? "crouchblock" : "block"))),
+        COMBO(builder -> builder.playAndHold("animation.thefool.combo")),
+        AIR_BARRAGE(builder -> builder.loop("animation.thefool.airbarrage")),
+        LAUNCH(builder -> builder.playAndHold("animation.thefool.launch")),
+        POUND_UP(builder -> builder.playAndHold("animation.thefool.poundup")),
+        POUND_DOWN(builder -> builder.playAndHold("animation.thefool.pounddown")),
+        CHARGE(builder -> builder.loop("animation.thefool.charge")),
+        CHARGE_HIT(builder -> builder.playAndHold("animation.thefool.charge_hit")),
+        CREATE(builder -> builder.playAndHold("animation.thefool.create")),
+        SAND_WAVE(builder -> builder.loop("animation.thefool.sandwave")),
+        SANDSTORM(builder -> builder.playAndHold("animation.thefool.sandstorm")),
+        GLIDE(builder -> builder.loop("animation.thefool.glide")),
+        TORNADO(builder -> builder.loop("animation.thefool.tornado"));
+
+        private final BiConsumer<TheFoolEntity, AnimationBuilder> animator;
+
+        State(Consumer<AnimationBuilder> animator) {
+            this((fool, builder) -> animator.accept(builder));
+        }
+
+        State(BiConsumer<TheFoolEntity, AnimationBuilder> animator) {
+            this.animator = animator;
+        }
+
+        @Override
+        public void playAnimation(TheFoolEntity stand, AnimationBuilder builder) {
+            animator.accept(stand, builder);
+        }
+    }
+
     @Override
-    protected <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
-        String blockAnim = isSand() ? "animation.thefool.crouchblock" : "animation.thefool.block";
+    protected State[] getStateValues() {
+        return State.values();
+    }
 
-        AnimationController<E> controller = event.getController();
-        AnimationBuilder builder = new AnimationBuilder();
+    @Override
+    protected @Nullable String getSummonAnimation() {
+        return "animation.thefool.summon";
+    }
 
-        if (playSummonAnim) {
-            controller.setAnimation(builder.playAndHold("animation.thefool.summon"));
-            return PlayState.CONTINUE;
-        }
-
-        if (getSameState()) controller.markNeedsReload();
-        switch (getState()) {
-            default -> controller.setAnimation(builder.loop("animation.thefool.idle"));
-            case 2 -> controller.setAnimation(builder.playAndHold("animation.thefool.swipe"));
-            case 3 -> controller.setAnimation(builder.loop(blockAnim));
-            case 4 -> controller.setAnimation(builder.playAndHold("animation.thefool.combo"));
-            case 5 -> controller.setAnimation(builder.playAndHold("animation.thefool.airbarrage"));
-            case 6 -> controller.setAnimation(builder.playAndHold("animation.thefool.launch"));
-            case 7 -> controller.setAnimation(builder.playAndHold("animation.thefool.poundup"));
-            case 8 -> controller.setAnimation(builder.loop("animation.thefool.charge"));
-            case 9 -> controller.setAnimation(builder.playAndHold("animation.thefool.create"));
-            case 10 -> controller.setAnimation(builder.loop("animation.thefool.sandwave"));
-            case 11 -> controller.setAnimation(builder.playAndHold("animation.thefool.charge_hit"));
-            case 12 -> controller.setAnimation(builder.playAndHold("animation.thefool.sandstorm"));
-            case 13 -> controller.setAnimation(builder.loop("animation.thefool.glide"));
-            case 14 -> controller.setAnimation(builder.playAndHold("animation.thefool.pounddown"));
-            case 15 -> controller.setAnimation(builder.loop("animation.thefool.tornado"));
-        }
-        return PlayState.CONTINUE;
+    @Override
+    public State getBlockState() {
+        return State.BLOCK;
     }
 }

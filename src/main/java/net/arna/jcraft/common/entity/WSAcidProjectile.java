@@ -109,7 +109,7 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
 
         if (entity instanceof LivingEntity living) {
             LivingEntity target = living;
-            if (entity instanceof StandEntity stand && stand.hasUser())
+            if (entity instanceof StandEntity<?, ?> stand && stand.hasUser())
                 target = stand.getUserOrThrow();
             damageLogic(world, target, Vec3d.ZERO, 10, 1, false, 5f, false, 6, DamageSource.thrownProjectile(this, owner), owner);
             target.addStatusEffect(new StatusEffectInstance(JStatusRegister.WSPOISON, 60, 0, false, true));
@@ -174,7 +174,7 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
         if (inGround) {
             if (!world.isClient && dataTracker.get(SPLAT) && age % 4 == 0) {
                 List<Entity> except;
-                StandEntity ownerStand = ((IEntityDataSaver) owner).getStand();
+                StandEntity<?, ?> ownerStand = ((IEntityDataSaver) owner).getStand();
                 if (ownerStand != null) except = List.of(owner, ownerStand);
                 else except = List.of(owner);
 

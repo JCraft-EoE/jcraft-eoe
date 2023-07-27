@@ -19,7 +19,7 @@ public class StandlessEffect extends StatusEffect {
 
     @Override
     public void applyUpdateEffect(LivingEntity entity, int amplifier) {
-        StandEntity stand = ((IEntityDataSaver)entity).getStand();
+        StandEntity<?, ?> stand = ((IEntityDataSaver)entity).getStand();
         if (stand != null)
             stand.desummon();
     }

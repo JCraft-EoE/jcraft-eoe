@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 public class JDamageSources {
-    public static DamageSource stand(StandEntity stand) {
+    public static DamageSource stand(StandEntity<?, ?> stand) {
         return new EntityDamageSource("stand", stand.getUser()).setBypassesArmor();
     }
 

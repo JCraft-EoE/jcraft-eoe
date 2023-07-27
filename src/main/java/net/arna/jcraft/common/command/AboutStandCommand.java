@@ -3,9 +3,8 @@ package net.arna.jcraft.common.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.attack.Attack;
-import net.minecraft.command.CommandRegistryAccess;
+import net.arna.jcraft.common.entity.StandEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -25,7 +24,7 @@ public class AboutStandCommand {
             "Utility"
     );
 
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment) {
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(CommandManager.literal("stand")
                 .then(CommandManager.literal("about").executes(AboutStandCommand::run)));
     }
@@ -37,7 +36,7 @@ public class AboutStandCommand {
             return 0;
         }
 
-        if (playerEntity.getFirstPassenger() instanceof StandEntity stand) {
+        if (playerEntity.getFirstPassenger() instanceof StandEntity<?, ?> stand) {
             StringBuilder readout = new StringBuilder("Name: §e");
 
             // Name

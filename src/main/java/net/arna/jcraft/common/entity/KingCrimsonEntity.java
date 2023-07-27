@@ -9,7 +9,10 @@ import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.ShaderDeactivationPacket;
-import net.arna.jcraft.common.util.*;
+import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.util.ITimeStop;
+import net.arna.jcraft.common.util.MobilityType;
+import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JPacketRegistry;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
@@ -43,16 +46,14 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.PlayState;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class KingCrimsonEntity extends StandEntity {
+public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimsonEntity.State> {
     public static final Attack crm1 = new Attack(11, JCraft.lightCooldown + 1, 0.85f, 20, 10, 1.5, 5f, 0.1f, AttackType.BOX, 1f, 0.3f, 0, JSoundRegister.IMPACT_4)
             .setBlockstun(6)
             .appendHitbox(new HitBoxData(0, 0, 1))
@@ -98,7 +99,7 @@ public class KingCrimsonEntity extends StandEntity {
             .setLaunch()
             .setInfo("Barrage (Final Hit)", "");
 
-    private static final TrackedData<Integer> TIMEERASETIME;
+    private static final TrackedData<Integer> TIME_ERASE_TIME;
     private final Map<Entity, Vec3d> predictionInfo = new WeakHashMap<>();
 
     public KingCrimsonEntity(World worldIn) {
@@ -143,21 +144,21 @@ public class KingCrimsonEntity extends StandEntity {
     }
 
     static {
-        TIMEERASETIME = DataTracker.registerData(KingCrimsonEntity.class, TrackedDataHandlerRegistry.INTEGER);
+        TIME_ERASE_TIME = DataTracker.registerData(KingCrimsonEntity.class, TrackedDataHandlerRegistry.INTEGER);
     }
 
     public int getTETime() {
-        return this.dataTracker.get(TIMEERASETIME);
+        return this.dataTracker.get(TIME_ERASE_TIME);
     }
 
     public void setTETime(int teTime) {
-        this.dataTracker.set(TIMEERASETIME, teTime);
+        this.dataTracker.set(TIME_ERASE_TIME, teTime);
     }
 
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
-        this.getDataTracker().startTracking(TIMEERASETIME, 0);
+        this.getDataTracker().startTracking(TIME_ERASE_TIME, 0);
     }
 
     // Moveset
@@ -166,8 +167,8 @@ public class KingCrimsonEntity extends StandEntity {
         if (!canAttack()) return;
 
         if (getUserOrThrow().isSneaking())
-            handleAttack(crm1, JCraft.standLightCD, 14);
-        else if (handleAttack(light, JCraft.standLightCD, 2))
+            handleAttack(crm1, JCraft.standLightCD, State.SWEEP);
+        else if (handleAttack(light, JCraft.standLightCD, State.DUAL_CHOP))
             playSound(JSoundRegister.KC_DUAL_CHOP, 1, 1);
     }
 
@@ -178,11 +179,11 @@ public class KingCrimsonEntity extends StandEntity {
         boolean idling = getMoveStun() < 1;
 
         if (curAttack != heavy) {
-            if (idling && handleAttack(heavy, JCraft.standHeavyCD, 10)) {
+            if (idling && handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY)) {
                 playSound(JSoundRegister.KC_HEAVY, 1, 1);
             }
         } else if (getMoveStun() < 7) {
-            setAttack(overhead, 4);
+            setAttack(overhead, State.OVERHEAD);
             playSound(JSoundRegister.KC_HEAVY2, 1, 1);
         }
     }
@@ -190,16 +191,16 @@ public class KingCrimsonEntity extends StandEntity {
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, 6))
+        if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
             playSound(JSoundRegister.KC_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack() || !hasUser()) return;
-        if (getUserOrThrow().isSneaking() && handleAttack(bloodthrow, JCraft.standS1CD, 11))
+        if (getUserOrThrow().isSneaking() && handleAttack(bloodthrow, JCraft.standS1CD, State.BLOOD_THROW))
             getUserOrThrow().damage(DamageSource.MAGIC, 0.1f);
-        else if (handleAttack(eyechop, JCraft.standS1CD, 7)) playSound(JSoundRegister.KC_EYE_CHOP, 1, 1);
+        else if (handleAttack(eyechop, JCraft.standS1CD, State.EYE_CHOP)) playSound(JSoundRegister.KC_EYE_CHOP, 1, 1);
     }
 
     private void beginPrediction() {
@@ -252,7 +253,7 @@ public class KingCrimsonEntity extends StandEntity {
             return;
         }
 
-        if (handleAttack(timeerase, JCraft.standUltCD, 8)) {
+        if (handleAttack(timeerase, JCraft.standUltCD, State.TIME_ERASE)) {
             if (getUser() instanceof ServerPlayerEntity player)
                 player.networkHandler.sendPacket(new PlaySoundS2CPacket(JSoundRegister.TIME_ERASE, SoundCategory.PLAYERS, getX(), getY(), getZ(), 1, 1, 0));
         }
@@ -261,7 +262,7 @@ public class KingCrimsonEntity extends StandEntity {
     @Override
     public void initSpecial2() {
         if (!canAttack()) return;
-        if (handleAttack(donut, JCraft.standS2CD, 5))
+        if (handleAttack(donut, JCraft.standS2CD, State.DONUT))
             playSound(JSoundRegister.KC_DONUT, 1, 1);
     }
 
@@ -278,8 +279,8 @@ public class KingCrimsonEntity extends StandEntity {
 
             if (start) {
                 if (user.isSneaking())
-                    handleAttack(epitaph, JCraft.standS3CD, 9);
-                else if (handleAttack(prediction, JCraft.standS3CD, 12)) {
+                    handleAttack(epitaph, JCraft.standS3CD, State.EPITAPH);
+                else if (handleAttack(prediction, JCraft.standS3CD, State.PREDICT)) {
                     predictionInfo.clear();
                     playSound(JSoundRegister.KC_EPITAPH, 1, 1);
 
@@ -323,7 +324,7 @@ public class KingCrimsonEntity extends StandEntity {
 
     @Override
     public void initUtil() {
-        if (!canAttack() || !hasUser() || !handleAttack(timeskip, JCraft.utilCD, 0)) return;
+        if (!canAttack() || !hasUser() || !handleAttack(timeskip, JCraft.utilCD, State.IDLE)) return;
         LivingEntity user = getUserOrThrow();
 
         Vec3d pos = user.getPos();
@@ -347,7 +348,7 @@ public class KingCrimsonEntity extends StandEntity {
         curAttack = null;
         queuedAttack = null;
         setMoveStun(2);
-        setState(0); // Basically state 1, but runs logic once
+        setState(State.IDLE); // Basically state 1, but runs logic once
     }
 
     @Override
@@ -494,7 +495,7 @@ public class KingCrimsonEntity extends StandEntity {
 
         if (entity instanceof LivingEntity livingEntity) {
             stun(livingEntity, 20, 0);
-            if (entity.getFirstPassenger() instanceof StandEntity stand)
+            if (entity.getFirstPassenger() instanceof StandEntity<?, ?> stand)
                 stand.cancelAttack();
         }
 
@@ -505,7 +506,7 @@ public class KingCrimsonEntity extends StandEntity {
 
     @Override
     public void whiffCounter() {
-        setAttack(counterMiss, 13);
+        setAttack(counterMiss, State.COUNTER_MISS);
         stun(getUser(), counterMiss.moveStun, 0);
         playSound(JSoundRegister.KC_RAGE, 1, 1);
     }
@@ -528,7 +529,7 @@ public class KingCrimsonEntity extends StandEntity {
         fakeUserData.putInt("StandID", getStandType().getId());
         fakeUserData.putInt("StandSkin", getSkin());
 
-        StandEntity clone = JCraft.summon(world, doppelganger);
+        StandEntity<?, ?> clone = JCraft.summon(world, doppelganger);
         if (clone == null) return;
         clone.blocking = true;
         clone.setMoveStun(32767);
@@ -561,7 +562,7 @@ public class KingCrimsonEntity extends StandEntity {
             playerEntity = serverPlayer;
         }
 
-        if (getState() == 12) {
+        if (getState() == State.PREDICT) {
             if (getMoveStun() == prediction.moveStun - prediction.initTime)
                 beginPrediction(); // Clientside prediction, serverside is in specialAttack()
 
@@ -629,7 +630,7 @@ public class KingCrimsonEntity extends StandEntity {
         }
     }
 
-    public static List<Entity> getEntitiesToCatch(World world, StandEntity stand, PlayerEntity player) {
+    public static List<Entity> getEntitiesToCatch(World world, StandEntity<?, ?> stand, PlayerEntity player) {
         if (world == null || stand == null) return List.of();
 
         return world.getEntitiesByClass(Entity.class, stand.getBoundingBox().expand(64),
@@ -699,33 +700,46 @@ public class KingCrimsonEntity extends StandEntity {
 
 
     // Animations
-    @SuppressWarnings("SameReturnValue")
-    @Override
-    protected <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
-        AnimationController<E> controller = event.getController();
-        AnimationBuilder builder = new AnimationBuilder();
+    public enum State implements StandAnimationState<KingCrimsonEntity> {
+        IDLE(builder -> builder.loop("animation.kingcrimson.idle")),
+        DUAL_CHOP(builder -> builder.playAndHold("animation.kingcrimson.dual_chop")),
+        BLOCK(builder -> builder.loop("animation.kingcrimson.block")),
+        OVERHEAD(builder -> builder.playAndHold("animation.kingcrimson.overhead")),
+        DONUT(builder -> builder.playAndHold("animation.kingcrimson.donut")),
+        BARRAGE(builder -> builder.loop("animation.kingcrimson.barrage")),
+        EYE_CHOP(builder -> builder.playAndHold("animation.kingcrimson.eye_chop")),
+        TIME_ERASE(builder -> builder.playAndHold("animation.kingcrimson.time_erase")),
+        EPITAPH(builder -> builder.playAndHold("animation.kingcrimson.epitaph")),
+        HEAVY(builder -> builder.playAndHold("animation.kingcrimson.heavy")),
+        BLOOD_THROW(builder -> builder.playAndHold("animation.kingcrimson.bloodthrow")),
+        PREDICT(builder -> builder.playAndHold("animation.kingcrimson.predict")),
+        COUNTER_MISS(builder -> builder.playAndHold("animation.kingcrimson.counter_miss")),
+        SWEEP(builder -> builder.playAndHold("animation.kingcrimson.sweep"));
 
-        if (playSummonAnim) {
-            controller.setAnimation(builder.playOnce("animation.kingcrimson.summon"));
-            return PlayState.CONTINUE;
+        private final Consumer<AnimationBuilder> animator;
+
+        State(Consumer<AnimationBuilder> animator) {
+            this.animator = animator;
         }
-        if (getSameState()) controller.markNeedsReload();
-        switch (this.getState()) {
-            default -> controller.setAnimation(builder.loop("animation.kingcrimson.idle"));
-            case 2 -> controller.setAnimation(builder.playAndHold("animation.kingcrimson.dual_chop"));
-            case 3 -> controller.setAnimation(builder.loop("animation.kingcrimson.block"));
-            case 4 -> controller.setAnimation(builder.playAndHold("animation.kingcrimson.overhead"));
-            case 5 -> controller.setAnimation(builder.playAndHold("animation.kingcrimson.donut"));
-            case 6 -> controller.setAnimation(builder.loop("animation.kingcrimson.barrage"));
-            case 7 -> controller.setAnimation(builder.playAndHold("animation.kingcrimson.eye_chop"));
-            case 8 -> controller.setAnimation(builder.playAndHold("animation.kingcrimson.time_erase"));
-            case 9 -> controller.setAnimation(builder.playAndHold("animation.kingcrimson.epitaph"));
-            case 10 -> controller.setAnimation(builder.playAndHold("animation.kingcrimson.heavy"));
-            case 11 -> controller.setAnimation(builder.playAndHold("animation.kingcrimson.bloodthrow"));
-            case 12 -> controller.setAnimation(builder.playAndHold("animation.kingcrimson.predict"));
-            case 13 -> controller.setAnimation(builder.playAndHold("animation.kingcrimson.counter_miss"));
-            case 14 -> controller.setAnimation(builder.playAndHold("animation.kingcrimson.sweep"));
+
+        @Override
+        public void playAnimation(KingCrimsonEntity stand, AnimationBuilder builder) {
+            animator.accept(builder);
         }
-        return PlayState.CONTINUE;
+    }
+
+    @Override
+    protected State[] getStateValues() {
+        return State.values();
+    }
+
+    @Override
+    protected @Nullable String getSummonAnimation() {
+        return "animation.kingcrimson.summon";
+    }
+
+    @Override
+    public State getBlockState() {
+        return State.BLOCK;
     }
 }

@@ -46,7 +46,7 @@ public abstract class StandObtainmentItem extends Item {
             playerData.putInt("StandID", standIOMap.get(standID));
 
             // Re-summon users stand
-            StandEntity stand = userDataSaver.getStand();
+            StandEntity<?, ?> stand = userDataSaver.getStand();
             if (stand != null)
                 stand.desummon();
 

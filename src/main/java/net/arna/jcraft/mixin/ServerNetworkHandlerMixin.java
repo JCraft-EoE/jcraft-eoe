@@ -15,7 +15,7 @@ public abstract class ServerNetworkHandlerMixin {
             , method = "onPlayerMove"
             )
     public void jcraft$onPlayerMove(PlayerMoveC2SPacket packet, CallbackInfo ci) {
-        if ( player.getFirstPassenger() instanceof StandEntity stand) {
+        if ( player.getFirstPassenger() instanceof StandEntity<?, ?> stand) {
             stand.UpdateRemoveMovement(
                     player.prevX - packet.getX(player.getX()),
                     player.prevY - packet.getX(player.getY()),

@@ -5,7 +5,10 @@ import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
-import net.arna.jcraft.common.util.*;
+import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.common.util.MobilityType;
+import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
@@ -29,18 +32,16 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.PlayState;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 //TODO: give MiH a trail during speed slice and heaven's judgement
-public class MadeInHeavenEntity extends StandEntity {
+public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHeavenEntity.State> {
     // placeholder sound
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 8, 5, 1.5, 4f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, SoundEvents.ITEM_TRIDENT_HIT)
             .setInfo("Slice", "quick combo starter");
@@ -70,13 +71,14 @@ public class MadeInHeavenEntity extends StandEntity {
             .setMobility(MobilityType.DASH)
             .crouchingVariation(judgement)
             .setInfo("Heaven's Judgement", "rapidly circles a looked-at target within 4m at a radius of 7m");
-
-    public Vec3d judgementInitPos = Vec3d.ZERO;
-    public Vec3d judgementInitRot = Vec3d.ZERO;
-
     private static final TrackedData<Integer> ACCELTIME;
     private static final TrackedData<Boolean> AFTERIMAGE;
     private static final TrackedData<Integer> TARGETID;
+
+    public Vec3d judgementInitPos = Vec3d.ZERO;
+    public Vec3d judgementInitRot = Vec3d.ZERO;
+    private LivingEntity circleTarget;
+    private float circleOrbitProg;
 
     public MadeInHeavenEntity(World worldIn) {
         super(StandType.MADE_IN_HEAVEN, worldIn);
@@ -157,69 +159,63 @@ public class MadeInHeavenEntity extends StandEntity {
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        handleAttack(light, JCraft.standLightCD, 2);
+        handleAttack(light, JCraft.standLightCD, State.SLICE);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        handleAttack(donut, JCraft.standHeavyCD, 4);
+        handleAttack(donut, JCraft.standHeavyCD, State.DONUT);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
+        if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
             playSound(JSoundRegister.MIH_BARRAGE, 1, 1);
-        }
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack()) return;
-        if (handleAttack(legcrusher, JCraft.standS1CD, 8)) {
+        if (handleAttack(legcrusher, JCraft.standS1CD, State.LEG_CRUSHER))
             playSound(JSoundRegister.MIH_LEGCRUSHER, 1, 1);
-        }
     }
 
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        if (handleAttack(timeaccel, JCraft.standUltCD, 10)) {
+        if (handleAttack(timeaccel, JCraft.standUltCD, State.TIME_ACCELERATION))
             playSound(JSoundRegister.MIH_TACCEL, 1, 1);
-        }
     }
 
     @Override
     public void initSpecial2() {
         if (!canAttack()) return;
-        if (handleAttack(furychop, JCraft.standS2CD, 9)) {
+        if (handleAttack(furychop, JCraft.standS2CD, State.FURY_CHOP))
             playSound(JSoundRegister.MIH_FURYCHOP, 1, 1);
-        }
     }
-
-    private LivingEntity circleTarget;
-    private float circleOrbitProg;
 
     @Override
     public void initSpecial3() {
         if (!canAttack()) return;
         LivingEntity user = getUserOrThrow();
-        if (user.isSneaking() && handleAttack(judgement, JCraft.standS3CD, 7)) {
+        if (user.isSneaking() && handleAttack(judgement, JCraft.standS3CD, State.JUDGEMENT)) {
             playSound(JSoundRegister.MIH_JUDGEMENT, 1, 1);
-        } else {
-            List<? extends LivingEntity> targets = JUtils.generateHitbox(world, user.getEyePos().add(getRotationVector()), 2, List.of(this, user));
-            LivingEntity target = null;
-            for (LivingEntity living : targets) {
-                target = JUtils.getUserIfStand(living);
-                break;
-            }
-            if (target != null && handleAttack(circle, JCraft.standS3CD, 11)) {
-                circleTarget = target;
-                circleOrbitProg = user.getHeadYaw();
-                setTargetId(circleTarget.getId());
-                playSound(JSoundRegister.MIH_CIRCLE, 1f, 1f);
-            }
+            return;
+        }
+
+        List<? extends LivingEntity> targets = JUtils.generateHitbox(world, user.getEyePos().add(getRotationVector()), 2, List.of(this, user));
+        LivingEntity target = null;
+        for (LivingEntity living : targets) {
+            target = JUtils.getUserIfStand(living);
+            break;
+        }
+        if (target != null && handleAttack(circle, JCraft.standS3CD, State.CIRCLE_STARTUP)) {
+            circleTarget = target;
+            circleOrbitProg = user.getHeadYaw();
+            setTargetId(circleTarget.getId());
+            playSound(JSoundRegister.MIH_CIRCLE, 1f, 1f);
         }
     }
 
@@ -227,13 +223,12 @@ public class MadeInHeavenEntity extends StandEntity {
     @Override
     public void initUtil() {
         if (!canAttack()) return;
-        if (handleAttack(speedslice, JCraft.utilCD, 6)) {
+        if (handleAttack(speedslice, JCraft.utilCD, State.SPEED_SLICE))
             playSound(JSoundRegister.MIH_SPEEDSLICE, 1, 1);
-        }
     }
 
     @Override
-    public boolean handleAttack(Attack attack, String cooldownName, int animState) {
+    public boolean handleAttack(Attack attack, String cooldownName, State animState) {
         if (!hasUser()) return false;
         LivingEntity player = getUserOrThrow();
         NbtCompound userData = ((IEntityDataSaver) player).getPersistentData();
@@ -264,7 +259,7 @@ public class MadeInHeavenEntity extends StandEntity {
             case (4) -> {
                 if (user == null) return;
 
-                if (entities.size() > 0) {
+                if (!entities.isEmpty()) {
                     for (LivingEntity ent : entities)
                         ent.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 160, 0));
                     user.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE, 160, 0));
@@ -473,29 +468,44 @@ public class MadeInHeavenEntity extends StandEntity {
         }
     }
 
-    // Animations
-    @Override
-    protected <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
-        AnimationController<E> controller = event.getController();
-        AnimationBuilder builder = new AnimationBuilder();
-        if (this.getSameState()) {
-            controller.markNeedsReload();
-        }
-        switch (this.getState()) {
-            default -> controller.setAnimation(builder.loop("animation.mih.idle"));
-            case 2 -> controller.setAnimation(builder.playAndHold("animation.mih.slice"));
-            case 3 -> controller.setAnimation(builder.loop("animation.mih.block"));
-            case 4 -> controller.setAnimation(builder.playAndHold("animation.mih.donut"));
-            case 5 -> controller.setAnimation(builder.loop("animation.mih.barrage"));
-            case 6 -> controller.setAnimation(builder.playAndHold("animation.mih.speedslice"));
-            case 7 -> controller.setAnimation(builder.playAndHold("animation.mih.judgement"));
-            case 8 -> controller.setAnimation(builder.playAndHold("animation.mih.legcrusher"));
-            case 9 -> controller.setAnimation(builder.playAndHold("animation.mih.furychop"));
-            case 10 -> controller.setAnimation(builder.playAndHold("animation.mih.taccel"));
-            case 11 -> controller.setAnimation(builder.playAndHold("animation.mih.circlestartup"));
+    // Animation code
+    public enum State implements StandAnimationState<MadeInHeavenEntity> {
+        IDLE(builder -> builder.loop("animation.mih.idle")),
+        SLICE(builder -> builder.playAndHold("animation.mih.slice")),
+        BLOCK(builder -> builder.loop("animation.mih.block")),
+        DONUT(builder -> builder.playAndHold("animation.mih.donut")),
+        BARRAGE(builder -> builder.loop("animation.mih.barrage")),
+        SPEED_SLICE(builder -> builder.playAndHold("animation.mih.speedslice")),
+        JUDGEMENT(builder -> builder.playAndHold("animation.mih.judgement")),
+        LEG_CRUSHER(builder -> builder.playAndHold("animation.mih.legcrusher")),
+        FURY_CHOP(builder -> builder.playAndHold("animation.mih.furychop")),
+        TIME_ACCELERATION(builder -> builder.playAndHold("animation.mih.taccel")),
+        CIRCLE_STARTUP(builder -> builder.playAndHold("animation.mih.circlestartup"));
 
-            //default -> throw new IllegalStateException("Unexpected value: " + this.getState());
+        private final Consumer<AnimationBuilder> animator;
+
+        State(Consumer<AnimationBuilder> animator) {
+            this.animator = animator;
         }
-        return PlayState.CONTINUE;
+
+        @Override
+        public void playAnimation(MadeInHeavenEntity stand, AnimationBuilder builder) {
+            animator.accept(builder);
+        }
+    }
+
+    @Override
+    protected State[] getStateValues() {
+        return State.values();
+    }
+
+    @Override
+    protected @Nullable String getSummonAnimation() {
+        return null;
+    }
+
+    @Override
+    public State getBlockState() {
+        return State.BLOCK;
     }
 }

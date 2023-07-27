@@ -311,12 +311,12 @@ public class JCraft implements ModInitializer {
         auWorld.setChunkForced(chunkX, chunkY, true);
     }
 
-    public static StandEntity summon(World world, LivingEntity player) {
+    public static StandEntity<?, ?> summon(World world, LivingEntity player) {
         if (player.hasStatusEffect(JStatusRegister.STANDLESS)) return null;
 
         NbtCompound data = ((IEntityDataSaver) player).getPersistentData();
         StandType type = StandType.fromId(data.getInt("StandID"));
-        StandEntity stand = type == null ? null : type.createNew(world);
+        StandEntity<?, ?> stand = type == null ? null : type.createNew(world);
 
         if (stand == null) return null;
 

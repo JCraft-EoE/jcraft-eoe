@@ -37,7 +37,7 @@ public abstract class LivingEntityMixin {
     @Inject(cancellable = true, method = "getJumpBoostVelocityModifier", at = @At("HEAD"))
     public void jcraft$getJumpBoostVelocityModifier(CallbackInfoReturnable<Double> cir) {
         LivingEntity player = ((LivingEntity) (Object) this);
-        StandEntity stand = ((IEntityDataSaver) this).getStand();
+        StandEntity<?, ?> stand = ((IEntityDataSaver) this).getStand();
         StatusEffectInstance stun = player.getStatusEffect(JStatusRegister.DAZED);
         if (
                 player.hasStatusEffect(JStatusRegister.KNOCKDOWN) || // Knocked down
@@ -58,7 +58,7 @@ public abstract class LivingEntityMixin {
     protected void jcraft$applyDamage(DamageSource source, float amount, CallbackInfo info) {
         LivingEntity player = ((LivingEntity) (Object) this);
 
-        if (player.getFirstPassenger() instanceof StandEntity stand) {
+        if (player.getFirstPassenger() instanceof StandEntity<?, ?> stand) {
             Attack attack = stand.curAttack;
             if (attack != null) {
                 if (attack.attackType == AttackType.COUNTER && stand.getMoveStun() < (attack.moveStun - attack.initTime)) {

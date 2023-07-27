@@ -154,7 +154,7 @@ public abstract class PlayerEntityMixin implements ISpec, IComboCounter {
     protected void jcraft$applyDamage(DamageSource source, float amount, CallbackInfo info) {
         PlayerEntity player = ((PlayerEntity) (Object) this);
 
-        if (player.getFirstPassenger() instanceof StandEntity stand) {
+        if (player.getFirstPassenger() instanceof StandEntity<?, ?> stand) {
             Attack attack = stand.curAttack;
             if (attack != null) {
                 if (attack.attackType == AttackType.COUNTER && stand.getMoveStun() < (attack.moveStun - attack.initTime)) {

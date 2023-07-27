@@ -26,16 +26,16 @@ public abstract class ModEntityDataSaver implements IEntityDataSaver {
     }
 
     // Stand tracking
-    @Nullable private StandEntity stand;
+    @Nullable private StandEntity<?, ?> stand;
 
-    public void setStand(@Nullable StandEntity standEntity) {
+    public void setStand(@Nullable StandEntity<?, ?> standEntity) {
         this.stand = standEntity;
     }
 
-    public StandEntity getStand() {
+    public StandEntity<?, ?> getStand() {
         if (this.stand == null || !this.stand.isAlive() || this.stand.isRemoved()) {
             this.stand = null;
-            if (this.getFirstPassenger() instanceof StandEntity standEntity)
+            if (this.getFirstPassenger() instanceof StandEntity<?, ?> standEntity)
                 this.stand = standEntity;
         }
         return this.stand;

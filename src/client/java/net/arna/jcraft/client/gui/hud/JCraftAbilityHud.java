@@ -100,7 +100,7 @@ public class JCraftAbilityHud extends DrawableHelper implements ClientTickEvents
         int selectedY = isMid ? iconSpacing * 11 : 0;
 
         if (player != null) {
-            StandEntity stand = ( (IEntityDataSaver)player ).getStand();
+            StandEntity<?, ?> stand = ( (IEntityDataSaver)player ).getStand();
             JCraftSpec spec = JClientUtils.getSpec(player);
 
             if (stand == null) {

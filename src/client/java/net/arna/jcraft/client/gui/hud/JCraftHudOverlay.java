@@ -29,7 +29,7 @@ public class JCraftHudOverlay {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1, 1, 1, 1);
 
-        if (!(player.getFirstPassenger() instanceof StandEntity stand)) return;
+        if (!(player.getFirstPassenger() instanceof StandEntity<?, ?> stand)) return;
         RenderSystem.setShaderTexture(0, EMPTY_GAUGE);
         DrawableHelper.drawTexture(matrixStack, x - gaugeWidth / 2, height - 65, 0, 0, gaugeWidth, 5, gaugeWidth, 5);
         RenderSystem.setShaderTexture(0, FULL_GAUGE);

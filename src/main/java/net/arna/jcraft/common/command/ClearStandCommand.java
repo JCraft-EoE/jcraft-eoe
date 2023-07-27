@@ -35,7 +35,7 @@ public class ClearStandCommand {
                 if (!data.contains("StandID") || data.getInt("StandID") == 0) continue;
                 data.putInt("StandID", 0);
 
-                StandEntity stand = entityData.getStand();
+                StandEntity<?, ?> stand = entityData.getStand();
                 if (stand != null)
                     stand.detach();
             }

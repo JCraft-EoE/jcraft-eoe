@@ -58,7 +58,7 @@ public abstract class BipedEntityModelMixin<T extends LivingEntity> {
         if (livingEntity.isHolding(JObjectRegistry.FVREVOLVER))
             CrossbowPosing.hold(rightArm, leftArm, head, livingEntity.getMainArm() == Arm.RIGHT);
 
-        if (livingEntity.getPose() == EntityPose.STANDING && livingEntity.getFirstPassenger() instanceof StandEntity stand) {
+        if (livingEntity.getPose() == EntityPose.STANDING && livingEntity.getFirstPassenger() instanceof StandEntity<?, ?> stand) {
             //im sorry but you cant make a switch statement for instanceof
             if (stand instanceof StarPlatinumEntity) {
                 // 0.017453292F = pi/180

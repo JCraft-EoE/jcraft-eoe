@@ -4,6 +4,7 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.minecraft.entity.LivingEntity;
@@ -13,15 +14,13 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.PlayState;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 
 import java.util.List;
+import java.util.function.Consumer;
 
-public class WhiteSnakeEntity extends StandEntity {
+public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEntity.State> {
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 14, 7, 1.5, 5f, 0.75f, AttackType.BOX, 0.6f, 0.2f, 0, JSoundRegister.IMPACT_3)
             .setInfo("Punch", "quick combo starter");
     public static final Attack legcrusher = new Attack(4, 20, 0.75f, 22, 16, 1.75, 7f, 0.25f, AttackType.BOX, 1.6f, 0.2f, 0, JSoundRegister.TW_KICK_HIT)
@@ -91,43 +90,43 @@ public class WhiteSnakeEntity extends StandEntity {
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        handleAttack(light, JCraft.standLightCD, 2);
+        handleAttack(light, JCraft.standLightCD, State.LIGHT);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, 5))
+        if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
             playSound(JSoundRegister.WS_BARRAGE, 1, 1);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        if (handleAttack(donut, JCraft.standHeavyCD, 4))
+        if (handleAttack(donut, JCraft.standHeavyCD, State.DONUT))
             playSound(JSoundRegister.WS_DONUT, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack()) return;
-        if (handleAttack(memorydisk, JCraft.standS1CD, 8))
+        if (handleAttack(memorydisk, JCraft.standS1CD, State.DISC))
             playSound(JSoundRegister.WS_MEMORY_DISC, 1, 1);
     }
 
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        if (getRemote() && handleAttack(meltyourheart, JCraft.standUltCD, 18))
+        if (getRemote() && handleAttack(meltyourheart, JCraft.standUltCD, State.MELT_YOUR_HEART))
             playSound(JSoundRegister.WS_MYH, 1, 1);
-        else if (handleAttack(standdisk, JCraft.standUltCD, 8))
+        else if (handleAttack(standdisk, JCraft.standUltCD, State.DISC))
             playSound(JSoundRegister.WS_STAND_DISC, 1, 1);
     }
 
     @Override
     public void initSpecial2() {
         if (!canAttack()) return;
-        if (handleAttack(legcrusher, JCraft.standS2CD, 6))
+        if (handleAttack(legcrusher, JCraft.standS2CD, State.LEG_CRUSHER))
             playSound(JSoundRegister.WS_LEGCRUSH, 1, 1);
     }
 
@@ -136,8 +135,8 @@ public class WhiteSnakeEntity extends StandEntity {
         if (!canAttack() || !hasUser()) return;
 
         if (getUserOrThrow().isSneaking())
-            handleAttack(chargedspew, JCraft.standS3CD, 17);
-        else handleAttack(poisonspew, JCraft.standS3CD, 7);
+            handleAttack(chargedspew, JCraft.standS3CD, State.ACID_SPEW_CHARGED);
+        else handleAttack(poisonspew, JCraft.standS3CD, State.ACID_SPEW);
     }
 
     @Override
@@ -222,11 +221,11 @@ public class WhiteSnakeEntity extends StandEntity {
         //HitResult groundCheck = this.world.raycast(new RaycastContext(getEyePos(), pos.add(0, -1.0E-5F, 0), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
         boolean onGround = isOnGround();
 
-        if (getState() < 2) { // Replace idle anim
-            if (s > 0) setStateNoReset(onGround ? 12 : 16);
-            if (s < 0) setStateNoReset(onGround ? 11 : 15);
-            if (f < 0) setStateNoReset(onGround ? 10 : 14);
-            if (f > 0) setStateNoReset(onGround ? 9 : 13);
+        if (getState() == State.IDLE) { // Replace idle anim
+            if (s > 0) setStateNoReset(onGround ? State.RIGHT : State.RIGHT_DASH);
+            if (s < 0) setStateNoReset(onGround ? State.LEFT : State.LEFT_DASH);
+            if (f < 0) setStateNoReset(onGround ? State.BACKWARD : State.BACKWARD_DASH);
+            if (f > 0) setStateNoReset(onGround ? State.FORWARD : State.FORWARD_DASH);
         }
 
         if (onGround) { // If grounded
@@ -243,8 +242,7 @@ public class WhiteSnakeEntity extends StandEntity {
 
         remoteSpeed = remoteSpeed
                 .add(rotVec.multiply(f * moveSpeed)) // Forward movement
-                .add(rotVec.rotateY(1.5707963f).multiply(s * moveSpeed)) // Side movement
-        ;
+                .add(rotVec.rotateY(1.5707963f).multiply(s * moveSpeed)); // Side movement
 
         remoteSpeed = remoteSpeed.multiply(dragMult, 1, dragMult);
 
@@ -257,41 +255,52 @@ public class WhiteSnakeEntity extends StandEntity {
     }
 
     // Animation code
+    public enum State implements StandAnimationState<WhiteSnakeEntity> {
+        IDLE(builder -> builder.loop("animation.whitesnake.idle")),
+        LIGHT(builder -> builder.playAndHold("animation.whitesnake.light")),
+        BLOCK(builder -> builder.loop("animation.whitesnake.block")),
+        DONUT(builder -> builder.playAndHold("animation.whitesnake.donut")),
+        BARRAGE(builder -> builder.loop("animation.whitesnake.barrage")),
+        LEG_CRUSHER(builder -> builder.playAndHold("animation.whitesnake.legcrusher")),
+        ACID_SPEW(builder -> builder.playAndHold("animation.whitesnake.acidspew")),
+        ACID_SPEW_CHARGED(builder -> builder.playAndHold("animation.whitesnake.acidspew_charged")),
+        DISC(builder -> builder.playAndHold("animation.whitesnake.disc")),
+
+        FORWARD(builder -> builder.loop("animation.whitesnake.forw")),
+        BACKWARD(builder -> builder.loop("animation.whitesnake.back")),
+        LEFT(builder -> builder.loop("animation.whitesnake.left")),
+        RIGHT(builder -> builder.loop("animation.whitesnake.right")),
+        FORWARD_DASH(builder -> builder.loop("animation.whitesnake.fdash")),
+        BACKWARD_DASH(builder -> builder.loop("animation.whitesnake.bdash")),
+        LEFT_DASH(builder -> builder.loop("animation.whitesnake.ldash")),
+        RIGHT_DASH(builder -> builder.loop("animation.whitesnake.rdash")),
+
+        MELT_YOUR_HEART(builder -> builder.playAndHold("animation.whitesnake.meltyourheart"));
+
+        private final Consumer<AnimationBuilder> animator;
+
+        State(Consumer<AnimationBuilder> animator) {
+            this.animator = animator;
+        }
+
+        @Override
+        public void playAnimation(WhiteSnakeEntity stand, AnimationBuilder builder) {
+            animator.accept(builder);
+        }
+    }
+
     @Override
-    protected <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
-        AnimationController<E> controller = event.getController();
-        AnimationBuilder builder = new AnimationBuilder();
+    protected State[] getStateValues() {
+        return State.values();
+    }
 
-        if (playSummonAnim) {
-            controller.setAnimation(builder.playOnce("animation.whitesnake.summon"));
-            return PlayState.CONTINUE;
-        }
+    @Override
+    protected @Nullable String getSummonAnimation() {
+        return "animation.whitesnake.summon";
+    }
 
-        if (getSameState()) controller.markNeedsReload();
-        int state = getState();
-        switch (state) {
-            default -> controller.setAnimation(builder.loop("animation.whitesnake.idle"));
-            case 2 -> controller.setAnimation(builder.playAndHold("animation.whitesnake.light"));
-            case 3 -> controller.setAnimation(builder.loop("animation.whitesnake.block"));
-            case 4 -> controller.setAnimation(builder.playAndHold("animation.whitesnake.donut"));
-            case 5 -> controller.setAnimation(builder.loop("animation.whitesnake.barrage"));
-            case 6 -> controller.setAnimation(builder.playAndHold("animation.whitesnake.legcrusher"));
-            case 7 -> controller.setAnimation(builder.playAndHold("animation.whitesnake.acidspew"));
-            case 8 -> controller.setAnimation(builder.playAndHold("animation.whitesnake.disc"));
-
-            case 9 -> controller.setAnimation(builder.loop("animation.whitesnake.forw"));
-            case 10 -> controller.setAnimation(builder.loop("animation.whitesnake.back"));
-            case 11 -> controller.setAnimation(builder.loop("animation.whitesnake.left"));
-            case 12 -> controller.setAnimation(builder.loop("animation.whitesnake.right"));
-            case 13 -> controller.setAnimation(builder.loop("animation.whitesnake.fdash"));
-            case 14 -> controller.setAnimation(builder.loop("animation.whitesnake.bdash"));
-            case 15 -> controller.setAnimation(builder.loop("animation.whitesnake.ldash"));
-            case 16 -> controller.setAnimation(builder.loop("animation.whitesnake.rdash"));
-
-            case 17 -> controller.setAnimation(builder.playAndHold("animation.whitesnake.acidspew_charged"));
-            case 18 -> controller.setAnimation(builder.playAndHold("animation.whitesnake.meltyourheart"));
-        }
-        controller.setAnimationSpeed(state > 8 ? 1.2 : 1);
-        return PlayState.CONTINUE;
+    @Override
+    public State getBlockState() {
+        return State.BLOCK;
     }
 }

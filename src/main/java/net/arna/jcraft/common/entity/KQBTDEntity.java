@@ -1,11 +1,12 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.MobilityType;
+import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -31,16 +32,13 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.IAnimationTickable;
-import software.bernie.geckolib3.core.PlayState;
+import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 
 import java.util.List;
+import java.util.function.Consumer;
 
-public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnimationTickable {
+public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQBTDEntity.State> {
     public static final Attack light = Attack.copyOf(KillerQueenEntity.light);
     public static final Attack heavy = new Attack(2, 12, 0.75f, 9, 5, 1, 7.5f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_4).setHitspark(2).setLaunch()
             .setInfo("Elbow", "fast, short-range knockback");
@@ -57,16 +55,18 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
             .setUB(true)
             .setBlockstun(8)
             .setInfo("Bites the Dust Plant", "press the same button to detonate, sending the affected enemy back to their ");
+    private static final Attack counterMiss = new Attack(8, 0, 15, 16, 1, AttackType.BOX);
 
     private BubbleProjectile bubbleProjectile;
-    private Entity bombEntity, btdEntity;
-    private Vec3d bombBlock, btdPos;
+    private Entity btdEntity;
+    private Vec3d btdPos;
+    private boolean detonateBTD = false;
 
     //private NbtCompound userData;
     //private NbtCompound targetData;
 
     public KQBTDEntity(World worldIn) {
-        super(StandType.KILLER_QUEEN_BITES_THE_DUST, worldIn);
+        super(StandType.KILLER_QUEEN_BITES_THE_DUST, State.class, worldIn);
         super.initialize();
 
         description = "Ascended Explosive SETPLAY";
@@ -91,27 +91,17 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
                 , new Attack().setMobility(MobilityType.DASH).setInfo("Explosive Dash", "slight aoe damage, 3D movement tool"));
     }
 
-    // Necessary, otherwise it simply doesn't reference the correct ones
-    @Override
-    public Vec3d getBombPos() {
-        if (this.bombEntity != null)
-            return this.bombEntity.getPos();
-        if (this.bombBlock != null)
-            return this.bombBlock;
-        return null;
-    }
-
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        if (handleAttack(heavy, JCraft.standHeavyCD, 4))
+        if (handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY))
             playSound(JSoundRegister.KQBTD_ELBOW, 1, 1);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, 5))
+        if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
             playSound(JSoundRegister.KQ_BARRAGE, 1, 1);
     }
 
@@ -131,17 +121,15 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
                 playerData.putInt(JCraft.standS1CD, bombplantCD);
             }
         } else {
-            handleAttack(bombplant, JCraft.standS1CD, 7);
+            handleAttack(bombplant, JCraft.standS1CD, State.BOMB_PLANT);
             this.bombBlock = null;
         }
     }
 
-    boolean detonateBTD = false;
-
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        if (handleAttack(detonate, JCraft.standUltCD, 6)) {
+        if (handleAttack(detonate, JCraft.standUltCD, State.DETONATE)) {
             playSound(JSoundRegister.KQ_DETONATE, 1, 1);
             detonateBTD = false;
         }
@@ -150,21 +138,21 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
     @Override
     public void initSpecial2() {
         if (!canAttack() || !hasUser()) return;
-        if (getUserOrThrow().isSneaking() && handleAttack(bubblecounter, JCraft.standS2CD, 10)) {
+        if (getUserOrThrow().isSneaking() && handleAttack(bubblecounter, JCraft.standS2CD, State.BUBBLE_COUNTER)) {
             //playSound(JSoundRegister.KQBTD_COUNTER, 1, 1);
-        } else if (handleAttack(bubble, JCraft.standS2CD, 8))
+        } else if (handleAttack(bubble, JCraft.standS2CD, State.BUBBLE))
             playSound(JSoundRegister.KQ_UPPERCUT, 1, 1);
     }
 
     @Override
     public void initSpecial3() {
-        if (btdEntity != null && handleAttack(detonate, JCraft.ultCD, 6)) {
+        if (btdEntity != null && handleAttack(detonate, JCraft.ultCD, State.DETONATE)) {
             playSound(JSoundRegister.KQ_DETONATE, 1, 1);
             detonateBTD = true;
             return;
         }
         if (!canAttack()) return;
-        if (handleAttack(btdplant, JCraft.standS3CD, 12)) {
+        if (handleAttack(btdplant, JCraft.standS3CD, State.BTD_PLANT)) {
             //playSound(JSoundRegister.KQ_UPPERCUT, 1 ,1);
         }
     }
@@ -180,7 +168,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
             case (4) -> {
                 if (user == null) return;
 
-                if (entities.size() > 0) { // Living entities take priority
+                if (!entities.isEmpty()) { // Living entities take priority
                     bombEntity = entities.get(0);
                     bombBlock = null;
 
@@ -202,7 +190,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
                     hit.remove(this);
                     hit.remove(user);
 
-                    if (hit.size() > 0) {
+                    if (!hit.isEmpty()) {
                         bombEntity = hit.get(0);
                         bombBlock = null;
                     }
@@ -232,22 +220,14 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
                         JCraft.createParticle((ServerWorld) getWorld(), pos.x, pos.y + 2, pos.z, -4);
                         Vec3d v1 = pos.add(3, 3, 3);
                         Vec3d v2 = pos.add(-3, -3, -3);
-                        List<LivingEntity> list = world.getEntitiesByClass(LivingEntity.class, new Box(v1, v2), EntityPredicates.VALID_LIVING_ENTITY);
-
-                        if (user.getVehicle() instanceof LivingEntity livingVehicle)
-                            list.remove(livingVehicle);
-
-                        list.remove(user);
-                        list.remove(this);
-                        list.remove(livingEntity);
+                        List<LivingEntity> list = world.getEntitiesByClass(LivingEntity.class, new Box(v1, v2),
+                                EntityPredicates.VALID_LIVING_ENTITY.and(e -> e != user.getVehicle() && e != user && e != this && e != btdEntity));
 
                         for (LivingEntity l : list)
                             if (l.squaredDistanceTo(pos) < 9) {
-                                if (l.squaredDistanceTo(pos) < 2.25) {
+                                if (l.squaredDistanceTo(pos) < 2.25)
                                     world.createExplosion(user, l.getX(), l.getY() + l.getHeight() / 2, l.getZ(), 1.5f, Explosion.DestructionType.NONE);
-                                } else {
-                                    world.createExplosion(user, l.getX(), l.getY() + l.getHeight() / 2, l.getZ(), 1f, Explosion.DestructionType.NONE);
-                                }
+                                else world.createExplosion(user, l.getX(), l.getY() + l.getHeight() / 2, l.getZ(), 1f, Explosion.DestructionType.NONE);
                             }
 
                         livingEntity.teleport(btdPos.x, btdPos.y, btdPos.z);
@@ -352,7 +332,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
             if (entity instanceof LivingEntity livingEntity) {
                 stun(livingEntity, 10, 3);
 
-                StandEntity stand = ((IEntityDataSaver) livingEntity).getStand();
+                StandEntity<?, ?> stand = ((IEntityDataSaver) livingEntity).getStand();
                 if (stand != null)
                     stand.cancelAttack();
             }
@@ -363,11 +343,9 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
         }
     }
 
-    private static final Attack counterMiss = new Attack(8, 0, 15, 16, 1, AttackType.BOX);
-
     @Override
     public void whiffCounter() {
-        setAttack(counterMiss, 11);
+        setAttack(counterMiss, State.COUNTER_MISS);
         stun(getUser(), counterMiss.moveStun, 0);
     }
 
@@ -377,7 +355,7 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
     }
 
     @Override
-    public MoveSelectionResult specificMoveSelectionCriterion(Attack attack, MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity enemyStand, Attack enemyAttack) {
+    public MoveSelectionResult specificMoveSelectionCriterion(Attack attack, MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand, Attack enemyAttack) {
         Vec3d bombPos = this.getBombPos();
         if (attack == detonate && bombPos != null && target.squaredDistanceTo(bombPos) < 9.0D) {
             return MoveSelectionResult.USE;
@@ -420,7 +398,6 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
         }
     }
 
-    @SuppressWarnings("SuspiciousMethodCalls")
     protected void displayBTDParticles(ServerPlayerEntity playerEntity, Entity bombEntity) {
         boolean bombExists = bombEntity != null;
 
@@ -464,8 +441,8 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
             Vec3d pos = btdEntity.getPos();
             Vec3d v1 = pos.add(3, 3, 3);
             Vec3d v2 = pos.add(-3, -3, -3);
-            List<LivingEntity> list = world.getEntitiesByClass(LivingEntity.class, new Box(v1, v2), EntityPredicates.VALID_LIVING_ENTITY);
-            list.remove(bombEntity);
+            List<LivingEntity> list = world.getEntitiesByClass(LivingEntity.class, new Box(v1, v2),
+                    EntityPredicates.VALID_LIVING_ENTITY.and(e -> e != bombEntity));
             for (LivingEntity l : list)
                 if (l.squaredDistanceTo(pos) < 9) {
                     anyInRange = true;
@@ -480,30 +457,54 @@ public class KQBTDEntity extends KillerQueenEntity implements IAnimatable, IAnim
     }
 
     // Animations
-    @SuppressWarnings("SameReturnValue")
-    protected <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
-        AnimationController<E> controller = event.getController();
-        AnimationBuilder builder = new AnimationBuilder();
+    public enum State implements StandAnimationState<KQBTDEntity> {
+        IDLE(builder -> builder.loop("animation.kqbtd.idle")),
+        LIGHT(builder -> builder.playAndHold("animation.kqbtd.light")),
+        BLOCK(builder -> builder.loop("animation.kqbtd.block")),
+        HEAVY(builder -> builder.playAndHold("animation.kqbtd.heavy")),
+        BARRAGE(builder -> builder.loop("animation.kqbtd.barrage")),
+        DETONATE(builder -> builder.playAndHold("animation.kqbtd.detonate")),
+        BOMB_PLANT(builder -> builder.playAndHold("animation.kqbtd.bombplant")),
+        BUBBLE(builder -> builder.playAndHold("animation.kqbtd.bubble")),
+        LOW(builder -> builder.playAndHold("animation.kqbtd.low")),
+        BUBBLE_COUNTER(builder -> builder.playAndHold("animation.kqbtd.bubblecounter")),
+        COUNTER_MISS(builder -> builder.playAndHold("animation.kqbtd.counter_miss")),
+        BTD_PLANT(builder -> builder.playAndHold("animation.kqbtd.btdplant"));
 
-        if (playSummonAnim) {
-            controller.setAnimation(builder.playOnce("animation.kqbtd.summon"));
-            return PlayState.CONTINUE;
+        private final Consumer<AnimationBuilder> animator;
+
+        State(Consumer<AnimationBuilder> animator) {
+            this.animator = animator;
         }
-        if (getSameState()) controller.markNeedsReload();
-        switch (getState()) {
-            default -> controller.setAnimation(builder.loop("animation.kqbtd.idle"));
-            case 2 -> controller.setAnimation(builder.playAndHold("animation.kqbtd.light"));
-            case 3 -> controller.setAnimation(builder.loop("animation.kqbtd.block"));
-            case 4 -> controller.setAnimation(builder.playAndHold("animation.kqbtd.heavy"));
-            case 5 -> controller.setAnimation(builder.loop("animation.kqbtd.barrage"));
-            case 6 -> controller.setAnimation(builder.playAndHold("animation.kqbtd.detonate"));
-            case 7 -> controller.setAnimation(builder.playAndHold("animation.kqbtd.bombplant"));
-            case 8 -> controller.setAnimation(builder.playAndHold("animation.kqbtd.bubble"));
-            case 9 -> controller.setAnimation(builder.playAndHold("animation.kqbtd.low"));
-            case 10 -> controller.setAnimation(builder.playAndHold("animation.kqbtd.bubblecounter"));
-            case 11 -> controller.setAnimation(builder.playAndHold("animation.kqbtd.counter_miss"));
-            case 12 -> controller.setAnimation(builder.playAndHold("animation.kqbtd.btdplant"));
+
+        @Override
+        public void playAnimation(KQBTDEntity stand, AnimationBuilder builder) {
+            animator.accept(builder);
         }
-        return PlayState.CONTINUE;
+    }
+
+    @Override
+    protected State[] getStateValues() {
+        return State.values();
+    }
+
+    @Override
+    protected @NotNull String getSummonAnimation() {
+        return "animation.kqbtd.summon";
+    }
+
+    @Override
+    public State getBlockState() {
+        return State.BLOCK;
+    }
+
+    @Override
+    protected State getLightState() {
+        return State.LIGHT;
+    }
+
+    @Override
+    protected State getLowState() {
+        return State.LOW;
     }
 }

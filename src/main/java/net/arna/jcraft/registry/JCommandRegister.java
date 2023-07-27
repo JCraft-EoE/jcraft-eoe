@@ -7,7 +7,7 @@ public interface JCommandRegister {
     static void registerCommands() {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
             InduceAttackCommand.register(dispatcher, registryAccess, environment);
-            AboutStandCommand.register(dispatcher, registryAccess, environment);
+            AboutStandCommand.register(dispatcher);
             AboutSpecCommand.register(dispatcher, registryAccess, environment);
             SetStandCommand.register(dispatcher, registryAccess, environment);
             ClearStandCommand.register(dispatcher, registryAccess, environment);

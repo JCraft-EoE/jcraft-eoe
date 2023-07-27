@@ -1,11 +1,12 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
+import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
@@ -26,15 +27,13 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.PlayState;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 
 import java.util.List;
+import java.util.function.Consumer;
 
-public class MagiciansRedEntity extends StandEntity {
+public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, MagiciansRedEntity.State> {
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 8, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
     public static final Attack heavy = new Attack(1, 17, 1f, 22, 12, 1.75, 7f, 0.5f, AttackType.BOX, 0.5f, 0.6f, 0, JSoundRegister.TW_KICK_HIT)
@@ -98,57 +97,57 @@ public class MagiciansRedEntity extends StandEntity {
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        handleAttack(light, JCraft.standLightCD, 2);
+        handleAttack(light, JCraft.standLightCD, State.LIGHT);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        if (handleAttack(heavy, JCraft.standHeavyCD, 4))
+        if (handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY))
             playSound(JSoundRegister.MR_HEAVY, 1, 1);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, 5))
+        if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
             playSound(JSoundRegister.MR_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack()) return;
-        if (handleAttack(crossfire, JCraft.standS1CD, 6))
+        if (handleAttack(crossfire, JCraft.standS1CD, State.CROSSFIRE))
             playSound(JSoundRegister.MR_CROSSFIRE, 1, 1);
     }
 
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        if (handleAttack(crossfirehurricane, JCraft.standUltCD, 7))
+        if (handleAttack(crossfirehurricane, JCraft.standUltCD, State.CROSSFIRE_HURRICANE))
             playSound(JSoundRegister.MR_ULT, 1, 1);
     }
 
     @Override
     public void initSpecial2() {
         if (!canAttack()) return;
-        if (handleAttack(crossfirevariation, JCraft.standS2CD, 8))
+        if (handleAttack(crossfirevariation, JCraft.standS2CD, State.CROSSFIRE_VARIATION))
             playSound(JSoundRegister.MR_CROSSFIRE, 1, 1);
     }
 
     @Override
     public void initSpecial3() {
         if (!canAttack()) return;
-        if (handleAttack(redirect, JCraft.standS3CD, 9))
+        if (handleAttack(redirect, JCraft.standS3CD, State.REDIRECT))
             playSound(JSoundRegister.MR_REDIRECT, 1, 1);
     }
 
     @Override
     public void initUtil() {
         if (!canAttack() || !hasUser()) return;
-        if (getUserOrThrow().isSneaking() && handleAttack(redbind, JCraft.utilCD, 10))
+        if (getUserOrThrow().isSneaking() && handleAttack(redbind, JCraft.utilCD, State.RED_BIND))
             playSound(JSoundRegister.MR_REDBIND, 1, 1);
-        else if (handleAttack(detector, JCraft.utilCD, 11)) playSound(JSoundRegister.MR_DETECTOR, 1, 1);
+        else if (handleAttack(detector, JCraft.utilCD, State.DETECTOR)) playSound(JSoundRegister.MR_DETECTOR, 1, 1);
     }
 
     @Override
@@ -191,7 +190,7 @@ public class MagiciansRedEntity extends StandEntity {
                 List<AnkhProjectile> ankhs = world.getEntitiesByClass(AnkhProjectile.class,
                         new Box(eyePos.add(32.0, 32.0, 32.0), eyePos.subtract(32.0, 32.0, 32.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
 
-                if (ankhs.size() > 0) {
+                if (!ankhs.isEmpty()) {
                     HitResult hitResult = this.world.raycast(new RaycastContext(eyePos, eyePos.add(user.getRotationVector().multiply(24)), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user));
 
                     for (AnkhProjectile ankh : ankhs) {
@@ -223,7 +222,7 @@ public class MagiciansRedEntity extends StandEntity {
         if (hasUser()) {
             LivingEntity user = getUserOrThrow();
             if (world.isClient) {
-                if (this.getState() == 5) {
+                if (getState() == State.BARRAGE) {
                     Vec3d rotVec = getRotationVector();
                     Vec3d mouthPos = getEyePos().add(rotVec);
                     for (int i = 0; i < 16; i++) {
@@ -302,30 +301,43 @@ public class MagiciansRedEntity extends StandEntity {
     }
 
     // Animation code
-    @Override
-    protected <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
-        AnimationController<E> controller = event.getController();
-        AnimationBuilder builder = new AnimationBuilder();
-        if (playSummonAnim) {
-            controller.setAnimation(builder.playOnce("animation.mr.summon"));
-            return PlayState.CONTINUE;
-        }
-        if (getSameState()) controller.markNeedsReload();
-        switch (this.getState()) {
-            default -> controller.setAnimation(builder.loop("animation.mr.idle"));
-            case 2 -> controller.setAnimation(builder.playAndHold("animation.mr.light"));
-            case 3 -> controller.setAnimation(builder.loop("animation.mr.block"));
-            case 4 -> controller.setAnimation(builder.playAndHold("animation.mr.heavy"));
-            case 5 -> controller.setAnimation(builder.playAndHold("animation.mr.barrage"));
-            case 6 -> controller.setAnimation(builder.playAndHold("animation.mr.crossfire"));
-            case 7 -> controller.setAnimation(builder.playAndHold("animation.mr.crossfirehurricane"));
-            case 8 -> controller.setAnimation(builder.playAndHold("animation.mr.crossfirevariation"));
-            case 9 -> controller.setAnimation(builder.playAndHold("animation.mr.redirect"));
-            case 10 -> controller.setAnimation(builder.playAndHold("animation.mr.redbind"));
-            case 11 -> controller.setAnimation(builder.playAndHold("animation.mr.detector"));
+    public enum State implements StandAnimationState<MagiciansRedEntity> {
+        IDLE(builder -> builder.loop("animation.mr.idle")),
+        LIGHT(builder -> builder.playAndHold("animation.mr.light")),
+        BLOCK(builder -> builder.loop("animation.mr.block")),
+        HEAVY(builder -> builder.playAndHold("animation.mr.heavy")),
+        BARRAGE(builder -> builder.playAndHold("animation.mr.barrage")),
+        CROSSFIRE(builder -> builder.playAndHold("animation.mr.crossfire")),
+        CROSSFIRE_HURRICANE(builder -> builder.playAndHold("animation.mr.crossfirehurricane")),
+        CROSSFIRE_VARIATION(builder -> builder.playAndHold("animation.mr.crossfirevariation")),
+        REDIRECT(builder -> builder.playAndHold("animation.mr.redirect")),
+        RED_BIND(builder -> builder.playAndHold("animation.mr.redbind")),
+        DETECTOR(builder -> builder.playAndHold("animation.mr.detector"));
 
-            //default -> throw new IllegalStateException("Unexpected value: " + this.getState());
+        private final Consumer<AnimationBuilder> animator;
+
+        State(Consumer<AnimationBuilder> animator) {
+            this.animator = animator;
         }
-        return PlayState.CONTINUE;
+
+        @Override
+        public void playAnimation(MagiciansRedEntity stand, AnimationBuilder builder) {
+            animator.accept(builder);
+        }
+    }
+
+    @Override
+    protected State[] getStateValues() {
+        return State.values();
+    }
+
+    @Override
+    protected @Nullable String getSummonAnimation() {
+        return "animation.mr.summon";
+    }
+
+    @Override
+    public State getBlockState() {
+        return State.BLOCK;
     }
 }

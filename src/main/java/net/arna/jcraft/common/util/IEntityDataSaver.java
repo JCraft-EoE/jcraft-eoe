@@ -13,8 +13,8 @@ public interface IEntityDataSaver {
 
     NbtCompound getPersistentData();
 
-    void setStand(StandEntity standEntity);
-    StandEntity getStand();
+    void setStand(StandEntity<?, ?> standEntity);
+    StandEntity<?, ?> getStand();
 
     void copyFrom(IEntityDataSaver dataSaver);
 }

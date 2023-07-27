@@ -7,8 +7,6 @@ import net.arna.jcraft.common.entity.KingCrimsonEntity;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.network.s2c.JExplosionPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.common.spec.AnubisSpec;
-import net.arna.jcraft.common.spec.BrawlerSpec;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.spec.SpecType;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -111,7 +109,7 @@ public final class JUtils {
                 toReturn.remove(e);
                 continue;
             }
-            if (e instanceof StandEntity stand) {
+            if (e instanceof StandEntity<?, ?> stand) {
                 if (stand.hasUser()) {
                     LivingEntity user = stand.getUser();
                     if (!hit.contains(user))
@@ -140,7 +138,7 @@ public final class JUtils {
                 toReturn.remove(l);
                 continue;
             }
-            if (l instanceof StandEntity stand) {
+            if (l instanceof StandEntity<?, ?> stand) {
                 //JCraft.LOGGER.info("Stand: " + stand);
                 if (stand.hasUser()) {
                     LivingEntity user = stand.getUser();
@@ -244,7 +242,7 @@ public final class JUtils {
      * @return the stand user if the specified entity is a {@link StandEntity}
      */
     public static LivingEntity getUserIfStand(LivingEntity ent) {
-        if (ent instanceof StandEntity stand && stand.hasUser())
+        if (ent instanceof StandEntity<?, ?> stand && stand.hasUser())
             return stand.getUser();
         return ent;
     }
@@ -271,7 +269,7 @@ public final class JUtils {
 
         if (ent instanceof LivingEntity living) {
             LivingEntity target = living;
-            if (ent instanceof StandEntity stand)
+            if (ent instanceof StandEntity<?, ?> stand)
                 target = stand.getUser();
             damageLogic(world, target, kb, stunT, stunType, overrideStun, damage, false, blockstun, source, owner);
         }
@@ -282,27 +280,22 @@ public final class JUtils {
 
     //To check method ms usage, use spark[something]
     public static boolean isBlocking(LivingEntity entity) {
-        if (entity instanceof StandEntity stand) return stand.blocking;
-        if (entity.getFirstPassenger() instanceof StandEntity stand) return stand.blocking;
+        if (entity instanceof StandEntity<?, ?> stand) return stand.blocking;
+        if (entity.getFirstPassenger() instanceof StandEntity<?, ?> stand) return stand.blocking;
         return false;
     }
 
     public static boolean shouldForceRender(Entity entity) {
-        if (entity instanceof D4CEntity d4c && d4c.getState() == 11)
+        if (entity instanceof D4CEntity d4c && d4c.getState() == D4CEntity.State.FLAG)
             return true;
-        return entity instanceof CreamEntity cream && cream.getHalfBall();
+        return entity instanceof CreamEntity cream && cream.isHalfBall();
     }
 
     public static boolean shouldNotRender(Entity entity) {
         Entity passenger = entity.getFirstPassenger();
-        if (passenger instanceof KingCrimsonEntity kc && kc.getTETime() > 0)
-            return true;
-        if (passenger instanceof D4CEntity d4c && d4c.getState() == 11)
-            return true;
-        if (passenger instanceof CreamEntity cream && cream.getHalfBall()) {
-            return true;
-        }
-        return false;
+        return passenger instanceof KingCrimsonEntity kc && kc.getTETime() > 0 ||
+                passenger instanceof D4CEntity d4c && d4c.getState() == D4CEntity.State.FLAG ||
+                passenger instanceof CreamEntity cream && cream.isHalfBall();
     }
 
     public static boolean isTimestopped(Entity entity) {
@@ -354,13 +347,9 @@ public final class JUtils {
     }
 
     public static boolean isInTSRange(BlockPos pos) {
-        for (DimValues timeStop : activeTimestops) {
-            if (timeStop != null) {
-                if (timeStop.pos.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) <= 65536) {
-                    return true;
-                }
-            }
-        }
+        for (DimValues timeStop : activeTimestops)
+            if (timeStop != null && timeStop.pos.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) <= 65536)
+                return true;
 
         return false;
     }
@@ -386,12 +375,6 @@ public final class JUtils {
 
         int[][] array = new int[radius * 2 + 1][radius * 2 + 1];
 
-        for (int i = 0; i < radius; i++) {
-            for (int j = 0; j < radius; j++) {
-                array[i][j] = 0;
-            }
-        }
-
         int originX = origin.getX();
         int originY = origin.getY();
         int originZ = origin.getZ();
@@ -400,21 +383,22 @@ public final class JUtils {
             for (int x = originX - radius; x <= originX + radius; x++) {
                 for (int z = originZ - radius; z <= originZ + radius; z++) {
                     double distance = Math.sqrt(Math.pow(x - originX, 2) + Math.pow(y - originY, 2) + Math.pow(z - originZ, 2));
-                    if (distance <= radius) {
-                        double skipProbability = (distance / radius);
-                        if (world.getRandom().nextDouble() > skipProbability / 2) {
-                            BlockPos pos = new BlockPos(x, y, z);
-                            BlockState state = world.getBlockState(pos);
-                            int x0 = x - originX + radius;
-                            int z0 = z - originZ + radius;
-                            if(state.isSideSolid(world, pos, Direction.UP, SideShapeType.RIGID) && array[x0][z0] == 0){
-                                array[x0][z0] = 1;
+                    if (!(distance <= radius)) continue;
 
-                                BlockInfo info = new BlockInfo(state, pos);
-                                infoList.add(info);
-                            }
-                        }
-                    }
+                    double skipProbability = (distance / radius);
+                    if (!(world.getRandom().nextDouble() > skipProbability / 2)) continue;
+
+                    BlockPos pos = new BlockPos(x, y, z);
+                    BlockState state = world.getBlockState(pos);
+                    int x0 = x - originX + radius;
+                    int z0 = z - originZ + radius;
+                    if (!state.isSideSolid(world, pos, Direction.UP, SideShapeType.RIGID) || array[x0][z0] != 0)
+                        continue;
+
+                    array[x0][z0] = 1;
+
+                    BlockInfo info = new BlockInfo(state, pos);
+                    infoList.add(info);
                 }
             }
         }

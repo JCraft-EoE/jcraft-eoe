@@ -40,7 +40,8 @@ public abstract class LivingEntityRenderMixin<T extends LivingEntity, M extends 
     @Inject(method = "render(Lnet/minecraft/entity/LivingEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At(value = "INVOKE", shift = At.Shift.BEFORE, target = "Lnet/minecraft/client/util/math/MatrixStack;pop()V"))
     private void suckmahballs(T livingEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci){
         if (false && MinecraftClient.getInstance().player instanceof IEntityDataSaver entityDataSaver) {
-            if (entityDataSaver.getStand() instanceof KingCrimsonEntity kc && kc.getState() == 12 && kc.getMoveStun() <= (KingCrimsonEntity.prediction.moveStun - KingCrimsonEntity.prediction.initTime)) {
+            if (entityDataSaver.getStand() instanceof KingCrimsonEntity kc && kc.getState() == KingCrimsonEntity.State.PREDICT &&
+                    kc.getMoveStun() <= (KingCrimsonEntity.prediction.moveStun - KingCrimsonEntity.prediction.initTime)) {
                 RenderLayer renderLayer = JRenderLayerRegistry.RRRE;
                 if (renderLayer != null) {
                     VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(renderLayer);

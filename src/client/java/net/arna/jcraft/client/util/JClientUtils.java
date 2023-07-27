@@ -51,19 +51,19 @@ public class JClientUtils {
     }
 
     // Torso/Head rotation for stands
-    public static void animateGenericHumanoid(StandEntityModel<?> model, StandEntity entity, LivingEntity player, float partialTick) {
+    public static void animateGenericHumanoid(StandEntityModel<?> model, StandEntity<?, ?> entity, LivingEntity player, float partialTick) {
         animateGenericHumanoid(model, entity, player, partialTick, false, false);
     }
 
-    public static void animateGenericHumanoid(StandEntityModel<?> model, StandEntity entity, LivingEntity player, float partialTick, boolean flipBody, boolean flipHead) {
+    public static void animateGenericHumanoid(StandEntityModel<?> model, StandEntity<?, ?> entity, LivingEntity player, float partialTick, boolean flipBody, boolean flipHead) {
         animateGenericHumanoid(model, entity, player, partialTick, flipBody, flipHead, 0, 0, 90f);
     }
 
-    public static void animateGenericHumanoid(StandEntityModel<?> model, StandEntity entity, LivingEntity player, float partialTick, boolean flipBody, boolean flipHead, float tPO, float hPO) {
+    public static void animateGenericHumanoid(StandEntityModel<?> model, StandEntity<?, ?> entity, LivingEntity player, float partialTick, boolean flipBody, boolean flipHead, float tPO, float hPO) {
         animateGenericHumanoid(model, entity, player, partialTick, flipBody, flipHead, tPO, hPO, 90f);
     }
 
-    public static void animateGenericHumanoid(StandEntityModel<?> model, StandEntity entity, LivingEntity player, float partialTick, boolean flipBody, boolean flipHead, float tPO, float hPO, float velInfluence) {
+    public static void animateGenericHumanoid(StandEntityModel<?> model, StandEntity<?, ?> entity, LivingEntity player, float partialTick, boolean flipBody, boolean flipHead, float tPO, float hPO, float velInfluence) {
         float overVel = 0;
 
         if (entity.getMoveStun() < 1) {
@@ -85,7 +85,7 @@ public class JClientUtils {
             }
         }
 
-        if (entity.getState() == 3 || entity.getState() < 2) { // if in/going to idle, or blocking
+        if (entity.isBlocking() || entity.isIdle()) { // if in/going to idle, or blocking
             IBone head = model.getAnimationProcessor().getBone("head");
             if (head != null) {
                 float headPitch = (player.getPitch() - overVel * velInfluence) * 3.1415f / 180f;

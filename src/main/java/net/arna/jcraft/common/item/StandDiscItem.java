@@ -75,7 +75,7 @@ public class StandDiscItem extends Item {
         data.putInt("StandID", userStandID);
         data.putInt("Skin", userSkin);
 
-        StandEntity stand = userDataSaver.getStand();
+        StandEntity<?, ?> stand = userDataSaver.getStand();
         if (stand != null)
             stand.discard();
 

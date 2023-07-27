@@ -50,7 +50,7 @@ public class BloodProjectile extends PersistentProjectileEntity implements IAnim
 
         if (entity instanceof LivingEntity living) {
             LivingEntity target = living;
-            if (entity instanceof StandEntity stand && stand.hasUser())
+            if (entity instanceof StandEntity<?, ?> stand && stand.hasUser())
                 target = stand.getUserOrThrow();
             damageLogic(world, target, Vec3d.ZERO, 10, 1, false, 2f,
                     false, 6, DamageSource.thrownProjectile(this, owner), owner);

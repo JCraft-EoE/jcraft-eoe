@@ -40,7 +40,7 @@ public class StandControlPacket {
                 ServerChannelFeedbackPacket.send(player, buf2);
 
                 IEntityDataSaver playerData = ((IEntityDataSaver)player);
-                StandEntity stand = playerData.getStand();
+                StandEntity<?, ?> stand = playerData.getStand();
 	            if (stand != null) {
                     int moveStun = stand.getMoveStun();
                     if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT)
@@ -52,7 +52,7 @@ public class StandControlPacket {
             });
             // 2 - LIGHT ATTACK
             case 2 -> server.execute(() -> {
-                StandEntity stand = ((IEntityDataSaver)player).getStand();
+                StandEntity<?, ?> stand = ((IEntityDataSaver)player).getStand();
 	            if (stand != null) {
                     int moveStun = stand.getMoveStun();
                     stand.initLightAttack();
@@ -64,7 +64,7 @@ public class StandControlPacket {
             case 3 -> {
                 boolean rmb = buf.readBoolean();
                 server.execute(() -> {
-                    StandEntity stand = ((IEntityDataSaver)player).getStand();
+                    StandEntity<?, ?> stand = ((IEntityDataSaver)player).getStand();
                     if (!JCraft.isDashing(player) && stand != null) {
                         boolean blocking = stand.blocking;
                         if (!blocking && stand.canAttack() && rmb) {
@@ -78,7 +78,7 @@ public class StandControlPacket {
             }
             // 4 - HEAVY
             case 4 -> server.execute(() -> {
-                StandEntity stand = ((IEntityDataSaver)player).getStand();
+                StandEntity<?, ?> stand = ((IEntityDataSaver)player).getStand();
 	            if (stand != null) {
                     int moveStun = stand.getMoveStun();
 
@@ -96,7 +96,7 @@ public class StandControlPacket {
             });
             // 5 - BARRAGE
             case 5 -> server.execute(() -> {
-                StandEntity stand = ((IEntityDataSaver)player).getStand();
+                StandEntity<?, ?> stand = ((IEntityDataSaver)player).getStand();
 	            if (stand != null) {
                     int moveStun = stand.getMoveStun();
 
@@ -114,7 +114,7 @@ public class StandControlPacket {
             });
             // 6 - SPECIAL 1
             case 6 -> server.execute(() -> {
-                StandEntity stand = ((IEntityDataSaver)player).getStand();
+                StandEntity<?, ?> stand = ((IEntityDataSaver)player).getStand();
 	            if (stand != null) {
                     int moveStun = stand.getMoveStun();
 
@@ -132,7 +132,7 @@ public class StandControlPacket {
             });
             // 7 - Ultimate
             case 7 -> server.execute(() -> {
-                StandEntity stand = ((IEntityDataSaver)player).getStand();
+                StandEntity<?, ?> stand = ((IEntityDataSaver)player).getStand();
 	            if (stand != null) {
                     int moveStun = stand.getMoveStun();
 
@@ -150,7 +150,7 @@ public class StandControlPacket {
             });
             // 8 - SPECIAL 2
             case 8 -> server.execute(() -> {
-                StandEntity stand = ((IEntityDataSaver)player).getStand();
+                StandEntity<?, ?> stand = ((IEntityDataSaver)player).getStand();
 	            if (stand != null) {
                     int moveStun = stand.getMoveStun();
 
@@ -168,7 +168,7 @@ public class StandControlPacket {
             });
             // 9 - SPECIAL 3
             case 9 -> server.execute(() -> {
-                StandEntity stand = ((IEntityDataSaver)player).getStand();
+                StandEntity<?, ?> stand = ((IEntityDataSaver)player).getStand();
 	            if (stand != null) {
                     int moveStun = stand.getMoveStun();
 
@@ -187,14 +187,14 @@ public class StandControlPacket {
             // 10 - Utility (TSTP, Explosive dash, Gun, etc.)
             case 10 -> server.execute(() -> {
                 IEntityDataSaver playerData = ((IEntityDataSaver)player);
-                StandEntity stand = playerData.getStand();
+                StandEntity<?, ?> stand = playerData.getStand();
                 if (stand != null) {
                     int moveStun = stand.getMoveStun();
                     stand.initUtil();
                     if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking())
                         stand.queuedAttack = AttackQueue.MIDDLEMOUSE;
                 } else {
-                    StandEntity stand2 = JCraft.summon(world, player);
+                    StandEntity<?, ?> stand2 = JCraft.summon(world, player);
                     if (stand2 != null) stand2.initUtil();
                     playerData.setStand(stand2);
                 }

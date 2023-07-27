@@ -9,6 +9,7 @@ import net.arna.jcraft.common.gravity.util.Gravity;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
+import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
@@ -30,18 +31,15 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 //todo: 3d, rotatable shockwave particle effect
 //todo: particles on gravpunch and both slams
-public class CMoonEntity extends StandEntity {
+public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
 
@@ -126,27 +124,27 @@ public class CMoonEntity extends StandEntity {
     @Override
     public void initLightAttack() {
         if (!this.canAttack()) return;
-        handleAttack(light, JCraft.standLightCD, 2);
+        handleAttack(light, JCraft.standLightCD, State.LIGHT);
     }
 
     @Override
     public void initBarrage() {
         if (!this.canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, 5))
+        if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
             this.playSound(JSoundRegister.CMOON_BARRAGE, 1, 1);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!this.canAttack()) return;
-        if (handleAttack(gutpunch, JCraft.standHeavyCD, 4))
+        if (handleAttack(gutpunch, JCraft.standHeavyCD, State.DONUT))
             this.playSound(JSoundRegister.CMOON_DONUT, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!this.canAttack()) return;
-        if (handleAttack(gravpunch, JCraft.standS1CD, 6))
+        if (handleAttack(gravpunch, JCraft.standS1CD, State.GRAV_PUNCH))
             this.playSound(JSoundRegister.CMOON_GRAVPUNCH, 1, 1);
     }
 
@@ -162,14 +160,14 @@ public class CMoonEntity extends StandEntity {
                 if (block.getMaster() != user) continue;
                 block.markRefresh();
             }
-        } else if (canAttack() && handleAttack(launch, JCraft.standS2CD, 9))
+        } else if (canAttack() && handleAttack(launch, JCraft.standS2CD, State.GROUND_SHOOT))
             playSound(JSoundRegister.CMOON_GROUNDSHOOT, 1, 1);
     }
 
     @Override
     public void initSpecial3() {
         if (!this.canAttack()) return;
-        if (handleAttack(groundslam, JCraft.standS3CD, 7))
+        if (handleAttack(groundslam, JCraft.standS3CD, State.GROUND_SLAM))
             playSound(JSoundRegister.CMOON_GROUNDSLAM, 1, 1);
     }
 
@@ -177,9 +175,9 @@ public class CMoonEntity extends StandEntity {
     public void initUlt() {
         if (!this.canAttack()) return;
         if (getShiftTime() <= 0) {
-            if (getUserOrThrow().isSneaking() && handleAttack(gravshift, JCraft.standUltCD, 10))
+            if (getUserOrThrow().isSneaking() && handleAttack(gravshift, JCraft.standUltCD, State.GRAV_SHIFT))
                 playSound(JSoundRegister.CMOON_GRAVSHIFT, 1, 1);
-            else if (handleAttack(directionalshift, JCraft.standUltCD, 11))
+            else if (handleAttack(directionalshift, JCraft.standUltCD, State.DIRECTIONAL_SHIFT))
                 playSound(JSoundRegister.CMOON_GRAVSHIFT_DIRECTIONAL, 1, 1);
 
         } else {
@@ -414,31 +412,42 @@ public class CMoonEntity extends StandEntity {
     }
 
     // Animation code
-    @SuppressWarnings("SameReturnValue")
+    public enum State implements StandAnimationState<CMoonEntity> {
+        IDLE(builder -> builder.loop("animation.cmoon.idle")),
+        LIGHT(builder -> builder.playAndHold("animation.cmoon.light")),
+        BLOCK(builder -> builder.loop("animation.cmoon.block")),
+        DONUT(builder -> builder.playAndHold("animation.cmoon.donut")),
+        BARRAGE(builder -> builder.loop("animation.cmoon.barrage")),
+        GRAV_PUNCH(builder -> builder.playAndHold("animation.cmoon.gravpunch")),
+        GROUND_SLAM(builder -> builder.playAndHold("animation.cmoon.groundslam")),
+        GROUND_SHOOT(builder -> builder.playAndHold("animation.cmoon.groundshoot")),
+        GRAV_SHIFT(builder -> builder.playAndHold("animation.cmoon.gravshift")),
+        DIRECTIONAL_SHIFT(builder -> builder.playAndHold("animation.cmoon.directionalshift"));
+
+        private final Consumer<AnimationBuilder> animator;
+
+        State(Consumer<AnimationBuilder> animator) {
+            this.animator = animator;
+        }
+
+        @Override
+        public void playAnimation(CMoonEntity stand, AnimationBuilder builder) {
+            animator.accept(builder);
+        }
+    }
+
     @Override
-    protected <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
-        AnimationController<E> controller = event.getController();
-        AnimationBuilder builder = new AnimationBuilder();
+    protected State[] getStateValues() {
+        return State.values();
+    }
 
-        if (playSummonAnim) {
-            controller.setAnimation(builder.playOnce("animation.cmoon.summon"));
-            return PlayState.CONTINUE;
-        }
+    @Override
+    protected String getSummonAnimation() {
+        return "animation.cmoon.summon";
+    }
 
-        if (this.getSameState()) controller.markNeedsReload();
-        switch (this.getState()) {
-            default -> controller.setAnimation(builder.loop("animation.cmoon.idle"));
-            case 2 -> controller.setAnimation(builder.playAndHold("animation.cmoon.light"));
-            case 3 -> controller.setAnimation(builder.loop("animation.cmoon.block"));
-            case 4 -> controller.setAnimation(builder.playAndHold("animation.cmoon.donut"));
-            case 5 -> controller.setAnimation(builder.loop("animation.cmoon.barrage"));
-            case 6 -> controller.setAnimation(builder.playAndHold("animation.cmoon.gravpunch"));
-            case 7 -> controller.setAnimation(builder.playAndHold("animation.cmoon.groundslam"));
-            case 9 -> controller.setAnimation(builder.playAndHold("animation.cmoon.groundshoot"));
-            case 10 -> controller.setAnimation(builder.playAndHold("animation.cmoon.gravshift"));
-            case 11 -> controller.setAnimation(builder.playAndHold("animation.cmoon.directionalshift"));
-            //default -> throw new IllegalStateException("Unexpected value: " + this.getState());
-        }
-        return PlayState.CONTINUE;
+    @Override
+    public State getBlockState() {
+        return State.BLOCK;
     }
 }

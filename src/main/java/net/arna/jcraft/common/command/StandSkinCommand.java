@@ -37,7 +37,7 @@ public class StandSkinCommand {
         for (Entity entity : targets) {
             if (entity instanceof LivingEntity livingEntity) {
                 IEntityDataSaver entityData = (IEntityDataSaver) livingEntity;
-                StandEntity stand = entityData.getStand();
+                StandEntity<?, ?> stand = entityData.getStand();
 
                 if (stand == null) continue;
 

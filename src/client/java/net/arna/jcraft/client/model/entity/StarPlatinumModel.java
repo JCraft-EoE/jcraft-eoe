@@ -1,11 +1,11 @@
 package net.arna.jcraft.client.model.entity;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.entity.AbstractStarPlatinumEntity;
 import net.arna.jcraft.common.entity.StandType;
-import net.arna.jcraft.common.entity.StarPlatinumEntity;
 import net.minecraft.util.Identifier;
 
-public class StarPlatinumModel extends StandEntityModel<StarPlatinumEntity> {
+public class StarPlatinumModel extends StandEntityModel<AbstractStarPlatinumEntity<?, ?>> {
     //EntityModelData extraData = (EntityModelData) customPredicate.getExtraDataOfType(EntityModelData.class).get(0);
     private static final Identifier MODEL = JCraft.id("geo/star_platinum.geo.json");
 
@@ -14,7 +14,7 @@ public class StarPlatinumModel extends StandEntityModel<StarPlatinumEntity> {
     }
 
     @Override
-    public Identifier getModelResource(StarPlatinumEntity object) {
+    public Identifier getModelResource(AbstractStarPlatinumEntity<?, ?> object) {
         return MODEL;
     }
 }

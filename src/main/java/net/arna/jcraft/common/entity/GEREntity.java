@@ -6,7 +6,10 @@ import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.common.util.*;
+import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.util.ITimeStop;
+import net.arna.jcraft.common.util.MobilityType;
+import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
@@ -32,18 +35,16 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.PlayState;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
-public class GEREntity extends StandEntity {
+public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
     public static final Attack airlight = new Attack(1, JCraft.lightCooldown, 0.75f, 12, 5, 1.25, 4f, 0.75f, AttackType.BOX, 1, 0.33f, 0, JSoundRegister.IMPACT_1)
             .appendHitbox(new HitBoxData(0, -1, 1))
             .setInfo("Downward Kick", "medium stun combo starter, low hitbox, low blockstun");
@@ -153,24 +154,23 @@ public class GEREntity extends StandEntity {
     @Override
     public void initLightAttack() {
         CanAttackData data = canAttackWithData();
-        if (!data.canAttack) return;
+        if (!data.canAttack()) return;
 
-        if (data.user.isOnGround())
-            handleAttack(light, JCraft.standLightCD, 2);
-        else
-            handleAttack(airlight, JCraft.standLightCD, 10);
+        if (data.user().isOnGround())
+            handleAttack(light, JCraft.standLightCD, State.LIGHT);
+        else handleAttack(airlight, JCraft.standLightCD, State.AIR_LIGHT);
     }
 
     @Override
     public void initHeavyAttack() {
         CanAttackData data = canAttackWithData();
-        if (!data.canAttack) return;
+        if (!data.canAttack()) return;
 
-        if (data.user.isOnGround()) {
-            if (handleAttack(heavy, JCraft.standHeavyCD, 4))
+        if (data.user().isOnGround()) {
+            if (handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY))
                 playSound(JSoundRegister.GER_HEAVY, 1, 1);
         } else {
-            if (handleAttack(airheavy, JCraft.standHeavyCD, 11))
+            if (handleAttack(airheavy, JCraft.standHeavyCD, State.AIR_HEAVY))
                 playSound(JSoundRegister.GER_HEAVY, 1, 1);
         }
     }
@@ -178,24 +178,24 @@ public class GEREntity extends StandEntity {
     @Override
     public void initBarrage() {
         CanAttackData data = canAttackWithData();
-        if (!data.canAttack) return;
+        if (!data.canAttack()) return;
 
-        if (data.user.isOnGround() && handleAttack(barrage, JCraft.standBarrageCD, 5))
+        if (data.user().isOnGround() && handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
             playSound(JSoundRegister.GE_BARRAGE, 1, 1);
-        else if (handleAttack(airbarrage, JCraft.standBarrageCD, 12))
+        else if (handleAttack(airbarrage, JCraft.standBarrageCD, State.AIR_BARRAGE))
             playSound(JSoundRegister.GER_KICKBARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         CanAttackData data = canAttackWithData();
-        if (!data.canAttack) return;
+        if (!data.canAttack()) return;
 
-        if (data.user.isSneaking()) {
-            if (handleAttack(heal, JCraft.standS1CD, 7))
+        if (data.user().isSneaking()) {
+            if (handleAttack(heal, JCraft.standS1CD, State.HEAL))
                 playSound(JSoundRegister.GE_HEAL, 1, 1);
         } else {
-            if (handleAttack(healself, JCraft.standS1CD, 6))
+            if (handleAttack(healself, JCraft.standS1CD, State.HEAL_SELF))
                 playSound(JSoundRegister.GE_HEAL, 1, 1);
         }
     }
@@ -215,18 +215,18 @@ public class GEREntity extends StandEntity {
     @Override
     public void initSpecial2() {
         CanAttackData data = canAttackWithData();
-        if (!data.canAttack) return;
+        if (!data.canAttack()) return;
 
-        if (data.user.isSneaking() && handleAttack(chargelaser, JCraft.standS2CD, 14))
+        if (data.user().isSneaking() && handleAttack(chargelaser, JCraft.standS2CD, State.SLOW_LASER))
             playSound(JSoundRegister.GER_SLOW_LASER, 1, 1);
-        else if (handleAttack(laser, JCraft.standS2CD, 8))
+        else if (handleAttack(laser, JCraft.standS2CD, State.LASER))
             playSound(JSoundRegister.GER_LASER, 1, 1);
     }
 
     @Override
     public void initSpecial3() {
         if (!canAttack()) return;
-        if (handleAttack(counter, JCraft.standS3CD, 9))
+        if (handleAttack(counter, JCraft.standS3CD, State.COUNTER))
             playSound(JSoundRegister.GE_HEAL, 1, 1);
     }
 
@@ -247,7 +247,7 @@ public class GEREntity extends StandEntity {
                 ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
         ((ITimeStop) entity).setTimeStopTicks(counterStopTime);
 
-        StandEntity stand = ((IEntityDataSaver) entity).getStand();
+        StandEntity<?, ?> stand = ((IEntityDataSaver) entity).getStand();
         if (stand != null)
             stand.cancelAttack();
 
@@ -262,7 +262,7 @@ public class GEREntity extends StandEntity {
 
     @Override
     public void whiffCounter() {
-        setAttack(counterMiss, 15);
+        setAttack(counterMiss, State.COUNTER_MISS);
         stun(getUser(), counterMiss.moveStun, 0);
     }
 
@@ -270,7 +270,7 @@ public class GEREntity extends StandEntity {
     public void initUlt() {
         if (!canAttack()) return;
         if (rtzEntityData.isEmpty()) {
-            if (handleAttack(rtz, JCraft.standUltCD, 13)) // Setup
+            if (handleAttack(rtz, JCraft.standUltCD, State.SETUP)) // Setup
                 playSound(JSoundRegister.GER_SETUP, 1, 1);
         } else {
             returnToZero();
@@ -450,40 +450,47 @@ public class GEREntity extends StandEntity {
     }
 
     // Animation code
-    @SuppressWarnings("SameReturnValue")
+    public enum State implements StandAnimationState<GEREntity> {
+        IDLE(builder -> builder.loop("animation.ger.idle")),
+        LIGHT(builder -> builder.playAndHold("animation.ger.light")),
+        BLOCK(builder -> builder.loop("animation.ger.block")),
+        HEAVY(builder -> builder.playAndHold("animation.ger.heavy")),
+        BARRAGE(builder -> builder.loop("animation.ger.barrage")),
+        HEAL_SELF(builder -> builder.playAndHold("animation.ger.healself")),
+        HEAL(builder -> builder.playAndHold("animation.ger.heal")),
+        LASER(builder -> builder.playAndHold("animation.ger.laser")),
+        SLOW_LASER(builder -> builder.playAndHold("animation.ger.slowlaser")),
+        COUNTER(builder -> builder.playAndHold("animation.ger.counter")),
+        COUNTER_MISS(builder -> builder.playAndHold("animation.ger.counter_miss")),
+        AIR_HEAVY(builder -> builder.playAndHold("animation.ger.airheavy")),
+        AIR_LIGHT(builder -> builder.playAndHold("animation.ger.airlight")),
+        AIR_BARRAGE(builder -> builder.playAndHold("animation.ger.airbarrage")),
+        SETUP(builder -> builder.playAndHold("animation.ger.setup"));
+
+        private final Consumer<AnimationBuilder> animator;
+
+        State(Consumer<AnimationBuilder> animator) {
+            this.animator = animator;
+        }
+
+        @Override
+        public void playAnimation(GEREntity stand, AnimationBuilder builder) {
+            animator.accept(builder);
+        }
+    }
+
     @Override
-    protected <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
-        AnimationController<E> controller = event.getController();
-        AnimationBuilder builder = new AnimationBuilder();
+    protected State[] getStateValues() {
+        return State.values();
+    }
 
-        if (playSummonAnim) {
-            controller.setAnimation(builder.playAndHold("animation.ger.summon"));
-            return PlayState.CONTINUE;
-        }
+    @Override
+    protected @Nullable String getSummonAnimation() {
+        return "animation.ger.summon";
+    }
 
-        if (getSameState()) controller.markNeedsReload();
-        switch (getState()) {
-
-            default -> controller.setAnimation(builder.loop("animation.ger.idle"));
-            case 2 -> controller.setAnimation(builder.playAndHold("animation.ger.light"));
-            case 3 -> controller.setAnimation(builder.loop("animation.ger.block"));
-            case 4 -> controller.setAnimation(builder.playAndHold("animation.ger.heavy"));
-            case 5 -> controller.setAnimation(builder.loop("animation.ger.barrage"));
-
-            case 6 -> controller.setAnimation(builder.playAndHold("animation.ger.healself"));
-            case 7 -> controller.setAnimation(builder.playAndHold("animation.ger.heal"));
-            case 8 -> controller.setAnimation(builder.playAndHold("animation.ger.laser"));
-            case 14 -> controller.setAnimation(builder.playAndHold("animation.ger.slowlaser"));
-            case 9 -> controller.setAnimation(builder.playAndHold("animation.ger.counter"));
-
-            case 10 -> controller.setAnimation(builder.playAndHold("animation.ger.airlight"));
-            case 11 -> controller.setAnimation(builder.playAndHold("animation.ger.airheavy"));
-            case 12 -> controller.setAnimation(builder.playAndHold("animation.ger.airbarrage"));
-
-            case 13 -> controller.setAnimation(builder.playAndHold("animation.ger.setup"));
-            case 15 -> controller.setAnimation(builder.playAndHold("animation.ger.counter_miss"));
-        }
-
-        return PlayState.CONTINUE;
+    @Override
+    public State getBlockState() {
+        return State.BLOCK;
     }
 }

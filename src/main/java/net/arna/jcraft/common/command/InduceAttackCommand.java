@@ -80,7 +80,7 @@ public class InduceAttackCommand {
                         entityData.getPersistentData().putInt(cdType, 0);
                     }
 
-                    StandEntity standEntity = entityData.getStand();
+                    StandEntity<?, ?> standEntity = entityData.getStand();
                     if (standEntity != null) {
                         switch (type) {
                             case LIGHT -> standEntity.initLightAttack();

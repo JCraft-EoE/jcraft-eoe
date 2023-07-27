@@ -6,6 +6,7 @@ import net.arna.jcraft.common.attack.AttackQueue;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JEntityTypeRegister;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
@@ -19,15 +20,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.PlayState;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 
 import java.util.List;
+import java.util.function.Consumer;
 
-public class GoldenExperienceEntity extends StandEntity {
+public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, GoldenExperienceEntity.State> {
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 9, 6, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
     public static final Attack heavy = new Attack(1, 17, 1f, 22, 13, 1.5, 9f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_2)
@@ -47,7 +46,8 @@ public class GoldenExperienceEntity extends StandEntity {
             .setInfo("Tree Summon", "two-hitting launch");
 
     //todo: convert lifegiver to move with followup
-    public static final Attack lifegiver = new Attack(6, 36, 1f, 25, 16, 0, 0f, 0f, AttackType.BOX).setRanged(true)
+    public static final Attack lifegiver = new Attack(6, 36, 1f, 25, 16, 0, 0f, 0f, AttackType.BOX)
+            .setRanged(true)
             .setInfo("Life Giver",
                     """
                             turns a held item into a:
@@ -62,12 +62,12 @@ public class GoldenExperienceEntity extends StandEntity {
             .setInfo("Rekka (Final Hit)", "knockdown", AttackQueue.SPECIAL2);
     public static final Attack rekka2 = new Attack(8, 23, 1f, 18, 10, 1.75, 5f, 0.5f, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.IMPACT_2)
             .setHitspark(2)
-            .setFollowup(rekka3)
+
             .setInfo("Rekka (2nd Hit)", "links into Light", AttackQueue.SPECIAL2);
     public static final Attack rekka1 = new Attack(7, 23, 1f, 20, 8, 1.5, 5f, 0.5f, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.IMPACT_2)
             .appendHitbox(new HitBoxData(1.25))
-            .setInfo("Rekka Series", "a set of three attacks, which cancel into each other during recovery", AttackQueue.SPECIAL2)
-            .setFollowup(rekka2);
+            .setFollowup(rekka2)
+            .setInfo("Rekka Series", "a set of three attacks, which cancel into each other during recovery", AttackQueue.SPECIAL2);
 
     public GoldenExperienceEntity(World worldIn) {
         super(StandType.GOLD_EXPERIENCE, worldIn);
@@ -101,36 +101,37 @@ public class GoldenExperienceEntity extends StandEntity {
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        handleAttack(light, JCraft.standLightCD, 2);
+        handleAttack(light, JCraft.standLightCD, State.LIGHT);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        handleAttack(heavy, JCraft.standHeavyCD, 4);
+        handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY);
         //this.playSound(ModSoundRegister.GE_HEAVY,1, 1);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, 5))
+        if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
             playSound(JSoundRegister.GE_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         CanAttackData data = this.canAttackWithData();
-        if (!data.canAttack) return;
-        if (data.user.isSneaking()) {
-            if (handleAttack(heal, JCraft.standS1CD, 7)) playSound(JSoundRegister.GE_HEAL, 1, 1);
-        } else if (handleAttack(healself, JCraft.standS1CD, 6)) playSound(JSoundRegister.GE_HEAL, 1, 1);
+        if (!data.canAttack()) return;
+
+        if (data.user().isSneaking()) {
+            if (handleAttack(heal, JCraft.standS1CD, State.HEAL)) playSound(JSoundRegister.GE_HEAL, 1, 1);
+        } else if (handleAttack(healself, JCraft.standS1CD, State.HEAL_SELF)) playSound(JSoundRegister.GE_HEAL, 1, 1);
     }
 
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        handleAttack(overclock, JCraft.standUltCD, 13);
+        handleAttack(overclock, JCraft.standUltCD, State.OVERCLOCK);
         //this.playSound(ModSoundRegister.GE_ULT, 1, 1);
     }
 
@@ -143,17 +144,17 @@ public class GoldenExperienceEntity extends StandEntity {
 
             if (curAttack != rekka1 && curAttack != rekka2 && curAttack != rekka3) {
                 if (idling) {
-                    if (handleAttack(rekka1, JCraft.standS2CD, 10))
+                    if (handleAttack(rekka1, JCraft.standS2CD, State.REKKA1))
                         playSound(JSoundRegister.GE_REKKA1, 1, 1);
                     return;
                 }
             }
             if (curAttack.id == rekka1.id && this.getMoveStun() < 12) {
-                setAttack(rekka2, 11);
+                setAttack(rekka2, State.REKKA2);
                 playSound(JSoundRegister.GE_REKKA2, 1, 1);
             }
             if (curAttack.id == rekka2.id && this.getMoveStun() < 8) {
-                setAttack(rekka3, 12);
+                setAttack(rekka3, State.REKKA3);
                 playSound(JSoundRegister.GE_REKKA3, 1, 1);
             }
         }
@@ -171,14 +172,14 @@ public class GoldenExperienceEntity extends StandEntity {
     public void initSpecial3() {
         if (!canAttack() || !hasUser()) return;
         toSummon = getUserOrThrow().isSneaking() ? LifeGiverType.FROG : LifeGiverType.SNAKE;
-        if (handleAttack(lifegiver, JCraft.standS3CD, 9))
+        if (handleAttack(lifegiver, JCraft.standS3CD, State.SNAKE))
             playSound(JSoundRegister.GE_HEAL, 1, 1);
     }
 
     @Override
     public void initUtil() {
         if (!canAttack()) return;
-        if (handleAttack(tree, JCraft.utilCD, 8))
+        if (handleAttack(tree, JCraft.utilCD, State.TREE))
             playSound(JSoundRegister.GE_TREE, 1, 1);
     }
 
@@ -273,7 +274,7 @@ public class GoldenExperienceEntity extends StandEntity {
     }
 
     @Override
-    public MoveSelectionResult specificMoveSelectionCriterion(Attack attack, MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity enemyStand, Attack enemyAttack) {
+    public MoveSelectionResult specificMoveSelectionCriterion(Attack attack, MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand, Attack enemyAttack) {
         if (attack == lifegiver) {
             if (mob.getMainHandStack().isEmpty() && mob.getOffHandStack().isEmpty()) {
                 return MoveSelectionResult.STOP;
@@ -297,34 +298,46 @@ public class GoldenExperienceEntity extends StandEntity {
     }
 
     // Animation code
-    @SuppressWarnings("SameReturnValue")
-    @Override
-    protected  <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
-        AnimationController<E> controller = event.getController();
-        AnimationBuilder builder = new AnimationBuilder();
+    public enum State implements StandAnimationState<GoldenExperienceEntity> {
+        IDLE(builder -> builder.loop("animation.ge.idle")),
+        LIGHT(builder -> builder.playAndHold("animation.ge.light")),
+        BLOCK(builder -> builder.loop("animation.ge.block")),
+        HEAVY(builder -> builder.playAndHold("animation.ge.heavy")),
+        BARRAGE(builder -> builder.loop("animation.ge.barrage")),
+        HEAL_SELF(builder -> builder.playAndHold("animation.ge.healself")),
+        HEAL(builder -> builder.playAndHold("animation.ge.heal")),
+        TREE(builder -> builder.playAndHold("animation.ge.tree")),
+        SNAKE(builder -> builder.playAndHold("animation.ge.snake")),
+        REKKA1(builder -> builder.playAndHold("animation.ge.rekka1")),
+        REKKA2(builder -> builder.playAndHold("animation.ge.rekka2")),
+        REKKA3(builder -> builder.playAndHold("animation.ge.rekka3")),
+        OVERCLOCK(builder -> builder.playAndHold("animation.ge.overclock"));
 
-        if (this.getSameState()) controller.markNeedsReload();
-        switch (this.getState()) {
+        private final Consumer<AnimationBuilder> animator;
 
-            default -> controller.setAnimation(builder.loop("animation.ge.idle"));
-            case 2 -> controller.setAnimation(builder.playAndHold("animation.ge.light"));
-            case 3 -> controller.setAnimation(builder.loop("animation.ge.block"));
-            case 4 -> controller.setAnimation(builder.playAndHold("animation.ge.heavy"));
-            case 5 -> controller.setAnimation(builder.loop("animation.ge.barrage"));
-            case 6 -> controller.setAnimation(builder.playAndHold("animation.ge.healself"));
-            case 7 -> controller.setAnimation(builder.playAndHold("animation.ge.heal"));
-            case 8 -> controller.setAnimation(builder.playAndHold("animation.ge.tree"));
-            case 9 -> controller.setAnimation(builder.playAndHold("animation.ge.snake"));
-
-            case 10 -> controller.setAnimation(builder.playAndHold("animation.ge.rekka1"));
-            case 11 -> controller.setAnimation(builder.playAndHold("animation.ge.rekka2"));
-            case 12 -> controller.setAnimation(builder.playAndHold("animation.ge.rekka3"));
-
-            case 13 -> controller.setAnimation(builder.playAndHold("animation.ge.overclock"));
-
-            //default -> throw new IllegalStateException("Unexpected value: " + this.getState());
+        State(Consumer<AnimationBuilder> animator) {
+            this.animator = animator;
         }
 
-        return PlayState.CONTINUE;
+        @Override
+        public void playAnimation(GoldenExperienceEntity stand, AnimationBuilder builder) {
+            animator.accept(builder);
+        }
+    }
+
+    @Override
+    protected State[] getStateValues() {
+        return State.values();
+    }
+
+    @Nullable
+    @Override
+    protected String getSummonAnimation() {
+        return null;
+    }
+
+    @Override
+    public State getBlockState() {
+        return State.BLOCK;
     }
 }

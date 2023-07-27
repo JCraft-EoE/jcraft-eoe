@@ -17,8 +17,8 @@ public class KingCrimsonModel extends StandEntityModel<KingCrimsonEntity> {
     public void setCustomAnimations(KingCrimsonEntity entity, int uniqueID, AnimationEvent animationEvent) {
         super.setCustomAnimations(entity, uniqueID, animationEvent);
         if (!entity.hasUser()) return;
-        
-        LivingEntity user = entity.getUser();
+
+        LivingEntity user = entity.getUserOrThrow();
         float overVel = 0;
         float velInfluence = 90f;
 
@@ -37,7 +37,7 @@ public class KingCrimsonModel extends StandEntityModel<KingCrimsonEntity> {
 
         IBone head = this.getAnimationProcessor().getBone("head");
 
-        if ((entity.getState() == 3 || entity.getState() < 2) && head != null) {
+        if ((entity.isBlocking() || entity.isIdle()) && head != null) {
             head.setRotationX(-(user.getPitch() + overVel * velInfluence) * 3.1415f / 180f);
         }
     }

@@ -37,7 +37,7 @@ public class MoveDataCommand {
         Attack attack;
 
         if (stand) {
-            if (player.getFirstPassenger() instanceof StandEntity standEntity) {
+            if (player.getFirstPassenger() instanceof StandEntity<?, ?> standEntity) {
                 attack = standEntity.curAttack;
                 if (attack == null) {
                     attack = standEntity.previousAttack;

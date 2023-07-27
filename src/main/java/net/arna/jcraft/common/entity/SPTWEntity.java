@@ -5,6 +5,7 @@ import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.util.MobilityType;
+import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.LivingEntity;
@@ -13,16 +14,12 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.IAnimationTickable;
-import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 
 import java.util.List;
+import java.util.function.Consumer;
 
-public class SPTWEntity extends StarPlatinumEntity implements IAnimatable, IAnimationTickable {
+public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPTWEntity.State> {
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 5, 1.5, 5f, 0.25f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter, low knockback");
     public static final Attack heavy = new Attack(1, 17, 1f, 30, 20, 2.0, 10f, 1.5f, AttackType.BOX, 0.7f, 0, 0, JSoundRegister.IMPACT_1)
@@ -59,7 +56,7 @@ public class SPTWEntity extends StarPlatinumEntity implements IAnimatable, IAnim
     private boolean turnAround;
 
     public SPTWEntity(World worldIn) {
-        super(StandType.STAR_PLATINUM_THE_WORLD, worldIn);
+        super(StandType.STAR_PLATINUM_THE_WORLD, State.class, worldIn);
         super.initialize();
         idleRotation = 315f;
 
@@ -97,13 +94,13 @@ public class SPTWEntity extends StarPlatinumEntity implements IAnimatable, IAnim
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        handleAttack(light, JCraft.standLightCD, 2);
+        handleAttack(light, JCraft.standLightCD, State.PUNCH);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        if (handleAttack(heavy, JCraft.standHeavyCD, 4)) {
+        if (handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY)) {
             playSound(JSoundRegister.STAR_BREAKER, 1, 1);
         }
     }
@@ -111,7 +108,7 @@ public class SPTWEntity extends StarPlatinumEntity implements IAnimatable, IAnim
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, 5)) {
+        if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE)) {
             playSound(JSoundRegister.STAR_PLATINUM_BARRAGE, 1, 1);
         }
     }
@@ -119,7 +116,7 @@ public class SPTWEntity extends StarPlatinumEntity implements IAnimatable, IAnim
     @Override
     public void initSpecial1() {
         if (!canAttack() || !hasUser()) return;
-        if (handleAttack(timestrike, JCraft.standS1CD, 6)) {
+        if (handleAttack(timestrike, JCraft.standS1CD, State.TIME_STRIKE)) {
             turnAround = getUserOrThrow().isSneaking();
             //playSound(JSoundRegister.SPTW_TIMESTRIKE, 1, 1);
         }
@@ -128,14 +125,14 @@ public class SPTWEntity extends StarPlatinumEntity implements IAnimatable, IAnim
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        if (handleAttack(timestop, JCraft.standUltCD, 7))
+        if (handleAttack(timestop, JCraft.standUltCD, State.TIME_STOP))
             playSound(JSoundRegister.STAR_PLATINUM_THE_WORLD, 1, 1);
     }
 
     @Override
     public void initSpecial2() {
         if (!canAttack()) return;
-        if (handleAttack(backhand, JCraft.standS2CD, 8))
+        if (handleAttack(backhand, JCraft.standS2CD, State.BACK_HAND))
             playSound(JSoundRegister.SPTW_BACKHAND, 1, 1);
     }
 
@@ -143,14 +140,14 @@ public class SPTWEntity extends StarPlatinumEntity implements IAnimatable, IAnim
     public void initSpecial3() {
         if (!canAttack()) return;
         // Uses a copy because otherwise the main one gets overwritten by specialAttack()
-        if (handleAttack(grab, JCraft.standS3CD, 9))
+        if (handleAttack(grab, JCraft.standS3CD, State.GRAB))
             playSound(JSoundRegister.SPTW_GRAB, 1, 1);
     }
 
     @Override
     public void initUtil() {
         if (!canAttack()) return;
-        handleAttack(timeskip, JCraft.utilCD, 0);
+        handleAttack(timeskip, JCraft.utilCD, State.IDLE);
     }
 
     @Override
@@ -162,11 +159,11 @@ public class SPTWEntity extends StarPlatinumEntity implements IAnimatable, IAnim
             }
             case (5) -> {
                 if (entities.isEmpty()) return;
-                setAttack(grabhit, 10);
+                setAttack(grabhit, State.GRAB_HIT);
                 playSound(JSoundRegister.SPTW_UPPERCUT, 1, 1);
 
                 for (LivingEntity ent : entities)
-                    if (ent.getFirstPassenger() instanceof StandEntity stand)
+                    if (ent.getFirstPassenger() instanceof StandEntity<?, ?> stand)
                         stand.blocking = false;
             }
             case (7) -> {
@@ -201,30 +198,42 @@ public class SPTWEntity extends StarPlatinumEntity implements IAnimatable, IAnim
     }
 
     // Animation code
+    public enum State implements StandAnimationState<SPTWEntity> {
+        IDLE(builder -> builder.loop("animation.sptw.idle")),
+        PUNCH(builder -> builder.playAndHold("animation.sptw.punch")),
+        BLOCK(builder -> builder.loop("animation.sptw.block")),
+        HEAVY(builder -> builder.playAndHold("animation.sptw.heavy")),
+        BARRAGE(builder -> builder.loop("animation.sptw.barrage")),
+        TIME_STRIKE(builder -> builder.playAndHold("animation.sptw.timestrike")),
+        TIME_STOP(builder -> builder.playAndHold("animation.sptw.timestop")),
+        BACK_HAND(builder -> builder.playAndHold("animation.sptw.backhand")),
+        GRAB(builder -> builder.playAndHold("animation.sptw.grab")),
+        GRAB_HIT(builder -> builder.playAndHold("animation.sptw.grabhit"));
+
+        private final Consumer<AnimationBuilder> animator;
+
+        State(Consumer<AnimationBuilder> animator) {
+            this.animator = animator;
+        }
+
+        @Override
+        public void playAnimation(SPTWEntity stand, AnimationBuilder builder) {
+            animator.accept(builder);
+        }
+    }
+
     @Override
-    protected <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
-        AnimationController<E> controller = event.getController();
-        AnimationBuilder builder = new AnimationBuilder();
+    protected State[] getStateValues() {
+        return State.values();
+    }
 
-        if (playSummonAnim) {
-            controller.setAnimation(builder.playOnce("animation.sptw.summon"));
-            return PlayState.CONTINUE;
-        }
+    @Override
+    protected String getSummonAnimation() {
+        return "animation.sptw.summon";
+    }
 
-        if (getSameState()) controller.markNeedsReload();
-        switch (getState()) {
-            default -> controller.setAnimation(builder.loop("animation.sptw.idle"));
-            case 2 -> controller.setAnimation(builder.playAndHold("animation.sptw.punch"));
-            case 3 -> controller.setAnimation(builder.loop("animation.sptw.block"));
-            case 4 -> controller.setAnimation(builder.playAndHold("animation.sptw.heavy"));
-            case 5 -> controller.setAnimation(builder.loop("animation.sptw.barrage"));
-            case 6 -> controller.setAnimation(builder.playAndHold("animation.sptw.timestrike"));
-            case 7 -> controller.setAnimation(builder.playAndHold("animation.sptw.timestop"));
-            case 8 -> controller.setAnimation(builder.playAndHold("animation.sptw.backhand"));
-            case 9 -> controller.setAnimation(builder.playAndHold("animation.sptw.grab"));
-            case 10 -> controller.setAnimation(builder.playAndHold("animation.sptw.grabhit"));
-        }
-
-        return PlayState.CONTINUE;
+    @Override
+    public State getBlockState() {
+        return State.BLOCK;
     }
 }

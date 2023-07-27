@@ -5,7 +5,10 @@ import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackQueue;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
-import net.arna.jcraft.common.util.*;
+import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.common.util.MobilityType;
+import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
@@ -30,16 +33,14 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.PlayState;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
-public class TheWorldOverHeavenEntity extends StandEntity {
+public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEntity, TheWorldOverHeavenEntity.State> {
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 4, 1.5, 6f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0, JSoundRegister.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
     public static final Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 2, 0, 3, JSoundRegister.IMPACT_1)
@@ -147,26 +148,26 @@ public class TheWorldOverHeavenEntity extends StandEntity {
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        handleAttack(light, JCraft.standLightCD, 2);
+        handleAttack(light, JCraft.standLightCD, State.LIGHT);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, 5))
+        if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
             playSound(JSoundRegister.TWOH_BARRAGE, 1, 1);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        if (handleAttack(heavy, JCraft.standHeavyCD, 4))
+        if (handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY))
             playSound(JSoundRegister.TWOH_HEAVY, 1, 1);
     }
 
     private void initOverwrite(int type) {
         setOverwriteType(type);
-        setAttack(overwrite, 10);
+        setAttack(overwrite, State.OVERWRITE);
         playSound(JSoundRegister.TWOH_OVERWRITE, 1, 1);
     }
 
@@ -177,7 +178,7 @@ public class TheWorldOverHeavenEntity extends StandEntity {
             return;
         }
 
-        if (canAttack() && handleAttack(smite, JCraft.standS1CD, 6) && hasUser()) {
+        if (canAttack() && handleAttack(smite, JCraft.standS1CD, State.SMITE) && hasUser()) {
             LivingEntity user = getUserOrThrow();
             if (user.isOnGround()) {
                 smiteDamage = 8f;
@@ -219,11 +220,11 @@ public class TheWorldOverHeavenEntity extends StandEntity {
         }
 
         CanAttackData cad = this.canAttackWithData();
-        if (!cad.canAttack) return;
+        if (!cad.canAttack()) return;
 
-        if (cad.user.isOnGround() && handleAttack(delayknives, JCraft.standS2CD, 11))
+        if (cad.user().isOnGround() && handleAttack(delayknives, JCraft.standS2CD, State.AIR_KNIVES))
             playSound(JSoundRegister.TWOH_AIRKNIVES, 1, 1);
-        else if (handleAttack(knives, JCraft.standS2CD, 9)) playSound(JSoundRegister.TWOH_KNIFETHROW, 1, 1);
+        else if (handleAttack(knives, JCraft.standS2CD, State.THROW)) playSound(JSoundRegister.TWOH_KNIFETHROW, 1, 1);
     }
 
     @Override
@@ -233,21 +234,21 @@ public class TheWorldOverHeavenEntity extends StandEntity {
             return;
         }
 
-        if (canAttack() && handleAttack(chargeoverwrite, JCraft.standS3CD, 8))
+        if (canAttack() && handleAttack(chargeoverwrite, JCraft.standS3CD, State.CHARGE_OVERWRITE))
             playSound(JSoundRegister.TWOH_CHARGEOVERWRITE, 1, 1);
     }
 
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        if (handleAttack(timestop, JCraft.standUltCD, 7))
+        if (handleAttack(timestop, JCraft.standUltCD, State.TIME_STOP))
             playSound(JSoundRegister.TWOH_TS, 1, 1);
     }
 
     @Override
     public void initUtil() {
         if (!canAttack()) return;
-        handleAttack(timeskip, JCraft.utilCD, 0);
+        handleAttack(timeskip, JCraft.utilCD, State.IDLE);
     }
 
     @Override
@@ -446,28 +447,43 @@ public class TheWorldOverHeavenEntity extends StandEntity {
     }
 
     // Animation code
+    public enum State implements StandAnimationState<TheWorldOverHeavenEntity> {
+        IDLE(builder -> builder.loop("animation.twoh.idle")),
+        LIGHT(builder -> builder.playAndHold("animation.twoh.light")),
+        BLOCK(builder -> builder.loop("animation.twoh.block")),
+        HEAVY(builder -> builder.playAndHold("animation.twoh.heavy")),
+        BARRAGE(builder -> builder.loop("animation.twoh.barrage")),
+        SMITE(builder -> builder.playAndHold("animation.twoh.smite")),
+        TIME_STOP(builder -> builder.playAndHold("animation.twoh.timestop")),
+        CHARGE_OVERWRITE(builder -> builder.loop("animation.twoh.chargeoverwrite")),
+        OVERWRITE(builder -> builder.playAndHold("animation.twoh.overwrite")),
+        THROW(builder -> builder.playAndHold("animation.twoh.throw")),
+        AIR_KNIVES(builder -> builder.playAndHold("animation.twoh.airknives"));
+
+        private final Consumer<AnimationBuilder> animator;
+
+        State(Consumer<AnimationBuilder> animator) {
+            this.animator = animator;
+        }
+
+        @Override
+        public void playAnimation(TheWorldOverHeavenEntity stand, AnimationBuilder builder) {
+            animator.accept(builder);
+        }
+    }
+
     @Override
-    protected <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
-        AnimationController<E> controller = event.getController();
-        AnimationBuilder builder = new AnimationBuilder();
-        if (playSummonAnim) {
-            controller.setAnimation(builder.loop("animation.twoh.summon"));
-            return PlayState.CONTINUE;
-        }
-        if (getSameState()) controller.markNeedsReload();
-        switch (getState()) {
-            default -> controller.setAnimation(builder.loop("animation.twoh.idle"));
-            case 2 -> controller.setAnimation(builder.playAndHold("animation.twoh.light"));
-            case 3 -> controller.setAnimation(builder.loop("animation.twoh.block"));
-            case 4 -> controller.setAnimation(builder.playAndHold("animation.twoh.heavy"));
-            case 5 -> controller.setAnimation(builder.loop("animation.twoh.barrage"));
-            case 6 -> controller.setAnimation(builder.playAndHold("animation.twoh.smite"));
-            case 7 -> controller.setAnimation(builder.playAndHold("animation.twoh.timestop"));
-            case 8 -> controller.setAnimation(builder.playAndHold("animation.twoh.chargeoverwrite"));
-            case 9 -> controller.setAnimation(builder.playAndHold("animation.twoh.throw"));
-            case 10 -> controller.setAnimation(builder.playAndHold("animation.twoh.overwrite"));
-            case 11 -> controller.setAnimation(builder.playAndHold("animation.twoh.airknives"));
-        }
-        return PlayState.CONTINUE;
+    protected State[] getStateValues() {
+        return State.values();
+    }
+
+    @Override
+    protected @Nullable String getSummonAnimation() {
+        return "animation.twoh.summon";
+    }
+
+    @Override
+    public State getBlockState() {
+        return State.BLOCK;
     }
 }

@@ -5,6 +5,7 @@ import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.util.MobilityType;
+import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
@@ -15,15 +16,13 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.PlayState;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 
 import java.util.List;
+import java.util.function.Consumer;
 
-public class TheWorldEntity extends StandEntity {
+public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.State> {
     public static final Attack crm1 = new Attack(0, JCraft.lightCooldown, 0.75f, 14, 8, 1.5, 6f, 1f, AttackType.BOX, 0.85f, 0.25f, 0, JSoundRegister.IMPACT_1)
             .appendHitbox(new HitBoxData(0, 0, 1))
             .setInfo("Low Kick", "slower, higher stun");
@@ -37,7 +36,7 @@ public class TheWorldEntity extends StandEntity {
             .appendHitbox(new HitBoxData(0, 0, 1.5))
             .hyperArmor()
             .setInfo("Donut", "slow, uninterruptable combo starter/extender, 1.5s stun on whiff");
-    public static final Attack charge = new Attack(4, 20, 7.5f, 19, 5, 1.5, 5f, 0.25f, AttackType.CHARGE, 1, 0, 9, JSoundRegister.TW_CHARGE_HIT)
+    public static final Attack charge = new Attack(4, 20, 7.5f, 19, 5, 1.5, 5f, 0.25f, AttackType.CHARGE, 1, 0, State.CHARGE_HIT.ordinal(), JSoundRegister.TW_CHARGE_HIT)
             .setRanged(true)
             .disableBackstab()
             .setBlockstun(11)
@@ -102,57 +101,56 @@ public class TheWorldEntity extends StandEntity {
     public void initLightAttack() {
         if (!canAttack()) return;
         if (getUserOrThrow().isSneaking())
-            handleAttack(crm1, JCraft.standLightCD, 13);
-        else
-            handleAttack(light, JCraft.standLightCD, 2);
+            handleAttack(crm1, JCraft.standLightCD, State.LOW);
+        else handleAttack(light, JCraft.standLightCD, State.LIGHT);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        if (handleAttack(donut, JCraft.standHeavyCD, 4))
+        if (handleAttack(donut, JCraft.standHeavyCD, State.DONUT))
             playSound(JSoundRegister.TW_DONUT, 1, 1);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, 5))
+        if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
             playSound(JSoundRegister.TW_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack()) return;
-        if (handleAttack(roundhouse, JCraft.standS1CD, 10))
+        if (handleAttack(roundhouse, JCraft.standS1CD, State.ROUNDHOUSE))
             playSound(JSoundRegister.TW_KICK, 1, 1);
     }
 
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        if (handleAttack(timestop, JCraft.standUltCD, 7))
+        if (handleAttack(timestop, JCraft.standUltCD, State.TIME_STOP))
             playSound(JSoundRegister.TW_TS, 1, 1);
     }
 
     @Override
     public void initSpecial2() {
         if (!canAttack()) return;
-        if (handleAttack(charge, JCraft.standS2CD, 8))
+        if (handleAttack(charge, JCraft.standS2CD, State.CHARGE))
             playSound(JSoundRegister.TW_CHARGE, 1, 1);
     }
 
     @Override
     public void initSpecial3() {
         if (!canAttack()) return;
-        if (handleAttack(feignbarrage, JCraft.standS3CD, 5))
+        if (handleAttack(feignbarrage, JCraft.standS3CD, State.BARRAGE))
             playSound(JSoundRegister.TW_BARRAGE, 1, 1);
     }
 
     @Override
     public void initUtil() {
         if (!canAttack()) return;
-        handleAttack(timeskip, JCraft.utilCD, 0);
+        handleAttack(timeskip, JCraft.utilCD, State.IDLE);
     }
 
     @Override
@@ -197,10 +195,10 @@ public class TheWorldEntity extends StandEntity {
         if (entity instanceof LivingEntity livingEntity) {
             livingEntity.removeStatusEffect(JStatusRegister.DAZED);
             stun(livingEntity, 20, 0);
-            if (entity.getFirstPassenger() instanceof StandEntity stand) stand.cancelAttack();
+            if (entity.getFirstPassenger() instanceof StandEntity<?, ?> stand) stand.cancelAttack();
         }
 
-        setAttack(counterfollowup, 11);
+        setAttack(counterfollowup, State.COUNTER_HIT);
 
         playSound(JSoundRegister.TIME_SKIP, 1, 1);
         playSound(JSoundRegister.TW_COUNTER, 1, 1);
@@ -208,7 +206,7 @@ public class TheWorldEntity extends StandEntity {
 
     @Override
     public void whiffCounter() {
-        setAttack(counterMiss, 12);
+        setAttack(counterMiss, State.COUNTER_MISS);
         stun(getUser(), counterMiss.moveStun, 0);
     }
 
@@ -226,31 +224,44 @@ public class TheWorldEntity extends StandEntity {
     }
 
     // Animation code
+    public enum State implements StandAnimationState<TheWorldEntity> {
+        IDLE(builder -> builder.loop("animation.theworld.idle")),
+        LIGHT(builder -> builder.playAndHold("animation.theworld.light")),
+        BLOCK(builder -> builder.loop("animation.theworld.block")),
+        DONUT(builder -> builder.playAndHold("animation.theworld.donut")),
+        BARRAGE(builder -> builder.loop("animation.theworld.barrage")),
+        TIME_STOP(builder -> builder.playAndHold("animation.theworld.timestop")),
+        CHARGE(builder -> builder.loop("animation.theworld.charge")),
+        CHARGE_HIT(builder -> builder.playAndHold("animation.theworld.charge_hit")),
+        ROUNDHOUSE(builder -> builder.playAndHold("animation.theworld.roundhouse")),
+        COUNTER_HIT(builder -> builder.playAndHold("animation.theworld.counter_hit")),
+        COUNTER_MISS(builder -> builder.playAndHold("animation.theworld.counter_miss")),
+        LOW(builder -> builder.playAndHold("animation.theworld.low"));
+
+        private final Consumer<AnimationBuilder> animator;
+
+        State(Consumer<AnimationBuilder> animator) {
+            this.animator = animator;
+        }
+
+        @Override
+        public void playAnimation(TheWorldEntity stand, AnimationBuilder builder) {
+            animator.accept(builder);
+        }
+    }
+
     @Override
-    protected <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
-        AnimationController<E> controller = event.getController();
-        AnimationBuilder builder = new AnimationBuilder();
+    protected State[] getStateValues() {
+        return State.values();
+    }
 
-        if (playSummonAnim) {
-            controller.setAnimation(builder.playOnce("animation.theworld.summon"));
-            return PlayState.CONTINUE;
-        }
+    @Override
+    protected @Nullable String getSummonAnimation() {
+        return "animation.theworld.summon";
+    }
 
-        if (getSameState()) controller.markNeedsReload();
-        switch (getState()) {
-            case 2 -> controller.setAnimation(builder.playAndHold("animation.theworld.light"));
-            case 3 -> controller.setAnimation(builder.loop("animation.theworld.block"));
-            case 4 -> controller.setAnimation(builder.playAndHold("animation.theworld.donut"));
-            case 5 -> controller.setAnimation(builder.loop("animation.theworld.barrage"));
-            case 7 -> controller.setAnimation(builder.playAndHold("animation.theworld.timestop"));
-            case 8 -> controller.setAnimation(builder.loop("animation.theworld.charge"));
-            case 9 -> controller.setAnimation(builder.playAndHold("animation.theworld.charge_hit"));
-            case 10 -> controller.setAnimation(builder.playAndHold("animation.theworld.roundhouse"));
-            case 11 -> controller.setAnimation(builder.playAndHold("animation.theworld.counter_hit"));
-            case 12 -> controller.setAnimation(builder.playAndHold("animation.theworld.counter_miss"));
-            case 13 -> controller.setAnimation(builder.playAndHold("animation.theworld.low"));
-            default -> controller.setAnimation(builder.loop("animation.theworld.idle"));
-        }
-        return PlayState.CONTINUE;
+    @Override
+    public State getBlockState() {
+        return State.BLOCK;
     }
 }

@@ -321,7 +321,7 @@ public class JCraftClient implements ClientModInitializer {
         // Handle JCraft inputs (stand, spec, universal controls)
         GameOptions go = minecraftClient.options;
 
-        StandEntity stand = ((IEntityDataSaver) player).getStand();
+        StandEntity<?, ?> stand = ((IEntityDataSaver) player).getStand();
         boolean standOn = stand != null;
 
         //todo: reformat this into 2 more packets (stand block packet, attack packet)
@@ -439,7 +439,7 @@ public class JCraftClient implements ClientModInitializer {
     }
 
     @Nullable
-    public static StandEntity getStandEntity() {
+    public static StandEntity<?, ?> getStandEntity() {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         if (player == null) return null;
 

@@ -66,20 +66,20 @@ public enum StandType {
             totalStandCount = regularStandCount + evoStandCount;
 
     @Getter
-    private final EntityType<? extends StandEntity> entityType;
+    private final EntityType<? extends StandEntity<?, ?>> entityType;
     @Getter
     private final int id;
-    private final Function<World, StandEntity> ctor;
+    private final Function<World, StandEntity<?, ?>> ctor;
     @Getter
     private final Text nameText;
     @Getter
     private final List<Text> skinNames;
 
-    StandType(EntityType<? extends StandEntity> entityType, Function<World, StandEntity> ctor, String nameKey, Text... skinNames) {
+    StandType(EntityType<? extends StandEntity<?, ?>> entityType, Function<World, StandEntity<?, ?>> ctor, String nameKey, Text... skinNames) {
         this(entityType, ctor, nameKey, false, skinNames);
     }
 
-    StandType(EntityType<? extends StandEntity> entityType, Function<World, StandEntity> ctor, String nameKey, boolean isEvo, Text... skinNames) {
+    StandType(EntityType<? extends StandEntity<?, ?>> entityType, Function<World, StandEntity<?, ?>> ctor, String nameKey, boolean isEvo, Text... skinNames) {
         this.entityType = entityType;
         id = isEvo ? --StaticFields.nextEvoId : ++StaticFields.nextId;
         this.ctor = ctor;
@@ -95,7 +95,7 @@ public enum StandType {
     }
 
     @NonNull
-    public StandEntity createNew(World world) {
+    public StandEntity<?, ?> createNew(World world) {
         return ctor.apply(world);
     }
 
