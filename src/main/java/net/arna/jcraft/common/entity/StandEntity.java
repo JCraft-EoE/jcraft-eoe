@@ -212,7 +212,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     public void setRawState(int state) {
         int oldState = getRawState();
-        boolean sameState = oldState == state || oldState == 1;
+        boolean sameState = oldState == state || oldState <= 1;
         dataTracker.set(STATE, state);
         dataTracker.set(SAMESTATE, sameState); // Pretty much just an animation reset flag
         // If we're switched states and are moving to idle, perform reset logic.

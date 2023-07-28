@@ -39,7 +39,10 @@ import java.util.function.Consumer;
 import static net.arna.jcraft.common.attack.Attack.unusable;
 
 public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
+    public static final Attack crm1 = new Attack(14, JCraft.lightCooldown, 0.75f, 15, 9, 1.75, 5f, 0.75f, AttackType.BOX, 1f, 0.3f, 0, JSoundRegister.IMPACT_3)
+            .setInfo("Bite", "applies Slowness II (2s) on hit");
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 14, 6, 1.5, 5f, 0.75f, AttackType.BOX, 1f, 0.1f, 0, JSoundRegister.IMPACT_3)
+            .crouchingVariation(crm1)
             .setInfo("Punch", "quick combo starter");
     public static final Attack heavy = new Attack(1, 14, 1f, 30, 20, 1.5, 10f, 0.1f, AttackType.BOX, 2, 0, 0, JSoundRegister.IMPACT_3)
             .setHitspark(2)
@@ -167,6 +170,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         if (!canAttack()) return;
 
         if (isHalfBall()) handleAttack(balllight, JCraft.standLightCD, State.BALL_LIGHT);
+        else if (getUserOrThrow().isSneaking()) handleAttack(crm1, JCraft.standLightCD, State.BITE);
         else handleAttack(light, JCraft.standLightCD, State.LIGHT);
     }
 
@@ -310,6 +314,11 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                 charging = true;
                 chargeDir = getUserOrThrow().getRotationVector().multiply(0.5);
                 setVoidTime(15);
+            }
+            case (14) -> {
+                for (LivingEntity ent : entities)
+                    if (!JUtils.isBlocking(ent))
+                        ent.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 40, 1));
             }
         }
     }
@@ -518,7 +527,8 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         GRAB_HIT(builder -> builder.playAndHold("animation.cream.grab_hit")),
         ENTER(builder -> builder.playAndHold("animation.cream.enter")),
         EXIT(builder -> builder.playAndHold("animation.cream.exit")),
-        DESTROY(builder -> builder.playAndHold("animation.cream.destroy"));
+        DESTROY(builder -> builder.playAndHold("animation.cream.destroy")),
+        BITE(builder -> builder.playAndHold("animation.cream.bite"));
 
         private final Consumer<AnimationBuilder> animator;
 
