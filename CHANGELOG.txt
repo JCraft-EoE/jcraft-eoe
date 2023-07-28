@@ -1350,7 +1350,7 @@ C-Moon
 Made in Heaven
     >Improved initiation detection for Heaven's Judgement (normal)
 
-● 27/7/2023
+● 28/7/2023
 
 D4C
     >Chop stun reduced (1.5->1.1s)

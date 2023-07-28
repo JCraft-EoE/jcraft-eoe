@@ -248,7 +248,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
     @Override
     public void initUtil() {
         if (!canAttack()) return;
-        handleAttack(timeskip, JCraft.utilCD, State.IDLE);
+        handleAttack(timeskip, JCraft.utilCD, State.TIMESKIP);
     }
 
     @Override
@@ -458,7 +458,8 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         CHARGE_OVERWRITE(builder -> builder.loop("animation.twoh.chargeoverwrite")),
         OVERWRITE(builder -> builder.playAndHold("animation.twoh.overwrite")),
         THROW(builder -> builder.playAndHold("animation.twoh.throw")),
-        AIR_KNIVES(builder -> builder.playAndHold("animation.twoh.airknives"));
+        AIR_KNIVES(builder -> builder.playAndHold("animation.twoh.airknives")),
+        TIMESKIP(builder -> builder.loop("animation.twoh.idle"));
 
         private final Consumer<AnimationBuilder> animator;
 

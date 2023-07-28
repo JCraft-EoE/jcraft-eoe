@@ -324,7 +324,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
 
     @Override
     public void initUtil() {
-        if (!canAttack() || !hasUser() || !handleAttack(timeskip, JCraft.utilCD, State.IDLE)) return;
+        if (!canAttack() || !hasUser() || !handleAttack(timeskip, JCraft.utilCD, State.TIMESKIP)) return;
         LivingEntity user = getUserOrThrow();
 
         Vec3d pos = user.getPos();
@@ -714,7 +714,8 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
         BLOOD_THROW(builder -> builder.playAndHold("animation.kingcrimson.bloodthrow")),
         PREDICT(builder -> builder.playAndHold("animation.kingcrimson.predict")),
         COUNTER_MISS(builder -> builder.playAndHold("animation.kingcrimson.counter_miss")),
-        SWEEP(builder -> builder.playAndHold("animation.kingcrimson.sweep"));
+        SWEEP(builder -> builder.playAndHold("animation.kingcrimson.sweep")),
+        TIMESKIP(builder -> builder.loop("animation.kingcrimson.idle"));
 
         private final Consumer<AnimationBuilder> animator;
 

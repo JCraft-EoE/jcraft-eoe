@@ -401,7 +401,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         super.initDataTracker();
         dataTracker.startTracking(STATE, 0);
         dataTracker.startTracking(SAMESTATE, false);
-        dataTracker.startTracking(RESET, false);
+        dataTracker.startTracking(RESET, true);
 
         dataTracker.startTracking(MOVESTUN, 0);
 
@@ -650,6 +650,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         curAttack = null;
         setMoveStun(0);
         setState(getIdleState());
+        setReset(true);
     }
 
     /**
@@ -1263,7 +1264,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             int stunTicks = stun != null ? stun.getDuration() + stand.random.nextInt(5) : 0;
             stunTicks += blockPlusTicks;
             stunTicks += ((ITimeStop) target).getTimeStopTicks();
-            int move = stand.selectMove(mob, target, stunTicks, enemyMoveStun, distance, enemyStand, enemyAttack);
+            int move = stand.selectMove(0, mob, target, stunTicks, enemyMoveStun, distance, enemyStand, enemyAttack);
             Attack selectedAttack = null;
 
             boolean shouldPerformMove = stand.getMoveStun() < 1;
@@ -1355,8 +1356,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         return MoveSelectionResult.PASS;
     }
 
-    private int selectMove(MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand, Attack enemyAttack) {
-        int chosenMove = 0; //random.nextInt(0, 4);
+    //todo: make stand user AI aware of attack variations
+    private int selectMove(int initialMove, MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand, Attack enemyAttack) {
+        int chosenMove = initialMove; //random.nextInt(0, 4);
         int chosenMoveInitTime = this.moves.get(chosenMove).initTime;
         int movesOnCooldown = 0;
 

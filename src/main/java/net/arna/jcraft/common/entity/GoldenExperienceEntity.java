@@ -334,7 +334,7 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
     @Override
     protected String getSummonAnimation() {
         return null;
-    }
+    } //todo: GE summon anim
 
     @Override
     public State getBlockState() {

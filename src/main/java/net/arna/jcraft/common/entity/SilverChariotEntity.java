@@ -61,11 +61,11 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .setInfo("God of Death", "high-damage beatdown, 1.5s stun on whiff, cannot be combo broken");
     public final Attack mainbeatdown = new Attack(9, 0, 0.65f, 59, 0, 2.0, 4.5f, 0.75f, AttackType.MULTIHIT, 1.6f, 0, List.of(13, 23), JSoundRegister.IMPACT_1)
             .setStunType(StunType.UNBURSTABLE)
-            .setInfo("God of Death (hit)", "");
+            .setInfo("God of Death (Hit)", "");
     public final Attack beatdownfinish = new Attack(10, 0, 0.65f, 59, 0, 2.5, 6f, 1.25f, AttackType.MULTIHIT, 1, 0, List.of(54), JSoundRegister.TW_KICK_HIT)
             .setLaunch()
             .setHitspark(2)
-            .setInfo("God of Death (final hit)", "");
+            .setInfo("God of Death (Final Hit)", "");
     public final Attack armoroff = new Attack(11, 60, 0.65f, 15, 6, 1.75, 4f, 0.75f, AttackType.BOX, 0.35f, 0f, 0)
             .setLaunch()
             .setInfo("Armor Off", "25s of faster moves");

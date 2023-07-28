@@ -150,7 +150,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
     @Override
     public void initUtil() {
         if (!canAttack()) return;
-        handleAttack(timeskip, JCraft.utilCD, State.IDLE);
+        handleAttack(timeskip, JCraft.utilCD, State.TIMESKIP);
     }
 
     @Override
@@ -236,7 +236,8 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
         ROUNDHOUSE(builder -> builder.playAndHold("animation.theworld.roundhouse")),
         COUNTER_HIT(builder -> builder.playAndHold("animation.theworld.counter_hit")),
         COUNTER_MISS(builder -> builder.playAndHold("animation.theworld.counter_miss")),
-        LOW(builder -> builder.playAndHold("animation.theworld.low"));
+        LOW(builder -> builder.playAndHold("animation.theworld.low")),
+        TIMESKIP(builder -> builder.loop("animation.theworld.idle"));
 
         private final Consumer<AnimationBuilder> animator;
 
