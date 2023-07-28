@@ -13,6 +13,7 @@ import net.arna.jcraft.registry.JDimensionRegister;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -21,11 +22,13 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.*;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkSection;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -34,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.stream.IntStream;
 
 public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
     public static final Attack crm1 = new Attack(11, JCraft.lightCooldown, 0.75f, 15, 11, 0, 0, 0f, AttackType.BOX)
@@ -255,7 +259,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
-        Entity player = this.getUser();
+        LivingEntity user = getUser();
         switch (attack.id) {
             case (3) -> {
                 ChunkPos origin = getChunkPos();
@@ -266,14 +270,33 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                         int cX = origin.x + x;
                         int cZ = origin.z + z;
                         JCraft.preloadChunk(auWorld, cX, cZ);
-                        ChunkSection[] orSec = world.getChunk(cX, cZ).getSectionArray().clone(); //TODO: fix changes in AU creating ghost blocks in main worlds (probably caused by this and next 2 lines)
+
+                        ChunkSection[] sections = world.getChunk(cX, cZ).getSectionArray();
+                        ChunkSection[] copies = IntStream.range(0, sections.length)
+                                .mapToObj(i -> {
+                                    ChunkSection copy = new ChunkSection(world.sectionIndexToCoord(i),
+                                            world.getRegistryManager().get(Registry.BIOME_KEY));
+
+                                    PacketByteBuf serialized = PacketByteBufs.create();
+                                    sections[i].toPacket(serialized);
+                                    copy.fromPacket(serialized);
+                                    return copy;
+                                })
+                                .toArray(ChunkSection[]::new);
+
                         ChunkSection[] auSec = auWorld.getChunk(cX, cZ).getSectionArray();
-                        System.arraycopy(orSec, 0, auSec, 0, Math.min(orSec.length, auSec.length));
+                        System.arraycopy(copies, 0, auSec, 0, Math.min(copies.length, auSec.length));
                     }
                 }
 
+                for (BlockPos pos : BlockPos.iterate(new BlockPos(origin.getStartX() - 3 * 16, world.getBottomY(), origin.getStartZ() - 3 * 16),
+                        new BlockPos(origin.getEndX() + 3 * 16, world.getTopY(), origin.getEndZ() + 3 * 16))) {
+                    auWorld.removeBlockEntity(pos); // Ensure the old one is gone.
+                    auWorld.getBlockEntity(pos); // Creates the BE if it does not yet exist while there should be one.
+                }
+
                 List<Entity> toHop = new ArrayList<>(entities);
-                toHop.add(player);
+                toHop.add(user);
                 int heightOffset = auWorld.getHeight() - world.getHeight();
                 for (Entity entity : toHop)
                     JCraft.dimensionHop(entity, heightOffset / 2);
@@ -296,7 +319,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                 playSound(JSoundRegister.REVOLVER_FIRE, 1, 1);
             }
             case (6) -> {
-                if (player instanceof PlayerEntity playerEntity) {
+                if (user instanceof PlayerEntity playerEntity) {
                     playerEntity.giveItemStack(JObjectRegistry.FVREVOLVER.getDefaultStack());
                     getMainHandStack().decrement(1);
                 }
@@ -305,14 +328,14 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                 ItemStack weapon = new ItemStack(Items.IRON_SWORD);
                 weapon.setDamage(249);
 
-                if (player instanceof ServerPlayerEntity playerEntity) {
+                if (user instanceof ServerPlayerEntity playerEntity) {
                     PlayerCloneEntity playerCloneEntity = new PlayerCloneEntity(PlayerCloneEntity.getCloneType(playerEntity), this.world);
                     playerCloneEntity.copyPositionAndRotation(playerEntity);
                     playerCloneEntity.setMaster(playerEntity);
 
                     world.spawnEntity(playerCloneEntity);
                     playerCloneEntity.equipStack(EquipmentSlot.MAINHAND, weapon);
-                } else if (player instanceof MobEntity mob) { //Code sourced from MobEntity.class convertTo()
+                } else if (user instanceof MobEntity mob) { //Code sourced from MobEntity.class convertTo()
                     EntityType<?> entityType = mob.getType();
                     MobEntity newMob = (MobEntity) entityType.create(world);
 
