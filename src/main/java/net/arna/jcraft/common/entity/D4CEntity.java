@@ -9,10 +9,14 @@ import net.arna.jcraft.common.util.DimValues;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
+import net.arna.jcraft.mixin.ChunkLightProviderAccessor;
+import net.arna.jcraft.mixin.LightStorageAccessor;
+import net.arna.jcraft.mixin.LightingProviderAccessor;
 import net.arna.jcraft.registry.JDimensionRegister;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegister;
 import net.arna.jcraft.registry.JStatusRegister;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -21,19 +25,27 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.*;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.ChunkNibbleArray;
 import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.world.chunk.ChunkToNibbleArrayMap;
+import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.chunk.light.LightingProvider;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.IntStream;
 
 public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
     public static final Attack crm1 = new Attack(11, JCraft.lightCooldown, 0.75f, 15, 11, 0, 0, 0f, AttackType.BOX)
@@ -255,25 +267,82 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
-        Entity player = this.getUser();
+        LivingEntity user = getUser();
         switch (attack.id) {
             case (3) -> {
                 ChunkPos origin = getChunkPos();
                 ServerWorld world = (ServerWorld) getWorld();
+
+                // Lighting providers are too complicated, man. Wth
+                // We got 2 providers, every provider has 2 storages and every storage has 2 storages.
+                LightingProvider ogLightingProvider = world.getLightingProvider();
+                LightingProvider auLightingProvider = auWorld.getLightingProvider();
+                LightStorageAccessor ogBlockLightStorage0 = (LightStorageAccessor) ((ChunkLightProviderAccessor)
+                        ((LightingProviderAccessor) ogLightingProvider).getBlockLightProvider()).getLightStorage();
+                LightStorageAccessor auBlockLightStorage0 = (LightStorageAccessor) ((ChunkLightProviderAccessor)
+                        ((LightingProviderAccessor) auLightingProvider).getBlockLightProvider()).getLightStorage();
+                LightStorageAccessor ogSkyLightStorage0 = (LightStorageAccessor) ((ChunkLightProviderAccessor)
+                        ((LightingProviderAccessor) ogLightingProvider).getSkyLightProvider()).getLightStorage();
+                LightStorageAccessor auSkyLightStorage0 = (LightStorageAccessor) ((ChunkLightProviderAccessor)
+                        ((LightingProviderAccessor) auLightingProvider).getSkyLightProvider()).getLightStorage();
+
+                ChunkToNibbleArrayMap<?> ogBlockLightStorage = ogBlockLightStorage0.getStorage();
+                ChunkToNibbleArrayMap<?> ogUncachedBlockLightStorage = ogBlockLightStorage0.getUncachedStorage();
+                ChunkToNibbleArrayMap<?> auBlockLightStorage = auBlockLightStorage0.getStorage();
+                ChunkToNibbleArrayMap<?> auUncachedBlockLightStorage = auBlockLightStorage0.getUncachedStorage();
+                ChunkToNibbleArrayMap<?> ogSkyLightStorage = ogSkyLightStorage0.getStorage();
+                ChunkToNibbleArrayMap<?> ogUncachedSkyLightStorage = ogSkyLightStorage0.getUncachedStorage();
+                ChunkToNibbleArrayMap<?> auSkyLightStorage = auSkyLightStorage0.getStorage();
+                ChunkToNibbleArrayMap<?> auUncachedSkyLightStorage = auSkyLightStorage0.getUncachedStorage();
 
                 for (int x = -3; x < 4; x++) {
                     for (int z = -3; z < 4; z++) {
                         int cX = origin.x + x;
                         int cZ = origin.z + z;
                         JCraft.preloadChunk(auWorld, cX, cZ);
-                        ChunkSection[] orSec = world.getChunk(cX, cZ).getSectionArray().clone(); //TODO: fix changes in AU creating ghost blocks in main worlds (probably caused by this and next 2 lines)
-                        ChunkSection[] auSec = auWorld.getChunk(cX, cZ).getSectionArray();
-                        System.arraycopy(orSec, 0, auSec, 0, Math.min(orSec.length, auSec.length));
+
+                        WorldChunk ogChunk = world.getChunk(cX, cZ);
+                        WorldChunk auChunk = auWorld.getChunk(cX, cZ);
+
+                        ChunkSection[] sections = ogChunk.getSectionArray();
+                        ChunkSection[] copies = IntStream.range(0, sections.length)
+                                .mapToObj(i -> {
+                                    ChunkSection copy = new ChunkSection(world.sectionIndexToCoord(i),
+                                            world.getRegistryManager().get(Registry.BIOME_KEY));
+
+                                    PacketByteBuf serialized = PacketByteBufs.create();
+                                    sections[i].toPacket(serialized);
+                                    copy.fromPacket(serialized);
+                                    return copy;
+                                })
+                                .toArray(ChunkSection[]::new);
+
+                        ChunkSection[] auSec = auChunk.getSectionArray();
+                        System.arraycopy(copies, 0, auSec, 0, Math.min(copies.length, auSec.length));
+
+                        // Copy light for every section.
+                        for (int y = auWorld.getBottomY(); y < auWorld.getTopY(); y += 16) {
+                            long cPos = ChunkSectionPos.toLong(new BlockPos(cX * 16, y, cZ * 16));
+                            auBlockLightStorage.put(cPos, Optional.ofNullable(ogBlockLightStorage.get(cPos))
+                                    .map(ChunkNibbleArray::copy).orElse(null));
+                            auUncachedBlockLightStorage.put(cPos, Optional.ofNullable(ogUncachedBlockLightStorage.get(cPos))
+                                    .map(ChunkNibbleArray::copy).orElse(null));
+                            auSkyLightStorage.put(cPos, Optional.ofNullable(ogSkyLightStorage.get(cPos))
+                                    .map(ChunkNibbleArray::copy).orElse(null));
+                            auUncachedSkyLightStorage.put(cPos, Optional.ofNullable(ogUncachedSkyLightStorage.get(cPos))
+                                    .map(ChunkNibbleArray::copy).orElse(null));
+                        }
                     }
                 }
 
+                for (BlockPos pos : BlockPos.iterate(new BlockPos(origin.getStartX() - 3 * 16, world.getBottomY(), origin.getStartZ() - 3 * 16),
+                        new BlockPos(origin.getEndX() + 3 * 16, world.getTopY(), origin.getEndZ() + 3 * 16))) {
+                    auWorld.removeBlockEntity(pos); // Ensure the old one is gone.
+                    auWorld.getBlockEntity(pos); // Creates the BE if it does not yet exist while there should be one.
+                }
+
                 List<Entity> toHop = new ArrayList<>(entities);
-                toHop.add(player);
+                toHop.add(user);
                 int heightOffset = auWorld.getHeight() - world.getHeight();
                 for (Entity entity : toHop)
                     JCraft.dimensionHop(entity, heightOffset / 2);
@@ -296,7 +365,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                 playSound(JSoundRegister.REVOLVER_FIRE, 1, 1);
             }
             case (6) -> {
-                if (player instanceof PlayerEntity playerEntity) {
+                if (user instanceof PlayerEntity playerEntity) {
                     playerEntity.giveItemStack(JObjectRegistry.FVREVOLVER.getDefaultStack());
                     getMainHandStack().decrement(1);
                 }
@@ -305,14 +374,14 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                 ItemStack weapon = new ItemStack(Items.IRON_SWORD);
                 weapon.setDamage(249);
 
-                if (player instanceof ServerPlayerEntity playerEntity) {
+                if (user instanceof ServerPlayerEntity playerEntity) {
                     PlayerCloneEntity playerCloneEntity = new PlayerCloneEntity(PlayerCloneEntity.getCloneType(playerEntity), this.world);
                     playerCloneEntity.copyPositionAndRotation(playerEntity);
                     playerCloneEntity.setMaster(playerEntity);
 
                     world.spawnEntity(playerCloneEntity);
                     playerCloneEntity.equipStack(EquipmentSlot.MAINHAND, weapon);
-                } else if (player instanceof MobEntity mob) { //Code sourced from MobEntity.class convertTo()
+                } else if (user instanceof MobEntity mob) { //Code sourced from MobEntity.class convertTo()
                     EntityType<?> entityType = mob.getType();
                     MobEntity newMob = (MobEntity) entityType.create(world);
 

@@ -306,9 +306,12 @@ public class JCraft implements ModInitializer {
         preloadedChunks.clear();
     }
 
-    public static void preloadChunk(ServerWorld auWorld, int chunkX, int chunkY) {
-        preloadedChunks.add(new ChunkPos(chunkX, chunkY));
-        auWorld.setChunkForced(chunkX, chunkY, true);
+    public static void preloadChunk(ServerWorld auWorld, int chunkX, int chunkZ) {
+        // Already loaded, no need to do so again.
+        if (auWorld.getForcedChunks().contains(new ChunkPos(chunkX, chunkZ).toLong())) return;
+
+        preloadedChunks.add(new ChunkPos(chunkX, chunkZ));
+        auWorld.setChunkForced(chunkX, chunkZ, true);
     }
 
     public static StandEntity<?, ?> summon(World world, LivingEntity player) {
