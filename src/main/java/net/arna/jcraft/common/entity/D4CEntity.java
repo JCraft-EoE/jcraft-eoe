@@ -43,7 +43,6 @@ import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
@@ -323,14 +322,18 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                         // Copy light for every section.
                         for (int y = auWorld.getBottomY(); y < auWorld.getTopY(); y += 16) {
                             long cPos = ChunkSectionPos.toLong(new BlockPos(cX * 16, y, cZ * 16));
-                            auBlockLightStorage.put(cPos, Optional.ofNullable(ogBlockLightStorage.get(cPos))
-                                    .map(ChunkNibbleArray::copy).orElse(null));
-                            auUncachedBlockLightStorage.put(cPos, Optional.ofNullable(ogUncachedBlockLightStorage.get(cPos))
-                                    .map(ChunkNibbleArray::copy).orElse(null));
-                            auSkyLightStorage.put(cPos, Optional.ofNullable(ogSkyLightStorage.get(cPos))
-                                    .map(ChunkNibbleArray::copy).orElse(null));
-                            auUncachedSkyLightStorage.put(cPos, Optional.ofNullable(ogUncachedSkyLightStorage.get(cPos))
-                                    .map(ChunkNibbleArray::copy).orElse(null));
+                            ChunkNibbleArray a;
+                            a = ogBlockLightStorage.get(cPos);
+                            if (a != null) auBlockLightStorage.put(cPos, a);
+
+                            a = ogUncachedBlockLightStorage.get(cPos);
+                            if (a != null) auUncachedBlockLightStorage.put(cPos, a);
+
+                            a = ogSkyLightStorage.get(cPos);
+                            if (a != null) auSkyLightStorage.put(cPos, a);
+
+                            a = ogUncachedSkyLightStorage.get(cPos);
+                            if (a != null) auUncachedSkyLightStorage.put(cPos, a);
                         }
                     }
                 }
