@@ -6,6 +6,7 @@
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "AnvilScreenHandlerMixin",
+    "ChunkLightProviderAccessor",
     "EntityMixin",
     "ExplosionMixin",
     "GrindstoneScreenHandlerAnon2and3Mixin",
@@ -13,6 +14,8 @@
     "ItemMixin",
     "ItemStackMixin",
     "ItemUsageMixin",
+    "LightingProviderAccessor",
+    "LightStorageAccessor",
     "LivingEntityInvoker",
     "LivingEntityMixin",
     "LongUsageItemMixin",

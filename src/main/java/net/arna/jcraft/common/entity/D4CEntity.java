@@ -9,6 +9,9 @@ import net.arna.jcraft.common.util.DimValues;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
+import net.arna.jcraft.mixin.ChunkLightProviderAccessor;
+import net.arna.jcraft.mixin.LightStorageAccessor;
+import net.arna.jcraft.mixin.LightingProviderAccessor;
 import net.arna.jcraft.registry.JDimensionRegister;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegister;
@@ -30,12 +33,17 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.*;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.ChunkNibbleArray;
 import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.world.chunk.ChunkToNibbleArrayMap;
+import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.chunk.light.LightingProvider;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
@@ -265,13 +273,38 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                 ChunkPos origin = getChunkPos();
                 ServerWorld world = (ServerWorld) getWorld();
 
+                // Lighting providers are too complicated, man. Wth
+                // We got 2 providers, every provider has 2 storages and every storage has 2 storages.
+                LightingProvider ogLightingProvider = world.getLightingProvider();
+                LightingProvider auLightingProvider = auWorld.getLightingProvider();
+                LightStorageAccessor ogBlockLightStorage0 = (LightStorageAccessor) ((ChunkLightProviderAccessor)
+                        ((LightingProviderAccessor) ogLightingProvider).getBlockLightProvider()).getLightStorage();
+                LightStorageAccessor auBlockLightStorage0 = (LightStorageAccessor) ((ChunkLightProviderAccessor)
+                        ((LightingProviderAccessor) auLightingProvider).getBlockLightProvider()).getLightStorage();
+                LightStorageAccessor ogSkyLightStorage0 = (LightStorageAccessor) ((ChunkLightProviderAccessor)
+                        ((LightingProviderAccessor) ogLightingProvider).getSkyLightProvider()).getLightStorage();
+                LightStorageAccessor auSkyLightStorage0 = (LightStorageAccessor) ((ChunkLightProviderAccessor)
+                        ((LightingProviderAccessor) auLightingProvider).getSkyLightProvider()).getLightStorage();
+
+                ChunkToNibbleArrayMap<?> ogBlockLightStorage = ogBlockLightStorage0.getStorage();
+                ChunkToNibbleArrayMap<?> ogUncachedBlockLightStorage = ogBlockLightStorage0.getUncachedStorage();
+                ChunkToNibbleArrayMap<?> auBlockLightStorage = auBlockLightStorage0.getStorage();
+                ChunkToNibbleArrayMap<?> auUncachedBlockLightStorage = auBlockLightStorage0.getUncachedStorage();
+                ChunkToNibbleArrayMap<?> ogSkyLightStorage = ogSkyLightStorage0.getStorage();
+                ChunkToNibbleArrayMap<?> ogUncachedSkyLightStorage = ogSkyLightStorage0.getUncachedStorage();
+                ChunkToNibbleArrayMap<?> auSkyLightStorage = auSkyLightStorage0.getStorage();
+                ChunkToNibbleArrayMap<?> auUncachedSkyLightStorage = auSkyLightStorage0.getUncachedStorage();
+
                 for (int x = -3; x < 4; x++) {
                     for (int z = -3; z < 4; z++) {
                         int cX = origin.x + x;
                         int cZ = origin.z + z;
                         JCraft.preloadChunk(auWorld, cX, cZ);
 
-                        ChunkSection[] sections = world.getChunk(cX, cZ).getSectionArray();
+                        WorldChunk ogChunk = world.getChunk(cX, cZ);
+                        WorldChunk auChunk = auWorld.getChunk(cX, cZ);
+
+                        ChunkSection[] sections = ogChunk.getSectionArray();
                         ChunkSection[] copies = IntStream.range(0, sections.length)
                                 .mapToObj(i -> {
                                     ChunkSection copy = new ChunkSection(world.sectionIndexToCoord(i),
@@ -284,8 +317,21 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                                 })
                                 .toArray(ChunkSection[]::new);
 
-                        ChunkSection[] auSec = auWorld.getChunk(cX, cZ).getSectionArray();
+                        ChunkSection[] auSec = auChunk.getSectionArray();
                         System.arraycopy(copies, 0, auSec, 0, Math.min(copies.length, auSec.length));
+
+                        // Copy light for every section.
+                        for (int y = auWorld.getBottomY(); y < auWorld.getTopY(); y += 16) {
+                            long cPos = ChunkSectionPos.toLong(new BlockPos(cX * 16, y, cZ * 16));
+                            auBlockLightStorage.put(cPos, Optional.ofNullable(ogBlockLightStorage.get(cPos))
+                                    .map(ChunkNibbleArray::copy).orElse(null));
+                            auUncachedBlockLightStorage.put(cPos, Optional.ofNullable(ogUncachedBlockLightStorage.get(cPos))
+                                    .map(ChunkNibbleArray::copy).orElse(null));
+                            auSkyLightStorage.put(cPos, Optional.ofNullable(ogSkyLightStorage.get(cPos))
+                                    .map(ChunkNibbleArray::copy).orElse(null));
+                            auUncachedSkyLightStorage.put(cPos, Optional.ofNullable(ogUncachedSkyLightStorage.get(cPos))
+                                    .map(ChunkNibbleArray::copy).orElse(null));
+                        }
                     }
                 }
 
