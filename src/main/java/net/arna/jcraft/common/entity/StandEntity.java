@@ -9,6 +9,7 @@ import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.network.s2c.ComboCounterPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.*;
@@ -517,9 +518,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * @param ent          entity to harm
      */
     public static void damage(float damage, DamageSource damageSource, LivingEntity ent) {
-        if (ent == null || ent.isRemoved() || ent.isDead()) {
-            return;
-        }
+        if (ent == null || ent.isRemoved() || ent.isDead()) return;
+
         ent.damage(damageSource, 0.001f);
 
         // All stands ignore 10% of armor & armor toughness
@@ -527,7 +527,36 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         damage = ((LivingEntityInvoker) ent).invokeModifyAppliedDamage(damageSource, damage);
 
         // Apply absorption
-        float f = damage;
+        float f = damage * ((IDamageScaler)ent).jcraft$getDamageScaling();
+        damage = Math.max(damage - ent.getAbsorptionAmount(), 0.0F);
+        ent.setAbsorptionAmount(ent.getAbsorptionAmount() - (f - damage));
+
+        if (damage <= 0) return;
+
+        float h = ent.getHealth();
+        ent.setHealth(h - damage);
+        ent.getDamageTracker().onDamage(damageSource, h, damage);
+        if (ent.isDead())
+            ent.onDeath(damageSource);
+    }
+
+    /**
+     * Basic damage method, ignores potion effects and enchantments, accounts for armor and damage scaling
+     *
+     * @param damage       damage in half hearts
+     * @param damageSource source of damage
+     * @param ent          entity to harm
+     */
+    public static void trueDamage(float damage, DamageSource damageSource, LivingEntity ent) {
+        if (ent == null || ent.isRemoved() || ent.isDead()) return;
+
+        ent.damage(damageSource, 0.001f);
+
+        // All stands ignore 10% of armor & armor toughness
+        damage = DamageUtil.getDamageLeft(damage, (float) ent.getArmor() * 0.9f, (float) ent.getAttributeValue(EntityAttributes.GENERIC_ARMOR_TOUGHNESS) * 0.9f);
+
+        // Apply absorption
+        float f = damage * ((IDamageScaler)ent).jcraft$getDamageScaling();
         damage = Math.max(damage - ent.getAbsorptionAmount(), 0.0F);
         ent.setAbsorptionAmount(ent.getAbsorptionAmount() - (f - damage));
 
@@ -983,7 +1012,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      */
     public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunLevel, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, boolean canBackstab, boolean unblockable) {
         if (world == null || world.isClient || ent == null || !ent.canTakeDamage()) return;
-        if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && attacker instanceof PlayerEntity playerEntity)
+        if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && attacker instanceof ServerPlayerEntity playerEntity)
             comboCounterLogic(playerEntity, ent);
 
         baseDamageLogic(ent, kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, canBackstab, unblockable);
@@ -1002,7 +1031,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      */
     public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunLevel, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, boolean canBackstab) {
         if (world == null || world.isClient || ent == null || !ent.canTakeDamage()) return;
-        if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && attacker instanceof PlayerEntity playerEntity)
+        if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && attacker instanceof ServerPlayerEntity playerEntity)
             comboCounterLogic(playerEntity, ent);
 
         baseDamageLogic(ent, kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, canBackstab, false);
@@ -1021,7 +1050,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      */
     public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunLevel, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker) {
         if (world == null || world.isClient || ent == null || !ent.canTakeDamage()) return;
-        if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && attacker instanceof PlayerEntity playerEntity)
+        if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && attacker instanceof ServerPlayerEntity playerEntity)
             comboCounterLogic(playerEntity, ent);
         baseDamageLogic(ent, kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, false, false);
     }
@@ -1031,22 +1060,21 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      *
      * @param playerEntity attacker
      */
-    private static void comboCounterLogic(PlayerEntity playerEntity, LivingEntity victim) {
+    private static void comboCounterLogic(ServerPlayerEntity playerEntity, LivingEntity victim) {
         IComboCounter comboCounter = (IComboCounter) playerEntity;
+
         if (comboCounter.getLastAttacked() != victim)
             comboCounter.jcraft$setComboCount(1);
         else {
             StatusEffectInstance stun = victim.getStatusEffect(JStatusRegister.DAZED);
             if (stun != null && stun.getAmplifier() != 2) //LOGGER.info("Target stun: " + stun.getDuration());
-                comboCounter.incrementComboCount();
+                comboCounter.jcraft$incrementComboCount();
             else
                 comboCounter.jcraft$setComboCount(1);
 
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(6);
-            buf.writeInt(comboCounter.jcraft$getComboCount());
-            ServerChannelFeedbackPacket.send((ServerPlayerEntity) playerEntity, buf);
+            ComboCounterPacket.send(playerEntity, comboCounter.jcraft$getComboCount(), ((IDamageScaler) victim).jcraft$getDamageScaling());
         }
+
         comboCounter.setLastAttacked(victim);
     }
 
@@ -1109,9 +1137,14 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         }
 
         // Stun application & overriding
+        IDamageScaler damageScaler = (IDamageScaler) ent;
+
         if (hit) {
-            if (overrideStun)
-                ent.removeStatusEffect(JStatusRegister.DAZED);
+            if (ent.hasStatusEffect(JStatusRegister.DAZED) && ent.getStatusEffect(JStatusRegister.DAZED).getAmplifier() != 2) {
+                damageScaler.jcraft$increaseHitCount();
+                if (overrideStun) ent.removeStatusEffect(JStatusRegister.DAZED);
+            }
+
             stun(ent, stunTicks, stunLevel);
             ent.addVelocity(kbVec.x, kbVec.y, kbVec.z);
         }
@@ -1532,7 +1565,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     public abstract S getBlockState();
 
     public boolean isIdle() {
-        return getRawState() <= 1;
+        return getRawState() == 0;
     }
 
     public boolean isBlocking() {

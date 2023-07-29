@@ -128,7 +128,7 @@ public class AnkhProjectile extends PersistentProjectileEntity implements IAnima
                         this.inGroundTime = 0;
 
                         // Orbiting logic
-                        double orbitProg = Math.toRadians(this.age + this.orbitOffset) * 5;
+                        double orbitProg = Math.toRadians(this.age * 3 + this.orbitOffset);
                         Vec3d orbitPos = owner.getEyePos().add(
                                 Math.sin(orbitProg) * this.orbitRange,
                                 0.0,

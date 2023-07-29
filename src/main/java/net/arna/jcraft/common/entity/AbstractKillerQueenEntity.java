@@ -28,9 +28,14 @@ import java.util.List;
 
 public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQueenEntity<E, S>, S extends Enum<S> & StandAnimationState<E>> extends StandEntity<E, S>
         permits KillerQueenEntity, KQBTDEntity {
-    public static final Attack low = new Attack(1, 0, 0.85f, 13, 8, 1.5, 4f, 0.5f, AttackType.BOX, 0.5f, 0.1f, 0, JSoundRegister.IMPACT_1);
+    public static final Attack low = new Attack(1, 0, 0.85f, 13, 8, 1.5, 4f, 0.5f, AttackType.BOX, 0.5f, 0.1f, 0, JSoundRegister.IMPACT_1)
+            .setInfo("Low Punch", "frametrap tool, low stun");
+
+    public static final Attack detonate = new Attack(6, 1, 1, 6, 5, 0, 0f, 0.0f, AttackType.BOX)
+            .setInfo("Detonate", "slight windup");
 
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 19, 0, 1.5, 3f, 0.75f, AttackType.MULTIHIT, 1f, 0, List.of(6, 11), JSoundRegister.IMPACT_4)
+            .crouchingVariation(detonate)
             .setFollowup(low)
             .setInfo("Dual Punch", "combo starter, decent speed, has followup with more blockstun");
 
@@ -51,9 +56,6 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
     public static final Attack sha = new Attack(5, 45, 20, 16, 0, AttackType.BOX)
             .setRanged(true)
             .setInfo("Sheer Heart Attack", "creates an automatic, heat-seeking sub-stand that explodes on contact, reflects 25% damage back to owner");
-
-    public static final Attack detonate = new Attack(6, 1, 1, 6, 5, 0, 0f, 0.0f, AttackType.BOX)
-            .setInfo("Detonate", "slight windup");
     protected static final int bombplantCD = (int) (bombplant.cooldown * 20);
 
     protected ItemEntity coin;
@@ -88,7 +90,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
                     M1>Barrage>Heavy(>Sheer Heart Attack)""";
 
 
-        moves = List.of(light, heavy, barrage, bombplant, detonate, sha
+        moves = List.of(light, heavy, barrage, bombplant, Attack.unusable, sha
                 , new Attack().setRanged(true).setInfo("Coin Toss", "overrides current bomb with an aimable coin")
                 , new Attack().setMobility(MobilityType.DASH).setInfo("Explosive Dash", "slight aoe damage, 3D movement tool"));
     }
@@ -99,6 +101,11 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
         if (bombBlock != null)
             return bombBlock;
         return null;
+    }
+
+    private void detonate() {
+        setAttack(detonate, getDetonateState());
+        playSound(JSoundRegister.KQ_DETONATE, 1, 1);
     }
 
     // Moveset
@@ -112,8 +119,18 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
 
         boolean idling = getMoveStun() < 1;
         if (curAttack != light) {
-            if (idling) handleAttack(light, JCraft.standLightCD, getLightState());
-        } else if (getMoveStun() < 7) setAttack(low, getLowState());
+            if (idling) {
+                if (user.isSneaking())
+                    detonate();
+                else
+                    handleAttack(light, JCraft.standLightCD, getLightState());
+            }
+        } else if (getMoveStun() < 7) {
+            if (user.isSneaking())
+                detonate();
+            else
+                setAttack(low, getLowState());
+        }
     }
 
     // All moves apart from light and util are different for both versions.
@@ -251,6 +268,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
     }
 
     // Animation code
+    protected abstract S getDetonateState();
     protected abstract S getLightState();
     protected abstract S getLowState();
 }

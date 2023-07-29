@@ -31,7 +31,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
             .setInfo("Punch", "quick combo starter");
     public static final Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 2, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public static final Attack donut = new Attack(1, 14, 1f, 48, 26, 2, 9f, 0.0f, AttackType.BOX, 4, 0, 0, JSoundRegister.TW_DONUT_HIT)
+    public static final Attack donut = new Attack(1, 14, 1f, 48, 26, 2, 9f, 0.0f, AttackType.BOX, 3.25f, 0, 0, JSoundRegister.TW_DONUT_HIT)
             .setHitspark(2)
             .appendHitbox(new HitBoxData(0, 0, 1.5))
             .hyperArmor()
@@ -41,7 +41,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
             .disableBackstab()
             .setBlockstun(11)
             .setInfo("Forward Charge", "The World detaches from the user and lunges forward, combo starter");
-    public static final Attack roundhouse = new Attack(3, 11, 0.75f, 13, 7, 1.75, 5f, 0.3f, AttackType.BOX, 0.45f, -0.1f, 0, JSoundRegister.TW_KICK_HIT)
+    public static final Attack roundhouse = new Attack(3, 8, 0.75f, 13, 7, 1.75, 5f, 0.3f, AttackType.BOX, 0.45f, -0.1f, 0, JSoundRegister.TW_KICK_HIT)
             .setBlockstun(12)
             .setInfo("Roundhouse", "fast poke, low stun");
     public static final Attack timestop = new Attack(6, 70, 52, 45, 4, AttackType.TIMESTOP)

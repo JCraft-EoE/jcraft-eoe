@@ -3,6 +3,7 @@ package net.arna.jcraft.mixin;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.entity.StandEntity;
+import net.arna.jcraft.common.network.s2c.ComboCounterPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.*;
@@ -101,7 +102,7 @@ public abstract class PlayerEntityMixin implements ISpec, IComboCounter {
     }
 
     @Override
-    public void incrementComboCount() {
+    public void jcraft$incrementComboCount() {
         comboCount++;
     }
 
@@ -117,12 +118,8 @@ public abstract class PlayerEntityMixin implements ISpec, IComboCounter {
                 lastAttacked = null;
                 comboCount = 0;
 
-                PacketByteBuf buf = PacketByteBufs.create();
-                buf.writeShort(6);
-                buf.writeInt(0);
-                if (PlayerEntity.class.cast(this) instanceof ServerPlayerEntity serverPlayerEntity) {
-                    ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
-                }
+                if (PlayerEntity.class.cast(this) instanceof ServerPlayerEntity serverPlayerEntity)
+                    ComboCounterPacket.send(serverPlayerEntity, 0, 1.00f);
             }
         }
     }

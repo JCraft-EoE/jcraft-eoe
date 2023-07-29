@@ -77,12 +77,16 @@ import java.util.List;
 import static net.arna.jcraft.client.util.JClientUtils.activeTimestops;
 
 public class JCraftClient implements ClientModInitializer {
-
-    private final List<String> comboRemarks = List.of("admin rdm!!!", "baby combo", "caught lackin", "kinda ez", "skill issue", "cancelled on twitter", "sent to bulgaria", "down bad");
+    // Cooldowns
     public static DefaultedList<Double> clientCooldowns = DefaultedList.ofSize(JCraft.cooldowns.size(), 0.0);
+
+    // Combo counting
+    private final List<String> comboRemarks = List.of("admin rdm!!!", "baby combo", "caught lackin", "kinda ez", "skill issue", "cancelled on twitter", "sent to bulgaria", "down bad");
     public static int comboCounter = 0;
+    public static float damageScaling = 1.00f;
     public static int framesSinceCounted = 0;
 
+    // Keybinds
     public static KeyBinding standSummon;
     public static KeyBinding heavyKey;
     public static KeyBinding barrageKey;
@@ -98,14 +102,14 @@ public class JCraftClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         JCraft.setClientEntityHandler(ClientEntityHandlerImpl.INSTANCE);
-//        MidnightConfig.init(JCraft.MOD_ID, JConfig.class);
+        // MidnightConfig.init(JCraft.MOD_ID, JConfig.class);
 
         AutoConfig.register(JClientConfig.class, JanksonConfigSerializer::new);
         JClientConfig.load();
 
         GravityChannelClient.init();
 
-        //Rendering
+        // Rendering
         JRenderLayerRegistry.init();
         RenderHandler.init();
         JClientEventsRegistry.registerClientEvents();
@@ -220,7 +224,7 @@ public class JCraftClient implements ClientModInitializer {
             // Combo Counter rendering
             textRenderer.drawWithShadow(
                     matrixStack,
-                    remark + " - " + comboCounter,
+                    comboCounter + " - (" + Math.round(damageScaling * 100f) + "%) - " + remark,
                     selectedX + (framesSinceCounted < 5 ? player.getRandom().nextFloat() * 5f : 0) +
                             ((JClientConfig.getInstance().getUiPosition() == JClientConfig.UIPos.MIDDLE && useIcons) ? 54f : 0),
                     selectedY * (1.15f) + (framesSinceCounted < 5 ? player.getRandom().nextFloat() * 5f : 0),

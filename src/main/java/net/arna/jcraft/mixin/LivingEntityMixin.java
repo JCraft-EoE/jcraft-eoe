@@ -17,7 +17,38 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
-public abstract class LivingEntityMixin {
+public abstract class LivingEntityMixin implements IDamageScaler {
+    // Damage scaling
+    private float damageScaling = 1.00f;
+    private int hitCount = 0;
+    @Override
+    public float jcraft$getDamageScaling() {
+        return this.damageScaling;
+    }
+    @Override
+    public int jcraft$getHitCount() {
+        return this.hitCount;
+    }
+    @Override
+    public void jcraft$increaseHitCount() {
+        hitCount++;
+        if (damageScaling > 0.42f)
+            damageScaling -= 0.02f;
+    }
+    @Override
+    public void jcraft$resetHitCount() {
+        damageScaling = 1.00f;
+        hitCount = 0;
+    }
+
+    // Called serverside, if the LivingEntity wasn't removed
+    @Inject(method = "tickMovement", at = @At("HEAD"))
+    public void jcraft$tickMovement(CallbackInfo callbackInfo) {
+        LivingEntity living = LivingEntity.class.cast(this);
+        if ( !living.hasStatusEffect(JStatusRegister.DAZED) )
+             ((IDamageScaler)this).jcraft$resetHitCount();
+    }
+
     // Make stand users rideable entities in water (prevents stand desummon)
     @Inject(cancellable = true, method = "canBeRiddenInWater", at = @At("HEAD"))
     public void jcraft$canBeRiddenInWater(CallbackInfoReturnable<Boolean> cir) {

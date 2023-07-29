@@ -45,7 +45,7 @@ public abstract sealed class AbstractStarPlatinumEntity<E extends AbstractStarPl
             .setHitspark(2)
             .appendHitbox(new HitBoxData(2, 0.5, 1))
             .setInfo("Star Finger", "medium windup, combo starter/extender");
-    public static final Attack lowkick = new Attack(4, 12, 0.75f, 12, 7, 1.5, 6f, 0.25f, AttackType.BOX, 0.4f, 0)
+    public static final Attack lowkick = new Attack(4, 8, 0.75f, 12, 7, 1.5, 6f, 0.25f, AttackType.BOX, 0.4f, 0)
             .setInfo("Roundhouse", "fast poke, low stun");
     public static final Attack chargebarrage = new Attack(5, 26, 5f, 55, 5, 1.5, 0.6f, 0.4f, AttackType.CHARGEBARRAGE, 1, 0, 3)
             .setRanged(true)

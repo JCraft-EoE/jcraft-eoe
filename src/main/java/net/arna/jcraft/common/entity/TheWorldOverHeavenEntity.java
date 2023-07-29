@@ -265,24 +265,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             case (1) -> { // TWOH's heavy is a mini-overwrite that ignores block
                 for (LivingEntity ent : entities) {
                     stun(ent, 20, 1);
-                    ent.damage(damageSource, 0.001f);
-                    float damage = 6f;
-
-                    // All stands ignore 10% of armor & armor toughness
-                    damage = DamageUtil.getDamageLeft(damage, (float) ent.getArmor() * 0.9f, (float) ent.getAttributeValue(EntityAttributes.GENERIC_ARMOR_TOUGHNESS) * 0.9f);
-                    // NOTE THE LACK OF invokeModifyAppliedDamage()
-
-                    float f = damage;
-                    damage = Math.max(damage - ent.getAbsorptionAmount(), 0.0F);
-                    ent.setAbsorptionAmount(ent.getAbsorptionAmount() - (f - damage));
-
-                    if (damage != 0.0F) {
-                        float h = ent.getHealth();
-                        ent.setHealth(h - damage);
-                        ent.getDamageTracker().onDamage(damageSource, h, damage);
-                        if (ent.isDead())
-                            ent.onDeath(damageSource);
-                    }
+                    trueDamage(6, JDamageSources.stand(this), ent);
                 }
             }
             case (3) -> {

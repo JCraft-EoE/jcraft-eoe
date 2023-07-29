@@ -1351,8 +1351,18 @@ Made in Heaven
     >Improved initiation detection for Heaven's Judgement (normal)
 
 ● 28/7/2023
+Added DAMAGE SCALING
+    >The more hits in a combo, the less damage each hit does (100%, -1%/hit until 30%)
+
+Star Platinum
+    >Roundhouse cooldown reduced (11->8s)
+
+The World
+    >Donut stun reduced (4->3.25s)
+    >Roundhouse cooldown reduced (11->8s)
 
 D4C
+    >Fixed breaking blocks in the alternate universe ghosting ones in the main universe
     >Added crouching variant to Light
     >Chop stun reduced (1.5->1.1s)
     >Dimensional Explosions changed
@@ -1363,6 +1373,15 @@ D4C
 
 Cream
     >Added crouching variant to Light
+
+Killer Queen & Bites the Dust
+    >Detonate moved from Ultimate to crouching Light
+    >Light can now be cancelled into Detonate
+
+Magician's Red
+    >Redirect moved from Special 3 to crouching Light
+    >Variation Ankh speed reduced by 40%
+    >Redirected Ankh speed reduced by 40%
 
 priority (top to bottom)
 todo: fix predict not working with new projectiles

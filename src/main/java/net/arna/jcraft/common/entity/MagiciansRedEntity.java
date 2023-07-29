@@ -34,11 +34,16 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, MagiciansRedEntity.State> {
+    public static final Attack redirect = new Attack(5, 5, 0.75f, 10, 7, 0, 0f, 0f, AttackType.BOX)
+            .setMobility(MobilityType.TELEPORT)
+            .setInfo("Redirect", "redirects all the users ankhs to where they're looking");
+    // and so begins my terrible misuse of my own AI flags, the tldr here being that its simply called whenever the enemy is >3 blocks away, which is great here
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 8, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_1)
+            .crouchingVariation(redirect)
             .setInfo("Punch", "quick combo starter");
     public static final Attack heavy = new Attack(1, 17, 1f, 22, 12, 1.75, 7f, 0.5f, AttackType.BOX, 0.5f, 0.6f, 0, JSoundRegister.TW_KICK_HIT)
             .setLaunch()
-            .setInfo("Low Kick", "knockdown provider, medium windup");
+            .setInfo("Low Kick", "medium windup knockdown");
     public static final Attack barrage = new Attack(2, 17, 0.75f, 60, 0, 2, 0.4f, 0.25f, AttackType.BARRAGE, 1.5f, 0, 3)
             .setInfo("Flamethrower", "fast reliable combo starter/extender, high stun, burns");
     public static final Attack crossfire = new Attack(3, 20, 0.75f, 10, 8, 0, 0f, 0f, AttackType.BOX)
@@ -47,9 +52,6 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
     public static final Attack crossfirevariation = new Attack(4, 30, 0.75f, 17, 12, 0, 0f, 0f, AttackType.BOX)
             .setRanged(true)
             .setInfo("Crossfire Variation", "summons 6 ankhs that orbit around the user, crouch to increase orbit distance");
-    public static final Attack redirect = new Attack(5, 5, 0.75f, 10, 7, 0, 0f, 0f, AttackType.BOX).setMobility(MobilityType.TELEPORT)
-            .setInfo("Redirect", "redirects all the users ankhs to where they're looking");
-    // and so begins my terrible misuse of my own AI flags, the tldr here being that its simply called whenever the enemy is >3 blocks away, which is great here
     public static final Attack crossfirehurricane = new Attack(6, 60, 0.75f, 22, 18, 0, 0f, 0f, AttackType.BOX)
             .setInfo("Crossfire Hurricane", "summons slow, homing fire hurricane that knocks down, lasts for 3 seconds after hitting anything");
     public static final Attack redbind = new Attack(8, 20, 0.75f, 22, 12, 1.5, 5, 0, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.IMPACT_3)
@@ -90,14 +92,18 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
                     Hurricane>[opponent in air]Barrage>M1>Crossfire>Red Bind>M1>Low Kick>Variation
                     Red Bind>M1>Barrage>M1>Crossfire>Low Kick>Hurricane+Variation""";
 
-        moves = List.of(light, heavy, barrage, crossfire, crossfirehurricane, crossfirevariation, redirect, detector);
+        moves = List.of(light, heavy, barrage, crossfire, crossfirehurricane, crossfirevariation, Attack.unusable, detector);
     }
 
     // Moveset
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        handleAttack(light, JCraft.standLightCD, State.LIGHT);
+        if (getUserOrThrow().isSneaking()) {
+            setAttack(redirect, State.REDIRECT);
+            playSound(JSoundRegister.MR_REDIRECT, 1, 1);
+        } else
+            handleAttack(light, JCraft.standLightCD, State.LIGHT);
     }
 
     @Override
@@ -137,9 +143,12 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
 
     @Override
     public void initSpecial3() {
+        /*
         if (!canAttack()) return;
         if (handleAttack(redirect, JCraft.standS3CD, State.REDIRECT))
             playSound(JSoundRegister.MR_REDIRECT, 1, 1);
+
+         */
     }
 
     @Override
@@ -196,7 +205,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
                     for (AnkhProjectile ankh : ankhs) {
                         if (ankh.getOwner() == user) {
                             ankh.setVariation(false);
-                            ankh.setVelocity(hitResult.getPos().subtract(ankh.getPos()).normalize());
+                            ankh.setVelocity(hitResult.getPos().subtract(ankh.getPos()).normalize().multiply(0.6));
                         }
                     }
                 }

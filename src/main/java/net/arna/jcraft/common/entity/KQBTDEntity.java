@@ -83,11 +83,15 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                 "no armored moves"
         );
 
-        freespace = "BNBs:\n" +
-                "    M1>Barrage>Coin Toss>M1>Heavy>Detonate";
+        freespace = """
+                    BNBs:
+                    the kitty cat
+                    M1~Low>Barrage>Bomb Plant/Bites the Dust Plant
+                    
+                    the ol razzle dazzle
+                    (Already bomb planted) M1~Low>Barrage>M1>Elbow>Detonate""";
 
-        moves = List.of(KillerQueenEntity.light, heavy, KillerQueenEntity.barrage, KillerQueenEntity.bombplant, detonate, bubble
-                , new Attack().setRanged(true).setInfo("Coin Toss", "overrides current bomb with an aimable coin")
+        moves = List.of(KillerQueenEntity.light, heavy, KillerQueenEntity.barrage, KillerQueenEntity.bombplant, Attack.unusable, bubble, btdplant
                 , new Attack().setMobility(MobilityType.DASH).setInfo("Explosive Dash", "slight aoe damage, 3D movement tool"));
     }
 
@@ -506,5 +510,10 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
     @Override
     protected State getLowState() {
         return State.LOW;
+    }
+
+    @Override
+    protected State getDetonateState() {
+        return State.DETONATE;
     }
 }

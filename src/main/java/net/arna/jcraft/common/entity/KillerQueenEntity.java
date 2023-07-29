@@ -106,9 +106,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
 
     @Override
     public void initUlt() {
-        if (!canAttack()) return;
-        if (handleAttack(detonate, JCraft.standUltCD, State.DETONATE))
-            playSound(JSoundRegister.KQ_DETONATE, 1, 1);
+        //todo: KQ ULT
     }
 
     @Override
@@ -247,5 +245,10 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
     @Override
     protected State getLowState() {
         return State.LOW;
+    }
+
+    @Override
+    protected State getDetonateState() {
+        return State.DETONATE;
     }
 }

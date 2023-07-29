@@ -11,5 +11,5 @@ public interface IComboCounter {
 
     void jcraft$setComboCount(int i);
 
-    void incrementComboCount();
+    void jcraft$incrementComboCount();
 }

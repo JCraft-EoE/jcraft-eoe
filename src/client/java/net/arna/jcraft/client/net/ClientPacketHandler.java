@@ -65,6 +65,7 @@ public class ClientPacketHandler {
         register(S2C_TIME_ERASE_PREDICTION_STATE, ClientPacketHandler::handlePredictionState);
         register(S2C_SERVER_CONFIG, ClientPacketHandler::handleServerConfig);
         register(S2C_J_EXPLOSION, ClientPacketHandler::handleJExplosion);
+        register(S2C_COMBO_COUNTER, ClientPacketHandler::handleComboCounter);
     }
 
     private static void register(Identifier id, Consumer<PacketByteBuf> handler) {
@@ -207,9 +208,9 @@ public class ClientPacketHandler {
             // Spec synchronization
             case (5) -> {
                 int specId = buf.readInt();
+
                 client.execute(() -> {
                     JCraftSpec spec = SpecType.fromId(specId);
-                    JCraft.LOGGER.info(spec);
 
                     if (spec != null)
                         spec.player = client.player;
@@ -218,10 +219,9 @@ public class ClientPacketHandler {
                 });
             }
 
-            // Combo counter
+            // WAS Combo counter
             case (6) -> {
-                JCraftClient.comboCounter = buf.readInt();
-                JCraftClient.framesSinceCounted = 0;
+
             }
 
             // Return to Zero trackers
@@ -487,5 +487,11 @@ public class ClientPacketHandler {
             Objects.requireNonNull(client.player).setVelocity(client.player.getVelocity()
                     .add(nativePacket.getPlayerVelocityX(), nativePacket.getPlayerVelocityY(), nativePacket.getPlayerVelocityZ()));
         });
+    }
+
+    private static void handleComboCounter(MinecraftClient minecraftClient, PacketByteBuf buf) {
+        JCraftClient.comboCounter = buf.readInt();
+        JCraftClient.damageScaling = buf.readFloat();
+        JCraftClient.framesSinceCounted = 0;
     }
 }

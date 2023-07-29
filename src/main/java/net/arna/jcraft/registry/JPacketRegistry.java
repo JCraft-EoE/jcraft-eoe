@@ -13,4 +13,5 @@ public interface JPacketRegistry {
     Identifier S2C_TIME_ERASE_PREDICTION_STATE = JCraft.id("te_prediction_state");
     Identifier S2C_SERVER_CONFIG = JCraft.id("server_config");
     Identifier S2C_J_EXPLOSION = JCraft.id("explosion");
+    Identifier S2C_COMBO_COUNTER = JCraft.id("combocounter");
 }
