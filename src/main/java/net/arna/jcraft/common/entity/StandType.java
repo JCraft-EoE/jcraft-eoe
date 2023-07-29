@@ -5,7 +5,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.Getter;
 import lombok.NonNull;
-import net.arna.jcraft.registry.JEntityTypeRegister;
+import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.text.Text;
 import net.minecraft.world.World;
@@ -16,41 +16,41 @@ import java.util.List;
 import java.util.function.Function;
 
 public enum StandType {
-    STAR_PLATINUM(JEntityTypeRegister.STAR_PLATINUM, StarPlatinumEntity::new, "starplatinum",                   // 1
+    STAR_PLATINUM(JEntityTypeRegistry.STAR_PLATINUM, StarPlatinumEntity::new, "starplatinum",                   // 1
             Text.literal("Manga"), Text.literal("Arcade"), Text.literal("OVA")),
-    THE_WORLD(JEntityTypeRegister.THE_WORLD, TheWorldEntity::new, "theworld",                                   // 2
+    THE_WORLD(JEntityTypeRegistry.THE_WORLD, TheWorldEntity::new, "theworld",                                   // 2
             Text.literal("Arcade"), Text.literal("Manga"), Text.literal("OVA")),
-    KING_CRIMSON(JEntityTypeRegister.KING_CRIMSON, KingCrimsonEntity::new, "kingcrimson",                       // 3
+    KING_CRIMSON(JEntityTypeRegistry.KING_CRIMSON, KingCrimsonEntity::new, "kingcrimson",                       // 3
             Text.literal("Royal"), Text.literal("Manga"), Text.literal("Concept")),
-    D4C(JEntityTypeRegister.D4C, D4CEntity::new, "d4c",                                                         // 4
+    D4C(JEntityTypeRegistry.D4C, D4CEntity::new, "d4c",                                                         // 4
             Text.literal("Pride"), Text.literal("Europe"), Text.literal("Spangled")),
-    CREAM(JEntityTypeRegister.CREAM, CreamEntity::new, "cream",                                                 // 5
+    CREAM(JEntityTypeRegistry.CREAM, CreamEntity::new, "cream",                                                 // 5
             Text.literal("Menace"), Text.literal("Eraser"), Text.literal("White Void")),
-    KILLER_QUEEN(JEntityTypeRegister.KILLER_QUEEN, KillerQueenEntity::new, "killerqueen",                       // 6
+    KILLER_QUEEN(JEntityTypeRegistry.KILLER_QUEEN, KillerQueenEntity::new, "killerqueen",                       // 6
             Text.literal("Gunpowder"), Text.literal("Deadly"), Text.literal("1999")),
-    WHITE_SNAKE(JEntityTypeRegister.WHITE_SNAKE, WhiteSnakeEntity::new, "whitesnake",                           // 7
+    WHITE_SNAKE(JEntityTypeRegistry.WHITE_SNAKE, WhiteSnakeEntity::new, "whitesnake",                           // 7
             Text.literal("Mamba"), Text.literal("Kingsnake"), Text.literal("Melting")),
-    SILVER_CHARIOT(JEntityTypeRegister.SILVER_CHARIOT, SilverChariotEntity::new, "silverchariot",               // 8
+    SILVER_CHARIOT(JEntityTypeRegistry.SILVER_CHARIOT, SilverChariotEntity::new, "silverchariot",               // 8
             Text.literal("Gold Chariot"), Text.literal("OVA"), Text.literal("Vento")),
-    MAGICIANS_RED(JEntityTypeRegister.MAGICIANS_RED, MagiciansRedEntity::new, "mr",                             // 9
+    MAGICIANS_RED(JEntityTypeRegistry.MAGICIANS_RED, MagiciansRedEntity::new, "mr",                             // 9
             Text.literal("Purple"), Text.literal("Moltres"), Text.literal("Fried")),
-    THE_FOOL(JEntityTypeRegister.THE_FOOL, TheFoolEntity::new, "thefool",                                       // 10
+    THE_FOOL(JEntityTypeRegistry.THE_FOOL, TheFoolEntity::new, "thefool",                                       // 10
             Text.literal("Chilled"), Text.literal("OVA"), Text.literal("Manga")),
-    GOLD_EXPERIENCE(JEntityTypeRegister.GOLD_EXPERIENCE, GoldenExperienceEntity::new, "goldenexperience",       // 11
+    GOLD_EXPERIENCE(JEntityTypeRegistry.GOLD_EXPERIENCE, GoldenExperienceEntity::new, "goldenexperience",       // 11
             Text.literal("Passione"), Text.literal("Chosen One"), Text.literal("Life Energy")),
 
     // Evolutions
-    C_MOON(JEntityTypeRegister.C_MOON, CMoonEntity::new, "cmoon", true,                                             // -1
+    C_MOON(JEntityTypeRegistry.C_MOON, CMoonEntity::new, "cmoon", true,                                             // -1
             Text.literal("Inversion"), Text.literal("Gravity"), Text.literal("Pale")),
-    MADE_IN_HEAVEN(JEntityTypeRegister.MADE_IN_HEAVEN, MadeInHeavenEntity::new, "mih", true,                        // -2
+    MADE_IN_HEAVEN(JEntityTypeRegistry.MADE_IN_HEAVEN, MadeInHeavenEntity::new, "mih", true,                        // -2
             Text.literal("Pony"), Text.literal("Daft"), Text.literal("Nightmare")),
-    THE_WORLD_OVER_HEAVEN(JEntityTypeRegister.THE_WORLD_OVER_HEAVEN, TheWorldOverHeavenEntity::new, "twoh", true,   // -3
+    THE_WORLD_OVER_HEAVEN(JEntityTypeRegistry.THE_WORLD_OVER_HEAVEN, TheWorldOverHeavenEntity::new, "twoh", true,   // -3
             Text.literal("Shadow"), Text.literal("Gone to Heaven"), Text.literal("Greatest High")),
-    KILLER_QUEEN_BITES_THE_DUST(JEntityTypeRegister.KILLER_QUEEN_BITES_THE_DUST, KQBTDEntity::new, "kqbtd",true,    // -4
+    KILLER_QUEEN_BITES_THE_DUST(JEntityTypeRegistry.KILLER_QUEEN_BITES_THE_DUST, KQBTDEntity::new, "kqbtd",true,    // -4
             Text.literal("Gelatin"), Text.literal("Veiled"), Text.literal("Garf")),
-    GOLD_EXPERIENCE_REQUIEM(JEntityTypeRegister.GER, GEREntity::new, "ger", true,                                   // -5
+    GOLD_EXPERIENCE_REQUIEM(JEntityTypeRegistry.GER, GEREntity::new, "ger", true,                                   // -5
             Text.literal("Energized"), Text.literal("Manga"), Text.literal("Silver")),
-    STAR_PLATINUM_THE_WORLD(JEntityTypeRegister.SPTW, SPTWEntity::new, "sptw", true,                                // -6
+    STAR_PLATINUM_THE_WORLD(JEntityTypeRegistry.SPTW, SPTWEntity::new, "sptw", true,                                // -6
             Text.literal("Judge, Jury, Executioner"), Text.literal("Diamond"), Text.literal("Over Heaven"));
 
 

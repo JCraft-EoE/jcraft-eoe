@@ -3,7 +3,7 @@ package net.arna.jcraft.common.item;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.arna.jcraft.common.entity.KnifeProjectile;
-import net.arna.jcraft.registry.JStatusRegister;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttribute;
@@ -36,7 +36,7 @@ public class KnifeBundleItem extends KnifeItem {
 
     @Override
     public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
-        if (user.hasStatusEffect(JStatusRegister.DAZED))
+        if (user.hasStatusEffect(JStatusRegistry.DAZED))
             return;
 
         if (!world.isClient) {

@@ -38,8 +38,8 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
         if (!canAttack()) return;
 
         if (handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY)) {
-            playSound(JSoundRegister.KQ_UPPERCUT, 1, 1);
-            playSound(JSoundRegister.KQ_HEAVY, 1, 1);
+            playSound(JSoundRegistry.KQ_UPPERCUT, 1, 1);
+            playSound(JSoundRegistry.KQ_HEAVY, 1, 1);
         }
     }
 
@@ -47,7 +47,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
     public void initBarrage() {
         if (!canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
-            playSound(JSoundRegister.KQ_BARRAGE, 1, 1);
+            playSound(JSoundRegistry.KQ_BARRAGE, 1, 1);
     }
 
     @Override
@@ -99,7 +99,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
         this.bombEntity = this.coin;
         this.bombBlock = null;
 
-        playSound(JSoundRegister.COIN_TOSS, 1, 1);
+        playSound(JSoundRegistry.COIN_TOSS, 1, 1);
         playerData.putInt(JCraft.standS3CD, 500); // 25s coin toss cd
         playerData.putInt(JCraft.standUltCD, 20); // 1s detonate cd (prevents IUB)
     }
@@ -134,7 +134,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
                 }
             }
             case (5) -> {
-                SheerHeartAttackEntity sha = new SheerHeartAttackEntity(JEntityTypeRegister.SHEER_HEART_ATTACK, world);
+                SheerHeartAttackEntity sha = new SheerHeartAttackEntity(JEntityTypeRegistry.SHEER_HEART_ATTACK, world);
                 sha.setMaster(user);
                 sha.refreshPositionAndAngles(getX(), getY() + 0.5, getZ(), getYaw(), getPitch());
 
@@ -142,21 +142,8 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
             }
             case (6) -> {
                 if (bombEntity instanceof LivingEntity livingEntity) {
-
-                    JUtils.explode(
-                            world, user,
-                            livingEntity.getX(),
-                            livingEntity.getY() + livingEntity.getHeight() / 2,
-                            livingEntity.getZ(),
-                            2f,
-                            JExplosionModifier.builder()
-                                    .particle(JParticleTypeRegistry.BOOM_1)
-                                    .destructionType(Explosion.DestructionType.NONE)
-                                    .particleVelocity(Vec3d.ZERO)
-                                    .build()
-                    );
-
-                    livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
+                    explode(user, livingEntity.getEyePos());
+                    livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0, true, false));
                 } else {
                     Vec3d bombPos = null;
 
@@ -168,18 +155,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
                     if (bombBlock != null) bombPos = bombBlock;
 
                     if (bombPos != null) {
-                        JUtils.explode(
-                                world, user,
-                                bombPos.getX(),
-                                bombPos.getY(),
-                                bombPos.getZ(),
-                                2f,
-                                JExplosionModifier.builder()
-                                        .particle(JParticleTypeRegistry.BOOM_1)
-                                        .destructionType(Explosion.DestructionType.NONE)
-                                        .particleVelocity(Vec3d.ZERO)
-                                        .build()
-                        );
+                        explode(user, bombPos);
 
                         List<LivingEntity> toKD = world.getEntitiesByClass(
                                 LivingEntity.class,
@@ -188,7 +164,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
                         );
 
                         for (LivingEntity livingEntity : toKD)
-                            livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
+                            livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0, true, false));
                     }
                 }
 

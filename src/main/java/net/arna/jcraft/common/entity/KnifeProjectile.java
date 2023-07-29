@@ -1,9 +1,9 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.registry.JEntityTypeRegister;
+import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.arna.jcraft.registry.JObjectRegistry;
-import net.arna.jcraft.registry.JSoundRegister;
+import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
@@ -46,7 +46,7 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
     }
 
     public KnifeProjectile(World world, LivingEntity owner) {
-        super(JEntityTypeRegister.KNIFE, owner, world);
+        super(JEntityTypeRegistry.KNIFE, owner, world);
         this.setOwner(owner);
     }
 
@@ -108,7 +108,7 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
 
                                 HitResult hitResult = world.raycast(new RaycastContext(eP, eP.add(rangeMod), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, owner));
 
-                                playSound(JSoundRegister.TWOH_SHOOT, 1, 1);
+                                playSound(JSoundRegistry.TWOH_SHOOT, 1, 1);
 
                                 Vec3d hitPos = hitResult.getPos();
                                 if (eHit != null) hitPos = eHit.getPos();

@@ -27,7 +27,7 @@ import net.minecraft.util.registry.Registry;
 import static net.arna.jcraft.common.util.EntityInterest.blockAttractionInterest;
 import static net.arna.jcraft.common.util.EntityInterest.itemAttractionInterest;
 
-public interface JEventsRegister {
+public interface JEventsRegistry {
     static void registerEvents() {
         ServerEntityEvents.ENTITY_LOAD.register(
                 (entity, world) -> {
@@ -46,7 +46,7 @@ public interface JEventsRegister {
                         }
 
                         // ... in the AU
-                        if (world.getRegistryKey().equals(JDimensionRegister.AU_DIMENSION_KEY)) {
+                        if (world.getRegistryKey().equals(JDimensionRegistry.AU_DIMENSION_KEY)) {
                             if (item.getThrower() != null || MockItem.isMockItem(stack)) return;
 
                             ItemStack mockStack = MockItem.createMockStack(stack); // Convert it to a mock item (incompatible and useless)

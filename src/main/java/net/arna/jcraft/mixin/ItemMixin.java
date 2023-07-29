@@ -1,6 +1,6 @@
 package net.arna.jcraft.mixin;
 
-import net.arna.jcraft.registry.JStatusRegister;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.util.Hand;
@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class ItemMixin {
     @Inject(cancellable = true, at = @At("HEAD"), method = "use") // Inability to use items while stunned
     private void jcraft$use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<TypedActionResult<ItemStack>> cir) {
-        if (user.hasStatusEffect(JStatusRegister.DAZED)) {
+        if (user.hasStatusEffect(JStatusRegistry.DAZED)) {
             cir.setReturnValue(TypedActionResult.fail(user.getStackInHand(hand)));
         }
     }

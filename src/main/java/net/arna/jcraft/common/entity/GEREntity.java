@@ -10,9 +10,9 @@ import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.ITimeStop;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
-import net.arna.jcraft.registry.JEntityTypeRegister;
-import net.arna.jcraft.registry.JSoundRegister;
-import net.arna.jcraft.registry.JStatusRegister;
+import net.arna.jcraft.registry.JEntityTypeRegistry;
+import net.arna.jcraft.registry.JSoundRegistry;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -45,19 +45,19 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
-    public static final Attack airlight = new Attack(1, JCraft.lightCooldown, 0.75f, 12, 5, 1.25, 4f, 0.75f, AttackType.BOX, 1, 0.33f, 0, JSoundRegister.IMPACT_1)
+    public static final Attack airlight = new Attack(1, JCraft.lightCooldown, 0.75f, 12, 5, 1.25, 4f, 0.75f, AttackType.BOX, 1, 0.33f, 0, JSoundRegistry.IMPACT_1)
             .appendHitbox(new HitBoxData(0, -1, 1))
             .setInfo("Downward Kick", "medium stun combo starter, low hitbox, low blockstun");
-    public static final Attack airheavy = new Attack(3, 17, 1f, 24, 14, 1.5, 9f, 0.8f, AttackType.BOX, 2, 0.25f, 0, JSoundRegister.IMPACT_1).setHitspark(2)
+    public static final Attack airheavy = new Attack(3, 17, 1f, 24, 14, 1.5, 9f, 0.8f, AttackType.BOX, 2, 0.25f, 0, JSoundRegistry.IMPACT_1).setHitspark(2)
             .appendHitbox(new HitBoxData(0, -1, 1))
             .setInfo("Overhead Kick", "slow, high stun combo starter");
     public static final Attack airbarrage = new Attack(5, 14, 1f, 48, 0, 1.5, 1f, 0.3f, AttackType.BARRAGE, 1, 0, 3)
             .setInfo("Kick Barrage", "fast combo finisher, knocks back");
 
-    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 9, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0, JSoundRegister.IMPACT_1)
+    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 9, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0, JSoundRegistry.IMPACT_1)
             .aerialVariation(airlight)
             .setInfo("Punch/Downward Kick", "quick combo starter");
-    public static final Attack heavy = new Attack(2, 17, 1f, 19, 10, 1.5, 9f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_2)
+    public static final Attack heavy = new Attack(2, 17, 1f, 19, 10, 1.5, 9f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegistry.IMPACT_2)
             .aerialVariation(airheavy)
             .setHitspark(2)
             .hyperArmor()
@@ -168,10 +168,10 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
 
         if (data.user().isOnGround()) {
             if (handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY))
-                playSound(JSoundRegister.GER_HEAVY, 1, 1);
+                playSound(JSoundRegistry.GER_HEAVY, 1, 1);
         } else {
             if (handleAttack(airheavy, JCraft.standHeavyCD, State.AIR_HEAVY))
-                playSound(JSoundRegister.GER_HEAVY, 1, 1);
+                playSound(JSoundRegistry.GER_HEAVY, 1, 1);
         }
     }
 
@@ -181,9 +181,9 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         if (!data.canAttack()) return;
 
         if (data.user().isOnGround() && handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
-            playSound(JSoundRegister.GE_BARRAGE, 1, 1);
+            playSound(JSoundRegistry.GE_BARRAGE, 1, 1);
         else if (handleAttack(airbarrage, JCraft.standBarrageCD, State.AIR_BARRAGE))
-            playSound(JSoundRegister.GER_KICKBARRAGE, 1, 1);
+            playSound(JSoundRegistry.GER_KICKBARRAGE, 1, 1);
     }
 
     @Override
@@ -193,10 +193,10 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
 
         if (data.user().isSneaking()) {
             if (handleAttack(heal, JCraft.standS1CD, State.HEAL))
-                playSound(JSoundRegister.GE_HEAL, 1, 1);
+                playSound(JSoundRegistry.GE_HEAL, 1, 1);
         } else {
             if (handleAttack(healself, JCraft.standS1CD, State.HEAL_SELF))
-                playSound(JSoundRegister.GE_HEAL, 1, 1);
+                playSound(JSoundRegistry.GE_HEAL, 1, 1);
         }
     }
 
@@ -209,7 +209,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         data.putInt(JCraft.utilCD, 360); // 18 second flight cd
         setFlightTime(20);
 
-        playSound(JSoundRegister.GER_FLY, 1, 1);
+        playSound(JSoundRegistry.GER_FLY, 1, 1);
     }
 
     @Override
@@ -218,16 +218,16 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         if (!data.canAttack()) return;
 
         if (data.user().isSneaking() && handleAttack(chargelaser, JCraft.standS2CD, State.SLOW_LASER))
-            playSound(JSoundRegister.GER_SLOW_LASER, 1, 1);
+            playSound(JSoundRegistry.GER_SLOW_LASER, 1, 1);
         else if (handleAttack(laser, JCraft.standS2CD, State.LASER))
-            playSound(JSoundRegister.GER_LASER, 1, 1);
+            playSound(JSoundRegistry.GER_LASER, 1, 1);
     }
 
     @Override
     public void initSpecial3() {
         if (!canAttack()) return;
         if (handleAttack(counter, JCraft.standS3CD, State.COUNTER))
-            playSound(JSoundRegister.GE_HEAL, 1, 1);
+            playSound(JSoundRegistry.GE_HEAL, 1, 1);
     }
 
 
@@ -271,7 +271,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         if (!canAttack()) return;
         if (rtzEntityData.isEmpty()) {
             if (handleAttack(rtz, JCraft.standUltCD, State.SETUP)) // Setup
-                playSound(JSoundRegister.GER_SETUP, 1, 1);
+                playSound(JSoundRegistry.GER_SETUP, 1, 1);
         } else {
             returnToZero();
         }
@@ -299,7 +299,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         rtzEntityData.clear();
         returnInformation.clear();
 
-        playSound(JSoundRegister.GER_RTZ, 1, 1);
+        playSound(JSoundRegistry.GER_RTZ, 1, 1);
     }
 
     @Override
@@ -311,7 +311,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         super.desummon();
     }
 
-    private static final Attack barrageFinisher = new Attack(11, 17, 1f, 9, 6, 1.75, 1f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.TW_KICK_HIT)
+    private static final Attack barrageFinisher = new Attack(11, 17, 1f, 9, 6, 1.75, 1f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegistry.TW_KICK_HIT)
             .setHitspark(2)
             .setLaunch()
             .setInfo("Kick Barrage (Final hit)", "");
@@ -322,7 +322,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         switch (attack.id) {
             case (2) -> {
                 for (LivingEntity l : entities)
-                    l.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 30, 0, false, false));
+                    l.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 30, 0, false, false));
             }
             case (3) -> {
                 for (LivingEntity ent : entities) {
@@ -354,7 +354,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             case (8) -> {
                 if (user == null) return;
 
-                GERScorpionEntity scorpion = new GERScorpionEntity(JEntityTypeRegister.GER_SCORPION, world);
+                GERScorpionEntity scorpion = new GERScorpionEntity(JEntityTypeRegistry.GER_SCORPION, world);
                 if (attack.moveStun == 28) scorpion.charge(); // If it's the slow variation
                 scorpion.setInitialVel(user.getRotationVector().multiply(2));
                 Vec3d ePos = this.getEyePos();
@@ -379,7 +379,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
 
     @Override
     public void tick() {
-        if (age == 1) playSound(JSoundRegister.GER_SUMMON, 1f, 1f);
+        if (age == 1) playSound(JSoundRegistry.GER_SUMMON, 1f, 1f);
         super.tick();
 
         if (hasUser()) {

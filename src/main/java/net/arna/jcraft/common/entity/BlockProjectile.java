@@ -2,7 +2,7 @@ package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.common.util.IOwnable;
 import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.registry.JSoundRegister;
+import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -27,7 +27,6 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Arm;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
@@ -138,7 +137,7 @@ public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatab
                     toRefresh = false;
                     setVelocity(0, 0, 0);
                     setEffect(2);
-                    playSound(JSoundRegister.CMOON_BLOCKHALT, 1, 1);
+                    playSound(JSoundRegistry.CMOON_BLOCKHALT, 1, 1);
                 } else if (!launched) {
                     Vec3d targetPos;
                     Vec3d eP = master.getEyePos();
@@ -159,7 +158,7 @@ public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatab
 
                     setVelocity(targetPos.subtract(getPos()).normalize()); //.multiply(1)
 
-                    playSound(JSoundRegister.CMOON_BLOCKLAUNCH, 1, 1);
+                    playSound(JSoundRegistry.CMOON_BLOCKLAUNCH, 1, 1);
                     launched = true;
                     setNoDrag(true);
                 }

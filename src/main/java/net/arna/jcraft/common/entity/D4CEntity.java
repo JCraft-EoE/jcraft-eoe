@@ -12,10 +12,10 @@ import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.mixin.ChunkLightProviderAccessor;
 import net.arna.jcraft.mixin.LightStorageAccessor;
 import net.arna.jcraft.mixin.LightingProviderAccessor;
-import net.arna.jcraft.registry.JDimensionRegister;
+import net.arna.jcraft.registry.JDimensionRegistry;
 import net.arna.jcraft.registry.JObjectRegistry;
-import net.arna.jcraft.registry.JSoundRegister;
-import net.arna.jcraft.registry.JStatusRegister;
+import net.arna.jcraft.registry.JSoundRegistry;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
@@ -49,12 +49,12 @@ import java.util.stream.IntStream;
 public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
     public static final Attack crm1 = new Attack(11, JCraft.lightCooldown, 0.75f, 15, 11, 0, 0, 0f, AttackType.BOX)
             .setInfo("Item Place", "places an item from an alternate universe on the ground, attracts other such items");
-    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 15, 9, 1.5, 5f, 0.75f, AttackType.BOX, 1.1f, -0.1f, 0, JSoundRegister.IMPACT_2)
+    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 15, 9, 1.5, 5f, 0.75f, AttackType.BOX, 1.1f, -0.1f, 0, JSoundRegistry.IMPACT_2)
             .crouchingVariation(crm1)
             .setInfo("Chop", "quick combo starter");
-    public static final Attack barrage = new Attack(2, 17, 0.75f, 70, 0, 2, 0.8f, 0.25f, AttackType.BARRAGE, 2, 0, 3, JSoundRegister.IMPACT_2)
+    public static final Attack barrage = new Attack(2, 17, 0.75f, 70, 0, 2, 0.8f, 0.25f, AttackType.BARRAGE, 2, 0, 3, JSoundRegistry.IMPACT_2)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public static final Attack heavy = new Attack(1, 15, 1, 25, 14, 2, 8f, 1.5f, AttackType.BOX, 0.6f, -0.2f, 0, JSoundRegister.IMPACT_2)
+    public static final Attack heavy = new Attack(1, 15, 1, 25, 14, 2, 8f, 1.5f, AttackType.BOX, 0.6f, -0.2f, 0, JSoundRegistry.IMPACT_2)
             .setHitspark(2)
             .hyperArmor()
             .setLaunch()
@@ -68,10 +68,10 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             .setGrab()
             .crouchingVariation(givegun)
             .setInfo("Grab", "unblockable, combo finisher");
-    public static final Attack grabhit = new Attack(5, 0, 0.75f, 34, 0, 2, 4f, 0f, AttackType.MULTIHIT, 0.5f, 0, List.of(11, 17, 26), JSoundRegister.IMPACT_1)
+    public static final Attack grabhit = new Attack(5, 0, 0.75f, 34, 0, 2, 4f, 0f, AttackType.MULTIHIT, 0.5f, 0, List.of(11, 17, 26), JSoundRegistry.IMPACT_1)
             .setStunType(StunType.UNBURSTABLE)
             .setInfo("Grab (Hit)", "");
-    private static final Attack grabhitfinal = new Attack(10, 0, 0.75f, 34, 0, 2, 4f, 1.2f, AttackType.MULTIHIT, 0.45f, 0, List.of(11, 17, 26), JSoundRegister.IMPACT_1)
+    private static final Attack grabhitfinal = new Attack(10, 0, 0.75f, 34, 0, 2, 4f, 1.2f, AttackType.MULTIHIT, 0.45f, 0, List.of(11, 17, 26), JSoundRegistry.IMPACT_1)
             .setHitspark(2)
             .setLaunch()
             .setInfo("Grab (Final Hit)", "");
@@ -119,7 +119,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
         moves = List.of(light, heavy, barrage, dimhop_others, clonespawn, grab, counter, flag);
 
         if (world.isClient) return;
-        auWorld = Objects.requireNonNull(getServer()).getWorld(JDimensionRegister.AU_DIMENSION_KEY);
+        auWorld = Objects.requireNonNull(getServer()).getWorld(JDimensionRegistry.AU_DIMENSION_KEY);
     }
 
     private static final List<ItemStack> placeableStacks = List.of(
@@ -141,14 +141,14 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             equipStack(EquipmentSlot.OFFHAND, placing.copy());
             placingFirstStack = !placingFirstStack;
         } else if (handleAttack(light, JCraft.standLightCD, State.LIGHT))
-            playSound(JSoundRegister.D4C_LIGHT, 1, 1);
+            playSound(JSoundRegistry.D4C_LIGHT, 1, 1);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack() || !handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY)) return;
 
-        playSound(JSoundRegister.D4C_HEAVY, 1, 1);
+        playSound(JSoundRegistry.D4C_HEAVY, 1, 1);
         Entity ent = getUserOrThrow();
 
         if (!ent.isOnGround()) return;
@@ -160,14 +160,14 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
     public void initBarrage() {
         if (!canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
-            playSound(JSoundRegister.D4C_BARRAGE, 1, 1);
+            playSound(JSoundRegistry.D4C_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack()) return;
         if (handleAttack(clonespawn, JCraft.standS1CD, State.DIM_HOP))
-            playSound(JSoundRegister.D4C_DIMHOP, 1, 1);
+            playSound(JSoundRegistry.D4C_DIMHOP, 1, 1);
     }
 
     @Override
@@ -182,7 +182,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
 
         LivingEntity user = getUser();
         if (user instanceof ServerPlayerEntity serverPlayer) { // Logic for cancelling dimhop early, and generating failsafe data
-            if (user.getWorld().getRegistryKey().equals(JDimensionRegister.AU_DIMENSION_KEY)) {
+            if (user.getWorld().getRegistryKey().equals(JDimensionRegistry.AU_DIMENSION_KEY)) {
                 boolean isStored = false; // Should always be true
                 for (DimValues dimV : JCraft.pastDimensions) {
                     if (dimV.user != user)
@@ -202,17 +202,17 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             }
         }
 
-        if (handleAttack(dimhop_others, JCraft.standUltCD, State.DIM_HOP)) playSound(JSoundRegister.D4C_DIMHOP, 1, 1);
+        if (handleAttack(dimhop_others, JCraft.standUltCD, State.DIM_HOP)) playSound(JSoundRegistry.D4C_DIMHOP, 1, 1);
     }
 
     @Override
     public void initSpecial2() {
         if (!canAttack() || !hasUser()) return;
         if (getUserOrThrow().isSneaking() && handleAttack(givegun, JCraft.standS2CD, State.GIVE_GUN)) {
-            playSound(JSoundRegister.D4C_THROW, 1, 1);
+            playSound(JSoundRegistry.D4C_THROW, 1, 1);
             equipStack(EquipmentSlot.MAINHAND, JObjectRegistry.FVREVOLVER.getDefaultStack());
         } else if (handleAttack(grab, JCraft.standS2CD, State.THROW)) {
-            playSound(JSoundRegister.D4C_THROW, 1, 1);
+            playSound(JSoundRegistry.D4C_THROW, 1, 1);
             equipStack(EquipmentSlot.MAINHAND, JObjectRegistry.FVREVOLVER.getDefaultStack());
         }
     }
@@ -238,9 +238,9 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
     public void initUtil() {
         if (!canAttack() || !hasUser()) return;
         if (handleAttack(flag, JCraft.utilCD, State.FLAG)) {
-            getUserOrThrow().addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, flag.moveStun, 0, true, false));
+            getUserOrThrow().addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, flag.moveStun, 0, true, false));
             getUserOrThrow().addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, flag.moveStun, 0, true, false));
-            playSound(JSoundRegister.D4C_UTILITY, 1, 1);
+            playSound(JSoundRegistry.D4C_UTILITY, 1, 1);
         }
     }
 
@@ -365,7 +365,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             case (5) -> {
                 if (getMoveStun() == 17)
                     curAttack = grabhitfinal;
-                playSound(JSoundRegister.REVOLVER_FIRE, 1, 1);
+                playSound(JSoundRegistry.REVOLVER_FIRE, 1, 1);
             }
             case (6) -> {
                 if (user instanceof PlayerEntity playerEntity) {
@@ -448,7 +448,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             }
 
             world.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1f, 1f);
-            playSound(JSoundRegister.D4C_COUNTER, 1, 1);
+            playSound(JSoundRegistry.D4C_COUNTER, 1, 1);
         }
     }
 
@@ -462,8 +462,8 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
     @Override
     public void tick() {
         if (age == 1) {
-            playSound(JSoundRegister.STAND_SUMMON, 1, 1);
-            playSound(JSoundRegister.D4C_SUMMON, 1, 1);
+            playSound(JSoundRegistry.STAND_SUMMON, 1, 1);
+            playSound(JSoundRegistry.D4C_SUMMON, 1, 1);
         }
 
         super.tick();

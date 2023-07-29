@@ -9,11 +9,10 @@ import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
-import net.arna.jcraft.registry.JSoundRegister;
-import net.arna.jcraft.registry.JStatusRegister;
+import net.arna.jcraft.registry.JSoundRegistry;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.*;
-import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -41,18 +40,18 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEntity, TheWorldOverHeavenEntity.State> {
-    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 4, 1.5, 6f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0, JSoundRegister.IMPACT_1)
+    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 4, 1.5, 6f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0, JSoundRegistry.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
-    public static final Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 2, 0, 3, JSoundRegister.IMPACT_1)
+    public static final Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 2, 0, 3, JSoundRegistry.IMPACT_1)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public static final Attack heavy = new Attack(1, 19, 1f, 22, 10, 2, 0f, 0.0f, AttackType.BOX, 1, 0, 0, JSoundRegister.IMPACT_5)
+    public static final Attack heavy = new Attack(1, 19, 1f, 22, 10, 2, 0f, 0.0f, AttackType.BOX, 1, 0, 0, JSoundRegistry.IMPACT_5)
             .setHitspark(2)
             .setUB(true)
             .setInfo("Singularity", "block bypass, low stun, medium windup");
     public static final Attack smite = new Attack(3, 21, 1f, 20, 10, 0, 6f, 0.0f, AttackType.BOX, 1.05f, 0, 0)
             .setBlockstun(13)
             .setInfo("You won't run away!", "summons a stunning lightning bolt at the user/in air summons one at aimed position, launches on hit");
-    public static final Attack overwrite = new Attack(6, 0, 1f, 23, 7, 2, 0f, 1.0f, AttackType.BOX, 2, 0, 0, JSoundRegister.IMPACT_5)
+    public static final Attack overwrite = new Attack(6, 0, 1f, 23, 7, 2, 0f, 1.0f, AttackType.BOX, 2, 0, 0, JSoundRegistry.IMPACT_5)
             .setHitspark(2)
             .setLaunch()
             .hyperArmor()
@@ -155,20 +154,20 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
     public void initBarrage() {
         if (!canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
-            playSound(JSoundRegister.TWOH_BARRAGE, 1, 1);
+            playSound(JSoundRegistry.TWOH_BARRAGE, 1, 1);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
         if (handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY))
-            playSound(JSoundRegister.TWOH_HEAVY, 1, 1);
+            playSound(JSoundRegistry.TWOH_HEAVY, 1, 1);
     }
 
     private void initOverwrite(int type) {
         setOverwriteType(type);
         setAttack(overwrite, State.OVERWRITE);
-        playSound(JSoundRegister.TWOH_OVERWRITE, 1, 1);
+        playSound(JSoundRegistry.TWOH_OVERWRITE, 1, 1);
     }
 
     @Override
@@ -207,8 +206,8 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
 
             world.spawnEntity(effectCloud);
 
-            world.playSound(null, lightningPos.x, lightningPos.y, lightningPos.z, JSoundRegister.TWOH_CHARGE, SoundCategory.PLAYERS, 1, 1);
-            playSound(JSoundRegister.TWOH_SMITE, 1, 1);
+            world.playSound(null, lightningPos.x, lightningPos.y, lightningPos.z, JSoundRegistry.TWOH_CHARGE, SoundCategory.PLAYERS, 1, 1);
+            playSound(JSoundRegistry.TWOH_SMITE, 1, 1);
         }
     }
 
@@ -223,8 +222,8 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         if (!cad.canAttack()) return;
 
         if (cad.user().isOnGround() && handleAttack(delayknives, JCraft.standS2CD, State.AIR_KNIVES))
-            playSound(JSoundRegister.TWOH_AIRKNIVES, 1, 1);
-        else if (handleAttack(knives, JCraft.standS2CD, State.THROW)) playSound(JSoundRegister.TWOH_KNIFETHROW, 1, 1);
+            playSound(JSoundRegistry.TWOH_AIRKNIVES, 1, 1);
+        else if (handleAttack(knives, JCraft.standS2CD, State.THROW)) playSound(JSoundRegistry.TWOH_KNIFETHROW, 1, 1);
     }
 
     @Override
@@ -235,14 +234,14 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         }
 
         if (canAttack() && handleAttack(chargeoverwrite, JCraft.standS3CD, State.CHARGE_OVERWRITE))
-            playSound(JSoundRegister.TWOH_CHARGEOVERWRITE, 1, 1);
+            playSound(JSoundRegistry.TWOH_CHARGEOVERWRITE, 1, 1);
     }
 
     @Override
     public void initUlt() {
         if (!canAttack()) return;
         if (handleAttack(timestop, JCraft.standUltCD, State.TIME_STOP))
-            playSound(JSoundRegister.TWOH_TS, 1, 1);
+            playSound(JSoundRegistry.TWOH_TS, 1, 1);
     }
 
     @Override
@@ -260,7 +259,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         switch (attack.id) {
             case (-2) -> {
                 if (tsTime > 0) return;
-                timeSkip(14, JSoundRegister.TWOH_TIMESKIP);
+                timeSkip(14, JSoundRegistry.TWOH_TIMESKIP);
             }
             case (1) -> { // TWOH's heavy is a mini-overwrite that ignores block
                 for (LivingEntity ent : entities) {
@@ -316,7 +315,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             }
             case (6) -> {
                 for (LivingEntity ent : entities) {
-                    ent.removeStatusEffect(JStatusRegister.DAZED);
+                    ent.removeStatusEffect(JStatusRegistry.DAZED);
                     stun(ent, 30, 3);
 
                     if (getOverwriteType() == 1) {
@@ -351,8 +350,8 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         if (!hasUser()) return;
         LivingEntity user = getUserOrThrow();
         if (age == 1) {
-            this.playSound(JSoundRegister.TWOH_SUMMON, 1f, 1f);
-            this.playSound(JSoundRegister.TW_SUMMON, 1f, 1f);
+            this.playSound(JSoundRegistry.TWOH_SUMMON, 1f, 1f);
+            this.playSound(JSoundRegistry.TW_SUMMON, 1f, 1f);
 
             List<LivingEntity> hit = world.getEntitiesByClass(LivingEntity.class, new Box(
                             getPos().add(-64, -64, -64), getPos().add(64, 64, 64)),

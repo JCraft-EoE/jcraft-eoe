@@ -7,7 +7,7 @@ import net.arna.jcraft.common.network.s2c.ComboCounterPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.*;
-import net.arna.jcraft.registry.JStatusRegister;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -128,8 +128,8 @@ public abstract class PlayerEntityMixin implements ISpec, IComboCounter {
     @Inject(cancellable = true, at = @At("HEAD"), method = "updatePose")
     public void jcraft$updatePose(CallbackInfo info) {
         if (
-                ((PlayerEntity) (Object) this).hasStatusEffect(JStatusRegister.KNOCKDOWN)
-                        || ((PlayerEntity) (Object) this).hasStatusEffect(JStatusRegister.WSPOISON)
+                ((PlayerEntity) (Object) this).hasStatusEffect(JStatusRegistry.KNOCKDOWN)
+                        || ((PlayerEntity) (Object) this).hasStatusEffect(JStatusRegistry.WSPOISON)
         ) {
             info.cancel();
         }
@@ -156,7 +156,7 @@ public abstract class PlayerEntityMixin implements ISpec, IComboCounter {
             if (attack != null) {
                 if (attack.attackType == AttackType.COUNTER && stand.getMoveStun() < (attack.moveStun - attack.initTime)) {
                     stand.counter(source.getAttacker(), source); // Initiate counter
-                    player.removeStatusEffect(JStatusRegister.DAZED);
+                    player.removeStatusEffect(JStatusRegistry.DAZED);
                     info.cancel();
                 }
             }

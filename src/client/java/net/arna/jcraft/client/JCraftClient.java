@@ -9,7 +9,7 @@ import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
 import net.arna.jcraft.client.gui.hud.JCraftAbilityHud;
 import net.arna.jcraft.client.net.ClientPacketHandler;
 import net.arna.jcraft.client.particle.*;
-import net.arna.jcraft.client.registry.JArmorRendererRegister;
+import net.arna.jcraft.client.registry.JArmorRendererRegistry;
 import net.arna.jcraft.client.registry.JClientEventsRegistry;
 import net.arna.jcraft.client.registry.JEntityRendererRegister;
 import net.arna.jcraft.client.registry.JRenderLayerRegistry;
@@ -133,7 +133,7 @@ public class JCraftClient implements ClientModInitializer {
 
         // Renderer registration
         JEntityRendererRegister.registerEntityRenderers();
-        JArmorRendererRegister.registerArmorRenderers();
+        JArmorRendererRegistry.registerArmorRenderers();
         BlockEntityRendererFactories.register(JBlockEntityTypeRegistry.SHADER_TEST_BLOCK_ENTITY, ShaderTestBlockEntityRenderer::new);
 
         // Keybind registration

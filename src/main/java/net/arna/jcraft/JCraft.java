@@ -240,7 +240,7 @@ public class JCraft implements ModInitializer {
 
         public void tickDash() {
             duration--;
-            if (entity.hasStatusEffect(JStatusRegister.DAZED)) { // Being stunned stops dashes
+            if (entity.hasStatusEffect(JStatusRegistry.DAZED)) { // Being stunned stops dashes
                 finished = true;
                 return;
             }
@@ -268,7 +268,7 @@ public class JCraft implements ModInitializer {
     public static void tryDash(int forward, int side, LivingEntity entity) {
         NbtCompound data = ((IEntityDataSaver) entity).getPersistentData();
         //todo: make a JCraftUtils method for checking if the player should be effectively disabled? like when stunned or knocked down as shown here:
-        if (data.getInt(dashCD) > 0 || !entity.isOnGround() || entity.hasStatusEffect(JStatusRegister.DAZED) || entity.hasStatusEffect(JStatusRegister.KNOCKDOWN))
+        if (data.getInt(dashCD) > 0 || !entity.isOnGround() || entity.hasStatusEffect(JStatusRegistry.DAZED) || entity.hasStatusEffect(JStatusRegistry.KNOCKDOWN))
             return;
         data.putInt(dashCD, dashCooldown);
 
@@ -315,7 +315,7 @@ public class JCraft implements ModInitializer {
     }
 
     public static StandEntity<?, ?> summon(World world, LivingEntity player) {
-        if (player.hasStatusEffect(JStatusRegister.STANDLESS)) return null;
+        if (player.hasStatusEffect(JStatusRegistry.STANDLESS)) return null;
 
         NbtCompound data = ((IEntityDataSaver) player).getPersistentData();
         StandType type = StandType.fromId(data.getInt("StandID"));
@@ -349,12 +349,12 @@ public class JCraft implements ModInitializer {
         // Registration
         JObjectRegistry.init();
         JBlockEntityTypeRegistry.init();
-        JCommandRegister.registerCommands();
-        JEventsRegister.registerEvents();
-        JStatusRegister.registerStatuses();
-        JSoundRegister.registerSounds();
-        JEntityTypeRegister.registerEntities();
-        JDimensionRegister.registerDimensions();
+        JCommandRegistry.registerCommands();
+        JEventsRegistry.registerEvents();
+        JStatusRegistry.registerStatuses();
+        JSoundRegistry.registerSounds();
+        JEntityTypeRegistry.registerEntities();
+        JDimensionRegistry.registerDimensions();
         JArgumentTypeRegistry.registerArgumentTypes();
         JEnchantmentRegistry.init();
         JLootTableHelper.init();
@@ -401,7 +401,7 @@ public class JCraft implements ModInitializer {
             data.putInt(cooldownCancelCD, 900); // 45s
 
             Vec3d pPos = player.getEyePos();
-            world.playSoundFromEntity(null, player, JSoundRegister.COOLDOWN_CANCEL, SoundCategory.PLAYERS, 1, 1);
+            world.playSoundFromEntity(null, player, JSoundRegistry.COOLDOWN_CANCEL, SoundCategory.PLAYERS, 1, 1);
             createParticle(world, pPos.x, pPos.y, pPos.z, 1);
         }
     }
@@ -419,7 +419,7 @@ public class JCraft implements ModInitializer {
 
             stun(player, 5, 2); // Player is slowed down considerably pre-burst
 
-            world.playSoundFromEntity(null, player, JSoundRegister.COMBO_BREAK, SoundCategory.PLAYERS, 1, 1);
+            world.playSoundFromEntity(null, player, JSoundRegistry.COMBO_BREAK, SoundCategory.PLAYERS, 1, 1);
 
             Vec3d pPos = player.getEyePos();
             burstTimers.put(player, 4);
@@ -447,7 +447,7 @@ public class JCraft implements ModInitializer {
     public static void dimensionHop(Entity entity, int heightOffset) {
         ServerWorld original = (ServerWorld) entity.getWorld();
         MinecraftServer server = original.getServer();
-        ServerWorld au = server.getWorld(JDimensionRegister.AU_DIMENSION_KEY);
+        ServerWorld au = server.getWorld(JDimensionRegistry.AU_DIMENSION_KEY);
         if (au == null) {
             JCraft.LOGGER.fatal("Alternate universe world does not exist!");
             return;
@@ -461,7 +461,7 @@ public class JCraft implements ModInitializer {
         if (entity instanceof ServerPlayerEntity player) {
             player.teleport(au, pos.x, pos.y - heightOffset, pos.z, entity.getYaw(), entity.getPitch());
             player.networkHandler.sendPacket(
-                    new PlaySoundS2CPacket(JSoundRegister.D4C_ALT_UNIVERSE_AMBIENCE, SoundCategory.MUSIC, pos.x, pos.y - heightOffset, pos.z, 1.0F, 1.0F, 0)
+                    new PlaySoundS2CPacket(JSoundRegistry.D4C_ALT_UNIVERSE_AMBIENCE, SoundCategory.MUSIC, pos.x, pos.y - heightOffset, pos.z, 1.0F, 1.0F, 0)
             );
         } else
             finalEnt = teleportToWorld(entity, au, entity.getX(), entity.getY() - heightOffset, entity.getZ());

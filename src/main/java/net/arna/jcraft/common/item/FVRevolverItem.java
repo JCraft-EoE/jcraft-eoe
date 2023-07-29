@@ -1,8 +1,8 @@
 package net.arna.jcraft.common.item;
 
 import net.arna.jcraft.common.entity.BulletProjectile;
-import net.arna.jcraft.registry.JSoundRegister;
-import net.arna.jcraft.registry.JStatusRegister;
+import net.arna.jcraft.registry.JSoundRegistry;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -38,7 +38,7 @@ public class FVRevolverItem extends Item {
         if (world.isClient()) return TypedActionResult.success(user.getStackInHand(hand));
 
         ItemStack itemStack = user.getStackInHand(hand);
-        if (user.hasStatusEffect(JStatusRegister.DAZED))
+        if (user.hasStatusEffect(JStatusRegistry.DAZED))
             return TypedActionResult.fail(itemStack);
 
         NbtCompound data = itemStack.getOrCreateNbt();
@@ -47,7 +47,7 @@ public class FVRevolverItem extends Item {
 
         data.putInt("Shots", shots - 1);
         user.getItemCooldownManager().set(this, 8);
-        world.playSound(null, user.getX(), user.getY(), user.getZ(), JSoundRegister.REVOLVER_FIRE, SoundCategory.PLAYERS, 1f, 1f);
+        world.playSound(null, user.getX(), user.getY(), user.getZ(), JSoundRegistry.REVOLVER_FIRE, SoundCategory.PLAYERS, 1f, 1f);
 
         BulletProjectile bullet = new BulletProjectile(world, user, 9f, 10f, 10, 5);
         bullet.setVelocity(user, user.getPitch(), user.getYaw(), 0f,  10, 0F);

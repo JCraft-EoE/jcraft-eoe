@@ -5,7 +5,7 @@ import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.entity.KingCrimsonEntity;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.util.*;
-import net.arna.jcraft.registry.JStatusRegister;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -45,7 +45,7 @@ public abstract class LivingEntityMixin implements IDamageScaler {
     @Inject(method = "tickMovement", at = @At("HEAD"))
     public void jcraft$tickMovement(CallbackInfo callbackInfo) {
         LivingEntity living = LivingEntity.class.cast(this);
-        if ( !living.hasStatusEffect(JStatusRegister.DAZED) )
+        if ( !living.hasStatusEffect(JStatusRegistry.DAZED) )
              ((IDamageScaler)this).jcraft$resetHitCount();
     }
 
@@ -69,9 +69,9 @@ public abstract class LivingEntityMixin implements IDamageScaler {
     public void jcraft$getJumpBoostVelocityModifier(CallbackInfoReturnable<Double> cir) {
         LivingEntity player = ((LivingEntity) (Object) this);
         StandEntity<?, ?> stand = ((IEntityDataSaver) this).getStand();
-        StatusEffectInstance stun = player.getStatusEffect(JStatusRegister.DAZED);
+        StatusEffectInstance stun = player.getStatusEffect(JStatusRegistry.DAZED);
         if (
-                player.hasStatusEffect(JStatusRegister.KNOCKDOWN) || // Knocked down
+                player.hasStatusEffect(JStatusRegistry.KNOCKDOWN) || // Knocked down
                         (stun != null && stun.getAmplifier() != 2) || // Stunned (not blocking)
                         (stand != null && stand.getRemote()) // Stand ON in remote mode
         ) {
@@ -94,7 +94,7 @@ public abstract class LivingEntityMixin implements IDamageScaler {
             if (attack != null) {
                 if (attack.attackType == AttackType.COUNTER && stand.getMoveStun() < (attack.moveStun - attack.initTime)) {
                     stand.counter(source.getAttacker(), source); // Initiate counter
-                    player.removeStatusEffect(JStatusRegister.DAZED);
+                    player.removeStatusEffect(JStatusRegistry.DAZED);
                     info.cancel();
                 }
             }
@@ -107,7 +107,7 @@ public abstract class LivingEntityMixin implements IDamageScaler {
         LivingEntity livingEntity = (LivingEntity) (Object) this;
         IEntityDataSaver entityDataSaver = (IEntityDataSaver) livingEntity;
 
-        if ((livingEntity.hasStatusEffect(JStatusRegister.DAZED) && !JUtils.isBlocking(livingEntity)) || livingEntity.hasStatusEffect(JStatusRegister.KNOCKDOWN)) {
+        if ((livingEntity.hasStatusEffect(JStatusRegistry.DAZED) && !JUtils.isBlocking(livingEntity)) || livingEntity.hasStatusEffect(JStatusRegistry.KNOCKDOWN)) {
             cir.setReturnValue(false);
         }
 
@@ -128,9 +128,9 @@ public abstract class LivingEntityMixin implements IDamageScaler {
     public void jcraft$canTarget(LivingEntity target, CallbackInfoReturnable<Boolean> cir) {
         LivingEntity livingEntity = (LivingEntity) (Object) this;
         IEntityDataSaver entityDataSaver = (IEntityDataSaver) livingEntity;
-        StatusEffectInstance stun = livingEntity.getStatusEffect(JStatusRegister.DAZED);
+        StatusEffectInstance stun = livingEntity.getStatusEffect(JStatusRegistry.DAZED);
 
-        if ((livingEntity.hasStatusEffect(JStatusRegister.DAZED) && !JUtils.isBlocking(livingEntity)) || livingEntity.hasStatusEffect(JStatusRegister.KNOCKDOWN)) {
+        if ((livingEntity.hasStatusEffect(JStatusRegistry.DAZED) && !JUtils.isBlocking(livingEntity)) || livingEntity.hasStatusEffect(JStatusRegistry.KNOCKDOWN)) {
             cir.setReturnValue(false);
         }
 

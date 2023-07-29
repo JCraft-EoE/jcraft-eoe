@@ -434,6 +434,12 @@
     ]
   },
 
+  "kqexplode": {
+    "sounds": [
+      "jcraft:stands/killerqueen/explode"
+    ]
+  },
+
   "kqbtdelbow": {
     "sounds": [
       "jcraft:stands/kqbtd/elbow"
@@ -952,9 +958,15 @@
     ]
   },
 
-  "bulletlodge": {
+  "bulletricochet": {
     "sounds": [
-      "jcraft:projectiles/bulletlodge"
+      "jcraft:projectiles/bullet/ricochet"
+    ]
+  },
+
+  "bulletpenetrate": {
+    "sounds": [
+      "jcraft:projectiles/bullet/penetrate"
     ]
   }
 }

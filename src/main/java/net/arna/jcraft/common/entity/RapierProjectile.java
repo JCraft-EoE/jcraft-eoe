@@ -3,7 +3,7 @@ package net.arna.jcraft.common.entity;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.registry.JEntityTypeRegister;
+import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -49,7 +49,7 @@ public class RapierProjectile extends PersistentProjectileEntity implements IAni
     }
 
     public RapierProjectile(World world, LivingEntity owner, StandEntity<?, ?> silverChariot) {
-        super(JEntityTypeRegister.RAPIER, owner, world);
+        super(JEntityTypeRegistry.RAPIER, owner, world);
         this.setOwner(owner);
         this.origin = silverChariot;
     }

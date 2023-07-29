@@ -3,7 +3,7 @@ package net.arna.jcraft.common.item;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.arna.jcraft.common.entity.KnifeProjectile;
-import net.arna.jcraft.registry.JStatusRegister;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.item.TooltipContext;
@@ -53,7 +53,7 @@ public class KnifeItem extends Item {
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack stack = user.getStackInHand(hand);
 
-        if (user.hasStatusEffect(JStatusRegister.DAZED))
+        if (user.hasStatusEffect(JStatusRegistry.DAZED))
             return TypedActionResult.fail(stack);
 
         user.setCurrentHand(hand);
@@ -79,7 +79,7 @@ public class KnifeItem extends Item {
 
     @Override
     public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
-        if (user.hasStatusEffect(JStatusRegister.DAZED))
+        if (user.hasStatusEffect(JStatusRegistry.DAZED))
             return;
 
         if (!world.isClient) {

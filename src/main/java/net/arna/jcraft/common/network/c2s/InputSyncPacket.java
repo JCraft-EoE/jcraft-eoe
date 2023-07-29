@@ -4,7 +4,7 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.registry.JStatusRegister;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.network.PacketByteBuf;
@@ -58,7 +58,7 @@ public class InputSyncPacket {
 
                 // Combo break if stunned, jumping and crouching
                 if (player.isSneaking()) {
-                    StatusEffectInstance stun = player.getStatusEffect(JStatusRegister.DAZED);
+                    StatusEffectInstance stun = player.getStatusEffect(JStatusRegistry.DAZED);
                     if (JUtils.isBlocking(player)) return;
                     if (stun != null)
                         comboBreak(world, player, stun);

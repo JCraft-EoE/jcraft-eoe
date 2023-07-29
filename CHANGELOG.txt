@@ -1352,13 +1352,13 @@ Made in Heaven
 
 ● 28/7/2023
 Added DAMAGE SCALING
-    >The more hits in a combo, the less damage each hit does (100%, -1%/hit until 30%)
+    >The more hits in a combo, the less damage each hit does (100%, -2%/hit until 40%)
 
 Star Platinum
     >Roundhouse cooldown reduced (11->8s)
 
 The World
-    >Donut stun reduced (4->3.25s)
+    >Donut stun reduced (4->3.4s)
     >Roundhouse cooldown reduced (11->8s)
 
 D4C

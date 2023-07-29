@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.entity.ai.goal;
 
-import net.arna.jcraft.registry.JStatusRegister;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.pathing.Path;
@@ -110,7 +110,7 @@ public class StunningMeleeAttackGoal extends Goal {
         resetCooldown();
         mob.swingHand(Hand.MAIN_HAND);
         if (mob.tryAttack(target))
-            target.addStatusEffect(new StatusEffectInstance(JStatusRegister.DAZED, this.stunT, 1, true, false));
+            target.addStatusEffect(new StatusEffectInstance(JStatusRegistry.DAZED, this.stunT, 1, true, false));
     }
 
     protected void resetCooldown() {

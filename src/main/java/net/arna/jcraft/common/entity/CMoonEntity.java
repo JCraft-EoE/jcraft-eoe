@@ -10,9 +10,9 @@ import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
-import net.arna.jcraft.registry.JEntityTypeRegister;
-import net.arna.jcraft.registry.JSoundRegister;
-import net.arna.jcraft.registry.JStatusRegister;
+import net.arna.jcraft.registry.JEntityTypeRegistry;
+import net.arna.jcraft.registry.JSoundRegistry;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.FallingBlockEntity;
@@ -40,23 +40,23 @@ import java.util.function.Consumer;
 //todo: 3d, rotatable shockwave particle effect
 //todo: particles on gravpunch and both slams
 public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
-    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
+    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegistry.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
 
-    public static final Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 0.75f, 0.25f, AttackType.BARRAGE, 1, 0, 4, JSoundRegister.IMPACT_3)
+    public static final Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 0.75f, 0.25f, AttackType.BARRAGE, 1, 0, 4, JSoundRegistry.IMPACT_3)
             .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
-    public static final Attack gutpunch = new Attack(1, 17, 1f, 30, 19, 2.0, 8f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.TW_KICK_HIT).setHitspark(2).hyperArmor().setLaunch()
+    public static final Attack gutpunch = new Attack(1, 17, 1f, 30, 19, 2.0, 8f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegistry.TW_KICK_HIT).setHitspark(2).hyperArmor().setLaunch()
             .appendHitbox(new HitBoxData(0, 0.25, 1.25))
             .setInfo("Gut Punch", "slow, uninterruptable combo finisher");
-    public static final Attack launch = new Attack(4, 22, 0.75f, 21, 14, 1.75, 5f, 0.9f, AttackType.BOX, 0.95f, 0.3f, 0, JSoundRegister.IMPACT_5)
+    public static final Attack launch = new Attack(4, 22, 0.75f, 21, 14, 1.75, 5f, 0.9f, AttackType.BOX, 0.95f, 0.3f, 0, JSoundRegistry.IMPACT_5)
             .setHitspark(2)
             .setRanged(true)
             .setInfo("Block Launch", "lifts a block from the ground and launches it at a delay/crouching and using this button resets the delay on nearby blocks");
-    public static final Attack gravpunch = new Attack(3, 24, 1f, 32, 20, 1.75, 6f, 0.35f, AttackType.BOX, 2.25f, -0.3f, 0, JSoundRegister.CMOON_GRAVPUNCHHIT).setHitspark(2).hyperArmor()
+    public static final Attack gravpunch = new Attack(3, 24, 1f, 32, 20, 1.75, 6f, 0.35f, AttackType.BOX, 2.25f, -0.3f, 0, JSoundRegistry.CMOON_GRAVPUNCHHIT).setHitspark(2).hyperArmor()
             .setUB(true)
             .appendHitbox(new HitBoxData(1))
             .setInfo("Only One Punch", "lifts enemy on hit");
-    public static final Attack groundslam = new Attack(5, 23, 1f, 18, 10, 3, 7f, 0.2f, AttackType.BOX, 0.85f, 1.4f, 0, JSoundRegister.CMOON_GRAVPUNCHHIT)
+    public static final Attack groundslam = new Attack(5, 23, 1f, 18, 10, 3, 7f, 0.2f, AttackType.BOX, 0.85f, 1.4f, 0, JSoundRegistry.CMOON_GRAVPUNCHHIT)
             .setUB(true)
             .setInfo("Ground Slam", "lifts the ground, combo starter/extender, knockdown when used while crouching");
     public static final Attack gravshift = new Attack(6, 70, 32, 20, 7, AttackType.BOX)
@@ -131,21 +131,21 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
     public void initBarrage() {
         if (!this.canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
-            this.playSound(JSoundRegister.CMOON_BARRAGE, 1, 1);
+            this.playSound(JSoundRegistry.CMOON_BARRAGE, 1, 1);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!this.canAttack()) return;
         if (handleAttack(gutpunch, JCraft.standHeavyCD, State.DONUT))
-            this.playSound(JSoundRegister.CMOON_DONUT, 1, 1);
+            this.playSound(JSoundRegistry.CMOON_DONUT, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!this.canAttack()) return;
         if (handleAttack(gravpunch, JCraft.standS1CD, State.GRAV_PUNCH))
-            this.playSound(JSoundRegister.CMOON_GRAVPUNCH, 1, 1);
+            this.playSound(JSoundRegistry.CMOON_GRAVPUNCH, 1, 1);
     }
 
     @Override
@@ -161,14 +161,14 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
                 block.markRefresh();
             }
         } else if (canAttack() && handleAttack(launch, JCraft.standS2CD, State.GROUND_SHOOT))
-            playSound(JSoundRegister.CMOON_GROUNDSHOOT, 1, 1);
+            playSound(JSoundRegistry.CMOON_GROUNDSHOOT, 1, 1);
     }
 
     @Override
     public void initSpecial3() {
         if (!this.canAttack()) return;
         if (handleAttack(groundslam, JCraft.standS3CD, State.GROUND_SLAM))
-            playSound(JSoundRegister.CMOON_GROUNDSLAM, 1, 1);
+            playSound(JSoundRegistry.CMOON_GROUNDSLAM, 1, 1);
     }
 
     @Override
@@ -176,9 +176,9 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
         if (!this.canAttack()) return;
         if (getShiftTime() <= 0) {
             if (getUserOrThrow().isSneaking() && handleAttack(gravshift, JCraft.standUltCD, State.GRAV_SHIFT))
-                playSound(JSoundRegister.CMOON_GRAVSHIFT, 1, 1);
+                playSound(JSoundRegistry.CMOON_GRAVSHIFT, 1, 1);
             else if (handleAttack(directionalshift, JCraft.standUltCD, State.DIRECTIONAL_SHIFT))
-                playSound(JSoundRegister.CMOON_GRAVSHIFT_DIRECTIONAL, 1, 1);
+                playSound(JSoundRegistry.CMOON_GRAVSHIFT_DIRECTIONAL, 1, 1);
 
         } else {
             int shiftType = getShiftType();
@@ -195,10 +195,10 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
         LivingEntity user = getUserOrThrow();
 
         if (user.isOnGround() && directionChangeCooldown <= 0) {
-            StatusEffectInstance weightless = user.getStatusEffect(JStatusRegister.WEIGHTLESS);
+            StatusEffectInstance weightless = user.getStatusEffect(JStatusRegistry.WEIGHTLESS);
             if (weightless != null && weightless.getAmplifier() == 1) {
-                user.removeStatusEffect(JStatusRegister.WEIGHTLESS);
-                user.addStatusEffect(new StatusEffectInstance(JStatusRegister.WEIGHTLESS, weightless.getDuration(), 1));
+                user.removeStatusEffect(JStatusRegistry.WEIGHTLESS);
+                user.addStatusEffect(new StatusEffectInstance(JStatusRegistry.WEIGHTLESS, weightless.getDuration(), 1));
             }
 
             directionChangeCooldown = 10;
@@ -210,7 +210,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
         if (userData.getPersistentData().getInt(JCraft.utilCD) > 0) return;
 
         if (user.isOnGround()) {
-            user.addStatusEffect(new StatusEffectInstance(JStatusRegister.WEIGHTLESS, 200, 1));
+            user.addStatusEffect(new StatusEffectInstance(JStatusRegistry.WEIGHTLESS, 200, 1));
         } else {
             user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 60, 1));
             user.addVelocity(0, 1.0, 0);
@@ -256,7 +256,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
 
         switch (attack.id) {
             case (4) -> { // Block Launch
-                BlockProjectile block = new BlockProjectile(JEntityTypeRegister.BLOCK_PROJECTILE, world);
+                BlockProjectile block = new BlockProjectile(JEntityTypeRegistry.BLOCK_PROJECTILE, world);
                 BlockState steppingState = getSteppingBlockState();
                 if (steppingState.isAir() || !steppingState.isOpaque())
                     block.setBlockStack(Items.STONE.getDefaultStack());
@@ -275,7 +275,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
                     ent.setVelocity(new Vec3d(0.0, -0.75, 0.0));
                     ent.velocityModified = true;
                     if (user.isSneaking())
-                        ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 30, 0));
+                        ent.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 30, 0));
                 }
 
                 if (world.getGameRules().getBoolean(JCraft.STAND_GRIEFING)) {
@@ -329,7 +329,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
 
     @Override
     public void tick() {
-        if (age == 1) playSound(JSoundRegister.CMOON_SUMMON, 1f, 1f);
+        if (age == 1) playSound(JSoundRegistry.CMOON_SUMMON, 1f, 1f);
         super.tick();
 
         if (hasUser()) {
@@ -380,7 +380,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
                             GravityChangerAPI.clearGravity(entity); // todo: this interferes with other gravities, solve later
                     }
 
-                if (sTime > 0 && !user.hasStatusEffect(JStatusRegister.DAZED)) {
+                if (sTime > 0 && !user.hasStatusEffect(JStatusRegistry.DAZED)) {
                     List<Entity> toCatch = world.getEntitiesByClass(Entity.class, getBoundingBox().expand(64), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
 
                     toCatch.remove(this);

@@ -7,7 +7,7 @@ import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
-import net.arna.jcraft.registry.JSoundRegister;
+import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
@@ -26,11 +26,11 @@ import java.util.List;
 //todo: move all inhale code to StarPlatinumEntity.java
 public abstract sealed class AbstractStarPlatinumEntity<E extends AbstractStarPlatinumEntity<E, S>, S extends Enum<S> & StandAnimationState<E>> extends StandEntity<E, S>
         permits StarPlatinumEntity, SPTWEntity {
-    public static final Attack crm1 = new Attack(7, JCraft.lightCooldown, 0.75f, 14, 8, 1.5, 6f, 0.25f, AttackType.BOX, 1f, -0.4f, 0, JSoundRegister.IMPACT_1)
+    public static final Attack crm1 = new Attack(7, JCraft.lightCooldown, 0.75f, 14, 8, 1.5, 6f, 0.25f, AttackType.BOX, 1f, -0.4f, 0, JSoundRegistry.IMPACT_1)
             .setLaunch()
             .appendHitbox(new HitBoxData(0, 0.35, 1.25))
             .setInfo("Uppercut", "slower combo starter, launches");
-    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
+    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegistry.IMPACT_1)
             .crouchingVariation(crm1)
             .setInfo("Punch", "quick combo starter");
     public static final Attack heavy = new Attack(1, 17, 1f, 30, 20, 2.0, 10f, 1.5f, AttackType.BOX, 0.7f)
@@ -151,7 +151,7 @@ public abstract sealed class AbstractStarPlatinumEntity<E extends AbstractStarPl
 
     @Override
     public void tick() {
-        if (age == 1) playSound(JSoundRegister.STAR_PLATINUM_SUMMON, 1f, 1f);
+        if (age == 1) playSound(JSoundRegistry.STAR_PLATINUM_SUMMON, 1f, 1f);
         super.tick();
         LivingEntity user = getUser();
 

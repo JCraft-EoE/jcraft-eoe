@@ -4,11 +4,10 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.common.util.IEntityDataSaver;
-import net.arna.jcraft.common.util.MobilityType;
-import net.arna.jcraft.common.util.StandAnimationState;
-import net.arna.jcraft.registry.JSoundRegister;
-import net.arna.jcraft.registry.JStatusRegister;
+import net.arna.jcraft.common.util.*;
+import net.arna.jcraft.registry.JParticleTypeRegistry;
+import net.arna.jcraft.registry.JSoundRegistry;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
@@ -28,24 +27,24 @@ import java.util.List;
 
 public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQueenEntity<E, S>, S extends Enum<S> & StandAnimationState<E>> extends StandEntity<E, S>
         permits KillerQueenEntity, KQBTDEntity {
-    public static final Attack low = new Attack(1, 0, 0.85f, 13, 8, 1.5, 4f, 0.5f, AttackType.BOX, 0.5f, 0.1f, 0, JSoundRegister.IMPACT_1)
+    public static final Attack low = new Attack(1, 0, 0.85f, 13, 8, 1.5, 4f, 0.5f, AttackType.BOX, 0.5f, 0.1f, 0, JSoundRegistry.IMPACT_1)
             .setInfo("Low Punch", "frametrap tool, low stun");
 
     public static final Attack detonate = new Attack(6, 1, 1, 6, 5, 0, 0f, 0.0f, AttackType.BOX)
             .setInfo("Detonate", "slight windup");
 
-    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 19, 0, 1.5, 3f, 0.75f, AttackType.MULTIHIT, 1f, 0, List.of(6, 11), JSoundRegister.IMPACT_4)
+    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 19, 0, 1.5, 3f, 0.75f, AttackType.MULTIHIT, 1f, 0, List.of(6, 11), JSoundRegistry.IMPACT_4)
             .crouchingVariation(detonate)
             .setFollowup(low)
             .setInfo("Dual Punch", "combo starter, decent speed, has followup with more blockstun");
 
-    public static final Attack heavy = new Attack(2, 12, 0.75f, 24, 16, 2, 9f, 1.75f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_4)
+    public static final Attack heavy = new Attack(2, 12, 0.75f, 24, 16, 2, 9f, 1.75f, AttackType.BOX, 0.5f, 0, 0, JSoundRegistry.IMPACT_4)
             .setHitspark(2)
             .hyperArmor()
             .setLaunch()
             .setInfo("Haymaker", "slow, uninterruptable launcher");
 
-    public static final Attack barrage = new Attack(3, 17, 0.75f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3, JSoundRegister.IMPACT_4)
+    public static final Attack barrage = new Attack(3, 17, 0.75f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3, JSoundRegistry.IMPACT_4)
             .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
 
     public static final Attack bombplant = new Attack(4, 30, 1, 20, 12, 1.5, 0f, 0.0f, AttackType.BOX, 0.45f)
@@ -95,6 +94,22 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
                 , new Attack().setMobility(MobilityType.DASH).setInfo("Explosive Dash", "slight aoe damage, 3D movement tool"));
     }
 
+    protected void explode(Entity user, Vec3d pos) {
+        JUtils.explode(
+                world, user,
+                pos.x,
+                pos.y,
+                pos.z,
+                2f,
+                JExplosionModifier.builder()
+                        .particle(JParticleTypeRegistry.BOOM_1)
+                        .destructionType(Explosion.DestructionType.NONE)
+                        .particleVelocity(Vec3d.ZERO)
+                        .sound(JSoundRegistry.KQ_EXPLODE)
+                        .build()
+        );
+    }
+
     public Vec3d getBombPos() {
         if (bombEntity != null)
             return bombEntity.getPos();
@@ -105,7 +120,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
 
     private void detonate() {
         setAttack(detonate, getDetonateState());
-        playSound(JSoundRegister.KQ_DETONATE, 1, 1);
+        playSound(JSoundRegistry.KQ_DETONATE, 1, 1);
     }
 
     // Moveset
@@ -114,7 +129,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
         if (!hasUser()) return;
 
         LivingEntity user = getUserOrThrow();
-        if (user.hasStatusEffect(JStatusRegister.DAZED))
+        if (user.hasStatusEffect(JStatusRegistry.DAZED))
             return;
 
         boolean idling = getMoveStun() < 1;
@@ -171,7 +186,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
         user.velocityModified = true;
 
         playerData.putInt(JCraft.utilCD, 360); // 18s explosive dash cooldown
-        playSound(JSoundRegister.KQ_DETONATE, 1, 1);
+        playSound(JSoundRegistry.KQ_DETONATE, 1, 1);
     }
 
     @Override
@@ -193,7 +208,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
 
     @Override
     public void tick() {
-        if (age == 1) playSound(JSoundRegister.STAND_SUMMON, 1f, 1f);
+        if (age == 1) playSound(JSoundRegistry.STAND_SUMMON, 1f, 1f);
         super.tick();
 
         if (hasUser()) {

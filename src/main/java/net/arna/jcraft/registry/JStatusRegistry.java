@@ -7,7 +7,7 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.util.registry.Registry;
 
-public interface JStatusRegister {
+public interface JStatusRegistry {
     StatusEffect DAZED = new DazedStatusEffect();
     StatusEffect KNOCKDOWN = new KnockdownStatusEffect();
     StatusEffect WSPOISON = new WSPoisonEffect();

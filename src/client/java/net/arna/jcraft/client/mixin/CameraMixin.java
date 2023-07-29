@@ -2,7 +2,7 @@ package net.arna.jcraft.client.mixin;
 
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.util.IEntityDataSaver;
-import net.arna.jcraft.registry.JStatusRegister;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.client.render.Camera;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -62,7 +62,7 @@ public abstract class CameraMixin {
     @Inject(method = "update", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;setPos(DDD)V", shift = At.Shift.BEFORE))
     public void jcraft$prevSetPosUpdate(BlockView area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta, CallbackInfo info) {
         if (focusedEntity instanceof LivingEntity living) {
-            if (living.hasStatusEffect(JStatusRegister.OUTOFBODY)) {
+            if (living.hasStatusEffect(JStatusRegistry.OUTOFBODY)) {
                 this.thirdPerson = true;
                 info.cancel();
             }

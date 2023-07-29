@@ -4,11 +4,10 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.common.util.IEntityDataSaver;
-import net.arna.jcraft.common.util.MobilityType;
-import net.arna.jcraft.common.util.StandAnimationState;
-import net.arna.jcraft.registry.JSoundRegister;
-import net.arna.jcraft.registry.JStatusRegister;
+import net.arna.jcraft.common.util.*;
+import net.arna.jcraft.registry.JParticleTypeRegistry;
+import net.arna.jcraft.registry.JSoundRegistry;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
@@ -40,7 +39,7 @@ import java.util.function.Consumer;
 
 public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQBTDEntity.State> {
     public static final Attack light = Attack.copyOf(KillerQueenEntity.light);
-    public static final Attack heavy = new Attack(2, 12, 0.75f, 9, 5, 1, 7.5f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.IMPACT_4).setHitspark(2).setLaunch()
+    public static final Attack heavy = new Attack(2, 12, 0.75f, 9, 5, 1, 7.5f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegistry.IMPACT_4).setHitspark(2).setLaunch()
             .setInfo("Elbow", "fast, short-range knockback");
     public static final Attack barrage = Attack.copyOf(KillerQueenEntity.barrage);
     public static final Attack bombplant = Attack.copyOf(KillerQueenEntity.bombplant);
@@ -99,14 +98,14 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
     public void initHeavyAttack() {
         if (!canAttack()) return;
         if (handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY))
-            playSound(JSoundRegister.KQBTD_ELBOW, 1, 1);
+            playSound(JSoundRegistry.KQBTD_ELBOW, 1, 1);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
-            playSound(JSoundRegister.KQ_BARRAGE, 1, 1);
+            playSound(JSoundRegistry.KQ_BARRAGE, 1, 1);
     }
 
     private static final int bombplantCD = (int) (bombplant.cooldown * 20);
@@ -134,7 +133,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
     public void initUlt() {
         if (!canAttack()) return;
         if (handleAttack(detonate, JCraft.standUltCD, State.DETONATE)) {
-            playSound(JSoundRegister.KQ_DETONATE, 1, 1);
+            playSound(JSoundRegistry.KQ_DETONATE, 1, 1);
             detonateBTD = false;
         }
     }
@@ -145,13 +144,13 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
         if (getUserOrThrow().isSneaking() && handleAttack(bubblecounter, JCraft.standS2CD, State.BUBBLE_COUNTER)) {
             //playSound(JSoundRegister.KQBTD_COUNTER, 1, 1);
         } else if (handleAttack(bubble, JCraft.standS2CD, State.BUBBLE))
-            playSound(JSoundRegister.KQ_UPPERCUT, 1, 1);
+            playSound(JSoundRegistry.KQ_UPPERCUT, 1, 1);
     }
 
     @Override
     public void initSpecial3() {
         if (btdEntity != null && handleAttack(detonate, JCraft.ultCD, State.DETONATE)) {
-            playSound(JSoundRegister.KQ_DETONATE, 1, 1);
+            playSound(JSoundRegistry.KQ_DETONATE, 1, 1);
             detonateBTD = true;
             return;
         }
@@ -218,7 +217,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                 if (detonateBTD) {
                     if (btdEntity instanceof LivingEntity livingEntity) {
                         world.createExplosion(user, livingEntity.getX(), livingEntity.getY() + livingEntity.getHeight() / 2, livingEntity.getZ(), 2f, Explosion.DestructionType.NONE);
-                        livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
+                        livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0, true, false));
 
                         Vec3d pos = btdEntity.getPos();
                         JCraft.createParticle((ServerWorld) getWorld(), pos.x, pos.y + 2, pos.z, -4);
@@ -239,8 +238,9 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                     }
                 } else {
                     if (bombEntity instanceof LivingEntity livingEntity) {
-                        world.createExplosion(user, livingEntity.getX(), livingEntity.getY() + livingEntity.getHeight() / 2, livingEntity.getZ(), 2f, Explosion.DestructionType.NONE);
-                        livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
+                        explode(user, livingEntity.getEyePos());
+
+                        livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0, true, false));
                     /*
                     if (user.isSneaking()) {
                         if (targetData != null && userData != null) {
@@ -298,7 +298,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                             bombPos = bombBlock;
 
                         if (bombPos != null) {
-                            world.createExplosion(user, bombPos.x, bombPos.y, bombPos.z, 2f, Explosion.DestructionType.NONE);
+                            explode(user, bombPos);
 
                             List<LivingEntity> toKD = world.getEntitiesByClass(
                                     LivingEntity.class,
@@ -306,11 +306,8 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                                     EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR
                             );
 
-                            for (LivingEntity livingEntity : toKD) {
-                                livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
-                            }
-
-                            world.playSound(bombPos.x, bombPos.y, bombPos.z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.75f, 1, true);
+                            for (LivingEntity livingEntity : toKD)
+                                livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0, true, false));
                         }
                     }
 
@@ -371,7 +368,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
 
     @Override
     public void tick() {
-        if (age == 1) playSound(JSoundRegister.KQBTD_SUMMON, 1f, 1f);
+        if (age == 1) playSound(JSoundRegistry.KQBTD_SUMMON, 1f, 1f);
         super.tick();
 
         if (hasUser()) {

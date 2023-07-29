@@ -3,7 +3,7 @@ package net.arna.jcraft.common.item;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JObjectRegistry;
-import net.arna.jcraft.registry.JSoundRegister;
+import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -50,11 +50,11 @@ public class SheathedAnubisItem extends SpecObtainmentItem {
 
         boolean specChanged = tryGetSpec(user);
         if (specChanged) {
-            JUtils.serverPlaySound(JSoundRegister.ANUBIS_UNSHEATHE, serverWorld, user.getPos());
-            JUtils.serverPlaySound(JSoundRegister.ANUBIS_SPECCHANGE, serverWorld, user.getPos());
+            JUtils.serverPlaySound(JSoundRegistry.ANUBIS_UNSHEATHE, serverWorld, user.getPos());
+            JUtils.serverPlaySound(JSoundRegistry.ANUBIS_SPECCHANGE, serverWorld, user.getPos());
             user.setStackInHand(hand, new ItemStack(JObjectRegistry.ANUBIS));
         } else if (!warned) {
-            JUtils.serverPlaySound(JSoundRegister.ANUBIS_UNSHEATHE, serverWorld, user.getPos());
+            JUtils.serverPlaySound(JSoundRegistry.ANUBIS_UNSHEATHE, serverWorld, user.getPos());
             user.setStackInHand(hand, new ItemStack(JObjectRegistry.ANUBIS));
         }
         return TypedActionResult.consume(itemStack);

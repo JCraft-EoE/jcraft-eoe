@@ -5,8 +5,8 @@ import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.StandAnimationState;
-import net.arna.jcraft.registry.JSoundRegister;
-import net.arna.jcraft.registry.JStatusRegister;
+import net.arna.jcraft.registry.JSoundRegistry;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -21,22 +21,22 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEntity.State> {
-    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 14, 7, 1.5, 5f, 0.75f, AttackType.BOX, 0.6f, 0.2f, 0, JSoundRegister.IMPACT_3)
+    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 14, 7, 1.5, 5f, 0.75f, AttackType.BOX, 0.6f, 0.2f, 0, JSoundRegistry.IMPACT_3)
             .setInfo("Punch", "quick combo starter");
-    public static final Attack donut = new Attack(1, 18, 1f, 36, 17, 2, 10f, 0.0f, AttackType.BOX, 1.4f, 0, 0, JSoundRegister.TW_DONUT_HIT)
+    public static final Attack donut = new Attack(1, 18, 1f, 36, 17, 2, 10f, 0.0f, AttackType.BOX, 1.4f, 0, 0, JSoundRegistry.TW_DONUT_HIT)
             .setHitspark(2)
             .setInfo("Donut", "slow combo starter/extender");
-    public static final Attack barrage = new Attack(2, 17, 0.75f, 60, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 1, 0, 3, JSoundRegister.IMPACT_3)
+    public static final Attack barrage = new Attack(2, 17, 0.75f, 60, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 1, 0, 3, JSoundRegistry.IMPACT_3)
             .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
-    public static final Attack standdisk = new Attack(3, 30, 1f, 34, 22, 2, 8f, 0.0f, AttackType.BOX, 1f, 0, 0, JSoundRegister.IMPACT_2)
+    public static final Attack standdisk = new Attack(3, 30, 1f, 34, 22, 2, 8f, 0.0f, AttackType.BOX, 1f, 0, 0, JSoundRegistry.IMPACT_2)
             .setHitspark(2)
             .hyperArmor()
             .setUB(true)
             .setInfo("Stand Disk", "uninterruptable, removes enemy stand for 8s");
-    public static final Attack legcrusher = new Attack(4, 20, 0.75f, 22, 16, 1.75, 7f, 0.25f, AttackType.BOX, 1.6f, 0.2f, 0, JSoundRegister.TW_KICK_HIT)
+    public static final Attack legcrusher = new Attack(4, 20, 0.75f, 22, 16, 1.75, 7f, 0.25f, AttackType.BOX, 1.6f, 0.2f, 0, JSoundRegistry.TW_KICK_HIT)
             .setHitspark(2)
             .setInfo("Leg Crusher", "high stun, medium windup");
-    public static final Attack memorydisk = new Attack(6, 30, 1f, 34, 22, 2, 7f, 0.0f, AttackType.BOX, 1f, 0, 0, JSoundRegister.IMPACT_2)
+    public static final Attack memorydisk = new Attack(6, 30, 1f, 34, 22, 2, 7f, 0.0f, AttackType.BOX, 1f, 0, 0, JSoundRegistry.IMPACT_2)
             .setHitspark(2)
             .hyperArmor()
             .setUB(true)
@@ -48,7 +48,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .setUB(true)
             .crouchingVariation(chargedspew)
             .setInfo("Poison Spew", "fires an acid projectile that slows enemies and persists on the surface it hits for 5s");
-    public static final Attack meltyourheart = new Attack(8, 40, 1f, 50, 40, 2, 3f, 1.0f, AttackType.BOX, 1f, 0, 0, JSoundRegister.IMPACT_2)
+    public static final Attack meltyourheart = new Attack(8, 40, 1f, 50, 40, 2, 3f, 1.0f, AttackType.BOX, 1f, 0, 0, JSoundRegistry.IMPACT_2)
             .hyperArmor()
             .setUB(true)
             .setLaunch()
@@ -95,37 +95,37 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
     public void initBarrage() {
         if (!canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
-            playSound(JSoundRegister.WS_BARRAGE, 1, 1);
+            playSound(JSoundRegistry.WS_BARRAGE, 1, 1);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
         if (handleAttack(donut, JCraft.standHeavyCD, State.DONUT))
-            playSound(JSoundRegister.WS_DONUT, 1, 1);
+            playSound(JSoundRegistry.WS_DONUT, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack()) return;
         if (handleAttack(memorydisk, JCraft.standS1CD, State.DISC))
-            playSound(JSoundRegister.WS_MEMORY_DISC, 1, 1);
+            playSound(JSoundRegistry.WS_MEMORY_DISC, 1, 1);
     }
 
     @Override
     public void initUlt() {
         if (!canAttack()) return;
         if (getRemote() && handleAttack(meltyourheart, JCraft.standUltCD, State.MELT_YOUR_HEART))
-            playSound(JSoundRegister.WS_MYH, 1, 1);
+            playSound(JSoundRegistry.WS_MYH, 1, 1);
         else if (handleAttack(standdisk, JCraft.standUltCD, State.DISC))
-            playSound(JSoundRegister.WS_STAND_DISC, 1, 1);
+            playSound(JSoundRegistry.WS_STAND_DISC, 1, 1);
     }
 
     @Override
     public void initSpecial2() {
         if (!canAttack()) return;
         if (handleAttack(legcrusher, JCraft.standS2CD, State.LEG_CRUSHER))
-            playSound(JSoundRegister.WS_LEGCRUSH, 1, 1);
+            playSound(JSoundRegistry.WS_LEGCRUSH, 1, 1);
     }
 
     @Override
@@ -161,7 +161,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         switch (attack.id) {
             case (3) -> { // Stand Disc
                 for (LivingEntity ent : entities)
-                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.STANDLESS, 160, 0, true, false));
+                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegistry.STANDLESS, 160, 0, true, false));
             }
             case (5) -> { // Poison Spew
                 WSAcidProjectile acidProjectile = new WSAcidProjectile(world, user);
@@ -200,7 +200,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
 
     @Override
     public void tick() {
-        if (age == 1) playSound(JSoundRegister.WS_SUMMON, 1f, 1f);
+        if (age == 1) playSound(JSoundRegistry.WS_SUMMON, 1f, 1f);
         super.tick();
 
         if (!getRemote()) {

@@ -4,7 +4,7 @@ import net.arna.jcraft.JCraft;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.registry.Registry;
 
-public interface JSoundRegister {
+public interface JSoundRegistry {
 
     static SoundEvent registerSound(String id) {
         //JCraft.LOGGER.info("Registering sound: " + id); // Probably unnecessary
@@ -95,6 +95,7 @@ public interface JSoundRegister {
     SoundEvent KQ_BARRAGE = registerSound("kqbarrage");
     SoundEvent KQ_DETONATE = registerSound("kqdetonate");
     SoundEvent KQ_UPPERCUT = registerSound("kquppercut");
+    SoundEvent KQ_EXPLODE = registerSound("kqexplode");
 
     //Killer Queen: Bites The Dust
     SoundEvent KQBTD_ELBOW = registerSound("kqbtdelbow");
@@ -214,7 +215,8 @@ public interface JSoundRegister {
     SoundEvent ANUBIS_REKKA3 = registerSound("anubisrekka3"); //todo: 3 hit rekka sound for anubis
 
     //// OTHER
-    SoundEvent BULLET_LODGE = registerSound("bulletlodge");
+    SoundEvent BULLET_RICOCHET = registerSound("bulletricochet");
+    SoundEvent BULLET_PENETRATE = registerSound("bulletpenetrate");
 
     static void registerSounds() {
 

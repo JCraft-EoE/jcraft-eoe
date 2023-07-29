@@ -15,7 +15,7 @@ import net.minecraft.world.World;
 
 import java.util.function.Function;
 
-public interface JEntityTypeRegister {
+public interface JEntityTypeRegistry {
 
     EntityType<StarPlatinumEntity> STAR_PLATINUM = Registry.register(
             Registry.ENTITY_TYPE,

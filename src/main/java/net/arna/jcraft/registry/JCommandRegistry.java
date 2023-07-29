@@ -3,7 +3,7 @@ package net.arna.jcraft.registry;
 import net.arna.jcraft.common.command.*;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 
-public interface JCommandRegister {
+public interface JCommandRegistry {
     static void registerCommands() {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
             InduceAttackCommand.register(dispatcher, registryAccess, environment);

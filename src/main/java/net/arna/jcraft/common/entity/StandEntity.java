@@ -10,13 +10,11 @@ import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.network.s2c.ComboCounterPacket;
-import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.mixin.LivingEntityInvoker;
-import net.arna.jcraft.registry.JSoundRegister;
-import net.arna.jcraft.registry.JStatusRegister;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.arna.jcraft.registry.JSoundRegistry;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.Entity;
@@ -34,7 +32,6 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.StopSoundS2CPacket;
 import net.minecraft.particle.ParticleTypes;
@@ -189,7 +186,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         return dataTracker.get(RESET);
     }
 
-    private void setReset(boolean reset) {
+    protected void setReset(boolean reset) {
         dataTracker.set(RESET, reset);
     }
 
@@ -436,7 +433,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     public boolean canAttack() {
         if (hasUser()) {
             ITimeStop timeStop = (ITimeStop) getUserOrThrow();
-            return this.getMoveStun() < 1 && timeStop.getTimeStopTicks() < 1 && !getUserOrThrow().hasStatusEffect(JStatusRegister.DAZED);
+            return this.getMoveStun() < 1 && timeStop.getTimeStopTicks() < 1 && !getUserOrThrow().hasStatusEffect(JStatusRegistry.DAZED);
         }
         return false;
     }
@@ -460,7 +457,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if (hasUser()) {
             ITimeStop timeStop = (ITimeStop) getUserOrThrow();
             return new CanAttackData(user, this.getMoveStun() < 1 && timeStop.getTimeStopTicks() < 1 &&
-                    !getUserOrThrow().hasStatusEffect(JStatusRegister.DAZED));
+                    !getUserOrThrow().hasStatusEffect(JStatusRegistry.DAZED));
         }
         return new CanAttackData(null, false);
     }
@@ -506,7 +503,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      */
     public static void stun(LivingEntity entity, int duration, int amplifier) {
         if (entity == null || duration == 0) return;
-        entity.addStatusEffect(new StatusEffectInstance(JStatusRegister.DAZED, duration, amplifier, false, false, true));
+        entity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.DAZED, duration, amplifier, false, false, true));
         //JCraft.LOGGER.info("Stunned: " + entity.getEntityName() + " for: " + duration);
     }
 
@@ -762,7 +759,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
             // Block break check
             if (getStandGauge() < 1) {
-                user.addStatusEffect(new StatusEffectInstance(JStatusRegister.DAZED, 40, 2));
+                user.addStatusEffect(new StatusEffectInstance(JStatusRegistry.DAZED, 40, 2));
                 playSound(SoundEvents.ITEM_TOTEM_USE, 1, 0.5f);
                 kill();
             }
@@ -907,7 +904,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                                     cancelAttack();
                                     stand.cancelAttack();
                                     Vec3d midPos = stand.getPos().add(getPos()).multiply(0.5);
-                                    this.world.playSound(null, midPos.x, midPos.y, midPos.z, JSoundRegister.IMPACT_1, SoundCategory.NEUTRAL, 1, 0.5f);
+                                    this.world.playSound(null, midPos.x, midPos.y, midPos.z, JSoundRegistry.IMPACT_1, SoundCategory.NEUTRAL, 1, 0.5f);
                                 }
                                 continue;
                             }
@@ -918,8 +915,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                         }
 
                         for (LivingEntity livingEntity : clashed) {
-                            livingEntity.removeStatusEffect(JStatusRegister.DAZED);
-                            livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegister.DAZED, 10, 3, true, false));
+                            livingEntity.removeStatusEffect(JStatusRegistry.DAZED);
+                            livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.DAZED, 10, 3, true, false));
                         }
                     }
 
@@ -1066,7 +1063,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if (comboCounter.getLastAttacked() != victim)
             comboCounter.jcraft$setComboCount(1);
         else {
-            StatusEffectInstance stun = victim.getStatusEffect(JStatusRegister.DAZED);
+            StatusEffectInstance stun = victim.getStatusEffect(JStatusRegistry.DAZED);
             if (stun != null && stun.getAmplifier() != 2) //LOGGER.info("Target stun: " + stun.getDuration());
                 comboCounter.jcraft$incrementComboCount();
             else
@@ -1099,7 +1096,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 // Counter check
                 if (!tsHit && standAttack.attackType == AttackType.COUNTER && stand.getMoveStun() < (standAttack.moveStun - standAttack.initTime)) {
                     stand.counter(attacker, source);
-                    ent.removeStatusEffect(JStatusRegister.DAZED);
+                    ent.removeStatusEffect(JStatusRegistry.DAZED);
                     return;
                 }
 
@@ -1116,7 +1113,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 } else if (!unblockable) {
                     stand.setMoveStun(blockstun);
                     stand.setStandGauge(stand.getStandGauge() - 2 * damage);
-                    stand.playSound(JSoundRegister.STAND_BLOCK, 1, 1);
+                    stand.playSound(JSoundRegistry.STAND_BLOCK, 1, 1);
                     hit = false;
                 } else {
                     stand.blocking = false;
@@ -1140,9 +1137,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         IDamageScaler damageScaler = (IDamageScaler) ent;
 
         if (hit) {
-            if (ent.hasStatusEffect(JStatusRegister.DAZED) && ent.getStatusEffect(JStatusRegister.DAZED).getAmplifier() != 2) {
+            if (ent.hasStatusEffect(JStatusRegistry.DAZED) && ent.getStatusEffect(JStatusRegistry.DAZED).getAmplifier() != 2) {
                 damageScaler.jcraft$increaseHitCount();
-                if (overrideStun) ent.removeStatusEffect(JStatusRegister.DAZED);
+                if (overrideStun) ent.removeStatusEffect(JStatusRegistry.DAZED);
             }
 
             stun(ent, stunTicks, stunLevel);
@@ -1180,7 +1177,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         super.stopRiding();
         if (getRemote() || world.isClient) return;
 
-        playSound(JSoundRegister.STAND_DESUMMON, 1, 1);
+        playSound(JSoundRegistry.STAND_DESUMMON, 1, 1);
         discard();
     }
 
@@ -1285,14 +1282,14 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         //JCraft.LOGGER.info("Want to block: " + wantToBlock);
         stand.blocking = wantToBlock && stand.canAttack();
 
-        StatusEffectInstance mobStun = mob.getStatusEffect(JStatusRegister.DAZED);
+        StatusEffectInstance mobStun = mob.getStatusEffect(JStatusRegistry.DAZED);
         // If stunned, and about to get hit by another move, combo break sometimes
         if (mobStun != null)
             if (!stand.blocking && enemyAttack != null && enemyMoveStun > enemyAttack.initTime && stand.random.nextFloat() < 0.1f)
                 comboBreak((ServerWorld) stand.world, mob, mobStun);
 
         if (!stand.blocking) {
-            StatusEffectInstance stun = target.getStatusEffect(JStatusRegister.DAZED);
+            StatusEffectInstance stun = target.getStatusEffect(JStatusRegistry.DAZED);
             // Overestimating stun up to 1/4 of a second for longer combos and frametraps
             int stunTicks = stun != null ? stun.getDuration() + stand.random.nextInt(5) : 0;
             stunTicks += blockPlusTicks;

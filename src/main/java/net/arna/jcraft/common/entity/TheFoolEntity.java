@@ -7,10 +7,10 @@ import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.*;
-import net.arna.jcraft.registry.JEntityTypeRegister;
+import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.arna.jcraft.registry.JObjectRegistry;
-import net.arna.jcraft.registry.JSoundRegister;
-import net.arna.jcraft.registry.JStatusRegister;
+import net.arna.jcraft.registry.JSoundRegistry;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.block.BlockState;
@@ -51,22 +51,22 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.State> {
-    public static final Attack light = new Attack(0, JCraft.lightCooldown, 1.5f, 14, 7, 2, 6f, 0.8f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_2)
+    public static final Attack light = new Attack(0, JCraft.lightCooldown, 1.5f, 14, 7, 2, 6f, 0.8f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegistry.IMPACT_2)
             .appendHitbox(new HitBoxData(0, 0.25, 1))
             .setInfo("Swipe", "slow, long-reaching poke");
     public static final Attack airbarrage = new Attack(3, 17, 1f, 30, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 0.5f, 0, 3)
             .setInfo("Burn Rubber", "slows down all movement, combo starter/extender");
-    public static final Attack combo = new Attack(2, 15, 1.5f, 29, 0, 1.75, 4.5f, 0.1f, AttackType.MULTIHIT, 1f, -0.1f, List.of(6, 14, 18, 19), JSoundRegister.IMPACT_2)
+    public static final Attack combo = new Attack(2, 15, 1.5f, 29, 0, 1.75, 4.5f, 0.1f, AttackType.MULTIHIT, 1f, -0.1f, List.of(6, 14, 18, 19), JSoundRegistry.IMPACT_2)
             .appendHitbox(new HitBoxData(0.5, 0, 1.25))
             .aerialVariation(airbarrage)
             .setInfo("3-hit Combo", "fast knockdown provider");
-    public static final Attack launch = new Attack(1, 16, 1.25f, 20, 16, 2, 8f, 0.5f, AttackType.BOX, 1.25f, -0.3f, 0, JSoundRegister.IMPACT_2)
+    public static final Attack launch = new Attack(1, 16, 1.25f, 20, 16, 2, 8f, 0.5f, AttackType.BOX, 1.25f, -0.3f, 0, JSoundRegistry.IMPACT_2)
             .appendHitbox(new HitBoxData(1.5))
             .setHitspark(2)
             .hyperArmor()
             .setInfo("Launch", "uninterruptable, slow, launching uppercut");
-    public static final Attack slam = new Attack(10, 0, 1.25f, 10, 4, 2, 4f, 0.2f, AttackType.BOX, 1.2f, 0.1f, 0, JSoundRegister.IMPACT_2);
-    public static final Attack pound = new Attack(4, 18, 1.25f, 22, 7, 1.5, 4f, 0.1f, AttackType.BOX, 1.25f, -0.1f, 0, JSoundRegister.IMPACT_2)
+    public static final Attack slam = new Attack(10, 0, 1.25f, 10, 4, 2, 4f, 0.2f, AttackType.BOX, 1.2f, 0.1f, 0, JSoundRegistry.IMPACT_2);
+    public static final Attack pound = new Attack(4, 18, 1.25f, 22, 7, 1.5, 4f, 0.1f, AttackType.BOX, 1.25f, -0.1f, 0, JSoundRegistry.IMPACT_2)
             .setLift(false)
             .setFollowup(slam)
             .setInfo("Pound", """
@@ -89,13 +89,13 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     public static final Attack tornado = new Attack(11, 25, 1, 13, 12, 0, 0f, 0.0f, AttackType.BOX)
             .setRanged(true)
             .setInfo("Sand Tornado", "summons a slow, stunning sand tornado");
-    public static final Attack charge = new Attack(5, 20, 7f, 20, 5, 1.5, 6f, 1.2f, AttackType.CHARGE, 0.5f, 0, State.CHARGE_HIT.ordinal(), JSoundRegister.IMPACT_2)
+    public static final Attack charge = new Attack(5, 20, 7f, 20, 5, 1.5, 6f, 1.2f, AttackType.CHARGE, 0.5f, 0, State.CHARGE_HIT.ordinal(), JSoundRegistry.IMPACT_2)
             .setRanged(true)
             .setLaunch()
             .disableBackstab()
             .aerialVariation(tornado)
             .setInfo("Charge", "The Fool detaches from the user and charges forward, dealing knockback on hit");
-    public static final Attack sandstorm = new Attack(7, 40, 1.5f, 41, 28, 2, 7f, 0.1f, AttackType.BOX, 1, 0, 0, JSoundRegister.TW_KICK_HIT)
+    public static final Attack sandstorm = new Attack(7, 40, 1.5f, 41, 28, 2, 7f, 0.1f, AttackType.BOX, 1, 0, 0, JSoundRegistry.TW_KICK_HIT)
             .appendHitbox(new HitBoxData(1.5))
             .setHitspark(2)
             .hyperArmor()
@@ -226,7 +226,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
         if (!canAttack()) return;
         if (handleAttack(launch, JCraft.standHeavyCD, State.LAUNCH)) {
             setSand(true);
-            playSound(JSoundRegister.FOOL_LAUNCH, 1, 1);
+            playSound(JSoundRegistry.FOOL_LAUNCH, 1, 1);
         }
     }
 
@@ -234,20 +234,20 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     public void initUlt() {
         if (!canAttack()) return;
         if (handleAttack(sandstorm, JCraft.standUltCD, State.SANDSTORM))
-            playSound(JSoundRegister.FOOL_ULT, 1, 1);
+            playSound(JSoundRegistry.FOOL_ULT, 1, 1);
     }
 
     private void initSlam(int type) {
         slamType = type;
         setAttack(slam, State.POUND_DOWN);
-        playSound(JSoundRegister.FOOL_BARK1, 1, 1);
+        playSound(JSoundRegistry.FOOL_BARK1, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (curAttack != null && curAttack.id == pound.id && getMoveStun() < 12) initSlam(1);
         if (canAttack() && handleAttack(pound, JCraft.standS1CD, State.POUND_UP))
-            playSound(JSoundRegister.FOOL_BARK2, 1, 1);
+            playSound(JSoundRegistry.FOOL_BARK2, 1, 1);
     }
 
     @Override
@@ -257,10 +257,10 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
         if (!canAttack()) return;
 
         if (getUser() != null && getUser().isOnGround() && handleAttack(charge, JCraft.standS2CD, State.CHARGE))
-            playSound(JSoundRegister.FOOL_CHARGE, 1, 1);
+            playSound(JSoundRegistry.FOOL_CHARGE, 1, 1);
         else if (handleAttack(tornado, JCraft.standS2CD, State.TORNADO)) {
             setSand(true);
-            playSound(JSoundRegister.FOOL_LAUNCH, 1, 1);
+            playSound(JSoundRegistry.FOOL_LAUNCH, 1, 1);
         }
     }
 
@@ -282,12 +282,12 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             setWave(true);
             setFree(false);
 
-            playSound(JSoundRegister.FOOL_BARK1, 1, 1);
+            playSound(JSoundRegistry.FOOL_BARK1, 1, 1);
         } else if (handleAttack(glide, JCraft.utilCD, State.GLIDE)) {
             setSand(true);
             setFree(false);
 
-            playSound(JSoundRegister.FOOL_GLIDE, 1, 1);
+            playSound(JSoundRegistry.FOOL_GLIDE, 1, 1);
         }
     }
 
@@ -302,7 +302,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
         LivingEntity user = getUser();
         if (hasUser()) {
             ITimeStop timeStop = Objects.requireNonNull((ITimeStop) user);
-            if (timeStop.getTimeStopTicks() > 0 || user.hasStatusEffect(JStatusRegister.DAZED)) return false;
+            if (timeStop.getTimeStopTicks() > 0 || user.hasStatusEffect(JStatusRegistry.DAZED)) return false;
             if (curAttack != null && curAttack.id == glide.id) return true;
             return getMoveStun() < 1;
         }
@@ -337,7 +337,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             case (2) -> {
                 if (this.getMoveStun() < 11)
                     for (LivingEntity ent : entities)
-                        ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 20, 0));
+                        ent.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 20, 0));
             }
             case (4) -> {
                 for (LivingEntity ent : entities) {
@@ -447,7 +447,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             }
             case (8) -> {
                 for (LivingEntity ent : entities)
-                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 15, 0));
+                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 15, 0));
             }
             case (9) -> setSand(false); // Ends transformation state
             case (10) -> {
@@ -474,7 +474,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
                 }
             }
             case (11) -> {
-                SandTornadoEntity sandTornado = new SandTornadoEntity(JEntityTypeRegister.SAND_TORNADO, world);
+                SandTornadoEntity sandTornado = new SandTornadoEntity(JEntityTypeRegistry.SAND_TORNADO, world);
                 sandTornado.setMaster(user);
                 sandTornado.refreshPositionAndAngles(getX(), getY() + 1.5, getZ(), getYaw(), getPitch());
                 world.spawnEntity(sandTornado);
@@ -522,7 +522,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
 
     @Override
     public void tick() {
-        if (age == 1) playSound(JSoundRegister.STAND_SUMMON, 1f, 1f);
+        if (age == 1) playSound(JSoundRegistry.STAND_SUMMON, 1f, 1f);
 
         super.tick();
 

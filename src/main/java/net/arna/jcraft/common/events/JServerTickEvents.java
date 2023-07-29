@@ -5,7 +5,7 @@ import net.arna.jcraft.JCraft.DashData;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.*;
-import net.arna.jcraft.registry.JStatusRegister;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.block.Blocks;
@@ -144,7 +144,7 @@ public class JServerTickEvents {
                 continue;
             }
 
-            player.removeStatusEffect(JStatusRegister.DAZED);
+            player.removeStatusEffect(JStatusRegistry.DAZED);
             stun(player, 10, 1);
             Vec3d pPos = player.getEyePos();
             List<? extends Entity> toPush = JUtils.generateHitbox(player.world, pPos, 4, Entity.class, filter);
@@ -315,7 +315,7 @@ public class JServerTickEvents {
         for (LivingEntity ent : toDamage) {
             ent.damage(explosion.getDamageSource(), 7);
             StandEntity.stun(ent, 10, 3);
-            ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0));
+            ent.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0));
         }
     }
 }

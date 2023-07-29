@@ -10,8 +10,8 @@ import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
-import net.arna.jcraft.registry.JSoundRegister;
-import net.arna.jcraft.registry.JStatusRegister;
+import net.arna.jcraft.registry.JSoundRegistry;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -45,19 +45,19 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     // placeholder sound
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 8, 5, 1.5, 4f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, SoundEvents.ITEM_TRIDENT_HIT)
             .setInfo("Slice", "quick combo starter");
-    public static final Attack barrage = new Attack(2, 17, 0.85f, 32, 0, 2, 1.5f, 0.1f, AttackType.BARRAGE, 0.5f, 0, 3, JSoundRegister.IMPACT_1)
+    public static final Attack barrage = new Attack(2, 17, 0.85f, 32, 0, 2, 1.5f, 0.1f, AttackType.BARRAGE, 0.5f, 0, 3, JSoundRegistry.IMPACT_1)
             .setInfo("Barrage", "short, knocks back");
     public static final Attack speedslice = new Attack(7, 18, 1.25f, 11, 10, 0, 6f, 0.5f, AttackType.BOX, 1f, 0, 0)
             .setRanged(true)
             .setMobility(MobilityType.TELEPORT)
             .setInfo("Speed Slice", "short windup, harming teleport with hitstun and light knockback");
-    public static final Attack legcrusher = new Attack(3, 16, 0.85f, 17, 8, 1.5, 7f, 0.25f, AttackType.BOX, 1.5f, 0.2f, 0, JSoundRegister.TW_KICK_HIT)
+    public static final Attack legcrusher = new Attack(3, 16, 0.85f, 17, 8, 1.5, 7f, 0.25f, AttackType.BOX, 1.5f, 0.2f, 0, JSoundRegistry.TW_KICK_HIT)
             .appendHitbox(new HitBoxData(0, -0.5, 1))
             .setInfo("Leg Crusher", "combo starter/extender, mih hoofs the enemies legs in a quick, stunning attack");
-    public static final Attack furychop = new Attack(4, 19, 0.85f, 24, 15, 1.6, 7f, 0.25f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegister.IMPACT_2)
+    public static final Attack furychop = new Attack(4, 19, 0.85f, 24, 15, 1.6, 7f, 0.25f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegistry.IMPACT_2)
             .setHitspark(2)
             .setInfo("Fury Chop", "combo extender, on hit gives haste(8s) to user and mining fatigue(8s) to victim, on whiff the fatigue goes to user");
-    public static final Attack donut = new Attack(1, 23, 0.75f, 32, 26, 2.5, 8.5f, 0.0f, AttackType.BOX, 3f, 0.2f, 0, JSoundRegister.IMPACT_4)
+    public static final Attack donut = new Attack(1, 23, 0.75f, 32, 26, 2.5, 8.5f, 0.0f, AttackType.BOX, 3f, 0.2f, 0, JSoundRegistry.IMPACT_4)
             .hyperArmor()
             .setHitspark(2)
             .setInfo("Roundabout Donut", "feigns stand desummon, uninterruptable combo starter");
@@ -172,28 +172,28 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     public void initBarrage() {
         if (!canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
-            playSound(JSoundRegister.MIH_BARRAGE, 1, 1);
+            playSound(JSoundRegistry.MIH_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack()) return;
         if (handleAttack(legcrusher, JCraft.standS1CD, State.LEG_CRUSHER))
-            playSound(JSoundRegister.MIH_LEGCRUSHER, 1, 1);
+            playSound(JSoundRegistry.MIH_LEGCRUSHER, 1, 1);
     }
 
     @Override
     public void initUlt() {
         if (!canAttack()) return;
         if (handleAttack(timeaccel, JCraft.standUltCD, State.TIME_ACCELERATION))
-            playSound(JSoundRegister.MIH_TACCEL, 1, 1);
+            playSound(JSoundRegistry.MIH_TACCEL, 1, 1);
     }
 
     @Override
     public void initSpecial2() {
         if (!canAttack()) return;
         if (handleAttack(furychop, JCraft.standS2CD, State.FURY_CHOP))
-            playSound(JSoundRegister.MIH_FURYCHOP, 1, 1);
+            playSound(JSoundRegistry.MIH_FURYCHOP, 1, 1);
     }
 
     @Override
@@ -201,7 +201,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
         if (!canAttack()) return;
         LivingEntity user = getUserOrThrow();
         if (user.isSneaking() && handleAttack(judgement, JCraft.standS3CD, State.JUDGEMENT)) {
-            playSound(JSoundRegister.MIH_JUDGEMENT, 1, 1);
+            playSound(JSoundRegistry.MIH_JUDGEMENT, 1, 1);
             return;
         }
 
@@ -215,7 +215,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             circleTarget = target;
             circleOrbitProg = user.getHeadYaw();
             setTargetId(circleTarget.getId());
-            playSound(JSoundRegister.MIH_CIRCLE, 1f, 1f);
+            playSound(JSoundRegistry.MIH_CIRCLE, 1f, 1f);
         }
     }
 
@@ -224,7 +224,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     public void initUtil() {
         if (!canAttack()) return;
         if (handleAttack(speedslice, JCraft.utilCD, State.SPEED_SLICE))
-            playSound(JSoundRegister.MIH_SPEEDSLICE, 1, 1);
+            playSound(JSoundRegistry.MIH_SPEEDSLICE, 1, 1);
     }
 
     @Override
@@ -244,7 +244,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
         return true;
     }
 
-    private static final Attack barrageFinisher = new Attack(8, 17, 0.85f, 9, 6, 1.5, 1f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegister.TW_KICK_HIT)
+    private static final Attack barrageFinisher = new Attack(8, 17, 0.85f, 9, 6, 1.5, 1f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegistry.TW_KICK_HIT)
             .setHitspark(2)
             .setLaunch()
             .setInfo("Barrage (Final Hit)", "");
@@ -348,7 +348,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             damageLogic(world, target, kbVec.multiply(kb).add(0, kb / 4, 0), 20, 1, false, damage, true, (int) (4 + damage), playerSource, player);
         }
 
-        playSound(JSoundRegister.MIH_ZOOM, 1f, 1f);
+        playSound(JSoundRegistry.MIH_ZOOM, 1f, 1f);
     }
 
     private void createSpeedParticles(Entity entity) {
@@ -363,7 +363,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
 
     @Override
     public void tick() {
-        if (age == 1) playSound(JSoundRegister.MIH_SUMMON, 1f, 1f);
+        if (age == 1) playSound(JSoundRegistry.MIH_SUMMON, 1f, 1f);
         super.tick();
 
         if (!hasUser()) return;
@@ -432,7 +432,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             if (circleTime == 1) endCircle();
 
             // Time Accel handling
-            boolean userIsStunned = user.hasStatusEffect(JStatusRegister.DAZED);
+            boolean userIsStunned = user.hasStatusEffect(JStatusRegistry.DAZED);
             setAccelTime(aTime - 1);
 
             if (aTime > 1) {
@@ -450,7 +450,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                 toCatch.remove(user);
 
                 for (LivingEntity entity : toCatch) // 15s of Standless to any victims of Time Acceleration
-                    entity.addStatusEffect(new StatusEffectInstance(JStatusRegister.STANDLESS, 300, 0, true, false));
+                    entity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.STANDLESS, 300, 0, true, false));
 
                 setAfterimage(false);
             }

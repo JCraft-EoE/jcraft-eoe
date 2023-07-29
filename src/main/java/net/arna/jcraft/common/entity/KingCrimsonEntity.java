@@ -14,8 +14,8 @@ import net.arna.jcraft.common.util.ITimeStop;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JPacketRegistry;
-import net.arna.jcraft.registry.JSoundRegister;
-import net.arna.jcraft.registry.JStatusRegister;
+import net.arna.jcraft.registry.JSoundRegistry;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -54,11 +54,11 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimsonEntity.State> {
-    public static final Attack crm1 = new Attack(11, JCraft.lightCooldown + 1, 0.85f, 20, 10, 1.5, 5f, 0.1f, AttackType.BOX, 1f, 0.3f, 0, JSoundRegister.IMPACT_4)
+    public static final Attack crm1 = new Attack(11, JCraft.lightCooldown + 1, 0.85f, 20, 10, 1.5, 5f, 0.1f, AttackType.BOX, 1f, 0.3f, 0, JSoundRegistry.IMPACT_4)
             .setBlockstun(6)
             .appendHitbox(new HitBoxData(0, 0, 1))
             .setInfo("Sweep", "quick combo finisher, knocks down");
-    public static final Attack light = new Attack(0, JCraft.lightCooldown + 1, 0.85f, 23, 0, 1.5, 4f, 0.1f, AttackType.MULTIHIT, 2f, -0.1f, List.of(10, 16), JSoundRegister.IMPACT_4)
+    public static final Attack light = new Attack(0, JCraft.lightCooldown + 1, 0.85f, 23, 0, 1.5, 4f, 0.1f, AttackType.MULTIHIT, 2f, -0.1f, List.of(10, 16), JSoundRegistry.IMPACT_4)
             .crouchingVariation(crm1)
             .setInfo("Dual Chop", "quick combo starter");
     public static final Attack barrage = new Attack(3, 17, 0.85f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3)
@@ -169,22 +169,22 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
         if (getUserOrThrow().isSneaking())
             handleAttack(crm1, JCraft.standLightCD, State.SWEEP);
         else if (handleAttack(light, JCraft.standLightCD, State.DUAL_CHOP))
-            playSound(JSoundRegister.KC_DUAL_CHOP, 1, 1);
+            playSound(JSoundRegistry.KC_DUAL_CHOP, 1, 1);
     }
 
     @Override
     public void initHeavyAttack() {
-        if (!hasUser() || getUserOrThrow().hasStatusEffect(JStatusRegister.DAZED)) return;
+        if (!hasUser() || getUserOrThrow().hasStatusEffect(JStatusRegistry.DAZED)) return;
 
         boolean idling = getMoveStun() < 1;
 
         if (curAttack != heavy) {
             if (idling && handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY)) {
-                playSound(JSoundRegister.KC_HEAVY, 1, 1);
+                playSound(JSoundRegistry.KC_HEAVY, 1, 1);
             }
         } else if (getMoveStun() < 7) {
             setAttack(overhead, State.OVERHEAD);
-            playSound(JSoundRegister.KC_HEAVY2, 1, 1);
+            playSound(JSoundRegistry.KC_HEAVY2, 1, 1);
         }
     }
 
@@ -192,7 +192,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     public void initBarrage() {
         if (!canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
-            playSound(JSoundRegister.KC_BARRAGE, 1, 1);
+            playSound(JSoundRegistry.KC_BARRAGE, 1, 1);
     }
 
     @Override
@@ -200,7 +200,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
         if (!canAttack() || !hasUser()) return;
         if (getUserOrThrow().isSneaking() && handleAttack(bloodthrow, JCraft.standS1CD, State.BLOOD_THROW))
             getUserOrThrow().damage(DamageSource.MAGIC, 0.1f);
-        else if (handleAttack(eyechop, JCraft.standS1CD, State.EYE_CHOP)) playSound(JSoundRegister.KC_EYE_CHOP, 1, 1);
+        else if (handleAttack(eyechop, JCraft.standS1CD, State.EYE_CHOP)) playSound(JSoundRegistry.KC_EYE_CHOP, 1, 1);
     }
 
     private void beginPrediction() {
@@ -255,7 +255,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
 
         if (handleAttack(timeerase, JCraft.standUltCD, State.TIME_ERASE)) {
             if (getUser() instanceof ServerPlayerEntity player)
-                player.networkHandler.sendPacket(new PlaySoundS2CPacket(JSoundRegister.TIME_ERASE, SoundCategory.PLAYERS, getX(), getY(), getZ(), 1, 1, 0));
+                player.networkHandler.sendPacket(new PlaySoundS2CPacket(JSoundRegistry.TIME_ERASE, SoundCategory.PLAYERS, getX(), getY(), getZ(), 1, 1, 0));
         }
     }
 
@@ -263,7 +263,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     public void initSpecial2() {
         if (!canAttack()) return;
         if (handleAttack(donut, JCraft.standS2CD, State.DONUT))
-            playSound(JSoundRegister.KC_DONUT, 1, 1);
+            playSound(JSoundRegistry.KC_DONUT, 1, 1);
     }
 
     @Override
@@ -271,7 +271,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
         if (hasUser()) {
             LivingEntity user = getUserOrThrow();
             ITimeStop timeStop = (ITimeStop) user;
-            if (user.hasStatusEffect(JStatusRegister.DAZED) || timeStop.getTimeStopTicks() > 0)
+            if (user.hasStatusEffect(JStatusRegistry.DAZED) || timeStop.getTimeStopTicks() > 0)
                 return;
 
             NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
@@ -282,7 +282,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                     handleAttack(epitaph, JCraft.standS3CD, State.EPITAPH);
                 else if (handleAttack(prediction, JCraft.standS3CD, State.PREDICT)) {
                     predictionInfo.clear();
-                    playSound(JSoundRegister.KC_EPITAPH, 1, 1);
+                    playSound(JSoundRegistry.KC_EPITAPH, 1, 1);
 
                     // Send epitaph state start
                     if (user instanceof ServerPlayerEntity player)
@@ -354,10 +354,10 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
         switch (attack.id) {
-            case (-2) -> timeSkip(16, JSoundRegister.TE_TP);
+            case (-2) -> timeSkip(16, JSoundRegistry.TE_TP);
             case (2), (11) -> {
                 for (LivingEntity ent : entities)
-                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0));
+                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0));
             }
             case (3) -> {
                 if (getMoveStun() < 4)
@@ -499,7 +499,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                 stand.cancelAttack();
         }
 
-        world.playSound(null, ePos.x, ePos.y, ePos.z, JSoundRegister.TE_TP, SoundCategory.PLAYERS, 1f, 1f);
+        world.playSound(null, ePos.x, ePos.y, ePos.z, JSoundRegistry.TE_TP, SoundCategory.PLAYERS, 1f, 1f);
     }
 
     private static final Attack counterMiss = new Attack(8, 0, 20, 21, -1, AttackType.BOX);
@@ -508,7 +508,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     public void whiffCounter() {
         setAttack(counterMiss, State.COUNTER_MISS);
         stun(getUser(), counterMiss.moveStun, 0);
-        playSound(JSoundRegister.KC_RAGE, 1, 1);
+        playSound(JSoundRegistry.KC_RAGE, 1, 1);
     }
 
     @Override
@@ -548,7 +548,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
 
     @Override
     public void tick() {
-        if (age == 1) playSound(JSoundRegister.KC_SUMMON, 1f, 1f);
+        if (age == 1) playSound(JSoundRegistry.KC_SUMMON, 1f, 1f);
         super.tick();
 
         LivingEntity user = this.getUser();
@@ -598,7 +598,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                 user.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 10, 9, true, false));
                 user.addStatusEffect(new StatusEffectInstance(StatusEffects.INVISIBILITY, 10, 0, true, false));
                 // Inability to be stunned
-                user.removeStatusEffect(JStatusRegister.DAZED);
+                user.removeStatusEffect(JStatusRegistry.DAZED);
                 // Inability to be hit (by projectiles)
                 Box noBox = new Box(0, 0, 0, 0, 0, 0);
                 user.setBoundingBox(noBox);
@@ -607,7 +607,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                 if (getTETime() < 1) {
                     // Play exit noise
                     if (userIsPlayer)
-                        playerEntity.networkHandler.sendPacket(new PlaySoundS2CPacket(JSoundRegister.TIME_ERASE_EXIT, SoundCategory.PLAYERS, getX(), getY(), getZ(), 1, 1, 0));
+                        playerEntity.networkHandler.sendPacket(new PlaySoundS2CPacket(JSoundRegistry.TIME_ERASE_EXIT, SoundCategory.PLAYERS, getX(), getY(), getZ(), 1, 1, 0));
 
                     /* Return targets to position
                     for (TimeEraseData timeEraseData : timeEraseInfo) {

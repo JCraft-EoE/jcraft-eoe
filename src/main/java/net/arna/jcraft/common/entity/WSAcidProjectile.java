@@ -3,8 +3,8 @@ package net.arna.jcraft.common.entity;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.registry.JEntityTypeRegister;
-import net.arna.jcraft.registry.JStatusRegister;
+import net.arna.jcraft.registry.JEntityTypeRegistry;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -79,7 +79,7 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
     }
 
     public WSAcidProjectile(World world, LivingEntity owner) {
-        super(JEntityTypeRegister.WS_ACID_PROJECTILE, owner, world);
+        super(JEntityTypeRegistry.WS_ACID_PROJECTILE, owner, world);
         setSound(SoundEvents.BLOCK_SLIME_BLOCK_FALL);
         setOwner(owner);
         pickupType = PickupPermission.DISALLOWED;
@@ -112,7 +112,7 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
             if (entity instanceof StandEntity<?, ?> stand && stand.hasUser())
                 target = stand.getUserOrThrow();
             damageLogic(world, target, Vec3d.ZERO, 10, 1, false, 5f, false, 6, DamageSource.thrownProjectile(this, owner), owner);
-            target.addStatusEffect(new StatusEffectInstance(JStatusRegister.WSPOISON, 60, 0, false, true));
+            target.addStatusEffect(new StatusEffectInstance(JStatusRegistry.WSPOISON, 60, 0, false, true));
             discard();
         }
 
@@ -179,7 +179,7 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
                 else except = List.of(owner);
 
                 for (LivingEntity living : JUtils.generateHitbox(world, getPos(), 1.5, except)) {
-                    living.addStatusEffect(new StatusEffectInstance(JStatusRegister.WSPOISON, 20, 0, true, false));
+                    living.addStatusEffect(new StatusEffectInstance(JStatusRegistry.WSPOISON, 20, 0, true, false));
                     living.damage(JDamageSources.whitesnakePoison(owner), 2f);
                 }
             }

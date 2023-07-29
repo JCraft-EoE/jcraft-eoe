@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.entity;
 
-import net.arna.jcraft.registry.JEntityTypeRegister;
+import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -30,7 +30,7 @@ public class BloodProjectile extends PersistentProjectileEntity implements IAnim
     }
 
     public BloodProjectile(World world, LivingEntity owner) {
-        super(JEntityTypeRegister.BLOOD_PROJECTILE, owner, world);
+        super(JEntityTypeRegistry.BLOOD_PROJECTILE, owner, world);
         this.setSound(SoundEvents.BLOCK_SLIME_BLOCK_FALL);
         this.setOwner(owner);
     }

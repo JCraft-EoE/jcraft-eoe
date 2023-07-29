@@ -7,8 +7,8 @@ import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
-import net.arna.jcraft.registry.JSoundRegister;
-import net.arna.jcraft.registry.JStatusRegister;
+import net.arna.jcraft.registry.JSoundRegistry;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.LivingEntity;
@@ -34,31 +34,32 @@ import net.minecraft.world.World;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static net.arna.jcraft.common.attack.Attack.unusable;
 
 public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
-    public static final Attack crm1 = new Attack(14, JCraft.lightCooldown, 0.75f, 15, 9, 1.75, 5f, 0.75f, AttackType.BOX, 1f, 0.3f, 0, JSoundRegister.IMPACT_3)
+    public static final Attack crm1 = new Attack(14, JCraft.lightCooldown, 0.75f, 15, 9, 1.75, 5f, 0.75f, AttackType.BOX, 1f, 0.3f, 0, JSoundRegistry.IMPACT_3)
             .setInfo("Bite", "applies Slowness II (2s) on hit");
-    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 14, 6, 1.5, 5f, 0.75f, AttackType.BOX, 1f, 0.1f, 0, JSoundRegister.IMPACT_3)
+    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 14, 6, 1.5, 5f, 0.75f, AttackType.BOX, 1f, 0.1f, 0, JSoundRegistry.IMPACT_3)
             .crouchingVariation(crm1)
             .setInfo("Punch", "quick combo starter");
-    public static final Attack heavy = new Attack(1, 14, 1f, 30, 20, 1.5, 10f, 0.1f, AttackType.BOX, 2, 0, 0, JSoundRegister.IMPACT_3)
+    public static final Attack heavy = new Attack(1, 14, 1f, 30, 20, 1.5, 10f, 0.1f, AttackType.BOX, 2, 0, 0, JSoundRegistry.IMPACT_3)
             .setHitspark(2)
             .hyperArmor()
             .setInfo("Vertical Chop", "slow, uninterruptable combo starter");
-    public static final Attack combo = new Attack(2, 17, 0.75f, 36, 0, 2.0, 7f, 0.1f, AttackType.MULTIHIT, 1, 0, List.of(10, 17, 25), JSoundRegister.IMPACT_3)
+    public static final Attack combo = new Attack(2, 17, 0.75f, 36, 0, 2.0, 7f, 0.1f, AttackType.MULTIHIT, 1, 0, List.of(10, 17, 25), JSoundRegistry.IMPACT_3)
             .setInfo("3-hit Combo", "medium windup, good stun");
     public static final Attack grab = new Attack(3, 20, 1f, 20, 8, 1.5, 3f, 0f, AttackType.BOX, 1.5f, 0, 0)
             .setGrab()
             .setInfo("Grab", "unblockable, knocks back");
     public static final Attack grabhit = new Attack(4, 0, 1f, 20, 13, 2.0, 6f, 1.5f, AttackType.BOX, 0.25f)
             .setLaunch();
-    public static final Attack charge = new Attack(5, 20, 4f, 13, 5, 1.5, 8f, 0.25f, AttackType.CHARGE, 1, 0, State.CHARGE_HIT.ordinal(), JSoundRegister.IMPACT_3)
+    public static final Attack charge = new Attack(5, 20, 4f, 13, 5, 1.5, 8f, 0.25f, AttackType.CHARGE, 1, 0, State.CHARGE_HIT.ordinal(), JSoundRegistry.IMPACT_3)
             .setRanged(true)
             .setInfo("Charge", "3.5 block range, combo starter/extender");
-    public static final Attack destroy = new Attack(6, 25, 1f, 30, 21, 2, 0f, 1.25f, AttackType.BOX, 0f, 0f, 0, JSoundRegister.IMPACT_5)
+    public static final Attack destroy = new Attack(6, 25, 1f, 30, 21, 2, 0f, 1.25f, AttackType.BOX, 0f, 0f, 0, JSoundRegistry.IMPACT_5)
             .setHitspark(2)
             .hyperArmor()
             .setUB(false)
@@ -71,12 +72,12 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public static final Attack exit = new Attack(9, 2, 15, 5, 0, 0f, AttackType.BOX)
             .setInfo("Exit Cream", "cream and its user return from the void");
 
-    public static final Attack balllight = new Attack(10, 2, 0.1f, 14, 7, 2, 5f, 0.75f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegister.IMPACT_3)
+    public static final Attack balllight = new Attack(10, 2, 0.1f, 14, 7, 2, 5f, 0.75f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegistry.IMPACT_3)
             .setInfo("Swipe", "quick air-to-ground poke");
-    public static final Attack ballheavy = new Attack(11, 14, 0.1f, 20, 14, 2, 9f, 1.25f, AttackType.BOX, 0.75f, 0.3f, 0, JSoundRegister.TW_KICK_HIT)
+    public static final Attack ballheavy = new Attack(11, 14, 0.1f, 20, 14, 2, 9f, 1.25f, AttackType.BOX, 0.75f, 0.3f, 0, JSoundRegistry.TW_KICK_HIT)
             .setHitspark(2).hyperArmor().setLaunch()
             .setInfo("Overhead Smash", "slow, uninterruptable launcher");
-    public static final Attack ballcombo = new Attack(12, 14, 0.1f, 36, 0, 2, 7f, 0.1f, AttackType.MULTIHIT, 0.75f, 0.3f, List.of(10, 17, 25), JSoundRegister.IMPACT_3)
+    public static final Attack ballcombo = new Attack(12, 14, 0.1f, 36, 0, 2, 7f, 0.1f, AttackType.MULTIHIT, 0.75f, 0.3f, List.of(10, 17, 25), JSoundRegistry.IMPACT_3)
             .setInfo("3-hit Combo", "less stun than grounded version");
     public static final Attack ballcharge = new Attack(13, 20, 28, 13, 0, AttackType.BOX)
             .setInfo("Void Charge", "cream quickly transforms into a black hole and charges in the pointed direction");
@@ -148,6 +149,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
 
     public void setVoidTime(int vTime) {
         dataTracker.set(VOID_TIME, vTime);
+        if (vTime == 0) setReset(true);
     }
 
     @Override
@@ -180,9 +182,9 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
 
         if (isHalfBall()) {
             if (handleAttack(ballheavy, JCraft.standHeavyCD, State.BALL_HEAVY))
-                playSound(JSoundRegister.CREAM_SMASH, 1, 1);
+                playSound(JSoundRegistry.CREAM_SMASH, 1, 1);
         } else if (handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY))
-            playSound(JSoundRegister.CREAM_HEAVY, 1, 1);
+            playSound(JSoundRegistry.CREAM_HEAVY, 1, 1);
     }
 
     @Override
@@ -190,9 +192,9 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         if (!canAttack()) return;
 
         if (isHalfBall() && handleAttack(ballcombo, JCraft.standBarrageCD, State.BALL_COMBO))
-            playSound(JSoundRegister.CREAM_COMBO, 1, 1);
+            playSound(JSoundRegistry.CREAM_COMBO, 1, 1);
         else if (handleAttack(combo, JCraft.standBarrageCD, State.COMBO))
-            playSound(JSoundRegister.CREAM_COMBO, 1, 1);
+            playSound(JSoundRegistry.CREAM_COMBO, 1, 1);
     }
 
     @Override
@@ -200,7 +202,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         if (!canAttack()) return;
 
         if (handleAttack(consume, JCraft.standUltCD, State.CONSUME))
-            playSound(JSoundRegister.CREAM_CONSUME, 1, 1);
+            playSound(JSoundRegistry.CREAM_CONSUME, 1, 1);
     }
 
     @Override
@@ -208,9 +210,9 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         if (!canAttack()) return;
 
         if (isHalfBall() && handleAttack(ballcharge, JCraft.standS1CD, State.BALL_CONSUME))
-            playSound(JSoundRegister.CREAM_BALLDASH, 1, 1);
+            playSound(JSoundRegistry.CREAM_BALLDASH, 1, 1);
         else if (handleAttack(grab, JCraft.standS1CD, State.GRAB))
-            playSound(JSoundRegister.CREAM_GRAB, 1, 1);
+            playSound(JSoundRegistry.CREAM_GRAB, 1, 1);
     }
 
     @Override
@@ -218,7 +220,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         if (!canAttack()) return;
 
         if (!isHalfBall() && handleAttack(charge, JCraft.standS2CD, State.CHARGE))
-            playSound(JSoundRegister.CREAM_CHARGE, 1, 1);
+            playSound(JSoundRegistry.CREAM_CHARGE, 1, 1);
     }
 
     @Override
@@ -226,7 +228,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         if (!canAttack()) return;
 
         if (!isHalfBall() && handleAttack(destroy, JCraft.standS3CD, State.DESTROY))
-            playSound(JSoundRegister.CREAM_OVERHEAD, 1, 1);
+            playSound(JSoundRegistry.CREAM_OVERHEAD, 1, 1);
     }
 
     @Override
@@ -235,9 +237,9 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
 
         if (isHalfBall()) {
             if (handleAttack(exit, JCraft.utilCD, State.EXIT))
-                playSound(JSoundRegister.CREAM_EXIT, 1, 1);
+                playSound(JSoundRegistry.CREAM_EXIT, 1, 1);
         } else if (handleAttack(enter, JCraft.utilCD, State.ENTER))
-            playSound(JSoundRegister.CREAM_ENTER, 1, 1);
+            playSound(JSoundRegistry.CREAM_ENTER, 1, 1);
     }
 
     @Override
@@ -262,9 +264,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                         if (ent.getFirstPassenger() instanceof StandEntity<?, ?> stand) stand.blocking = false;
                     }
 
-                    curAttack = grabhit;
-                    setMoveStun(20);
-                    setState(State.GRAB_HIT);
+                    setAttack(grabhit, State.GRAB_HIT);
                 }
             }
             case (6) -> {
@@ -291,7 +291,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                         }
                     }
 
-                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0));
+                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0));
                 }
             }
             case (7) -> {
@@ -305,12 +305,12 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             case (11) -> {
                 for (LivingEntity ent : entities)
                     if (!JUtils.isBlocking(ent))
-                        ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0));
+                        ent.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0));
             }
             case (13) -> {
                 if (!hasUser()) return;
 
-                playSound(JSoundRegister.CREAM_CHARGE, 1, 1);
+                playSound(JSoundRegistry.CREAM_CHARGE, 1, 1);
                 charging = true;
                 chargeDir = getUserOrThrow().getRotationVector().multiply(0.5);
                 setVoidTime(15);
@@ -348,7 +348,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
 
     @Override
     public void tick() {
-        if (age == 1) playSound(JSoundRegister.CREAM_SUMMON, 1f, 1f);
+        if (age == 1) playSound(JSoundRegistry.CREAM_SUMMON, 1f, 1f);
         super.tick();
         boolean server = !this.world.isClient();
 
@@ -474,7 +474,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                         if (lastRemoteInputTime - age > 4) updateRemoteInputs(0, 0, false);
 
                         Vec3d finalSpeed = Vec3d.ZERO;
-                        if (!blocking && !user.hasStatusEffect(JStatusRegister.DAZED)) {
+                        if (!blocking && !user.hasStatusEffect(JStatusRegistry.DAZED)) {
                             Vec3d eP = user.getEyePos();
                             Vec3d groundPos = world.raycast(
                                     new RaycastContext(eP, eP.add(0, -24, 0), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user)
@@ -508,9 +508,9 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
 
     // Animation code
     public enum State implements StandAnimationState<CreamEntity> {
-        IDLE(builder -> builder.loop("animation.cream.idle")),
-        BALL_IDLE(builder -> builder.loop("animation.cream.ballidle")),
-        VOID_IDLE(builder -> builder.loop("animation.cream.voididle")),
+        IDLE((cream, builder) -> builder.loop(
+                "animation.cream." + ( cream.getVoidTime() > 0 ? "void" : cream.isHalfBall() ? "ball" : "" ) + "idle"
+        )),
         LIGHT(builder -> builder.playAndHold("animation.cream.light")),
         BALL_LIGHT(builder -> builder.playAndHold("animation.cream.balllight")),
         BLOCK(builder -> builder.loop("animation.cream.block")),
@@ -530,15 +530,19 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         DESTROY(builder -> builder.playAndHold("animation.cream.destroy")),
         BITE(builder -> builder.playAndHold("animation.cream.bite"));
 
-        private final Consumer<AnimationBuilder> animator;
+        private final BiConsumer<CreamEntity, AnimationBuilder> animator;
 
         State(Consumer<AnimationBuilder> animator) {
+            this((creamEntity, builder) -> animator.accept(builder));
+        }
+
+        State(BiConsumer<CreamEntity, AnimationBuilder> animator) {
             this.animator = animator;
         }
 
         @Override
         public void playAnimation(CreamEntity stand, AnimationBuilder builder) {
-            animator.accept(builder);
+            animator.accept(stand, builder);
         }
     }
 
@@ -554,7 +558,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
 
     @Override
     public State getIdleState() {
-        return isHalfBall() ? State.BALL_IDLE : State.IDLE;
+        return State.IDLE;
     }
 
     @Override

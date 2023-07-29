@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.registry.JEntityTypeRegister;
+import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -31,7 +31,7 @@ public class AnkhProjectile extends PersistentProjectileEntity implements IAnima
     }
 
     public AnkhProjectile(World world, LivingEntity owner) {
-        super(JEntityTypeRegister.ANKH, owner, world);
+        super(JEntityTypeRegistry.ANKH, owner, world);
         this.setOwner(owner);
         this.pickupType = PickupPermission.DISALLOWED;
     }

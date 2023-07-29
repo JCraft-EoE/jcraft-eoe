@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.entity;
 
-import net.arna.jcraft.registry.JEntityTypeRegister;
+import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.entity.EntityType;
@@ -32,7 +32,7 @@ public class BubbleProjectile extends PersistentProjectileEntity implements IAni
     }
 
     public BubbleProjectile(World world, LivingEntity owner) {
-        super(JEntityTypeRegister.BUBBLE, owner, world);
+        super(JEntityTypeRegistry.BUBBLE, owner, world);
         this.setOwner(owner);
     }
 

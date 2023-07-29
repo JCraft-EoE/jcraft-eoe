@@ -1,8 +1,8 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.registry.JEntityTypeRegister;
-import net.arna.jcraft.registry.JSoundRegister;
+import net.arna.jcraft.registry.JEntityTypeRegistry;
+import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -13,6 +13,7 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -58,7 +59,7 @@ public class BulletProjectile extends PersistentProjectileEntity implements IAni
     }
 
     public BulletProjectile(World world, LivingEntity owner, float caliber, float length, int stunTicks, int damage) {
-        super(JEntityTypeRegister.BULLET, owner, world);
+        super(JEntityTypeRegistry.BULLET, owner, world);
 
         setCaliber(caliber);
         this.stunTicks = stunTicks;
@@ -66,7 +67,7 @@ public class BulletProjectile extends PersistentProjectileEntity implements IAni
 
         this.mass = (length * caliber * caliber * MathHelper.PI) * 0.000000013f; // Volume of a cylinder (mm^3) * Density of lead (kg/mm^3)
 
-        setSound(JSoundRegister.BULLET_LODGE);
+        setSound(JSoundRegistry.BULLET_RICOCHET);
     }
 
     @Override
@@ -75,7 +76,7 @@ public class BulletProjectile extends PersistentProjectileEntity implements IAni
 
         if (type == HitResult.Type.ENTITY) {
             this.onEntityHit((EntityHitResult) hitResult);
-            this.world.emitGameEvent(GameEvent.PROJECTILE_LAND, hitResult.getPos(), GameEvent.Emitter.of(this, null));
+            world.emitGameEvent(GameEvent.PROJECTILE_LAND, hitResult.getPos(), GameEvent.Emitter.of(this, null));
         } else if (type == HitResult.Type.BLOCK) {
             BlockHitResult blockHitResult = (BlockHitResult) hitResult;
             BlockPos blockPos = blockHitResult.getBlockPos();
@@ -108,9 +109,12 @@ public class BulletProjectile extends PersistentProjectileEntity implements IAni
                     this.onBlockHit(blockHitResult);
                     this.world.emitGameEvent(GameEvent.PROJECTILE_LAND, blockPos, GameEvent.Emitter.of(this, blockState));
                     discard();
+                } else if (!world.isClient) {
+                    JUtils.serverPlaySound(JSoundRegistry.BULLET_PENETRATE, (ServerWorld) world, getPos(), 32);
                 }
             } else { // Ricochet
                 setVelocity(impactVec.add(normal).multiply(0.5 / hardness));
+                if (!world.isClient) JUtils.serverPlaySound(JSoundRegistry.BULLET_RICOCHET, (ServerWorld) world, getPos(), 32);
             }
         }
     }
@@ -125,12 +129,14 @@ public class BulletProjectile extends PersistentProjectileEntity implements IAni
     protected void onEntityHit(EntityHitResult entityHitResult) {
         Entity entity = entityHitResult.getEntity();
         if (entity instanceof LivingEntity living) {
-            Entity owner = getOwner();
-            LivingEntity target = JUtils.getUserIfStand(living);
-            StandEntity.damageLogic(getWorld(), target, getVelocity().normalize(), stunTicks, 1,
-                    false, damage, true, 4 + damage, DamageSource.thrownProjectile(this, owner), owner);
-
-            discard(); //todo: pen calc (entities)
+            if (!world.isClient) {
+                Entity owner = getOwner();
+                LivingEntity target = JUtils.getUserIfStand(living);
+                StandEntity.damageLogic(getWorld(), target, getVelocity().normalize(), stunTicks, 1,
+                        false, damage, true, 4 + damage, DamageSource.thrownProjectile(this, owner), owner);
+                JUtils.serverPlaySound(JSoundRegistry.BULLET_PENETRATE, (ServerWorld) world, getPos(), 32);
+                discard(); //todo: pen calc (entities)
+            }
         } else
             super.onEntityHit(entityHitResult);
     }

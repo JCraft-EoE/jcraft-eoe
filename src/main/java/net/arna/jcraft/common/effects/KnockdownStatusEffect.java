@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.effects;
 
-import net.arna.jcraft.registry.JStatusRegister;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.AttributeContainer;
@@ -36,6 +36,6 @@ public class KnockdownStatusEffect extends StatusEffect {
 
     @Override
     public void applyUpdateEffect(LivingEntity entity, int amplifier) {// 5 tick (0.25s) stun immunity window after knockdown
-        entity.removeStatusEffect(JStatusRegister.DAZED);
+        entity.removeStatusEffect(JStatusRegistry.DAZED);
     }
 }

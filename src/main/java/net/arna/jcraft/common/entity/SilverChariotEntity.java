@@ -8,7 +8,7 @@ import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JObjectRegistry;
-import net.arna.jcraft.registry.JSoundRegister;
+import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -59,10 +59,10 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .setHitspark(-4)
             .setStunType(StunType.UNBURSTABLE)
             .setInfo("God of Death", "high-damage beatdown, 1.5s stun on whiff, cannot be combo broken");
-    public final Attack mainbeatdown = new Attack(9, 0, 0.65f, 59, 0, 2.0, 4.5f, 0.75f, AttackType.MULTIHIT, 1.6f, 0, List.of(13, 23), JSoundRegister.IMPACT_1)
+    public final Attack mainbeatdown = new Attack(9, 0, 0.65f, 59, 0, 2.0, 4.5f, 0.75f, AttackType.MULTIHIT, 1.6f, 0, List.of(13, 23), JSoundRegistry.IMPACT_1)
             .setStunType(StunType.UNBURSTABLE)
             .setInfo("God of Death (Hit)", "");
-    public final Attack beatdownfinish = new Attack(10, 0, 0.65f, 59, 0, 2.5, 6f, 1.25f, AttackType.MULTIHIT, 1, 0, List.of(54), JSoundRegister.TW_KICK_HIT)
+    public final Attack beatdownfinish = new Attack(10, 0, 0.65f, 59, 0, 2.5, 6f, 1.25f, AttackType.MULTIHIT, 1, 0, List.of(54), JSoundRegistry.TW_KICK_HIT)
             .setLaunch()
             .setHitspark(2)
             .setInfo("God of Death (Final Hit)", "");
@@ -161,28 +161,28 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
     public void initLightAttack() {
         if (!canAttack()) return;
         if (handleAttack(this.light, JCraft.standLightCD, State.STAB))
-            playSound(JSoundRegister.SC_POKE, 1, 1);
+            playSound(JSoundRegistry.SC_POKE, 1, 1);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
         if (handleAttack(this.heavy, JCraft.standHeavyCD, State.HEAVY))
-            playSound(JSoundRegister.SC_HEAVY, 1, 1);
+            playSound(JSoundRegistry.SC_HEAVY, 1, 1);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
         if (handleAttack(this.barrage, JCraft.standBarrageCD, State.BARRAGE))
-            playSound(JSoundRegister.SC_BARRAGE, 1, 1);
+            playSound(JSoundRegistry.SC_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack()) return;
         if (handleAttack(this.spinbarrage, JCraft.standS1CD, State.SPIN))
-            playSound(JSoundRegister.SC_SPIN, 1, 1);
+            playSound(JSoundRegistry.SC_SPIN, 1, 1);
     }
 
     @Override
@@ -192,7 +192,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             handleAttack(pbeatdown, JCraft.standUltCD, State.BEAT_DOWN_START);
             //playSound(ModSoundRegister.PSC_BEATDOWN,1, 1);
         else if (handleAttack(armoroff, JCraft.standUltCD, State.ARMOR_OFF))
-            playSound(JSoundRegister.SC_ARMOROFF, 1, 1);
+            playSound(JSoundRegistry.SC_ARMOROFF, 1, 1);
     }
 
     @Override
@@ -206,7 +206,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
                     user.setVelocity(user.getVelocity().add(getRotationVector().multiply(0.85)).add(0.0, 0.15, 0.0));
                     user.velocityModified = true;
                 }
-                playSound(JSoundRegister.SC_CHARGE, 1, 1);
+                playSound(JSoundRegistry.SC_CHARGE, 1, 1);
 
             }
         } else if (handleAttack(charge, JCraft.standS2CD, State.P_CHARGE)) {
@@ -225,7 +225,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             if (handleAttack(cleave, JCraft.standS3CD, State.CLEAVE)) {
                 setFreePos(new Vec3f(getUserOrThrow().getPos().add(getUserOrThrow().getRotationVector().multiply(1.5))));
                 setFree(true);
-                playSound(JSoundRegister.SC_CLEAVE, 1, 1);
+                playSound(JSoundRegistry.SC_CLEAVE, 1, 1);
             }
         }
     }
@@ -319,7 +319,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
 
     @Override
     public void tick() {
-        if (age == 1) playSound(JSoundRegister.SC_SUMMON, 1f, 1f);
+        if (age == 1) playSound(JSoundRegistry.SC_SUMMON, 1f, 1f);
         super.tick();
 
         if (hasUser()) {

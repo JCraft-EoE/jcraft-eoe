@@ -3,7 +3,7 @@ package net.arna.jcraft.common.entity;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.util.StandAnimationState;
-import net.arna.jcraft.registry.JSoundRegister;
+import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
@@ -35,21 +35,21 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
     public void initHeavyAttack() {
         if (!canAttack()) return;
         if (handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY))
-            playSound(JSoundRegister.STAR_BREAKER, 1, 1);
+            playSound(JSoundRegistry.STAR_BREAKER, 1, 1);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
-            playSound(JSoundRegister.STAR_PLATINUM_BARRAGE, 1, 1);
+            playSound(JSoundRegistry.STAR_PLATINUM_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack()) return;
         if (handleAttack(starfinger, JCraft.standS1CD, State.STAR_FINGER))
-            playSound(JSoundRegister.STAR_FINGER, 1, 1);
+            playSound(JSoundRegistry.STAR_FINGER, 1, 1);
     }
 
     @Override
@@ -64,7 +64,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
     public void initSpecial2() {
         if (!canAttack()) return;
         if (handleAttack(lowkick, JCraft.standS2CD, State.LOW_KICK))
-            playSound(JSoundRegister.STAR_PLATINUM_KICK, 1, 1);
+            playSound(JSoundRegistry.STAR_PLATINUM_KICK, 1, 1);
     }
 
     @Override
@@ -72,7 +72,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
         if (!canAttack()) return;
         // Uses a copy because otherwise the main one gets overwritten by specialAttack()
         if (handleAttack(Attack.copyOf(chargebarrage), JCraft.standS3CD, State.BARRAGE))
-            playSound(JSoundRegister.STAR_PLATINUM_ADVANCING_BARRAGE, 1, 1);
+            playSound(JSoundRegistry.STAR_PLATINUM_ADVANCING_BARRAGE, 1, 1);
     }
 
     @Override

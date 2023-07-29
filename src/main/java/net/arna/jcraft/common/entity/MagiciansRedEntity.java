@@ -7,9 +7,9 @@ import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
-import net.arna.jcraft.registry.JEntityTypeRegister;
-import net.arna.jcraft.registry.JSoundRegister;
-import net.arna.jcraft.registry.JStatusRegister;
+import net.arna.jcraft.registry.JEntityTypeRegistry;
+import net.arna.jcraft.registry.JSoundRegistry;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -38,10 +38,10 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             .setMobility(MobilityType.TELEPORT)
             .setInfo("Redirect", "redirects all the users ankhs to where they're looking");
     // and so begins my terrible misuse of my own AI flags, the tldr here being that its simply called whenever the enemy is >3 blocks away, which is great here
-    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 8, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegister.IMPACT_1)
+    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 8, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegistry.IMPACT_1)
             .crouchingVariation(redirect)
             .setInfo("Punch", "quick combo starter");
-    public static final Attack heavy = new Attack(1, 17, 1f, 22, 12, 1.75, 7f, 0.5f, AttackType.BOX, 0.5f, 0.6f, 0, JSoundRegister.TW_KICK_HIT)
+    public static final Attack heavy = new Attack(1, 17, 1f, 22, 12, 1.75, 7f, 0.5f, AttackType.BOX, 0.5f, 0.6f, 0, JSoundRegistry.TW_KICK_HIT)
             .setLaunch()
             .setInfo("Low Kick", "medium windup knockdown");
     public static final Attack barrage = new Attack(2, 17, 0.75f, 60, 0, 2, 0.4f, 0.25f, AttackType.BARRAGE, 1.5f, 0, 3)
@@ -54,7 +54,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             .setInfo("Crossfire Variation", "summons 6 ankhs that orbit around the user, crouch to increase orbit distance");
     public static final Attack crossfirehurricane = new Attack(6, 60, 0.75f, 22, 18, 0, 0f, 0f, AttackType.BOX)
             .setInfo("Crossfire Hurricane", "summons slow, homing fire hurricane that knocks down, lasts for 3 seconds after hitting anything");
-    public static final Attack redbind = new Attack(8, 20, 0.75f, 22, 12, 1.5, 5, 0, AttackType.BOX, 0.75f, 0, 0, JSoundRegister.IMPACT_3)
+    public static final Attack redbind = new Attack(8, 20, 0.75f, 22, 12, 1.5, 5, 0, AttackType.BOX, 0.75f, 0, 0, JSoundRegistry.IMPACT_3)
             .setInfo("Red Bind", "medium windup, good stun");
     public static final Attack detector = new Attack(7, 25, 0.75f, 20, 13, 0, 0f, 0f, AttackType.BOX)
             .setRanged(true)
@@ -101,7 +101,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
         if (!canAttack()) return;
         if (getUserOrThrow().isSneaking()) {
             setAttack(redirect, State.REDIRECT);
-            playSound(JSoundRegister.MR_REDIRECT, 1, 1);
+            playSound(JSoundRegistry.MR_REDIRECT, 1, 1);
         } else
             handleAttack(light, JCraft.standLightCD, State.LIGHT);
     }
@@ -110,35 +110,35 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
     public void initHeavyAttack() {
         if (!canAttack()) return;
         if (handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY))
-            playSound(JSoundRegister.MR_HEAVY, 1, 1);
+            playSound(JSoundRegistry.MR_HEAVY, 1, 1);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
-            playSound(JSoundRegister.MR_BARRAGE, 1, 1);
+            playSound(JSoundRegistry.MR_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack()) return;
         if (handleAttack(crossfire, JCraft.standS1CD, State.CROSSFIRE))
-            playSound(JSoundRegister.MR_CROSSFIRE, 1, 1);
+            playSound(JSoundRegistry.MR_CROSSFIRE, 1, 1);
     }
 
     @Override
     public void initUlt() {
         if (!canAttack()) return;
         if (handleAttack(crossfirehurricane, JCraft.standUltCD, State.CROSSFIRE_HURRICANE))
-            playSound(JSoundRegister.MR_ULT, 1, 1);
+            playSound(JSoundRegistry.MR_ULT, 1, 1);
     }
 
     @Override
     public void initSpecial2() {
         if (!canAttack()) return;
         if (handleAttack(crossfirevariation, JCraft.standS2CD, State.CROSSFIRE_VARIATION))
-            playSound(JSoundRegister.MR_CROSSFIRE, 1, 1);
+            playSound(JSoundRegistry.MR_CROSSFIRE, 1, 1);
     }
 
     @Override
@@ -155,8 +155,8 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
     public void initUtil() {
         if (!canAttack() || !hasUser()) return;
         if (getUserOrThrow().isSneaking() && handleAttack(redbind, JCraft.utilCD, State.RED_BIND))
-            playSound(JSoundRegister.MR_REDBIND, 1, 1);
-        else if (handleAttack(detector, JCraft.utilCD, State.DETECTOR)) playSound(JSoundRegister.MR_DETECTOR, 1, 1);
+            playSound(JSoundRegistry.MR_REDBIND, 1, 1);
+        else if (handleAttack(detector, JCraft.utilCD, State.DETECTOR)) playSound(JSoundRegistry.MR_DETECTOR, 1, 1);
     }
 
     @Override
@@ -169,7 +169,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             case (1) -> {
                 for (LivingEntity ent : entities) {
                     if (!JUtils.isBlocking(ent))
-                        ent.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 40, 0));
+                        ent.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 40, 0));
                 }
             }
             case (2) -> {
@@ -215,7 +215,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
                 hurricanePos = this.getPos();
             }
             case (7) -> {
-                LifeDetectorEntity lifeDetector = new LifeDetectorEntity(JEntityTypeRegister.LIFE_DETECTOR, world);
+                LifeDetectorEntity lifeDetector = new LifeDetectorEntity(JEntityTypeRegistry.LIFE_DETECTOR, world);
                 lifeDetector.setMaster(user);
                 lifeDetector.refreshPositionAndAngles(getX(), getY() + 1.5, getZ(), getYaw(), getPitch());
                 world.spawnEntity(lifeDetector);
@@ -225,7 +225,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
 
     @Override
     public void tick() {
-        if (age == 1) playSound(JSoundRegister.MR_SUMMON, 1f, 1f);
+        if (age == 1) playSound(JSoundRegistry.MR_SUMMON, 1f, 1f);
         super.tick();
 
         if (hasUser()) {
@@ -287,7 +287,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
                                 if (hurricaneTime > 15)
                                     hurricaneTime = 15; // Allows for zoning up until it hits something
                             } else {
-                                target.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 20, 0));
+                                target.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 20, 0));
                             }
                         }
 

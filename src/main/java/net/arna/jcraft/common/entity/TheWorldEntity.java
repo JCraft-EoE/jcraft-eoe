@@ -6,8 +6,8 @@ import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
-import net.arna.jcraft.registry.JSoundRegister;
-import net.arna.jcraft.registry.JStatusRegister;
+import net.arna.jcraft.registry.JSoundRegistry;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -23,25 +23,26 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.State> {
-    public static final Attack crm1 = new Attack(0, JCraft.lightCooldown, 0.75f, 14, 8, 1.5, 6f, 1f, AttackType.BOX, 0.85f, 0.25f, 0, JSoundRegister.IMPACT_1)
+    public static final Attack crm1 = new Attack(0, JCraft.lightCooldown, 0.75f, 14, 8, 1.5, 6f, 0.2f, AttackType.BOX, 0.85f, 0.25f, 0, JSoundRegistry.IMPACT_1)
             .appendHitbox(new HitBoxData(0, 0, 1))
             .setInfo("Low Kick", "slower, higher stun");
-    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegister.IMPACT_1)
+    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 5, 1.5, 5f, 0.1f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegistry.IMPACT_1)
             .crouchingVariation(crm1)
             .setInfo("Punch", "quick combo starter");
     public static final Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 2, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public static final Attack donut = new Attack(1, 14, 1f, 48, 26, 2, 9f, 0.0f, AttackType.BOX, 3.25f, 0, 0, JSoundRegister.TW_DONUT_HIT)
+    public static final Attack donut = new Attack(1, 14, 1f, 48, 26, 2, 9f, 1.0f, AttackType.BOX, 3.4f, 0, 0, JSoundRegistry.TW_DONUT_HIT)
+            .setLaunch()
             .setHitspark(2)
             .appendHitbox(new HitBoxData(0, 0, 1.5))
             .hyperArmor()
             .setInfo("Donut", "slow, uninterruptable combo starter/extender, 1.5s stun on whiff");
-    public static final Attack charge = new Attack(4, 20, 7.5f, 19, 5, 1.5, 5f, 0.25f, AttackType.CHARGE, 1, 0, State.CHARGE_HIT.ordinal(), JSoundRegister.TW_CHARGE_HIT)
+    public static final Attack charge = new Attack(4, 20, 7.5f, 19, 5, 1.5, 5f, 0.25f, AttackType.CHARGE, 1, 0, State.CHARGE_HIT.ordinal(), JSoundRegistry.TW_CHARGE_HIT)
             .setRanged(true)
             .disableBackstab()
             .setBlockstun(11)
             .setInfo("Forward Charge", "The World detaches from the user and lunges forward, combo starter");
-    public static final Attack roundhouse = new Attack(3, 8, 0.75f, 13, 7, 1.75, 5f, 0.3f, AttackType.BOX, 0.45f, -0.1f, 0, JSoundRegister.TW_KICK_HIT)
+    public static final Attack roundhouse = new Attack(3, 8, 0.75f, 13, 7, 1.75, 5f, 0.1f, AttackType.BOX, 0.45f, -0.1f, 0, JSoundRegistry.TW_KICK_HIT)
             .setBlockstun(12)
             .setInfo("Roundhouse", "fast poke, low stun");
     public static final Attack timestop = new Attack(6, 70, 52, 45, 4, AttackType.TIMESTOP)
@@ -49,7 +50,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
             .setInfo("Timestop", "4 seconds");
     public static final Attack feignbarrage = new Attack(5, 30, 0.75f, 50, 5, 0, 0f, 0f, AttackType.COUNTER)
             .setInfo("Feign Barrage", "counter, 0.25s windup, 2.25s duration, teleports and knocks down on hit");
-    public static final Attack counterfollowup = new Attack(7, 0, 0.75f, 9, 5, 1.75, 6f, 0.7f, AttackType.BOX, 0.8f, 0.1f, 0, JSoundRegister.IMPACT_4)
+    public static final Attack counterfollowup = new Attack(7, 0, 0.75f, 9, 5, 1.75, 6f, 0.7f, AttackType.BOX, 0.8f, 0.1f, 0, JSoundRegistry.IMPACT_4)
             .appendHitbox(new HitBoxData(1.25))
             .hyperArmor()
             .setLaunch()
@@ -109,42 +110,42 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
     public void initHeavyAttack() {
         if (!canAttack()) return;
         if (handleAttack(donut, JCraft.standHeavyCD, State.DONUT))
-            playSound(JSoundRegister.TW_DONUT, 1, 1);
+            playSound(JSoundRegistry.TW_DONUT, 1, 1);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
         if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
-            playSound(JSoundRegister.TW_BARRAGE, 1, 1);
+            playSound(JSoundRegistry.TW_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack()) return;
         if (handleAttack(roundhouse, JCraft.standS1CD, State.ROUNDHOUSE))
-            playSound(JSoundRegister.TW_KICK, 1, 1);
+            playSound(JSoundRegistry.TW_KICK, 1, 1);
     }
 
     @Override
     public void initUlt() {
         if (!canAttack()) return;
         if (handleAttack(timestop, JCraft.standUltCD, State.TIME_STOP))
-            playSound(JSoundRegister.TW_TS, 1, 1);
+            playSound(JSoundRegistry.TW_TS, 1, 1);
     }
 
     @Override
     public void initSpecial2() {
         if (!canAttack()) return;
         if (handleAttack(charge, JCraft.standS2CD, State.CHARGE))
-            playSound(JSoundRegister.TW_CHARGE, 1, 1);
+            playSound(JSoundRegistry.TW_CHARGE, 1, 1);
     }
 
     @Override
     public void initSpecial3() {
         if (!canAttack()) return;
         if (handleAttack(feignbarrage, JCraft.standS3CD, State.BARRAGE))
-            playSound(JSoundRegister.TW_BARRAGE, 1, 1);
+            playSound(JSoundRegistry.TW_BARRAGE, 1, 1);
     }
 
     @Override
@@ -158,7 +159,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
         switch (attack.id) {
             case (-2) -> {
                 if (tsTime > 0) return;
-                timeSkip(14, JSoundRegister.TIME_SKIP);
+                timeSkip(14, JSoundRegistry.TIME_SKIP);
             }
             case (1) -> {
                 LivingEntity user = this.getUser();
@@ -172,7 +173,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
             }
             case (7) -> {
                 for (LivingEntity entity : entities)
-                    entity.addStatusEffect(new StatusEffectInstance(JStatusRegister.KNOCKDOWN, 35, 0, true, false));
+                    entity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0, true, false));
             }
         }
     }
@@ -193,15 +194,15 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
         user.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, entity.getEyePos());
 
         if (entity instanceof LivingEntity livingEntity) {
-            livingEntity.removeStatusEffect(JStatusRegister.DAZED);
+            livingEntity.removeStatusEffect(JStatusRegistry.DAZED);
             stun(livingEntity, 20, 0);
             if (entity.getFirstPassenger() instanceof StandEntity<?, ?> stand) stand.cancelAttack();
         }
 
         setAttack(counterfollowup, State.COUNTER_HIT);
 
-        playSound(JSoundRegister.TIME_SKIP, 1, 1);
-        playSound(JSoundRegister.TW_COUNTER, 1, 1);
+        playSound(JSoundRegistry.TIME_SKIP, 1, 1);
+        playSound(JSoundRegistry.TW_COUNTER, 1, 1);
     }
 
     @Override
@@ -213,8 +214,8 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
     @Override
     public void tick() {
         if (age == 1) {
-            playSound(JSoundRegister.TW_SUMMON, 1f, 1f);
-            playSound(JSoundRegister.MUDA_DA, 1f, 1f);
+            playSound(JSoundRegistry.TW_SUMMON, 1f, 1f);
+            playSound(JSoundRegistry.MUDA_DA, 1f, 1f);
         }
 
         super.tick();
