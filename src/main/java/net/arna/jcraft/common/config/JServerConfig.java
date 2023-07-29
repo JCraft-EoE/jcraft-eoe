@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import lombok.SneakyThrows;
+import lombok.Synchronized;
 import net.arna.jcraft.common.spec.SpecType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.WorldSavePath;
@@ -63,6 +64,7 @@ public class JServerConfig {
         }
     }
 
+    @Synchronized
     @SneakyThrows
     public static void save(MinecraftServer server) {
         Path path = server.getSavePath(WorldSavePath.ROOT).resolve("jcraft.json");
