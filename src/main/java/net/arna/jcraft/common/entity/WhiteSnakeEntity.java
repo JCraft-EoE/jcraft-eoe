@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.entity;
 
+import com.google.common.collect.Lists;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
@@ -80,7 +81,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
                             the gazebo
                             M1>Barrage>Leg Crusher>Donut>M1""";
 
-        moves = List.of(light, donut, barrage, memorydisk, standdisk, legcrusher, poisonspew,
+        moves = Lists.newArrayList(light, donut, barrage, memorydisk, standdisk, legcrusher, poisonspew,
                 new Attack().setInfo("Pilot Mode", ""));
     }
 

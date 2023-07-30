@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.util;
 
+import it.unimi.dsi.fastutil.ints.IntObjectPair;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.CreamEntity;
 import net.arna.jcraft.common.entity.D4CEntity;
@@ -42,6 +43,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 
@@ -424,5 +427,16 @@ public final class JUtils {
         if (world.isClient) return;
         for (ServerPlayerEntity player : PlayerLookup.around((ServerWorld) world, new Vec3d(x, y, z), 64))
             JExplosionPacket.send(player, x, y, z, power, explosion, modifier);
+    }
+
+    /**
+     * Supposed to be used in a stream.
+     * Turns every object in the stream into a pair of its index in the stream and the object.
+     * @return A function that turns every object into an enumerated pair.
+     * @param <T> The type of the object
+     */
+    public static <T> Function<T, IntObjectPair<T>> enumerate() {
+        AtomicInteger index = new AtomicInteger();
+        return t -> IntObjectPair.of(index.getAndIncrement(), t);
     }
 }
