@@ -164,7 +164,7 @@ public class SandTornadoEntity extends LivingEntity implements IAnimatable, IOwn
     }
 
     public static DefaultAttributeContainer.Builder createTornadoAttributes() {
-        return DefaultAttributeContainer.builder()
+        return createLivingAttributes() // This must be used instead of DefaultAttributeContainer.builder() due to compatibility with step-height-entity-attribute
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 20)
                 .add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE)
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED)

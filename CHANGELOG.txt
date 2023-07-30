@@ -1400,6 +1400,7 @@ Cream
 
 Killer Queen
     >Reanimated Haymaker
+    >New Special 2 - Face Grab
     >Sheer Heart Attack
         >Moved from Special 2 to Ultimate
         >SHA armor increased (10->20), armor toughness increased (10->12)

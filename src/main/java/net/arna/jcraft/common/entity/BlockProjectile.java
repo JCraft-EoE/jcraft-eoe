@@ -181,7 +181,7 @@ public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatab
     }
 
     public static DefaultAttributeContainer.Builder createBlockAttributes() {
-        return DefaultAttributeContainer.builder()
+        return createLivingAttributes() // This must be used instead of DefaultAttributeContainer.builder() due to compatibility with step-height-entity-attribute
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 10)
                 .add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, 1)
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED)
