@@ -2,7 +2,6 @@ package net.arna.jcraft.mixin.gravity;
 
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
-
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.AbstractSkeletonEntity;
 import net.minecraft.util.math.Direction;

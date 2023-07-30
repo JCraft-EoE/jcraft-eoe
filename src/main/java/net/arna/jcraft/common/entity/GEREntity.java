@@ -51,7 +51,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
     public static final Attack airheavy = new Attack(3, 17, 1f, 24, 14, 1.5, 9f, 0.8f, AttackType.BOX, 2, 0.25f, 0, JSoundRegistry.IMPACT_1).setHitspark(2)
             .appendHitbox(new HitBoxData(0, -1, 1))
             .setInfo("Overhead Kick", "slow, high stun combo starter");
-    public static final Attack airbarrage = new Attack(5, 14, 1f, 48, 0, 1.5, 1f, 0.3f, AttackType.BARRAGE, 1, 0, 3)
+    public static final Attack airbarrage = Attack.barrageAttack(5, 14, 1f, 48, 0, 1.5, 1f, 0.3f, 1, 0, 3)
             .setInfo("Kick Barrage", "fast combo finisher, knocks back");
 
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 9, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0, JSoundRegistry.IMPACT_1)
@@ -64,7 +64,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             .setLaunch()
             .appendHitbox(new HitBoxData(0, 0, 1.5))
             .setInfo("Overhead Smash", "slow, uninterruptable knockdown");
-    public static final Attack barrage = new Attack(4, 14, 0.75f, 30, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 2, 0, 3)
+    public static final Attack barrage = Attack.barrageAttack(4, 14, 0.75f, 30, 0, 2, 1f, 0.25f, 2, 0, 3)
             .aerialVariation(airbarrage)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
     public static final Attack healself = new Attack(6, 26, 1f, 14, 10, 0, 0f, 0f, AttackType.BOX)

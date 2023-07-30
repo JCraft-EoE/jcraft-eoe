@@ -516,15 +516,19 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      */
     public static void damage(float damage, DamageSource damageSource, LivingEntity ent) {
         if (ent == null || ent.isRemoved() || ent.isDead()) return;
-
         ent.damage(damageSource, 0.001f);
+
+        float scaling = ((IDamageScaler)ent).jcraft$getDamageScaling();
+        //JCraft.LOGGER.info("Damaging entity: " + ent + " with damage: " + damage + " and scaling: " + scaling);
+
+        damage *= scaling;
 
         // All stands ignore 10% of armor & armor toughness
         damage = DamageUtil.getDamageLeft(damage, (float) ent.getArmor() * 0.9f, (float) ent.getAttributeValue(EntityAttributes.GENERIC_ARMOR_TOUGHNESS) * 0.9f);
         damage = ((LivingEntityInvoker) ent).invokeModifyAppliedDamage(damageSource, damage);
 
         // Apply absorption
-        float f = damage * ((IDamageScaler)ent).jcraft$getDamageScaling();
+        float f = damage;
         damage = Math.max(damage - ent.getAbsorptionAmount(), 0.0F);
         ent.setAbsorptionAmount(ent.getAbsorptionAmount() - (f - damage));
 
@@ -1110,11 +1114,12 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                     stand.playSound(SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, 1, 1);
                     stand.blocking = false;
                     overrideStun = true;
-                } else if (!unblockable) {
+                } else if (!unblockable) { // Didn't backstab, not unblockable
                     stand.setMoveStun(blockstun);
                     stand.setStandGauge(stand.getStandGauge() - 2 * damage);
                     stand.playSound(JSoundRegistry.STAND_BLOCK, 1, 1);
                     hit = false;
+                    overrideStun = false;
                 } else {
                     stand.blocking = false;
                 }
@@ -1137,12 +1142,15 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         IDamageScaler damageScaler = (IDamageScaler) ent;
 
         if (hit) {
-            if (ent.hasStatusEffect(JStatusRegistry.DAZED) && ent.getStatusEffect(JStatusRegistry.DAZED).getAmplifier() != 2) {
-                damageScaler.jcraft$increaseHitCount();
+            damageScaler.jcraft$increaseHitCount();
+
+            StatusEffectInstance stun = ent.getStatusEffect(JStatusRegistry.DAZED);
+            if (stun != null) {
                 if (overrideStun) ent.removeStatusEffect(JStatusRegistry.DAZED);
             }
 
             stun(ent, stunTicks, stunLevel);
+
             ent.addVelocity(kbVec.x, kbVec.y, kbVec.z);
         }
 

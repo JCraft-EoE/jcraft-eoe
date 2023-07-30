@@ -4,7 +4,10 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.common.util.*;
+import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.util.JExplosionModifier;
+import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
@@ -29,7 +32,6 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
         permits KillerQueenEntity, KQBTDEntity {
     public static final Attack low = new Attack(1, 0, 0.85f, 13, 8, 1.5, 4f, 0.5f, AttackType.BOX, 0.5f, 0.1f, 0, JSoundRegistry.IMPACT_1)
             .setInfo("Low Punch", "frametrap tool, low stun");
-
     public static final Attack detonate = new Attack(6, 1, 1, 6, 5, 0, 0f, 0.0f, AttackType.BOX)
             .setInfo("Detonate", "slight windup");
 
@@ -37,14 +39,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
             .crouchingVariation(detonate)
             .setFollowup(low)
             .setInfo("Dual Punch", "combo starter, decent speed, has followup with more blockstun");
-
-    public static final Attack heavy = new Attack(2, 12, 0.75f, 24, 16, 2, 9f, 1.75f, AttackType.BOX, 0.5f, 0, 0, JSoundRegistry.IMPACT_4)
-            .setHitspark(2)
-            .hyperArmor()
-            .setLaunch()
-            .setInfo("Haymaker", "slow, uninterruptable launcher");
-
-    public static final Attack barrage = new Attack(3, 17, 0.75f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3, JSoundRegistry.IMPACT_4)
+    public static final Attack barrage = Attack.barrageAttack(3, 17, 0.75f, 50, 0, 1.5, 1f, 0.1f, 1, 0, 3, JSoundRegistry.IMPACT_4)
             .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
 
     public static final Attack bombplant = new Attack(4, 30, 1, 20, 12, 1.5, 0f, 0.0f, AttackType.BOX, 0.45f)
@@ -52,9 +47,6 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
             .setBlockstun(8)
             .setInfo("Bomb Plant", "crouch to plant on the ground below you, stealthily");
 
-    public static final Attack sha = new Attack(5, 45, 20, 16, 0, AttackType.BOX)
-            .setRanged(true)
-            .setInfo("Sheer Heart Attack", "creates an automatic, heat-seeking sub-stand that explodes on contact, reflects 25% damage back to owner");
     protected static final int bombplantCD = (int) (bombplant.cooldown * 20);
 
     protected ItemEntity coin;
@@ -89,18 +81,17 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
                     M1>Barrage>Heavy(>Sheer Heart Attack)""";
 
 
-        moves = List.of(light, heavy, barrage, bombplant, Attack.unusable, sha
-                , new Attack().setRanged(true).setInfo("Coin Toss", "overrides current bomb with an aimable coin")
-                , new Attack().setMobility(MobilityType.DASH).setInfo("Explosive Dash", "slight aoe damage, 3D movement tool"));
+        //moves = List.of(light, heavy, barrage, bombplant, Attack.unusable, sha, new Attack().setRanged(true).setInfo("Coin Toss", "overrides current bomb with an aimable coin"), new Attack().setMobility(MobilityType.DASH).setInfo("Explosive Dash", "slight aoe damage, 3D movement tool"));
     }
 
     protected void explode(Entity user, Vec3d pos) {
+        //todo: simplify this and make it do consistent damage
         JUtils.explode(
                 world, user,
                 pos.x,
                 pos.y,
                 pos.z,
-                2f,
+                1f,
                 JExplosionModifier.builder()
                         .particle(JParticleTypeRegistry.BOOM_1)
                         .destructionType(Explosion.DestructionType.NONE)
@@ -129,8 +120,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
         if (!hasUser()) return;
 
         LivingEntity user = getUserOrThrow();
-        if (user.hasStatusEffect(JStatusRegistry.DAZED))
-            return;
+        if (user.hasStatusEffect(JStatusRegistry.DAZED)) return;
 
         boolean idling = getMoveStun() < 1;
         if (curAttack != light) {

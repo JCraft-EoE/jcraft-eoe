@@ -45,7 +45,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     // placeholder sound
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 8, 5, 1.5, 4f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, SoundEvents.ITEM_TRIDENT_HIT)
             .setInfo("Slice", "quick combo starter");
-    public static final Attack barrage = new Attack(2, 17, 0.85f, 32, 0, 2, 1.5f, 0.1f, AttackType.BARRAGE, 0.5f, 0, 3, JSoundRegistry.IMPACT_1)
+    public static final Attack barrage = Attack.barrageAttack(2, 17, 0.85f, 32, 0, 2, 1.5f, 0.1f, 0.5f, 0, 3, JSoundRegistry.IMPACT_1)
             .setInfo("Barrage", "short, knocks back");
     public static final Attack speedslice = new Attack(7, 18, 1.25f, 11, 10, 0, 6f, 0.5f, AttackType.BOX, 1f, 0, 0)
             .setRanged(true)
@@ -64,7 +64,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     public static final Attack timeaccel = new Attack(6, 70, 40, 20, 0, AttackType.BOX)
             .setInfo("Time Acceleration", "2s windup, 15s t. accel, enemies standless for 15s after finishing");
     private int circleTime = 0;
-    public static final Attack judgement = new Attack(5, 33, 1.25f, 60, 20, 0, 0f, 0.5f, AttackType.BARRAGE, 0, 0, 2, null)
+    public static final Attack judgement = Attack.barrageAttack(5, 33, 1.25f, 60, 20, 0, 0f, 0.5f, 0, 0, 2)
             .setInfo("Divine Severance", "Made in Heaven rapidly speed slices an area, then finishes with a large, launching slice");
     public static final Attack circle = new Attack(8, 40, 14, 13, 0, 1.25f, AttackType.BOX)
             .setRanged(true)

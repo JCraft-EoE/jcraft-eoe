@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+//todo: make crouching with SC increase attackDist
 public class SilverChariotEntity extends StandEntity<SilverChariotEntity, SilverChariotEntity.State> {
     public final Attack light = new Attack(0, JCraft.lightCooldown, 0.65f, 9, 5, 1.75, 5f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0)
             .setInfo("Stab", "quick combo starter, links into Spinning Blade while armor is off");
@@ -38,18 +39,19 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .hyperArmor()
             .setLaunch()
             .setInfo("Impaling Thrust", "slow, uninterruptable launcher");
+    //todo: spin barrage deflecting projectiles, launch stun
     public final Attack spinbarrage = new Attack(3, 25, 0.65f, 24, 7, 2, 1f, 0.1f, AttackType.BARRAGE, 0.50f, 0, 2)
             .setInfo("Spinning Blade", "fast reliable combo starter/extender, low stun");
-    public final Attack pcharge = new Attack(4, 18, 0.65f, 25, 13, 1.75, 5f, 0.25f, AttackType.BOX, 0.75f, -0.2f, 0)
+    public final Attack pcharge = new Attack(4, 13, 0.65f, 25, 13, 1.75, 5f, 0.25f, AttackType.BOX, 0.75f, -0.2f, 0)
             .setRanged(true)
             .setMobility(MobilityType.DASH)
             .setBlockstun(17)
             .setInfo("Ray Dart", "Silver Chariot and the user charge forward, combo finisher");
-    public final Attack cleave = new Attack(5, 23, 0.75f, 21, 12, 2.5, 9f, 0.8f, AttackType.BOX, 1f, 0, 0)
+    public final Attack cleave = new Attack(5, 20, 0.75f, 21, 12, 2.5, 9f, 0.8f, AttackType.BOX, 1f, 0, 0)
             .setHitspark(2)
             .hyperArmor()
             .setInfo("Cleave", "Silver Chariot detaches from the user, delivering an uninterruptable, combo-starting slice");
-    public final Attack charge = new Attack(6, 22, 8f, 19, 5, 1.5, 5f, 0.25f, AttackType.CHARGE, 0.85f, 0, State.P_CHARGE_HIT.ordinal())
+    public final Attack charge = new Attack(6, 18, 8f, 19, 5, 1.5, 5f, 0.25f, AttackType.CHARGE, 0.85f, 0, State.P_CHARGE_HIT.ordinal())
             .setRanged(true)
             .disableBackstab()
             .setInfo("Shooting Star", "Silver Chariot detaches from the user and charges in the looked direction, combo starter/extender");
@@ -246,7 +248,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
 
         if (cooldown > 0) return false;
 
-        // Can't be compacted due to == check in SpecialAttack()
+        // todo: compact this
         if (getMode() == 2) {
             Attack attackRef = Attack.copyOf(attack);
             attackRef.initTime = (int) (attackRef.initTime * 0.67);
@@ -377,8 +379,8 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
     // Animation code
     public enum State implements StandAnimationState<SilverChariotEntity> {
         IDLE((silverChariot, builder) -> builder.loop("animation.silverchariot.idle" + switch (silverChariot.getMode()) {
-            case 0 -> "";
-            case 1 -> "_armorless";
+            case 1 -> "";
+            case 2 -> "_armorless";
             case 3 -> "_possessed";
             default -> throw new IllegalStateException("Unexpected value: " + silverChariot.getMode());
         })),

@@ -1,6 +1,5 @@
 package net.arna.jcraft.client.util;
 
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.model.entity.StandEntityModel;
 import net.arna.jcraft.common.entity.KingCrimsonEntity;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
@@ -12,7 +11,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;

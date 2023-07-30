@@ -3,6 +3,7 @@ package net.arna.jcraft.common.attack;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.VariationType;
 import net.minecraft.sound.SoundEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -154,6 +155,13 @@ public final class Attack {
         this.offset = offset;
         this.interval = (byte) interval;
         this.impactSound = impactSound;
+    }
+
+    public static Attack barrageAttack(int id, double cooldown, float attackDist, int moveStun, int initTime, double hitboxSize, float damage, float knockback, float stun, float offset, int interval) {
+        return barrageAttack(id, cooldown, attackDist, moveStun, initTime, hitboxSize, damage, knockback, stun, offset, interval, null);
+    }
+    public static Attack barrageAttack(int id, double cooldown, float attackDist, int moveStun, int initTime, double hitboxSize, float damage, float knockback, float stun, float offset, int interval, @Nullable SoundEvent impactSound) {
+        return new Attack(id, cooldown, attackDist, moveStun, initTime, hitboxSize, damage, knockback, AttackType.BARRAGE, stun, offset, interval, impactSound);
     }
 
     // For multi-hits that aren't barrages

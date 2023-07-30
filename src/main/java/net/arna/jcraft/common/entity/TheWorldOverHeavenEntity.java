@@ -4,6 +4,7 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackQueue;
 import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.JUtils;
@@ -48,6 +49,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .setHitspark(2)
             .setUB(true)
             .setInfo("Singularity", "block bypass, low stun, medium windup");
+    //todo: delay twoh smite until TS ends
     public static final Attack smite = new Attack(3, 21, 1f, 20, 10, 0, 6f, 0.0f, AttackType.BOX, 1.05f, 0, 0)
             .setBlockstun(13)
             .setInfo("You won't run away!", "summons a stunning lightning bolt at the user/in air summons one at aimed position, launches on hit");
@@ -121,6 +123,9 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
                             M1>Barrage>M1>Knives>Overwrite~S2/S3>dash>Smite>Heavy>M1""";
 
         moves = List.of(light, heavy, barrage, smite, timestop, delayknives, chargeoverwrite, timeskip);
+
+        if (world.isClient) return;
+        timestop.stun = JServerConfig.TWOH_TIME_STOP_DURATION.getValue() / 20.0f;
     }
 
     public int getOverwriteType() {
@@ -240,8 +245,12 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        if (handleAttack(timestop, JCraft.standUltCD, State.TIME_STOP))
-            playSound(JSoundRegistry.TWOH_TS, 1, 1);
+        if (tsTime <= 0) {
+            if (handleAttack(timestop, JCraft.standUltCD, State.TIME_STOP))
+                playSound(JSoundRegistry.TWOH_TS, 1, 1);
+        } else {
+
+        }
     }
 
     @Override

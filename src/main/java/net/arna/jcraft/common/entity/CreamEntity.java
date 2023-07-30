@@ -3,6 +3,8 @@ package net.arna.jcraft.common.entity;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.attack.StunType;
+import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
@@ -25,10 +27,8 @@ import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -45,22 +45,28 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 14, 6, 1.5, 5f, 0.75f, AttackType.BOX, 1f, 0.1f, 0, JSoundRegistry.IMPACT_3)
             .crouchingVariation(crm1)
             .setInfo("Punch", "quick combo starter");
-    public static final Attack heavy = new Attack(1, 14, 1f, 30, 20, 1.5, 10f, 0.1f, AttackType.BOX, 2, 0, 0, JSoundRegistry.IMPACT_3)
+    public static final Attack heavy = new Attack(1, 14, 1f, 30, 20, 1.5, 8f, 0.1f, AttackType.BOX, 2, 0, 0, JSoundRegistry.IMPACT_3)
             .setHitspark(2)
             .hyperArmor()
             .setInfo("Vertical Chop", "slow, uninterruptable combo starter");
-    public static final Attack combo = new Attack(2, 17, 0.75f, 36, 0, 2.0, 7f, 0.1f, AttackType.MULTIHIT, 1, 0, List.of(10, 17, 25), JSoundRegistry.IMPACT_3)
+    public static final Attack combo = new Attack(2, 17, 0.75f, 36, 0, 2.0, 5f, 0.1f, AttackType.MULTIHIT, 1, 0, List.of(10, 17, 25), JSoundRegistry.IMPACT_3)
             .setInfo("3-hit Combo", "medium windup, good stun");
     public static final Attack grab = new Attack(3, 20, 1f, 20, 8, 1.5, 3f, 0f, AttackType.BOX, 1.5f, 0, 0)
             .setGrab()
             .setInfo("Grab", "unblockable, knocks back");
     public static final Attack grabhit = new Attack(4, 0, 1f, 20, 13, 2.0, 6f, 1.5f, AttackType.BOX, 0.25f)
             .setLaunch();
+    /*
     public static final Attack charge = new Attack(5, 20, 4f, 13, 5, 1.5, 8f, 0.25f, AttackType.CHARGE, 1, 0, State.CHARGE_HIT.ordinal(), JSoundRegistry.IMPACT_3)
             .setRanged(true)
             .setInfo("Charge", "3.5 block range, combo starter/extender");
-    public static final Attack destroy = new Attack(6, 25, 1f, 30, 21, 2, 0f, 1.25f, AttackType.BOX, 0f, 0f, 0, JSoundRegistry.IMPACT_5)
+     */
+    public static final Attack surprise = new Attack(5, 20, 24, 14, 0, AttackType.BOX)
+            .setInfo("Surprise", "Cream disappears into the ground, then pops out in a nearby looked location");
+    public static final Attack destroy = new Attack(6, 20, 1f, 30, 21, 2, 0f, 1.25f, AttackType.BOX, 0.25f, 0f, 0, JSoundRegistry.IMPACT_5)
             .setHitspark(2)
+            .setStunOverride(true)
+            .setStunType(StunType.LAUNCH)
             .hyperArmor()
             .setUB(false)
             .setInfo("Destroy", "slow, uninterruptable, unblockable knockdown");
@@ -75,7 +81,9 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public static final Attack balllight = new Attack(10, 2, 0.1f, 14, 7, 2, 5f, 0.75f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegistry.IMPACT_3)
             .setInfo("Swipe", "quick air-to-ground poke");
     public static final Attack ballheavy = new Attack(11, 14, 0.1f, 20, 14, 2, 9f, 1.25f, AttackType.BOX, 0.75f, 0.3f, 0, JSoundRegistry.TW_KICK_HIT)
-            .setHitspark(2).hyperArmor().setLaunch()
+            .setHitspark(2)
+            .hyperArmor()
+            .setLaunch()
             .setInfo("Overhead Smash", "slow, uninterruptable launcher");
     public static final Attack ballcombo = new Attack(12, 14, 0.1f, 36, 0, 2, 7f, 0.1f, AttackType.MULTIHIT, 0.75f, 0.3f, List.of(10, 17, 25), JSoundRegistry.IMPACT_3)
             .setInfo("3-hit Combo", "less stun than grounded version");
@@ -85,6 +93,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     private static final TrackedData<Integer> VOID_TIME;
     private static final TrackedData<Boolean> HALF_BALL;
     private Vec3d chargeDir;
+    private Vec3f outDir;
     private boolean charging = false;
 
     static {
@@ -118,7 +127,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                     Chop>Void
                     i.M1>land+s.OFF>s.ON+Combo>M1>Charge>Grab""";
 
-        moves = List.of(light, heavy, combo, destroy, consume, charge, grab, enter);
+        moves = List.of(light, heavy, combo, destroy, consume, surprise, grab, enter);
     }
 
     public void beginHalfBall() {
@@ -136,7 +145,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         blockDistance = 0.75f;
         maxStandGauge = 90f;
 
-        moves = List.of(light, heavy, combo, destroy, consume, charge, grab, enter);
+        moves = List.of(light, heavy, combo, destroy, consume, surprise, grab, enter);
     }
 
     public boolean isHalfBall() {
@@ -215,12 +224,21 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             playSound(JSoundRegistry.CREAM_GRAB, 1, 1);
     }
 
+    private Vec3f outPos;
     @Override
     public void initSpecial2() {
-        if (!canAttack()) return;
+        if (isHalfBall() || !canAttack()) return;
+        LivingEntity user = getUserOrThrow();
+        Vec3d eyePos = user.getEyePos();
+        Vec3d rotVec = user.getRotationVector();
+        HitResult hitResult = world.raycast(new RaycastContext(eyePos, eyePos.add(rotVec.multiply(16)), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user));
 
-        if (!isHalfBall() && handleAttack(charge, JCraft.standS2CD, State.CHARGE))
-            playSound(JSoundRegistry.CREAM_CHARGE, 1, 1);
+        if (hitResult.getType() != HitResult.Type.MISS && handleAttack(surprise, JCraft.standS2CD, State.SURPRISE)) {
+            setFree(true);
+            setFreePos(new Vec3f(user.getPos()));
+            outPos = new Vec3f(hitResult.getPos());
+            playSound(JSoundRegistry.CREAM_SUMMON, 1, 1);
+        }
     }
 
     @Override
@@ -267,11 +285,23 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                     setAttack(grabhit, State.GRAB_HIT);
                 }
             }
+            case (5) -> {
+                charging = true;
+                outDir = GravityChangerAPI.getGravityDirection(this).getUnitVector();
+                outDir.scale(-1f);
+
+                outPos.subtract(outDir);
+                setFreePos(outPos);
+
+                setVoidTime(surprise.moveStun - surprise.initTime);
+
+                playSound(JSoundRegistry.IMPACT_5, 1, 0.75f);
+            }
             case (6) -> {
                 DamageSource playerSource = DamageSource.mob(getUser());
 
                 for (LivingEntity ent : entities) {
-                    float damage = 10f;
+                    float damage = 8f;
                     ent.damage(playerSource, 0.001f);
 
                     // All stands ignore 10% of armor & armor toughness
@@ -325,12 +355,14 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
 
     @Override
     protected Box calculateBoundingBox() {
-        if (isHalfBall()) {
-            double x = getX();
-            double y = getY();
-            double z = getZ();
+        double x = getX();
+        double y = getY();
+        double z = getZ();
+
+        if (isHalfBall())
             return new Box(x - 0.6, y + 0.6, z - 0.6, x + 0.6, y + 2, z + 0.6);
-        }
+        if (getState() == State.SURPRISE)
+            return new Box(x - 0.6, y + 0, z - 0.6, x + 0.6, y + 0.3, z + 0.6);
         return super.calculateBoundingBox();
     }
 
@@ -344,6 +376,12 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
 
         // Real desummon if not voiding
         super.desummon();
+    }
+
+    @Override
+    public boolean defaultToNear() {
+        if (charging) return false;
+        return super.defaultToNear();
     }
 
     @Override
@@ -398,10 +436,16 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                     }
 
                     if (charging) {
-                        user.setVelocity(chargeDir);
-                        user.velocityModified = true;
-                        if (user instanceof ServerPlayerEntity player)
-                            player.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(user));
+                        if (getFree()) {
+                            Vec3f newPos = getFreePos().copy();
+                            newPos.add(outDir);
+                            setFreePos(newPos);
+                        } else if (chargeDir != null) {
+                            user.setVelocity(chargeDir);
+                            user.velocityModified = true;
+                            if (user instanceof ServerPlayerEntity player)
+                                player.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(user));
+                        }
                     } else {
                         setStateNoReset(State.IDLE);
 
@@ -438,18 +482,31 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                     toDamage.remove(user);
                     toDamage.remove(this);
 
-                    for (LivingEntity ent : toDamage) {
-                        if (age % 4 == 0) {
-                            stun(ent, 2, 0);
+                    if (charging) {
+                        for (LivingEntity ent : toDamage) {
+                            if (getMoveStun() % 2 == 0) { // More consistent
+                                stun(ent, 4, 0);
 
-                            StandEntity<?, ?> enemyStand = ((IEntityDataSaver) ent).getStand();
-                            if (enemyStand != null)
-                                enemyStand.cancelAttack();
+                                StandEntity<?, ?> enemyStand = ((IEntityDataSaver) ent).getStand();
+                                if (enemyStand != null) enemyStand.cancelAttack();
+                            }
+
+                            ent.damage(DamageSource.OUT_OF_WORLD, 5);
                         }
-                        ent.damage(DamageSource.OUT_OF_WORLD, charging ? 4 : 2.5f);
+                    } else {
+                        for (LivingEntity ent : toDamage) {
+                            if (age % 4 == 0) {
+                                stun(ent, 2, 0);
+
+                                StandEntity<?, ?> enemyStand = ((IEntityDataSaver) ent).getStand();
+                                if (enemyStand != null) enemyStand.cancelAttack();
+                            }
+
+                            ent.damage(DamageSource.OUT_OF_WORLD, 2.5f);
+                        }
                     }
 
-                    if (notCorS)
+                    if (notCorS && !getFree())
                         user.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 25, 0, false, false));
                 } else {
                     for (int i = 0; i < 16; i++)
@@ -464,6 +521,11 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                 setDistanceOffset(0);
                 setAlpha(0);
             } else {
+                if (isIdle() && charging) {
+                    charging = false;
+                    setFree(false);
+                }
+
                 if (isHalfBall()) {
                     setAlpha(0.1f);
                     user.onLanding();
@@ -521,7 +583,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         BALL_COMBO(builder -> builder.playAndHold("animation.cream.ballcombo")),
         CONSUME(builder -> builder.playAndHold("animation.cream.consume")),
         BALL_CONSUME(builder -> builder.playAndHold("animation.cream.ballconsume")),
-        CHARGE(builder -> builder.playAndHold("animation.cream.charge")),
+        SURPRISE(builder -> builder.playAndHold("animation.cream.surprise")),
         CHARGE_HIT(builder -> builder.playAndHold("animation.cream.charge_hit")),
         GRAB(builder -> builder.playAndHold("animation.cream.grab")),
         GRAB_HIT(builder -> builder.playAndHold("animation.cream.grab_hit")),

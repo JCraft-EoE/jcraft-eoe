@@ -1,10 +1,14 @@
 package net.arna.jcraft.mixin;
 
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.entity.KingCrimsonEntity;
 import net.arna.jcraft.common.entity.StandEntity;
-import net.arna.jcraft.common.util.*;
+import net.arna.jcraft.common.util.IDamageScaler;
+import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.util.ITimeStop;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -42,11 +46,12 @@ public abstract class LivingEntityMixin implements IDamageScaler {
     }
 
     // Called serverside, if the LivingEntity wasn't removed
-    @Inject(method = "tickMovement", at = @At("HEAD"))
-    public void jcraft$tickMovement(CallbackInfo callbackInfo) {
+    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;tickMovement()V", shift = At.Shift.AFTER))
+    public void jcraft$tick(CallbackInfo callbackInfo) {
         LivingEntity living = LivingEntity.class.cast(this);
-        if ( !living.hasStatusEffect(JStatusRegistry.DAZED) )
-             ((IDamageScaler)this).jcraft$resetHitCount();
+        if ( hitCount > 0 && !living.hasStatusEffect(JStatusRegistry.DAZED) ) {
+            ((IDamageScaler) this).jcraft$resetHitCount();
+        }
     }
 
     // Make stand users rideable entities in water (prevents stand desummon)

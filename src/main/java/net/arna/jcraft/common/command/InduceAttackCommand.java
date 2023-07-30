@@ -2,9 +2,9 @@ package net.arna.jcraft.common.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.attack.AttackQueue;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.spec.JCraftSpec;
-import net.arna.jcraft.common.attack.AttackQueue;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.command.CommandRegistryAccess;

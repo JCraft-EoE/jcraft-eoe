@@ -2,9 +2,9 @@ package net.arna.jcraft.client.mixin.gravity;
 
 import net.arna.jcraft.common.gravity.RotationAnimation;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.gravity.util.EntityTags;
 import net.arna.jcraft.common.gravity.util.QuaternionUtil;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
-import net.arna.jcraft.common.gravity.util.EntityTags;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.RenderLayer;

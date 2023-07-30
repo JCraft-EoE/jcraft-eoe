@@ -2,25 +2,58 @@ package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
+import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPlatinumEntity, StarPlatinumEntity.State> {
+    // Inhale
+    public static final Attack inhale = new Attack(6, 50, 5, 5, 4, AttackType.BOX)
+            .setUB(true)
+            .setInfo("Inhale", "vacuums nearby entities for 4 seconds");
+    private static final TrackedData<Integer> INHALE_TIME;
+
+    static {
+        INHALE_TIME = DataTracker.registerData(StarPlatinumEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    }
 
     public StarPlatinumEntity(World worldIn) {
         super(StandType.STAR_PLATINUM, State.class, worldIn);
+        moves = List.of(light, heavy, barrage, starfinger, inhale, lowkick, starfinger, jump);
+    }
+
+    @Override
+    protected void initDataTracker() {
+        super.initDataTracker();
+        dataTracker.startTracking(INHALE_TIME, 0);
+    }
+
+    private void setInhaleTime(int time) {
+        dataTracker.set(INHALE_TIME, time);
+    }
+
+    private int getInhaleTime() {
+        return dataTracker.get(INHALE_TIME);
     }
 
     @Override
@@ -118,6 +151,66 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
                     if (living instanceof ServerPlayerEntity serverPlayerEntity)
                         serverPlayerEntity.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(serverPlayerEntity));
                 }
+            }
+        }
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        LivingEntity user = getUserOrThrow();
+        Vec3d rotVec = getRotationVector();
+
+        Vec3d fPos = getEyePos().add(rotVec.multiply(1.75));
+        Vec3d ffPos = getEyePos().add(rotVec.multiply(3));
+
+        if (world.isClient) {
+            setAlpha((float) MathHelper.clamp(255.0 * squaredDistanceTo(getUser()) / 2, 0.0, 255.0) / 255f);
+
+            if (getInhaleTime() > 0) {
+                // Display particles for the two hitboxes
+                Vec3d addVel = rotVec.add(random.nextDouble() * 2 - 1, random.nextDouble() * 2 - 1, random.nextDouble() * 2 - 1);
+                Vec3d particlePos = fPos.add(addVel);
+
+                world.addParticle(ParticleTypes.POOF,
+                        particlePos.x,
+                        particlePos.y,
+                        particlePos.z,
+                        -addVel.x / 10.0, -addVel.y / 10.0, -addVel.z / 10.0);
+
+                addVel = rotVec.add(random.nextDouble() * 1.5 - 0.75, random.nextDouble() * 1.5 - 0.75, random.nextDouble() * 1.5 - 0.75);
+                particlePos = ffPos.add(addVel);
+
+                world.addParticle(ParticleTypes.POOF,
+                        particlePos.x,
+                        particlePos.y,
+                        particlePos.z,
+                        -addVel.x / 10.0, -addVel.y / 10.0, -addVel.z / 10.0);
+            }
+        } else if (getInhaleTime() > 0) {
+            setInhaleTime(getInhaleTime() - 1);
+
+            if (getInhaleTime() > 0)
+                setRotationOffset(90);
+            else setRotationOffset(225);
+
+            if (age % 2 != 0) return;
+            List<Entity> filter = new ArrayList<>(List.of(this, user));
+            if (user.hasVehicle()) filter.add(user.getVehicle());
+
+            List<Entity> toInhale = (List<Entity>) JUtils.generateHitbox(world, fPos, 2, Entity.class, filter);
+            List<? extends Entity> inhaleTip = JUtils.generateHitbox(world, ffPos, 1.5, Entity.class, filter);
+            toInhale.addAll(inhaleTip);
+
+            for (Entity entity : toInhale) {
+                entity.setVelocity(entity.getVelocity()
+                        .subtract(rotVec.x, 0, rotVec.z)
+                        .multiply(0.2 * entity.distanceTo(this)));
+
+                entity.velocityModified = true;
+
+                if (entity instanceof ServerPlayerEntity player)
+                    player.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(player));
             }
         }
     }

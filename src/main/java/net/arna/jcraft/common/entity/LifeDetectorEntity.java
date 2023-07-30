@@ -75,6 +75,7 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
         if (target == null || master == null) return false;
         if (target == this || target == master) return false;
         if (target.isConnectedThroughVehicle(master)) return false;
+        if (target instanceof IOwnable ownable && ownable.getMaster() == master) return false;
         return target.canTakeDamage() && target.isAlive();
     }
 

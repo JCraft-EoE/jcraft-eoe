@@ -38,15 +38,16 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             .setMobility(MobilityType.TELEPORT)
             .setInfo("Redirect", "redirects all the users ankhs to where they're looking");
     // and so begins my terrible misuse of my own AI flags, the tldr here being that its simply called whenever the enemy is >3 blocks away, which is great here
-    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 8, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegistry.IMPACT_1)
+    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 8, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.8f, -0.1f, 0, JSoundRegistry.IMPACT_1)
             .crouchingVariation(redirect)
             .setInfo("Punch", "quick combo starter");
     public static final Attack heavy = new Attack(1, 17, 1f, 22, 12, 1.75, 7f, 0.5f, AttackType.BOX, 0.5f, 0.6f, 0, JSoundRegistry.TW_KICK_HIT)
             .setLaunch()
             .setInfo("Low Kick", "medium windup knockdown");
-    public static final Attack barrage = new Attack(2, 17, 0.75f, 60, 0, 2, 0.4f, 0.25f, AttackType.BARRAGE, 1.5f, 0, 3)
-            .setInfo("Flamethrower", "fast reliable combo starter/extender, high stun, burns");
-    public static final Attack crossfire = new Attack(3, 20, 0.75f, 10, 8, 0, 0f, 0f, AttackType.BOX)
+    public static final Attack barrage = Attack.barrageAttack(2, 17, 0.75f, 60, 0, 2, 0.4f, 0.25f, 0, 0, 3)
+            .armorPoints((byte) 1)
+            .setInfo("Flamethrower", "fast reliable damage cash-out tool, no stun, burns for 3 seconds");
+    public static final Attack crossfire = new Attack(3, 12, 0.75f, 10, 8, 0, 0f, 0f, AttackType.BOX)
             .setRanged(true)
             .setInfo("Crossfire", "fires 3 stunning ankhs");
     public static final Attack crossfirevariation = new Attack(4, 30, 0.75f, 17, 12, 0, 0f, 0f, AttackType.BOX)

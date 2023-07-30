@@ -1350,21 +1350,35 @@ C-Moon
 Made in Heaven
     >Improved initiation detection for Heaven's Judgement (normal)
 
-● 28/7/2023
+● 30/7/2023
 Added DAMAGE SCALING
     >The more hits in a combo, the less damage each hit does (100%, -2%/hit until 40%)
 
+>Added sounds to bullets
+
 Star Platinum
+    >Added second hitbox to Inhale
     >Roundhouse cooldown reduced (11->8s)
 
 The World
-    >Donut stun reduced (4->3.4s)
+    >Adjusted knockback values
+    >Donut
+        >Stun reduced (4->3.4s)
+        >Now launches
     >Roundhouse cooldown reduced (11->8s)
+
+King Crimson
+    >Light advantage on hit adjusted (+32->+15)
+    >Donut advantage on hit adjusted (+61->+41)
+    >Eye Chop
+        >Startup reduced (36->24t)
+        >Advantage on hit adjusted (+46->+13)
 
 D4C
     >Fixed breaking blocks in the alternate universe ghosting ones in the main universe
     >Added crouching variant to Light
     >Chop stun reduced (1.5->1.1s)
+    >Grab cooldown reduced (25->20s)
     >Dimensional Explosions changed
         >Reduced range by 25%
         >Increased knockdown time (1.25->1.5s)
@@ -1373,15 +1387,52 @@ D4C
 
 Cream
     >Added crouching variant to Light
+    >Charge replaced with Surprise
+    >Vertical Chop damage reduced (10->8)
+    >3-hit Combo damage reduced (7->5)
+    >Destroy
+        >Cooldown reduced (25->20s)
+        >Damage reduced (10->89)
+        >Added 5 ticks of launch stun
+    >Surprise & Void Charge
+        >Stun increased (2->4t)
+        >Damage increased (4->5)
+
+Killer Queen
+    >Reanimated Haymaker
+    >Sheer Heart Attack
+        >Moved from Special 2 to Ultimate
+        >SHA armor increased (10->20), armor toughness increased (10->12)
 
 Killer Queen & Bites the Dust
+    >Explosion power reduced (2->1)
     >Detonate moved from Ultimate to crouching Light
     >Light can now be cancelled into Detonate
+    >Updated explosion sound
+
+Silver Chariot
+    >Cleave cooldown reduced (23->20s)
+    >Shooting Star cooldown reduced (22->18s)
+    >Ray Dart cooldown reduced (18->13s)
 
 Magician's Red
+    >Flamethrower
+        >Stun Removed
+        >Added 1 armor point
+    >Light stun increased by 1 tick
     >Redirect moved from Special 3 to crouching Light
+    >Crossfire cooldown reduced (20->12s)
     >Variation Ankh speed reduced by 40%
     >Redirected Ankh speed reduced by 40%
+
+The Fool
+    >Pound cooldown reduced (18->13s)
+
+Golden Experience
+    >Shoulder Smash cooldown reduced (17->14s)
+
+The World: Over Heaven
+    >Can now cancel Timestop early by pressing the button again
 
 priority (top to bottom)
 todo: fix predict not working with new projectiles

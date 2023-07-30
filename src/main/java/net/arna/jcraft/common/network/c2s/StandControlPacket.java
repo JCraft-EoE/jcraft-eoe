@@ -1,10 +1,10 @@
 package net.arna.jcraft.common.network.c2s;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.attack.AttackQueue;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
-import net.arna.jcraft.common.attack.AttackQueue;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JStatusRegistry;

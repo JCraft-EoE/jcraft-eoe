@@ -5,9 +5,7 @@ import lombok.Getter;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public enum SpecType {
     NONE(null),

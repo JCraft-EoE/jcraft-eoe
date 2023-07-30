@@ -1,7 +1,6 @@
 package net.arna.jcraft.common.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.arna.jcraft.common.argumenttype.SpecArgumentType;
@@ -9,7 +8,6 @@ import net.arna.jcraft.common.spec.SpecType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.ISpec;
 import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.registry.JArgumentTypeRegistry;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.player.PlayerEntity;

@@ -26,7 +26,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
     public static final Attack donut = new Attack(1, 18, 1f, 36, 17, 2, 10f, 0.0f, AttackType.BOX, 1.4f, 0, 0, JSoundRegistry.TW_DONUT_HIT)
             .setHitspark(2)
             .setInfo("Donut", "slow combo starter/extender");
-    public static final Attack barrage = new Attack(2, 17, 0.75f, 60, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 1, 0, 3, JSoundRegistry.IMPACT_3)
+    public static final Attack barrage = Attack.barrageAttack(2, 17, 0.75f, 60, 0, 2, 1f, 0.25f, 1, 0, 3, JSoundRegistry.IMPACT_3)
             .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
     public static final Attack standdisk = new Attack(3, 30, 1f, 34, 22, 2, 8f, 0.0f, AttackType.BOX, 1f, 0, 0, JSoundRegistry.IMPACT_2)
             .setHitspark(2)

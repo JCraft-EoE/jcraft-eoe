@@ -4,6 +4,7 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.HitBoxData;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
@@ -29,7 +30,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 5, 1.5, 5f, 0.1f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegistry.IMPACT_1)
             .crouchingVariation(crm1)
             .setInfo("Punch", "quick combo starter");
-    public static final Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 2, 0, 3)
+    public static final Attack barrage = Attack.barrageAttack(2, 17, 0.75f, 50, 0, 2, 1f, 0.1f, 2, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
     public static final Attack donut = new Attack(1, 14, 1f, 48, 26, 2, 9f, 1.0f, AttackType.BOX, 3.4f, 0, 0, JSoundRegistry.TW_DONUT_HIT)
             .setLaunch()
@@ -89,6 +90,9 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
                             Donut>Roundhouse>Charge>M1>Barrage>M1""";
 
         moves = List.of(light, donut, barrage, roundhouse, timestop, charge, feignbarrage, timeskip);
+
+        if (world.isClient) return;
+        timestop.stun = JServerConfig.TW_TIME_STOP_DURATION.getValue() / 20.0f;
     }
 
     @Override

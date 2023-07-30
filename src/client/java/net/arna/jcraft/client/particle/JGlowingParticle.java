@@ -1,6 +1,8 @@
 package net.arna.jcraft.client.particle;
 
-import net.minecraft.client.particle.*;
+import net.minecraft.client.particle.AbstractSlowingParticle;
+import net.minecraft.client.particle.ParticleTextureSheet;
+import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
 
 public class JGlowingParticle extends AbstractSlowingParticle {

@@ -11,6 +11,7 @@ import net.minecraft.util.math.Vec3d;
 import java.util.Objects;
 import java.util.UUID;
 
+//todo: make stun interact with physical hits (sword swings, arrow hits, blah blah blah)
 public class DazedStatusEffect extends StatusEffect {
     private static final UUID slowUUID = UUID.fromString("778B48FC-485B-5BA7-58C7-E0D755CE354D");
 

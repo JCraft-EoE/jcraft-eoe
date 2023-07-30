@@ -241,8 +241,8 @@ public interface JEntityTypeRegistry {
         FabricDefaultAttributeRegistry.register(KILLER_QUEEN, KillerQueenEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(KILLER_QUEEN_BITES_THE_DUST, KQBTDEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(SHEER_HEART_ATTACK, SheerHeartAttackEntity.createMobAttributes()
-                .add(EntityAttributes.GENERIC_ARMOR, 10)
-                .add(EntityAttributes.GENERIC_ARMOR_TOUGHNESS, 10)
+                .add(EntityAttributes.GENERIC_ARMOR, 20)
+                .add(EntityAttributes.GENERIC_ARMOR_TOUGHNESS, 12)
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.15)
         );
 

@@ -58,10 +58,10 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             .setBlockstun(6)
             .appendHitbox(new HitBoxData(0, 0, 1))
             .setInfo("Sweep", "quick combo finisher, knocks down");
-    public static final Attack light = new Attack(0, JCraft.lightCooldown + 1, 0.85f, 23, 0, 1.5, 4f, 0.1f, AttackType.MULTIHIT, 2f, -0.1f, List.of(10, 16), JSoundRegistry.IMPACT_4)
+    public static final Attack light = new Attack(0, JCraft.lightCooldown + 1, 0.85f, 23, 0, 1.5, 4f, 0.1f, AttackType.MULTIHIT, 1.15f, -0.1f, List.of(10, 16), JSoundRegistry.IMPACT_4)
             .crouchingVariation(crm1)
             .setInfo("Dual Chop", "quick combo starter");
-    public static final Attack barrage = new Attack(3, 17, 0.85f, 50, 0, 1.5, 1f, 0.1f, AttackType.BARRAGE, 1, 0, 3)
+    public static final Attack barrage = Attack.barrageAttack(3, 17, 0.85f, 50, 0, 1.5, 1f, 0.1f, 1, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender/finisher, medium stun, knocks back");
     public static final Attack overhead = new Attack(2, 8, 0.85f, 32, 22, 2, 9f, 1.5f, AttackType.BOX, 0.55f)
             .setHitspark(2)
@@ -75,15 +75,15 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     public static final Attack bloodthrow = new Attack(5, 25, 15, 10, 10, AttackType.BOX)
             .setRanged(true)
             .setInfo("Blood Throw", "throws a stunning, blinding blood projectile");
-    public static final Attack eyechop = new Attack(4, 20, 1f, 50, 37, 1.75, 9f, 0.3f, AttackType.BOX, 3, -0.3f)
+    public static final Attack eyechop = new Attack(4, 20, 1f, 34, 25, 1.75, 9f, 0.3f, AttackType.BOX, 1.35f, -0.3f)
             .setHitspark(2)
             .appendHitbox(new HitBoxData(0, 0.5, 1))
             .crouchingVariation(bloodthrow)
             .setInfo("Eye Chop", "blindness on hit, donut combo extender");
-    public static final Attack donut = new Attack(6, 15, 1f, 60, 42, 1.75, 14f, 0.0f, AttackType.BOX, 4, 0.1f)
+    public static final Attack donut = new Attack(6, 15, 1f, 60, 42, 1.75, 14f, 0.0f, AttackType.BOX, 3, 0.1f)
             .setHitspark(2)
             .hyperArmor()
-            .setInfo("Donut", "huge windup, 4s hitstun");
+            .setInfo("Donut", "huge windup, huge stun");
     public static final Attack epitaph = new Attack(7, 30, 34, 4, 0, -1, AttackType.COUNTER)
             .setInfo("Epitaph", "0.2s windup, 1.5s counter");
     public static final Attack prediction = new Attack(9, 30, 104, 4, 0, -1, AttackType.BOX)

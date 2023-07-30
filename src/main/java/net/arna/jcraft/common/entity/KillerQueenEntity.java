@@ -2,11 +2,14 @@ package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
+import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
-import net.arna.jcraft.common.util.JExplosionModifier;
-import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
-import net.arna.jcraft.registry.*;
+import net.arna.jcraft.registry.JEntityTypeRegistry;
+import net.arna.jcraft.registry.JObjectRegistry;
+import net.arna.jcraft.registry.JSoundRegistry;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
@@ -14,12 +17,13 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
@@ -27,9 +31,28 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQueenEntity, KillerQueenEntity.State> {
+    public static final Attack heavy = new Attack(2, 12, 0.75f, 24, 16, 2, 9f, 1.75f, AttackType.BOX, 0.5f, 0, 0, JSoundRegistry.IMPACT_4)
+            .setHitspark(2)
+            .hyperArmor()
+            .setLaunch()
+            .setInfo("Haymaker", "slow, uninterruptable launcher");
+    public static final Attack sha = new Attack(5, 45, 20, 16, 0, AttackType.BOX)
+            .setRanged(true)
+            .setInfo("Sheer Heart Attack", "creates an automatic, heat-seeking sub-stand that explodes on contact, reflects 25% damage back to owner");
+    //todo: high launch face grab
+    public static final Attack grab = new Attack(7, 22, 0.75f, 20, 12, 1.75, 0, 0.1f, AttackType.BOX, 1f)
+            .setGrab()
+            .setInfo("Grab", "grabs opponent by the face, then detonates them, launching them upwards");
+    public static final Attack grabhit = new Attack(8, 0, 20, 13, 0.75f, AttackType.BOX)
+            .setGrab()
+            .setInfo("Grab (Hit)", "");
 
     public KillerQueenEntity(World worldIn) {
         super(StandType.KILLER_QUEEN, State.class, worldIn);
+
+        moves = List.of(light, heavy, barrage, bombplant, sha, grab
+                , new Attack().setRanged(true).setInfo("Coin Toss", "overrides current bomb with an aimable coin")
+                , new Attack().setMobility(MobilityType.DASH).setInfo("Explosive Dash", "slight aoe damage, 3D movement tool"));
     }
 
     // Move-set
@@ -77,8 +100,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
     @Override
     public void initSpecial2() {
         if (!canAttack()) return;
-        handleAttack(sha, JCraft.standS2CD, State.SHA);
-        //playSound(ModSoundRegister.KQ_SHA,1, 1);
+        handleAttack(grab, JCraft.standS2CD, State.GRAB);
     }
 
     @Override
@@ -106,7 +128,9 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
 
     @Override
     public void initUlt() {
-        //todo: KQ ULT
+        if (!canAttack()) return;
+        handleAttack(sha, JCraft.standUltCD, State.SHA);
+        //playSound(ModSoundRegister.KQ_SHA,1, 1);
     }
 
     @Override
@@ -142,7 +166,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
             }
             case (6) -> {
                 if (bombEntity instanceof LivingEntity livingEntity) {
-                    explode(user, livingEntity.getEyePos());
+                    explode(user, livingEntity.getPos());
                     livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0, true, false));
                 } else {
                     Vec3d bombPos = null;
@@ -171,6 +195,34 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
                 bombEntity = null;
                 bombBlock = null;
             }
+            case (7) -> {
+                if (entities.isEmpty()) return;
+
+                setAttack(grabhit, State.GRABHIT);
+                bombEntity = entities.get(0);
+                bombBlock = null;
+            }
+            case (8) -> {
+                playSound(JSoundRegistry.KQ_DETONATE, 1, 1);
+
+                if (bombEntity == null) return;
+                explode(user, bombEntity.getPos());
+
+                bombEntity.setVelocity(0, 1, 0);
+                bombEntity.velocityModified = true;
+
+                if (bombEntity instanceof LivingEntity livingEntity) {
+                    livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0, true, false));
+
+                    livingEntity.removeStatusEffect(JStatusRegistry.DAZED);
+                    stun(livingEntity, 5, 3);
+
+                    if (livingEntity instanceof ServerPlayerEntity serverPlayer)
+                        serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(serverPlayer));
+                }
+
+                bombEntity = null;
+            }
         }
     }
 
@@ -184,7 +236,10 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
         DETONATE(builder -> builder.playAndHold("animation.killerqueen.detonate")),
         BOMB_PLANT(builder -> builder.playAndHold("animation.killerqueen.bombplant")),
         SHA(builder -> builder.playAndHold("animation.killerqueen.sha")),
-        LOW(builder -> builder.playAndHold("animation.killerqueen.low"));
+        LOW(builder -> builder.playAndHold("animation.killerqueen.low")),
+        GRAB(builder -> builder.playAndHold("animation.killerqueen.grab")),
+        GRABHIT(builder -> builder.playAndHold("animation.killerqueen.grab_hit"));
+
 
         private final Consumer<AnimationBuilder> animator;
 

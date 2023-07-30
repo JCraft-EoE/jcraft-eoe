@@ -54,7 +54,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 1.5f, 14, 7, 2, 6f, 0.8f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegistry.IMPACT_2)
             .appendHitbox(new HitBoxData(0, 0.25, 1))
             .setInfo("Swipe", "slow, long-reaching poke");
-    public static final Attack airbarrage = new Attack(3, 17, 1f, 30, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 0.5f, 0, 3)
+    public static final Attack airbarrage = Attack.barrageAttack(3, 17, 1f, 30, 0, 2, 1f, 0.1f, 0.5f, 0, 3)
             .setInfo("Burn Rubber", "slows down all movement, combo starter/extender");
     public static final Attack combo = new Attack(2, 15, 1.5f, 29, 0, 1.75, 4.5f, 0.1f, AttackType.MULTIHIT, 1f, -0.1f, List.of(6, 14, 18, 19), JSoundRegistry.IMPACT_2)
             .appendHitbox(new HitBoxData(0.5, 0, 1.25))
@@ -66,7 +66,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .hyperArmor()
             .setInfo("Launch", "uninterruptable, slow, launching uppercut");
     public static final Attack slam = new Attack(10, 0, 1.25f, 10, 4, 2, 4f, 0.2f, AttackType.BOX, 1.2f, 0.1f, 0, JSoundRegistry.IMPACT_2);
-    public static final Attack pound = new Attack(4, 18, 1.25f, 22, 7, 1.5, 4f, 0.1f, AttackType.BOX, 1.25f, -0.1f, 0, JSoundRegistry.IMPACT_2)
+    public static final Attack pound = new Attack(4, 13, 1.25f, 22, 7, 1.5, 4f, 0.1f, AttackType.BOX, 1.25f, -0.1f, 0, JSoundRegistry.IMPACT_2)
             .setLift(false)
             .setFollowup(slam)
             .setInfo("Pound", """
@@ -80,12 +80,13 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     public static final Attack glide = new Attack(9, 27, 0f, 85, 5, 0, 0, 0, AttackType.BOX)
             .setMobility(MobilityType.FLIGHT)
             .setInfo("Glider", "turns The Fool into a glider");
-    public static final Attack sandwave = new Attack(8, 27, 0f, 80, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 0, 0, 3)
+    public static final Attack sandwave = Attack.barrageAttack(8, 27, 0f, 80, 0, 2, 1f, 0.1f, 0, 0, 3)
             .setMobility(MobilityType.DASH)
             .setRanged(true)
             .disableBackstab()
             .aerialVariation(glide)
             .setInfo("Sandwave", "The Fool turns into a quick sandwave that knocks anything it touches down");
+    //todo: sand tornado tracking
     public static final Attack tornado = new Attack(11, 25, 1, 13, 12, 0, 0f, 0.0f, AttackType.BOX)
             .setRanged(true)
             .setInfo("Sand Tornado", "summons a slow, stunning sand tornado");
@@ -397,6 +398,8 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
                         createFoolishSand(new Vec3d(Math.sin(h) / hDiv, y, Math.cos(h) / hDiv));
                     }
                 } else {
+                    //todo: sand clone - copies player armor, aggros STUPID PEOPLE
+
                     // Summon clone
                     if (user instanceof ServerPlayerEntity player) {
                         PlayerCloneEntity playerCloneEntity = new PlayerCloneEntity(PlayerCloneEntity.getCloneType(player), world);

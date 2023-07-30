@@ -19,7 +19,7 @@ public class JServerConfig {
     // TODO fix the default values
     // Balance options
     private static final String BALANCE = "balance";
-    public static final IntOption SPTW_TIME_STOP_DURATION = new IntOption("sptwTimeStopDuration", BALANCE, 30, 0);
+    public static final IntOption SPTW_TIME_STOP_DURATION = new IntOption("sptwTimeStopDuration", BALANCE, 35, 0);
     public static final IntOption TW_TIME_STOP_DURATION = new IntOption("twTimeStopDuration", BALANCE, 80, 0);
     public static final IntOption TWOH_TIME_STOP_DURATION = new IntOption("twohTimeStopDuration", BALANCE, 100, 0);
     public static final IntOption MIH_TIME_ACCELERATION_DURATION = new IntOption("mihTimeAccelerationDuration", BALANCE, 300, 0);

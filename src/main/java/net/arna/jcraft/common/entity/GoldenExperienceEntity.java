@@ -26,16 +26,17 @@ import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import java.util.List;
 import java.util.function.Consumer;
 
+//todo: disable unstackable items from being turned into animals
 public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, GoldenExperienceEntity.State> {
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 9, 6, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegistry.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
-    public static final Attack heavy = new Attack(1, 17, 1f, 22, 13, 1.5, 9f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegistry.IMPACT_2)
+    public static final Attack heavy = new Attack(1, 14, 1f, 22, 13, 1.5, 9f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegistry.IMPACT_2)
             .setHitspark(2)
             .appendHitbox(new HitBoxData(0, 0, 1.25))
             .hyperArmor()
             .setLaunch()
             .setInfo("Shoulder Smash", "slow, uninterruptable combo finisher");
-    public static final Attack barrage = new Attack(2, 14, 0.75f, 30, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 2, 0, 3)
+    public static final Attack barrage = Attack.barrageAttack(2, 14, 0.75f, 30, 0, 2, 1f, 0.25f, 2, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
     public static final Attack healself = new Attack(3, 26, 1f, 14, 10, 0, 0f, 0f, AttackType.BOX)
             .setInfo("Healing Hand", "standing: heals user for 2 hearts, crouching: heals others for 2 hearts, pacifies angered mobs");

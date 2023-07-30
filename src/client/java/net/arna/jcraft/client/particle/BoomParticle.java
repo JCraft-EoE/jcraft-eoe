@@ -2,7 +2,9 @@ package net.arna.jcraft.client.particle;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.particle.*;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleFactory;
+import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.DefaultParticleType;
 
@@ -14,7 +16,7 @@ public class BoomParticle extends JGlowingParticle {
 
     @Override
     protected void initialize() {
-        this.maxAge = 5;
+        this.maxAge = 6;
         this.scale = 3;
     }
 

@@ -4,6 +4,7 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.HitBoxData;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
@@ -20,7 +21,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPTWEntity.State> {
-    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 5, 1.5, 5f, 0.25f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegistry.IMPACT_1)
+    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 5, 1.5, 5f, 0.2f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegistry.IMPACT_1)
             .setInfo("Punch", "quick combo starter, low knockback");
     public static final Attack heavy = new Attack(1, 17, 1f, 30, 20, 2.0, 10f, 1.5f, AttackType.BOX, 0.7f, 0, 0, JSoundRegistry.IMPACT_1)
             .setHitspark(2)
@@ -36,7 +37,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
     public static final Attack backhand = new Attack(4, 12, 0.75f, 12, 7, 1.5, 6f, 0.25f, AttackType.BOX, 1f, 0, 0, JSoundRegistry.IMPACT_1)
             .appendHitbox(new HitBoxData(0, 0, 1))
             .setInfo("Backhand", "fast poke, decent stun");
-    public static final Attack grab = new Attack(5, 26, 1f, 20, 8, 1.5, 2f, 0.4f, AttackType.BOX, 1, 0, 0, JSoundRegistry.SPTW_GRABHIT)
+    public static final Attack grab = new Attack(5, 26, 1f, 20, 8, 1.5, 2f, 0.1f, AttackType.BOX, 1, 0, 0, JSoundRegistry.SPTW_GRABHIT)
             .appendHitbox(new HitBoxData(0, 0, 1))
             .setGrab()
             .setBlockstun(4)
@@ -58,6 +59,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
     public SPTWEntity(World worldIn) {
         super(StandType.STAR_PLATINUM_THE_WORLD, State.class, worldIn);
         super.initialize();
+
         idleRotation = 315f;
 
         description = "High Speed RUSHDOWN";
@@ -82,6 +84,9 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
                             M1>cr.Time Strike>Backhand>What an Ugly Watch>delay M1>Timestop~Star Breaker>dash/Timeskip>Barrage>M1""";
 
         moves = List.of(light, heavy, barrage, timestrike, timestop, backhand, timestrike, timeskip);
+
+        if (world.isClient) return;
+        timestop.stun = JServerConfig.SPTW_TIME_STOP_DURATION.getValue() / 20.0f;
     }
 
     @Override
