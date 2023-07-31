@@ -42,6 +42,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -66,6 +67,26 @@ public class ClientPacketHandler {
         register(S2C_SERVER_CONFIG, ClientPacketHandler::handleServerConfig);
         register(S2C_J_EXPLOSION, ClientPacketHandler::handleJExplosion);
         register(S2C_COMBO_COUNTER, ClientPacketHandler::handleComboCounter);
+        register(S2C_TIME_STOP, ClientPacketHandler::handleTimeStop);
+    }
+
+    private static void handleTimeStop(@NotNull MinecraftClient client, PacketByteBuf buf) {
+        if (client.world == null || client.player == null) return;
+
+        boolean isStart = buf.readBoolean();
+        int entID = buf.readInt();
+
+        if (isStart) {
+            Vec3d position = new Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
+            RegistryKey<World> registryKey = buf.readRegistryKey(Registry.WORLD_KEY);
+            int time = buf.readInt();
+
+            client.execute(() -> {
+                Entity ent = client.world.getEntityById(entID);
+                if (ent == null) return;
+                JClientUtils.activeTimestops.add( new DimValues(ent, position, registryKey, time) );
+            });
+        } else JClientUtils.removeTimestop(entID);
     }
 
     private static void register(Identifier id, Consumer<PacketByteBuf> handler) {
@@ -76,8 +97,8 @@ public class ClientPacketHandler {
         registerGlobalReceiver(id, (client, handler1, buf, responseSender) -> handler.accept(client, buf));
     }
 
-    public static void handleAnimation(MinecraftClient client, PacketByteBuf buf) {
-        if (client == null || client.world == null || client.player == null) return;
+    public static void handleAnimation(@NotNull MinecraftClient client, PacketByteBuf buf) {
+        if (client.world == null || client.player == null) return;
 
         int entID = buf.readInt();
         String animID = buf.readString(); // I know exactly how unoptimized this is, but I fail to care
@@ -125,8 +146,8 @@ public class ClientPacketHandler {
         });
     }
 
-    public static void handleChannelFeedback(MinecraftClient client, PacketByteBuf buf) {
-        if (client == null || client.world == null || client.player == null) return;
+    public static void handleChannelFeedback(@NotNull MinecraftClient client, PacketByteBuf buf) {
+        if (client.world == null || client.player == null) return;
 
         short control = buf.readShort();
         switch (control) {
@@ -369,24 +390,10 @@ public class ClientPacketHandler {
                     ((ITimeStop) ent).setTimeStopTicks(ticks);
                 });
             }
-
-            // TS Synchronization (see JCraft.java startTrackingTimestop())
-            case (15) -> {
-                int entID = buf.readInt();
-                Vec3d position = new Vec3d( buf.readDouble(), buf.readDouble(), buf.readDouble() );
-                RegistryKey<World> registryKey = buf.readRegistryKey(Registry.WORLD_KEY);
-                int time = buf.readInt();
-
-                client.execute(() -> {
-                    Entity ent = client.world.getEntityById(entID);
-                    if (ent == null) return;
-                    JClientUtils.activeTimestops.add( new DimValues(ent, position, registryKey, time) );
-                });
-            }
         }
     }
 
-    public static void handleShaderActivation(MinecraftClient client, PacketByteBuf buf) {
+    public static void handleShaderActivation(@NotNull MinecraftClient client, PacketByteBuf buf) {
         int delay = buf.readInt();
         int duration = buf.readInt();
         ShaderActivationPacket.Type type = ShaderActivationPacket.Type.byName(buf.readString());
@@ -417,7 +424,7 @@ public class ClientPacketHandler {
         }
     }
 
-    public static void handleShaderDeactivation(MinecraftClient client, PacketByteBuf buf) {
+    public static void handleShaderDeactivation(@NotNull MinecraftClient client, PacketByteBuf buf) {
         ShaderActivationPacket.Type type = ShaderActivationPacket.Type.byName(buf.readString());
         World world = client.world;
         if (world != null) {
@@ -438,7 +445,7 @@ public class ClientPacketHandler {
         }
     }
 
-    public static void handleTimeAccelState(MinecraftClient client, PacketByteBuf buf) {
+    public static void handleTimeAccelState(@NotNull MinecraftClient client, PacketByteBuf buf) {
         TimeAccelStatePacket.State state = TimeAccelStatePacket.State.values()[buf.readVarInt()];
         Entity e = client.world == null ? null : client.world.getEntityById(buf.readVarInt());
 
@@ -456,7 +463,7 @@ public class ClientPacketHandler {
         else EpitaphOverlay.stop();
     }
 
-    public static void handlePredictionState(MinecraftClient client, PacketByteBuf buf) {
+    public static void handlePredictionState(@NotNull MinecraftClient client, PacketByteBuf buf) {
         boolean start = buf.readBoolean();
         int length = start ? buf.readVarInt() : 0;
 
@@ -466,7 +473,7 @@ public class ClientPacketHandler {
         });
     }
 
-    public static void handleServerConfig(MinecraftClient client, PacketByteBuf buf) {
+    public static void handleServerConfig(@NotNull MinecraftClient client, PacketByteBuf buf) {
         boolean editable = buf.readBoolean();
         boolean show = buf.readBoolean();
 
@@ -475,7 +482,7 @@ public class ClientPacketHandler {
         if (show) client.execute(() -> ServerConfigUI.show(editable));
     }
 
-    private static void handleJExplosion(MinecraftClient client, PacketByteBuf buf) {
+    private static void handleJExplosion(@NotNull MinecraftClient client, PacketByteBuf buf) {
         ExplosionS2CPacket nativePacket = new ExplosionS2CPacket(buf);
         JExplosionModifier modifier = buf.readBoolean() ? JExplosionModifier.read(buf) : null;
 
@@ -489,7 +496,7 @@ public class ClientPacketHandler {
         });
     }
 
-    private static void handleComboCounter(MinecraftClient minecraftClient, PacketByteBuf buf) {
+    private static void handleComboCounter(@NotNull MinecraftClient minecraftClient, PacketByteBuf buf) {
         JCraftClient.comboCounter = buf.readInt();
         JCraftClient.damageScaling = buf.readFloat();
         JCraftClient.framesSinceCounted = 0;

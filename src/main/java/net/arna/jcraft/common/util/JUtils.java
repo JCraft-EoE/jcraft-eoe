@@ -305,14 +305,10 @@ public final class JUtils {
         return ((ITimeStop) entity).getTimeStopTicks() > 0;
     }
 
-    public static boolean isStoppingTime(Entity entity) {
-        for (DimValues d :
-                activeTimestops) {
-            if (d.user == entity) {
-                return true;
-            }
-        }
-        return false;
+    public static @Nullable DimValues getTimestop(Entity entity) {
+        for (DimValues d : activeTimestops)
+            if (d.user == entity) return d;
+        return null;
     }
 
     public static void stopTick(Entity entity) {

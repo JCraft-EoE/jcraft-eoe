@@ -249,7 +249,8 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             if (handleAttack(timestop, JCraft.standUltCD, State.TIME_STOP))
                 playSound(JSoundRegistry.TWOH_TS, 1, 1);
         } else {
-
+            JCraft.stopTimestop(getUserOrThrow());
+            tsTime = 0;
         }
     }
 

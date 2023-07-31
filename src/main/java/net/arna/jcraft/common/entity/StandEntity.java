@@ -827,7 +827,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                     StatusEffectInstance tsBlind = new StatusEffectInstance(StatusEffects.BLINDNESS, 19, 0, false, false, false);
                     user.addStatusEffect(tsBlind);
 
-                    JCraft.stopTime(user, pos, (ServerWorld) world, stunTicks);
+                    JCraft.beginTimestop(user, pos, (ServerWorld) world, stunTicks);
                 }
 
                 boolean isBarrage = attack.isBarrage();

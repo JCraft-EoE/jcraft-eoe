@@ -30,7 +30,11 @@ import java.util.function.Consumer;
 
 //todo: make crouching with SC increase attackDist
 public class SilverChariotEntity extends StandEntity<SilverChariotEntity, SilverChariotEntity.State> {
+    public final Attack lastshot = new Attack(12, 24, 1f, 15, 12, 0, 0f, 0f, AttackType.BOX)
+            .setRanged(true)
+            .setInfo("Last Shot", "Chariot fires his rapier, which can bounce 5 times off walls, nerfs all hitboxes and damage by 25% until returned");
     public final Attack light = new Attack(0, JCraft.lightCooldown, 0.65f, 9, 5, 1.75, 5f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0)
+            .crouchingVariation(lastshot)
             .setInfo("Stab", "quick combo starter, links into Spinning Blade while armor is off");
     public final Attack barrage = new Attack(2, 17, 0.65f, 60, 0, 2.25, 0.9f, 0.1f, AttackType.BARRAGE, 1.25f, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
@@ -71,9 +75,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
     public final Attack armoroff = new Attack(11, 60, 0.65f, 15, 6, 1.75, 4f, 0.75f, AttackType.BOX, 0.35f, 0f, 0)
             .setLaunch()
             .setInfo("Armor Off", "25s of faster moves");
-    public final Attack lastshot = new Attack(12, 24, 1f, 15, 12, 0, 0f, 0f, AttackType.BOX)
-            .setRanged(true)
-            .setInfo("Last Shot", "Chariot fires his rapier, which can bounce 5 times off walls, nerfs all hitboxes and damage by 25% until returned");
+
     private int armorTime;
 
     private void setNormalDesc() {

@@ -1350,11 +1350,12 @@ C-Moon
 Made in Heaven
     >Improved initiation detection for Heaven's Judgement (normal)
 
-● 30/7/2023
+● 31/7/2023
 Added DAMAGE SCALING
     >The more hits in a combo, the less damage each hit does (100%, -2%/hit until 40%)
 
 >Added sounds to bullets
+>Fixed a crash relating to Step Height Entity Attribute
 
 Star Platinum
     >Added second hitbox to Inhale
@@ -1434,6 +1435,9 @@ Golden Experience
 
 The World: Over Heaven
     >Can now cancel Timestop early by pressing the button again
+
+Star Platinum: The World
+    >Updated skin 3
 
 priority (top to bottom)
 todo: fix predict not working with new projectiles

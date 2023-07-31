@@ -9,6 +9,7 @@ import net.arna.jcraft.common.util.DimValues;
 import net.arna.jcraft.common.util.ISpec;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
@@ -29,6 +30,18 @@ public class JClientUtils {
 
     // Timestop tracking
     public static List<DimValues> activeTimestops = new ArrayList<>();
+
+    public static boolean removeTimestop(int timestopperId) {
+        for (DimValues timestop : activeTimestops) {
+            Entity timestopper = timestop.user;
+            if (timestopper.getId() != timestopperId) continue;
+            activeTimestops.remove(timestop);
+            return true;
+        }
+
+        return false;
+    }
+
     public static boolean isInTSRange(Vec3d pos) {
         for (DimValues timeStop : activeTimestops)
             if (timeStop != null && timeStop.pos.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) <= 65536)

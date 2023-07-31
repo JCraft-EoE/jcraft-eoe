@@ -14,9 +14,7 @@ import net.arna.jcraft.common.network.c2s.ConfigUpdatePacket;
 import net.arna.jcraft.common.network.c2s.InputSyncPacket;
 import net.arna.jcraft.common.network.c2s.OnConnectedPacket;
 import net.arna.jcraft.common.network.c2s.StandControlPacket;
-import net.arna.jcraft.common.network.s2c.PlayerAnimPacket;
-import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
+import net.arna.jcraft.common.network.s2c.*;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.*;
@@ -149,39 +147,56 @@ public class JCraft implements ModInitializer {
      * @param position in world
      */
     //todo: make TS stop animated textures
-    public static void stopTime(Entity timestopper, Vec3d position, ServerWorld world, int duration) {
+    public static void beginTimestop(Entity timestopper, Vec3d position, ServerWorld world, int duration) {
         // Registration
         RegistryKey<World> worldRegistryKey = world.getRegistryKey();
         JUtils.activeTimestops.add(new DimValues(timestopper, position, worldRegistryKey, duration));
 
         // Synchronization
-        PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeShort(15);
-        buf.writeInt(timestopper.getId());
-        buf.writeDouble(position.x);
-        buf.writeDouble(position.y);
-        buf.writeDouble(position.z);
-        buf.writeRegistryKey(worldRegistryKey);
-        buf.writeInt(duration);
+        PacketByteBuf buf = TimeStopStatePacket.createStartPacket(timestopper.getId(), position, worldRegistryKey, duration);
+        PlayerLookup.world(world).forEach( playerEntity -> TimeStopStatePacket.send(playerEntity, buf) ); // Sends to unaffected players because they may walk into range
 
-        PlayerLookup.world(world).forEach(
-                playerEntity -> ServerChannelFeedbackPacket.send(playerEntity, buf)
-        );
-
-        // Inventory cooldowns
-        List<ServerPlayerEntity> toCooldown = world.getEntitiesByClass(ServerPlayerEntity.class,
+        List<ServerPlayerEntity> toStop = world.getEntitiesByClass(ServerPlayerEntity.class,
                 new Box(position.add(96.0, 96.0, 96.0), position.subtract(96.0, 96.0, 96.0)), EntityPredicates.VALID_LIVING_ENTITY);
 
-        for (ServerPlayerEntity serverPlayerEntity : toCooldown) {
+        for (ServerPlayerEntity serverPlayer : toStop) {
             // Shader handling
-            ShaderActivationPacket.send(serverPlayerEntity, timestopper, 0, duration, ShaderActivationPacket.Type.ZA_WARUDO);
-            if (serverPlayerEntity == timestopper || serverPlayerEntity.isCreative()) continue;
+            ShaderActivationPacket.send(serverPlayer, timestopper, 0, duration, ShaderActivationPacket.Type.ZA_WARUDO);
+            if (serverPlayer == timestopper || serverPlayer.isCreative()) continue;
 
             // Puts all player items besides armor into cooldown for entire duration of timestop
-            for (int i = 0; i < serverPlayerEntity.getInventory().main.size(); i++)
-                serverPlayerEntity.getItemCooldownManager().set(serverPlayerEntity.getInventory().main.get(i).getItem(), duration);
-            serverPlayerEntity.getItemCooldownManager().set(serverPlayerEntity.getOffHandStack().getItem(), duration);
+            for (int i = 0; i < serverPlayer.getInventory().main.size(); i++)
+                serverPlayer.getItemCooldownManager().set(serverPlayer.getInventory().main.get(i).getItem(), duration);
+            serverPlayer.getItemCooldownManager().set(serverPlayer.getOffHandStack().getItem(), duration);
         }
+    }
+
+    public static void stopTimestop(Entity timestopper) {
+        DimValues timestop = JUtils.getTimestop(timestopper);
+        World world = timestopper.getWorld();
+
+        if (timestop == null || !(world instanceof ServerWorld serverWorld)) return;
+
+        // Synchronization
+        PacketByteBuf buf = TimeStopStatePacket.createStopPacket(timestopper.getId());
+        PlayerLookup.world(serverWorld).forEach( playerEntity -> TimeStopStatePacket.send(playerEntity, buf) );
+
+        Vec3d position = timestop.pos;
+
+        List<ServerPlayerEntity> toUnfreeze = serverWorld.getEntitiesByClass(ServerPlayerEntity.class,
+                new Box(position.add(96.0, 96.0, 96.0), position.subtract(96.0, 96.0, 96.0)), EntityPredicates.VALID_LIVING_ENTITY);
+
+        for (ServerPlayerEntity serverPlayer : toUnfreeze) {
+            // Shader handling
+            ShaderDeactivationPacket.send(serverPlayer, ShaderActivationPacket.Type.ZA_WARUDO);
+
+            // Removes cooldowns
+            for (int i = 0; i < serverPlayer.getInventory().main.size(); i++)
+                serverPlayer.getItemCooldownManager().remove(serverPlayer.getInventory().main.get(i).getItem());
+            serverPlayer.getItemCooldownManager().remove(serverPlayer.getOffHandStack().getItem());
+        }
+
+        JUtils.activeTimestops.remove(timestop);
     }
 
     private static void appendJcraftGroupStacks(List<ItemStack> stacks) {
