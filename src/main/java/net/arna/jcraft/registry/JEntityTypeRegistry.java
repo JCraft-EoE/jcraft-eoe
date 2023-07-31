@@ -3,6 +3,7 @@ package net.arna.jcraft.registry;
 import lombok.RequiredArgsConstructor;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.*;
+import net.arna.jcraft.common.entity.projectile.*;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.entity.Entity;

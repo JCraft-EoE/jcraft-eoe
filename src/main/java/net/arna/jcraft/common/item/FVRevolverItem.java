@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.item;
 
-import net.arna.jcraft.common.entity.BulletProjectile;
+import net.arna.jcraft.common.entity.projectile.BulletProjectile;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.client.item.TooltipContext;

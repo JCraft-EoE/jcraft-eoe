@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.renderer.entity;
 
 import net.arna.jcraft.client.model.entity.KnifeModel;
-import net.arna.jcraft.common.entity.KnifeProjectile;
+import net.arna.jcraft.common.entity.projectile.KnifeProjectile;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;

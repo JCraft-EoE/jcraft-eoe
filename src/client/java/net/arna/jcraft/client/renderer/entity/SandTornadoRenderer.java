@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.renderer.entity;
 
 import net.arna.jcraft.client.model.entity.SandTornadoModel;
-import net.arna.jcraft.common.entity.SandTornadoEntity;
+import net.arna.jcraft.common.entity.projectile.SandTornadoEntity;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;

@@ -1,4 +1,4 @@
-package net.arna.jcraft.common.entity;
+package net.arna.jcraft.common.entity.projectile;
 
 import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.fabricmc.api.EnvType;

@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.renderer.entity;
 
 import net.arna.jcraft.client.model.entity.AnkhModel;
-import net.arna.jcraft.common.entity.AnkhProjectile;
+import net.arna.jcraft.common.entity.projectile.AnkhProjectile;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;

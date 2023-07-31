@@ -20,7 +20,7 @@ public final class Attack {
     public float stun = 0f; // How long is the opponent stunned for after being hit
     public float offset = 0; // Hitbox Y offset (inverted)
     public SoundEvent impactSound;
-    public List<Integer> attackTimes;
+    public final List<Integer> attackTimes = new ArrayList<>();
 
     public byte interval = 1; // For barrages; attack interval | For charges; hit state ID
 
@@ -177,7 +177,7 @@ public final class Attack {
         this.attackType = attackType;
         this.stun = stun;
         this.offset = offset;
-        this.attackTimes = attackTimes;
+        this.attackTimes.addAll(attackTimes);
         this.impactSound = impactSound;
     }
 
@@ -441,7 +441,11 @@ public final class Attack {
                 attack.impactSound
         );
 
-        attackCopy.attackTimes = attack.attackTimes;
+        if (!attack.attackTimes.isEmpty())
+            attackCopy.attackTimes.addAll(attack.attackTimes);
+        if (!attack.extraHitboxes.isEmpty())
+            attackCopy.extraHitboxes.addAll(attack.extraHitboxes);
+
         attackCopy.armor = attack.armor;
         attackCopy.lift = attack.lift;
         attackCopy.hitspark = attack.hitspark;
@@ -451,7 +455,6 @@ public final class Attack {
 
         attackCopy.animation = attack.animation;
         attackCopy.canBackstab = attack.canBackstab;
-        attackCopy.extraHitboxes = attack.extraHitboxes;
 
         attackCopy.blockstun = attack.blockstun;
         attackCopy.overrideBlockstun = attack.overrideBlockstun;

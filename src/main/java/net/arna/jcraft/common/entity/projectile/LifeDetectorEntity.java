@@ -1,5 +1,6 @@
-package net.arna.jcraft.common.entity;
+package net.arna.jcraft.common.entity.projectile;
 
+import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.util.IOwnable;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.command.argument.EntityAnchorArgumentType;

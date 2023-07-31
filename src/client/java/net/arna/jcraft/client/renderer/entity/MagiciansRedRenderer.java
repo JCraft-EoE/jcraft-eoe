@@ -19,7 +19,7 @@ public class MagiciansRedRenderer extends GeoEntityRenderer<MagiciansRedEntity> 
 
     public MagiciansRedRenderer(EntityRendererFactory.Context context) {
         super(context, new MagiciansRedModel());
-        this.addLayer(new MRGlowLayer(this));
+        addLayer(new MRGlowLayer(this));
     }
 
     @Override

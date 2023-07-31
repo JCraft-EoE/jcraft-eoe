@@ -14,8 +14,8 @@ import software.bernie.geckolib3.renderers.geo.IGeoRenderer;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static net.arna.jcraft.common.entity.RapierProjectile.ARMOR_OFF_TEXTURE;
-import static net.arna.jcraft.common.entity.RapierProjectile.POSSESSED_TEXTURE;
+import static net.arna.jcraft.common.entity.projectile.RapierProjectile.ARMOR_OFF_TEXTURE;
+import static net.arna.jcraft.common.entity.projectile.RapierProjectile.POSSESSED_TEXTURE;
 
 public class SCRapierLayer extends GeoLayerRenderer<SilverChariotEntity> {
     private static final Identifier MODEL = JCraft.id("geo/silver_chariot.geo.json");

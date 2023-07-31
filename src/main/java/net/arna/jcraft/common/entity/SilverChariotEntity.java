@@ -3,7 +3,9 @@ package net.arna.jcraft.common.entity;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.attack.StunType;
+import net.arna.jcraft.common.entity.projectile.RapierProjectile;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -17,8 +19,11 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -30,51 +35,59 @@ import java.util.function.Consumer;
 
 //todo: make crouching with SC increase attackDist
 public class SilverChariotEntity extends StandEntity<SilverChariotEntity, SilverChariotEntity.State> {
-    public final Attack lastshot = new Attack(12, 24, 1f, 15, 12, 0, 0f, 0f, AttackType.BOX)
+    public static final Attack lastshot = new Attack(12, 7, 1f, 15, 12, 0, 0f, 0f, AttackType.BOX)
             .setRanged(true)
             .setInfo("Last Shot", "Chariot fires his rapier, which can bounce 5 times off walls, nerfs all hitboxes and damage by 25% until returned");
-    public final Attack light = new Attack(0, JCraft.lightCooldown, 0.65f, 9, 5, 1.75, 5f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0)
+    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.65f, 9, 5, 1.75, 5f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0)
             .crouchingVariation(lastshot)
             .setInfo("Stab", "quick combo starter, links into Spinning Blade while armor is off");
-    public final Attack barrage = new Attack(2, 17, 0.65f, 60, 0, 2.25, 0.9f, 0.1f, AttackType.BARRAGE, 1.25f, 0, 3)
+    public static final Attack barrage = new Attack(2, 17, 0.65f, 60, 0, 2.25, 0.9f, 0.1f, AttackType.BARRAGE, 1.25f, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public final Attack heavy = new Attack(1, 15, 0.65f, 28, 20, 2.0, 8f, 1.5f, AttackType.BOX, 0.5f)
+    public static final Attack heavy = new Attack(1, 15, 0.65f, 28, 20, 2.0, 8f, 1.5f, AttackType.BOX, 0.5f)
             .setHitspark(2)
             .hyperArmor()
             .setLaunch()
             .setInfo("Impaling Thrust", "slow, uninterruptable launcher");
     //todo: spin barrage deflecting projectiles, launch stun
-    public final Attack spinbarrage = new Attack(3, 25, 0.65f, 24, 7, 2, 1f, 0.1f, AttackType.BARRAGE, 0.50f, 0, 2)
+    public static final Attack spinbarrage = new Attack(3, 25, 0.65f, 24, 7, 2, 1f, 0.1f, AttackType.BARRAGE, 0.50f, 0, 2)
             .setInfo("Spinning Blade", "fast reliable combo starter/extender, low stun");
-    public final Attack pcharge = new Attack(4, 13, 0.65f, 25, 13, 1.75, 5f, 0.25f, AttackType.BOX, 0.75f, -0.2f, 0)
+    public static final Attack pcharge = new Attack(4, 13, 0.65f, 25, 13, 1.75, 5f, 0.25f, AttackType.BOX, 0.75f, -0.2f, 0)
             .setRanged(true)
             .setMobility(MobilityType.DASH)
             .setBlockstun(17)
             .setInfo("Ray Dart", "Silver Chariot and the user charge forward, combo finisher");
-    public final Attack cleave = new Attack(5, 20, 0.75f, 21, 12, 2.5, 9f, 0.8f, AttackType.BOX, 1f, 0, 0)
+    public static final Attack cleave = new Attack(5, 20, 0.75f, 21, 12, 2.5, 9f, 0.8f, AttackType.BOX, 1f, 0, 0)
             .setHitspark(2)
             .hyperArmor()
             .setInfo("Cleave", "Silver Chariot detaches from the user, delivering an uninterruptable, combo-starting slice");
-    public final Attack charge = new Attack(6, 18, 8f, 19, 5, 1.5, 5f, 0.25f, AttackType.CHARGE, 0.85f, 0, State.P_CHARGE_HIT.ordinal())
+    public static final Attack charge = new Attack(6, 18, 8f, 19, 5, 1.5, 5f, 0.25f, AttackType.CHARGE, 0.85f, 0, State.P_CHARGE_HIT.ordinal())
             .setRanged(true)
             .disableBackstab()
             .setInfo("Shooting Star", "Silver Chariot detaches from the user and charges in the looked direction, combo starter/extender");
-    public final Attack counter = new Attack(7, 32, 0.5f, 34, 4, 0, 0, 0, AttackType.COUNTER)
+    public static final Attack counter = new Attack(7, 32, 0.5f, 34, 4, 0, 0, 0, AttackType.COUNTER)
             .setInfo("Counter", "0.2s windup, 1.5s duration, stuns when hit");
-    public final Attack pbeatdown = new Attack(8, 50, 0.65f, 28, 23, 1.75, 4f, 0f, AttackType.BOX, 2, 0, 0)
+    public static final Attack pbeatdown = new Attack(8, 50, 0.65f, 28, 23, 1.75, 4f, 0f, AttackType.BOX, 2, 0, 0)
             .setHitspark(-4)
             .setStunType(StunType.UNBURSTABLE)
             .setInfo("God of Death", "high-damage beatdown, 1.5s stun on whiff, cannot be combo broken");
-    public final Attack mainbeatdown = new Attack(9, 0, 0.65f, 59, 0, 2.0, 4.5f, 0.75f, AttackType.MULTIHIT, 1.6f, 0, List.of(13, 23), JSoundRegistry.IMPACT_1)
+    public static final Attack mainbeatdown = new Attack(9, 0, 0.65f, 59, 0, 2.0, 4.5f, 0.75f, AttackType.MULTIHIT, 1.6f, 0, List.of(13, 23), JSoundRegistry.IMPACT_1)
             .setStunType(StunType.UNBURSTABLE)
             .setInfo("God of Death (Hit)", "");
-    public final Attack beatdownfinish = new Attack(10, 0, 0.65f, 59, 0, 2.5, 6f, 1.25f, AttackType.MULTIHIT, 1, 0, List.of(54), JSoundRegistry.TW_KICK_HIT)
+    public static final Attack beatdownfinish = new Attack(10, 0, 0.65f, 59, 0, 2.5, 6f, 1.25f, AttackType.MULTIHIT, 1, 0, List.of(54), JSoundRegistry.TW_KICK_HIT)
             .setLaunch()
             .setHitspark(2)
             .setInfo("God of Death (Final Hit)", "");
-    public final Attack armoroff = new Attack(11, 60, 0.65f, 15, 6, 1.75, 4f, 0.75f, AttackType.BOX, 0.35f, 0f, 0)
+    public static final Attack armoroff = new Attack(11, 60, 0.65f, 15, 6, 1.75, 4f, 0.75f, AttackType.BOX, 0.35f, 0f, 0)
             .setLaunch()
             .setInfo("Armor Off", "25s of faster moves");
+    public static final Attack circleslash = new Attack(14, 0, 0.65f, 20, 2, 1.75, 5, 0, AttackType.BOX, 1, 0, 0, JSoundRegistry.IMPACT_1)
+            .setLaunch()
+            .appendHitbox( new HitBoxData(-0.65, 0, 1.75) )
+            .setInfo("Circle Slash (Hit)", "");
+    public final Attack circlecharge = new Attack(13, 17, 0.65f, 100, 101, 0, 0, 0, AttackType.BOX)
+            .setFollowup(circleslash)
+            .armorPoints((byte) 2)
+            .setInfo("Circle Slash", "charges for a minimum of 1 second, tap again to release, 2 armor points");
 
     private int armorTime;
 
@@ -91,7 +104,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
                             (Armor OFF) Impaling Thrust>dash>Barrage>...
                         """;
 
-        moves = List.of(light, heavy, barrage, spinbarrage, armoroff, charge, cleave, lastshot);
+        moves = List.of(light, heavy, barrage, spinbarrage, armoroff, charge, cleave, circlecharge);
     }
 
     private void setPossessedDesc() {
@@ -104,7 +117,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
                             (M1>)Charge~Barrage>God of Death""";
 
         // Possessed moveset
-        moves = List.of(light, heavy, barrage, spinbarrage, pbeatdown, pcharge, counter, lastshot);
+        moves = List.of(light, heavy, barrage, spinbarrage, pbeatdown, pcharge, counter, circlecharge);
     }
 
     public SilverChariotEntity(World worldIn) {
@@ -164,28 +177,30 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        if (handleAttack(this.light, JCraft.standLightCD, State.STAB))
+        if (getUserOrThrow().isSneaking())
+            handleAttack(lastshot, JCraft.standLightCD, State.LAST_SHOT);
+        else if (handleAttack(light, JCraft.standLightCD, State.STAB))
             playSound(JSoundRegistry.SC_POKE, 1, 1);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        if (handleAttack(this.heavy, JCraft.standHeavyCD, State.HEAVY))
+        if (handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY))
             playSound(JSoundRegistry.SC_HEAVY, 1, 1);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(this.barrage, JCraft.standBarrageCD, State.BARRAGE))
+        if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
             playSound(JSoundRegistry.SC_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack()) return;
-        if (handleAttack(this.spinbarrage, JCraft.standS1CD, State.SPIN))
+        if (handleAttack(spinbarrage, JCraft.standS1CD, State.SPIN))
             playSound(JSoundRegistry.SC_SPIN, 1, 1);
     }
 
@@ -204,7 +219,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         if (!canAttack() || !hasUser()) return;
         LivingEntity user = getUserOrThrow();
         if (getMode() == 3) {
-            if (handleAttack(this.pcharge, JCraft.standS2CD, State.CHARGE)) {
+            if (handleAttack(pcharge, JCraft.standS2CD, State.CHARGE)) {
                 //playSound(ModSoundRegister.PSC_CHARGE,1, 1);
                 if (user.isOnGround()) {
                     user.setVelocity(user.getVelocity().add(getRotationVector().multiply(0.85)).add(0.0, 0.15, 0.0));
@@ -234,10 +249,14 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         }
     }
 
+    private Attack chargedSlash;
     @Override
     public void initUtil() {
+        if (curAttack != null && curAttack.id == circlecharge.id && getMoveStun() <= 80)
+            setAttack(chargedSlash, State.CIRCLE_SLASH);
         if (!canAttack()) return;
-        handleAttack(lastshot, JCraft.utilCD, State.LAST_SHOT);
+        handleAttack(circlecharge, JCraft.utilCD, State.CIRCLE_CHARGE);
+        chargedSlash = Attack.copyOf(circleslash);
     }
 
     @Override
@@ -250,20 +269,16 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
 
         if (cooldown > 0) return false;
 
-        // todo: compact this
+        Attack attackRef = Attack.copyOf(attack);
         if (getMode() == 2) {
-            Attack attackRef = Attack.copyOf(attack);
             attackRef.initTime = (int) (attackRef.initTime * 0.67);
             attackRef.moveStun = (int) (attackRef.moveStun * 0.67);
-
-            setAttack(attackRef, animState);
-        } else if (!hasRapier()) {
-            Attack attackRef = Attack.copyOf(attack);
+        }
+        if (!hasRapier()) {
             attackRef.hitboxSize *= 0.75;
             attackRef.damage = (float) (attackRef.damage * 0.75);
-
-            setAttack(attackRef, animState);
-        } else setAttack(attack, animState);
+        }
+        setAttack(attack, animState);
 
         userData.putInt(cooldownName, (int) (attack.cooldown * 20));
         return true;
@@ -299,6 +314,21 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
                 world.spawnEntity(rapier);
                 setHasRapier(false);
                 //playSound();
+            }
+            case (14) -> {
+                if (!hasUser()) return;
+
+                Vec3d pos = getUserOrThrow().getPos();
+                double launchMult = attack.damage / 8; // (6 to 9) / 8
+
+                for (LivingEntity living : entities) {
+                    Vec3d launchVec = living.getPos().subtract(pos).normalize().multiply(launchMult);
+                    living.addVelocity(launchVec.x, launchVec.y, launchVec.z);
+
+                    living.velocityModified = true;
+                    if (living instanceof ServerPlayerEntity serverPlayer)
+                        serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(serverPlayer));
+                }
             }
         }
     }
@@ -369,10 +399,17 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
 
                 if (mode == 2 && armorTime-- < 1) setMode(1);
 
-                if (curAttack != null && curAttack.id == charge.id) {
-                    Vec3f chargePos = getFreePos();
-                    chargePos.add(0, lookDirY, 0);
-                    setFreePos(chargePos);
+                if (curAttack != null) {
+                    if (curAttack.id == charge.id) {
+                        Vec3f chargePos = getFreePos();
+                        chargePos.add(0, lookDirY, 0);
+                        setFreePos(chargePos);
+                    }
+                    if (curAttack.id == circlecharge.id) {
+                        if (chargedSlash == null) chargedSlash = Attack.copyOf(circleslash); // Fallback for when the server restarts inconveniently
+                        if (getMoveStun() % 20 == 0)
+                            chargedSlash.damage += 1f;
+                    }
                 }
             }
         }
@@ -400,7 +437,9 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         CLEAVE(builder -> builder.playAndHold("animation.silverchariot.cleave")),
         ARMOR_OFF(builder -> builder.playAndHold("animation.silverchariot.armor_off")),
         COUNTER_MISS(builder -> builder.playAndHold("animation.silverchariot.counter_miss")),
-        LAST_SHOT(builder -> builder.playAndHold("animation.silverchariot.lastshot"));
+        LAST_SHOT(builder -> builder.playAndHold("animation.silverchariot.lastshot")),
+        CIRCLE_CHARGE(builder -> builder.playAndHold("animation.silverchariot.circle_charge")),
+        CIRCLE_SLASH(builder -> builder.playAndHold("animation.silverchariot.circle_slash"));
 
         private final BiConsumer<SilverChariotEntity, AnimationBuilder> animator;
 

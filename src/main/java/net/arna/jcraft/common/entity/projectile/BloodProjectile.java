@@ -1,5 +1,6 @@
-package net.arna.jcraft.common.entity;
+package net.arna.jcraft.common.entity.projectile;
 
+import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;

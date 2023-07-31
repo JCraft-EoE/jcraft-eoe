@@ -1,6 +1,8 @@
-package net.arna.jcraft.common.entity;
+package net.arna.jcraft.common.entity.projectile;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.entity.SilverChariotEntity;
+import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JEntityTypeRegistry;

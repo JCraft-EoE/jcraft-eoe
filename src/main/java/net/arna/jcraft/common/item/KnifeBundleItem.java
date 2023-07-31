@@ -2,7 +2,7 @@ package net.arna.jcraft.common.item;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-import net.arna.jcraft.common.entity.KnifeProjectile;
+import net.arna.jcraft.common.entity.projectile.KnifeProjectile;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;

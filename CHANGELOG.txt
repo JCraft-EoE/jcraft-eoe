@@ -1416,6 +1416,10 @@ Silver Chariot
     >Cleave cooldown reduced (23->20s)
     >Shooting Star cooldown reduced (22->18s)
     >Ray Dart cooldown reduced (18->13s)
+    >New Utility - Circle Slash
+    >Last Shot
+        >Cooldown reduced (24->7s)
+        >Moved from Utility to crouching Light
 
 Magician's Red
     >Flamethrower
