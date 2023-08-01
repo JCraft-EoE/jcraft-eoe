@@ -564,23 +564,39 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     public static void trueDamage(float damage, DamageSource damageSource, LivingEntity ent) {
         if (ent == null || ent.isRemoved() || ent.isDead()) return;
 
-        ent.damage(damageSource, 0.001f);
+        float scaling = ((IDamageScaler)ent).jcraft$getDamageScaling();
+        //JCraft.LOGGER.info("True damaging entity: " + ent + " with damage: " + damage + " and scaling: " + scaling);
+        damage *= scaling;
 
         // All stands ignore 10% of armor & armor toughness
         damage = DamageUtil.getDamageLeft(damage, (float) ent.getArmor() * 0.9f, (float) ent.getAttributeValue(EntityAttributes.GENERIC_ARMOR_TOUGHNESS) * 0.9f);
 
         // Apply absorption
-        float f = damage * ((IDamageScaler)ent).jcraft$getDamageScaling();
+        float f = damage;
         damage = Math.max(damage - ent.getAbsorptionAmount(), 0.0F);
         ent.setAbsorptionAmount(ent.getAbsorptionAmount() - (f - damage));
 
         if (damage <= 0) return;
 
         float h = ent.getHealth();
+
+        LivingEntityInvoker invoker = (LivingEntityInvoker) ent;
+
+        // Statistics
+        World world = ent.getWorld();
+        world.sendEntityStatus(ent, (byte) 2);
+
+        invoker.setLastDamageTaken(damage);
+        invoker.setLastDamageSource(damageSource);
+        invoker.setLastDamageTime(world.getTime());
+
+        ent.timeUntilRegen = 20;
+        ent.maxHurtTime = ent.hurtTime = 10;
+
         ent.setHealth(h - damage);
         ent.getDamageTracker().onDamage(damageSource, h, damage);
-        if (ent.isDead())
-            ent.onDeath(damageSource);
+        ent.emitGameEvent(GameEvent.ENTITY_DAMAGE);
+        if (ent.isDead()) ent.onDeath(damageSource);
     }
 
     // Stock attacks to define

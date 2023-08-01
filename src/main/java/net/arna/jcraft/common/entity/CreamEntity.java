@@ -301,26 +301,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                 DamageSource playerSource = DamageSource.mob(getUser());
 
                 for (LivingEntity ent : entities) {
-                    float damage = 8f;
-                    ent.damage(playerSource, 0.001f);
-
-                    // All stands ignore 10% of armor & armor toughness
-                    damage = DamageUtil.getDamageLeft(damage, (float) ent.getArmor() * 0.9f, (float) ent.getAttributeValue(EntityAttributes.GENERIC_ARMOR_TOUGHNESS) * 0.9f);
-
-                    // Apply absorption
-                    float f = damage;
-                    damage = Math.max(damage - ent.getAbsorptionAmount(), 0.0F);
-                    ent.setAbsorptionAmount(ent.getAbsorptionAmount() - (f - damage));
-
-                    if (damage != 0.0F) {
-                        float h = ent.getHealth();
-                        if ((h - damage) <= 0) ent.kill();
-                        else {
-                            ent.setHealth(h - damage);
-                            ent.getDamageTracker().onDamage(playerSource, h, damage);
-                        }
-                    }
-
+                    trueDamage(8, playerSource, ent);
                     ent.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0));
                 }
             }

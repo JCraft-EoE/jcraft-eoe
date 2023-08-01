@@ -3,6 +3,7 @@ package net.arna.jcraft.registry;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.config.ConfigOption;
 import net.arna.jcraft.common.config.JServerConfig;
+import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.events.JPlayerEntityEvents;
 import net.arna.jcraft.common.events.JServerTickEvents;
 import net.arna.jcraft.common.item.MockItem;
@@ -15,8 +16,10 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -29,6 +32,27 @@ import static net.arna.jcraft.common.util.EntityInterest.itemAttractionInterest;
 
 public interface JEventsRegistry {
     static void registerEvents() {
+        ServerLivingEntityEvents.ALLOW_DAMAGE.register(
+                (entity, source, amount) -> {
+                    Entity attacker = source.getAttacker();
+                    if (!(attacker instanceof LivingEntity living)) return true;
+
+                    // Only apply stun nerfs if hit with a weapon or a projectile
+                    boolean hasWeapon = source.isProjectile();
+                    if (!hasWeapon) hasWeapon = !living.getMainHandStack().isEmpty();
+
+                    if (hasWeapon) {
+                        StatusEffectInstance stun = entity.getStatusEffect(JStatusRegistry.DAZED);
+                        if (stun != null && stun.getAmplifier() != 3) {
+                            int duration = stun.getDuration() / 2;
+                            entity.removeStatusEffect(JStatusRegistry.DAZED);
+                            StandEntity.stun(entity, duration, 3);
+                        }
+                    }
+                    return true;
+                }
+        );
+
         ServerEntityEvents.ENTITY_LOAD.register(
                 (entity, world) -> {
                     // If an item was spawned
@@ -97,7 +121,7 @@ public interface JEventsRegistry {
 
         // Send initial values of server config options to the player.
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) ->
-            ConfigUpdatePacket.sendOptionsToClient(handler.getPlayer(), ConfigOption.getImmutableOptions().values()));
+                ConfigUpdatePacket.sendOptionsToClient(handler.getPlayer(), ConfigOption.getImmutableOptions().values()));
 
         ServerLifecycleEvents.SERVER_STARTING.register(JServerConfig::load);
     }
