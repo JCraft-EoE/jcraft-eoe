@@ -29,7 +29,7 @@ public class SplatterEffectRenderer {
 
     public static void addSplatter(World world, Vec3d pos, SplatterType type) {
         synchronized (SPLATTERS) {
-            SPLATTERS.add(new Splatter(world, new Vec3d(pos.getX(), Math.floor(pos.getY()), pos.getZ()), type));
+            SPLATTERS.add(new Splatter(world, new Vec3d(pos.getX(), Math.floor(pos.getY()), pos.getZ()), type, .8f));
         }
     }
 
