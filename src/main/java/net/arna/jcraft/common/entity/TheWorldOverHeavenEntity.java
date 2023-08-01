@@ -44,7 +44,7 @@ import java.util.function.Consumer;
 public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEntity, TheWorldOverHeavenEntity.State> {
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 4, 1.5, 6f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0, JSoundRegistry.IMPACT_1)
             .setInfo("Punch", "quick combo starter");
-    public static final Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 2, 0, 3, JSoundRegistry.IMPACT_1)
+    public static final Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 1.5f, 0, 3, JSoundRegistry.IMPACT_1)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
     public static final Attack heavy = new Attack(1, 19, 1f, 22, 10, 2, 0f, 0.0f, AttackType.BOX, 1, 0, 0, JSoundRegistry.IMPACT_5)
             .setHitspark(2)

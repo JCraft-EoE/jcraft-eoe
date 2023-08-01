@@ -1350,7 +1350,7 @@ C-Moon
 Made in Heaven
     >Improved initiation detection for Heaven's Judgement (normal)
 
-● 31/8/2023
+● 1/8/2023
 Added DAMAGE SCALING
     >The more hits in a combo, the less damage each hit does (100%, -2%/hit until 40%)
 
@@ -1365,8 +1365,10 @@ Star Platinum
 
 The World
     >Adjusted knockback values
+    >Barrage stun reduced (2->1.5s)
     >Donut
-        >Stun reduced (4->3.4s)
+        >Startup reduced (26->20t)
+        >Stun reduced (4->2.6s)
         >Now launches
     >Roundhouse cooldown reduced (11->8s)
 
@@ -1437,13 +1439,24 @@ The Fool
     >Pound cooldown reduced (18->13s)
 
 Golden Experience
+    >Light
+        >Cooldown reduced (1.5->0.75s)
+        >Advantage on hit adjusted to +3
     >Shoulder Smash cooldown reduced (17->14s)
+    >Barrage stun reduced (2->1.5s)
 
 Made in Heaven
     >Donut stun reduced (3->2s)
 
 The World: Over Heaven
+    >Barrage stun reduced (2->1.5s)
     >Can now cancel Timestop early by pressing the button again
+
+Golden Experience: Requiem
+    >Light
+        >Cooldown reduced (1.5->0.75s)
+        >Advantage on hit adjusted to +3
+    >Barrage stun reduced (2->1.5s)
 
 Star Platinum: The World
     >Barrage stun reduced (2->1.5s)
