@@ -1354,6 +1354,7 @@ Made in Heaven
 Added DAMAGE SCALING
     >The more hits in a combo, the less damage each hit does (100%, -2%/hit until 40%)
 
+>Physical hits (weapons or otherwise) now affect JCraft stun
 >Added sounds to bullets
 >Fixed a crash relating to Step Height Entity Attribute
 
