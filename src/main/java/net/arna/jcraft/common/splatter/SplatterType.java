@@ -1,4 +1,4 @@
-package net.arna.jcraft.client.renderer.effects.splatter;
+package net.arna.jcraft.common.splatter;
 
 import lombok.Getter;
 import net.arna.jcraft.JCraft;

@@ -23,10 +23,13 @@ import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.spec.SpecType;
+import net.arna.jcraft.common.splatter.JSplatterManager;
+import net.arna.jcraft.common.splatter.SplatterType;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -68,6 +71,7 @@ public class ClientPacketHandler {
         register(S2C_J_EXPLOSION, ClientPacketHandler::handleJExplosion);
         register(S2C_COMBO_COUNTER, ClientPacketHandler::handleComboCounter);
         register(S2C_TIME_STOP, ClientPacketHandler::handleTimeStop);
+        register(S2C_SPLATTER, ClientPacketHandler::handleSplatter);
     }
 
     private static void handleTimeStop(@NotNull MinecraftClient client, PacketByteBuf buf) {
@@ -500,5 +504,20 @@ public class ClientPacketHandler {
         JCraftClient.comboCounter = buf.readInt();
         JCraftClient.damageScaling = buf.readFloat();
         JCraftClient.framesSinceCounted = 0;
+    }
+
+    private static void handleSplatter(MinecraftClient client, PacketByteBuf buf) {
+        ClientWorld world = client.world;
+        if (world == null) return;
+
+        double x = buf.readDouble();
+        double y = buf.readDouble();
+        double z = buf.readDouble();
+        SplatterType type = buf.readEnumConstant(SplatterType.class);
+        float xRange = buf.readFloat();
+        float zRange = buf.readFloat();
+
+        JSplatterManager splatterManager = ((IJSplatterManagerHolder) world).jcraft$getSplatterManager();
+        splatterManager.addSplatter(new Vec3d(x, y, z), type, xRange, zRange);
     }
 }

@@ -1,39 +1,26 @@
-package net.arna.jcraft.client.renderer.effects.splatter;
+package net.arna.jcraft.client.renderer.effects;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.arna.jcraft.common.splatter.JSplatterManager;
+import net.arna.jcraft.common.splatter.SplatterSection;
+import net.arna.jcraft.common.util.IJSplatterManagerHolder;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.*;
 import net.minecraft.world.LightType;
-import net.minecraft.world.World;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class SplatterEffectRenderer {
-    private static final Set<Splatter> SPLATTERS = new HashSet<>();
 
     public static void init() {
         WorldRenderEvents.AFTER_ENTITIES.register(SplatterEffectRenderer::render);
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            synchronized (SPLATTERS) {
-                SPLATTERS.forEach(Splatter::tick);
-                SPLATTERS.removeIf(Splatter::isRemoved);
-            }
-        });
-    }
-
-    public static void addSplatter(World world, Vec3d pos, SplatterType type) {
-        synchronized (SPLATTERS) {
-            SPLATTERS.add(new Splatter(world, new Vec3d(pos.getX(), Math.floor(pos.getY()), pos.getZ()), type, .8f));
-        }
     }
 
     private static void render(WorldRenderContext ctx) {
+        JSplatterManager splatterManager = ((IJSplatterManagerHolder) ctx.world()).jcraft$getSplatterManager();
+
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
         RenderSystem.disableCull();
@@ -43,32 +30,30 @@ public class SplatterEffectRenderer {
         MatrixStack matrices = ctx.matrixStack();
         Vec3d camPos = ctx.camera().getPos();
 
-        synchronized (SPLATTERS) {
-            for (Splatter splatter : SPLATTERS) {
-                if (splatter.isRemoved()) continue;
+        splatterManager.iterateSplatters(splatter -> {
+            if (splatter.isRemoved()) return;
 
-                RenderSystem.setShaderTexture(0, splatter.getType().getTexture());
+            RenderSystem.setShaderTexture(0, splatter.getType().getTexture());
 
-                matrices.push();
-                matrices.translate(-camPos.x, -camPos.y, -camPos.z);
+            matrices.push();
+            matrices.translate(-camPos.x, -camPos.y, -camPos.z);
 
-                Tessellator tess = Tessellator.getInstance();
-                BufferBuilder buf = tess.getBuffer();
-                buf.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE_LIGHT);
+            Tessellator tess = Tessellator.getInstance();
+            BufferBuilder buf = tess.getBuffer();
+            buf.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE_LIGHT);
 
-                int blockLight = splatter.getWorld().getLightLevel(LightType.BLOCK, new BlockPos(splatter.getPos()));
-                int skyLight = splatter.getWorld().getLightLevel(LightType.SKY, new BlockPos(splatter.getPos()));
-                int light = LightmapTextureManager.pack(blockLight, skyLight);
-                float alpha = splatter.getStrength(ctx.tickDelta());
+            int blockLight = splatter.getWorld().getLightLevel(LightType.BLOCK, new BlockPos(splatter.getPos()));
+            int skyLight = splatter.getWorld().getLightLevel(LightType.SKY, new BlockPos(splatter.getPos()));
+            int light = LightmapTextureManager.pack(blockLight, skyLight);
+            float alpha = splatter.getStrength(ctx.tickDelta());
 
-                for (SplatterSection section : splatter.getSections())
-                    if (!section.isRemoved())
-                        renderSection(section, buf, matrices, alpha, light, splatter.getOffset());
+            for (SplatterSection section : splatter.getSections())
+                if (!section.isRemoved())
+                    renderSection(section, buf, matrices, alpha, light, splatter.getOffset());
 
-                tess.draw();
-                matrices.pop();
-            }
-        }
+            tess.draw();
+            matrices.pop();
+        });
 
         RenderSystem.disableBlend();
         RenderSystem.enableCull();

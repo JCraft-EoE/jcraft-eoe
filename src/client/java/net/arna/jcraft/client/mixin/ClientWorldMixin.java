@@ -1,6 +1,7 @@
 package net.arna.jcraft.client.mixin;
 
 import net.arna.jcraft.common.entity.CreamEntity;
+import net.arna.jcraft.common.util.IJSplatterManagerHolder;
 import net.arna.jcraft.common.util.ITimeStop;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -14,11 +15,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 import static net.arna.jcraft.common.util.JUtils.stopTick;
 
 @Mixin(ClientWorld.class)
-public class ClientWorldMixin {
+public abstract class ClientWorldMixin implements IJSplatterManagerHolder {
 
     // Clientside timestop handling
     @Inject(cancellable = true, at = @At("HEAD"), method = "tickEntity")
@@ -51,5 +53,10 @@ public class ClientWorldMixin {
                 }
             }
         }
+    }
+
+    @Inject(method = "tick", at = @At("RETURN"))
+    private void tickSplatters(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+        jcraft$getSplatterManager().tick();
     }
 }

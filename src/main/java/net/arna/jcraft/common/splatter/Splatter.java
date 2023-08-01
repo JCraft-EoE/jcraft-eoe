@@ -1,4 +1,4 @@
-package net.arna.jcraft.client.renderer.effects.splatter;
+package net.arna.jcraft.common.splatter;
 
 import com.google.common.collect.Streams;
 import it.unimi.dsi.fastutil.objects.ObjectBooleanPair;
@@ -26,15 +26,7 @@ public class Splatter {
     private int age;
     private boolean removed;
 
-    public Splatter(World world, Vec3d pos, SplatterType type) {
-        this(world, pos, type, .5f);
-    }
-
-    public Splatter(World world, Vec3d pos, SplatterType type, float range) {
-        this(world, pos, type, range, range);
-    }
-
-    public Splatter(World world, Vec3d pos, SplatterType type, float xRange, float zRange) {
+    Splatter(World world, Vec3d pos, SplatterType type, float xRange, float zRange) {
         this.world = world;
         this.pos = pos;
         this.type = type;
