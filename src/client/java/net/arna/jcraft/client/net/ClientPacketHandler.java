@@ -23,7 +23,6 @@ import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.spec.SpecType;
-import net.arna.jcraft.common.splatter.JSplatterManager;
 import net.arna.jcraft.common.splatter.SplatterType;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
@@ -517,7 +516,6 @@ public class ClientPacketHandler {
         float xRange = buf.readFloat();
         float zRange = buf.readFloat();
 
-        JSplatterManager splatterManager = ((IJSplatterManagerHolder) world).jcraft$getSplatterManager();
-        splatterManager.addSplatter(new Vec3d(x, y, z), type, xRange, zRange);
+        JUtils.getSplatterManager(world).addSplatter(new Vec3d(x, y, z), type, xRange, zRange);
     }
 }
