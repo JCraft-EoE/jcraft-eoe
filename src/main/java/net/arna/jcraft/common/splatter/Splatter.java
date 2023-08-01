@@ -1,4 +1,4 @@
-package net.arna.jcraft.client.renderer.effects.splatter;
+package net.arna.jcraft.common.splatter;
 
 import com.google.common.collect.Streams;
 import it.unimi.dsi.fastutil.objects.ObjectBooleanPair;
@@ -18,7 +18,7 @@ public class Splatter {
     private final Vec3d pos;
     private final SplatterType type;
     // Half of the width on the x-axis and half of the width on the z-axis.
-    private final float xRange = .5f, zRange = .5f;
+    private final float xRange, zRange;
     private final List<SplatterSection> sections;
     @Getter(lazy = true)
     private final BlockPos anchor = new BlockPos(pos).down();
@@ -26,10 +26,12 @@ public class Splatter {
     private int age;
     private boolean removed;
 
-    public Splatter(World world, Vec3d pos, SplatterType type) {
+    Splatter(World world, Vec3d pos, SplatterType type, float xRange, float zRange) {
         this.world = world;
         this.pos = pos;
         this.type = type;
+        this.xRange = xRange;
+        this.zRange = zRange;
         sections = splitAndWrap();
     }
 
@@ -80,7 +82,6 @@ public class Splatter {
         Vec3d max = center.add(xRange, 0, zRange);
 
         return Streams.stream(BlockPos.iterate(new BlockPos(min), new BlockPos(max)))
-                .map(BlockPos::toImmutable)
                 .map(pos -> {
                     double minX = pos.getX() + (1 - MathHelper.clamp(pos.getX() + 1 - (center.getX() - xRange), 0, 1));
                     double maxX = pos.getX() + MathHelper.clamp(center.getX() + xRange - pos.getX(), 0, 1);
@@ -109,8 +110,8 @@ public class Splatter {
             if (anchors == null) return Stream.of(section); // No anchors, no special handling.
 
             Stream.Builder<SplatterSection> res = Stream.builder();
-            Vec3f minP = section.getMinPos();
-            Vec3f maxP = section.getMaxPos();
+            Vec3f minP = section.getMinPos().copy();
+            Vec3f maxP = section.getMaxPos().copy();
 
             for (ObjectBooleanPair<Direction> anchor : anchors) {
                 boolean up = anchor.rightBoolean();
@@ -124,7 +125,7 @@ public class Splatter {
                     case WEST -> {
                         float height = maxP.getX() - minP.getX();
                         yield up ?
-                                section.wrapped(Direction.WEST, maxP, new Vec3f(minP.getX(), maxP.getY() + height, maxP.getZ())) :
+                                section.wrapped(Direction.WEST, minP, new Vec3f(minP.getX(), maxP.getY() + height, maxP.getZ())) :
                                 section.wrapped(Direction.WEST, new Vec3f(maxP.getX(), minP.getY() - height, minP.getZ()), maxP);
                     }
                     case SOUTH -> {
@@ -148,7 +149,15 @@ public class Splatter {
                 });
             }
 
-            return res.build();
+            return res.build()
+                    .peek(s -> {
+                        // Try to get rid of the little seam caused by the offset between sections.
+                        float offset = 2 * this.offset;
+                        if (s.getDirection() == Direction.UP) {
+                            s.getMinPos().add(offset, 0, -offset);
+                            s.getMaxPos().add(offset, 0, offset);
+                        } else s.getMaxPos().add(0, offset, 0);
+                    });
         })
         .toList();
     }

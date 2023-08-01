@@ -1,4 +1,4 @@
-package net.arna.jcraft.client.renderer.effects.splatter;
+package net.arna.jcraft.common.splatter;
 
 import lombok.Data;
 import lombok.NonNull;
@@ -25,10 +25,6 @@ public class SplatterSection {
         blockPos = getAnchor(center, direction);
         this.minUv = minUv;
         this.maxUv = maxUv;
-    }
-
-    public SplatterSection(World world, Vec3d minPos, Vec3d maxPos, Vec2f minUv, Vec2f maxUv) {
-        this(world, Direction.UP, new Vec3f(minPos), new Vec3f(maxPos), minUv, maxUv);
     }
 
     public static BlockPos getAnchor(Vec3f center, Direction facing) {
@@ -70,6 +66,7 @@ public class SplatterSection {
         if (!hasValidAnchor()) removed = true;
     }
 
+    // Mostly for debugging
     @Override
     public String toString() {
         return "Section{" +

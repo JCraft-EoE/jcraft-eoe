@@ -15,7 +15,7 @@ import net.arna.jcraft.client.registry.JEntityRendererRegister;
 import net.arna.jcraft.client.registry.JRenderLayerRegistry;
 import net.arna.jcraft.client.renderer.block.ShaderTestBlockEntityRenderer;
 import net.arna.jcraft.client.renderer.effects.AttackHitBoxEffectRenderer;
-import net.arna.jcraft.client.renderer.effects.splatter.SplatterEffectRenderer;
+import net.arna.jcraft.client.renderer.effects.SplatterEffectRenderer;
 import net.arna.jcraft.client.renderer.effects.TimeAccelerationEffectRenderer;
 import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer;
 import net.arna.jcraft.client.renderer.item.BigItemRenderer;

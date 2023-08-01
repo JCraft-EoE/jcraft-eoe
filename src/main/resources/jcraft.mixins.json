@@ -26,7 +26,8 @@
     "ServerNetworkHandlerMixin",
     "ServerWorldMixin",
     "TimestopBlockEntityMixin",
-    "TimestopBlockMixin"
+    "TimestopBlockMixin",
+    "WorldMixin"
   ],
   "injectors": {
     "defaultRequire": 1

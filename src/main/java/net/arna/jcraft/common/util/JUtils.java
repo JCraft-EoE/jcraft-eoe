@@ -10,6 +10,7 @@ import net.arna.jcraft.common.network.s2c.JExplosionPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.spec.SpecType;
+import net.arna.jcraft.common.splatter.JSplatterManager;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.block.BlockState;
@@ -434,5 +435,9 @@ public final class JUtils {
     public static <T> Function<T, IntObjectPair<T>> enumerate() {
         AtomicInteger index = new AtomicInteger();
         return t -> IntObjectPair.of(index.getAndIncrement(), t);
+    }
+
+    public static JSplatterManager getSplatterManager(World world) {
+        return ((IJSplatterManagerHolder) world).jcraft$getSplatterManager();
     }
 }
