@@ -1350,7 +1350,7 @@ C-Moon
 Made in Heaven
     >Improved initiation detection for Heaven's Judgement (normal)
 
-● 31/7/2023
+● 31/8/2023
 Added DAMAGE SCALING
     >The more hits in a combo, the less damage each hit does (100%, -2%/hit until 40%)
 
@@ -1360,6 +1360,7 @@ Added DAMAGE SCALING
 Star Platinum
     >Added second hitbox to Inhale
     >Roundhouse cooldown reduced (11->8s)
+    >Barrage stun reduced (2->1.5s)
 
 The World
     >Adjusted knockback values
@@ -1437,10 +1438,14 @@ The Fool
 Golden Experience
     >Shoulder Smash cooldown reduced (17->14s)
 
+Made in Heaven
+    >Donut stun reduced (3->2s)
+
 The World: Over Heaven
     >Can now cancel Timestop early by pressing the button again
 
 Star Platinum: The World
+    >Barrage stun reduced (2->1.5s)
     >Updated skin 3
 
 priority (top to bottom)

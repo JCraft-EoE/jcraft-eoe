@@ -45,6 +45,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.IAnimatable;
@@ -516,11 +517,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      */
     public static void damage(float damage, DamageSource damageSource, LivingEntity ent) {
         if (ent == null || ent.isRemoved() || ent.isDead()) return;
-        ent.damage(damageSource, 0.001f);
 
         float scaling = ((IDamageScaler)ent).jcraft$getDamageScaling();
         //JCraft.LOGGER.info("Damaging entity: " + ent + " with damage: " + damage + " and scaling: " + scaling);
-
         damage *= scaling;
 
         // All stands ignore 10% of armor & armor toughness
@@ -535,10 +534,24 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if (damage <= 0) return;
 
         float h = ent.getHealth();
+
+        LivingEntityInvoker invoker = (LivingEntityInvoker) ent;
+
+        // Statistics
+        World world = ent.getWorld();
+        world.sendEntityStatus(ent, (byte) 2);
+
+        invoker.setLastDamageTaken(damage);
+        invoker.setLastDamageSource(damageSource);
+        invoker.setLastDamageTime(world.getTime());
+
+        ent.timeUntilRegen = 20;
+        ent.maxHurtTime = ent.hurtTime = 10;
+
         ent.setHealth(h - damage);
         ent.getDamageTracker().onDamage(damageSource, h, damage);
-        if (ent.isDead())
-            ent.onDeath(damageSource);
+        ent.emitGameEvent(GameEvent.ENTITY_DAMAGE);
+        if (ent.isDead()) ent.onDeath(damageSource);
     }
 
     /**

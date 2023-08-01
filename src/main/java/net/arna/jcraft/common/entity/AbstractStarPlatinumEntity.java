@@ -29,7 +29,7 @@ public abstract sealed class AbstractStarPlatinumEntity<E extends AbstractStarPl
             .hyperArmor()
             .setLaunch()
             .setInfo("Star Breaker", "uninterruptable launcher");
-    public static final Attack barrage = Attack.barrageAttack(2, 17, 0.75f, 60, 0, 2, 1f, 0.25f, 2, 0, 3)
+    public static final Attack barrage = Attack.barrageAttack(2, 17, 0.75f, 60, 0, 2, 1f, 0.25f, 1.5f, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
     public static final Attack starfinger = new Attack(3, 20, 0.75f, 20, 12, 1.75, 5f, -0.25f, AttackType.BOX, 1.5f, -0.25f)
             .setHitspark(2)

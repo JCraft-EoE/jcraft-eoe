@@ -57,7 +57,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     public static final Attack furychop = new Attack(4, 19, 0.85f, 24, 15, 1.6, 7f, 0.25f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegistry.IMPACT_2)
             .setHitspark(2)
             .setInfo("Fury Chop", "combo extender, on hit gives haste(8s) to user and mining fatigue(8s) to victim, on whiff the fatigue goes to user");
-    public static final Attack donut = new Attack(1, 23, 0.75f, 32, 26, 2.5, 8.5f, 0.0f, AttackType.BOX, 3f, 0.2f, 0, JSoundRegistry.IMPACT_4)
+    public static final Attack donut = new Attack(1, 23, 0.75f, 32, 26, 2.5, 8.5f, 0.0f, AttackType.BOX, 2f, 0.2f, 0, JSoundRegistry.IMPACT_4)
             .hyperArmor()
             .setHitspark(2)
             .setInfo("Roundabout Donut", "feigns stand desummon, uninterruptable combo starter");

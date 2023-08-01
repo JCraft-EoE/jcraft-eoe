@@ -319,11 +319,11 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
                 if (!hasUser()) return;
 
                 Vec3d pos = getUserOrThrow().getPos();
-                double launchMult = attack.damage / 8; // (6 to 9) / 8
+                double launchMult = attack.damage / 5; // (6 to 9) / 8
 
                 for (LivingEntity living : entities) {
                     Vec3d launchVec = living.getPos().subtract(pos).normalize().multiply(launchMult);
-                    living.addVelocity(launchVec.x, launchVec.y, launchVec.z);
+                    living.addVelocity(launchVec.x, launchVec.y + 0.2, launchVec.z);
 
                     living.velocityModified = true;
                     if (living instanceof ServerPlayerEntity serverPlayer)

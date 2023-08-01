@@ -2351,7 +2351,13 @@
 				},
 				"lower_left": {
 					"rotation": {
-						"vector": ["easeInSine", "easeInSine", "easeInSine"]
+						"0.0": {
+							"vector": [-82.5, 0, 0]
+						},
+						"1.0": {
+							"vector": [-70, 0, 0],
+							"easing": "easeOutBack"
+						}
 					}
 				},
 				"kneeleft": {
