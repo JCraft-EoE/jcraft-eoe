@@ -27,10 +27,6 @@ public class SplatterSection {
         this.maxUv = maxUv;
     }
 
-    public SplatterSection(World world, Vec3d minPos, Vec3d maxPos, Vec2f minUv, Vec2f maxUv) {
-        this(world, Direction.UP, new Vec3f(minPos), new Vec3f(maxPos), minUv, maxUv);
-    }
-
     public static BlockPos getAnchor(Vec3f center, Direction facing) {
         return new BlockPos(new Vec3d(center).add(new Vec3d(facing.getUnitVector()).multiply(0.05)));
     }
@@ -67,9 +63,10 @@ public class SplatterSection {
 
     public void tick() {
         if (removed) return;
-//        if (!hasValidAnchor()) removed = true;
+        if (!hasValidAnchor()) removed = true;
     }
 
+    // Mostly for debugging
     @Override
     public String toString() {
         return "Section{" +
