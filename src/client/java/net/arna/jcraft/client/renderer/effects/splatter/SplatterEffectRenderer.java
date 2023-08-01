@@ -59,7 +59,7 @@ public class SplatterEffectRenderer {
                 int blockLight = splatter.getWorld().getLightLevel(LightType.BLOCK, new BlockPos(splatter.getPos()));
                 int skyLight = splatter.getWorld().getLightLevel(LightType.SKY, new BlockPos(splatter.getPos()));
                 int light = LightmapTextureManager.pack(blockLight, skyLight);
-                float alpha = splatter.getStrength();
+                float alpha = splatter.getStrength(ctx.tickDelta());
 
                 for (SplatterSection section : splatter.getSections())
                     if (!section.isRemoved())
@@ -125,6 +125,8 @@ public class SplatterEffectRenderer {
                 vertex(buf, matrix, minX, maxY, maxZ, maxUv.x, maxUv.y, alpha, light);
                 vertex(buf, matrix, minX, maxY, minZ, maxUv.x, minUv.y, alpha, light);
             }
+            // Down should be impossible
+            default -> throw new IllegalStateException("Unexpected value: " + section.getDirection());
         }
 
         matrices.pop();
