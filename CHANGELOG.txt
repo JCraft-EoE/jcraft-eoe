@@ -1350,11 +1350,12 @@ C-Moon
 Made in Heaven
     >Improved initiation detection for Heaven's Judgement (normal)
 
-● 1/8/2023
+● 2/8/2023
 Added DAMAGE SCALING
     >The more hits in a combo, the less damage each hit does (100%, -2%/hit until 40%)
 
 >Physical hits (weapons or otherwise) now affect JCraft stun
+    >All non-launch stun is converted to launch stun and has its duration halved
 >Added sounds to bullets
 >Fixed a crash relating to Step Height Entity Attribute
 
@@ -1430,6 +1431,9 @@ Magician's Red
         >Stun Removed
         >Added 1 armor point
     >Light stun increased by 1 tick
+    >Red Bind
+        >Moved from crouching Utility to Special 3
+        >Now traps opponents in fiery rings
     >Redirect moved from Special 3 to crouching Light
     >Crossfire cooldown reduced (20->12s)
     >Variation Ankh speed reduced by 40%
