@@ -1355,7 +1355,7 @@ Added DAMAGE SCALING
     >The more hits in a combo, the less damage each hit does (100%, -2%/hit until 40%)
 
 >Physical hits (weapons or otherwise) now affect JCraft stun
-    >All non-launch stun is converted to launch stun and has its duration halved
+    >All non-launch stun is converted to launch stun and has its duration divided by 3
 >Added sounds to bullets
 >Fixed a crash relating to Step Height Entity Attribute
 

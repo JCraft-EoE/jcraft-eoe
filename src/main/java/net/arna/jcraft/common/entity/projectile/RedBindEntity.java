@@ -107,13 +107,7 @@ public class RedBindEntity extends JAttackEntity implements IAnimatable {
     }
 
     private void detonate() {
-        // Get entities initial velocity
-        Vec3d vel = boundEntity.getVelocity();
-
-        // Fall back to away-velocity from Magician's Red user
-        if (vel == Vec3d.ZERO)
-            vel = master.getPos().subtract(boundEntity.getPos()).add(0, 1, 0);
-
+        Vec3d vel = master.getPos().subtract(boundEntity.getPos()).add(0, 1, 0);
         Vec3d launch = vel.normalize().multiply(1.5);
         StandEntity.damageLogic(boundEntity.getWorld(), boundEntity, launch, 20, 3, true, 6, false, 4, DamageSource.mob(master), master, false, true);
         dataTracker.set(EXPLODED, true);
