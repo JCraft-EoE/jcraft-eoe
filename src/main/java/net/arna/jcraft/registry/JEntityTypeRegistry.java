@@ -211,6 +211,13 @@ public interface JEntityTypeRegistry {
                         .dimensions(EntityDimensions.fixed(1f, 1f)).build()
     );
 
+    EntityType<RedBindEntity> RED_BIND = Registry.register(
+            Registry.ENTITY_TYPE,
+            JCraft.id("redbind"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MISC, RedBindEntity::new)
+                    .dimensions(EntityDimensions.fixed(1f, 2f)).build()
+    );
+
     EntityType<BlockProjectile> BLOCK_PROJECTILE = Registry.register(
             Registry.ENTITY_TYPE,
             JCraft.id("blockprojectile"),
@@ -280,6 +287,7 @@ public interface JEntityTypeRegistry {
         FabricDefaultAttributeRegistry.register(PLAYER_ENTITY_CLONE_SLIM, PlayerCloneEntity.createCloneAttributes());
 
         FabricDefaultAttributeRegistry.register(LIFE_DETECTOR, LifeDetectorEntity.createDetectorAttributes());
+        FabricDefaultAttributeRegistry.register(RED_BIND, LifeDetectorEntity.createDetectorAttributes()); // This will do fine.
         FabricDefaultAttributeRegistry.register(BLOCK_PROJECTILE, BlockProjectile.createBlockAttributes());
         FabricDefaultAttributeRegistry.register(SAND_TORNADO, SandTornadoEntity.createTornadoAttributes());
     }

@@ -6,6 +6,7 @@ import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.events.JPlayerEntityEvents;
 import net.arna.jcraft.common.events.JServerTickEvents;
+import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.item.MockItem;
 import net.arna.jcraft.common.network.c2s.ConfigUpdatePacket;
 import net.arna.jcraft.common.util.EntityInterest;
@@ -25,6 +26,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.registry.Registry;
 
 import static net.arna.jcraft.common.util.EntityInterest.blockAttractionInterest;
@@ -43,10 +46,19 @@ public interface JEventsRegistry {
 
                     if (hasWeapon) {
                         StatusEffectInstance stun = entity.getStatusEffect(JStatusRegistry.DAZED);
-                        if (stun != null && stun.getAmplifier() != 3) {
-                            int duration = stun.getDuration() / 2;
+                        if (stun != null) {
+                            int duration = stun.getDuration() / 3;
+
                             entity.removeStatusEffect(JStatusRegistry.DAZED);
                             StandEntity.stun(entity, duration, 3);
+
+                            Vec3i upVec = GravityChangerAPI.getGravityDirection(entity).getVector();
+
+                            entity.setVelocity(
+                                    entity.getPos().subtract(attacker.getPos()).normalize()
+                                            .add(-upVec.getX() / 3.0, -upVec.getY() / 3.0, -upVec.getZ() / 3.0)
+                            );
+                            entity.velocityModified = true;
                         }
                     }
                     return true;

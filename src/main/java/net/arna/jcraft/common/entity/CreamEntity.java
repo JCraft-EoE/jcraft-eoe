@@ -54,8 +54,10 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public static final Attack grab = new Attack(3, 20, 1f, 20, 8, 1.5, 3f, 0f, AttackType.BOX, 1.5f, 0, 0)
             .setGrab()
             .setInfo("Grab", "unblockable, knocks back");
-    public static final Attack grabhit = new Attack(4, 0, 1f, 20, 13, 2.0, 6f, 1.5f, AttackType.BOX, 0.25f)
-            .setLaunch();
+    public static final Attack grabhit = new Attack(4, 0, 1f, 20, 13, 2.0, 6f, 1.5f, AttackType.BOX, 0.25f, 0, 0, JSoundRegistry.IMPACT_1)
+            .setLaunch()
+            .setHitspark(2)
+            .setInfo("Grab (Hit)", "");
     /*
     public static final Attack charge = new Attack(5, 20, 4f, 13, 5, 1.5, 8f, 0.25f, AttackType.CHARGE, 1, 0, State.CHARGE_HIT.ordinal(), JSoundRegistry.IMPACT_3)
             .setRanged(true)
@@ -127,7 +129,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                     Chop>Void
                     i.M1>land+s.OFF>s.ON+Combo>M1>Charge>Grab""";
 
-        moves = List.of(light, heavy, combo, destroy, consume, surprise, grab, enter);
+        moves = List.of(light, heavy, combo, grab, consume, surprise, destroy, enter);
     }
 
     public void beginHalfBall() {
@@ -145,7 +147,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         blockDistance = 0.75f;
         maxStandGauge = 90f;
 
-        moves = List.of(light, heavy, combo, destroy, consume, surprise, grab, enter);
+        moves = List.of(light, heavy, combo, grab, consume, surprise, destroy, enter);
     }
 
     public boolean isHalfBall() {

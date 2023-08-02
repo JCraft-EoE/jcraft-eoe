@@ -5,7 +5,9 @@ import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.entity.projectile.AnkhProjectile;
 import net.arna.jcraft.common.entity.projectile.LifeDetectorEntity;
+import net.arna.jcraft.common.entity.projectile.RedBindEntity;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
+import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -57,12 +59,12 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             .setInfo("Crossfire Variation", "summons 6 ankhs that orbit around the user, crouch to increase orbit distance");
     public static final Attack crossfirehurricane = new Attack(6, 60, 0.75f, 22, 18, 0, 0f, 0f, AttackType.BOX)
             .setInfo("Crossfire Hurricane", "summons slow, homing fire hurricane that knocks down, lasts for 3 seconds after hitting anything");
-    public static final Attack redbind = new Attack(8, 20, 0.75f, 22, 12, 1.5, 5, 0, AttackType.BOX, 0.75f, 0, 0, JSoundRegistry.IMPACT_3)
-            .setInfo("Red Bind", "medium windup, good stun");
+    public static final Attack redbind = new Attack(8, 20, 0.75f, 22, 12, 1.5, 3, 0, AttackType.BOX, 0.75f, 0, 0, JSoundRegistry.IMPACT_3)
+            .setInfo("Red Bind", "on hit, wraps opponent in fiery rings that launch them in the direction they are hit");
     public static final Attack detector = new Attack(7, 25, 0.75f, 20, 13, 0, 0f, 0f, AttackType.BOX)
             .setRanged(true)
             .crouchingVariation(redbind)
-            .setInfo("Life Detector/Red Bind", "tracks down nearby life, lasts 15s/crouch for a whip attack");
+            .setInfo("Life Detector", "tracks down nearby life, lasts 15s");
 
     private static final int variationAnkhs = 6;
     private Vec3d hurricanePos;
@@ -95,7 +97,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
                     Hurricane>[opponent in air]Barrage>M1>Crossfire>Red Bind>M1>Low Kick>Variation
                     Red Bind>M1>Barrage>M1>Crossfire>Low Kick>Hurricane+Variation""";
 
-        moves = List.of(light, heavy, barrage, crossfire, crossfirehurricane, crossfirevariation, Attack.unusable, detector);
+        moves = List.of(light, heavy, barrage, crossfire, crossfirehurricane, crossfirevariation, redbind, detector);
     }
 
     // Moveset
@@ -146,20 +148,16 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
 
     @Override
     public void initSpecial3() {
-        /*
         if (!canAttack()) return;
-        if (handleAttack(redirect, JCraft.standS3CD, State.REDIRECT))
-            playSound(JSoundRegister.MR_REDIRECT, 1, 1);
-
-         */
+        if (handleAttack(redbind, JCraft.standS3CD, State.RED_BIND))
+            playSound(JSoundRegistry.MR_REDBIND, 1, 1);
     }
 
     @Override
     public void initUtil() {
         if (!canAttack() || !hasUser()) return;
-        if (getUserOrThrow().isSneaking() && handleAttack(redbind, JCraft.utilCD, State.RED_BIND))
-            playSound(JSoundRegistry.MR_REDBIND, 1, 1);
-        else if (handleAttack(detector, JCraft.utilCD, State.DETECTOR)) playSound(JSoundRegistry.MR_DETECTOR, 1, 1);
+        if (handleAttack(detector, JCraft.utilCD, State.DETECTOR))
+            playSound(JSoundRegistry.MR_DETECTOR, 1, 1);
     }
 
     @Override
@@ -222,6 +220,31 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
                 lifeDetector.setMaster(user);
                 lifeDetector.refreshPositionAndAngles(getX(), getY() + 1.5, getZ(), getYaw(), getPitch());
                 world.spawnEntity(lifeDetector);
+            }
+            case (8) -> {
+                if (!hasUser() || entities.isEmpty()) return;
+
+                LivingEntity master = getUserOrThrow();
+                LivingEntity boundEntity = JUtils.getUserIfStand(entities.get(0));
+
+                // Remove Stand
+                StandEntity<?, ?> stand = ((IEntityDataSaver) boundEntity).getStand();
+                if (stand != null) {
+                    stand.curAttack = null;
+                    stand.setMoveStun(0);
+                    stand.desummon();
+                }
+
+                // Stun
+                boundEntity.removeStatusEffect(JStatusRegistry.DAZED);
+                StandEntity.stun(boundEntity, RedBindEntity.ticksToLive, 0);
+
+                // Create and bind
+                RedBindEntity redBind = new RedBindEntity(JEntityTypeRegistry.RED_BIND, world);
+                redBind.setPosition(boundEntity.getPos());
+                redBind.setMaster(master);
+                redBind.setBoundEntity(boundEntity);
+                world.spawnEntity(redBind);
             }
         }
     }

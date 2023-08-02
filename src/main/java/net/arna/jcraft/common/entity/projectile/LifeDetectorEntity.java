@@ -6,7 +6,6 @@ import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -15,13 +14,11 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.Arm;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -37,10 +34,9 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
 
-public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOwnable {
+public class LifeDetectorEntity extends JAttackEntity implements IAnimatable {
     private static final TrackedData<Boolean> EXPLODED;
     public LivingEntity target;
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
     static {
         EXPLODED = DataTracker.registerData(LifeDetectorEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
@@ -58,17 +54,6 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
 
     public LifeDetectorEntity(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);
-    }
-
-    private LivingEntity master;
-
-    @Override
-    public LivingEntity getMaster() {
-        return master;
-    }
-
-    public void setMaster(LivingEntity l) {
-        this.master = l;
     }
 
     @Override
@@ -212,26 +197,9 @@ public class LifeDetectorEntity extends LivingEntity implements IAnimatable, IOw
         else master = (LivingEntity) world.getEntityById(tag.getInt("ownerID")); // Always is living
     }
 
-    @Override
-    public Iterable<ItemStack> getArmorItems() {
-        return List.of();
-    }
-
-    @Override
-    public ItemStack getEquippedStack(EquipmentSlot slot) {
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public void equipStack(EquipmentSlot slot, ItemStack stack) {
-    }
-
-    @Override
-    public Arm getMainArm() {
-        return null;
-    }
-
     // Animations
+    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+
     @Override
     public void registerControllers(AnimationData animationData) {
         animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));

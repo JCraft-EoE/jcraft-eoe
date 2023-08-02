@@ -53,7 +53,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 15, 9, 1.5, 5f, 0.75f, AttackType.BOX, 1.1f, -0.1f, 0, JSoundRegistry.IMPACT_2)
             .crouchingVariation(crm1)
             .setInfo("Chop", "quick combo starter");
-    public static final Attack barrage = Attack.barrageAttack(2, 17, 0.75f, 70, 0, 2, 0.8f, 0.25f, 2, 0, 3, JSoundRegistry.IMPACT_2)
+    public static final Attack barrage = Attack.barrageAttack(2, 17, 0.75f, 70, 0, 2, 0.8f, 0.25f, 1.5f, 0, 3, JSoundRegistry.IMPACT_2)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
     public static final Attack heavy = new Attack(1, 15, 1, 25, 14, 2, 8f, 1.5f, AttackType.BOX, 0.6f, -0.2f, 0, JSoundRegistry.IMPACT_2)
             .setHitspark(2)

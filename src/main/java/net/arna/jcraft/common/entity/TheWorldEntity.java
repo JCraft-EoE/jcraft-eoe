@@ -30,9 +30,9 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 5, 1.5, 5f, 0.1f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegistry.IMPACT_1)
             .crouchingVariation(crm1)
             .setInfo("Punch", "quick combo starter");
-    public static final Attack barrage = Attack.barrageAttack(2, 17, 0.75f, 50, 0, 2, 1f, 0.1f, 2, 0, 3)
+    public static final Attack barrage = Attack.barrageAttack(2, 17, 0.75f, 50, 0, 2, 1f, 0.1f, 1.5f, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public static final Attack donut = new Attack(1, 14, 1f, 48, 26, 2, 9f, 1.0f, AttackType.BOX, 3.4f, 0, 0, JSoundRegistry.TW_DONUT_HIT)
+    public static final Attack donut = new Attack(1, 14, 1f, 42, 20, 2, 9f, 1.0f, AttackType.BOX, 2.6f, 0, 0, JSoundRegistry.TW_DONUT_HIT)
             .setLaunch()
             .setHitspark(2)
             .appendHitbox(new HitBoxData(0, 0, 1.5))
