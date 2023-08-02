@@ -7,6 +7,7 @@ import net.arna.jcraft.common.entity.projectile.AnkhProjectile;
 import net.arna.jcraft.common.entity.projectile.LifeDetectorEntity;
 import net.arna.jcraft.common.entity.projectile.RedBindEntity;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
+import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -222,7 +223,28 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             }
             case (8) -> {
                 if (!hasUser() || entities.isEmpty()) return;
-                RedBindEntity.bindEntity( getUserOrThrow(), JUtils.getUserIfStand(entities.get(0)) );
+
+                LivingEntity master = getUserOrThrow();
+                LivingEntity boundEntity = JUtils.getUserIfStand(entities.get(0));
+
+                // Remove Stand
+                StandEntity<?, ?> stand = ((IEntityDataSaver) boundEntity).getStand();
+                if (stand != null) {
+                    stand.curAttack = null;
+                    stand.setMoveStun(0);
+                    stand.desummon();
+                }
+
+                // Stun
+                boundEntity.removeStatusEffect(JStatusRegistry.DAZED);
+                StandEntity.stun(boundEntity, RedBindEntity.ticksToLive, 0);
+
+                // Create and bind
+                RedBindEntity redBind = new RedBindEntity(JEntityTypeRegistry.RED_BIND, world);
+                redBind.copyPositionAndRotation(boundEntity);
+                redBind.setMaster(master);
+                redBind.setBoundEntity(boundEntity);
+                world.spawnEntity(redBind);
             }
         }
     }

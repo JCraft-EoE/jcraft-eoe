@@ -29,7 +29,7 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 public class RedBindEntity extends JAttackEntity implements IAnimatable {
     private LivingEntity boundEntity;
     private float boundHealth;
-    private static final int ticksToLive = 60;
+    public static final int ticksToLive = 60;
     private int timeLeft = ticksToLive;
     private static final TrackedData<Boolean> EXPLODED;
     private static final TrackedData<Float> WIDTH;
@@ -65,26 +65,6 @@ public class RedBindEntity extends JAttackEntity implements IAnimatable {
         super(entityType, world);
     }
 
-    public static void bindEntity(LivingEntity master, LivingEntity boundEntity) {
-        World masterWorld = master.getWorld();
-        if (masterWorld.isClient) return;
-
-        // Remove Stand
-        StandEntity<?, ?> stand = ((IEntityDataSaver) boundEntity).getStand();
-        if (stand != null)
-            stand.discard();
-
-        // Stun
-        boundEntity.removeStatusEffect(JStatusRegistry.DAZED);
-        StandEntity.stun(boundEntity, ticksToLive, 0);
-
-        // Create and bind
-        RedBindEntity redBind = new RedBindEntity(JEntityTypeRegistry.RED_BIND, masterWorld);
-        redBind.setMaster(master);
-        redBind.setBoundEntity(boundEntity);
-        masterWorld.spawnEntity(redBind);
-    }
-
     @Override
     public double getMountedHeightOffset() {
         return -1.0;
@@ -92,7 +72,7 @@ public class RedBindEntity extends JAttackEntity implements IAnimatable {
 
     @Override
     public void tickRiding() {
-        if (!hasExploded()) {
+        if (!world.isClient && !hasExploded()) {
             if (boundEntity == null) { // If boundEntity data was wiped, attempt to recover
                 if (getVehicle() instanceof LivingEntity living) setBoundEntity(living);
                 if (boundEntity == null) discard();
@@ -107,9 +87,12 @@ public class RedBindEntity extends JAttackEntity implements IAnimatable {
     }
 
     private void detonate() {
-        Vec3d vel = master.getPos().subtract(boundEntity.getPos()).add(0, 1, 0);
-        Vec3d launch = vel.normalize().multiply(1.5);
-        StandEntity.damageLogic(boundEntity.getWorld(), boundEntity, launch, 20, 3, true, 6, false, 4, DamageSource.mob(master), master, false, true);
+        if (master != null) {
+            Vec3d vel = boundEntity.getPos().subtract(master.getPos()).add(0, 1, 0);
+            Vec3d launch = vel.normalize().multiply(1.5);
+            StandEntity.damageLogic(boundEntity.getWorld(), boundEntity, launch, 20, 3, true, 6, false, 4, DamageSource.mob(master), master, false, true);
+        }
+
         dataTracker.set(EXPLODED, true);
         kill();
     }
