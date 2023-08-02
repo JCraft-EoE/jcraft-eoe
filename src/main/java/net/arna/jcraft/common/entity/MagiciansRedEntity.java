@@ -241,7 +241,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
 
                 // Create and bind
                 RedBindEntity redBind = new RedBindEntity(JEntityTypeRegistry.RED_BIND, world);
-                redBind.copyPositionAndRotation(boundEntity);
+                redBind.setPosition(boundEntity.getPos());
                 redBind.setMaster(master);
                 redBind.setBoundEntity(boundEntity);
                 world.spawnEntity(redBind);
