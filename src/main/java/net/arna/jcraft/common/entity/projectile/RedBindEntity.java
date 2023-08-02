@@ -88,8 +88,8 @@ public class RedBindEntity extends JAttackEntity implements IAnimatable {
 
     private void detonate() {
         if (master != null) {
-            Vec3d vel = boundEntity.getPos().subtract(master.getPos()).add(0, 1, 0);
-            Vec3d launch = vel.normalize().multiply(1.5);
+            Vec3d vel = boundEntity.getPos().add(0, 0.5, 0).subtract(master.getPos());
+            Vec3d launch = vel.normalize().multiply(1.25);
             StandEntity.damageLogic(boundEntity.getWorld(), boundEntity, launch, 20, 3, true, 6, false, 4, DamageSource.mob(master), master, false, true);
         }
 

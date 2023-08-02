@@ -59,7 +59,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             .setInfo("Crossfire Variation", "summons 6 ankhs that orbit around the user, crouch to increase orbit distance");
     public static final Attack crossfirehurricane = new Attack(6, 60, 0.75f, 22, 18, 0, 0f, 0f, AttackType.BOX)
             .setInfo("Crossfire Hurricane", "summons slow, homing fire hurricane that knocks down, lasts for 3 seconds after hitting anything");
-    public static final Attack redbind = new Attack(8, 20, 0.75f, 22, 12, 1.5, 5, 0, AttackType.BOX, 0.75f, 0, 0, JSoundRegistry.IMPACT_3)
+    public static final Attack redbind = new Attack(8, 20, 0.75f, 22, 12, 1.5, 3, 0, AttackType.BOX, 0.75f, 0, 0, JSoundRegistry.IMPACT_3)
             .setInfo("Red Bind", "on hit, wraps opponent in fiery rings that launch them in the direction they are hit");
     public static final Attack detector = new Attack(7, 25, 0.75f, 20, 13, 0, 0f, 0f, AttackType.BOX)
             .setRanged(true)
