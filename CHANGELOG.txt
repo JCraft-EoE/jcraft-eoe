@@ -1466,7 +1466,35 @@ Star Platinum: The World
     >Barrage stun reduced (2->1.5s)
     >Updated skin 3
 
+● 3/8/2023
+
+Star Platinum (& SP:TW)
+    >Fixed crash relating to lack of a user
+
+Magician's Red
+    >Reduced damage (5->3) on Red Bind (first hit)
+    >Low Kick
+        >Reanimated
+        >Reduced cooldown (17->14s)
+    >Redirect
+        >Can now redirect towards entities
+
+Brawler
+    >Combo
+        >Cooldown reduced (22->20s)
+        >Blockstun reduced (8->5t)
+    >Gut Punch cooldown reduced (20->17s)
+    >Sweep cooldown reduced (20->15s)
+
+Anubis
+    >Added Passive
+        >Hitting opponents (regardless of if they blocked) now speeds up the next attack by 25%
+        >25% of the speed boost is removed every 5 seconds spent without a landed hit
+
 priority (top to bottom)
+todo: mih gauge
+todo: anubis swing speed
+
 todo: fix predict not working with new projectiles
 
 TODO: AI improvements (general)

@@ -39,13 +39,12 @@ import java.util.function.Consumer;
 
 public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, MagiciansRedEntity.State> {
     public static final Attack redirect = new Attack(5, 5, 0.75f, 10, 7, 0, 0f, 0f, AttackType.BOX)
-            .setMobility(MobilityType.TELEPORT)
+            .setMobility(MobilityType.TELEPORT) // this is a LIE, it just tells the ai to use it at a range of >3m
             .setInfo("Redirect", "redirects all the users ankhs to where they're looking");
-    // and so begins my terrible misuse of my own AI flags, the tldr here being that its simply called whenever the enemy is >3 blocks away, which is great here
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 8, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.8f, -0.1f, 0, JSoundRegistry.IMPACT_1)
             .crouchingVariation(redirect)
             .setInfo("Punch", "quick combo starter");
-    public static final Attack heavy = new Attack(1, 17, 1f, 22, 12, 1.75, 7f, 0.5f, AttackType.BOX, 0.5f, 0.6f, 0, JSoundRegistry.TW_KICK_HIT)
+    public static final Attack heavy = new Attack(1, 14, 1f, 22, 12, 1.75, 7f, 0.5f, AttackType.BOX, 0.5f, 0.6f, 0, JSoundRegistry.TW_KICK_HIT)
             .setLaunch()
             .setInfo("Low Kick", "medium windup knockdown");
     public static final Attack barrage = Attack.barrageAttack(2, 17, 0.75f, 60, 0, 2, 0.4f, 0.25f, 0, 0, 3)
@@ -198,15 +197,15 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             }
             case (5) -> {
                 List<AnkhProjectile> ankhs = world.getEntitiesByClass(AnkhProjectile.class,
-                        new Box(eyePos.add(32.0, 32.0, 32.0), eyePos.subtract(32.0, 32.0, 32.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+                        getBoundingBox().expand(32), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
 
                 if (!ankhs.isEmpty()) {
-                    HitResult hitResult = this.world.raycast(new RaycastContext(eyePos, eyePos.add(user.getRotationVector().multiply(24)), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user));
+                    Vec3d pos = JUtils.raycastAll(user, eyePos, eyePos.add(user.getRotationVector().multiply(24)), RaycastContext.FluidHandling.NONE);
 
                     for (AnkhProjectile ankh : ankhs) {
                         if (ankh.getOwner() == user) {
                             ankh.setVariation(false);
-                            ankh.setVelocity(hitResult.getPos().subtract(ankh.getPos()).normalize().multiply(0.6));
+                            ankh.setVelocity(pos.subtract(ankh.getPos()).normalize().multiply(0.6));
                         }
                     }
                 }

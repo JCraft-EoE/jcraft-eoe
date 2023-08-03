@@ -39,6 +39,9 @@ public class AnubisSpec extends JCraftSpec {
             .setAnimation("an.swp")
             .setInfo("Sweep", "");
 
+    private int ticksSinceLastHit = 0;
+    private float attackSpeedMult = 1f;
+
     // Info
     @Override
     public String getInternalName() {
@@ -73,7 +76,7 @@ public class AnubisSpec extends JCraftSpec {
     @Override
     public void initHeavyAttack(ServerWorld serverWorld) {
         if (!canAttack()) return;
-        if (handleAttack(serverWorld, player.isHolding(JObjectRegistry.ANUBIS) ? pommel : pommelIn, JCraft.heavyCD))
+        if (handleAttack(serverWorld, player.isHolding(JObjectRegistry.ANUBIS) ? pommel : pommelIn, JCraft.heavyCD, attackSpeedMult))
             JUtils.serverPlaySound(JSoundRegistry.ANUBIS_POMMEL, serverWorld, player.getPos());
     }
 
@@ -89,7 +92,7 @@ public class AnubisSpec extends JCraftSpec {
     public void initSpecial1(ServerWorld serverWorld) {
         if (!canAttack()) return;
         if (!player.isHolding(JObjectRegistry.ANUBIS)) return;
-        if (handleAttack(serverWorld, slash, JCraft.s1CD))
+        if (handleAttack(serverWorld, slash, JCraft.s1CD, attackSpeedMult))
             JUtils.serverPlaySound(JSoundRegistry.ANUBIS_SLASH, serverWorld, player.getPos());
     }
 
@@ -97,17 +100,17 @@ public class AnubisSpec extends JCraftSpec {
     public void initSpecial2(ServerWorld serverWorld) {
         if (!canAttack()) return;
         if (!player.isHolding(JObjectRegistry.ANUBIS)) return;
-        if (handleAttack(serverWorld, rekkas2, JCraft.s2CD))
+        if (handleAttack(serverWorld, rekkas2, JCraft.s2CD, attackSpeedMult))
             JUtils.serverPlaySound(JSoundRegistry.ANUBIS_REKKA2, serverWorld, player.getPos());
     }
 
     @Override
     public void initSpecial3(ServerWorld serverWorld) {
         if (!canAttack()) return;
-        if (player.isHolding(JObjectRegistry.ANUBIS) && handleAttack(serverWorld, rekkas3, JCraft.s2CD)) {
+        if (player.isHolding(JObjectRegistry.ANUBIS) && handleAttack(serverWorld, rekkas3, JCraft.s2CD, attackSpeedMult)) {
             JUtils.serverPlaySound(JSoundRegistry.ANUBIS_REKKA3, serverWorld, player.getPos());
         } else {
-            handleAttack(serverWorld, sweep, JCraft.s3CD);
+            handleAttack(serverWorld, sweep, JCraft.s3CD, attackSpeedMult);
             player.addStatusEffect(
                     new StatusEffectInstance(StatusEffects.SLOWNESS, sweep.moveStun, 2, true, false)
             );
@@ -116,11 +119,26 @@ public class AnubisSpec extends JCraftSpec {
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> hurt) {
+        if (!hurt.isEmpty()) {
+            ticksSinceLastHit = 0;
+            if (attackSpeedMult < 2f) attackSpeedMult += 0.25f;
+
+            if (attack.id >= 4) // Rekka finisher or Sweep
+                for (LivingEntity ent : hurt)
+                    if (!JUtils.isBlocking(ent))
+                        ent.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0, true, true));
+        }
+
         if (attack.id == 3 && moveStun == 20)
             curAttack = rekkafinisher;
-        if (attack.id >= 4) // Rekka finisher or Sweep
-            for (LivingEntity ent : hurt)
-                if (!JUtils.isBlocking(ent))
-                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0, true, true));
+    }
+
+    @Override
+    public void tickSpec() {
+        super.tickSpec();
+        if (++ticksSinceLastHit > 100 && attackSpeedMult > 1f) {
+            ticksSinceLastHit = 0; // Technically untrue, but all this serves is for counting 5s since last hit then rolling over
+            attackSpeedMult -= 0.25f;
+        }
     }
 }

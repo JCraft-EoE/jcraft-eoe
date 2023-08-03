@@ -178,12 +178,6 @@ public final class JUtils {
         return playerSpec.getSpec();
     }
 
-    public enum RaycastPriority {
-        ENTITY,
-        BLOCK,
-        NEAREST
-    }
-
     public static void serverPlaySound(SoundEvent sound, ServerWorld serverWorld, Vec3d pos) {
         serverPlaySound(sound, serverWorld, pos, 32);
     }
@@ -196,8 +190,7 @@ public final class JUtils {
         );
     }
 
-    //todo: generic raycast that hits entities and blocks
-    public static Vec3d raycastAll(Entity entity, Vec3d start, Vec3d end, RaycastContext.FluidHandling fluidHandling, RaycastPriority priority) {
+    public static Vec3d raycastAll(Entity entity, Vec3d start, Vec3d end, RaycastContext.FluidHandling fluidHandling) {
         World world = entity.getWorld();
         double rangeSquared = start.squaredDistanceTo(end);
 
@@ -206,17 +199,20 @@ public final class JUtils {
                 EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR,
                 rangeSquared
         );
+        boolean entityHit = eHit != null && eHit.getType() == HitResult.Type.ENTITY;
         HitResult bHit = world.raycast(new RaycastContext(start, end, RaycastContext.ShapeType.COLLIDER, fluidHandling, entity));
 
-        if (Objects.requireNonNull(priority) == RaycastPriority.BLOCK) {
-            if (bHit.getType() != HitResult.Type.MISS) return bHit.getPos();
-            // STOPPED HERE
-        } else {
-            if (eHit != null) return eHit.getPos();
-            return bHit.getPos();
+        Vec3d blockPos = bHit.getPos();
+
+        if (entityHit) {
+            Vec3d entityPos = eHit.getPos();
+            if (blockPos.squaredDistanceTo(start) > entityPos.squaredDistanceTo(start))
+                return entityPos;
+            else
+                return blockPos;
         }
 
-        return Vec3d.ZERO; //THIS IS A TERRIBLE IDEA!!!!!
+        return blockPos;
     }
 
     public static Direction getLookDirection(Entity entity) {

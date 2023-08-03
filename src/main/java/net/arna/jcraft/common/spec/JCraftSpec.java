@@ -99,16 +99,27 @@ public abstract class JCraftSpec {
     }
 
     public boolean handleAttack(ServerWorld serverWorld, Attack attack, String cooldownName) {
+        return handleAttack(serverWorld, attack, cooldownName, 1f);
+    }
+
+    public boolean handleAttack(ServerWorld serverWorld, Attack attack, String cooldownName, float animationSpeed) {
         NbtCompound playerData = ((IEntityDataSaver) player).getPersistentData();
         int cd = playerData.getInt(cooldownName);
         if (cd > 0) return false;
-        moveStun = attack.moveStun;
         playerData.putInt(cooldownName, (int) (attack.cooldown * 20));
-        curAttack = attack;
+
+        //JCraft.LOGGER.info("SERVER: Handling spec attack: " + attack + " in world: " + serverWorld);
+
+        curAttack = Attack.copyOf(attack);
+
+        moveStun = curAttack.moveStun = (int) (curAttack.moveStun / animationSpeed);
+        curAttack.initTime = (int) (curAttack.initTime / animationSpeed);
+        if (curAttack.attackType == AttackType.MULTIHIT)
+            curAttack.attackTimes.replaceAll(integer -> (int) (integer / animationSpeed));
         armorPoints = attack.armor;
 
         PlayerLookup.world(serverWorld).forEach(
-                serverPlayer -> PlayerAnimPacket.sendSpec(player, serverPlayer, curAttack.animation, moveStun, curAttack.id));
+                serverPlayer -> PlayerAnimPacket.sendSpec(player, serverPlayer, curAttack.animation, moveStun, curAttack.id, animationSpeed));
         return true;
     }
 
