@@ -158,6 +158,8 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
     @Override
     public void tick() {
         super.tick();
+        if (!hasUser()) return;
+
         LivingEntity user = getUserOrThrow();
         Vec3d rotVec = getRotationVector();
 

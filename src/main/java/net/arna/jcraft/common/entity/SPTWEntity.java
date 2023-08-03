@@ -181,24 +181,23 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
     @Override
     public void tick() {
         super.tick();
+        if (!hasUser()) return;
 
-        LivingEntity user = getUser();
+        LivingEntity user = getUserOrThrow();
 
-        if (user != null) {
-            if (world.isClient) setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(getUser()) / 2, 0.0, 255.0) / 255f);
-            else if (curAttack != null && curAttack.id == timestrike.id && getMoveStun() == 7) {
-                /*
-                NbtCompound userData = ((IEntityDataSaver)user).getPersistentData();
-                if (userData.getInt(JCraft.utilCD) < 200)
-                    userData.putInt(JCraft.utilCD, 200);
-                 */
+        if (world.isClient) setAlpha((float) MathHelper.clamp(255.0 * squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
+        else if (curAttack != null && curAttack.id == timestrike.id && getMoveStun() == 7) {
+            /*
+            NbtCompound userData = ((IEntityDataSaver)user).getPersistentData();
+            if (userData.getInt(JCraft.utilCD) < 200)
+                userData.putInt(JCraft.utilCD, 200);
+             */
 
-                Vec3d prevPos = user.getEyePos();
+            Vec3d prevPos = user.getEyePos();
 
-                timeSkip(2.5, JSoundRegistry.STAR_PLATINUM_TIMESKIP);
-                if (turnAround)
-                    user.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, prevPos);
-            }
+            timeSkip(2.5, JSoundRegistry.STAR_PLATINUM_TIMESKIP);
+            if (turnAround)
+                user.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, prevPos);
         }
     }
 
