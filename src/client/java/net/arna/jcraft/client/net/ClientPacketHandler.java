@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import dev.kosmx.playerAnim.api.layered.IAnimation;
 import dev.kosmx.playerAnim.api.layered.KeyframeAnimationPlayer;
 import dev.kosmx.playerAnim.api.layered.ModifierLayer;
+import dev.kosmx.playerAnim.api.layered.modifier.SpeedModifier;
 import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
 import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import lombok.experimental.UtilityClass;
@@ -112,13 +113,17 @@ public class ClientPacketHandler {
 
         int moveStun;
         int attackID;
+        float animationSpeed;
+
         if (isSpec) {
             moveStun = buf.readInt();
             attackID = buf.readInt();
+            animationSpeed = buf.readFloat();
             //JCraft.LOGGER.info("Animation packet is for specs, and has attached moveStun: " + moveStun + " and attackID: " + attackID);
         } else {
-            attackID = 0;
             moveStun = 0;
+            attackID = 0;
+            animationSpeed = 0f;
         }
 
         client.execute(() -> {
@@ -132,8 +137,10 @@ public class ClientPacketHandler {
                     JCraft.LOGGER.error("Tried to play null animation on player: " + player + ", in world " + client.world);
                     return;
                 }
-                //JCraft.LOGGER.info("Animation to be applied: " + anim);
-                animationContainer.setAnimation(new KeyframeAnimationPlayer(anim));
+
+                // Remove last speed modifier, this is rather primitive but will do for now
+                if ( animationContainer.size() > 0 )
+                    animationContainer.removeModifier(0);
 
                 // Synchronize spec values
                 if (isSpec) {
@@ -145,7 +152,13 @@ public class ClientPacketHandler {
                     //JCraft.LOGGER.info("Spec: " + spec.getName());
                     spec.moveStun = moveStun;
                     spec.attackID = attackID;
+
+                    //JCraft.LOGGER.info("Speed: " + animationSpeed);
+                    animationContainer.addModifierBefore(new SpeedModifier(animationSpeed));
                 }
+
+                //JCraft.LOGGER.info("Animation to be applied: " + anim);
+                animationContainer.setAnimation(new KeyframeAnimationPlayer(anim));
             }
         });
     }

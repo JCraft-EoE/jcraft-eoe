@@ -14,7 +14,7 @@ public class PlayerAnimPacket {
      * @param from ServerPlayerEntity to animate
      * @param to ServerPlayerEntity that views animation
      */
-    public static void sendSpec(PlayerEntity from, ServerPlayerEntity to, String animID, int moveStun, int attackID) {
+    public static void sendSpec(PlayerEntity from, ServerPlayerEntity to, String animID, int moveStun, int attackID, float animationSpeed) {
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeInt(from.getId());
         buf.writeString(animID);
@@ -22,6 +22,7 @@ public class PlayerAnimPacket {
 
         buf.writeInt(moveStun);
         buf.writeInt(attackID);
+        buf.writeFloat(animationSpeed);
 
         ServerPlayNetworking.send(to, JPacketRegistry.S2C_PLAYER_ANIMATION, buf);
     }

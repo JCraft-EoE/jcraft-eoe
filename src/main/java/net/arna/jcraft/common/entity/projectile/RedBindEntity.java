@@ -71,19 +71,21 @@ public class RedBindEntity extends JAttackEntity implements IAnimatable {
     }
 
     @Override
-    public void tickRiding() {
-        if (!world.isClient && !hasExploded()) {
+    public void tick() {
+        if (!world.isClient) {
             if (boundEntity == null) { // If boundEntity data was wiped, attempt to recover
                 if (getVehicle() instanceof LivingEntity living) setBoundEntity(living);
-                if (boundEntity == null) discard();
-            } else if (!hasVehicle()) { // If detached
+            } else if (!hasVehicle() && !hasExploded()) { // If detached
                 detonate();
             }
 
-            if (--timeLeft <= 0 || boundEntity.getHealth() < boundHealth)
+            if (boundEntity == null)
+                discard();
+            else if ( !hasExploded() && (--timeLeft <= 0 || boundEntity.getHealth() < boundHealth) )
                 detonate();
         }
-        super.tickRiding();
+
+        super.tick();
     }
 
     private void detonate() {

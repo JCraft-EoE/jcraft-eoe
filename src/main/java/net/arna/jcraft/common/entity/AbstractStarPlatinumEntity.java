@@ -13,7 +13,6 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-//todo: move all inhale code to StarPlatinumEntity.java
 public abstract sealed class AbstractStarPlatinumEntity<E extends AbstractStarPlatinumEntity<E, S>, S extends Enum<S> & StandAnimationState<E>> extends StandEntity<E, S>
         permits StarPlatinumEntity, SPTWEntity {
     public static final Attack crm1 = new Attack(7, JCraft.lightCooldown, 0.75f, 14, 8, 1.5, 6f, 0.25f, AttackType.BOX, 1f, -0.4f, 0, JSoundRegistry.IMPACT_1)
@@ -120,10 +119,7 @@ public abstract sealed class AbstractStarPlatinumEntity<E extends AbstractStarPl
         if (age == 1) playSound(JSoundRegistry.STAR_PLATINUM_SUMMON, 1f, 1f);
         super.tick();
 
-        if (world.isClient)
+        if (world.isClient && hasUser())
             setAlpha((float) MathHelper.clamp(255.0 * squaredDistanceTo(getUser()) / 2, 0.0, 255.0) / 255f);
     }
-
-    // Animation code
-
 }
