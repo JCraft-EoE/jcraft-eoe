@@ -151,17 +151,14 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
 
     @Override
     public void initUtil() {
-        if (!canAttack()) return;
-        handleAttack(timeskip, JCraft.utilCD, State.IDLE);
+        if (!canAttack() || tsTime > 0) return;
+        handleAttack(timeskip, JCraft.utilCD, State.TIME_SKIP);
     }
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
         switch (attack.id) {
-            case (-2) -> {
-                if (tsTime > 0) return;
-                timeSkip(14, JSoundRegistry.STAR_PLATINUM_TIMESKIP);
-            }
+            case (-2) -> timeSkip(14, JSoundRegistry.STAR_PLATINUM_TIMESKIP);
             case (5) -> {
                 if (entities.isEmpty()) return;
                 setAttack(grabhit, State.GRAB_HIT);
@@ -212,7 +209,8 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
         TIME_STOP(builder -> builder.playAndHold("animation.sptw.timestop")),
         BACK_HAND(builder -> builder.playAndHold("animation.sptw.backhand")),
         GRAB(builder -> builder.playAndHold("animation.sptw.grab")),
-        GRAB_HIT(builder -> builder.playAndHold("animation.sptw.grabhit"));
+        GRAB_HIT(builder -> builder.playAndHold("animation.sptw.grabhit")),
+        TIME_SKIP(builder -> builder.loop("animation.sptw.idle"));
 
         private final Consumer<AnimationBuilder> animator;
 

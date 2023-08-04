@@ -51,7 +51,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
             .setInfo("Timestop", "4 seconds");
     public static final Attack feignbarrage = new Attack(5, 30, 0.75f, 50, 5, 0, 0f, 0f, AttackType.COUNTER)
             .setInfo("Feign Barrage", "counter, 0.25s windup, 2.25s duration, teleports and knocks down on hit");
-    public static final Attack counterfollowup = new Attack(7, 0, 0.75f, 9, 5, 1.75, 6f, 0.7f, AttackType.BOX, 0.8f, 0.1f, 0, JSoundRegistry.IMPACT_4)
+    public static final Attack counterfollowup = new Attack(7, 0, 0.75f, 9, 5, 1.75, 9f, 0.7f, AttackType.BOX, 0.8f, 0.1f, 0, JSoundRegistry.IMPACT_4)
             .appendHitbox(new HitBoxData(1.25))
             .hyperArmor()
             .setLaunch()
@@ -154,26 +154,24 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
 
     @Override
     public void initUtil() {
-        if (!canAttack()) return;
+        if (!canAttack() || tsTime > 0) return;
         handleAttack(timeskip, JCraft.utilCD, State.TIMESKIP);
     }
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
         switch (attack.id) {
-            case (-2) -> {
-                if (tsTime > 0) return;
-                timeSkip(14, JSoundRegistry.TIME_SKIP);
-            }
+            case (-2) -> timeSkip(14, JSoundRegistry.TIME_SKIP);
             case (1) -> {
-                LivingEntity user = this.getUser();
+                LivingEntity user = getUser();
                 // If missed, stun the user for 1.5 seconds
                 if (entities.isEmpty()) stun(user, 30, 0);
-                    // If hit, impale and set position to middle of arm
+                    /* If hit, impale and set position to middle of arm
                 else for (LivingEntity entity : entities) {
                     Vec3d pos = this.getPos().add(this.getRotationVector().multiply(1.5));
                     entity.teleport(pos.x, entity.getY(), pos.z);
                 }
+                     */
             }
             case (7) -> {
                 for (LivingEntity entity : entities)

@@ -84,6 +84,8 @@
   "entity.jcraft.playerclone": "Clone",
   "entity.jcraft.playerclone_slim": "Clone",
 
+  "entity.jcraft.knife": "Knife",
+  "entity.jcraft.ankh": "Ankh",
   "entity.jcraft.bullet": "Bullet",
 
   "effect.jcraft.dazed_effect": "Dazed",

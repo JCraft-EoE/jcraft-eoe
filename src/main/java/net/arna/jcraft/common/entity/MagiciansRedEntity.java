@@ -226,6 +226,8 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
                 LivingEntity master = getUserOrThrow();
                 LivingEntity boundEntity = JUtils.getUserIfStand(entities.get(0));
 
+                if (JUtils.isBlocking(boundEntity)) return;
+
                 // Remove Stand
                 StandEntity<?, ?> stand = ((IEntityDataSaver) boundEntity).getStand();
                 if (stand != null) {

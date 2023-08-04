@@ -4,22 +4,29 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.block.FoolishSandBlock;
 import net.arna.jcraft.common.block.ShaderTestBlock;
 import net.arna.jcraft.common.block.SoulBlock;
+import net.arna.jcraft.common.entity.projectile.KnifeProjectile;
 import net.arna.jcraft.common.item.*;
 import net.arna.jcraft.common.spec.AnubisSpec;
 import net.arna.jcraft.common.spec.BrawlerSpec;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
+import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.MapColor;
 import net.minecraft.block.Material;
+import net.minecraft.block.dispenser.ProjectileDispenserBehavior;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.ArmorMaterials;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
+import net.minecraft.util.math.Position;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -115,5 +122,14 @@ public interface JObjectRegistry {
     static void init() {
         BLOCKS.keySet().forEach(block -> Registry.register(Registry.BLOCK, BLOCKS.get(block), block));
         ITEMS.keySet().forEach(item -> Registry.register(Registry.ITEM, ITEMS.get(item), item));
+
+        DispenserBlock.registerBehavior(KNIFE, new ProjectileDispenserBehavior() {
+            @Override
+            protected ProjectileEntity createProjectile(World world, Position position, ItemStack stack) {
+                KnifeProjectile knife = new KnifeProjectile(world);
+                knife.setPosition(position.getX(), position.getY(), position.getZ());
+                return knife;
+            }
+        });
     }
 }

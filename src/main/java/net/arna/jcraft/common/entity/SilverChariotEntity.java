@@ -82,7 +82,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .setInfo("Armor Off", "25s of faster moves");
     public static final Attack circleslash = new Attack(14, 0, 0.65f, 20, 2, 1.75, 5, 0, AttackType.BOX, 1, 0, 0, JSoundRegistry.IMPACT_1)
             .setLaunch()
-            .appendHitbox( new HitBoxData(-0.65, 0, 1.75) )
+            .appendHitbox( new HitBoxData(-0.65, 0, 2) )
             .setInfo("Circle Slash (Hit)", "");
     public final Attack circlecharge = new Attack(13, 17, 0.65f, 100, 101, 0, 0, 0, AttackType.BOX)
             .setFollowup(circleslash)
@@ -319,7 +319,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
                 if (!hasUser()) return;
 
                 Vec3d pos = getUserOrThrow().getPos();
-                double launchMult = attack.damage / 5; // (6 to 9) / 8
+                double launchMult = attack.damage / 5; // damage [6.5 to 11]
 
                 for (LivingEntity living : entities) {
                     Vec3d launchVec = living.getPos().subtract(pos).normalize().multiply(launchMult);
@@ -408,7 +408,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
                     if (curAttack.id == circlecharge.id) {
                         if (chargedSlash == null) chargedSlash = Attack.copyOf(circleslash); // Fallback for when the server restarts inconveniently
                         if (getMoveStun() % 20 == 0)
-                            chargedSlash.damage += 1f;
+                            chargedSlash.damage += 1.5f;
                     }
                 }
             }

@@ -42,7 +42,10 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
 
     public KnifeProjectile(EntityType<? extends KnifeProjectile> entityType, World world) {
         super(entityType, world);
-        this.pickupType = PersistentProjectileEntity.PickupPermission.DISALLOWED;
+    }
+
+    public KnifeProjectile(World world) {
+        super(JEntityTypeRegistry.KNIFE, world);
     }
 
     public KnifeProjectile(World world, LivingEntity owner) {
@@ -133,20 +136,20 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
     protected void onEntityHit(EntityHitResult entityHitResult) {
         if (world.isClient) return;
         if (delayed && delayTime > 1) return;
-        Entity owner = this.getOwner();
-        if (owner == null) return;
         Entity entity = entityHitResult.getEntity();
-        if (owner.hasPassenger(entity) || entity == owner) return;
+        Entity owner = this.getOwner();
 
-        if (this.isOnFire()) entity.setOnFireFor(5);
+        if (owner != null && owner.hasPassenger(entity) || entity == owner) return;
+
+        if (isOnFire()) entity.setOnFireFor(5);
 
         int blockstun = 4;
         int stunT = 0;
-        if (this.getLightning()) {
+        if (getLightning()) {
             stunT = 20;
             blockstun = 6;
         } else {
-            dropStack(this.asItemStack(), 0.1F);
+            dropStack(asItemStack(), 0.1F);
         }
 
         JUtils.projectileDamageLogic(this, world, entity, Vec3d.ZERO, stunT, 1, false, 2, blockstun);

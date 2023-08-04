@@ -505,7 +505,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     public static void stun(LivingEntity entity, int duration, int amplifier) {
         if (entity == null || duration == 0) return;
         entity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.DAZED, duration, amplifier, false, false, true));
-        //JCraft.LOGGER.info("Stunned: " + entity.getEntityName() + " for: " + duration);
+        //JCraft.LOGGER.info("Stunned: " + entity.getEntityName() + " for: " + duration + " with stunType: " + amplifier);
     }
 
     /**
@@ -539,7 +539,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         // Statistics
         World world = ent.getWorld();
-        world.sendEntityStatus(ent, (byte) 2);
+        if (!(ent instanceof PlayerEntity)) world.sendEntityStatus(ent, (byte) 2);
 
         invoker.setLastDamageTaken(damage);
         invoker.setLastDamageSource(damageSource);
@@ -584,7 +584,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         // Statistics
         World world = ent.getWorld();
-        world.sendEntityStatus(ent, (byte) 2);
+        if (!(ent instanceof PlayerEntity)) world.sendEntityStatus(ent, (byte) 2);
 
         invoker.setLastDamageTaken(damage);
         invoker.setLastDamageSource(damageSource);
@@ -1159,12 +1159,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             stunLevel = 3;
             if (stunTicks > 20) stunTicks = 20;
             lift = false;
-        } else {
-            // Velocity modification synchronisation
-            if (ent instanceof ServerPlayerEntity serverPlayer)
-                serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(serverPlayer));
-            else
-                ent.velocityModified = true;
         }
 
         // Stun application & overriding
@@ -1205,6 +1199,14 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         }
 
         damage(damage, source, ent);
+
+        if (!tsHit) {
+            // Velocity modification synchronisation
+            if (ent instanceof ServerPlayerEntity serverPlayer)
+                serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(serverPlayer));
+            else
+                ent.velocityModified = true;
+        }
     }
 
     @Override

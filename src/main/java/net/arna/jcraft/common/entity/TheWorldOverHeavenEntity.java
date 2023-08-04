@@ -257,7 +257,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
 
     @Override
     public void initUtil() {
-        if (!canAttack()) return;
+        if (!canAttack() || tsTime > 0) return;
         handleAttack(timeskip, JCraft.utilCD, State.TIMESKIP);
     }
 
@@ -268,10 +268,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         DamageSource damageSource = JDamageSources.stand(this);
 
         switch (attack.id) {
-            case (-2) -> {
-                if (tsTime > 0) return;
-                timeSkip(14, JSoundRegistry.TWOH_TIMESKIP);
-            }
+            case (-2) -> timeSkip(14, JSoundRegistry.TWOH_TIMESKIP);
             case (1) -> { // TWOH's heavy is a mini-overwrite that ignores block
                 for (LivingEntity ent : entities) {
                     stun(ent, 20, 1);
@@ -336,9 +333,9 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
 
                     if (getOverwriteType() == 2) {
                         ent.setOnFireFor(5);
-                        ent.addStatusEffect(new StatusEffectInstance(StatusEffects.HUNGER, 100, 1, false, true));
-                        ent.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 100, 1, false, true));
-                        ent.addStatusEffect(new StatusEffectInstance(StatusEffects.WITHER, 100, 1, false, true));
+                        ent.addStatusEffect(new StatusEffectInstance(StatusEffects.HUNGER, 100, 0, false, true));
+                        ent.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 100, 0, false, true));
+                        ent.addStatusEffect(new StatusEffectInstance(StatusEffects.WITHER, 100, 0, false, true));
                     }
 
                     if (getOverwriteType() != 3) continue;
