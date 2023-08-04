@@ -1495,6 +1495,9 @@ Magician's Red
         >Can now redirect towards entities
     >Red Bind is no longer unblockable
 
+Made in Heaven
+    >Fixed crash relating to lack of a user
+
 The World: Over Heaven
     >Overwrite
         >Reduced level of status effects inflicted (2->1)

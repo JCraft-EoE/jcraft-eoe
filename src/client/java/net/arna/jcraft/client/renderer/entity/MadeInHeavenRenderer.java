@@ -51,8 +51,11 @@ public class MadeInHeavenRenderer extends GeoEntityRenderer<MadeInHeavenEntity> 
             if (aa < 0) aa = 0;
 
             Vec3d baseVel = Vec3d.ZERO;
-            if (animatable.hasUser())
+            float bodyYaw = animatable.bodyYaw;
+            if (animatable.hasUser()) {
                 baseVel = animatable.getUser().getVelocity();
+                bodyYaw = animatable.getUser().bodyYaw;
+            }
 
             for (int i = 0; i <= 3; ++i) {
 
@@ -60,6 +63,7 @@ public class MadeInHeavenRenderer extends GeoEntityRenderer<MadeInHeavenEntity> 
 
                 renderAfter(
                         velocity,
+                        bodyYaw,
                         aa * (1f / i),
                         model,
                         animatable,
@@ -79,12 +83,12 @@ public class MadeInHeavenRenderer extends GeoEntityRenderer<MadeInHeavenEntity> 
         }
     }
 
-    private void renderAfter(Vec3d velocity, float aa, GeoModel model, MadeInHeavenEntity animatable, float partialTicks, RenderLayer type, MatrixStack matrixStack, VertexConsumerProvider renderTypeBuffer, VertexConsumer vertexBuilder, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha){
+    private void renderAfter(Vec3d velocity, float bodyYaw, float aa, GeoModel model, MadeInHeavenEntity animatable, float partialTicks, RenderLayer type, MatrixStack matrixStack, VertexConsumerProvider renderTypeBuffer, VertexConsumer vertexBuilder, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha){
         matrixStack.push();
 
-        matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(animatable.getUser().bodyYaw));
+        matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(bodyYaw));
         matrixStack.translate(velocity.x, -velocity.y, velocity.z);
-        matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(-animatable.getUser().bodyYaw));
+        matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(-bodyYaw));
         super.render(model, animatable, partialTicks, type, matrixStack, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, aa);
         matrixStack.pop();
     }
