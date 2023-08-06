@@ -24,6 +24,13 @@ public interface JSoundRegistry {
     SoundEvent IMPACT_3 = registerSound("impact3");
     SoundEvent IMPACT_4 = registerSound("impact4");
     SoundEvent IMPACT_5 = registerSound("impact5");
+    SoundEvent IMPACT_6 = registerSound("impact6");
+    SoundEvent IMPACT_7 = registerSound("impact7");
+    SoundEvent IMPACT_8 = registerSound("impact8");
+    SoundEvent IMPACT_9 = registerSound("impact9");
+    SoundEvent IMPACT_10 = registerSound("impact10");
+    SoundEvent IMPACT_11 = registerSound("impact11");
+    SoundEvent IMPACT_12 = registerSound("impact12");
     SoundEvent TIME_SKIP = registerSound("timeskip");
     SoundEvent COIN_TOSS = registerSound("cointoss");
 

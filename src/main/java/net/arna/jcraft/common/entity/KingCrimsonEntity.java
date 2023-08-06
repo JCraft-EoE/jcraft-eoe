@@ -64,24 +64,24 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             .setInfo("Dual Chop", "quick combo starter");
     public static final Attack barrage = Attack.barrageAttack(3, 17, 0.85f, 50, 0, 1.5, 1f, 0.1f, 1, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender/finisher, medium stun, knocks back");
-    public static final Attack overhead = new Attack(2, 8, 0.85f, 32, 22, 2, 9f, 1.5f, AttackType.BOX, 0.55f)
+    public static final Attack overhead = new Attack(2, 8, 0.85f, 32, 22, 2, 9f, 1.5f, AttackType.BOX, 0.55f, 0, 0, JSoundRegistry.IMPACT_7)
             .setHitspark(2)
             .hyperArmor()
             .setLaunch()
             .setInfo("Overhead Hook", "long windup, knockdown", AttackQueue.HEAVY);
-    public static final Attack heavy = new Attack(1, 13, 0.85f, 19, 12, 1.5, 6f, 0.2f, AttackType.BOX, 1.25f, 0, 0)
+    public static final Attack heavy = new Attack(1, 13, 0.85f, 19, 12, 1.5, 6f, 0.2f, AttackType.BOX, 1.25f, 0, 0, JSoundRegistry.IMPACT_9)
             .appendHitbox(new HitBoxData(0, 0.5, 1))
             .setInfo("Vertical Chop", "medium windup combo starter, has a true followup in the form of a slow, armored knockdown", AttackQueue.HEAVY)
             .setFollowup(overhead);
     public static final Attack bloodthrow = new Attack(5, 25, 15, 10, 10, AttackType.BOX)
             .setRanged(true)
             .setInfo("Blood Throw", "throws a stunning, blinding blood projectile");
-    public static final Attack eyechop = new Attack(4, 20, 1f, 34, 25, 1.75, 9f, 0.3f, AttackType.BOX, 1.35f, -0.3f)
+    public static final Attack eyechop = new Attack(4, 20, 1f, 34, 25, 1.75, 9f, 0.3f, AttackType.BOX, 1.35f, -0.3f, 0, JSoundRegistry.IMPACT_9)
             .setHitspark(2)
             .appendHitbox(new HitBoxData(0, 0.5, 1))
             .crouchingVariation(bloodthrow)
             .setInfo("Eye Chop", "blindness on hit, donut combo extender");
-    public static final Attack donut = new Attack(6, 15, 1f, 60, 42, 1.75, 14f, 0.0f, AttackType.BOX, 3, 0.1f)
+    public static final Attack donut = new Attack(6, 15, 1f, 60, 42, 1.75, 14f, 0.0f, AttackType.BOX, 3, 0.1f, 0, JSoundRegistry.IMPACT_7)
             .setHitspark(2)
             .hyperArmor()
             .setInfo("Donut", "huge windup, huge stun");
@@ -95,7 +95,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                               during a move: cancels it (puts Time Erase on a 7 second cooldown but doesn't require it to be usable)""");
     public static final Attack timeerase = new Attack(8, 50, 15, 5, 6, AttackType.BOX)
             .setInfo("Time Erase", "6 seconds duration, cancellable by doing anything with King Crimson"); // TE = (moveStun-initTime)/20
-    private static final Attack barrageFinisher = new Attack(10, 17, 0.85f, 50, 0, 1.5, 1f, 1.1f, AttackType.BARRAGE, 0.5f, 0, 3)
+    private static final Attack barrageFinisher = new Attack(10, 17, 0.85f, 50, 0, 1.5, 1f, 1.1f, AttackType.BARRAGE, 0.5f, 0, 3, JSoundRegistry.IMPACT_6)
             .setHitspark(2)
             .setLaunch()
             .setInfo("Barrage (Final Hit)", "");

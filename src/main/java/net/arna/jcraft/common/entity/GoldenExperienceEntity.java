@@ -5,6 +5,7 @@ import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackQueue;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.HitBoxData;
+import net.arna.jcraft.common.entity.projectile.GETreeEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
@@ -43,7 +44,7 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
             .setInfo("Healing Hand", "standing: heals user for 2 hearts, crouching: heals others for 2 hearts, pacifies angered mobs");
     public static final Attack heal = new Attack(4, 26, 1f, 16, 10, 1.25, 0f, 0f, AttackType.BOX)
             .setInfo("Healing Hand (Others)", "");
-    public static final Attack tree = new Attack(5, 20, 1f, 24, 14, 1.25, 5f, 0.2f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegistry.IMPACT_2)
+    public static final Attack tree = new Attack(5, 20, 1f, 24, 14, 1.75, 5f, 0.2f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegistry.IMPACT_2)
             .setHitspark(2)
             .setInfo("Tree Summon", "two-hitting launch");
 
@@ -55,7 +56,7 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
                             turns a held item into a:
                             STANDING: snake which lasts for 25s and stuns for 0.5s on hit
                             CROUCHING: frog which lasts for 15s and reflects damage while following you""");
-    public static final Attack overclock = new Attack(10, 46, 1f, 31, 22, 2, 9f, 0.9f, AttackType.BOX, 3, 0, 0, JSoundRegistry.IMPACT_5)
+    public static final Attack overclock = new Attack(10, 46, 1f, 31, 22, 2, 9f, 0.9f, AttackType.BOX, 3, 0, 0, JSoundRegistry.IMPACT_10)
             .setHitspark(2)
             .setUB(false)
             .setInfo("Overclock", "slow, unblockable, devastating stun");
@@ -165,7 +166,7 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
     private enum LifeGiverType {
         SNAKE,
         FROG,
-        FISH
+        BUSH
     }
 
     private LifeGiverType toSummon;
@@ -174,7 +175,7 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
     public void initSpecial3() {
         if (!canAttack() || !hasUser()) return;
         toSummon = getUserOrThrow().isSneaking() ? LifeGiverType.FROG : LifeGiverType.SNAKE;
-        if (handleAttack(lifegiver, JCraft.standS3CD, State.SNAKE))
+        if (handleAttack(lifegiver, JCraft.standS3CD, State.LIFEGIVER))
             playSound(JSoundRegistry.GE_HEAL, 1, 1);
     }
 
@@ -223,17 +224,20 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
                 }
             }
             case (5) -> {
+                if (user == null) return;
+
                 GETreeEntity tree = new GETreeEntity(JEntityTypeRegistry.GE_TREE, world);
-                tree.owner = user;
-                tree.refreshPositionAndAngles(getX(), getY(), getZ(), getYaw(), 0);
-                this.world.spawnEntity(tree);
+                tree.setMaster(user);
+                tree.copyPositionAndRotation(this);
+
+                world.spawnEntity(tree);
             }
             case (6) -> {
                 if (user == null) return;
 
                 ItemStack item = user.getOffHandStack(); // Get offhand, or if unavailable main hand stack
                 if (item.isEmpty()) item = user.getMainHandStack();
-                if (item.isEmpty()) return;
+                if (item.isEmpty() || item.getMaxCount() <= 1) return;
 
                 LivingEntity animal = null;
                 ItemStack animalItem = item.copy();
@@ -309,7 +313,7 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
         HEAL_SELF(builder -> builder.playAndHold("animation.ge.healself")),
         HEAL(builder -> builder.playAndHold("animation.ge.heal")),
         TREE(builder -> builder.playAndHold("animation.ge.tree")),
-        SNAKE(builder -> builder.playAndHold("animation.ge.snake")),
+        LIFEGIVER(builder -> builder.playAndHold("animation.ge.lifegiver")),
         REKKA1(builder -> builder.playAndHold("animation.ge.rekka1")),
         REKKA2(builder -> builder.playAndHold("animation.ge.rekka2")),
         REKKA3(builder -> builder.playAndHold("animation.ge.rekka3")),
@@ -335,8 +339,8 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
     @Nullable
     @Override
     protected String getSummonAnimation() {
-        return null;
-    } //todo: GE summon anim
+        return "animation.ge.summon";
+    }
 
     @Override
     public State getBlockState() {

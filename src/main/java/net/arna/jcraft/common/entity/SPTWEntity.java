@@ -23,12 +23,6 @@ import java.util.function.Consumer;
 public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPTWEntity.State> {
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 5, 1.5, 5f, 0.2f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegistry.IMPACT_1)
             .setInfo("Punch", "quick combo starter, low knockback");
-    public static final Attack heavy = new Attack(1, 17, 1f, 30, 20, 2.0, 10f, 1.5f, AttackType.BOX, 0.7f, 0, 0, JSoundRegistry.IMPACT_1)
-            .setHitspark(2)
-            .appendHitbox(new HitBoxData(0, 0, 1.5))
-            .hyperArmor()
-            .setLaunch()
-            .setInfo("Star Breaker", "uninterruptable launcher");
     public static final Attack barrage = new Attack(2, 17, 0.75f, 60, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 2, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
     public static final Attack timestrike = new Attack(3, 20, 0.75f, 11, 7, 1.5, 5f, 0.75f, AttackType.BOX, 0.6f, -0.25f, 0, JSoundRegistry.IMPACT_1)
@@ -42,7 +36,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .setGrab()
             .setBlockstun(4)
             .setInfo("What an Ugly Watch", "grab, high recovery");
-    public static final Attack grabhit = new Attack(7, 0, 1f, 24, 16, 1.75, 9f, 0.4f, AttackType.BOX, 1, 0, 0, JSoundRegistry.IMPACT_1)
+    public static final Attack grabhit = new Attack(7, 0, 1f, 24, 16, 1.75, 9f, 0.4f, AttackType.BOX, 1, 0, 0, JSoundRegistry.IMPACT_6)
             .setHitspark(2)
             .setLaunch()
             .hyperArmor()

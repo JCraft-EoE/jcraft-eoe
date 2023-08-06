@@ -1,13 +1,11 @@
-package net.arna.jcraft.common.entity;
+package net.arna.jcraft.common.entity.projectile;
 
+import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.Packet;
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import software.bernie.geckolib3.core.IAnimatable;
@@ -23,33 +21,27 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
 
-public class GETreeEntity extends Entity implements IAnimatable, IAnimationTickable {
-    public LivingEntity owner;
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
-
-    public GETreeEntity(EntityType<? extends Entity> type, World world) {
+public class GETreeEntity extends JAttackEntity implements IAnimatable, IAnimationTickable {
+    public GETreeEntity(EntityType<? extends LivingEntity> type, World world) {
         super(type, world);
-    }
-
-    @Override
-    protected void initDataTracker() {
+        setInvulnerable(true);
     }
 
     @Override
     public void tick() {
         super.tick();
 
-        if (owner != null) {
+        if (master != null) {
             if (age == 4) {
-                DamageSource ds = DamageSource.mob(owner);
-                List<LivingEntity> hurt = JUtils.generateHitbox(world, getPos().add(0, 1, 0), 2.5, null);
+                DamageSource ds = DamageSource.mob(master);
+                List<LivingEntity> hurt = JUtils.generateHitbox(world, getPos().add(0, 1.5, 0), 2.5, List.of(this, master));
                 for (LivingEntity living : hurt) {
                     if (living.isInvulnerableTo(ds)) continue;
 
                     LivingEntity target = JUtils.getUserIfStand(living);
-                    if (owner != target)
-                        StandEntity.damageLogic(world, target, new Vec3d(0, 1, 0), 25, 1,
-                                false, 7f, true, 11, ds, owner);
+                    if (master != target)
+                        StandEntity.damageLogic(world, target, new Vec3d(0, 1, 0), 25, 3,
+                                false, 7f, true, 11, ds, master);
 
                     target.setVelocity(0, 1, 0);
                     target.velocityModified = true;
@@ -61,24 +53,13 @@ public class GETreeEntity extends Entity implements IAnimatable, IAnimationTicka
     }
 
     @Override
-    protected void readCustomDataFromNbt(NbtCompound nbt) {
-    }
-
-    @Override
-    protected void writeCustomDataToNbt(NbtCompound nbt) {
-    }
-
-    @Override
     public boolean startRiding(Entity entity, boolean force) {
         return false;
     }
 
-    @Override
-    public Packet<?> createSpawnPacket() {
-        return new EntitySpawnS2CPacket(this);
-    }
-
     // Animations
+    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+
     @Override
     public AnimationFactory getFactory() {
         return this.factory;

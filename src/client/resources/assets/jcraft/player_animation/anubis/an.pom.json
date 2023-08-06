@@ -1,7 +1,7 @@
 {
     "name": "an.pom",
-    "author": "garlic",
-    "description": "anubis pom",
+    "author": "MrGarlic & Arna",
+    "description": "anubis pommel",
     "emote":{
         "isLoop": "false",
         "returnTick": 2,
@@ -208,7 +208,7 @@
                 "easing": "EASEINOUTQUAD",
                 "turn": 0,
                 "torso":{
-                    "yaw":0.862341582775116
+                    "yaw":1.862341582775116
                 }
             },
             {
@@ -216,7 +216,7 @@
                 "easing": "EASEINBACK",
                 "turn": 0,
                 "torso":{
-                    "yaw":0.37448954582214355
+                    "yaw":1.0
                 }
             },
             {
@@ -592,7 +592,7 @@
                 "easing": "EASEINBACK",
                 "turn": 0,
                 "rightArm":{
-                    "pitch":0.31541579961776733
+                    "pitch":-0.51541579961776733
                 }
             },
             {
@@ -624,7 +624,7 @@
                 "easing": "EASEINBACK",
                 "turn": 0,
                 "rightArm":{
-                    "bend":-1.8190206289291382
+                    "bend":-0.5
                 }
             },
             {

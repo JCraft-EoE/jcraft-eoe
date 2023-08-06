@@ -46,18 +46,23 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
 
     public static final Attack barrage = Attack.barrageAttack(2, 17, 0.75f, 50, 0, 2, 0.75f, 0.25f, 1, 0, 4, JSoundRegistry.IMPACT_3)
             .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
-    public static final Attack gutpunch = new Attack(1, 17, 1f, 30, 19, 2.0, 8f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegistry.TW_KICK_HIT).setHitspark(2).hyperArmor().setLaunch()
+    public static final Attack gutpunch = new Attack(1, 17, 1f, 30, 19, 2.0, 8f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegistry.TW_KICK_HIT)
+            .setHitspark(2)
+            .hyperArmor()
+            .setLaunch()
             .appendHitbox(new HitBoxData(0, 0.25, 1.25))
             .setInfo("Gut Punch", "slow, uninterruptable combo finisher");
     public static final Attack launch = new Attack(4, 22, 0.75f, 21, 14, 1.75, 5f, 0.9f, AttackType.BOX, 0.95f, 0.3f, 0, JSoundRegistry.IMPACT_5)
             .setHitspark(2)
             .setRanged(true)
             .setInfo("Block Launch", "lifts a block from the ground and launches it at a delay/crouching and using this button resets the delay on nearby blocks");
-    public static final Attack gravpunch = new Attack(3, 24, 1f, 32, 20, 1.75, 6f, 0.35f, AttackType.BOX, 2.25f, -0.3f, 0, JSoundRegistry.CMOON_GRAVPUNCHHIT).setHitspark(2).hyperArmor()
+    public static final Attack gravpunch = new Attack(3, 24, 1f, 32, 20, 1.75, 6f, 0.35f, AttackType.BOX, 2.25f, -0.3f, 0, JSoundRegistry.CMOON_GRAVPUNCHHIT)
+            .setHitspark(2)
+            .hyperArmor()
             .setUB(true)
             .appendHitbox(new HitBoxData(1))
             .setInfo("Only One Punch", "lifts enemy on hit");
-    public static final Attack groundslam = new Attack(5, 23, 1f, 18, 10, 3, 7f, 0.2f, AttackType.BOX, 0.85f, 1.4f, 0, JSoundRegistry.CMOON_GRAVPUNCHHIT)
+    public static final Attack groundslam = new Attack(5, 23, 1f, 18, 10, 3, 7f, 0.2f, AttackType.BOX, 0.85f, 1.4f, 0, JSoundRegistry.IMPACT_10)
             .setUB(true)
             .setInfo("Ground Slam", "lifts the ground, combo starter/extender, knockdown when used while crouching");
     public static final Attack gravshift = new Attack(6, 70, 32, 20, 7, AttackType.BOX)
@@ -248,6 +253,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             invertEntities.add(ent);
             invertTimes.add(40);
 
+            //todo: make grav punch make them hover
             if (attack.id == gravpunch.id) {
                 GravityChangerAPI.addGravity(ent, new Gravity(Direction.UP, 2, 60, "stand"));
                 ent.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 60, 0, true, false));

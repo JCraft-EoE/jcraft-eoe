@@ -72,7 +72,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     private static final TrackedData<Integer> STATE;
     private static final TrackedData<Boolean> SAMESTATE; // Marks if the state was set to what it already was during the last setState() call
-    private static final TrackedData<Boolean> RESET; // Set to true when state is set to idle. Set back to false when the after-idle reset code has ran.
+    private static final TrackedData<Boolean> RESET; // Set to true when state is set to idle. Set back to false when the after-idle reset code has run.
     private static final TrackedData<Integer> MOVESTUN;
 
     private static final TrackedData<Integer> SKIN;
@@ -839,14 +839,14 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                         this.setFreePos(new Vec3f((float) newPos.x, (float) newPos.y, (float) newPos.z));
                         this.setFree(true);
                     } else {
-                        this.setPosition(user.getPos());
-                        this.setRotationOffset(this.attackRotation);
+                        setPosition(user.getPos());
+                        setRotationOffset(attackRotation);
                     }
                 } else {
                     user.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 5, 4, true, false));
 
-                    this.setRotationOffset(this.attackRotation);
-                    this.setDistanceOffset(attackDist);
+                    setAttackRotationOffset();
+                    setDistanceOffset(attackDist);
                 }
 
                 if (attack.attackType == AttackType.TIMESTOP && curMoveStun == realInitTime) {
@@ -1027,6 +1027,14 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             this.previousAttack = this.curAttack;
 
         //this.pastAttack = this.curAttack;
+    }
+
+    /**
+     * Called when curAttack isn't null, and it's being processed
+     * Sets the StandEntities rotation (in cylindrical coordinates) to the attack position
+     */
+    public void setAttackRotationOffset() {
+        setRotationOffset(attackRotation);
     }
 
     /**

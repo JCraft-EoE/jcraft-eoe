@@ -46,7 +46,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .setInfo("Punch", "quick combo starter");
     public static final Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 1.5f, 0, 3, JSoundRegistry.IMPACT_1)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public static final Attack heavy = new Attack(1, 19, 1f, 22, 10, 2, 0f, 0.0f, AttackType.BOX, 1, 0, 0, JSoundRegistry.IMPACT_5)
+    public static final Attack heavy = new Attack(1, 19, 1f, 22, 10, 2, 0f, 0.0f, AttackType.BOX, 1, 0, 0, JSoundRegistry.IMPACT_12)
             .setHitspark(2)
             .setUB(true)
             .setInfo("Singularity", "block bypass, low stun, medium windup");

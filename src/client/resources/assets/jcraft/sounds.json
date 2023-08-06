@@ -71,6 +71,48 @@
     ]
   },
 
+  "impact6": {
+    "sounds": [
+      "jcraft:generic/impact6"
+    ]
+  },
+
+  "impact7": {
+    "sounds": [
+      "jcraft:generic/impact7"
+    ]
+  },
+
+  "impact8": {
+    "sounds": [
+      "jcraft:generic/impact8"
+    ]
+  },
+
+  "impact9": {
+    "sounds": [
+      "jcraft:generic/impact9"
+    ]
+  },
+
+  "impact10": {
+    "sounds": [
+      "jcraft:generic/impact10"
+    ]
+  },
+
+  "impact11": {
+    "sounds": [
+      "jcraft:generic/impact11"
+    ]
+  },
+
+  "impact12": {
+    "sounds": [
+      "jcraft:generic/impact12"
+    ]
+  },
+
   "spsummon": {
     "sounds": [
       "jcraft:stands/starplatinum/summon"

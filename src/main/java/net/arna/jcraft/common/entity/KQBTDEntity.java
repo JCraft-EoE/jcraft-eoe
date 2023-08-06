@@ -39,13 +39,16 @@ import java.util.function.Consumer;
 
 public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQBTDEntity.State> {
     public static final Attack light = Attack.copyOf(KillerQueenEntity.light);
-    public static final Attack heavy = new Attack(2, 12, 0.75f, 9, 5, 1, 7.5f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegistry.IMPACT_4).setHitspark(2).setLaunch()
+    public static final Attack heavy = new Attack(2, 12, 0.75f, 9, 5, 1, 7.5f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegistry.IMPACT_4)
+            .setHitspark(2)
+            .setLaunch()
             .setInfo("Elbow", "fast, short-range knockback");
     public static final Attack barrage = Attack.copyOf(KillerQueenEntity.barrage);
     public static final Attack bombplant = Attack.copyOf(KillerQueenEntity.bombplant);
     public static final Attack bubblecounter = new Attack(7, 27, 20, 5, 0, 1, AttackType.COUNTER)
             .setInfo("Stray Cat Counter", "0.25s windup counter, turns opponent into your primary bomb");
-    public static final Attack bubble = new Attack(5, 23, 0.75f, 18, 15, 0, 0f, 0.0f, AttackType.BOX).setRanged(true)
+    public static final Attack bubble = new Attack(5, 23, 0.75f, 18, 15, 0, 0f, 0.0f, AttackType.BOX)
+            .setRanged(true)
             .crouchingVariation(bubblecounter)
             .setInfo("Stray Cat Bubble", "launches an explosive bubble");
     public static final Attack detonate = new Attack(6, 1, 0.75f, 6, 5, 0, 0f, 0.0f, AttackType.BOX)
@@ -399,7 +402,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
         }
     }
 
-    protected void displayBTDParticles(ServerPlayerEntity playerEntity, Entity bombEntity) {
+    private void displayBTDParticles(ServerPlayerEntity playerEntity, Entity bombEntity) {
         boolean bombExists = bombEntity != null;
 
         double dX1 = 0;

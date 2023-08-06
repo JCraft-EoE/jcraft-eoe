@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.common.util.IOwnable;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -15,12 +16,16 @@ public class GEFrogEntity extends FrogEntity implements IOwnable {
 
     @Override
     public boolean damage(DamageSource source, float amount) {
+        if (source.isOutOfWorld()) {
+            discard();
+            return true;
+        }
+
         if (source.getAttacker() instanceof LivingEntity living) {
             setAttacker(living);
             return living.damage(source, amount);
         }
-        if (source.isOutOfWorld())
-            return super.damage(source, amount);
+
         return false;
     }
 
@@ -40,26 +45,29 @@ public class GEFrogEntity extends FrogEntity implements IOwnable {
 
     @Override
     public void tick() {
-        timeToLive--;
-        if (timeToLive == 0) {
-            discard();
-            dropStack(getMainHandStack());
-        }
+        boolean server = !world.isClient;
 
-        if (!world.isClient) {
+        if (server) {
             if (master == null) kill();
             else {
                 // Covers any edge cases, including stand damage (which uses a separate damage routine
                 float deltaHealth = getMaxHealth() - getHealth();
                 if (deltaHealth > 0) {
-                    //JCraft.LOGGER.info("Redirecting " + deltaHealth + " damage from frog to " + master);
                     setHealth(getMaxHealth());
-                    DamageSource source = getAttacker() == null ? DamageSource.GENERIC : DamageSource.mob(getAttacker());
-                    master.damage(source, deltaHealth);
+
+                    LivingEntity attacker = getAttacker();
+                    if (attacker == null) attacker = getDamageTracker().getBiggestAttacker();
+                    attacker = JUtils.getUserIfStand(attacker);
+                    if (attacker != null) attacker.damage(DamageSource.mob(attacker), deltaHealth);
                 }
 
                 // Go to master
-                getNavigation().startMovingTo(master, 2.5);
+                getNavigation().startMovingTo(master, 3);
+            }
+
+            if (--timeToLive == 0) {
+                dropStack(getMainHandStack());
+                kill();
             }
         }
 

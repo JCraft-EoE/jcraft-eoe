@@ -22,8 +22,6 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 import java.util.Arrays;
 
 public class GESnakeEntity extends TameableEntity implements IAnimatable, IAnimationTickable {
-    private final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-
     public GESnakeEntity(EntityType<? extends TameableEntity> entityType, World world) {
         super(entityType, world);
         Arrays.fill(this.handDropChances, 1F);
@@ -40,9 +38,10 @@ public class GESnakeEntity extends TameableEntity implements IAnimatable, IAnima
         this.goalSelector.add(1, new SwimGoal(this));
         this.goalSelector.add(4, new PounceAtTargetGoal(this, 0.4F));
         this.goalSelector.add(5, new StunningMeleeAttackGoal(this, 1.0, true, 10));
-        this.goalSelector.add(6, new FollowOwnerGoal(this, 1.0, 10.0F, 2.0F, false));
         this.goalSelector.add(10, new LookAtEntityGoal(this, LivingEntity.class, 32.0F));
         this.goalSelector.add(10, new LookAroundGoal(this));
+
+        this.goalSelector.add(6, new FollowOwnerGoal(this, 1.0, 10.0F, 2.0F, false));
 
         this.targetSelector.add(1, new TrackOwnerAttackerGoal(this));
         this.targetSelector.add(2, new AttackWithOwnerGoal(this));
@@ -63,13 +62,15 @@ public class GESnakeEntity extends TameableEntity implements IAnimatable, IAnima
             }
         } else if (this.age == 500) {
             dropStack(getMainHandStack());
-            this.kill();
+            kill();
         } else if (this.isAlive() && this.age > 500) { // Edge case, mostly dealing with unloading
-            this.discard();
+            discard();
         }
     }
 
     // Animations
+    private final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+
     @Override
     public void registerControllers(AnimationData animationData) {
         animationData.addAnimationController(new AnimationController<>(this, "movement", 10, this::predicate));
@@ -100,9 +101,8 @@ public class GESnakeEntity extends TameableEntity implements IAnimatable, IAnima
     }
 
     private <E extends IAnimatable> PlayState attackPredicate(AnimationEvent<E> event) {
-        if (!this.handSwinging) {
-            return PlayState.STOP;
-        }
+        if (!handSwinging) return PlayState.STOP;
+
         event.getController().setAnimation(new AnimationBuilder().loop("animation.gesnake.attack"));
         return PlayState.CONTINUE;
     }

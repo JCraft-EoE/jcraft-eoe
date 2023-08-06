@@ -1470,13 +1470,14 @@ Star Platinum: The World
 >Fixed launch stun
 >Removed layered hurt sounds
 >Knives (single) can now be shot out of dispensers
+>Added more impact sounds
 
 Star Platinum (& SP:TW)
     >Fixed crash relating to lack of a user
 
 The World
     >Feign Barrage
-        >TODO: updated animation
+        >Stays behind the user until it's active
         >Increased damage on hit (6->9)
     >Added icons
 
@@ -1494,6 +1495,18 @@ Magician's Red
     >Redirect
         >Can now redirect towards entities
     >Red Bind is no longer unblockable
+
+Golden Experience
+    >Updated skins
+    >Updated Overclock animation
+    >Increased first hitbox on Tree Summon (1.25->1.75m^3)
+    >Life Giver
+        Can no longer convert unstackable items into Life
+        >Snake
+            >Updated texture
+        >Frog
+            >Increased speed by 20%
+            >Fixed damage redirection issues
 
 Made in Heaven
     >Fixed crash relating to lack of a user
@@ -1513,6 +1526,7 @@ Brawler
     >Sweep cooldown reduced (20->15s)
 
 Anubis
+    >Updated animations
     >Added Passive
         >Hitting opponents (regardless of if they blocked) now speeds up the next attack by 25%
         >25% of the speed boost is removed every 5 seconds spent without a landed hit
@@ -1520,8 +1534,10 @@ Anubis
 priority (top to bottom)
 todo: mih gauge
 todo: tw counter anim
-todo: counters that invalidate hit effects
+todo: anubis sweep reanim
+todo: GE life giver changes
 
+todo: counters that invalidate hit effects
 todo: fix predict not working with new projectiles
 
 TODO: AI improvements (general)

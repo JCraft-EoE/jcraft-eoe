@@ -1,7 +1,7 @@
 {
     "name": "an.pmi",
-    "author": "garlic",
-    "description": "anubis slash?",
+    "author": "MrGarlic & Arna",
+    "description": "anubis pommel (sheathed)",
     "emote":{
         "isLoop": "false",
         "returnTick": 2,
@@ -120,7 +120,7 @@
                 "easing": "EASEOUTBACK",
                 "turn": 0,
                 "head":{
-                    "yaw":0.07633340358734131
+                    "yaw":1.37633340358734131
                 }
             },
             {
@@ -216,7 +216,7 @@
                 "easing": "EASEOUTBACK",
                 "turn": 0,
                 "torso":{
-                    "yaw":0.08978983759880066
+                    "yaw":1.08978983759880066
                 }
             },
             {

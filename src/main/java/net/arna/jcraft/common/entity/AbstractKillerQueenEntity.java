@@ -30,7 +30,7 @@ import java.util.List;
 
 public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQueenEntity<E, S>, S extends Enum<S> & StandAnimationState<E>> extends StandEntity<E, S>
         permits KillerQueenEntity, KQBTDEntity {
-    public static final Attack low = new Attack(1, 0, 0.85f, 13, 8, 1.5, 4f, 0.5f, AttackType.BOX, 0.5f, 0.1f, 0, JSoundRegistry.IMPACT_1)
+    public static final Attack low = new Attack(1, 0, 0.85f, 13, 8, 1.5, 4f, 0.5f, AttackType.BOX, 0.5f, 0.1f, 0, JSoundRegistry.IMPACT_6)
             .setInfo("Low Punch", "frametrap tool, low stun");
     public static final Attack detonate = new Attack(6, 1, 1, 6, 5, 0, 0f, 0.0f, AttackType.BOX)
             .setInfo("Detonate", "slight windup");

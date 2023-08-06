@@ -267,6 +267,7 @@ public interface JEntityTypeRegistry {
 
         FabricDefaultAttributeRegistry.register(GOLD_EXPERIENCE, GoldenExperienceEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(GER, GEREntity.createMobAttributes());
+        FabricDefaultAttributeRegistry.register(GE_TREE, GETreeEntity.createLivingAttributes());
         FabricDefaultAttributeRegistry.register(GE_FROG, GEFrogEntity.createFrogAttributes());
         FabricDefaultAttributeRegistry.register(GE_SNAKE, GESnakeEntity.createMobAttributes()
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3)

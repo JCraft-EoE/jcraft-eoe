@@ -59,7 +59,8 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
     private static final Attack timeskip = new Attack(-2, 18, 2, 2)
             .setMobility(MobilityType.TELEPORT)
             .setInfo("Timeskip", "14m range");
-    private static final Attack counterMiss = new Attack(8, 0, 10, 11);
+    private static final Attack counterMiss = new Attack(8, 0, 10, 11)
+            .setInfo("Counter (Whiff)", "");
 
     public TheWorldEntity(World worldIn) {
         super(StandType.THE_WORLD, worldIn);
@@ -211,6 +212,16 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
     public void whiffCounter() {
         setAttack(counterMiss, State.COUNTER_MISS);
         stun(getUser(), counterMiss.moveStun, 0);
+    }
+
+    @Override
+    public void setAttackRotationOffset() {
+        // Prevents The World from going in front of the user while the Feign Barrage isn't active
+        if (curAttack == feignbarrage && getMoveStun() > feignbarrage.moveStun - feignbarrage.initTime) {
+            setRotationOffset(idleRotation);
+            return;
+        }
+        super.setAttackRotationOffset();
     }
 
     @Override
