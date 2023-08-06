@@ -24,6 +24,7 @@ import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.spec.SpecType;
+import net.arna.jcraft.common.splatter.Splatter;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
 import net.minecraft.block.Blocks;
@@ -521,6 +522,12 @@ public class ClientPacketHandler {
         ClientWorld world = client.world;
         if (world == null) return;
 
-        JUtils.getSplatterManager(world).readSplatter(buf);
+        Splatter splatter = JUtils.getSplatterManager(world).readSplatter(buf);
+
+        long ageMs = splatter.getType().getMaxAge() * 50L;
+        AttackHitBoxEffectRenderer.addHitBox(splatter.getMainBox(), ageMs, true);
+        splatter.getSections().stream()
+                .filter(section -> !section.isRemoved())
+                .forEach(section -> AttackHitBoxEffectRenderer.addHitBox(section.getHitBox(), ageMs, true));
     }
 }

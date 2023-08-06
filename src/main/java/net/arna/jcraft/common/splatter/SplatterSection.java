@@ -15,6 +15,7 @@ public class SplatterSection {
     private final Vec3f center;
     private final BlockPos blockPos;
     private final Vec2f minUv, maxUv;
+    private final Box hitBox;
     private boolean removed;
 
     public SplatterSection(World world, Direction direction, @NotNull Vec3f minPos, @NotNull Vec3f maxPos, Vec2f minUv, Vec2f maxUv) {
@@ -26,6 +27,8 @@ public class SplatterSection {
         blockPos = getAnchor(center, direction);
         this.minUv = minUv;
         this.maxUv = maxUv;
+        this.hitBox = new Box(new Vec3d(minPos), new Vec3d(maxPos))
+                .stretch(new Vec3d(direction.getUnitVector()).multiply(0.1));
     }
 
     public static BlockPos getAnchor(Vec3f center, Direction facing) {

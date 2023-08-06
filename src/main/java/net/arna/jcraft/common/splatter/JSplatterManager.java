@@ -112,7 +112,7 @@ public class JSplatterManager {
         buf.writeFloat(splatter.getZRange());
     }
 
-    public void readSplatter(PacketByteBuf buf) {
+    public Splatter readSplatter(PacketByteBuf buf) {
         double x = buf.readDouble();
         double y = buf.readDouble();
         double z = buf.readDouble();
@@ -120,7 +120,10 @@ public class JSplatterManager {
         SplatterType type = buf.readEnumConstant(SplatterType.class);
         float xRange = buf.readFloat();
         float zRange = buf.readFloat();
-        splatters.add(new Splatter(world, new Vec3d(x, y, z), direction, type, xRange, zRange));
+
+        Splatter splatter = new Splatter(world, new Vec3d(x, y, z), direction, type, xRange, zRange);
+        splatters.add(splatter);
+        return splatter;
     }
 
     public void tick() {

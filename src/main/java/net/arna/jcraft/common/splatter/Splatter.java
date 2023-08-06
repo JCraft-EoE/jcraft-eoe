@@ -2,13 +2,11 @@ package net.arna.jcraft.common.splatter;
 
 import lombok.Data;
 import lombok.Getter;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 
 import java.util.List;
+import java.util.function.BiFunction;
 
 @Data
 public class Splatter {
@@ -23,6 +21,7 @@ public class Splatter {
     @Getter(lazy = true)
     private final BlockPos anchor = new BlockPos(pos).down();
     private final float offset = (float) (Math.random() * 0.0019 + 0.0001); // To prevent z-fighting with anchor block and other splatters
+    private final Box mainBox;
     private int age;
     private boolean removed;
 
@@ -34,22 +33,40 @@ public class Splatter {
         this.xRange = xRange;
         this.zRange = zRange;
         sections = SplatterSplitter.splitAndWrap(this);
+
+        Vec3f min = findEdge(sections, false);
+        Vec3f max = findEdge(sections, true);
+        mainBox = new Box(new Vec3d(min), new Vec3d(max)).expand(.1);
+    }
+
+    private static Vec3f findEdge(List<SplatterSection> sections, boolean max) {
+        float f = max ? Float.NEGATIVE_INFINITY : Float.POSITIVE_INFINITY;
+        BiFunction<Float, Float, Float> function = max ? Math::max : Math::min;
+
+        return sections.stream()
+                .map(max ? SplatterSection::getMaxPos : SplatterSection::getMinPos)
+                .reduce(new Vec3f(f, f, f), (current, vec) -> {
+                    float x = function.apply(current.getX(), vec.getX());
+                    float y = function.apply(current.getY(), vec.getY());
+                    float z = function.apply(current.getZ(), vec.getZ());
+                    current.set(x, y, z);
+                    return current;
+                });
     }
 
     public float getStrength(float tickDelta) {
-        // For ages 0 to 60: 1f
-        // For ages 61 to 80: lerp to 0
-        return MathHelper.lerp(tickDelta, getStrength(age - 1), getStrength(age));
+        if (tickDelta <= 0.001) return getStrength(type.getMaxAge(), age);
+        return MathHelper.lerp(tickDelta, getStrength(type.getMaxAge(), age - 1), getStrength(type.getMaxAge(), age));
     }
 
-    private static float getStrength(int age) {
-        return MathHelper.clamp((MAX_AGE - age) / 20f, 0f, 1f);
+    private static float getStrength(int maxAge, int age) {
+        return MathHelper.clamp((maxAge - age) / 20f, 0f, 1f);
     }
 
     public void tick() {
         if (removed) return;
 
-        if (age++ == MAX_AGE) {
+        if (age++ == type.getMaxAge()) {
             removed = true;
             return;
         }
@@ -58,5 +75,14 @@ public class Splatter {
                 .filter(section -> !section.isRemoved())
                 .peek(SplatterSection::tick)
                 .allMatch(SplatterSection::isRemoved);
+    }
+
+    public boolean intersects(Box box) {
+        if (box == null || !mainBox.intersects(box)) return false;
+
+        return sections.stream()
+                .filter(section -> !section.isRemoved())
+                .map(SplatterSection::getHitBox)
+                .anyMatch(box::intersects);
     }
 }

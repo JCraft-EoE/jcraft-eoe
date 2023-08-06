@@ -6,12 +6,14 @@ import net.minecraft.util.Identifier;
 
 @Getter
 public enum SplatterType {
-    BLOOD("blood.png"),
-    ACID("acid.png");
+    BLOOD("blood.png", 80),
+    ACID("acid.png", 100);
 
     private final Identifier texture;
+    private final int maxAge;
 
-    SplatterType(String texture) {
+    SplatterType(String texture, int maxAge) {
         this.texture = JCraft.id("textures/effect/splatter/" + texture);
+        this.maxAge = maxAge;
     }
 }
