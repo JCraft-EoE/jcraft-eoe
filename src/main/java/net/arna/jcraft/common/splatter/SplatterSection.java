@@ -100,15 +100,13 @@ public class SplatterSection {
     }
 
     public boolean hasValidAnchor() {
-        // Direction offset check has to do with the section technically already being
-        // in the block that's supposed to be its anchor in the case of north and west.
-        BlockPos pos = blockPos.offset(direction.getOpposite(), 1);
-        return world.getBlockState(pos).isFullCube(world, pos);
+        BlockPos pos = blockPos.offset(direction.getOpposite());
+        return SplatterSplitter.isValidAnchor(world, pos);
     }
 
     public void tick() {
         if (removed) return;
-        if (!hasValidAnchor()) removed = true;
+        if (!hasValidAnchor() || SplatterSplitter.isValidAnchor(world, blockPos)) removed = true;
     }
 
     // Mostly for debugging
