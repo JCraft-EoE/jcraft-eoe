@@ -13,7 +13,6 @@ import java.util.List;
 @Data
 public class Splatter {
     public static final int MAX_AGE = 80;
-    public static boolean shouldTick = true; // TODO debug helper, remove this
     private final World world;
     private final Vec3d pos;
     private final Direction direction;
@@ -48,7 +47,7 @@ public class Splatter {
     }
 
     public void tick() {
-        if (removed || !shouldTick) return;
+        if (removed) return;
 
         if (age++ == MAX_AGE) {
             removed = true;

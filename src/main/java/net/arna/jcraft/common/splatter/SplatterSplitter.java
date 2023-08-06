@@ -101,7 +101,6 @@ class SplatterSplitter {
     }
 
     private static Pair<Vec2f, Vec2f> packUv(float minU, float maxU, float minV, float maxV, Direction direction) {
-        // TODO I'm not sure why these are necessary.
         boolean flipU = direction == EAST;
         boolean flipV = direction == SOUTH;
 

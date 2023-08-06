@@ -105,8 +105,7 @@ public class SplatterSection {
 
     public void tick() {
         if (removed) return;
-        // TODO commented for debugging. Uncomment when committing.
-//        if (!hasValidAnchor()) removed = true;
+        if (!hasValidAnchor()) removed = true;
     }
 
     // Mostly for debugging
