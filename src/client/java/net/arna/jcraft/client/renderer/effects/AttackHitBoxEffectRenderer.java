@@ -4,6 +4,7 @@ import com.google.common.collect.EvictingQueue;
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.longs.LongLongPair;
+import lombok.Synchronized;
 import lombok.experimental.UtilityClass;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
@@ -23,7 +24,7 @@ public class AttackHitBoxEffectRenderer {
     // If there are already 8 hit boxes, and we wish to add more, old ones will be removed.
     @SuppressWarnings("UnstableApiUsage") // I do not care. (based)
     private static final Queue<Pair<LongLongPair, Box>> hitBoxes = EvictingQueue.create(8);
-    private static final List<Pair<LongLongPair, Box>> highPriorityBoxes = new ArrayList<>(); // Do not get evicted.
+    private static final List<Pair<LongLongPair, Box>> highPriorityBoxes = new ArrayList<>(); // These do not get evicted.
 
     public static void init() {
         WorldRenderEvents.AFTER_ENTITIES.register(AttackHitBoxEffectRenderer::render);
@@ -33,6 +34,7 @@ public class AttackHitBoxEffectRenderer {
         addHitBox(box, 2500, false);
     }
 
+    @Synchronized
     public static void addHitBox(Box box, long duration, boolean highPriority) {
         (highPriority ? highPriorityBoxes : hitBoxes).add(Pair.of(LongLongPair.of(Util.getEpochTimeMs(), duration), box));
     }
@@ -53,6 +55,7 @@ public class AttackHitBoxEffectRenderer {
         matrices.pop();
     }
 
+    @Synchronized
     private static void renderBoxes(WorldRenderContext ctx, MatrixStack matrices, Matrix4f m, Collection<Pair<LongLongPair, Box>> boxes) {
         for (Iterator<Pair<LongLongPair, Box>> iterator = boxes.iterator(); iterator.hasNext();) {
             Pair<LongLongPair, Box> pair = iterator.next();
