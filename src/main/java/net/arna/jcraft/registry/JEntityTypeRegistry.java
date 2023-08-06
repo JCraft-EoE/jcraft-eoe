@@ -235,7 +235,7 @@ public interface JEntityTypeRegistry {
     EntityType<WSAcidProjectile> WS_ACID_PROJECTILE = Registry.register(
             Registry.ENTITY_TYPE,
             JCraft.id("wsacidprojectile"),
-            FabricEntityTypeBuilder.<WSAcidProjectile>create(SpawnGroup.MISC, WSAcidProjectile::new)
+            FabricEntityTypeBuilder.create(SpawnGroup.MISC, WorldOnlyEntityFactory.from(WSAcidProjectile::new))
                     .dimensions(EntityDimensions.fixed(0.5f, 0.5f)).trackRangeChunks(4).trackedUpdateRate(10).build()
     );
 

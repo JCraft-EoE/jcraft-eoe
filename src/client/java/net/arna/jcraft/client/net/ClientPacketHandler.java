@@ -24,7 +24,6 @@ import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
 import net.arna.jcraft.common.spec.SpecType;
-import net.arna.jcraft.common.splatter.SplatterType;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
 import net.minecraft.block.Blocks;
@@ -522,13 +521,6 @@ public class ClientPacketHandler {
         ClientWorld world = client.world;
         if (world == null) return;
 
-        double x = buf.readDouble();
-        double y = buf.readDouble();
-        double z = buf.readDouble();
-        SplatterType type = buf.readEnumConstant(SplatterType.class);
-        float xRange = buf.readFloat();
-        float zRange = buf.readFloat();
-
-        JUtils.getSplatterManager(world).addSplatter(new Vec3d(x, y, z), type, xRange, zRange);
+        JUtils.getSplatterManager(world).readSplatter(buf);
     }
 }

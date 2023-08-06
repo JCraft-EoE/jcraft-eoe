@@ -2,12 +2,12 @@ package net.arna.jcraft.common.entity.projectile;
 
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
+import net.arna.jcraft.common.splatter.SplatterType;
 import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
@@ -52,8 +52,16 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
         FINALYAW = DataTracker.registerData(WSAcidProjectile.class, TrackedDataHandlerRegistry.FLOAT);
     }
 
-    public WSAcidProjectile(EntityType<? extends WSAcidProjectile> entityType, World world) {
-        super(entityType, world);
+    public WSAcidProjectile(World world) {
+        super(JEntityTypeRegistry.WS_ACID_PROJECTILE, world);
+    }
+
+    public WSAcidProjectile(World world, LivingEntity owner) {
+        super(JEntityTypeRegistry.WS_ACID_PROJECTILE, owner, world);
+        setSound(SoundEvents.BLOCK_SLIME_BLOCK_FALL);
+        setOwner(owner);
+        pickupType = PickupPermission.DISALLOWED;
+        ignoreCameraFrustum = true;
     }
 
     public void markMeltYourHeart() {
@@ -63,6 +71,9 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
     private void splat() {
         dataTracker.set(SPLAT, true);
         setNoGravity(true);
+
+        discard();
+        JUtils.getSplatterManager(world).addSplatter(getPos(), SplatterType.ACID, 1);
     }
 
     @Override
@@ -77,14 +88,6 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
         if (dataTracker.get(SPLAT))
             return dataTracker.get(FINALYAW);
         return super.getYaw();
-    }
-
-    public WSAcidProjectile(World world, LivingEntity owner) {
-        super(JEntityTypeRegistry.WS_ACID_PROJECTILE, owner, world);
-        setSound(SoundEvents.BLOCK_SLIME_BLOCK_FALL);
-        setOwner(owner);
-        pickupType = PickupPermission.DISALLOWED;
-        ignoreCameraFrustum = true;
     }
 
     @Override
@@ -216,6 +219,11 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
 
         dataTracker.set(FINALPITCH, snappedPitch);
         dataTracker.set(FINALYAW, snappedYaw);
+    }
+
+    @Override
+    public boolean isInvisible() {
+        return super.isInvisible() || dataTracker.get(SPLAT);
     }
 
     @Override

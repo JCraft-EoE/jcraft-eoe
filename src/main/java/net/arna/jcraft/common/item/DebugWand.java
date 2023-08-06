@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.item;
 
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
+import net.arna.jcraft.common.splatter.Splatter;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -20,20 +21,21 @@ public class DebugWand extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if (!world.isClient() && user.isSneaking()) {
+        if (world.isClient) return TypedActionResult.pass(user.getStackInHand(hand));
+
+        if (user.isSneaking()) {
             world.playSound(null, user.getBlockPos(), JSoundRegistry.TW_TS_CLEAN, SoundCategory.PLAYERS, 1.2f, 1);
             ShaderActivationPacket.send((ServerPlayerEntity) user, user, 0, 20 * 6, ShaderActivationPacket.Type.ZA_WARUDO);
-        }
+        } else Splatter.shouldTick = !Splatter.shouldTick;
         return super.use(world, user, hand);
     }
 
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
         PlayerEntity player = context.getPlayer();
-        if (player == null) return ActionResult.PASS;
+        if (player == null || context.getWorld().isClient) return ActionResult.PASS;
 
-        World world = context.getWorld();
-        if (!player.isSneaking() && !world.isClient())
+        if (player.isSneaking())
             ShaderActivationPacket.send((ServerPlayerEntity) player, player, 0, 20 * 6, ShaderActivationPacket.Type.CRIMSON);
 
         return super.useOnBlock(context);

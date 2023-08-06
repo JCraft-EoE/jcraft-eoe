@@ -25,6 +25,7 @@ public class SplatterEffectRenderer {
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
         RenderSystem.disableCull();
         RenderSystem.enableDepthTest();
+        RenderSystem.depthMask(false);
         RenderSystem.setShader(GameRenderer::getPositionColorTexLightmapShader);
 
         MatrixStack matrices = ctx.matrixStack();
@@ -41,15 +42,11 @@ public class SplatterEffectRenderer {
             Tessellator tess = Tessellator.getInstance();
             BufferBuilder buf = tess.getBuffer();
             buf.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE_LIGHT);
-
-            int blockLight = splatter.getWorld().getLightLevel(LightType.BLOCK, new BlockPos(splatter.getPos()));
-            int skyLight = splatter.getWorld().getLightLevel(LightType.SKY, new BlockPos(splatter.getPos()));
-            int light = LightmapTextureManager.pack(blockLight, skyLight);
             float alpha = splatter.getStrength(ctx.tickDelta());
 
             for (SplatterSection section : splatter.getSections())
                 if (!section.isRemoved())
-                    renderSection(section, buf, matrices, alpha, light, splatter.getOffset());
+                    renderSection(section, buf, matrices, alpha, splatter.getOffset());
 
             tess.draw();
             matrices.pop();
@@ -57,15 +54,20 @@ public class SplatterEffectRenderer {
 
         RenderSystem.disableBlend();
         RenderSystem.enableCull();
+        RenderSystem.depthMask(true);
     }
 
     @SuppressWarnings("DuplicatedCode") // I do not care how similar the different directions' code are.
-    private static void renderSection(SplatterSection section, BufferBuilder buf, MatrixStack matrices, float alpha, int light, float offset) {
+    private static void renderSection(SplatterSection section, BufferBuilder buf, MatrixStack matrices, float alpha, float offset) {
         matrices.push();
         Vec3f offsetVec = section.getDirection().getUnitVector();
         offsetVec.multiplyComponentwise(offset, offset, offset); // Prevent z-fighting with anchor block and other splatters.
         matrices.translate(offsetVec.getX(), offsetVec.getY(), offsetVec.getZ());
-        Matrix4f matrix = matrices.peek().getPositionMatrix();
+        Matrix4f m = matrices.peek().getPositionMatrix();
+
+        int blockLight = section.getWorld().getLightLevel(LightType.BLOCK, section.getBlockPos());
+        int skyLight = section.getWorld().getLightLevel(LightType.SKY, section.getBlockPos());
+        int light = LightmapTextureManager.pack(blockLight, skyLight);
 
         Vec3f min = section.getMinPos();
         Vec3f max = section.getMaxPos();
@@ -81,37 +83,41 @@ public class SplatterEffectRenderer {
 
         switch (section.getDirection()) {
             case UP -> {
-                vertex(buf, matrix, minX, minY, minZ, minUv.x, minUv.y, alpha, light);
-                vertex(buf, matrix, maxX, minY, minZ, maxUv.x, minUv.y, alpha, light);
-                vertex(buf, matrix, maxX, minY, maxZ, maxUv.x, maxUv.y, alpha, light);
-                vertex(buf, matrix, minX, minY, maxZ, minUv.x, maxUv.y, alpha, light);
+                vertex(buf, m, minX, minY, minZ, minUv.x, minUv.y, alpha, light);
+                vertex(buf, m, maxX, minY, minZ, maxUv.x, minUv.y, alpha, light);
+                vertex(buf, m, maxX, minY, maxZ, maxUv.x, maxUv.y, alpha, light);
+                vertex(buf, m, minX, minY, maxZ, minUv.x, maxUv.y, alpha, light);
+            }
+            case DOWN -> {
+                vertex(buf, m, maxX, minY, minZ, maxUv.x, minUv.y, alpha, light);
+                vertex(buf, m, minX, minY, minZ, minUv.x, minUv.y, alpha, light);
+                vertex(buf, m, minX, minY, maxZ, minUv.x, maxUv.y, alpha, light);
+                vertex(buf, m, maxX, minY, maxZ, maxUv.x, maxUv.y, alpha, light);
             }
             case NORTH -> {
-                vertex(buf, matrix, minX, minY, minZ, minUv.x, minUv.y, alpha, light);
-                vertex(buf, matrix, minX, maxY, minZ, minUv.x, maxUv.y, alpha, light);
-                vertex(buf, matrix, maxX, maxY, minZ, maxUv.x, maxUv.y, alpha, light);
-                vertex(buf, matrix, maxX, minY, minZ, maxUv.x, minUv.y, alpha, light);
+                vertex(buf, m, minX, minY, minZ, minUv.x, minUv.y, alpha, light);
+                vertex(buf, m, minX, maxY, minZ, minUv.x, maxUv.y, alpha, light);
+                vertex(buf, m, maxX, maxY, minZ, maxUv.x, maxUv.y, alpha, light);
+                vertex(buf, m, maxX, minY, minZ, maxUv.x, minUv.y, alpha, light);
             }
             case EAST -> {
-                vertex(buf, matrix, maxX, minY, minZ, maxUv.x, minUv.y, alpha, light);
-                vertex(buf, matrix, maxX, maxY, minZ, minUv.x, minUv.y, alpha, light);
-                vertex(buf, matrix, maxX, maxY, maxZ, minUv.x, maxUv.y, alpha, light);
-                vertex(buf, matrix, maxX, minY, maxZ, maxUv.x, maxUv.y, alpha, light);
+                vertex(buf, m, maxX, minY, minZ, maxUv.x, minUv.y, alpha, light);
+                vertex(buf, m, maxX, maxY, minZ, minUv.x, minUv.y, alpha, light);
+                vertex(buf, m, maxX, maxY, maxZ, minUv.x, maxUv.y, alpha, light);
+                vertex(buf, m, maxX, minY, maxZ, maxUv.x, maxUv.y, alpha, light);
             }
             case SOUTH -> {
-                vertex(buf, matrix, minX, minY, maxZ, minUv.x, maxUv.y, alpha, light);
-                vertex(buf, matrix, maxX, minY, maxZ, maxUv.x, maxUv.y, alpha, light);
-                vertex(buf, matrix, maxX, maxY, maxZ, maxUv.x, minUv.y, alpha, light);
-                vertex(buf, matrix, minX, maxY, maxZ, minUv.x, minUv.y, alpha, light);
+                vertex(buf, m, minX, minY, maxZ, minUv.x, maxUv.y, alpha, light);
+                vertex(buf, m, maxX, minY, maxZ, maxUv.x, maxUv.y, alpha, light);
+                vertex(buf, m, maxX, maxY, maxZ, maxUv.x, minUv.y, alpha, light);
+                vertex(buf, m, minX, maxY, maxZ, minUv.x, minUv.y, alpha, light);
             }
             case WEST -> {
-                vertex(buf, matrix, minX, minY, minZ, minUv.x, minUv.y, alpha, light);
-                vertex(buf, matrix, minX, minY, maxZ, minUv.x, maxUv.y, alpha, light);
-                vertex(buf, matrix, minX, maxY, maxZ, maxUv.x, maxUv.y, alpha, light);
-                vertex(buf, matrix, minX, maxY, minZ, maxUv.x, minUv.y, alpha, light);
+                vertex(buf, m, minX, minY, minZ, minUv.x, minUv.y, alpha, light);
+                vertex(buf, m, minX, minY, maxZ, minUv.x, maxUv.y, alpha, light);
+                vertex(buf, m, minX, maxY, maxZ, maxUv.x, maxUv.y, alpha, light);
+                vertex(buf, m, minX, maxY, minZ, maxUv.x, minUv.y, alpha, light);
             }
-            // Down should be impossible
-            default -> throw new IllegalStateException("Unexpected value: " + section.getDirection());
         }
 
         matrices.pop();
