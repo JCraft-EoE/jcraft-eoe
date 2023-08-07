@@ -39,7 +39,6 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
     public static final Attack sha = new Attack(5, 45, 20, 16, 0, AttackType.BOX)
             .setRanged(true)
             .setInfo("Sheer Heart Attack", "creates an automatic, heat-seeking sub-stand that explodes on contact, reflects 25% damage back to owner");
-    //todo: high launch face grab
     public static final Attack grab = new Attack(7, 22, 0.75f, 20, 12, 1.75, 0, 0.1f, AttackType.BOX, 1f)
             .setGrab()
             .setInfo("Grab", "grabs opponent by the face, then detonates them, launching them upwards");

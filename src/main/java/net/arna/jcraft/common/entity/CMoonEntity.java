@@ -61,7 +61,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             .hyperArmor()
             .setUB(true)
             .appendHitbox(new HitBoxData(1))
-            .setInfo("Only One Punch", "lifts enemy on hit");
+            .setInfo("Only One Punch", "floats enemy on hit, high stun");
     public static final Attack groundslam = new Attack(5, 23, 1f, 18, 10, 3, 7f, 0.2f, AttackType.BOX, 0.85f, 1.4f, 0, JSoundRegistry.IMPACT_10)
             .setUB(true)
             .setInfo("Ground Slam", "lifts the ground, combo starter/extender, knockdown when used while crouching");
@@ -100,8 +100,10 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
                 Passive: Inversion, all physical hits deal an extra half heart after 2s
 
                     BNBs:
-                    the mean green bean
-                    M1>Barrage>jump>Block Launch>M1>Only One Punch>Block hits>Grav. Hop>Ground Slam""";
+                    going up?
+                    M1>Barrage>jump>Block Launch>M1>Only One Punch>Block Launch (Projectile Hit)>...
+                        ...Grav. Hop>Ground Slam
+                        ...Gut Punch""";
 
         moves = List.of(light, gutpunch, barrage, gravpunch, directionalshift, launch, groundslam
                 , new Attack().setMobility(MobilityType.HIGHJUMP)
@@ -253,10 +255,9 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             invertEntities.add(ent);
             invertTimes.add(40);
 
-            //todo: make grav punch make them hover
             if (attack.id == gravpunch.id) {
                 GravityChangerAPI.addGravity(ent, new Gravity(Direction.UP, 2, 60, "stand"));
-                ent.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 60, 0, true, false));
+                ent.addStatusEffect(new StatusEffectInstance(JStatusRegistry.WEIGHTLESS, 60, 0, true, false));
                 ent.velocityModified = true;
             }
         }

@@ -1199,11 +1199,12 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             if (!ent.isOnGround())
                 finalY = MathHelper.clamp(vel.y / 2, 0.085, 0.25);
 
-            ent.setVelocity(
-                    MathHelper.clamp(vel.x, -1, 1),
-                    MathHelper.clamp(finalY, -0.25, 0.25),
-                    MathHelper.clamp(vel.z, -1, 1)
-            );
+            GravityChangerAPI.setWorldVelocity(ent,
+                    new Vec3d(
+                            MathHelper.clamp(vel.x, -1, 1),
+                            MathHelper.clamp(finalY, -0.25, 0.25),
+                            MathHelper.clamp(vel.z, -1, 1)
+                    ));
         }
 
         damage(damage, source, ent);

@@ -104,9 +104,10 @@ public class BulletProjectile extends PersistentProjectileEntity implements IAni
 
             //if (getOwner() instanceof PlayerEntity player) player.sendMessage(Text.of("Impact Angle: " + impactAngleDeg + "\n Hardness: " + hardness + "\n Penetration Angle: " + penAngle + "\n Kinetic Energy: " + kineticEnergy));
 
-            if (impactAngleDeg > penAngle) { // If penetrated or ran out of energy
+            boolean lowEnergy = kineticEnergy < 0.001;
+            if (impactAngleDeg > penAngle || lowEnergy) { // If penetrated or ran out of energy
                 boolean through = hardness <= 1.0; // Go straight through?
-                if (kineticEnergy < 0.001 || !through) { // Lodged inside block
+                if (lowEnergy || !through) { // Lodged inside block
                     this.onBlockHit(blockHitResult);
                     this.world.emitGameEvent(GameEvent.PROJECTILE_LAND, blockPos, GameEvent.Emitter.of(this, blockState));
                     discard();
@@ -136,7 +137,7 @@ public class BulletProjectile extends PersistentProjectileEntity implements IAni
                 StandEntity.damageLogic(getWorld(), target, getVelocity().normalize(), stunTicks, 1,
                         false, damage, true, 4 + damage, DamageSource.thrownProjectile(this, owner), owner);
                 JUtils.serverPlaySound(JSoundRegistry.BULLET_PENETRATE, (ServerWorld) world, getPos(), 32);
-                discard(); //todo: pen calc (entities)
+                discard();
             }
         } else
             super.onEntityHit(entityHitResult);

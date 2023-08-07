@@ -57,12 +57,14 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     public static final Attack furychop = new Attack(4, 19, 0.85f, 24, 15, 1.6, 7f, 0.25f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegistry.IMPACT_2)
             .setHitspark(2)
             .setInfo("Fury Chop", "combo extender, on hit gives haste(8s) to user and mining fatigue(8s) to victim, on whiff the fatigue goes to user");
-    public static final Attack donut = new Attack(1, 23, 0.75f, 32, 26, 2.5, 8.5f, 0.0f, AttackType.BOX, 2f, 0.2f, 0, JSoundRegistry.IMPACT_4)
+    public static final Attack donut = new Attack(1, 23, 0.75f, 32, 26, 2, 8.5f, 0.0f, AttackType.BOX, 2f, 0.2f, 0, JSoundRegistry.IMPACT_7)
             .hyperArmor()
             .setHitspark(2)
             .setInfo("Roundabout Donut", "feigns stand desummon, uninterruptable combo starter");
+    private boolean uniReset = false;
     public static final Attack timeaccel = new Attack(6, 70, 40, 20, 0, AttackType.BOX)
-            .setInfo("Time Acceleration", "2s windup, 15s t. accel, enemies standless for 15s after finishing");
+            .setInfo("Time Acceleration", "duration depends on speedometer, if full, enemies become standless for 15s after finishing");
+    //todo: time accel duration is relative to speedometer at usage, uni reset only happens if it was full
     private int circleTime = 0;
     public static final Attack judgement = Attack.barrageAttack(5, 33, 1.25f, 60, 20, 0, 0f, 0.5f, 0, 0, 2)
             .setInfo("Divine Severance", "Made in Heaven rapidly speed slices an area, then finishes with a large, launching slice");
@@ -72,13 +74,68 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .crouchingVariation(judgement)
             .setInfo("Heaven's Judgement", "rapidly circles a looked-at target within 4m at a radius of 7m");
     private static final TrackedData<Integer> ACCELTIME;
-    private static final TrackedData<Boolean> AFTERIMAGE;
     private static final TrackedData<Integer> TARGETID;
+    private static final TrackedData<Integer> SPEEDOMETER;
+    private static final TrackedData<Boolean> AFTERIMAGE;
+
+    public static final int MAXIMUM_SPEEDOMETER = 30;
 
     public Vec3d judgementInitPos = Vec3d.ZERO;
     public Vec3d judgementInitRot = Vec3d.ZERO;
     private LivingEntity circleTarget;
     private float circleOrbitProg;
+
+    static {
+        ACCELTIME = DataTracker.registerData(MadeInHeavenEntity.class, TrackedDataHandlerRegistry.INTEGER);
+        TARGETID = DataTracker.registerData(MadeInHeavenEntity.class, TrackedDataHandlerRegistry.INTEGER);
+        SPEEDOMETER = DataTracker.registerData(MadeInHeavenEntity.class, TrackedDataHandlerRegistry.INTEGER);
+        
+        AFTERIMAGE = DataTracker.registerData(MadeInHeavenEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    }
+
+    public int getAccelTime() {
+        return dataTracker.get(ACCELTIME);
+    }
+
+    public void setAccelTime(int aTime) {
+        dataTracker.set(ACCELTIME, aTime);
+    }
+
+    public int getSpeedometer() {
+        return dataTracker.get(SPEEDOMETER);
+    }
+
+    private int speedometer = 0;
+    private void incrementSpeedometer() {
+        if (++speedometer > MAXIMUM_SPEEDOMETER)
+            speedometer = MAXIMUM_SPEEDOMETER;
+        JCraft.LOGGER.info("Speedometer increased to: " + speedometer);
+    }
+
+    /**
+     * Tracks the speedometer value every tick, for actual addition see incrementSpeedometer()
+     */
+    public void setSpeedometer(int speedometer) {
+        dataTracker.set(SPEEDOMETER, speedometer);
+    }
+
+    public boolean getAfterimage() {
+        return dataTracker.get(AFTERIMAGE);
+    }
+
+    public void setAfterimage(boolean a) {
+        dataTracker.set(AFTERIMAGE, a);
+    }
+
+    private Entity getCircleTarget() {
+        int id = dataTracker.get(TARGETID);
+        if (id == -1) return null;
+        return world.getEntityById(id);
+    }
+
+    private void setTargetId(int id) {
+        dataTracker.set(TARGETID, id);
+    }
 
     public MadeInHeavenEntity(World worldIn) {
         super(StandType.MADE_IN_HEAVEN, worldIn);
@@ -88,20 +145,22 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
         description = "Lightspeed RUSHDOWN";
 
         pros = List.of(
-                "absurdly good mobility",
-                "good mixups",
+                "best mobility",
+                "great mixups",
                 "good pressure",
                 "low cooldowns"
         );
 
         cons = List.of(
-                "zero defensive options barring running away",
-                "highly spacing-dependent"
+                "bad defensive options",
+                "relies on good spacing"
         );
 
         freespace =
                 """
                         PASSIVE: Speed I
+                        PASSIVE: Speedometer, builds up speed for every landed hit, allows usage of Time Acceleration
+                        
                         BNBs:
                         the white supremacist
                             (Donut>M1>)Speed Slice>Leg Crusher>Fury Chop>M1>Barrage""";
@@ -109,43 +168,12 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
         moves = List.of(light, donut, barrage, legcrusher, timeaccel, furychop, circle, speedslice);
     }
 
-    static {
-        ACCELTIME = DataTracker.registerData(MadeInHeavenEntity.class, TrackedDataHandlerRegistry.INTEGER);
-        TARGETID = DataTracker.registerData(MadeInHeavenEntity.class, TrackedDataHandlerRegistry.INTEGER);
-        AFTERIMAGE = DataTracker.registerData(MadeInHeavenEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    }
-
-    public int getAccelTime() {
-        return this.dataTracker.get(ACCELTIME);
-    }
-
-    public void setAccelTime(int aTime) {
-        this.dataTracker.set(ACCELTIME, aTime);
-    }
-
-    public boolean getAfterimage() {
-        return this.dataTracker.get(AFTERIMAGE);
-    }
-
-    public void setAfterimage(boolean a) {
-        this.dataTracker.set(AFTERIMAGE, a);
-    }
-
-    public Entity getCircleTarget() {
-        int id = dataTracker.get(TARGETID);
-        if (id == -1) return null;
-        return world.getEntityById(id);
-    }
-
-    public void setTargetId(int id) {
-        this.dataTracker.set(TARGETID, id);
-    }
-
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
         getDataTracker().startTracking(ACCELTIME, 0);
         getDataTracker().startTracking(TARGETID, -1);
+        getDataTracker().startTracking(SPEEDOMETER, 0);
         getDataTracker().startTracking(AFTERIMAGE, false);
     }
 
@@ -165,7 +193,8 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        handleAttack(donut, JCraft.standHeavyCD, State.DONUT);
+        if (handleAttack(donut, JCraft.standHeavyCD, State.DONUT))
+            playSound(JSoundRegistry.STAND_DESUMMON, 1, 1);
     }
 
     @Override
@@ -184,7 +213,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
 
     @Override
     public void initUlt() {
-        if (!canAttack()) return;
+        if (speedometer <= 0 || !canAttack()) return;
         if (handleAttack(timeaccel, JCraft.standUltCD, State.TIME_ACCELERATION))
             playSound(JSoundRegistry.MIH_TACCEL, 1, 1);
     }
@@ -251,7 +280,11 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
 
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
-        LivingEntity user = this.getUser();
+        LivingEntity user = getUser();
+
+        boolean hit = !entities.isEmpty();
+        if (hit && speedometer < MAXIMUM_SPEEDOMETER) incrementSpeedometer();
+
         switch (attack.id) {
             case (2) -> {
                 if (getMoveStun() < 10) curAttack = barrageFinisher;
@@ -259,7 +292,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             case (4) -> {
                 if (user == null) return;
 
-                if (!entities.isEmpty()) {
+                if (hit) {
                     for (LivingEntity ent : entities)
                         ent.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 160, 0));
                     user.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE, 160, 0));
@@ -284,9 +317,12 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                 }
             }
             case (6) -> {
-                setAccelTime(300);
+                int accelTime = 300 * speedometer / MAXIMUM_SPEEDOMETER;
+                setAccelTime(accelTime);
                 setAfterimage(true);
-                TimeAccelStatePacket.sendStart(Objects.requireNonNull(world.getServer()).getPlayerManager(), this, 300);
+                TimeAccelStatePacket.sendStart(Objects.requireNonNull(world.getServer()).getPlayerManager(), this, accelTime);
+                uniReset = speedometer == MAXIMUM_SPEEDOMETER;
+                speedometer = 0;
             }
             case (7) -> {
                 if (user == null) return;
@@ -311,7 +347,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     }
 
     private void speedSlice(LivingEntity player, Vec3d start, Vec3d destination, float damage, float kb, double size) {
-        HitResult hitResult = this.world.raycast(new RaycastContext(start, destination, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, player));
+        HitResult hitResult = world.raycast(new RaycastContext(start, destination, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, player));
         Vec3d pos1 = player.getPos();
         Vec3d pos2 = hitResult.getPos();
         Vec3d towardsVec = pos2.subtract(pos1);
@@ -334,7 +370,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
 
             JUtils.displayHitbox(getWorld(), vec1, vec2);
 
-            List<LivingEntity> hurt = this.world.getEntitiesByClass(LivingEntity.class, new Box(vec1, vec2), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+            List<LivingEntity> hurt = world.getEntitiesByClass(LivingEntity.class, new Box(vec1, vec2), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
             hurt.removeIf(hurtAll::contains);
             hurtAll.addAll(hurt);
         }
@@ -347,6 +383,8 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             LivingEntity target = JUtils.getUserIfStand(ent);
             damageLogic(world, target, kbVec.multiply(kb).add(0, kb / 4, 0), 20, 1, false, damage, true, (int) (4 + damage), playerSource, player);
         }
+
+        if (!hurtAll.isEmpty()) incrementSpeedometer();
 
         playSound(JSoundRegistry.MIH_ZOOM, 1f, 1f);
     }
@@ -443,14 +481,16 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                     entity.tick();
                 }
             } else if (aTime == 1) {
-                List<LivingEntity> toCatch = world.getEntitiesByClass(LivingEntity.class,
-                        getBoundingBox().expand(96), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+                if (uniReset) {
+                    List<LivingEntity> toCatch = world.getEntitiesByClass(LivingEntity.class,
+                            getBoundingBox().expand(96), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
 
-                toCatch.remove(this);
-                toCatch.remove(user);
+                    toCatch.remove(this);
+                    toCatch.remove(user);
 
-                for (LivingEntity entity : toCatch) // 15s of Standless to any victims of Time Acceleration
-                    entity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.STANDLESS, 300, 0, true, false));
+                    for (LivingEntity entity : toCatch) // 15s of Standless to any victims of Universe Reset
+                        entity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.STANDLESS, 300, 0, true, false));
+                }
 
                 setAfterimage(false);
             }
@@ -465,6 +505,9 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                     user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 40, 0, true, false));
                 }
             }
+
+            // Tracking
+            setSpeedometer(speedometer);
         }
     }
 
@@ -501,7 +544,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
 
     @Override
     protected @Nullable String getSummonAnimation() {
-        return null;
+        return "animation.mih.summon";
     }
 
     @Override

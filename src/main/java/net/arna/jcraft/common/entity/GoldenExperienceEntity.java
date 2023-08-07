@@ -27,7 +27,6 @@ import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import java.util.List;
 import java.util.function.Consumer;
 
-//todo: disable unstackable items from being turned into animals
 public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, GoldenExperienceEntity.State> {
     // JCraft.lightCooldown -> 0 | 0.5f -> 0.35f
     public static final Attack light = new Attack(0, JCraft.lightCooldown / 2, 0.75f, 9, 6, 1.5, 5f, 0.75f, AttackType.BOX, 0.35f, -0.1f, 0, JSoundRegistry.IMPACT_1)

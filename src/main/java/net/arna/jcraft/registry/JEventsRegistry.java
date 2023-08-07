@@ -18,6 +18,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -42,7 +43,9 @@ public interface JEventsRegistry {
 
                     // Only apply stun nerfs if hit with a weapon or a projectile
                     boolean hasWeapon = source.isProjectile();
-                    if (!hasWeapon) hasWeapon = !living.getMainHandStack().isEmpty();
+                    if (!hasWeapon) {
+                        hasWeapon = !living.getMainHandStack().getAttributeModifiers(EquipmentSlot.MAINHAND).isEmpty();
+                    }
 
                     if (hasWeapon) {
                         StatusEffectInstance stun = entity.getStatusEffect(JStatusRegistry.DAZED);
@@ -54,10 +57,11 @@ public interface JEventsRegistry {
 
                             Vec3i upVec = GravityChangerAPI.getGravityDirection(entity).getVector();
 
-                            entity.setVelocity(
-                                    entity.getPos().subtract(attacker.getPos()).normalize()
-                                            .add(-upVec.getX() / 3.0, -upVec.getY() / 3.0, -upVec.getZ() / 3.0)
-                            );
+                            Vec3d knockback = entity.getPos().subtract(attacker.getPos()).normalize()
+                                            .add(-upVec.getX() / 3.0, -upVec.getY() / 3.0, -upVec.getZ() / 3.0);
+
+                            GravityChangerAPI.setWorldVelocity(entity, knockback);
+
                             entity.velocityModified = true;
                         }
                     }

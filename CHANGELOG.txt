@@ -1466,11 +1466,13 @@ Star Platinum: The World
     >Barrage stun reduced (2->1.5s)
     >Updated skin 3
 
-● 4/8/2023
+● 7/8/2023
 >Fixed launch stun
 >Removed layered hurt sounds
 >Knives (single) can now be shot out of dispensers
 >Added more impact sounds
+
+>Physical hits while in JCraft stun (now called S-Slashes) now only apply their effect when the held item is meant for usage with the main hand
 
 Star Platinum (& SP:TW)
     >Fixed crash relating to lack of a user
@@ -1497,6 +1499,7 @@ Magician's Red
     >Red Bind is no longer unblockable
 
 Golden Experience
+    >Added summon animation
     >Updated skins
     >Updated Overclock animation
     >Increased first hitbox on Tree Summon (1.25->1.75m^3)
@@ -1508,8 +1511,19 @@ Golden Experience
             >Increased speed by 20%
             >Fixed damage redirection issues
 
+C-Moon
+    >Only One Punch now applies Weightless instead of Slow Falling
+
 Made in Heaven
+    >Added summon animation
+    >Updated skin 2
     >Fixed crash relating to lack of a user
+    >Time Acceleration now requires building up a new Speedometer gauge to use
+        >Universe Reset only hits if T. Accel. was used with a full Speedometer
+    >Roundabout Donut
+        >Reanimated
+        >Plays desummoning noise when used
+        >Hitbox size reduced by 20%
 
 The World: Over Heaven
     >Overwrite
@@ -1532,9 +1546,6 @@ Anubis
         >25% of the speed boost is removed every 5 seconds spent without a landed hit
 
 priority (top to bottom)
-todo: mih gauge
-todo: tw counter anim
-todo: anubis sweep reanim
 todo: GE life giver changes
 
 todo: counters that invalidate hit effects
