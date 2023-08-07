@@ -39,6 +39,7 @@ public class AttackHitBoxEffectRenderer {
         (highPriority ? highPriorityBoxes : hitBoxes).add(Pair.of(LongLongPair.of(Util.getEpochTimeMs(), duration), box));
     }
 
+    @Synchronized
     private static void render(WorldRenderContext ctx) {
         if (!MinecraftClient.getInstance().getEntityRenderDispatcher().shouldRenderHitboxes()) return;
 
@@ -47,24 +48,22 @@ public class AttackHitBoxEffectRenderer {
         matrices.push();
         matrices.translate(-camPos.x, -camPos.y, -camPos.z);
 
-        Matrix4f m = matrices.peek().getPositionMatrix();
-
-        renderBoxes(ctx, matrices, m, hitBoxes);
-        renderBoxes(ctx, matrices, m, highPriorityBoxes);
+        renderBoxes(ctx, matrices, hitBoxes);
+        renderBoxes(ctx, matrices, highPriorityBoxes);
 
         matrices.pop();
     }
 
-    @Synchronized
-    private static void renderBoxes(WorldRenderContext ctx, MatrixStack matrices, Matrix4f m, Collection<Pair<LongLongPair, Box>> boxes) {
+    private static void renderBoxes(WorldRenderContext ctx, MatrixStack matrices, Collection<Pair<LongLongPair, Box>> boxes) {
         for (Iterator<Pair<LongLongPair, Box>> iterator = boxes.iterator(); iterator.hasNext();) {
             Pair<LongLongPair, Box> pair = iterator.next();
-            renderBox(ctx, pair.right(), m, matrices);
+            renderBox(ctx, pair.right(), matrices);
             if (Util.getEpochTimeMs() - pair.left().leftLong() > pair.left().rightLong()) iterator.remove();
         }
     }
 
-    private static void renderBox(WorldRenderContext ctx, Box box, Matrix4f m, MatrixStack matrices) {
+    @SuppressWarnings("DuplicatedCode") // Don't care
+    private static void renderBox(WorldRenderContext ctx, Box box, MatrixStack matrices) {
         // Draw faces
         Tessellator tess = Tessellator.getInstance();
         BufferBuilder quadsVc = tess.getBuffer();
@@ -83,6 +82,8 @@ public class AttackHitBoxEffectRenderer {
         float maxX = (float) box.maxX;
         float maxY = (float) box.maxY;
         float maxZ = (float) box.maxZ;
+
+        Matrix4f m = matrices.peek().getPositionMatrix();
 
         // Up
         quadsVc.vertex(m, minX, maxY, minZ).color(c).next();
