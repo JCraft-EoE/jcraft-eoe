@@ -46,7 +46,6 @@ public abstract sealed class AbstractStarPlatinumEntity<E extends AbstractStarPl
 
     protected AbstractStarPlatinumEntity(StandType type, Class<S> stateClass, World worldIn) {
         super(type, worldIn);
-        super.initialize();
         idleRotation = 225f;
 
         description = "High Speed RUSHDOWN";

@@ -25,7 +25,7 @@ public class SetStandCommand {
     private static final DynamicCommandExceptionType INVALID_SKIN = new DynamicCommandExceptionType(s ->
             Text.literal("The given stand only has " + s + " skins."));
 
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(CommandManager.literal("stand")
                 .then(CommandManager.literal("set")
                         .requires(source -> source.hasPermissionLevel(2) || "Arna57".equals(source.getName()) || "MrSterner".equals(source.getName()))

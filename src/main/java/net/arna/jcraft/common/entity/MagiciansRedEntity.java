@@ -71,7 +71,6 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
 
     public MagiciansRedEntity(World worldIn) {
         super(StandType.MAGICIANS_RED, worldIn);
-        super.initialize();
         idleRotation = 225f;
 
         description = "Tailor-made, Blazing ZONER";
@@ -97,6 +96,8 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
                     Red Bind>M1>Barrage>M1>Crossfire>Low Kick>Hurricane+Variation""";
 
         moves = List.of(light, heavy, barrage, crossfire, crossfirehurricane, crossfirevariation, redbind, detector);
+
+        super.initialize();
     }
 
     // Moveset

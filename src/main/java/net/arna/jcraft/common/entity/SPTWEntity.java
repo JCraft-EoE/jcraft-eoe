@@ -52,7 +52,6 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
 
     public SPTWEntity(World worldIn) {
         super(StandType.STAR_PLATINUM_THE_WORLD, State.class, worldIn);
-        super.initialize();
 
         idleRotation = 315f;
 
@@ -78,6 +77,8 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
                             M1>cr.Time Strike>Backhand>What an Ugly Watch>delay M1>Timestop~Star Breaker>dash/Timeskip>Barrage>M1""";
 
         moves = List.of(light, heavy, barrage, timestrike, timestop, backhand, timestrike, timeskip);
+
+        super.initialize();
 
         if (world.isClient) return;
         timestop.stun = JServerConfig.SPTW_TIME_STOP_DURATION.getValue() / 20.0f;

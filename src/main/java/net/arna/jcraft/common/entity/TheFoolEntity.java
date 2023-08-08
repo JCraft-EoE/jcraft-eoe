@@ -116,7 +116,6 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
 
     public TheFoolEntity(World worldIn) {
         super(StandType.THE_FOOL, worldIn);
-        super.initialize();
         idleRotation = 225f;
         idleDistance = 2f;
 
@@ -154,6 +153,8 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
                                        Sand Clone/Sandwave""";
 
         moves = List.of(light, launch, combo, pound, sandstorm, charge, sandclone, sandwave);
+
+        super.initialize();
     }
 
     public boolean isSand() {

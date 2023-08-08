@@ -2,8 +2,15 @@ package net.arna.jcraft.common.splatter;
 
 import lombok.Data;
 import lombok.Getter;
+import net.arna.jcraft.common.entity.damage.JDamageSources;
+import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.registry.JStatusRegistry;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.BiFunction;
@@ -15,6 +22,8 @@ public class Splatter {
     private final Vec3d pos;
     private final Direction direction;
     private final SplatterType type;
+    @Nullable
+    private final Entity creator;
     // Half of the width on the x-axis and half of the width on the z-axis.
     private final float xRange, zRange;
     private final List<SplatterSection> sections;
@@ -25,13 +34,14 @@ public class Splatter {
     private int age;
     private boolean removed;
 
-    Splatter(World world, Vec3d pos, Direction direction, SplatterType type, float xRange, float zRange) {
+    Splatter(World world, Vec3d pos, Direction direction, SplatterType type, float xRange, float zRange, @Nullable Entity creator) {
         this.world = world;
         this.pos = pos;
         this.direction = direction;
         this.type = type;
         this.xRange = xRange;
         this.zRange = zRange;
+        this.creator = creator;
         sections = SplatterSplitter.splitAndWrap(this);
 
         Vec3f min = findEdge(sections, false);
@@ -69,6 +79,15 @@ public class Splatter {
         if (age++ == type.getMaxAge()) {
             removed = true;
             return;
+        }
+
+        if (!world.isClient) {
+            if (type == SplatterType.ACID && age % 4 == 0)
+                for (LivingEntity hit : JUtils.generateHitbox(world, mainBox))
+                    if (!hit.isConnectedThroughVehicle(creator) && intersects(hit.getBoundingBox())) {
+                        hit.addStatusEffect(new StatusEffectInstance(JStatusRegistry.WSPOISON, 20, 0, true, false));
+                        hit.damage(JDamageSources.whitesnakePoison(creator), 2f);
+                    }
         }
 
         removed = sections.stream()

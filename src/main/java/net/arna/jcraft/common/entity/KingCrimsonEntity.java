@@ -105,7 +105,6 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
 
     public KingCrimsonEntity(World worldIn) {
         super(StandType.KING_CRIMSON, worldIn);
-        super.initialize();
 
         idleDistance = 1f;
         idleRotation = -65f;
@@ -142,6 +141,8 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                     ...Time Erase""";
 
         moves = List.of(light, heavy, barrage, eyechop, timeerase, donut, prediction, timeskip);
+
+        super.initialize();
     }
 
     static {

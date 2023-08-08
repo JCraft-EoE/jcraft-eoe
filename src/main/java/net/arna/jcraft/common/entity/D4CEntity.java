@@ -91,7 +91,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
 
     public D4CEntity(World worldIn) {
         super(StandType.D4C, worldIn);
-        super.initialize();
+
         idleRotation = -45f;
 
         description = "All Range, Multipurpose TRICKSTER";
@@ -118,6 +118,8 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                             M1>Summon Gun>Barrage>M1~stand.OFF>M2>M2>M2>M2>M2>M2~s.ON+M1>Charge""";
 
         moves = List.of(light, heavy, barrage, dimhop_others, clonespawn, grab, counter, flag);
+
+        super.initialize();
 
         if (world.isClient) return;
         auWorld = Objects.requireNonNull(getServer()).getWorld(JDimensionRegistry.AU_DIMENSION_KEY);

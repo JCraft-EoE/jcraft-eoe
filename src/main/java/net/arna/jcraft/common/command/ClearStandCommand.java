@@ -16,7 +16,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import java.util.Collection;
 
 public class ClearStandCommand {
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(CommandManager.literal("stand")
                 .then(CommandManager.literal("clear")
                         .requires(source -> source.hasPermissionLevel(2) || "Arna57".equals(source.getName()) || "MrSterner".equals(source.getName()))

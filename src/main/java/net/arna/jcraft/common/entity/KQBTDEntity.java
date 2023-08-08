@@ -69,7 +69,6 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
 
     public KQBTDEntity(World worldIn) {
         super(StandType.KILLER_QUEEN_BITES_THE_DUST, State.class, worldIn);
-        super.initialize();
 
         description = "Ascended Explosive SETPLAY";
 
@@ -95,6 +94,8 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
 
         moves = List.of(KillerQueenEntity.light, heavy, KillerQueenEntity.barrage, KillerQueenEntity.bombplant, Attack.unusable, bubble, btdplant
                 , new Attack().setMobility(MobilityType.DASH).setInfo("Explosive Dash", "slight aoe damage, 3D movement tool"));
+
+        super.initialize();
     }
 
     @Override

@@ -111,7 +111,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
 
     public GEREntity(World worldIn) {
         super(StandType.GOLD_EXPERIENCE_REQUIEM, worldIn);
-        super.initialize();
+
         idleRotation = 0f;
 
         description = "Impossible Ascended DEFENSE";
@@ -138,6 +138,8 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
 
         moves = List.of(light, heavy, barrage, healself, rtz, laser, counter,
                 new Attack().setInfo("Flight", "1 second").setMobility(MobilityType.FLIGHT));
+
+        super.initialize();
     }
 
     static {

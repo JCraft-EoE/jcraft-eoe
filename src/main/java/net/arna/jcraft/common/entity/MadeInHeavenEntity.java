@@ -139,7 +139,6 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
 
     public MadeInHeavenEntity(World worldIn) {
         super(StandType.MADE_IN_HEAVEN, worldIn);
-        super.initialize();
         idleRotation = 225f;
 
         description = "Lightspeed RUSHDOWN";
@@ -166,6 +165,8 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                             (Donut>M1>)Speed Slice>Leg Crusher>Fury Chop>M1>Barrage""";
 
         moves = List.of(light, donut, barrage, legcrusher, timeaccel, furychop, circle, speedslice);
+
+        super.initialize();
     }
 
     @Override

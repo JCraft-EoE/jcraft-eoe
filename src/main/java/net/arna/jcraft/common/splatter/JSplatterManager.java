@@ -5,6 +5,7 @@ import net.arna.jcraft.registry.JPacketRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -12,6 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,7 +34,7 @@ public class JSplatterManager {
      * @param type The type of this splatter
      */
     public Splatter addSplatter(Vec3d pos, SplatterType type) {
-        return addSplatter(pos, type, .5f);
+        return addSplatter(pos, type, .5f, null);
     }
 
     /**
@@ -41,8 +43,8 @@ public class JSplatterManager {
      * @param type The type of this splatter
      * @param range The range of this splatter in both directions
      */
-    public Splatter addSplatter(Vec3d pos, SplatterType type, float range) {
-        return addSplatter(pos, type, range, range);
+    public Splatter addSplatter(Vec3d pos, SplatterType type, float range, @Nullable Entity creator) {
+        return addSplatter(pos, type, range, range, creator);
     }
 
     /**
@@ -52,11 +54,11 @@ public class JSplatterManager {
      * @param xRange The range of this splatter on the x-axis
      * @param zRange The range of this splatter on the z-axis
      */
-    public Splatter addSplatter(Vec3d pos, SplatterType type, float xRange, float zRange) {
+    public Splatter addSplatter(Vec3d pos, SplatterType type, float xRange, float zRange, @Nullable Entity creator) {
         Pair<Vec3d, Direction> anchoredPos = anchorPos(pos);
         pos = anchoredPos.left();
 
-        Splatter splatter = new Splatter(world, pos, anchoredPos.right().getOpposite(), type, xRange, zRange);
+        Splatter splatter = new Splatter(world, pos, anchoredPos.right().getOpposite(), type, xRange, zRange, creator);
         splatters.add(splatter);
         if (world.isClient) return splatter;
 
@@ -121,7 +123,7 @@ public class JSplatterManager {
         float xRange = buf.readFloat();
         float zRange = buf.readFloat();
 
-        Splatter splatter = new Splatter(world, new Vec3d(x, y, z), direction, type, xRange, zRange);
+        Splatter splatter = new Splatter(world, new Vec3d(x, y, z), direction, type, xRange, zRange, null); // At the moment, clients do not need to know who made a splatter
         splatters.add(splatter);
         return splatter;
     }

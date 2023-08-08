@@ -105,7 +105,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
 
     public CreamEntity(World worldIn) {
         super(StandType.CREAM, worldIn);
-        super.initialize();
+
         idleRotation = 220f;
 
         description = "Close Range SETUP";
@@ -130,6 +130,8 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                     i.M1>land+s.OFF>s.ON+Combo>M1>Charge>Grab""";
 
         moves = List.of(light, heavy, combo, grab, consume, surprise, destroy, enter);
+
+        super.initialize();
     }
 
     public void beginHalfBall() {
