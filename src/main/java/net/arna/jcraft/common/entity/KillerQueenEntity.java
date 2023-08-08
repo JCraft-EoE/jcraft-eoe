@@ -52,6 +52,8 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
         moves = List.of(light, heavy, barrage, bombplant, sha, grab
                 , new Attack().setRanged(true).setInfo("Coin Toss", "overrides current bomb with an aimable coin")
                 , new Attack().setMobility(MobilityType.DASH).setInfo("Explosive Dash", "slight aoe damage, 3D movement tool"));
+
+        super.initialize();
     }
 
     // Move-set

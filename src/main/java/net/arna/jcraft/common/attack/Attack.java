@@ -3,6 +3,7 @@ package net.arna.jcraft.common.attack;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.VariationType;
 import net.minecraft.sound.SoundEvent;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -51,6 +52,7 @@ public final class Attack {
     public int blockstun;
     public Attack followup;
     public Map<VariationType, Attack> variations = new LinkedHashMap<>();
+    public boolean isFollowup, isCrouchingVariation, isAerialVariation = false;
 
     // For non-physicals
     public Attack() {
@@ -386,6 +388,7 @@ public final class Attack {
      */
     public Attack setFollowup(Attack followup) {
         this.followup = followup;
+        followup.isFollowup = true;
         return this;
     }
 
@@ -401,11 +404,15 @@ public final class Attack {
      */
     public Attack aerialVariation(Attack air) {
         this.variations.put(VariationType.AERIAL, air);
+        air.isAerialVariation = true;
         return this;
     }
-    public Attack getAerialVariation() {
+    public @Nullable Attack getAerialVariation() {
         if (!this.variations.containsKey(VariationType.AERIAL)) return null;
         return this.variations.get(VariationType.AERIAL);
+    }
+    public @NotNull Attack getAerialVariationOrThrow() {
+        return variations.get(VariationType.AERIAL);
     }
 
     /**
@@ -413,11 +420,15 @@ public final class Attack {
      */
     public Attack crouchingVariation(Attack cr) {
         this.variations.put(VariationType.CROUCHING, cr);
+        cr.isCrouchingVariation = true;
         return this;
     }
-    public Attack getCrouchingVariation() {
+    public @Nullable Attack getCrouchingVariation() {
         if (!this.variations.containsKey(VariationType.CROUCHING)) return null;
         return this.variations.get(VariationType.CROUCHING);
+    }
+    public @NotNull Attack getCrouchingVariationOrThrow() {
+        return variations.get(VariationType.CROUCHING);
     }
 
     public int realInitTime() {

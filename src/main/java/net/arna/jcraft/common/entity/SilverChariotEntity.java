@@ -105,6 +105,10 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
                         """;
 
         moves = List.of(light, heavy, barrage, spinbarrage, armoroff, charge, cleave, circlecharge);
+
+        // A little redundant for Silver Chariot when it mode switches a few times, but the overhead is negligible
+        markAllAttackButtons();
+        gatherAllAttacks();
     }
 
     private void setPossessedDesc() {
@@ -118,11 +122,14 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
 
         // Possessed moveset
         moves = List.of(light, heavy, barrage, spinbarrage, pbeatdown, pcharge, counter, circlecharge);
+
+        // A little redundant for Silver Chariot when it mode switches a few times, but the overhead is negligible
+        markAllAttackButtons();
+        gatherAllAttacks();
     }
 
     public SilverChariotEntity(World worldIn) {
         super(StandType.SILVER_CHARIOT, worldIn);
-        super.initialize();
         idleRotation = 225f;
 
         pros = List.of(
@@ -140,6 +147,8 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         );
 
         setNormalDesc();
+
+        super.initialize();
     }
 
     private static final TrackedData<Boolean> HAS_RAPIER;

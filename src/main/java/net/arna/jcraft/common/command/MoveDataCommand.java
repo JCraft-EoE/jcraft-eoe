@@ -14,7 +14,7 @@ import net.minecraft.text.Text;
 import java.util.List;
 
 public class MoveDataCommand {
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment) {
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(CommandManager.literal("movedata")
                 .then(CommandManager.literal("stand")
                         .executes(

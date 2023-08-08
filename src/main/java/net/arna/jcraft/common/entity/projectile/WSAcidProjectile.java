@@ -40,16 +40,10 @@ import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 
 public class WSAcidProjectile extends PersistentProjectileEntity implements IAnimatable {
     private static final TrackedData<Boolean> MYH; // Melt your Heart variant
-    private static final TrackedData<Boolean> SPLAT;
-    private static final TrackedData<Float> FINALPITCH;
-    private static final TrackedData<Float> FINALYAW;
     private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
     static {
         MYH = DataTracker.registerData(WSAcidProjectile.class, TrackedDataHandlerRegistry.BOOLEAN);
-        SPLAT = DataTracker.registerData(WSAcidProjectile.class, TrackedDataHandlerRegistry.BOOLEAN);
-        FINALPITCH = DataTracker.registerData(WSAcidProjectile.class, TrackedDataHandlerRegistry.FLOAT);
-        FINALYAW = DataTracker.registerData(WSAcidProjectile.class, TrackedDataHandlerRegistry.FLOAT);
     }
 
     public WSAcidProjectile(World world) {
@@ -69,33 +63,13 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
     }
 
     private void splat() {
-        dataTracker.set(SPLAT, true);
-        setNoGravity(true);
-
+        JUtils.getSplatterManager(world).addSplatter(getPos(), SplatterType.ACID, 1, getOwner());
         discard();
-        JUtils.getSplatterManager(world).addSplatter(getPos(), SplatterType.ACID, 1);
-    }
-
-    @Override
-    public float getPitch() {
-        if (dataTracker.get(SPLAT))
-            return dataTracker.get(FINALPITCH);
-        return super.getPitch();
-    }
-
-    @Override
-    public float getYaw() {
-        if (dataTracker.get(SPLAT))
-            return dataTracker.get(FINALYAW);
-        return super.getYaw();
     }
 
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
-        dataTracker.startTracking(FINALPITCH, 0.0F);
-        dataTracker.startTracking(FINALYAW, 0.0F);
-        dataTracker.startTracking(SPLAT, false);
         dataTracker.startTracking(MYH, false);
     }
 
@@ -126,17 +100,6 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
         playSound(SoundEvents.ITEM_BUCKET_EMPTY, 1, 0.5f);
     }
 
-    @Override
-    protected Box calculateBoundingBox() {
-        if (dataTracker.get(SPLAT)) {
-            double x = getX();
-            double y = getY();
-            double z = getZ();
-            return new Box(x, y, z, x, y + 0.1, z);
-        }
-        return super.calculateBoundingBox();
-    }
-
     private int timeOnSurface = 0;
 
     @Override
@@ -144,7 +107,7 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
         super.age();
         if (world.isClient) return;
         if (timeOnSurface++ >= 100) discard();
-        if (!dataTracker.get(SPLAT)) splat();
+        splat();
     }
 
     @Override
@@ -175,55 +138,13 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
 
         super.tick();
 
-        if (inGround) {
-            if (!world.isClient && dataTracker.get(SPLAT) && age % 4 == 0) {
-                List<Entity> except;
-                StandEntity<?, ?> ownerStand = ((IEntityDataSaver) owner).getStand();
-                if (ownerStand != null) except = List.of(owner, ownerStand);
-                else except = List.of(owner);
-
-                for (LivingEntity living : JUtils.generateHitbox(world, getPos(), 1.5, except)) {
-                    living.addStatusEffect(new StatusEffectInstance(JStatusRegistry.WSPOISON, 20, 0, true, false));
-                    living.damage(JDamageSources.whitesnakePoison(owner), 2f);
-                }
-            }
-        } else if (world.isClient) {
-            if (dataTracker.get(SPLAT)) discard(); // Remove if splatted and not on ground
-
+        if (!inGround) {
             Vec3d vel = getVelocity();
             world.addParticle(
                     ParticleTypes.SPIT,
                     getX(), getY(), getZ(),
                     vel.x, vel.y, vel.z);
         }
-    }
-
-    @Override
-    protected void onBlockHit(BlockHitResult blockHitResult) {
-        super.onBlockHit(blockHitResult);
-
-        float snappedYaw = getYaw();
-        Direction direction = blockHitResult.getSide();
-        int dirID = direction.getId();
-        float snappedPitch = (dirID > 1) ? 0F : getPitch();
-
-        switch (dirID) {
-            case (0) -> snappedPitch = 90F;
-            case (1) -> snappedPitch = -90F;
-
-            case (2) -> snappedYaw = 0F;
-            case (3) -> snappedYaw = 180F;
-            case (4) -> snappedYaw = 90F;
-            case (5) -> snappedYaw = -90F;
-        }
-
-        dataTracker.set(FINALPITCH, snappedPitch);
-        dataTracker.set(FINALYAW, snappedYaw);
-    }
-
-    @Override
-    public boolean isInvisible() {
-        return super.isInvisible() || dataTracker.get(SPLAT);
     }
 
     @Override
@@ -244,11 +165,7 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
 
     @SuppressWarnings("SameReturnValue")
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        event.getController().setAnimation(
-                dataTracker.get(SPLAT) ?
-                        new AnimationBuilder().playAndHold("animation.wsacid.splat") :
-                        new AnimationBuilder().loop(dataTracker.get(MYH) ? "animation.wsacid.meltidle" : "animation.wsacid.idle")
-        );
+        event.getController().setAnimation( new AnimationBuilder().loop(dataTracker.get(MYH) ? "animation.wsacid.meltidle" : "animation.wsacid.idle") );
         return PlayState.CONTINUE;
     }
 

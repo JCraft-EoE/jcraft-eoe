@@ -50,10 +50,15 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .setHitspark(2)
             .setUB(true)
             .setInfo("Singularity", "block bypass, low stun, medium windup");
-    //todo: delay twoh smite until TS ends
-    public static final Attack smite = new Attack(3, 21, 1f, 20, 10, 0, 6f, 0.0f, AttackType.BOX, 1.05f, 0, 0)
+    //airsmite isn't actually used in attack processing, but it is used for AI and info display
+    public static final Attack airsmite = new Attack(3, 0, 1f, 20, 10, 0, 6f, 0.0f, AttackType.BOX, 1.05f)
+            .setRanged(true)
+            .setInfo("You won't run away!", "summons a weaker lightning bolt at the aimed position");
+    public static final Attack smite = new Attack(3, 21, 1f, 20, 10, 0, 6f, 0.0f, AttackType.BOX, 1.05f)
             .setBlockstun(13)
-            .setInfo("You won't run away!", "summons a stunning lightning bolt at the user/in air summons one at aimed position, launches on hit");
+            .aerialVariation(airsmite)
+            .setInfo("Evaporate", "summons a powerful lightning bolt that deals high damage and stun");
+    //todo: delay twoh smite until TS ends
     public static final Attack overwrite = new Attack(6, 0, 1f, 23, 7, 2, 0f, 1.0f, AttackType.BOX, 2, 0, 0, JSoundRegistry.IMPACT_5)
             .setHitspark(2)
             .setLaunch()
@@ -99,7 +104,6 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
 
     public TheWorldOverHeavenEntity(World worldIn) {
         super(StandType.THE_WORLD_OVER_HEAVEN, worldIn);
-        super.initialize();
         idleRotation = -45f;
         summonAnimDuration = 29;
 
@@ -124,6 +128,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
                             M1>Barrage>M1>Knives>Overwrite~S2/S3>dash>Smite>Heavy>M1""";
 
         moves = List.of(light, heavy, barrage, smite, timestop, delayknives, chargeoverwrite, timeskip);
+        super.initialize();
 
         if (world.isClient) return;
         timestop.stun = JServerConfig.TWOH_TIME_STOP_DURATION.getValue() / 20.0f;

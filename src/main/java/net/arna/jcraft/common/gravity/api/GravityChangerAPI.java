@@ -14,6 +14,7 @@ import net.arna.jcraft.common.gravity.util.packet.UpdateGravityPacket;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3f;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -193,6 +194,10 @@ public abstract class GravityChangerAPI {
      */
     public static void setWorldVelocity(Entity entity, Vec3d worldVelocity) {
         entity.setVelocity(RotationUtil.vecWorldToPlayer(worldVelocity, getGravityDirection(entity)));
+    }
+
+    public static void setWorldVelocity(Entity entity, Vec3f worldVelocity) {
+        entity.setVelocity(RotationUtil.vecWorldToPlayer(new Vec3d(worldVelocity), getGravityDirection(entity)));
     }
 
     /**

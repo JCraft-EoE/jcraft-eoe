@@ -58,7 +58,6 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
 
     public WhiteSnakeEntity(World worldIn) {
         super(StandType.WHITE_SNAKE, worldIn);
-        super.initialize();
         idleRotation = 220f;
 
         pros = List.of(
@@ -84,6 +83,8 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
 
         moves = Lists.newArrayList(light, donut, barrage, memorydisk, standdisk, legcrusher, poisonspew,
                 new Attack().setInfo("Pilot Mode", ""));
+
+        super.initialize();
     }
 
     // Moveset

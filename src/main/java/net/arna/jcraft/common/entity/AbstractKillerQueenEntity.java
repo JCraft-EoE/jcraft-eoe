@@ -55,7 +55,6 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
 
     protected AbstractKillerQueenEntity(StandType type, Class<S> stateClass, World worldIn) {
         super(type, worldIn);
-        super.initialize();
         idleRotation = -30f;
 
         description = "Explosive SETPLAY";

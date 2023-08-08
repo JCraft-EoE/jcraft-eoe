@@ -64,7 +64,6 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
 
     public TheWorldEntity(World worldIn) {
         super(StandType.THE_WORLD, worldIn);
-        super.initialize();
         idleRotation = 225f;
 
         pros = List.of(
@@ -91,6 +90,8 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
                             Donut>Roundhouse>Charge>M1>Barrage>M1""";
 
         moves = List.of(light, donut, barrage, roundhouse, timestop, charge, feignbarrage, timeskip);
+
+        super.initialize();
 
         if (world.isClient) return;
         timestop.stun = JServerConfig.TW_TIME_STOP_DURATION.getValue() / 20.0f;

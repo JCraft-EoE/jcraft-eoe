@@ -1466,13 +1466,18 @@ Star Platinum: The World
     >Barrage stun reduced (2->1.5s)
     >Updated skin 3
 
-● 7/8/2023
+● 8/8/2023
 >Fixed launch stun
 >Removed layered hurt sounds
 >Knives (single) can now be shot out of dispensers
 >Added more impact sounds
 
 >Physical hits while in JCraft stun (now called S-Slashes) now only apply their effect when the held item is meant for usage with the main hand
+
+>Added /stand block [entity] [true/false], which forces a certain entities stand to start or stop blocking
+
+Stand User Mobs
+    >Are now aware of attack variations
 
 Star Platinum (& SP:TW)
     >Fixed crash relating to lack of a user
@@ -1504,7 +1509,7 @@ Golden Experience
     >Updated Overclock animation
     >Increased first hitbox on Tree Summon (1.25->1.75m^3)
     >Life Giver
-        Can no longer convert unstackable items into Life
+        >Can no longer convert unstackable items into life
         >Snake
             >Updated texture
         >Frog
@@ -1512,11 +1517,13 @@ Golden Experience
             >Fixed damage redirection issues
 
 C-Moon
-    >Only One Punch now applies Weightless instead of Slow Falling
+    >Only One Punch
+        >Now applies Weightless instead of Slow Falling
+        >Damage increased (6->8)
 
 Made in Heaven
     >Added summon animation
-    >Updated skin 2
+    >Updated skins 1 and 2
     >Fixed crash relating to lack of a user
     >Time Acceleration now requires building up a new Speedometer gauge to use
         >Universe Reset only hits if T. Accel. was used with a full Speedometer

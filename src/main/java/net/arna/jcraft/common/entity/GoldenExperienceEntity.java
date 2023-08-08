@@ -73,7 +73,7 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
 
     public GoldenExperienceEntity(World worldIn) {
         super(StandType.GOLD_EXPERIENCE, worldIn);
-        super.initialize();
+
         idleRotation = 0f;
 
         description = "Impenetrable Regenerative DEFENSE";
@@ -97,6 +97,8 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
                 Rekka 1~2>M1>Barrage>M1>Tree>Heavy""";
 
         moves = List.of(light, heavy, barrage, healself, overclock, rekka1, lifegiver, tree);
+
+        super.initialize();
     }
 
     // Moveset

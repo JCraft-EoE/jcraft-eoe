@@ -15,10 +15,10 @@ import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.mixin.LivingEntityInvoker;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
-import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.control.JumpControl;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
@@ -62,6 +62,7 @@ import java.util.List;
 
 import static net.arna.jcraft.JCraft.comboBreak;
 import static net.arna.jcraft.JCraft.cooldownCancel;
+import static net.minecraft.command.argument.EntityAnchorArgumentType.EntityAnchor;
 
 public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S> & StandAnimationState<E>> extends MobEntity implements IAnimatable, IAnimationTickable {
 
@@ -69,6 +70,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     // All variables that the player can see in action (i.e. time erase time, timestop time, alpha, state) have to be tracked.
     public List<Attack> moves = List.of();
+    @SuppressWarnings("FieldMayBeFinal")
+    private List<Attack> allMoves = new ArrayList<>();
 
     private static final TrackedData<Integer> STATE;
     private static final TrackedData<Boolean> SAMESTATE; // Marks if the state was set to what it already was during the last setState() call
@@ -420,10 +423,65 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         dataTracker.startTracking(FREEZ, 0f);
     }
 
+    /**
+     * Must be called after moves is assigned to.
+     * Assigns certain properties to the stand, marks the correct button for each move, stores all available moves in a list.
+     */
     public void initialize() {
-        this.noClip = true;
+        noClip = true;
         setInvulnerable(true);
         addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 999999, 9, false, false));
+
+        markAllAttackButtons();
+
+        gatherAllAttacks();
+    }
+
+    /**
+     * Marks the correct attack button (in the form of an AttackQueue) for each attack.
+     */
+    protected void markAllAttackButtons() {
+        if (moves.isEmpty()) throw new IllegalStateException("StandEntity.markAllAttackButtons() was called without moves being set for: " + this);
+        int i = 0;
+        for (Attack attack : moves)
+            // Marking an attack with the correct attack button
+            attack.button = AttackQueue.values()[i++];
+    }
+
+    /**
+     * Stores all possible attacks a stand may do, and assigns the correct button to each variation and followup.
+     */
+    protected void gatherAllAttacks() {
+        if (moves.isEmpty()) throw new IllegalStateException("StandEntity.gatherAllAttacks() was called without moves being set for: " + this);
+        for (Attack attack : moves) {
+            allMoves.add(attack);
+            if (attack.hasFollowup()) {
+                Attack followup = attack.followup;
+                addFollowup(followup, 1);
+                followup.button = attack.button;
+            }
+            if (attack.variations.containsKey(VariationType.AERIAL)) {
+                Attack aerial = attack.getAerialVariationOrThrow();
+                allMoves.add(aerial);
+                aerial.button = attack.button;
+            }
+            if (attack.variations.containsKey(VariationType.CROUCHING)) {
+                Attack crouching = attack.getCrouchingVariationOrThrow();
+                allMoves.add(crouching);
+                crouching.button = attack.button;
+            }
+        }
+    }
+
+    private void addFollowup(Attack followup, int recursion) {
+        if (recursion > 127) {
+            JCraft.LOGGER.fatal("Stopping possible stack overflow, attack has over 127 followups");
+            return;
+        }
+
+        allMoves.add(followup);
+        if (followup.hasFollowup())
+            addFollowup(followup.followup, ++recursion);
     }
 
     // Attack controls
@@ -1264,6 +1322,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if (mob == target) return;
         if (target == null || !target.isAlive() || target.isRemoved()) return;
 
+        JumpControl mobJumpControl = mob.getJumpControl();
+
         mob.lookAtEntity(target, 30, 30); // Point body at enemy
         mob.getLookControl().lookAt(target); // Usually detrimental not to
 
@@ -1342,18 +1402,25 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             int stunTicks = stun != null ? stun.getDuration() + stand.random.nextInt(5) : 0;
             stunTicks += blockPlusTicks;
             stunTicks += ((ITimeStop) target).getTimeStopTicks();
-            int move = stand.selectMove(0, mob, target, stunTicks, enemyMoveStun, distance, enemyStand, enemyAttack);
-            Attack selectedAttack = null;
 
-            boolean shouldPerformMove = stand.getMoveStun() < 1;
-            if (stand.curAttack != null && stand.curAttack.hasFollowup())
-                shouldPerformMove = true;
+            Attack selectedAttack = stand.selectAttack(mob, target, stunTicks, enemyMoveStun, distance, enemyStand, enemyAttack);
 
-            if (move != -1) {
-                selectedAttack = stand.moves.get(move);
+            if (selectedAttack != null) {
+                boolean shouldPerformMove = stand.getMoveStun() < 1;
+
+                if (stand.curAttack != null && stand.curAttack.hasFollowup())
+                    shouldPerformMove = true;
+
+                mob.setSneaking(selectedAttack.isCrouchingVariation);
+                if (selectedAttack.isAerialVariation) {
+                    mobJumpControl.setActive();
+                    mob.setOnGround(false);
+                }
 
                 if (shouldPerformMove) {
-                    switch (move) {
+                    //JCraft.LOGGER.info("Stand User AI: Performing attack " + selectedAttack);
+
+                    switch (selectedAttack.button.ordinal()) {
                         case 0 -> stand.initLightAttack();
                         case 1 -> stand.initHeavyAttack();
                         case 2 -> stand.initBarrage();
@@ -1363,9 +1430,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                         case 6 -> stand.initSpecial3();
                         case 7 -> stand.initUtil();
                     }
-                } else {
-                    stand.queuedAttack = AttackQueue.values()[move];
-                }
+                } else stand.queuedAttack = selectedAttack.button;
             }
 
             double sideswitchDistance = 1.25;
@@ -1401,7 +1466,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 // Jump if extremely close to opponent in attempt to sideswitch
                 if (distance < sideswitchDistance) {
                     fStrafe = 1;
-                    mob.getJumpControl().setActive();
+                    mobJumpControl.setActive();
                 }
 
                 mob.getMoveControl().strafeTo(fStrafe, sStrafe);
@@ -1425,6 +1490,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         STOP
     }
 
+    //todo: make stand user AI aware of attack variations
+
 
     /**
      * Used to help AIs that use stands with unique moves
@@ -1434,129 +1501,124 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         return MoveSelectionResult.PASS;
     }
 
-    //todo: make stand user AI aware of attack variations
-    private int selectMove(int initialMove, MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand, Attack enemyAttack) {
-        int chosenMove = initialMove; //random.nextInt(0, 4);
-        int chosenMoveInitTime = this.moves.get(chosenMove).initTime;
+    private @Nullable Attack selectAttack(MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand, Attack enemyAttack) {
+        Attack selectedAttack = null;
+        boolean enemyIsAttacking = enemyAttack != null;
+
+        // If the opponent is countering, don't attack
+        if (enemyIsAttacking && enemyAttack.attackType == AttackType.COUNTER) return null;
         int movesOnCooldown = 0;
 
-        NbtCompound userData = ((IEntityDataSaver) mob).getPersistentData();
+        if (curAttack != null) {
+            if (curAttack.hasFollowup())
+                selectedAttack = curAttack.followup;
+        } else {
+            NbtCompound userData = ((IEntityDataSaver) mob).getPersistentData();
+            selectedAttack = moves.get(0);
+            int selectedAttackInitTime = selectedAttack.realInitTime();
 
-        for (int i = 0; i < this.moves.size(); i++) {
-            Attack attack = this.moves.get(i);
+            for (Attack attack : allMoves) {
+                int parentAttackIndex = attack.button.ordinal(); // ID of the highest level attack's button
+                int initTime = attack.realInitTime();
 
-            int initTime = attack.realInitTime();
-
-            // If the opponent is countering, don't attack
-            if (enemyAttack != null) {
-                if (enemyAttack.attackType == AttackType.COUNTER) {
-                    chosenMove = -1;
-                    break;
-                }
-            }
-
-            // Skip attacks on cooldown
-            if (userData.getInt(attackCooldowns.get(i)) > 0) {
-                movesOnCooldown += 1;
-                // If the button matches the current attack's button, and it has a followup, then consider said followup
-                // This logic was chosen because simply checking this.curAttack.hasFollowup() only goes up to a depth of 1
-                if (this.curAttack != null && this.curAttack.hasFollowup() && AttackQueue.values()[i] == this.curAttack.button) {
-                    //JCraft.LOGGER.info("Followup detected");
-                    attack = this.curAttack.followup;
-                    initTime = stunTicks; // Followups should always win the initTime contest, given that they cancel the current move
-                } else {
+                // Discount any on-cooldown non-followup attacks
+                if (userData.getInt(attackCooldowns.get(parentAttackIndex)) > 0) {
+                    movesOnCooldown++;
                     continue;
                 }
-            }
 
-            // Selection of characteristic moves with custom usage logic
-            MoveSelectionResult result = specificMoveSelectionCriterion(attack, mob, target, stunTicks, enemyMoveStun, distance, enemyStand, enemyAttack);
-            if (result == MoveSelectionResult.USE) {
-                chosenMove = i;
-                break;
-            }
-            if (result == MoveSelectionResult.STOP) continue;
+                // Selection of characteristic moves with custom usage logic
+                MoveSelectionResult result = specificMoveSelectionCriterion(attack, mob, target, stunTicks, enemyMoveStun, distance, enemyStand, enemyAttack);
+                if (result == MoveSelectionResult.USE) {
+                    selectedAttack = attack;
+                    break;
+                }
+                if (result == MoveSelectionResult.STOP) continue;
 
-            // Use mobility if opponent is far away
-            if (attack.mobilityType != null) {
-                // ...and isn't being comboed or is blocking
-                if (stunTicks > 0) continue;
+                // Use mobility if opponent is far away
+                if (attack.mobilityType != null) {
+                    // ...and isn't being comboed or is blocking
+                    if (stunTicks > 0) continue;
 
-                if (attack.mobilityType != MobilityType.HIGHJUMP && distance > 6) {
-                    if (target.isOnGround()) {
-                        if (attack.mobilityType == MobilityType.TELEPORT) {
-                            // Intentionally looks at target's feet as to hit the ground exactly at it
-                            mob.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, target.getPos());
-                        } else if (attack.mobilityType == MobilityType.DASH) {
-                            // Look at target itself as a dash works best at that angle
-                            mob.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, target.getEyePos().add(0, 0.2, 0));
+                    if (attack.mobilityType != MobilityType.HIGHJUMP && distance > 6) {
+                        if (target.isOnGround()) {
+                            if (attack.mobilityType == MobilityType.TELEPORT) {
+                                // Intentionally looks at target's feet as to hit the ground exactly at it
+                                mob.lookAt(EntityAnchor.EYES, target.getPos());
+                            } else if (attack.mobilityType == MobilityType.DASH) {
+                                // Look at target itself as a dash works best at that angle
+                                mob.lookAt(EntityAnchor.EYES, target.getEyePos().add(0, 0.5, 0));
+                            }
                         }
-                    }
 
-                    if (attack.mobilityType == MobilityType.FLIGHT) {
-                        mob.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, target.getEyePos());
-                    }
+                        if (attack.mobilityType == MobilityType.FLIGHT) mob.lookAt(EntityAnchor.EYES, target.getEyePos());
 
-                    chosenMove = i;
-                    break;
-                } // If target is considerably above the mob, or the mob is going to get hit
-                else if (target.getY() > mob.getY() + 2 || (enemyAttack != null && enemyStand != null && enemyMoveStun > enemyAttack.realInitTime())) {
-                    chosenMove = i;
-                    break;
-                }
-            }
-
-            // Use counter if opponent is using a non-ranged move
-            if (!attack.isRanged && attack.attackType == AttackType.COUNTER) {
-                if (enemyStand != null && !enemyStand.blocking && enemyMoveStun > 0) {
-                    chosenMove = i;
-                    break;
-                }
-                continue;
-            }
-
-            // Use a barrage (or variant thereof) if the opponent is stunned, not blocking, and it's off cooldown,
-            // because it's a free combo extender and has a lower init. time than light
-            if (distance < 1.4) {
-                if (attack.attackType == AttackType.BARRAGE || (attack.attackType == AttackType.MULTIHIT && initTime <= stunTicks)) {
-                    if (enemyStand == null) {
-                        chosenMove = i;
+                        selectedAttack = attack;
                         break;
-                    } else if (!enemyStand.blocking) {
-                        chosenMove = i;
+                    } // If target is considerably above the mob, or the mob is going to get hit
+                    else if (target.getY() > mob.getY() + 2 || (enemyAttack != null && enemyStand != null && enemyMoveStun > enemyAttack.realInitTime())) {
+                        selectedAttack = attack;
+                        break;
+                    }
+                }
+
+                // Use counter if opponent is using a non-ranged move
+                if (enemyIsAttacking && !enemyAttack.isRanged && attack.attackType == AttackType.COUNTER) {
+                    if (enemyStand != null && !enemyStand.blocking && enemyMoveStun > 0) {
+                        selectedAttack = attack;
                         break;
                     }
                     continue;
                 }
-            }
 
-            // If the opponent is out of exactly twice the range it would take him to get to the user within the move being complete, use a projectile
-            if (attack.isRanged && distance > attack.moveStun * target.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED) * 2) {
-                mob.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, target.getEyePos());
-                chosenMove = i;
-                break;
-            }
+                /*
+                Use a barrage (or variant thereof) if the opponent is stunned, not blocking, and it's off cooldown,
+                because it's a free combo extender and has a lower init. time than light
+                 */
+                if (distance < 1.4) {
+                    if (attack.attackType == AttackType.BARRAGE || (attack.attackType == AttackType.MULTIHIT && initTime <= stunTicks)) {
+                        if (enemyStand == null) {
+                            selectedAttack = attack;
+                            break;
+                        } else if (!enemyStand.blocking) {
+                            selectedAttack = attack;
+                            break;
+                        }
+                        continue;
+                    }
+                }
 
-            // If the opponent isn't using a move, prioritize attack with higher or equal initiation time
-            if (initTime <= stunTicks && initTime >= chosenMoveInitTime) {
-                chosenMoveInitTime = initTime;
-                chosenMove = i;
+                if (attack.isAerialVariation)
+                    JCraft.LOGGER.info(attack.name);
+
+                // If the opponent is out of exactly twice the range it would take him to get to the user within the move being complete, use a projectile
+                if (attack.isRanged && distance > attack.moveStun * target.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED) * 2) {
+                    mob.lookAt(EntityAnchor.EYES, target.getEyePos());
+                    selectedAttack = attack;
+                    break;
+                }
+
+                // If the opponent isn't using a move, prioritize attack with higher or equal initiation time
+                if (initTime <= stunTicks && initTime >= selectedAttackInitTime) {
+                    selectedAttackInitTime = initTime;
+                    selectedAttack = attack;
+                }
             }
         }
 
-        if (movesOnCooldown > 5) { // >5 = 80+%
-            cooldownCancel((ServerWorld) this.world, mob);
-        }
+        if (movesOnCooldown > 5) cooldownCancel((ServerWorld)world, mob); // >5 = 80+%
 
         // Non ranged offensive attacks are cancelled if the opponent is too far (and -1 causes an out-of-bounds error)
-        if (chosenMove != -1) {
-            Attack chosenAttack = this.moves.get(chosenMove);
-            if (chosenAttack.attackType != AttackType.COUNTER && chosenAttack.mobilityType == null && chosenAttack.hitboxSize > 0 && !chosenAttack.isRanged && distance > chosenAttack.attackDist + chosenAttack.hitboxSize) {
-                chosenMove = -1;
-            }
+        if (selectedAttack != null) {
+            if (selectedAttack.attackType != AttackType.COUNTER &&
+                    selectedAttack.mobilityType == null &&
+                    selectedAttack.hitboxSize > 0 &&
+                    !selectedAttack.isRanged &&
+                    distance > selectedAttack.attackDist + selectedAttack.hitboxSize)
+                selectedAttack = null;
         }
 
-        return chosenMove;
+        return selectedAttack;
     }
 
     // Animation code

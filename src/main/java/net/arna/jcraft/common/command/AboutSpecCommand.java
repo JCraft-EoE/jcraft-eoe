@@ -24,7 +24,7 @@ public class AboutSpecCommand {
             "Ultimate"
     );
 
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment) {
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(CommandManager.literal("spec")
                 .then(CommandManager.literal("about").executes(AboutSpecCommand::run)));
     }

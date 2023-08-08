@@ -18,7 +18,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import java.util.Collection;
 
 public class SetSpecCommand {
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment) {
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(CommandManager.literal("spec")
                 .then(CommandManager.literal("set")
                         .requires(source -> source.hasPermissionLevel(2) || "Arna57".equals(source.getName()) || "MrSterner".equals(source.getName()))

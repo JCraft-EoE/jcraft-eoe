@@ -18,7 +18,7 @@ import net.minecraft.server.world.ServerWorld;
 import java.util.Collection;
 
 public class InduceAttackCommand {
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment) {
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(CommandManager.literal("attack")
                 .then(CommandManager.argument("ents", EntityArgumentType.entities())
                         .then(CommandManager.literal("stand")

@@ -96,6 +96,27 @@ public final class JUtils {
                 .forEach(p -> ServerChannelFeedbackPacket.send(p, buf));
     }
 
+    public static List<? extends LivingEntity> generateHitbox(World world, Box box) {
+        Vec3d v1 = new Vec3d(box.minX, box.minY, box.minZ);
+        Vec3d v2 = new Vec3d(box.maxX, box.maxY, box.maxZ);
+
+        if (box.getAverageSideLength() > 0) displayHitbox(world, v1, v2);
+
+        List<? extends LivingEntity> hit = world.getEntitiesByClass(LivingEntity.class, new Box(v1, v2), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+        ArrayList<LivingEntity> toReturn = new ArrayList<>(List.copyOf(hit));
+        for (LivingEntity e : hit) {
+            if (e instanceof StandEntity<?, ?> stand) {
+                if (stand.hasUser()) {
+                    LivingEntity user = stand.getUser();
+                    if (!hit.contains(user))
+                        toReturn.add(user);
+                }
+            }
+        }
+
+        return toReturn;
+    }
+
     // Specify what type the hitbox searches for
     public static List<? extends Entity> generateHitbox(World world, Vec3d center, double hitboxSize, Class<? extends Entity> entityClass, List<Entity> except) {
         double size = hitboxSize / 2;
