@@ -12,9 +12,7 @@ import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.block.Block;
-import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -141,6 +139,8 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         maxStandGauge = 45f;
 
         moves = List.of(balllight, ballheavy, ballcombo, ballcharge, consume, unusable, unusable, exit);
+        markAllAttackButtons();
+        gatherAllAttacks();
     }
 
     public void endHalfBall() {
@@ -150,6 +150,8 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         maxStandGauge = 90f;
 
         moves = List.of(light, heavy, combo, grab, consume, surprise, destroy, enter);
+        markAllAttackButtons();
+        gatherAllAttacks();
     }
 
     public boolean isHalfBall() {

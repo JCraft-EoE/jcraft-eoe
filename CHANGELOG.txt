@@ -1552,6 +1552,24 @@ Anubis
         >Hitting opponents (regardless of if they blocked) now speeds up the next attack by 25%
         >25% of the speed boost is removed every 5 seconds spent without a landed hit
 
+● 9/8/2023
+>Removed some debugging logs
+
+D4C
+    >Updated skins 1 and 2
+
+Cream
+    >Fixed crash when AI is attempting to use Half-Ball form moves
+
+Killer Queen (and Bites the Dust)
+    >Planting bombs on stands now redirects the bomb onto the stands user
+
+Golden Experience
+    >Added crouching variant to Light
+
+Made in Heaven
+    >Fixed incorrect name for skin 1
+
 priority (top to bottom)
 todo: GE life giver changes
 

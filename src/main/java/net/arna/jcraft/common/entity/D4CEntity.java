@@ -76,10 +76,9 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             .setHitspark(2)
             .setLaunch()
             .setInfo("Grab (Final Hit)", "");
-
-
     public static final Attack counter = new Attack(7, 30, 35, 5, 0, 0.75f, AttackType.COUNTER)
             .setInfo("Counter", "0.25s startup, 1.5s duration, high damage, knocks back when hit");
+    //todo: make them spawn without weapons unless you are crouching
     public static final Attack clonespawn = new Attack(8, 40, 1, 50, 40, 0, 0f, 0.0f, AttackType.BOX)
             .setRanged(true)
             .setInfo("Dimensional Clone", "summons an unlimited number of servants");

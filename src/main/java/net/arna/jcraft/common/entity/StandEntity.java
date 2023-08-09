@@ -1420,7 +1420,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 if (shouldPerformMove) {
                     //JCraft.LOGGER.info("Stand User AI: Performing attack " + selectedAttack);
 
-                    switch (selectedAttack.button.ordinal()) {
+                    if (selectedAttack.button == null) {
+                        JCraft.LOGGER.error("Attempting to use attack with unset button: " + selectedAttack.name + ", stand: " + stand);
+                    } else switch (selectedAttack.button.ordinal()) {
                         case 0 -> stand.initLightAttack();
                         case 1 -> stand.initHeavyAttack();
                         case 2 -> stand.initBarrage();
@@ -1587,9 +1589,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                         continue;
                     }
                 }
-
-                if (attack.isAerialVariation)
-                    JCraft.LOGGER.info(attack.name);
 
                 // If the opponent is out of exactly twice the range it would take him to get to the user within the move being complete, use a projectile
                 if (attack.isRanged && distance > attack.moveStun * target.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED) * 2) {

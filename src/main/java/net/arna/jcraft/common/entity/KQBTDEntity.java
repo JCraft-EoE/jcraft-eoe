@@ -6,6 +6,7 @@ import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.entity.projectile.BubbleProjectile;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
@@ -175,18 +176,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
             case (4) -> {
                 if (user == null) return;
 
-                if (!entities.isEmpty()) { // Living entities take priority
-                    bombEntity = entities.get(0);
-                    bombBlock = null;
-
-                    /*
-                    targetData = new NbtCompound();
-                    userData = new NbtCompound();
-
-                    bombEntity.writeNbt(targetData);
-                    user.writeNbt(userData);
-                     */
-                } else { // If none are found, re-do an optimized hitbox check for any entity type
+                if (entities.isEmpty()) { // If none are found, re-do an optimized hitbox check for any entity type
                     Vec3d rotVec = getRotationVector();
                     Vec3d boxCenter = getPos().add(0, user.getHeight() / 2, 0).add(rotVec);
                     Vec3d halfBox = new Vec3d(0.5, 0.5, 0.5);
@@ -201,6 +191,17 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                         bombEntity = hit.get(0);
                         bombBlock = null;
                     }
+                } else { // Living entities take priority
+                    bombEntity = JUtils.getUserIfStand(entities.get(0));
+                    bombBlock = null;
+
+                    /*
+                    targetData = new NbtCompound();
+                    userData = new NbtCompound();
+
+                    bombEntity.writeNbt(targetData);
+                    user.writeNbt(userData);
+                     */
                 }
             }
             case (5) -> {
@@ -322,7 +323,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
             case (7) -> {
                 if (entities.isEmpty()) return;
 
-                btdEntity = entities.get(0);
+                btdEntity = JUtils.getUserIfStand(entities.get(0));
                 btdPos = btdEntity.getPos();
             }
         }

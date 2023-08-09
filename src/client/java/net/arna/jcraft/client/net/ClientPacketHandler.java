@@ -146,14 +146,14 @@ public class ClientPacketHandler {
                     JCraftSpec spec = JClientUtils.getSpec(player);
                     if (spec == null) {
                         JCraft.LOGGER.error("Tried to set spec animation values on player without spec: " + player + ", in world " + client.world);
-                        return;
-                    }
-                    //JCraft.LOGGER.info("Spec: " + spec.getName());
-                    spec.moveStun = moveStun;
-                    spec.attackID = attackID;
+                    } else {
+                        //JCraft.LOGGER.info("Spec: " + spec.getName());
+                        spec.moveStun = moveStun;
+                        spec.attackID = attackID;
 
-                    //JCraft.LOGGER.info("Speed: " + animationSpeed);
-                    animationContainer.addModifierBefore(new SpeedModifier(animationSpeed));
+                        //JCraft.LOGGER.info("Speed: " + animationSpeed);
+                        animationContainer.addModifierBefore(new SpeedModifier(animationSpeed));
+                    }
                 }
 
                 //JCraft.LOGGER.info("Animation to be applied: " + anim);
