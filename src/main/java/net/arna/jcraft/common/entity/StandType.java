@@ -43,7 +43,7 @@ public enum StandType {
     C_MOON(JEntityTypeRegistry.C_MOON, CMoonEntity::new, "cmoon", true,                                             // -1
             Text.literal("Inversion"), Text.literal("Gravity"), Text.literal("Pale")),
     MADE_IN_HEAVEN(JEntityTypeRegistry.MADE_IN_HEAVEN, MadeInHeavenEntity::new, "mih", true,                        // -2
-            Text.literal("Pony"), Text.literal("Daft"), Text.literal("Nightmare")),
+            Text.literal("Brick"), Text.literal("Daft"), Text.literal("Nightmare")),
     THE_WORLD_OVER_HEAVEN(JEntityTypeRegistry.THE_WORLD_OVER_HEAVEN, TheWorldOverHeavenEntity::new, "twoh", true,   // -3
             Text.literal("Shadow"), Text.literal("Gone to Heaven"), Text.literal("Greatest High")),
     KILLER_QUEEN_BITES_THE_DUST(JEntityTypeRegistry.KILLER_QUEEN_BITES_THE_DUST, KQBTDEntity::new, "kqbtd",true,    // -4

@@ -11,6 +11,9 @@ import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.SweetBerryBushBlock;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -19,6 +22,7 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +33,11 @@ import java.util.function.Consumer;
 
 public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, GoldenExperienceEntity.State> {
     // JCraft.lightCooldown -> 0 | 0.5f -> 0.35f
+    //todo: crouching m1, berry bush :)
+    public static final Attack crm1 = new Attack(11, JCraft.lightCooldown * 4, 1.25f, 20, 16, 1.5, 4f, 0.75f, AttackType.BOX, 0.25f, 0.2f, 0, JSoundRegistry.IMPACT_4)
+            .setInfo("Place Berry Bush", "places an almost-ripe berry bush on the ground, this move cannot be aimed up or down");
     public static final Attack light = new Attack(0, JCraft.lightCooldown / 2, 0.75f, 9, 6, 1.5, 5f, 0.75f, AttackType.BOX, 0.35f, -0.1f, 0, JSoundRegistry.IMPACT_1)
+            .crouchingVariation(crm1)
             .setInfo("Punch", "quick combo starter");
     public static final Attack heavy = new Attack(1, 14, 1f, 22, 13, 1.5, 9f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegistry.IMPACT_2)
             .setHitspark(2)
@@ -64,7 +72,6 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
             .setInfo("Rekka (Final Hit)", "knockdown", AttackQueue.SPECIAL2);
     public static final Attack rekka2 = new Attack(8, 23, 1f, 18, 10, 1.75, 5f, 0.5f, AttackType.BOX, 0.75f, 0, 0, JSoundRegistry.IMPACT_2)
             .setHitspark(2)
-
             .setInfo("Rekka (2nd Hit)", "links into Light", AttackQueue.SPECIAL2);
     public static final Attack rekka1 = new Attack(7, 23, 1f, 20, 8, 1.5, 5f, 0.5f, AttackType.BOX, 0.75f, 0, 0, JSoundRegistry.IMPACT_2)
             .appendHitbox(new HitBoxData(1.25))
@@ -79,12 +86,14 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
         description = "Impenetrable Regenerative DEFENSE";
 
         pros = List.of(
-                "amazing pressure",
+                "good pressure",
                 "above average speed",
-                "excellent defense (tree, heal, snake, heavy)"
+                "excellent defense (tree, heal, snake, heavy)",
+                "excellent setups"
         );
 
         cons = List.of(
+                "low damage",
                 "no horizontal movement tools",
                 "snake is unreliable"
         );
@@ -105,7 +114,10 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        handleAttack(light, JCraft.standLightCD, State.LIGHT);
+        if (getUserOrThrow().isSneaking())
+            handleAttack(crm1, JCraft.standLightCD, State.LIFEGIVER);
+        else
+            handleAttack(light, JCraft.standLightCD, State.LIGHT);
     }
 
     @Override
@@ -201,6 +213,8 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
     }
      */
 
+    private static final BlockState berryBush = Blocks.SWEET_BERRY_BUSH.getDefaultState().with(SweetBerryBushBlock.AGE, 1);
+
     @Override
     public void specialAttack(Attack attack, List<LivingEntity> entities) {
         LivingEntity user = this.getUser();
@@ -277,6 +291,11 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
                     ent.addStatusEffect(new StatusEffectInstance(JStatusRegistry.OUTOFBODY, 60, 0, false, true));
                 }
             }
+            case (11) -> {
+                BlockPos blockPos = getBlockPos();
+                if (world.getBlockState(blockPos).isAir() && world.getBlockState(blockPos.down()).isOpaque())
+                    world.setBlockState(blockPos, berryBush);
+            }
         }
     }
 
@@ -289,6 +308,12 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
             return MoveSelectionResult.USE;
         }
         return MoveSelectionResult.PASS;
+    }
+
+    @Override
+    public boolean shouldOffsetHeight() {
+        if (getState() == State.LIFEGIVER) return false;
+        return super.shouldOffsetHeight();
     }
 
     @Override

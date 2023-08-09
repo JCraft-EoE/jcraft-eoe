@@ -109,7 +109,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     private void incrementSpeedometer() {
         if (++speedometer > MAXIMUM_SPEEDOMETER)
             speedometer = MAXIMUM_SPEEDOMETER;
-        JCraft.LOGGER.info("Speedometer increased to: " + speedometer);
+        //JCraft.LOGGER.info("Speedometer increased to: " + speedometer);
     }
 
     /**
@@ -139,7 +139,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
 
     public MadeInHeavenEntity(World worldIn) {
         super(StandType.MADE_IN_HEAVEN, worldIn);
-        idleRotation = 225f;
+        idleRotation = -45f;
 
         description = "Lightspeed RUSHDOWN";
 
