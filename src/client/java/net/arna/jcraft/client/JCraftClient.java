@@ -218,7 +218,6 @@ public class JCraftClient implements ClientModInitializer {
             case RIGHT -> selectedY /= 2.25f;
         }
 
-        int i = 0;
         TextRenderer textRenderer = client.inGameHud.getTextRenderer();
         if (comboCounter > 0 && player.world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && framesSinceCounted <= 180) {
 
@@ -246,10 +245,11 @@ public class JCraftClient implements ClientModInitializer {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1, 1, 1, 1);
 
-        for (CooldownType type : CooldownType.values()) {
+        CooldownType[] values = CooldownType.values();
+        for (int i = 0; i < values.length; i++) {
+            CooldownType type = values[i];
             int cooldownTicks = cooldowns.getCooldown(type);
 
-            i++;
             if (cooldownTicks == 0) continue;
             double cooldown = (cooldownTicks - tickDelta) / 20d;
 
@@ -269,13 +269,13 @@ public class JCraftClient implements ClientModInitializer {
                 case DASH -> generateName(dash.getBoundKeyTranslationKey());
             };
 
-            boolean isSpec = i > 11;
+            boolean isSpec = type.getCategory() == CooldownType.Category.SPEC;
             float defaultAlpha = 0.65f;
             int xOffset = 0;
 
             String finalText = keyBindText + " - " + getDecimalFormat().format(MathHelper.clamp(cooldown, 0.0, 9999.0)) + "s";
 
-            if (i < 8 || isSpec) {
+            if (type.getCategory() == CooldownType.Category.STAND || isSpec) {
                 if (!isSpec) finalText = "s." + finalText;
 
                 if ((isSpec && standOn) || (!isSpec && !standOn)) {
