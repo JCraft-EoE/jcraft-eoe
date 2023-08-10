@@ -1,6 +1,7 @@
 package net.arna.jcraft.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import lombok.Getter;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.arna.jcraft.JCraft;
@@ -38,6 +39,7 @@ import net.arna.jcraft.registry.JBlockEntityTypeRegistry;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
@@ -99,8 +101,8 @@ public class JCraftClient implements ClientModInitializer {
     public static KeyBinding utility;
     public static KeyBinding dash;
     // TODO this should probably be updated when the Minecraft language is updated.
-    private static final DecimalFormat decimalFormat = new DecimalFormat("#.#", DecimalFormatSymbols.getInstance(
-            Locale.forLanguageTag(MinecraftClient.getInstance().options.language)));
+    @Getter(lazy = true)
+    private static final DecimalFormat decimalFormat = new DecimalFormat("#.#", DecimalFormatSymbols.getInstance(Locale.forLanguageTag(MinecraftClient.getInstance().options.language)));
 
     @Override
     public void onInitializeClient() {
@@ -271,7 +273,7 @@ public class JCraftClient implements ClientModInitializer {
             float defaultAlpha = 0.65f;
             int xOffset = 0;
 
-            String finalText = keyBindText + " - " + decimalFormat.format(MathHelper.clamp(cooldown, 0.0, 9999.0)) + "s";
+            String finalText = keyBindText + " - " + getDecimalFormat().format(MathHelper.clamp(cooldown, 0.0, 9999.0)) + "s";
 
             if (i < 8 || isSpec) {
                 if (!isSpec) finalText = "s." + finalText;
