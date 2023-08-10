@@ -52,16 +52,21 @@ public class CooldownsComponentImpl implements CooldownsComponent {
     public void cooldownCancel() {
         if (entity.isSpectator()) return;
 
-        boolean force = entity instanceof PlayerEntity player && player.isCreative();
-        if (!force && getCooldown(CooldownType.COOLDOWN_CANCEL) > 0) return;
+        if (entity instanceof PlayerEntity player && player.isCreative()) {
+            // Creative gets boring cooldown cancel.
+            clear();
+            return;
+        }
+
+        if (getCooldown(CooldownType.COOLDOWN_CANCEL) > 0) return;
 
         skipSync = true;
         for (CooldownType type : CooldownType.values())
-            if (force || !type.isNonResettable())
+            if (!type.isNonResettable())
                 clear(type);
         skipSync = false;
 
-        if (!force) startCooldown(CooldownType.COOLDOWN_CANCEL);
+        startCooldown(CooldownType.COOLDOWN_CANCEL);
 
         Vec3d pPos = entity.getEyePos();
         entity.world.playSoundFromEntity(null, entity, JSoundRegistry.COOLDOWN_CANCEL, SoundCategory.PLAYERS, 1, 1);
