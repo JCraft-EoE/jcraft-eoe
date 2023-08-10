@@ -1555,6 +1555,9 @@ Anubis
 ● 9/8/2023
 >Removed some debugging logs
 
+The World
+    >Updated skin 2
+
 D4C
     >Updated skins 1 and 2
 
@@ -1564,10 +1567,18 @@ Cream
 Killer Queen (and Bites the Dust)
     >Planting bombs on stands now redirects the bomb onto the stands user
 
+Magician's Red
+    >Updated skin 2
+
 Golden Experience
     >Added crouching variant to Light
 
+The Fool
+    >Updated default and skin 2
+
 Made in Heaven
+    >Reworked Time Acceleration
+        >Speedometer may now only be charged after using it, and affects how fast you are
     >Fixed incorrect name for skin 1
 
 priority (top to bottom)
@@ -1576,7 +1587,6 @@ todo: GE life giver changes
 todo: counters that invalidate hit effects
 todo: fix predict not working with new projectiles
 
-TODO: AI improvements (general)
 TODO: stand summon particles
 TODO: patchouli and the stand users manual
 TODO: Knockdown() method

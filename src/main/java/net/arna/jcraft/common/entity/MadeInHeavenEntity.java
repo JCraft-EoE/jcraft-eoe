@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-//TODO: give MiH a trail during speed slice and heaven's judgement
 public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHeavenEntity.State> {
     // placeholder sound
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 8, 5, 1.5, 4f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, SoundEvents.ITEM_TRIDENT_HIT)
@@ -62,10 +61,13 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .hyperArmor()
             .setHitspark(2)
             .setInfo("Roundabout Donut", "feigns stand desummon, uninterruptable combo starter");
-    private boolean uniReset = false;
     public static final Attack timeaccel = new Attack(6, 70, 40, 20, 0, AttackType.BOX)
-            .setInfo("Time Acceleration", "duration depends on speedometer, if full, enemies become standless for 15s after finishing");
-    //todo: time accel duration is relative to speedometer at usage, uni reset only happens if it was full
+            .setInfo("Time Acceleration",
+                    """
+                            allows charging the speedometer for 30s
+                            it is charged by landing hits
+                            the speedometer impacts the level of speed and haste granted by Time Acceleration
+                            if the speedometer is full and the charging period finishes, enemies become standless for 15s""");
     private int circleTime = 0;
     public static final Attack judgement = Attack.barrageAttack(5, 33, 1.25f, 60, 20, 0, 0f, 0.5f, 0, 0, 2)
             .setInfo("Divine Severance", "Made in Heaven rapidly speed slices an area, then finishes with a large, launching slice");
@@ -286,7 +288,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
         LivingEntity user = getUser();
 
         boolean hit = !entities.isEmpty();
-        if (hit && speedometer < MAXIMUM_SPEEDOMETER) incrementSpeedometer();
+        if (getAccelTime() > 0 && hit && speedometer < MAXIMUM_SPEEDOMETER) incrementSpeedometer();
 
         switch (attack.id) {
             case (2) -> {
@@ -320,11 +322,10 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                 }
             }
             case (6) -> {
-                int accelTime = 300 * speedometer / MAXIMUM_SPEEDOMETER;
+                int accelTime = 600;
                 setAccelTime(accelTime);
                 setAfterimage(true);
                 TimeAccelStatePacket.sendStart(Objects.requireNonNull(world.getServer()).getPlayerManager(), this, accelTime);
-                uniReset = speedometer == MAXIMUM_SPEEDOMETER;
                 speedometer = 0;
             }
             case (7) -> {
@@ -387,7 +388,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             damageLogic(world, target, kbVec.multiply(kb).add(0, kb / 4, 0), 20, 1, false, damage, true, (int) (4 + damage), playerSource, player);
         }
 
-        if (!hurtAll.isEmpty()) incrementSpeedometer();
+        if (getAccelTime() > 0 && !hurtAll.isEmpty()) incrementSpeedometer();
 
         playSound(JSoundRegistry.MIH_ZOOM, 1f, 1f);
     }
@@ -484,7 +485,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                     entity.tick();
                 }
             } else if (aTime == 1) {
-                if (uniReset) {
+                if (speedometer == MAXIMUM_SPEEDOMETER) {
                     List<LivingEntity> toCatch = world.getEntitiesByClass(LivingEntity.class,
                             getBoundingBox().expand(96), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
 
@@ -502,11 +503,11 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                 if (circleTime > 0) endCircle();
             } else {
                 if (aTime > 0) {
-                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 20, 2, true, false));
-                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE, 20, 2, true, false));
-                } else {
+                    int amplifier = speedometer / 3;
+                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 20, amplifier, true, false));
+                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE, 20, amplifier, true, false));
+                } else
                     user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 40, 0, true, false));
-                }
             }
 
             // Tracking

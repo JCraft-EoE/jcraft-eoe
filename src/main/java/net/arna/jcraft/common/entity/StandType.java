@@ -20,11 +20,11 @@ public enum StandType {
     STAR_PLATINUM(JEntityTypeRegistry.STAR_PLATINUM, StarPlatinumEntity::new, "starplatinum",                   // 1
             Text.literal("Manga"), Text.literal("Arcade"), Text.literal("OVA")),
     THE_WORLD(JEntityTypeRegistry.THE_WORLD, TheWorldEntity::new, "theworld",                                   // 2
-            Text.literal("Arcade"), Text.literal("Manga"), Text.literal("OVA")),
+            Text.literal("Arcade"), Text.literal("Black"), Text.literal("OVA")),
     KING_CRIMSON(JEntityTypeRegistry.KING_CRIMSON, KingCrimsonEntity::new, "kingcrimson",                       // 3
             Text.literal("Royal"), Text.literal("Manga"), Text.literal("Concept")),
     D4C(JEntityTypeRegistry.D4C, D4CEntity::new, "d4c",                                                         // 4
-            Text.literal("Pride"), Text.literal("Europe"), Text.literal("Spangled")),
+            Text.literal("Jojoveller"), Text.literal("Teaser"), Text.literal("Spangled")),
     CREAM(JEntityTypeRegistry.CREAM, CreamEntity::new, "cream",                                                 // 5
             Text.literal("Menace"), Text.literal("Eraser"), Text.literal("White Void")),
     KILLER_QUEEN(JEntityTypeRegistry.KILLER_QUEEN, KillerQueenEntity::new, "killerqueen",                       // 6
@@ -34,7 +34,7 @@ public enum StandType {
     SILVER_CHARIOT(JEntityTypeRegistry.SILVER_CHARIOT, SilverChariotEntity::new, "silverchariot",               // 8
             Text.literal("Gold Chariot"), Text.literal("OVA"), Text.literal("Vento")),
     MAGICIANS_RED(JEntityTypeRegistry.MAGICIANS_RED, MagiciansRedEntity::new, "mr",                             // 9
-            Text.literal("Purple"), Text.literal("Moltres"), Text.literal("Fried")),
+            Text.literal("Purple"), Text.literal("OVA"), Text.literal("Fried")),
     THE_FOOL(JEntityTypeRegistry.THE_FOOL, TheFoolEntity::new, "thefool",                                       // 10
             Text.literal("Chilled"), Text.literal("OVA"), Text.literal("Manga")),
     GOLD_EXPERIENCE(JEntityTypeRegistry.GOLD_EXPERIENCE, GoldenExperienceEntity::new, "goldenexperience",       // 11
