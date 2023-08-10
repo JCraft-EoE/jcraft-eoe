@@ -734,8 +734,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     public void desummon() {
         if (curAttack != null || getMoveStun() > 0) return;
         discard();
-
-        if (user != null) JComponents.getStandData(user).setStand(null);
     }
 
     // Define idle override

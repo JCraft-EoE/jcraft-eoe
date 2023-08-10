@@ -49,8 +49,7 @@ public class StandControlPacket {
                         stand.queuedAttack = AttackQueue.STANDSUMMON;
                     else
                         stand.desummon();
-                } else if (world != null)
-                    standData.setStand(JCraft.summon(world, player));
+                } else if (world != null) JCraft.summon(world, player);
             });
             // 2 - LIGHT ATTACK
             case 2 -> server.execute(() -> {
@@ -196,7 +195,6 @@ public class StandControlPacket {
                 } else {
                     StandEntity<?, ?> stand2 = JCraft.summon(world, player);
                     if (stand2 != null) stand2.initUtil();
-                    standData.setStand(stand2);
                 }
             });
             // 13 - Cooldown Cancel

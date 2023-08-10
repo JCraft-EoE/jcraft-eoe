@@ -316,7 +316,6 @@ public class JCraft implements ModInitializer {
         stand.setPosition(player.getPos().subtract(player.getRotationVector()));
         stand.startRiding(player);
         stand.setUser(player);
-        standData.setStand(stand);
         world.spawnEntity(stand);
         return stand;
     }

@@ -14,5 +14,4 @@ public interface StandComponent extends Component, AutoSyncedComponent {
     void setSkin(int skin);
 
     @Nullable StandEntity<?, ?> getStand();
-    void setStand(@Nullable StandEntity<?, ?> stand);
 }
