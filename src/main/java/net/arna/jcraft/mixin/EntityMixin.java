@@ -6,6 +6,7 @@ import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
@@ -53,9 +54,10 @@ public abstract class EntityMixin {
     /**
      * Disables sprinting particles during time erase
      */
+    @SuppressWarnings("ConstantValue")
     @Inject(method = "shouldSpawnSprintingParticles", at = @At("HEAD"), cancellable = true)
     private void jcraft$shouldSpawnSprintingParticles(CallbackInfoReturnable<Boolean> cir) {
-        if (JUtils.getStand((Entity) (Object) this) instanceof KingCrimsonEntity kc && kc.getTETime() > 0 )
+        if ((Object) this instanceof LivingEntity living && JUtils.getStand(living) instanceof KingCrimsonEntity kc && kc.getTETime() > 0)
             cir.setReturnValue(false);
     }
     //todo (polishing): stand position autosolver

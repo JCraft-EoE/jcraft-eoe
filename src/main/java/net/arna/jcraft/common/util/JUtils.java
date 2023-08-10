@@ -435,7 +435,7 @@ public final class JUtils {
     }
 
     @Nullable
-    public static StandEntity<?, ?> getStand(Entity entity) {
+    public static StandEntity<?, ?> getStand(LivingEntity entity) {
         return JComponents.getStandData(entity).getStand();
     }
 

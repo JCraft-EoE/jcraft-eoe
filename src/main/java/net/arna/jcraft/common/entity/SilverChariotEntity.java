@@ -347,7 +347,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         if (!(entity instanceof LivingEntity ent)) return;
 
         stun(ent, 30, 0);
-        StandEntity<?, ?> stand = JUtils.getStand(entity);
+        StandEntity<?, ?> stand = JUtils.getStand(ent);
         if (stand != null) stand.cancelAttack();
     }
 

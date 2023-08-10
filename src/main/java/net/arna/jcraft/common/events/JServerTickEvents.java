@@ -93,7 +93,8 @@ public class JServerTickEvents {
                         new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
 
                 for (Entity entity : toStop)
-                    if (!entity.hasVehicle() && entity != user && entity != JUtils.getStand(user) && entity != user.getVehicle())
+                    if (!entity.hasVehicle() && entity != user && (!(entity instanceof LivingEntity living) || entity != JUtils.getStand(living)) &&
+                            entity != user.getVehicle())
                         JComponents.getTimeStopData(entity).setTicks(2);
 
                 newActiveTimestops.add(timestop);

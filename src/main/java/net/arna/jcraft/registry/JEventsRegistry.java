@@ -24,7 +24,6 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
@@ -115,17 +114,10 @@ public interface JEventsRegistry {
                 }
         );
 
-        ServerLivingEntityEvents.AFTER_DEATH.register(
-                (living, source) -> {
-                    if (living instanceof ServerPlayerEntity player) {
-                        // Reset cooldowns upon death
-                        JComponents.getCooldowns(player).clear();
-
-                        if (source.getAttacker() instanceof LivingEntity killer)
-                            JComponents.getCooldowns(killer).clear(CooldownType.COMBO_BREAKER);
-                    }
-                }
-        );
+        ServerLivingEntityEvents.AFTER_DEATH.register((living, source) -> {
+            if (source.getAttacker() instanceof LivingEntity killer)
+                JComponents.getCooldowns(killer).clear(CooldownType.COMBO_BREAKER);
+        });
 
         ServerTickEvents.END_SERVER_TICK.register(JServerTickEvents::serverTick);
 

@@ -4,9 +4,11 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
+import dev.onyxstudios.cca.api.v3.entity.RespawnCopyStrategy;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.component.impl.*;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 
 public class JComponents implements EntityComponentInitializer {
@@ -26,11 +28,20 @@ public class JComponents implements EntityComponentInitializer {
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
         registry.registerFor(Entity.class, GRAVITY_MODIFIER, GravityComponentImpl::new);
-        registry.registerFor(Entity.class, STAND, StandComponentImpl::new);
-        registry.registerFor(PlayerEntity.class, SPEC, SpecComponentImpl::new);
-        registry.registerFor(Entity.class, COOLDOWNS, CooldownsComponentImpl::new);
+        registry.beginRegistration(LivingEntity.class, STAND)
+                .respawnStrategy(RespawnCopyStrategy.ALWAYS_COPY)
+                .impl(StandComponentImpl.class)
+                .end(StandComponentImpl::new);
+        registry.registerForPlayers(SPEC, SpecComponentImpl::new, RespawnCopyStrategy.ALWAYS_COPY);
+        registry.beginRegistration(LivingEntity.class, COOLDOWNS)
+                .respawnStrategy(RespawnCopyStrategy.LOSSLESS_ONLY)
+                .impl(CooldownsComponentImpl.class)
+                .end(CooldownsComponentImpl::new);
         registry.registerFor(Entity.class, TIME_STOP, TimeStopComponentImpl::new);
-        registry.registerFor(Entity.class, MISC, MiscComponentImpl::new);
+        registry.beginRegistration(LivingEntity.class, MISC)
+                .respawnStrategy(RespawnCopyStrategy.LOSSLESS_ONLY)
+                .impl(MiscComponentImpl.class)
+                .end(MiscComponentImpl::new);
     }
 
     public static StandComponent getStandData(Entity entity) {

@@ -248,7 +248,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
                 ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
         JComponents.getTimeStopData(entity).setTicks(counterStopTime);
 
-        StandEntity<?, ?> stand = JUtils.getStand(entity);
+        StandEntity<?, ?> stand = entity instanceof LivingEntity living ? JUtils.getStand(living) : null;
         if (stand != null)
             stand.cancelAttack();
 
