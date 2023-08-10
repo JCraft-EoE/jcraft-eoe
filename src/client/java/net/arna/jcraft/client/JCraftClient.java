@@ -28,7 +28,6 @@ import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
-import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.network.c2s.InputSyncPacket;
 import net.arna.jcraft.common.network.c2s.StandControlPacket;
@@ -39,7 +38,6 @@ import net.arna.jcraft.registry.JBlockEntityTypeRegistry;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
@@ -213,9 +211,9 @@ public class JCraftClient implements ClientModInitializer {
         boolean useIcons = JClientConfig.getInstance().isIconHud();
 
         switch (JClientConfig.getInstance().getUiPosition()) {
-            case LEFT -> selectedY /= 20f;
-            case MIDDLE -> selectedY /= 3f;
-            case RIGHT -> selectedY /= 2.25f;
+            case LEFT -> selectedY /= 20;
+            case MIDDLE -> selectedY /= 3;
+            case RIGHT -> selectedY = (int) (selectedY / 2.25f);
         }
 
         TextRenderer textRenderer = client.inGameHud.getTextRenderer();
@@ -292,7 +290,7 @@ public class JCraftClient implements ClientModInitializer {
                     finalText,
                     selectedX + xOffset,
                     offsetY,
-                    ColorUtils.HSBAtoRGBA(0.3f - (float) (double) cooldown * 10f / 720f, (cooldown < 1.6) ? 0.0f : 1.0f, 1.0f, (cooldown < 1.6) ? 1.0f : defaultAlpha),
+                    ColorUtils.HSBAtoRGBA(0.3f - (float) cooldown * 10f / 720f, (cooldown < 1.6) ? 0.0f : 1.0f, 1.0f, (cooldown < 1.6) ? 1.0f : defaultAlpha),
                     true
             );
         }
@@ -441,11 +439,6 @@ public class JCraftClient implements ClientModInitializer {
         return StringUtils.capitalize(secondLast) + StringUtils.capitalize(last);
     }
 
-    public static boolean shouldNotRenderClone(PlayerCloneEntity clone) {
-        ClientPlayerEntity player = MinecraftClient.getInstance().player;
-        return !clone.shouldRenderForMaster() && player != null && clone.getMasterId().equals(player.getUuid());
-    }
-
     @Nullable
     public static StandEntity<?, ?> getStandEntity() {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
@@ -453,7 +446,7 @@ public class JCraftClient implements ClientModInitializer {
 
         return player.getPassengerList().stream()
                 .filter(e -> e instanceof StandEntity)
-                .map(e -> (StandEntity) e)
+                .map(e -> (StandEntity<?, ?>) e)
                 .findFirst()
                 .orElse(null);
     }
