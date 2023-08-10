@@ -100,10 +100,20 @@ public class CooldownsComponentImpl implements CooldownsComponent {
 
     @Override
     public void tick() {
+        boolean isClient = entity.world.isClient;
+
         // Decrement all cooldowns.
-        cooldowns.object2IntEntrySet().forEach(entry -> {
-            if (entry.getIntValue() > 0) entry.setValue(entry.getIntValue() - 1);
-        });
+        boolean shouldSync = false;
+        for (Object2IntMap.Entry<CooldownType> entry : cooldowns.object2IntEntrySet()) {
+            // Leave at 1 tick on clients. We'll get a sync packet from the server when
+            // it actually reaches 0.
+            if (isClient && entry.getIntValue() <= 1 || entry.getIntValue() <= 0) continue;
+
+            entry.setValue(entry.getIntValue() - 1);
+            if (!isClient && entry.getIntValue() <= 0) shouldSync = true;
+        }
+
+        if (shouldSync) sync();
     }
 
     @Override
