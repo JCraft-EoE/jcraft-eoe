@@ -368,10 +368,10 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                     if (someModMessedUpLight) auWorld.getLightingProvider().checkBlock(pos);
                 }
 
-                List<Entity> toHop = new ArrayList<>(entities);
+                List<LivingEntity> toHop = new ArrayList<>(entities);
                 toHop.add(user);
                 int heightOffset = auWorld.getHeight() - world.getHeight();
-                for (Entity entity : toHop)
+                for (LivingEntity entity : toHop)
                     JCraft.dimensionHop(entity, heightOffset / 2);
             }
             case (4) -> {

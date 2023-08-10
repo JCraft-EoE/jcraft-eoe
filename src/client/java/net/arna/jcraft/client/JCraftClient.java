@@ -34,6 +34,7 @@ import net.arna.jcraft.common.network.c2s.StandControlPacket;
 import net.arna.jcraft.common.util.ColorUtils;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.DimValues;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JBlockEntityTypeRegistry;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
@@ -60,6 +61,7 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.resource.ResourceType;
@@ -317,7 +319,7 @@ public class JCraftClient implements ClientModInitializer {
         ArrayList<DimValues> newActiveTimestops = new ArrayList<>();
 
         for (DimValues timestop : activeTimestops) {
-            Entity user = timestop.user;
+            LivingEntity user = timestop.user;
             //JCraft.LOGGER.info("CLIENT: Ticking timestop " + timestop + " with user " + user + " and duration " + timestop.timer);
 
             if (user != null && user.isAlive() && timestop.timer-- > 0) {
@@ -327,7 +329,7 @@ public class JCraftClient implements ClientModInitializer {
                         new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
 
                 for (Entity entity : toStop)
-                    if (!entity.hasVehicle() && entity != user && entity != JComponents.getStandData(user).getStand() && entity != user.getVehicle())
+                    if (!entity.hasVehicle() && entity != user && entity != JUtils.getStand(user) && entity != user.getVehicle())
                         JComponents.getTimeStopData(entity).setTicks(2);
 
                 newActiveTimestops.add(timestop);

@@ -86,8 +86,8 @@ public class ClientPacketHandler {
 
             client.execute(() -> {
                 Entity ent = client.world.getEntityById(entID);
-                if (ent == null) return;
-                JClientUtils.activeTimestops.add( new DimValues(ent, position, registryKey, time) );
+                if (!(ent instanceof LivingEntity livingEntity)) return;
+                JClientUtils.activeTimestops.add( new DimValues(livingEntity, position, registryKey, time) );
             });
         } else JClientUtils.removeTimestop(entID);
     }

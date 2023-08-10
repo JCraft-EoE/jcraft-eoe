@@ -120,7 +120,7 @@ public class JCraft implements ModInitializer {
      * @param position in world
      */
     //todo: make TS stop animated textures
-    public static void beginTimestop(Entity timestopper, Vec3d position, ServerWorld world, int duration) {
+    public static void beginTimestop(LivingEntity timestopper, Vec3d position, ServerWorld world, int duration) {
         // Registration
         RegistryKey<World> worldRegistryKey = world.getRegistryKey();
         JUtils.activeTimestops.add(new DimValues(timestopper, position, worldRegistryKey, duration));
@@ -390,10 +390,11 @@ public class JCraft implements ModInitializer {
         }
     }
 
-    public static Entity teleportToWorld(Entity e, ServerWorld w, double x, double y, double z) {
+    public static <T extends Entity> T teleportToWorld(T e, ServerWorld w, double x, double y, double z) {
         if (!e.isRemoved()) {
             e.detach();
-            Entity entity = e.getType().create(w);
+            //noinspection unchecked
+            T entity = (T) e.getType().create(w);
             if (entity != null) {
                 entity.copyFrom(e);
                 entity.refreshPositionAndAngles(x, y, z, e.getYaw(), e.getPitch());
@@ -407,7 +408,7 @@ public class JCraft implements ModInitializer {
         return null;
     }
 
-    public static void dimensionHop(Entity entity, int heightOffset) {
+    public static void dimensionHop(LivingEntity entity, int heightOffset) {
         ServerWorld original = (ServerWorld) entity.getWorld();
         MinecraftServer server = original.getServer();
         ServerWorld au = server.getWorld(JDimensionRegistry.AU_DIMENSION_KEY);
@@ -419,15 +420,14 @@ public class JCraft implements ModInitializer {
             return;
 
         Vec3d pos = entity.getPos();
-        Entity finalEnt = entity;
+        LivingEntity finalEnt = entity;
 
         if (entity instanceof ServerPlayerEntity player) {
             player.teleport(au, pos.x, pos.y - heightOffset, pos.z, entity.getYaw(), entity.getPitch());
             player.networkHandler.sendPacket(
                     new PlaySoundS2CPacket(JSoundRegistry.D4C_ALT_UNIVERSE_AMBIENCE, SoundCategory.MUSIC, pos.x, pos.y - heightOffset, pos.z, 1.0F, 1.0F, 0)
             );
-        } else
-            finalEnt = teleportToWorld(entity, au, entity.getX(), entity.getY() - heightOffset, entity.getZ());
+        } else finalEnt = teleportToWorld(entity, au, entity.getX(), entity.getY() - heightOffset, entity.getZ());
 
         pastDimensions.add(new DimValues(finalEnt, pos, original.getRegistryKey()));
     }

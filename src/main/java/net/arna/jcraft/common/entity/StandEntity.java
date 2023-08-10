@@ -27,7 +27,6 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
@@ -1288,8 +1287,16 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
-        if (hasUser() && getUser() instanceof ArmorStandEntity) return;
-        discard(); // Whenever the stand is being loaded, discard it, it'll break
+        super.readCustomDataFromNbt(nbt);
+
+        setSkin(nbt.getInt("Skin"));
+    }
+
+    @Override
+    public void writeCustomDataToNbt(NbtCompound nbt) {
+        super.writeCustomDataToNbt(nbt);
+
+        nbt.putInt("Skin", getSkin());
     }
 
     @Override

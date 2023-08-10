@@ -158,7 +158,7 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
 
         JUtils.projectileDamageLogic(this, world, entity, Vec3d.ZERO, stunT, 1, false, 2, blockstun);
         playSound(SoundEvents.ITEM_TRIDENT_HIT, 1, 1);
-        JComponents.getMiscData(entity).stab();
+        if (entity instanceof LivingEntity living) JComponents.getMiscData(living).stab();
         discard();
     }
 

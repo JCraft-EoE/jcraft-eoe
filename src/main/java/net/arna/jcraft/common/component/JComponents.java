@@ -44,7 +44,7 @@ public class JComponents implements EntityComponentInitializer {
                 .end(MiscComponentImpl::new);
     }
 
-    public static StandComponent getStandData(Entity entity) {
+    public static StandComponent getStandData(LivingEntity entity) {
         return STAND.get(entity);
     }
 
@@ -52,7 +52,7 @@ public class JComponents implements EntityComponentInitializer {
         return SPEC.get(player);
     }
 
-    public static CooldownsComponent getCooldowns(Entity entity) {
+    public static CooldownsComponent getCooldowns(LivingEntity entity) {
         return COOLDOWNS.get(entity);
     }
 
@@ -60,7 +60,7 @@ public class JComponents implements EntityComponentInitializer {
         return TIME_STOP.get(entity);
     }
 
-    public static MiscComponent getMiscData(Entity entity) {
+    public static MiscComponent getMiscData(LivingEntity entity) {
         return MISC.get(entity);
     }
 }

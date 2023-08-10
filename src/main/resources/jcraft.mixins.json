@@ -8,6 +8,7 @@
     "AnvilScreenHandlerMixin",
     "ChunkLightProviderAccessor",
     "EntityMixin",
+    "EntityTypeMixin",
     "ExplosionMixin",
     "GrindstoneScreenHandlerAnon2and3Mixin",
     "GrindstoneScreenHandlerMixin",

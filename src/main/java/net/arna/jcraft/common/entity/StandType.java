@@ -14,7 +14,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public enum StandType {
     STAR_PLATINUM(JEntityTypeRegistry.STAR_PLATINUM, StarPlatinumEntity::new, "starplatinum",                   // 1
@@ -65,6 +67,11 @@ public enum StandType {
     @Getter
     private static final int regularStandCount = getRegularStandTypes().size(), evoStandCount = getEvoStandTypes().size(),
             totalStandCount = regularStandCount + evoStandCount;
+
+    @Getter(lazy = true)
+    private static final Set<EntityType<? extends StandEntity<?, ?>>> entityTypes = getAllStandTypes().stream()
+            .map(StandType::getEntityType)
+            .collect(Collectors.toSet());
 
     @Getter
     private final EntityType<? extends StandEntity<?, ?>> entityType;
