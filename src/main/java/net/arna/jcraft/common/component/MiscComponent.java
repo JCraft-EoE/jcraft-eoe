@@ -19,4 +19,7 @@ public interface MiscComponent extends Component, AutoSyncedComponent, CommonTic
 
     void startDamageTimer();
     boolean isOnDamageTimer();
+
+    int getStuckKnifeCount();
+    void stab();
 }

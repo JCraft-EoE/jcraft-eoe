@@ -1,6 +1,7 @@
 package net.arna.jcraft.client.mixin;
 
 import net.arna.jcraft.client.registry.JRenderLayerRegistry;
+import net.arna.jcraft.client.renderer.features.StuckKnivesFeatureRenderer;
 import net.arna.jcraft.common.entity.KingCrimsonEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.render.RenderLayer;
@@ -11,6 +12,7 @@ import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
+import net.minecraft.client.render.entity.model.AnimalModel;
 import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
@@ -24,16 +26,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.List;
 
 @Mixin(LivingEntityRenderer.class)
-public abstract class LivingEntityRenderMixin<T extends LivingEntity, M extends EntityModel<T>> extends EntityRenderer<T> implements FeatureRendererContext<T, M> {
+public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extends EntityModel<T>> extends EntityRenderer<T> implements FeatureRendererContext<T, M> {
 
     @Shadow protected M model;
 
-    @Shadow protected abstract float getAnimationProgress(T entity, float tickDelta);
-
     @Shadow @Final protected List<FeatureRenderer<T, M>> features;
 
-    protected LivingEntityRenderMixin(EntityRendererFactory.Context ctx) {
+    protected LivingEntityRendererMixin(EntityRendererFactory.Context ctx) {
         super(ctx);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Inject(at = @At("RETURN"), method = "<init>")
+    private void addStuckKnivesFeatureRenderer(EntityRendererFactory.Context ctx, EntityModel<?> model, float shadowRadius, CallbackInfo ci) {
+        if (model instanceof AnimalModel<?>)
+            addFeature((FeatureRenderer<T, M>) new StuckKnivesFeatureRenderer<>(ctx, (LivingEntityRenderer<T, ? extends AnimalModel<T>>) (Object) this));
     }
 
     @Inject(method = "render(Lnet/minecraft/entity/LivingEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
@@ -55,4 +62,8 @@ public abstract class LivingEntityRenderMixin<T extends LivingEntity, M extends 
 
         }
     }
+
+    @Shadow protected abstract float getAnimationProgress(T entity, float tickDelta);
+
+    @Shadow protected abstract boolean addFeature(FeatureRenderer<T, M> feature);
 }

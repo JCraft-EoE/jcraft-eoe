@@ -20,6 +20,9 @@ public class MiscComponentImpl implements MiscComponent {
     @Getter
     private UUID slavedTo;
     private int damageTimer;
+    private int knifeTimer;
+    @Getter
+    private int stuckKnifeCount;
 
     public MiscComponentImpl(Entity entity) {
         this.entity = entity;
@@ -65,8 +68,24 @@ public class MiscComponentImpl implements MiscComponent {
     }
 
     @Override
+    public void stab() {
+        stuckKnifeCount++;
+        updateKnifeTimer();
+    }
+
+    @Override
     public void tick() {
         if (damageTimer > 0) damageTimer--;
+
+        if (stuckKnifeCount <= 0) return;
+        if (--knifeTimer <= 0) {
+            stuckKnifeCount--;
+            updateKnifeTimer();
+        }
+    }
+
+    private void updateKnifeTimer() {
+        knifeTimer = 20 * (30 - stuckKnifeCount);
     }
 
     private void sync() {
@@ -81,6 +100,8 @@ public class MiscComponentImpl implements MiscComponent {
         desiredVelocity = new Vec3d(dvComp.getDouble("X"), dvComp.getDouble("Y"), dvComp.getDouble("Z"));
 
         damageTimer = tag.getInt("DamageTimer");
+
+        // Stuck knives are not persistent.
     }
 
     @Override

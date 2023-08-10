@@ -5,6 +5,7 @@
   "plugin": "net.arna.jcraft.client.JClientMixinPlugin",
   "compatibilityLevel": "JAVA_16",
   "client": [
+    "AnimalModelAccessor",
     "ArmorFeatureRendererMixin",
     "BackgroundRenderMixin",
     "BipedEntityModelMixin",
@@ -20,7 +21,7 @@
     "InGameHudMixin",
     "IntegratedServerLoaderMixin",
     "ItemRendererMixin",
-    "LivingEntityRenderMixin",
+    "LivingEntityRendererMixin",
     "ParticleAccessor",
     "ParticleManagerMixin",
     "WorldRendererMixin",

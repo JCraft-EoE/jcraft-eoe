@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.entity.projectile;
 
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.arna.jcraft.registry.JObjectRegistry;
@@ -84,47 +85,52 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
 
         if (!this.inGround) ++this.ticksInAir;
 
-        if (getLightning()) {
-            if (world.isClient) {
-                double x = getX();
-                double y = getY();
-                double z = getZ();
-                world.addParticle(ParticleTypes.ELECTRIC_SPARK, x, y, z, 0, 0, 0);
-                world.addParticle(ParticleTypes.ELECTRIC_SPARK, (x + prevX) / 2, (y + prevY) / 2, (z + prevZ) / 2, 0, 0, 0);
-            } else {
-                if (ticksInAir > 200 || inGround)
-                    discard();
-                if (delayed) {
-                    delayTime--;
-                    Entity owner = getOwner();
-                    if (owner != null) {
-                        if (delayTime < 1) {
-                            if (!delayFired) {
-                                Vec3d eP = owner.getEyePos();
-                                Vec3d rangeMod = owner.getRotationVector().multiply(24);
+        if (!getLightning()) {
+            if (ticksInAir > 640 && !world.isClient) discard();
+            return;
+        }
+        if (world.isClient) {
+            double x = getX();
+            double y = getY();
+            double z = getZ();
+            world.addParticle(ParticleTypes.ELECTRIC_SPARK, x, y, z, 0, 0, 0);
+            world.addParticle(ParticleTypes.ELECTRIC_SPARK, (x + prevX) / 2, (y + prevY) / 2, (z + prevZ) / 2, 0, 0, 0);
+            return;
+        }
 
-                                EntityHitResult eHit = ProjectileUtil.raycast(owner, eP, eP.add(rangeMod),
-                                        owner.getBoundingBox().expand(24),
-                                        EntityPredicates.VALID_LIVING_ENTITY, // This is a hack, and will miss on stuff like End Crystals, but also makes it miss on other knives
-                                        576 // Squared
-                                );
+        if (ticksInAir > 200 || inGround)
+            discard();
+        if (!delayed) return;
 
-                                HitResult hitResult = world.raycast(new RaycastContext(eP, eP.add(rangeMod), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, owner));
+        delayTime--;
+        Entity owner = getOwner();
+        if (owner == null) return;
 
-                                playSound(JSoundRegistry.TWOH_SHOOT, 1, 1);
+        if (delayTime >= 1) {
+            setVelocity(getVelocity().multiply(0.5));
+            return;
+        }
 
-                                Vec3d hitPos = hitResult.getPos();
-                                if (eHit != null) hitPos = eHit.getPos();
-                                setVelocity(new Vec3d(hitPos.x - getX(), hitPos.y - getY(), hitPos.z - getZ()).normalize());
+        if (delayFired) return;
+        Vec3d eP = owner.getEyePos();
+        Vec3d rangeMod = owner.getRotationVector().multiply(24);
 
-                                velocityDirty = true;
-                                delayFired = true;
-                            }
-                        } else setVelocity(getVelocity().multiply(0.5));
-                    }
-                }
-            }
-        } else if (ticksInAir > 640 && !world.isClient) discard();
+        EntityHitResult eHit = ProjectileUtil.raycast(owner, eP, eP.add(rangeMod),
+                owner.getBoundingBox().expand(24),
+                EntityPredicates.VALID_LIVING_ENTITY, // This is a hack, and will miss on stuff like End Crystals, but also makes it miss on other knives
+                576 // Squared
+        );
+
+        HitResult hitResult = world.raycast(new RaycastContext(eP, eP.add(rangeMod), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, owner));
+
+        playSound(JSoundRegistry.TWOH_SHOOT, 1, 1);
+
+        Vec3d hitPos = hitResult.getPos();
+        if (eHit != null) hitPos = eHit.getPos();
+        setVelocity(new Vec3d(hitPos.x - getX(), hitPos.y - getY(), hitPos.z - getZ()).normalize());
+
+        velocityDirty = true;
+        delayFired = true;
     }
 
     @Override
@@ -148,12 +154,11 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
         if (getLightning()) {
             stunT = 20;
             blockstun = 6;
-        } else {
-            dropStack(asItemStack(), 0.1F);
-        }
+        } else dropStack(asItemStack(), 0.1F);
 
         JUtils.projectileDamageLogic(this, world, entity, Vec3d.ZERO, stunT, 1, false, 2, blockstun);
         playSound(SoundEvents.ITEM_TRIDENT_HIT, 1, 1);
+        JComponents.getMiscData(entity).stab();
         discard();
     }
 
