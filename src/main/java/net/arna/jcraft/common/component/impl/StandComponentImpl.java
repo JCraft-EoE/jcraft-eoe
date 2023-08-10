@@ -52,7 +52,6 @@ public class StandComponentImpl implements StandComponent {
         int rawType = tag.getInt("Type");
         type = rawType == 0 ? null : StandType.fromId(rawType);
         skin = tag.getInt("Skin");
-        // Stand is not persistent
     }
 
     @Override
