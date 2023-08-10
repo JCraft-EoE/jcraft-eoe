@@ -11,6 +11,7 @@ import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -107,11 +108,15 @@ public class CooldownsComponentImpl implements CooldownsComponent {
 
     @Override
     public void readFromNbt(@NonNull NbtCompound tag) {
-        NbtCompound cooldowns = tag.getCompound("Cooldowns");
-        cooldowns.getKeys().forEach(type -> this.cooldowns.put(CooldownType.valueOf(type), cooldowns.getInt(type)));
+        readMap(cooldowns, tag.getCompound("Cooldowns"));
+        readMap(initialDurations, tag.getCompound("InitialDurations"));
+    }
 
-        NbtCompound initialDurations = tag.getCompound("InitialDurations");
-        initialDurations.getKeys().forEach(type -> this.initialDurations.put(CooldownType.valueOf(type), initialDurations.getInt(type)));
+    private static void readMap(Object2IntMap<CooldownType> map, NbtCompound tag) {
+        for (CooldownType type : CooldownType.values())
+            if (tag.contains(type.name(), NbtElement.INT_TYPE))
+                map.put(type, tag.getInt(type.name()));
+            else map.removeInt(type);
     }
 
     @Override
