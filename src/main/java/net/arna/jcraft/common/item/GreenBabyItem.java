@@ -8,15 +8,12 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Map;
 
 public class GreenBabyItem extends StandObtainmentItem {
     public GreenBabyItem(Settings settings) {
         super(settings);
 
-        standIOMap = Map.ofEntries(
-                Map.entry(StandType.WHITE_SNAKE.getId(), StandType.C_MOON.getId())
-        );
+        standIOMap.put(StandType.WHITE_SNAKE, StandType.C_MOON);
     }
 
     @Override

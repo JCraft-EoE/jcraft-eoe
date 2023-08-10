@@ -1,9 +1,10 @@
 package net.arna.jcraft.common.item;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.component.StandComponent;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.entity.StandType;
-import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
@@ -55,30 +56,26 @@ public class StandDiscItem extends Item {
         user.getItemCooldownManager().set(this, 20);
 
         // Get NBT and swap stands
-        int itemStandID = 0;
+        StandType itemStand = null;
         int itemSkin = 0;
-        int userStandID = 0;
+        StandType userStand = null;
         int userSkin = 0;
 
-        IEntityDataSaver userDataSaver = ((IEntityDataSaver) user);
-
         NbtCompound data = itemStack.getOrCreateNbt();
-        NbtCompound userData = userDataSaver.getPersistentData();
+        StandComponent standData = JComponents.getStandData(user);
 
-        if (userData.contains("StandID", NbtElement.INT_TYPE)) userStandID = userData.getInt("StandID");
-        if (userData.contains("StandSkin", NbtElement.INT_TYPE)) userSkin = userData.getInt("StandSkin");
-        if (data.contains("StandID", NbtElement.INT_TYPE)) itemStandID = data.getInt("StandID");
+        userStand = standData.getType();
+        userSkin = standData.getSkin();
+        if (data.contains("StandID", NbtElement.INT_TYPE)) itemStand = StandType.fromId(data.getInt("StandID"));
         if (data.contains("Skin", NbtElement.INT_TYPE)) itemSkin = data.getInt("Skin");
 
-        userData.putInt("StandID", itemStandID);
-        userData.putInt("StandSkin", itemSkin);
-        data.putInt("StandID", userStandID);
+        standData.setType(itemStand);
+        standData.setSkin(itemSkin);
+        data.putInt("StandID", userStand == null ? 0 : userStand.getId());
         data.putInt("Skin", userSkin);
 
-        StandEntity<?, ?> stand = userDataSaver.getStand();
-        if (stand != null)
-            stand.discard();
-
+        StandEntity<?, ?> stand = standData.getStand();
+        if (stand != null) stand.discard();
         JCraft.summon(world, user);
 
         return TypedActionResult.success(itemStack);

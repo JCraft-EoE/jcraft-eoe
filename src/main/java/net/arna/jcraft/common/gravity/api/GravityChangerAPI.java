@@ -5,6 +5,7 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.component.GravityComponent;
 import net.arna.jcraft.common.gravity.RotationAnimation;
 import net.arna.jcraft.common.gravity.util.*;
 import net.arna.jcraft.common.gravity.util.packet.DefaultGravityPacket;
@@ -18,6 +19,7 @@ import net.minecraft.util.math.Vec3f;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public abstract class GravityChangerAPI {
@@ -49,7 +51,7 @@ public abstract class GravityChangerAPI {
         return Direction.DOWN;
     }
 
-    public static ArrayList<Gravity> getGravityList(Entity entity) {
+    public static List<Gravity> getGravityList(Entity entity) {
         if (EntityTags.canChangeGravity(entity)) {
             return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getGravity).orElse(new ArrayList<>());
         }

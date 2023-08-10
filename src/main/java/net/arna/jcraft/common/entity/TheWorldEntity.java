@@ -5,6 +5,7 @@ import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.config.JServerConfig;
+import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
@@ -108,56 +109,56 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
     public void initLightAttack() {
         if (!canAttack()) return;
         if (getUserOrThrow().isSneaking())
-            handleAttack(crm1, JCraft.standLightCD, State.LOW);
-        else handleAttack(light, JCraft.standLightCD, State.LIGHT);
+            handleAttack(crm1, CooldownType.STAND_LIGHT, State.LOW);
+        else handleAttack(light, CooldownType.STAND_LIGHT, State.LIGHT);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        if (handleAttack(donut, JCraft.standHeavyCD, State.DONUT))
+        if (handleAttack(donut, CooldownType.STAND_HEAVY, State.DONUT))
             playSound(JSoundRegistry.TW_DONUT, 1, 1);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
+        if (handleAttack(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
             playSound(JSoundRegistry.TW_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack()) return;
-        if (handleAttack(roundhouse, JCraft.standS1CD, State.ROUNDHOUSE))
+        if (handleAttack(roundhouse, CooldownType.STAND_SP1, State.ROUNDHOUSE))
             playSound(JSoundRegistry.TW_KICK, 1, 1);
     }
 
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        if (handleAttack(timestop, JCraft.standUltCD, State.TIME_STOP))
+        if (handleAttack(timestop, CooldownType.STAND_ULT, State.TIME_STOP))
             playSound(JSoundRegistry.TW_TS, 1, 1);
     }
 
     @Override
     public void initSpecial2() {
         if (!canAttack()) return;
-        if (handleAttack(charge, JCraft.standS2CD, State.CHARGE))
+        if (handleAttack(charge, CooldownType.STAND_SP2, State.CHARGE))
             playSound(JSoundRegistry.TW_CHARGE, 1, 1);
     }
 
     @Override
     public void initSpecial3() {
         if (!canAttack()) return;
-        if (handleAttack(feignbarrage, JCraft.standS3CD, State.BARRAGE))
+        if (handleAttack(feignbarrage, CooldownType.STAND_SP3, State.BARRAGE))
             playSound(JSoundRegistry.TW_BARRAGE, 1, 1);
     }
 
     @Override
     public void initUtil() {
         if (!canAttack() || tsTime > 0) return;
-        handleAttack(timeskip, JCraft.utilCD, State.TIMESKIP);
+        handleAttack(timeskip, CooldownType.UTIL, State.TIMESKIP);
     }
 
     @Override

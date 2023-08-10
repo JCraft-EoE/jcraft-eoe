@@ -2,7 +2,7 @@ package net.arna.jcraft.client.renderer.entity;
 
 import net.arna.jcraft.client.model.entity.GoldenExperienceModel;
 import net.arna.jcraft.common.entity.GoldenExperienceEntity;
-import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -39,7 +39,7 @@ public class GoldenExperienceRenderer extends GeoEntityRenderer<GoldenExperience
         float a = 1f;
         MinecraftClient mcClient = MinecraftClient.getInstance();
         if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null)
-            if ( ((IEntityDataSaver)mcClient.player).getStand() == animatable )
+            if (JUtils.getStand(mcClient.player) == animatable )
                 a = animatable.getAlpha();
         super.render(model, animatable, partialTicks, type, matrixStackIn, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, a);
     }

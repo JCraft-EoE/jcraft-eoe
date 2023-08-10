@@ -2,7 +2,7 @@ package net.arna.jcraft.client.renderer.entity;
 
 import net.arna.jcraft.client.model.entity.MadeInHeavenModel;
 import net.arna.jcraft.common.entity.MadeInHeavenEntity;
-import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -41,45 +41,44 @@ public class MadeInHeavenRenderer extends GeoEntityRenderer<MadeInHeavenEntity> 
 
         MinecraftClient mcClient = MinecraftClient.getInstance();
         if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null)
-            if ( ((IEntityDataSaver)mcClient.player).getStand() == animatable )
+            if (JUtils.getStand(mcClient.player) == animatable )
                 a = animatable.getAlpha();
 
         super.render(model, animatable, partialTicks, type, matrixStack, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, a);
 
-        if (animatable.getAfterimage()) {
-            float aa = a - 0.5f;
-            if (aa < 0) aa = 0;
+        if (!animatable.getAfterimage()) return;
 
-            Vec3d baseVel = Vec3d.ZERO;
-            float bodyYaw = animatable.bodyYaw;
-            if (animatable.hasUser()) {
-                baseVel = animatable.getUser().getVelocity();
-                bodyYaw = animatable.getUser().bodyYaw;
-            }
+        float aa = a - 0.5f;
+        if (aa < 0) aa = 0;
 
-            for (int i = 0; i <= 3; ++i) {
+        Vec3d baseVel = Vec3d.ZERO;
+        float bodyYaw = animatable.bodyYaw;
+        if (animatable.hasUser()) {
+            baseVel = animatable.getUser().getVelocity();
+            bodyYaw = animatable.getUser().bodyYaw;
+        }
 
-                Vec3d velocity = baseVel.multiply(i);
+        for (int i = 0; i <= 3; ++i) {
+            Vec3d velocity = baseVel.multiply(i);
 
-                renderAfter(
-                        velocity,
-                        bodyYaw,
-                        aa * (1f / i),
-                        model,
-                        animatable,
-                        partialTicks,
-                        RenderLayer.getEntityNoOutline(getTextureLocation(animatable)),
-                        matrixStack,
-                        renderTypeBuffer,
-                        vertexBuilder,
-                        packedLightIn,
-                        packedOverlayIn,
-                        red,
-                        green,
-                        blue,
-                        alpha
-                );
-            }
+            renderAfter(
+                    velocity,
+                    bodyYaw,
+                    aa * (1f / i),
+                    model,
+                    animatable,
+                    partialTicks,
+                    RenderLayer.getEntityNoOutline(getTextureLocation(animatable)),
+                    matrixStack,
+                    renderTypeBuffer,
+                    vertexBuilder,
+                    packedLightIn,
+                    packedOverlayIn,
+                    red,
+                    green,
+                    blue,
+                    alpha
+            );
         }
     }
 

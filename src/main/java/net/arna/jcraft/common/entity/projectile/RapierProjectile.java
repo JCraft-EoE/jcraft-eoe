@@ -3,7 +3,6 @@ package net.arna.jcraft.common.entity.projectile;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.SilverChariotEntity;
 import net.arna.jcraft.common.entity.StandEntity;
-import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.arna.jcraft.registry.JObjectRegistry;
@@ -127,13 +126,11 @@ public class RapierProjectile extends PersistentProjectileEntity implements IAni
 
     @Override
     protected boolean tryPickup(PlayerEntity player) {
-        if (player == getOwner()) {
-            if (((IEntityDataSaver) player).getStand() instanceof SilverChariotEntity silverChariot) {
-                silverChariot.setHasRapier(true);
-                return true;
-            }
-        }
-        return false;
+        if (player != getOwner() || !(JUtils.getStand(player) instanceof SilverChariotEntity silverChariot))
+            return false;
+
+        silverChariot.setHasRapier(true);
+        return true;
     }
 
     @Override

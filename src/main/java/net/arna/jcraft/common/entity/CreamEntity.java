@@ -5,7 +5,7 @@ import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.StunType;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
-import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -186,9 +186,9 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public void initLightAttack() {
         if (!canAttack()) return;
 
-        if (isHalfBall()) handleAttack(balllight, JCraft.standLightCD, State.BALL_LIGHT);
-        else if (getUserOrThrow().isSneaking()) handleAttack(crm1, JCraft.standLightCD, State.BITE);
-        else handleAttack(light, JCraft.standLightCD, State.LIGHT);
+        if (isHalfBall()) handleAttack(balllight, CooldownType.STAND_LIGHT, State.BALL_LIGHT);
+        else if (getUserOrThrow().isSneaking()) handleAttack(crm1, CooldownType.STAND_LIGHT, State.BITE);
+        else handleAttack(light, CooldownType.STAND_LIGHT, State.LIGHT);
     }
 
     @Override
@@ -196,9 +196,9 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         if (!canAttack()) return;
 
         if (isHalfBall()) {
-            if (handleAttack(ballheavy, JCraft.standHeavyCD, State.BALL_HEAVY))
+            if (handleAttack(ballheavy, CooldownType.STAND_HEAVY, State.BALL_HEAVY))
                 playSound(JSoundRegistry.CREAM_SMASH, 1, 1);
-        } else if (handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY))
+        } else if (handleAttack(heavy, CooldownType.STAND_HEAVY, State.HEAVY))
             playSound(JSoundRegistry.CREAM_HEAVY, 1, 1);
     }
 
@@ -206,9 +206,9 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public void initBarrage() {
         if (!canAttack()) return;
 
-        if (isHalfBall() && handleAttack(ballcombo, JCraft.standBarrageCD, State.BALL_COMBO))
+        if (isHalfBall() && handleAttack(ballcombo, CooldownType.STAND_BARRAGE, State.BALL_COMBO))
             playSound(JSoundRegistry.CREAM_COMBO, 1, 1);
-        else if (handleAttack(combo, JCraft.standBarrageCD, State.COMBO))
+        else if (handleAttack(combo, CooldownType.STAND_BARRAGE, State.COMBO))
             playSound(JSoundRegistry.CREAM_COMBO, 1, 1);
     }
 
@@ -216,7 +216,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public void initUlt() {
         if (!canAttack()) return;
 
-        if (handleAttack(consume, JCraft.standUltCD, State.CONSUME))
+        if (handleAttack(consume, CooldownType.STAND_ULT, State.CONSUME))
             playSound(JSoundRegistry.CREAM_CONSUME, 1, 1);
     }
 
@@ -224,9 +224,9 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public void initSpecial1() {
         if (!canAttack()) return;
 
-        if (isHalfBall() && handleAttack(ballcharge, JCraft.standS1CD, State.BALL_CONSUME))
+        if (isHalfBall() && handleAttack(ballcharge, CooldownType.STAND_SP1, State.BALL_CONSUME))
             playSound(JSoundRegistry.CREAM_BALLDASH, 1, 1);
-        else if (handleAttack(grab, JCraft.standS1CD, State.GRAB))
+        else if (handleAttack(grab, CooldownType.STAND_SP1, State.GRAB))
             playSound(JSoundRegistry.CREAM_GRAB, 1, 1);
     }
 
@@ -239,7 +239,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         Vec3d rotVec = user.getRotationVector();
         HitResult hitResult = world.raycast(new RaycastContext(eyePos, eyePos.add(rotVec.multiply(16)), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user));
 
-        if (hitResult.getType() != HitResult.Type.MISS && handleAttack(surprise, JCraft.standS2CD, State.SURPRISE)) {
+        if (hitResult.getType() != HitResult.Type.MISS && handleAttack(surprise, CooldownType.STAND_SP2, State.SURPRISE)) {
             setFree(true);
             setFreePos(new Vec3f(user.getPos()));
             outPos = new Vec3f(hitResult.getPos());
@@ -251,7 +251,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public void initSpecial3() {
         if (!canAttack()) return;
 
-        if (!isHalfBall() && handleAttack(destroy, JCraft.standS3CD, State.DESTROY))
+        if (!isHalfBall() && handleAttack(destroy, CooldownType.STAND_SP3, State.DESTROY))
             playSound(JSoundRegistry.CREAM_OVERHEAD, 1, 1);
     }
 
@@ -260,9 +260,9 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         if (!canAttack()) return;
 
         if (isHalfBall()) {
-            if (handleAttack(exit, JCraft.utilCD, State.EXIT))
+            if (handleAttack(exit, CooldownType.UTIL, State.EXIT))
                 playSound(JSoundRegistry.CREAM_EXIT, 1, 1);
-        } else if (handleAttack(enter, JCraft.utilCD, State.ENTER))
+        } else if (handleAttack(enter, CooldownType.UTIL, State.ENTER))
             playSound(JSoundRegistry.CREAM_ENTER, 1, 1);
     }
 
@@ -474,7 +474,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                             if (getMoveStun() % 2 == 0) { // More consistent
                                 stun(ent, 4, 0);
 
-                                StandEntity<?, ?> enemyStand = ((IEntityDataSaver) ent).getStand();
+                                StandEntity<?, ?> enemyStand = JUtils.getStand(ent);
                                 if (enemyStand != null) enemyStand.cancelAttack();
                             }
 
@@ -485,7 +485,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                             if (age % 4 == 0) {
                                 stun(ent, 2, 0);
 
-                                StandEntity<?, ?> enemyStand = ((IEntityDataSaver) ent).getStand();
+                                StandEntity<?, ?> enemyStand = JUtils.getStand(ent);
                                 if (enemyStand != null) enemyStand.cancelAttack();
                             }
 

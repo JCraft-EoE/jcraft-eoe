@@ -6,14 +6,14 @@ import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackQueue;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.HitBoxData;
+import net.arna.jcraft.common.component.CooldownsComponent;
+import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.component.StandComponent;
 import net.arna.jcraft.common.entity.projectile.BloodProjectile;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.ShaderDeactivationPacket;
-import net.arna.jcraft.common.util.IEntityDataSaver;
-import net.arna.jcraft.common.util.ITimeStop;
-import net.arna.jcraft.common.util.MobilityType;
-import net.arna.jcraft.common.util.StandAnimationState;
+import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JPacketRegistry;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
@@ -34,7 +34,6 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
@@ -169,8 +168,8 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
         if (!canAttack()) return;
 
         if (getUserOrThrow().isSneaking())
-            handleAttack(crm1, JCraft.standLightCD, State.SWEEP);
-        else if (handleAttack(light, JCraft.standLightCD, State.DUAL_CHOP))
+            handleAttack(crm1, CooldownType.STAND_LIGHT, State.SWEEP);
+        else if (handleAttack(light, CooldownType.STAND_LIGHT, State.DUAL_CHOP))
             playSound(JSoundRegistry.KC_DUAL_CHOP, 1, 1);
     }
 
@@ -181,7 +180,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
         boolean idling = getMoveStun() < 1;
 
         if (curAttack != heavy) {
-            if (idling && handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY)) {
+            if (idling && handleAttack(heavy, CooldownType.STAND_HEAVY, State.HEAVY)) {
                 playSound(JSoundRegistry.KC_HEAVY, 1, 1);
             }
         } else if (getMoveStun() < 7) {
@@ -193,16 +192,16 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
+        if (handleAttack(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
             playSound(JSoundRegistry.KC_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack() || !hasUser()) return;
-        if (getUserOrThrow().isSneaking() && handleAttack(bloodthrow, JCraft.standS1CD, State.BLOOD_THROW))
+        if (getUserOrThrow().isSneaking() && handleAttack(bloodthrow, CooldownType.STAND_SP1, State.BLOOD_THROW))
             getUserOrThrow().damage(DamageSource.MAGIC, 0.1f);
-        else if (handleAttack(eyechop, JCraft.standS1CD, State.EYE_CHOP)) playSound(JSoundRegistry.KC_EYE_CHOP, 1, 1);
+        else if (handleAttack(eyechop, CooldownType.STAND_SP1, State.EYE_CHOP)) playSound(JSoundRegistry.KC_EYE_CHOP, 1, 1);
     }
 
     private void beginPrediction() {
@@ -239,9 +238,9 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     public void initUlt() {
         // If predicting, and Time Erase isn't on cooldown
         if (curAttack != null && curAttack.id == 9 && hasUser()) {
-            NbtCompound playerData = ((IEntityDataSaver) getUserOrThrow()).getPersistentData();
-            if (playerData.getInt(JCraft.standUltCD) <= 0) {
-                playerData.putInt(JCraft.standUltCD, 400);
+            CooldownsComponent cooldowns = JComponents.getCooldowns(getUser());
+            if (cooldowns.getCooldown(CooldownType.STAND_ULT) <= 0) {
+                cooldowns.setCooldown(CooldownType.STAND_ULT, 400);
                 finishPrediction();
             }
         }
@@ -255,7 +254,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             return;
         }
 
-        if (handleAttack(timeerase, JCraft.standUltCD, State.TIME_ERASE)) {
+        if (handleAttack(timeerase, CooldownType.STAND_ULT, State.TIME_ERASE)) {
             if (getUser() instanceof ServerPlayerEntity player)
                 player.networkHandler.sendPacket(new PlaySoundS2CPacket(JSoundRegistry.TIME_ERASE, SoundCategory.PLAYERS, getX(), getY(), getZ(), 1, 1, 0));
         }
@@ -264,59 +263,57 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     @Override
     public void initSpecial2() {
         if (!canAttack()) return;
-        if (handleAttack(donut, JCraft.standS2CD, State.DONUT))
+        if (handleAttack(donut, CooldownType.STAND_SP2, State.DONUT))
             playSound(JSoundRegistry.KC_DONUT, 1, 1);
     }
 
     @Override
     public void initSpecial3() {
-        if (hasUser()) {
-            LivingEntity user = getUserOrThrow();
-            ITimeStop timeStop = (ITimeStop) user;
-            if (user.hasStatusEffect(JStatusRegistry.DAZED) || timeStop.getTimeStopTicks() > 0)
-                return;
+        if (!hasUser()) return;
+        LivingEntity user = getUserOrThrow();
+        if (user.hasStatusEffect(JStatusRegistry.DAZED) || JUtils.isAffectedByTimeStop(user))
+            return;
 
-            NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
-            boolean start = getMoveStun() < 1;
+        CooldownsComponent cooldowns = JComponents.getCooldowns(user);
+        boolean start = getMoveStun() < 1;
 
-            if (start) {
-                if (user.isSneaking())
-                    handleAttack(epitaph, JCraft.standS3CD, State.EPITAPH);
-                else if (handleAttack(prediction, JCraft.standS3CD, State.PREDICT)) {
-                    predictionInfo.clear();
-                    playSound(JSoundRegistry.KC_EPITAPH, 1, 1);
+        if (start) {
+            if (user.isSneaking())
+                handleAttack(epitaph, CooldownType.STAND_SP3, State.EPITAPH);
+            else if (handleAttack(prediction, CooldownType.STAND_SP3, State.PREDICT)) {
+                predictionInfo.clear();
+                playSound(JSoundRegistry.KC_EPITAPH, 1, 1);
 
-                    // Send epitaph state start
-                    if (user instanceof ServerPlayerEntity player)
-                        ServerPlayNetworking.send(player, JPacketRegistry.S2C_EPITAPH_STATE, new PacketByteBuf(Unpooled.buffer().writeBoolean(true)));
-                }
-            } else {
-                // When used during a move, cancels it and puts time erase on cooldown
-                moveCancel();
-
-                // 7 second time erase cooldown
-                if (playerData.getInt(JCraft.standUltCD) < 140)
-                    playerData.putInt(JCraft.standUltCD, 140);
-
-                // Particle effects
-                Vec3d oPos = user.getPos();
-                Box bBox = user.getBoundingBox();
-                for (ServerPlayerEntity serverPlayer : ((ServerWorld) world).getPlayers()) {
-                    PacketByteBuf buf = PacketByteBufs.create();
-                    buf.writeVarInt(2);
-                    buf.writeDouble(oPos.x);
-                    buf.writeDouble(oPos.y);
-                    buf.writeDouble(oPos.z);
-                    buf.writeDouble(bBox.getXLength());
-                    buf.writeDouble(bBox.getYLength());
-                    buf.writeDouble(bBox.getZLength());
-                    ServerChannelFeedbackPacket.send(serverPlayer, buf);
-                }
-
-                // Stop epitaph state
+                // Send epitaph state start
                 if (user instanceof ServerPlayerEntity player)
-                    ServerPlayNetworking.send(player, JPacketRegistry.S2C_EPITAPH_STATE, new PacketByteBuf(Unpooled.buffer().writeBoolean(false)));
+                    ServerPlayNetworking.send(player, JPacketRegistry.S2C_EPITAPH_STATE, new PacketByteBuf(Unpooled.buffer().writeBoolean(true)));
             }
+        } else {
+            // When used during a move, cancels it and puts time erase on cooldown
+            moveCancel();
+
+            // 7 second time erase cooldown
+            if (cooldowns.getCooldown(CooldownType.STAND_ULT) < 140)
+                cooldowns.setCooldown(CooldownType.STAND_ULT, 140);
+
+            // Particle effects
+            Vec3d oPos = user.getPos();
+            Box bBox = user.getBoundingBox();
+            for (ServerPlayerEntity serverPlayer : ((ServerWorld) world).getPlayers()) {
+                PacketByteBuf buf = PacketByteBufs.create();
+                buf.writeVarInt(2);
+                buf.writeDouble(oPos.x);
+                buf.writeDouble(oPos.y);
+                buf.writeDouble(oPos.z);
+                buf.writeDouble(bBox.getXLength());
+                buf.writeDouble(bBox.getYLength());
+                buf.writeDouble(bBox.getZLength());
+                ServerChannelFeedbackPacket.send(serverPlayer, buf);
+            }
+
+            // Stop epitaph state
+            if (user instanceof ServerPlayerEntity player)
+                ServerPlayNetworking.send(player, JPacketRegistry.S2C_EPITAPH_STATE, new PacketByteBuf(Unpooled.buffer().writeBoolean(false)));
         }
     }
 
@@ -326,7 +323,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
 
     @Override
     public void initUtil() {
-        if (!canAttack() || !hasUser() || !handleAttack(timeskip, JCraft.utilCD, State.TIMESKIP)) return;
+        if (!canAttack() || !hasUser() || !handleAttack(timeskip, CooldownType.UTIL, State.TIMESKIP)) return;
         LivingEntity user = getUserOrThrow();
 
         Vec3d pos = user.getPos();
@@ -527,9 +524,9 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     private MobEntity doppelganger;
 
     private void summonFakeKC() {
-        NbtCompound fakeUserData = ((IEntityDataSaver) doppelganger).getPersistentData();
-        fakeUserData.putInt("StandID", getStandType().getId());
-        fakeUserData.putInt("StandSkin", getSkin());
+        StandComponent standData = JComponents.getStandData(doppelganger);
+        standData.setType(getStandType());
+        standData.setSkin(getSkin());
 
         StandEntity<?, ?> clone = JCraft.summon(world, doppelganger);
         if (clone == null) return;
@@ -540,8 +537,9 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
 
     private void cancelTE() {
         LivingEntity user = getUserOrThrow();
-        NbtCompound userData = ((IEntityDataSaver) user).getPersistentData();
-        userData.putInt(JCraft.standUltCD, userData.getInt(JCraft.standUltCD) - getTETime() * 2);
+        CooldownsComponent cooldowns = JComponents.getCooldowns(user);
+        cooldowns.setCooldown(CooldownType.STAND_ULT, cooldowns.getCooldown(CooldownType.STAND_ULT) - getTETime() * 2);
+
         setTETime(0);
         doppelganger.discard();
         if (user instanceof ServerPlayerEntity serverPlayer)
@@ -672,7 +670,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
         // If moving faster than 0.01 m/s, account for distance traveled
         Vec3d velocity = entity.getVelocity();
         if (entity instanceof ServerPlayerEntity player) // EXTREMELY cursed implementation of player velocity because NOTHING ELSE WORKS
-            velocity = ((IEntityDataSaver) player).getDesiredVelocity();
+            velocity = JComponents.MISC.get(player).getDesiredVelocity();
         //JCraft.LOGGER.info("Target is moving at a velocity of: " + velocity);
         if (velocity.lengthSquared() > 0.0001) {
             Vec3d velocityComp = new Vec3d(velocity.x * ticksLeft, Math.max(0, velocity.y * ticksLeft), velocity.z * ticksLeft);

@@ -8,16 +8,13 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Map;
 
 public class DIOsDiaryItem extends StandObtainmentItem {
     public DIOsDiaryItem(Settings settings) {
         super(settings);
 
-        standIOMap = Map.ofEntries(
-                Map.entry(StandType.C_MOON.getId(), StandType.MADE_IN_HEAVEN.getId()),
-                Map.entry(StandType.THE_WORLD.getId(), StandType.THE_WORLD_OVER_HEAVEN.getId())
-        );
+        standIOMap.put(StandType.C_MOON, StandType.MADE_IN_HEAVEN);
+        standIOMap.put(StandType.THE_WORLD, StandType.THE_WORLD_OVER_HEAVEN);
     }
 
     @Override

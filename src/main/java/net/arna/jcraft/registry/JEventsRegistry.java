@@ -1,18 +1,17 @@
 package net.arna.jcraft.registry;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.config.ConfigOption;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.entity.StandEntity;
-import net.arna.jcraft.common.events.JPlayerEntityEvents;
 import net.arna.jcraft.common.events.JServerTickEvents;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.item.MockItem;
 import net.arna.jcraft.common.network.c2s.ConfigUpdatePacket;
+import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.EntityInterest;
-import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -119,19 +118,14 @@ public interface JEventsRegistry {
         ServerLivingEntityEvents.AFTER_DEATH.register(
                 (living, source) -> {
                     if (living instanceof ServerPlayerEntity player) {
-                        NbtCompound playerData = ((IEntityDataSaver) player).getPersistentData();
                         // Reset cooldowns upon death
-                        for (String cooldownType : JCraft.cooldowns) playerData.putInt(cooldownType, 0);
+                        JComponents.getCooldowns(player).clear();
 
-                        if (source.getAttacker() instanceof LivingEntity killer) {
-                            NbtCompound killerData = ((IEntityDataSaver) killer).getPersistentData();
-                            killerData.putInt(JCraft.comboBreakerCD, 0);
-                        }
+                        if (source.getAttacker() instanceof LivingEntity killer)
+                            JComponents.getCooldowns(killer).clear(CooldownType.COMBO_BREAKER);
                     }
                 }
         );
-
-        ServerPlayerEvents.COPY_FROM.register(new JPlayerEntityEvents());
 
         ServerTickEvents.END_SERVER_TICK.register(JServerTickEvents::serverTick);
 

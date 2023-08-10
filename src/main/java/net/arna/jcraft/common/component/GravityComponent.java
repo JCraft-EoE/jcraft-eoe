@@ -1,12 +1,13 @@
-package net.arna.jcraft.common.gravity.util;
+package net.arna.jcraft.common.component;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.tick.CommonTickingComponent;
 import net.arna.jcraft.common.gravity.RotationAnimation;
 import net.arna.jcraft.common.gravity.api.RotationParameters;
+import net.arna.jcraft.common.gravity.util.Gravity;
 import net.minecraft.util.math.Direction;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public interface GravityComponent extends Component, CommonTickingComponent {
     //Internal
@@ -25,7 +26,7 @@ public interface GravityComponent extends Component, CommonTickingComponent {
 
     Direction getActualGravityDirection();
 
-    ArrayList<Gravity> getGravity();
+    List<Gravity> getGravity();
 
     boolean getInvertGravity();
 
@@ -33,7 +34,7 @@ public interface GravityComponent extends Component, CommonTickingComponent {
 
     //Set
 
-    void setGravity(ArrayList<Gravity> gravityList, boolean initialGravity);
+    void setGravity(List<Gravity> gravityList, boolean initialGravity);
 
     void invertGravity(boolean isInverted, RotationParameters rotationParameters, boolean initialGravity);
 

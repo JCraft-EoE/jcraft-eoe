@@ -1,7 +1,8 @@
 package net.arna.jcraft.mixin;
 
+import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.component.StandComponent;
 import net.arna.jcraft.common.entity.StandType;
-import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
@@ -15,7 +16,6 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.GameRules;
@@ -23,6 +23,7 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -42,11 +43,16 @@ public class MobEntityMixin {
     @Shadow
     private DefaultedList<ItemStack> armorItems;
 
-    private final List<Enchantment> jcraftArmorEnchants = List.of(Enchantments.PROTECTION, Enchantments.PROJECTILE_PROTECTION, Enchantments.BLAST_PROTECTION, Enchantments.FIRE_PROTECTION, Enchantments.UNBREAKING);
-    private final List<Item> jcraftHeadArmor = List.of(Items.AIR, Items.GOLDEN_HELMET, Items.CHAINMAIL_HELMET, Items.IRON_HELMET, Items.DIAMOND_HELMET, Items.NETHERITE_HELMET);
-    private final List<Item> jcraftChestArmor = List.of(Items.AIR, Items.GOLDEN_CHESTPLATE, Items.CHAINMAIL_CHESTPLATE, Items.IRON_CHESTPLATE, Items.DIAMOND_CHESTPLATE, Items.NETHERITE_CHESTPLATE);
-    private final List<Item> jcraftLegArmor = List.of(Items.AIR, Items.GOLDEN_LEGGINGS, Items.CHAINMAIL_LEGGINGS, Items.IRON_LEGGINGS, Items.DIAMOND_LEGGINGS, Items.NETHERITE_LEGGINGS);
-    private final List<Item> jcraftFootArmor = List.of(Items.AIR, Items.GOLDEN_BOOTS, Items.CHAINMAIL_BOOTS, Items.IRON_BOOTS, Items.DIAMOND_BOOTS, Items.NETHERITE_BOOTS);
+    @Unique
+    private static final List<Enchantment> jcraftArmorEnchants = List.of(Enchantments.PROTECTION, Enchantments.PROJECTILE_PROTECTION, Enchantments.BLAST_PROTECTION, Enchantments.FIRE_PROTECTION, Enchantments.UNBREAKING);
+    @Unique
+    private static final List<Item> jcraftHeadArmor = List.of(Items.AIR, Items.GOLDEN_HELMET, Items.CHAINMAIL_HELMET, Items.IRON_HELMET, Items.DIAMOND_HELMET, Items.NETHERITE_HELMET);
+    @Unique
+    private static final List<Item> jcraftChestArmor = List.of(Items.AIR, Items.GOLDEN_CHESTPLATE, Items.CHAINMAIL_CHESTPLATE, Items.IRON_CHESTPLATE, Items.DIAMOND_CHESTPLATE, Items.NETHERITE_CHESTPLATE);
+    @Unique
+    private static final List<Item> jcraftLegArmor = List.of(Items.AIR, Items.GOLDEN_LEGGINGS, Items.CHAINMAIL_LEGGINGS, Items.IRON_LEGGINGS, Items.DIAMOND_LEGGINGS, Items.NETHERITE_LEGGINGS);
+    @Unique
+    private static final List<Item> jcraftFootArmor = List.of(Items.AIR, Items.GOLDEN_BOOTS, Items.CHAINMAIL_BOOTS, Items.IRON_BOOTS, Items.DIAMOND_BOOTS, Items.NETHERITE_BOOTS);
 
     @Inject(method = "<init>(Lnet/minecraft/entity/EntityType;Lnet/minecraft/world/World;)V", at = @At("TAIL"))
     public void jcraft$mobEntityInit(EntityType<? extends MobEntity> entityType, World world, CallbackInfo info) {
@@ -55,9 +61,9 @@ public class MobEntityMixin {
         ServerWorld serverWorld = (ServerWorld) world;
         MobEntity mob = (MobEntity) (Object) this;
 
-        NbtCompound nbt = ((IEntityDataSaver) mob).getPersistentData();
+        StandComponent standData = JComponents.getStandData(mob);
 
-        if (nbt.contains("StandID")) return;
+        if (standData.getType() != null) return;
         EntityGroup group = mob.getGroup();
 
         if (group != EntityGroup.UNDEAD && group != EntityGroup.ILLAGER && !(mob instanceof EndermanEntity)) return;
@@ -69,21 +75,16 @@ public class MobEntityMixin {
         StandType type = types.get(random.nextInt(types.size()));
 
         // Silver chariot users may spawn with anubis (25% chance)
-        if (type == StandType.SILVER_CHARIOT && random.nextInt(5) == 4) {
+        if (type == StandType.SILVER_CHARIOT && random.nextInt(5) == 4)
             handItems.set(0, new ItemStack(JObjectRegistry.ANUBIS));
-        }
 
-        nbt.putInt("StandID", type.getId());
+        standData.setType(type);
 
         EntityAttributeInstance followRange = mob.getAttributeInstance(EntityAttributes.GENERIC_FOLLOW_RANGE);
-        if (followRange != null) {
-            followRange.setBaseValue(128.0);
-        }
+        if (followRange != null) followRange.setBaseValue(128.0);
 
         EntityAttributeInstance movementSpeed = mob.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
-        if (movementSpeed != null && movementSpeed.getBaseValue() < 0.3) {
-            movementSpeed.setBaseValue(0.3);
-        }
+        if (movementSpeed != null && movementSpeed.getBaseValue() < 0.3) movementSpeed.setBaseValue(0.3);
 
         if (random.nextInt(0, 100) >= 90) {
             handItems.set(1, new ItemStack(JObjectRegistry.STANDARROW));

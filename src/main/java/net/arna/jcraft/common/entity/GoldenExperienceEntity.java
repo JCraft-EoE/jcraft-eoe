@@ -6,6 +6,7 @@ import net.arna.jcraft.common.attack.AttackQueue;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.entity.projectile.GETreeEntity;
+import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
@@ -115,22 +116,21 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
     public void initLightAttack() {
         if (!canAttack()) return;
         if (getUserOrThrow().isSneaking())
-            handleAttack(crm1, JCraft.standLightCD, State.LIFEGIVER);
-        else
-            handleAttack(light, JCraft.standLightCD, State.LIGHT);
+            handleAttack(crm1, CooldownType.STAND_LIGHT, State.LIFEGIVER);
+        else handleAttack(light, CooldownType.STAND_LIGHT, State.LIGHT);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY);
+        handleAttack(heavy, CooldownType.STAND_HEAVY, State.HEAVY);
         //this.playSound(ModSoundRegister.GE_HEAVY,1, 1);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
+        if (handleAttack(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
             playSound(JSoundRegistry.GE_BARRAGE, 1, 1);
     }
 
@@ -140,14 +140,14 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
         if (!data.canAttack()) return;
 
         if (data.user().isSneaking()) {
-            if (handleAttack(heal, JCraft.standS1CD, State.HEAL)) playSound(JSoundRegistry.GE_HEAL, 1, 1);
-        } else if (handleAttack(healself, JCraft.standS1CD, State.HEAL_SELF)) playSound(JSoundRegistry.GE_HEAL, 1, 1);
+            if (handleAttack(heal, CooldownType.STAND_SP1, State.HEAL)) playSound(JSoundRegistry.GE_HEAL, 1, 1);
+        } else if (handleAttack(healself, CooldownType.STAND_SP1, State.HEAL_SELF)) playSound(JSoundRegistry.GE_HEAL, 1, 1);
     }
 
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        handleAttack(overclock, JCraft.standUltCD, State.OVERCLOCK);
+        handleAttack(overclock, CooldownType.STAND_ULT, State.OVERCLOCK);
         //this.playSound(ModSoundRegister.GE_ULT, 1, 1);
     }
 
@@ -160,7 +160,7 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
 
             if (curAttack != rekka1 && curAttack != rekka2 && curAttack != rekka3) {
                 if (idling) {
-                    if (handleAttack(rekka1, JCraft.standS2CD, State.REKKA1))
+                    if (handleAttack(rekka1, CooldownType.STAND_SP2, State.REKKA1))
                         playSound(JSoundRegistry.GE_REKKA1, 1, 1);
                     return;
                 }
@@ -188,14 +188,14 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
     public void initSpecial3() {
         if (!canAttack() || !hasUser()) return;
         toSummon = getUserOrThrow().isSneaking() ? LifeGiverType.FROG : LifeGiverType.SNAKE;
-        if (handleAttack(lifegiver, JCraft.standS3CD, State.LIFEGIVER))
+        if (handleAttack(lifegiver, CooldownType.STAND_SP3, State.LIFEGIVER))
             playSound(JSoundRegistry.GE_HEAL, 1, 1);
     }
 
     @Override
     public void initUtil() {
         if (!canAttack()) return;
-        if (handleAttack(tree, JCraft.utilCD, State.TREE))
+        if (handleAttack(tree, CooldownType.UTIL, State.TREE))
             playSound(JSoundRegistry.GE_TREE, 1, 1);
     }
 

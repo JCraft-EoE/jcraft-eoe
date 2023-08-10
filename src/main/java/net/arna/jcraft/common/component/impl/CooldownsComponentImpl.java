@@ -1,0 +1,130 @@
+package net.arna.jcraft.common.component.impl;
+
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntRBTreeMap;
+import lombok.NonNull;
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.component.CooldownsComponent;
+import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.util.CooldownType;
+import net.arna.jcraft.registry.JSoundRegistry;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.util.math.Vec3d;
+
+public class CooldownsComponentImpl implements CooldownsComponent {
+    private final Object2IntMap<CooldownType> cooldowns = new Object2IntRBTreeMap<>(),
+            initialDurations = new Object2IntRBTreeMap<>();
+    private final Entity entity;
+    private boolean skipSync;
+
+    public CooldownsComponentImpl(@NonNull Entity entity) {
+        this.entity = entity;
+    }
+
+    @Override
+    public int getCooldown(CooldownType type) {
+        return Math.max(cooldowns.getOrDefault(type, 0), 0);
+    }
+
+    @Override
+    public int getInitialDuration(CooldownType type) {
+        return initialDurations.getOrDefault(type, 0);
+    }
+
+    @Override
+    public void setCooldown(CooldownType type, int duration) {
+        if (duration == 0) {
+            clear(type);
+            return;
+        }
+
+        cooldowns.put(type, duration);
+        initialDurations.put(type, duration);
+        sync();
+    }
+
+    @Override
+    public void cooldownCancel() {
+        if (entity.isSpectator()) return;
+
+        boolean force = entity instanceof PlayerEntity player && player.isCreative();
+        if (!force && getCooldown(CooldownType.COOLDOWN_CANCEL) > 0) return;
+
+        skipSync = true;
+        for (CooldownType type : CooldownType.values())
+            if (force || !type.isNonResettable())
+                clear(type);
+        skipSync = false;
+
+        if (!force) startCooldown(CooldownType.COOLDOWN_CANCEL);
+
+        Vec3d pPos = entity.getEyePos();
+        entity.world.playSoundFromEntity(null, entity, JSoundRegistry.COOLDOWN_CANCEL, SoundCategory.PLAYERS, 1, 1);
+        if (!entity.world.isClient) JCraft.createParticle((ServerWorld) entity.world, pPos.x, pPos.y, pPos.z, 1);
+
+        sync();
+    }
+
+    @Override
+    public void clear(CooldownType type) {
+        cooldowns.removeInt(type);
+        initialDurations.removeInt(type);
+        sync();
+    }
+
+    @Override
+    public void clear() {
+        skipSync = true;
+        for (CooldownType type : CooldownType.values())
+            clear(type);
+        skipSync = false;
+
+        sync();
+    }
+
+    private void sync() {
+        if (skipSync) return; // To avoid packet spam.
+        JComponents.COOLDOWNS.sync(entity);
+    }
+
+    @Override
+    public void tick() {
+        // Decrement all cooldowns.
+        cooldowns.object2IntEntrySet().forEach(entry -> {
+            if (entry.getIntValue() > 0) entry.setValue(entry.getIntValue() - 1);
+        });
+    }
+
+    @Override
+    public void readFromNbt(@NonNull NbtCompound tag) {
+        NbtCompound cooldowns = tag.getCompound("Cooldowns");
+        cooldowns.getKeys().forEach(type -> this.cooldowns.put(CooldownType.valueOf(type), cooldowns.getInt(type)));
+
+        NbtCompound initialDurations = tag.getCompound("InitialDurations");
+        initialDurations.getKeys().forEach(type -> this.initialDurations.put(CooldownType.valueOf(type), initialDurations.getInt(type)));
+    }
+
+    @Override
+    public void writeToNbt(@NonNull NbtCompound tag) {
+        tag.put("Cooldowns", writeMap(this.cooldowns));
+        tag.put("InitialDurations", writeMap(this.initialDurations));
+    }
+
+    private static NbtCompound writeMap(Object2IntMap<CooldownType> map) {
+        NbtCompound nbt = new NbtCompound();
+        map.object2IntEntrySet().forEach(entry -> {
+            if (entry.getIntValue() > 0) nbt.putInt(entry.getKey().name(), entry.getIntValue());
+        });
+        return nbt;
+    }
+
+    @Override
+    public boolean shouldSyncWith(ServerPlayerEntity player) {
+        return player == entity; // Others don't need to know our cooldowns.
+    }
+}

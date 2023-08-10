@@ -3,7 +3,6 @@ package net.arna.jcraft.client.renderer.entity;
 import net.arna.jcraft.client.model.entity.SilverChariotModel;
 import net.arna.jcraft.client.renderer.entity.layer.SCRapierLayer;
 import net.arna.jcraft.common.entity.SilverChariotEntity;
-import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
@@ -46,7 +45,7 @@ public class SilverChariotRenderer extends GeoEntityRenderer<SilverChariotEntity
 
         MinecraftClient mcClient = MinecraftClient.getInstance();
         if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null)
-            if ( ((IEntityDataSaver)mcClient.player).getStand() == animatable )
+            if (JUtils.getStand(mcClient.player) == animatable )
                 a = animatable.getAlpha();
 
         super.render(model, animatable, partialTicks, type, matrixStack, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, a);

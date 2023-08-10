@@ -23,7 +23,6 @@ import net.arna.jcraft.common.entity.MadeInHeavenEntity;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
-import net.arna.jcraft.common.spec.SpecType;
 import net.arna.jcraft.common.splatter.Splatter;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
@@ -143,7 +142,7 @@ public class ClientPacketHandler {
 
                 // Synchronize spec values
                 if (isSpec) {
-                    JCraftSpec spec = JClientUtils.getSpec(player);
+                    JCraftSpec spec = JUtils.getSpec(player);
                     if (spec == null) {
                         JCraft.LOGGER.error("Tried to set spec animation values on player without spec: " + player + ", in world " + client.world);
                     } else {
@@ -207,9 +206,10 @@ public class ClientPacketHandler {
 
             // Cooldown tracking
             case (3) -> {
-                int index = buf.readInt(); // Doesn't start at 0
-                double cd = buf.readDouble();
-                JCraftClient.clientCooldowns.set(index - 1, cd);
+                // TODO no longer needed, Cooldowns component is ticked on both sides.
+//                int index = buf.readInt(); // Doesn't start at 0
+//                double cd = buf.readDouble();
+//                JCraftClient.clientCooldowns.set(index - 1, cd);
             }
 
             // KQ bomb tracker
@@ -244,16 +244,17 @@ public class ClientPacketHandler {
 
             // Spec synchronization
             case (5) -> {
-                int specId = buf.readInt();
-
-                client.execute(() -> {
-                    JCraftSpec spec = SpecType.fromId(specId);
-
-                    if (spec != null)
-                        spec.player = client.player;
-
-                    ((ISpec)(client.player)).setClientSpec(spec);
-                });
+                // TODO this should not be necessary anymore as the spec component is synced.
+//                int specId = buf.readInt();
+//
+//                client.execute(() -> {
+//                    JCraftSpec spec = SpecType.fromId(specId).createNew();
+//
+//                    if (spec != null)
+//                        spec.player = client.player;
+//
+//                    ((ISpec)(client.player)).setClientSpec(spec);
+//                });
             }
 
             // WAS Combo counter
@@ -397,14 +398,15 @@ public class ClientPacketHandler {
 
             // Clientside TS
             case (14) -> {
-                int entID = buf.readInt();
-                int ticks = buf.readInt();
-
-                client.execute(() -> {
-                    Entity ent = client.world.getEntityById(entID);
-                    if (ent == null) return;
-                    ((ITimeStop) ent).setTimeStopTicks(ticks);
-                });
+                // TODO not necessary anymore. TimeStop component is synced
+//                int entID = buf.readInt();
+//                int ticks = buf.readInt();
+//
+//                client.execute(() -> {
+//                    Entity ent = client.world.getEntityById(entID);
+//                    if (ent == null) return;
+//                    ((ITimeStop) ent).setTimeStopTicks(ticks);
+//                });
             }
         }
     }

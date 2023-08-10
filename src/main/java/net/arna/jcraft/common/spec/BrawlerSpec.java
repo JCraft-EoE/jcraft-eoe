@@ -1,9 +1,9 @@
 package net.arna.jcraft.common.spec;
 
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackQueue;
 import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.LivingEntity;
@@ -60,25 +60,25 @@ public class BrawlerSpec extends JCraftSpec {
     @Override
     public void initHeavyAttack(ServerWorld serverWorld) {
         if (!canAttack()) return;
-        handleAttack(serverWorld, heavy, JCraft.heavyCD);
+        handleAttack(serverWorld, heavy, CooldownType.HEAVY);
     }
 
     @Override
     public void initBarrage(ServerWorld serverWorld) {
         if (!canAttack()) return;
-        handleAttack(serverWorld, combo, JCraft.barrageCD);
+        handleAttack(serverWorld, combo, CooldownType.BARRAGE);
     }
 
     @Override
     public void initSpecial1(ServerWorld serverWorld) {
         if (!canAttack()) return;
-        handleAttack(serverWorld, gut, JCraft.s1CD);
+        handleAttack(serverWorld, gut, CooldownType.SP1);
     }
 
     @Override
     public void initSpecial2(ServerWorld serverWorld) {
         if (!canAttack()) return;
-        handleAttack(serverWorld, low, JCraft.s2CD);
+        handleAttack(serverWorld, low, CooldownType.SP2);
     }
 
     @Override

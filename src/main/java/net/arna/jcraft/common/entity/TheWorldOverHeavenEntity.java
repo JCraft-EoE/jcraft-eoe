@@ -1,13 +1,16 @@
 package net.arna.jcraft.common.entity;
 
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackQueue;
 import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.projectile.KnifeProjectile;
-import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -24,7 +27,6 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -39,6 +41,7 @@ import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEntity, TheWorldOverHeavenEntity.State> {
@@ -95,7 +98,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
     private static final TrackedData<Integer> OVERWRITE_TYPE;
     private Vec3d lightningPos;
     private final List<LivingEntity> overwriteEnts = new ArrayList<>();
-    private final List<Integer> overwriteTimes = new ArrayList<>();
+    private final IntList overwriteTimes = new IntArrayList();
     private float smiteDamage = 6f;
 
     static {
@@ -158,20 +161,20 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        handleAttack(light, JCraft.standLightCD, State.LIGHT);
+        handleAttack(light, CooldownType.STAND_LIGHT, State.LIGHT);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
+        if (handleAttack(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
             playSound(JSoundRegistry.TWOH_BARRAGE, 1, 1);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        if (handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY))
+        if (handleAttack(heavy, CooldownType.STAND_HEAVY, State.HEAVY))
             playSound(JSoundRegistry.TWOH_HEAVY, 1, 1);
     }
 
@@ -188,7 +191,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             return;
         }
 
-        if (canAttack() && handleAttack(smite, JCraft.standS1CD, State.SMITE) && hasUser()) {
+        if (canAttack() && handleAttack(smite, CooldownType.STAND_SP1, State.SMITE) && hasUser()) {
             LivingEntity user = getUserOrThrow();
             if (user.isOnGround()) {
                 smiteDamage = 8f;
@@ -232,9 +235,9 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         CanAttackData cad = this.canAttackWithData();
         if (!cad.canAttack()) return;
 
-        if (cad.user().isOnGround() && handleAttack(delayknives, JCraft.standS2CD, State.AIR_KNIVES))
+        if (cad.user().isOnGround() && handleAttack(delayknives, CooldownType.STAND_SP2, State.AIR_KNIVES))
             playSound(JSoundRegistry.TWOH_AIRKNIVES, 1, 1);
-        else if (handleAttack(knives, JCraft.standS2CD, State.THROW)) playSound(JSoundRegistry.TWOH_KNIFETHROW, 1, 1);
+        else if (handleAttack(knives, CooldownType.STAND_SP2, State.THROW)) playSound(JSoundRegistry.TWOH_KNIFETHROW, 1, 1);
     }
 
     @Override
@@ -244,7 +247,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             return;
         }
 
-        if (canAttack() && handleAttack(chargeoverwrite, JCraft.standS3CD, State.CHARGE_OVERWRITE))
+        if (canAttack() && handleAttack(chargeoverwrite, CooldownType.STAND_SP3, State.CHARGE_OVERWRITE))
             playSound(JSoundRegistry.TWOH_CHARGEOVERWRITE, 1, 1);
     }
 
@@ -252,7 +255,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
     public void initUlt() {
         if (!canAttack()) return;
         if (tsTime <= 0) {
-            if (handleAttack(timestop, JCraft.standUltCD, State.TIME_STOP))
+            if (handleAttack(timestop, CooldownType.STAND_ULT, State.TIME_STOP))
                 playSound(JSoundRegistry.TWOH_TS, 1, 1);
         } else {
             JCraft.stopTimestop(getUserOrThrow());
@@ -263,7 +266,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
     @Override
     public void initUtil() {
         if (!canAttack() || tsTime > 0) return;
-        handleAttack(timeskip, JCraft.utilCD, State.TIMESKIP);
+        handleAttack(timeskip, CooldownType.UTIL, State.TIMESKIP);
     }
 
     @Override
@@ -347,8 +350,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
                     ent.heal(4f);
 
                     if (!(ent instanceof MobEntity)) continue;
-                    IEntityDataSaver entityDataSaver = (IEntityDataSaver) ent;
-                    entityDataSaver.getPersistentData().putUuid("SlavedTo", user.getUuid());
+                    JComponents.getMiscData(ent).setSlavedTo(user.getUuid());
                     overwriteTimes.add(1048576);
                     overwriteEnts.add(ent);
                 }
@@ -371,13 +373,11 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
                     EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e -> e != this && e != user));
 
             for (LivingEntity ent : hit) {
-                NbtCompound entityData = ((IEntityDataSaver) ent).getPersistentData();
-                if (entityData.contains("SlavedTo")) {
-                    if (entityData.getUuid("SlavedTo").equals(user.getUuid())) {
-                        overwriteEnts.add(ent);
-                        overwriteTimes.add(1048576); // 2 to the whatever
-                    }
-                }
+                UUID slavedTo = JComponents.getMiscData(ent).getSlavedTo();
+
+                if (slavedTo == null || !slavedTo.equals(user.getUuid())) continue;
+                overwriteEnts.add(ent);
+                overwriteTimes.add(1048576); // 2 to the whatever
             }
         }
 

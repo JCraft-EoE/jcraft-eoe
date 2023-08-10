@@ -1,0 +1,84 @@
+package net.arna.jcraft.common.component.impl;
+
+import lombok.Getter;
+import lombok.NonNull;
+import net.arna.jcraft.common.component.StandComponent;
+import net.arna.jcraft.common.entity.StandEntity;
+import net.arna.jcraft.common.entity.StandType;
+import net.arna.jcraft.common.component.JComponents;
+import net.minecraft.entity.Entity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.MathHelper;
+import org.jetbrains.annotations.Nullable;
+
+public class StandComponentImpl implements StandComponent {
+    private final Entity entity;
+    @Getter
+    private StandType type;
+    @Getter
+    private int skin;
+    @Getter
+    private @Nullable StandEntity<?, ?> stand;
+
+    public StandComponentImpl(Entity entity) {
+        this.entity = entity;
+    }
+
+    @Override
+    public void setType(@Nullable StandType type) {
+        this.type = type;
+        if (type == null) skin = 0;
+        sync();
+    }
+
+    @Override
+    public void setSkin(int skin) {
+        if (type == null) return;
+
+        this.skin = MathHelper.clamp(skin, 0, type.getSkinCount());
+        sync();
+    }
+
+    @Override
+    public void setStand(@Nullable StandEntity<?, ?> stand) {
+        this.stand = stand;
+        sync();
+    }
+
+    private void sync() {
+        JComponents.STAND.sync(entity);
+    }
+
+    @Override
+    public void readFromNbt(@NonNull NbtCompound tag) {
+        int rawType = tag.getInt("Type");
+        type = rawType == 0 ? null : StandType.fromId(rawType);
+        skin = tag.getInt("Skin");
+        // Stand is not persistent
+    }
+
+    @Override
+    public void writeToNbt(@NonNull NbtCompound tag) {
+        tag.putInt("Type", type == null ? 0 : type.getId());
+        tag.putInt("Skin", skin);
+    }
+
+    @Override
+    public void applySyncPacket(PacketByteBuf buf) {
+        StandComponent.super.applySyncPacket(buf);
+
+        if (!buf.readBoolean()) return;
+        Entity entity = this.entity.world.getEntityById(buf.readVarInt());
+        if (entity instanceof StandEntity<?,?> standEntity) stand = standEntity;
+    }
+
+    @Override
+    public void writeSyncPacket(PacketByteBuf buf, ServerPlayerEntity recipient) {
+        StandComponent.super.writeSyncPacket(buf, recipient);
+
+        buf.writeBoolean(stand != null);
+        if (stand != null) buf.writeVarInt(stand.getId());
+    }
+}

@@ -6,13 +6,12 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import net.arna.jcraft.common.argumenttype.StandArgumentType;
+import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.component.StandComponent;
 import net.arna.jcraft.common.entity.StandType;
-import net.arna.jcraft.common.util.IEntityDataSaver;
-import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
@@ -45,10 +44,9 @@ public class SetStandCommand {
 
         for (Entity entity : targets) {
             if (entity instanceof LivingEntity livingEntity) {
-                IEntityDataSaver entityData = (IEntityDataSaver) livingEntity;
-                NbtCompound data = entityData.getPersistentData();
-                data.putInt("StandID", type.getId());
-                data.putInt("StandSkin", skin);
+                StandComponent standData = JComponents.getStandData(livingEntity);
+                standData.setType(type);
+                standData.setSkin(skin);
 
                 livingEntity.detach();
                 summon(entity.getWorld(), livingEntity);

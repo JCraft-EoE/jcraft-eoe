@@ -8,6 +8,7 @@ import lombok.NonNull;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -92,6 +93,10 @@ public enum StandType {
     @Nullable
     public static StandType fromId(int internalId) {
         return StaticFields.fromId.get(internalId);
+    }
+
+    public static StandType getRandomRegular(Random random) {
+        return getRegularStandTypes().get(random.nextInt(regularStandCount));
     }
 
     @NonNull

@@ -1,8 +1,11 @@
 package net.arna.jcraft.common.network.c2s;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.component.CooldownsComponent;
+import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.component.StandComponent;
 import net.arna.jcraft.common.entity.StandEntity;
-import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -15,10 +18,9 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 
 import static net.arna.jcraft.JCraft.comboBreak;
-import static net.arna.jcraft.JCraft.dashCD;
 
 public class InputSyncPacket {
-    public static final Identifier ID = JCraft.id("ispacket");
+    public static final Identifier ID = JCraft.id("input_sync");
 
     public static void handle(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler network, PacketByteBuf buf, PacketSender sender) {
         ServerWorld world = player.getWorld();
@@ -43,17 +45,18 @@ public class InputSyncPacket {
         dash = buf.readBoolean();
 
         server.execute(() -> {
-            IEntityDataSaver playerData = ((IEntityDataSaver) player);
-            playerData.updateRemoteInputs(fF, fS, jump);
+            JComponents.getMiscData(player).updateRemoteInputs(fF, fS, jump);
+            StandComponent standData = JComponents.getStandData(player);
+            CooldownsComponent cooldowns = JComponents.getCooldowns(player);
 
-            StandEntity<?, ?> stand = playerData.getStand();
+            StandEntity<?, ?> stand = standData.getStand();
             if (stand != null) stand.updateRemoteInputs(fF, fS, jump);
 
             if (dash) JCraft.tryDash(fF, fS, player);
 
             if (jump) {
                 if (JCraft.isDashing(player)) {
-                    playerData.getPersistentData().putInt(dashCD, 100); // 5s cooldown for superjumping
+                    cooldowns.setCooldown(CooldownType.DASH, 100); // 5s cooldown for superjumping
                 }
 
                 // Combo break if stunned, jumping and crouching

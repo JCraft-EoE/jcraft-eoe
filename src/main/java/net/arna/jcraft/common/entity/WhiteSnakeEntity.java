@@ -4,15 +4,16 @@ import com.google.common.collect.Lists;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.component.CooldownsComponent;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.projectile.WSAcidProjectile;
-import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -91,43 +92,43 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        handleAttack(light, JCraft.standLightCD, State.LIGHT);
+        handleAttack(light, CooldownType.STAND_LIGHT, State.LIGHT);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
+        if (handleAttack(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
             playSound(JSoundRegistry.WS_BARRAGE, 1, 1);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        if (handleAttack(donut, JCraft.standHeavyCD, State.DONUT))
+        if (handleAttack(donut, CooldownType.STAND_HEAVY, State.DONUT))
             playSound(JSoundRegistry.WS_DONUT, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack()) return;
-        if (handleAttack(memorydisk, JCraft.standS1CD, State.DISC))
+        if (handleAttack(memorydisk, CooldownType.STAND_SP1, State.DISC))
             playSound(JSoundRegistry.WS_MEMORY_DISC, 1, 1);
     }
 
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        if (getRemote() && handleAttack(meltyourheart, JCraft.standUltCD, State.MELT_YOUR_HEART))
+        if (getRemote() && handleAttack(meltyourheart, CooldownType.STAND_ULT, State.MELT_YOUR_HEART))
             playSound(JSoundRegistry.WS_MYH, 1, 1);
-        else if (handleAttack(standdisk, JCraft.standUltCD, State.DISC))
+        else if (handleAttack(standdisk, CooldownType.STAND_ULT, State.DISC))
             playSound(JSoundRegistry.WS_STAND_DISC, 1, 1);
     }
 
     @Override
     public void initSpecial2() {
         if (!canAttack()) return;
-        if (handleAttack(legcrusher, JCraft.standS2CD, State.LEG_CRUSHER))
+        if (handleAttack(legcrusher, CooldownType.STAND_SP2, State.LEG_CRUSHER))
             playSound(JSoundRegistry.WS_LEGCRUSH, 1, 1);
     }
 
@@ -136,24 +137,23 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         if (!canAttack() || !hasUser()) return;
 
         if (getUserOrThrow().isSneaking())
-            handleAttack(chargedspew, JCraft.standS3CD, State.ACID_SPEW_CHARGED);
-        else handleAttack(poisonspew, JCraft.standS3CD, State.ACID_SPEW);
+            handleAttack(chargedspew, CooldownType.STAND_SP3, State.ACID_SPEW_CHARGED);
+        else handleAttack(poisonspew, CooldownType.STAND_SP3, State.ACID_SPEW);
     }
 
     @Override
     public void initUtil() {
         if (!canAttack() || !hasUser()) return;
-        NbtCompound userData = ((IEntityDataSaver) getUserOrThrow()).getPersistentData();
-        if (userData.getInt(JCraft.utilCD) > 0) return;
+        CooldownsComponent cooldowns = JComponents.getCooldowns(getUser());
+        if (cooldowns.getCooldown(CooldownType.UTIL) > 0) return;
+
         boolean newRemote = !getRemote();
         setRemote(newRemote);
 
         // Update movelist
-        if (newRemote)
-            moves.set(4, meltyourheart);
-        else
-            moves.set(4, standdisk);
-        userData.putInt(JCraft.utilCD, 20);
+        if (newRemote) moves.set(4, meltyourheart);
+        else moves.set(4, standdisk);
+        cooldowns.setCooldown(CooldownType.UTIL, 20);
     }
 
     @Override

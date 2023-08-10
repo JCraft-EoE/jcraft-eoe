@@ -4,8 +4,7 @@ import net.arna.jcraft.common.entity.KingCrimsonEntity;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
-import net.arna.jcraft.common.util.IEntityDataSaver;
-import net.arna.jcraft.common.util.ITimeStop;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -17,17 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
-public abstract class EntityMixin implements ITimeStop {
-    // Timestop duration storage
-    private int timeStopTicks = 0;
-    @Override
-    public int getTimeStopTicks() {
-        return timeStopTicks;
-    }
-    @Override
-    public void setTimeStopTicks(int tsTicks) {
-        this.timeStopTicks = tsTicks;
-    }
+public abstract class EntityMixin {
 
     /**
      * Stand positioning mixin function
@@ -66,7 +55,7 @@ public abstract class EntityMixin implements ITimeStop {
      */
     @Inject(method = "shouldSpawnSprintingParticles", at = @At("HEAD"), cancellable = true)
     private void jcraft$shouldSpawnSprintingParticles(CallbackInfoReturnable<Boolean> cir) {
-        if ( ((IEntityDataSaver)this).getStand() instanceof KingCrimsonEntity kc && kc.getTETime() > 0 )
+        if (JUtils.getStand((Entity) (Object) this) instanceof KingCrimsonEntity kc && kc.getTETime() > 0 )
             cir.setReturnValue(false);
     }
     //todo (polishing): stand position autosolver

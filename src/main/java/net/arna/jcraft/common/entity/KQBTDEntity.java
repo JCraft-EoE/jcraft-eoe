@@ -3,12 +3,11 @@ package net.arna.jcraft.common.entity;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.component.CooldownsComponent;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.projectile.BubbleProjectile;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.common.util.IEntityDataSaver;
-import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.common.util.MobilityType;
-import net.arna.jcraft.common.util.StandAnimationState;
+import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -21,7 +20,6 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -102,14 +100,14 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        if (handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY))
+        if (handleAttack(heavy, CooldownType.STAND_HEAVY, State.HEAVY))
             playSound(JSoundRegistry.KQBTD_ELBOW, 1, 1);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
+        if (handleAttack(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
             playSound(JSoundRegistry.KQ_BARRAGE, 1, 1);
     }
 
@@ -118,18 +116,18 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
     public void initSpecial1() {
         if (!canAttack() || !hasUser()) return;
         LivingEntity user = getUserOrThrow();
-        NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
+        CooldownsComponent cooldowns = JComponents.getCooldowns(user);
 
-        if (user.isInSneakingPose() && playerData.getInt(JCraft.standS1CD) < 1) {
+        if (user.isInSneakingPose() && cooldowns.getCooldown(CooldownType.STAND_SP1) < 1) {
             BlockPos downBlock = user.getBlockPos().down();
             boolean notAir = (world.getBlockState(downBlock).getBlock() != Blocks.AIR && world.getBlockState(downBlock).getBlock() != Blocks.CAVE_AIR && world.getBlockState(downBlock).getBlock() != Blocks.VOID_AIR);
             if (notAir) {
                 this.bombEntity = null;
                 this.bombBlock = user.getPos().add(0, -0.5, 0);
-                playerData.putInt(JCraft.standS1CD, bombplantCD);
+                cooldowns.setCooldown(CooldownType.STAND_SP1, bombplantCD);
             }
         } else {
-            handleAttack(bombplant, JCraft.standS1CD, State.BOMB_PLANT);
+            handleAttack(bombplant, CooldownType.STAND_SP1, State.BOMB_PLANT);
             this.bombBlock = null;
         }
     }
@@ -137,7 +135,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        if (handleAttack(detonate, JCraft.standUltCD, State.DETONATE)) {
+        if (handleAttack(detonate, CooldownType.STAND_ULT, State.DETONATE)) {
             playSound(JSoundRegistry.KQ_DETONATE, 1, 1);
             detonateBTD = false;
         }
@@ -146,21 +144,21 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
     @Override
     public void initSpecial2() {
         if (!canAttack() || !hasUser()) return;
-        if (getUserOrThrow().isSneaking() && handleAttack(bubblecounter, JCraft.standS2CD, State.BUBBLE_COUNTER)) {
+        if (getUserOrThrow().isSneaking() && handleAttack(bubblecounter, CooldownType.STAND_SP2, State.BUBBLE_COUNTER)) {
             //playSound(JSoundRegister.KQBTD_COUNTER, 1, 1);
-        } else if (handleAttack(bubble, JCraft.standS2CD, State.BUBBLE))
+        } else if (handleAttack(bubble, CooldownType.STAND_SP2, State.BUBBLE))
             playSound(JSoundRegistry.KQ_UPPERCUT, 1, 1);
     }
 
     @Override
     public void initSpecial3() {
-        if (btdEntity != null && handleAttack(detonate, JCraft.ultCD, State.DETONATE)) {
+        if (btdEntity != null && handleAttack(detonate, CooldownType.STAND_ULT, State.DETONATE)) {
             playSound(JSoundRegistry.KQ_DETONATE, 1, 1);
             detonateBTD = true;
             return;
         }
         if (!canAttack()) return;
-        if (handleAttack(btdplant, JCraft.standS3CD, State.BTD_PLANT)) {
+        if (handleAttack(btdplant, CooldownType.STAND_SP3, State.BTD_PLANT)) {
             //playSound(JSoundRegister.KQ_UPPERCUT, 1 ,1);
         }
     }
@@ -338,7 +336,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
             if (entity instanceof LivingEntity livingEntity) {
                 stun(livingEntity, 10, 3);
 
-                StandEntity<?, ?> stand = ((IEntityDataSaver) livingEntity).getStand();
+                StandEntity<?, ?> stand = JUtils.getStand(livingEntity);
                 if (stand != null)
                     stand.cancelAttack();
             }

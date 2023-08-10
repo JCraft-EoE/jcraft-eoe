@@ -4,8 +4,10 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.HitBoxData;
+import net.arna.jcraft.common.component.CooldownsComponent;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
-import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -21,7 +23,6 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -89,7 +90,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
         ACCELTIME = DataTracker.registerData(MadeInHeavenEntity.class, TrackedDataHandlerRegistry.INTEGER);
         TARGETID = DataTracker.registerData(MadeInHeavenEntity.class, TrackedDataHandlerRegistry.INTEGER);
         SPEEDOMETER = DataTracker.registerData(MadeInHeavenEntity.class, TrackedDataHandlerRegistry.INTEGER);
-        
+
         AFTERIMAGE = DataTracker.registerData(MadeInHeavenEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     }
 
@@ -188,41 +189,41 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        handleAttack(light, JCraft.standLightCD, State.SLICE);
+        handleAttack(light, CooldownType.STAND_LIGHT, State.SLICE);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        if (handleAttack(donut, JCraft.standHeavyCD, State.DONUT))
+        if (handleAttack(donut, CooldownType.STAND_HEAVY, State.DONUT))
             playSound(JSoundRegistry.STAND_DESUMMON, 1, 1);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
+        if (handleAttack(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
             playSound(JSoundRegistry.MIH_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack()) return;
-        if (handleAttack(legcrusher, JCraft.standS1CD, State.LEG_CRUSHER))
+        if (handleAttack(legcrusher, CooldownType.STAND_SP1, State.LEG_CRUSHER))
             playSound(JSoundRegistry.MIH_LEGCRUSHER, 1, 1);
     }
 
     @Override
     public void initUlt() {
         if (speedometer <= 0 || !canAttack()) return;
-        if (handleAttack(timeaccel, JCraft.standUltCD, State.TIME_ACCELERATION))
+        if (handleAttack(timeaccel, CooldownType.STAND_ULT, State.TIME_ACCELERATION))
             playSound(JSoundRegistry.MIH_TACCEL, 1, 1);
     }
 
     @Override
     public void initSpecial2() {
         if (!canAttack()) return;
-        if (handleAttack(furychop, JCraft.standS2CD, State.FURY_CHOP))
+        if (handleAttack(furychop, CooldownType.STAND_SP2, State.FURY_CHOP))
             playSound(JSoundRegistry.MIH_FURYCHOP, 1, 1);
     }
 
@@ -230,7 +231,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     public void initSpecial3() {
         if (!canAttack()) return;
         LivingEntity user = getUserOrThrow();
-        if (user.isSneaking() && handleAttack(judgement, JCraft.standS3CD, State.JUDGEMENT)) {
+        if (user.isSneaking() && handleAttack(judgement, CooldownType.STAND_SP3, State.JUDGEMENT)) {
             playSound(JSoundRegistry.MIH_JUDGEMENT, 1, 1);
             return;
         }
@@ -241,7 +242,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             target = JUtils.getUserIfStand(living);
             break;
         }
-        if (target != null && handleAttack(circle, JCraft.standS3CD, State.CIRCLE_STARTUP)) {
+        if (target != null && handleAttack(circle, CooldownType.STAND_SP3, State.CIRCLE_STARTUP)) {
             circleTarget = target;
             circleOrbitProg = user.getHeadYaw();
             setTargetId(circleTarget.getId());
@@ -253,22 +254,23 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     @Override
     public void initUtil() {
         if (!canAttack()) return;
-        if (handleAttack(speedslice, JCraft.utilCD, State.SPEED_SLICE))
+        if (handleAttack(speedslice, CooldownType.UTIL, State.SPEED_SLICE))
             playSound(JSoundRegistry.MIH_SPEEDSLICE, 1, 1);
     }
 
     @Override
-    public boolean handleAttack(Attack attack, String cooldownName, State animState) {
+    public boolean handleAttack(Attack attack, CooldownType cooldownType, State animState) {
         if (!hasUser()) return false;
         LivingEntity player = getUserOrThrow();
-        NbtCompound userData = ((IEntityDataSaver) player).getPersistentData();
-        int cooldown = userData.getInt(cooldownName);
+
+        CooldownsComponent cooldowns = JComponents.getCooldowns(player);
+        int cooldown = cooldowns.getCooldown(cooldownType);
 
         if (cooldown > 0)
             return false;
 
         int cdMult = (this.getAccelTime() > 0) ? 10 : 20;
-        userData.putInt(cooldownName, (int) (attack.cooldown * cdMult));
+        cooldowns.setCooldown(cooldownType, (int) (attack.cooldown * cdMult));
 
         setAttack(attack, animState);
         return true;

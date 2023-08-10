@@ -6,7 +6,6 @@ import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.gravity.util.GravityChannelClient;
 import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
-import net.arna.jcraft.client.gui.hud.JCraftAbilityHud;
 import net.arna.jcraft.client.net.ClientPacketHandler;
 import net.arna.jcraft.client.particle.*;
 import net.arna.jcraft.client.registry.JArmorRendererRegistry;
@@ -26,14 +25,15 @@ import net.arna.jcraft.client.rendering.handler.UIShaderHandler;
 import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
 import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
+import net.arna.jcraft.common.component.CooldownsComponent;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.network.c2s.InputSyncPacket;
 import net.arna.jcraft.common.network.c2s.StandControlPacket;
 import net.arna.jcraft.common.util.ColorUtils;
+import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.DimValues;
-import net.arna.jcraft.common.util.IEntityDataSaver;
-import net.arna.jcraft.common.util.ITimeStop;
 import net.arna.jcraft.registry.JBlockEntityTypeRegistry;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
@@ -64,7 +64,6 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -78,9 +77,6 @@ import java.util.List;
 import static net.arna.jcraft.client.util.JClientUtils.activeTimestops;
 
 public class JCraftClient implements ClientModInitializer {
-    // Cooldowns
-    public static DefaultedList<Double> clientCooldowns = DefaultedList.ofSize(JCraft.cooldowns.size(), 0.0);
-
     // Combo counting
     private final List<String> comboRemarks = List.of("admin rdm!!!", "baby combo", "caught lackin", "kinda ez", "skill issue", "cancelled on twitter", "sent to bulgaria", "down bad");
     public static int comboCounter = 0;
@@ -152,7 +148,6 @@ public class JCraftClient implements ClientModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(this::tickClient);
         ClientTickEvents.END_WORLD_TICK.register(new SkyBoxManager());
-        ClientTickEvents.END_CLIENT_TICK.register(JCraftAbilityHud.INSTANCE);
 
         ClientPacketHandler.init();
 
@@ -198,9 +193,10 @@ public class JCraftClient implements ClientModInitializer {
     }
 
     @SuppressWarnings("DataFlowIssue") // If the player is null, we have much larger problems than that
-    private void renderHud(MatrixStack matrixStack, float v) {
+    private void renderHud(MatrixStack matrixStack, float tickDelta) {
         MinecraftClient client = MinecraftClient.getInstance();
         ClientPlayerEntity player = client.player;
+        CooldownsComponent cooldowns = JComponents.getCooldowns(player);
         framesSinceCounted++;
 
         int selectedX = getHudX(client.getWindow().getScaledWidth());
@@ -237,28 +233,32 @@ public class JCraftClient implements ClientModInitializer {
 
         // Cooldown rendering, for icon hud see JCraftHudOverlay
         if (useIcons) return;
-        boolean standOn = ((IEntityDataSaver) player).getStand() != null;
+        boolean standOn = JComponents.getStandData(player).getStand() != null;
 
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1, 1, 1, 1);
 
-        for (Double cooldown : clientCooldowns) {
+        for (CooldownType type : CooldownType.values()) {
+            int cooldownTicks = cooldowns.getCooldown(type);
+            double cooldown = cooldownTicks / 20d - tickDelta;
+
             i++;
             if (cooldown != 0) {
 
-                String keyBindText = switch (i) {
-                    case (1) -> "M1";
-                    case (12), (2) -> generateName(heavyKey.getBoundKeyTranslationKey());
-                    case (13), (3) -> generateName(barrageKey.getBoundKeyTranslationKey());
-                    case (14), (4) -> generateName(ultKey.getBoundKeyTranslationKey());
-                    case (15), (5) -> generateName(special1Key.getBoundKeyTranslationKey());
-                    case (16), (6) -> generateName(special2Key.getBoundKeyTranslationKey());
-                    case (17), (7) -> generateName(special3Key.getBoundKeyTranslationKey());
-                    case (8) -> generateName(utility.getBoundKeyTranslationKey());
-                    case (9) -> "Combo Breaker";
-                    case (10) -> generateName(cooldownCancel.getBoundKeyTranslationKey());
-                    case (11) -> generateName(dash.getBoundKeyTranslationKey());
-                    default -> "unknown";
+                // These are (mainly) based off of keybindings which are client-only and thus have
+                // to be done here and cannot be done in CooldownType.
+                String keyBindText = switch (type) {
+                    case STAND_LIGHT -> "M1";
+                    case HEAVY, STAND_HEAVY -> generateName(heavyKey.getBoundKeyTranslationKey());
+                    case BARRAGE, STAND_BARRAGE -> generateName(barrageKey.getBoundKeyTranslationKey());
+                    case ULT, STAND_ULT -> generateName(ultKey.getBoundKeyTranslationKey());
+                    case SP1, STAND_SP1 -> generateName(special1Key.getBoundKeyTranslationKey());
+                    case SP2, STAND_SP2 -> generateName(special2Key.getBoundKeyTranslationKey());
+                    case SP3, STAND_SP3 -> generateName(special3Key.getBoundKeyTranslationKey());
+                    case UTIL -> generateName(utility.getBoundKeyTranslationKey());
+                    case COMBO_BREAKER -> "Combo Breaker";
+                    case COOLDOWN_CANCEL -> generateName(cooldownCancel.getBoundKeyTranslationKey());
+                    case DASH -> generateName(dash.getBoundKeyTranslationKey());
                 };
 
                 boolean isSpec = i > 11;
@@ -284,8 +284,8 @@ public class JCraftClient implements ClientModInitializer {
                         finalText,
                         selectedX + xOffset,
                         offsetY,
-                        ColorUtils.HSBAtoRGBA(0.3f - (float) (double) cooldown * 10f / 720f, (cooldown < 1.6) ? 0.0f : 1.0f, 1.0f, (cooldown < 1.6) ? 1.0f : defaultAlpha)
-                        , true
+                        ColorUtils.HSBAtoRGBA(0.3f - (float) (double) cooldown * 10f / 720f, (cooldown < 1.6) ? 0.0f : 1.0f, 1.0f, (cooldown < 1.6) ? 1.0f : defaultAlpha),
+                        true
                 );
             }
         }
@@ -311,12 +311,9 @@ public class JCraftClient implements ClientModInitializer {
                 List<? extends Entity> toStop = user.world.getEntitiesByClass(Entity.class,
                         new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
 
-                for (Entity entity : toStop) {
-                    if (entity.hasVehicle() || entity == user || entity == ((IEntityDataSaver) user).getStand() || entity == user.getVehicle())
-                        continue;
-                    ITimeStop ts = ((ITimeStop) entity);
-                    ts.setTimeStopTicks(2);
-                }
+                for (Entity entity : toStop)
+                    if (!entity.hasVehicle() && entity != user && entity != JComponents.getStandData(user).getStand() && entity != user.getVehicle())
+                        JComponents.getTimeStopData(entity).setTicks(2);
 
                 newActiveTimestops.add(timestop);
             }
@@ -327,7 +324,7 @@ public class JCraftClient implements ClientModInitializer {
         // Handle JCraft inputs (stand, spec, universal controls)
         GameOptions go = minecraftClient.options;
 
-        StandEntity<?, ?> stand = ((IEntityDataSaver) player).getStand();
+        StandEntity<?, ?> stand = JComponents.getStandData(player).getStand();
         boolean standOn = stand != null;
 
         //todo: reformat this into 2 more packets (stand block packet, attack packet)
@@ -340,8 +337,6 @@ public class JCraftClient implements ClientModInitializer {
             buf.writeBoolean(go.jumpKey.isPressed()); // Space
             buf.writeBoolean(dash.isPressed()); // Dash
             ClientPlayNetworking.send(InputSyncPacket.ID, buf);
-        } else { // Reset cooldowns on death
-            clientCooldowns = DefaultedList.ofSize(JCraft.cooldowns.size(), 0.0);
         }
 
         // Block (3)

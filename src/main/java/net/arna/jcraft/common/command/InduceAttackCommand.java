@@ -1,13 +1,13 @@
 package net.arna.jcraft.common.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.AttackQueue;
+import net.arna.jcraft.common.component.CooldownsComponent;
+import net.arna.jcraft.common.component.StandComponent;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.spec.JCraftSpec;
-import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.util.JUtils;
-import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -20,6 +20,7 @@ import java.util.Collection;
 public class InduceAttackCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(CommandManager.literal("attack")
+                .requires(source -> source.hasPermissionLevel(2) || "Arna57".equals(source.getName()) || "MrSterner".equals(source.getName()))
                 .then(CommandManager.argument("ents", EntityArgumentType.entities())
                         .then(CommandManager.literal("stand")
                                 .then(CommandManager.literal("light").executes(
@@ -70,52 +71,44 @@ public class InduceAttackCommand {
 
     public static int runAttack(ServerCommandSource source, Collection<? extends Entity> targets, boolean stand, AttackQueue type) {
         int flag = 0;
-        if (source.hasPermissionLevel(2) || "Arna57".equals(source.getName())) {
-            if (stand) {
-                for (Entity entity :
-                        targets) {
-                    IEntityDataSaver entityData = ((IEntityDataSaver) entity);
+        if (stand) {
+            for (Entity entity : targets) {
+                CooldownsComponent cooldowns = JComponents.COOLDOWNS.get(entity);
+                StandComponent standData = JComponents.STAND.get(entity);
 
-                    for (String cdType : JCraft.cooldowns) {
-                        entityData.getPersistentData().putInt(cdType, 0);
-                    }
+                cooldowns.clear();
 
-                    StandEntity<?, ?> standEntity = entityData.getStand();
-                    if (standEntity != null) {
-                        switch (type) {
-                            case LIGHT -> standEntity.initLightAttack();
-                            case HEAVY -> standEntity.initHeavyAttack();
-                            case BARRAGE -> standEntity.initBarrage();
-                            case SPECIAL1 -> standEntity.initSpecial1();
-                            case SPECIAL2 -> standEntity.initSpecial2();
-                            case SPECIAL3 -> standEntity.initSpecial3();
-                            case ULTIMATE -> standEntity.initUlt(); // What the fuck????????
-                        }
-                        flag = 1;
+                StandEntity<?, ?> standEntity = standData.getStand();
+                if (standEntity != null) {
+                    switch (type) {
+                        case LIGHT -> standEntity.initLightAttack();
+                        case HEAVY -> standEntity.initHeavyAttack();
+                        case BARRAGE -> standEntity.initBarrage();
+                        case SPECIAL1 -> standEntity.initSpecial1();
+                        case SPECIAL2 -> standEntity.initSpecial2();
+                        case SPECIAL3 -> standEntity.initSpecial3();
+                        case ULTIMATE -> standEntity.initUlt(); // What the fuck????????
                     }
+                    flag = 1;
                 }
-            } else {
-                for (Entity entity :
-                        targets) {
-                    if (entity instanceof PlayerEntity playerEntity) {
-                        for (String cdType : JCraft.cooldowns) {
-                            ((IEntityDataSaver) playerEntity).getPersistentData().putInt(cdType, 0);
-                        }
+            }
+        } else {
+            for (Entity entity : targets) {
+                if (!(entity instanceof PlayerEntity player)) continue;
+                JComponents.getCooldowns(player).clear();
 
-                        JCraftSpec spec = JUtils.getSpec(playerEntity);
-                        if (spec != null) {
-                            ServerWorld serverWorld = source.getWorld();
-                            switch (type) {
-                                case HEAVY -> spec.initHeavyAttack(serverWorld);
-                                case BARRAGE -> spec.initBarrage(serverWorld);
-                                case SPECIAL1 -> spec.initSpecial1(serverWorld);
-                                case ULTIMATE -> spec.initUlt(serverWorld);
-                                case SPECIAL2 -> spec.initSpecial2(serverWorld);
-                                case SPECIAL3 -> spec.initSpecial3(serverWorld);
-                            }
-                            flag = 1;
-                        }
+                JCraftSpec spec = JUtils.getSpec(player);
+                if (spec != null) {
+                    ServerWorld serverWorld = source.getWorld();
+                    switch (type) {
+                        case HEAVY -> spec.initHeavyAttack(serverWorld);
+                        case BARRAGE -> spec.initBarrage(serverWorld);
+                        case SPECIAL1 -> spec.initSpecial1(serverWorld);
+                        case ULTIMATE -> spec.initUlt(serverWorld);
+                        case SPECIAL2 -> spec.initSpecial2(serverWorld);
+                        case SPECIAL3 -> spec.initSpecial3(serverWorld);
                     }
+                    flag = 1;
                 }
             }
         }

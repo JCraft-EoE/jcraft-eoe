@@ -4,8 +4,8 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.StandEntity;
-import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -33,8 +33,7 @@ public class StandBlockCommand {
         if (targets.isEmpty()) return 0;
         for (Entity entity : targets) {
             if (entity instanceof LivingEntity livingEntity) {
-                IEntityDataSaver entityData = (IEntityDataSaver) livingEntity;
-                StandEntity<?, ?> stand = entityData.getStand();
+                StandEntity<?, ?> stand = JComponents.getStandData(livingEntity).getStand();
 
                 if (stand == null) continue;
                 stand.blocking = block;

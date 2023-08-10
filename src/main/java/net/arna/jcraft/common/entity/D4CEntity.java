@@ -5,10 +5,7 @@ import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.StunType;
 import net.arna.jcraft.common.item.MockItem;
-import net.arna.jcraft.common.util.DimValues;
-import net.arna.jcraft.common.util.IEntityDataSaver;
-import net.arna.jcraft.common.util.MobilityType;
-import net.arna.jcraft.common.util.StandAnimationState;
+import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.mixin.ChunkLightProviderAccessor;
 import net.arna.jcraft.mixin.LightStorageAccessor;
 import net.arna.jcraft.mixin.LightingProviderAccessor;
@@ -136,19 +133,19 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        if (getUserOrThrow().isSneaking() && handleAttack(crm1, JCraft.standLightCD, State.ITEM_PLACE)) {
+        if (getUserOrThrow().isSneaking() && handleAttack(crm1, CooldownType.STAND_LIGHT, State.ITEM_PLACE)) {
             if (placingFirstStack) {
                 placing = MockItem.createMockStack( placeableStacks.get(random.nextInt(placeableStacks.size())) );
             }
             equipStack(EquipmentSlot.OFFHAND, placing.copy());
             placingFirstStack = !placingFirstStack;
-        } else if (handleAttack(light, JCraft.standLightCD, State.LIGHT))
+        } else if (handleAttack(light, CooldownType.STAND_LIGHT, State.LIGHT))
             playSound(JSoundRegistry.D4C_LIGHT, 1, 1);
     }
 
     @Override
     public void initHeavyAttack() {
-        if (!canAttack() || !handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY)) return;
+        if (!canAttack() || !handleAttack(heavy, CooldownType.STAND_HEAVY, State.HEAVY)) return;
 
         playSound(JSoundRegistry.D4C_HEAVY, 1, 1);
         Entity ent = getUserOrThrow();
@@ -161,14 +158,14 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
+        if (handleAttack(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
             playSound(JSoundRegistry.D4C_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack()) return;
-        if (handleAttack(clonespawn, JCraft.standS1CD, State.DIM_HOP))
+        if (handleAttack(clonespawn, CooldownType.STAND_SP1, State.DIM_HOP))
             playSound(JSoundRegistry.D4C_DIMHOP, 1, 1);
     }
 
@@ -204,16 +201,16 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             }
         }
 
-        if (handleAttack(dimhop_others, JCraft.standUltCD, State.DIM_HOP)) playSound(JSoundRegistry.D4C_DIMHOP, 1, 1);
+        if (handleAttack(dimhop_others, CooldownType.STAND_ULT, State.DIM_HOP)) playSound(JSoundRegistry.D4C_DIMHOP, 1, 1);
     }
 
     @Override
     public void initSpecial2() {
         if (!canAttack() || !hasUser()) return;
-        if (getUserOrThrow().isSneaking() && handleAttack(givegun, JCraft.standS2CD, State.GIVE_GUN)) {
+        if (getUserOrThrow().isSneaking() && handleAttack(givegun, CooldownType.STAND_SP2, State.GIVE_GUN)) {
             playSound(JSoundRegistry.D4C_THROW, 1, 1);
             equipStack(EquipmentSlot.MAINHAND, JObjectRegistry.FVREVOLVER.getDefaultStack());
-        } else if (handleAttack(grab, JCraft.standS2CD, State.THROW)) {
+        } else if (handleAttack(grab, CooldownType.STAND_SP2, State.THROW)) {
             playSound(JSoundRegistry.D4C_THROW, 1, 1);
             equipStack(EquipmentSlot.MAINHAND, JObjectRegistry.FVREVOLVER.getDefaultStack());
         }
@@ -222,7 +219,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
     @Override
     public void initSpecial3() {
         if (!canAttack()) return;
-        handleAttack(counter, JCraft.standS3CD, State.COUNTER);
+        handleAttack(counter, CooldownType.STAND_SP3, State.COUNTER);
     }
 
     @Override
@@ -239,7 +236,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
     @Override
     public void initUtil() {
         if (!canAttack() || !hasUser()) return;
-        if (handleAttack(flag, JCraft.utilCD, State.FLAG)) {
+        if (handleAttack(flag, CooldownType.UTIL, State.FLAG)) {
             getUserOrThrow().addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, flag.moveStun, 0, true, false));
             getUserOrThrow().addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, flag.moveStun, 0, true, false));
             playSound(JSoundRegistry.D4C_UTILITY, 1, 1);
@@ -429,8 +426,6 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                     }
 
                     newMob.age = mob.age;
-                    IEntityDataSaver newMobData = (IEntityDataSaver) newMob;
-                    newMobData.getPersistentData().putInt("StandID", 0);
 
                     world.spawnEntity(newMob);
                     newMob.equipStack(EquipmentSlot.MAINHAND, weapon);
@@ -469,7 +464,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                 livingEntity.damage(DamageSource.mob(user), 10);
                 stun(livingEntity, 20, 3);
 
-                StandEntity<?, ?> stand = ((IEntityDataSaver) livingEntity).getStand();
+                StandEntity<?, ?> stand = JUtils.getStand(livingEntity);
                 if (stand != null)
                     stand.cancelAttack();
             }

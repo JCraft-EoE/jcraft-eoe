@@ -5,10 +5,10 @@ import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.attack.StunType;
+import net.arna.jcraft.common.component.CooldownsComponent;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.projectile.RapierProjectile;
-import net.arna.jcraft.common.util.IEntityDataSaver;
-import net.arna.jcraft.common.util.MobilityType;
-import net.arna.jcraft.common.util.StandAnimationState;
+import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.entity.Entity;
@@ -18,7 +18,6 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -187,29 +186,29 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
     public void initLightAttack() {
         if (!canAttack()) return;
         if (getUserOrThrow().isSneaking())
-            handleAttack(lastshot, JCraft.standLightCD, State.LAST_SHOT);
-        else if (handleAttack(light, JCraft.standLightCD, State.STAB))
+            handleAttack(lastshot, CooldownType.STAND_LIGHT, State.LAST_SHOT);
+        else if (handleAttack(light, CooldownType.STAND_LIGHT, State.STAB))
             playSound(JSoundRegistry.SC_POKE, 1, 1);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        if (handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY))
+        if (handleAttack(heavy, CooldownType.STAND_HEAVY, State.HEAVY))
             playSound(JSoundRegistry.SC_HEAVY, 1, 1);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
+        if (handleAttack(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
             playSound(JSoundRegistry.SC_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack()) return;
-        if (handleAttack(spinbarrage, JCraft.standS1CD, State.SPIN))
+        if (handleAttack(spinbarrage, CooldownType.STAND_SP1, State.SPIN))
             playSound(JSoundRegistry.SC_SPIN, 1, 1);
     }
 
@@ -217,9 +216,9 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
     public void initUlt() {
         if (!canAttack()) return;
         if (this.getMode() == 3)
-            handleAttack(pbeatdown, JCraft.standUltCD, State.BEAT_DOWN_START);
+            handleAttack(pbeatdown, CooldownType.STAND_ULT, State.BEAT_DOWN_START);
             //playSound(ModSoundRegister.PSC_BEATDOWN,1, 1);
-        else if (handleAttack(armoroff, JCraft.standUltCD, State.ARMOR_OFF))
+        else if (handleAttack(armoroff, CooldownType.STAND_ULT, State.ARMOR_OFF))
             playSound(JSoundRegistry.SC_ARMOROFF, 1, 1);
     }
 
@@ -228,7 +227,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         if (!canAttack() || !hasUser()) return;
         LivingEntity user = getUserOrThrow();
         if (getMode() == 3) {
-            if (handleAttack(pcharge, JCraft.standS2CD, State.CHARGE)) {
+            if (handleAttack(pcharge, CooldownType.STAND_SP2, State.CHARGE)) {
                 //playSound(ModSoundRegister.PSC_CHARGE,1, 1);
                 if (user.isOnGround()) {
                     user.setVelocity(user.getVelocity().add(getRotationVector().multiply(0.85)).add(0.0, 0.15, 0.0));
@@ -237,7 +236,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
                 playSound(JSoundRegistry.SC_CHARGE, 1, 1);
 
             }
-        } else if (handleAttack(charge, JCraft.standS2CD, State.P_CHARGE)) {
+        } else if (handleAttack(charge, CooldownType.STAND_SP2, State.P_CHARGE)) {
             lookDirY = (float) user.getRotationVector().y;
             lookDirY *= MathHelper.abs(lookDirY);
         }
@@ -247,10 +246,10 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
     public void initSpecial3() {
         if (!canAttack() || !hasUser()) return;
         if (getMode() == 3) {
-            handleAttack(counter, JCraft.standS3CD, State.COUNTER);
+            handleAttack(counter, CooldownType.STAND_SP3, State.COUNTER);
             //playSound(ModSoundRegister.PSC_CHARGE,1, 1);
         } else {
-            if (handleAttack(cleave, JCraft.standS3CD, State.CLEAVE)) {
+            if (handleAttack(cleave, CooldownType.STAND_SP3, State.CLEAVE)) {
                 setFreePos(new Vec3f(getUserOrThrow().getPos().add(getUserOrThrow().getRotationVector().multiply(1.5))));
                 setFree(true);
                 playSound(JSoundRegistry.SC_CLEAVE, 1, 1);
@@ -264,17 +263,17 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         if (curAttack != null && curAttack.id == circlecharge.id && getMoveStun() <= 80)
             setAttack(chargedSlash, State.CIRCLE_SLASH);
         if (!canAttack()) return;
-        handleAttack(circlecharge, JCraft.utilCD, State.CIRCLE_CHARGE);
+        handleAttack(circlecharge, CooldownType.UTIL, State.CIRCLE_CHARGE);
         chargedSlash = Attack.copyOf(circleslash);
     }
 
     @Override
-    public boolean handleAttack(Attack attack, String cooldownName, State animState) {
+    public boolean handleAttack(Attack attack, CooldownType cooldownType, State animState) {
         if (!hasUser()) return false;
 
         LivingEntity user = getUserOrThrow();
-        NbtCompound userData = ((IEntityDataSaver) user).getPersistentData();
-        int cooldown = userData.getInt(cooldownName);
+        CooldownsComponent cooldowns = JComponents.getCooldowns(user);
+        int cooldown = cooldowns.getCooldown(cooldownType);
 
         if (cooldown > 0) return false;
 
@@ -289,7 +288,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         }
         setAttack(attack, animState);
 
-        userData.putInt(cooldownName, (int) (attack.cooldown * 20));
+        cooldowns.setCooldown(cooldownType, (int) (attack.cooldown * 20));
         return true;
     }
 
@@ -348,7 +347,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         if (!(entity instanceof LivingEntity ent)) return;
 
         stun(ent, 30, 0);
-        StandEntity<?, ?> stand = ((IEntityDataSaver) ent).getStand();
+        StandEntity<?, ?> stand = JUtils.getStand(entity);
         if (stand != null) stand.cancelAttack();
     }
 

@@ -5,11 +5,10 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.HitBoxData;
+import net.arna.jcraft.common.component.CooldownsComponent;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.common.util.IEntityDataSaver;
-import net.arna.jcraft.common.util.ITimeStop;
-import net.arna.jcraft.common.util.MobilityType;
-import net.arna.jcraft.common.util.StandAnimationState;
+import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
@@ -159,8 +158,8 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         if (!data.canAttack()) return;
 
         if (data.user().isOnGround())
-            handleAttack(light, JCraft.standLightCD, State.LIGHT);
-        else handleAttack(airlight, JCraft.standLightCD, State.AIR_LIGHT);
+            handleAttack(light, CooldownType.STAND_LIGHT, State.LIGHT);
+        else handleAttack(airlight, CooldownType.STAND_LIGHT, State.AIR_LIGHT);
     }
 
     @Override
@@ -169,10 +168,10 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         if (!data.canAttack()) return;
 
         if (data.user().isOnGround()) {
-            if (handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY))
+            if (handleAttack(heavy, CooldownType.STAND_HEAVY, State.HEAVY))
                 playSound(JSoundRegistry.GER_HEAVY, 1, 1);
         } else {
-            if (handleAttack(airheavy, JCraft.standHeavyCD, State.AIR_HEAVY))
+            if (handleAttack(airheavy, CooldownType.STAND_HEAVY, State.AIR_HEAVY))
                 playSound(JSoundRegistry.GER_HEAVY, 1, 1);
         }
     }
@@ -182,9 +181,9 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         CanAttackData data = canAttackWithData();
         if (!data.canAttack()) return;
 
-        if (data.user().isOnGround() && handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
+        if (data.user().isOnGround() && handleAttack(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
             playSound(JSoundRegistry.GE_BARRAGE, 1, 1);
-        else if (handleAttack(airbarrage, JCraft.standBarrageCD, State.AIR_BARRAGE))
+        else if (handleAttack(airbarrage, CooldownType.STAND_BARRAGE, State.AIR_BARRAGE))
             playSound(JSoundRegistry.GER_KICKBARRAGE, 1, 1);
     }
 
@@ -194,10 +193,10 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         if (!data.canAttack()) return;
 
         if (data.user().isSneaking()) {
-            if (handleAttack(heal, JCraft.standS1CD, State.HEAL))
+            if (handleAttack(heal, CooldownType.STAND_SP1, State.HEAL))
                 playSound(JSoundRegistry.GE_HEAL, 1, 1);
         } else {
-            if (handleAttack(healself, JCraft.standS1CD, State.HEAL_SELF))
+            if (handleAttack(healself, CooldownType.STAND_SP1, State.HEAL_SELF))
                 playSound(JSoundRegistry.GE_HEAL, 1, 1);
         }
     }
@@ -206,9 +205,9 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
     public void initUtil() {
         if (!canAttack() || !hasUser()) return;
 
-        NbtCompound data = ((IEntityDataSaver) getUserOrThrow()).getPersistentData();
-        if (data.getInt(JCraft.utilCD) > 0) return;
-        data.putInt(JCraft.utilCD, 360); // 18 second flight cd
+        CooldownsComponent cooldowns = JComponents.getCooldowns(getUser());
+        if (cooldowns.getCooldown(CooldownType.UTIL) > 0) return;
+        cooldowns.setCooldown(CooldownType.UTIL, 360); // 18 second flight cd
         setFlightTime(20);
 
         playSound(JSoundRegistry.GER_FLY, 1, 1);
@@ -219,16 +218,16 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         CanAttackData data = canAttackWithData();
         if (!data.canAttack()) return;
 
-        if (data.user().isSneaking() && handleAttack(chargelaser, JCraft.standS2CD, State.SLOW_LASER))
+        if (data.user().isSneaking() && handleAttack(chargelaser, CooldownType.STAND_SP2, State.SLOW_LASER))
             playSound(JSoundRegistry.GER_SLOW_LASER, 1, 1);
-        else if (handleAttack(laser, JCraft.standS2CD, State.LASER))
+        else if (handleAttack(laser, CooldownType.STAND_SP2, State.LASER))
             playSound(JSoundRegistry.GER_LASER, 1, 1);
     }
 
     @Override
     public void initSpecial3() {
         if (!canAttack()) return;
-        if (handleAttack(counter, JCraft.standS3CD, State.COUNTER))
+        if (handleAttack(counter, CooldownType.STAND_SP3, State.COUNTER))
             playSound(JSoundRegistry.GE_HEAL, 1, 1);
     }
 
@@ -247,9 +246,9 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         for (PlayerEntity sendPlayer : world.getPlayers())
             if (sendPlayer instanceof ServerPlayerEntity serverPlayerEntity)
                 ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
-        ((ITimeStop) entity).setTimeStopTicks(counterStopTime);
+        JComponents.getTimeStopData(entity).setTicks(counterStopTime);
 
-        StandEntity<?, ?> stand = ((IEntityDataSaver) entity).getStand();
+        StandEntity<?, ?> stand = JUtils.getStand(entity);
         if (stand != null)
             stand.cancelAttack();
 
@@ -272,7 +271,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
     public void initUlt() {
         if (!canAttack()) return;
         if (rtzEntityData.isEmpty()) {
-            if (handleAttack(rtz, JCraft.standUltCD, State.SETUP)) // Setup
+            if (handleAttack(rtz, CooldownType.STAND_ULT, State.SETUP)) // Setup
                 playSound(JSoundRegistry.GER_SETUP, 1, 1);
         } else {
             returnToZero();

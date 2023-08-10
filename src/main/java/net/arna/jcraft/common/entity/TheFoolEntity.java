@@ -213,21 +213,21 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        handleAttack(light, JCraft.standLightCD, State.SWIPE);
+        handleAttack(light, CooldownType.STAND_LIGHT, State.SWIPE);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
         if (getUser() != null && getUser().isOnGround())
-            handleAttack(combo, JCraft.standBarrageCD, State.COMBO);
-        else handleAttack(airbarrage, JCraft.standBarrageCD, State.AIR_BARRAGE);
+            handleAttack(combo, CooldownType.STAND_BARRAGE, State.COMBO);
+        else handleAttack(airbarrage, CooldownType.STAND_BARRAGE, State.AIR_BARRAGE);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        if (handleAttack(launch, JCraft.standHeavyCD, State.LAUNCH)) {
+        if (handleAttack(launch, CooldownType.STAND_HEAVY, State.LAUNCH)) {
             setSand(true);
             playSound(JSoundRegistry.FOOL_LAUNCH, 1, 1);
         }
@@ -236,7 +236,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        if (handleAttack(sandstorm, JCraft.standUltCD, State.SANDSTORM))
+        if (handleAttack(sandstorm, CooldownType.STAND_ULT, State.SANDSTORM))
             playSound(JSoundRegistry.FOOL_ULT, 1, 1);
     }
 
@@ -249,7 +249,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     @Override
     public void initSpecial1() {
         if (curAttack != null && curAttack.id == pound.id && getMoveStun() < 12) initSlam(1);
-        if (canAttack() && handleAttack(pound, JCraft.standS1CD, State.POUND_UP))
+        if (canAttack() && handleAttack(pound, CooldownType.STAND_SP1, State.POUND_UP))
             playSound(JSoundRegistry.FOOL_BARK2, 1, 1);
     }
 
@@ -259,9 +259,9 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
 
         if (!canAttack()) return;
 
-        if (getUser() != null && getUser().isOnGround() && handleAttack(charge, JCraft.standS2CD, State.CHARGE))
+        if (getUser() != null && getUser().isOnGround() && handleAttack(charge, CooldownType.STAND_SP2, State.CHARGE))
             playSound(JSoundRegistry.FOOL_CHARGE, 1, 1);
-        else if (handleAttack(tornado, JCraft.standS2CD, State.TORNADO)) {
+        else if (handleAttack(tornado, CooldownType.STAND_SP2, State.TORNADO)) {
             setSand(true);
             playSound(JSoundRegistry.FOOL_LAUNCH, 1, 1);
         }
@@ -270,7 +270,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     @Override
     public void initSpecial3() {
         if (curAttack != null && curAttack.id == pound.id && getMoveStun() < 12) initSlam(3);
-        if (canAttack() && handleAttack(sandclone, JCraft.standS3CD, State.CREATE)) {
+        if (canAttack() && handleAttack(sandclone, CooldownType.STAND_SP3, State.CREATE)) {
             setSand(true);
             playSound(SoundEvents.BLOCK_SAND_PLACE, 1, 1);
         }
@@ -280,13 +280,13 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     public void initUtil() {
         if (!canAttack()) return;
         LivingEntity user = getUser();
-        if (user != null && user.isOnGround() && handleAttack(sandwave, JCraft.utilCD, State.SAND_WAVE)) {
+        if (user != null && user.isOnGround() && handleAttack(sandwave, CooldownType.STAND_ULT, State.SAND_WAVE)) {
             setSand(true);
             setWave(true);
             setFree(false);
 
             playSound(JSoundRegistry.FOOL_BARK1, 1, 1);
-        } else if (handleAttack(glide, JCraft.utilCD, State.GLIDE)) {
+        } else if (handleAttack(glide, CooldownType.STAND_ULT, State.GLIDE)) {
             setSand(true);
             setFree(false);
 
@@ -302,10 +302,9 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
 
     @Override
     public boolean canAttack() {
-        LivingEntity user = getUser();
         if (hasUser()) {
-            ITimeStop timeStop = Objects.requireNonNull((ITimeStop) user);
-            if (timeStop.getTimeStopTicks() > 0 || user.hasStatusEffect(JStatusRegistry.DAZED)) return false;
+            LivingEntity user = getUserOrThrow();
+            if (JUtils.isAffectedByTimeStop(user) || user.hasStatusEffect(JStatusRegistry.DAZED)) return false;
             if (curAttack != null && curAttack.id == glide.id) return true;
             return getMoveStun() < 1;
         }
@@ -428,7 +427,6 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
                         }
 
                         newMob.age = mob.age;
-                        ((IEntityDataSaver) newMob).getPersistentData().putInt("StandID", 0);
 
                         setSandClone(newMob);
                     }

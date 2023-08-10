@@ -1,17 +1,16 @@
 package net.arna.jcraft.client.util;
 
 import net.arna.jcraft.client.model.entity.StandEntityModel;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.KingCrimsonEntity;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.entity.StandEntity;
-import net.arna.jcraft.common.spec.JCraftSpec;
+import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.DimValues;
-import net.arna.jcraft.common.util.ISpec;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -24,9 +23,6 @@ import java.util.UUID;
 import static net.arna.jcraft.common.util.JUtils.deltaPos;
 
 public class JClientUtils {
-    public static JCraftSpec getSpec(PlayerEntity player) {
-        return ((ISpec)player).getSpec();
-    }
 
     // Timestop tracking
     public static List<DimValues> activeTimestops = new ArrayList<>();
@@ -117,5 +113,9 @@ public class JClientUtils {
             return masterId.equals(player.getUuid());
         }
         return false;
+    }
+
+    public static int getCooldown(CooldownType type) {
+        return JComponents.getCooldowns(MinecraftClient.getInstance().player).getCooldown(type);
     }
 }

@@ -3,8 +3,10 @@ package net.arna.jcraft.common.entity;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.component.CooldownsComponent;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JExplosionModifier;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -16,7 +18,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -124,10 +125,8 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
         boolean idling = getMoveStun() < 1;
         if (curAttack != light) {
             if (idling) {
-                if (user.isSneaking())
-                    detonate();
-                else
-                    handleAttack(light, JCraft.standLightCD, getLightState());
+                if (user.isSneaking()) detonate();
+                else handleAttack(light, CooldownType.STAND_LIGHT, getLightState());
             }
         } else if (getMoveStun() < 7) {
             if (user.isSneaking())
@@ -161,8 +160,8 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
         if (!canAttack() || !hasUser()) return;
 
         LivingEntity user = getUserOrThrow();
-        NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
-        if (playerData.getInt(JCraft.utilCD) > 0) return;
+        CooldownsComponent cooldowns = JComponents.getCooldowns(user);
+        if (cooldowns.getCooldown(CooldownType.UTIL) > 0) return;
 
         Vec3d lookVec = user.getRotationVector().multiply(0.9);
         world.createExplosion(user,
@@ -174,7 +173,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
         user.setVelocity(user.getVelocity().add(lookVec));
         user.velocityModified = true;
 
-        playerData.putInt(JCraft.utilCD, 360); // 18s explosive dash cooldown
+        cooldowns.setCooldown(CooldownType.UTIL, 360); // 18s explosive dash cooldown
         playSound(JSoundRegistry.KQ_DETONATE, 1, 1);
     }
 

@@ -2,10 +2,11 @@ package net.arna.jcraft.common.network.c2s;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.AttackQueue;
+import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.component.StandComponent;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
-import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -18,7 +19,8 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.UseAction;
 
-import static net.arna.jcraft.JCraft.*;
+import static net.arna.jcraft.JCraft.QUEUE_MOVESTUN_LIMIT;
+import static net.arna.jcraft.JCraft.SPEC_QUEUE_MOVESTUN_LIMIT;
 
 
 public class StandControlPacket {
@@ -39,8 +41,8 @@ public class StandControlPacket {
                 buf2.writeInt(0);
                 ServerChannelFeedbackPacket.send(player, buf2);
 
-                IEntityDataSaver playerData = ((IEntityDataSaver)player);
-                StandEntity<?, ?> stand = playerData.getStand();
+                StandComponent standData = JComponents.getStandData(player);
+                StandEntity<?, ?> stand = standData.getStand();
 	            if (stand != null) {
                     int moveStun = stand.getMoveStun();
                     if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT)
@@ -48,11 +50,11 @@ public class StandControlPacket {
                     else
                         stand.desummon();
                 } else if (world != null)
-                    playerData.setStand(JCraft.summon(world, player));
+                    standData.setStand(JCraft.summon(world, player));
             });
             // 2 - LIGHT ATTACK
             case 2 -> server.execute(() -> {
-                StandEntity<?, ?> stand = ((IEntityDataSaver)player).getStand();
+                StandEntity<?, ?> stand = JUtils.getStand(player);
 	            if (stand != null) {
                     int moveStun = stand.getMoveStun();
                     stand.initLightAttack();
@@ -64,21 +66,19 @@ public class StandControlPacket {
             case 3 -> {
                 boolean rmb = buf.readBoolean();
                 server.execute(() -> {
-                    StandEntity<?, ?> stand = ((IEntityDataSaver)player).getStand();
+                    StandEntity<?, ?> stand = JUtils.getStand(player);
                     if (!JCraft.isDashing(player) && stand != null) {
                         boolean blocking = stand.blocking;
                         if (!blocking && stand.canAttack() && rmb) {
                             if (player.getMainHandStack().getUseAction() == UseAction.NONE && player.getOffHandStack().getUseAction() == UseAction.NONE)
                                 stand.blocking = true;
-                        } else if (blocking && !rmb) {
-                            stand.blocking = false;
-                        }
+                        } else if (blocking && !rmb) stand.blocking = false;
                     }
                 });
             }
             // 4 - HEAVY
             case 4 -> server.execute(() -> {
-                StandEntity<?, ?> stand = ((IEntityDataSaver)player).getStand();
+                StandEntity<?, ?> stand = JUtils.getStand(player);
 	            if (stand != null) {
                     int moveStun = stand.getMoveStun();
 
@@ -96,7 +96,7 @@ public class StandControlPacket {
             });
             // 5 - BARRAGE
             case 5 -> server.execute(() -> {
-                StandEntity<?, ?> stand = ((IEntityDataSaver)player).getStand();
+                StandEntity<?, ?> stand = JUtils.getStand(player);
 	            if (stand != null) {
                     int moveStun = stand.getMoveStun();
 
@@ -114,7 +114,7 @@ public class StandControlPacket {
             });
             // 6 - SPECIAL 1
             case 6 -> server.execute(() -> {
-                StandEntity<?, ?> stand = ((IEntityDataSaver)player).getStand();
+                StandEntity<?, ?> stand = JUtils.getStand(player);
 	            if (stand != null) {
                     int moveStun = stand.getMoveStun();
 
@@ -132,7 +132,7 @@ public class StandControlPacket {
             });
             // 7 - Ultimate
             case 7 -> server.execute(() -> {
-                StandEntity<?, ?> stand = ((IEntityDataSaver)player).getStand();
+                StandEntity<?, ?> stand = JUtils.getStand(player);
 	            if (stand != null) {
                     int moveStun = stand.getMoveStun();
 
@@ -150,7 +150,7 @@ public class StandControlPacket {
             });
             // 8 - SPECIAL 2
             case 8 -> server.execute(() -> {
-                StandEntity<?, ?> stand = ((IEntityDataSaver)player).getStand();
+                StandEntity<?, ?> stand = JUtils.getStand(player);
 	            if (stand != null) {
                     int moveStun = stand.getMoveStun();
 
@@ -168,7 +168,7 @@ public class StandControlPacket {
             });
             // 9 - SPECIAL 3
             case 9 -> server.execute(() -> {
-                StandEntity<?, ?> stand = ((IEntityDataSaver)player).getStand();
+                StandEntity<?, ?> stand = JUtils.getStand(player);
 	            if (stand != null) {
                     int moveStun = stand.getMoveStun();
 
@@ -186,8 +186,8 @@ public class StandControlPacket {
             });
             // 10 - Utility (TSTP, Explosive dash, Gun, etc.)
             case 10 -> server.execute(() -> {
-                IEntityDataSaver playerData = ((IEntityDataSaver)player);
-                StandEntity<?, ?> stand = playerData.getStand();
+                StandComponent standData = JComponents.getStandData(player);
+                StandEntity<?, ?> stand = standData.getStand();
                 if (stand != null) {
                     int moveStun = stand.getMoveStun();
                     stand.initUtil();
@@ -196,18 +196,13 @@ public class StandControlPacket {
                 } else {
                     StandEntity<?, ?> stand2 = JCraft.summon(world, player);
                     if (stand2 != null) stand2.initUtil();
-                    playerData.setStand(stand2);
+                    standData.setStand(stand2);
                 }
             });
             // 13 - Cooldown Cancel
             case 13 -> server.execute(() -> {
-                if (player.isCreative()) {
-                    for (String cooldownType : cooldowns)
-                        ((IEntityDataSaver) player).getPersistentData().putInt(cooldownType, 0);
-                } else {
-                    if (!player.hasStatusEffect(JStatusRegistry.DAZED))
-                        cooldownCancel(world, player);
-                }
+                if (player.isCreative() || !player.hasStatusEffect(JStatusRegistry.DAZED))
+                    JComponents.getCooldowns(player).cooldownCancel();
             });
         }
     }

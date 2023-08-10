@@ -2,6 +2,9 @@ package net.arna.jcraft;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.arna.jcraft.common.component.CooldownsComponent;
+import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.component.StandComponent;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.entity.StandType;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
@@ -30,8 +33,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
@@ -69,34 +70,6 @@ public class JCraft implements ModInitializer {
 
     public static final int SPEC_QUEUE_MOVESTUN_LIMIT = 11; // exclusive, 10 -> 0.5s window for queueing moves
     public static final int QUEUE_MOVESTUN_LIMIT = 7; // exclusive, 6 -> 0.3s window for queueing moves
-
-    // Stand Cooldowns
-    public static final String standLightCD = "SLightCD";
-    public static final String standHeavyCD = "SHeavyCD";
-    public static final String standBarrageCD = "SBarrageCD";
-    public static final String standS1CD = "SS1CD";
-    public static final String standS2CD = "SS2CD";
-    public static final String standS3CD = "SS3CD";
-    public static final String standUltCD = "SUltCD";
-
-    // Spec Cooldowns
-    public static final String heavyCD = "HeavyCD";
-    public static final String barrageCD = "BarrageCD";
-    public static final String s1CD = "S1CD";
-    public static final String s2CD = "S2CD";
-    public static final String s3CD = "S3CD";
-    public static final String ultCD = "UltCD";
-
-    // Universal Cooldowns
-    public static final String utilCD = "M3CD";
-    public static final String comboBreakerCD = "CBCD";
-    public static final String cooldownCancelCD = "CCCD";
-    public static final String dashCD = "dCD";
-
-    public static final List<String> cooldowns = List.of(
-            standLightCD, standHeavyCD, standBarrageCD, standUltCD, standS1CD, standS2CD, standS3CD,
-            utilCD, comboBreakerCD, cooldownCancelCD, dashCD,
-            heavyCD, barrageCD, ultCD, s1CD, s2CD, s3CD);
 
     public static final ItemGroup JCRAFT_GROUP = FabricItemGroupBuilder.create(new Identifier(MOD_ID, "main"))
             .icon(() -> new ItemStack(JObjectRegistry.STANDARROW))
@@ -281,11 +254,11 @@ public class JCraft implements ModInitializer {
     }
 
     public static void tryDash(int forward, int side, LivingEntity entity) {
-        NbtCompound data = ((IEntityDataSaver) entity).getPersistentData();
+        CooldownsComponent cooldowns = JComponents.COOLDOWNS.get(entity);
         //todo: make a JCraftUtils method for checking if the player should be effectively disabled? like when stunned or knocked down as shown here:
-        if (data.getInt(dashCD) > 0 || !entity.isOnGround() || entity.hasStatusEffect(JStatusRegistry.DAZED) || entity.hasStatusEffect(JStatusRegistry.KNOCKDOWN))
+        if (cooldowns.getCooldown(CooldownType.DASH) > 0 || !entity.isOnGround() || entity.hasStatusEffect(JStatusRegistry.DAZED) || entity.hasStatusEffect(JStatusRegistry.KNOCKDOWN))
             return;
-        data.putInt(dashCD, dashCooldown);
+        cooldowns.setCooldown(CooldownType.DASH, dashCooldown);
 
         double dashSpeed = 0.75;
         Vec3d rotVec = entity.getRotationVector().rotateY(1.57079632679f * side); // L/R
@@ -332,13 +305,13 @@ public class JCraft implements ModInitializer {
     public static StandEntity<?, ?> summon(World world, LivingEntity player) {
         if (player.hasStatusEffect(JStatusRegistry.STANDLESS)) return null;
 
-        NbtCompound data = ((IEntityDataSaver) player).getPersistentData();
-        StandType type = StandType.fromId(data.getInt("StandID"));
+        StandComponent standData = JComponents.STAND.get(player);
+        StandType type = standData.getType();
         StandEntity<?, ?> stand = type == null ? null : type.createNew(world);
 
         if (stand == null) return null;
 
-        int skin = data.contains("StandSkin", NbtElement.INT_TYPE) ? data.getInt("StandSkin") : 0;
+        int skin = standData.getSkin();
         stand.setSkin(skin);
         stand.setPosition(player.getPos().subtract(player.getRotationVector()));
         stand.startRiding(player);
@@ -395,42 +368,16 @@ public class JCraft implements ModInitializer {
         );
     }
 
-    public static final List<String> unresettableCooldowns = List.of(standBarrageCD, standUltCD, barrageCD, ultCD, comboBreakerCD, cooldownCancelCD, dashCD);
-
-    /**
-     * Resets specific cooldowns, or all cooldowns if player is in creative.
-     */
-    public static void cooldownCancel(ServerWorld world, LivingEntity player) {
-        if (player.isSpectator()) return;
-
-        NbtCompound data = ((IEntityDataSaver) player).getPersistentData();
-
-        if (data.getInt(cooldownCancelCD) <= 0) {
-            for (String cooldownType : cooldowns) {
-                if (unresettableCooldowns.contains(cooldownType)) {
-                    continue;
-                }
-                data.putInt(cooldownType, 0);
-            }
-
-            data.putInt(cooldownCancelCD, 900); // 45s
-
-            Vec3d pPos = player.getEyePos();
-            world.playSoundFromEntity(null, player, JSoundRegistry.COOLDOWN_CANCEL, SoundCategory.PLAYERS, 1, 1);
-            createParticle(world, pPos.x, pPos.y, pPos.z, 1);
-        }
-    }
-
     /**
      * Breaks out of a combo using a slightly delayed attack centered at the player.
      * This attack is blockable, launches and stuns on hit.
      */
     public static void comboBreak(ServerWorld world, LivingEntity player, StatusEffectInstance stun) {
         if (player.isSpectator()) return;
-        NbtCompound data = ((IEntityDataSaver) player).getPersistentData();
+        CooldownsComponent cooldowns = JComponents.getCooldowns(player);
 
-        if (stun.getDuration() > 1 && stun.getAmplifier() == 1 && data.getInt(comboBreakerCD) <= 0) {
-            data.putInt(comboBreakerCD, 1200); // 60s
+        if (stun.getDuration() > 1 && stun.getAmplifier() == 1 && cooldowns.getCooldown(CooldownType.COMBO_BREAKER) <= 0) {
+            cooldowns.startCooldown(CooldownType.COMBO_BREAKER);
 
             stun(player, 5, 2); // Player is slowed down considerably pre-burst
 

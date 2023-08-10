@@ -5,13 +5,14 @@ import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackQueue;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.HitBoxData;
+import net.arna.jcraft.common.component.CooldownsComponent;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.network.s2c.PlayerAnimPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.common.util.IEntityDataSaver;
-import net.arna.jcraft.common.util.ITimeStop;
+import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -22,7 +23,6 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -94,19 +94,18 @@ public abstract class JCraftSpec {
     }
 
     public boolean canAttack() {
-        ITimeStop timeStop = (ITimeStop) player;
-        return this.moveStun < 1 && timeStop.getTimeStopTicks() < 1 && !player.hasStatusEffect(JStatusRegistry.DAZED);
+        return moveStun <= 0 && !JUtils.isAffectedByTimeStop(player) && !player.hasStatusEffect(JStatusRegistry.DAZED);
     }
 
-    public boolean handleAttack(ServerWorld serverWorld, Attack attack, String cooldownName) {
-        return handleAttack(serverWorld, attack, cooldownName, 1f);
+    public boolean handleAttack(ServerWorld serverWorld, Attack attack, CooldownType cooldownType) {
+        return handleAttack(serverWorld, attack, cooldownType, 1f);
     }
 
-    public boolean handleAttack(ServerWorld serverWorld, Attack attack, String cooldownName, float animationSpeed) {
-        NbtCompound playerData = ((IEntityDataSaver) player).getPersistentData();
-        int cd = playerData.getInt(cooldownName);
+    public boolean handleAttack(ServerWorld serverWorld, Attack attack, CooldownType cooldownType, float animationSpeed) {
+        CooldownsComponent cooldowns = JComponents.getCooldowns(player);
+        int cd = cooldowns.getCooldown(cooldownType);
         if (cd > 0) return false;
-        playerData.putInt(cooldownName, (int) (attack.cooldown * 20));
+        cooldowns.setCooldown(cooldownType, (int) (attack.cooldown * 20));
 
         //JCraft.LOGGER.info("SERVER: Handling spec attack: " + attack + " in world: " + serverWorld);
 

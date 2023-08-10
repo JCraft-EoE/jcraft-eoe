@@ -1,12 +1,12 @@
 package net.arna.jcraft.common.item;
 
+import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.component.StandComponent;
 import net.arna.jcraft.common.entity.StandType;
-import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
@@ -35,18 +35,13 @@ public class RequiemArrowItem extends Item {
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         // Check for correct stand id
         ItemStack itemStack = user.getStackInHand(hand);
-        if (!world.isClient) {
-            NbtCompound playerNbt = ((IEntityDataSaver) user).getPersistentData();
-            int standID = playerNbt.getInt("StandID");
-            if (standID == StandType.GOLD_EXPERIENCE.getId()) {
-                if (!user.isCreative()) {
-                    itemStack.decrement(1);
-                }
-                playerNbt.putInt("StandID", StandType.GOLD_EXPERIENCE_REQUIEM.getId());
-                if (!user.isCreative()) {
-                    itemStack.decrement(1);
-                }
-            }
+        if (world.isClient) return TypedActionResult.consume(itemStack);
+
+        StandComponent standData = JComponents.getStandData(user);
+        if (standData.getType() == StandType.GOLD_EXPERIENCE) {
+            if (!user.isCreative()) itemStack.decrement(1);
+            standData.setType(StandType.GOLD_EXPERIENCE_REQUIEM);
+            if (!user.isCreative()) itemStack.decrement(1);
         }
 
         return TypedActionResult.consume(itemStack);

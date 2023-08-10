@@ -1,8 +1,8 @@
 package net.arna.jcraft.common.entity;
 
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
@@ -63,35 +63,35 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
     public void initLightAttack() {
         if (!canAttack()) return;
         if (getUserOrThrow().isSneaking())
-            handleAttack(crm1, JCraft.standLightCD, State.UPPERCUT);
-        else handleAttack(light, JCraft.standLightCD, State.PUNCH);
+            handleAttack(crm1, CooldownType.STAND_LIGHT, State.UPPERCUT);
+        else handleAttack(light, CooldownType.STAND_LIGHT, State.PUNCH);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        if (handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY))
+        if (handleAttack(heavy, CooldownType.STAND_HEAVY, State.HEAVY))
             playSound(JSoundRegistry.STAR_BREAKER, 1, 1);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
+        if (handleAttack(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
             playSound(JSoundRegistry.STAR_PLATINUM_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack()) return;
-        if (handleAttack(starfinger, JCraft.standS1CD, State.STAR_FINGER))
+        if (handleAttack(starfinger, CooldownType.STAND_SP1, State.STAR_FINGER))
             playSound(JSoundRegistry.STAR_FINGER, 1, 1);
     }
 
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        if (handleAttack(inhale, JCraft.standUltCD, State.INHALE)) {
+        if (handleAttack(inhale, CooldownType.STAND_ULT, State.INHALE)) {
             //playSound(JSoundRegister.STAR_SUCK, 1, 1);
         }
     }
@@ -99,7 +99,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
     @Override
     public void initSpecial2() {
         if (!canAttack()) return;
-        if (handleAttack(lowkick, JCraft.standS2CD, State.LOW_KICK))
+        if (handleAttack(lowkick, CooldownType.STAND_SP2, State.LOW_KICK))
             playSound(JSoundRegistry.STAR_PLATINUM_KICK, 1, 1);
     }
 
@@ -107,14 +107,14 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
     public void initSpecial3() {
         if (!canAttack()) return;
         // Uses a copy because otherwise the main one gets overwritten by specialAttack()
-        if (handleAttack(Attack.copyOf(chargebarrage), JCraft.standS3CD, State.BARRAGE))
+        if (handleAttack(Attack.copyOf(chargebarrage), CooldownType.STAND_SP3, State.BARRAGE))
             playSound(JSoundRegistry.STAR_PLATINUM_ADVANCING_BARRAGE, 1, 1);
     }
 
     @Override
     public void initUtil() {
         if (!canAttack() || !hasUser() || !getUserOrThrow().isOnGround()) return;
-        handleAttack(jump, JCraft.utilCD, State.JUMP);
+        handleAttack(jump, CooldownType.UTIL, State.JUMP);
     }
 
     @Override

@@ -1,54 +1,55 @@
 package net.arna.jcraft.common.spec;
 
 import com.google.common.collect.ImmutableList;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import lombok.AccessLevel;
 import lombok.Getter;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 public enum SpecType {
-    NONE(null),
-    BRAWLER(new BrawlerSpec()),
-    ANUBIS(new AnubisSpec());
+    NONE(() -> null),
+    BRAWLER(BrawlerSpec::new),
+    ANUBIS(AnubisSpec::new);
 
-    @Getter
-    private final JCraftSpec spec;
+    @Getter(lazy = true)
+    private static final List<SpecType> allSpecTypes = ImmutableList.copyOf(values());
+    @Getter(value = AccessLevel.PRIVATE, lazy = true)
+    private static final Int2ObjectMap<SpecType> byId = getAllSpecTypes().stream()
+            .collect(Int2ObjectOpenHashMap::new, (map, type) -> map.put(type.getId(), type), Int2ObjectMap::putAll);
+
+    private final Supplier<@Nullable JCraftSpec> specSupplier;
     @Getter
     private final int id;
     @Getter
     private final String internalName;
     @Getter
-    private final Text translatablename;
+    private final Text translatableName;
 
-    @Getter(lazy = true)
-    private static final List<SpecType> allSpecTypes = ImmutableList.copyOf(values());
+    SpecType(Supplier<@Nullable JCraftSpec> specSupplier) {
+        this.specSupplier = specSupplier;
 
-    // has to return a new one every time
-    public static JCraftSpec fromId(int id) {
-        switch (id) {
-            default -> {
-                return null;
-            }
-            case 1 -> {
-                return new BrawlerSpec();
-            }
-            case 2 -> {
-                return new AnubisSpec();
-            }
+        JCraftSpec spec = createNew();
+        if (spec != null) {
+            id = spec.getId();
+            internalName = spec.getInternalName();
+            translatableName = spec.getTranslatableName();
+        } else {
+            id = 0;
+            internalName = "none";
+            translatableName = Text.of("none");
         }
     }
 
-    SpecType(@Nullable JCraftSpec spec) {
-        this.spec = spec;
-        if (spec != null) {
-            this.id = spec.getId();
-            this.internalName = spec.getInternalName();
-            this.translatablename = spec.getTranslatableName();
-        } else {
-            this.id = 0;
-            this.internalName = "none";
-            this.translatablename = Text.of("none");
-        }
+    public JCraftSpec createNew() {
+        return specSupplier.get();
+    }
+
+    public static SpecType fromId(int id) {
+        return getById().get(id);
     }
 }

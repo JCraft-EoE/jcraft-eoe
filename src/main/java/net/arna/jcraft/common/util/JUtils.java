@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.util;
 
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
-import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.CreamEntity;
 import net.arna.jcraft.common.entity.D4CEntity;
 import net.arna.jcraft.common.entity.KingCrimsonEntity;
@@ -9,7 +9,6 @@ import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.network.s2c.JExplosionPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
-import net.arna.jcraft.common.spec.SpecType;
 import net.arna.jcraft.common.splatter.JSplatterManager;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
@@ -176,27 +175,8 @@ public final class JUtils {
         return toReturn;
     }
 
-    public static void assignSpec(PlayerEntity player, NbtCompound playerNbt, ISpec playerSpec) {
-        JCraftSpec spec = SpecType.fromId(playerNbt.getInt("SpecID"));
-        if (spec != null)
-            spec.player = player;
-        playerSpec.setSpec(spec);
-    }
-
     public static JCraftSpec getSpec(PlayerEntity player) {
-        ISpec playerSpec = (ISpec) player;
-
-        // Autogenerate spec data when necessary
-        NbtCompound playerNbt = ((IEntityDataSaver) player).getPersistentData();
-        if (playerNbt.contains("SpecID")) {
-            if (playerSpec.getSpec() == null)
-                assignSpec(player, playerNbt, playerSpec);
-        } else {
-            playerNbt.putInt("SpecID", player.world.getGameRules().getInt(JCraft.DEFAULT_SPEC));
-            return getSpec(player);
-        }
-
-        return playerSpec.getSpec();
+        return JComponents.getSpecData(player).getSpec();
     }
 
     public static void serverPlaySound(SoundEvent sound, ServerWorld serverWorld, Vec3d pos) {
@@ -317,10 +297,6 @@ public final class JUtils {
         return passenger instanceof KingCrimsonEntity kc && kc.getTETime() > 0 ||
                 passenger instanceof D4CEntity d4c && d4c.getState() == D4CEntity.State.FLAG ||
                 passenger instanceof CreamEntity cream && cream.isHalfBall();
-    }
-
-    public static boolean isTimestopped(Entity entity) {
-        return ((ITimeStop) entity).getTimeStopTicks() > 0;
     }
 
     public static @Nullable DimValues getTimestop(Entity entity) {
@@ -456,5 +432,14 @@ public final class JUtils {
 
     public static JSplatterManager getSplatterManager(World world) {
         return ((IJSplatterManagerHolder) world).jcraft$getSplatterManager();
+    }
+
+    @Nullable
+    public static StandEntity<?, ?> getStand(Entity entity) {
+        return JComponents.getStandData(entity).getStand();
+    }
+
+    public static boolean isAffectedByTimeStop(Entity entity) {
+        return JComponents.getTimeStopData(entity).getTicks() > 0;
     }
 }

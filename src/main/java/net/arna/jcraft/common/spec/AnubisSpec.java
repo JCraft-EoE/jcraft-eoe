@@ -1,8 +1,8 @@
 package net.arna.jcraft.common.spec;
 
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegistry;
@@ -76,7 +76,7 @@ public class AnubisSpec extends JCraftSpec {
     @Override
     public void initHeavyAttack(ServerWorld serverWorld) {
         if (!canAttack()) return;
-        if (handleAttack(serverWorld, player.isHolding(JObjectRegistry.ANUBIS) ? pommel : pommelIn, JCraft.heavyCD, attackSpeedMult))
+        if (handleAttack(serverWorld, player.isHolding(JObjectRegistry.ANUBIS) ? pommel : pommelIn, CooldownType.HEAVY, attackSpeedMult))
             JUtils.serverPlaySound(JSoundRegistry.ANUBIS_POMMEL, serverWorld, player.getPos());
     }
 
@@ -92,7 +92,7 @@ public class AnubisSpec extends JCraftSpec {
     public void initSpecial1(ServerWorld serverWorld) {
         if (!canAttack()) return;
         if (!player.isHolding(JObjectRegistry.ANUBIS)) return;
-        if (handleAttack(serverWorld, slash, JCraft.s1CD, attackSpeedMult))
+        if (handleAttack(serverWorld, slash, CooldownType.SP1, attackSpeedMult))
             JUtils.serverPlaySound(JSoundRegistry.ANUBIS_SLASH, serverWorld, player.getPos());
     }
 
@@ -100,17 +100,17 @@ public class AnubisSpec extends JCraftSpec {
     public void initSpecial2(ServerWorld serverWorld) {
         if (!canAttack()) return;
         if (!player.isHolding(JObjectRegistry.ANUBIS)) return;
-        if (handleAttack(serverWorld, rekkas2, JCraft.s2CD, attackSpeedMult))
+        if (handleAttack(serverWorld, rekkas2, CooldownType.SP2, attackSpeedMult))
             JUtils.serverPlaySound(JSoundRegistry.ANUBIS_REKKA2, serverWorld, player.getPos());
     }
 
     @Override
     public void initSpecial3(ServerWorld serverWorld) {
         if (!canAttack()) return;
-        if (player.isHolding(JObjectRegistry.ANUBIS) && handleAttack(serverWorld, rekkas3, JCraft.s2CD, attackSpeedMult)) {
+        if (player.isHolding(JObjectRegistry.ANUBIS) && handleAttack(serverWorld, rekkas3, CooldownType.SP2, attackSpeedMult)) {
             JUtils.serverPlaySound(JSoundRegistry.ANUBIS_REKKA3, serverWorld, player.getPos());
         } else {
-            handleAttack(serverWorld, sweep, JCraft.s3CD, attackSpeedMult);
+            handleAttack(serverWorld, sweep, CooldownType.SP3, attackSpeedMult);
             player.addStatusEffect(
                     new StatusEffectInstance(StatusEffects.SLOWNESS, sweep.moveStun, 2, true, false)
             );

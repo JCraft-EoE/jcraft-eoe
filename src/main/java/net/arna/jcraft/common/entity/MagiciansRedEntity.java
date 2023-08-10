@@ -7,7 +7,7 @@ import net.arna.jcraft.common.entity.projectile.AnkhProjectile;
 import net.arna.jcraft.common.entity.projectile.LifeDetectorEntity;
 import net.arna.jcraft.common.entity.projectile.RedBindEntity;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -25,7 +25,6 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -107,56 +106,55 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
         if (getUserOrThrow().isSneaking()) {
             setAttack(redirect, State.REDIRECT);
             playSound(JSoundRegistry.MR_REDIRECT, 1, 1);
-        } else
-            handleAttack(light, JCraft.standLightCD, State.LIGHT);
+        } else handleAttack(light, CooldownType.STAND_LIGHT, State.LIGHT);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        if (handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY))
+        if (handleAttack(heavy, CooldownType.STAND_HEAVY, State.HEAVY))
             playSound(JSoundRegistry.MR_HEAVY, 1, 1);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
+        if (handleAttack(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
             playSound(JSoundRegistry.MR_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack()) return;
-        if (handleAttack(crossfire, JCraft.standS1CD, State.CROSSFIRE))
+        if (handleAttack(crossfire, CooldownType.STAND_SP1, State.CROSSFIRE))
             playSound(JSoundRegistry.MR_CROSSFIRE, 1, 1);
     }
 
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        if (handleAttack(crossfirehurricane, JCraft.standUltCD, State.CROSSFIRE_HURRICANE))
+        if (handleAttack(crossfirehurricane, CooldownType.STAND_ULT, State.CROSSFIRE_HURRICANE))
             playSound(JSoundRegistry.MR_ULT, 1, 1);
     }
 
     @Override
     public void initSpecial2() {
         if (!canAttack()) return;
-        if (handleAttack(crossfirevariation, JCraft.standS2CD, State.CROSSFIRE_VARIATION))
+        if (handleAttack(crossfirevariation, CooldownType.STAND_SP2, State.CROSSFIRE_VARIATION))
             playSound(JSoundRegistry.MR_CROSSFIRE, 1, 1);
     }
 
     @Override
     public void initSpecial3() {
         if (!canAttack()) return;
-        if (handleAttack(redbind, JCraft.standS3CD, State.RED_BIND))
+        if (handleAttack(redbind, CooldownType.STAND_SP3, State.RED_BIND))
             playSound(JSoundRegistry.MR_REDBIND, 1, 1);
     }
 
     @Override
     public void initUtil() {
         if (!canAttack() || !hasUser()) return;
-        if (handleAttack(detector, JCraft.utilCD, State.DETECTOR))
+        if (handleAttack(detector, CooldownType.UTIL, State.DETECTOR))
             playSound(JSoundRegistry.MR_DETECTOR, 1, 1);
     }
 
@@ -230,7 +228,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
                 if (JUtils.isBlocking(boundEntity)) return;
 
                 // Remove Stand
-                StandEntity<?, ?> stand = ((IEntityDataSaver) boundEntity).getStand();
+                StandEntity<?, ?> stand = JUtils.getStand(boundEntity);
                 if (stand != null) {
                     stand.curAttack = null;
                     stand.setMoveStun(0);
@@ -253,7 +251,8 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
 
     @Override
     public void tick() {
-        if (age == 1) playSound(JSoundRegistry.MR_SUMMON, 1f, 1f);
+        if (age == 1)
+            playSound(JSoundRegistry.MR_SUMMON, 1f, 1f);
         super.tick();
 
         if (hasUser()) {

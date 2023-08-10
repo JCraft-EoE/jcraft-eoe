@@ -7,6 +7,8 @@ import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackQueue;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.HitBoxData;
+import net.arna.jcraft.common.component.CooldownsComponent;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.network.s2c.ComboCounterPacket;
@@ -61,7 +63,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static net.arna.jcraft.JCraft.comboBreak;
-import static net.arna.jcraft.JCraft.cooldownCancel;
 import static net.minecraft.command.argument.EntityAnchorArgumentType.EntityAnchor;
 
 public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S> & StandAnimationState<E>> extends MobEntity implements IAnimatable, IAnimationTickable {
@@ -111,7 +112,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     public Attack previousAttack;
     public int armorPoints;
 
-    public static final List<String> attackCooldowns = List.of(JCraft.standLightCD, JCraft.standHeavyCD, JCraft.standBarrageCD, JCraft.standS1CD, JCraft.standUltCD, JCraft.standS2CD, JCraft.standS3CD, JCraft.utilCD);
+    public static final List<CooldownType> attackCooldowns = List.of(CooldownType.STAND_LIGHT, CooldownType.STAND_HEAVY,
+            CooldownType.STAND_BARRAGE, CooldownType.STAND_SP1, CooldownType.STAND_ULT, CooldownType.STAND_SP2, CooldownType.STAND_SP3, CooldownType.UTIL);
 
     // Info
     public List<String> pros;
@@ -490,11 +492,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * @return whether the stand should be able to attack
      */
     public boolean canAttack() {
-        if (hasUser()) {
-            ITimeStop timeStop = (ITimeStop) getUserOrThrow();
-            return this.getMoveStun() < 1 && timeStop.getTimeStopTicks() < 1 && !getUserOrThrow().hasStatusEffect(JStatusRegistry.DAZED);
-        }
-        return false;
+        return hasUser() && this.getMoveStun() < 1 && !JUtils.isAffectedByTimeStop(user) && !getUserOrThrow().hasStatusEffect(JStatusRegistry.DAZED);
     }
 
     /**
@@ -514,8 +512,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      */
     public CanAttackData canAttackWithData() {
         if (hasUser()) {
-            ITimeStop timeStop = (ITimeStop) getUserOrThrow();
-            return new CanAttackData(user, this.getMoveStun() < 1 && timeStop.getTimeStopTicks() < 1 &&
+            return new CanAttackData(user, getMoveStun() <= 0 && !JUtils.isAffectedByTimeStop(user) &&
                     !getUserOrThrow().hasStatusEffect(JStatusRegistry.DAZED));
         }
         return new CanAttackData(null, false);
@@ -525,17 +522,17 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * Initiates an attack with the stand
      *
      * @param attack       attack to handle
-     * @param cooldownName string identifier for which cooldown to start
+     * @param cooldownType type of cooldown to start
      * @param animState    int identifier for which state to put the stand into
      */
-    public boolean handleAttack(Attack attack, String cooldownName, S animState) {
-        NbtCompound userData = ((IEntityDataSaver) getUserOrThrow()).getPersistentData();
-        int cooldown = userData.getInt(cooldownName);
+    public boolean handleAttack(Attack attack, CooldownType cooldownType, S animState) {
+        CooldownsComponent cooldowns = JComponents.getCooldowns(getUser());
+        int cooldown = cooldowns.getCooldown(cooldownType);
 
         if (cooldown > 0)
             return false;
 
-        userData.putInt(cooldownName, (int) (attack.cooldown * 20));
+        cooldowns.setCooldown(cooldownType, (int) (attack.cooldown * 20));
         this.setAttack(attack, animState);
         return true;
     }
@@ -715,9 +712,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         Vec3d telePos = hitResult.getPos();
 
         // 3s minimum ult cooldown
-        NbtCompound userData = ((IEntityDataSaver) user).getPersistentData();
-        if (userData.getInt(JCraft.standUltCD) < 60)
-            userData.putInt(JCraft.standUltCD, 60);
+        CooldownsComponent cooldowns = JComponents.getCooldowns(user);
+        if (cooldowns.getCooldown(CooldownType.STAND_ULT) < 60)
+            cooldowns.setCooldown(CooldownType.STAND_ULT, 60);
 
         if (hasVehicle) user.getRootVehicle().setPosition(telePos.x, telePos.y, telePos.z);
         else user.teleport(telePos.x, telePos.y, telePos.z);
@@ -738,8 +735,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     public void desummon() {
         if (curAttack != null || getMoveStun() > 0) return;
         discard();
-        if (user != null)
-            ((IEntityDataSaver) user).setStand(null);
+
+        if (user != null) JComponents.getStandData(user).setStand(null);
     }
 
     // Define idle override
@@ -846,7 +843,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             if (isSameState()) setSameState(false);
 
             // Make sure the user is using this stand
-            if (((IEntityDataSaver) user).getStand() != this) discard();
+            if (JUtils.getStand(user) != this) discard();
 
             // Block break check
             if (getStandGauge() < 1) {
@@ -1184,11 +1181,13 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * @param damage       damage in half hearts
      * @param lift         will the attack lift the victim upon an aerial hit?
      */
-    private static void baseDamageLogic(LivingEntity ent, Vec3d kbVec, int stunTicks, int stunLevel, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, boolean canBackstab, boolean unblockable) {
+    private static void baseDamageLogic(LivingEntity ent, Vec3d kbVec, int stunTicks, int stunLevel, boolean overrideStun,
+                                        float damage, boolean lift, int blockstun, DamageSource source, Entity attacker,
+                                        boolean canBackstab, boolean unblockable) {
         boolean hit = true;
-        boolean tsHit = ((ITimeStop) ent).getTimeStopTicks() > 0;
+        boolean tsHit = JUtils.isAffectedByTimeStop(ent);
 
-        StandEntity<?, ?> stand = ((IEntityDataSaver) ent).getStand();
+        StandEntity<?, ?> stand = JUtils.getStand(ent);
         if (stand != null) {
             Attack standAttack = stand.curAttack;
             if (standAttack != null) {
@@ -1328,7 +1327,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         mob.getLookControl().lookAt(target); // Usually detrimental not to
 
         JCraftSpec enemySpec;
-        StandEntity<?, ?> enemyStand = ((IEntityDataSaver) target).getStand();
+        StandEntity<?, ?> enemyStand = JUtils.getStand(target);
         Attack enemyAttack = null;
         boolean enemyHasStand = enemyStand != null;
 
@@ -1349,7 +1348,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         // If none was found, try to find a spec attack
         if (enemyAttack == null) {
             if (target instanceof PlayerEntity player) {
-                enemySpec = ((ISpec) player).getSpec();
+                enemySpec = JComponents.getSpecData(player).getSpec();
 
                 if (enemySpec != null) {
                     enemyMoveStun = enemySpec.moveStun;
@@ -1401,7 +1400,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             // Overestimating stun up to 1/4 of a second for longer combos and frametraps
             int stunTicks = stun != null ? stun.getDuration() + stand.random.nextInt(5) : 0;
             stunTicks += blockPlusTicks;
-            stunTicks += ((ITimeStop) target).getTimeStopTicks();
+            stunTicks += JComponents.getTimeStopData(target).getTicks();
 
             Attack selectedAttack = stand.selectAttack(mob, target, stunTicks, enemyMoveStun, distance, enemyStand, enemyAttack);
 
@@ -1506,6 +1505,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     private @Nullable Attack selectAttack(MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand, Attack enemyAttack) {
         Attack selectedAttack = null;
         boolean enemyIsAttacking = enemyAttack != null;
+        CooldownsComponent cooldowns = JComponents.getCooldowns(mob);
 
         // If the opponent is countering, don't attack
         if (enemyIsAttacking && enemyAttack.attackType == AttackType.COUNTER) return null;
@@ -1515,7 +1515,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             if (curAttack.hasFollowup())
                 selectedAttack = curAttack.followup;
         } else {
-            NbtCompound userData = ((IEntityDataSaver) mob).getPersistentData();
             selectedAttack = moves.get(0);
             int selectedAttackInitTime = selectedAttack.realInitTime();
 
@@ -1524,7 +1523,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 int initTime = attack.realInitTime();
 
                 // Discount any on-cooldown non-followup attacks
-                if (userData.getInt(attackCooldowns.get(parentAttackIndex)) > 0) {
+                if (cooldowns.getCooldown(attackCooldowns.get(parentAttackIndex)) > 0) {
                     movesOnCooldown++;
                     continue;
                 }
@@ -1565,7 +1564,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 }
 
                 // Use counter if opponent is using a non-ranged move
-                if (enemyIsAttacking && !enemyAttack.isRanged && attack.attackType == AttackType.COUNTER) {
+                if (enemyIsAttacking && enemyAttack != null && !enemyAttack.isRanged && attack.attackType == AttackType.COUNTER) {
                     if (enemyStand != null && !enemyStand.blocking && enemyMoveStun > 0) {
                         selectedAttack = attack;
                         break;
@@ -1605,7 +1604,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             }
         }
 
-        if (movesOnCooldown > 5) cooldownCancel((ServerWorld)world, mob); // >5 = 80+%
+        if (movesOnCooldown > 5) cooldowns.cooldownCancel(); // >5 = 80+%
 
         // Non ranged offensive attacks are cancelled if the opponent is too far (and -1 causes an out-of-bounds error)
         if (selectedAttack != null) {

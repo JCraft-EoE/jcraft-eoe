@@ -1,9 +1,10 @@
 package net.arna.jcraft.common.entity;
 
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
-import net.arna.jcraft.common.util.IEntityDataSaver;
+import net.arna.jcraft.common.component.CooldownsComponent;
+import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -17,7 +18,6 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -62,7 +62,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
     public void initHeavyAttack() {
         if (!canAttack()) return;
 
-        if (handleAttack(heavy, JCraft.standHeavyCD, State.HEAVY)) {
+        if (handleAttack(heavy, CooldownType.STAND_HEAVY, State.HEAVY)) {
             playSound(JSoundRegistry.KQ_UPPERCUT, 1, 1);
             playSound(JSoundRegistry.KQ_HEAVY, 1, 1);
         }
@@ -71,7 +71,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
+        if (handleAttack(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
             playSound(JSoundRegistry.KQ_BARRAGE, 1, 1);
     }
 
@@ -80,18 +80,18 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
         if (!canAttack() || !hasUser()) return;
 
         LivingEntity user = getUserOrThrow();
-        NbtCompound userData = ((IEntityDataSaver) user).getPersistentData();
-        if (user.isInSneakingPose() && userData.getInt(JCraft.standS1CD) < 1) {
+        CooldownsComponent cooldowns = JComponents.getCooldowns(user);
+        if (user.isInSneakingPose() && cooldowns.getCooldown(CooldownType.STAND_SP1) < 1) {
             BlockPos downBlock = user.getBlockPos().down();
             boolean notAir = (world.getBlockState(downBlock).getBlock() != Blocks.AIR && world.getBlockState(downBlock).getBlock() != Blocks.CAVE_AIR &&
                     world.getBlockState(downBlock).getBlock() != Blocks.VOID_AIR);
             if (notAir) {
                 bombEntity = null;
                 bombBlock = user.getPos().add(0, -0.5, 0);
-                userData.putInt(JCraft.standS1CD, bombplantCD);
+                cooldowns.setCooldown(CooldownType.STAND_SP1, bombplantCD);
             }
         } else {
-            handleAttack(bombplant, JCraft.standS1CD, State.BOMB_PLANT);
+            handleAttack(bombplant, CooldownType.STAND_SP1, State.BOMB_PLANT);
             bombBlock = null;
         }
 
@@ -102,7 +102,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
     @Override
     public void initSpecial2() {
         if (!canAttack()) return;
-        handleAttack(grab, JCraft.standS2CD, State.GRAB);
+        handleAttack(grab, CooldownType.STAND_SP2, State.GRAB);
     }
 
     @Override
@@ -110,8 +110,8 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
         if (!canAttack() || !hasUser()) return;
 
         LivingEntity user = getUserOrThrow();
-        NbtCompound playerData = ((IEntityDataSaver) user).getPersistentData();
-        if (playerData.getInt(JCraft.standS3CD) > 0) return;
+        CooldownsComponent cooldowns = JComponents.getCooldowns(user);
+        if (cooldowns.getCooldown(CooldownType.STAND_SP3) > 0) return;
 
         Vec3d lookVec = user.getRotationVector().multiply(0.75);
         if (this.coin != null) this.coin.discard();
@@ -124,14 +124,14 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
         this.bombBlock = null;
 
         playSound(JSoundRegistry.COIN_TOSS, 1, 1);
-        playerData.putInt(JCraft.standS3CD, 500); // 25s coin toss cd
-        playerData.putInt(JCraft.standUltCD, 20); // 1s detonate cd (prevents IUB)
+        cooldowns.setCooldown(CooldownType.STAND_SP3, 500); // 25s coin toss cd
+        cooldowns.setCooldown(CooldownType.STAND_ULT, 20); // 1s detonate cd (prevents IUB)
     }
 
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        handleAttack(sha, JCraft.standUltCD, State.SHA);
+        handleAttack(sha, CooldownType.STAND_ULT, State.SHA);
         //playSound(ModSoundRegister.KQ_SHA,1, 1);
     }
 

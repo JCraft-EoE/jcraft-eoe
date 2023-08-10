@@ -1,9 +1,7 @@
 package net.arna.jcraft.common.entity.projectile;
 
 import net.arna.jcraft.common.entity.StandEntity;
-import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.splatter.SplatterType;
-import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
@@ -19,10 +17,7 @@ import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import software.bernie.geckolib3.core.IAnimatable;
@@ -33,8 +28,6 @@ import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
-
-import java.util.List;
 
 import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 

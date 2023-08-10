@@ -4,13 +4,12 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.HitBoxData;
+import net.arna.jcraft.common.component.CooldownsComponent;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.projectile.BlockProjectile;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.Gravity;
-import net.arna.jcraft.common.util.IEntityDataSaver;
-import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.common.util.MobilityType;
-import net.arna.jcraft.common.util.StandAnimationState;
+import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
@@ -133,27 +132,27 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        handleAttack(light, JCraft.standLightCD, State.LIGHT);
+        handleAttack(light, CooldownType.STAND_LIGHT, State.LIGHT);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, JCraft.standBarrageCD, State.BARRAGE))
+        if (handleAttack(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
             playSound(JSoundRegistry.CMOON_BARRAGE, 1, 1);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        if (handleAttack(gutpunch, JCraft.standHeavyCD, State.DONUT))
+        if (handleAttack(gutpunch, CooldownType.STAND_HEAVY, State.DONUT))
             playSound(JSoundRegistry.CMOON_DONUT, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack()) return;
-        if (handleAttack(gravpunch, JCraft.standS1CD, State.GRAV_PUNCH))
+        if (handleAttack(gravpunch, CooldownType.STAND_SP1, State.GRAV_PUNCH))
             playSound(JSoundRegistry.CMOON_GRAVPUNCH, 1, 1);
     }
 
@@ -169,14 +168,14 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
                 if (block.getMaster() != user) continue;
                 block.markRefresh();
             }
-        } else if (canAttack() && handleAttack(launch, JCraft.standS2CD, State.GROUND_SHOOT))
+        } else if (canAttack() && handleAttack(launch, CooldownType.STAND_SP2, State.GROUND_SHOOT))
             playSound(JSoundRegistry.CMOON_GROUNDSHOOT, 1, 1);
     }
 
     @Override
     public void initSpecial3() {
         if (!canAttack()) return;
-        if (handleAttack(groundslam, JCraft.standS3CD, State.GROUND_SLAM))
+        if (handleAttack(groundslam, CooldownType.STAND_SP3, State.GROUND_SLAM))
             playSound(JSoundRegistry.CMOON_GROUNDSLAM, 1, 1);
     }
 
@@ -184,9 +183,9 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
     public void initUlt() {
         if (!canAttack()) return;
         if (getShiftTime() <= 0) {
-            if (getUserOrThrow().isSneaking() && handleAttack(gravshift, JCraft.standUltCD, State.GRAV_SHIFT))
+            if (getUserOrThrow().isSneaking() && handleAttack(gravshift, CooldownType.STAND_ULT, State.GRAV_SHIFT))
                 playSound(JSoundRegistry.CMOON_GRAVSHIFT, 1, 1);
-            else if (handleAttack(directionalshift, JCraft.standUltCD, State.DIRECTIONAL_SHIFT))
+            else if (handleAttack(directionalshift, CooldownType.STAND_ULT, State.DIRECTIONAL_SHIFT))
                 playSound(JSoundRegistry.CMOON_GRAVSHIFT_DIRECTIONAL, 1, 1);
 
         } else {
@@ -215,8 +214,8 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
         }
 
         if (!canAttack()) return;
-        IEntityDataSaver userData = (IEntityDataSaver) user;
-        if (userData.getPersistentData().getInt(JCraft.utilCD) > 0) return;
+        CooldownsComponent cooldowns = JComponents.getCooldowns(user);
+        if (cooldowns.getCooldown(CooldownType.UTIL) > 0) return;
 
         if (user.isOnGround()) {
             user.addStatusEffect(new StatusEffectInstance(JStatusRegistry.WEIGHTLESS, 200, 1));
@@ -226,7 +225,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
         }
 
         user.velocityModified = true;
-        userData.getPersistentData().putInt(JCraft.utilCD, 340);
+        cooldowns.setCooldown(CooldownType.UTIL, 340);
     }
 
     @Override

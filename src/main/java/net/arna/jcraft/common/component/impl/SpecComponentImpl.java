@@ -1,0 +1,65 @@
+package net.arna.jcraft.common.component.impl;
+
+import lombok.NonNull;
+import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.component.SpecComponent;
+import net.arna.jcraft.common.spec.JCraftSpec;
+import net.arna.jcraft.common.spec.SpecType;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.network.ServerPlayerEntity;
+import org.jetbrains.annotations.Nullable;
+
+public class SpecComponentImpl implements SpecComponent {
+    private final PlayerEntity player;
+    private SpecType type = SpecType.NONE;
+    private JCraftSpec spec;
+
+    public SpecComponentImpl(PlayerEntity player) {
+        this.player = player;
+    }
+
+    @Override
+    public SpecType getType() {
+        return type;
+    }
+
+    @Override
+    public void setType(@NonNull SpecType type) {
+        setTypeRaw(type);
+        sync();
+    }
+
+    private void setTypeRaw(SpecType type) {
+        this.type = type;
+        spec = type.createNew();
+
+        if (spec == null) return;
+        spec.player = player;
+    }
+
+    @Nullable
+    @Override
+    public JCraftSpec getSpec() {
+        return spec;
+    }
+
+    private void sync() {
+        JComponents.SPEC.sync(player);
+    }
+
+    @Override
+    public void readFromNbt(@NonNull NbtCompound tag) {
+        setTypeRaw(SpecType.fromId(tag.getInt("Type")));
+    }
+
+    @Override
+    public void writeToNbt(@NonNull NbtCompound tag) {
+        tag.putInt("Type", type.getId());
+    }
+
+    @Override
+    public boolean shouldSyncWith(ServerPlayerEntity player) {
+        return player == this.player; // Only our player needs to know, I believe.
+    }
+}

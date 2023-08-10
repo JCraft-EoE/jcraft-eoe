@@ -1,20 +1,21 @@
 package net.arna.jcraft.common.gravity.util.packet;
 
+import net.arna.jcraft.common.component.GravityComponent;
 import net.arna.jcraft.common.gravity.api.RotationParameters;
 import net.arna.jcraft.common.gravity.util.Gravity;
-import net.arna.jcraft.common.gravity.util.GravityComponent;
 import net.arna.jcraft.common.gravity.util.NetworkUtil;
 import net.minecraft.network.PacketByteBuf;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 
 public class OverwriteGravityPacket extends GravityPacket {
-    public final ArrayList<Gravity> gravityList;
+    public final List<Gravity> gravityList;
     public final boolean initialGravity;
 
-    public OverwriteGravityPacket(ArrayList<Gravity> _gravityList, boolean _initialGravity) {
+    public OverwriteGravityPacket(List<Gravity> _gravityList, boolean _initialGravity) {
         gravityList = _gravityList;
         initialGravity = _initialGravity;
     }

@@ -2,8 +2,7 @@ package net.arna.jcraft.client.mixin;
 
 import net.arna.jcraft.client.registry.JRenderLayerRegistry;
 import net.arna.jcraft.common.entity.KingCrimsonEntity;
-import net.arna.jcraft.common.util.IEntityDataSaver;
-import net.minecraft.client.MinecraftClient;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -37,23 +36,23 @@ public abstract class LivingEntityRenderMixin<T extends LivingEntity, M extends 
         super(ctx);
     }
 
-    @Inject(method = "render(Lnet/minecraft/entity/LivingEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At(value = "INVOKE", shift = At.Shift.BEFORE, target = "Lnet/minecraft/client/util/math/MatrixStack;pop()V"))
-    private void suckmahballs(T livingEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci){
-        if (false && MinecraftClient.getInstance().player instanceof IEntityDataSaver entityDataSaver) {
-            if (entityDataSaver.getStand() instanceof KingCrimsonEntity kc && kc.getState() == KingCrimsonEntity.State.PREDICT &&
-                    kc.getMoveStun() <= (KingCrimsonEntity.prediction.moveStun - KingCrimsonEntity.prediction.initTime)) {
-                RenderLayer renderLayer = JRenderLayerRegistry.RRRE;
-                if (renderLayer != null) {
-                    VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(renderLayer);
-                    int o = LivingEntityRenderer.getOverlay(livingEntity, this.getAnimationProgress(livingEntity, g));
-                    this.model.render(matrixStack, vertexConsumer, i, o, 1, 1, 1, 1);
-                }
+    @Inject(method = "render(Lnet/minecraft/entity/LivingEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
+            at = @At(value = "INVOKE", shift = At.Shift.BEFORE, target = "Lnet/minecraft/client/util/math/MatrixStack;pop()V"))
+    private void suckmahballs(T livingEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci) {
+        if (true || !(JUtils.getStand((LivingEntity) (Object) this) instanceof KingCrimsonEntity kc) || kc.getState() != KingCrimsonEntity.State.PREDICT ||
+                kc.getMoveStun() > (KingCrimsonEntity.prediction.moveStun - KingCrimsonEntity.prediction.initTime))
+            return;
 
-                for (FeatureRenderer<T, M>  featureRenderer : features) {
-                    //TODO we got all funny features here planet suckondeeze
+        RenderLayer renderLayer = JRenderLayerRegistry.RRRE;
+        if (renderLayer != null) {
+            VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(renderLayer);
+            int o = LivingEntityRenderer.getOverlay(livingEntity, this.getAnimationProgress(livingEntity, g));
+            this.model.render(matrixStack, vertexConsumer, i, o, 1, 1, 1, 1);
+        }
 
-                }
-            }
+        for (FeatureRenderer<T, M> featureRenderer : features) {
+            //TODO we got all funny features here planet suckondeeze
+
         }
     }
 }

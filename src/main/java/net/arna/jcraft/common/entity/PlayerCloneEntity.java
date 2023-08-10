@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.entity;
 
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.ai.goal.CloneAttackGoal;
-import net.arna.jcraft.common.util.IEntityDataSaver;
 import net.arna.jcraft.common.util.IOwnable;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
@@ -145,7 +145,7 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
     }
 
     public static EntityType<PlayerCloneEntity> getCloneType(ServerPlayerEntity player) {
-        return ((IEntityDataSaver) player).isThin() ? JEntityTypeRegistry.PLAYER_ENTITY_CLONE_SLIM : JEntityTypeRegistry.PLAYER_ENTITY_CLONE;
+        return JComponents.getMiscData(player).isThin() ? JEntityTypeRegistry.PLAYER_ENTITY_CLONE_SLIM : JEntityTypeRegistry.PLAYER_ENTITY_CLONE;
     }
 
     @Override

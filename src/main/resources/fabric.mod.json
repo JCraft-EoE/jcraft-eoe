@@ -33,7 +33,7 @@
       "net.arna.jcraft.datagen.JDataGen"
     ],
     "cardinal-components": [
-      "net.arna.jcraft.common.gravity.util.GravityChangerComponents"
+      "net.arna.jcraft.common.component.JComponents"
     ],
     "modmenu": [
       "net.arna.jcraft.client.JModMenuIntegration"
@@ -70,7 +70,12 @@
 
   "custom": {
     "cardinal-components": [
-      "jcraft:gravity_direction"
+      "jcraft:gravity_direction",
+      "jcraft:stand",
+      "jcraft:spec",
+      "jcraft:cooldowns",
+      "jcraft:time_stop",
+      "jcraft:misc"
     ]
   }
 }
