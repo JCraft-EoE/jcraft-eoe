@@ -267,13 +267,16 @@ public class JCraftClient implements ClientModInitializer {
                 case DASH -> generateName(dash.getBoundKeyTranslationKey());
             };
 
-            boolean isSpec = type.getCategory() == CooldownType.Category.SPEC;
+            CooldownType.Category category = type.getCategory();
+
+            boolean isSpec = category == CooldownType.Category.SPEC;
+            boolean isUniversal = category == CooldownType.Category.UNIVERSAL;
             float defaultAlpha = 0.65f;
             int xOffset = 0;
 
             String finalText = keyBindText + " - " + getDecimalFormat().format(MathHelper.clamp(cooldown, 0.0, 9999.0)) + "s";
 
-            if (type.getCategory() == CooldownType.Category.STAND || isSpec) {
+            if (category == CooldownType.Category.STAND || isSpec) {
                 if (!isSpec) finalText = "s." + finalText;
 
                 if ((isSpec && standOn) || (!isSpec && !standOn)) {
@@ -282,7 +285,14 @@ public class JCraftClient implements ClientModInitializer {
                 }
             }
 
-            float offsetY = selectedY * (1.25f) + (isSpec ? 9 * (i - 9) : 9 * i);
+            int offsetIndex = i;
+            if (isSpec)
+                offsetIndex -= 7;
+            else if (isUniversal)
+                offsetIndex -= 6;
+
+            float offsetY = selectedY * 1.25f + 9f * offsetIndex;
+
             //RenderSystem.setShaderTexture(0, BIND_BG);
             //DrawableHelper.drawTexture(matrixStack, maxX + xOffset + 6, (int) offsetY - 2, 0, 0, 10, 10, 10, 10);
             textRenderer.drawWithShadow(
