@@ -71,8 +71,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static net.arna.jcraft.client.util.JClientUtils.activeTimestops;
 
@@ -95,6 +98,9 @@ public class JCraftClient implements ClientModInitializer {
     public static KeyBinding cooldownCancel;
     public static KeyBinding utility;
     public static KeyBinding dash;
+    // TODO this should probably be updated when the Minecraft language is updated.
+    private static final DecimalFormat decimalFormat = new DecimalFormat("#.#", DecimalFormatSymbols.getInstance(
+            Locale.forLanguageTag(MinecraftClient.getInstance().options.language)));
 
     @Override
     public void onInitializeClient() {
@@ -240,54 +246,53 @@ public class JCraftClient implements ClientModInitializer {
 
         for (CooldownType type : CooldownType.values()) {
             int cooldownTicks = cooldowns.getCooldown(type);
-            double cooldown = cooldownTicks / 20d - tickDelta;
 
             i++;
-            if (cooldown != 0) {
+            if (cooldownTicks == 0) continue;
+            double cooldown = (cooldownTicks - tickDelta) / 20d;
 
-                // These are (mainly) based off of keybindings which are client-only and thus have
-                // to be done here and cannot be done in CooldownType.
-                String keyBindText = switch (type) {
-                    case STAND_LIGHT -> "M1";
-                    case HEAVY, STAND_HEAVY -> generateName(heavyKey.getBoundKeyTranslationKey());
-                    case BARRAGE, STAND_BARRAGE -> generateName(barrageKey.getBoundKeyTranslationKey());
-                    case ULT, STAND_ULT -> generateName(ultKey.getBoundKeyTranslationKey());
-                    case SP1, STAND_SP1 -> generateName(special1Key.getBoundKeyTranslationKey());
-                    case SP2, STAND_SP2 -> generateName(special2Key.getBoundKeyTranslationKey());
-                    case SP3, STAND_SP3 -> generateName(special3Key.getBoundKeyTranslationKey());
-                    case UTIL -> generateName(utility.getBoundKeyTranslationKey());
-                    case COMBO_BREAKER -> "Combo Breaker";
-                    case COOLDOWN_CANCEL -> generateName(cooldownCancel.getBoundKeyTranslationKey());
-                    case DASH -> generateName(dash.getBoundKeyTranslationKey());
-                };
+            // These are (mainly) based off of keybindings which are client-only and thus have
+            // to be done here and cannot be done in CooldownType.
+            String keyBindText = switch (type) {
+                case STAND_LIGHT -> "M1";
+                case HEAVY, STAND_HEAVY -> generateName(heavyKey.getBoundKeyTranslationKey());
+                case BARRAGE, STAND_BARRAGE -> generateName(barrageKey.getBoundKeyTranslationKey());
+                case ULT, STAND_ULT -> generateName(ultKey.getBoundKeyTranslationKey());
+                case SP1, STAND_SP1 -> generateName(special1Key.getBoundKeyTranslationKey());
+                case SP2, STAND_SP2 -> generateName(special2Key.getBoundKeyTranslationKey());
+                case SP3, STAND_SP3 -> generateName(special3Key.getBoundKeyTranslationKey());
+                case UTIL -> generateName(utility.getBoundKeyTranslationKey());
+                case COMBO_BREAKER -> "Combo Breaker";
+                case COOLDOWN_CANCEL -> generateName(cooldownCancel.getBoundKeyTranslationKey());
+                case DASH -> generateName(dash.getBoundKeyTranslationKey());
+            };
 
-                boolean isSpec = i > 11;
-                float defaultAlpha = 0.65f;
-                int xOffset = 0;
+            boolean isSpec = i > 11;
+            float defaultAlpha = 0.65f;
+            int xOffset = 0;
 
-                String finalText = keyBindText + " - " + MathHelper.clamp(cooldown, 0.0, 9999.0) + "s";
+            String finalText = keyBindText + " - " + decimalFormat.format(MathHelper.clamp(cooldown, 0.0, 9999.0)) + "s";
 
-                if (i < 8 || isSpec) {
-                    if (!isSpec) finalText = "s." + finalText;
+            if (i < 8 || isSpec) {
+                if (!isSpec) finalText = "s." + finalText;
 
-                    if ((isSpec && standOn) || (!isSpec && !standOn)) {
-                        xOffset = 48;
-                        defaultAlpha = 0.3f;
-                    }
+                if ((isSpec && standOn) || (!isSpec && !standOn)) {
+                    xOffset = 48;
+                    defaultAlpha = 0.3f;
                 }
-
-                float offsetY = selectedY * (1.25f) + (isSpec ? 9 * (i - 9) : 9 * i);
-                //RenderSystem.setShaderTexture(0, BIND_BG);
-                //DrawableHelper.drawTexture(matrixStack, maxX + xOffset + 6, (int) offsetY - 2, 0, 0, 10, 10, 10, 10);
-                textRenderer.drawWithShadow(
-                        matrixStack,
-                        finalText,
-                        selectedX + xOffset,
-                        offsetY,
-                        ColorUtils.HSBAtoRGBA(0.3f - (float) (double) cooldown * 10f / 720f, (cooldown < 1.6) ? 0.0f : 1.0f, 1.0f, (cooldown < 1.6) ? 1.0f : defaultAlpha),
-                        true
-                );
             }
+
+            float offsetY = selectedY * (1.25f) + (isSpec ? 9 * (i - 9) : 9 * i);
+            //RenderSystem.setShaderTexture(0, BIND_BG);
+            //DrawableHelper.drawTexture(matrixStack, maxX + xOffset + 6, (int) offsetY - 2, 0, 0, 10, 10, 10, 10);
+            textRenderer.drawWithShadow(
+                    matrixStack,
+                    finalText,
+                    selectedX + xOffset,
+                    offsetY,
+                    ColorUtils.HSBAtoRGBA(0.3f - (float) (double) cooldown * 10f / 720f, (cooldown < 1.6) ? 0.0f : 1.0f, 1.0f, (cooldown < 1.6) ? 1.0f : defaultAlpha),
+                    true
+            );
         }
         RenderSystem.setShaderTexture(0, InGameHud.GUI_ICONS_TEXTURE);
     }
