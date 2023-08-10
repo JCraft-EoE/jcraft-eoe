@@ -46,6 +46,11 @@ repositories {
 		url = "https://maven.terraformersmc.com/releases/"
 	}
 
+	maven {
+		name = "EngineHub"
+		url = "https://maven.enginehub.org/artifactory/libs-release"
+	}
+
 	mavenCentral()
 }
 
@@ -73,6 +78,7 @@ dependencies {
 	runtimeOnly('org.joml:joml:1.10.4')
 	modImplementation("maven.modrinth:sodium:${project.sodium}")
 	modImplementation "com.ptsmods:devlogin:3.3.2" // To login into your Minecraft account
+	modRuntimeOnly "com.sk89q.worldedit:worldedit-fabric-mc1.19.2:7.2.12"
 
 	// Bendylib
 	include modImplementation("io.github.kosmx.bendy-lib:bendy-lib-fabric:${project.bendylib_version}")
