@@ -13,6 +13,8 @@ import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -22,7 +24,11 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPTWEntity.State> {
+    public static final Attack crm1 = new Attack(8, JCraft.lightCooldown, 0.75f, 19, 12, 1.8, 7f, 0f, AttackType.BOX, 0.55f, 0.8f, 0, JSoundRegistry.IMPACT_8)
+            .setLaunch()
+            .setInfo("Ground Slam", "low hitbox, decent damage, launches");
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 5, 1.5, 5f, 0.2f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegistry.IMPACT_1)
+            .crouchingVariation(crm1)
             .setInfo("Punch", "quick combo starter, low knockback");
     public static final Attack barrage = new Attack(2, 17, 0.75f, 60, 0, 2, 1f, 0.25f, AttackType.BARRAGE, 2, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
@@ -95,7 +101,10 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        handleAttack(light, CooldownType.STAND_LIGHT, State.PUNCH);
+        if (getUserOrThrow().isSneaking())
+            handleAttack(crm1, CooldownType.STAND_LIGHT, State.GROUND_SLAM);
+        else
+            handleAttack(light, CooldownType.STAND_LIGHT, State.PUNCH);
     }
 
     @Override
@@ -168,6 +177,19 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
                 for (LivingEntity ent : entities)
                     ent.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 5, 10, true, false));
             }
+            case (8) -> {
+                if (!hasUser()) return;
+
+                Vec3d pos = getUserOrThrow().getPos();
+                for (LivingEntity living : entities) {
+                    Vec3d launchVec = living.getPos().subtract(pos).normalize().multiply(1.3);
+                    living.addVelocity(launchVec.x, launchVec.y + 0.4, launchVec.z);
+
+                    living.velocityModified = true;
+                    if (living instanceof ServerPlayerEntity serverPlayer)
+                        serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(serverPlayer));
+                }
+            }
         }
     }
 
@@ -206,7 +228,8 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
         BACK_HAND(builder -> builder.playAndHold("animation.sptw.backhand")),
         GRAB(builder -> builder.playAndHold("animation.sptw.grab")),
         GRAB_HIT(builder -> builder.playAndHold("animation.sptw.grabhit")),
-        TIME_SKIP(builder -> builder.loop("animation.sptw.idle"));
+        TIME_SKIP(builder -> builder.loop("animation.sptw.idle")),
+        GROUND_SLAM(builder -> builder.playAndHold("animation.sptw.groundslam"));
 
         private final Consumer<AnimationBuilder> animator;
 

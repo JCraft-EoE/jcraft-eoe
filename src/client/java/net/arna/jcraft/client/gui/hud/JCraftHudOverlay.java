@@ -37,7 +37,7 @@ public class JCraftHudOverlay {
             RenderSystem.setShaderTexture(0, FULL_GAUGE);
             DrawableHelper.drawTexture(matrixStack, gaugeX, height - 65, 0, 0, (int) stand.getStandGauge() * gaugeWidth / 90, 5, gaugeWidth, 5);
 
-            if (stand instanceof MadeInHeavenEntity madeInHeaven) {
+            if (stand instanceof MadeInHeavenEntity madeInHeaven && madeInHeaven.getAccelTime() > 0) {
                 RenderSystem.setShaderColor(1, 0.8f, 0, 1);
                 RenderSystem.setShaderTexture(0, EMPTY_GAUGE);
                 DrawableHelper.drawTexture(matrixStack, gaugeX, height - 71, 0, 0,
