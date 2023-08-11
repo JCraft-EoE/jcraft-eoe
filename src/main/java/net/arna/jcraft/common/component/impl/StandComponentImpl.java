@@ -8,6 +8,8 @@ import net.arna.jcraft.common.entity.StandEntity;
 import net.arna.jcraft.common.entity.StandType;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 
@@ -50,8 +52,8 @@ public class StandComponentImpl implements StandComponent {
         if (stand != null && !stand.isAlive())
             setStand(null);
         // Checks if the stand user has a passenger, and updates the stand if the passenger and stand do not match
-        if (entity.getFirstPassenger() instanceof StandEntity<?, ?> passenger)
-            if (stand != passenger) setStand(passenger);
+        if (entity.getFirstPassenger() instanceof StandEntity<?, ?> passenger && stand != passenger)
+            setStand(passenger);
         // Otherwise, returns the stored stand value
         return stand;
     }
@@ -71,5 +73,21 @@ public class StandComponentImpl implements StandComponent {
     public void writeToNbt(@NonNull NbtCompound tag) {
         tag.putInt("Type", type == null ? 0 : type.getId());
         tag.putInt("Skin", skin);
+    }
+
+    @Override
+    public void applySyncPacket(PacketByteBuf buf) {
+        StandComponent.super.applySyncPacket(buf);
+
+        Entity entity = buf.readBoolean() ? this.entity.world.getEntityById(buf.readVarInt()) : null;
+        if (entity == null || entity instanceof StandEntity<?,?>) stand = (StandEntity<?, ?>) entity;
+    }
+
+    @Override
+    public void writeSyncPacket(PacketByteBuf buf, ServerPlayerEntity recipient) {
+        StandComponent.super.writeSyncPacket(buf, recipient);
+
+        buf.writeBoolean(stand != null);
+        if (stand != null) buf.writeVarInt(stand.getId());
     }
 }
