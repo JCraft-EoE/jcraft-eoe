@@ -1002,6 +1002,184 @@
 				}
 			}
 		},
+		"animation.thefool.drill": {
+			"animation_length": 0.76,
+			"bones": {
+				"leftforearm": {
+					"rotation": {
+						"vector": [20, 0, 0]
+					}
+				},
+				"rightarm": {
+					"rotation": {
+						"vector": [0, 0, -47.5]
+					},
+					"position": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"rightforearm": {
+					"rotation": {
+						"vector": [-22.5, 0, -20]
+					}
+				},
+				"rightleg": {
+					"rotation": {
+						"vector": [0, 0, -62.5]
+					}
+				},
+				"rightwheel": {
+					"rotation": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"leftleg": {
+					"rotation": {
+						"vector": [0, 0, 62.5]
+					}
+				},
+				"leftwheel": {
+					"rotation": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"torso": {
+					"rotation": {
+						"0.0": {
+							"vector": [-15, 0, 0]
+						},
+						"0.48": {
+							"vector": [-5, 0, 0],
+							"easing": "easeOutBack"
+						}
+					},
+					"position": {
+						"vector": [0, -1, 0]
+					}
+				},
+				"upper_torso": {
+					"rotation": {
+						"0.0": {
+							"vector": [10, 0, 0]
+						},
+						"0.48": {
+							"vector": [40, 0, 0],
+							"easing": "easeOutBack"
+						}
+					}
+				},
+				"head": {
+					"rotation": {
+						"vector": [20, 0, 0]
+					}
+				},
+				"jaw": {
+					"rotation": {
+						"vector": [-5, 0, 0]
+					}
+				},
+				"right_arm": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, -47.5]
+						},
+						"0.24": {
+							"vector": [-70.66607, -73.81271, -21.3674],
+							"easing": "easeOutSine"
+						}
+					},
+					"position": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"right_lower_arm": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, -15]
+						},
+						"0.24": {
+							"vector": [0, 0, -105],
+							"easing": "easeOutSine"
+						}
+					}
+				},
+				"right_paw": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 7.5]
+						},
+						"0.24": {
+							"vector": [22.5, 0, 17.5],
+							"easing": "easeOutSine"
+						}
+					},
+					"scale": {
+						"vector": [1.2, 1.3, 1]
+					}
+				},
+				"left_arm": {
+					"rotation": {
+						"0.0": {
+							"vector": [177.36962, -166.40252, -135.9205]
+						},
+						"0.24": {
+							"vector": [269.52039, -256.11043, -193.94904],
+							"easing": "easeOutSine"
+						}
+					}
+				},
+				"left_lower_arm": {
+					"rotation": {
+						"0.0": {
+							"vector": [-17.35763, 6.86185, -33.70539]
+						},
+						"0.24": {
+							"vector": [0.7899, 5.40648, -106.67633],
+							"easing": "easeOutSine"
+						}
+					}
+				},
+				"left_paw": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 15]
+						},
+						"0.24": {
+							"vector": [-17.5, 0, 25],
+							"easing": "easeOutSine"
+						}
+					},
+					"scale": {
+						"vector": [1.3, 1.3, 1]
+					}
+				},
+				"left_leg": {
+					"rotation": {
+						"vector": [0, 0, 30]
+					}
+				},
+				"left_wheel": {
+					"rotation": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"right_leg": {
+					"rotation": {
+						"vector": [0, 0, -30]
+					}
+				},
+				"right_wheel": {
+					"rotation": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"glider": {
+					"scale": {
+						"vector": [0, 0, 0]
+					}
+				}
+			}
+		},
 		"animation.thefool.combo": {
 			"animation_length": 1.68,
 			"bones": {

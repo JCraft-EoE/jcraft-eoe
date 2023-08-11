@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQBTDEntity.State> {
-    public static final Attack light = Attack.copyOf(KillerQueenEntity.light);
     public static final Attack heavy = new Attack(2, 12, 0.75f, 9, 5, 1, 7.5f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegistry.IMPACT_4)
             .setHitspark(2)
             .setLaunch()

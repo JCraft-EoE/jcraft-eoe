@@ -66,8 +66,9 @@ public class JCraft implements ModInitializer {
     // Unchanging mod values
     public static final String MOD_ID = "jcraft";
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
-
-
+    public static void prefixedLog(boolean isClient, String s) {
+        LOGGER.info(isClient ? "CLIENT: " : "SERVER: " + s);
+    }
     public static final int SPEC_QUEUE_MOVESTUN_LIMIT = 11; // exclusive, 10 -> 0.5s window for queueing moves
     public static final int QUEUE_MOVESTUN_LIMIT = 7; // exclusive, 6 -> 0.3s window for queueing moves
 
@@ -316,7 +317,10 @@ public class JCraft implements ModInitializer {
         stand.setPosition(player.getPos().subtract(player.getRotationVector()));
         stand.startRiding(player);
         stand.setUser(player);
+
         world.spawnEntity(stand);
+
+        standData.setStand(stand);
         return stand;
     }
 
