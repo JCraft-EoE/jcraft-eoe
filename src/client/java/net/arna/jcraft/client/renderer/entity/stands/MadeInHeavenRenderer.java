@@ -7,6 +7,7 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import software.bernie.geckolib3.geo.render.built.GeoModel;
@@ -29,8 +30,9 @@ public class MadeInHeavenRenderer extends StandEntityRenderer<MadeInHeavenEntity
         Vec3d baseVel = Vec3d.ZERO;
         float bodyYaw = animatable.bodyYaw;
         if (animatable.hasUser()) {
-            baseVel = animatable.getUser().getVelocity();
-            bodyYaw = animatable.getUser().bodyYaw;
+            LivingEntity user = animatable.getUserOrThrow();
+            baseVel = user.getVelocity();
+            bodyYaw = user.bodyYaw;
         }
 
         for (int i = 0; i <= 3; ++i)
