@@ -38,7 +38,7 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends GeoEntityR
                                      int packedLightIn, Identifier textureLocation) {
         MinecraftClient mcClient = MinecraftClient.getInstance();
         return mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null && mcClient.player.getFirstPassenger() == stand ?
-                RenderLayer.getEntityNoOutline(getTextureLocation(stand)) : RenderLayer.getEntityTranslucent(getTextureLocation(stand));
+                RenderLayer.getEntityNoOutline(textureLocation) : RenderLayer.getEntityTranslucent(textureLocation);
 
     }
 
