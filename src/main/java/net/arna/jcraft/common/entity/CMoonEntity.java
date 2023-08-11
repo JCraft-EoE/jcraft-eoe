@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.entity;
 
+import lombok.Data;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
@@ -40,7 +41,7 @@ import java.util.function.Consumer;
 //todo: 3d, rotatable shockwave particle effect
 //todo: particles on gravpunch and both slams
 public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
-    public static final Attack crm1 = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegistry.IMPACT_1)
+    public static final Attack crm1 = new Attack(0, JCraft.lightCooldown, 0.75f, 12, 6, 1.5, 5f, 0.75f, AttackType.BOX, 0.45f, -0.1f, 0, JSoundRegistry.IMPACT_1)
             .setInfo("Inversion Punch", "very low stun, delayed slowness");
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegistry.IMPACT_1)
             .crouchingVariation(crm1)
@@ -76,9 +77,25 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             .setInfo("Gravity Shift Pulse", """
                     changes the gravitational direction of nearby entities to the users looked direction""");
 
-    public final ArrayList<Float> invertDamages = new ArrayList<>();
-    public final ArrayList<LivingEntity> invertEntities = new ArrayList<>();
-    public final ArrayList<Integer> invertTimes = new ArrayList<>();
+    @Data
+    private static class Inversion {
+        private int time;
+        private float damage;
+        private LivingEntity entity;
+        private boolean doSlow = false;
+        private Inversion(int time, float damage, LivingEntity entity) {
+            this.time = time;
+            this.damage = damage;
+            this.entity = entity;
+        }
+        private Inversion(int time, float damage, LivingEntity entity, boolean doSlow) {
+            this.time = time;
+            this.damage = damage;
+            this.entity = entity;
+            this.doSlow = doSlow;
+        }
+    }
+    public final ArrayList<Inversion> inversions = new ArrayList<>();
 
     public CMoonEntity(World worldIn) {
         super(StandType.C_MOON, worldIn);
@@ -134,7 +151,10 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        handleAttack(light, CooldownType.STAND_LIGHT, State.LIGHT);
+        if (getUserOrThrow().isSneaking())
+            handleAttack(crm1, CooldownType.STAND_LIGHT, State.INVERSION_PUNCH);
+        else
+            handleAttack(light, CooldownType.STAND_LIGHT, State.LIGHT);
     }
 
     @Override
@@ -252,19 +272,22 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
         if (!hasUser()) return;
         LivingEntity user = getUserOrThrow();
 
-        for (LivingEntity ent : entities) {
-            invertDamages.add(attack == barrage ? 0.25f : 0.5f);
-            invertEntities.add(ent);
-            invertTimes.add(40);
+        int attackID = attack.id;
 
-            if (attack.id == gravpunch.id) {
+        for (LivingEntity ent : entities) {
+            if (attackID == crm1.id)
+                inversions.add( new Inversion(70, 0.5f, ent, true) );
+            else
+                inversions.add( new Inversion(40, attackID == barrage.id ? 0.25f : 0.5f, ent) );
+
+            if (attackID == gravpunch.id) {
                 GravityChangerAPI.addGravity(ent, new Gravity(Direction.UP, 2, 60, "stand"));
                 ent.addStatusEffect(new StatusEffectInstance(JStatusRegistry.WEIGHTLESS, 60, 0, true, false));
                 ent.velocityModified = true;
             }
         }
 
-        switch (attack.id) {
+        switch (attackID) {
             case (4) -> { // Block Launch
                 BlockProjectile block = new BlockProjectile(JEntityTypeRegistry.BLOCK_PROJECTILE, world);
                 BlockState steppingState = getSteppingBlockState();
@@ -371,15 +394,18 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             } else {
                 directionChangeCooldown--;
 
-                for (int i = 0; i < invertTimes.size(); i++) {
-                    int time = invertTimes.get(i);
-                    invertTimes.set(i, time - 1);
+                for (int i = 0; i < inversions.size(); i++) {
+                    Inversion inversion = inversions.get(i);
+                    int time = inversion.getTime();
+                    inversion.setTime(time - 1);
+
                     if (time < 1) {
-                        LivingEntity entity = invertEntities.get(i);
-                        damage(invertDamages.get(i), DamageSource.mob(user), entity);
-                        invertTimes.remove(i);
-                        invertEntities.remove(i);
-                        invertDamages.remove(i);
+                        LivingEntity entity = inversion.getEntity();
+                        damage(inversion.getDamage(), DamageSource.mob(user), entity);
+                        inversions.remove(i);
+
+                        if (inversion.doSlow)
+                            entity.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 20, 1, true, false));
                         i--;
                     }
                 }
@@ -434,7 +460,8 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
         GROUND_SLAM(builder -> builder.playAndHold("animation.cmoon.groundslam")),
         GROUND_SHOOT(builder -> builder.playAndHold("animation.cmoon.groundshoot")),
         GRAV_SHIFT(builder -> builder.playAndHold("animation.cmoon.gravshift")),
-        DIRECTIONAL_SHIFT(builder -> builder.playAndHold("animation.cmoon.directionalshift"));
+        DIRECTIONAL_SHIFT(builder -> builder.playAndHold("animation.cmoon.directionalshift")),
+        INVERSION_PUNCH(builder -> builder.playAndHold("animation.cmoon.inversionpunch"));
 
         private final Consumer<AnimationBuilder> animator;
 

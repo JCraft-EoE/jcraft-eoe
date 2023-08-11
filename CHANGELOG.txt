@@ -1552,8 +1552,9 @@ Anubis
         >Hitting opponents (regardless of if they blocked) now speeds up the next attack by 25%
         >25% of the speed boost is removed every 5 seconds spent without a landed hit
 
-● 9/8/2023
+● 11/8/2023
 >Removed some debugging logs
+>Smoothed out stand transparency
 
 The World
     >Updated skin 2
@@ -1575,6 +1576,9 @@ Golden Experience
 
 The Fool
     >Updated default and skin 2
+
+C-Moon
+    >Added crouching variant to Light
 
 Made in Heaven
     >Reworked Time Acceleration
