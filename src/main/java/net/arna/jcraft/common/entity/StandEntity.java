@@ -94,6 +94,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     private static final TrackedData<Boolean> REMOTE;
 
     protected int tsTime = 0;
+    @Getter
+    private float prevAlpha = 1f;
 
 
     public Boolean blocking = false;
@@ -783,6 +785,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if (isDead()) return;
 
         boolean client = world.isClient;
+
+        prevAlpha = getAlpha();
 
         if (user == null) {
             if (client && getVehicle() instanceof LivingEntity living)

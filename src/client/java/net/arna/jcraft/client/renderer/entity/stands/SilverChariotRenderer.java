@@ -23,14 +23,14 @@ public class SilverChariotRenderer extends StandEntityRenderer<SilverChariotEnti
 
     // Adds ability to change render alpha
     @Override
-    public void render(GeoModel model, SilverChariotEntity animatable, float partialTicks, RenderLayer type, MatrixStack matrixStack,
+    public void render(GeoModel model, SilverChariotEntity animatable, float tickDelta, RenderLayer type, MatrixStack matrixStack,
                        VertexConsumerProvider renderTypeBuffer, VertexConsumer vertexBuilder, int packedLightIn, int packedOverlayIn,
                        float red, float green, float blue, float alpha) {
-        super.render(model, animatable, partialTicks, type, matrixStack, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+        super.render(model, animatable, tickDelta, type, matrixStack, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 
         if (animatable.getMode() == 2 && animatable.hasUser()) for (double i = 0; i < 3; i++)
             renderAfter(animatable.getUserOrThrow(), JUtils.deltaPos(animatable).multiply(i * 2.0), 1f,
-                    model, animatable, partialTicks, RenderLayer.getEntityNoOutline(getTextureLocation(animatable)),
+                    model, animatable, tickDelta, RenderLayer.getEntityNoOutline(getTextureLocation(animatable)),
                     matrixStack, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue,
                     alpha);
     }

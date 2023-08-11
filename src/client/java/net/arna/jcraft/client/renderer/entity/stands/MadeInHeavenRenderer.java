@@ -18,12 +18,12 @@ public class MadeInHeavenRenderer extends StandEntityRenderer<MadeInHeavenEntity
     }
 
     @Override
-    public void render(GeoModel model, MadeInHeavenEntity animatable, float partialTicks, RenderLayer type, MatrixStack matrixStack, VertexConsumerProvider renderTypeBuffer, VertexConsumer vertexBuilder, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
-        super.render(model, animatable, partialTicks, type, matrixStack, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+    public void render(GeoModel model, MadeInHeavenEntity animatable, float tickDelta, RenderLayer type, MatrixStack matrixStack, VertexConsumerProvider renderTypeBuffer, VertexConsumer vertexBuilder, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+        super.render(model, animatable, tickDelta, type, matrixStack, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 
         if (!animatable.getAfterimage()) return;
 
-        float aa = getAlpha(animatable) - 0.5f;
+        float aa = shouldApplyAlpha(animatable) ? animatable.getAlpha() - 0.5f : .5f;
         if (aa < 0) aa = 0;
 
         Vec3d baseVel = Vec3d.ZERO;
@@ -34,7 +34,7 @@ public class MadeInHeavenRenderer extends StandEntityRenderer<MadeInHeavenEntity
         }
 
         for (int i = 0; i <= 3; ++i)
-            renderAfter(baseVel.multiply(i), bodyYaw, aa * (1f / i), model, animatable, partialTicks,
+            renderAfter(baseVel.multiply(i), bodyYaw, aa * (1f / i), model, animatable, tickDelta,
                     RenderLayer.getEntityNoOutline(getTextureLocation(animatable)), matrixStack, renderTypeBuffer,
                     vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
     }
