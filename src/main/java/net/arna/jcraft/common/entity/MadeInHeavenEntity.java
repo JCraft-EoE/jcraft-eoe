@@ -217,7 +217,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
 
     @Override
     public void initUlt() {
-        if (speedometer <= 0 || !canAttack()) return;
+        if (!canAttack()) return;
         if (handleAttack(timeaccel, CooldownType.STAND_ULT, State.TIME_ACCELERATION))
             playSound(JSoundRegistry.MIH_TACCEL, 1, 1);
     }
@@ -497,6 +497,8 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                 }
 
                 setAfterimage(false);
+
+                speedometer = 0;
             }
 
             if (userIsStunned) {
