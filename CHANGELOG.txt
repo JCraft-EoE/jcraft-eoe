@@ -1581,6 +1581,9 @@ Made in Heaven
         >Speedometer may now only be charged after using it, and affects how fast you are
     >Fixed incorrect name for skin 1
 
+The World: Over Heaven
+    >Added crouching variant to Light
+
 Star Platinum: The World
     >Added crouching variant to Light
 

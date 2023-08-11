@@ -45,7 +45,12 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEntity, TheWorldOverHeavenEntity.State> {
+    public static final Attack crm1 = new Attack(9, JCraft.lightCooldown, 0.75f, 16, 10, 1.75, 8f, 1f, AttackType.BOX, 0.8f, 0, 0, JSoundRegistry.TW_KICK_HIT)
+            .setLaunch()
+            .setHitspark(2)
+            .setInfo("Lunge", "medium speed launcher");
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 4, 1.5, 6f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0, JSoundRegistry.IMPACT_1)
+            .crouchingVariation(crm1)
             .setInfo("Punch", "quick combo starter");
     public static final Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 1.5f, 0, 3, JSoundRegistry.IMPACT_1)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
@@ -161,7 +166,10 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        handleAttack(light, CooldownType.STAND_LIGHT, State.LIGHT);
+        if (getUserOrThrow().isSneaking())
+            handleAttack(Attack.copyOf(crm1), CooldownType.STAND_LIGHT, State.LUNGE);
+        else
+            handleAttack(light, CooldownType.STAND_LIGHT, State.LIGHT);
     }
 
     @Override
@@ -386,14 +394,20 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             return;
         }
 
-        if (getOverwriteType() != 0 && getMoveStun() <= 0) setOverwriteType(0);
+        int moveStun = getMoveStun();
+
+        if (moveStun <= 0) {
+            if (getOverwriteType() != 0) setOverwriteType(0);
+        } else if (curAttack != null && curAttack.id == crm1.id) {
+            if (moveStun <= 11 && moveStun > 5) curAttack.attackDist += 0.15f;
+        }
 
         for (int i = 0; i < overwriteTimes.size(); i++) {
-            int time = overwriteTimes.get(i);
+            int time = overwriteTimes.getInt(i);
             overwriteTimes.set(i, time - 1);
 
             if (time < 1) {
-                overwriteTimes.remove(i);
+                overwriteTimes.removeInt(i);
                 overwriteEnts.remove(i);
                 i--;
             } else {
@@ -454,7 +468,8 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         OVERWRITE(builder -> builder.playAndHold("animation.twoh.overwrite")),
         THROW(builder -> builder.playAndHold("animation.twoh.throw")),
         AIR_KNIVES(builder -> builder.playAndHold("animation.twoh.airknives")),
-        TIMESKIP(builder -> builder.loop("animation.twoh.idle"));
+        TIMESKIP(builder -> builder.loop("animation.twoh.idle")),
+        LUNGE(builder -> builder.loop("animation.twoh.lunge"));
 
         private final Consumer<AnimationBuilder> animator;
 

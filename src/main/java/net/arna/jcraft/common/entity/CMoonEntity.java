@@ -40,9 +40,11 @@ import java.util.function.Consumer;
 //todo: 3d, rotatable shockwave particle effect
 //todo: particles on gravpunch and both slams
 public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
+    public static final Attack crm1 = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegistry.IMPACT_1)
+            .setInfo("Inversion Punch", "very low stun, delayed slowness");
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegistry.IMPACT_1)
+            .crouchingVariation(crm1)
             .setInfo("Punch", "quick combo starter");
-
     public static final Attack barrage = Attack.barrageAttack(2, 17, 0.75f, 50, 0, 2, 0.75f, 0.25f, 1, 0, 4, JSoundRegistry.IMPACT_3)
             .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
     public static final Attack gutpunch = new Attack(1, 17, 1f, 30, 19, 2.0, 8f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegistry.TW_KICK_HIT)
