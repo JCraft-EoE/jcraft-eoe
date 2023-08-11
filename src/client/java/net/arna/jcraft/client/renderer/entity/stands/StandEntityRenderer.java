@@ -1,6 +1,7 @@
 package net.arna.jcraft.client.renderer.entity.stands;
 
 import net.arna.jcraft.common.entity.StandEntity;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -60,7 +61,7 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends GeoEntityR
 
     protected boolean shouldApplyAlpha(T stand) {
         MinecraftClient mcClient = MinecraftClient.getInstance();
-        return mcClient.player != null && mcClient.options.getPerspective().isFirstPerson() && mcClient.player.getFirstPassenger() == stand;
+        return mcClient.player != null && mcClient.options.getPerspective().isFirstPerson() && JUtils.getStand(mcClient.player) == stand;
     }
 
     protected float getRed(T stand, float red, float alpha) {
