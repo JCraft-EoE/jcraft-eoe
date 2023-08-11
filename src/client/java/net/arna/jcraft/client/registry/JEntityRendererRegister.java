@@ -1,6 +1,8 @@
 package net.arna.jcraft.client.registry;
 
 import net.arna.jcraft.client.renderer.entity.*;
+import net.arna.jcraft.client.renderer.entity.projectiles.*;
+import net.arna.jcraft.client.renderer.entity.stands.*;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 

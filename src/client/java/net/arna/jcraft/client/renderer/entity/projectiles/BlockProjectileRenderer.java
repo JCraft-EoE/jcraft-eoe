@@ -1,4 +1,4 @@
-package net.arna.jcraft.client.renderer.entity;
+package net.arna.jcraft.client.renderer.entity.projectiles;
 
 import net.arna.jcraft.client.model.entity.BlockProjectileModel;
 import net.arna.jcraft.common.entity.projectile.BlockProjectile;

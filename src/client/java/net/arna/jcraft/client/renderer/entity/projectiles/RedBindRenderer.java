@@ -1,4 +1,4 @@
-package net.arna.jcraft.client.renderer.entity;
+package net.arna.jcraft.client.renderer.entity.projectiles;
 
 import net.arna.jcraft.client.model.entity.RedBindModel;
 import net.arna.jcraft.common.entity.projectile.RedBindEntity;
@@ -11,7 +11,9 @@ import net.minecraft.util.Identifier;
 import software.bernie.geckolib3.renderers.geo.GeoProjectilesRenderer;
 
 public class RedBindRenderer extends GeoProjectilesRenderer<RedBindEntity> {
-    public RedBindRenderer(EntityRendererFactory.Context renderManagerIn) { super(renderManagerIn, new RedBindModel()); }
+    public RedBindRenderer(EntityRendererFactory.Context renderManagerIn) {
+        super(renderManagerIn, new RedBindModel());
+    }
 
     @Override
     public RenderLayer getRenderType(RedBindEntity animatable, float partialTicks, MatrixStack stack,

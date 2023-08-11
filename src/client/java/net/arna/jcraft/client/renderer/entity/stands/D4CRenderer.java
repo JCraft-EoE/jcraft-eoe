@@ -1,4 +1,4 @@
-package net.arna.jcraft.client.renderer.entity;
+package net.arna.jcraft.client.renderer.entity.stands;
 
 import net.arna.jcraft.client.model.entity.StandEntityModel;
 import net.arna.jcraft.common.entity.D4CEntity;
