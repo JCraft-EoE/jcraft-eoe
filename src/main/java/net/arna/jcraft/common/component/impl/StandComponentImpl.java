@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class StandComponentImpl implements StandComponent {
     private final Entity entity;
+    private StandEntity<?, ?> stand;
     @Getter
     private StandType type;
     @Getter
@@ -37,10 +38,22 @@ public class StandComponentImpl implements StandComponent {
         sync();
     }
 
+    @Override
+    public void setStand(@Nullable StandEntity<?, ?> stand) {
+        this.stand = stand;
+        sync();
+    }
+
     @Nullable
     @Override
     public StandEntity<?, ?> getStand() {
-        return entity.getFirstPassenger() instanceof StandEntity<?, ?> stand ? stand : null;
+        if (stand != null && !stand.isAlive())
+            setStand(null);
+        // Checks if the stand user has a passenger, and updates the stand if the passenger and stand do not match
+        if (entity.getFirstPassenger() instanceof StandEntity<?, ?> passenger)
+            if (stand != passenger) setStand(passenger);
+        // Otherwise, returns the stored stand value
+        return stand;
     }
 
     private void sync() {

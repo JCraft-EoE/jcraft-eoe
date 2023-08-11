@@ -345,9 +345,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         detach();
 
-        this.noClip = false;
-
-        this.velocityDirty = true;
+        noClip = false;
+        velocityDirty = true;
         setPos(fPos.x, user.getY() + 0.5, fPos.z);
     }
 
@@ -356,12 +355,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      */
     protected void endRemote() {
         setFree(false);
-
         setAlpha(1);
-
         startRiding(user);
-
-        this.noClip = true;
+        noClip = true;
     }
 
     /*
@@ -814,14 +810,13 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         // Common code for remote mode
         if (isRemote) {
             if (hasVehicle()) detach();
-            if (!user.isAlive())
-                discard();
+            if (user.isAlive()) {
+                // Clientside rotational sync for remote mode
+                user.setBodyYaw(user.getHeadYaw());
 
-            // Clientside rotational sync for remote mode
-            user.setBodyYaw(user.getHeadYaw());
-
-            setHeadYaw(user.getHeadYaw());
-            setRotation(user.getYaw(), user.getPitch());
+                setHeadYaw(user.getHeadYaw());
+                setRotation(user.getYaw(), user.getPitch());
+            } else discard();
         } else if (!hasVehicle() && !getFree())
             startRiding(user, true);
 
