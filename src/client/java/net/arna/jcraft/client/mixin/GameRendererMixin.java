@@ -3,16 +3,20 @@ package net.arna.jcraft.client.mixin;
 import com.mojang.datafixers.util.Pair;
 import net.arna.jcraft.client.registry.JShaderRegistry;
 import net.arna.jcraft.client.rendering.PostProcessHandler;
+import net.arna.jcraft.common.entity.CreamEntity;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Shader;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.io.IOException;
@@ -40,5 +44,11 @@ public class GameRendererMixin {
     @Inject(method = "onResized", at = @At(value = "HEAD"))
     public void jcraft$injectionResizeListener(int width, int height, CallbackInfo ci) {
         PostProcessHandler.resize(width, height);
+    }
+
+    @Inject(method = "method_18144", at = @At("HEAD"), cancellable = true)
+    private static void preventUserHittingCreamWhenInBall(Entity entity, CallbackInfoReturnable<Boolean> cir) {
+        if (entity instanceof CreamEntity cream && cream.isHalfBall() && JUtils.getStand(MinecraftClient.getInstance().player) == cream)
+            cir.setReturnValue(false);
     }
 }
