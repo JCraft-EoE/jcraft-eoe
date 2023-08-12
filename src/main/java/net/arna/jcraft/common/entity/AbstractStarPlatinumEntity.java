@@ -117,8 +117,5 @@ public abstract sealed class AbstractStarPlatinumEntity<E extends AbstractStarPl
     public void tick() {
         if (age == 1) playSound(JSoundRegistry.STAR_PLATINUM_SUMMON, 1f, 1f);
         super.tick();
-
-        if (world.isClient && hasUser())
-            setAlpha((float) MathHelper.clamp(255.0 * squaredDistanceTo(getUser()) / 2, 0.0, 255.0) / 255f);
     }
 }

@@ -14,7 +14,6 @@ import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -206,12 +205,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         if (age == 1) playSound(JSoundRegistry.WS_SUMMON, 1f, 1f);
         super.tick();
 
-        if (!getRemote()) {
-            if (hasUser()) setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(getUser()) / 2, 0.0, 255.0) / 255f);
-            return;
-        }
-
-        if (world.isClient) return;
+        if (!getRemote() || world.isClient) return;
 
         double f = getRemoteForwardInput();
         double s = getRemoteSideInput();

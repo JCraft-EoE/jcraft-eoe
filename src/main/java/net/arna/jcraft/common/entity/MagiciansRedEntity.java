@@ -330,8 +330,6 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
                             ServerChannelFeedbackPacket.send(sendPlayer, buf);
                     }
                 }
-
-                this.setAlpha((float) MathHelper.clamp(255.0 * squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
             }
         }
     }

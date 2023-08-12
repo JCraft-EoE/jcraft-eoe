@@ -492,8 +492,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                             ent.damage(DamageSource.OUT_OF_WORLD, 2.5f);
                         }
 
-
-                        setAlpha(0);
+                        setAlphaOverride(0);
                     }
 
                     if (notCorS && !getFree())
@@ -515,43 +514,42 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                     setFree(false);
                 }
 
-                if (isHalfBall()) {
-                    setAlpha(0.1f);
-                    user.onLanding();
-                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 5, 9, true, false));
+                if (!isHalfBall()) return;
+                setAlphaOverride(0.1f);
+                user.onLanding();
+                user.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 5, 9, true, false));
 
-                    // Player Half-Ball controls
-                    if (user instanceof ServerPlayerEntity serverPlayer) {
-                        if (lastRemoteInputTime - age > 4) updateRemoteInputs(0, 0, false);
+                // Player Half-Ball controls
+                if (user instanceof ServerPlayerEntity serverPlayer) {
+                    if (lastRemoteInputTime - age > 4) updateRemoteInputs(0, 0, false);
 
-                        Vec3d finalSpeed = Vec3d.ZERO;
-                        if (!blocking && !user.hasStatusEffect(JStatusRegistry.DAZED)) {
-                            Vec3d eP = user.getEyePos();
-                            Vec3d groundPos = world.raycast(
-                                    new RaycastContext(eP, eP.add(0, -24, 0), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user)
-                            ).getPos();
+                    Vec3d finalSpeed = Vec3d.ZERO;
+                    if (!blocking && !user.hasStatusEffect(JStatusRegistry.DAZED)) {
+                        Vec3d eP = user.getEyePos();
+                        Vec3d groundPos = world.raycast(
+                                new RaycastContext(eP, eP.add(0, -24, 0), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user)
+                        ).getPos();
 
-                            double groundDist = groundPos.distanceTo(pos);
-                            double stabilization = user.getVelocity().y;
-                            if (stabilization < 0) stabilization *= -0.75;
-                            else stabilization = 0;
+                        double groundDist = groundPos.distanceTo(pos);
+                        double stabilization = user.getVelocity().y;
+                        if (stabilization < 0) stabilization *= -0.75;
+                        else stabilization = 0;
 
-                            if (getRemoteJumpInput()) {
-                                if (groundDist < 5) {
-                                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 10, 2, true, false));
-                                    if (groundDist < 3)
-                                        finalSpeed = finalSpeed.add(0, 0.25 / groundDist + stabilization, 0);
-                                }
+                        if (getRemoteJumpInput()) {
+                            if (groundDist < 5) {
+                                user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 10, 2, true, false));
+                                if (groundDist < 3)
+                                    finalSpeed = finalSpeed.add(0, 0.25 / groundDist + stabilization, 0);
                             }
-
-                            Vec3d rotVec = user.getRotationVector();
-                            finalSpeed = finalSpeed.add(rotVec.multiply(getRemoteForwardInput() / 30)); // Forward movement
-                            finalSpeed = finalSpeed.add(rotVec.rotateY(1.5707963f).multiply(getRemoteSideInput() / 30)); // Side movement
-                            user.addVelocity(finalSpeed.x, finalSpeed.y, finalSpeed.z);
-                            serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(user));
                         }
+
+                        Vec3d rotVec = user.getRotationVector();
+                        finalSpeed = finalSpeed.add(rotVec.multiply(getRemoteForwardInput() / 30)); // Forward movement
+                        finalSpeed = finalSpeed.add(rotVec.rotateY(1.5707963f).multiply(getRemoteSideInput() / 30)); // Side movement
+                        user.addVelocity(finalSpeed.x, finalSpeed.y, finalSpeed.z);
+                        serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(user));
                     }
-                } else setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
+                } else resetAlphaOverride();
             }
         }
     }

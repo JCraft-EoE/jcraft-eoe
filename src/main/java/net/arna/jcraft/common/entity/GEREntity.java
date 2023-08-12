@@ -418,34 +418,28 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
                 user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 5, 1, true, false));
             }
 
-            if (world.isClient) {
-                setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
-            } else {
+            if (world.isClient) return;
                 /*
                 if (rtzTimer-- > 0)
                     if (rtzTimer == 0)
                         rtzEntityData.clear();
                  */
 
-                if (userPlayer instanceof ServerPlayerEntity serverPlayer) {
-                    for (ReturnData data : returnInformation) {
-                        Entity entity = data.getEntity();
-                        if (entity == null || !entity.isAlive()) continue;
-                        Vec3d position = data.getOriginalPos();
-                        PacketByteBuf buf = PacketByteBufs.create();
-                        buf.writeShort(7);
+            if (!(userPlayer instanceof ServerPlayerEntity serverPlayer)) return;
+            for (ReturnData data : returnInformation) {
+                Entity entity = data.getEntity();
+                if (entity == null || !entity.isAlive()) continue;
+                Vec3d position = data.getOriginalPos();
+                PacketByteBuf buf = PacketByteBufs.create();
+                buf.writeShort(7);
 
-                        buf.writeInt(entity.getId());
+                buf.writeInt(entity.getId());
 
-                        buf.writeDouble(position.getX());
-                        buf.writeDouble(position.getY());
-                        buf.writeDouble(position.getZ());
+                buf.writeDouble(position.getX());
+                buf.writeDouble(position.getY());
+                buf.writeDouble(position.getZ());
 
-                        ServerChannelFeedbackPacket.send(
-                                serverPlayer, buf
-                        );
-                    }
-                }
+                ServerChannelFeedbackPacket.send(serverPlayer, buf);
             }
         }
     }

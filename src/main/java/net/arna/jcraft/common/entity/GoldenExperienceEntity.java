@@ -323,9 +323,7 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
         super.tick();
         if (!hasUser()) return;
 
-        if (world.isClient)
-            setAlpha((float) MathHelper.clamp(255.0 * squaredDistanceTo(getUser()) / 2, 0.0, 255.0) / 255f);
-        else if (curAttack == rekka2 && queuedAttack == AttackQueue.SPECIAL2)
+        if (!world.isClient && curAttack == rekka2 && queuedAttack == AttackQueue.SPECIAL2)
             queuedAttack = null;
     }
 

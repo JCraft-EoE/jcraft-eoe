@@ -37,7 +37,7 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends GeoEntityR
                                      @Nullable VertexConsumerProvider renderTypeBuffer, @Nullable VertexConsumer vertexBuilder,
                                      int packedLightIn, Identifier textureLocation) {
         MinecraftClient mcClient = MinecraftClient.getInstance();
-        return mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null && mcClient.player.getFirstPassenger() == stand ?
+        return mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null && JUtils.getStand(mcClient.player) == stand ?
                 RenderLayer.getEntityNoOutline(textureLocation) : RenderLayer.getEntityTranslucent(textureLocation);
 
     }
@@ -47,7 +47,7 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends GeoEntityR
     public void render(GeoModel model, T stand, float tickDelta, RenderLayer type, MatrixStack matrixStackIn,
                        VertexConsumerProvider vertexConsumerProvider, VertexConsumer vertexConsumer, int packedLightIn,
                        int packedOverlayIn, float red, float green, float blue, float alpha) {
-        float a = shouldApplyAlpha(stand) ? MathHelper.lerp(tickDelta, stand.getPrevAlpha(), stand.getAlpha()) : getInitialAlpha(stand);
+        float a = getAlpha(stand, tickDelta);
         a *= alpha;
         if (a <= 0.01f) return;
 
@@ -62,6 +62,19 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends GeoEntityR
     protected boolean shouldApplyAlpha(T stand) {
         MinecraftClient mcClient = MinecraftClient.getInstance();
         return mcClient.player != null && mcClient.options.getPerspective().isFirstPerson() && JUtils.getStand(mcClient.player) == stand;
+    }
+
+    protected float getAlpha(T stand, float tickDelta) {
+        if (!shouldApplyAlpha(stand)) return getInitialAlpha(stand);
+
+        // If we have an alpha override this tick and had one last tick too, just use that.
+        if (stand.hasAlphaOverride() && stand.getPrevAlpha() >= 0) return stand.getAlphaOverride();
+
+        float a = MathHelper.clamp((float) stand.squaredDistanceTo(MinecraftClient.getInstance().player) / 2f, 0, 1);
+        if (!stand.hasAlphaOverride()) return a; // If we don't have an override, use this alpha value.
+
+        // If we do have an override, but didn't last tick, lerp between the previous alpha and the override.
+        return MathHelper.lerp(tickDelta, a, stand.getAlphaOverride());
     }
 
     protected float getRed(T stand, float red, float alpha) {

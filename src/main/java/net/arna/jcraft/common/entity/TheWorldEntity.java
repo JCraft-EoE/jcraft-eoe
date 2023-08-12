@@ -234,9 +234,6 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
         }
 
         super.tick();
-
-        if (hasUser())
-            this.setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(getUser()) / 2, 0.0, 255.0) / 255f);
     }
 
     // Animation code

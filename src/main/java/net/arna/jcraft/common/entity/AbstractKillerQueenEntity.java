@@ -201,9 +201,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
 
         if (hasUser()) {
             LivingEntity user = getUser();
-            if (world.isClient)
-                setAlpha((float) MathHelper.clamp(255.0 * squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
-            else if (user instanceof ServerPlayerEntity playerEntity)
+            if (!world.isClient && user instanceof ServerPlayerEntity playerEntity)
                 displayBombParticles(playerEntity, this.bombBlock, this.bombEntity);
         }
     }

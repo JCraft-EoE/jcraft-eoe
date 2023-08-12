@@ -170,8 +170,6 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
         Vec3d ffPos = getEyePos().add(rotVec.multiply(3));
 
         if (world.isClient) {
-            setAlpha((float) MathHelper.clamp(255.0 * squaredDistanceTo(getUser()) / 2, 0.0, 255.0) / 255f);
-
             if (getInhaleTime() > 0) {
                 // Display particles for the two hitboxes
                 Vec3d addVel = rotVec.add(random.nextDouble() * 2 - 1, random.nextDouble() * 2 - 1, random.nextDouble() * 2 - 1);

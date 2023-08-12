@@ -389,13 +389,9 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             }
         }
 
-        if (world.isClient) {
-            setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
-            return;
-        }
+        if (world.isClient) return;
 
         int moveStun = getMoveStun();
-
         if (moveStun <= 0) {
             if (getOverwriteType() != 0) setOverwriteType(0);
         } else if (curAttack != null && curAttack.id == crm1.id) {

@@ -489,9 +489,6 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
         }
 
         super.tick();
-
-        if (hasUser())
-            setAlpha((float) MathHelper.clamp(255.0 * squaredDistanceTo(getUser()) / 2, 0.0, 255.0) / 255f);
     }
 
     // Animation code

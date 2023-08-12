@@ -373,8 +373,6 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             int sTime = getShiftTime();
 
             if (world.isClient) {
-                setAlpha((float) MathHelper.clamp(255.0 * squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
-
                 if (sTime > 0) {
                     for (int h = 0; h < 256; ++h) {
                         Vec3d vel = Vec3d.ZERO;

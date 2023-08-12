@@ -369,8 +369,6 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             int mode = getMode();
 
             if (world.isClient) {
-                setAlpha((float) MathHelper.clamp(255.0 * squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
-
                 if (mode == 3)
                     for (int i = 0; i < 16; i++)
                         world.addParticle(

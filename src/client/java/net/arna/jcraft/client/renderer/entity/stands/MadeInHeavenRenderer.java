@@ -24,7 +24,7 @@ public class MadeInHeavenRenderer extends StandEntityRenderer<MadeInHeavenEntity
 
         if (!animatable.getAfterimage()) return;
 
-        float aa = shouldApplyAlpha(animatable) ? animatable.getAlpha() - 0.5f : .5f;
+        float aa = getAlpha(animatable, tickDelta) - 0.5f;
         if (aa < 0) aa = 0;
 
         Vec3d baseVel = Vec3d.ZERO;

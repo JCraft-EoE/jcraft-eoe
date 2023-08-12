@@ -576,7 +576,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             }
         }
 
-        if (!world.isClient()) {
+        if (!world.isClient) {
             if (attack != null) {
                 if (attack.id == overhead.id)
                     this.queuedAttack = null;
@@ -616,8 +616,6 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                     }
                      */
                 }
-            } else {
-                setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
             }
 
             if (getTETime() < 1 && doppelganger != null) // Doppelgänger disappears at the end of Time Erase

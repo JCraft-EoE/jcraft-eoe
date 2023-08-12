@@ -82,7 +82,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     private static final TrackedData<Float> ROTATIONOFFSET;
     private static final TrackedData<Float> DISTANCEOFFSET;
 
-    private static final TrackedData<Float> ALPHA;
+    private static final TrackedData<Float> ALPHA_OVERRIDE;
 
     private static final TrackedData<Float> STANDGAUGE;
 
@@ -154,7 +154,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         ROTATIONOFFSET = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.FLOAT);
         DISTANCEOFFSET = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.FLOAT);
 
-        ALPHA = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.FLOAT);
+        ALPHA_OVERRIDE = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.FLOAT);
 
         STANDGAUGE = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.FLOAT);
 
@@ -274,12 +274,20 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         this.dataTracker.set(DISTANCEOFFSET, distanceOffset);
     }
 
-    public float getAlpha() {
-        return this.dataTracker.get(ALPHA);
+    public boolean hasAlphaOverride() {
+        return getAlphaOverride() >= 0;
     }
 
-    public void setAlpha(float alpha) {
-        this.dataTracker.set(ALPHA, alpha);
+    public float getAlphaOverride() {
+        return this.dataTracker.get(ALPHA_OVERRIDE);
+    }
+
+    public void setAlphaOverride(float alpha) {
+        dataTracker.set(ALPHA_OVERRIDE, alpha);
+    }
+
+    public void resetAlphaOverride() {
+        setAlphaOverride(-1);
     }
 
     public float getStandGauge() {
@@ -343,7 +351,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         remoteSpeed = user.getVelocity(); // Inertia
         remoteSpeed = new Vec3d(remoteSpeed.x * 5, remoteSpeed.y / 2, remoteSpeed.z * 5);
 
-        setAlpha(0.1f);
+        setAlphaOverride(0.1f);
 
         detach();
 
@@ -357,7 +365,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      */
     protected void endRemote() {
         setFree(false);
-        setAlpha(1);
+        resetAlphaOverride();
         startRiding(user);
         noClip = true;
     }
@@ -410,7 +418,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         dataTracker.startTracking(ROTATIONOFFSET, -90f);
         dataTracker.startTracking(DISTANCEOFFSET, 1f);
 
-        dataTracker.startTracking(ALPHA, 0f);
+        dataTracker.startTracking(ALPHA_OVERRIDE, -1f);
 
         dataTracker.startTracking(STANDGAUGE, 45f);
 
@@ -786,7 +794,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         boolean client = world.isClient;
 
-        prevAlpha = getAlpha();
+        prevAlpha = getAlphaOverride();
 
         if (user == null) {
             if (client && getVehicle() instanceof LivingEntity living)

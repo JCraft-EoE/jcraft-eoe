@@ -421,7 +421,6 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
 
         if (!hasUser()) return;
         LivingEntity user = getUserOrThrow();
-        setAlpha((float) MathHelper.clamp(255.0 * squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
         int aTime = getAccelTime();
 
         if (world.isClient) {

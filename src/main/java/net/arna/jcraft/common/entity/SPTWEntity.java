@@ -200,20 +200,18 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
 
         LivingEntity user = getUserOrThrow();
 
-        if (world.isClient) setAlpha((float) MathHelper.clamp(255.0 * squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
-        else if (curAttack != null && curAttack.id == timestrike.id && getMoveStun() == 7) {
-            /*
+        if (world.isClient || curAttack == null || curAttack.id != timestrike.id || getMoveStun() != 7) return;
+        /*
             NbtCompound userData = ((IEntityDataSaver)user).getPersistentData();
             if (userData.getInt(JCraft.utilCD) < 200)
                 userData.putInt(JCraft.utilCD, 200);
              */
 
-            Vec3d prevPos = user.getEyePos();
+        Vec3d prevPos = user.getEyePos();
 
-            timeSkip(2.5, JSoundRegistry.STAR_PLATINUM_TIMESKIP);
-            if (turnAround)
-                user.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, prevPos);
-        }
+        timeSkip(2.5, JSoundRegistry.STAR_PLATINUM_TIMESKIP);
+        if (turnAround)
+            user.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, prevPos);
     }
 
     // Animation code

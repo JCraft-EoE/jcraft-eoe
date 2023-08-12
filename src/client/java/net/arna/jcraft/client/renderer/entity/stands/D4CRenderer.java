@@ -52,7 +52,7 @@ public class D4CRenderer extends ExtendedGeoEntityRenderer<D4CEntity> {
         MinecraftClient mcClient = MinecraftClient.getInstance();
         if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null)
             if (JUtils.getStand(mcClient.player) == animatable )
-                a = animatable.getAlpha();
+                a = animatable.getAlphaOverride();
         float gR = 1.0f - a;
 
         super.render(model, animatable, partialTicks, type, matrixStackIn, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green - gR, blue, a);

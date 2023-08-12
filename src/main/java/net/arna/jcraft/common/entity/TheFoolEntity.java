@@ -628,8 +628,6 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
                 if (sandClone != null && sandClone.age > 200)
                     setSandClone(null);
             }
-
-            setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
         }
     }
 

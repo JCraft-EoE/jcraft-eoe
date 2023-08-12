@@ -376,12 +376,12 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
         if (hasUser()) {
             LivingEntity user = getUserOrThrow();
 
-            if (world.isClient) setAlpha((float) MathHelper.clamp(255.0 * squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
-            else {
-                if (bubbleProjectile != null && !bubbleProjectile.isInGround()) {
-                    bubbleProjectile.setVelocity(user.getRotationVector().multiply(0.5));
-                    bubbleProjectile.velocityModified = true;
-                }
+            if (world.isClient) return;
+
+            if (bubbleProjectile != null && !bubbleProjectile.isInGround()) {
+                bubbleProjectile.setVelocity(user.getRotationVector().multiply(0.5));
+                bubbleProjectile.velocityModified = true;
+            }
 
                 /*
                 if (userData != null && !userData.isEmpty()) {
@@ -393,10 +393,9 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                 }
                  */
 
-                if (user instanceof ServerPlayerEntity playerEntity) {
-                    super.displayBombParticles(playerEntity, this.bombBlock, this.bombEntity);
-                    displayBTDParticles(playerEntity, this.btdEntity);
-                }
+            if (user instanceof ServerPlayerEntity playerEntity) {
+                super.displayBombParticles(playerEntity, this.bombBlock, this.bombEntity);
+                displayBTDParticles(playerEntity, this.btdEntity);
             }
         }
     }
