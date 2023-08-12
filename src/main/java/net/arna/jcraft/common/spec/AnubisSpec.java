@@ -14,6 +14,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 
 import java.util.List;
+import java.util.Set;
 
 public class AnubisSpec extends JCraftSpec {
     public static final Attack slash = new Attack(0, 17, 1f, 20, 9, 1.75, 6f, 0.9f, AttackType.BOX, 0.75f, 0, 0, SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP)
@@ -118,7 +119,7 @@ public class AnubisSpec extends JCraftSpec {
     }
 
     @Override
-    public void specialAttack(Attack attack, List<LivingEntity> hurt) {
+    public void specialAttack(Attack attack, Set<LivingEntity> hurt) {
         if (!hurt.isEmpty()) {
             ticksSinceLastHit = 0;
             if (attackSpeedMult < 2f) attackSpeedMult += 0.25f;

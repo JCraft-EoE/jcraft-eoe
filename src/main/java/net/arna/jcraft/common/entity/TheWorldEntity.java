@@ -15,13 +15,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.State> {
@@ -162,7 +162,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
     }
 
     @Override
-    public void specialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, Set<LivingEntity> entities) {
         switch (attack.id) {
             case (-2) -> timeSkip(14, JSoundRegistry.TIME_SKIP);
             case (1) -> {

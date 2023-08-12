@@ -15,7 +15,6 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +22,7 @@ import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -118,7 +118,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
     }
 
     @Override
-    public void specialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, Set<LivingEntity> entities) {
         switch (attack.id) {
             case (-2) -> {
                 if (!hasUser()) return;

@@ -32,6 +32,7 @@ import net.minecraft.world.World;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -267,7 +268,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     }
 
     @Override
-    public void specialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, Set<LivingEntity> entities) {
         switch (attack.id) {
             case (2) -> {
                 if (getMoveStun() == 11) {

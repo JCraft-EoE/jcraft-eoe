@@ -29,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQueenEntity, KillerQueenEntity.State> {
@@ -136,7 +137,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
     }
 
     @Override
-    public void specialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, Set<LivingEntity> entities) {
         if (!hasUser()) return;
 
         LivingEntity user = getUserOrThrow();
@@ -155,7 +156,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
                         bombBlock = null;
                     }
                 } else { // Living entities take priority
-                    bombEntity = JUtils.getUserIfStand(entities.get(0));
+                    bombEntity = JUtils.getUserIfStand(entities.stream().findFirst().orElseThrow());
                     bombBlock = null;
                 }
             }
@@ -201,7 +202,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
                 if (entities.isEmpty()) return;
 
                 setAttack(grabhit, State.GRABHIT);
-                bombEntity = entities.get(0);
+                bombEntity = entities.stream().findFirst().orElseThrow();
                 bombBlock = null;
             }
             case (8) -> {

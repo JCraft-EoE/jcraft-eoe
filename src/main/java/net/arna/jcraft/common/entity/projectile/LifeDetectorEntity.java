@@ -33,6 +33,7 @@ import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
+import java.util.Set;
 
 public class LifeDetectorEntity extends JAttackEntity implements IAnimatable {
     private static final TrackedData<Boolean> EXPLODED;
@@ -62,7 +63,7 @@ public class LifeDetectorEntity extends JAttackEntity implements IAnimatable {
         if (target == this || target == master) return false;
         if (target.isConnectedThroughVehicle(master)) return false;
         if (target instanceof IOwnable ownable && ownable.getMaster() == master) return false;
-        return target.canTakeDamage() && target.isAlive();
+        return target.canTakeDamage() && target.isAlive() && JUtils.canDamage(DamageSource.mob(master), target);
     }
 
     private void Explode() {
@@ -70,9 +71,8 @@ public class LifeDetectorEntity extends JAttackEntity implements IAnimatable {
         velocityModified = true;
 
         Vec3d pos = getPos();
-        List<LivingEntity> hurt = JUtils.generateHitbox(world, pos, 2.25, null);
-        for (LivingEntity living :
-                hurt) {
+        Set<LivingEntity> hurt = JUtils.generateHitbox(world, pos, 2.25, null);
+        for (LivingEntity living : hurt) {
             if (!canTarget(living)) continue;
             LivingEntity target = JUtils.getUserIfStand(living);
             Vec3d kbVec = target.getPos().subtract(pos).normalize();

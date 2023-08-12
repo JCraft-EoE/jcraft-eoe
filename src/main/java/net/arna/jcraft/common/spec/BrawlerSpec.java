@@ -11,6 +11,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.server.world.ServerWorld;
 
 import java.util.List;
+import java.util.Set;
 
 public class BrawlerSpec extends JCraftSpec {
     public static final Attack heavy = new Attack(0, 17, 1f, 21, 10, 1.5, 6f, 0.8f, AttackType.BOX, 0.75f, 0, 0, JSoundRegistry.IMPACT_2)
@@ -82,7 +83,7 @@ public class BrawlerSpec extends JCraftSpec {
     }
 
     @Override
-    public void specialAttack(Attack attack, List<LivingEntity> hurt) {
+    public void specialAttack(Attack attack, Set<LivingEntity> hurt) {
         if (attack.id == low.id)
             for (LivingEntity ent : hurt)
                 ent.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 25, 0, true, true));

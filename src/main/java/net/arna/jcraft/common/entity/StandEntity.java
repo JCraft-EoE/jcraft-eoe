@@ -58,8 +58,7 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static net.arna.jcraft.JCraft.comboBreak;
 import static net.minecraft.command.argument.EntityAnchorArgumentType.EntityAnchor;
@@ -436,7 +435,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      */
     public void initialize() {
         noClip = true;
-        setInvulnerable(true);
         addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 999999, 9, false, false));
 
         markAllAttackButtons();
@@ -576,7 +574,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * @param ent          entity to harm
      */
     public static void damage(float damage, DamageSource damageSource, LivingEntity ent) {
-        if (ent == null || ent.isRemoved() || ent.isDead()) return;
+        if (JUtils.canDamage(damageSource, ent)) return;
 
         float scaling = ((IDamageScaler)ent).jcraft$getDamageScaling();
         //JCraft.LOGGER.info("Damaging entity: " + ent + " with damage: " + damage + " and scaling: " + scaling);
@@ -733,7 +731,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     }
 
     // Define special attack actions
-    public void specialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, Set<LivingEntity> entities) {
     }
 
     // Define desummon conditions
@@ -931,7 +929,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                                 || (attack.attackType == AttackType.MULTIHIT && attack.attackTimes.contains(moveStun - curMoveStun))
                 ) {
                     //JCraft.LOGGER.info(curMoveStun + " ACTIVE " + attack.interval);
-                    List<LivingEntity> hurt = new ArrayList<>();
+                    Set<LivingEntity> hurt = Collections.emptySet();
 
                     if (attack.hitboxSize > 0) {
                         Vec3d upVec = GravityChangerAPI.getEyeOffset(user);
@@ -942,20 +940,21 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                                 hPos.add(rotVec.multiply(attackDist)).add(
                                         upVec.multiply(-attack.offset)
                                 );
+                        DamageSource damageSource = JDamageSources.stand(this);
 
-                        List<Entity> filter = new ArrayList<>(List.of(this, user));
-                        if (vehicle != null) filter.add(vehicle);
-
+                        Set<Entity> filter = vehicle == null ? Set.of(this, user) : Set.of(this, user, vehicle);
                         hurt = JUtils.generateHitbox(world, fPos, attack.hitboxSize, filter);
                         for (HitBoxData data : attack.extraHitboxes) {
-                            List<LivingEntity> extraHurt = JUtils.generateHitbox(world,
+                            Set<LivingEntity> extraHurt = JUtils.generateHitbox(world,
                                     hPos.add(
                                             rotVec.multiply(data.forwardOffset))
-                                            .add(upVec.multiply(data.verticalOffset))
-                                    , data.hitboxSize, filter);
-                            for (LivingEntity hurtEntity : extraHurt)
-                                if (!hurt.contains(hurtEntity)) hurt.add(hurtEntity);
+                                            .add(upVec.multiply(data.verticalOffset)),
+                                    data.hitboxSize, filter);
+                            hurt.addAll(extraHurt);
                         }
+
+                        hurt.removeIf(e -> !JUtils.canDamage(damageSource, e));
+
                         if (!hurt.isEmpty()) {
                             JCraft.createParticle((ServerWorld) this.world,
                                     fPos.x + random.nextGaussian() * 0.25,
@@ -1002,7 +1001,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                             }
 
                             damageLogic(world, livingEntity, kbVec, stunTicks, attack.stunType.ordinal(), attack.overrideStun,
-                                    damage, attack.lift, attack.getEffectiveBlockstun(), JDamageSources.stand(this),
+                                    damage, attack.lift, attack.getEffectiveBlockstun(), damageSource,
                                     user, attack.canBackstab, attack.unblockable && !attack.ubEffectsOnly);
                         }
 
@@ -1326,12 +1325,21 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         return user.addStatusEffect(effect, source);
     }
 
+    @Override
+    public boolean isInvulnerableTo(DamageSource damageSource) {
+        return true;
+    }
+
+    @Override
+    public boolean isAttackable() {
+        return false;
+    }
+
     /**
      * Handles AI for mob stand users
      */
     public static void standUserAI(MobEntity mob, LivingEntity target, StandEntity<?, ?> stand) {
-        if (mob == target) return;
-        if (target == null || !target.isAlive() || target.isRemoved()) return;
+        if (mob == target || !JUtils.canDamage(JDamageSources.stand(stand), target)) return;
 
         JumpControl mobJumpControl = mob.getJumpControl();
 

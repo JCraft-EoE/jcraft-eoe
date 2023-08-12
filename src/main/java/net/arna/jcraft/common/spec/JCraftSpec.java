@@ -31,9 +31,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 
@@ -137,16 +135,13 @@ public abstract class JCraftSpec {
             ServerChannelFeedbackPacket.send(sendPlayer, buf);
     }
 
-    public void specialAttack(Attack attack, List<LivingEntity> hurt) {
-
-    }
+    public void specialAttack(Attack attack, Set<LivingEntity> hurt) {}
 
     public boolean shouldSneak() {
         return false;
     }
 
-    public void processAttackClient() {
-    }
+    public void processAttackClient() {}
 
     public void tickSpec() {
         if (player.isSpectator()) return;
@@ -201,23 +196,25 @@ public abstract class JCraftSpec {
                                     )
                             );
 
-                    List<Entity> exclude = new ArrayList<>(player.getPassengerList());
+                    DamageSource playerSource = DamageSource.player(player);
+                    Set<Entity> exclude = new HashSet<>(player.getPassengerList());
                     exclude.add(player);
 
                     if (player.hasVehicle())
                         exclude.add(player.getVehicle());
 
-                    List<LivingEntity> hurt = JUtils.generateHitbox(world, hitPos, attack.hitboxSize, List.copyOf(exclude));
+                    Set<LivingEntity> hurt = JUtils.generateHitbox(world, hitPos, attack.hitboxSize, exclude);
 
                     for (HitBoxData data : attack.extraHitboxes) {
-                        List<LivingEntity> extraHurt = JUtils.generateHitbox(world,
+                        Set<LivingEntity> extraHurt = JUtils.generateHitbox(world,
                                 hitPos.add(
                                         RotationUtil.vecPlayerToWorld(
                                                 rotVec.multiply(data.forwardOffset).add(0, data.verticalOffset, 0), gravDir)
                                 ), data.hitboxSize, exclude);
-                        for (LivingEntity hurtEntity : extraHurt)
-                            if (!hurt.contains(hurtEntity)) hurt.add(hurtEntity);
+                        hurt.addAll(extraHurt);
                     }
+
+                    hurt.removeIf(e -> !JUtils.canDamage(playerSource, e));
 
                     if (!hurt.isEmpty()) {
                         Random random = new Random();
@@ -233,7 +230,6 @@ public abstract class JCraftSpec {
                         float kb = attack.knockback;
                         Vec3d kbVec = rotVec.multiply(kb).add(new Vec3d(0.0, Math.abs(attack.knockback) / 4, 0.0));
 
-                        DamageSource playerSource = DamageSource.player(player);
                         for (LivingEntity livingEntity : hurt) {
                             if (livingEntity instanceof StandEntity) continue;
                             damageLogic(world, livingEntity, kbVec, stunS, attack.stunType.ordinal(), attack.overrideStun,

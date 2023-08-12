@@ -353,7 +353,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     }
 
     @Override
-    public void specialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, Set<LivingEntity> entities) {
         switch (attack.id) {
             case (-2) -> timeSkip(16, JSoundRegistry.TE_TP);
             case (2), (11) -> {

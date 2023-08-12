@@ -36,6 +36,7 @@ import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
+import java.util.Set;
 
 public class SandTornadoEntity extends LivingEntity implements IAnimatable, IOwnable {
     private static final TrackedData<Boolean> DISAPPEARED;
@@ -97,7 +98,7 @@ public class SandTornadoEntity extends LivingEntity implements IAnimatable, IOwn
                 return;
             }
 
-            List<LivingEntity> toHurt = JUtils.generateHitbox(world, getEyePos(), 1.8, List.of(this, master));
+            Set<LivingEntity> toHurt = JUtils.generateHitbox(world, getEyePos(), 1.8, Set.of(this, master));
 
             if (toHurt.isEmpty()) {
                 setVelocity(getVelocity().add(getRotationVector().multiply(0.5)).multiply(0.4));

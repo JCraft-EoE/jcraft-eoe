@@ -29,7 +29,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
@@ -39,6 +38,7 @@ import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHeavenEntity.State> {
@@ -244,12 +244,14 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             return;
         }
 
-        List<? extends LivingEntity> targets = JUtils.generateHitbox(world, user.getEyePos().add(getRotationVector()), 2, List.of(this, user));
-        LivingEntity target = null;
-        for (LivingEntity living : targets) {
-            target = JUtils.getUserIfStand(living);
-            break;
-        }
+        Set<? extends LivingEntity> targets = JUtils.generateHitbox(world, user.getEyePos().add(getRotationVector()), 2, Set.of(this, user));
+        LivingEntity target = targets.stream()
+                .filter(e -> e instanceof StandEntity<?, ?> stand && stand.hasUser())
+                .map(e -> (StandEntity<?, ?>) e)
+                .findFirst()
+                .map(StandEntity::getUser)
+                .orElse(null);
+
         if (target != null && handleAttack(circle, CooldownType.STAND_SP3, State.CIRCLE_STARTUP)) {
             circleTarget = target;
             circleOrbitProg = user.getHeadYaw();
@@ -290,7 +292,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .setInfo("Barrage (Final Hit)", "");
 
     @Override
-    public void specialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, Set<LivingEntity> entities) {
         LivingEntity user = getUser();
 
         boolean hit = !entities.isEmpty();

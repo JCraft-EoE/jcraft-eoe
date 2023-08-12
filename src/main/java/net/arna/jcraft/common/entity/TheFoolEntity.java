@@ -48,6 +48,7 @@ import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -328,7 +329,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     }
 
     @Override
-    public void specialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, Set<LivingEntity> entities) {
         LivingEntity user = this.getUser();
 
         switch (attack.id) {
@@ -437,7 +438,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             case (7) -> {
                 if (entities.isEmpty()) return;
 
-                superTarget = JUtils.getUserIfStand(entities.get(0));
+                superTarget = JUtils.getUserIfStand(entities.stream().findFirst().orElseThrow());
                 for (int i = 0; i < 8; i++) {
                     FallingBlockEntity sand = FallingBlockEntity.spawnFromBlock(world, superTarget.getBlockPos(), JObjectRegistry.FOOLISH_SAND_BLOCK.getDefaultState());
                     sand.timeFalling = -32767;

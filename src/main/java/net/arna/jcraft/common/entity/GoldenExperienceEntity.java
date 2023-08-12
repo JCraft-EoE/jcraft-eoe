@@ -24,12 +24,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, GoldenExperienceEntity.State> {
@@ -216,7 +216,7 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
     private static final BlockState berryBush = Blocks.SWEET_BERRY_BUSH.getDefaultState().with(SweetBerryBushBlock.AGE, 1);
 
     @Override
-    public void specialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, Set<LivingEntity> entities) {
         LivingEntity user = this.getUser();
         switch (attack.id) {
             case (3) -> {

@@ -8,10 +8,10 @@ import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 import java.util.List;
+import java.util.Set;
 
 public abstract sealed class AbstractStarPlatinumEntity<E extends AbstractStarPlatinumEntity<E, S>, S extends Enum<S> & StandAnimationState<E>> extends StandEntity<E, S>
         permits StarPlatinumEntity, SPTWEntity {
@@ -111,7 +111,7 @@ public abstract sealed class AbstractStarPlatinumEntity<E extends AbstractStarPl
     public abstract void initUtil();
 
     @Override
-    public abstract void specialAttack(Attack attack, List<LivingEntity> entities);
+    public abstract void specialAttack(Attack attack, Set<LivingEntity> entities);
 
     @Override
     public void tick() {

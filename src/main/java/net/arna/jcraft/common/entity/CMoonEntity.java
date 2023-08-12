@@ -36,6 +36,7 @@ import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 //todo: 3d, rotatable shockwave particle effect
@@ -268,7 +269,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
     }
 
     @Override
-    public void specialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, Set<LivingEntity> entities) {
         if (!hasUser()) return;
         LivingEntity user = getUserOrThrow();
 

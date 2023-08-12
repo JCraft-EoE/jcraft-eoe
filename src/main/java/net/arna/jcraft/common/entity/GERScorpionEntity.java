@@ -33,11 +33,9 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
+import static net.arna.jcraft.common.util.JUtils.canDamage;
 import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
 
 public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimationTickable, IOwnable {
@@ -181,10 +179,11 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
             }
         } else {
             if (owner != null) {
-                List<Entity> filter = new ArrayList<>();
+                Set<Entity> filter = new HashSet<>();
                 filter.add(owner);
                 filter.add(this);
                 if (owner.hasPassengers()) filter.addAll(owner.getPassengerList());
+                DamageSource damageSource = DamageSource.mob(owner);
                 if (isRock()) {
                     if (!getVelocity().equals(initialVel)) // Ghetto collision check
                         Transform();
@@ -192,18 +191,17 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                     // Recursive hitbox check between current and previous position
                     Vec3d towardsVec = curPos.subtract(new Vec3d(prevX, prevY, prevZ));
                     List<LivingEntity> hurtAll = new ArrayList<>();
-                    for (double i = 0; i < 3; i++) {
-                        List<LivingEntity> hurt = JUtils.generateHitbox(world, curPos.add(towardsVec.multiply(i / 3)), 0.5, filter);
-                        hurt.removeIf(hurtAll::contains);
-                        hurtAll.addAll(hurt);
-                    }
+                    for (double i = 0; i < 3; i++)
+                        hurtAll.addAll(JUtils.generateHitbox(world, curPos.add(towardsVec.multiply(i / 3)), 0.5, filter));
+
+                    hurtAll.removeIf(e -> !canDamage(damageSource, e));
 
                     if (!hurtAll.isEmpty()) {
                         jumpTarget = hurtAll.get(0);
-                        for (LivingEntity l :
-                                hurtAll) {
+                        for (LivingEntity l : hurtAll) {
                             LivingEntity target = JUtils.getUserIfStand(l);
-                            damageLogic(world, target, getVelocity(), rockStun, 1, false, 6f, true, 10, DamageSource.mob(owner), owner);
+                            damageLogic(world, target, getVelocity(), rockStun, 1, false, 6f,
+                                    true, 10, damageSource, owner);
                         }
                         Transform();
                         JCraft.createParticle((ServerWorld) this.world,
@@ -224,15 +222,15 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                     }
 
                     if (landedTimer == 20) { // Sting followup, 5t gap
-                        List<LivingEntity> hurt = JUtils.generateHitbox(world, getPos(), 1.5, filter);
+                        Set<LivingEntity> hurt = JUtils.generateHitbox(world, getPos(), 1.5, filter);
                         if (isCharged()) for (LivingEntity l : hurt) {
                             LivingEntity target = JUtils.getUserIfStand(l);
                             target.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 60, 0, false, true));
-                            damageLogic(world, target, Vec3d.ZERO, 15, 1, false, 3f, true, 7, DamageSource.mob(owner), owner);
+                            damageLogic(world, target, Vec3d.ZERO, 15, 1, false, 3f, true, 7, damageSource, owner);
                         }
                         else for (LivingEntity l : hurt) {
                             LivingEntity target = JUtils.getUserIfStand(l);
-                            damageLogic(world, target, Vec3d.ZERO, 15, 1, false, 3f, true, 7, DamageSource.mob(owner), owner);
+                            damageLogic(world, target, Vec3d.ZERO, 15, 1, false, 3f, true, 7, damageSource, owner);
                         }
                     }
                 }

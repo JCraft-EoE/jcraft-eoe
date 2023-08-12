@@ -26,7 +26,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
@@ -34,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQBTDEntity.State> {
@@ -163,7 +163,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
     }
 
     @Override
-    public void specialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, Set<LivingEntity> entities) {
         LivingEntity user = this.getUser();
         switch (attack.id) {
             case (2) -> {
@@ -178,8 +178,8 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                     Vec3d boxCenter = getPos().add(0, user.getHeight() / 2, 0).add(rotVec);
                     Vec3d halfBox = new Vec3d(0.5, 0.5, 0.5);
                     List<Entity> hit = world.getEntitiesByClass(Entity.class,
-                            new Box(boxCenter.subtract(halfBox), boxCenter.add(halfBox))
-                            , EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+                            new Box(boxCenter.subtract(halfBox), boxCenter.add(halfBox)),
+                            EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
 
                     hit.remove(this);
                     hit.remove(user);
@@ -189,7 +189,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                         bombBlock = null;
                     }
                 } else { // Living entities take priority
-                    bombEntity = JUtils.getUserIfStand(entities.get(0));
+                    bombEntity = JUtils.getUserIfStand(entities.stream().findFirst().orElseThrow());
                     bombBlock = null;
 
                     /*
@@ -320,7 +320,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
             case (7) -> {
                 if (entities.isEmpty()) return;
 
-                btdEntity = JUtils.getUserIfStand(entities.get(0));
+                btdEntity = JUtils.getUserIfStand(entities.stream().findFirst().orElseThrow());
                 btdPos = btdEntity.getPos();
             }
         }

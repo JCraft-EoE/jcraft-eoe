@@ -37,10 +37,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
@@ -318,7 +315,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             .setInfo("Kick Barrage (Final hit)", "");
 
     @Override
-    public void specialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, Set<LivingEntity> entities) {
         LivingEntity user = getUser();
         switch (attack.id) {
             case (2) -> {

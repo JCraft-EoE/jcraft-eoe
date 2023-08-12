@@ -26,7 +26,6 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
@@ -34,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, MagiciansRedEntity.State> {
@@ -159,7 +159,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
     }
 
     @Override
-    public void specialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, Set<LivingEntity> entities) {
         if (!hasUser()) return;
         LivingEntity user = getUserOrThrow();
         Vec3d eyePos = user.getEyePos();
@@ -223,7 +223,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
                 if (!hasUser() || entities.isEmpty()) return;
 
                 LivingEntity master = getUserOrThrow();
-                LivingEntity boundEntity = JUtils.getUserIfStand(entities.get(0));
+                LivingEntity boundEntity = JUtils.getUserIfStand(entities.stream().findFirst().orElseThrow());
 
                 if (JUtils.isBlocking(boundEntity)) return;
 

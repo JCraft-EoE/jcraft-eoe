@@ -19,7 +19,7 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
-import java.util.List;
+import java.util.Set;
 
 public class GETreeEntity extends JAttackEntity implements IAnimatable, IAnimationTickable {
     public GETreeEntity(EntityType<? extends LivingEntity> type, World world) {
@@ -34,9 +34,9 @@ public class GETreeEntity extends JAttackEntity implements IAnimatable, IAnimati
         if (master != null) {
             if (age == 4) {
                 DamageSource ds = DamageSource.mob(master);
-                List<LivingEntity> hurt = JUtils.generateHitbox(world, getPos().add(0, 1.5, 0), 2.5, List.of(this, master));
+                Set<LivingEntity> hurt = JUtils.generateHitbox(world, getPos().add(0, 1.5, 0), 2.5, Set.of(this, master));
                 for (LivingEntity living : hurt) {
-                    if (living.isInvulnerableTo(ds)) continue;
+                    if (!JUtils.canDamage(ds, living)) continue;
 
                     LivingEntity target = JUtils.getUserIfStand(living);
                     if (master != target)

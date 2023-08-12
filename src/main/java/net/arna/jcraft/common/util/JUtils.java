@@ -40,9 +40,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
@@ -146,7 +144,7 @@ public final class JUtils {
     }
 
     // Defaults to LivingEntity
-    public static List<LivingEntity> generateHitbox(World world, Vec3d center, double hitboxSize, List<Entity> except) {
+    public static Set<LivingEntity> generateHitbox(World world, Vec3d center, double hitboxSize, Set<Entity> except) {
         double size = hitboxSize / 2;
 
         Vec3d v1 = center.subtract(size, size, size);
@@ -155,7 +153,7 @@ public final class JUtils {
         if (size > 0) displayHitbox(world, v1, v2);
 
         List<LivingEntity> hit = world.getEntitiesByClass(LivingEntity.class, new Box(v1, v2), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
-        ArrayList<LivingEntity> toReturn = new ArrayList<>(List.copyOf(hit));
+        Set<LivingEntity> toReturn = new HashSet<>(hit);
         for (LivingEntity l : hit) {
             if (except != null && except.contains(l)) {
                 //JCraft.LOGGER.info("Removing: " + l);
@@ -164,11 +162,7 @@ public final class JUtils {
             }
             if (l instanceof StandEntity<?, ?> stand) {
                 //JCraft.LOGGER.info("Stand: " + stand);
-                if (stand.hasUser()) {
-                    LivingEntity user = stand.getUser();
-                    if (!hit.contains(user))
-                        toReturn.add(user);
-                }
+                if (stand.hasUser()) toReturn.add(stand.getUserOrThrow());
             }
         }
 
@@ -441,5 +435,9 @@ public final class JUtils {
 
     public static boolean isAffectedByTimeStop(Entity entity) {
         return JComponents.getTimeStopData(entity).getTicks() > 0;
+    }
+
+    public static boolean canDamage(DamageSource damageSource, LivingEntity ent) {
+        return ent != null && ent.isAlive() && ent.isAttackable() && !ent.isInvulnerableTo(damageSource);
     }
 }

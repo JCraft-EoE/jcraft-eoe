@@ -12,7 +12,7 @@ import software.bernie.geckolib3.model.AnimatedTickingGeoModel;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class StandEntityModel<E extends StandEntity> extends AnimatedTickingGeoModel<E> {
+public class StandEntityModel<E extends StandEntity<?, ?>> extends AnimatedTickingGeoModel<E> {
     private final StandType type;
     private final Identifier model;
     private final List<Identifier> skins;
@@ -22,11 +22,11 @@ public class StandEntityModel<E extends StandEntity> extends AnimatedTickingGeoM
     public StandEntityModel(StandType type) {
         this(type, 0f, 0f);
     }
-    
+
     public StandEntityModel(StandType type, float torsoPitchOffset, float headPitchOffset) {
         this(type, torsoPitchOffset, headPitchOffset, 90f);
     }
-    
+
     public StandEntityModel(StandType type, float torsoPitchOffset, float headPitchOffset, float velInfluence) {
         this.type = type;
         String typeName = type.name().toLowerCase();
@@ -35,12 +35,12 @@ public class StandEntityModel<E extends StandEntity> extends AnimatedTickingGeoM
                 .mapToObj(i -> JCraft.id("textures/entity/stands/" + typeName + "/" + (i == 0 ? "default" : "skin" + i) + ".png"))
                 .toList();
         animation = JCraft.id("animations/" + typeName + ".animation.json");
-        
+
         this.torsoPitchOffset = torsoPitchOffset;
         this.headPitchOffset = headPitchOffset;
         this.velInfluence = velInfluence;
     }
-    
+
     @Override
     public Identifier getModelResource(E entity) {
         return model;
@@ -60,11 +60,11 @@ public class StandEntityModel<E extends StandEntity> extends AnimatedTickingGeoM
     public void setCustomAnimations(E entity, int instanceId, AnimationEvent animationEvent) {
         super.setCustomAnimations(entity, instanceId, animationEvent);
         if (skipCustomAnimations() || !entity.hasUser()) return;
-        
-        JClientUtils.animateGenericHumanoid(this, entity, entity.getUser(), animationEvent.getPartialTick(), 
+
+        JClientUtils.animateGenericHumanoid(this, entity, entity.getUser(), animationEvent.getPartialTick(),
                 true, true, torsoPitchOffset, headPitchOffset, velInfluence);
     }
-    
+
     protected boolean skipCustomAnimations() {
         return false;
     }

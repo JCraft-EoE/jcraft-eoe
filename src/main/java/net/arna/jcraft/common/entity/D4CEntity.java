@@ -40,6 +40,7 @@ import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -265,7 +266,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
 
     @SuppressWarnings("DataFlowIssue") // There is no issue.
     @Override
-    public void specialAttack(Attack attack, List<LivingEntity> entities) {
+    public void specialAttack(Attack attack, Set<LivingEntity> entities) {
         LivingEntity user = getUser();
         switch (attack.id) {
             case (3) -> {

@@ -42,6 +42,7 @@ import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
+import java.util.Set;
 
 public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatable {
     private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
@@ -167,13 +168,14 @@ public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatab
 
             if (launched && timeLaunched < 20 && !hit) {
                 timeLaunched++;
-                List<LivingEntity> toHurt = JUtils.generateHitbox(world, getPos(), 1, List.of(master));
+                Set<LivingEntity> toHurt = JUtils.generateHitbox(world, getPos(), 1, Set.of(master));
+                DamageSource damageSource = DamageSource.mob(master);
                 for (LivingEntity living : toHurt) {
                     LivingEntity target = JUtils.getUserIfStand(living);
-                    if (target == master || target == this) continue;
+                    if (target == master || target == this || !JUtils.canDamage(damageSource, target)) continue;
                     hit = true;
                     StandEntity.damageLogic(world, target, getVelocity(), 15, 1, true,
-                            6, false, 11, DamageSource.mob(master), master, false);
+                            6, false, 11, damageSource, master, false);
                 }
             }
 
