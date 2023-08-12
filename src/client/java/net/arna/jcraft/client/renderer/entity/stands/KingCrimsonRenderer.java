@@ -12,11 +12,6 @@ public class KingCrimsonRenderer extends StandEntityRenderer<KingCrimsonEntity> 
     }
 
     @Override
-    protected float getInitialAlpha(KingCrimsonEntity stand) {
-        return stand.getTETime() > 0 ? 0f : 1f;
-    }
-
-    @Override
     protected float getGreen(KingCrimsonEntity stand, float green, float alpha) {
         return green - (1f - alpha);
     }

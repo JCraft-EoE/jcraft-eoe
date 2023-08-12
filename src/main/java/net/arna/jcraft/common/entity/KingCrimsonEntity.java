@@ -13,7 +13,10 @@ import net.arna.jcraft.common.entity.projectile.BloodProjectile;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.ShaderDeactivationPacket;
-import net.arna.jcraft.common.util.*;
+import net.arna.jcraft.common.util.CooldownType;
+import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.common.util.MobilityType;
+import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JPacketRegistry;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
@@ -42,7 +45,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
@@ -576,56 +578,58 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             }
         }
 
-        if (!world.isClient) {
-            if (attack != null) {
-                if (attack.id == overhead.id)
-                    this.queuedAttack = null;
-            }
+        if (world.isClient) return;
+        if (attack != null && attack.id == overhead.id)
+            queuedAttack = null;
 
-            // Handle time erase
-            int teTime = this.getTETime();
-            if (teTime > 0) {
-                setTETime(teTime - 1);
+        // Handle time erase
+        int teTime = this.getTETime();
+        if (teTime > 0) {
+            setTETime(teTime - 1);
 
-                if (blocking)
+            if (blocking)
+                cancelTE();
+
+            if (attack != null)
+                if (getMoveStun() < (attack.moveStun - attack.realInitTime() * 2 / 3))
                     cancelTE();
 
-                if (attack != null)
-                    if (getMoveStun() < (attack.moveStun - attack.realInitTime() * 2 / 3))
-                        cancelTE();
+            // Invulnerability and invisibility
+            user.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 10, 9, true, false));
+            user.addStatusEffect(new StatusEffectInstance(StatusEffects.INVISIBILITY, 10, 0, true, false));
+            // Inability to be stunned
+            user.removeStatusEffect(JStatusRegistry.DAZED);
+            // Inability to be hit (by projectiles)
+            Box noBox = new Box(0, 0, 0, 0, 0, 0);
+            user.setBoundingBox(noBox);
+            user.noClip = true;
 
-                // Invulnerability and invisibility
-                user.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 10, 9, true, false));
-                user.addStatusEffect(new StatusEffectInstance(StatusEffects.INVISIBILITY, 10, 0, true, false));
-                // Inability to be stunned
-                user.removeStatusEffect(JStatusRegistry.DAZED);
-                // Inability to be hit (by projectiles)
-                Box noBox = new Box(0, 0, 0, 0, 0, 0);
-                user.setBoundingBox(noBox);
-                user.noClip = true;
+            if (getTETime() < 1) {
+                // Play exit noise
+                if (userIsPlayer)
+                    playerEntity.networkHandler.sendPacket(new PlaySoundS2CPacket(JSoundRegistry.TIME_ERASE_EXIT, SoundCategory.PLAYERS, getX(), getY(), getZ(), 1, 1, 0));
 
-                if (getTETime() < 1) {
-                    // Play exit noise
-                    if (userIsPlayer)
-                        playerEntity.networkHandler.sendPacket(new PlaySoundS2CPacket(JSoundRegistry.TIME_ERASE_EXIT, SoundCategory.PLAYERS, getX(), getY(), getZ(), 1, 1, 0));
-
-                    /* Return targets to position
-                    for (TimeEraseData timeEraseData : timeEraseInfo) {
-                        Vec3d tePos = timeEraseData.getPosition();
-                        timeEraseData.getEntity().teleport(tePos.x, tePos.y, tePos.z);
-                    }
-                     */
+                /* Return targets to position
+                for (TimeEraseData timeEraseData : timeEraseInfo) {
+                    Vec3d tePos = timeEraseData.getPosition();
+                    timeEraseData.getEntity().teleport(tePos.x, tePos.y, tePos.z);
                 }
+                 */
             }
-
-            if (getTETime() < 1 && doppelganger != null) // Doppelgänger disappears at the end of Time Erase
-                doppelganger.discard();
-
-            setSilent(teTime > 0);
-
-            if (user.hasCustomName())
-                user.setCustomNameVisible(teTime <= 0);
         }
+
+        if (getTETime() < 1 && doppelganger != null) // Doppelgänger disappears at the end of Time Erase
+            doppelganger.discard();
+
+        setSilent(teTime > 0);
+
+        if (user.hasCustomName())
+            user.setCustomNameVisible(teTime <= 0);
+    }
+
+    @Override
+    public boolean isInvisibleTo(PlayerEntity player) {
+        return getTETime() > 0 || super.isInvisibleTo(player);
     }
 
     public static List<Entity> getEntitiesToCatch(World world, StandEntity<?, ?> stand, PlayerEntity player) {

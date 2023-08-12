@@ -36,26 +36,18 @@ public class D4CRenderer extends ExtendedGeoEntityRenderer<D4CEntity> {
     public RenderLayer getRenderType(D4CEntity animatable, float partialTicks, MatrixStack stack,
                                      @Nullable VertexConsumerProvider renderTypeBuffer, @Nullable VertexConsumer vertexBuilder,
                                      int packedLightIn, Identifier textureLocation) {
-
         MinecraftClient mcClient = MinecraftClient.getInstance();
-        if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null)
-            if (mcClient.player.getFirstPassenger() == animatable)
-                return RenderLayer.getEntityNoOutline(this.getTextureLocation(animatable));
-
-        return RenderLayer.getEntityCutout(this.getTextureLocation(animatable));
+        return mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null && JUtils.getStand(mcClient.player) == animatable ?
+                RenderLayer.getEntityNoOutline(textureLocation) : RenderLayer.getEntityCutout(textureLocation);
     }
 
     // Adds ability to change render alpha
     @Override
-    public void render(GeoModel model, D4CEntity animatable, float partialTicks, RenderLayer type, MatrixStack matrixStackIn, VertexConsumerProvider renderTypeBuffer, VertexConsumer vertexBuilder, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
-        float a = 1f;
-        MinecraftClient mcClient = MinecraftClient.getInstance();
-        if (mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null)
-            if (JUtils.getStand(mcClient.player) == animatable )
-                a = animatable.getAlphaOverride();
+    public void render(GeoModel model, D4CEntity animatable, float tickDelta, RenderLayer type, MatrixStack matrixStackIn, VertexConsumerProvider renderTypeBuffer, VertexConsumer vertexBuilder, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+        float a = StandEntityRenderer.getAlpha(animatable, tickDelta);
         float gR = 1.0f - a;
 
-        super.render(model, animatable, partialTicks, type, matrixStackIn, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green - gR, blue, a);
+        super.render(model, animatable, tickDelta, type, matrixStackIn, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green - gR, blue, a);
     }
 
     /*

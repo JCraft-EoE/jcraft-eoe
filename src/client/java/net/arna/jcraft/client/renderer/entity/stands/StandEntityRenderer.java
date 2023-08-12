@@ -55,17 +55,13 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends GeoEntityR
                 packedOverlayIn, getRed(stand, red, a), getGreen(stand, green, a), getBlue(stand, blue, a), a);
     }
 
-    protected float getInitialAlpha(T stand) {
-        return 1f;
-    }
-
-    protected boolean shouldApplyAlpha(T stand) {
+    public static boolean shouldApplyAlpha(StandEntity<?, ?> stand) {
         MinecraftClient mcClient = MinecraftClient.getInstance();
         return mcClient.player != null && mcClient.options.getPerspective().isFirstPerson() && JUtils.getStand(mcClient.player) == stand;
     }
 
-    protected float getAlpha(T stand, float tickDelta) {
-        if (!shouldApplyAlpha(stand)) return getInitialAlpha(stand);
+    public static float getAlpha(StandEntity<?, ?> stand, float tickDelta) {
+        if (!shouldApplyAlpha(stand)) return 1f;
 
         // If we have an alpha override this tick and had one last tick too, just use that.
         if (stand.hasAlphaOverride() && stand.getPrevAlpha() >= 0) return stand.getAlphaOverride();
