@@ -491,6 +491,9 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
 
                             ent.damage(DamageSource.OUT_OF_WORLD, 2.5f);
                         }
+
+
+                        setAlpha(0);
                     }
 
                     if (notCorS && !getFree())
@@ -506,7 +509,6 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
 
                 setVoidTime(vTime - 1);
                 setDistanceOffset(0);
-                setAlpha(0);
             } else {
                 if (isIdle() && charging) {
                     charging = false;
@@ -549,21 +551,18 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                             serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(user));
                         }
                     }
-                } else
-                    setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
+                } else setAlpha((float) MathHelper.clamp(255.0 * this.squaredDistanceTo(user) / 2, 0.0, 255.0) / 255f);
             }
         }
     }
 
     // Animation code
     public enum State implements StandAnimationState<CreamEntity> {
-        IDLE((cream, builder) -> builder.loop(
-                "animation.cream." + ( cream.getVoidTime() > 0 ? "void" : cream.isHalfBall() ? "ball" : "" ) + "idle"
-        )),
+        IDLE((cream, builder) -> builder.loop("animation.cream." + ( cream.getVoidTime() > 0 ? "void" : cream.isHalfBall() ? "ball" : "" ) + "idle")),
         LIGHT(builder -> builder.playAndHold("animation.cream.light")),
         BALL_LIGHT(builder -> builder.playAndHold("animation.cream.balllight")),
         BLOCK(builder -> builder.loop("animation.cream.block")),
-        BALL_BLOCK(builder -> builder.loop("animation.cream.block")),
+        BALL_BLOCK(builder -> builder.loop("animation.cream.ballblock")),
         HEAVY(builder -> builder.playAndHold("animation.cream.heavy")),
         BALL_HEAVY(builder -> builder.playAndHold("animation.cream.ballheavy")),
         COMBO(builder -> builder.playAndHold("animation.cream.combo")),

@@ -94,6 +94,7 @@
   "effect.jcraft.knockdown": "Knocked Down",
   "effect.jcraft.outofbody": "Out of Body",
   "effect.jcraft.weightless": "Weightless",
+  "effect.jcraft.bleeding": "Bleeding",
 
   "gamerule.showHitboxes": "Show JCraft hitboxes",
   "gamerule.kingCrimsonTeleportEffect": "King Crimson's teleport displacement",
@@ -165,6 +166,11 @@
   "death.attack.wsacid.item": "%1$s was melted by %2$s while wielding %3$s",
   "death.attack.wsacid.player": "%1$s was melted by %2$s",
   "death.attack.wsacid.player.item": "%1$s was melted by %2$s while wielding %3$s",
+
+  "death.attack.jbleeding": "%1$s bled out",
+  "death.attack.jbleeding.item": "%1$s bled out while fighting %2$s",
+  "death.attack.jbleeding.player": "%1$s bled out while fighting %2$s",
+  "death.attack.jbleeding.player.item": "%1$s bled out while fighting %2$s",
 
   "commands.gravity.get.self": "Your gravity is %s",
   "commands.gravity.get.other": "%s's gravity is %s",

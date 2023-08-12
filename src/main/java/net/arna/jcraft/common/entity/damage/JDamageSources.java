@@ -8,12 +8,16 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 public class JDamageSources {
-    public static DamageSource stand(StandEntity<?, ?> stand) {
+    public static @NotNull DamageSource stand(StandEntity<?, ?> stand) {
         return new EntityDamageSource("stand", stand.getUser()).setBypassesArmor();
     }
 
     @Contract(value = "_ -> new", pure = true)
     public static @NotNull DamageSource whitesnakePoison(Entity user) {
         return new EntityDamageSource("wspoison", user);
+    }
+
+    public static @NotNull DamageSource bleeding() {
+        return new DamageSource("jbleeding");
     }
 }

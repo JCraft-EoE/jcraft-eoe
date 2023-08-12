@@ -150,9 +150,9 @@ public class SheerHeartAttackEntity extends MobEntity implements IAnimatable, IA
 
             setTarget(getAttacking());
         } else {
-            //45s is the cooldown period
-            //18s is how long SHA can be out for
-            if (age > 360 || !master.isAlive()) kill();
+            //50s is the cooldown period
+            //15s is how long SHA can be out for
+            if (age > 300 || !master.isAlive()) kill();
 
             Vec3d pos = getPos();
             LivingEntity target = getTarget();
@@ -195,6 +195,6 @@ public class SheerHeartAttackEntity extends MobEntity implements IAnimatable, IA
     }
 
     public void Explode() {
-        world.createExplosion(this, this.getX(), this.getY() + this.getHeight() / 2, this.getZ(), 2f, Explosion.DestructionType.NONE);
+        world.createExplosion(this, getX(), getY() + getHeight() / 2, getZ(), 1.8f, Explosion.DestructionType.NONE);
     }
 }

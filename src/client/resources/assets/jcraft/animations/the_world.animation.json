@@ -1042,6 +1042,10 @@
 						"0.44": {
 							"vector": [57.27971, 7.90892, -44.19163],
 							"easing": "easeInOutSine"
+						},
+						"0.84": {
+							"vector": [38.92076, -2.0861, -50.79645],
+							"easing": "easeOutSine"
 						}
 					}
 				},
@@ -1176,12 +1180,24 @@
 				},
 				"brow_1": {
 					"rotation": {
-						"vector": [0, 0, 9]
+						"0.12": {
+							"vector": [0, 0, 0]
+						},
+						"0.36": {
+							"vector": [0, 0, 11],
+							"easing": "easeInSine"
+						}
 					}
 				},
 				"brow_2": {
 					"rotation": {
-						"vector": [0, 0, -9]
+						"0.12": {
+							"vector": [0, 0, 0]
+						},
+						"0.36": {
+							"vector": [0, 0, -11],
+							"easing": "easeInSine"
+						}
 					}
 				},
 				"TheWorld": {
@@ -1203,11 +1219,11 @@
 							"vector": [0, 0, 0]
 						},
 						"0.24": {
-							"vector": [0, 0, 2],
+							"vector": [0, 0, 5],
 							"easing": "easeOutSine"
 						},
 						"0.52": {
-							"vector": [0, 0, -3],
+							"vector": [0, 0, -6],
 							"easing": "easeOutBack"
 						}
 					}

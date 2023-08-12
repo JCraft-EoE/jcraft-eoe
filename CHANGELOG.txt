@@ -1552,20 +1552,29 @@ Anubis
         >Hitting opponents (regardless of if they blocked) now speeds up the next attack by 25%
         >25% of the speed boost is removed every 5 seconds spent without a landed hit
 
-● 11/8/2023
+● 12/8/2023
 >Removed some debugging logs
+>Fixed being able to eat in stun
 >Smoothed out stand transparency
 
 The World
     >Updated skin 2
+    >Updated Low Kick animation
 
 D4C
     >Updated skins 1 and 2
 
 Cream
     >Fixed crash when AI is attempting to use Half-Ball form moves
+    >Fixed broken animations in Half-Ball form
 
-Killer Queen (and Bites the Dust)
+Killer Queen
+    >Sheer Heart Attack
+        >Lifetime reduced (18->15s)
+        >Explosion power reduced (2->1.8)
+    >Planting bombs on stands now redirects the bomb onto the stands user
+
+Killer Queen: Bites the Dust
     >Planting bombs on stands now redirects the bomb onto the stands user
 
 Magician's Red
@@ -1578,15 +1587,19 @@ The Fool
     >Updated default and skin 2
 
 C-Moon
+    >Updated Light animation
     >Added crouching variant to Light
 
 Made in Heaven
+    >Added crouching variant to Light
     >Reworked Time Acceleration
         >Speedometer may now only be charged after using it, and affects how fast you are
     >Fixed incorrect name for skin 1
+    >Swapped Divine Severance and Heaven's Judgement
 
 The World: Over Heaven
     >Added crouching variant to Light
+    >Updated Overwrite and Singularity animations
 
 Star Platinum: The World
     >Added crouching variant to Light

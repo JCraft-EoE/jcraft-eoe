@@ -280,13 +280,13 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     public void initUtil() {
         if (!canAttack()) return;
         LivingEntity user = getUser();
-        if (user != null && user.isOnGround() && handleAttack(sandwave, CooldownType.STAND_ULT, State.SAND_WAVE)) {
+        if (user != null && user.isOnGround() && handleAttack(sandwave, CooldownType.UTIL, State.SAND_WAVE)) {
             setSand(true);
             setWave(true);
             setFree(false);
 
             playSound(JSoundRegistry.FOOL_BARK1, 1, 1);
-        } else if (handleAttack(glide, CooldownType.STAND_ULT, State.GLIDE)) {
+        } else if (handleAttack(glide, CooldownType.UTIL, State.GLIDE)) {
             setSand(true);
             setFree(false);
 

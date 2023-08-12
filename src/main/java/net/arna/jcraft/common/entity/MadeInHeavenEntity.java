@@ -42,8 +42,10 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHeavenEntity.State> {
-    // placeholder sound
+    public static final Attack crm1 = new Attack(9, JCraft.lightCooldown, 0.75f, 11, 6, 1.5, 3f, 0.75f, AttackType.BOX, 0.4f, -0.1f, 0, SoundEvents.ITEM_TRIDENT_HIT)
+            .setInfo("Speed Chop", "tiny stun, procs bleed");
     public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 8, 5, 1.5, 4f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, SoundEvents.ITEM_TRIDENT_HIT)
+            .crouchingVariation(crm1)
             .setInfo("Slice", "quick combo starter");
     public static final Attack barrage = Attack.barrageAttack(2, 17, 0.85f, 32, 0, 2, 1.5f, 0.1f, 0.5f, 0, 3, JSoundRegistry.IMPACT_1)
             .setInfo("Barrage", "short, knocks back");
@@ -69,13 +71,14 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                             the speedometer impacts the level of speed and haste granted by Time Acceleration
                             if the speedometer is full and the charging period finishes, enemies become standless for 15s""");
     private int circleTime = 0;
-    public static final Attack judgement = Attack.barrageAttack(5, 33, 1.25f, 60, 20, 0, 0f, 0.5f, 0, 0, 2)
-            .setInfo("Divine Severance", "Made in Heaven rapidly speed slices an area, then finishes with a large, launching slice");
     public static final Attack circle = new Attack(8, 40, 14, 13, 0, 1.25f, AttackType.BOX)
             .setRanged(true)
             .setMobility(MobilityType.DASH)
-            .crouchingVariation(judgement)
+
             .setInfo("Heaven's Judgement", "rapidly circles a looked-at target within 4m at a radius of 7m");
+    public static final Attack judgement = Attack.barrageAttack(5, 33, 1.25f, 60, 20, 0, 0f, 0.5f, 0, 0, 2)
+            .crouchingVariation(circle)
+            .setInfo("Divine Severance", "Made in Heaven rapidly speed slices an area, then finishes with a large, launching slice");
     private static final TrackedData<Integer> ACCELTIME;
     private static final TrackedData<Integer> TARGETID;
     private static final TrackedData<Integer> SPEEDOMETER;
@@ -167,7 +170,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                         the white supremacist
                             (Donut>M1>)Speed Slice>Leg Crusher>Fury Chop>M1>Barrage""";
 
-        moves = List.of(light, donut, barrage, legcrusher, timeaccel, furychop, circle, speedslice);
+        moves = List.of(light, donut, barrage, legcrusher, timeaccel, furychop, judgement, speedslice);
 
         super.initialize();
     }
@@ -191,7 +194,10 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        handleAttack(light, CooldownType.STAND_LIGHT, State.SLICE);
+        if (getUserOrThrow().isSneaking())
+            handleAttack(crm1, CooldownType.STAND_LIGHT, State.SPEED_CHOP);
+        else
+            handleAttack(light, CooldownType.STAND_LIGHT, State.SLICE);
     }
 
     @Override
@@ -233,7 +239,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     public void initSpecial3() {
         if (!canAttack()) return;
         LivingEntity user = getUserOrThrow();
-        if (user.isSneaking() && handleAttack(judgement, CooldownType.STAND_SP3, State.JUDGEMENT)) {
+        if (!user.isSneaking() && handleAttack(judgement, CooldownType.STAND_SP3, State.JUDGEMENT)) {
             playSound(JSoundRegistry.MIH_JUDGEMENT, 1, 1);
             return;
         }
@@ -334,6 +340,11 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                 speedSlice(user, user.getEyePos(), user.getEyePos().add(user.getRotationVector().multiply(8)), 6, 1, 1.5);
             }
             case (8) -> startCircle();
+            case (9) -> {
+                for (LivingEntity ent : entities)
+                    if (!JUtils.isBlocking(ent))
+                        ent.addStatusEffect(new StatusEffectInstance(JStatusRegistry.BLEEDING, 80, 1, true, false, true));
+            }
         }
     }
 
@@ -529,7 +540,8 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
         LEG_CRUSHER(builder -> builder.playAndHold("animation.mih.legcrusher")),
         FURY_CHOP(builder -> builder.playAndHold("animation.mih.furychop")),
         TIME_ACCELERATION(builder -> builder.playAndHold("animation.mih.taccel")),
-        CIRCLE_STARTUP(builder -> builder.playAndHold("animation.mih.circlestartup"));
+        CIRCLE_STARTUP(builder -> builder.playAndHold("animation.mih.circlestartup")),
+        SPEED_CHOP(builder -> builder.playAndHold("animation.mih.speedchop"));
 
         private final Consumer<AnimationBuilder> animator;
 

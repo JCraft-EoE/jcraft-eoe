@@ -162,7 +162,9 @@ public class MoveDataCommand {
                         "Recovery: §a" + recovery + "§r ticks\n" +
                         advOnHit +
                         advOnBlock +
-                        "Attack distance: §6" + attack.attackDist;
+                        "Attack distance: §6" + attack.attackDist + "§r m\n" +
+                        "Damage: §6" + attack.damage / 2f + "§r hearts\n" +
+                        "Knockback: §6" + attack.knockback;
 
         if (effectOnlyUB)
             mainFDMessage = mainFDMessage.concat("§r\nEffects on hit are §5UNBLOCKABLE");

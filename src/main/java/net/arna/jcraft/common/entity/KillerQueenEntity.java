@@ -37,7 +37,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
             .hyperArmor()
             .setLaunch()
             .setInfo("Haymaker", "slow, uninterruptable launcher");
-    public static final Attack sha = new Attack(5, 45, 20, 16, 0, AttackType.BOX)
+    public static final Attack sha = new Attack(5, 50, 20, 16, 0, AttackType.BOX)
             .setRanged(true)
             .setInfo("Sheer Heart Attack", "creates an automatic, heat-seeking sub-stand that explodes on contact, reflects 25% damage back to owner");
     public static final Attack grab = new Attack(7, 22, 0.75f, 20, 12, 1.75, 0, 0.1f, AttackType.BOX, 1f)

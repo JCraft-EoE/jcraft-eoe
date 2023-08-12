@@ -2571,7 +2571,7 @@
 			}
 		},
 		"animation.ge.rekka3": {
-			"animation_length": 1.12,
+			"animation_length": 1.2,
 			"bones": {
 				"BAM": {
 					"scale": {

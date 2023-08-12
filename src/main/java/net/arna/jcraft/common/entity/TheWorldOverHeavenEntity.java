@@ -166,8 +166,8 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        if (getUserOrThrow().isSneaking())
-            handleAttack(Attack.copyOf(crm1), CooldownType.STAND_LIGHT, State.LUNGE);
+        if (getUserOrThrow().isSneaking() && handleAttack(Attack.copyOf(crm1), CooldownType.STAND_LIGHT, State.LUNGE))
+            playSound(JSoundRegistry.MUDA_DA, 1, 1);
         else
             handleAttack(light, CooldownType.STAND_LIGHT, State.LIGHT);
     }
