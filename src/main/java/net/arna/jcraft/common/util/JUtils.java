@@ -17,6 +17,7 @@ import net.minecraft.block.SideShapeType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
@@ -438,6 +439,7 @@ public final class JUtils {
     }
 
     public static boolean canDamage(DamageSource damageSource, LivingEntity ent) {
-        return ent != null && ent.isAlive() && ent.isAttackable() && !ent.isInvulnerableTo(damageSource);
+        return ent != null && ent.isAlive() && ent.isAttackable() && !ent.isInvulnerableTo(damageSource) &&
+                !(ent instanceof ArmorStandEntity armorStand && armorStand.isMarker());
     }
 }
