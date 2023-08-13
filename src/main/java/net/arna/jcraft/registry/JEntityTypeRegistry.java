@@ -154,16 +154,11 @@ public interface JEntityTypeRegistry {
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, GERScorpionEntity::new).dimensions(EntityDimensions.fixed(0.4f, 0.4f)).build()
     );
 
-    // D4C clone variants
-    EntityType<PlayerCloneEntity> PLAYER_ENTITY_CLONE = Registry.register(
+    // Player clone
+    EntityType<PlayerCloneEntity> PLAYER_CLONE = Registry.register(
             Registry.ENTITY_TYPE,
             JCraft.id("playerclone"),
-            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, PlayerCloneEntity::new).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
-    );
-    EntityType<PlayerCloneEntity> PLAYER_ENTITY_CLONE_SLIM = Registry.register(
-            Registry.ENTITY_TYPE,
-            JCraft.id("playerclone_slim"),
-            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, PlayerCloneEntity::new).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, (EntityType<PlayerCloneEntity> entityType, World world) -> new PlayerCloneEntity(world)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     // Take note of the extra <KnifeProjectile> and tracked values
@@ -290,8 +285,7 @@ public interface JEntityTypeRegistry {
         );
 
         FabricDefaultAttributeRegistry.register(D4C, D4CEntity.createMobAttributes());
-        FabricDefaultAttributeRegistry.register(PLAYER_ENTITY_CLONE, PlayerCloneEntity.createCloneAttributes());
-        FabricDefaultAttributeRegistry.register(PLAYER_ENTITY_CLONE_SLIM, PlayerCloneEntity.createCloneAttributes());
+        FabricDefaultAttributeRegistry.register(PLAYER_CLONE, PlayerCloneEntity.createCloneAttributes());
 
         FabricDefaultAttributeRegistry.register(LIFE_DETECTOR, LifeDetectorEntity.createDetectorAttributes());
         FabricDefaultAttributeRegistry.register(RED_BIND, LifeDetectorEntity.createDetectorAttributes()); // This will also do fine.

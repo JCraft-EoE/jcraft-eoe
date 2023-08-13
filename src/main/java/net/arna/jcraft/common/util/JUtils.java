@@ -347,7 +347,7 @@ public final class JUtils {
     public static List<BlockInfo> collectBlockInfo(World world, BlockPos origin, int radius) {
         List<BlockInfo> infoList = new ArrayList<>();
 
-        int[][] array = new int[radius * 2 + 1][radius * 2 + 1];
+        boolean[][] array = new boolean[radius * 2 + 1][radius * 2 + 1];
 
         int originX = origin.getX();
         int originY = origin.getY();
@@ -366,10 +366,10 @@ public final class JUtils {
                     BlockState state = world.getBlockState(pos);
                     int x0 = x - originX + radius;
                     int z0 = z - originZ + radius;
-                    if (!state.isSideSolid(world, pos, Direction.UP, SideShapeType.RIGID) || array[x0][z0] != 0)
+                    if (!state.isSideSolid(world, pos, Direction.UP, SideShapeType.RIGID) || array[x0][z0])
                         continue;
 
-                    array[x0][z0] = 1;
+                    array[x0][z0] = true;
 
                     BlockInfo info = new BlockInfo(state, pos);
                     infoList.add(info);

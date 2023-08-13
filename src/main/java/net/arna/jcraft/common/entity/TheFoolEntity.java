@@ -404,7 +404,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
 
                     // Summon clone
                     if (user instanceof ServerPlayerEntity player) {
-                        PlayerCloneEntity playerCloneEntity = new PlayerCloneEntity(PlayerCloneEntity.getCloneType(player), world);
+                        PlayerCloneEntity playerCloneEntity = new PlayerCloneEntity(world);
                         playerCloneEntity.copyPositionAndRotation(player);
                         playerCloneEntity.setMaster(player);
                         playerCloneEntity.markSand();

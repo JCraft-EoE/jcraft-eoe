@@ -14,8 +14,6 @@ import java.util.UUID;
 public class MiscComponentImpl implements MiscComponent {
     private final Entity entity;
     @Getter
-    private boolean thin;
-    @Getter
     private Vec3d desiredVelocity = Vec3d.ZERO;
     @Getter
     private UUID slavedTo;
@@ -26,12 +24,6 @@ public class MiscComponentImpl implements MiscComponent {
 
     public MiscComponentImpl(Entity entity) {
         this.entity = entity;
-    }
-
-    @Override
-    public void setThin(boolean thin) {
-        this.thin = thin;
-        sync();
     }
 
     @Override
@@ -94,8 +86,6 @@ public class MiscComponentImpl implements MiscComponent {
 
     @Override
     public void readFromNbt(@NonNull NbtCompound tag) {
-        thin = tag.getBoolean("Thin");
-
         NbtCompound dvComp = tag.getCompound("DesiredVelocity");
         desiredVelocity = new Vec3d(dvComp.getDouble("X"), dvComp.getDouble("Y"), dvComp.getDouble("Z"));
 
@@ -106,8 +96,6 @@ public class MiscComponentImpl implements MiscComponent {
 
     @Override
     public void writeToNbt(@NonNull NbtCompound tag) {
-        tag.putBoolean("Thin", thin);
-
         NbtCompound dvComp = new NbtCompound();
         dvComp.putDouble("X", desiredVelocity.getX());
         dvComp.putDouble("Y", desiredVelocity.getY());

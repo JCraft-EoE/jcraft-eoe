@@ -2,6 +2,7 @@ package net.arna.jcraft.client.mixin;
 
 import net.arna.jcraft.client.registry.JRenderLayerRegistry;
 import net.arna.jcraft.client.renderer.features.StuckKnivesFeatureRenderer;
+import net.arna.jcraft.client.util.PlayerCloneClientPlayerEntity;
 import net.arna.jcraft.common.entity.KingCrimsonEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.render.RenderLayer;
@@ -22,6 +23,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 
@@ -41,6 +43,11 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
     private void addStuckKnivesFeatureRenderer(EntityRendererFactory.Context ctx, EntityModel<?> model, float shadowRadius, CallbackInfo ci) {
         if (model instanceof AnimalModel<?>)
             addFeature((FeatureRenderer<T, M>) new StuckKnivesFeatureRenderer<>(ctx, (LivingEntityRenderer<T, ? extends AnimalModel<T>>) (Object) this));
+    }
+
+    @Inject(method = "hasLabel(Lnet/minecraft/entity/LivingEntity;)Z", at = @At("HEAD"), cancellable = true)
+    private void doNotRenderCloneLabel(T livingEntity, CallbackInfoReturnable<Boolean> cir) {
+        if (livingEntity instanceof PlayerCloneClientPlayerEntity) cir.setReturnValue(false);
     }
 
     @Inject(method = "render(Lnet/minecraft/entity/LivingEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",

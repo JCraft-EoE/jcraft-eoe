@@ -8,9 +8,6 @@ import net.minecraft.util.math.Vec3d;
 import java.util.UUID;
 
 public interface MiscComponent extends Component, AutoSyncedComponent, CommonTickingComponent {
-    boolean isThin();
-    void setThin(boolean thin);
-
     Vec3d getDesiredVelocity();
     void updateRemoteInputs(int forward, int sideways, boolean jumping);
 

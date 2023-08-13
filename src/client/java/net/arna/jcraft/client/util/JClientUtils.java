@@ -1,11 +1,8 @@
 package net.arna.jcraft.client.util;
 
 import net.arna.jcraft.client.model.entity.StandEntityModel;
-import net.arna.jcraft.common.component.JComponents;
-import net.arna.jcraft.common.entity.KingCrimsonEntity;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.entity.StandEntity;
-import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.DimValues;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -105,17 +102,14 @@ public class JClientUtils {
     }
 
     public static boolean shouldNotRenderClone(PlayerCloneEntity clone) {
+        if (clone.shouldRenderForMaster()) return false;
+
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
-        // It's recommended to use ((IEntityDataSaver)player).getStand(), but in this case it doesn't matter
-        if (player != null && player.getFirstPassenger() instanceof KingCrimsonEntity) {
+        if (player != null) {
             UUID masterId = clone.getMasterId();
             if (masterId == null) return false;
             return masterId.equals(player.getUuid());
         }
         return false;
-    }
-
-    public static int getCooldown(CooldownType type) {
-        return JComponents.getCooldowns(MinecraftClient.getInstance().player).getCooldown(type);
     }
 }

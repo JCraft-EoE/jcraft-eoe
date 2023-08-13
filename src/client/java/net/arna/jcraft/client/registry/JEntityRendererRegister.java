@@ -13,9 +13,6 @@ public interface JEntityRendererRegister {
         EntityRendererRegistry.register(JEntityTypeRegistry.KING_CRIMSON, KingCrimsonRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegistry.D4C, D4CRenderer::new);
 
-        EntityRendererRegistry.register(JEntityTypeRegistry.PLAYER_ENTITY_CLONE, ctx -> new PlayerCloneRenderer(ctx, false));
-        EntityRendererRegistry.register(JEntityTypeRegistry.PLAYER_ENTITY_CLONE_SLIM, ctx -> new PlayerCloneRenderer(ctx, true));
-
         EntityRendererRegistry.register(JEntityTypeRegistry.CREAM, CreamRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegistry.KILLER_QUEEN, KillerQueenRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegistry.KILLER_QUEEN_BITES_THE_DUST, KQBTDRenderer::new);
