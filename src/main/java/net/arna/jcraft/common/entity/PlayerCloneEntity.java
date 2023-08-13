@@ -100,8 +100,9 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
     }
 
     public GameProfile getGameProfile() {
-        if (gameProfile == null || gameProfile.getId() == null || gameProfile.getName() == null ||
-                !gameProfile.getId().equals(getMasterId()) || !gameProfile.getName().equals(getMasterName()))
+        if ((gameProfile == null || gameProfile.getId() == null || gameProfile.getName() == null ||
+                !gameProfile.getId().equals(getMasterId()) || !gameProfile.getName().equals(getMasterName())) &&
+                getMasterId() != null && getMasterName() != null)
             gameProfile = new GameProfile(getMasterId(), getMasterName());
 
         return gameProfile;
