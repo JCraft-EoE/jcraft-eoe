@@ -1604,7 +1604,7 @@ The World: Over Heaven
 Star Platinum: The World
     >Added crouching variant to Light
 
-● 13/8/2023
+● 14/8/2023
 
 King Crimson
     >Added icons
@@ -1616,6 +1616,7 @@ Cream
     >Added icons
 
 Killer Queen
+    >Fixed bug where Sheer Heart Attack cooldown could be nullified
     >Standardized explosion damage to 5.5 hearts
 
 Golden Experience
@@ -1629,8 +1630,8 @@ The World: Over Heaven
     >Replaced skins 1 and 3
 
 Killer Queen: Bites the Dust
-    >Standardized explosion damage to 5.5 hearts
     >Fixed detonation bug
+    >Standardized explosion damage to 5.5 hearts
 
 priority (top to bottom)
 todo: GE life giver changes

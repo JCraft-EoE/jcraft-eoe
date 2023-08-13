@@ -113,6 +113,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
         LivingEntity user = getUserOrThrow();
         CooldownsComponent cooldowns = JComponents.getCooldowns(user);
         if (cooldowns.getCooldown(CooldownType.STAND_SP3) > 0) return;
+        cooldowns.setCooldown(CooldownType.STAND_SP3, 500); // 25s coin toss cd
 
         Vec3d lookVec = user.getRotationVector().multiply(0.75);
         if (this.coin != null) this.coin.discard();
@@ -125,8 +126,6 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
         this.bombBlock = null;
 
         playSound(JSoundRegistry.COIN_TOSS, 1, 1);
-        cooldowns.setCooldown(CooldownType.STAND_SP3, 500); // 25s coin toss cd
-        cooldowns.setCooldown(CooldownType.STAND_ULT, 20); // 1s detonate cd (prevents IUB)
     }
 
     @Override
