@@ -27,6 +27,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
@@ -801,6 +802,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      */
     @Override
     public void tick() {
+        if (user == null && getVehicle() instanceof LivingEntity vehicle) user = vehicle;
+
         super.tick();
 
         if (isDead()) return;
@@ -1290,12 +1293,17 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             // Velocity modification synchronisation
             if (ent instanceof ServerPlayerEntity serverPlayer)
                 serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(serverPlayer));
-            else
-                ent.velocityModified = true;
+            else ent.velocityModified = true;
         }
     }
 
+    protected boolean shouldPlaySummonSound() {
+        return !(user instanceof ArmorStandEntity);
+    }
+
     protected void playSummonSound() {
+        if (!shouldPlaySummonSound()) return;
+
         if (summonSound != null) playSound(summonSound, 1f, 1f);
         if (summonSound == null || playGenericSummonSound)
             playSound(JSoundRegistry.STAND_SUMMON, 1f, 1f);

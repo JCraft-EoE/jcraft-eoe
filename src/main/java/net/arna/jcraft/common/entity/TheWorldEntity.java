@@ -238,6 +238,8 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
 
     @Override
     protected void playSummonSound() {
+        if (!shouldPlaySummonSound()) return;
+
         playSound(JSoundRegistry.TW_SUMMON, 1f, 1f);
         playSound(JSoundRegistry.MUDA_DA, 1f, 1f);
     }
