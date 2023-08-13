@@ -403,12 +403,12 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                 weapon.setDamage(249);
 
                 if (user instanceof ServerPlayerEntity playerEntity) {
-                    PlayerCloneEntity playerCloneEntity = new PlayerCloneEntity(PlayerCloneEntity.getCloneType(playerEntity), this.world);
-                    playerCloneEntity.copyPositionAndRotation(playerEntity);
-                    playerCloneEntity.setMaster(playerEntity);
+                    PlayerCloneEntity clone = new PlayerCloneEntity(this.world);
+                    clone.copyPositionAndRotation(playerEntity);
+                    clone.setMaster(playerEntity);
 
-                    world.spawnEntity(playerCloneEntity);
-                    playerCloneEntity.equipStack(EquipmentSlot.MAINHAND, weapon);
+                    world.spawnEntity(clone);
+                    clone.equipStack(EquipmentSlot.MAINHAND, weapon);
                 } else if (user instanceof MobEntity mob) { //Code sourced from MobEntity.class convertTo()
                     EntityType<?> entityType = mob.getType();
                     MobEntity newMob = (MobEntity) entityType.create(world);

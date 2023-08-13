@@ -1,12 +1,12 @@
 package net.arna.jcraft.common.entity;
 
-import net.arna.jcraft.common.component.JComponents;
+import com.mojang.authlib.GameProfile;
 import net.arna.jcraft.common.entity.ai.goal.CloneAttackGoal;
 import net.arna.jcraft.common.util.IOwnable;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityType;
+import net.minecraft.client.render.entity.PlayerModelPart;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.RangedAttackMob;
@@ -32,6 +32,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -42,7 +43,9 @@ import java.util.UUID;
 
 public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob, IOwnable {
     private static final TrackedData<Optional<UUID>> MASTER;
+    private static final TrackedData<String> MASTER_NAME;
     private static final TrackedData<Boolean> SAND, RENDER_FOR_MASTER;
+    private static final TrackedData<Byte> PART_MASK;
     private final BowAttackGoal<PlayerCloneEntity> bowAttackGoal = new BowAttackGoal<>(this, 1.0, 30, 15.0F);
     private final CloneAttackGoal cloneAttackGoal = new CloneAttackGoal(this, 1) {
         public void stop() {
@@ -57,6 +60,8 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
     };
     private boolean allowItemExchange = true;
 
+    private GameProfile gameProfile;
+
     private LivingEntity persistTarget = null;
     private LivingEntity master;
     private final EntityNavigation navigation;
@@ -64,12 +69,14 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
 
     static {
         MASTER = DataTracker.registerData(PlayerCloneEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
+        MASTER_NAME = DataTracker.registerData(PlayerCloneEntity.class, TrackedDataHandlerRegistry.STRING);
         SAND = DataTracker.registerData(PlayerCloneEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
         RENDER_FOR_MASTER = DataTracker.registerData(PlayerCloneEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+        PART_MASK = DataTracker.registerData(PlayerCloneEntity.class, TrackedDataHandlerRegistry.BYTE);
     }
 
-    public PlayerCloneEntity(EntityType<? extends HostileEntity> entityType, World world) {
-        super(entityType, world);
+    public PlayerCloneEntity(World world) {
+        super(JEntityTypeRegistry.PLAYER_CLONE, world);
         Arrays.fill(armorDropChances, 2.0F);
         Arrays.fill(handDropChances, 2.0F);
 
@@ -92,16 +99,39 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
         return master;
     }
 
+    public GameProfile getGameProfile() {
+        if ((gameProfile == null || gameProfile.getId() == null || gameProfile.getName() == null ||
+                !gameProfile.getId().equals(getMasterId()) || !gameProfile.getName().equals(getMasterName())) &&
+                getMasterId() != null && getMasterName() != null)
+            gameProfile = new GameProfile(getMasterId(), getMasterName());
+
+        return gameProfile;
+    }
+
     @Override
     public void setMaster(LivingEntity m) {
         this.master = m;
         Text mName = m.getName();
         setCustomName(mName);
         dataTracker.set(MASTER, Optional.of(m.getUuid()));
+        dataTracker.set(MASTER_NAME, m.getEntityName());
+
+        if (!(m instanceof ServerPlayerEntity player)) return;
+        byte partMask = 0;
+        for (PlayerModelPart part : PlayerModelPart.values())
+            if (player.isPartVisible(part))
+                partMask |= (byte) part.getBitFlag();
+
+        dataTracker.set(PART_MASK, partMask);
+        setLeftHanded(player.getMainArm() == Arm.LEFT);
     }
 
     public UUID getMasterId() {
         return dataTracker.get(MASTER).orElse(null);
+    }
+
+    public String getMasterName() {
+        return dataTracker.get(MASTER_NAME);
     }
 
     public boolean shouldRenderForMaster() {
@@ -121,11 +151,17 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
         TheFoolEntity.applySandCloneModifiers(this);
     }
 
+    public byte getPartMask() {
+        return dataTracker.get(PART_MASK);
+    }
+
     protected void initDataTracker() {
         super.initDataTracker();
         dataTracker.startTracking(MASTER, Optional.empty());
+        dataTracker.startTracking(MASTER_NAME, null);
         dataTracker.startTracking(SAND, false);
         dataTracker.startTracking(RENDER_FOR_MASTER, true);
+        dataTracker.startTracking(PART_MASK, (byte) 0);
     }
 
     @Override
@@ -146,22 +182,22 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
         return true;
     }
 
-    public static EntityType<PlayerCloneEntity> getCloneType(ServerPlayerEntity player) {
-        return JComponents.getMiscData(player).isThin() ? JEntityTypeRegistry.PLAYER_ENTITY_CLONE_SLIM : JEntityTypeRegistry.PLAYER_ENTITY_CLONE;
-    }
-
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
         nbt.putUuid("Master", getMasterId());
+        nbt.putString("MasterName", getMasterName());
         nbt.putInt("DisabledSlots", disabledSlots);
+        nbt.putByte("PartMask", getPartMask());
     }
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         dataTracker.set(MASTER, Optional.of(nbt.getUuid("Master")));
+        dataTracker.set(MASTER_NAME, nbt.getString("MasterName"));
         disabledSlots = nbt.getInt("DisabledSlots");
+        dataTracker.set(PART_MASK, nbt.getByte("PartMask"));
         updateAttackType();
     }
 
@@ -312,20 +348,19 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
 
     @Override
     public boolean canTarget(LivingEntity target) {
-        if (target == master) return false;
-        return super.canTarget(target);
+        return target != master && target != this &&
+                (!(target instanceof PlayerCloneEntity clone) || !clone.getMasterId().equals(getMasterId())) &&
+                super.canTarget(target);
     }
 
     public void updateAttackType() {
-        if (world != null && !world.isClient) {
-            goalSelector.remove(this.cloneAttackGoal);
-            goalSelector.remove(this.bowAttackGoal);
-            ItemStack itemStack = this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW));
-            if (itemStack.isOf(Items.BOW))
-                goalSelector.add(2, this.bowAttackGoal);
-            else
-                goalSelector.add(2, this.cloneAttackGoal);
-        }
+        if (world == null || world.isClient) return;
+        goalSelector.remove(this.cloneAttackGoal);
+        goalSelector.remove(this.bowAttackGoal);
+        ItemStack itemStack = this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW));
+        if (itemStack.isOf(Items.BOW))
+            goalSelector.add(2, this.bowAttackGoal);
+        else goalSelector.add(2, this.cloneAttackGoal);
     }
 
     // Ranged attack handling
@@ -333,7 +368,7 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
         ItemStack itemStack = this.getArrowType(this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW)));
         PersistentProjectileEntity persistentProjectileEntity = this.createArrowProjectile(itemStack, pullProgress);
         double d = target.getX() - this.getX();
-        double e = target.getBodyY(0.3333333333333333) - persistentProjectileEntity.getY();
+        double e = target.getBodyY(0.33) - persistentProjectileEntity.getY();
         double f = target.getZ() - this.getZ();
         double g = Math.sqrt(d * d + f * f);
         persistentProjectileEntity.setVelocity(d, e + g * 0.2, f, 1.6F, 2f);

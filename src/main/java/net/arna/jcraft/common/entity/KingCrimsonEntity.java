@@ -404,16 +404,15 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                     // Shader handling
                     ShaderActivationPacket.send(player, this, 0, 120, ShaderActivationPacket.Type.CRIMSON);
 
-                    PlayerCloneEntity playerCloneEntity = new PlayerCloneEntity(PlayerCloneEntity.getCloneType(player), world);
-
-                    playerCloneEntity.setShouldRenderForMaster(false);
-                    playerCloneEntity.disableDrops();
-                    playerCloneEntity.disableItemExchange();
+                    PlayerCloneEntity clone = new PlayerCloneEntity(world);
+                    clone.setShouldRenderForMaster(false);
+                    clone.disableDrops();
+                    clone.disableItemExchange();
 
                     // Copy properties
-                    playerCloneEntity.setMaster(player);
+                    clone.setMaster(player);
 
-                    doppelganger = playerCloneEntity;
+                    doppelganger = clone;
                 } else if (user instanceof MobEntity mob) { //Code sourced from MobEntity.class convertTo()
                     EntityType<?> entityType = mob.getType();
                     MobEntity newMob = (MobEntity) entityType.create(world);
