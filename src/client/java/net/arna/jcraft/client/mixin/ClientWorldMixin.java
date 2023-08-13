@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.mixin;
 
 import net.arna.jcraft.common.component.JComponents;
-import net.arna.jcraft.common.entity.CreamEntity;
+import net.arna.jcraft.common.entity.stand.CreamEntity;
 import net.arna.jcraft.common.util.IJSplatterManagerHolder;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;

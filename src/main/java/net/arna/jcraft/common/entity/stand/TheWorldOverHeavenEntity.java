@@ -1,4 +1,4 @@
-package net.arna.jcraft.common.entity;
+package net.arna.jcraft.common.entity.stand;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;

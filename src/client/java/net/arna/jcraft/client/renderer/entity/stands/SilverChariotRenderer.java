@@ -2,7 +2,7 @@ package net.arna.jcraft.client.renderer.entity.stands;
 
 import net.arna.jcraft.client.model.entity.SilverChariotModel;
 import net.arna.jcraft.client.renderer.entity.layer.SCRapierLayer;
-import net.arna.jcraft.common.entity.SilverChariotEntity;
+import net.arna.jcraft.common.entity.stand.SilverChariotEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;

@@ -2,10 +2,10 @@ package net.arna.jcraft.common.util;
 
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
 import net.arna.jcraft.common.component.JComponents;
-import net.arna.jcraft.common.entity.CreamEntity;
-import net.arna.jcraft.common.entity.D4CEntity;
-import net.arna.jcraft.common.entity.KingCrimsonEntity;
-import net.arna.jcraft.common.entity.StandEntity;
+import net.arna.jcraft.common.entity.stand.CreamEntity;
+import net.arna.jcraft.common.entity.stand.D4CEntity;
+import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
+import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.network.s2c.JExplosionPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.spec.JCraftSpec;
@@ -44,7 +44,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
-import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
+import static net.arna.jcraft.common.entity.stand.StandEntity.damageLogic;
 
 public final class JUtils {
     public static List<DimValues> activeTimestops = new ArrayList<>();

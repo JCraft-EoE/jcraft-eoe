@@ -2,8 +2,8 @@ package net.arna.jcraft.client.model.entity;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.util.JClientUtils;
-import net.arna.jcraft.common.entity.SilverChariotEntity;
-import net.arna.jcraft.common.entity.StandType;
+import net.arna.jcraft.common.entity.stand.SilverChariotEntity;
+import net.arna.jcraft.common.entity.stand.StandType;
 import net.minecraft.util.Identifier;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 

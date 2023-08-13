@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.renderer.entity.stands;
 
 import net.arna.jcraft.client.model.entity.TheFoolModel;
-import net.arna.jcraft.common.entity.TheFoolEntity;
+import net.arna.jcraft.common.entity.stand.TheFoolEntity;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 
 public class TheFoolRenderer extends StandEntityRenderer<TheFoolEntity> {

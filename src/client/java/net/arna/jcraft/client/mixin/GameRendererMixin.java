@@ -3,7 +3,7 @@ package net.arna.jcraft.client.mixin;
 import com.mojang.datafixers.util.Pair;
 import net.arna.jcraft.client.registry.JShaderRegistry;
 import net.arna.jcraft.client.rendering.PostProcessHandler;
-import net.arna.jcraft.common.entity.CreamEntity;
+import net.arna.jcraft.common.entity.stand.CreamEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.GameRenderer;

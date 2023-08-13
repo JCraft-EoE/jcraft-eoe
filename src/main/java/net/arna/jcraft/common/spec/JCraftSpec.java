@@ -7,7 +7,7 @@ import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
-import net.arna.jcraft.common.entity.StandEntity;
+import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.network.s2c.PlayerAnimPacket;
@@ -33,7 +33,7 @@ import net.minecraft.world.World;
 
 import java.util.*;
 
-import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
+import static net.arna.jcraft.common.entity.stand.StandEntity.damageLogic;
 
 /**
  * Class that needs to be instantiated per-player to contain temporary data relating to their current state.

@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.entity.projectile;
 
-import net.arna.jcraft.common.entity.StandEntity;
+import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.splatter.SplatterType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
@@ -29,7 +29,7 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
-import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
+import static net.arna.jcraft.common.entity.stand.StandEntity.damageLogic;
 
 public class WSAcidProjectile extends PersistentProjectileEntity implements IAnimatable {
     private static final TrackedData<Boolean> MYH; // Melt your Heart variant

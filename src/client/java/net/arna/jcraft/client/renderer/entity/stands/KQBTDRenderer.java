@@ -2,7 +2,7 @@ package net.arna.jcraft.client.renderer.entity.stands;
 
 import net.arna.jcraft.client.model.entity.KQBTDModel;
 import net.arna.jcraft.client.renderer.entity.layer.KQBTDEyesLayer;
-import net.arna.jcraft.common.entity.KQBTDEntity;
+import net.arna.jcraft.common.entity.stand.KQBTDEntity;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 
 public class KQBTDRenderer extends StandEntityRenderer<KQBTDEntity> {

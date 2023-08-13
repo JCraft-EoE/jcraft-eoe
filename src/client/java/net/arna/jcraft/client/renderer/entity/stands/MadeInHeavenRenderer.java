@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.renderer.entity.stands;
 
 import net.arna.jcraft.client.model.entity.MadeInHeavenModel;
-import net.arna.jcraft.common.entity.MadeInHeavenEntity;
+import net.arna.jcraft.common.entity.stand.MadeInHeavenEntity;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;

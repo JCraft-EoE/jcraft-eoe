@@ -5,8 +5,8 @@ import lombok.Setter;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.StandComponent;
-import net.arna.jcraft.common.entity.StandEntity;
-import net.arna.jcraft.common.entity.StandType;
+import net.arna.jcraft.common.entity.stand.StandEntity;
+import net.arna.jcraft.common.entity.stand.StandType;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.config.GravityChangerConfig;
 import net.arna.jcraft.common.gravity.util.GravityChannel;
@@ -57,7 +57,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static net.arna.jcraft.common.entity.StandEntity.stun;
+import static net.arna.jcraft.common.entity.stand.StandEntity.stun;
 
 //initialize your FUCKING variables, arna
 //todo: add working out

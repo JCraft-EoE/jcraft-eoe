@@ -11,7 +11,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import net.arna.jcraft.common.entity.StandType;
+import net.arna.jcraft.common.entity.stand.StandType;
 import net.minecraft.text.Text;
 
 import java.util.Collection;

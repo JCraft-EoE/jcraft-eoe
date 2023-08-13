@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.model.entity;
 
-import net.arna.jcraft.common.entity.MadeInHeavenEntity;
-import net.arna.jcraft.common.entity.StandType;
+import net.arna.jcraft.common.entity.stand.MadeInHeavenEntity;
+import net.arna.jcraft.common.entity.stand.StandType;
 
 public class MadeInHeavenModel extends StandEntityModel<MadeInHeavenEntity> {
     public MadeInHeavenModel() {

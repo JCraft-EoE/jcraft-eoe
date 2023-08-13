@@ -1,4 +1,4 @@
-package net.arna.jcraft.common.entity;
+package net.arna.jcraft.common.entity.stand;
 
 import io.netty.buffer.Unpooled;
 import net.arna.jcraft.JCraft;
@@ -9,6 +9,7 @@ import net.arna.jcraft.common.attack.HitBoxData;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.StandComponent;
+import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.entity.projectile.BloodProjectile;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;

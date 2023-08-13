@@ -3,7 +3,7 @@ package net.arna.jcraft.client.mixin;
 import net.arna.jcraft.client.registry.JRenderLayerRegistry;
 import net.arna.jcraft.client.renderer.features.StuckKnivesFeatureRenderer;
 import net.arna.jcraft.client.util.PlayerCloneClientPlayerEntity;
-import net.arna.jcraft.common.entity.KingCrimsonEntity;
+import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;

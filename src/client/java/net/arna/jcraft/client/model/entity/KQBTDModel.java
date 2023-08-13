@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.model.entity;
 
-import net.arna.jcraft.common.entity.KQBTDEntity;
-import net.arna.jcraft.common.entity.StandType;
+import net.arna.jcraft.common.entity.stand.KQBTDEntity;
+import net.arna.jcraft.common.entity.stand.StandType;
 
 public class KQBTDModel extends StandEntityModel<KQBTDEntity> {
     public KQBTDModel() {

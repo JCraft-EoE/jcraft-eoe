@@ -1,4 +1,4 @@
-package net.arna.jcraft.common.entity;
+package net.arna.jcraft.common.entity.stand;
 
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;

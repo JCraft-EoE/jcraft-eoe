@@ -1,9 +1,10 @@
-package net.arna.jcraft.common.entity;
+package net.arna.jcraft.common.entity.stand;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.StunType;
+import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.item.MockItem;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.mixin.ChunkLightProviderAccessor;

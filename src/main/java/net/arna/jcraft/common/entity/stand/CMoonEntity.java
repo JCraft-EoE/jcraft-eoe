@@ -1,4 +1,4 @@
-package net.arna.jcraft.common.entity;
+package net.arna.jcraft.common.entity.stand;
 
 import lombok.Data;
 import net.arna.jcraft.JCraft;

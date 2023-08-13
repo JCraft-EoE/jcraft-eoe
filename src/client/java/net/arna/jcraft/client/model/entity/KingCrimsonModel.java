@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.model.entity;
 
-import net.arna.jcraft.common.entity.KingCrimsonEntity;
-import net.arna.jcraft.common.entity.StandType;
+import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
+import net.arna.jcraft.common.entity.stand.StandType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Vec3d;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;

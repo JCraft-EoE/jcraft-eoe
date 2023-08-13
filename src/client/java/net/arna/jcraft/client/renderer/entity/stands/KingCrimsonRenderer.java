@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.renderer.entity.stands;
 
 import net.arna.jcraft.client.model.entity.KingCrimsonModel;
-import net.arna.jcraft.common.entity.KingCrimsonEntity;
+import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 
 public class KingCrimsonRenderer extends StandEntityRenderer<KingCrimsonEntity> {

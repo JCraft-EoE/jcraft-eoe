@@ -3,7 +3,7 @@ package net.arna.jcraft.client.renderer.effects;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.arna.jcraft.client.JCraftClient;
 import net.arna.jcraft.client.util.RenderUtils;
-import net.arna.jcraft.common.entity.KingCrimsonEntity;
+import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;

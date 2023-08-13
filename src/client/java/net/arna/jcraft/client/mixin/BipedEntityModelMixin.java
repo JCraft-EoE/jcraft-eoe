@@ -1,6 +1,6 @@
 package net.arna.jcraft.client.mixin;
 
-import net.arna.jcraft.common.entity.*;
+import net.arna.jcraft.common.entity.stand.*;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.minecraft.client.model.ModelPart;

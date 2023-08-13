@@ -36,7 +36,7 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 import java.util.*;
 
 import static net.arna.jcraft.common.util.JUtils.canDamage;
-import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
+import static net.arna.jcraft.common.entity.stand.StandEntity.damageLogic;
 
 public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimationTickable, IOwnable {
     private static final TrackedData<Optional<UUID>> OWNERUUID;

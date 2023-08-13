@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.entity.projectile;
 
-import net.arna.jcraft.common.entity.StandEntity;
+import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -20,7 +20,7 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
-import static net.arna.jcraft.common.entity.StandEntity.damageLogic;
+import static net.arna.jcraft.common.entity.stand.StandEntity.damageLogic;
 
 public class BloodProjectile extends PersistentProjectileEntity implements IAnimatable {
     private final AnimationFactory factory = GeckoLibUtil.createFactory(this);

@@ -2,7 +2,7 @@ package net.arna.jcraft.mixin;
 
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.StandComponent;
-import net.arna.jcraft.common.entity.StandType;
+import net.arna.jcraft.common.entity.stand.StandType;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;

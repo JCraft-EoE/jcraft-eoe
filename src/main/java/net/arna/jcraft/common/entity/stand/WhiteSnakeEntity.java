@@ -1,4 +1,4 @@
-package net.arna.jcraft.common.entity;
+package net.arna.jcraft.common.entity.stand;
 
 import com.google.common.collect.Lists;
 import net.arna.jcraft.JCraft;

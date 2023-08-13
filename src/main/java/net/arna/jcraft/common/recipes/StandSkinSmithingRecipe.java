@@ -2,7 +2,7 @@ package net.arna.jcraft.common.recipes;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.enchantments.CinderellasKissEnchantment;
-import net.arna.jcraft.common.entity.StandType;
+import net.arna.jcraft.common.entity.stand.StandType;
 import net.arna.jcraft.common.item.StandDiscItem;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.minecraft.inventory.Inventory;

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.*;
 import net.arna.jcraft.common.entity.projectile.*;
+import net.arna.jcraft.common.entity.stand.*;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.entity.Entity;
@@ -117,10 +118,10 @@ public interface JEntityTypeRegistry {
                     .build()
     );
 
-    EntityType<GoldenExperienceEntity> GOLD_EXPERIENCE = Registry.register(
+    EntityType<GoldExperienceEntity> GOLD_EXPERIENCE = Registry.register(
             Registry.ENTITY_TYPE,
             JCraft.id("goldenexperience"),
-            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(GoldenExperienceEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(GoldExperienceEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
     EntityType<GETreeEntity> GE_TREE = Registry.register(
             Registry.ENTITY_TYPE,
@@ -265,7 +266,7 @@ public interface JEntityTypeRegistry {
         FabricDefaultAttributeRegistry.register(MAGICIANS_RED, MagiciansRedEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(THE_FOOL, TheFoolEntity.createMobAttributes());
 
-        FabricDefaultAttributeRegistry.register(GOLD_EXPERIENCE, GoldenExperienceEntity.createMobAttributes());
+        FabricDefaultAttributeRegistry.register(GOLD_EXPERIENCE, GoldExperienceEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(GER, GEREntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(GE_TREE, GETreeEntity.createLivingAttributes());
         FabricDefaultAttributeRegistry.register(GE_FROG, GEFrogEntity.createFrogAttributes());

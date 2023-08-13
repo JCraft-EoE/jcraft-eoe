@@ -2,6 +2,7 @@ package net.arna.jcraft.common.entity;
 
 import com.mojang.authlib.GameProfile;
 import net.arna.jcraft.common.entity.ai.goal.CloneAttackGoal;
+import net.arna.jcraft.common.entity.stand.TheFoolEntity;
 import net.arna.jcraft.common.util.IOwnable;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;

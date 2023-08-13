@@ -1,8 +1,8 @@
 package net.arna.jcraft.client.model.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.entity.AbstractStarPlatinumEntity;
-import net.arna.jcraft.common.entity.StandType;
+import net.arna.jcraft.common.entity.stand.AbstractStarPlatinumEntity;
+import net.arna.jcraft.common.entity.stand.StandType;
 import net.minecraft.util.Identifier;
 
 public class StarPlatinumModel extends StandEntityModel<AbstractStarPlatinumEntity<?, ?>> {

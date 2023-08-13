@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.model.entity;
 
-import net.arna.jcraft.common.entity.StandType;
-import net.arna.jcraft.common.entity.WhiteSnakeEntity;
+import net.arna.jcraft.common.entity.stand.StandType;
+import net.arna.jcraft.common.entity.stand.WhiteSnakeEntity;
 
 public class WhiteSnakeModel extends StandEntityModel<WhiteSnakeEntity> {
 

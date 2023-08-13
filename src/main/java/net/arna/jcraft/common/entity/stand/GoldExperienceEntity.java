@@ -1,10 +1,13 @@
-package net.arna.jcraft.common.entity;
+package net.arna.jcraft.common.entity.stand;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackQueue;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.attack.HitBoxData;
+import net.arna.jcraft.common.entity.GEButterflyEntity;
+import net.arna.jcraft.common.entity.GEFrogEntity;
+import net.arna.jcraft.common.entity.GESnakeEntity;
 import net.arna.jcraft.common.entity.projectile.GETreeEntity;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
@@ -32,7 +35,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, GoldenExperienceEntity.State> {
+public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, GoldExperienceEntity.State> {
     // JCraft.lightCooldown -> 0 | 0.5f -> 0.35f
     public static final Attack crm1 = new Attack(11, JCraft.lightCooldown * 4, 1.25f, 20, 16, 1.5, 4f, 0.75f, AttackType.BOX, 0.25f, 0.2f, 0, JSoundRegistry.IMPACT_4)
             .setInfo("Place Berry Bush", "places an almost-ripe berry bush on the ground, this move cannot be aimed up or down");
@@ -76,7 +79,7 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
             .setFollowup(rekka2)
             .setInfo("Rekka Series", "a set of three attacks, which cancel into each other during recovery", AttackQueue.SPECIAL2);
 
-    public GoldenExperienceEntity(World worldIn) {
+    public GoldExperienceEntity(World worldIn) {
         super(StandType.GOLD_EXPERIENCE, worldIn, JSoundRegistry.GE_SUMMON);
 
         idleRotation = 0f;
@@ -338,7 +341,7 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
     }
 
     // Animation code
-    public enum State implements StandAnimationState<GoldenExperienceEntity> {
+    public enum State implements StandAnimationState<GoldExperienceEntity> {
         IDLE(builder -> builder.loop("animation.ge.idle")),
         LIGHT(builder -> builder.playAndHold("animation.ge.light")),
         BLOCK(builder -> builder.loop("animation.ge.block")),
@@ -360,7 +363,7 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
         }
 
         @Override
-        public void playAnimation(GoldenExperienceEntity stand, AnimationBuilder builder) {
+        public void playAnimation(GoldExperienceEntity stand, AnimationBuilder builder) {
             animator.accept(builder);
         }
     }

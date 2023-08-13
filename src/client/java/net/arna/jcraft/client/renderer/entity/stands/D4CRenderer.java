@@ -1,8 +1,8 @@
 package net.arna.jcraft.client.renderer.entity.stands;
 
 import net.arna.jcraft.client.model.entity.StandEntityModel;
-import net.arna.jcraft.common.entity.D4CEntity;
-import net.arna.jcraft.common.entity.StandType;
+import net.arna.jcraft.common.entity.stand.D4CEntity;
+import net.arna.jcraft.common.entity.stand.StandType;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;

@@ -2,7 +2,7 @@ package net.arna.jcraft.common.item;
 
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.StandComponent;
-import net.arna.jcraft.common.entity.StandType;
+import net.arna.jcraft.common.entity.stand.StandType;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;

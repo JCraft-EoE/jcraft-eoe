@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.model.entity;
 
-import net.arna.jcraft.common.entity.StandType;
-import net.arna.jcraft.common.entity.TheWorldEntity;
+import net.arna.jcraft.common.entity.stand.StandType;
+import net.arna.jcraft.common.entity.stand.TheWorldEntity;
 
 public class TheWorldModel extends StandEntityModel<TheWorldEntity> {
 
