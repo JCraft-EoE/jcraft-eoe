@@ -1,6 +1,5 @@
 package net.arna.jcraft.client.mixin;
 
-import it.unimi.dsi.fastutil.Pair;
 import net.arna.jcraft.client.renderer.entity.PlayerCloneRenderer;
 import net.arna.jcraft.client.rendering.CloneSkinTracker;
 import net.arna.jcraft.client.util.JClientUtils;
@@ -12,7 +11,6 @@ import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.entity.Entity;
 import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -57,8 +55,8 @@ public class EntityRenderDispatcherMixin {
     private <T extends Entity> void getCloneRenderer(T entity, CallbackInfoReturnable<EntityRenderer<? super T>> cir) {
         if (!(entity instanceof PlayerCloneEntity clone)) return;
 
-        Pair<Identifier, String> skin = CloneSkinTracker.getSkinFor(clone);
-        cir.setReturnValue((EntityRenderer<? super T>) cloneRenderers.getOrDefault(skin.right(), cloneRenderers.get("default")));
+        cir.setReturnValue((EntityRenderer<? super T>) cloneRenderers.getOrDefault(CloneSkinTracker.getModelFor(clone),
+                cloneRenderers.get("default")));
     }
 
     @Inject(method = "reload", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILEXCEPTION)

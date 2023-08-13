@@ -1,16 +1,19 @@
 package net.arna.jcraft.client.util;
 
+import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import net.arna.jcraft.client.rendering.CloneSkinTracker;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Objects;
@@ -37,13 +40,56 @@ public class PlayerCloneClientPlayerEntity extends AbstractClientPlayerEntity {
     }
 
     @Override
+    public boolean isSpectator() {
+        return false;
+    }
+
+    @Override
+    public boolean isCreative() {
+        return false;
+    }
+
+    @Nullable
+    @Override
+    protected PlayerListEntry getPlayerListEntry() {
+        return null;
+    }
+
+    @Override
+    public boolean hasSkinTexture() {
+        return CloneSkinTracker.getSkinFor(clone, MinecraftProfileTexture.Type.SKIN) != null;
+    }
+
+    @Override
     public Identifier getSkinTexture() {
-        return CloneSkinTracker.getSkinFor(clone).first();
+        return CloneSkinTracker.getSkinFor(clone, MinecraftProfileTexture.Type.SKIN);
+    }
+
+    @Override
+    public boolean canRenderCapeTexture() {
+        return CloneSkinTracker.getSkinFor(clone, MinecraftProfileTexture.Type.CAPE) != null;
+    }
+
+    @Nullable
+    @Override
+    public Identifier getCapeTexture() {
+        return CloneSkinTracker.getSkinFor(clone, MinecraftProfileTexture.Type.CAPE);
+    }
+
+    @Override
+    public boolean canRenderElytraTexture() {
+        return CloneSkinTracker.getSkinFor(clone, MinecraftProfileTexture.Type.ELYTRA) != null;
+    }
+
+    @Nullable
+    @Override
+    public Identifier getElytraTexture() {
+        return CloneSkinTracker.getSkinFor(clone, MinecraftProfileTexture.Type.ELYTRA);
     }
 
     @Override
     public String getModel() {
-        return CloneSkinTracker.getSkinFor(clone).second();
+        return CloneSkinTracker.getModelFor(clone);
     }
 
     @Override

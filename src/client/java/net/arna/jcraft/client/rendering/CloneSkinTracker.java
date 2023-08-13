@@ -2,7 +2,6 @@ package net.arna.jcraft.client.rendering;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
-import it.unimi.dsi.fastutil.Pair;
 import lombok.experimental.UtilityClass;
 import net.arna.jcraft.client.util.PlayerCloneClientPlayerEntity;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
@@ -10,21 +9,24 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.DefaultSkinHelper;
 import net.minecraft.util.Identifier;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.*;
 
 @UtilityClass
 public class CloneSkinTracker {
-    private static final Map<PlayerCloneEntity, Pair<Identifier, String>> modelCache = new WeakHashMap<>();
+    private static final Map<PlayerCloneEntity, Map<MinecraftProfileTexture.Type, Identifier>> skinCache = new WeakHashMap<>();
+    private static final Map<PlayerCloneEntity, String> modelCache = new WeakHashMap<>();
     private static final Map<PlayerCloneEntity, PlayerCloneClientPlayerEntity> playerCache = new WeakHashMap<>();
     private static final Set<PlayerCloneEntity> loading = Collections.newSetFromMap(new WeakHashMap<>());
 
-    public static Pair<Identifier, String> getSkinFor(PlayerCloneEntity clone) {
-        if (!modelCache.containsKey(clone)) load(clone);
-        Pair<Identifier, String> pair = modelCache.get(clone);
-        return pair == null ? getDefault(clone) : pair;
+    public static Identifier getSkinFor(PlayerCloneEntity clone, MinecraftProfileTexture.Type type) {
+        if (!skinCache.containsKey(clone)) load(clone);
+        Identifier skin = skinCache.getOrDefault(clone, Collections.emptyMap()).get(type);
+        return skin == null ? DefaultSkinHelper.getTexture(clone.getMasterId()) : skin;
+    }
+
+    public static String getModelFor(PlayerCloneEntity clone) {
+        if (!skinCache.containsKey(clone)) load(clone);
+        return modelCache.getOrDefault(clone, DefaultSkinHelper.getModel(clone.getMasterId()));
     }
 
     public static PlayerCloneClientPlayerEntity toPlayer(PlayerCloneEntity clone) {
@@ -43,18 +45,15 @@ public class CloneSkinTracker {
         }
 
         MinecraftClient.getInstance().getSkinProvider().loadSkin(profile, (type, id, texture) -> {
-            String model;
-            if (type != MinecraftProfileTexture.Type.SKIN || (model = texture.getMetadata("model")) == null) return;
-
-            modelCache.put(clone, Pair.of(id, model));
+            skinCache.computeIfAbsent(clone, c -> new HashMap<>()).put(type, id);
 
             synchronized (loading) {
                 loading.remove(clone);
             }
-        }, true);
-    }
 
-    private static Pair<Identifier, String> getDefault(PlayerCloneEntity clone) {
-        return Pair.of(DefaultSkinHelper.getTexture(clone.getMasterId()), DefaultSkinHelper.getModel(clone.getMasterId()));
+            String model;
+            if (type != MinecraftProfileTexture.Type.SKIN || (model = texture.getMetadata("model")) == null) return;
+            modelCache.put(clone, model);
+        }, true);
     }
 }
