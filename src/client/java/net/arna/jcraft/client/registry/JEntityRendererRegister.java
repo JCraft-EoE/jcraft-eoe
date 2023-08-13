@@ -38,6 +38,7 @@ public interface JEntityRendererRegister {
         EntityRendererRegistry.register(JEntityTypeRegistry.GE_TREE, GETreeRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegistry.GE_FROG, GEFrogRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegistry.GE_SNAKE, GESnakeRenderer::new);
+        EntityRendererRegistry.register(JEntityTypeRegistry.GE_BUTTERFLY, GEButterflyRenderer::new);
 
         EntityRendererRegistry.register(JEntityTypeRegistry.GER, GERRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegistry.GER_SCORPION, GERScorpionRenderer::new);

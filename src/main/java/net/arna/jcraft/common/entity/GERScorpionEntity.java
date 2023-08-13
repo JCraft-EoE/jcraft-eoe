@@ -42,7 +42,6 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
     private static final TrackedData<Optional<UUID>> OWNERUUID;
     private static final TrackedData<Boolean> ISROCK;
     private static final TrackedData<Boolean> CHARGED;
-    private final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
     private Vec3d initialVel;
     private LivingEntity jumpTarget;
     private LivingEntity owner;
@@ -257,6 +256,8 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
     }
 
     // Animations
+    private final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+
     @Override
     public void registerControllers(AnimationData animationData) {
         animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));

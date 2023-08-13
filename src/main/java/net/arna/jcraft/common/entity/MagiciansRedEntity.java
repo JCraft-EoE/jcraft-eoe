@@ -96,6 +96,8 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
 
         moves = List.of(light, heavy, barrage, crossfire, crossfirehurricane, crossfirevariation, redbind, detector);
 
+        barrage.damage = 0.75f;
+
         super.initialize();
     }
 
@@ -172,7 +174,9 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
                 }
             }
             case (2) -> {
-                for (LivingEntity ent : entities) ent.setOnFireFor(3);
+                for (LivingEntity ent : entities)
+                    if (!ent.isOnFire())
+                        ent.setOnFireFor(3);
             }
             case (3) -> {
                 for (int i = 0; i < 3; i++) {

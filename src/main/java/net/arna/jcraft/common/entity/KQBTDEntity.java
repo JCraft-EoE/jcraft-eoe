@@ -97,6 +97,12 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
     }
 
     @Override
+    protected void detonate() {
+        super.detonate();
+        detonateBTD = false;
+    }
+
+    @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
         if (handleAttack(heavy, CooldownType.STAND_HEAVY, State.HEAVY))
@@ -133,11 +139,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
 
     @Override
     public void initUlt() {
-        if (!canAttack()) return;
-        if (handleAttack(detonate, CooldownType.STAND_ULT, State.DETONATE)) {
-            playSound(JSoundRegistry.KQ_DETONATE, 1, 1);
-            detonateBTD = false;
-        }
+
     }
 
     @Override

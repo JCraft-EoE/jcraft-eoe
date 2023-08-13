@@ -1,0 +1,57 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.gebutterfly.idle": {
+			"loop": true,
+			"animation_length": 0.48,
+			"bones": {
+				"antennae": {
+					"rotation": {
+						"0.0": {
+							"vector": [-5, 0, 0]
+						},
+						"0.24": {
+							"vector": [5, 0, 0],
+							"easing": "easeInOutSine"
+						},
+						"0.48": {
+							"vector": [-5, 0, 0],
+							"easing": "easeInOutSine"
+						}
+					}
+				},
+				"right_wing": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 25]
+						},
+						"0.24": {
+							"vector": [0, 0, -25],
+							"easing": "easeInOutSine"
+						},
+						"0.48": {
+							"vector": [0, 0, 25],
+							"easing": "easeInOutSine"
+						}
+					}
+				},
+				"left_wing": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, -25]
+						},
+						"0.24": {
+							"vector": [0, 0, 25],
+							"easing": "easeInOutSine"
+						},
+						"0.48": {
+							"vector": [0, 0, -25],
+							"easing": "easeInOutSine"
+						}
+					}
+				}
+			}
+		}
+	},
+	"geckolib_format_version": 2
+}

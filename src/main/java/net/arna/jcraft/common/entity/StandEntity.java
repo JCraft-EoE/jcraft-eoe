@@ -574,7 +574,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * @param ent          entity to harm
      */
     public static void damage(float damage, DamageSource damageSource, LivingEntity ent) {
-        if (JUtils.canDamage(damageSource, ent)) return;
+        if (!JUtils.canDamage(damageSource, ent)) return;
 
         float scaling = ((IDamageScaler)ent).jcraft$getDamageScaling();
         //JCraft.LOGGER.info("Damaging entity: " + ent + " with damage: " + damage + " and scaling: " + scaling);

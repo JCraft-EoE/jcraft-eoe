@@ -1604,6 +1604,21 @@ The World: Over Heaven
 Star Platinum: The World
     >Added crouching variant to Light
 
+● 13/8/2023
+
+Golden Experience
+    >Added aerial variant to Life Giver
+
+The World
+    >Moved OVA from skin 3 to 1
+    >Replaced skin 3 with Greatest High
+
+The World: Over Heaven
+    >Replaced skins 1 and 3
+
+Killer Queen: Bites the Dust
+    >
+
 priority (top to bottom)
 todo: GE life giver changes
 

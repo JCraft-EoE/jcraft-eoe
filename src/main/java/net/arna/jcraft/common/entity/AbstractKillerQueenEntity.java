@@ -109,7 +109,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
         return null;
     }
 
-    private void detonate() {
+    protected void detonate() {
         setAttack(detonate, getDetonateState());
         playSound(JSoundRegistry.KQ_DETONATE, 1, 1);
     }

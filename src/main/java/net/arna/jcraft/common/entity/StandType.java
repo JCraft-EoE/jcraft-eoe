@@ -22,7 +22,7 @@ public enum StandType {
     STAR_PLATINUM(JEntityTypeRegistry.STAR_PLATINUM, StarPlatinumEntity::new, "starplatinum",                   // 1
             Text.literal("Manga"), Text.literal("Arcade"), Text.literal("OVA")),
     THE_WORLD(JEntityTypeRegistry.THE_WORLD, TheWorldEntity::new, "theworld",                                   // 2
-            Text.literal("Arcade"), Text.literal("Black"), Text.literal("OVA")),
+            Text.literal("OVA"), Text.literal("Black"), Text.literal("Greatest High")),
     KING_CRIMSON(JEntityTypeRegistry.KING_CRIMSON, KingCrimsonEntity::new, "kingcrimson",                       // 3
             Text.literal("Royal"), Text.literal("Manga"), Text.literal("Concept")),
     D4C(JEntityTypeRegistry.D4C, D4CEntity::new, "d4c",                                                         // 4
@@ -48,7 +48,7 @@ public enum StandType {
     MADE_IN_HEAVEN(JEntityTypeRegistry.MADE_IN_HEAVEN, MadeInHeavenEntity::new, "mih", true,                        // -2
             Text.literal("Brick"), Text.literal("Daft"), Text.literal("Nightmare")),
     THE_WORLD_OVER_HEAVEN(JEntityTypeRegistry.THE_WORLD_OVER_HEAVEN, TheWorldOverHeavenEntity::new, "twoh", true,   // -3
-            Text.literal("Shadow"), Text.literal("Gone to Heaven"), Text.literal("Greatest High")),
+            Text.literal("Shooting Star"), Text.literal("Above the Clouds"), Text.literal("Dirt to Divinity")),
     KILLER_QUEEN_BITES_THE_DUST(JEntityTypeRegistry.KILLER_QUEEN_BITES_THE_DUST, KQBTDEntity::new, "kqbtd",true,    // -4
             Text.literal("Gelatin"), Text.literal("Veiled"), Text.literal("Garf")),
     GOLD_EXPERIENCE_REQUIEM(JEntityTypeRegistry.GER, GEREntity::new, "ger", true,                                   // -5

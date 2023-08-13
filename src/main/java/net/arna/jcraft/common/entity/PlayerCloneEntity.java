@@ -70,15 +70,17 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
 
     public PlayerCloneEntity(EntityType<? extends HostileEntity> entityType, World world) {
         super(entityType, world);
-        Arrays.fill(armorDropChances, 1F);
-        Arrays.fill(handDropChances, 1F);
+        Arrays.fill(armorDropChances, 2.0F);
+        Arrays.fill(handDropChances, 2.0F);
+
         updateAttackType();
+
         navigation = getNavigation();
     }
 
     public void disableDrops() {
-        Arrays.fill(armorDropChances, 0);
-        Arrays.fill(handDropChances, 0);
+        Arrays.fill(armorDropChances, 0.0F);
+        Arrays.fill(handDropChances, 0.0F);
     }
 
     public void disableItemExchange() {

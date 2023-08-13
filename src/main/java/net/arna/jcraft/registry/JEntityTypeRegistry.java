@@ -137,6 +137,11 @@ public interface JEntityTypeRegistry {
             JCraft.id("gefrog"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, GEFrogEntity::new).dimensions(EntityDimensions.fixed(0.3f, 0.3f)).build()
     );
+    EntityType<GEButterflyEntity> GE_BUTTERFLY = Registry.register(
+            Registry.ENTITY_TYPE,
+            JCraft.id("gebutterfly"),
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, GEButterflyEntity::new).dimensions(EntityDimensions.fixed(0.3f, 0.3f)).build()
+    );
 
     EntityType<GEREntity> GER = Registry.register(
             Registry.ENTITY_TYPE,
@@ -269,6 +274,7 @@ public interface JEntityTypeRegistry {
         FabricDefaultAttributeRegistry.register(GER, GEREntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(GE_TREE, GETreeEntity.createLivingAttributes());
         FabricDefaultAttributeRegistry.register(GE_FROG, GEFrogEntity.createFrogAttributes());
+        FabricDefaultAttributeRegistry.register(GE_BUTTERFLY, GEButterflyEntity.createButterflyAttributes());
         FabricDefaultAttributeRegistry.register(GE_SNAKE, GESnakeEntity.createMobAttributes()
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3)
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 10)
@@ -288,7 +294,7 @@ public interface JEntityTypeRegistry {
         FabricDefaultAttributeRegistry.register(PLAYER_ENTITY_CLONE_SLIM, PlayerCloneEntity.createCloneAttributes());
 
         FabricDefaultAttributeRegistry.register(LIFE_DETECTOR, LifeDetectorEntity.createDetectorAttributes());
-        FabricDefaultAttributeRegistry.register(RED_BIND, LifeDetectorEntity.createDetectorAttributes()); // This will do fine.
+        FabricDefaultAttributeRegistry.register(RED_BIND, LifeDetectorEntity.createDetectorAttributes()); // This will also do fine.
         FabricDefaultAttributeRegistry.register(BLOCK_PROJECTILE, BlockProjectile.createBlockAttributes());
         FabricDefaultAttributeRegistry.register(SAND_TORNADO, SandTornadoEntity.createTornadoAttributes());
     }

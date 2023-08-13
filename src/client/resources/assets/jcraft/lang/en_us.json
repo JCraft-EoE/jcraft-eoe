@@ -11,6 +11,7 @@
   "item.jcraft.dios_diary": "DIO's Diary",
   "item.jcraft.sinners_soul": "Sinner's Soul",
   "item.jcraft.soul_block": "Block of Suffering",
+  "item.jcraft.meteorite_block": "Meteorite Block",
   "item.jcraft.green_baby": "Green Baby",
   "item.jcraft.knife": "Knife",
   "item.jcraft.knife_bundle": "Knife Bundle",
@@ -35,6 +36,7 @@
   "itemGroup.jcraft.main": "JCraft Items",
 
   "block.jcraft.soul_block": "Block of Suffering",
+  "block.jcraft.meteorite_block": "Meteorite Block",
   "block.jcraft.foolish_sand_block": "Foolish Sand",
 
   "enchantment.jcraft.cinderellas_kiss": "Cinderella's Kiss",

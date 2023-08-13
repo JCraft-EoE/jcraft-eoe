@@ -34,7 +34,6 @@ import java.util.function.Consumer;
 
 public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, GoldenExperienceEntity.State> {
     // JCraft.lightCooldown -> 0 | 0.5f -> 0.35f
-    //todo: crouching m1, berry bush :)
     public static final Attack crm1 = new Attack(11, JCraft.lightCooldown * 4, 1.25f, 20, 16, 1.5, 4f, 0.75f, AttackType.BOX, 0.25f, 0.2f, 0, JSoundRegistry.IMPACT_4)
             .setInfo("Place Berry Bush", "places an almost-ripe berry bush on the ground, this move cannot be aimed up or down");
     public static final Attack light = new Attack(0, JCraft.lightCooldown / 2, 0.75f, 9, 6, 1.5, 5f, 0.75f, AttackType.BOX, 0.35f, -0.1f, 0, JSoundRegistry.IMPACT_1)
@@ -52,18 +51,16 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
             .setInfo("Healing Hand", "standing: heals user for 2 hearts, crouching: heals others for 2 hearts, pacifies angered mobs");
     public static final Attack heal = new Attack(4, 26, 1f, 16, 10, 1.25, 0f, 0f, AttackType.BOX)
             .setInfo("Healing Hand (Others)", "");
-    public static final Attack tree = new Attack(5, 20, 1f, 24, 14, 1.75, 5f, 0.2f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegistry.IMPACT_2)
+    public static final Attack tree = new Attack(5, 20, 1f, 24, 14, 1.75, 5f, 0.2f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegistry.IMPACT_8)
             .setHitspark(2)
             .setInfo("Tree Summon", "two-hitting launch");
-
-    //todo: convert lifegiver to move with followup
     public static final Attack lifegiver = new Attack(6, 36, 1f, 25, 16, 0, 0f, 0f, AttackType.BOX)
             .setRanged(true)
             .setInfo("Life Giver",
                     """
-                            turns a held item into a:
-                            STANDING: snake which lasts for 25s and stuns for 0.5s on hit
-                            CROUCHING: frog which lasts for 15s and reflects damage while following you""");
+                            STANDING: turns any stackable item into a snake, lasts for 25s and stuns for 0.5s on hit
+                            CROUCHING: turns any stackable item into a frog, lasts for 15s and reflects damage, follows user
+                            AERIAL: turns any item into a butterfly, lasts forever""");
     public static final Attack overclock = new Attack(10, 46, 1f, 31, 22, 2, 9f, 0.9f, AttackType.BOX, 3, 0, 0, JSoundRegistry.IMPACT_10)
             .setHitspark(2)
             .setUB(false)
@@ -179,7 +176,7 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
     private enum LifeGiverType {
         SNAKE,
         FROG,
-        BUSH
+        BUTTERFLY
     }
 
     private LifeGiverType toSummon;
@@ -187,7 +184,13 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
     @Override
     public void initSpecial3() {
         if (!canAttack() || !hasUser()) return;
-        toSummon = getUserOrThrow().isSneaking() ? LifeGiverType.FROG : LifeGiverType.SNAKE;
+        LivingEntity user = getUserOrThrow();
+
+        toSummon = LifeGiverType.SNAKE;
+        if (user.isOnGround()) {
+            if (user.isSneaking()) toSummon = LifeGiverType.FROG;
+        } else toSummon = LifeGiverType.BUTTERFLY;
+
         if (handleAttack(lifegiver, CooldownType.STAND_SP3, State.LIFEGIVER))
             playSound(JSoundRegistry.GE_HEAL, 1, 1);
     }
@@ -223,8 +226,7 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
                 if (user != null) user.heal(4f);
             }
             case (4) -> {
-                for (LivingEntity ent :
-                        entities) {
+                for (LivingEntity ent : entities) {
                     ent.heal(4f);
                     ent.setAttacker(null);
 
@@ -232,9 +234,7 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
                         stun(mob, 10, 0);
                         mob.setTarget(null);
                         mob.setAttacking(null);
-                        if (mob instanceof Angerable angerable) {
-                            angerable.stopAnger();
-                        }
+                        if (mob instanceof Angerable angerable) angerable.stopAnger();
                     }
                 }
             }
@@ -252,21 +252,33 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
 
                 ItemStack item = user.getOffHandStack(); // Get offhand, or if unavailable main hand stack
                 if (item.isEmpty()) item = user.getMainHandStack();
-                if (item.isEmpty() || item.getMaxCount() <= 1) return;
+                if (item.isEmpty()) return;
 
                 LivingEntity animal = null;
                 ItemStack animalItem = item.copy();
                 animalItem.setCount(1);
-                if (toSummon == LifeGiverType.SNAKE) {
-                    GESnakeEntity snake = new GESnakeEntity(JEntityTypeRegistry.GE_SNAKE, world);
-                    //todo: fix snake not working for mobs
-                    if (user instanceof PlayerEntity playerEntity) snake.setOwner(playerEntity);
-                    animal = snake;
-                }
-                if (toSummon == LifeGiverType.FROG) {
-                    GEFrogEntity frog = new GEFrogEntity(JEntityTypeRegistry.GE_FROG, world);
-                    frog.setMaster(user);
-                    animal = frog;
+                switch (toSummon) {
+                    case SNAKE -> {
+                        if (item.getMaxCount() <= 1) return;
+
+                        GESnakeEntity snake = new GESnakeEntity(JEntityTypeRegistry.GE_SNAKE, world);
+                        //todo: fix snake not working for mobs
+                        if (user instanceof PlayerEntity playerEntity) snake.setOwner(playerEntity);
+                        animal = snake;
+                    }
+                    case FROG -> {
+                        if (item.getMaxCount() <= 1) return;
+
+                        GEFrogEntity frog = new GEFrogEntity(JEntityTypeRegistry.GE_FROG, world);
+                        frog.setMaster(user);
+                        animal = frog;
+                    }
+                    case BUTTERFLY -> {
+                        GEButterflyEntity butterfly = new GEButterflyEntity(JEntityTypeRegistry.GE_BUTTERFLY, world);
+                        butterfly.setMaster(user);
+                        animal = butterfly;
+                    }
+                    default -> JCraft.LOGGER.error("Attempted to create Life Giver entity with invalid LifeGiverType: " + this);
                 }
 
                 if (animal == null) {
@@ -274,7 +286,7 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
                     return;
                 }
                 item.decrement(1);
-                animal.refreshPositionAndAngles(this.getX(), this.getY() + 0.5f, this.getZ(), this.getYaw(), this.getPitch());
+                animal.refreshPositionAndAngles(getX(), getY() + 0.5f, getZ(), getYaw(), getPitch());
                 animal.setStackInHand(Hand.MAIN_HAND, animalItem);
                 world.spawnEntity(animal);
             }
