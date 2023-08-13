@@ -348,20 +348,19 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
 
     @Override
     public boolean canTarget(LivingEntity target) {
-        if (target == master) return false;
-        return super.canTarget(target);
+        return target != master && target != this &&
+                (!(target instanceof PlayerCloneEntity clone) || !clone.getMasterId().equals(getMasterId())) &&
+                super.canTarget(target);
     }
 
     public void updateAttackType() {
-        if (world != null && !world.isClient) {
-            goalSelector.remove(this.cloneAttackGoal);
-            goalSelector.remove(this.bowAttackGoal);
-            ItemStack itemStack = this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW));
-            if (itemStack.isOf(Items.BOW))
-                goalSelector.add(2, this.bowAttackGoal);
-            else
-                goalSelector.add(2, this.cloneAttackGoal);
-        }
+        if (world == null || world.isClient) return;
+        goalSelector.remove(this.cloneAttackGoal);
+        goalSelector.remove(this.bowAttackGoal);
+        ItemStack itemStack = this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW));
+        if (itemStack.isOf(Items.BOW))
+            goalSelector.add(2, this.bowAttackGoal);
+        else goalSelector.add(2, this.cloneAttackGoal);
     }
 
     // Ranged attack handling
