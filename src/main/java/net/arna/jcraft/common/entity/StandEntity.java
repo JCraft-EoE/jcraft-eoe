@@ -92,6 +92,11 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     private static final TrackedData<Boolean> FREE;
     private static final TrackedData<Boolean> REMOTE;
 
+    @Getter
+    @Nullable
+    private final SoundEvent summonSound;
+    private final boolean playGenericSummonSound;
+
     protected int tsTime = 0;
     @Getter
     private float prevAlpha = 1f;
@@ -137,8 +142,18 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     protected boolean playSummonAnim = true;
 
     protected StandEntity(StandType type, World world) {
+        this(type, world, null, true);
+    }
+
+    protected StandEntity(StandType type, World world, @Nullable SoundEvent summonSound) {
+        this(type, world, summonSound, false);
+    }
+
+    protected StandEntity(StandType type, World world, @Nullable SoundEvent summonSound, boolean playGenericSummonSound) {
         super(type.getEntityType(), world);
         standType = type;
+        this.summonSound = summonSound;
+        this.playGenericSummonSound = playGenericSummonSound;
     }
 
     // State controls
@@ -790,6 +805,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         if (isDead()) return;
 
+        if (age == 1) playSummonSound();
+
         boolean client = world.isClient;
 
         prevAlpha = getAlphaOverride();
@@ -1276,6 +1293,12 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             else
                 ent.velocityModified = true;
         }
+    }
+
+    protected void playSummonSound() {
+        if (summonSound != null) playSound(summonSound, 1f, 1f);
+        if (summonSound == null || playGenericSummonSound)
+            playSound(JSoundRegistry.STAND_SUMMON, 1f, 1f);
     }
 
     @Override

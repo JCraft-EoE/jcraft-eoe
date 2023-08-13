@@ -64,7 +64,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
             .setInfo("Counter (Whiff)", "");
 
     public TheWorldEntity(World worldIn) {
-        super(StandType.THE_WORLD, worldIn);
+        super(StandType.THE_WORLD, worldIn, JSoundRegistry.TW_SUMMON);
         idleRotation = 225f;
 
         pros = List.of(
@@ -234,6 +234,12 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
         }
 
         super.tick();
+    }
+
+    @Override
+    protected void playSummonSound() {
+        playSound(JSoundRegistry.TW_SUMMON, 1f, 1f);
+        playSound(JSoundRegistry.MUDA_DA, 1f, 1f);
     }
 
     // Animation code

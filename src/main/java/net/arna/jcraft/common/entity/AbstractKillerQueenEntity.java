@@ -8,10 +8,8 @@ import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.CooldownType;
-import net.arna.jcraft.common.util.JExplosionModifier;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
-import net.arna.jcraft.registry.JParticleTypeRegistry;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -25,11 +23,12 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Set;
@@ -59,8 +58,8 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
     protected Entity bombEntity;
     protected Vec3d bombBlock;
 
-    protected AbstractKillerQueenEntity(StandType type, Class<S> stateClass, World worldIn) {
-        super(type, worldIn);
+    protected AbstractKillerQueenEntity(StandType type, World worldIn, @Nullable SoundEvent summonSound) {
+        super(type, worldIn, summonSound, true);
         idleRotation = -30f;
 
         description = "Explosive SETPLAY";
@@ -203,7 +202,6 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
 
     @Override
     public void tick() {
-        if (age == 1) playSound(JSoundRegistry.STAND_SUMMON, 1f, 1f);
         super.tick();
 
         if (hasUser()) {

@@ -99,7 +99,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
     public final ArrayList<Inversion> inversions = new ArrayList<>();
 
     public CMoonEntity(World worldIn) {
-        super(StandType.C_MOON, worldIn);
+        super(StandType.C_MOON, worldIn, JSoundRegistry.CMOON_SUMMON);
         idleRotation = 220f;
 
         pros = List.of(
@@ -365,7 +365,6 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
 
     @Override
     public void tick() {
-        if (age == 1) playSound(JSoundRegistry.CMOON_SUMMON, 1f, 1f);
         super.tick();
 
         if (hasUser()) {

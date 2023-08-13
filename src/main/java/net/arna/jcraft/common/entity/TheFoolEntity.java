@@ -526,8 +526,6 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
 
     @Override
     public void tick() {
-        if (age == 1) playSound(JSoundRegistry.STAND_SUMMON, 1f, 1f);
-
         super.tick();
 
         if (hasUser()) {

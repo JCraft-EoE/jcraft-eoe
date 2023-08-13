@@ -77,7 +77,7 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
             .setInfo("Rekka Series", "a set of three attacks, which cancel into each other during recovery", AttackQueue.SPECIAL2);
 
     public GoldenExperienceEntity(World worldIn) {
-        super(StandType.GOLD_EXPERIENCE, worldIn);
+        super(StandType.GOLD_EXPERIENCE, worldIn, JSoundRegistry.GE_SUMMON);
 
         idleRotation = 0f;
 
@@ -330,8 +330,6 @@ public class GoldenExperienceEntity extends StandEntity<GoldenExperienceEntity, 
 
     @Override
     public void tick() {
-        if (age == 1) playSound(JSoundRegistry.GE_SUMMON, 1f, 1f);
-
         super.tick();
         if (!hasUser()) return;
 

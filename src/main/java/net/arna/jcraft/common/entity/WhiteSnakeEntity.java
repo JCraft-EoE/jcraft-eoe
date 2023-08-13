@@ -58,7 +58,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .setInfo("Melt your Heart", "remote-only and armored, expels a sphere of poison");
 
     public WhiteSnakeEntity(World worldIn) {
-        super(StandType.WHITE_SNAKE, worldIn);
+        super(StandType.WHITE_SNAKE, worldIn, JSoundRegistry.WS_SUMMON);
         idleRotation = 220f;
 
         pros = List.of(
@@ -203,7 +203,6 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
 
     @Override
     public void tick() {
-        if (age == 1) playSound(JSoundRegistry.WS_SUMMON, 1f, 1f);
         super.tick();
 
         if (!getRemote() || world.isClient) return;

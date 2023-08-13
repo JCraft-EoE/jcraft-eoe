@@ -44,8 +44,8 @@ public abstract sealed class AbstractStarPlatinumEntity<E extends AbstractStarPl
             .setMobility(MobilityType.DASH)
             .setInfo("Stand Jump", "jumps in looked direction with slight upward bias, you must stay on the ground until Star Platinum jumps");
 
-    protected AbstractStarPlatinumEntity(StandType type, Class<S> stateClass, World worldIn) {
-        super(type, worldIn);
+    protected AbstractStarPlatinumEntity(StandType type, World worldIn) {
+        super(type, worldIn, JSoundRegistry.STAR_PLATINUM_SUMMON);
         idleRotation = 225f;
 
         description = "High Speed RUSHDOWN";
@@ -112,10 +112,4 @@ public abstract sealed class AbstractStarPlatinumEntity<E extends AbstractStarPl
 
     @Override
     public abstract void specialAttack(Attack attack, Set<LivingEntity> entities);
-
-    @Override
-    public void tick() {
-        if (age == 1) playSound(JSoundRegistry.STAR_PLATINUM_SUMMON, 1f, 1f);
-        super.tick();
-    }
 }

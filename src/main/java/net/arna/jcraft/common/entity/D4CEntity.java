@@ -87,7 +87,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
     public static ServerWorld auWorld;
 
     public D4CEntity(World worldIn) {
-        super(StandType.D4C, worldIn);
+        super(StandType.D4C, worldIn, JSoundRegistry.D4C_SUMMON, true);
 
         idleRotation = -45f;
 
@@ -480,16 +480,6 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
     public void whiffCounter() {
         setAttack(counterMiss, State.COUNTER_MISS);
         stun(getUser(), counterMiss.moveStun, 0);
-    }
-
-    @Override
-    public void tick() {
-        if (age == 1) {
-            playSound(JSoundRegistry.STAND_SUMMON, 1, 1);
-            playSound(JSoundRegistry.D4C_SUMMON, 1, 1);
-        }
-
-        super.tick();
     }
 
     // Animation code

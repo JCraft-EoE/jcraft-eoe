@@ -129,7 +129,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
     }
 
     public SilverChariotEntity(World worldIn) {
-        super(StandType.SILVER_CHARIOT, worldIn);
+        super(StandType.SILVER_CHARIOT, worldIn, JSoundRegistry.SC_SUMMON);
         idleRotation = 225f;
 
         pros = List.of(
@@ -362,62 +362,62 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
 
     @Override
     public void tick() {
-        if (age == 1) playSound(JSoundRegistry.SC_SUMMON, 1f, 1f);
         super.tick();
 
-        if (hasUser()) {
-            LivingEntity user = getUserOrThrow();
-            int mode = getMode();
+        if (!hasUser()) return;
+        LivingEntity user = getUserOrThrow();
+        int mode = getMode();
 
-            if (world.isClient) {
-                if (mode == 3)
-                    for (int i = 0; i < 16; i++)
-                        world.addParticle(
-                                ParticleTypes.ASH,
-                                getX() + random.nextDouble() - 0.5, getY() + random.nextDouble() * 0.25 + 0.5, getZ() + random.nextDouble() - 0.5,
-                                0.0, 0.0, 0.0
-                        );
-            } else {
-                boolean hasAnubis = (user instanceof PlayerEntity playerEntity) ? playerEntity.getInventory().contains(JObjectRegistry.ANUBIS.getDefaultStack()) : user.getMainHandStack().getItem() == JObjectRegistry.ANUBIS;
+        if (world.isClient) {
+            if (mode == 3)
+                for (int i = 0; i < 16; i++)
+                    world.addParticle(
+                            ParticleTypes.ASH,
+                            getX() + random.nextDouble() - 0.5, getY() + random.nextDouble() * 0.25 + 0.5, getZ() + random.nextDouble() - 0.5,
+                            0.0, 0.0, 0.0
+                    );
 
-                if (hasAnubis && mode != 3) {
-                    for (int i = 0; i < 128; i++)
-                        world.addParticle(
-                                ParticleTypes.ASH,
-                                getX() + random.nextDouble() - 0.5, getY() + random.nextDouble() * 2, getZ() + random.nextDouble() - 0.5,
-                                0.0, 0.1, 0.0
-                        );
+            return;
+        }
 
-                    // Possession state
-                    setMode(3);
-                    setPossessedDesc();
-                } else if (!hasAnubis && mode == 3) {
-                    for (int i = 0; i < 128; i++)
-                        world.addParticle(
-                                ParticleTypes.ELECTRIC_SPARK,
-                                getX() + random.nextDouble() - 0.5, getY() + random.nextDouble() * 2, getZ() + random.nextDouble() - 0.5,
-                                0.0, 0.1, 0.0
-                        );
+        boolean hasAnubis = (user instanceof PlayerEntity playerEntity) ? playerEntity.getInventory().contains(JObjectRegistry.ANUBIS.getDefaultStack()) : user.getMainHandStack().getItem() == JObjectRegistry.ANUBIS;
 
-                    // Reset
-                    setMode(1);
-                    setNormalDesc();
-                }
+        if (hasAnubis && mode != 3) {
+            for (int i = 0; i < 128; i++)
+                world.addParticle(
+                        ParticleTypes.ASH,
+                        getX() + random.nextDouble() - 0.5, getY() + random.nextDouble() * 2, getZ() + random.nextDouble() - 0.5,
+                        0.0, 0.1, 0.0
+                );
 
-                if (mode == 2 && armorTime-- < 1) setMode(1);
+            // Possession state
+            setMode(3);
+            setPossessedDesc();
+        } else if (!hasAnubis && mode == 3) {
+            for (int i = 0; i < 128; i++)
+                world.addParticle(
+                        ParticleTypes.ELECTRIC_SPARK,
+                        getX() + random.nextDouble() - 0.5, getY() + random.nextDouble() * 2, getZ() + random.nextDouble() - 0.5,
+                        0.0, 0.1, 0.0
+                );
 
-                if (curAttack != null) {
-                    if (curAttack.id == charge.id) {
-                        Vec3f chargePos = getFreePos();
-                        chargePos.add(0, lookDirY, 0);
-                        setFreePos(chargePos);
-                    }
-                    if (curAttack.id == circlecharge.id) {
-                        if (chargedSlash == null) chargedSlash = Attack.copyOf(circleslash); // Fallback for when the server restarts inconveniently
-                        if (getMoveStun() % 20 == 0)
-                            chargedSlash.damage += 1.5f;
-                    }
-                }
+            // Reset
+            setMode(1);
+            setNormalDesc();
+        }
+
+        if (mode == 2 && armorTime-- < 1) setMode(1);
+
+        if (curAttack != null) {
+            if (curAttack.id == charge.id) {
+                Vec3f chargePos = getFreePos();
+                chargePos.add(0, lookDirY, 0);
+                setFreePos(chargePos);
+            }
+            if (curAttack.id == circlecharge.id) {
+                if (chargedSlash == null) chargedSlash = Attack.copyOf(circleslash); // Fallback for when the server restarts inconveniently
+                if (getMoveStun() % 20 == 0)
+                    chargedSlash.damage += 1.5f;
             }
         }
     }

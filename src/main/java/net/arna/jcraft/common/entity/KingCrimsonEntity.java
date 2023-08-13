@@ -105,7 +105,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     private final Map<Entity, Vec3d> predictionInfo = new WeakHashMap<>();
 
     public KingCrimsonEntity(World worldIn) {
-        super(StandType.KING_CRIMSON, worldIn);
+        super(StandType.KING_CRIMSON, worldIn, JSoundRegistry.KC_SUMMON);
 
         idleDistance = 1f;
         idleRotation = -65f;
@@ -549,7 +549,6 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
 
     @Override
     public void tick() {
-        if (age == 1) playSound(JSoundRegistry.KC_SUMMON, 1f, 1f);
         super.tick();
 
         LivingEntity user = this.getUser();

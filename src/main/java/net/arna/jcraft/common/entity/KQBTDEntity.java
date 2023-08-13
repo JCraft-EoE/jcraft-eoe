@@ -66,7 +66,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
     //private NbtCompound targetData;
 
     public KQBTDEntity(World worldIn) {
-        super(StandType.KILLER_QUEEN_BITES_THE_DUST, State.class, worldIn);
+        super(StandType.KILLER_QUEEN_BITES_THE_DUST, worldIn, JSoundRegistry.KQBTD_SUMMON);
 
         description = "Ascended Explosive SETPLAY";
 
@@ -360,7 +360,6 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
 
     @Override
     public void tick() {
-        if (age == 1) playSound(JSoundRegistry.KQBTD_SUMMON, 1f, 1f);
         super.tick();
 
         if (hasUser()) {

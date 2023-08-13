@@ -58,7 +58,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
     private boolean turnAround;
 
     public SPTWEntity(World worldIn) {
-        super(StandType.STAR_PLATINUM_THE_WORLD, State.class, worldIn);
+        super(StandType.STAR_PLATINUM_THE_WORLD, worldIn);
 
         idleRotation = 315f;
 

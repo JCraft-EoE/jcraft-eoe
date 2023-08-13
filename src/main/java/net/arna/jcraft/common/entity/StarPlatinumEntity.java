@@ -38,7 +38,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
     }
 
     public StarPlatinumEntity(World worldIn) {
-        super(StandType.STAR_PLATINUM, State.class, worldIn);
+        super(StandType.STAR_PLATINUM, worldIn);
 
         moves = List.of(light, heavy, barrage, starfinger, inhale, lowkick, starfinger, jump);
 

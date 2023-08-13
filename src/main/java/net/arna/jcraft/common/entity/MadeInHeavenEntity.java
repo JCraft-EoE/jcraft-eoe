@@ -144,7 +144,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     }
 
     public MadeInHeavenEntity(World worldIn) {
-        super(StandType.MADE_IN_HEAVEN, worldIn);
+        super(StandType.MADE_IN_HEAVEN, worldIn, JSoundRegistry.MIH_SUMMON);
         idleRotation = -45f;
 
         description = "Lightspeed RUSHDOWN";
@@ -418,7 +418,6 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
 
     @Override
     public void tick() {
-        if (age == 1) playSound(JSoundRegistry.MIH_SUMMON, 1f, 1f);
         super.tick();
 
         if (!hasUser()) return;
@@ -443,90 +442,92 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                     entity.tick();
                 }
             }
-        } else {
-            // Circling
-            if (circleTime > 0) {
-                circleTime--;
-                if (circleTarget == null || !circleTarget.isAlive() || circleTarget.isRemoved())
-                    circleTime = 1;
-                else {
-                    circleOrbitProg += 0.15f;
-                    boolean toExit = curAttack != null && curAttack.id != 8;
-                    Vec3d rotVec = user.getRotationVector();
-                    Vec3d exitVel = Vec3d.ZERO;
-                    double side = getRemoteSideInput();
-                    double forw = getRemoteForwardInput();
-                    // This isn't normalized and idc
-                    if (side != 0) {
-                        exitVel = exitVel.add(rotVec.rotateY(1.5707963f).multiply(side));
-                        toExit = true;
-                    }
-                    if (forw != 0) {
-                        exitVel = exitVel.add(rotVec.multiply(forw));
-                        toExit = true;
-                    }
 
-                    if (toExit) {
-                        user.setVelocity(exitVel.add(0, 0.5, 0));
-                        endCircle();
-                    } else {
-                        Vec3d orbitPos = circleTarget.getEyePos().add(Math.sin(circleOrbitProg) * 7, 0, Math.cos(circleOrbitProg) * 7);
-                        Vec3d towardsVel = orbitPos.subtract(user.getPos()).normalize();
-                        double stabilization = user.getPos().distanceTo(orbitPos);
-                        if (stabilization > 0.5) stabilization = 0.5;
-                        user.setVelocity(user.getVelocity().multiply(stabilization).add(towardsVel));
-                    }
-
-                    if (user instanceof ServerPlayerEntity serverPlayer)
-                        serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(serverPlayer));
-                    else
-                        user.velocityModified = true;
-                }
-            }
-            if (circleTime == 1) endCircle();
-
-            // Time Accel handling
-            boolean userIsStunned = user.hasStatusEffect(JStatusRegistry.DAZED);
-            setAccelTime(aTime - 1);
-
-            if (aTime > 1) {
-                List<Entity> toCatch = world.getEntitiesByClass(Entity.class,
-                        getBoundingBox().expand(96), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
-                for (Entity entity : toCatch) {
-                    if (entity instanceof LivingEntity) continue;
-                    entity.tick();
-                }
-            } else if (aTime == 1) {
-                if (speedometer == MAXIMUM_SPEEDOMETER) {
-                    List<LivingEntity> toCatch = world.getEntitiesByClass(LivingEntity.class,
-                            getBoundingBox().expand(96), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
-
-                    toCatch.remove(this);
-                    toCatch.remove(user);
-
-                    for (LivingEntity entity : toCatch) // 15s of Standless to any victims of Universe Reset
-                        entity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.STANDLESS, 300, 0, true, false));
-                }
-
-                setAfterimage(false);
-
-                speedometer = 0;
-            }
-
-            if (userIsStunned) {
-                if (circleTime > 0) endCircle();
-            } else {
-                if (aTime > 0) {
-                    int amplifier = speedometer / 3;
-                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 20, amplifier, true, false));
-                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE, 20, amplifier, true, false));
-                } else
-                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 40, 0, true, false));
-            }
-
-            // Tracking
-            setSpeedometer(speedometer);
+            return;
         }
+
+        // Circling
+        if (circleTime > 0) {
+            circleTime--;
+            if (circleTarget == null || !circleTarget.isAlive() || circleTarget.isRemoved())
+                circleTime = 1;
+            else {
+                circleOrbitProg += 0.15f;
+                boolean toExit = curAttack != null && curAttack.id != 8;
+                Vec3d rotVec = user.getRotationVector();
+                Vec3d exitVel = Vec3d.ZERO;
+                double side = getRemoteSideInput();
+                double forw = getRemoteForwardInput();
+                // This isn't normalized and idc
+                if (side != 0) {
+                    exitVel = exitVel.add(rotVec.rotateY(1.5707963f).multiply(side));
+                    toExit = true;
+                }
+                if (forw != 0) {
+                    exitVel = exitVel.add(rotVec.multiply(forw));
+                    toExit = true;
+                }
+
+                if (toExit) {
+                    user.setVelocity(exitVel.add(0, 0.5, 0));
+                    endCircle();
+                } else {
+                    Vec3d orbitPos = circleTarget.getEyePos().add(Math.sin(circleOrbitProg) * 7, 0, Math.cos(circleOrbitProg) * 7);
+                    Vec3d towardsVel = orbitPos.subtract(user.getPos()).normalize();
+                    double stabilization = user.getPos().distanceTo(orbitPos);
+                    if (stabilization > 0.5) stabilization = 0.5;
+                    user.setVelocity(user.getVelocity().multiply(stabilization).add(towardsVel));
+                }
+
+                if (user instanceof ServerPlayerEntity serverPlayer)
+                    serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(serverPlayer));
+                else
+                    user.velocityModified = true;
+            }
+        }
+        if (circleTime == 1) endCircle();
+
+        // Time Accel handling
+        boolean userIsStunned = user.hasStatusEffect(JStatusRegistry.DAZED);
+        setAccelTime(aTime - 1);
+
+        if (aTime > 1) {
+            List<Entity> toCatch = world.getEntitiesByClass(Entity.class,
+                    getBoundingBox().expand(96), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+            for (Entity entity : toCatch) {
+                if (entity instanceof LivingEntity) continue;
+                entity.tick();
+            }
+        } else if (aTime == 1) {
+            if (speedometer == MAXIMUM_SPEEDOMETER) {
+                List<LivingEntity> toCatch = world.getEntitiesByClass(LivingEntity.class,
+                        getBoundingBox().expand(96), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+
+                toCatch.remove(this);
+                toCatch.remove(user);
+
+                for (LivingEntity entity : toCatch) // 15s of Standless to any victims of Universe Reset
+                    entity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.STANDLESS, 300, 0, true, false));
+            }
+
+            setAfterimage(false);
+
+            speedometer = 0;
+        }
+
+        if (userIsStunned) {
+            if (circleTime > 0) endCircle();
+        } else {
+            if (aTime > 0) {
+                int amplifier = speedometer / 3;
+                user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 20, amplifier, true, false));
+                user.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE, 20, amplifier, true, false));
+            } else
+                user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 40, 0, true, false));
+        }
+
+        // Tracking
+        setSpeedometer(speedometer);
     }
 
     // Animation code

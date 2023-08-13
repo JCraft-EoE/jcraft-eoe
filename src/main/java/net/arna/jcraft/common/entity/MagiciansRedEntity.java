@@ -69,7 +69,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
     private int hurricaneTime;
 
     public MagiciansRedEntity(World worldIn) {
-        super(StandType.MAGICIANS_RED, worldIn);
+        super(StandType.MAGICIANS_RED, worldIn, JSoundRegistry.MR_SUMMON);
         idleRotation = 225f;
 
         description = "Tailor-made, Blazing ZONER";
@@ -255,87 +255,83 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
 
     @Override
     public void tick() {
-        if (age == 1)
-            playSound(JSoundRegistry.MR_SUMMON, 1f, 1f);
         super.tick();
 
-        if (hasUser()) {
-            LivingEntity user = getUserOrThrow();
-            if (world.isClient) {
-                if (getState() == State.BARRAGE) {
-                    Vec3d rotVec = getRotationVector();
-                    Vec3d mouthPos = getEyePos().add(rotVec);
-                    for (int i = 0; i < 16; i++) {
-                        Vec3d vel = user.getVelocity().add(
-                                rotVec
-                                        .rotateX(random.nextFloat() - 0.5f)
-                                        .rotateY(random.nextFloat() - 0.5f)
-                                        .rotateZ(random.nextFloat() - 0.5f)
-                                        .multiply(0.2)
-                        );
-                        this.world.addParticle(
-                                random.nextInt(6) == 5 ? ParticleTypes.LAVA : ParticleTypes.FLAME,
-                                mouthPos.x, mouthPos.y, mouthPos.z,
-                                vel.x, vel.y, vel.z
-                        );
-                    }
-                }
-            } else {
-                user.addStatusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 20, 0, true, false));
-
-                Entity vehicle = user.getVehicle();
-
-                // Run every four ticks because the hurricane's meant to be slow, and it's convenient for CPU usage
-                if (this.age % 4 == 0) {
-                    if (hurricaneTime > 0) {
-                        hurricaneTime -= 1;
-
-                        // Homing
-                        List<LivingEntity> nearbyEnts = world.getEntitiesByClass(LivingEntity.class,
-                                new Box(hurricanePos.add(32.0, 32.0, 32.0), hurricanePos.subtract(32.0, 32.0, 32.0)),
-                                EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e -> e != vehicle && e != this && e != user));
-
-                        if (!nearbyEnts.isEmpty()) {
-                            Vec3d avgPos = Vec3d.ZERO;
-                            for (LivingEntity livingEntity : nearbyEnts)
-                                avgPos = avgPos.add(livingEntity.getEyePos());
-                            avgPos = avgPos.multiply(1.0 / nearbyEnts.size());
-
-                            hurricanePos = hurricanePos.add(avgPos.subtract(hurricanePos).normalize().multiply(0.5));
-                        }
-
-                        // Damage
-                        List<LivingEntity> toHurt = world.getEntitiesByClass(LivingEntity.class,
-                                new Box(hurricanePos.add(2.5, 1, 2.5), hurricanePos.subtract(2.5, 1, 2.5)),
-                                EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e -> e != this && e != user && e != vehicle));
-                        toHurt.remove(this);
-                        toHurt.remove(user);
-
-                        for (LivingEntity living : toHurt) {
-                            LivingEntity target = JUtils.getUserIfStand(living);
-                            if (hurricaneTime > 1) {
-                                damageLogic(world, target, new Vec3d(Math.sin(age / 10.0) * 3, 0.0, Math.cos(age / 10.0) * 3), 10, 1, false, 0.5f, true, 5, DamageSource.mob(user), user);
-                                if (hurricaneTime > 15)
-                                    hurricaneTime = 15; // Allows for zoning up until it hits something
-                            } else {
-                                target.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 20, 0));
-                            }
-                        }
-
-                        // Particles
-                        PacketByteBuf buf = PacketByteBufs.create();
-                        buf.writeShort(10);
-
-                        buf.writeDouble(hurricanePos.x);
-                        buf.writeDouble(hurricanePos.y);
-                        buf.writeDouble(hurricanePos.z);
-
-                        for (ServerPlayerEntity sendPlayer : ((ServerWorld) world).getPlayers())
-                            ServerChannelFeedbackPacket.send(sendPlayer, buf);
-                    }
+        if (!hasUser()) return;
+        LivingEntity user = getUserOrThrow();
+        if (world.isClient) {
+            if (getState() == State.BARRAGE) {
+                Vec3d rotVec = getRotationVector();
+                Vec3d mouthPos = getEyePos().add(rotVec);
+                for (int i = 0; i < 16; i++) {
+                    Vec3d vel = user.getVelocity().add(
+                            rotVec
+                                    .rotateX(random.nextFloat() - 0.5f)
+                                    .rotateY(random.nextFloat() - 0.5f)
+                                    .rotateZ(random.nextFloat() - 0.5f)
+                                    .multiply(0.2)
+                    );
+                    this.world.addParticle(
+                            random.nextInt(6) == 5 ? ParticleTypes.LAVA : ParticleTypes.FLAME,
+                            mouthPos.x, mouthPos.y, mouthPos.z,
+                            vel.x, vel.y, vel.z
+                    );
                 }
             }
+
+            return;
         }
+
+        user.addStatusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 20, 0, true, false));
+
+        Entity vehicle = user.getVehicle();
+
+        // Run every four ticks because the hurricane's meant to be slow, and it's convenient for CPU usage
+        if (this.age % 4 != 0 || hurricaneTime <= 0) return;
+        hurricaneTime -= 1;
+
+        // Homing
+        List<LivingEntity> nearbyEnts = world.getEntitiesByClass(LivingEntity.class,
+                new Box(hurricanePos.add(32.0, 32.0, 32.0), hurricanePos.subtract(32.0, 32.0, 32.0)),
+                EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e -> e != vehicle && e != this && e != user));
+
+        if (!nearbyEnts.isEmpty()) {
+            Vec3d avgPos = Vec3d.ZERO;
+            for (LivingEntity livingEntity : nearbyEnts)
+                avgPos = avgPos.add(livingEntity.getEyePos());
+            avgPos = avgPos.multiply(1.0 / nearbyEnts.size());
+
+            hurricanePos = hurricanePos.add(avgPos.subtract(hurricanePos).normalize().multiply(0.5));
+        }
+
+        // Damage
+        List<LivingEntity> toHurt = world.getEntitiesByClass(LivingEntity.class,
+                new Box(hurricanePos.add(2.5, 1, 2.5), hurricanePos.subtract(2.5, 1, 2.5)),
+                EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e -> e != this && e != user && e != vehicle));
+        toHurt.remove(this);
+        toHurt.remove(user);
+
+        for (LivingEntity living : toHurt) {
+            LivingEntity target = JUtils.getUserIfStand(living);
+            if (hurricaneTime > 1) {
+                damageLogic(world, target, new Vec3d(Math.sin(age / 10.0) * 3, 0.0, Math.cos(age / 10.0) * 3), 10, 1, false, 0.5f, true, 5, DamageSource.mob(user), user);
+                if (hurricaneTime > 15)
+                    hurricaneTime = 15; // Allows for zoning up until it hits something
+            } else {
+                target.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 20, 0));
+            }
+        }
+
+        // Particles
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeShort(10);
+
+        buf.writeDouble(hurricanePos.x);
+        buf.writeDouble(hurricanePos.y);
+        buf.writeDouble(hurricanePos.z);
+
+        for (ServerPlayerEntity sendPlayer : ((ServerWorld) world).getPlayers())
+            ServerChannelFeedbackPacket.send(sendPlayer, buf);
     }
 
     // Animation code

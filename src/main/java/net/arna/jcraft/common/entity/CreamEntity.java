@@ -103,7 +103,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     }
 
     public CreamEntity(World worldIn) {
-        super(StandType.CREAM, worldIn);
+        super(StandType.CREAM, worldIn, JSoundRegistry.CREAM_SUMMON);
 
         idleRotation = 220f;
 
@@ -374,7 +374,6 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
 
     @Override
     public void tick() {
-        if (age == 1) playSound(JSoundRegistry.CREAM_SUMMON, 1f, 1f);
         super.tick();
         boolean server = !this.world.isClient();
 

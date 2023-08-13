@@ -111,7 +111,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
     }
 
     public TheWorldOverHeavenEntity(World worldIn) {
-        super(StandType.THE_WORLD_OVER_HEAVEN, worldIn);
+        super(StandType.THE_WORLD_OVER_HEAVEN, worldIn, JSoundRegistry.TWOH_SUMMON);
         idleRotation = -45f;
         summonAnimDuration = 29;
 
@@ -373,9 +373,6 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         if (!hasUser()) return;
         LivingEntity user = getUserOrThrow();
         if (age == 1) {
-            this.playSound(JSoundRegistry.TWOH_SUMMON, 1f, 1f);
-            this.playSound(JSoundRegistry.TW_SUMMON, 1f, 1f);
-
             List<LivingEntity> hit = world.getEntitiesByClass(LivingEntity.class, new Box(
                             getPos().add(-64, -64, -64), getPos().add(64, 64, 64)),
                     EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e -> e != this && e != user));
@@ -449,6 +446,12 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
                         random.nextInt() * 10));
             }
         }
+    }
+
+    @Override
+    protected void playSummonSound() {
+        playSound(JSoundRegistry.TWOH_SUMMON, 1f, 1f);
+        playSound(JSoundRegistry.TW_SUMMON, 1f, 1f);
     }
 
     // Animation code
