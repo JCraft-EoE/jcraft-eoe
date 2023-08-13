@@ -170,7 +170,6 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
             case (6) -> {
                 if (bombEntity instanceof LivingEntity livingEntity) {
                     explode(user, livingEntity.getPos());
-                    livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0, true, false));
                 } else {
                     Vec3d bombPos = null;
 
@@ -181,18 +180,8 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
                     }
                     if (bombBlock != null) bombPos = bombBlock;
 
-                    if (bombPos != null) {
+                    if (bombPos != null)
                         explode(user, bombPos);
-
-                        List<LivingEntity> toKD = world.getEntitiesByClass(
-                                LivingEntity.class,
-                                new Box(bombPos.add(2.2, 2.2, 2.2), bombPos.add(-2.2, -2.2, -2.2)),
-                                EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR
-                        );
-
-                        for (LivingEntity livingEntity : toKD)
-                            livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0, true, false));
-                    }
                 }
 
                 bombEntity = null;

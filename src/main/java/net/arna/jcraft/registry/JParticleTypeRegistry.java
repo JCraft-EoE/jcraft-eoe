@@ -21,6 +21,7 @@ public interface JParticleTypeRegistry {
     DefaultParticleType BOOM_1 = FabricParticleTypes.simple();
 
     Map<Integer, DefaultParticleType> particles = Map.ofEntries(
+            Map.entry(-5, JParticleTypeRegistry.BOOM_1),
             Map.entry(-4, JParticleTypeRegistry.BITES_THE_DUST),
             Map.entry(-3, ParticleTypes.SWEEP_ATTACK),
             Map.entry(-2, BACKSTAB),

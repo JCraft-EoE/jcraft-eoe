@@ -22,7 +22,6 @@ import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
@@ -243,16 +242,6 @@ public final class JUtils {
         return ent;
     }
 
-    /**
-     * @param data NBT data of the entity in question
-     * @return whether an entity is a stand user based on its NBT data
-     */
-    public static boolean isStandUser(NbtCompound data) {
-        if (data.contains("StandID"))
-            return data.getInt("StandID") != 0;
-        return false;
-    }
-
     public static void projectileDamageLogic(ProjectileEntity proj, World world, Entity ent, Vec3d kb, int stunT, int stunType, boolean overrideStun, float damage, int blockstun) {
         if (world.isClient) return;
         Objects.requireNonNull(proj, "Attempted to run ProjectileDamageLogic with invalid projectile in world " + world);
@@ -323,13 +312,10 @@ public final class JUtils {
     }
 
     public static boolean isInTSRange(Vec3d pos) {
-        for (DimValues timeStop : activeTimestops) {
-            if (timeStop != null) {
-                if (timeStop.pos.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) <= 65536) {
+        for (DimValues timeStop : activeTimestops)
+            if (timeStop != null)
+                if (timeStop.pos.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) <= 65536)
                     return true;
-                }
-            }
-        }
 
         return false;
     }

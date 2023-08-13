@@ -5,6 +5,6 @@ import net.arna.jcraft.common.entity.StandType;
 
 public class KillerQueenModel extends StandEntityModel<KillerQueenEntity> {
     public KillerQueenModel() {
-        super(StandType.KILLER_QUEEN, -0.1745329251f, -0.34f);
+        super(StandType.KILLER_QUEEN, -0.1745329251f, -0.36f);
     }
 }

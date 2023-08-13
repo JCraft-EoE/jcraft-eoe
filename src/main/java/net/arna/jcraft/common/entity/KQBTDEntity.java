@@ -243,8 +243,6 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                 } else {
                     if (bombEntity instanceof LivingEntity livingEntity) {
                         explode(user, livingEntity.getPos());
-
-                        livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0, true, false));
                     /*
                     if (user.isSneaking()) {
                         if (targetData != null && userData != null) {
@@ -301,18 +299,8 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                         if (bombBlock != null)
                             bombPos = bombBlock;
 
-                        if (bombPos != null) {
+                        if (bombPos != null)
                             explode(user, bombPos);
-
-                            List<LivingEntity> toKD = world.getEntitiesByClass(
-                                    LivingEntity.class,
-                                    new Box(bombPos.add(2.2, 2.2, 2.2), bombPos.add(-2.2, -2.2, -2.2)),
-                                    EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR
-                            );
-
-                            for (LivingEntity livingEntity : toKD)
-                                livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0, true, false));
-                        }
                     }
 
                     bombEntity = null;

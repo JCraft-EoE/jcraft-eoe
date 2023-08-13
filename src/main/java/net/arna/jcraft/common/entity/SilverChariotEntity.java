@@ -287,7 +287,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             attackRef.hitboxSize *= 0.75;
             attackRef.damage = (float) (attackRef.damage * 0.75);
         }
-        setAttack(attack, animState);
+        setAttack(attackRef, animState);
 
         cooldowns.setCooldown(cooldownType, (int) (attack.cooldown * 20));
         return true;

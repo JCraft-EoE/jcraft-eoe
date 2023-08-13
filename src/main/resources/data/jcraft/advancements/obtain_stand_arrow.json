@@ -5,7 +5,7 @@
     },
     "title": "Stand Proud",
     "description": "Obtain a Stand Arrow",
-    "background": "jcraft:textures/block/foolish_sand.png",
+    "background": "jcraft:textures/block/foolish_sand_block.png",
     "frame": "task",
     "show_toast": true,
     "announce_to_chat": false

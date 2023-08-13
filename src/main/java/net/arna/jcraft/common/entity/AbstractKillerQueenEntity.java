@@ -5,6 +5,7 @@ import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JExplosionModifier;
@@ -17,10 +18,14 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -85,20 +90,22 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
     }
 
     protected void explode(Entity user, Vec3d pos) {
-        //todo: simplify this and make it do consistent damage
-        JUtils.explode(
-                world, user,
-                pos.x,
-                pos.y,
-                pos.z,
-                1f,
-                JExplosionModifier.builder()
-                        .particle(JParticleTypeRegistry.BOOM_1)
-                        .destructionType(Explosion.DestructionType.NONE)
-                        .particleVelocity(Vec3d.ZERO)
-                        .sound(JSoundRegistry.KQ_EXPLODE)
-                        .build()
-        );
+        double y = pos.y + 2.2;
+        Vec3d offsetPos = new Vec3d(pos.x, y, pos.z);
+        ServerWorld serverWorld = (ServerWorld) world;
+
+        JCraft.createParticle(serverWorld, pos.x, y, pos.z,-5);
+        JUtils.serverPlaySound(JSoundRegistry.KQ_EXPLODE, serverWorld, offsetPos, 96);
+
+        DamageSource damageSource = JDamageSources.stand(this);
+
+        Set<? extends LivingEntity> toExplode = JUtils.generateHitbox(world, offsetPos, 2.2, Set.of(user, this));
+
+        for (LivingEntity living : toExplode) {
+            Vec3d kbVec = offsetPos.subtract(living.getPos()).normalize();
+            damageLogic(world, living, kbVec, 2, 3, true, 11f, true, 4, damageSource, user);
+            living.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0, true, false));
+        }
     }
 
     public Vec3d getBombPos() {

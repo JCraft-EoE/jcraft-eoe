@@ -1606,6 +1606,18 @@ Star Platinum: The World
 
 ● 13/8/2023
 
+King Crimson
+    >Added icons
+
+D4C
+    >Added icons
+
+Cream
+    >Added icons
+
+Killer Queen
+    >Standardized explosion damage to 5.5 hearts
+
 Golden Experience
     >Added aerial variant to Life Giver
 
@@ -1617,7 +1629,8 @@ The World: Over Heaven
     >Replaced skins 1 and 3
 
 Killer Queen: Bites the Dust
-    >
+    >Standardized explosion damage to 5.5 hearts
+    >Fixed detonation bug
 
 priority (top to bottom)
 todo: GE life giver changes
