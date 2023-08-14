@@ -1605,11 +1605,17 @@ Star Platinum: The World
     >Added crouching variant to Light
 
 ● 14/8/2023
+>Updated almost every /stand about page
+>Combo Counter now flashes white when starting a new combo
 
 King Crimson
     >Added icons
 
 D4C
+    >Dimensional Hop
+        >Fixed bug where mobs got stuck in the Alternate Universe
+        >Can now bring entities on the way back from Alternate Universe
+        >Entities moving between dimensions are given 5 seconds of invulnerability
     >Added icons
 
 Cream
@@ -1617,7 +1623,10 @@ Cream
 
 Killer Queen
     >Fixed bug where Sheer Heart Attack cooldown could be nullified
-    >Standardized explosion damage to 5.5 hearts
+    >Standardized explosion damage (to 5.5 hearts), knockback, hitbox size
+
+Magician's Red
+    >Fixed bug where Flamethrower did massive damage
 
 Golden Experience
     >Added aerial variant to Life Giver
@@ -1631,7 +1640,7 @@ The World: Over Heaven
 
 Killer Queen: Bites the Dust
     >Fixed detonation bug
-    >Standardized explosion damage to 5.5 hearts
+    >Standardized explosion damage (to 5.5 hearts), knockback, hitbox size
 
 priority (top to bottom)
 todo: GE life giver changes

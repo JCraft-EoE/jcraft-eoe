@@ -81,6 +81,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
                 BNBs:
                     -Standard bomb plant confirm and SHA setup
                     M1>Barrage>Bomb plant>Detonate(>Sheer Heart Attack)
+                    
                     -Confirm while bomb plant is on cd
                     M1>Barrage>Heavy(>Sheer Heart Attack)""";
 
@@ -89,20 +90,18 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
     }
 
     protected void explode(Entity user, Vec3d pos) {
-        double y = pos.y + 2.2;
-        Vec3d offsetPos = new Vec3d(pos.x, y, pos.z);
         ServerWorld serverWorld = (ServerWorld) world;
 
-        JCraft.createParticle(serverWorld, pos.x, y, pos.z,-5);
-        JUtils.serverPlaySound(JSoundRegistry.KQ_EXPLODE, serverWorld, offsetPos, 96);
+        JCraft.createParticle(serverWorld, pos.x, pos.y, pos.z,-5);
+        JUtils.serverPlaySound(JSoundRegistry.KQ_EXPLODE, serverWorld, pos, 96);
 
         DamageSource damageSource = JDamageSources.stand(this);
 
-        Set<? extends LivingEntity> toExplode = JUtils.generateHitbox(world, offsetPos, 2.2, Set.of(user, this));
+        Set<? extends LivingEntity> toExplode = JUtils.generateHitbox(world, pos, 4.4, Set.of(user, this));
 
         for (LivingEntity living : toExplode) {
-            Vec3d kbVec = offsetPos.subtract(living.getPos()).normalize();
-            damageLogic(world, living, kbVec, 2, 3, true, 11f, true, 4, damageSource, user);
+            Vec3d kbVec = living.getEyePos().subtract(pos).normalize();
+            damageLogic(world, living, kbVec, 2, 3, true, 11f, false, 4, damageSource, user);
             living.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0, true, false));
         }
     }

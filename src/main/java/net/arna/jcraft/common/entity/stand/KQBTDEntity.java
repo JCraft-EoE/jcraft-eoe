@@ -50,11 +50,11 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
             .crouchingVariation(bubblecounter)
             .setInfo("Stray Cat Bubble", "launches an explosive bubble");
     public static final Attack detonate = new Attack(6, 1, 0.75f, 6, 5, 0, 0f, 0.0f, AttackType.BOX)
-            .setInfo("Detonate", "crouch with a bomb planted within 20s on a living being to activate Bites the Dust");
+            .setInfo("Detonate", "");
     public static final Attack btdplant = new Attack(7, 50, 1, 24, 14, 1.5, 0f, 0.0f, AttackType.BOX, 0.5f)
             .setUB(true)
             .setBlockstun(8)
-            .setInfo("Bites the Dust Plant", "press the same button to detonate, sending the affected enemy back to their ");
+            .setInfo("Bites the Dust Plant", "press the same button to detonate, sending the affected enemy back to their previous location");
     private static final Attack counterMiss = new Attack(8, 0, 15, 16, 1, AttackType.BOX);
 
     private BubbleProjectile bubbleProjectile;

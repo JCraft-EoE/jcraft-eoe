@@ -88,15 +88,19 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
         );
 
         freespace = """
-                PASSIVE: Fire Resistance
-
-                BNBs:
-                    Hurricane>[opponent in air]Barrage>M1>Crossfire>Red Bind>M1>Low Kick>Variation
-                    Red Bind>M1>Barrage>M1>Crossfire>Low Kick>Hurricane+Variation""";
+                    PASSIVE: Fire Resistance
+    
+                    BNBs:
+                        -the happy camper
+                        M1>Low Kick>Variation/Life Detector
+                        
+                        -the "omg i have setups????"
+                        M1>Red Bind>dash past enemy>Life Detector/Variation>any physical hit
+                        
+                        -the "this move is fire"
+                        M1>Red Bind>Hurricane""";
 
         moves = List.of(light, heavy, barrage, crossfire, crossfirehurricane, crossfirevariation, redbind, detector);
-
-        barrage.damage = 0.75f;
 
         super.initialize();
     }

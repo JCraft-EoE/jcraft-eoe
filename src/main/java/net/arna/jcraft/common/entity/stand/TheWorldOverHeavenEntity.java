@@ -115,24 +115,26 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         idleRotation = -45f;
         summonAnimDuration = 29;
 
+        description = "All Range DOMINATOR";
+
         pros = List.of(
                 "fast m1",
-                "longest timestop",
-                "unblockable heavy",
-                "good ranged coverage"
+                "unblockables",
+                "good ranged coverage",
+                "longest timestop"
         );
 
         cons = List.of(
-                "no knockdowns or knockbacks",
-                "unsafe pressure"
+                "no knockdowns",
+                "unsafe pressure",
+                "committal",
+                "extremely expensive timestop setup"
         );
-
-        description = "Mid Range DOMINATOR";
 
         freespace =
                 """
                         BNBs:
-                            the ultrakill
+                            -the ultrakill
                             M1>Barrage>M1>Knives>Overwrite~S2/S3>dash>Smite>Heavy>M1""";
 
         moves = List.of(light, heavy, barrage, smite, timestop, delayknives, chargeoverwrite, timeskip);

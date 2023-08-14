@@ -67,7 +67,8 @@ public class JServerTickEvents {
                 player.teleport(original, dimPos.x, dimPos.y, dimPos.z, player.getYaw(), player.getPitch());
             else JCraft.teleportToWorld(user, original, dimPos.x, dimPos.y, dimPos.z);
 
-            JCraft.clearPreloadedChunks(au); //this can probably be optimized
+            if (newPastDimensions.isEmpty()) // Nobody left in AU
+                JCraft.clearPreloadedChunks(au);
         }
 
         JCraft.pastDimensions.clear();

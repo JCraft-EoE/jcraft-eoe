@@ -13,6 +13,7 @@ import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.JCraftClient;
 import net.arna.jcraft.client.gui.ServerConfigUI;
 import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
+import net.arna.jcraft.client.gui.hud.JCraftAbilityHud;
 import net.arna.jcraft.client.renderer.effects.AttackHitBoxEffectRenderer;
 import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer;
 import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
@@ -516,7 +517,10 @@ public class ClientPacketHandler {
 
     private static void handleComboCounter(@NotNull MinecraftClient minecraftClient, PacketByteBuf buf) {
         JCraftClient.comboCounter = buf.readInt();
+        if (JCraftClient.comboCounter == 1) JCraftClient.markComboStarted();
+
         JCraftClient.damageScaling = buf.readFloat();
+
         JCraftClient.framesSinceCounted = 0;
     }
 

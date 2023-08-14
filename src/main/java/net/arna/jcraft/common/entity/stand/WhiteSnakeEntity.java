@@ -61,6 +61,8 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         super(StandType.WHITE_SNAKE, worldIn, JSoundRegistry.WS_SUMMON);
         idleRotation = 220f;
 
+        description = "All Range DISABLER";
+
         pros = List.of(
                 "coverage on all ranges",
                 "high versatility",
@@ -69,18 +71,21 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
 
         cons = List.of(
                 "no mobility options",
-                "slow pokes"
+                "slow pokes",
+                "below average damage"
         );
-
-        description = "All Range DISABLER";
 
         freespace =
                 """
-                        BNBs:
-                            the el mayo
-                            Memory Disk>M1>Barrage>Leg Crusher>Stand Disk>M1
-                            the gazebo
-                            M1>Barrage>Leg Crusher>Donut>M1""";
+                BNBs:
+                    -the el mayo (optimal damage with disk moves)
+                    Memory Disk>M1>Barrage>Leg Crusher>Stand Disk>M1
+                                
+                    -the gazebo (optimal damage without disk)
+                    M1>Barrage>Leg Crusher>Donut>M1
+                    
+                    -the protein shake (sets up mixups)
+                    M1>Barrage>Leg Crusher>Charged Spew""";
 
         moves = Lists.newArrayList(light, donut, barrage, memorydisk, standdisk, legcrusher, poisonspew,
                 new Attack().setInfo("Pilot Mode", ""));

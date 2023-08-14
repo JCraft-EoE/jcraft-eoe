@@ -163,12 +163,11 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
 
         freespace =
                 """
-                        PASSIVE: Speed I
-                        PASSIVE: Speedometer, builds up speed for every landed hit, allows usage of Time Acceleration
-                        
-                        BNBs:
-                        the white supremacist
-                            (Donut>M1>)Speed Slice>Leg Crusher>Fury Chop>M1>Barrage""";
+                PASSIVE: Speed I
+                
+                BNBs:
+                    -the white supremacist
+                    (Donut>M1>)Speed Slice>Leg Crusher>Fury Chop>M1>Barrage""";
 
         moves = List.of(light, donut, barrage, legcrusher, timeaccel, furychop, judgement, speedslice);
 

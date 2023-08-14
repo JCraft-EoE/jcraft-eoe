@@ -5,27 +5,37 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import lombok.experimental.UtilityClass;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.JClientConfig;
+import net.arna.jcraft.client.JCraftClient;
 import net.arna.jcraft.client.util.RenderUtils;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.spec.JCraftSpec;
+import net.arna.jcraft.common.util.ColorUtils;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.random.Random;
+import org.apache.commons.lang3.StringUtils;
 
+import java.util.List;
 import java.util.Map;
+
+import static net.arna.jcraft.client.JCraftClient.*;
 
 @UtilityClass
 public class JCraftAbilityHud extends DrawableHelper {
+    /// ICON HUD
     private static final Identifier GUI_ICONS_TEXTURE = new Identifier("textures/gui/icons.png");
 
     final IconPos ICON = new IconPos("icon", 10, 18 * 3 + 18);
@@ -95,38 +105,40 @@ public class JCraftAbilityHud extends DrawableHelper {
             .put(CooldownType.SP3, SPEC_SPECIAL_3)
             .build();
 
-    private static int getHudX(int scaledX) {
+    public static int getHudX(int scaledX, int rightOffset) {
         return switch (JClientConfig.getInstance().getUiPosition()) {
             case LEFT -> 2;
-            case RIGHT -> scaledX - 48;
+            case RIGHT -> scaledX - rightOffset;
             case MIDDLE -> (int) (scaledX * 0.55f);
         };
     }
 
     public static void render(MatrixStack matrices, boolean renderCooldownOverlay) {
-        if (!JClientConfig.getInstance().isIconHud()) return;
-
         MinecraftClient client = MinecraftClient.getInstance();
         ClientPlayerEntity player = client.player;
         if (player == null) return;
 
         boolean isMid = JClientConfig.getInstance().getUiPosition() == JClientConfig.UIPos.MIDDLE;
-
-        int selectedX = getHudX(client.getWindow().getScaledWidth());
-        int selectedY = isMid ? iconSpacing * 11 : 0;
-
+        boolean useIcons = JClientConfig.getInstance().isIconHud();
         StandEntity<?, ?> stand = JUtils.getStand(player);
-        JCraftSpec spec = JUtils.getSpec(player);
 
-        if (stand == null) {
-            // Render cooldown HUD for specs
-            if (spec != null) renderIcons(matrices, SPEC_ICONS, selectedX, selectedY, spec.getInternalName().toLowerCase(), renderCooldownOverlay);
-        } else {
-            // Render cooldown HUD for stands
-            renderIcons(matrices, isMid ? STAND_ICONS_MID : STAND_ICONS, selectedX, selectedY, stand.getType().getUntranslatedName(), renderCooldownOverlay);
+        if (useIcons) {
+            int selectedX = getHudX(client.getWindow().getScaledWidth(), 48);
+            int selectedY = isMid ? iconSpacing * 11 : 0;
+
+            JCraftSpec spec = JUtils.getSpec(player);
+
+            if (stand == null) {
+                // Render cooldown HUD for specs
+                if (spec != null)
+                    renderIcons(matrices, SPEC_ICONS, selectedX, selectedY, spec.getInternalName().toLowerCase(), renderCooldownOverlay);
+            } else {
+                // Render cooldown HUD for stands
+                renderIcons(matrices, isMid ? STAND_ICONS_MID : STAND_ICONS, selectedX, selectedY, stand.getType().getUntranslatedName(), renderCooldownOverlay);
+            }
+
+            renderIcons(matrices, UNIVERSAL_ICONS, selectedX, selectedY, "universal", renderCooldownOverlay);
         }
-
-        renderIcons(matrices, UNIVERSAL_ICONS, selectedX, selectedY, "universal", renderCooldownOverlay);
     }
 
     /**

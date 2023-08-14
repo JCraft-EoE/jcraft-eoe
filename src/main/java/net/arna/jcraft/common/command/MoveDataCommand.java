@@ -36,13 +36,12 @@ public class MoveDataCommand {
         Attack attack;
 
         if (stand) {
-            if (player.getFirstPassenger() instanceof StandEntity<?, ?> standEntity) {
-                attack = standEntity.curAttack;
-                if (attack == null) {
-                    attack = standEntity.previousAttack;
-                }
-            } else {
+            StandEntity<?, ?> standEntity = JUtils.getStand(player);
+            if (standEntity == null) {
                 return 0;
+            } else {
+                attack = standEntity.curAttack;
+                if (attack == null) attack = standEntity.previousAttack;
             }
         } else {
             JCraftSpec spec = JUtils.getSpec(player);

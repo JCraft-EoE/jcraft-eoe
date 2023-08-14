@@ -1,10 +1,12 @@
 package net.arna.jcraft.common.entity.stand;
 
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.SheerHeartAttackEntity;
+import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
@@ -17,11 +19,13 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
@@ -197,20 +201,17 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
             case (8) -> {
                 playSound(JSoundRegistry.KQ_DETONATE, 1, 1);
 
-                if (bombEntity == null) return;
-                explode(user, bombEntity.getPos());
-
-                bombEntity.setVelocity(0, 1, 0);
-                bombEntity.velocityModified = true;
-
                 if (bombEntity instanceof LivingEntity livingEntity) {
+                    ServerWorld serverWorld = (ServerWorld) world;
+
+                    Vec3d pos = livingEntity.getPos();
+                    JCraft.createParticle(serverWorld, pos.x, pos.y, pos.z,-5);
+                    JUtils.serverPlaySound(JSoundRegistry.KQ_EXPLODE, serverWorld, pos, 96);
+
+                    DamageSource damageSource = JDamageSources.stand(this);
+
+                    damageLogic(world, livingEntity, new Vec3d(0, 1, 0), 2, 3, true, 11f, false, 4, damageSource, user);
                     livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0, true, false));
-
-                    livingEntity.removeStatusEffect(JStatusRegistry.DAZED);
-                    stun(livingEntity, 5, 3);
-
-                    if (livingEntity instanceof ServerPlayerEntity serverPlayer)
-                        serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(serverPlayer));
                 }
 
                 bombEntity = null;

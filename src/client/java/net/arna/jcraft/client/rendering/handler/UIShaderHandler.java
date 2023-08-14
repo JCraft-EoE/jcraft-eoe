@@ -33,7 +33,6 @@ public class UIShaderHandler implements ShaderEffectRenderCallback {
         // but we do it here, so we can use different frame-buffers.
         RenderUtils.startOverlayRender();
 
-
         // Render HUD
         inputBuffer.clear();
         inputBuffer.beginWrite(false);
@@ -42,7 +41,6 @@ public class UIShaderHandler implements ShaderEffectRenderCallback {
         overlayBuffer.clear();
         overlayBuffer.beginWrite(false);
         JCraftAbilityHud.render(new MatrixStack(), true);
-
 
         // Restore
         RenderUtils.endOverlayRender();

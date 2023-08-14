@@ -94,17 +94,18 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
         );
 
         cons = List.of(
-                "low damage",
+                "requires setup to become threatening",
                 "no horizontal movement tools",
                 "snake is unreliable"
         );
 
         freespace = """
                 BNBs:
-                the giogio
-                M1>Barrage>M1>Tree>Rekka 1~2~3
-                the superprince of gaming
-                Rekka 1~2>M1>Barrage>M1>Tree>Heavy""";
+                    -the giogio
+                    M1>Barrage>M1>Tree>Rekka 1~2~3
+                    
+                    -the superprince of gaming
+                    Rekka 1~2>M1>Barrage>M1>Tree>Heavy""";
 
         moves = List.of(light, heavy, barrage, healself, overclock, rekka1, lifegiver, tree);
 

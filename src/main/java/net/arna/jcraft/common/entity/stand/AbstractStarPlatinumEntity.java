@@ -53,13 +53,13 @@ public abstract sealed class AbstractStarPlatinumEntity<E extends AbstractStarPl
         pros = List.of(
                 "fast m1",
                 "long, damaging combos",
-                "low cooldowns",
-                "timestop & timeskip"
+                "low cooldowns"
         );
 
         cons = List.of(
                 "predictable playstyle",
-                "weak ranged coverage"
+                "weak ranged coverage",
+                "weak mixups without inhale"
         );
 
         freespace =

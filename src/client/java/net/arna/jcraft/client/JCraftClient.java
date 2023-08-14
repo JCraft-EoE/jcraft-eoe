@@ -1,6 +1,5 @@
 package net.arna.jcraft.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import lombok.Getter;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
@@ -51,11 +50,9 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.ModelIdentifier;
@@ -69,6 +66,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -79,15 +77,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import static net.arna.jcraft.client.gui.hud.JCraftAbilityHud.getHudX;
 import static net.arna.jcraft.client.util.JClientUtils.activeTimestops;
 
 public class JCraftClient implements ClientModInitializer {
-    // Combo counting
-    private final List<String> comboRemarks = List.of("admin rdm!!!", "baby combo", "caught lackin", "kinda ez", "skill issue", "cancelled on twitter", "sent to bulgaria", "down bad");
-    public static int comboCounter = 0;
-    public static float damageScaling = 1.00f;
-    public static int framesSinceCounted = 0;
-
     // Keybinds
     public static KeyBinding standSummon;
     public static KeyBinding heavyKey;
@@ -182,35 +175,30 @@ public class JCraftClient implements ClientModInitializer {
         });
     }
 
-    private static int getHudX(int scaledX) {
-        switch (JClientConfig.getInstance().getUiPosition()) {
-            case LEFT -> {
-                return 2;
-            }
-            case RIGHT -> {
-                return scaledX - 128;
-            }
-            case MIDDLE -> {
-                return (int) (scaledX * 0.55f);
-            }
-            default -> {
-                JCraft.LOGGER.error("JCraft UI position is set to an invalid value!");
-                return 10;
-            }
-        }
-    }
+    /// TEXT HUD
+    private final List<String> comboRemarks = List.of("admin rdm!!!", "baby combo", "caught lackin", "kinda ez", "skill issue", "cancelled on twitter", "sent to bulgaria", "down bad");
+    public static int comboCounter = 0;
+    public static float damageScaling = 1.00f;
+    public static int framesSinceCounted = 0;
 
-    @SuppressWarnings("DataFlowIssue") // If the player is null, we have much larger problems than that
-    private void renderHud(MatrixStack matrixStack, float tickDelta) {
+    private void renderHud(MatrixStack matrices, float tickDelta) {
         MinecraftClient client = MinecraftClient.getInstance();
         ClientPlayerEntity player = client.player;
-        CooldownsComponent cooldowns = JComponents.getCooldowns(player);
+        if (player == null) {
+            JCraft.LOGGER.fatal("Attempted to render hud with no player!");
+            return;
+        }
+
         framesSinceCounted++;
 
-        int selectedX = getHudX(client.getWindow().getScaledWidth());
-        int selectedY = client.getWindow().getScaledHeight();
-
+        boolean isMid = JClientConfig.getInstance().getUiPosition() == JClientConfig.UIPos.MIDDLE;
         boolean useIcons = JClientConfig.getInstance().isIconHud();
+        StandEntity<?, ?> stand = JUtils.getStand(player);
+
+        TextRenderer textRenderer = client.inGameHud.getTextRenderer();
+
+        int selectedX = getHudX(client.getWindow().getScaledWidth(), 128);
+        int selectedY = client.getWindow().getScaledHeight();
 
         switch (JClientConfig.getInstance().getUiPosition()) {
             case LEFT -> selectedY /= 20;
@@ -218,95 +206,110 @@ public class JCraftClient implements ClientModInitializer {
             case RIGHT -> selectedY = (int) (selectedY / 2.25f);
         }
 
-        TextRenderer textRenderer = client.inGameHud.getTextRenderer();
-        if (comboCounter > 0 && player.world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && framesSinceCounted <= 180) {
+        // Draw text HUD
+        if (!useIcons) {
+            CooldownsComponent cooldowns = JComponents.getCooldowns(player);
 
-            String remark = "epic tod free download";
-            if (comboCounter < comboRemarks.size() * 7) {
-                remark = comboRemarks.get(Math.floorDiv(comboCounter, 7));
-            }
+            CooldownType[] values = CooldownType.values();
+            for (int i = 0; i < values.length; i++) {
+                CooldownType type = values[i];
+                int cooldownTicks = cooldowns.getCooldown(type);
 
-            // Combo Counter rendering
-            textRenderer.drawWithShadow(
-                    matrixStack,
-                    comboCounter + " - (" + Math.round(damageScaling * 100f) + "%) - " + remark,
-                    selectedX + (framesSinceCounted < 5 ? player.getRandom().nextFloat() * 5f : 0) +
-                            ((JClientConfig.getInstance().getUiPosition() == JClientConfig.UIPos.MIDDLE && useIcons) ? 54f : 0),
-                    selectedY * (1.15f) + (framesSinceCounted < 5 ? player.getRandom().nextFloat() * 5f : 0),
-                    ColorUtils.HSBAtoRGBA(comboCounter / 360f - 1f, 1f, 1f, 0.8f),
-                    true
-            );
-        }
+                if (cooldownTicks == 0) continue;
+                double cooldown = (cooldownTicks - tickDelta) / 20d;
 
-        // Cooldown rendering, for icon hud see JCraftHudOverlay
-        if (useIcons) return;
-        boolean standOn = JComponents.getStandData(player).getStand() != null;
+                // These are (mainly) based off of keybindings which are client-only and thus have
+                // to be done here and cannot be done in CooldownType.
+                String keyBindText = switch (type) {
+                    case STAND_LIGHT -> "M1";
+                    case HEAVY, STAND_HEAVY -> generateName(heavyKey);
+                    case BARRAGE, STAND_BARRAGE -> generateName(barrageKey);
+                    case ULT, STAND_ULT -> generateName(ultKey);
+                    case SP1, STAND_SP1 -> generateName(special1Key);
+                    case SP2, STAND_SP2 -> generateName(special2Key);
+                    case SP3, STAND_SP3 -> generateName(special3Key);
+                    case UTIL -> generateName(utility);
+                    case COMBO_BREAKER -> "Combo Breaker";
+                    case COOLDOWN_CANCEL -> generateName(cooldownCancel);
+                    case DASH -> generateName(dash);
+                };
 
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderColor(1, 1, 1, 1);
+                CooldownType.Category category = type.getCategory();
 
-        CooldownType[] values = CooldownType.values();
-        for (int i = 0; i < values.length; i++) {
-            CooldownType type = values[i];
-            int cooldownTicks = cooldowns.getCooldown(type);
+                boolean isSpec = category == CooldownType.Category.SPEC;
+                boolean isUniversal = category == CooldownType.Category.UNIVERSAL;
+                float defaultAlpha = 0.65f;
+                int xOffset = 0;
 
-            if (cooldownTicks == 0) continue;
-            double cooldown = (cooldownTicks - tickDelta) / 20d;
+                String finalText = keyBindText + " - " + JCraftClient.getDecimalFormat().format(MathHelper.clamp(cooldown, 0.0, 9999.0)) + "s";
 
-            // These are (mainly) based off of keybindings which are client-only and thus have
-            // to be done here and cannot be done in CooldownType.
-            String keyBindText = switch (type) {
-                case STAND_LIGHT -> "M1";
-                case HEAVY, STAND_HEAVY -> generateName(heavyKey.getBoundKeyTranslationKey());
-                case BARRAGE, STAND_BARRAGE -> generateName(barrageKey.getBoundKeyTranslationKey());
-                case ULT, STAND_ULT -> generateName(ultKey.getBoundKeyTranslationKey());
-                case SP1, STAND_SP1 -> generateName(special1Key.getBoundKeyTranslationKey());
-                case SP2, STAND_SP2 -> generateName(special2Key.getBoundKeyTranslationKey());
-                case SP3, STAND_SP3 -> generateName(special3Key.getBoundKeyTranslationKey());
-                case UTIL -> generateName(utility.getBoundKeyTranslationKey());
-                case COMBO_BREAKER -> "Combo Breaker";
-                case COOLDOWN_CANCEL -> generateName(cooldownCancel.getBoundKeyTranslationKey());
-                case DASH -> generateName(dash.getBoundKeyTranslationKey());
-            };
+                if (category == CooldownType.Category.STAND || isSpec) {
+                    if (!isSpec) finalText = "s." + finalText;
 
-            CooldownType.Category category = type.getCategory();
-
-            boolean isSpec = category == CooldownType.Category.SPEC;
-            boolean isUniversal = category == CooldownType.Category.UNIVERSAL;
-            float defaultAlpha = 0.65f;
-            int xOffset = 0;
-
-            String finalText = keyBindText + " - " + getDecimalFormat().format(MathHelper.clamp(cooldown, 0.0, 9999.0)) + "s";
-
-            if (category == CooldownType.Category.STAND || isSpec) {
-                if (!isSpec) finalText = "s." + finalText;
-
-                if ((isSpec && standOn) || (!isSpec && !standOn)) {
-                    xOffset = 48;
-                    defaultAlpha = 0.3f;
+                    if ((isSpec && stand != null) || (!isSpec && stand == null)) {
+                        xOffset = 48;
+                        defaultAlpha = 0.3f;
+                    }
                 }
+
+                int offsetIndex = i;
+                if (isSpec)
+                    offsetIndex -= 7;
+                else if (isUniversal)
+                    offsetIndex -= 6;
+                float offsetY = selectedY * 1.25f + 9f * offsetIndex;
+
+                textRenderer.drawWithShadow(
+                        matrices,
+                        finalText,
+                        selectedX + xOffset,
+                        offsetY,
+                        ColorUtils.HSBAtoRGBA(0.3f - (float) cooldown * 10f / 720f, (cooldown < 1.6) ? 0.0f : 1.0f, 1.0f, (cooldown < 1.6) ? 1.0f : defaultAlpha),
+                        true
+                );
             }
+        }
 
-            int offsetIndex = i;
-            if (isSpec)
-                offsetIndex -= 7;
-            else if (isUniversal)
-                offsetIndex -= 6;
+        // Draw Combo Counter
+        if (comboCounter > 0 && player.world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && framesSinceCounted <= 180) {
+            String remark = "epic tod free download";
+            if (comboCounter < comboRemarks.size() * 7)
+                remark = comboRemarks.get(Math.floorDiv(comboCounter, 7));
 
-            float offsetY = selectedY * 1.25f + 9f * offsetIndex;
+            boolean recentHit = framesSinceCounted < 5;
 
-            //RenderSystem.setShaderTexture(0, BIND_BG);
-            //DrawableHelper.drawTexture(matrixStack, maxX + xOffset + 6, (int) offsetY - 2, 0, 0, 10, 10, 10, 10);
+            Random random = player.getRandom();
+
+            if (comboStarted && ++framesSinceComboStarted > 59) comboStarted = false;
+
             textRenderer.drawWithShadow(
-                    matrixStack,
-                    finalText,
-                    selectedX + xOffset,
-                    offsetY,
-                    ColorUtils.HSBAtoRGBA(0.3f - (float) cooldown * 10f / 720f, (cooldown < 1.6) ? 0.0f : 1.0f, 1.0f, (cooldown < 1.6) ? 1.0f : defaultAlpha),
+                    matrices,
+                    comboCounter + " - (" + Math.round(damageScaling * 100f) + "%) - " + remark,
+                    selectedX + (isMid && useIcons ? 54f : 0) + (recentHit ? tickDelta * random.nextFloat() * 5f : 0),
+                    selectedY * (1.15f) + (recentHit ? tickDelta * random.nextFloat() * 5f : 0),
+                    ColorUtils.HSBAtoRGBA(comboCounter / 360f - 1f, comboStarted ? framesSinceComboStarted / 60f : 1f, 1f, 0.8f),
                     true
             );
         }
-        RenderSystem.setShaderTexture(0, InGameHud.GUI_ICONS_TEXTURE);
+    }
+
+    private static boolean comboStarted = false;
+    private static int framesSinceComboStarted = 0;
+    public static void markComboStarted() {
+        comboStarted = true;
+        framesSinceComboStarted = 0;
+    }
+
+    /**
+     * @return cleaned up version of TranslatableText name of button
+     */
+    private String generateName(KeyBinding keyBinding) {
+        String str = keyBinding.getBoundKeyTranslationKey();
+        String[] components = str.split("\\.");
+        String last = components[components.length - 1];
+        String secondLast = components[components.length - 2] + " ";
+        if (components[components.length - 2].equals("keyboard")) secondLast = "";
+        return StringUtils.capitalize(secondLast) + StringUtils.capitalize(last);
     }
 
     private void tickClient(MinecraftClient minecraftClient) {
@@ -438,17 +441,6 @@ public class JCraftClient implements ClientModInitializer {
 
     private void sendStandControlPacket(PacketByteBuf buf) {
         ClientPlayNetworking.send(StandControlPacket.ID, buf);
-    }
-
-    /**
-     * @return cleaned up version of TranslatableText name of button
-     */
-    private String generateName(String str) {
-        String[] components = str.split("\\.");
-        String last = components[components.length - 1];
-        String secondLast = components[components.length - 2] + " ";
-        if (components[components.length - 2].equals("keyboard")) secondLast = "";
-        return StringUtils.capitalize(secondLast) + StringUtils.capitalize(last);
     }
 
     @Nullable

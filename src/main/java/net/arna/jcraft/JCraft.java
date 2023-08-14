@@ -31,6 +31,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
@@ -50,6 +51,7 @@ import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.example.GeckoLibMod;
 
 import java.util.ArrayList;
@@ -394,7 +396,7 @@ public class JCraft implements ModInitializer {
         }
     }
 
-    public static <T extends Entity> T teleportToWorld(T e, ServerWorld w, double x, double y, double z) {
+    public static @Nullable <T extends Entity> T teleportToWorld(T e, ServerWorld w, double x, double y, double z) {
         if (!e.isRemoved()) {
             e.detach();
             //noinspection unchecked
@@ -420,8 +422,7 @@ public class JCraft implements ModInitializer {
             JCraft.LOGGER.fatal("Alternate universe world does not exist!");
             return;
         }
-        if (original == au)
-            return;
+        if (original == au) return;
 
         Vec3d pos = entity.getPos();
         LivingEntity finalEnt = entity;
@@ -433,6 +434,12 @@ public class JCraft implements ModInitializer {
             );
         } else finalEnt = teleportToWorld(entity, au, entity.getX(), entity.getY() - heightOffset, entity.getZ());
 
+        if (finalEnt == null) {
+            JCraft.LOGGER.error("Failed to teleport " + entity + " to alternate universe!");
+            return;
+        }
+
+        finalEnt.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 100, 9, true, false, true));
         pastDimensions.add(new DimValues(finalEnt, pos, original.getRegistryKey()));
     }
 }

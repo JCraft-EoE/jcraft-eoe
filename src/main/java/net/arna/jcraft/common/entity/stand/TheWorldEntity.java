@@ -85,8 +85,8 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
                 """
                         BNBs:
                             the saucy racist
-                            ppl without timeskips will suffer, but so will people with timeskips :)))
-                            (M1>)Charge>M1>Roundhouse>Barrage>M1>Donut>Timestop{  }
+                            (M1>)Charge>M1>Roundhouse>Barrage>M1>Donut>M1
+                            
                             the no ts racist
                             Donut>Roundhouse>Charge>M1>Barrage>M1""";
 

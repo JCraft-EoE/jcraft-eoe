@@ -76,12 +76,11 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
                 "hard to hitconfirm important options without using TS"
         );
 
-        freespace =
-                """
-                        BNBs:
-                                                
-                            -the
-                            M1>cr.Time Strike>Backhand>What an Ugly Watch>delay M1>Timestop~Star Breaker>dash/Timeskip>Barrage>M1""";
+        freespace = """
+                    BNBs:
+                                            
+                        -the superman
+                        M1>cr.Time Strike>Backhand>What an Ugly Watch>delay M1>Timestop~Star Breaker>dash/Timeskip>Barrage>M1""";
 
         moves = List.of(light, heavy, barrage, timestrike, timestop, backhand, timestrike, timeskip);
 

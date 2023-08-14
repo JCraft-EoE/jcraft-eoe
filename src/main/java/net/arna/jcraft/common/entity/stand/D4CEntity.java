@@ -179,31 +179,15 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             curAttack = null;
         }
 
-        if (!canAttack()) return;
-
-        LivingEntity user = getUser();
-        if (user instanceof ServerPlayerEntity serverPlayer) { // Logic for cancelling dimhop early, and generating failsafe data
-            if (user.getWorld().getRegistryKey().equals(JDimensionRegistry.AU_DIMENSION_KEY)) {
-                boolean isStored = false; // Should always be true
-                for (DimValues dimV : JCraft.pastDimensions) {
-                    if (dimV.user != user)
-                        continue;
-                    isStored = true;
-                    dimV.timer = 1;
-                }
-
-                if (!isStored) { // If not stored, force your way back
-                    BlockPos spawnPos = serverPlayer.getSpawnPointPosition(); // Prioritize spawn point
-                    // Use current position if all else fails
-                    if (spawnPos == null) spawnPos = serverPlayer.getBlockPos();
-                    JCraft.pastDimensions.add(new DimValues(user,
-                            new Vec3d(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()),
-                            serverPlayer.getSpawnPointDimension()));
-                }
-            }
+        if (getWorld().getRegistryKey().equals(JDimensionRegistry.AU_DIMENSION_KEY)) {
+            setAttack(dimhop_others, State.DIM_HOP);
+            playSound(JSoundRegistry.D4C_DIMHOP, 1, 1);
+            return;
         }
 
-        if (handleAttack(dimhop_others, CooldownType.STAND_ULT, State.DIM_HOP)) playSound(JSoundRegistry.D4C_DIMHOP, 1, 1);
+        if (!canAttack()) return;
+        if (handleAttack(dimhop_others, CooldownType.STAND_ULT, State.DIM_HOP))
+            playSound(JSoundRegistry.D4C_DIMHOP, 1, 1);
     }
 
     @Override
@@ -271,110 +255,138 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
         LivingEntity user = getUser();
         switch (attack.id) {
             case (3) -> {
-                ChunkPos origin = getChunkPos();
                 ServerWorld world = (ServerWorld) getWorld();
 
-                // Lighting providers are too complicated, man. Wth
-                // We got 2 providers, every provider has 2 storages and every storage has 2 storages.
-                LightingProvider ogLightingProvider = world.getLightingProvider();
-                LightingProvider auLightingProvider = auWorld.getLightingProvider();
+                if (world.getRegistryKey().equals(JDimensionRegistry.AU_DIMENSION_KEY)) {
+                    if (user instanceof ServerPlayerEntity serverPlayer) { // Logic for cancelling dimhop early, and generating failsafe data
+                        boolean isStored = false; // Should always be true
+                        for (DimValues dimV : JCraft.pastDimensions) {
+                            if (entities.contains(dimV.user)) {
+                                dimV.timer = 1;
+                                continue;
+                            }
 
-                ChunkLightProviderAccessor ogBlockLightProvider = (ChunkLightProviderAccessor)
-                        ((LightingProviderAccessor) ogLightingProvider).getBlockLightProvider();
-                ChunkLightProviderAccessor auBlockLightProvider = (ChunkLightProviderAccessor)
-                        ((LightingProviderAccessor) auLightingProvider).getBlockLightProvider();
-                ChunkLightProviderAccessor ogSkyLightProvider = (ChunkLightProviderAccessor)
-                        ((LightingProviderAccessor) ogLightingProvider).getSkyLightProvider();
-                ChunkLightProviderAccessor auSkyLightProvider = (ChunkLightProviderAccessor)
-                        ((LightingProviderAccessor) auLightingProvider).getSkyLightProvider();
+                            if (dimV.user != user)
+                                continue;
+                            isStored = true;
+                            dimV.timer = 1;
+                        }
 
-                LightStorageAccessor ogBlockLightStorage0 = ogBlockLightProvider == null ? null :
-                        (LightStorageAccessor) ogBlockLightProvider.getLightStorage();
-                LightStorageAccessor auBlockLightStorage0 = auBlockLightProvider == null ? null :
-                        (LightStorageAccessor) auBlockLightProvider.getLightStorage();
-                LightStorageAccessor ogSkyLightStorage0 = ogSkyLightProvider == null ? null :
-                        (LightStorageAccessor) ogSkyLightProvider.getLightStorage();
-                LightStorageAccessor auSkyLightStorage0 = auSkyLightProvider == null ? null :
-                        (LightStorageAccessor) auSkyLightProvider.getLightStorage();
-
-                // Whether some mod (like Starlight or Phosphor) overwrote the lighting system.
-                // If so, our method of copying light data is not going to work.
-                boolean someModMessedUpLight = Stream.of(ogBlockLightStorage0, auBlockLightStorage0, ogSkyLightStorage0, auSkyLightStorage0)
-                        .anyMatch(Objects::isNull);
-
-                ChunkToNibbleArrayMap<?> ogBlockLightStorage = someModMessedUpLight ? null : ogBlockLightStorage0.getStorage();
-                ChunkToNibbleArrayMap<?> ogUncachedBlockLightStorage = someModMessedUpLight ? null : ogBlockLightStorage0.getUncachedStorage();
-                ChunkToNibbleArrayMap<?> auBlockLightStorage = someModMessedUpLight ? null : auBlockLightStorage0.getStorage();
-                ChunkToNibbleArrayMap<?> auUncachedBlockLightStorage = someModMessedUpLight ? null : auBlockLightStorage0.getUncachedStorage();
-                ChunkToNibbleArrayMap<?> ogSkyLightStorage = someModMessedUpLight ? null : ogSkyLightStorage0.getStorage();
-                ChunkToNibbleArrayMap<?> ogUncachedSkyLightStorage = someModMessedUpLight ? null : ogSkyLightStorage0.getUncachedStorage();
-                ChunkToNibbleArrayMap<?> auSkyLightStorage = someModMessedUpLight ? null : auSkyLightStorage0.getStorage();
-                ChunkToNibbleArrayMap<?> auUncachedSkyLightStorage = someModMessedUpLight ? null : auSkyLightStorage0.getUncachedStorage();
-
-                someModMessedUpLight |= Stream.of(ogBlockLightStorage, ogUncachedBlockLightStorage, auBlockLightStorage, auUncachedBlockLightStorage,
-                        ogSkyLightStorage, ogUncachedSkyLightStorage, auSkyLightStorage, auUncachedBlockLightStorage)
-                        .anyMatch(Objects::isNull);
-
-                for (int x = -3; x < 4; x++) {
-                    for (int z = -3; z < 4; z++) {
-                        int cX = origin.x + x;
-                        int cZ = origin.z + z;
-                        JCraft.preloadChunk(auWorld, cX, cZ);
-
-                        WorldChunk ogChunk = world.getChunk(cX, cZ);
-                        WorldChunk auChunk = auWorld.getChunk(cX, cZ);
-
-                        ChunkSection[] sections = ogChunk.getSectionArray();
-                        ChunkSection[] copies = IntStream.range(0, sections.length)
-                                .mapToObj(i -> {
-                                    ChunkSection copy = new ChunkSection(world.sectionIndexToCoord(i),
-                                            world.getRegistryManager().get(Registry.BIOME_KEY));
-
-                                    PacketByteBuf serialized = PacketByteBufs.create();
-                                    sections[i].toPacket(serialized);
-                                    copy.fromPacket(serialized);
-                                    return copy;
-                                })
-                                .toArray(ChunkSection[]::new);
-
-                        ChunkSection[] auSec = auChunk.getSectionArray();
-                        System.arraycopy(copies, 0, auSec, 0, Math.min(copies.length, auSec.length));
-
-                        // Copy light for every section.
-                        if (!someModMessedUpLight) for (int y = auWorld.getBottomY(); y < auWorld.getTopY(); y += 16) {
-                            long cPos = ChunkSectionPos.toLong(new BlockPos(cX * 16, y, cZ * 16));
-                            ChunkNibbleArray a;
-                            a = ogBlockLightStorage.get(cPos);
-                            if (a != null) auBlockLightStorage.put(cPos, a);
-
-                            a = ogUncachedBlockLightStorage.get(cPos);
-                            if (a != null) auUncachedBlockLightStorage.put(cPos, a);
-
-                            a = ogSkyLightStorage.get(cPos);
-                            if (a != null) auSkyLightStorage.put(cPos, a);
-
-                            a = ogUncachedSkyLightStorage.get(cPos);
-                            if (a != null) auUncachedSkyLightStorage.put(cPos, a);
+                        if (!isStored) { // If not stored, force your way back
+                            BlockPos spawnPos = serverPlayer.getSpawnPointPosition(); // Prioritize spawn point
+                            // Use current position if all else fails
+                            if (spawnPos == null) spawnPos = serverPlayer.getBlockPos();
+                            JCraft.pastDimensions.add(new DimValues(user,
+                                    new Vec3d(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()),
+                                    serverPlayer.getSpawnPointDimension()));
                         }
                     }
+                } else {
+                    ChunkPos origin = getChunkPos();
+
+                    // Lighting providers are too complicated, man. Wth
+                    // We got 2 providers, every provider has 2 storages and every storage has 2 storages.
+                    LightingProvider ogLightingProvider = world.getLightingProvider();
+                    LightingProvider auLightingProvider = auWorld.getLightingProvider();
+
+                    ChunkLightProviderAccessor ogBlockLightProvider = (ChunkLightProviderAccessor)
+                            ((LightingProviderAccessor) ogLightingProvider).getBlockLightProvider();
+                    ChunkLightProviderAccessor auBlockLightProvider = (ChunkLightProviderAccessor)
+                            ((LightingProviderAccessor) auLightingProvider).getBlockLightProvider();
+                    ChunkLightProviderAccessor ogSkyLightProvider = (ChunkLightProviderAccessor)
+                            ((LightingProviderAccessor) ogLightingProvider).getSkyLightProvider();
+                    ChunkLightProviderAccessor auSkyLightProvider = (ChunkLightProviderAccessor)
+                            ((LightingProviderAccessor) auLightingProvider).getSkyLightProvider();
+
+                    LightStorageAccessor ogBlockLightStorage0 = ogBlockLightProvider == null ? null :
+                            (LightStorageAccessor) ogBlockLightProvider.getLightStorage();
+                    LightStorageAccessor auBlockLightStorage0 = auBlockLightProvider == null ? null :
+                            (LightStorageAccessor) auBlockLightProvider.getLightStorage();
+                    LightStorageAccessor ogSkyLightStorage0 = ogSkyLightProvider == null ? null :
+                            (LightStorageAccessor) ogSkyLightProvider.getLightStorage();
+                    LightStorageAccessor auSkyLightStorage0 = auSkyLightProvider == null ? null :
+                            (LightStorageAccessor) auSkyLightProvider.getLightStorage();
+
+                    // Whether some mod (like Starlight or Phosphor) overwrote the lighting system.
+                    // If so, our method of copying light data is not going to work.
+                    boolean someModMessedUpLight = Stream.of(ogBlockLightStorage0, auBlockLightStorage0, ogSkyLightStorage0, auSkyLightStorage0)
+                            .anyMatch(Objects::isNull);
+
+                    ChunkToNibbleArrayMap<?> ogBlockLightStorage = someModMessedUpLight ? null : ogBlockLightStorage0.getStorage();
+                    ChunkToNibbleArrayMap<?> ogUncachedBlockLightStorage = someModMessedUpLight ? null : ogBlockLightStorage0.getUncachedStorage();
+                    ChunkToNibbleArrayMap<?> auBlockLightStorage = someModMessedUpLight ? null : auBlockLightStorage0.getStorage();
+                    ChunkToNibbleArrayMap<?> auUncachedBlockLightStorage = someModMessedUpLight ? null : auBlockLightStorage0.getUncachedStorage();
+                    ChunkToNibbleArrayMap<?> ogSkyLightStorage = someModMessedUpLight ? null : ogSkyLightStorage0.getStorage();
+                    ChunkToNibbleArrayMap<?> ogUncachedSkyLightStorage = someModMessedUpLight ? null : ogSkyLightStorage0.getUncachedStorage();
+                    ChunkToNibbleArrayMap<?> auSkyLightStorage = someModMessedUpLight ? null : auSkyLightStorage0.getStorage();
+                    ChunkToNibbleArrayMap<?> auUncachedSkyLightStorage = someModMessedUpLight ? null : auSkyLightStorage0.getUncachedStorage();
+
+                    someModMessedUpLight |= Stream.of(ogBlockLightStorage, ogUncachedBlockLightStorage, auBlockLightStorage, auUncachedBlockLightStorage,
+                                    ogSkyLightStorage, ogUncachedSkyLightStorage, auSkyLightStorage, auUncachedBlockLightStorage)
+                            .anyMatch(Objects::isNull);
+
+                    for (int x = -3; x < 4; x++) {
+                        for (int z = -3; z < 4; z++) {
+                            int cX = origin.x + x;
+                            int cZ = origin.z + z;
+                            JCraft.preloadChunk(auWorld, cX, cZ);
+
+                            WorldChunk ogChunk = world.getChunk(cX, cZ);
+                            WorldChunk auChunk = auWorld.getChunk(cX, cZ);
+
+                            ChunkSection[] sections = ogChunk.getSectionArray();
+                            ChunkSection[] copies = IntStream.range(0, sections.length)
+                                    .mapToObj(i -> {
+                                        ChunkSection copy = new ChunkSection(world.sectionIndexToCoord(i),
+                                                world.getRegistryManager().get(Registry.BIOME_KEY));
+
+                                        PacketByteBuf serialized = PacketByteBufs.create();
+                                        sections[i].toPacket(serialized);
+                                        copy.fromPacket(serialized);
+                                        return copy;
+                                    })
+                                    .toArray(ChunkSection[]::new);
+
+                            ChunkSection[] auSec = auChunk.getSectionArray();
+                            System.arraycopy(copies, 0, auSec, 0, Math.min(copies.length, auSec.length));
+
+                            // Copy light for every section.
+                            if (!someModMessedUpLight)
+                                for (int y = auWorld.getBottomY(); y < auWorld.getTopY(); y += 16) {
+                                    long cPos = ChunkSectionPos.toLong(new BlockPos(cX * 16, y, cZ * 16));
+                                    ChunkNibbleArray a;
+                                    a = ogBlockLightStorage.get(cPos);
+                                    if (a != null) auBlockLightStorage.put(cPos, a);
+
+                                    a = ogUncachedBlockLightStorage.get(cPos);
+                                    if (a != null) auUncachedBlockLightStorage.put(cPos, a);
+
+                                    a = ogSkyLightStorage.get(cPos);
+                                    if (a != null) auSkyLightStorage.put(cPos, a);
+
+                                    a = ogUncachedSkyLightStorage.get(cPos);
+                                    if (a != null) auUncachedSkyLightStorage.put(cPos, a);
+                                }
+                        }
+                    }
+
+                    for (BlockPos pos : BlockPos.iterate(new BlockPos(origin.getStartX() - 3 * 16, world.getBottomY(), origin.getStartZ() - 3 * 16),
+                            new BlockPos(origin.getEndX() + 3 * 16, world.getTopY(), origin.getEndZ() + 3 * 16))) {
+                        auWorld.removeBlockEntity(pos); // Ensure the old one is gone.
+                        auWorld.getBlockEntity(pos); // Creates the BE if it does not yet exist while there should be one.
+
+                        // If some mod felt the need to overwrite the light system,
+                        // they have probably improved the efficiency of this method.
+                        // Thus, it should theoretically be fine to call this for every block.
+                        if (someModMessedUpLight) auWorld.getLightingProvider().checkBlock(pos);
+                    }
+
+                    List<LivingEntity> toHop = new ArrayList<>(entities);
+                    toHop.add(user);
+                    int heightOffset = auWorld.getHeight() - world.getHeight();
+                    for (LivingEntity entity : toHop)
+                        JCraft.dimensionHop(entity, heightOffset / 2);
                 }
-
-                for (BlockPos pos : BlockPos.iterate(new BlockPos(origin.getStartX() - 3 * 16, world.getBottomY(), origin.getStartZ() - 3 * 16),
-                        new BlockPos(origin.getEndX() + 3 * 16, world.getTopY(), origin.getEndZ() + 3 * 16))) {
-                    auWorld.removeBlockEntity(pos); // Ensure the old one is gone.
-                    auWorld.getBlockEntity(pos); // Creates the BE if it does not yet exist while there should be one.
-
-                    // If some mod felt the need to overwrite the light system,
-                    // they have probably improved the efficiency of this method.
-                    // Thus, it should theoretically be fine to call this for every block.
-                    if (someModMessedUpLight) auWorld.getLightingProvider().checkBlock(pos);
-                }
-
-                List<LivingEntity> toHop = new ArrayList<>(entities);
-                toHop.add(user);
-                int heightOffset = auWorld.getHeight() - world.getHeight();
-                for (LivingEntity entity : toHop)
-                    JCraft.dimensionHop(entity, heightOffset / 2);
             }
             case (4) -> {
                 if (!entities.isEmpty()) {
