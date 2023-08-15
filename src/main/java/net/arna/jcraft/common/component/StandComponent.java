@@ -8,7 +8,11 @@ import org.jetbrains.annotations.Nullable;
 
 public interface StandComponent extends Component, AutoSyncedComponent {
     @Nullable StandType getType();
-    void setType(@Nullable StandType type);
+    default void setType(@Nullable StandType type) {
+        setTypeAndSkin(type, 0);
+    }
+
+    void setTypeAndSkin(@Nullable StandType type, int skin);
 
     int getSkin();
     void setSkin(int skin);

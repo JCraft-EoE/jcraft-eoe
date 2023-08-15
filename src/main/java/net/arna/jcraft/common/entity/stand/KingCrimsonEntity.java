@@ -527,8 +527,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
 
     private void summonFakeKC() {
         StandComponent standData = JComponents.getStandData(doppelganger);
-        standData.setType(getStandType());
-        standData.setSkin(getSkin());
+        standData.setTypeAndSkin(getStandType(), getSkin());
 
         StandEntity<?, ?> clone = JCraft.summon(world, doppelganger);
         if (clone == null) return;

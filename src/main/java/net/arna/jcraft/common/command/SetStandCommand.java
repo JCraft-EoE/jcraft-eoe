@@ -45,8 +45,7 @@ public class SetStandCommand {
         for (Entity entity : targets) {
             if (entity instanceof LivingEntity livingEntity) {
                 StandComponent standData = JComponents.getStandData(livingEntity);
-                standData.setType(type);
-                standData.setSkin(skin);
+                standData.setTypeAndSkin(type, skin);
 
                 livingEntity.detach();
                 summon(entity.getWorld(), livingEntity);

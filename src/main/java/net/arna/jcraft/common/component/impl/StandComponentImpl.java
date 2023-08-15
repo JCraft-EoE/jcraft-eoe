@@ -26,9 +26,9 @@ public class StandComponentImpl implements StandComponent {
     }
 
     @Override
-    public void setType(@Nullable StandType type) {
+    public void setTypeAndSkin(@Nullable StandType type, int skin) {
         this.type = type;
-        if (type == null) skin = 0;
+        this.skin = 0;
         sync();
     }
 

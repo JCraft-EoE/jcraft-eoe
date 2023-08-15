@@ -39,7 +39,6 @@ public class RequiemArrowItem extends Item {
 
         StandComponent standData = JComponents.getStandData(user);
         if (standData.getType() == StandType.GOLD_EXPERIENCE) {
-            if (!user.isCreative()) itemStack.decrement(1);
             standData.setType(StandType.GOLD_EXPERIENCE_REQUIEM);
             if (!user.isCreative()) itemStack.decrement(1);
         }

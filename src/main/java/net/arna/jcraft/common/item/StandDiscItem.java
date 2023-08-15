@@ -69,8 +69,7 @@ public class StandDiscItem extends Item {
         if (data.contains("StandID", NbtElement.INT_TYPE)) itemStand = StandType.fromId(data.getInt("StandID"));
         if (data.contains("Skin", NbtElement.INT_TYPE)) itemSkin = data.getInt("Skin");
 
-        standData.setType(itemStand);
-        standData.setSkin(itemSkin);
+        standData.setTypeAndSkin(itemStand, itemSkin);
         data.putInt("StandID", userStand == null ? 0 : userStand.getId());
         data.putInt("Skin", userSkin);
 
