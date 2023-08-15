@@ -1,11 +1,8 @@
 package net.arna.jcraft.client.util;
 
 import net.arna.jcraft.client.model.entity.StandEntityModel;
-import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.DimValues;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
@@ -15,7 +12,6 @@ import software.bernie.geckolib3.core.processor.IBone;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static net.arna.jcraft.common.util.JUtils.deltaPos;
 
@@ -99,17 +95,5 @@ public class JClientUtils {
                 head.setRotationX(headPitch + hPO);
             }
         }
-    }
-
-    public static boolean shouldNotRenderClone(PlayerCloneEntity clone) {
-        if (clone.shouldRenderForMaster()) return false;
-
-        ClientPlayerEntity player = MinecraftClient.getInstance().player;
-        if (player != null) {
-            UUID masterId = clone.getMasterId();
-            if (masterId == null) return false;
-            return masterId.equals(player.getUuid());
-        }
-        return false;
     }
 }

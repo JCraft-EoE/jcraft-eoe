@@ -2,7 +2,6 @@ package net.arna.jcraft.client.mixin;
 
 import net.arna.jcraft.client.renderer.entity.PlayerCloneRenderer;
 import net.arna.jcraft.client.rendering.CloneSkinTracker;
-import net.arna.jcraft.client.util.JClientUtils;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.render.Frustum;
@@ -12,6 +11,7 @@ import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.entity.Entity;
 import net.minecraft.resource.ResourceManager;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,7 +23,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Mixin(EntityRenderDispatcher.class)
-public class EntityRenderDispatcherMixin {
+public abstract class EntityRenderDispatcherMixin {
+    @Shadow public abstract <T extends Entity> EntityRenderer<? super T> getRenderer(T entity);
+
     private final @Unique Map<String, PlayerCloneRenderer> cloneRenderers = new HashMap<>();
 
     @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
@@ -36,13 +38,13 @@ public class EntityRenderDispatcherMixin {
             }
 
             // Do not render PlayerCloneEntity (fated self) if it's a Time Erase clone and the user is the viewer
-            if (e instanceof PlayerCloneEntity clone && JClientUtils.shouldNotRenderClone(clone)) {
-                cir.cancel();
+            if (e instanceof PlayerCloneEntity clone && !getRenderer(clone).shouldRender(clone, frustum, x, y, z)) {
+                cir.setReturnValue(false);
                 return;
             }
 
             if (JUtils.shouldNotRender(e)) {
-                cir.cancel();
+                cir.setReturnValue(false);
                 return;
             }
 
