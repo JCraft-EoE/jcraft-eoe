@@ -50,7 +50,7 @@ public enum StandType {
     THE_WORLD_OVER_HEAVEN(JEntityTypeRegistry.THE_WORLD_OVER_HEAVEN, TheWorldOverHeavenEntity::new, "twoh", true,   // -3
             Text.literal("Shooting Star"), Text.literal("Above the Clouds"), Text.literal("Dirt to Divinity")),
     KILLER_QUEEN_BITES_THE_DUST(JEntityTypeRegistry.KILLER_QUEEN_BITES_THE_DUST, KQBTDEntity::new, "kqbtd",true,    // -4
-            Text.literal("Gelatin"), Text.literal("Veiled"), Text.literal("Garf")),
+            Text.literal("Veiled"), Text.literal("Back from the Dead"), Text.literal("Garf")),
     GOLD_EXPERIENCE_REQUIEM(JEntityTypeRegistry.GER, GEREntity::new, "ger", true,                                   // -5
             Text.literal("Energized"), Text.literal("Manga"), Text.literal("Silver")),
     STAR_PLATINUM_THE_WORLD(JEntityTypeRegistry.SPTW, SPTWEntity::new, "sptw", true,                                // -6

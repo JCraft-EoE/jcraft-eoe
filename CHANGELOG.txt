@@ -1644,11 +1644,23 @@ Killer Queen: Bites the Dust
 
 ● 17/8/2023
 >Fixed block breaking not working
+>Fixed barrage clashing not working
 
 D4C
     >Increased hitbox size (1.5->1.75) for Dimensional Hop
 
+Killer Queen
+    >Added icons
+
+Magician's Red
+    >Added icons
+
+Gold Experience
+    >Added icons
+
 Killer Queen: Bites the Dust
+    >Added icons
+    >Updated skins 1 and 2
     >Bites the Dust moved from Special 3 to Ultimate
     >New Special 3 - Takedown
     >Taught the AI how to use KQ:BtD

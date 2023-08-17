@@ -997,7 +997,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                         List<LivingEntity> clashed = new ArrayList<>();
 
                         for (LivingEntity livingEntity : hurt) {
-                            if (livingEntity instanceof StandEntity<?, ?> stand) {
+                            StandEntity<?, ?> stand = JUtils.getStand(livingEntity);
+                            if (stand != null) {
                                 // Barrage clashing
                                 if (isBarrage && stand.curAttack != null && stand.curAttack.attackType == AttackType.BARRAGE) {
                                     // Override stun with high priority 0.5s stun, also stops all current sounds for cleaner audio cue
@@ -1014,10 +1015,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                                     // Cancels both barrages
                                     cancelAttack();
                                     stand.cancelAttack();
+
                                     Vec3d midPos = stand.getPos().add(getPos()).multiply(0.5);
-                                    this.world.playSound(null, midPos.x, midPos.y, midPos.z, JSoundRegistry.IMPACT_1, SoundCategory.NEUTRAL, 1, 0.5f);
+                                    world.playSound(null, midPos.x, midPos.y, midPos.z, JSoundRegistry.IMPACT_1, SoundCategory.NEUTRAL, 1, 0.5f);
                                 }
-                                continue;
                             }
 
                             damageLogic(world, livingEntity, kbVec, stunTicks, attack.stunType.ordinal(), attack.overrideStun,
@@ -1031,7 +1032,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                         }
                     }
 
-                    this.specialAttack(attack, hurt);
+                    specialAttack(attack, hurt);
                 }
                 /*
                 else {

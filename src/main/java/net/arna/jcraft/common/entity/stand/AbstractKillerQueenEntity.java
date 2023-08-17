@@ -194,6 +194,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
     @Override
     public MoveSelectionResult specificMoveSelectionCriterion(Attack attack, MobEntity mob, LivingEntity target, int stunTicks,
                                                               int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand, Attack enemyAttack) {
+        if (enemyStand != null && enemyStand.blocking) return MoveSelectionResult.STOP;
         Vec3d bombPos = getBombPos();
         return bombPos != null && attack == detonate && target.squaredDistanceTo(bombPos) < 9.0D ?
                 MoveSelectionResult.USE : MoveSelectionResult.PASS;

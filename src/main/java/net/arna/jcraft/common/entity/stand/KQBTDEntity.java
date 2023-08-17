@@ -369,12 +369,12 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
 
     @Override
     public MoveSelectionResult specificMoveSelectionCriterion(Attack attack, MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand, Attack enemyAttack) {
-        Vec3d bombPos = this.getBombPos();
-        if (attack == detonate && bombPos != null && target.squaredDistanceTo(bombPos) < 9.0D) {
+        if (enemyStand != null && enemyStand.blocking) return MoveSelectionResult.STOP;
+        Vec3d bombPos = getBombPos();
+        if (attack == detonate && bombPos != null && target.squaredDistanceTo(bombPos) < 9.0D)
             return MoveSelectionResult.USE;
-        } else if (attack == btdplant && btdEntity != null) {
+        if (attack == btdplant && btdEntity != null)
             return MoveSelectionResult.USE;
-        }
         return MoveSelectionResult.PASS;
     }
 
