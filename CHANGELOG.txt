@@ -1642,6 +1642,17 @@ Killer Queen: Bites the Dust
     >Fixed detonation bug
     >Standardized explosion damage (to 5.5 hearts), knockback, hitbox size
 
+● 17/8/2023
+>Fixed block breaking not working
+
+D4C
+    >Increased hitbox size (1.5->1.75) for Dimensional Hop
+
+Killer Queen: Bites the Dust
+    >Bites the Dust moved from Special 3 to Ultimate
+    >New Special 3 - Takedown
+    >Taught the AI how to use KQ:BtD
+
 priority (top to bottom)
 todo: GE life giver changes
 

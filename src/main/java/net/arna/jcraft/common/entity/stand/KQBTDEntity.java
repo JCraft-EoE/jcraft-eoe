@@ -3,6 +3,7 @@ package net.arna.jcraft.common.entity.stand;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.Attack;
 import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.attack.StunType;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.projectile.BubbleProjectile;
@@ -56,6 +57,12 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
             .setBlockstun(8)
             .setInfo("Bites the Dust Plant", "press the same button to detonate, sending the affected enemy back to their previous location");
     private static final Attack counterMiss = new Attack(8, 0, 15, 16, 1, AttackType.BOX);
+    public static final Attack grab = new Attack(9, 22, 0.75f, 28, 12, 1.75, 0, 0.1f, AttackType.BOX, 1f)
+            .setGrab()
+            .setInfo("Takedown", "high damage grab");
+    public static final Attack grabhit = new Attack(10, 0, 0.75f, 42, 0, 2, 5f, 0f, AttackType.MULTIHIT, 0.75f, 0.5f, List.of(8, 22, 32), JSoundRegistry.IMPACT_1)
+            .setStunType(StunType.UNBURSTABLE)
+            .setInfo("Takedown (Hit)", "");
 
     private BubbleProjectile bubbleProjectile;
     private Entity btdEntity;
@@ -90,7 +97,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                     the ol razzle dazzle
                     (Already bomb planted) M1~Low>Barrage>M1>Elbow>Detonate""";
 
-        moves = List.of(KillerQueenEntity.light, heavy, KillerQueenEntity.barrage, KillerQueenEntity.bombplant, Attack.unusable, bubble, btdplant
+        moves = List.of(KillerQueenEntity.light, heavy, KillerQueenEntity.barrage, KillerQueenEntity.bombplant, btdplant, bubble, grab
                 , new Attack().setMobility(MobilityType.DASH).setInfo("Explosive Dash", "slight aoe damage, 3D movement tool"));
 
         super.initialize();
@@ -139,12 +146,18 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
 
     @Override
     public void initUlt() {
-
+        if (!canAttack()) return;
+        if (btdEntity != null) {
+            super.detonate();
+            detonateBTD = true;
+        } else if (handleAttack(btdplant, CooldownType.STAND_ULT, State.BTD_PLANT)) {
+            //playSound(JSoundRegister.KQ_UPPERCUT, 1 ,1);
+        }
     }
 
     @Override
     public void initSpecial2() {
-        if (!canAttack() || !hasUser()) return;
+        if (!canAttack()) return;
         if (getUserOrThrow().isSneaking() && handleAttack(bubblecounter, CooldownType.STAND_SP2, State.BUBBLE_COUNTER)) {
             //playSound(JSoundRegister.KQBTD_COUNTER, 1, 1);
         } else if (handleAttack(bubble, CooldownType.STAND_SP2, State.BUBBLE))
@@ -153,15 +166,8 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
 
     @Override
     public void initSpecial3() {
-        if (btdEntity != null && handleAttack(detonate, CooldownType.STAND_ULT, State.DETONATE)) {
-            playSound(JSoundRegistry.KQ_DETONATE, 1, 1);
-            detonateBTD = true;
-            return;
-        }
         if (!canAttack()) return;
-        if (handleAttack(btdplant, CooldownType.STAND_SP3, State.BTD_PLANT)) {
-            //playSound(JSoundRegister.KQ_UPPERCUT, 1 ,1);
-        }
+        handleAttack(grab, CooldownType.STAND_SP3, State.GRAB);
     }
 
     @Override
@@ -313,6 +319,20 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                 btdEntity = JUtils.getUserIfStand(entities.stream().findFirst().orElseThrow());
                 btdPos = btdEntity.getPos();
             }
+            case (9) -> {
+                if (entities.isEmpty()) return;
+
+                setAttack(grabhit, State.GRAB_HIT);
+            }
+            case (10) -> {
+                if (user == null) return;
+
+                if (getMoveStun() == 34)
+                    for (LivingEntity ent : entities)
+                        ent.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 40, 0, true, false, true));
+                if (getMoveStun() == 10)
+                    explode(user, getPos().subtract(0, 0.5, 0));
+            }
         }
     }
 
@@ -460,7 +480,9 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
         LOW(builder -> builder.playAndHold("animation.kqbtd.low")),
         BUBBLE_COUNTER(builder -> builder.playAndHold("animation.kqbtd.bubblecounter")),
         COUNTER_MISS(builder -> builder.playAndHold("animation.kqbtd.counter_miss")),
-        BTD_PLANT(builder -> builder.playAndHold("animation.kqbtd.btdplant"));
+        BTD_PLANT(builder -> builder.playAndHold("animation.kqbtd.btdplant")),
+        GRAB(builder -> builder.playAndHold("animation.kqbtd.grab")),
+        GRAB_HIT(builder -> builder.playAndHold("animation.kqbtd.grab_hit"));
 
         private final Consumer<AnimationBuilder> animator;
 

@@ -1358,7 +1358,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     @Override
     public boolean isInvulnerableTo(DamageSource damageSource) {
-        return true;
+        return !damageSource.isOutOfWorld();
     }
 
     @Override

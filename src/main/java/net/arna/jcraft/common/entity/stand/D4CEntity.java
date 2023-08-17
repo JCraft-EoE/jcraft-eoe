@@ -59,7 +59,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             .hyperArmor()
             .setLaunch()
             .setInfo("Charge", "user & stand charge forward, uninterruptable launcher");
-    public static final Attack dimhop_others = new Attack(3, 60, 1, 60, 40, 1.5, 0f, 0.0f, AttackType.BOX)
+    public static final Attack dimhop_others = new Attack(3, 60, 1, 60, 40, 1.75, 0f, 0.0f, AttackType.BOX)
             .setInfo("Dimensional Hop", "travels to a random dimension at exact coordinates, if user was hit in the last 30s, he is forced back, certified death button");
 
     public static final Attack givegun = new Attack(6, 25, 14, 10, 0, 0.75f, AttackType.BOX)
