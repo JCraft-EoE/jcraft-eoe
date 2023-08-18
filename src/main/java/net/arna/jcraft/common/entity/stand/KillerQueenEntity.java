@@ -12,15 +12,11 @@ import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
-import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -67,52 +63,28 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
     }
 
     // Move-set
-
-
     @Override
     public void initMove(MoveType type) {
         if (!hasUser()) return;
 
-        switch (type) {
-            case SPECIAL1 -> {
-                LivingEntity user = getUserOrThrow();
-                CooldownsComponent cooldowns = JComponents.getCooldowns(user);
-                if (user.isInSneakingPose() && cooldowns.getCooldown(CooldownType.STAND_SP1) < 1) {
-                    Block downBlock = world.getBlockState(user.getBlockPos().down()).getBlock();
-                    boolean notAir = downBlock != Blocks.AIR && downBlock != Blocks.CAVE_AIR && downBlock != Blocks.VOID_AIR;
-                    if (notAir) {
-                        bombEntity = null;
-                        bombBlock = user.getPos().add(0, -0.5, 0);
-                        cooldowns.setCooldown(CooldownType.STAND_SP1, BOMB_PLANT.getCooldown());
-                    }
-                } else {
-                    handleAttack(MoveType.SPECIAL1);
-                    bombBlock = null;
+        if (type == MoveType.SPECIAL1) {
+            LivingEntity user = getUserOrThrow();
+            CooldownsComponent cooldowns = JComponents.getCooldowns(user);
+            if (user.isInSneakingPose() && cooldowns.getCooldown(CooldownType.STAND_SP1) < 1) {
+                Block downBlock = world.getBlockState(user.getBlockPos().down()).getBlock();
+                boolean notAir = downBlock != Blocks.AIR && downBlock != Blocks.CAVE_AIR && downBlock != Blocks.VOID_AIR;
+                if (notAir) {
+                    bombEntity = null;
+                    bombBlock = user.getPos().add(0, -0.5, 0);
+                    cooldowns.setCooldown(CooldownType.STAND_SP1, BOMB_PLANT.getCooldown());
                 }
-
-                if (coin != null) coin.discard();
-            }
-            case SPECIAL3 -> {
-                LivingEntity user = getUserOrThrow();
-                CooldownsComponent cooldowns = JComponents.getCooldowns(user);
-                if (cooldowns.getCooldown(CooldownType.STAND_SP3) > 0) return;
-                cooldowns.setCooldown(CooldownType.STAND_SP3, 500); // 25s coin toss cd
-
-                Vec3d lookVec = user.getRotationVector().multiply(0.75);
-                if (coin != null) coin.discard();
-                coin = new ItemEntity(world, user.getX(), user.getY() + user.getHeight() * 2 / 3, user.getZ(),
-                        new ItemStack(JObjectRegistry.KQ_COIN, 1), lookVec.x, lookVec.y, lookVec.z);
-                coin.setPickupDelayInfinite();
-
-                world.spawnEntity(coin);
-
-                bombEntity = coin;
+            } else {
+                handleAttack(MoveType.SPECIAL1);
                 bombBlock = null;
-
-                playSound(JSoundRegistry.COIN_TOSS, 1, 1);
             }
-            default -> super.initMove(type);
-        }
+
+            if (coin != null) coin.discard();
+        } else super.initMove(type);
     }
 
     // Animations
