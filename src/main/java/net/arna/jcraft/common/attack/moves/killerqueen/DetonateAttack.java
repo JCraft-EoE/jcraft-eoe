@@ -1,8 +1,8 @@
 package net.arna.jcraft.common.attack.moves.killerqueen;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.attack.core.base.AbstractMove;
-import net.arna.jcraft.common.attack.core.base.AbstractSimpleAttack;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
+import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.stand.AbstractKillerQueenEntity;
@@ -23,8 +23,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 
 public class DetonateAttack extends AbstractMove<DetonateAttack, AbstractKillerQueenEntity<?, ?>> {
-    public DetonateAttack(int cooldown, int windup, int moveStunTicks, float moveDistance) {
-        super(cooldown, windup, moveStunTicks, moveDistance);
+    public DetonateAttack(int cooldown, int windup, int duration, float moveDistance) {
+        super(cooldown, windup, duration, moveDistance);
     }
 
     @Override

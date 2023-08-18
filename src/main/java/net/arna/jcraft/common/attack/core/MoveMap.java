@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.attack.core;
 
 import lombok.Getter;
-import net.arna.jcraft.common.attack.core.base.AbstractMove;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.StandAnimationState;

@@ -2,7 +2,7 @@ package net.arna.jcraft.common.attack.moves.magiciansred;
 
 import net.arna.jcraft.common.attack.core.ctx.IntMoveVariable;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
-import net.arna.jcraft.common.attack.core.base.AbstractMove;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.core.ctx.MoveVariable;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.stand.MagiciansRedEntity;
@@ -30,15 +30,15 @@ public class CrossfireHurricaneAttack extends AbstractMove<CrossfireHurricaneAtt
     public static final IntMoveVariable HURRICANE_TIME = new IntMoveVariable();
     public static final MoveVariable<Vec3d> HURRICANE_POS = new MoveVariable<>(Vec3d.class);
 
-    public CrossfireHurricaneAttack(int cooldown, int windup, int moveStunTicks, float moveDistance) {
-        super(cooldown, windup, moveStunTicks, moveDistance);
+    public CrossfireHurricaneAttack(int cooldown, int windup, int duration, float moveDistance) {
+        super(cooldown, windup, duration, moveDistance);
     }
 
     @Override
     public @NotNull Set<LivingEntity> perform(MagiciansRedEntity stand, LivingEntity user, MoveContext ctx) {
         ctx.setInt(HURRICANE_TIME, 50);
         ctx.set(HURRICANE_POS, stand.getPos());
-        return super.perform(stand, user, ctx);
+        return Set.of();
     }
 
     public void tickHurricane(MagiciansRedEntity stand) {

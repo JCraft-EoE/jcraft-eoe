@@ -22,12 +22,22 @@ public class MoveContext {
         return entry.getIntValue();
     }
 
+    public boolean getBoolean(BooleanMoveVariable variable) {
+        BooleanMoveVariable.BooleanEntry entry = (BooleanMoveVariable.BooleanEntry) getEntry(variable);
+        return entry.getBooleanValue();
+    }
+
     public <T> void set(MoveVariable<T> variable, T value) {
         getEntry(variable).setValue(value);
     }
 
     public void setInt(IntMoveVariable variable, int value) {
         IntMoveVariable.IntEntry entry = (IntMoveVariable.IntEntry) getEntry(variable);
+        entry.setValue(value);
+    }
+
+    public void setBoolean(BooleanMoveVariable variable, boolean value) {
+        BooleanMoveVariable.BooleanEntry entry = (BooleanMoveVariable.BooleanEntry) getEntry(variable);
         entry.setValue(value);
     }
 

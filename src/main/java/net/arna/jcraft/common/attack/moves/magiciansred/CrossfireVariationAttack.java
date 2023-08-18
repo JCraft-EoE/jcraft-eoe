@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.attack.moves.magiciansred;
 
-import net.arna.jcraft.common.attack.core.base.AbstractMove;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.entity.projectile.AnkhProjectile;
 import net.arna.jcraft.common.entity.stand.MagiciansRedEntity;

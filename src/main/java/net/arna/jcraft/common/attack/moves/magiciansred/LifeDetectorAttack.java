@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.attack.moves.magiciansred;
 
-import net.arna.jcraft.common.attack.core.base.AbstractMove;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.entity.projectile.LifeDetectorEntity;
 import net.arna.jcraft.common.entity.stand.MagiciansRedEntity;
@@ -11,8 +11,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 
 public class LifeDetectorAttack extends AbstractMove<LifeDetectorAttack, MagiciansRedEntity> {
-    public LifeDetectorAttack(int cooldown, int windup, int moveStunTicks, float moveDistance) {
-        super(cooldown, windup, moveStunTicks, moveDistance);
+    public LifeDetectorAttack(int cooldown, int windup, int duration, float moveDistance) {
+        super(cooldown, windup, duration, moveDistance);
         ranged = true;
     }
 
@@ -23,7 +23,7 @@ public class LifeDetectorAttack extends AbstractMove<LifeDetectorAttack, Magicia
         lifeDetector.refreshPositionAndAngles(stand.getX(), stand.getY() + 1.5, stand.getZ(), stand.getYaw(), stand.getPitch());
         stand.world.spawnEntity(lifeDetector);
 
-        return super.perform(stand, user, ctx);
+        return Set.of();
     }
 
     @Override

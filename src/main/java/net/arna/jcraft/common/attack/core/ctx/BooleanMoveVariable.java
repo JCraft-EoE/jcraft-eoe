@@ -1,7 +1,5 @@
 package net.arna.jcraft.common.attack.core.ctx;
 
-import lombok.Getter;
-
 public class BooleanMoveVariable extends MoveVariable<Boolean> {
     public BooleanMoveVariable() {
         super(boolean.class);
@@ -12,12 +10,15 @@ public class BooleanMoveVariable extends MoveVariable<Boolean> {
         return super.createEntry();
     }
 
-    @Getter
     public static class BooleanEntry extends MoveContext.Entry<Boolean> {
         private boolean booleanValue;
 
         public BooleanEntry() {
             super(boolean.class);
+        }
+
+        public boolean getBooleanValue() {
+            return booleanValue;
         }
 
         public void setValue(boolean value) {

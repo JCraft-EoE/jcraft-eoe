@@ -5,7 +5,7 @@ import net.arna.jcraft.common.attack.core.BlockableType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.StunType;
-import net.arna.jcraft.common.attack.core.base.AbstractMove;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.killerqueen.BombPlantAttack;
 import net.arna.jcraft.common.attack.moves.killerqueen.bitesthedust.*;
 import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
@@ -51,6 +51,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
             .withSound(JSoundRegistry.KQ_DETONATE)
             .withInfo(Text.literal("Detonate"), Text.empty());
     public static final BTDPlantAttack BTD_PLANT = new BTDPlantAttack(1000, 14, 24, 1f, 1.5f, 0f)
+            .withStun(10)
             .withBlockableType(BlockableType.NON_BLOCKABLE)
             .withBlockStun(8)
             .withInfo(Text.literal("Bites the Dust Plant"), Text.literal("press the same button to detonate, sending the affected enemy back to their previous location"));
@@ -136,7 +137,8 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
     public MoveSelectionResult specificMoveSelectionCriterion(AbstractMove<?, ? super KQBTDEntity> attack, MobEntity mob,
                                                               LivingEntity target, int stunTicks, int enemyMoveStun,
                                                               double distance, StandEntity<?, ?> enemyStand, AbstractMove<?, ?> enemyAttack) {
-                    if (enemyStand != null && enemyStand.blocking) return MoveSelectionResult.STOP;
+        if (enemyStand != null && enemyStand.blocking) return MoveSelectionResult.STOP;
+
         Vec3d bombPos = this.getBombPos();
         if (attack == DETONATE && bombPos != null && target.squaredDistanceTo(bombPos) < 9.0D) {
             return MoveSelectionResult.USE;

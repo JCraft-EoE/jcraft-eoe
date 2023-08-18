@@ -206,7 +206,7 @@ public class JCraft implements ModInitializer {
         stacks.add(new ItemStack(JObjectRegistry.JOTAROPANTS));
         stacks.add(new ItemStack(JObjectRegistry.JOTAROBOOTS));
 
-        stacks.add(new ItemStack(JObjectRegistry.KQCOIN));
+        stacks.add(new ItemStack(JObjectRegistry.KQ_COIN));
         stacks.add(new ItemStack(JObjectRegistry.FOOLISH_SAND_BLOCK.asItem()));
 
         stacks.add(new ItemStack(JObjectRegistry.CINDERELLA_MASK));

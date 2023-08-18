@@ -4,9 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.*;
-import net.arna.jcraft.common.attack.core.base.AbstractBarrageAttack;
-import net.arna.jcraft.common.attack.core.base.AbstractMove;
-import net.arna.jcraft.common.attack.core.base.AbstractSimpleAttack;
+import net.arna.jcraft.common.attack.moves.base.AbstractBarrageAttack;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
+import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.core.old.Attack;
 import net.arna.jcraft.common.attack.core.old.AttackQueue;
@@ -588,7 +588,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      */
     public void setAttack(AbstractMove<?, ? super E> attack, @Nullable S animState) {
         curAttack = attack;
-        setMoveStun(attack.getMoveStun());
+        setMoveStun(attack.getDuration());
         if (animState != null) this.setState(animState);
         armorPoints = attack.getArmor();
     }
@@ -890,7 +890,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 int stunTicks = 0;
                 //LOGGER.info("Stun ticks: " + stunTicks);
 
-                int moveStun = attack.getMoveStun();
+                int moveStun = attack.getDuration();
                 float attackDist = attack.getMoveDistance();
 
                 int realInitTime = (moveStun - attack.getWindup());
@@ -1120,7 +1120,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             AbstractMove<?, ?> standAttack = stand.curAttack;
             if (standAttack != null) {
                 // Counter check
-                if (!tsHit && standAttack.attackType == AttackType.COUNTER && stand.getMoveStun() < (standAttack.getMoveStun() - standAttack.getWindup())) {
+                if (!tsHit && standAttack.attackType == AttackType.COUNTER && stand.getMoveStun() < (standAttack.getDuration() - standAttack.getWindup())) {
                     stand.counter(attacker, source);
                     ent.removeStatusEffect(JStatusRegistry.DAZED);
                     return;
@@ -1474,7 +1474,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 selectedAttack = curAttack.getFollowUp();
         } else {
             selectedAttack = moveMap.getMove(MoveType.LIGHT).attack();
-            int selectedAttackInitTime = selectedAttack.getMoveStun() - selectedAttack.getWindup();
+            int selectedAttackInitTime = selectedAttack.getDuration() - selectedAttack.getWindup();
 
             for (MoveMap.Entry<E, S> entry : moveMap) {
                 AbstractMove<?, ? super E> attack = entry.attack();
@@ -1549,7 +1549,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 }
 
                 // If the opponent is out of exactly twice the range it would take him to get to the user within the move being complete, use a projectile
-                if (attack.isRanged() && distance > attack.getMoveStun() * target.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED) * 2) {
+                if (attack.isRanged() && distance > attack.getDuration() * target.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED) * 2) {
                     mob.lookAt(EntityAnchor.EYES, target.getEyePos());
                     selectedAttack = attack;
                     break;

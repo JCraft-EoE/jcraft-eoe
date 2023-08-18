@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.attack.moves.magiciansred;
 
-import net.arna.jcraft.common.attack.core.base.AbstractMove;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.entity.projectile.AnkhProjectile;
 import net.arna.jcraft.common.entity.stand.MagiciansRedEntity;
@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Set;
 
 public class RedirectAttack extends AbstractMove<RedirectAttack, MagiciansRedEntity> {
-    public RedirectAttack(int cooldown, int windup, int moveStunTicks, float moveDistance) {
-        super(cooldown, windup, moveStunTicks, moveDistance);
+    public RedirectAttack(int cooldown, int windup, int duration, float moveDistance) {
+        super(cooldown, windup, duration, moveDistance);
         mobilityType = MobilityType.TELEPORT; // this is a LIE, it just tells the AI to use it at a range of >3m
     }
 
@@ -37,7 +37,7 @@ public class RedirectAttack extends AbstractMove<RedirectAttack, MagiciansRedEnt
             }
         }
 
-        return super.perform(stand, user, ctx);
+        return Set.of();
     }
 
     @Override

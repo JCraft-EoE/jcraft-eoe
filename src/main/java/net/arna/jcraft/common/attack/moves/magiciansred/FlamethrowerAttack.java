@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.attack.moves.magiciansred;
 
-import net.arna.jcraft.common.attack.core.base.AbstractBarrageAttack;
+import net.arna.jcraft.common.attack.moves.base.AbstractBarrageAttack;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.entity.stand.MagiciansRedEntity;
 import net.minecraft.entity.LivingEntity;
@@ -11,8 +11,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 
 public class FlamethrowerAttack extends AbstractBarrageAttack<FlamethrowerAttack, MagiciansRedEntity> {
-    public FlamethrowerAttack(int cooldown, int windup, int moveStunTicks, float damage, float hitBoxSize, float knockBack, float range, float offset, int interval) {
-        super(cooldown, windup, moveStunTicks, range, damage, hitBoxSize, knockBack, offset, interval);
+    public FlamethrowerAttack(int cooldown, int windup, int duration, float damage, float hitBoxSize, float knockBack,
+                              float range, float offset, int interval) {
+        super(cooldown, windup, duration, range, damage, hitBoxSize, knockBack, offset, interval);
     }
 
     @Override

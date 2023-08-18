@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.attack.moves.magiciansred;
 
-import net.arna.jcraft.common.attack.core.base.AbstractMove;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.entity.projectile.AnkhProjectile;
 import net.arna.jcraft.common.entity.stand.MagiciansRedEntity;
@@ -10,8 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 
 public class CrossfireAttack extends AbstractMove<CrossfireAttack, MagiciansRedEntity> {
-    public CrossfireAttack(int cooldown, int windup, int moveStunTicks, float attackDistance) {
-        super(cooldown, windup, moveStunTicks, attackDistance);
+    public CrossfireAttack(int cooldown, int windup, int duration, float attackDistance) {
+        super(cooldown, windup, duration, attackDistance);
         ranged = true;
     }
 
@@ -24,7 +24,7 @@ public class CrossfireAttack extends AbstractMove<CrossfireAttack, MagiciansRedE
             stand.world.spawnEntity(ankh);
         }
 
-        return super.perform(stand, user, ctx); // Play sound and return empty set.
+        return Set.of();
     }
 
     @Override

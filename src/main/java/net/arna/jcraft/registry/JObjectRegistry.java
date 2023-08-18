@@ -45,7 +45,7 @@ public interface JObjectRegistry {
 
     Item BULLET = register("bullet", new BulletItem(settings()));
 
-    Item KQCOIN = register("kq_coin", new KQCoinItem(settings()));
+    Item KQ_COIN = register("kq_coin", new KQCoinItem(settings()));
 
     Item GREENBABY = register("green_baby", new GreenBabyItem(settings().rarity(Rarity.RARE)));
 

@@ -1,4 +1,4 @@
-package net.arna.jcraft.common.attack.core.base;
+package net.arna.jcraft.common.attack.moves.base;
 
 import it.unimi.dsi.fastutil.ints.*;
 import lombok.NonNull;
@@ -15,9 +15,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class AbstractMultiHitAttack<T extends AbstractMultiHitAttack<T, S>, S extends StandEntity<?, ?>> extends AbstractSimpleAttack<T, S> {
     private final IntSortedSet hitMoments;
 
-    protected AbstractMultiHitAttack(int cooldown, int moveStunTicks, float attackDistance, float damage, float hitBoxSize, float knockBack, float offset,
+    protected AbstractMultiHitAttack(int cooldown, int duration, float attackDistance, float damage, float hitBoxSize, float knockBack, float offset,
                                      @NonNull IntCollection hitMoments) {
-        super(cooldown, hitMoments.intStream().min().orElse(0), moveStunTicks, attackDistance, damage, hitBoxSize, knockBack, offset);
+        super(cooldown, hitMoments.intStream().min().orElse(0), duration, attackDistance, damage, hitBoxSize, knockBack, offset);
 
         // Ensure hitMoments is sorted
         IntSortedSet intermediary = new IntLinkedOpenHashSet();
@@ -29,12 +29,12 @@ public abstract class AbstractMultiHitAttack<T extends AbstractMultiHitAttack<T,
 
     @Override
     protected boolean shouldPerform(S stand) {
-        return stand.hasUser() && hitMoments.contains(getMoveStun() - stand.getMoveStun());
+        return stand.hasUser() && hitMoments.contains(getDuration() - stand.getMoveStun());
     }
 
     @Override
     public int getBlow(S stand) {
-        int tick = getMoveStun() - stand.getMoveStun();
+        int tick = getDuration() - stand.getMoveStun();
         AtomicInteger blow = new AtomicInteger(-1);
         hitMoments.forEach(i -> {
             if (i >= tick) blow.getAndIncrement();

@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.attack.moves.killerqueen.bitesthedust;
 
-import net.arna.jcraft.common.attack.core.base.AbstractSimpleAttack;
+import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.core.ctx.MoveVariable;
 import net.arna.jcraft.common.entity.stand.KQBTDEntity;
@@ -23,8 +23,8 @@ public class BTDPlantAttack extends AbstractSimpleAttack<BTDPlantAttack, KQBTDEn
     public static final MoveVariable<LivingEntity> BTD_ENTITY = new MoveVariable<>(LivingEntity.class);
     public static final MoveVariable<Vec3d> BTD_POS = new MoveVariable<>(Vec3d.class);
 
-    public BTDPlantAttack(int cooldown, int windup, int moveStunTicks, float attackDistance, float hitBoxSize, float offset) {
-        super(cooldown, windup, moveStunTicks, attackDistance, 0f, hitBoxSize, 0f, offset);
+    public BTDPlantAttack(int cooldown, int windup, int duration, float attackDistance, float hitBoxSize, float offset) {
+        super(cooldown, windup, duration, attackDistance, 0f, hitBoxSize, 0f, offset);
     }
 
     @Override

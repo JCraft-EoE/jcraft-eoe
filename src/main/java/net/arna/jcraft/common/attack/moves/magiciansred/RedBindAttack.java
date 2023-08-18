@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.attack.moves.magiciansred;
 
-import net.arna.jcraft.common.attack.core.base.AbstractSimpleAttack;
+import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.entity.projectile.RedBindEntity;
 import net.arna.jcraft.common.entity.stand.MagiciansRedEntity;
@@ -14,8 +14,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 
 public class RedBindAttack extends AbstractSimpleAttack<RedBindAttack, MagiciansRedEntity> {
-    public RedBindAttack(int cooldown, int windup, int moveStunTicks, float attackDistance, float damage, float hitBoxSize, float knockBack, float offset) {
-        super(cooldown, windup, moveStunTicks, attackDistance, damage, hitBoxSize, knockBack, offset);
+    public RedBindAttack(int cooldown, int windup, int duration, float attackDistance, float damage, float hitBoxSize,
+                         float knockBack, float offset) {
+        super(cooldown, windup, duration, attackDistance, damage, hitBoxSize, knockBack, offset);
     }
 
     @Override

@@ -5,7 +5,7 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.BlockableType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
-import net.arna.jcraft.common.attack.core.base.AbstractMove;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.core.old.Attack;
 import net.arna.jcraft.common.attack.core.old.AttackType;
 import net.arna.jcraft.common.attack.moves.killerqueen.BombPlantAttack;
@@ -101,9 +101,6 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
                     
                     -Confirm while bomb plant is on cd
                     M1>Barrage>Heavy(>Sheer Heart Attack)""";
-
-
-        //moves = List.of(light, heavy, barrage, bombplant, Attack.unusable, sha, new Attack().setRanged(true).setInfo("Coin Toss", "overrides current bomb with an aimable coin"), new Attack().setMobility(MobilityType.DASH).setInfo("Explosive Dash", "slight aoe damage, 3D movement tool"));
     }
 
     @Override

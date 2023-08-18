@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.attack.moves.shared;
 
-import net.arna.jcraft.common.attack.core.base.AbstractBarrageAttack;
+import net.arna.jcraft.common.attack.moves.base.AbstractBarrageAttack;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 
 /**
@@ -9,9 +9,9 @@ import net.arna.jcraft.common.entity.stand.StandEntity;
  */
 public class BarrageAttack<S extends StandEntity<?, ?>> extends AbstractBarrageAttack<BarrageAttack<S>, S> {
 
-    public BarrageAttack(int cooldown, int windup, int moveStunTicks, float attackDistance, float damage,
+    public BarrageAttack(int cooldown, int windup, int duration, float attackDistance, float damage,
                          float hitBoxSize, float knockBack, float offset, int interval) {
-        super(cooldown, windup, moveStunTicks, attackDistance, damage, hitBoxSize, knockBack, offset, interval);
+        super(cooldown, windup, duration, attackDistance, damage, hitBoxSize, knockBack, offset, interval);
     }
 
     @Override

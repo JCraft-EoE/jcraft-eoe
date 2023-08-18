@@ -1,4 +1,4 @@
-package net.arna.jcraft.common.attack.core.base;
+package net.arna.jcraft.common.attack.moves.base;
 
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
@@ -10,8 +10,8 @@ import net.minecraft.entity.damage.DamageSource;
 import java.util.Set;
 
 public abstract class AbstractCounterAttack<T extends AbstractCounterAttack<T, S>, S extends StandEntity<?, ?>> extends AbstractMove<T, S> {
-    protected AbstractCounterAttack(int cooldown, int windup, int moveStun, float moveDistance) {
-        super(cooldown, windup, moveStun, moveDistance);
+    protected AbstractCounterAttack(int cooldown, int windup, int duration, float moveDistance) {
+        super(cooldown, windup, duration, moveDistance);
         counter = true;
     }
 

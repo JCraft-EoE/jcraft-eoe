@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.attack.moves.killerqueen.bitesthedust;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.attack.core.base.AbstractMove;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.entity.stand.AbstractKillerQueenEntity;
 import net.arna.jcraft.common.util.JParticleType;
@@ -19,15 +19,15 @@ import java.util.List;
 import java.util.Set;
 
 public class BTDDetonateAttack extends AbstractMove<BTDDetonateAttack, AbstractKillerQueenEntity<?, ?>> {
-    public BTDDetonateAttack(int cooldown, int windup, int moveStunTicks, float moveDistance) {
-        super(cooldown, windup, moveStunTicks, moveDistance);
+    public BTDDetonateAttack(int cooldown, int windup, int duration, float moveDistance) {
+        super(cooldown, windup, duration, moveDistance);
     }
 
     @Override
     public @NotNull Set<LivingEntity> perform(AbstractKillerQueenEntity<?, ?> stand, LivingEntity user, MoveContext ctx) {
         LivingEntity btdEntity = ctx.get(BTDPlantAttack.BTD_ENTITY);
         Vec3d btdPos = ctx.get(BTDPlantAttack.BTD_POS);
-        if (btdEntity == null) return super.perform(stand, user, ctx);
+        if (btdEntity == null) return Set.of();
 
         stand.world.createExplosion(user, btdEntity.getX(), btdEntity.getY() + btdEntity.getHeight() / 2, btdEntity.getZ(), 2f, Explosion.DestructionType.NONE);
         btdEntity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0, true, false));
@@ -50,7 +50,7 @@ public class BTDDetonateAttack extends AbstractMove<BTDDetonateAttack, AbstractK
         ctx.set(BTDPlantAttack.BTD_ENTITY, null);
         ctx.set(BTDPlantAttack.BTD_POS, null);
 
-        return super.perform(stand, user, ctx);
+        return Set.of();
     }
 
     @Override

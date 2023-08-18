@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.attack.moves.shared;
 
 import it.unimi.dsi.fastutil.ints.IntCollection;
-import net.arna.jcraft.common.attack.core.base.AbstractMultiHitAttack;
+import net.arna.jcraft.common.attack.moves.base.AbstractMultiHitAttack;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 
 /**
@@ -10,8 +10,8 @@ import net.arna.jcraft.common.entity.stand.StandEntity;
  * @param <S>
  */
 public class SimpleMultiHitAttack<S extends StandEntity<?, ?>> extends AbstractMultiHitAttack<SimpleMultiHitAttack<S>, S> {
-    public SimpleMultiHitAttack(int cooldown, int moveStunTicks, float damage, float hitBoxSize, float knockBack, float range, float offset, IntCollection hitMoments) {
-        super(cooldown, moveStunTicks, range, damage, hitBoxSize, knockBack, offset, hitMoments);
+    public SimpleMultiHitAttack(int cooldown, int duration, float damage, float hitBoxSize, float knockBack, float range, float offset, IntCollection hitMoments) {
+        super(cooldown, duration, range, damage, hitBoxSize, knockBack, offset, hitMoments);
     }
 
     /**

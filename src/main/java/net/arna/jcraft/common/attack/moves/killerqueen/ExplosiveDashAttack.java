@@ -1,12 +1,9 @@
 package net.arna.jcraft.common.attack.moves.killerqueen;
 
 import lombok.NonNull;
-import net.arna.jcraft.common.attack.core.base.AbstractMove;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
-import net.arna.jcraft.common.component.CooldownsComponent;
-import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.entity.stand.AbstractKillerQueenEntity;
-import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Vec3d;
@@ -21,9 +18,6 @@ public class ExplosiveDashAttack extends AbstractMove<ExplosiveDashAttack, Abstr
 
     @Override
     public @NonNull Set<LivingEntity> perform(AbstractKillerQueenEntity<?, ?> stand, LivingEntity user, MoveContext ctx) {
-        CooldownsComponent cooldowns = JComponents.getCooldowns(user);
-        if (cooldowns.getCooldown(CooldownType.UTIL) > 0) return Set.of();
-
         Vec3d lookVec = user.getRotationVector().multiply(0.9);
         stand.world.createExplosion(user,
                 user.getX() - lookVec.x,
@@ -34,7 +28,6 @@ public class ExplosiveDashAttack extends AbstractMove<ExplosiveDashAttack, Abstr
         user.setVelocity(user.getVelocity().add(lookVec));
         user.velocityModified = true;
 
-        cooldowns.setCooldown(CooldownType.UTIL, getCooldown());
         stand.playSound(JSoundRegistry.KQ_DETONATE, 1, 1);
 
         return Set.of();

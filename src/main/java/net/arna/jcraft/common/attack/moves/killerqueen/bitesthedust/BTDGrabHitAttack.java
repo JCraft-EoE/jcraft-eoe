@@ -2,7 +2,7 @@ package net.arna.jcraft.common.attack.moves.killerqueen.bitesthedust;
 
 import it.unimi.dsi.fastutil.ints.IntCollection;
 import lombok.NonNull;
-import net.arna.jcraft.common.attack.core.base.AbstractMultiHitAttack;
+import net.arna.jcraft.common.attack.moves.base.AbstractMultiHitAttack;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.killerqueen.DetonateAttack;
 import net.arna.jcraft.common.entity.stand.KQBTDEntity;
@@ -13,8 +13,8 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import java.util.Set;
 
 public class BTDGrabHitAttack extends AbstractMultiHitAttack<BTDGrabHitAttack, KQBTDEntity> {
-    public BTDGrabHitAttack(int cooldown, int moveStunTicks, float attackDistance, float damage, float hitBoxSize, float knockBack, float offset, @NonNull IntCollection hitMoments) {
-        super(cooldown, moveStunTicks, attackDistance, damage, hitBoxSize, knockBack, offset, hitMoments);
+    public BTDGrabHitAttack(int cooldown, int duration, float attackDistance, float damage, float hitBoxSize, float knockBack, float offset, @NonNull IntCollection hitMoments) {
+        super(cooldown, duration, attackDistance, damage, hitBoxSize, knockBack, offset, hitMoments);
     }
 
     @Override

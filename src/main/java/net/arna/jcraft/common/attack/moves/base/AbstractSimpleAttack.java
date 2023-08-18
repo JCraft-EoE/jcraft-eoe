@@ -1,4 +1,4 @@
-package net.arna.jcraft.common.attack.core.base;
+package net.arna.jcraft.common.attack.moves.base;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -48,9 +48,9 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
     private BlockableType blockableType = BlockableType.BLOCKABLE;
     protected JParticleType hitSpark = JParticleType.HIT_SPARK_1;
 
-    protected AbstractSimpleAttack(int cooldown, int windup, int moveStunTicks, float attackDistance, float damage,
+    protected AbstractSimpleAttack(int cooldown, int windup, int duration, float attackDistance, float damage,
                                    float hitBoxSize, float knockBack, float offset) {
-        super(cooldown, windup, moveStunTicks, attackDistance);
+        super(cooldown, windup, duration, attackDistance);
         this.damage = damage;
         this.hitBoxSize = hitBoxSize;
         this.knockBack = knockBack;
@@ -277,7 +277,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
                 center.z + random.nextGaussian() * 0.25,
                 hitSpark);
 
-        if (getImpactSound() != null) stand.playSound(getImpactSound(), 1, 1);
+        getImpactSounds().forEach(sound -> stand.playSound(sound, 1f, 1f));
 
         Vec3d kbVec = getRotVec(stand).multiply(knockBack).add(new Vec3d(0.0, Math.abs(knockBack) / 4, 0.0));
         for (LivingEntity target : validateTargets(stand, hurt))

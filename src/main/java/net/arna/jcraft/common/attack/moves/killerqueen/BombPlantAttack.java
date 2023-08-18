@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.attack.moves.killerqueen;
 
-import net.arna.jcraft.common.attack.core.base.AbstractSimpleAttack;
+import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.core.ctx.MoveVariable;
 import net.arna.jcraft.common.entity.stand.AbstractKillerQueenEntity;
@@ -24,8 +24,8 @@ public class BombPlantAttack extends AbstractSimpleAttack<BombPlantAttack, Abstr
     public static final MoveVariable<Entity> BOMB_ENTITY = new MoveVariable<>(Entity.class);
     public static final MoveVariable<Vec3d> BOMB_POS = new MoveVariable<>(Vec3d.class);
 
-    public BombPlantAttack(int cooldown, int windup, int moveStunTicks, float attackDistance, float hitBoxSize, float offset) {
-        super(cooldown, windup, moveStunTicks, attackDistance, 0f, hitBoxSize, 0f, offset);
+    public BombPlantAttack(int cooldown, int windup, int duration, float attackDistance, float hitBoxSize, float offset) {
+        super(cooldown, windup, duration, attackDistance, 0f, hitBoxSize, 0f, offset);
     }
 
     @Override

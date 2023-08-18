@@ -1,4 +1,4 @@
-package net.arna.jcraft.common.attack.core.base;
+package net.arna.jcraft.common.attack.moves.base;
 
 import lombok.Getter;
 import net.arna.jcraft.common.entity.stand.StandEntity;
@@ -23,9 +23,9 @@ import java.util.Set;
 public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, S>, S extends StandEntity<?, ?>> extends AbstractSimpleAttack<T, S> {
     private final int interval;
 
-    protected AbstractBarrageAttack(int cooldown, int windup, int moveStunTicks, float attackDistance, float damage,
+    protected AbstractBarrageAttack(int cooldown, int windup, int duration, float attackDistance, float damage,
                                     float hitBoxSize, float knockBack, float offset, int interval) {
-        super(cooldown, windup, moveStunTicks, attackDistance, damage, hitBoxSize, knockBack, offset);
+        super(cooldown, windup, duration, attackDistance, damage, hitBoxSize, knockBack, offset);
         barrage = true;
         this.interval = interval;
     }
@@ -45,7 +45,7 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, S
         // Which means that if your move stun is 22, windup is 6 and interval is 6,
         // the first blow will not be landed after 6 ticks (when stand move stun is 22 - 6 = 16),
         // but rather after 10 ticks (when stand move stun is 22 - 10 = 12).
-        return super.shouldPerform(stand) && (getMoveStun() - getWindup() - stand.getMoveStun()) % interval == 0;
+        return super.shouldPerform(stand) && (getDuration() - getWindup() - stand.getMoveStun()) % interval == 0;
     }
 
     @Override

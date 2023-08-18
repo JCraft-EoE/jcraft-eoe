@@ -1,7 +1,7 @@
 package net.arna.jcraft.mixin;
 
-import net.arna.jcraft.common.attack.core.base.AbstractCounterAttack;
-import net.arna.jcraft.common.attack.core.base.AbstractMove;
+import net.arna.jcraft.common.attack.moves.base.AbstractCounterAttack;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.network.s2c.ComboCounterPacket;
@@ -100,7 +100,7 @@ public abstract class PlayerEntityMixin implements IComboCounter {
 
         if (player.getFirstPassenger() instanceof StandEntity<?, ?> stand) {
             AbstractMove<?, ?> attack = stand.curAttack;
-            if (attack == null || !attack.isCounter() || stand.getMoveStun() >= (attack.getMoveStun() - attack.getWindup()))
+            if (attack == null || !attack.isCounter() || stand.getMoveStun() >= (attack.getDuration() - attack.getWindup()))
                 return;
 
             //noinspection unchecked,rawtypes // Generic types can be annoying sometimes. This is fine.

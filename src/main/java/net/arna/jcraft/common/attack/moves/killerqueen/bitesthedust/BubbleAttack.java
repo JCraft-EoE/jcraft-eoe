@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.attack.moves.killerqueen.bitesthedust;
 
-import net.arna.jcraft.common.attack.core.base.AbstractMove;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.core.ctx.MoveVariable;
 import net.arna.jcraft.common.attack.moves.killerqueen.BombPlantAttack;
@@ -15,8 +15,8 @@ import java.util.Set;
 public class BubbleAttack extends AbstractMove<BubbleAttack, KQBTDEntity> {
     public static final MoveVariable<BubbleProjectile> BUBBLE_PROJECTILE = new MoveVariable<>(BubbleProjectile.class);
 
-    public BubbleAttack(int cooldown, int windup, int moveStun, float moveDistance) {
-        super(cooldown, windup, moveStun, moveDistance);
+    public BubbleAttack(int cooldown, int windup, int duration, float moveDistance) {
+        super(cooldown, windup, duration, moveDistance);
         ranged = true;
     }
 

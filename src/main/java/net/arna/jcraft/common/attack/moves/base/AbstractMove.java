@@ -1,4 +1,4 @@
-package net.arna.jcraft.common.attack.core.base;
+package net.arna.jcraft.common.attack.moves.base;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -13,26 +13,27 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Getter
 public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends StandEntity<?, ?>> {
     private final int cooldown, windup;
-    private final int moveStun;
+    private final int duration;
     private final float moveDistance;
+    private final List<SoundEvent> sounds = new ArrayList<>(), impactSounds = new ArrayList<>();
     private Text name, description;
-    private SoundEvent sound, impactSound;
     private AbstractMove<?, S> crouchingVariant, followUp;
     private int armor;
-    protected boolean ranged;
     protected MobilityType mobilityType;
     // Used to help AI know how and when to use this attack.
-    protected boolean barrage, multiHit, charge, counter, dash, grab;
+    protected boolean ranged, barrage, multiHit, charge, counter, dash, grab;
 
-    protected AbstractMove(int cooldown, int windup, int moveStun, float moveDistance) {
+    protected AbstractMove(int cooldown, int windup, int duration, float moveDistance) {
         this.cooldown = cooldown;
         this.windup = windup;
-        this.moveStun = moveStun;
+        this.duration = duration;
         this.moveDistance = moveDistance;
     }
 
@@ -66,33 +67,44 @@ public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends Stand
     }
 
     /**
-     * Sets the sound to play when this move is performed.
-     * @param sound The sound to play when this move is performed.
+     * Adds a sound to play when this move is performed.
+     * Can be called multiple times.
+     * @param sound A sound to play when this move is performed.
      * @return This move
      */
     public T withSound(SoundEvent sound) {
-        this.sound = sound;
+        sounds.add(sound);
         return getThis();
     }
 
     /**
-     * Sets the sound to play when this move hits something.
-     * @param sound The sound to play when this move hits something.
+     * Adds a sound to play when this move hits something.
+     * Can be called multiple times.
+     * @param sound A sound to play when this move hits something.
      * @return This move
      */
     public T withImpactSound(SoundEvent sound) {
-        this.impactSound = sound;
+        impactSounds.add(sound);
         return getThis();
     }
 
     /**
      * Sets the amount of hits this attack can withstand before breaking.
      * @param armor The amount of hits this attack can withstand
-     * @return This attack
+     * @return This move
      */
     public T withArmor(int armor) {
         this.armor = armor;
         return getThis();
+    }
+
+    /**
+     * Sets the armor value to {@link Integer#MAX_VALUE}.
+     * @see #withArmor(int)
+     * @return This move
+     */
+    public T withUnbreakable() {
+        return withArmor(Integer.MAX_VALUE);
     }
 
     // Logic methods
@@ -105,9 +117,9 @@ public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends Stand
      * @param stand The stand to tick for.
      */
     public void tick(S stand) {
-        // Play the sound in the first tick.
-        if (sound != null && stand.getMoveStun() == getMoveStun())
-            stand.playSound(sound, 1f, 1f);
+        // Play the sound(s) in the first tick.
+        if (sounds != null && stand.getMoveStun() == getDuration())
+            sounds.forEach(sound -> stand.playSound(sound, 1f, 1f));
 
         if (shouldPerform(stand))
             perform(stand, stand.getUserOrThrow(), stand.getMoveContext());
@@ -119,7 +131,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends Stand
      * @return Whether this move should be performed this tick.
      */
     protected boolean shouldPerform(S stand) {
-        return stand.getMoveStun() == moveStun - windup && stand.hasUser();
+        return stand.getMoveStun() == duration - windup && stand.hasUser();
     }
 
     /**
@@ -156,7 +168,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends Stand
      * @return Whether the windup has passed
      */
     public boolean hasWindupPassed(StandEntity<?, ?> stand) {
-        return stand.getMoveStun() <= moveStun - windup;
+        return stand.getMoveStun() <= duration - windup;
     }
 
     /**

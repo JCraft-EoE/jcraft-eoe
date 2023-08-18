@@ -1,222 +1,117 @@
 package net.arna.jcraft.common.entity.stand;
 
-import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.attack.core.old.Attack;
-import net.arna.jcraft.common.attack.core.old.AttackType;
+import net.arna.jcraft.common.attack.core.MoveMap;
+import net.arna.jcraft.common.attack.core.MoveType;
+import net.arna.jcraft.common.attack.moves.killerqueen.CoinTossAttack;
+import net.arna.jcraft.common.attack.moves.killerqueen.KQGrabAttack;
+import net.arna.jcraft.common.attack.moves.killerqueen.KQGrabHitAttack;
+import net.arna.jcraft.common.attack.moves.killerqueen.SheerHeartAttackAttack;
+import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
-import net.arna.jcraft.common.entity.SheerHeartAttackEntity;
-import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.util.CooldownType;
-import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.common.util.MobilityType;
+import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
-import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegistry;
-import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemStack;
-import net.minecraft.predicate.entity.EntityPredicates;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.Box;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.function.Consumer;
 
 public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQueenEntity, KillerQueenEntity.State> {
-    public static final Attack heavy = new Attack(2, 12, 0.75f, 24, 16, 2, 9f, 1.75f, AttackType.BOX, 0.5f, 0, 0, JSoundRegistry.IMPACT_4)
-            .setHitspark(2)
-            .hyperArmor()
-            .setLaunch()
-            .setInfo("Haymaker", "slow, uninterruptable launcher");
-    public static final Attack sha = new Attack(5, 50, 20, 16, 0, AttackType.BOX)
-            .setRanged(true)
-            .setInfo("Sheer Heart Attack", "creates an automatic, heat-seeking sub-stand that explodes on contact, reflects 25% damage back to owner");
-    public static final Attack grab = new Attack(7, 22, 0.75f, 20, 12, 1.75, 0, 0.1f, AttackType.BOX, 1f)
-            .setGrab()
-            .setInfo("Grab", "grabs opponent by the face, then detonates them, launching them upwards");
-    public static final Attack grabhit = new Attack(8, 0, 20, 13, 0.75f, AttackType.BOX)
-            .setGrab()
-            .setInfo("Grab (Hit)", "");
+    public static final SimpleAttack<KillerQueenEntity> HEAVY = new SimpleAttack<KillerQueenEntity>(240, 16, 24, 9f, 2f, 1.75f, 0.75f, 0f)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withSound(JSoundRegistry.KQ_UPPERCUT)
+            .withSound(JSoundRegistry.KQ_HEAVY)
+            .withImpactSound(JSoundRegistry.IMPACT_4)
+            .withUnbreakable()
+            .withLaunch()
+            .withStun(10)
+            .withInfo(Text.literal("Haymaker"), Text.literal("slow, uninterruptible launcher"));
+    public static final SheerHeartAttackAttack SHEER_HEART_ATTACK = new SheerHeartAttackAttack(1000, 16, 20, 1f)
+//            .withSound(JSoundRegistry.KQ_SHA)
+            .withInfo(Text.literal("Sheer Heart Attack"), Text.literal("creates an automatic, heat-seeking sub-stand that explodes on contact, reflects 25% damage back to owner"));
+    public static final KQGrabHitAttack GRAB_HIT = new KQGrabHitAttack(0, 13, 20, 1f, 2)
+            .withInfo(Text.literal("Grab (hit)"), Text.empty());
+    public static final KQGrabAttack GRAB = new KQGrabAttack(440, 12, 20, 0.75f, 0f, 1.75f, 0.1f, 0f,
+            GRAB_HIT, State.GRAB_HIT)
+            .withStun(20)
+            .withInfo(Text.literal("Grab"), Text.literal("grabs opponent by the face, then detonates them, launching them upwards"));
+    public static final CoinTossAttack COIN_TOSS = new CoinTossAttack(500);
 
     public KillerQueenEntity(World worldIn) {
         super(StandType.KILLER_QUEEN, worldIn, null);
 
-        moves = List.of(light, heavy, barrage, bombplant, sha, grab,
-                new Attack().setRanged(true).setInfo("Coin Toss", "overrides current bomb with an aimable coin"),
-                new Attack().setMobility(MobilityType.DASH).setInfo("Explosive Dash", "slight aoe damage, 3D movement tool"));
-
         super.initialize();
     }
 
+    @Override
+    protected void registerMoves(MoveMap<KillerQueenEntity, KillerQueenEntity.State> moves) {
+        super.registerMoves(moves);
+
+        // Light, barrage and util are registered by the super class.
+        moves.register(MoveType.HEAVY, HEAVY, State.HEAVY);
+        moves.register(MoveType.SPECIAL1, BOMB_PLANT, State.BOMB_PLANT);
+        moves.register(MoveType.SPECIAL2, GRAB, State.GRAB);
+        moves.register(MoveType.SPECIAL3, COIN_TOSS); // No special state
+        moves.register(MoveType.ULT, SHEER_HEART_ATTACK, State.SHA);
+    }
+
     // Move-set
-    @Override
-    public void initHeavyAttack() {
-        if (!canAttack()) return;
 
-        if (handleAttack(heavy, CooldownType.STAND_HEAVY, State.HEAVY)) {
-            playSound(JSoundRegistry.KQ_UPPERCUT, 1, 1);
-            playSound(JSoundRegistry.KQ_HEAVY, 1, 1);
-        }
-    }
 
     @Override
-    public void initBarrage() {
-        if (!canAttack()) return;
-        if (handleAttack(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
-            playSound(JSoundRegistry.KQ_BARRAGE, 1, 1);
-    }
-
-    @Override
-    public void initSpecial1() {
-        if (!canAttack() || !hasUser()) return;
-
-        LivingEntity user = getUserOrThrow();
-        CooldownsComponent cooldowns = JComponents.getCooldowns(user);
-        if (user.isInSneakingPose() && cooldowns.getCooldown(CooldownType.STAND_SP1) < 1) {
-            Block downBlock = world.getBlockState(user.getBlockPos().down()).getBlock();
-            boolean notAir = downBlock != Blocks.AIR && downBlock != Blocks.CAVE_AIR && downBlock != Blocks.VOID_AIR;
-            if (notAir) {
-                bombEntity = null;
-                bombBlock = user.getPos().add(0, -0.5, 0);
-                cooldowns.setCooldown(CooldownType.STAND_SP1, bombplantCD);
-            }
-        } else {
-            handleAttack(bombplant, CooldownType.STAND_SP1, State.BOMB_PLANT);
-            bombBlock = null;
-        }
-
-        if (this.coin != null)
-            this.coin.discard();
-    }
-
-    @Override
-    public void initSpecial2() {
-        if (!canAttack()) return;
-        handleAttack(grab, CooldownType.STAND_SP2, State.GRAB);
-    }
-
-    @Override
-    public void initSpecial3() {
-        if (!canAttack() || !hasUser()) return;
-
-        LivingEntity user = getUserOrThrow();
-        CooldownsComponent cooldowns = JComponents.getCooldowns(user);
-        if (cooldowns.getCooldown(CooldownType.STAND_SP3) > 0) return;
-        cooldowns.setCooldown(CooldownType.STAND_SP3, 500); // 25s coin toss cd
-
-        Vec3d lookVec = user.getRotationVector().multiply(0.75);
-        if (this.coin != null) this.coin.discard();
-        this.coin = new ItemEntity(world, user.getX(), user.getY() + user.getHeight() * 2 / 3, user.getZ(), new ItemStack(JObjectRegistry.KQCOIN, 1), lookVec.x, lookVec.y, lookVec.z);
-        this.coin.setPickupDelayInfinite();
-
-        world.spawnEntity(this.coin);
-
-        this.bombEntity = this.coin;
-        this.bombBlock = null;
-
-        playSound(JSoundRegistry.COIN_TOSS, 1, 1);
-    }
-
-    @Override
-    public void initUlt() {
-        if (!canAttack()) return;
-        handleAttack(sha, CooldownType.STAND_ULT, State.SHA);
-        //playSound(ModSoundRegister.KQ_SHA,1, 1);
-    }
-
-    @Override
-    public void specialAttack(Attack attack, Set<LivingEntity> entities) {
+    public void initMove(MoveType type) {
         if (!hasUser()) return;
 
-        LivingEntity user = getUserOrThrow();
-        switch (attack.id) {
-            case (4) -> {
-                Entity target = entities.stream()
-                        .findFirst()
-                        .<Entity>map(JUtils::getUserIfStand)
-                        .or(() -> {
-                            // If none are found, re-do an optimized hitbox check for any entity type
-                            Vec3d rotVec = getRotationVector();
-                            Vec3d boxCenter = getPos().add(0, user.getHeight() / 2, 0).add(rotVec);
-                            Vec3d halfBox = new Vec3d(0.5, 0.5, 0.5);
-                            List<Entity> hit = world.getEntitiesByClass(Entity.class,
-                                    new Box(boxCenter.subtract(halfBox), boxCenter.add(halfBox)),
-                                    EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e -> e != this && e != user));
-                            return !hit.isEmpty() ? Optional.of(hit.get(0)) : Optional.empty();
-                        })
-                        .orElse(null);
-
-                if (target != null) {
-                    bombEntity = target;
+        switch (type) {
+            case SPECIAL1 -> {
+                LivingEntity user = getUserOrThrow();
+                CooldownsComponent cooldowns = JComponents.getCooldowns(user);
+                if (user.isInSneakingPose() && cooldowns.getCooldown(CooldownType.STAND_SP1) < 1) {
+                    Block downBlock = world.getBlockState(user.getBlockPos().down()).getBlock();
+                    boolean notAir = downBlock != Blocks.AIR && downBlock != Blocks.CAVE_AIR && downBlock != Blocks.VOID_AIR;
+                    if (notAir) {
+                        bombEntity = null;
+                        bombBlock = user.getPos().add(0, -0.5, 0);
+                        cooldowns.setCooldown(CooldownType.STAND_SP1, BOMB_PLANT.getCooldown());
+                    }
+                } else {
+                    handleAttack(MoveType.SPECIAL1);
                     bombBlock = null;
                 }
+
+                if (coin != null) coin.discard();
             }
-            case (5) -> {
-                SheerHeartAttackEntity sha = new SheerHeartAttackEntity(JEntityTypeRegistry.SHEER_HEART_ATTACK, world);
-                sha.setMaster(user);
-                sha.refreshPositionAndAngles(getX(), getY() + 0.5, getZ(), getYaw(), getPitch());
+            case SPECIAL3 -> {
+                LivingEntity user = getUserOrThrow();
+                CooldownsComponent cooldowns = JComponents.getCooldowns(user);
+                if (cooldowns.getCooldown(CooldownType.STAND_SP3) > 0) return;
+                cooldowns.setCooldown(CooldownType.STAND_SP3, 500); // 25s coin toss cd
 
-                world.spawnEntity(sha);
-            }
-            case (6) -> {
-                if (bombEntity instanceof LivingEntity livingEntity) {
-                    explode(user, livingEntity.getPos());
-                } else {
-                    Vec3d bombPos = null;
+                Vec3d lookVec = user.getRotationVector().multiply(0.75);
+                if (coin != null) coin.discard();
+                coin = new ItemEntity(world, user.getX(), user.getY() + user.getHeight() * 2 / 3, user.getZ(),
+                        new ItemStack(JObjectRegistry.KQ_COIN, 1), lookVec.x, lookVec.y, lookVec.z);
+                coin.setPickupDelayInfinite();
 
-                    if (bombEntity != null) {
-                        bombPos = bombEntity.getPos();
-                        if (bombEntity instanceof ItemEntity)
-                            bombEntity.kill();
-                    }
-                    if (bombBlock != null) bombPos = bombBlock;
+                world.spawnEntity(coin);
 
-                    if (bombPos != null)
-                        explode(user, bombPos);
-                }
-
-                bombEntity = null;
+                bombEntity = coin;
                 bombBlock = null;
+
+                playSound(JSoundRegistry.COIN_TOSS, 1, 1);
             }
-            case (7) -> {
-                if (entities.isEmpty()) return;
-
-                setAttack(grabhit, State.GRABHIT);
-                bombEntity = entities.stream().findFirst().orElseThrow();
-                bombBlock = null;
-            }
-            case (8) -> {
-                playSound(JSoundRegistry.KQ_DETONATE, 1, 1);
-
-                if (bombEntity instanceof LivingEntity livingEntity) {
-                    ServerWorld serverWorld = (ServerWorld) world;
-
-                    Vec3d pos = livingEntity.getPos();
-                    JCraft.createParticle(serverWorld, pos.x, pos.y, pos.z,-5);
-                    JUtils.serverPlaySound(JSoundRegistry.KQ_EXPLODE, serverWorld, pos, 96);
-
-                    DamageSource damageSource = JDamageSources.stand(this);
-
-                    damageLogic(world, livingEntity, new Vec3d(0, 1, 0), 2, 3, true, 11f, false, 4, damageSource, user);
-                    livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0, true, false));
-                }
-
-                bombEntity = null;
-            }
+            default -> super.initMove(type);
         }
     }
 
@@ -232,7 +127,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
         SHA(builder -> builder.playAndHold("animation.killerqueen.sha")),
         LOW(builder -> builder.playAndHold("animation.killerqueen.low")),
         GRAB(builder -> builder.playAndHold("animation.killerqueen.grab")),
-        GRABHIT(builder -> builder.playAndHold("animation.killerqueen.grab_hit"));
+        GRAB_HIT(builder -> builder.playAndHold("animation.killerqueen.grab_hit"));
 
 
         private final Consumer<AnimationBuilder> animator;
@@ -270,6 +165,11 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
     @Override
     protected State getLowState() {
         return State.LOW;
+    }
+
+    @Override
+    protected State getBarrageState() {
+        return State.BARRAGE;
     }
 
     @Override
