@@ -1,4 +1,4 @@
-package net.arna.jcraft.common.attack;
+package net.arna.jcraft.common.attack.core;
 
 public class HitBoxData {
     public double forwardOffset = 0.0;

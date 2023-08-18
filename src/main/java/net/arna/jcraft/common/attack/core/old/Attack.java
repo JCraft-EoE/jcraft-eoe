@@ -1,5 +1,7 @@
-package net.arna.jcraft.common.attack;
+package net.arna.jcraft.common.attack.core.old;
 
+import net.arna.jcraft.common.attack.core.HitBoxData;
+import net.arna.jcraft.common.attack.core.StunType;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.VariationType;
 import net.minecraft.sound.SoundEvent;

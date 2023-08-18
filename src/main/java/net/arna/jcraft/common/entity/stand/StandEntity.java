@@ -3,10 +3,14 @@ package net.arna.jcraft.common.entity.stand;
 import lombok.Getter;
 import lombok.Setter;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.attack.Attack;
-import net.arna.jcraft.common.attack.AttackQueue;
-import net.arna.jcraft.common.attack.AttackType;
-import net.arna.jcraft.common.attack.HitBoxData;
+import net.arna.jcraft.common.attack.core.*;
+import net.arna.jcraft.common.attack.core.base.AbstractBarrageAttack;
+import net.arna.jcraft.common.attack.core.base.AbstractMove;
+import net.arna.jcraft.common.attack.core.base.AbstractSimpleAttack;
+import net.arna.jcraft.common.attack.core.ctx.MoveContext;
+import net.arna.jcraft.common.attack.core.old.Attack;
+import net.arna.jcraft.common.attack.core.old.AttackQueue;
+import net.arna.jcraft.common.attack.core.old.AttackType;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
@@ -35,7 +39,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.StopSoundS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -72,6 +75,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     public List<Attack> moves = List.of();
     @SuppressWarnings("FieldMayBeFinal")
     private List<Attack> allMoves = new ArrayList<>();
+    protected final MoveMap<E, S> moveMap = new MoveMap<>();
+    @Getter
+    protected final MoveContext moveContext = new MoveContext();
 
     private static final TrackedData<Integer> STATE;
     private static final TrackedData<Boolean> SAMESTATE; // Marks if the state was set to what it already was during the last setState() call
@@ -106,16 +112,16 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     public Boolean blocking = false;
     public Boolean idleOverride = false;
 
-    public Float idleDistance = 1.25f;
-    public Float idleRotation = -45f;
+    public float idleDistance = 1.25f;
+    public float idleRotation = -45f;
     public final float attackRotation = 90f;
     public float blockDistance = 0.75f;
 
     public float maxStandGauge = 90f;
 
     public AttackQueue queuedAttack;
-    public Attack curAttack;
-    public Attack previousAttack;
+    public AbstractMove<?, ? super E> curAttack;
+    public AbstractMove<?, ? super E> previousAttack;
     public int armorPoints;
 
     public static final List<CooldownType> attackCooldowns = List.of(CooldownType.STAND_LIGHT, CooldownType.STAND_HEAVY,
@@ -155,6 +161,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         standType = type;
         this.summonSound = summonSound;
         this.playGenericSummonSound = playGenericSummonSound;
+
+        registerMoves(moveMap);
+        moveMap.freeze();
+        moveMap.forEach(entry -> entry.attack().registerContextEntries(moveContext));
     }
 
     // State controls
@@ -331,6 +341,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     public boolean getRemoteJumpInput() {
         return remoteJumpInput;
     }
+
+    protected abstract void registerMoves(MoveMap<E, S> moves);
 
     /**
      * Synchronises the user inputs serverside
@@ -537,6 +549,15 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         return new CanAttackData(null, false);
     }
 
+    public boolean handleAttack(MoveType type) {
+        MoveMap.Entry<E, S> move = moveMap.getMove(type);
+        AbstractMove<?, ? super E> attack = move.attack();
+        if (hasUser() && getUserOrThrow().isSneaking() && attack.getCrouchingVariant() != null)
+            attack = attack.getCrouchingVariant();
+
+        return handleAttack(attack, move.cooldownType(), move.animState());
+    }
+
     /**
      * Initiates an attack with the stand
      *
@@ -544,15 +565,18 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * @param cooldownType type of cooldown to start
      * @param animState    int identifier for which state to put the stand into
      */
-    public boolean handleAttack(Attack attack, CooldownType cooldownType, S animState) {
-        CooldownsComponent cooldowns = JComponents.getCooldowns(getUser());
-        int cooldown = cooldowns.getCooldown(cooldownType);
+    public boolean handleAttack(AbstractMove<?, ? super E> attack, CooldownType cooldownType, @Nullable S animState) {
+        if (cooldownType != null) {
+            CooldownsComponent cooldowns = JComponents.getCooldowns(getUser());
+            int cooldown = cooldowns.getCooldown(cooldownType);
 
-        if (cooldown > 0)
-            return false;
+            if (cooldown > 0)
+                return false;
 
-        cooldowns.setCooldown(cooldownType, (int) (attack.cooldown * 20));
-        this.setAttack(attack, animState);
+            cooldowns.setCooldown(cooldownType, attack.getCooldown());
+        }
+
+        setAttack(attack, animState);
         return true;
     }
 
@@ -562,11 +586,11 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * @param attack    attack to set
      * @param animState int identifier for which state to put the stand into
      */
-    public void setAttack(Attack attack, S animState) {
-        this.curAttack = attack;
-        this.setMoveStun(attack.moveStun);
-        this.setState(animState);
-        this.armorPoints = attack.armor;
+    public void setAttack(AbstractMove<?, ? super E> attack, @Nullable S animState) {
+        curAttack = attack;
+        setMoveStun(attack.getMoveStun());
+        if (animState != null) this.setState(animState);
+        armorPoints = attack.getArmor();
     }
 
     /**
@@ -674,26 +698,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     }
 
     // Stock attacks to define
-    public void initLightAttack() {
-    }
-
-    public void initHeavyAttack() {
-    }
-
-    public void initBarrage() {
-    }
-
-    // Specials to define within the specific stand
-    public void initSpecial1() {
-    }
-
-    public void initSpecial2() {
-    }
-
-    public void initSpecial3() {
-    }
-
-    public void initUlt() {
+    public void initMove(MoveType type) {
+        handleAttack(type);
     }
 
     /**
@@ -742,14 +748,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         return telePos;
     }
 
-    // Define utility
-    public void initUtil() {
-    }
-
-    // Define special attack actions
-    public void specialAttack(Attack attack, Set<LivingEntity> entities) {
-    }
-
     // Define desummon conditions
     public void desummon() {
         if (curAttack != null || getMoveStun() > 0) return;
@@ -758,21 +756,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     // Define idle override
     public void idleOverride(LivingEntity player) {} // TODO this isn't used.
-
-    /**
-     * Defines what happens if the stand successfully countered something
-     *
-     * @param entity countered entity
-     * @param source exact source of damage
-     */
-    public void counter(Entity entity, DamageSource source) {
-        curAttack = null;
-        setMoveStun(0);
-    }
-
-    public void whiffCounter() {
-        JCraft.LOGGER.info("SERVER: Counter whiffed for " + this);
-    }
 
     /**
      * Cancels the stands attack instantly
@@ -825,7 +808,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if (playSummonAnim && (getMoveStun() > 0 || age > summonAnimDuration))
             playSummonAnim = false;
 
-        Attack attack = this.curAttack;
+        AbstractMove<?, ? super E> attack = this.curAttack;
 
         Direction gravDir = GravityChangerAPI.getGravityDirection(user);
 
@@ -896,15 +879,21 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             int curMoveStun = this.getMoveStun();
 
             // Attack logic
+            if (attack != null)
+                // It's fine here.
+                // Could be solved by making a getThis() method in this class that returns a value of type E (this),
+                // but this is the only instance where it's needed.
+                //noinspection unchecked
+                attack.tick((E) this);
+
             if (curMoveStun >= 0 && !this.blocking && attack != null) {
-                int stunTicks = (int) (attack.stun * 20f);
+                int stunTicks = 0;
                 //LOGGER.info("Stun ticks: " + stunTicks);
 
-                int moveStun = attack.moveStun;
-                float damage = attack.damage;
-                float attackDist = attack.attackDist;
+                int moveStun = attack.getMoveStun();
+                float attackDist = attack.getMoveDistance();
 
-                int realInitTime = (moveStun - attack.initTime);
+                int realInitTime = (moveStun - attack.getWindup());
 
                 boolean isChargeAttack = attack.isCharge();
                 // Positioning
@@ -938,10 +927,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
                 boolean isBarrage = attack.isBarrage();
 
-                if (attack.attackType == AttackType.BARRAGE) { // Excludes charge barrages
-                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 10, 2, true, false));
-                }
-
                 if (
                         (attack.attackType == AttackType.BOX && curMoveStun == realInitTime)
                                 || (isBarrage && curMoveStun % attack.interval == 0 && curMoveStun <= realInitTime)
@@ -951,88 +936,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                     //JCraft.LOGGER.info(curMoveStun + " ACTIVE " + attack.interval);
                     Set<LivingEntity> hurt = Collections.emptySet();
 
-                    if (attack.hitboxSize > 0) {
-                        Vec3d upVec = GravityChangerAPI.getEyeOffset(user);
-                        Vec3d heightOffset = upVec.multiply(0.5);
-                        Vec3d hPos = pos.add(heightOffset);
-
-                        Vec3d fPos = (isChargeAttack) ? hPos.add(rotVec) :
-                                hPos.add(rotVec.multiply(attackDist)).add(
-                                        upVec.multiply(-attack.offset)
-                                );
-                        DamageSource damageSource = JDamageSources.stand(this);
-
-                        Set<Entity> filter = vehicle == null ? Set.of(this, user) : Set.of(this, user, vehicle);
-                        hurt = JUtils.generateHitbox(world, fPos, attack.hitboxSize, filter);
-                        for (HitBoxData data : attack.extraHitboxes) {
-                            Set<LivingEntity> extraHurt = JUtils.generateHitbox(world,
-                                    hPos.add(
-                                            rotVec.multiply(data.forwardOffset))
-                                            .add(upVec.multiply(data.verticalOffset)),
-                                    data.hitboxSize, filter);
-                            hurt.addAll(extraHurt);
-                        }
-
-                        hurt.removeIf(e -> !JUtils.canDamage(damageSource, e));
-
-                        if (!hurt.isEmpty()) {
-                            JCraft.createParticle((ServerWorld) this.world,
-                                    fPos.x + random.nextGaussian() * 0.25,
-                                    fPos.y + random.nextGaussian() * 0.25,
-                                    fPos.z + random.nextGaussian() * 0.25,
-                                    attack.hitspark + 1);
-
-                            if (attack.impactSound != null) playSound(attack.impactSound, 1, 1);
-
-                            if (attack.attackType == AttackType.CHARGE) {
-                                setMoveStun(10);
-                                setState(boxState(attack.interval)); // Interval is hitAnim for charges
-                                curAttack = null;
-                            }
-                        }
-
-                        float kb = attack.knockback;
-                        Vec3d kbVec = rotVec.multiply(kb).add(new Vec3d(0.0, Math.abs(attack.knockback) / 4, 0.0));
-
-                        List<LivingEntity> clashed = new ArrayList<>();
-
-                        for (LivingEntity livingEntity : hurt) {
-                            StandEntity<?, ?> stand = JUtils.getStand(livingEntity);
-                            if (stand != null) {
-                                // Barrage clashing
-                                if (isBarrage && stand.curAttack != null && stand.curAttack.attackType == AttackType.BARRAGE) {
-                                    // Override stun with high priority 0.5s stun, also stops all current sounds for cleaner audio cue
-                                    clashed.add(user);
-                                    if (stand.hasUser()) {
-                                        clashed.add(stand.getUser());
-
-                                        if (stand.getUser() instanceof ServerPlayerEntity serverPlayer)
-                                            serverPlayer.networkHandler.sendPacket(new StopSoundS2CPacket(null, SoundCategory.PLAYERS));
-                                    }
-                                    if (user instanceof ServerPlayerEntity serverPlayer)
-                                        serverPlayer.networkHandler.sendPacket(new StopSoundS2CPacket(null, SoundCategory.PLAYERS));
-
-                                    // Cancels both barrages
-                                    cancelAttack();
-                                    stand.cancelAttack();
-
-                                    Vec3d midPos = stand.getPos().add(getPos()).multiply(0.5);
-                                    world.playSound(null, midPos.x, midPos.y, midPos.z, JSoundRegistry.IMPACT_1, SoundCategory.NEUTRAL, 1, 0.5f);
-                                }
-                            }
-
-                            damageLogic(world, livingEntity, kbVec, stunTicks, attack.stunType.ordinal(), attack.overrideStun,
-                                    damage, attack.lift, attack.getEffectiveBlockstun(), damageSource,
-                                    user, attack.canBackstab, attack.unblockable && !attack.ubEffectsOnly);
-                        }
-
-                        for (LivingEntity livingEntity : clashed) {
-                            livingEntity.removeStatusEffect(JStatusRegistry.DAZED);
-                            livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.DAZED, 10, 3, true, false));
-                        }
-                    }
-
-                    specialAttack(attack, hurt);
+                    this.specialAttack(attack, hurt);
                 }
                 /*
                 else {
@@ -1213,10 +1117,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         StandEntity<?, ?> stand = JUtils.getStand(ent);
         if (stand != null) {
-            Attack standAttack = stand.curAttack;
+            AbstractMove<?, ?> standAttack = stand.curAttack;
             if (standAttack != null) {
                 // Counter check
-                if (!tsHit && standAttack.attackType == AttackType.COUNTER && stand.getMoveStun() < (standAttack.moveStun - standAttack.initTime)) {
+                if (!tsHit && standAttack.attackType == AttackType.COUNTER && stand.getMoveStun() < (standAttack.getMoveStun() - standAttack.getWindup())) {
                     stand.counter(attacker, source);
                     ent.removeStatusEffect(JStatusRegistry.DAZED);
                     return;
@@ -1228,7 +1132,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             if (stand.blocking && !stand.getRemote()) {
                 double delta = Math.abs((ent.headYaw + 90.0f) % 360.0f - (attacker.getHeadYaw() + 90.0f) % 360.0f);
                 if (canBackstab && (360.0 - delta % 360.0 < 90 || delta % 360.0 < 90) && ent.squaredDistanceTo(attacker.getPos()) >= 1.5625) { // Backstab logic
-                    JCraft.createParticle((ServerWorld) attacker.getWorld(), ent.getX(), attacker.getEyeY(), ent.getZ(), -2);
+                    JCraft.createParticle((ServerWorld) attacker.getWorld(), ent.getX(), attacker.getEyeY(), ent.getZ(), JParticleType.BACK_STAB);
                     stand.playSound(SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, 1, 1);
                     stand.blocking = false;
                     overrideStun = true;
@@ -1380,7 +1284,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         JCraftSpec enemySpec;
         StandEntity<?, ?> enemyStand = JUtils.getStand(target);
-        Attack enemyAttack = null;
+        AbstractMove<?, ?> enemyAttack = null;
         boolean enemyHasStand = enemyStand != null;
 
         double distance = target.distanceTo(mob);
@@ -1413,10 +1317,12 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         boolean wantToBlock = false;
         if (enemyAttack != null && enemyMoveStun > 0) { // Only block if the attack is actually active
             // Block regardless of range if the attack is ranged, or is a barrage
-            if (enemyAttack.isRanged || enemyAttack.attackType == AttackType.BARRAGE)
+            if (enemyAttack.isRanged() || enemyAttack instanceof AbstractBarrageAttack<?,?>)
                 wantToBlock = true;
             // Block if the attack isn't ranged, but is within hitting distance, and doesn't block break/bypass
-            if (enemyAttack.attackDist + enemyAttack.hitboxSize * 0.66 > distance && enemyAttack.damage * 2 < stand.getStandGauge() && !enemyAttack.unblockable)
+            if (enemyAttack instanceof AbstractSimpleAttack<?, ?> simpleEnemyAttack &&
+                    enemyAttack.getMoveDistance() + simpleEnemyAttack.getHitBoxSize() * 0.66 > distance &&
+                    simpleEnemyAttack.getDamage() * 2 < stand.getStandGauge() && !simpleEnemyAttack.getBlockableType().isNonBlockable())
                 wantToBlock = true;
         }
 
@@ -1444,7 +1350,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         StatusEffectInstance mobStun = mob.getStatusEffect(JStatusRegistry.DAZED);
         // If stunned, and about to get hit by another move, combo break sometimes
         if (mobStun != null)
-            if (!stand.blocking && enemyAttack != null && enemyMoveStun > enemyAttack.initTime && stand.random.nextFloat() < 0.1f)
+            if (!stand.blocking && enemyAttack != null && enemyMoveStun > enemyAttack.getWindup() && stand.random.nextFloat() < 0.1f)
                 comboBreak((ServerWorld) stand.world, mob, mobStun);
 
         if (!stand.blocking) {
@@ -1459,7 +1365,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             if (selectedAttack != null) {
                 boolean shouldPerformMove = stand.getMoveStun() < 1;
 
-                if (stand.curAttack != null && stand.curAttack.hasFollowup())
+                if (stand.curAttack != null && stand.curAttack.getFollowUp() != null)
                     shouldPerformMove = true;
 
                 mob.setSneaking(selectedAttack.isCrouchingVariation);
@@ -1549,28 +1455,29 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     /**
      * Used to help AIs that use stands with unique moves
      */
-    public MoveSelectionResult specificMoveSelectionCriterion(Attack attack, MobEntity mob, LivingEntity target, int stunTicks,
-                                                              int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand, Attack enemyAttack) {
+    public MoveSelectionResult specificMoveSelectionCriterion(AbstractMove<?, ? super E> attack, MobEntity mob, LivingEntity target, int stunTicks,
+                                                              int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand, AbstractMove<?, ?> enemyAttack) {
         return MoveSelectionResult.PASS;
     }
 
-    private @Nullable Attack selectAttack(MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand, Attack enemyAttack) {
-        Attack selectedAttack = null;
+    private @Nullable AbstractMove<?, ? super E> selectAttack(MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand, AbstractMove<?, ?> enemyAttack) {
+        AbstractMove<?, ? super E> selectedAttack = null;
         boolean enemyIsAttacking = enemyAttack != null;
         CooldownsComponent cooldowns = JComponents.getCooldowns(mob);
 
         // If the opponent is countering, don't attack
-        if (enemyIsAttacking && enemyAttack.attackType == AttackType.COUNTER) return null;
+        if (enemyIsAttacking && enemyAttack.isCounter()) return null;
         int movesOnCooldown = 0;
 
         if (curAttack != null) {
-            if (curAttack.hasFollowup())
-                selectedAttack = curAttack.followup;
+            if (curAttack.getFollowUp() != null)
+                selectedAttack = curAttack.getFollowUp();
         } else {
-            selectedAttack = moves.get(0);
-            int selectedAttackInitTime = selectedAttack.realInitTime();
+            selectedAttack = moveMap.getMove(MoveType.LIGHT).attack();
+            int selectedAttackInitTime = selectedAttack.getMoveStun() - selectedAttack.getWindup();
 
-            for (Attack attack : allMoves) {
+            for (MoveMap.Entry<E, S> entry : moveMap) {
+                AbstractMove<?, ? super E> attack = entry.attack();
                 int parentAttackIndex = attack.button.ordinal(); // ID of the highest level attack's button
                 int initTime = attack.realInitTime();
 
@@ -1589,34 +1496,34 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 if (result == MoveSelectionResult.STOP) continue;
 
                 // Use mobility if opponent is far away
-                if (attack.mobilityType != null) {
+                if (attack.getMobilityType() != null) {
                     // ...and isn't being comboed or is blocking
                     if (stunTicks > 0) continue;
 
-                    if (attack.mobilityType != MobilityType.HIGHJUMP && distance > 6) {
+                    if (attack.getMobilityType() != MobilityType.HIGHJUMP && distance > 6) {
                         if (target.isOnGround()) {
-                            if (attack.mobilityType == MobilityType.TELEPORT) {
+                            if (attack.getMobilityType() == MobilityType.TELEPORT) {
                                 // Intentionally looks at target's feet as to hit the ground exactly at it
                                 mob.lookAt(EntityAnchor.EYES, target.getPos());
-                            } else if (attack.mobilityType == MobilityType.DASH) {
+                            } else if (attack.getMobilityType() == MobilityType.DASH) {
                                 // Look at target itself as a dash works best at that angle
                                 mob.lookAt(EntityAnchor.EYES, target.getEyePos().add(0, 0.5, 0));
                             }
                         }
 
-                        if (attack.mobilityType == MobilityType.FLIGHT) mob.lookAt(EntityAnchor.EYES, target.getEyePos());
+                        if (attack.getMobilityType() == MobilityType.FLIGHT) mob.lookAt(EntityAnchor.EYES, target.getEyePos());
 
                         selectedAttack = attack;
                         break;
                     } // If target is considerably above the mob, or the mob is going to get hit
-                    else if (target.getY() > mob.getY() + 2 || (enemyAttack != null && enemyStand != null && enemyMoveStun > enemyAttack.realInitTime())) {
+                    else if (target.getY() > mob.getY() + 2 || (enemyAttack != null && enemyStand != null && enemyAttack.hasWindupPassed(enemyStand))) {
                         selectedAttack = attack;
                         break;
                     }
                 }
 
                 // Use counter if opponent is using a non-ranged move
-                if (enemyIsAttacking && enemyAttack != null && !enemyAttack.isRanged && attack.attackType == AttackType.COUNTER) {
+                if (enemyIsAttacking && enemyAttack != null && !enemyAttack.isRanged() && attack.isCounter()) {
                     if (enemyStand != null && !enemyStand.blocking && enemyMoveStun > 0) {
                         selectedAttack = attack;
                         break;
@@ -1626,10 +1533,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
                 /*
                 Use a barrage (or variant thereof) if the opponent is stunned, not blocking, and it's off cooldown,
-                because it's a free combo extender and has a lower init. time than light
+                because it's a free combo extender and has a lower windup than light
                  */
                 if (distance < 1.4) {
-                    if (attack.attackType == AttackType.BARRAGE || (attack.attackType == AttackType.MULTIHIT && initTime <= stunTicks)) {
+                    if (attack.isBarrage() || (attack.isMultiHit() && attack.hasWindupPassed(this))) {
                         if (enemyStand == null) {
                             selectedAttack = attack;
                             break;
@@ -1642,7 +1549,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 }
 
                 // If the opponent is out of exactly twice the range it would take him to get to the user within the move being complete, use a projectile
-                if (attack.isRanged && distance > attack.moveStun * target.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED) * 2) {
+                if (attack.isRanged() && distance > attack.getMoveStun() * target.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED) * 2) {
                     mob.lookAt(EntityAnchor.EYES, target.getEyePos());
                     selectedAttack = attack;
                     break;
@@ -1660,11 +1567,12 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         // Non ranged offensive attacks are cancelled if the opponent is too far (and -1 causes an out-of-bounds error)
         if (selectedAttack != null) {
-            if (selectedAttack.attackType != AttackType.COUNTER &&
-                    selectedAttack.mobilityType == null &&
-                    selectedAttack.hitboxSize > 0 &&
-                    !selectedAttack.isRanged &&
-                    distance > selectedAttack.attackDist + selectedAttack.hitboxSize)
+            if (!selectedAttack.isCounter() &&
+                    selectedAttack.getMobilityType() == null &&
+                    selectedAttack instanceof AbstractSimpleAttack<?, ?> boxAttack &&
+                    boxAttack.getHitBoxSize() > 0 &&
+                    !selectedAttack.isRanged() &&
+                    distance > selectedAttack.getMoveDistance() + boxAttack.getHitBoxSize())
                 selectedAttack = null;
         }
 

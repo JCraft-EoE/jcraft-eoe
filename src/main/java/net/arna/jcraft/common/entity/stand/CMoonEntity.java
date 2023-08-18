@@ -2,9 +2,9 @@ package net.arna.jcraft.common.entity.stand;
 
 import lombok.Data;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.attack.Attack;
-import net.arna.jcraft.common.attack.AttackType;
-import net.arna.jcraft.common.attack.HitBoxData;
+import net.arna.jcraft.common.attack.core.old.Attack;
+import net.arna.jcraft.common.attack.core.old.AttackType;
+import net.arna.jcraft.common.attack.core.HitBoxData;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.projectile.BlockProjectile;

@@ -1,4 +1,4 @@
-package net.arna.jcraft.common.attack;
+package net.arna.jcraft.common.attack.core.old;
 
 public enum AttackType {
     BOX,

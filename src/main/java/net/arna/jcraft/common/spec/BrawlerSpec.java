@@ -1,8 +1,8 @@
 package net.arna.jcraft.common.spec;
 
-import net.arna.jcraft.common.attack.Attack;
-import net.arna.jcraft.common.attack.AttackQueue;
-import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.attack.core.old.Attack;
+import net.arna.jcraft.common.attack.core.old.AttackQueue;
+import net.arna.jcraft.common.attack.core.old.AttackType;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;

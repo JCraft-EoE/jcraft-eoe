@@ -1,7 +1,7 @@
 package net.arna.jcraft.mixin;
 
-import net.arna.jcraft.common.attack.Attack;
-import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.attack.core.base.AbstractCounterAttack;
+import net.arna.jcraft.common.attack.core.base.AbstractMove;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.MiscComponent;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
@@ -92,11 +92,13 @@ public abstract class LivingEntityMixin implements IDamageScaler {
         LivingEntity player = ((LivingEntity) (Object) this);
 
         if (!(player.getFirstPassenger() instanceof StandEntity<?, ?> stand)) return;
-        Attack attack = stand.curAttack;
-        if (attack == null || attack.attackType != AttackType.COUNTER || stand.getMoveStun() >= (attack.moveStun - attack.initTime))
+        AbstractMove<?, ?> attack = stand.curAttack;
+        if (attack == null || !attack.isCounter() || stand.getMoveStun() >= (attack.getMoveStun() - attack.getWindup()))
             return;
 
-        stand.counter(source.getAttacker(), source); // Initiate counter
+        //noinspection unchecked,rawtypes // Generic types can be annoying sometimes. This is fine.
+        ((AbstractCounterAttack) attack).counter(stand, source.getAttacker(), source);
+//        stand.counter(source.getAttacker(), source); // Initiate counter
         player.removeStatusEffect(JStatusRegistry.DAZED);
         info.cancel();
     }

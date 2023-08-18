@@ -13,12 +13,12 @@ import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.JCraftClient;
 import net.arna.jcraft.client.gui.ServerConfigUI;
 import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
-import net.arna.jcraft.client.gui.hud.JCraftAbilityHud;
 import net.arna.jcraft.client.renderer.effects.AttackHitBoxEffectRenderer;
 import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer;
 import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
 import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
 import net.arna.jcraft.client.util.JClientUtils;
+import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.config.ConfigOption;
 import net.arna.jcraft.common.entity.stand.MadeInHeavenEntity;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
@@ -288,6 +288,7 @@ public class ClientPacketHandler {
                 double x = buf.readDouble();
                 double y = buf.readDouble();
                 double z = buf.readDouble();
+                buf.readEnumConstant(JParticleType.class);
                 int id = buf.readInt();
 
                 client.execute(() -> client.world.addParticle(

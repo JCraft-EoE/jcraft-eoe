@@ -43,6 +43,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static net.arna.jcraft.common.entity.stand.StandEntity.damageLogic;
 
@@ -115,7 +116,7 @@ public final class JUtils {
     }
 
     // Specify what type the hitbox searches for
-    public static List<? extends Entity> generateHitbox(World world, Vec3d center, double hitboxSize, Class<? extends Entity> entityClass, List<Entity> except) {
+    public static <T extends Entity> List<T> generateHitbox(World world, Vec3d center, double hitboxSize, Class<T> entityClass, List<T> except) {
         double size = hitboxSize / 2;
 
         Vec3d v1 = center.subtract(size, size, size);
@@ -123,9 +124,9 @@ public final class JUtils {
 
         if (size > 0) displayHitbox(world, v1, v2);
 
-        List<? extends Entity> hit = world.getEntitiesByClass(entityClass, new Box(v1, v2), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
-        ArrayList<Entity> toReturn = new ArrayList<>(List.copyOf(hit));
-        for (Entity e : hit) {
+        List<T> hit = world.getEntitiesByClass(entityClass, new Box(v1, v2), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+        List<T> toReturn = new ArrayList<>(hit);
+        for (T e : hit) {
             //JCraft.LOGGER.info(e);
             if (except.contains(e)) {
                 toReturn.remove(e);
@@ -135,7 +136,8 @@ public final class JUtils {
                 if (stand.hasUser()) {
                     LivingEntity user = stand.getUser();
                     if (!hit.contains(user))
-                        toReturn.add(user);
+                        //noinspection unchecked
+                        toReturn.add((T) user);
                 }
             }
         }
@@ -145,6 +147,10 @@ public final class JUtils {
 
     // Defaults to LivingEntity
     public static Set<LivingEntity> generateHitbox(World world, Vec3d center, double hitboxSize, Set<Entity> except) {
+        return generateHitbox(world, center, hitboxSize, e -> !except.contains(e));
+    }
+
+    public static Set<LivingEntity> generateHitbox(World world, Vec3d center, double hitboxSize, Predicate<Entity> predicate) {
         double size = hitboxSize / 2;
 
         Vec3d v1 = center.subtract(size, size, size);
@@ -152,19 +158,13 @@ public final class JUtils {
 
         if (size > 0) displayHitbox(world, v1, v2);
 
-        List<LivingEntity> hit = world.getEntitiesByClass(LivingEntity.class, new Box(v1, v2), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+        List<LivingEntity> hit = world.getEntitiesByClass(LivingEntity.class, new Box(v1, v2),
+                EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(predicate));
         Set<LivingEntity> toReturn = new HashSet<>(hit);
-        for (LivingEntity l : hit) {
-            if (except != null && except.contains(l)) {
-                //JCraft.LOGGER.info("Removing: " + l);
-                toReturn.remove(l);
-                continue;
-            }
-            if (l instanceof StandEntity<?, ?> stand) {
-                //JCraft.LOGGER.info("Stand: " + stand);
-                if (stand.hasUser()) toReturn.add(stand.getUserOrThrow());
-            }
-        }
+        for (LivingEntity l : hit)
+            //JCraft.LOGGER.info("Stand: " + stand);
+            if (l instanceof StandEntity<?, ?> stand && stand.hasUser())
+                toReturn.add(stand.getUserOrThrow());
 
         return toReturn;
     }
@@ -424,7 +424,7 @@ public final class JUtils {
         return JComponents.getTimeStopData(entity).getTicks() > 0;
     }
 
-    public static boolean canDamage(DamageSource damageSource, LivingEntity ent) {
+    public static boolean canDamage(DamageSource damageSource, Entity ent) {
         return ent != null && ent.isAlive() && ent.isAttackable() && !ent.isInvulnerableTo(damageSource) &&
                 !(ent instanceof ArmorStandEntity armorStand && armorStand.isMarker());
     }

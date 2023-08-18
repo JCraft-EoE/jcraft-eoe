@@ -3,7 +3,7 @@ package net.arna.jcraft.common.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.attack.Attack;
+import net.arna.jcraft.common.attack.core.old.Attack;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandManager;

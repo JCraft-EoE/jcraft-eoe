@@ -1,0 +1,38 @@
+package net.arna.jcraft.common.attack.moves.killerqueen.bitesthedust;
+
+import it.unimi.dsi.fastutil.ints.IntCollection;
+import lombok.NonNull;
+import net.arna.jcraft.common.attack.core.base.AbstractMultiHitAttack;
+import net.arna.jcraft.common.attack.core.ctx.MoveContext;
+import net.arna.jcraft.common.attack.moves.killerqueen.DetonateAttack;
+import net.arna.jcraft.common.entity.stand.KQBTDEntity;
+import net.arna.jcraft.registry.JStatusRegistry;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
+
+import java.util.Set;
+
+public class BTDGrabHitAttack extends AbstractMultiHitAttack<BTDGrabHitAttack, KQBTDEntity> {
+    public BTDGrabHitAttack(int cooldown, int moveStunTicks, float attackDistance, float damage, float hitBoxSize, float knockBack, float offset, @NonNull IntCollection hitMoments) {
+        super(cooldown, moveStunTicks, attackDistance, damage, hitBoxSize, knockBack, offset, hitMoments);
+    }
+
+    @Override
+    public @NonNull Set<LivingEntity> perform(KQBTDEntity stand, LivingEntity user, MoveContext ctx) {
+        Set<LivingEntity> targets = super.perform(stand, user, ctx);
+        switch (getBlow(stand)) {
+            case 0 -> {
+                for (LivingEntity ent : targets)
+                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 40, 0, true, false, true));
+            }
+            case 2 -> DetonateAttack.explode(stand, user, stand.getPos().subtract(0, .5, 0));
+        }
+
+        return targets;
+    }
+
+    @Override
+    protected BTDGrabHitAttack getThis() {
+        return this;
+    }
+}

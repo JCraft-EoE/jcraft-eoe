@@ -1,0 +1,60 @@
+package net.arna.jcraft.common.attack.core.ctx;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class MoveContext {
+    private final Map<MoveVariable<?>, Entry<?>> entries = new HashMap<>();
+
+    @SuppressWarnings("unchecked")
+    public <T> T get(MoveVariable<T> variable) {
+        Entry<?> entry = getEntry(variable);
+        return (T) entry.getValue();
+    }
+
+    public int getInt(IntMoveVariable variable) {
+        IntMoveVariable.IntEntry entry = (IntMoveVariable.IntEntry) getEntry(variable);
+        return entry.getIntValue();
+    }
+
+    public <T> void set(MoveVariable<T> variable, T value) {
+        getEntry(variable).setValue(value);
+    }
+
+    public void setInt(IntMoveVariable variable, int value) {
+        IntMoveVariable.IntEntry entry = (IntMoveVariable.IntEntry) getEntry(variable);
+        entry.setValue(value);
+    }
+
+    @SuppressWarnings("unchecked") // It is checked.
+    @NotNull
+    private <T> Entry<T> getEntry(MoveVariable<T> variable) {
+        Entry<?> entry = entries.get(variable);
+        if (entry == null) throw new IllegalArgumentException("No entry for the given variable could be found. " +
+                "Has it been registered?");
+
+        return (Entry<T>) entry;
+    }
+
+    public <T> void register(MoveVariable<T> variable) {
+        entries.put(variable, variable.createEntry());
+    }
+
+    public <T> void register(MoveVariable<T> variable, T initialValue) {
+        register(variable);
+        set(variable, initialValue);
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    static class Entry<T> {
+        private final Class<T> type;
+        @Setter
+        private T value;
+    }
+}

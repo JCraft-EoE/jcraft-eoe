@@ -361,14 +361,14 @@ public class JCraft implements ModInitializer {
     }
 
 
-    public static void createParticle(ServerWorld world, double x, double y, double z, int id) {
+    public static void createParticle(ServerWorld world, double x, double y, double z, JParticleType type) {
         PacketByteBuf buf = PacketByteBufs.create();
 
         buf.writeShort(8);
         buf.writeDouble(x);
         buf.writeDouble(y);
         buf.writeDouble(z);
-        buf.writeInt(id);
+        buf.writeEnumConstant(type);
 
         PlayerLookup.around(world, new Vec3d(x, y, z), 128).forEach(
                 serverPlayer -> ServerChannelFeedbackPacket.send(serverPlayer, buf)
@@ -392,7 +392,7 @@ public class JCraft implements ModInitializer {
 
             Vec3d pPos = player.getEyePos();
             burstTimers.put(player, 4);
-            createParticle(world, pPos.x, pPos.y, pPos.z, 0);
+            createParticle(world, pPos.x, pPos.y, pPos.z, JParticleType.COMBO_BREAK);
         }
     }
 

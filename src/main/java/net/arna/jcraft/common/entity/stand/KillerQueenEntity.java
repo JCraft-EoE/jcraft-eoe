@@ -1,8 +1,8 @@
 package net.arna.jcraft.common.entity.stand;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.attack.Attack;
-import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.attack.core.old.Attack;
+import net.arna.jcraft.common.attack.core.old.AttackType;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.SheerHeartAttackEntity;
@@ -15,6 +15,7 @@ import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
@@ -22,11 +23,8 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -34,6 +32,7 @@ import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -88,9 +87,8 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
         LivingEntity user = getUserOrThrow();
         CooldownsComponent cooldowns = JComponents.getCooldowns(user);
         if (user.isInSneakingPose() && cooldowns.getCooldown(CooldownType.STAND_SP1) < 1) {
-            BlockPos downBlock = user.getBlockPos().down();
-            boolean notAir = (world.getBlockState(downBlock).getBlock() != Blocks.AIR && world.getBlockState(downBlock).getBlock() != Blocks.CAVE_AIR &&
-                    world.getBlockState(downBlock).getBlock() != Blocks.VOID_AIR);
+            Block downBlock = world.getBlockState(user.getBlockPos().down()).getBlock();
+            boolean notAir = downBlock != Blocks.AIR && downBlock != Blocks.CAVE_AIR && downBlock != Blocks.VOID_AIR;
             if (notAir) {
                 bombEntity = null;
                 bombBlock = user.getPos().add(0, -0.5, 0);
@@ -147,20 +145,23 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
         LivingEntity user = getUserOrThrow();
         switch (attack.id) {
             case (4) -> {
-                if (entities.isEmpty()) { // If none are found, re-do an optimized hitbox check for any entity type
-                    Vec3d rotVec = getRotationVector();
-                    Vec3d boxCenter = getPos().add(0, user.getHeight() / 2, 0).add(rotVec);
-                    Vec3d halfBox = new Vec3d(0.5, 0.5, 0.5);
-                    List<Entity> hit = world.getEntitiesByClass(Entity.class,
-                            new Box(boxCenter.subtract(halfBox), boxCenter.add(halfBox)),
-                            EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e -> e != this && e != user));
+                Entity target = entities.stream()
+                        .findFirst()
+                        .<Entity>map(JUtils::getUserIfStand)
+                        .or(() -> {
+                            // If none are found, re-do an optimized hitbox check for any entity type
+                            Vec3d rotVec = getRotationVector();
+                            Vec3d boxCenter = getPos().add(0, user.getHeight() / 2, 0).add(rotVec);
+                            Vec3d halfBox = new Vec3d(0.5, 0.5, 0.5);
+                            List<Entity> hit = world.getEntitiesByClass(Entity.class,
+                                    new Box(boxCenter.subtract(halfBox), boxCenter.add(halfBox)),
+                                    EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e -> e != this && e != user));
+                            return !hit.isEmpty() ? Optional.of(hit.get(0)) : Optional.empty();
+                        })
+                        .orElse(null);
 
-                    if (!hit.isEmpty()) {
-                        bombEntity = hit.get(0);
-                        bombBlock = null;
-                    }
-                } else { // Living entities take priority
-                    bombEntity = JUtils.getUserIfStand(entities.stream().findFirst().orElseThrow());
+                if (target != null) {
+                    bombEntity = target;
                     bombBlock = null;
                 }
             }

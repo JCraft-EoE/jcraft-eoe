@@ -1,9 +1,9 @@
 package net.arna.jcraft.common.entity.stand;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.attack.Attack;
-import net.arna.jcraft.common.attack.AttackType;
-import net.arna.jcraft.common.attack.StunType;
+import net.arna.jcraft.common.attack.core.old.Attack;
+import net.arna.jcraft.common.attack.core.old.AttackType;
+import net.arna.jcraft.common.attack.core.StunType;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
@@ -36,7 +36,7 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import static net.arna.jcraft.common.attack.Attack.unusable;
+import static net.arna.jcraft.common.attack.core.old.Attack.unusable;
 
 public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public static final Attack crm1 = new Attack(14, JCraft.lightCooldown, 0.75f, 15, 9, 1.75, 5f, 0.75f, AttackType.BOX, 1f, 0.3f, 0, JSoundRegistry.IMPACT_3)
@@ -286,7 +286,8 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                     for (LivingEntity ent : entities) {
                         stun(ent, 20, 0);
 
-                        if (ent.getFirstPassenger() instanceof StandEntity<?, ?> stand) stand.blocking = false;
+                        StandEntity<?, ?> stand = JUtils.getStand(ent);
+                        if (stand != null) stand.blocking = false;
                     }
 
                     setAttack(grabhit, State.GRAB_HIT);

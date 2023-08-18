@@ -1,10 +1,11 @@
 package net.arna.jcraft.common.entity.stand;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.attack.Attack;
-import net.arna.jcraft.common.attack.AttackQueue;
-import net.arna.jcraft.common.attack.AttackType;
-import net.arna.jcraft.common.attack.HitBoxData;
+import net.arna.jcraft.common.attack.core.base.AbstractMove;
+import net.arna.jcraft.common.attack.core.old.Attack;
+import net.arna.jcraft.common.attack.core.old.AttackQueue;
+import net.arna.jcraft.common.attack.core.old.AttackType;
+import net.arna.jcraft.common.attack.core.HitBoxData;
 import net.arna.jcraft.common.entity.GEButterflyEntity;
 import net.arna.jcraft.common.entity.GEFrogEntity;
 import net.arna.jcraft.common.entity.GESnakeEntity;
@@ -316,7 +317,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
     }
 
     @Override
-    public MoveSelectionResult specificMoveSelectionCriterion(Attack attack, MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand, Attack enemyAttack) {
+    public MoveSelectionResult specificMoveSelectionCriterion(AbstractMove<?, ? super GoldExperienceEntity> attack, MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand, AbstractMove<?, ?> enemyAttack) {
         if (attack == lifegiver) {
             if (mob.getMainHandStack().isEmpty() && mob.getOffHandStack().isEmpty()) {
                 return MoveSelectionResult.STOP;
