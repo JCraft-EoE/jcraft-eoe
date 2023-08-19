@@ -2,6 +2,7 @@ package net.arna.jcraft.common.entity.stand;
 
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
+import net.arna.jcraft.common.attack.core.old.Attack;
 import net.arna.jcraft.common.attack.moves.magiciansred.*;
 import net.arna.jcraft.common.attack.moves.shared.KnockdownAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
@@ -19,17 +20,15 @@ import java.util.function.Consumer;
 
 public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, MagiciansRedEntity.State> {
     public static final RedirectAttack REDIRECT = new RedirectAttack(100, 7, 10, 0.75f);
-    public static final SimpleAttack<MagiciansRedEntity> LIGHT = SimpleAttack.<MagiciansRedEntity>lightAttack(5, 8, 5f, 0.75f, 0.75f, -0.1f)
+    public static final SimpleAttack<MagiciansRedEntity> LIGHT = SimpleAttack.<MagiciansRedEntity>lightAttack(5, 8, 5f, 16, 0.75f, 0.75f, -0.1f)
             .withCrouchingVariant(REDIRECT)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
-    public static final KnockdownAttack<MagiciansRedEntity> HEAVY = new KnockdownAttack<MagiciansRedEntity>(280, 12, 22, 7f, 1.75f, .5f, 1f, 0.6f, 40)
-            .withStun(10)
+    public static final KnockdownAttack<MagiciansRedEntity> HEAVY = new KnockdownAttack<MagiciansRedEntity>(280, 12, 22, 7f, 1.75f, 10, .5f, 1f, 0.6f, 40)
             .withSound(JSoundRegistry.MR_HEAVY)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withInfo(Text.literal("Low Kick"), Text.literal("medium windup knockdown"));
-
-    public static final FlamethrowerAttack FLAMETHROWER = new FlamethrowerAttack(340, 0, 60, 0.4f, 2, 0.25f, 0.75f, 0, 3)
+    public static final FlamethrowerAttack FLAMETHROWER = new FlamethrowerAttack(340, 0, 60, 0.4f, 0, 2, 0.25f, 0.75f, 0, 3)
             .withArmor(1)
             .withSound(JSoundRegistry.MR_BARRAGE)
             .withInfo(Text.literal("Flamethrower"), Text.literal("fast reliable damage cash-out tool, no stun, burns for 3 seconds"));

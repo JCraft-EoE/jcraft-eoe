@@ -8,9 +8,9 @@ import net.arna.jcraft.common.entity.stand.StandEntity;
  */
 public class BarrageAttack<S extends StandEntity<?, ?>> extends AbstractBarrageAttack<BarrageAttack<S>, StandEntity<?, ?>> {
 
-    public BarrageAttack(int cooldown, int windup, int duration, float attackDistance, float damage,
+    public BarrageAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun,
                          float hitBoxSize, float knockBack, float offset, int interval) {
-        super(cooldown, windup, duration, attackDistance, damage, , hitBoxSize, knockBack, offset, interval);
+        super(cooldown, windup, duration, attackDistance, damage, stun, hitBoxSize, knockBack, offset, interval);
     }
 
     @Override
