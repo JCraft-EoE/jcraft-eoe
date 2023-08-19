@@ -566,7 +566,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * @param animState    int identifier for which state to put the stand into
      */
     public boolean handleAttack(AbstractMove<?, ? super E> attack, CooldownType cooldownType, @Nullable S animState) {
-        if (cooldownType != null) {
+        if (cooldownType != null && attack.getCooldown() > 0) {
             CooldownsComponent cooldowns = JComponents.getCooldowns(getUser());
             int cooldown = cooldowns.getCooldown(cooldownType);
 
@@ -587,6 +587,15 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * @param animState int identifier for which state to put the stand into
      */
     public void setAttack(AbstractMove<?, ? super E> attack, @Nullable S animState) {
+        // If the attack has a duration of 0, just perform it immediately.
+        if (attack.getDuration() == 0) {
+            if (hasUser())
+                // Once again, fine here. Not making a method for this as we only need it twice.
+                //noinspection unchecked
+                attack.perform((E) this, user, moveContext);
+            return;
+        }
+
         curAttack = attack;
         setMoveStun(attack.getDuration());
         if (animState != null) this.setState(animState);
