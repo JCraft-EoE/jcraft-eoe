@@ -41,7 +41,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
     private final float offset;
     private final Set<HitBoxData> extraHitBoxes = new HashSet<>();
     private StunType stunType = StunType.BURSTABLE;
-    private int stun = 0;
+    private int stun;
     private boolean overrideStun;
     private boolean lift = true, canBackStab = true;
     private int blockStun;
@@ -62,26 +62,12 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
     // Properties alteration methods
 
     /**
-     * Stuns the targets, so they can no longer attack and/or move for a set period of time.
-     * Defaults to {@code 0}.
-     * @param stunTicks The duration for which targets should be stunned in ticks.
-     * @see #withStun(StunType, int)
-     * @return This attack
-     */
-    public T withStun(int stunTicks) {
-        return withStun(StunType.BURSTABLE, stunTicks);
-    }
-
-    /**
-     * Stuns the targets with a given type, so they can no longer attack and/or move for a set period of time.
-     * Defaults to {@code 0}.
-     * @param stunTicks The duration for which targets should be stunned in ticks.
+     * Sets the type to stun the target with.
      * @param type The type of stun to apply
      * @return This attack
      */
-    public T withStun(StunType type, int stunTicks) {
+    public T withStunType(StunType type) {
         this.stunType = type;
-        this.stun = stunTicks;
         return getThis();
     }
 
