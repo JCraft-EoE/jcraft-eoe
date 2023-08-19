@@ -171,8 +171,8 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
         if (!canAttack()) return;
 
         if (getUserOrThrow().isSneaking())
-            handleAttack(crm1, CooldownType.STAND_LIGHT, State.SWEEP);
-        else if (handleAttack(light, CooldownType.STAND_LIGHT, State.DUAL_CHOP))
+            handleMove(crm1, CooldownType.STAND_LIGHT, State.SWEEP);
+        else if (handleMove(light, CooldownType.STAND_LIGHT, State.DUAL_CHOP))
             playSound(JSoundRegistry.KC_DUAL_CHOP, 1, 1);
     }
 
@@ -183,7 +183,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
         boolean idling = getMoveStun() < 1;
 
         if (curAttack != heavy) {
-            if (idling && handleAttack(heavy, CooldownType.STAND_HEAVY, State.HEAVY)) {
+            if (idling && handleMove(heavy, CooldownType.STAND_HEAVY, State.HEAVY)) {
                 playSound(JSoundRegistry.KC_HEAVY, 1, 1);
             }
         } else if (getMoveStun() < 7) {
@@ -195,16 +195,16 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
+        if (handleMove(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
             playSound(JSoundRegistry.KC_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack() || !hasUser()) return;
-        if (getUserOrThrow().isSneaking() && handleAttack(bloodthrow, CooldownType.STAND_SP1, State.BLOOD_THROW))
+        if (getUserOrThrow().isSneaking() && handleMove(bloodthrow, CooldownType.STAND_SP1, State.BLOOD_THROW))
             getUserOrThrow().damage(DamageSource.MAGIC, 0.1f);
-        else if (handleAttack(eyechop, CooldownType.STAND_SP1, State.EYE_CHOP)) playSound(JSoundRegistry.KC_EYE_CHOP, 1, 1);
+        else if (handleMove(eyechop, CooldownType.STAND_SP1, State.EYE_CHOP)) playSound(JSoundRegistry.KC_EYE_CHOP, 1, 1);
     }
 
     private void beginPrediction() {
@@ -257,7 +257,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             return;
         }
 
-        if (handleAttack(timeerase, CooldownType.STAND_ULT, State.TIME_ERASE)) {
+        if (handleMove(timeerase, CooldownType.STAND_ULT, State.TIME_ERASE)) {
             if (getUser() instanceof ServerPlayerEntity player)
                 player.networkHandler.sendPacket(new PlaySoundS2CPacket(JSoundRegistry.TIME_ERASE, SoundCategory.PLAYERS, getX(), getY(), getZ(), 1, 1, 0));
         }
@@ -266,7 +266,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     @Override
     public void initSpecial2() {
         if (!canAttack()) return;
-        if (handleAttack(donut, CooldownType.STAND_SP2, State.DONUT))
+        if (handleMove(donut, CooldownType.STAND_SP2, State.DONUT))
             playSound(JSoundRegistry.KC_DONUT, 1, 1);
     }
 
@@ -282,8 +282,8 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
 
         if (start) {
             if (user.isSneaking())
-                handleAttack(epitaph, CooldownType.STAND_SP3, State.EPITAPH);
-            else if (handleAttack(prediction, CooldownType.STAND_SP3, State.PREDICT)) {
+                handleMove(epitaph, CooldownType.STAND_SP3, State.EPITAPH);
+            else if (handleMove(prediction, CooldownType.STAND_SP3, State.PREDICT)) {
                 predictionInfo.clear();
                 playSound(JSoundRegistry.KC_EPITAPH, 1, 1);
 
@@ -326,7 +326,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
 
     @Override
     public void initUtil() {
-        if (!canAttack() || !hasUser() || !handleAttack(timeskip, CooldownType.UTIL, State.TIMESKIP)) return;
+        if (!canAttack() || !hasUser() || !handleMove(timeskip, CooldownType.UTIL, State.TIMESKIP)) return;
         LivingEntity user = getUserOrThrow();
 
         Vec3d pos = user.getPos();

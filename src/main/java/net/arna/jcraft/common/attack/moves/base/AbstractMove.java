@@ -19,10 +19,10 @@ import java.util.Set;
 
 @Getter
 public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends StandEntity<?, ?>> {
-    private final int cooldown, windup;
-    private final int duration;
-    private final float moveDistance;
     private final List<SoundEvent> sounds = new ArrayList<>(), impactSounds = new ArrayList<>();
+    private int cooldown, windup;
+    private int duration;
+    private float moveDistance;
     private Text name, description;
     private AbstractMove<?, ? super S> crouchingVariant, followUp;
     private int armor;
@@ -38,6 +38,55 @@ public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends Stand
     }
 
     // Properties alteration methods
+
+    /**
+     * Sets the cooldown of this move.
+     * This is how many ticks the user has to wait to be able to use this attack again.
+     * Should be set via the constructor, this is only to modify copies.
+     * @param cooldown The cooldown of this move in ticks
+     * @return This move
+     */
+    public T withCooldown(int cooldown) {
+        this.cooldown = cooldown;
+        return getThis();
+    }
+
+    /**
+     * Sets the windup of this move.
+     * This is how long it takes for the attack to perform after being initiated.
+     * Should be set via the constructor, this is only to modify copies.
+     * @param windup The windup of this move in ticks
+     * @return This move
+     */
+    public T withWindup(int windup) {
+        this.windup = windup;
+        return getThis();
+    }
+
+    /**
+     * Sets the duration of this move.
+     * This is how long this attack lasts. It is also how long the user has to wait before they
+     * can initiate another attack.
+     * Should be set via the constructor, this is only to modify copies.
+     * @param duration The duration of this move in ticks
+     * @return This move
+     */
+    public T withDuration(int duration) {
+        this.duration = duration;
+        return getThis();
+    }
+
+    /**
+     * Sets the move distance of this move.
+     * This is how far away the stand is moved from the user when performing this move.
+     * Should be set via the constructor, this is only to modify copies.
+     * @param moveDistance The move distance of this move
+     * @return This move
+     */
+    public T withMoveDistance(float moveDistance) {
+        this.moveDistance = moveDistance;
+        return getThis();
+    }
 
     /**
      * Sets some information about this move displayed in commands.
@@ -103,7 +152,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends Stand
      * @see #withArmor(int)
      * @return This move
      */
-    public T withUnbreakable() {
+    public T withHyperArmor() {
         return withArmor(Integer.MAX_VALUE);
     }
 

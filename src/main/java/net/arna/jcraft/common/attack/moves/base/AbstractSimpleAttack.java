@@ -33,13 +33,14 @@ import java.util.stream.Stream;
  * @param <T>
  * @param <S>
  */
+@SuppressWarnings("unused")
 @Getter
 public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>, S extends StandEntity<?, ?>> extends AbstractMove<T, S> {
-    private final float damage;
-    private final float hitBoxSize;
-    private final float knockBack;
-    private final float offset;
     private final Set<HitBoxData> extraHitBoxes = new HashSet<>();
+    private float damage;
+    private float hitboxSize;
+    private float knockback;
+    private float offset;
     private StunType stunType = StunType.BURSTABLE;
     private int stun;
     private boolean overrideStun;
@@ -49,17 +50,72 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
     protected JParticleType hitSpark = JParticleType.HIT_SPARK_1;
 
     protected AbstractSimpleAttack(int cooldown, int windup, int duration, float attackDistance, float damage,
-                                   int stun, float hitBoxSize, float knockBack, float offset) {
+                                   int stun, float hitboxSize, float knockback, float offset) {
         super(cooldown, windup, duration, attackDistance);
         this.damage = damage;
         this.stun = stun;
-        this.hitBoxSize = hitBoxSize;
-        this.knockBack = knockBack;
+        this.hitboxSize = hitboxSize;
+        this.knockback = knockback;
         this.offset = offset;
         blockStun = (int) (damage + 4);
     }
 
     // Properties alteration methods
+
+    /**
+     * Sets the damage of this attack.
+     * Should be set using the constructor. This is only to modify copies.
+     * @param damage The damage of this attack
+     * @return This attack
+     */
+    public T withDamage(float damage) {
+        this.damage = damage;
+        return getThis();
+    }
+
+    /**
+     * Sets the hitbox size of this attack.
+     * Should be set using the constructor. This is only to modify copies.
+     * @param hitboxSize The hitbox size of this attack
+     * @return This attack
+     */
+    public T withHitboxSize(float hitboxSize) {
+        this.hitboxSize = hitboxSize;
+        return getThis();
+    }
+
+    /**
+     * Sets the knockback of this attack.
+     * Should be set using the constructor. This is only to modify copies.
+     * @param knockback The knockback of this attack
+     * @return This attack
+     */
+    public T withKnockback(float knockback) {
+        this.knockback = knockback;
+        return getThis();
+    }
+
+    /**
+     * Sets the offset of this attack.
+     * Should be set using the constructor. This is only to modify copies.
+     * @param offset The offset of this attack
+     * @return This attack
+     */
+    public T withOffset(float offset) {
+        this.offset = offset;
+        return getThis();
+    }
+
+    /**
+     * Sets the stun of this attack.
+     * Should be set using the constructor. This is only to modify copies.
+     * @param stun The stun of this attack
+     * @return This attack
+     */
+    public T withStun(int stun) {
+        this.stun = stun;
+        return getThis();
+    }
 
     /**
      * Sets the type to stun the target with.
@@ -137,9 +193,9 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
     }
 
     /**
-     * Adds an extra hit-box with the given size to use with every attack
-     * along with the main hit-box.
-     * @param size The size of the hit-box
+     * Adds an extra hitbox with the given size to use with every attack
+     * along with the main hitbox.
+     * @param size The size of the hitbox
      * @see #withExtraHitBox(double, double, double)
      * @return This attack
      */
@@ -148,12 +204,11 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
     }
 
     /**
-     * Adds an extra hit-box with the given size and offsets to use with every attack
-     * along with the main hit-box.
-     * @param size The size of the hit-box
-     * @param forwardOffset The forward offset of the hit-box
-     * @param verticalOffset The vertical offset of the hit-box
-     * @param size The size of the hit-box
+     * Adds an extra hitbox with the given size and offsets to use with every attack
+     * along with the main hitbox.
+     * @param forwardOffset The forward offset of the hitbox
+     * @param verticalOffset The vertical offset of the hitbox
+     * @param size The size of the hitbox
      * @return This attack
      */
     public T withExtraHitBox(double forwardOffset, double verticalOffset, double size) {
@@ -161,8 +216,8 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
     }
 
     /**
-     * Adds an extra hit-box to use with every attack along with the main hit-box.
-     * @param hitBox The hit-box to add
+     * Adds an extra hitbox to use with every attack along with the main hitbox.
+     * @param hitBox The hitbox to add
      * @return This attack
      */
     public T withExtraHitBox(HitBoxData hitBox) {
@@ -251,7 +306,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
     // Logic methods
     @Override
     public @NonNull Set<LivingEntity> perform(S stand, LivingEntity user, MoveContext ctx) {
-        if (hitBoxSize <= 0 && extraHitBoxes.isEmpty()) return Set.of();
+        if (hitboxSize <= 0 && extraHitBoxes.isEmpty()) return Set.of();
 
         Vec3d upVec = GravityChangerAPI.getEyeOffset(user);
         Vec3d hPos = getOffsetHeightPos(stand);
@@ -261,7 +316,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
 
         DamageSource damageSource = getDamageSource(stand);
         Set<Box> boxes = new HashSet<>();
-        boxes.add(createBox(fPos, hitBoxSize));
+        boxes.add(createBox(fPos, hitboxSize));
         extraHitBoxes.forEach(hitBox -> boxes.add(createBox(hPos, rotVec, upVec, hitBox)));
         return attackBoxes(stand, boxes, damageSource, fPos);
     }
@@ -290,7 +345,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
 
         getImpactSounds().forEach(sound -> stand.playSound(sound, 1f, 1f));
 
-        Vec3d kbVec = getRotVec(stand).multiply(knockBack).add(new Vec3d(0.0, Math.abs(knockBack) / 4, 0.0));
+        Vec3d kbVec = getRotVec(stand).multiply(knockback).add(new Vec3d(0.0, Math.abs(knockback) / 4, 0.0));
         for (LivingEntity target : validateTargets(stand, hurt))
             StandEntity.damageLogic(stand.world, target, kbVec, stun, stunType.ordinal(), overrideStun,
                     damage, lift, blockStun, damageSource, stand.getUserOrThrow(), canBackStab, blockableType.isNonBlockable());
@@ -301,5 +356,4 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
     protected Set<LivingEntity> validateTargets(S stand, Set<LivingEntity> targets) {
         return targets;
     }
-
 }

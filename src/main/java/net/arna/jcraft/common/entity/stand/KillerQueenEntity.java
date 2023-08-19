@@ -30,7 +30,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
             .withSound(JSoundRegistry.KQ_UPPERCUT)
             .withSound(JSoundRegistry.KQ_HEAVY)
             .withImpactSound(JSoundRegistry.IMPACT_4)
-            .withUnbreakable()
+            .withHyperArmor()
             .withLaunch()
             .withInfo(Text.literal("Haymaker"), Text.literal("slow, uninterruptible launcher"));
     public static final SheerHeartAttackAttack SHEER_HEART_ATTACK = new SheerHeartAttackAttack(1000, 16, 20, 1f)
@@ -78,7 +78,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
                     cooldowns.setCooldown(CooldownType.STAND_SP1, BOMB_PLANT.getCooldown());
                 }
             } else {
-                handleAttack(MoveType.SPECIAL1);
+                handleMove(MoveType.SPECIAL1);
                 bombBlock = null;
             }
 

@@ -112,7 +112,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
             if (curAttack != LIGHT) {
                 if (idling) {
                     if (user.isSneaking()) detonate();
-                    else handleAttack(MoveType.LIGHT);
+                    else handleMove(MoveType.LIGHT);
                 }
             } else if (getMoveStun() < 7) {
                 if (user.isSneaking())

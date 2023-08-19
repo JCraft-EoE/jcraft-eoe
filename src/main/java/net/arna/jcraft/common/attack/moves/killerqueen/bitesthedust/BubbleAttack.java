@@ -21,7 +21,7 @@ public class BubbleAttack extends AbstractMove<BubbleAttack, KQBTDEntity> {
     }
 
     @Override
-    public @NotNull Set<LivingEntity> perform(KQBTDEntity stand, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(KQBTDEntity stand, LivingEntity user, MoveContext ctx) {
         BubbleProjectile bubbleProjectile = new BubbleProjectile(stand.world, user);
         bubbleProjectile.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
         bubbleProjectile.setVelocity(user, user.getPitch(), user.getYaw(), 0, 0.5f, 0f);

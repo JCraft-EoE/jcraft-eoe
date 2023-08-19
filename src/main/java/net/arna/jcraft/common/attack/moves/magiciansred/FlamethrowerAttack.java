@@ -11,9 +11,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 
 public class FlamethrowerAttack extends AbstractBarrageAttack<FlamethrowerAttack, MagiciansRedEntity> {
-    public FlamethrowerAttack(int cooldown, int windup, int duration, float damage, int stun, float hitBoxSize, float knockBack,
+    public FlamethrowerAttack(int cooldown, int windup, int duration, float damage, int stun, float hitboxSize, float knockback,
                               float range, float offset, int interval) {
-        super(cooldown, windup, duration, range, damage, stun, hitBoxSize, knockBack, offset, interval);
+        super(cooldown, windup, duration, range, damage, stun, hitboxSize, knockback, offset, interval);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class FlamethrowerAttack extends AbstractBarrageAttack<FlamethrowerAttack
     }
 
     @Override
-    public @NotNull Set<LivingEntity> perform(MagiciansRedEntity stand, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(MagiciansRedEntity stand, LivingEntity user, MoveContext ctx) {
         Set<LivingEntity> targets = super.perform(stand, user, ctx);
         for (LivingEntity target : targets)
             if (!target.isOnFire())
@@ -56,6 +56,6 @@ public class FlamethrowerAttack extends AbstractBarrageAttack<FlamethrowerAttack
     @Override
     public FlamethrowerAttack copy() {
         return new FlamethrowerAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDuration(),
-                getStun(), getHitBoxSize(), getKnockBack(), getOffset(), getInterval());
+                getStun(), getHitboxSize(), getKnockback(), getOffset(), getInterval());
     }
 }

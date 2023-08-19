@@ -20,9 +20,9 @@ public class RekkaAttack extends AbstractSimpleAttack<RekkaAttack, GoldExperienc
     private final int switchStart;
     private final GoldExperienceEntity.State nextState;
 
-    public RekkaAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun, float hitBoxSize,
-                       float knockBack, float offset, int rekkaLevel, int switchStart, RekkaAttack next, GoldExperienceEntity.State nextState) {
-        super(cooldown, windup, duration, attackDistance, damage, stun, hitBoxSize, knockBack, offset);
+    public RekkaAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun, float hitboxSize,
+                       float knockback, float offset, int rekkaLevel, int switchStart, RekkaAttack next, GoldExperienceEntity.State nextState) {
+        super(cooldown, windup, duration, attackDistance, damage, stun, hitboxSize, knockback, offset);
         if (rekkaLevel > 1) hitSpark = JParticleType.HIT_SPARK_2;
         this.rekkaLevel = rekkaLevel;
         this.switchStart = switchStart;
@@ -54,6 +54,6 @@ public class RekkaAttack extends AbstractSimpleAttack<RekkaAttack, GoldExperienc
     @Override
     public RekkaAttack copy() {
         return new RekkaAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getHitBoxSize(), getKnockBack(), getOffset(), getRekkaLevel(), getSwitchStart(), getNext(), getNextState());
+                getHitboxSize(), getKnockback(), getOffset(), getRekkaLevel(), getSwitchStart(), getNext(), getNextState());
     }
 }

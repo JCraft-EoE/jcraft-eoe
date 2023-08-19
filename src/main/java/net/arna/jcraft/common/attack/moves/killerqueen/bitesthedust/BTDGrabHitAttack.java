@@ -13,9 +13,9 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import java.util.Set;
 
 public class BTDGrabHitAttack extends AbstractMultiHitAttack<BTDGrabHitAttack, KQBTDEntity> {
-    public BTDGrabHitAttack(int cooldown, int duration, float attackDistance, float damage, int stun, float hitBoxSize,
-                            float knockBack, float offset, @NonNull IntCollection hitMoments) {
-        super(cooldown, duration, attackDistance, damage, stun, hitBoxSize, knockBack, offset, hitMoments);
+    public BTDGrabHitAttack(int cooldown, int duration, float attackDistance, float damage, int stun, float hitboxSize,
+                            float knockback, float offset, @NonNull IntCollection hitMoments) {
+        super(cooldown, duration, attackDistance, damage, stun, hitboxSize, knockback, offset, hitMoments);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class BTDGrabHitAttack extends AbstractMultiHitAttack<BTDGrabHitAttack, K
 
     @Override
     public BTDGrabHitAttack copy() {
-        return new BTDGrabHitAttack(getCooldown(), getDuration(), getMoveDistance(), getDamage(), getStun(), getHitBoxSize(),
-                getKnockBack(), getOffset(), getHitMoments());
+        return new BTDGrabHitAttack(getCooldown(), getDuration(), getMoveDistance(), getDamage(), getStun(), getHitboxSize(),
+                getKnockback(), getOffset(), getHitMoments());
     }
 }

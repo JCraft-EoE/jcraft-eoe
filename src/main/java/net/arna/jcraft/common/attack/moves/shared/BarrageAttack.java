@@ -9,8 +9,8 @@ import net.arna.jcraft.common.entity.stand.StandEntity;
 public class BarrageAttack<S extends StandEntity<?, ?>> extends AbstractBarrageAttack<BarrageAttack<S>, StandEntity<?, ?>> {
 
     public BarrageAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun,
-                         float hitBoxSize, float knockBack, float offset, int interval) {
-        super(cooldown, windup, duration, attackDistance, damage, stun, hitBoxSize, knockBack, offset, interval);
+                         float hitboxSize, float knockback, float offset, int interval) {
+        super(cooldown, windup, duration, attackDistance, damage, stun, hitboxSize, knockback, offset, interval);
     }
 
     @Override
@@ -21,6 +21,6 @@ public class BarrageAttack<S extends StandEntity<?, ?>> extends AbstractBarrageA
     @Override
     public BarrageAttack<S> copy() {
         return new BarrageAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getHitBoxSize(), getKnockBack(), getOffset(), getInterval());
+                getHitboxSize(), getKnockback(), getOffset(), getInterval());
     }
 }

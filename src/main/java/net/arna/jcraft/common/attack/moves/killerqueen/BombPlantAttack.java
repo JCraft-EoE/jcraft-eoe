@@ -24,18 +24,18 @@ public class BombPlantAttack extends AbstractSimpleAttack<BombPlantAttack, Abstr
     public static final MoveVariable<Entity> BOMB_ENTITY = new MoveVariable<>(Entity.class);
     public static final MoveVariable<Vec3d> BOMB_POS = new MoveVariable<>(Vec3d.class);
 
-    public BombPlantAttack(int cooldown, int windup, int duration, float attackDistance, int stun, float hitBoxSize, float offset) {
-        super(cooldown, windup, duration, attackDistance, 0f, stun, hitBoxSize, 0f, offset);
+    public BombPlantAttack(int cooldown, int windup, int duration, float attackDistance, int stun, float hitboxSize, float offset) {
+        super(cooldown, windup, duration, attackDistance, 0f, stun, hitboxSize, 0f, offset);
     }
 
     @Override
-    public @NotNull Set<LivingEntity> perform(AbstractKillerQueenEntity<?, ?> stand, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(AbstractKillerQueenEntity<?, ?> stand, LivingEntity user, MoveContext ctx) {
         Set<LivingEntity> targets = super.perform(stand, user, ctx);
         Entity target = targets.stream()
                 .findFirst()
                 .<Entity>map(JUtils::getUserIfStand)
                 .or(() -> {
-                    // If none are found, re-do an optimized hit-box check for any entity type
+                    // If none are found, re-do an optimized hitbox check for any entity type
                     Vec3d rotVec = getRotVec(stand);
                     Vec3d boxCenter = stand.getPos().add(0, user.getHeight() / 2, 0).add(rotVec);
                     Vec3d halfBox = new Vec3d(0.5, 0.5, 0.5);
@@ -138,7 +138,7 @@ public class BombPlantAttack extends AbstractSimpleAttack<BombPlantAttack, Abstr
 
     @Override
     public BombPlantAttack copy() {
-        return new BombPlantAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getStun(), getHitBoxSize(),
+        return new BombPlantAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getStun(), getHitboxSize(),
                 getOffset());
     }
 }

@@ -23,12 +23,12 @@ public class BTDPlantAttack extends AbstractSimpleAttack<BTDPlantAttack, KQBTDEn
     public static final MoveVariable<LivingEntity> BTD_ENTITY = new MoveVariable<>(LivingEntity.class);
     public static final MoveVariable<Vec3d> BTD_POS = new MoveVariable<>(Vec3d.class);
 
-    public BTDPlantAttack(int cooldown, int windup, int duration, float attackDistance, int stun, float hitBoxSize, float offset) {
-        super(cooldown, windup, duration, attackDistance, 0f, stun, hitBoxSize, 0f, offset);
+    public BTDPlantAttack(int cooldown, int windup, int duration, float attackDistance, int stun, float hitboxSize, float offset) {
+        super(cooldown, windup, duration, attackDistance, 0f, stun, hitboxSize, 0f, offset);
     }
 
     @Override
-    public @NotNull Set<LivingEntity> perform(KQBTDEntity stand, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(KQBTDEntity stand, LivingEntity user, MoveContext ctx) {
         Set<LivingEntity> targets = super.perform(stand, user, ctx);
         if (targets.isEmpty()) return Set.of();
 
@@ -117,7 +117,7 @@ public class BTDPlantAttack extends AbstractSimpleAttack<BTDPlantAttack, KQBTDEn
 
     @Override
     public BTDPlantAttack copy() {
-        return new BTDPlantAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getStun(), getHitBoxSize(),
+        return new BTDPlantAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getStun(), getHitboxSize(),
                 getOffset());
     }
 }

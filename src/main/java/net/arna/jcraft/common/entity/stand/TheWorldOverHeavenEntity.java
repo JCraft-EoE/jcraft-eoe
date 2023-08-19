@@ -168,23 +168,23 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        if (getUserOrThrow().isSneaking() && handleAttack(Attack.copyOf(crm1), CooldownType.STAND_LIGHT, State.LUNGE))
+        if (getUserOrThrow().isSneaking() && handleMove(Attack.copyOf(crm1), CooldownType.STAND_LIGHT, State.LUNGE))
             playSound(JSoundRegistry.MUDA_DA, 1, 1);
         else
-            handleAttack(light, CooldownType.STAND_LIGHT, State.LIGHT);
+            handleMove(light, CooldownType.STAND_LIGHT, State.LIGHT);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
+        if (handleMove(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
             playSound(JSoundRegistry.TWOH_BARRAGE, 1, 1);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        if (handleAttack(heavy, CooldownType.STAND_HEAVY, State.HEAVY))
+        if (handleMove(heavy, CooldownType.STAND_HEAVY, State.HEAVY))
             playSound(JSoundRegistry.TWOH_HEAVY, 1, 1);
     }
 
@@ -201,7 +201,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             return;
         }
 
-        if (canAttack() && handleAttack(smite, CooldownType.STAND_SP1, State.SMITE) && hasUser()) {
+        if (canAttack() && handleMove(smite, CooldownType.STAND_SP1, State.SMITE) && hasUser()) {
             LivingEntity user = getUserOrThrow();
             if (user.isOnGround()) {
                 smiteDamage = 8f;
@@ -245,9 +245,9 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         CanAttackData cad = this.canAttackWithData();
         if (!cad.canAttack()) return;
 
-        if (cad.user().isOnGround() && handleAttack(delayknives, CooldownType.STAND_SP2, State.AIR_KNIVES))
+        if (cad.user().isOnGround() && handleMove(delayknives, CooldownType.STAND_SP2, State.AIR_KNIVES))
             playSound(JSoundRegistry.TWOH_AIRKNIVES, 1, 1);
-        else if (handleAttack(knives, CooldownType.STAND_SP2, State.THROW)) playSound(JSoundRegistry.TWOH_KNIFETHROW, 1, 1);
+        else if (handleMove(knives, CooldownType.STAND_SP2, State.THROW)) playSound(JSoundRegistry.TWOH_KNIFETHROW, 1, 1);
     }
 
     @Override
@@ -257,7 +257,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             return;
         }
 
-        if (canAttack() && handleAttack(chargeoverwrite, CooldownType.STAND_SP3, State.CHARGE_OVERWRITE))
+        if (canAttack() && handleMove(chargeoverwrite, CooldownType.STAND_SP3, State.CHARGE_OVERWRITE))
             playSound(JSoundRegistry.TWOH_CHARGEOVERWRITE, 1, 1);
     }
 
@@ -265,7 +265,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
     public void initUlt() {
         if (!canAttack()) return;
         if (tsTime <= 0) {
-            if (handleAttack(timestop, CooldownType.STAND_ULT, State.TIME_STOP))
+            if (handleMove(timestop, CooldownType.STAND_ULT, State.TIME_STOP))
                 playSound(JSoundRegistry.TWOH_TS, 1, 1);
         } else {
             JCraft.stopTimestop(getUserOrThrow());
@@ -276,7 +276,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
     @Override
     public void initUtil() {
         if (!canAttack() || tsTime > 0) return;
-        handleAttack(timeskip, CooldownType.UTIL, State.TIMESKIP);
+        handleMove(timeskip, CooldownType.UTIL, State.TIMESKIP);
     }
 
     @Override

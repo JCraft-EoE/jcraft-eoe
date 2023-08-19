@@ -17,13 +17,13 @@ public class KnockdownAttack<S extends StandEntity<?, ?>> extends AbstractSimple
     private final int knockdownDuration;
 
     public KnockdownAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun,
-                           float hitBoxSize, float knockBack, float offset, int knockdownDuration) {
-        super(cooldown, windup, duration, attackDistance, damage, stun, hitBoxSize, knockBack, offset);
+                           float hitboxSize, float knockback, float offset, int knockdownDuration) {
+        super(cooldown, windup, duration, attackDistance, damage, stun, hitboxSize, knockback, offset);
         this.knockdownDuration = knockdownDuration;
     }
 
     @Override
-    public @NotNull Set<LivingEntity> perform(S stand, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(S stand, LivingEntity user, MoveContext ctx) {
         Set<LivingEntity> targets = super.perform(stand, user, ctx);
         for (LivingEntity target : targets)
             if (!JUtils.isBlocking(target))
@@ -40,6 +40,6 @@ public class KnockdownAttack<S extends StandEntity<?, ?>> extends AbstractSimple
     @Override
     public KnockdownAttack<S> copy() {
         return new KnockdownAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getHitBoxSize(), getKnockBack(), getOffset(), knockdownDuration);
+                getHitboxSize(), getKnockback(), getOffset(), knockdownDuration);
     }
 }

@@ -35,7 +35,7 @@ public class CrossfireHurricaneAttack extends AbstractMove<CrossfireHurricaneAtt
     }
 
     @Override
-    public @NotNull Set<LivingEntity> perform(MagiciansRedEntity stand, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(MagiciansRedEntity stand, LivingEntity user, MoveContext ctx) {
         ctx.setInt(HURRICANE_TIME, 50);
         ctx.set(HURRICANE_POS, stand.getPos());
         return Set.of();

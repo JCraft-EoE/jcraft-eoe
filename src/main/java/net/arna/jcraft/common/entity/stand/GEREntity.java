@@ -156,8 +156,8 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         if (!data.canAttack()) return;
 
         if (data.user().isOnGround())
-            handleAttack(light, CooldownType.STAND_LIGHT, State.LIGHT);
-        else handleAttack(airlight, CooldownType.STAND_LIGHT, State.AIR_LIGHT);
+            handleMove(light, CooldownType.STAND_LIGHT, State.LIGHT);
+        else handleMove(airlight, CooldownType.STAND_LIGHT, State.AIR_LIGHT);
     }
 
     @Override
@@ -166,10 +166,10 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         if (!data.canAttack()) return;
 
         if (data.user().isOnGround()) {
-            if (handleAttack(heavy, CooldownType.STAND_HEAVY, State.HEAVY))
+            if (handleMove(heavy, CooldownType.STAND_HEAVY, State.HEAVY))
                 playSound(JSoundRegistry.GER_HEAVY, 1, 1);
         } else {
-            if (handleAttack(airheavy, CooldownType.STAND_HEAVY, State.AIR_HEAVY))
+            if (handleMove(airheavy, CooldownType.STAND_HEAVY, State.AIR_HEAVY))
                 playSound(JSoundRegistry.GER_HEAVY, 1, 1);
         }
     }
@@ -179,9 +179,9 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         CanAttackData data = canAttackWithData();
         if (!data.canAttack()) return;
 
-        if (data.user().isOnGround() && handleAttack(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
+        if (data.user().isOnGround() && handleMove(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
             playSound(JSoundRegistry.GE_BARRAGE, 1, 1);
-        else if (handleAttack(airbarrage, CooldownType.STAND_BARRAGE, State.AIR_BARRAGE))
+        else if (handleMove(airbarrage, CooldownType.STAND_BARRAGE, State.AIR_BARRAGE))
             playSound(JSoundRegistry.GER_KICKBARRAGE, 1, 1);
     }
 
@@ -191,10 +191,10 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         if (!data.canAttack()) return;
 
         if (data.user().isSneaking()) {
-            if (handleAttack(heal, CooldownType.STAND_SP1, State.HEAL))
+            if (handleMove(heal, CooldownType.STAND_SP1, State.HEAL))
                 playSound(JSoundRegistry.GE_HEAL, 1, 1);
         } else {
-            if (handleAttack(healself, CooldownType.STAND_SP1, State.HEAL_SELF))
+            if (handleMove(healself, CooldownType.STAND_SP1, State.HEAL_SELF))
                 playSound(JSoundRegistry.GE_HEAL, 1, 1);
         }
     }
@@ -216,16 +216,16 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         CanAttackData data = canAttackWithData();
         if (!data.canAttack()) return;
 
-        if (data.user().isSneaking() && handleAttack(chargelaser, CooldownType.STAND_SP2, State.SLOW_LASER))
+        if (data.user().isSneaking() && handleMove(chargelaser, CooldownType.STAND_SP2, State.SLOW_LASER))
             playSound(JSoundRegistry.GER_SLOW_LASER, 1, 1);
-        else if (handleAttack(laser, CooldownType.STAND_SP2, State.LASER))
+        else if (handleMove(laser, CooldownType.STAND_SP2, State.LASER))
             playSound(JSoundRegistry.GER_LASER, 1, 1);
     }
 
     @Override
     public void initSpecial3() {
         if (!canAttack()) return;
-        if (handleAttack(counter, CooldownType.STAND_SP3, State.COUNTER))
+        if (handleMove(counter, CooldownType.STAND_SP3, State.COUNTER))
             playSound(JSoundRegistry.GE_HEAL, 1, 1);
     }
 
@@ -269,7 +269,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
     public void initUlt() {
         if (!canAttack()) return;
         if (rtzEntityData.isEmpty()) {
-            if (handleAttack(rtz, CooldownType.STAND_ULT, State.SETUP)) // Setup
+            if (handleMove(rtz, CooldownType.STAND_ULT, State.SETUP)) // Setup
                 playSound(JSoundRegistry.GER_SETUP, 1, 1);
         } else {
             returnToZero();

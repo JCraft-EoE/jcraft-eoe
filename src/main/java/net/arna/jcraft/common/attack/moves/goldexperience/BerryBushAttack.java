@@ -17,8 +17,8 @@ public class BerryBushAttack extends AbstractSimpleAttack<BerryBushAttack, GoldE
     private static final BlockState berryBush = Blocks.SWEET_BERRY_BUSH.getDefaultState().with(SweetBerryBushBlock.AGE, 1);
 
     public BerryBushAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun,
-                           float hitBoxSize, float knockBack, float offset) {
-        super(cooldown, windup, duration, attackDistance, damage, stun, hitBoxSize, knockBack, offset);
+                           float hitboxSize, float knockback, float offset) {
+        super(cooldown, windup, duration, attackDistance, damage, stun, hitboxSize, knockback, offset);
     }
 
     @Override
@@ -39,6 +39,6 @@ public class BerryBushAttack extends AbstractSimpleAttack<BerryBushAttack, GoldE
     @Override
     public BerryBushAttack copy() {
         return new BerryBushAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getHitBoxSize(), getKnockBack(), getOffset());
+                getHitboxSize(), getKnockback(), getOffset());
     }
 }

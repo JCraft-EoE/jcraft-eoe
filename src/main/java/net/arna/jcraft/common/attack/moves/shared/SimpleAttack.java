@@ -6,18 +6,18 @@ import net.arna.jcraft.common.util.JParticleType;
 
 public class SimpleAttack<S extends StandEntity<?, ?>> extends AbstractSimpleAttack<SimpleAttack<S>, S> {
     /**
-     * Creates a new simple attack with a single hit-box.
+     * Creates a new simple attack with a single hitbox.
      * @param cooldown The cooldown for this attack in ticks.
      * @param windup The windup of this attack in ticks. How long until the blow is landed.
      * @param duration The duration after which a new attack can be initiated in ticks.
      * @param damage The damage this attack deals.
-     * @param hitBoxSize The size of the hit-box in blocks.
-     * @param knockBack The strength of the knock-back.
-     * @param attackDistance The distance at which the hit-box is placed.
-     * @param offset The amount the hit-box is offset by.
+     * @param hitboxSize The size of the hitbox in blocks.
+     * @param knockback The strength of the knock-back.
+     * @param attackDistance The distance at which the hitbox is placed.
+     * @param offset The amount the hitbox is offset by.
      */
-    public SimpleAttack(int cooldown, int windup, int duration, float damage, int stun, float hitBoxSize, float knockBack, float attackDistance, float offset) {
-        super(cooldown, windup, duration, attackDistance, damage, stun, hitBoxSize, knockBack, offset);
+    public SimpleAttack(int cooldown, int windup, int duration, float damage, int stun, float hitboxSize, float knockback, float attackDistance, float offset) {
+        super(cooldown, windup, duration, attackDistance, damage, stun, hitboxSize, knockback, offset);
     }
 
     public SimpleAttack<S> withHitSpark(JParticleType particle) {
@@ -30,12 +30,12 @@ public class SimpleAttack<S extends StandEntity<?, ?>> extends AbstractSimpleAtt
      * @param windup The windup of this attack in ticks. How long until the blow is landed.
      * @param duration The duration after which a new attack can be initiated in ticks.
      * @param damage The damage this attack deals.
-     * @param attackDistance The distance at which the hit-box is placed.
-     * @param offset The amount the hit-box is offset by.
+     * @param attackDistance The distance at which the hitbox is placed.
+     * @param offset The amount the hitbox is offset by.
      */
     public static <S extends StandEntity<?, ?>> SimpleAttack<S> lightAttack(int windup, int duration, float damage,
-                                                                            int stun, float knockBack, float attackDistance, float offset) {
-        return new SimpleAttack<>(30, windup, duration, damage, stun, 1.5f, knockBack, attackDistance, offset);
+                                                                            int stun, float knockback, float attackDistance, float offset) {
+        return new SimpleAttack<>(30, windup, duration, damage, stun, 1.5f, knockback, attackDistance, offset);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class SimpleAttack<S extends StandEntity<?, ?>> extends AbstractSimpleAtt
 
     @Override
     public SimpleAttack<S> copy() {
-        return new SimpleAttack<>(getCooldown(), getWindup(), getDuration(), getDamage(), getStun(), getHitBoxSize(),
-                getKnockBack(), getMoveDistance(), getOffset());
+        return new SimpleAttack<>(getCooldown(), getWindup(), getDuration(), getDamage(), getStun(), getHitboxSize(),
+                getKnockback(), getMoveDistance(), getOffset());
     }
 }

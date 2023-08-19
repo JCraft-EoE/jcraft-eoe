@@ -215,21 +215,21 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        handleAttack(light, CooldownType.STAND_LIGHT, State.SWIPE);
+        handleMove(light, CooldownType.STAND_LIGHT, State.SWIPE);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
         if (getUser() != null && getUser().isOnGround())
-            handleAttack(combo, CooldownType.STAND_BARRAGE, State.COMBO);
-        else handleAttack(airbarrage, CooldownType.STAND_BARRAGE, State.AIR_BARRAGE);
+            handleMove(combo, CooldownType.STAND_BARRAGE, State.COMBO);
+        else handleMove(airbarrage, CooldownType.STAND_BARRAGE, State.AIR_BARRAGE);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        if (handleAttack(launch, CooldownType.STAND_HEAVY, State.LAUNCH)) {
+        if (handleMove(launch, CooldownType.STAND_HEAVY, State.LAUNCH)) {
             setSand(true);
             playSound(JSoundRegistry.FOOL_LAUNCH, 1, 1);
         }
@@ -238,7 +238,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        if (handleAttack(sandstorm, CooldownType.STAND_ULT, State.SANDSTORM))
+        if (handleMove(sandstorm, CooldownType.STAND_ULT, State.SANDSTORM))
             playSound(JSoundRegistry.FOOL_ULT, 1, 1);
     }
 
@@ -251,7 +251,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     @Override
     public void initSpecial1() {
         if (curAttack != null && curAttack.id == pound.id && getMoveStun() < 12) initSlam(1);
-        if (canAttack() && handleAttack(pound, CooldownType.STAND_SP1, State.POUND_UP))
+        if (canAttack() && handleMove(pound, CooldownType.STAND_SP1, State.POUND_UP))
             playSound(JSoundRegistry.FOOL_BARK2, 1, 1);
     }
 
@@ -261,9 +261,9 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
 
         if (!canAttack()) return;
 
-        if (getUser() != null && getUser().isOnGround() && handleAttack(charge, CooldownType.STAND_SP2, State.CHARGE))
+        if (getUser() != null && getUser().isOnGround() && handleMove(charge, CooldownType.STAND_SP2, State.CHARGE))
             playSound(JSoundRegistry.FOOL_CHARGE, 1, 1);
-        else if (handleAttack(tornado, CooldownType.STAND_SP2, State.TORNADO)) {
+        else if (handleMove(tornado, CooldownType.STAND_SP2, State.TORNADO)) {
             setSand(true);
             playSound(JSoundRegistry.FOOL_LAUNCH, 1, 1);
         }
@@ -272,7 +272,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     @Override
     public void initSpecial3() {
         if (curAttack != null && curAttack.id == pound.id && getMoveStun() < 12) initSlam(3);
-        if (canAttack() && handleAttack(sandclone, CooldownType.STAND_SP3, State.CREATE)) {
+        if (canAttack() && handleMove(sandclone, CooldownType.STAND_SP3, State.CREATE)) {
             setSand(true);
             playSound(SoundEvents.BLOCK_SAND_PLACE, 1, 1);
         }
@@ -282,13 +282,13 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     public void initUtil() {
         if (!canAttack()) return;
         LivingEntity user = getUser();
-        if (user != null && user.isOnGround() && handleAttack(sandwave, CooldownType.UTIL, State.SAND_WAVE)) {
+        if (user != null && user.isOnGround() && handleMove(sandwave, CooldownType.UTIL, State.SAND_WAVE)) {
             setSand(true);
             setWave(true);
             setFree(false);
 
             playSound(JSoundRegistry.FOOL_BARK1, 1, 1);
-        } else if (handleAttack(glide, CooldownType.UTIL, State.GLIDE)) {
+        } else if (handleMove(glide, CooldownType.UTIL, State.GLIDE)) {
             setSand(true);
             setFree(false);
 

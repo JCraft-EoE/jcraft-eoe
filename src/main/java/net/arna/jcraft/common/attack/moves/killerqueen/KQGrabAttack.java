@@ -10,9 +10,9 @@ import net.minecraft.entity.LivingEntity;
 import java.util.Set;
 
 public class KQGrabAttack extends AbstractGrabAttack<KQGrabAttack, KillerQueenEntity, KillerQueenEntity.State> {
-    public KQGrabAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun, float hitBoxSize,
-                        float knockBack, float offset, AbstractMove<?, KillerQueenEntity> hitMove, KillerQueenEntity.State hitState) {
-        super(cooldown, windup, duration, attackDistance, damage, stun, hitBoxSize, knockBack, offset, hitMove, hitState);
+    public KQGrabAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun, float hitboxSize,
+                        float knockback, float offset, AbstractMove<?, KillerQueenEntity> hitMove, KillerQueenEntity.State hitState) {
+        super(cooldown, windup, duration, attackDistance, damage, stun, hitboxSize, knockback, offset, hitMove, hitState);
     }
 
     @Override
@@ -33,6 +33,6 @@ public class KQGrabAttack extends AbstractGrabAttack<KQGrabAttack, KillerQueenEn
     @Override
     public KQGrabAttack copy() {
         return new KQGrabAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getHitBoxSize(), getKnockBack(), getOffset(), getHitMove(), getHitState());
+                getHitboxSize(), getKnockback(), getOffset(), getHitMove(), getHitState());
     }
 }

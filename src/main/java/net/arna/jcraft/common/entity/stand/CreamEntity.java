@@ -187,9 +187,9 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public void initLightAttack() {
         if (!canAttack()) return;
 
-        if (isHalfBall()) handleAttack(balllight, CooldownType.STAND_LIGHT, State.BALL_LIGHT);
-        else if (getUserOrThrow().isSneaking()) handleAttack(crm1, CooldownType.STAND_LIGHT, State.BITE);
-        else handleAttack(light, CooldownType.STAND_LIGHT, State.LIGHT);
+        if (isHalfBall()) handleMove(balllight, CooldownType.STAND_LIGHT, State.BALL_LIGHT);
+        else if (getUserOrThrow().isSneaking()) handleMove(crm1, CooldownType.STAND_LIGHT, State.BITE);
+        else handleMove(light, CooldownType.STAND_LIGHT, State.LIGHT);
     }
 
     @Override
@@ -197,9 +197,9 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         if (!canAttack()) return;
 
         if (isHalfBall()) {
-            if (handleAttack(ballheavy, CooldownType.STAND_HEAVY, State.BALL_HEAVY))
+            if (handleMove(ballheavy, CooldownType.STAND_HEAVY, State.BALL_HEAVY))
                 playSound(JSoundRegistry.CREAM_SMASH, 1, 1);
-        } else if (handleAttack(heavy, CooldownType.STAND_HEAVY, State.HEAVY))
+        } else if (handleMove(heavy, CooldownType.STAND_HEAVY, State.HEAVY))
             playSound(JSoundRegistry.CREAM_HEAVY, 1, 1);
     }
 
@@ -207,9 +207,9 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public void initBarrage() {
         if (!canAttack()) return;
 
-        if (isHalfBall() && handleAttack(ballcombo, CooldownType.STAND_BARRAGE, State.BALL_COMBO))
+        if (isHalfBall() && handleMove(ballcombo, CooldownType.STAND_BARRAGE, State.BALL_COMBO))
             playSound(JSoundRegistry.CREAM_COMBO, 1, 1);
-        else if (handleAttack(combo, CooldownType.STAND_BARRAGE, State.COMBO))
+        else if (handleMove(combo, CooldownType.STAND_BARRAGE, State.COMBO))
             playSound(JSoundRegistry.CREAM_COMBO, 1, 1);
     }
 
@@ -217,7 +217,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public void initUlt() {
         if (!canAttack()) return;
 
-        if (handleAttack(consume, CooldownType.STAND_ULT, State.CONSUME))
+        if (handleMove(consume, CooldownType.STAND_ULT, State.CONSUME))
             playSound(JSoundRegistry.CREAM_CONSUME, 1, 1);
     }
 
@@ -225,9 +225,9 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public void initSpecial1() {
         if (!canAttack()) return;
 
-        if (isHalfBall() && handleAttack(ballcharge, CooldownType.STAND_SP1, State.BALL_CONSUME))
+        if (isHalfBall() && handleMove(ballcharge, CooldownType.STAND_SP1, State.BALL_CONSUME))
             playSound(JSoundRegistry.CREAM_BALLDASH, 1, 1);
-        else if (handleAttack(grab, CooldownType.STAND_SP1, State.GRAB))
+        else if (handleMove(grab, CooldownType.STAND_SP1, State.GRAB))
             playSound(JSoundRegistry.CREAM_GRAB, 1, 1);
     }
 
@@ -240,7 +240,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         Vec3d rotVec = user.getRotationVector();
         HitResult hitResult = world.raycast(new RaycastContext(eyePos, eyePos.add(rotVec.multiply(16)), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user));
 
-        if (hitResult.getType() != HitResult.Type.MISS && handleAttack(surprise, CooldownType.STAND_SP2, State.SURPRISE)) {
+        if (hitResult.getType() != HitResult.Type.MISS && handleMove(surprise, CooldownType.STAND_SP2, State.SURPRISE)) {
             setFree(true);
             setFreePos(new Vec3f(user.getPos()));
             outPos = new Vec3f(hitResult.getPos());
@@ -252,7 +252,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public void initSpecial3() {
         if (!canAttack()) return;
 
-        if (!isHalfBall() && handleAttack(destroy, CooldownType.STAND_SP3, State.DESTROY))
+        if (!isHalfBall() && handleMove(destroy, CooldownType.STAND_SP3, State.DESTROY))
             playSound(JSoundRegistry.CREAM_OVERHEAD, 1, 1);
     }
 
@@ -261,9 +261,9 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         if (!canAttack()) return;
 
         if (isHalfBall()) {
-            if (handleAttack(exit, CooldownType.UTIL, State.EXIT))
+            if (handleMove(exit, CooldownType.UTIL, State.EXIT))
                 playSound(JSoundRegistry.CREAM_EXIT, 1, 1);
-        } else if (handleAttack(enter, CooldownType.UTIL, State.ENTER))
+        } else if (handleMove(enter, CooldownType.UTIL, State.ENTER))
             playSound(JSoundRegistry.CREAM_ENTER, 1, 1);
     }
 

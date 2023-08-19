@@ -109,56 +109,56 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
     public void initLightAttack() {
         if (!canAttack()) return;
         if (getUserOrThrow().isSneaking())
-            handleAttack(crm1, CooldownType.STAND_LIGHT, State.LOW);
-        else handleAttack(light, CooldownType.STAND_LIGHT, State.LIGHT);
+            handleMove(crm1, CooldownType.STAND_LIGHT, State.LOW);
+        else handleMove(light, CooldownType.STAND_LIGHT, State.LIGHT);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        if (handleAttack(donut, CooldownType.STAND_HEAVY, State.DONUT))
+        if (handleMove(donut, CooldownType.STAND_HEAVY, State.DONUT))
             playSound(JSoundRegistry.TW_DONUT, 1, 1);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
+        if (handleMove(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
             playSound(JSoundRegistry.TW_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack()) return;
-        if (handleAttack(roundhouse, CooldownType.STAND_SP1, State.ROUNDHOUSE))
+        if (handleMove(roundhouse, CooldownType.STAND_SP1, State.ROUNDHOUSE))
             playSound(JSoundRegistry.TW_KICK, 1, 1);
     }
 
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        if (handleAttack(timestop, CooldownType.STAND_ULT, State.TIME_STOP))
+        if (handleMove(timestop, CooldownType.STAND_ULT, State.TIME_STOP))
             playSound(JSoundRegistry.TW_TS, 1, 1);
     }
 
     @Override
     public void initSpecial2() {
         if (!canAttack()) return;
-        if (handleAttack(charge, CooldownType.STAND_SP2, State.CHARGE))
+        if (handleMove(charge, CooldownType.STAND_SP2, State.CHARGE))
             playSound(JSoundRegistry.TW_CHARGE, 1, 1);
     }
 
     @Override
     public void initSpecial3() {
         if (!canAttack()) return;
-        if (handleAttack(feignbarrage, CooldownType.STAND_SP3, State.BARRAGE))
+        if (handleMove(feignbarrage, CooldownType.STAND_SP3, State.BARRAGE))
             playSound(JSoundRegistry.TW_BARRAGE, 1, 1);
     }
 
     @Override
     public void initUtil() {
         if (!canAttack() || tsTime > 0) return;
-        handleAttack(timeskip, CooldownType.UTIL, State.TIMESKIP);
+        handleMove(timeskip, CooldownType.UTIL, State.TIMESKIP);
     }
 
     @Override

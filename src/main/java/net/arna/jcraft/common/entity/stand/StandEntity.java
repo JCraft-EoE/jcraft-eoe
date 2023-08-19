@@ -550,13 +550,13 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         return new CanAttackData(null, false);
     }
 
-    public boolean handleAttack(MoveType type) {
+    public boolean handleMove(MoveType type) {
         MoveMap.Entry<E, S> entry = moveMap.getMove(type);
 
         if (hasUser() && getUserOrThrow().isSneaking() && entry.getMove().getCrouchingVariant() != null)
             entry = Objects.requireNonNull(entry.getCrouchingVariant());
 
-        return handleAttack(entry.getMove(), entry.getCooldownType(), entry.getAnimState());
+        return handleMove(entry.getMove(), entry.getCooldownType(), entry.getAnimState());
     }
 
     /**
@@ -566,7 +566,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * @param cooldownType type of cooldown to start
      * @param animState    int identifier for which state to put the stand into
      */
-    public boolean handleAttack(AbstractMove<?, ? super E> attack, CooldownType cooldownType, @Nullable S animState) {
+    public boolean handleMove(AbstractMove<?, ? super E> attack, CooldownType cooldownType, @Nullable S animState) {
         if (cooldownType != null && attack.getCooldown() > 0) {
             CooldownsComponent cooldowns = JComponents.getCooldowns(getUser());
             int cooldown = cooldowns.getCooldown(cooldownType);
@@ -709,7 +709,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     // Stock attacks to define
     public void initMove(MoveType type) {
-        handleAttack(type);
+        handleMove(type);
     }
 
     /**
@@ -1329,7 +1329,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 wantToBlock = true;
             // Block if the attack isn't ranged, but is within hitting distance, and doesn't block break/bypass
             if (enemyAttack instanceof AbstractSimpleAttack<?, ?> simpleEnemyAttack &&
-                    enemyAttack.getMoveDistance() + simpleEnemyAttack.getHitBoxSize() * 0.66 > distance &&
+                    enemyAttack.getMoveDistance() + simpleEnemyAttack.getHitboxSize() * 0.66 > distance &&
                     simpleEnemyAttack.getDamage() * 2 < stand.getStandGauge() && !simpleEnemyAttack.getBlockableType().isNonBlockable())
                 wantToBlock = true;
         }
@@ -1578,9 +1578,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             if (!selectedAttack.isCounter() &&
                     selectedAttack.getMobilityType() == null &&
                     selectedAttack instanceof AbstractSimpleAttack<?, ?> boxAttack &&
-                    boxAttack.getHitBoxSize() > 0 &&
+                    boxAttack.getHitboxSize() > 0 &&
                     !selectedAttack.isRanged() &&
-                    distance > selectedAttack.getMoveDistance() + boxAttack.getHitBoxSize())
+                    distance > selectedAttack.getMoveDistance() + boxAttack.getHitboxSize())
                 selectedAttack = null;
         }
 

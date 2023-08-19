@@ -24,7 +24,7 @@ public class BTDDetonateAttack extends AbstractMove<BTDDetonateAttack, AbstractK
     }
 
     @Override
-    public @NotNull Set<LivingEntity> perform(AbstractKillerQueenEntity<?, ?> stand, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(AbstractKillerQueenEntity<?, ?> stand, LivingEntity user, MoveContext ctx) {
         LivingEntity btdEntity = ctx.get(BTDPlantAttack.BTD_ENTITY);
         Vec3d btdPos = ctx.get(BTDPlantAttack.BTD_POS);
         if (btdEntity == null) return Set.of();

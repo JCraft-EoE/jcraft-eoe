@@ -135,19 +135,19 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        if (getUserOrThrow().isSneaking() && handleAttack(crm1, CooldownType.STAND_LIGHT, State.ITEM_PLACE)) {
+        if (getUserOrThrow().isSneaking() && handleMove(crm1, CooldownType.STAND_LIGHT, State.ITEM_PLACE)) {
             if (placingFirstStack) {
                 placing = MockItem.createMockStack( placeableStacks.get(random.nextInt(placeableStacks.size())) );
             }
             equipStack(EquipmentSlot.OFFHAND, placing.copy());
             placingFirstStack = !placingFirstStack;
-        } else if (handleAttack(light, CooldownType.STAND_LIGHT, State.LIGHT))
+        } else if (handleMove(light, CooldownType.STAND_LIGHT, State.LIGHT))
             playSound(JSoundRegistry.D4C_LIGHT, 1, 1);
     }
 
     @Override
     public void initHeavyAttack() {
-        if (!canAttack() || !handleAttack(heavy, CooldownType.STAND_HEAVY, State.HEAVY)) return;
+        if (!canAttack() || !handleMove(heavy, CooldownType.STAND_HEAVY, State.HEAVY)) return;
 
         playSound(JSoundRegistry.D4C_HEAVY, 1, 1);
         Entity ent = getUserOrThrow();
@@ -160,14 +160,14 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
+        if (handleMove(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
             playSound(JSoundRegistry.D4C_BARRAGE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack()) return;
-        if (handleAttack(clonespawn, CooldownType.STAND_SP1, State.DIM_HOP))
+        if (handleMove(clonespawn, CooldownType.STAND_SP1, State.DIM_HOP))
             playSound(JSoundRegistry.D4C_DIMHOP, 1, 1);
     }
 
@@ -186,17 +186,17 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
         }
 
         if (!canAttack()) return;
-        if (handleAttack(dimhop_others, CooldownType.STAND_ULT, State.DIM_HOP))
+        if (handleMove(dimhop_others, CooldownType.STAND_ULT, State.DIM_HOP))
             playSound(JSoundRegistry.D4C_DIMHOP, 1, 1);
     }
 
     @Override
     public void initSpecial2() {
         if (!canAttack() || !hasUser()) return;
-        if (getUserOrThrow().isSneaking() && handleAttack(givegun, CooldownType.STAND_SP2, State.GIVE_GUN)) {
+        if (getUserOrThrow().isSneaking() && handleMove(givegun, CooldownType.STAND_SP2, State.GIVE_GUN)) {
             playSound(JSoundRegistry.D4C_THROW, 1, 1);
             equipStack(EquipmentSlot.MAINHAND, JObjectRegistry.FVREVOLVER.getDefaultStack());
-        } else if (handleAttack(grab, CooldownType.STAND_SP2, State.THROW)) {
+        } else if (handleMove(grab, CooldownType.STAND_SP2, State.THROW)) {
             playSound(JSoundRegistry.D4C_THROW, 1, 1);
             equipStack(EquipmentSlot.MAINHAND, JObjectRegistry.FVREVOLVER.getDefaultStack());
         }
@@ -205,7 +205,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
     @Override
     public void initSpecial3() {
         if (!canAttack()) return;
-        handleAttack(counter, CooldownType.STAND_SP3, State.COUNTER);
+        handleMove(counter, CooldownType.STAND_SP3, State.COUNTER);
     }
 
     @Override
@@ -222,7 +222,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
     @Override
     public void initUtil() {
         if (!canAttack() || !hasUser()) return;
-        if (handleAttack(flag, CooldownType.UTIL, State.FLAG)) {
+        if (handleMove(flag, CooldownType.UTIL, State.FLAG)) {
             getUserOrThrow().addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, flag.moveStun, 0, true, false));
             getUserOrThrow().addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, flag.moveStun, 0, true, false));
             playSound(JSoundRegistry.D4C_UTILITY, 1, 1);

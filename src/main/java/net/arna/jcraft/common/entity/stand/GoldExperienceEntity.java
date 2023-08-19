@@ -41,7 +41,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
 //            .withSound(JSoundRegistry.GE_HEAVY)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withUnbreakable()
+            .withHyperArmor()
             .withLaunch()
             .withInfo(Text.literal("Shoulder Smash"), Text.literal("slow, uninterruptible combo finisher"));
     public static BarrageAttack<GoldExperienceEntity> BARRAGE = new BarrageAttack<GoldExperienceEntity>(
@@ -146,7 +146,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
                 if (user.hasStatusEffect(JStatusRegistry.DAZED)) return;
                 boolean idling = this.getMoveStun() <= 0;
                 if (!(curAttack instanceof RekkaAttack rekka)) {
-                    if (idling) handleAttack(MoveType.SPECIAL2);
+                    if (idling) handleMove(MoveType.SPECIAL2);
                 } else if (rekka.getNext() != null && rekka.mayAdvance(this))
                     setAttack(rekka.getNext(), rekka.getNextState());
             }
@@ -160,7 +160,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
                 } else toSummon = LifeGiverAttack.LifeGiverType.BUTTERFLY;
                 moveContext.set(LifeGiverAttack.TYPE_TO_SUMMON, toSummon);
 
-                handleAttack(MoveType.SPECIAL3);
+                handleMove(MoveType.SPECIAL3);
             }
             default -> super.initMove(type);
         }

@@ -97,43 +97,43 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
     @Override
     public void initLightAttack() {
         if (!canAttack()) return;
-        handleAttack(light, CooldownType.STAND_LIGHT, State.LIGHT);
+        handleMove(light, CooldownType.STAND_LIGHT, State.LIGHT);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
+        if (handleMove(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
             playSound(JSoundRegistry.WS_BARRAGE, 1, 1);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        if (handleAttack(donut, CooldownType.STAND_HEAVY, State.DONUT))
+        if (handleMove(donut, CooldownType.STAND_HEAVY, State.DONUT))
             playSound(JSoundRegistry.WS_DONUT, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack()) return;
-        if (handleAttack(memorydisk, CooldownType.STAND_SP1, State.DISC))
+        if (handleMove(memorydisk, CooldownType.STAND_SP1, State.DISC))
             playSound(JSoundRegistry.WS_MEMORY_DISC, 1, 1);
     }
 
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        if (getRemote() && handleAttack(meltyourheart, CooldownType.STAND_ULT, State.MELT_YOUR_HEART))
+        if (getRemote() && handleMove(meltyourheart, CooldownType.STAND_ULT, State.MELT_YOUR_HEART))
             playSound(JSoundRegistry.WS_MYH, 1, 1);
-        else if (handleAttack(standdisk, CooldownType.STAND_ULT, State.DISC))
+        else if (handleMove(standdisk, CooldownType.STAND_ULT, State.DISC))
             playSound(JSoundRegistry.WS_STAND_DISC, 1, 1);
     }
 
     @Override
     public void initSpecial2() {
         if (!canAttack()) return;
-        if (handleAttack(legcrusher, CooldownType.STAND_SP2, State.LEG_CRUSHER))
+        if (handleMove(legcrusher, CooldownType.STAND_SP2, State.LEG_CRUSHER))
             playSound(JSoundRegistry.WS_LEGCRUSH, 1, 1);
     }
 
@@ -142,8 +142,8 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         if (!canAttack() || !hasUser()) return;
 
         if (getUserOrThrow().isSneaking())
-            handleAttack(chargedspew, CooldownType.STAND_SP3, State.ACID_SPEW_CHARGED);
-        else handleAttack(poisonspew, CooldownType.STAND_SP3, State.ACID_SPEW);
+            handleMove(chargedspew, CooldownType.STAND_SP3, State.ACID_SPEW_CHARGED);
+        else handleMove(poisonspew, CooldownType.STAND_SP3, State.ACID_SPEW);
     }
 
     @Override

@@ -22,7 +22,7 @@ public class RedirectAttack extends AbstractMove<RedirectAttack, MagiciansRedEnt
     }
 
     @Override
-    public @NotNull Set<LivingEntity> perform(MagiciansRedEntity stand, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(MagiciansRedEntity stand, LivingEntity user, MoveContext ctx) {
         List<AnkhProjectile> ankhs = stand.world.getEntitiesByClass(AnkhProjectile.class,
                 stand.getBoundingBox().expand(32), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
 

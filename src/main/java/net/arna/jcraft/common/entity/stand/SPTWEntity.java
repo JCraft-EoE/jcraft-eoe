@@ -101,15 +101,15 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
     public void initLightAttack() {
         if (!canAttack()) return;
         if (getUserOrThrow().isSneaking())
-            handleAttack(crm1, CooldownType.STAND_LIGHT, State.GROUND_SLAM);
+            handleMove(crm1, CooldownType.STAND_LIGHT, State.GROUND_SLAM);
         else
-            handleAttack(light, CooldownType.STAND_LIGHT, State.PUNCH);
+            handleMove(light, CooldownType.STAND_LIGHT, State.PUNCH);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        if (handleAttack(heavy, CooldownType.STAND_HEAVY, State.HEAVY)) {
+        if (handleMove(heavy, CooldownType.STAND_HEAVY, State.HEAVY)) {
             playSound(JSoundRegistry.STAR_BREAKER, 1, 1);
         }
     }
@@ -117,7 +117,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE)) {
+        if (handleMove(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE)) {
             playSound(JSoundRegistry.STAR_PLATINUM_BARRAGE, 1, 1);
         }
     }
@@ -125,7 +125,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
     @Override
     public void initSpecial1() {
         if (!canAttack() || !hasUser()) return;
-        if (handleAttack(timestrike, CooldownType.STAND_SP1, State.TIME_STRIKE)) {
+        if (handleMove(timestrike, CooldownType.STAND_SP1, State.TIME_STRIKE)) {
             turnAround = getUserOrThrow().isSneaking();
             //playSound(JSoundRegister.SPTW_TIMESTRIKE, 1, 1);
         }
@@ -134,14 +134,14 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        if (handleAttack(timestop, CooldownType.STAND_ULT, State.TIME_STOP))
+        if (handleMove(timestop, CooldownType.STAND_ULT, State.TIME_STOP))
             playSound(JSoundRegistry.STAR_PLATINUM_THE_WORLD, 1, 1);
     }
 
     @Override
     public void initSpecial2() {
         if (!canAttack()) return;
-        if (handleAttack(backhand, CooldownType.STAND_SP2, State.BACK_HAND))
+        if (handleMove(backhand, CooldownType.STAND_SP2, State.BACK_HAND))
             playSound(JSoundRegistry.SPTW_BACKHAND, 1, 1);
     }
 
@@ -149,14 +149,14 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
     public void initSpecial3() {
         if (!canAttack()) return;
         // Uses a copy because otherwise the main one gets overwritten by specialAttack()
-        if (handleAttack(grab, CooldownType.STAND_SP3, State.GRAB))
+        if (handleMove(grab, CooldownType.STAND_SP3, State.GRAB))
             playSound(JSoundRegistry.SPTW_GRAB, 1, 1);
     }
 
     @Override
     public void initUtil() {
         if (!canAttack() || tsTime > 0) return;
-        handleAttack(timeskip, CooldownType.UTIL, State.TIME_SKIP);
+        handleMove(timeskip, CooldownType.UTIL, State.TIME_SKIP);
     }
 
     @Override

@@ -153,29 +153,29 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
     public void initLightAttack() {
         if (!canAttack()) return;
         if (getUserOrThrow().isSneaking())
-            handleAttack(crm1, CooldownType.STAND_LIGHT, State.INVERSION_PUNCH);
+            handleMove(crm1, CooldownType.STAND_LIGHT, State.INVERSION_PUNCH);
         else
-            handleAttack(light, CooldownType.STAND_LIGHT, State.LIGHT);
+            handleMove(light, CooldownType.STAND_LIGHT, State.LIGHT);
     }
 
     @Override
     public void initBarrage() {
         if (!canAttack()) return;
-        if (handleAttack(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
+        if (handleMove(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
             playSound(JSoundRegistry.CMOON_BARRAGE, 1, 1);
     }
 
     @Override
     public void initHeavyAttack() {
         if (!canAttack()) return;
-        if (handleAttack(gutpunch, CooldownType.STAND_HEAVY, State.DONUT))
+        if (handleMove(gutpunch, CooldownType.STAND_HEAVY, State.DONUT))
             playSound(JSoundRegistry.CMOON_DONUT, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
         if (!canAttack()) return;
-        if (handleAttack(gravpunch, CooldownType.STAND_SP1, State.GRAV_PUNCH))
+        if (handleMove(gravpunch, CooldownType.STAND_SP1, State.GRAV_PUNCH))
             playSound(JSoundRegistry.CMOON_GRAVPUNCH, 1, 1);
     }
 
@@ -191,14 +191,14 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
                 if (block.getMaster() != user) continue;
                 block.markRefresh();
             }
-        } else if (canAttack() && handleAttack(launch, CooldownType.STAND_SP2, State.GROUND_SHOOT))
+        } else if (canAttack() && handleMove(launch, CooldownType.STAND_SP2, State.GROUND_SHOOT))
             playSound(JSoundRegistry.CMOON_GROUNDSHOOT, 1, 1);
     }
 
     @Override
     public void initSpecial3() {
         if (!canAttack()) return;
-        if (handleAttack(groundslam, CooldownType.STAND_SP3, State.GROUND_SLAM))
+        if (handleMove(groundslam, CooldownType.STAND_SP3, State.GROUND_SLAM))
             playSound(JSoundRegistry.CMOON_GROUNDSLAM, 1, 1);
     }
 
@@ -206,9 +206,9 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
     public void initUlt() {
         if (!canAttack()) return;
         if (getShiftTime() <= 0) {
-            if (getUserOrThrow().isSneaking() && handleAttack(gravshift, CooldownType.STAND_ULT, State.GRAV_SHIFT))
+            if (getUserOrThrow().isSneaking() && handleMove(gravshift, CooldownType.STAND_ULT, State.GRAV_SHIFT))
                 playSound(JSoundRegistry.CMOON_GRAVSHIFT, 1, 1);
-            else if (handleAttack(directionalshift, CooldownType.STAND_ULT, State.DIRECTIONAL_SHIFT))
+            else if (handleMove(directionalshift, CooldownType.STAND_ULT, State.DIRECTIONAL_SHIFT))
                 playSound(JSoundRegistry.CMOON_GRAVSHIFT_DIRECTIONAL, 1, 1);
 
         } else {

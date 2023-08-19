@@ -107,7 +107,7 @@ public class GravityComponentImpl implements GravityComponent {
         } else if (rotationParameters.alternateCenter()) {
             EntityDimensions dimensions = entity.getDimensions(entity.getPose());
             if (newGravity.getOpposite() == oldGravity) {
-                //In the center of the hit-box
+                //In the center of the hitbox
                 relativeRotationCentre = new Vec3d(0, dimensions.height / 2, 0);
             } else {
                 //Around the ankles

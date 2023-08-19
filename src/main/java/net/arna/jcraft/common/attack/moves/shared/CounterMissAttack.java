@@ -18,7 +18,7 @@ public class CounterMissAttack<S extends StandEntity<?, ?>> extends AbstractMove
     }
 
     @Override
-    public @NotNull Set<LivingEntity> perform(S stand, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(S stand, LivingEntity user, MoveContext ctx) {
         return Set.of();
     }
 

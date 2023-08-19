@@ -116,14 +116,14 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                         cooldowns.setCooldown(CooldownType.STAND_SP1, BOMB_PLANT.getCooldown());
                     }
                 } else {
-                    handleAttack(MoveType.SPECIAL1);
+                    handleMove(MoveType.SPECIAL1);
                     moveContext.set(BombPlantAttack.BOMB_POS, null);
                 }
             }
             case ULT -> {
                 if (moveContext.get(BTDPlantAttack.BTD_ENTITY) != null)
-                    handleAttack(BTD_DETONATE, CooldownType.ULT, State.DETONATE);
-                else handleAttack(MoveType.ULT);
+                    handleMove(BTD_DETONATE, CooldownType.ULT, State.DETONATE);
+                else handleMove(MoveType.ULT);
             }
             default -> super.initMove(type);
         }

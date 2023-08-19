@@ -15,12 +15,12 @@ import java.util.Set;
 
 public class RedBindAttack extends AbstractSimpleAttack<RedBindAttack, MagiciansRedEntity> {
     public RedBindAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun,
-                         float hitBoxSize, float knockBack, float offset) {
-        super(cooldown, windup, duration, attackDistance, damage, stun, hitBoxSize, knockBack, offset);
+                         float hitboxSize, float knockback, float offset) {
+        super(cooldown, windup, duration, attackDistance, damage, stun, hitboxSize, knockback, offset);
     }
 
     @Override
-    public @NotNull Set<LivingEntity> perform(MagiciansRedEntity stand, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(MagiciansRedEntity stand, LivingEntity user, MoveContext ctx) {
         Set<LivingEntity> targets = super.perform(stand, user, ctx);
         if (targets.isEmpty()) return targets;
 
@@ -58,6 +58,6 @@ public class RedBindAttack extends AbstractSimpleAttack<RedBindAttack, Magicians
     @Override
     public RedBindAttack copy() {
         return new RedBindAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getHitBoxSize(), getKnockBack(), getOffset());
+                getHitboxSize(), getKnockback(), getOffset());
     }
 }

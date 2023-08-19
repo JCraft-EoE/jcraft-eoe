@@ -28,7 +28,7 @@ public class DetonateAttack extends AbstractMove<DetonateAttack, AbstractKillerQ
     }
 
     @Override
-    public @NotNull Set<LivingEntity> perform(AbstractKillerQueenEntity<?, ?> stand, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(AbstractKillerQueenEntity<?, ?> stand, LivingEntity user, MoveContext ctx) {
         Entity bombEntity = ctx.get(BombPlantAttack.BOMB_ENTITY);
         Vec3d bombPos = ctx.get(BombPlantAttack.BOMB_POS);
 
