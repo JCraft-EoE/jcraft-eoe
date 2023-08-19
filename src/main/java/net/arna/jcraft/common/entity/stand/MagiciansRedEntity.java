@@ -2,7 +2,6 @@ package net.arna.jcraft.common.entity.stand;
 
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
-import net.arna.jcraft.common.attack.core.old.Attack;
 import net.arna.jcraft.common.attack.moves.magiciansred.*;
 import net.arna.jcraft.common.attack.moves.shared.KnockdownAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
@@ -41,7 +40,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
     public static final CrossfireHurricaneAttack CROSSFIRE_HURRICANE = new CrossfireHurricaneAttack(1200, 18, 22, 0.75f)
             .withSound(JSoundRegistry.MR_ULT)
             .withInfo(Text.literal("Crossfire Hurricane"), Text.literal("summons slow, homing fire hurricane that knocks down, lasts for 3 seconds after hitting anything"));
-    public static final RedBindAttack RED_BIND = new RedBindAttack(400, 12, 22, 0.75f, 3, 1.5f, 0, 0)
+    public static final RedBindAttack RED_BIND = new RedBindAttack(400, 12, 22, 0.75f, 3, 15, 1.5f, 0, 0)
             .withSound(JSoundRegistry.MR_REDBIND)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withInfo(Text.literal("Red Bind"), Text.literal("on hit, wraps opponent in fiery rings that launch them in the direction they are hit"));
