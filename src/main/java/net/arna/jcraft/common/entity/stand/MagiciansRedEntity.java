@@ -45,7 +45,6 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withInfo(Text.literal("Red Bind"), Text.literal("on hit, wraps opponent in fiery rings that launch them in the direction they are hit"));
     public static final LifeDetectorAttack LIFE_DETECTOR = new LifeDetectorAttack(500, 13, 20, 0.75f)
-            .withCrouchingVariant(RED_BIND)
             .withSound(JSoundRegistry.MR_REDBIND)
             .withInfo(Text.literal("Life Detector"), Text.literal("tracks down nearby life, lasts 15s"));
 
@@ -93,7 +92,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
         moves.register(MoveType.SPECIAL2, CROSSFIRE_VARIATION, State.CROSSFIRE_VARIATION);
         moves.register(MoveType.SPECIAL3, RED_BIND, State.RED_BIND);
         moves.register(MoveType.ULT, CROSSFIRE_HURRICANE, State.CROSSFIRE_HURRICANE);
-        moves.register(MoveType.UTIL, LIFE_DETECTOR, State.DETECTOR).withCrouchingVariant(State.RED_BIND);
+        moves.register(MoveType.UTIL, LIFE_DETECTOR, State.DETECTOR);
     }
 
     @Override
