@@ -552,11 +552,11 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     public boolean handleAttack(MoveType type) {
         MoveMap.Entry<E, S> entry = moveMap.getMove(type);
-        AbstractMove<?, ? super E> move = entry.getMove();
-        if (hasUser() && getUserOrThrow().isSneaking() && move.getCrouchingVariant() != null)
-            move = move.getCrouchingVariant();
 
-        return handleAttack(move, entry.getCooldownType(), entry.getAnimState());
+        if (hasUser() && getUserOrThrow().isSneaking() && entry.getMove().getCrouchingVariant() != null)
+            entry = Objects.requireNonNull(entry.getCrouchingVariant());
+
+        return handleAttack(entry.getMove(), entry.getCooldownType(), entry.getAnimState());
     }
 
     /**
