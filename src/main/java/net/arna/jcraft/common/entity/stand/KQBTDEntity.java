@@ -30,14 +30,12 @@ import java.util.function.Consumer;
 
 public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQBTDEntity.State> {
     public static final ElbowAttack ELBOW = new ElbowAttack(240, 5, 9, 0.75f,
-            7.5f, 1f, 1.1f, 0f)
+            7.5f, 10, 1f, 1.1f, 0f)
             .withSound(JSoundRegistry.KQBTD_ELBOW)
             .withImpactSound(JSoundRegistry.IMPACT_4)
-            .withStun(10)
             .withInfo(Text.literal("Elbow"), Text.literal("fast, short-range knockback"));
     public static final BarrageAttack<KQBTDEntity> BARRAGE = new BarrageAttack<KQBTDEntity>(340, 0, 50,
-            0.75f, 1f, 1.5f, 0.1f, 0, 3)
-            .withStun(20)
+            0.75f, 1f, 20, 1.5f, 0.1f, 0, 3)
             .withSound(JSoundRegistry.KQ_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, medium stun"));
@@ -50,19 +48,17 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
     public static final BTDDetonateAttack BTD_DETONATE = new BTDDetonateAttack(20, 5, 6, 0.75f)
             .withSound(JSoundRegistry.KQ_DETONATE)
             .withInfo(Text.literal("Detonate"), Text.empty());
-    public static final BTDPlantAttack BTD_PLANT = new BTDPlantAttack(1000, 14, 24, 1f, 1.5f, 0f)
-            .withStun(10)
+    public static final BTDPlantAttack BTD_PLANT = new BTDPlantAttack(1000, 14, 24, 1f, 10, 1.5f, 0f)
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withBlockStun(8)
             .withInfo(Text.literal("Bites the Dust Plant"), Text.literal("press the same button to detonate, sending the affected enemy back to their previous location"));
     public static final BTDGrabHitAttack GRAB_HIT = new BTDGrabHitAttack(0, 42, 0.75f,
-            5f, 2f, 0f, 0.5f, IntSet.of(8, 22, 32))
-            .withStun(StunType.UNBURSTABLE, 15)
+            5f, 15, 2f, 0f, 0.5f, IntSet.of(8, 22, 32))
+            .withStunType(StunType.UNBURSTABLE)
             .withInfo(Text.literal("Takedown (hit)"), Text.empty());
     public static final GrabAttack<KQBTDEntity, State> GRAB = new GrabAttack<>(440, 12, 28,
             0.75f, 0f, 1.75f, 0.1f, 0f, GRAB_HIT, State.GRAB_HIT)
             .withInfo(Text.literal("Takedown"), Text.literal("high damage grab"));
-//    public static final
 
     public KQBTDEntity(World worldIn) {
         super(StandType.KILLER_QUEEN_BITES_THE_DUST, worldIn, JSoundRegistry.KQBTD_SUMMON);

@@ -25,23 +25,21 @@ import java.util.function.Consumer;
 
 public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQueenEntity, KillerQueenEntity.State> {
     public static final SimpleAttack<KillerQueenEntity> HEAVY = new SimpleAttack<KillerQueenEntity>(
-            240, 16, 24, 9f, 2f, 1.75f, 0.75f, 0f)
+            240, 16, 24, 9f, 10, 2f, 1.75f, 0.75f, 0f)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withSound(JSoundRegistry.KQ_UPPERCUT)
             .withSound(JSoundRegistry.KQ_HEAVY)
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withUnbreakable()
             .withLaunch()
-            .withStun(10)
             .withInfo(Text.literal("Haymaker"), Text.literal("slow, uninterruptible launcher"));
     public static final SheerHeartAttackAttack SHEER_HEART_ATTACK = new SheerHeartAttackAttack(1000, 16, 20, 1f)
 //            .withSound(JSoundRegistry.KQ_SHA)
             .withInfo(Text.literal("Sheer Heart Attack"), Text.literal("creates an automatic, heat-seeking sub-stand that explodes on contact, reflects 25% damage back to owner"));
     public static final KQGrabHitAttack GRAB_HIT = new KQGrabHitAttack(0, 13, 20, 1f, 2)
             .withInfo(Text.literal("Grab (hit)"), Text.empty());
-    public static final KQGrabAttack GRAB = new KQGrabAttack(440, 12, 20, 0.75f, 0f, 1.75f, 0.1f, 0f,
-            GRAB_HIT, State.GRAB_HIT)
-            .withStun(20)
+    public static final KQGrabAttack GRAB = new KQGrabAttack(440, 12, 20, 0.75f,
+            0f, 20, 1.75f, 0.1f, 0f, GRAB_HIT, State.GRAB_HIT)
             .withInfo(Text.literal("Grab"), Text.literal("grabs opponent by the face, then detonates them, launching them upwards"));
     public static final CoinTossAttack COIN_TOSS = new CoinTossAttack(500);
 

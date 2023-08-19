@@ -29,22 +29,21 @@ import java.util.List;
 public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQueenEntity<E, S>, S extends Enum<S> & StandAnimationState<E>> extends StandEntity<E, S>
         permits KillerQueenEntity, KQBTDEntity {
     public static final SimpleAttack<AbstractKillerQueenEntity<?, ?>> LOW = new SimpleAttack<AbstractKillerQueenEntity<?, ?>>(
-            0, 8, 13, 4f, 1.5f, 0.5f, 0.85f, 0.1f)
+            0, 8, 13, 4f, 10, 1.5f, 0.5f, 0.85f, 0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_6)
             .withInfo(Text.literal("Low Punch"), Text.literal("frametrap tool, low stun"));
     public static final DetonateAttack DETONATE = new DetonateAttack(20, 5, 6, 1f)
             .withInfo(Text.literal("Detonate"), Text.literal("slight windup"));
     public static final SimpleMultiHitAttack<AbstractKillerQueenEntity<?, ?>> LIGHT = SimpleMultiHitAttack.<AbstractKillerQueenEntity<?, ?>>lightAttack(
-            19, 3f, 0.75f, 0, IntSet.of(6, 11))
+            19, 3f, 20, 0.75f, 0, IntSet.of(6, 11))
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withCrouchingVariant(DETONATE)
             .withFollowUp(LOW)
             .withInfo(Text.literal("Dual Punch"), Text.literal("combo starter, decent speed, has followup with more blockstun"));
     public static final BarrageAttack<AbstractKillerQueenEntity<?, ?>> BARRAGE = new BarrageAttack<AbstractKillerQueenEntity<?, ?>>(
-            340, 0, 50, 0.75f, 1f, 1.5f, 0.1f, 0, 3)
+            340, 0, 50, 0.75f, 1f, 20, 1.5f, 0.1f, 0, 3)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, medium stun"));
-    public static final BombPlantAttack BOMB_PLANT = new BombPlantAttack(600, 12, 20, 1f, 1.5f, 0f)
-            .withStun(9)
+    public static final BombPlantAttack BOMB_PLANT = new BombPlantAttack(600, 12, 20, 1f, 9, 1.5f, 0f)
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withBlockStun(8)
             .withInfo(Text.literal("Bomb Plant"), Text.literal("crouch to plant on the ground below you, stealthily"));
