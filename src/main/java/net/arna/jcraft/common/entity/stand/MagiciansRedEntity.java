@@ -93,7 +93,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
         moves.register(MoveType.SPECIAL2, CROSSFIRE_VARIATION, State.CROSSFIRE_VARIATION);
         moves.register(MoveType.SPECIAL3, RED_BIND, State.RED_BIND);
         moves.register(MoveType.ULT, CROSSFIRE_HURRICANE, State.CROSSFIRE_HURRICANE);
-        moves.register(MoveType.UTIL, LIFE_DETECTOR, State.DETECTOR);
+        moves.register(MoveType.UTIL, LIFE_DETECTOR, State.DETECTOR).withCrouchingVariant(State.RED_BIND);
     }
 
     @Override
