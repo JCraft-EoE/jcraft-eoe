@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 
 public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, MagiciansRedEntity.State> {
     public static final RedirectAttack REDIRECT = new RedirectAttack(100, 7, 10, 0.75f);
-    public static final SimpleAttack<MagiciansRedEntity> LIGHT = SimpleAttack.<MagiciansRedEntity>lightAttack(5, 8, 5f, 0.75f, -0.1f)
+    public static final SimpleAttack<MagiciansRedEntity> LIGHT = SimpleAttack.<MagiciansRedEntity>lightAttack(5, 8, 5f, 0.75f, 0.75f, -0.1f)
             .withCrouchingVariant(REDIRECT)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
