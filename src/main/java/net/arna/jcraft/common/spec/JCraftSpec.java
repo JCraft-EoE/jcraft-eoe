@@ -209,8 +209,8 @@ public abstract class JCraftSpec {
                         Set<LivingEntity> extraHurt = JUtils.generateHitbox(world,
                                 hitPos.add(
                                         RotationUtil.vecPlayerToWorld(
-                                                rotVec.multiply(data.forwardOffset).add(0, data.verticalOffset, 0), gravDir)
-                                ), data.hitboxSize, exclude);
+                                                rotVec.multiply(data.getForwardOffset()).add(0, data.verticalOffset, 0), gravDir)
+                                ), data.size, exclude);
                         hurt.addAll(extraHurt);
                     }
 

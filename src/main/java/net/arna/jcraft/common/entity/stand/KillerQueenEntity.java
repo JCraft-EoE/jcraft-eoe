@@ -24,7 +24,8 @@ import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import java.util.function.Consumer;
 
 public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQueenEntity, KillerQueenEntity.State> {
-    public static final SimpleAttack<KillerQueenEntity> HEAVY = new SimpleAttack<KillerQueenEntity>(240, 16, 24, 9f, 2f, 1.75f, 0.75f, 0f)
+    public static final SimpleAttack<KillerQueenEntity> HEAVY = new SimpleAttack<KillerQueenEntity>(
+            240, 16, 24, 9f, 2f, 1.75f, 0.75f, 0f)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withSound(JSoundRegistry.KQ_UPPERCUT)
             .withSound(JSoundRegistry.KQ_HEAVY)

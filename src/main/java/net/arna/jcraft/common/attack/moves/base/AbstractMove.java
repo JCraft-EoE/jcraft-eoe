@@ -24,7 +24,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends Stand
     private final float moveDistance;
     private final List<SoundEvent> sounds = new ArrayList<>(), impactSounds = new ArrayList<>();
     private Text name, description;
-    private AbstractMove<?, S> crouchingVariant, followUp;
+    private AbstractMove<?, ? super S> crouchingVariant, followUp;
     private int armor;
     protected MobilityType mobilityType;
     // Used to help AI know how and when to use this attack.
@@ -51,7 +51,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends Stand
         return getThis();
     }
 
-    public T withCrouchingVariant(AbstractMove<?, S> crouchingVariant) {
+    public T withCrouchingVariant(AbstractMove<?, ? super S> crouchingVariant) {
         this.crouchingVariant = crouchingVariant;
         return getThis();
     }
@@ -61,7 +61,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends Stand
      * @param followUp The move that will be initiated after this move is performed.
      * @return This move
      */
-    public T withFollowUp(AbstractMove<?, S> followUp) {
+    public T withFollowUp(AbstractMove<?, ? super S> followUp) {
         this.followUp = followUp;
         return getThis();
     }

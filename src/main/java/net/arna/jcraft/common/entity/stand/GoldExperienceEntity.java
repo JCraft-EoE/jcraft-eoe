@@ -1,16 +1,22 @@
 package net.arna.jcraft.common.entity.stand;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.core.old.Attack;
 import net.arna.jcraft.common.attack.core.old.AttackQueue;
 import net.arna.jcraft.common.attack.core.old.AttackType;
 import net.arna.jcraft.common.attack.core.HitBoxData;
+import net.arna.jcraft.common.attack.moves.goldexperience.BerryBushAttack;
+import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
+import net.arna.jcraft.common.attack.moves.shared.HealMove;
+import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.entity.GEButterflyEntity;
 import net.arna.jcraft.common.entity.GEFrogEntity;
 import net.arna.jcraft.common.entity.GESnakeEntity;
 import net.arna.jcraft.common.entity.projectile.GETreeEntity;
 import net.arna.jcraft.common.util.CooldownType;
+import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
@@ -26,6 +32,7 @@ import net.minecraft.entity.mob.Angerable;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -38,19 +45,50 @@ import java.util.function.Consumer;
 
 public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, GoldExperienceEntity.State> {
     // JCraft.lightCooldown -> 0 | 0.5f -> 0.35f
-    public static final Attack crm1 = new Attack(11, JCraft.lightCooldown * 4, 1.25f, 20, 16, 1.5, 4f, 0.75f, AttackType.BOX, 0.25f, 0.2f, 0, JSoundRegistry.IMPACT_4)
+    public static final BerryBushAttack BERRY_BUSH = new BerryBushAttack(120, 16, 20, 1.25f,
+            4f, 1.5f, 0.75f, 0.2f)
+            .withImpactSound(JSoundRegistry.IMPACT_4)
+            .withInfo(Text.literal("Place Berry Bush"), Text.literal("places an almost-ripe berry bush on the ground, this move cannot be aimed up or down"));
+    public static final Attack crm1 = new Attack(11, JCraft.lightCooldown * 4, 1.25f, 20,
+            16, 1.5, 4f, 0.75f, AttackType.BOX, 0.25f, 0.2f, 0, JSoundRegistry.IMPACT_4)
             .setInfo("Place Berry Bush", "places an almost-ripe berry bush on the ground, this move cannot be aimed up or down");
-    public static final Attack light = new Attack(0, JCraft.lightCooldown / 2, 0.75f, 9, 6, 1.5, 5f, 0.75f, AttackType.BOX, 0.35f, -0.1f, 0, JSoundRegistry.IMPACT_1)
+    public static final SimpleAttack<GoldExperienceEntity> LIGHT = new SimpleAttack<GoldExperienceEntity>(
+            15, 6, 9, 5f, 1.5f, 0.75f, 0.75f, -0.1f)
+            .withCrouchingVariant(BERRY_BUSH)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
+    public static final Attack light = new Attack(0, JCraft.lightCooldown / 2, 0.75f, 9,
+            6, 1.5, 5f, 0.75f, AttackType.BOX, 0.35f, -0.1f, 0, JSoundRegistry.IMPACT_1)
             .crouchingVariation(crm1)
             .setInfo("Punch", "quick combo starter");
+    public static final SimpleAttack<GoldExperienceEntity> HEAVY = new SimpleAttack<GoldExperienceEntity>(
+            280, 13, 22, 9f, 1.5f, 1.5f, 1f, 0f)
+            .withExtraHitBox(new HitBoxData(0, 0, 1.25))
+//            .withSound(JSoundRegistry.GE_HEAVY)
+            .withImpactSound(JSoundRegistry.IMPACT_2)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withUnbreakable()
+            .withLaunch()
+            .withInfo(Text.literal("Shoulder Smash"), Text.literal("slow, uninterruptible combo finisher"));
     public static final Attack heavy = new Attack(1, 14, 1f, 22, 13, 1.5, 9f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegistry.IMPACT_2)
             .setHitspark(2)
             .appendHitbox(new HitBoxData(0, 0, 1.25))
             .hyperArmor()
             .setLaunch()
-            .setInfo("Shoulder Smash", "slow, uninterruptable combo finisher");
+            .setInfo("Shoulder Smash", "slow, uninterruptible combo finisher");
+    public static BarrageAttack<GoldExperienceEntity> BARRAGE = new BarrageAttack<GoldExperienceEntity>(
+            280, 0, 30, 0.75f, 1f, 2f, 0.25f, 0f, 3)
+            .withSound(JSoundRegistry.GE_BARRAGE)
+            .withStun(30)
+            .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
     public static final Attack barrage = Attack.barrageAttack(2, 14, 0.75f, 30, 0, 2, 1f, 0.25f, 1.5f, 0, 3)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
+    public static HealMove HEAL_OTHERS = new HealMove(520, 10, 16, 1f, 1.25f, 0f, 4f, HealMove.HealTarget.TARGETS)
+            .withSound(JSoundRegistry.GE_HEAL)
+            .withInfo(Text.literal("Healing Hand (others)"), Text.empty());
+    public static HealMove HEAL_SELF = new HealMove(520, 10, 14, 1f, 0, 0, 4f, HealMove.HealTarget.USER)
+            .withSound(JSoundRegistry.GE_HEAL)
+            .withInfo(Text.literal("Healing Hand"), Text.literal("standing: heals user for 2 hearts, crouching: heals others for 2 hearts, pacifies angered mobs"));
     public static final Attack healself = new Attack(3, 26, 1f, 14, 10, 0, 0f, 0f, AttackType.BOX)
             .setInfo("Healing Hand", "standing: heals user for 2 hearts, crouching: heals others for 2 hearts, pacifies angered mobs");
     public static final Attack heal = new Attack(4, 26, 1f, 16, 10, 1.25, 0f, 0f, AttackType.BOX)
@@ -111,6 +149,11 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
         moves = List.of(light, heavy, barrage, healself, overclock, rekka1, lifegiver, tree);
 
         super.initialize();
+    }
+
+    @Override
+    protected void registerMoves(MoveMap<GoldExperienceEntity, State> moves) {
+
     }
 
     // Moveset

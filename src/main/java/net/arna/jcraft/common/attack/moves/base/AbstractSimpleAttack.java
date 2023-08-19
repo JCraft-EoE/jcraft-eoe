@@ -150,7 +150,31 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
     }
 
     /**
-     * Adds an extra hit-box to use with every attack aside from the main hit-box.
+     * Adds an extra hit-box with the given size to use with every attack
+     * along with the main hit-box.
+     * @param size The size of the hit-box
+     * @see #withExtraHitBox(double, double, double)
+     * @return This attack
+     */
+    public T withExtraHitBox(double size) {
+        return withExtraHitBox(new HitBoxData(size));
+    }
+
+    /**
+     * Adds an extra hit-box with the given size and offsets to use with every attack
+     * along with the main hit-box.
+     * @param size The size of the hit-box
+     * @param forwardOffset The forward offset of the hit-box
+     * @param verticalOffset The vertical offset of the hit-box
+     * @param size The size of the hit-box
+     * @return This attack
+     */
+    public T withExtraHitBox(double forwardOffset, double verticalOffset, double size) {
+        return withExtraHitBox(new HitBoxData(forwardOffset, verticalOffset, size));
+    }
+
+    /**
+     * Adds an extra hit-box to use with every attack along with the main hit-box.
      * @param hitBox The hit-box to add
      * @return This attack
      */
@@ -179,8 +203,8 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
     }
 
     public static Box createBox(Vec3d offsetHeightPos, Vec3d rotVec, Vec3d upVec, HitBoxData data) {
-        return createBox(offsetHeightPos.add(rotVec.multiply(data.forwardOffset))
-                .add(upVec.multiply(data.verticalOffset)), data.hitboxSize);
+        return createBox(offsetHeightPos.add(rotVec.multiply(data.forwardOffset()))
+                .add(upVec.multiply(data.verticalOffset())), data.size());
     }
 
     /**

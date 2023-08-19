@@ -34,7 +34,7 @@ public class SimpleAttack<S extends StandEntity<?, ?>> extends AbstractSimpleAtt
      * @param offset The amount the hit-box is offset by.
      */
     public static <S extends StandEntity<?, ?>> SimpleAttack<S> lightAttack(int windup, int duration, float damage, float attackDistance, float offset) {
-        return new SimpleAttack<>(30, windup, duration, damage, 1.5f, 0.75f, attackDistance, offset);
+        return new SimpleAttack<S>(30, windup, duration, damage, 1.5f, 0.75f, attackDistance, offset);
     }
 
     @Override
