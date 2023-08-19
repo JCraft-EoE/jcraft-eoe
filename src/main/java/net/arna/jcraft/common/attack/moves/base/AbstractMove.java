@@ -118,7 +118,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends Stand
      */
     public void tick(S stand) {
         // Play the sound(s) in the first tick.
-        if (sounds != null && stand.getMoveStun() == getDuration())
+        if (stand.getMoveStun() == getDuration())
             sounds.forEach(sound -> stand.playSound(sound, 1f, 1f));
 
         if (shouldPerform(stand))

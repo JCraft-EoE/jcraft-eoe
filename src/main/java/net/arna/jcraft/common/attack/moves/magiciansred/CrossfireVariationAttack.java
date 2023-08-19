@@ -30,7 +30,7 @@ public class CrossfireVariationAttack extends AbstractMove<CrossfireVariationAtt
             stand.world.spawnEntity(ankh);
         }
 
-        return super.perform(stand, user, ctx);
+        return Set.of();
     }
 
     @Override
