@@ -31,37 +31,36 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withInfo(Text.literal("Place Berry Bush"), Text.literal("places an almost-ripe berry bush on the ground, this move cannot be aimed up or down"));
     public static final SimpleAttack<GoldExperienceEntity> LIGHT = new SimpleAttack<GoldExperienceEntity>(
-            15, 6, 9, 5f, 1.5f, 0.75f, 0.75f, -0.1f)
+            15, 6, 9, 5f, 7, 1.5f, 0.75f, 0.75f, -0.1f)
             .withCrouchingVariant(BERRY_BUSH)
             .withImpactSound(JSoundRegistry.IMPACT_1)
-            .withStun(7)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
     public static final SimpleAttack<GoldExperienceEntity> HEAVY = new SimpleAttack<GoldExperienceEntity>(
-            280, 13, 22, 9f, 1.5f, 1.5f, 1f, 0f)
+            280, 13, 22, 9f, 10, 1.5f, 1.5f, 1f, 0f)
             .withExtraHitBox(new HitBoxData(0, 0, 1.25))
 //            .withSound(JSoundRegistry.GE_HEAVY)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withUnbreakable()
             .withLaunch()
-            .withStun(10)
             .withInfo(Text.literal("Shoulder Smash"), Text.literal("slow, uninterruptible combo finisher"));
     public static BarrageAttack<GoldExperienceEntity> BARRAGE = new BarrageAttack<GoldExperienceEntity>(
-            280, 0, 30, 0.75f, 1f, 2f, 0.25f, 0f, 3)
+            280, 0, 30, 0.75f, 1f, 30, 2f, 0.25f, 0f, 3)
             .withSound(JSoundRegistry.GE_BARRAGE)
-            .withStun(30)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
-    public static HealMove HEAL_OTHERS = new HealMove(520, 10, 16, 1f, 1.25f, 0f, 4f, HealMove.HealTarget.TARGETS)
+    public static HealMove HEAL_OTHERS = new HealMove(520, 10, 16, 1f, 1.25f,
+            0f, 4f, HealMove.HealTarget.TARGETS)
             .withSound(JSoundRegistry.GE_HEAL)
             .withInfo(Text.literal("Healing Hand (others)"), Text.empty());
-    public static HealMove HEAL_SELF = new HealMove(520, 10, 14, 1f, 0, 0, 4f, HealMove.HealTarget.USER)
+    public static HealMove HEAL_SELF = new HealMove(520, 10, 14, 1f, 0,
+            0, 4f, HealMove.HealTarget.USER)
             .withCrouchingVariant(HEAL_OTHERS)
             .withSound(JSoundRegistry.GE_HEAL)
             .withInfo(Text.literal("Healing Hand"), Text.literal("standing: heals user for 2 hearts, crouching: heals others for 2 hearts, pacifies angered mobs"));
-    public static final TreeAttack TREE = new TreeAttack(100, 14, 24, 1f, 5f, 1.75f, 0.2f, -0.1f)
+    public static final TreeAttack TREE = new TreeAttack(100, 14, 24, 1f, 5f,
+            15, 1.75f, 0.2f, -0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_8)
             .withSound(JSoundRegistry.GE_TREE)
-            .withStun(15)
             .withInfo(Text.literal("Tree Summon"), Text.literal("two-hitting launch"));
     public static final LifeGiverAttack LIFE_GIVER = new LifeGiverAttack(720, 16, 25, 1f)
             .withSound(JSoundRegistry.GE_HEAL)
@@ -69,28 +68,28 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
                             STANDING: turns any stackable item into a snake, lasts for 25s and stuns for 0.5s on hit
                             CROUCHING: turns any stackable item into a frog, lasts for 15s and reflects damage, follows user
                             AERIAL: turns any item into a butterfly, lasts forever"""));
-    public static final OverclockAttack OVERCLOCK = new OverclockAttack(920, 22, 31, 1f, 9f, 2f, 0.9f, 0f)
+    public static final OverclockAttack OVERCLOCK = new OverclockAttack(920, 22, 31, 1f,
+            9f, 60, 2f, 0.9f, 0f)
 //            .withSound(JSoundRegistry.GE_ULT)
             .withImpactSound(JSoundRegistry.IMPACT_10)
-            .withStun(60)
             .withBlockableType(BlockableType.NON_BLOCKABLE)
             .withInfo(Text.literal("Overclock"), Text.literal("slow, unblockable, devastating stun"));
-    public static final RekkaAttack REKKA3 = new RekkaAttack(560, 12, 24, 1f, 7f, 2f, 0.5f, 0f, 3, 0, null, null)
+    public static final RekkaAttack REKKA3 = new RekkaAttack(560, 12, 24, 1f, 7f,
+            15, 2f, 0.5f, 0f, 3, 0, null, null)
             .withSound(JSoundRegistry.GE_REKKA3)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
-            .withStun(15)
             .withInfo(Text.literal("Rekka (Final Hit)"), Text.literal("knockdown"));
-    public static final RekkaAttack REKKA2 = new RekkaAttack(560, 10, 18, 1f, 5f, 1.75f, 0.5f, 0f, 2, 8, REKKA3, State.REKKA3)
+    public static final RekkaAttack REKKA2 = new RekkaAttack(560, 10, 18, 1f, 5f,
+            15, 1.75f, 0.5f, 0f, 2, 8, REKKA3, State.REKKA3)
             .withSound(JSoundRegistry.GE_REKKA2)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withFollowUp(REKKA3)
-            .withStun(15)
             .withInfo(Text.literal("Rekka (2nd Hit)"), Text.literal("links into Light"));
-    public static final RekkaAttack REKKA1 = new RekkaAttack(560, 8, 20, 1f, 5f, 1.5f, 0.5f, 0f, 1, 12, REKKA2, State.REKKA2)
+    public static final RekkaAttack REKKA1 = new RekkaAttack(560, 8, 20, 1f, 5f,
+            15, 1.5f, 0.5f, 0f, 1, 12, REKKA2, State.REKKA2)
             .withSound(JSoundRegistry.GE_REKKA1)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withFollowUp(REKKA2)
-            .withStun(15)
             .withExtraHitBox(1.25)
             .withInfo(Text.literal("Rekka Series"), Text.literal("a set of three attacks, which cancel into each other during recovery"));
 
