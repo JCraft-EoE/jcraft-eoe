@@ -16,4 +16,10 @@ public class GrabAttack<S extends StandEntity<S, A>, A extends Enum<A> & StandAn
     protected GrabAttack<S, A> getThis() {
         return this;
     }
+
+    @Override
+    public GrabAttack<S, A> copy() {
+        return new GrabAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
+                getHitBoxSize(), getKnockBack(), getOffset(), getHitMove(), getHitState());
+    }
 }

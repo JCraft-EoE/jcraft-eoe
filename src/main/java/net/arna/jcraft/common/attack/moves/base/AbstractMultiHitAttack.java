@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.attack.moves.base;
 
 import it.unimi.dsi.fastutil.ints.*;
+import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 
@@ -12,6 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @param <T>
  * @param <S>
  */
+@Getter
 public abstract class AbstractMultiHitAttack<T extends AbstractMultiHitAttack<T, S>, S extends StandEntity<?, ?>> extends AbstractSimpleAttack<T, S> {
     private final IntSortedSet hitMoments;
 

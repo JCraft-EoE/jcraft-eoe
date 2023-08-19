@@ -46,4 +46,9 @@ public class BubbleCounterAttack extends AbstractCounterAttack<BubbleCounterAtta
     protected BubbleCounterAttack getThis() {
         return this;
     }
+
+    @Override
+    public BubbleCounterAttack copy() {
+        return new BubbleCounterAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance());
+    }
 }

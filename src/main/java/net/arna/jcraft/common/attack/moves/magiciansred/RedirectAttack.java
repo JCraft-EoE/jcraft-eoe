@@ -44,4 +44,9 @@ public class RedirectAttack extends AbstractMove<RedirectAttack, MagiciansRedEnt
     protected RedirectAttack getThis() {
         return this;
     }
+
+    @Override
+    public RedirectAttack copy() {
+        return new RedirectAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance());
+    }
 }

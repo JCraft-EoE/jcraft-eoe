@@ -54,4 +54,10 @@ public class RedBindAttack extends AbstractSimpleAttack<RedBindAttack, Magicians
     protected RedBindAttack getThis() {
         return this;
     }
+
+    @Override
+    public RedBindAttack copy() {
+        return new RedBindAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
+                getHitBoxSize(), getKnockBack(), getOffset());
+    }
 }

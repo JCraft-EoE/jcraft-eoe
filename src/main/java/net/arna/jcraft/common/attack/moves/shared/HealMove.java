@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.attack.moves.shared;
 
+import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
@@ -10,6 +11,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
+@Getter
 public class HealMove extends AbstractSimpleAttack<HealMove, StandEntity<?, ?>> {
     private final float health;
     private final HealTarget target;
@@ -41,6 +43,12 @@ public class HealMove extends AbstractSimpleAttack<HealMove, StandEntity<?, ?>> 
     @Override
     protected HealMove getThis() {
         return this;
+    }
+
+    @Override
+    public HealMove copy() {
+        return new HealMove(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getHitBoxSize(), getOffset(),
+                health, target, consumer);
     }
 
     public enum HealTarget {

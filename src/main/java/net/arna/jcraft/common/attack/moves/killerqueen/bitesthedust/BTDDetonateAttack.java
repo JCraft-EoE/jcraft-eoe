@@ -57,4 +57,9 @@ public class BTDDetonateAttack extends AbstractMove<BTDDetonateAttack, AbstractK
     protected BTDDetonateAttack getThis() {
         return this;
     }
+
+    @Override
+    public BTDDetonateAttack copy() {
+        return new BTDDetonateAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance());
+    }
 }

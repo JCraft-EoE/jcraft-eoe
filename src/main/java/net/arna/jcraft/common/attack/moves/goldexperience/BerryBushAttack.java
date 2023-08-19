@@ -35,4 +35,10 @@ public class BerryBushAttack extends AbstractSimpleAttack<BerryBushAttack, GoldE
     protected BerryBushAttack getThis() {
         return this;
     }
+
+    @Override
+    public BerryBushAttack copy() {
+        return new BerryBushAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
+                getHitBoxSize(), getKnockBack(), getOffset());
+    }
 }

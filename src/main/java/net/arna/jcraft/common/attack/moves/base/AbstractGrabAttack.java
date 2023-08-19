@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.attack.moves.base;
 
+import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.entity.stand.StandEntity;
@@ -8,6 +9,7 @@ import net.minecraft.entity.LivingEntity;
 
 import java.util.Set;
 
+@Getter
 public abstract class AbstractGrabAttack<T extends AbstractGrabAttack<T, S, A>, S extends StandEntity<S, A>, A extends Enum<A> & StandAnimationState<S>>
         extends AbstractSimpleAttack<T, S> {
     private final AbstractMove<?, S> hitMove;

@@ -37,4 +37,9 @@ public class ExplosiveDashAttack extends AbstractMove<ExplosiveDashAttack, Abstr
     protected ExplosiveDashAttack getThis() {
         return this;
     }
+
+    @Override
+    public ExplosiveDashAttack copy() {
+        return new ExplosiveDashAttack(getCooldown());
+    }
 }

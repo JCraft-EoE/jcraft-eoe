@@ -26,4 +26,9 @@ public class CounterMissAttack<S extends StandEntity<?, ?>> extends AbstractMove
     protected CounterMissAttack<S> getThis() {
         return this;
     }
+
+    @Override
+    public CounterMissAttack<S> copy() {
+        return new CounterMissAttack<>(getDuration());
+    }
 }

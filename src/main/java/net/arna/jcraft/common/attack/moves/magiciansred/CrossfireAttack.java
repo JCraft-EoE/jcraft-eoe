@@ -31,4 +31,9 @@ public class CrossfireAttack extends AbstractMove<CrossfireAttack, MagiciansRedE
     protected CrossfireAttack getThis() {
         return this;
     }
+
+    @Override
+    public CrossfireAttack copy() {
+        return new CrossfireAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance());
+    }
 }

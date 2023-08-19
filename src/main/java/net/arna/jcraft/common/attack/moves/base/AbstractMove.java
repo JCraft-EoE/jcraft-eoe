@@ -217,4 +217,10 @@ public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends Stand
      * @return This move
      */
     protected abstract T getThis();
+
+    /**
+     * Creates a copy of this attack.
+     * @return A copy of this attack.
+     */
+    public abstract T copy();
 }

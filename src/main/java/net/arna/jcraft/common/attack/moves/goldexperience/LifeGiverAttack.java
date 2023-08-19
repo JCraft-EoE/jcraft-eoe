@@ -80,6 +80,11 @@ public class LifeGiverAttack extends AbstractMove<LifeGiverAttack, GoldExperienc
         return this;
     }
 
+    @Override
+    public LifeGiverAttack copy() {
+        return new LifeGiverAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance());
+    }
+
     public enum LifeGiverType {
         SNAKE,
         FROG,

@@ -52,4 +52,10 @@ public class FlamethrowerAttack extends AbstractBarrageAttack<FlamethrowerAttack
     protected FlamethrowerAttack getThis() {
         return this;
     }
+
+    @Override
+    public FlamethrowerAttack copy() {
+        return new FlamethrowerAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDuration(),
+                getStun(), getHitBoxSize(), getKnockBack(), getOffset(), getInterval());
+    }
 }

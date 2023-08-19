@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.attack.moves.shared;
 
+import lombok.Getter;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.entity.stand.StandEntity;
@@ -11,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
+@Getter
 public class KnockdownAttack<S extends StandEntity<?, ?>> extends AbstractSimpleAttack<KnockdownAttack<S>, S> {
     private final int knockdownDuration;
 
@@ -33,5 +35,11 @@ public class KnockdownAttack<S extends StandEntity<?, ?>> extends AbstractSimple
     @Override
     protected KnockdownAttack<S> getThis() {
         return this;
+    }
+
+    @Override
+    public KnockdownAttack<S> copy() {
+        return new KnockdownAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
+                getHitBoxSize(), getKnockBack(), getOffset(), knockdownDuration);
     }
 }

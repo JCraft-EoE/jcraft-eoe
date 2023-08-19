@@ -42,4 +42,10 @@ public class SimpleAttack<S extends StandEntity<?, ?>> extends AbstractSimpleAtt
     protected SimpleAttack<S> getThis() {
         return this;
     }
+
+    @Override
+    public SimpleAttack<S> copy() {
+        return new SimpleAttack<>(getCooldown(), getWindup(), getDuration(), getDamage(), getStun(), getHitBoxSize(),
+                getKnockBack(), getMoveDistance(), getOffset());
+    }
 }

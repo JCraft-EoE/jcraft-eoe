@@ -36,4 +36,10 @@ public class BTDGrabHitAttack extends AbstractMultiHitAttack<BTDGrabHitAttack, K
     protected BTDGrabHitAttack getThis() {
         return this;
     }
+
+    @Override
+    public BTDGrabHitAttack copy() {
+        return new BTDGrabHitAttack(getCooldown(), getDuration(), getMoveDistance(), getDamage(), getStun(), getHitBoxSize(),
+                getKnockBack(), getOffset(), getHitMoments());
+    }
 }

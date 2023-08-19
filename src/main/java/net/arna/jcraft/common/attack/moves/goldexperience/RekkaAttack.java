@@ -50,4 +50,10 @@ public class RekkaAttack extends AbstractSimpleAttack<RekkaAttack, GoldExperienc
     protected RekkaAttack getThis() {
         return this;
     }
+
+    @Override
+    public RekkaAttack copy() {
+        return new RekkaAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
+                getHitBoxSize(), getKnockBack(), getOffset(), getRekkaLevel(), getSwitchStart(), getNext(), getNextState());
+    }
 }

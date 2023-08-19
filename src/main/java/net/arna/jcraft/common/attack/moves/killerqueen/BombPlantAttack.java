@@ -135,4 +135,10 @@ public class BombPlantAttack extends AbstractSimpleAttack<BombPlantAttack, Abstr
     protected BombPlantAttack getThis() {
         return this;
     }
+
+    @Override
+    public BombPlantAttack copy() {
+        return new BombPlantAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getStun(), getHitBoxSize(),
+                getOffset());
+    }
 }

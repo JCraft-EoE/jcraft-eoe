@@ -29,4 +29,10 @@ public class KQGrabAttack extends AbstractGrabAttack<KQGrabAttack, KillerQueenEn
     protected KQGrabAttack getThis() {
         return this;
     }
+
+    @Override
+    public KQGrabAttack copy() {
+        return new KQGrabAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
+                getHitBoxSize(), getKnockBack(), getOffset(), getHitMove(), getHitState());
+    }
 }

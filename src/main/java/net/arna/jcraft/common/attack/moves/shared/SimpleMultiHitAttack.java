@@ -11,8 +11,8 @@ import net.arna.jcraft.common.entity.stand.StandEntity;
  */
 public class SimpleMultiHitAttack<S extends StandEntity<?, ?>> extends AbstractMultiHitAttack<SimpleMultiHitAttack<S>, S> {
     public SimpleMultiHitAttack(int cooldown, int duration, float damage, int stun, float hitBoxSize, float knockBack,
-                                float range, float offset, IntCollection hitMoments) {
-        super(cooldown, duration, range, damage, stun, hitBoxSize, knockBack, offset, hitMoments);
+                                float moveDistance, float offset, IntCollection hitMoments) {
+        super(cooldown, duration, moveDistance, damage, stun, hitBoxSize, knockBack, offset, hitMoments);
     }
 
     /**
@@ -33,5 +33,11 @@ public class SimpleMultiHitAttack<S extends StandEntity<?, ?>> extends AbstractM
     @Override
     protected SimpleMultiHitAttack<S> getThis() {
         return this;
+    }
+
+    @Override
+    public SimpleMultiHitAttack<S> copy() {
+        return new SimpleMultiHitAttack<>(getCooldown(), getDuration(), getDamage(), getStun(), getHitBoxSize(),
+                getKnockBack(), getMoveDistance(), getOffset(), getHitMoments());
     }
 }

@@ -30,4 +30,9 @@ public class SheerHeartAttackAttack extends AbstractMove<SheerHeartAttackAttack,
     protected SheerHeartAttackAttack getThis() {
         return this;
     }
+
+    @Override
+    public SheerHeartAttackAttack copy() {
+        return new SheerHeartAttackAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance());
+    }
 }

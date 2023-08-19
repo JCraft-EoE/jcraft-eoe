@@ -17,4 +17,10 @@ public class BarrageAttack<S extends StandEntity<?, ?>> extends AbstractBarrageA
     protected BarrageAttack<S> getThis() {
         return this;
     }
+
+    @Override
+    public BarrageAttack<S> copy() {
+        return new BarrageAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
+                getHitBoxSize(), getKnockBack(), getOffset(), getInterval());
+    }
 }
