@@ -86,7 +86,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
 
     @Override
     protected void registerMoves(MoveMap<MagiciansRedEntity, State> moves) {
-        moves.register(MoveType.LIGHT, LIGHT, State.LIGHT);
+        moves.register(MoveType.LIGHT, LIGHT, State.LIGHT).withCrouchingVariant(State.REDIRECT);
         moves.register(MoveType.HEAVY, HEAVY, State.HEAVY);
         moves.register(MoveType.BARRAGE, FLAMETHROWER, State.BARRAGE);
         moves.register(MoveType.SPECIAL1, CROSSFIRE, State.CROSSFIRE);

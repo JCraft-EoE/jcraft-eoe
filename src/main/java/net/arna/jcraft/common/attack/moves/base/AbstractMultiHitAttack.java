@@ -15,9 +15,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class AbstractMultiHitAttack<T extends AbstractMultiHitAttack<T, S>, S extends StandEntity<?, ?>> extends AbstractSimpleAttack<T, S> {
     private final IntSortedSet hitMoments;
 
-    protected AbstractMultiHitAttack(int cooldown, int duration, float attackDistance, float damage, float hitBoxSize, float knockBack, float offset,
-                                     @NonNull IntCollection hitMoments) {
-        super(cooldown, hitMoments.intStream().min().orElse(0), duration, attackDistance, damage, , hitBoxSize, knockBack, offset);
+    protected AbstractMultiHitAttack(int cooldown, int duration, float attackDistance, float damage, int stun,
+                                     float hitBoxSize, float knockBack, float offset, @NonNull IntCollection hitMoments) {
+        super(cooldown, hitMoments.intStream().min().orElse(0), duration, attackDistance, damage, stun, hitBoxSize, knockBack, offset);
 
         // Ensure hitMoments is sorted
         IntSortedSet intermediary = new IntLinkedOpenHashSet();

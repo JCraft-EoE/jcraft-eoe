@@ -5,6 +5,7 @@ import lombok.Setter;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.*;
 import net.arna.jcraft.common.attack.moves.base.AbstractBarrageAttack;
+import net.arna.jcraft.common.attack.moves.base.AbstractCounterAttack;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
@@ -164,7 +165,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         registerMoves(moveMap);
         moveMap.freeze();
-        moveMap.forEach(entry -> entry.attack().registerContextEntries(moveContext));
+        moveMap.forEach(entry -> entry.getMove().registerContextEntries(moveContext));
     }
 
     // State controls
@@ -550,12 +551,12 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     }
 
     public boolean handleAttack(MoveType type) {
-        MoveMap.Entry<E, S> move = moveMap.getMove(type);
-        AbstractMove<?, ? super E> attack = move.attack();
-        if (hasUser() && getUserOrThrow().isSneaking() && attack.getCrouchingVariant() != null)
-            attack = attack.getCrouchingVariant();
+        MoveMap.Entry<E, S> entry = moveMap.getMove(type);
+        AbstractMove<?, ? super E> move = entry.getMove();
+        if (hasUser() && getUserOrThrow().isSneaking() && move.getCrouchingVariant() != null)
+            move = move.getCrouchingVariant();
 
-        return handleAttack(attack, move.cooldownType(), move.animState());
+        return handleAttack(move, entry.getCooldownType(), entry.getAnimState());
     }
 
     /**
@@ -871,7 +872,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 if (attack == null) {
                     if (this.queuedAttack == null)
                         setFree(false);
-                } else if (attack.attackType == AttackType.COUNTER) {
+                } else if (attack.isCounter()) {
                     whiffCounter();
                 }
             }
@@ -942,10 +943,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                                 || (attack.attackType == AttackType.CHARGE && curMoveStun <= realInitTime)
                                 || (attack.attackType == AttackType.MULTIHIT && attack.attackTimes.contains(moveStun - curMoveStun))
                 ) {
-                    //JCraft.LOGGER.info(curMoveStun + " ACTIVE " + attack.interval);
-                    Set<LivingEntity> hurt = Collections.emptySet();
 
-                    this.specialAttack(attack, hurt);
                 }
                 /*
                 else {
@@ -1129,8 +1127,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             AbstractMove<?, ?> standAttack = stand.curAttack;
             if (standAttack != null) {
                 // Counter check
-                if (!tsHit && standAttack.attackType == AttackType.COUNTER && stand.getMoveStun() < (standAttack.getDuration() - standAttack.getWindup())) {
-                    stand.counter(attacker, source);
+                if (!tsHit && standAttack.isCounter() && stand.getMoveStun() < (standAttack.getDuration() - standAttack.getWindup())) {
+                    //noinspection rawtypes,unchecked // Fine here
+                    ((AbstractCounterAttack) standAttack).counter(stand, attacker, source);
                     ent.removeStatusEffect(JStatusRegistry.DAZED);
                     return;
                 }
@@ -1369,7 +1368,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             stunTicks += blockPlusTicks;
             stunTicks += JComponents.getTimeStopData(target).getTicks();
 
-            Attack selectedAttack = stand.selectAttack(mob, target, stunTicks, enemyMoveStun, distance, enemyStand, enemyAttack);
+            AbstractMove<?, ?> selectedAttack = stand.selectAttack(mob, target, stunTicks, enemyMoveStun, distance, enemyStand, enemyAttack);
 
             if (selectedAttack != null) {
                 boolean shouldPerformMove = stand.getMoveStun() < 1;
@@ -1408,8 +1407,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             boolean evade = enemyAttack != null;
             // If in range (to attack or get hit)
             if (
-                    (selectedAttack != null && distance < selectedAttack.attackDist + selectedAttack.hitboxSize * 0.75) ||
-                            (enemyAttack != null && !enemyAttack.isRanged && distance < enemyAttack.attackDist + enemyAttack.hitboxSize * 1.5)
+                    (selectedAttack != null && distance < selectedAttack.getMoveDistance() + selectedAttack.hitboxSize * 0.75) ||
+                            (enemyAttack != null && !enemyAttack.isRanged() && distance < enemyAttack.getMoveDistance() + enemyAttack.hitboxSize * 1.5)
             ) {
                 // Move towards or away depending on distance and intent
                 entityNavigation.setSpeed(evade ? -0.25 : 0.25);
@@ -1482,11 +1481,11 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             if (curAttack.getFollowUp() != null)
                 selectedAttack = curAttack.getFollowUp();
         } else {
-            selectedAttack = moveMap.getMove(MoveType.LIGHT).attack();
+            selectedAttack = moveMap.getMove(MoveType.LIGHT).getMove();
             int selectedAttackInitTime = selectedAttack.getDuration() - selectedAttack.getWindup();
 
             for (MoveMap.Entry<E, S> entry : moveMap) {
-                AbstractMove<?, ? super E> attack = entry.attack();
+                AbstractMove<?, ? super E> attack = entry.getMove();
                 int parentAttackIndex = attack.button.ordinal(); // ID of the highest level attack's button
                 int initTime = attack.realInitTime();
 

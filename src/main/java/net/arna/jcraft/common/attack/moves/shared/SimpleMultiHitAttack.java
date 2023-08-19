@@ -10,8 +10,9 @@ import net.arna.jcraft.common.entity.stand.StandEntity;
  * @param <S>
  */
 public class SimpleMultiHitAttack<S extends StandEntity<?, ?>> extends AbstractMultiHitAttack<SimpleMultiHitAttack<S>, S> {
-    public SimpleMultiHitAttack(int cooldown, int duration, float damage, float hitBoxSize, float knockBack, float range, float offset, IntCollection hitMoments) {
-        super(cooldown, duration, range, damage, hitBoxSize, knockBack, offset, hitMoments);
+    public SimpleMultiHitAttack(int cooldown, int duration, float damage, int stun, float hitBoxSize, float knockBack,
+                                float range, float offset, IntCollection hitMoments) {
+        super(cooldown, duration, range, damage, stun, hitBoxSize, knockBack, offset, hitMoments);
     }
 
     /**
@@ -23,9 +24,9 @@ public class SimpleMultiHitAttack<S extends StandEntity<?, ?>> extends AbstractM
      * @param hitMoments The ticks at which this attack is performed.
      */
     public static <S extends StandEntity<?, ?>> SimpleMultiHitAttack<S> lightAttack(int moveStunTicks, float damage,
-                                                                                    float attackDistance, float offset,
-                                                                                    IntCollection hitMoments) {
-        return new SimpleMultiHitAttack<>(30, moveStunTicks, damage, 1.5f, 0.75f,
+                                                                                    int stun, float attackDistance,
+                                                                                    float offset, IntCollection hitMoments) {
+        return new SimpleMultiHitAttack<>(30, moveStunTicks, damage, stun, 1.5f, 0.75f,
                 attackDistance, offset, hitMoments);
     }
 

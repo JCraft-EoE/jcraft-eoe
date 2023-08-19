@@ -2,6 +2,7 @@ package net.arna.jcraft.common.attack.core;
 
 import lombok.Data;
 import lombok.Getter;
+import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.CooldownType;
@@ -134,6 +135,16 @@ public class MoveMap<E extends StandEntity<E, S>, S extends Enum<S> & StandAnima
                     "no follow-up.");
             crouchingVariant = new Entry<>(move.getFollowUp(), cooldownType, animState);
             return this;
+        }
+
+        public void registerContextEntries(MoveContext ctx) {
+            registerContextEntries(move, ctx);
+        }
+
+        private void registerContextEntries(AbstractMove<?, ?> move, MoveContext ctx) {
+            move.registerContextEntries(ctx);
+            if (move.getCrouchingVariant() != null) registerContextEntries(move.getCrouchingVariant(), ctx);
+            if (move.getFollowUp() != null) registerContextEntries(move.getFollowUp(), ctx);
         }
     }
 }
