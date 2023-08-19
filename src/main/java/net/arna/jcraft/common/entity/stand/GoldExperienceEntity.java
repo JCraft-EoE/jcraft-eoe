@@ -26,10 +26,9 @@ import java.util.function.Consumer;
 
 public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, GoldExperienceEntity.State> {
     // JCraft.lightCooldown -> 0 | 0.5f -> 0.35f
-    public static final BerryBushAttack BERRY_BUSH = new BerryBushAttack(120, 16, 20, 1.25f,
-            4f, 1.5f, 0.75f, 0.2f)
+    public static final BerryBushAttack BERRY_BUSH = new BerryBushAttack(120, 16, 20,
+            1.25f, 4f, 5, 1.5f, 0.75f, 0.2f)
             .withImpactSound(JSoundRegistry.IMPACT_4)
-            .withStun(5)
             .withInfo(Text.literal("Place Berry Bush"), Text.literal("places an almost-ripe berry bush on the ground, this move cannot be aimed up or down"));
     public static final SimpleAttack<GoldExperienceEntity> LIGHT = new SimpleAttack<GoldExperienceEntity>(
             15, 6, 9, 5f, 1.5f, 0.75f, 0.75f, -0.1f)

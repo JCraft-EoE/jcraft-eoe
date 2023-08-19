@@ -13,7 +13,7 @@ import java.util.Set;
 public class FlamethrowerAttack extends AbstractBarrageAttack<FlamethrowerAttack, MagiciansRedEntity> {
     public FlamethrowerAttack(int cooldown, int windup, int duration, float damage, float hitBoxSize, float knockBack,
                               float range, float offset, int interval) {
-        super(cooldown, windup, duration, range, damage, hitBoxSize, knockBack, offset, interval);
+        super(cooldown, windup, duration, range, damage, , hitBoxSize, knockBack, offset, interval);
     }
 
     @Override

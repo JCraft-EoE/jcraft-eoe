@@ -16,8 +16,8 @@ public class SimpleAttack<S extends StandEntity<?, ?>> extends AbstractSimpleAtt
      * @param attackDistance The distance at which the hit-box is placed.
      * @param offset The amount the hit-box is offset by.
      */
-    public SimpleAttack(int cooldown, int windup, int duration, float damage, float hitBoxSize, float knockBack, float attackDistance, float offset) {
-        super(cooldown, windup, duration, attackDistance, damage, hitBoxSize, knockBack, offset);
+    public SimpleAttack(int cooldown, int windup, int duration, float damage, int stun, float hitBoxSize, float knockBack, float attackDistance, float offset) {
+        super(cooldown, windup, duration, attackDistance, damage, stun, hitBoxSize, knockBack, offset);
     }
 
     public SimpleAttack<S> withHitSpark(JParticleType particle) {
@@ -33,8 +33,9 @@ public class SimpleAttack<S extends StandEntity<?, ?>> extends AbstractSimpleAtt
      * @param attackDistance The distance at which the hit-box is placed.
      * @param offset The amount the hit-box is offset by.
      */
-    public static <S extends StandEntity<?, ?>> SimpleAttack<S> lightAttack(int windup, int duration, float damage, float knockBack, float attackDistance, float offset) {
-        return new SimpleAttack<S>(30, windup, duration, damage, 1.5f, knockBack, attackDistance, offset);
+    public static <S extends StandEntity<?, ?>> SimpleAttack<S> lightAttack(int windup, int duration, float damage,
+                                                                            int stun, float knockBack, float attackDistance, float offset) {
+        return new SimpleAttack<>(30, windup, duration, damage, stun, 1.5f, knockBack, attackDistance, offset);
     }
 
     @Override

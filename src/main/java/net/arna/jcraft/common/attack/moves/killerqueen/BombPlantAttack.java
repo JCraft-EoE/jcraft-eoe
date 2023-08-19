@@ -24,8 +24,8 @@ public class BombPlantAttack extends AbstractSimpleAttack<BombPlantAttack, Abstr
     public static final MoveVariable<Entity> BOMB_ENTITY = new MoveVariable<>(Entity.class);
     public static final MoveVariable<Vec3d> BOMB_POS = new MoveVariable<>(Vec3d.class);
 
-    public BombPlantAttack(int cooldown, int windup, int duration, float attackDistance, float hitBoxSize, float offset) {
-        super(cooldown, windup, duration, attackDistance, 0f, hitBoxSize, 0f, offset);
+    public BombPlantAttack(int cooldown, int windup, int duration, float attackDistance, int stun, float hitBoxSize, float offset) {
+        super(cooldown, windup, duration, attackDistance, 0f, stun, hitBoxSize, 0f, offset);
     }
 
     @Override

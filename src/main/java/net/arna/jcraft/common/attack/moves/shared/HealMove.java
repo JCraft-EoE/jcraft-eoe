@@ -15,14 +15,14 @@ public class HealMove extends AbstractSimpleAttack<HealMove, StandEntity<?, ?>> 
     private final HealTarget target;
     private final Consumer<LivingEntity> consumer;
 
-    public HealMove(int cooldown, int windup, int duration, float moveDistance, float hitBoxSize, float offset,
+    public HealMove(int cooldown, int windup, int duration, float moveDistance, int stun, float hitBoxSize, float offset,
                     float health, HealTarget target) {
-        this(cooldown, windup, duration, moveDistance, hitBoxSize, offset, health, target, e -> {});
+        this(cooldown, windup, duration, moveDistance, stun, hitBoxSize, offset, health, target, e -> {});
     }
 
-    public HealMove(int cooldown, int windup, int duration, float moveDistance, float hitBoxSize, float offset,
+    public HealMove(int cooldown, int windup, int duration, float moveDistance, int stun, float hitBoxSize, float offset,
                     float health, HealTarget target, Consumer<LivingEntity> consumer) {
-        super(cooldown, windup, duration, moveDistance, 0f, hitBoxSize, 0f, offset);
+        super(cooldown, windup, duration, moveDistance, 0f, stun, hitBoxSize, 0f, offset);
         this.health = health;
         this.target = target;
         this.consumer = consumer;

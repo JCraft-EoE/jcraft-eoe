@@ -10,7 +10,7 @@ public class BarrageAttack<S extends StandEntity<?, ?>> extends AbstractBarrageA
 
     public BarrageAttack(int cooldown, int windup, int duration, float attackDistance, float damage,
                          float hitBoxSize, float knockBack, float offset, int interval) {
-        super(cooldown, windup, duration, attackDistance, damage, hitBoxSize, knockBack, offset, interval);
+        super(cooldown, windup, duration, attackDistance, damage, , hitBoxSize, knockBack, offset, interval);
     }
 
     @Override

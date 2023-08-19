@@ -14,9 +14,9 @@ import java.util.Set;
 public class KnockdownAttack<S extends StandEntity<?, ?>> extends AbstractSimpleAttack<KnockdownAttack<S>, S> {
     private final int knockdownDuration;
 
-    public KnockdownAttack(int cooldown, int windup, int duration, float attackDistance, float damage, float hitBoxSize,
-                           float knockBack, float offset, int knockdownDuration) {
-        super(cooldown, windup, duration, attackDistance, damage, hitBoxSize, knockBack, offset);
+    public KnockdownAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun,
+                           float hitBoxSize, float knockBack, float offset, int knockdownDuration) {
+        super(cooldown, windup, duration, attackDistance, damage, stun, hitBoxSize, knockBack, offset);
         this.knockdownDuration = knockdownDuration;
     }
 

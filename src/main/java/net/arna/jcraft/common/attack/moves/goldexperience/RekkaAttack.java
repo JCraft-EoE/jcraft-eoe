@@ -20,9 +20,9 @@ public class RekkaAttack extends AbstractSimpleAttack<RekkaAttack, GoldExperienc
     private final int switchStart;
     private final GoldExperienceEntity.State nextState;
 
-    public RekkaAttack(int cooldown, int windup, int duration, float attackDistance, float damage, float hitBoxSize,
+    public RekkaAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun, float hitBoxSize,
                        float knockBack, float offset, int rekkaLevel, int switchStart, RekkaAttack next, GoldExperienceEntity.State nextState) {
-        super(cooldown, windup, duration, attackDistance, damage, hitBoxSize, knockBack, offset);
+        super(cooldown, windup, duration, attackDistance, damage, stun, hitBoxSize, knockBack, offset);
         if (rekkaLevel > 1) hitSpark = JParticleType.HIT_SPARK_2;
         this.rekkaLevel = rekkaLevel;
         this.switchStart = switchStart;

@@ -16,9 +16,9 @@ import java.util.Set;
 public class BerryBushAttack extends AbstractSimpleAttack<BerryBushAttack, GoldExperienceEntity> {
     private static final BlockState berryBush = Blocks.SWEET_BERRY_BUSH.getDefaultState().with(SweetBerryBushBlock.AGE, 1);
 
-    public BerryBushAttack(int cooldown, int windup, int duration, float attackDistance, float damage, float hitBoxSize,
-                           float knockBack, float offset) {
-        super(cooldown, windup, duration, attackDistance, damage, hitBoxSize, knockBack, offset);
+    public BerryBushAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun,
+                           float hitBoxSize, float knockBack, float offset) {
+        super(cooldown, windup, duration, attackDistance, damage, stun, hitBoxSize, knockBack, offset);
     }
 
     @Override

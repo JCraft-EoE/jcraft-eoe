@@ -23,8 +23,8 @@ public class BTDPlantAttack extends AbstractSimpleAttack<BTDPlantAttack, KQBTDEn
     public static final MoveVariable<LivingEntity> BTD_ENTITY = new MoveVariable<>(LivingEntity.class);
     public static final MoveVariable<Vec3d> BTD_POS = new MoveVariable<>(Vec3d.class);
 
-    public BTDPlantAttack(int cooldown, int windup, int duration, float attackDistance, float hitBoxSize, float offset) {
-        super(cooldown, windup, duration, attackDistance, 0f, hitBoxSize, 0f, offset);
+    public BTDPlantAttack(int cooldown, int windup, int duration, float attackDistance, int stun, float hitBoxSize, float offset) {
+        super(cooldown, windup, duration, attackDistance, 0f, stun, hitBoxSize, 0f, offset);
     }
 
     @Override

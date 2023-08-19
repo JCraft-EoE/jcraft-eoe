@@ -14,9 +14,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 
 public class RedBindAttack extends AbstractSimpleAttack<RedBindAttack, MagiciansRedEntity> {
-    public RedBindAttack(int cooldown, int windup, int duration, float attackDistance, float damage, float hitBoxSize,
-                         float knockBack, float offset) {
-        super(cooldown, windup, duration, attackDistance, damage, hitBoxSize, knockBack, offset);
+    public RedBindAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun,
+                         float hitBoxSize, float knockBack, float offset) {
+        super(cooldown, windup, duration, attackDistance, damage, stun, hitBoxSize, knockBack, offset);
     }
 
     @Override

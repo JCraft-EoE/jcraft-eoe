@@ -41,7 +41,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
     private final float offset;
     private final Set<HitBoxData> extraHitBoxes = new HashSet<>();
     private StunType stunType = StunType.BURSTABLE;
-    private int stunTicks = 0;
+    private int stun = 0;
     private boolean overrideStun;
     private boolean lift = true, canBackStab = true;
     private int blockStun;
@@ -49,9 +49,10 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
     protected JParticleType hitSpark = JParticleType.HIT_SPARK_1;
 
     protected AbstractSimpleAttack(int cooldown, int windup, int duration, float attackDistance, float damage,
-                                   float hitBoxSize, float knockBack, float offset) {
+                                   int stun, float hitBoxSize, float knockBack, float offset) {
         super(cooldown, windup, duration, attackDistance);
         this.damage = damage;
+        this.stun = stun;
         this.hitBoxSize = hitBoxSize;
         this.knockBack = knockBack;
         this.offset = offset;
@@ -80,7 +81,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
      */
     public T withStun(StunType type, int stunTicks) {
         this.stunType = type;
-        this.stunTicks = stunTicks;
+        this.stun = stunTicks;
         return getThis();
     }
 
@@ -305,7 +306,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
 
         Vec3d kbVec = getRotVec(stand).multiply(knockBack).add(new Vec3d(0.0, Math.abs(knockBack) / 4, 0.0));
         for (LivingEntity target : validateTargets(stand, hurt))
-            StandEntity.damageLogic(stand.world, target, kbVec, stunTicks, stunType.ordinal(), overrideStun,
+            StandEntity.damageLogic(stand.world, target, kbVec, stun, stunType.ordinal(), overrideStun,
                     damage, lift, blockStun, damageSource, stand.getUserOrThrow(), canBackStab, blockableType.isNonBlockable());
 
         return hurt;

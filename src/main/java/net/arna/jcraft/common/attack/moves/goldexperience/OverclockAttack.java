@@ -13,9 +13,9 @@ import net.minecraft.entity.effect.StatusEffects;
 import java.util.Set;
 
 public class OverclockAttack extends AbstractSimpleAttack<OverclockAttack, GoldExperienceEntity> {
-    public OverclockAttack(int cooldown, int windup, int duration, float attackDistance, float damage, float hitBoxSize,
-                           float knockBack, float offset) {
-        super(cooldown, windup, duration, attackDistance, damage, hitBoxSize, knockBack, offset);
+    public OverclockAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun,
+                           float hitBoxSize, float knockBack, float offset) {
+        super(cooldown, windup, duration, attackDistance, damage, stun, hitBoxSize, knockBack, offset);
         hitSpark = JParticleType.HIT_SPARK_2;
     }
 

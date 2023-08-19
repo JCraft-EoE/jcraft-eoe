@@ -9,7 +9,7 @@ public class GrabAttack<S extends StandEntity<S, A>, A extends Enum<A> & StandAn
 
     public GrabAttack(int cooldown, int windup, int duration, float attackDistance, float damage, float hitBoxSize,
                       float knockBack, float offset, AbstractMove<?, S> hitMove, A hitState) {
-        super(cooldown, windup, duration, attackDistance, damage, hitBoxSize, knockBack, offset, hitMove, hitState);
+        super(cooldown, windup, duration, attackDistance, damage, , hitBoxSize, knockBack, offset, hitMove, hitState);
     }
 
     @Override

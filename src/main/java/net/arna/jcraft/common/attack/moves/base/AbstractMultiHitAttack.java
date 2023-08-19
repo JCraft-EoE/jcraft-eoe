@@ -17,7 +17,7 @@ public abstract class AbstractMultiHitAttack<T extends AbstractMultiHitAttack<T,
 
     protected AbstractMultiHitAttack(int cooldown, int duration, float attackDistance, float damage, float hitBoxSize, float knockBack, float offset,
                                      @NonNull IntCollection hitMoments) {
-        super(cooldown, hitMoments.intStream().min().orElse(0), duration, attackDistance, damage, hitBoxSize, knockBack, offset);
+        super(cooldown, hitMoments.intStream().min().orElse(0), duration, attackDistance, damage, , hitBoxSize, knockBack, offset);
 
         // Ensure hitMoments is sorted
         IntSortedSet intermediary = new IntLinkedOpenHashSet();

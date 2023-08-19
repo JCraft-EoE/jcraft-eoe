@@ -24,8 +24,8 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, S
     private final int interval;
 
     protected AbstractBarrageAttack(int cooldown, int windup, int duration, float attackDistance, float damage,
-                                    float hitBoxSize, float knockBack, float offset, int interval) {
-        super(cooldown, windup, duration, attackDistance, damage, hitBoxSize, knockBack, offset);
+                                    int stun, float hitBoxSize, float knockBack, float offset, int interval) {
+        super(cooldown, windup, duration, attackDistance, damage, stun, hitBoxSize, knockBack, offset);
         barrage = true;
         this.interval = interval;
     }

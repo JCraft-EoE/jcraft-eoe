@@ -12,9 +12,9 @@ import net.minecraft.entity.LivingEntity;
 import java.util.Set;
 
 public class TreeAttack extends AbstractSimpleAttack<TreeAttack, GoldExperienceEntity> {
-    public TreeAttack(int cooldown, int windup, int duration, float attackDistance, float damage, float hitBoxSize,
+    public TreeAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun, float hitBoxSize,
                       float knockBack, float offset) {
-        super(cooldown, windup, duration, attackDistance, damage, hitBoxSize, knockBack, offset);
+        super(cooldown, windup, duration, attackDistance, damage, stun, hitBoxSize, knockBack, offset);
         hitSpark = JParticleType.HIT_SPARK_2;
     }
 
