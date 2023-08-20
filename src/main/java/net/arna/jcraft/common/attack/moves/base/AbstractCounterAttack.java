@@ -16,7 +16,7 @@ public abstract class AbstractCounterAttack<T extends AbstractCounterAttack<T, S
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(S stand, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(S attacker, LivingEntity user, MoveContext ctx) {
         return Set.of();
     }
 

@@ -19,24 +19,24 @@ public class TreeAttack extends AbstractSimpleAttack<TreeAttack, GoldExperienceE
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(GoldExperienceEntity stand, LivingEntity user, MoveContext ctx) {
-        Set<LivingEntity> targets = super.perform(stand, user, ctx);
+    public @NonNull Set<LivingEntity> perform(GoldExperienceEntity attacker, LivingEntity user, MoveContext ctx) {
+        Set<LivingEntity> targets = super.perform(attacker, user, ctx);
 
-        GETreeEntity tree = new GETreeEntity(JEntityTypeRegistry.GE_TREE, stand.world);
+        GETreeEntity tree = new GETreeEntity(JEntityTypeRegistry.GE_TREE, attacker.world);
         tree.setMaster(user);
-        tree.copyPositionAndRotation(stand);
-        stand.world.spawnEntity(tree);
+        tree.copyPositionAndRotation(attacker);
+        attacker.world.spawnEntity(tree);
 
         return targets;
     }
 
     @Override
-    protected TreeAttack getThis() {
+    protected @NonNull TreeAttack getThis() {
         return this;
     }
 
     @Override
-    public TreeAttack copy() {
+    public @NonNull TreeAttack copy() {
         return new TreeAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
                 getHitboxSize(), getKnockback(), getOffset());
     }

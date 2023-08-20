@@ -1,7 +1,8 @@
 package net.arna.jcraft.common.attack.moves.magiciansred;
 
-import net.arna.jcraft.common.attack.moves.base.AbstractMove;
+import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.entity.projectile.AnkhProjectile;
 import net.arna.jcraft.common.entity.stand.MagiciansRedEntity;
 import net.arna.jcraft.common.util.JUtils;
@@ -10,7 +11,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Set;
@@ -22,11 +22,11 @@ public class RedirectAttack extends AbstractMove<RedirectAttack, MagiciansRedEnt
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(MagiciansRedEntity stand, LivingEntity user, MoveContext ctx) {
-        List<AnkhProjectile> ankhs = stand.world.getEntitiesByClass(AnkhProjectile.class,
-                stand.getBoundingBox().expand(32), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+    public @NonNull Set<LivingEntity> perform(MagiciansRedEntity attacker, LivingEntity user, MoveContext ctx) {
+        List<AnkhProjectile> ankhs = attacker.world.getEntitiesByClass(AnkhProjectile.class,
+                attacker.getBoundingBox().expand(32), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
 
-        Vec3d eyePos = getOffsetHeightPos(stand);
+        Vec3d eyePos = getOffsetHeightPos(attacker);
         if (!ankhs.isEmpty()) {
             Vec3d pos = JUtils.raycastAll(user, eyePos, eyePos.add(user.getRotationVector().multiply(24)), RaycastContext.FluidHandling.NONE);
 
@@ -41,12 +41,12 @@ public class RedirectAttack extends AbstractMove<RedirectAttack, MagiciansRedEnt
     }
 
     @Override
-    protected RedirectAttack getThis() {
+    protected @NonNull RedirectAttack getThis() {
         return this;
     }
 
     @Override
-    public RedirectAttack copy() {
+    public @NonNull RedirectAttack copy() {
         return new RedirectAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance());
     }
 }

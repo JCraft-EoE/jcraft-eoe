@@ -1,11 +1,11 @@
 package net.arna.jcraft.common.attack.moves.magiciansred;
 
-import net.arna.jcraft.common.attack.moves.base.AbstractMove;
+import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.entity.projectile.AnkhProjectile;
 import net.arna.jcraft.common.entity.stand.MagiciansRedEntity;
 import net.minecraft.entity.LivingEntity;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
@@ -18,28 +18,28 @@ public class CrossfireVariationAttack extends AbstractMove<CrossfireVariationAtt
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(MagiciansRedEntity stand, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(MagiciansRedEntity attacker, LivingEntity user, MoveContext ctx) {
         int orbitRange = user.isSneaking() ? 6 : 4;
         for (int i = 0; i < variationAnkhs; i++) {
-            AnkhProjectile ankh = new AnkhProjectile(stand.world, user);
+            AnkhProjectile ankh = new AnkhProjectile(attacker.world, user);
             ankh.setVelocity(0.0, 1.0, 0.0);
-            ankh.setPosition(getOffsetHeightPos(stand).add(0.0, 1.0, 0.0));
+            ankh.setPosition(getOffsetHeightPos(attacker).add(0.0, 1.0, 0.0));
             ankh.setVariation(true);
             ankh.setOrbitRange(orbitRange);
             ankh.setOrbitOffset((360f / variationAnkhs) * i);
-            stand.world.spawnEntity(ankh);
+            attacker.world.spawnEntity(ankh);
         }
 
         return Set.of();
     }
 
     @Override
-    protected CrossfireVariationAttack getThis() {
+    protected @NonNull CrossfireVariationAttack getThis() {
         return this;
     }
 
     @Override
-    public CrossfireVariationAttack copy() {
+    public @NonNull CrossfireVariationAttack copy() {
         return new CrossfireVariationAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance());
     }
 }

@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.attack.moves.shared;
 
+import lombok.NonNull;
 import net.arna.jcraft.common.attack.moves.base.AbstractBarrageAttack;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 
@@ -14,12 +15,12 @@ public class BarrageAttack<S extends StandEntity<?, ?>> extends AbstractBarrageA
     }
 
     @Override
-    protected BarrageAttack<S> getThis() {
+    protected @NonNull BarrageAttack<S> getThis() {
         return this;
     }
 
     @Override
-    public BarrageAttack<S> copy() {
+    public @NonNull BarrageAttack<S> copy() {
         return new BarrageAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
                 getHitboxSize(), getKnockback(), getOffset(), getInterval());
     }

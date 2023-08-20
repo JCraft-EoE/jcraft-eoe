@@ -17,9 +17,9 @@ public class ExplosiveDashAttack extends AbstractMove<ExplosiveDashAttack, Abstr
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(AbstractKillerQueenEntity<?, ?> stand, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(AbstractKillerQueenEntity<?, ?> attacker, LivingEntity user, MoveContext ctx) {
         Vec3d lookVec = user.getRotationVector().multiply(0.9);
-        stand.world.createExplosion(user,
+        attacker.world.createExplosion(user,
                 user.getX() - lookVec.x,
                 user.getY() + user.getHeight() / 2 - lookVec.y,
                 user.getZ() - lookVec.z,
@@ -28,18 +28,18 @@ public class ExplosiveDashAttack extends AbstractMove<ExplosiveDashAttack, Abstr
         user.setVelocity(user.getVelocity().add(lookVec));
         user.velocityModified = true;
 
-        stand.playSound(JSoundRegistry.KQ_DETONATE, 1, 1);
+        attacker.playSound(JSoundRegistry.KQ_DETONATE, 1, 1);
 
         return Set.of();
     }
 
     @Override
-    protected ExplosiveDashAttack getThis() {
+    protected @NonNull ExplosiveDashAttack getThis() {
         return this;
     }
 
     @Override
-    public ExplosiveDashAttack copy() {
+    public @NonNull ExplosiveDashAttack copy() {
         return new ExplosiveDashAttack(getCooldown());
     }
 }

@@ -41,7 +41,7 @@ public class MoveDataCommand {
                 return 0;
             } else {
                 attack = standEntity.curMove;
-                if (attack == null) attack = standEntity.previousAttack;
+                if (attack == null) attack = standEntity.prevMove;
             }
         } else {
             JCraftSpec spec = JUtils.getSpec(player);

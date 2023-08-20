@@ -20,8 +20,8 @@ public class OverclockAttack extends AbstractSimpleAttack<OverclockAttack, GoldE
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(GoldExperienceEntity stand, LivingEntity user, MoveContext ctx) {
-        Set<LivingEntity> targets = super.perform(stand, user, ctx);
+    public @NonNull Set<LivingEntity> perform(GoldExperienceEntity attacker, LivingEntity user, MoveContext ctx) {
+        Set<LivingEntity> targets = super.perform(attacker, user, ctx);
 
         for (LivingEntity target : targets) {
             target.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 5, 14, true, false));
@@ -33,12 +33,12 @@ public class OverclockAttack extends AbstractSimpleAttack<OverclockAttack, GoldE
     }
 
     @Override
-    protected OverclockAttack getThis() {
+    protected @NonNull OverclockAttack getThis() {
         return this;
     }
 
     @Override
-    public OverclockAttack copy() {
+    public @NonNull OverclockAttack copy() {
         return new OverclockAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
                 getHitboxSize(), getKnockback(), getOffset());
     }

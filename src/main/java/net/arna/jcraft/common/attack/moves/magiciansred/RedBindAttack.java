@@ -1,7 +1,8 @@
 package net.arna.jcraft.common.attack.moves.magiciansred;
 
-import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
+import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
+import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.entity.projectile.RedBindEntity;
 import net.arna.jcraft.common.entity.stand.MagiciansRedEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
@@ -19,8 +20,8 @@ public class RedBindAttack extends AbstractSimpleAttack<RedBindAttack, Magicians
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(MagiciansRedEntity stand, LivingEntity user, MoveContext ctx) {
-        Set<LivingEntity> targets = super.perform(stand, user, ctx);
+    public @NonNull Set<LivingEntity> perform(MagiciansRedEntity attacker, LivingEntity user, MoveContext ctx) {
+        Set<LivingEntity> targets = super.perform(attacker, user, ctx);
         if (targets.isEmpty()) return targets;
 
         LivingEntity boundEntity = JUtils.getUserIfStand(targets.stream().findFirst().orElseThrow());
@@ -40,22 +41,22 @@ public class RedBindAttack extends AbstractSimpleAttack<RedBindAttack, Magicians
         StandEntity.stun(boundEntity, RedBindEntity.ticksToLive, 0);
 
         // Create and bind
-        RedBindEntity redBind = new RedBindEntity(JEntityTypeRegistry.RED_BIND, stand.world);
+        RedBindEntity redBind = new RedBindEntity(JEntityTypeRegistry.RED_BIND, attacker.world);
         redBind.setPosition(boundEntity.getPos());
         redBind.setMaster(user);
         redBind.setBoundEntity(boundEntity);
-        stand.world.spawnEntity(redBind);
+        attacker.world.spawnEntity(redBind);
 
         return targets;
     }
 
     @Override
-    protected RedBindAttack getThis() {
+    protected @NonNull RedBindAttack getThis() {
         return this;
     }
 
     @Override
-    public RedBindAttack copy() {
+    public @NonNull RedBindAttack copy() {
         return new RedBindAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
                 getHitboxSize(), getKnockback(), getOffset());
     }

@@ -26,7 +26,7 @@ public class LifeGiverAttack extends AbstractMove<LifeGiverAttack, GoldExperienc
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(GoldExperienceEntity stand, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(GoldExperienceEntity attacker, LivingEntity user, MoveContext ctx) {
         ItemStack item = user.getOffHandStack(); // Get offhand, or if unavailable main hand stack
         if (item.isEmpty()) item = user.getMainHandStack();
         if (item.isEmpty()) return Set.of();
@@ -38,7 +38,7 @@ public class LifeGiverAttack extends AbstractMove<LifeGiverAttack, GoldExperienc
             case SNAKE -> {
                 if (item.getMaxCount() <= 1) return Set.of();
 
-                GESnakeEntity snake = new GESnakeEntity(JEntityTypeRegistry.GE_SNAKE, stand.world);
+                GESnakeEntity snake = new GESnakeEntity(JEntityTypeRegistry.GE_SNAKE, attacker.world);
                 //todo: fix snake not working for mobs
                 if (user instanceof PlayerEntity playerEntity) snake.setOwner(playerEntity);
                 animal = snake;
@@ -46,12 +46,12 @@ public class LifeGiverAttack extends AbstractMove<LifeGiverAttack, GoldExperienc
             case FROG -> {
                 if (item.getMaxCount() <= 1) return Set.of();
 
-                GEFrogEntity frog = new GEFrogEntity(JEntityTypeRegistry.GE_FROG, stand.world);
+                GEFrogEntity frog = new GEFrogEntity(JEntityTypeRegistry.GE_FROG, attacker.world);
                 frog.setMaster(user);
                 animal = frog;
             }
             case BUTTERFLY -> {
-                GEButterflyEntity butterfly = new GEButterflyEntity(JEntityTypeRegistry.GE_BUTTERFLY, stand.world);
+                GEButterflyEntity butterfly = new GEButterflyEntity(JEntityTypeRegistry.GE_BUTTERFLY, attacker.world);
                 butterfly.setMaster(user);
                 animal = butterfly;
             }
@@ -63,9 +63,9 @@ public class LifeGiverAttack extends AbstractMove<LifeGiverAttack, GoldExperienc
             return Set.of();
         }
         item.decrement(1);
-        animal.refreshPositionAndAngles(stand.getX(), stand.getY() + 0.5f, stand.getZ(), stand.getYaw(), stand.getPitch());
+        animal.refreshPositionAndAngles(attacker.getX(), attacker.getY() + 0.5f, attacker.getZ(), attacker.getYaw(), attacker.getPitch());
         animal.setStackInHand(Hand.MAIN_HAND, animalItem);
-        stand.world.spawnEntity(animal);
+        attacker.world.spawnEntity(animal);
 
         return Set.of();
     }
@@ -76,12 +76,12 @@ public class LifeGiverAttack extends AbstractMove<LifeGiverAttack, GoldExperienc
     }
 
     @Override
-    protected LifeGiverAttack getThis() {
+    protected @NonNull LifeGiverAttack getThis() {
         return this;
     }
 
     @Override
-    public LifeGiverAttack copy() {
+    public @NonNull LifeGiverAttack copy() {
         return new LifeGiverAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance());
     }
 

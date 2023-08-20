@@ -1,10 +1,10 @@
 package net.arna.jcraft.common.attack.moves.shared;
 
-import net.arna.jcraft.common.attack.moves.base.AbstractMove;
+import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.minecraft.entity.LivingEntity;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
@@ -18,17 +18,17 @@ public class CounterMissAttack<S extends StandEntity<?, ?>> extends AbstractMove
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(S stand, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(S attacker, LivingEntity user, MoveContext ctx) {
         return Set.of();
     }
 
     @Override
-    protected CounterMissAttack<S> getThis() {
+    protected @NonNull CounterMissAttack<S> getThis() {
         return this;
     }
 
     @Override
-    public CounterMissAttack<S> copy() {
+    public @NonNull CounterMissAttack<S> copy() {
         return new CounterMissAttack<>(getDuration());
     }
 }

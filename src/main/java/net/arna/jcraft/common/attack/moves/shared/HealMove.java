@@ -31,8 +31,8 @@ public class HealMove extends AbstractSimpleAttack<HealMove, StandEntity<?, ?>> 
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(StandEntity<?, ?> stand, LivingEntity user, MoveContext ctx) {
-        Set<LivingEntity> targets = target.pickTargets(super.perform(stand, user, ctx), user);
+    public @NonNull Set<LivingEntity> perform(StandEntity<?, ?> attacker, LivingEntity user, MoveContext ctx) {
+        Set<LivingEntity> targets = target.pickTargets(super.perform(attacker, user, ctx), user);
         targets.forEach(e -> {
             e.heal(health);
             consumer.accept(e);
@@ -41,12 +41,12 @@ public class HealMove extends AbstractSimpleAttack<HealMove, StandEntity<?, ?>> 
     }
 
     @Override
-    protected HealMove getThis() {
+    protected @NonNull HealMove getThis() {
         return this;
     }
 
     @Override
-    public HealMove copy() {
+    public @NonNull HealMove copy() {
         return new HealMove(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getHitboxSize(), getOffset(),
                 health, target, consumer);
     }

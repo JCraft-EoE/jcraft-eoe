@@ -1,8 +1,9 @@
 package net.arna.jcraft.common.attack.moves.killerqueen;
 
-import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
+import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.core.ctx.MoveVariable;
+import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.entity.stand.AbstractKillerQueenEntity;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.JUtils;
@@ -14,7 +15,6 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,19 +29,19 @@ public class BombPlantAttack extends AbstractSimpleAttack<BombPlantAttack, Abstr
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(AbstractKillerQueenEntity<?, ?> stand, LivingEntity user, MoveContext ctx) {
-        Set<LivingEntity> targets = super.perform(stand, user, ctx);
+    public @NonNull Set<LivingEntity> perform(AbstractKillerQueenEntity<?, ?> attacker, LivingEntity user, MoveContext ctx) {
+        Set<LivingEntity> targets = super.perform(attacker, user, ctx);
         Entity target = targets.stream()
                 .findFirst()
                 .<Entity>map(JUtils::getUserIfStand)
                 .or(() -> {
                     // If none are found, re-do an optimized hitbox check for any entity type
-                    Vec3d rotVec = getRotVec(stand);
-                    Vec3d boxCenter = stand.getPos().add(0, user.getHeight() / 2, 0).add(rotVec);
+                    Vec3d rotVec = getRotVec(attacker);
+                    Vec3d boxCenter = attacker.getPos().add(0, user.getHeight() / 2, 0).add(rotVec);
                     Vec3d halfBox = new Vec3d(0.5, 0.5, 0.5);
-                    List<Entity> hit = stand.world.getEntitiesByClass(Entity.class,
+                    List<Entity> hit = attacker.world.getEntitiesByClass(Entity.class,
                             new Box(boxCenter.subtract(halfBox), boxCenter.add(halfBox)),
-                            EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e -> e != stand && e != user));
+                            EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e -> e != attacker && e != user));
                     return !hit.isEmpty() ? Optional.of(hit.get(0)) : Optional.empty();
                 })
                 .orElse(null);
@@ -132,12 +132,12 @@ public class BombPlantAttack extends AbstractSimpleAttack<BombPlantAttack, Abstr
     }
 
     @Override
-    protected BombPlantAttack getThis() {
+    protected @NonNull BombPlantAttack getThis() {
         return this;
     }
 
     @Override
-    public BombPlantAttack copy() {
+    public @NonNull BombPlantAttack copy() {
         return new BombPlantAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getStun(), getHitboxSize(),
                 getOffset());
     }

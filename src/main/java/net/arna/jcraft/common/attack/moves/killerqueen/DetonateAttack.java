@@ -1,9 +1,10 @@
 package net.arna.jcraft.common.attack.moves.killerqueen;
 
+import lombok.NonNull;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
-import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.stand.AbstractKillerQueenEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
@@ -18,7 +19,6 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
@@ -28,12 +28,12 @@ public class DetonateAttack extends AbstractMove<DetonateAttack, AbstractKillerQ
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(AbstractKillerQueenEntity<?, ?> stand, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(AbstractKillerQueenEntity<?, ?> attacker, LivingEntity user, MoveContext ctx) {
         Entity bombEntity = ctx.get(BombPlantAttack.BOMB_ENTITY);
         Vec3d bombPos = ctx.get(BombPlantAttack.BOMB_POS);
 
         if (bombEntity instanceof LivingEntity livingEntity) {
-            explode(stand, user, livingEntity.getPos());
+            explode(attacker, user, livingEntity.getPos());
         } else {
             Vec3d finalBombPos = null;
 
@@ -45,7 +45,7 @@ public class DetonateAttack extends AbstractMove<DetonateAttack, AbstractKillerQ
             if (bombPos != null) finalBombPos = bombPos;
 
             if (finalBombPos != null)
-                explode(stand, user, finalBombPos);
+                explode(attacker, user, finalBombPos);
         }
 
         ctx.set(BombPlantAttack.BOMB_ENTITY, null);
@@ -55,12 +55,12 @@ public class DetonateAttack extends AbstractMove<DetonateAttack, AbstractKillerQ
     }
 
     @Override
-    protected DetonateAttack getThis() {
+    protected @NonNull DetonateAttack getThis() {
         return this;
     }
 
     @Override
-    public DetonateAttack copy() {
+    public @NonNull DetonateAttack copy() {
         return new DetonateAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance());
     }
 

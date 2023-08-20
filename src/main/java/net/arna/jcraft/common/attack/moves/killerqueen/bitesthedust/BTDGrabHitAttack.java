@@ -19,26 +19,26 @@ public class BTDGrabHitAttack extends AbstractMultiHitAttack<BTDGrabHitAttack, K
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(KQBTDEntity stand, LivingEntity user, MoveContext ctx) {
-        Set<LivingEntity> targets = super.perform(stand, user, ctx);
-        switch (getBlow(stand)) {
+    public @NonNull Set<LivingEntity> perform(KQBTDEntity attacker, LivingEntity user, MoveContext ctx) {
+        Set<LivingEntity> targets = super.perform(attacker, user, ctx);
+        switch (getBlow(attacker)) {
             case 0 -> {
                 for (LivingEntity ent : targets)
                     ent.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 40, 0, true, false, true));
             }
-            case 2 -> DetonateAttack.explode(stand, user, stand.getPos().subtract(0, .5, 0));
+            case 2 -> DetonateAttack.explode(attacker, user, attacker.getPos().subtract(0, .5, 0));
         }
 
         return targets;
     }
 
     @Override
-    protected BTDGrabHitAttack getThis() {
+    protected @NonNull BTDGrabHitAttack getThis() {
         return this;
     }
 
     @Override
-    public BTDGrabHitAttack copy() {
+    public @NonNull BTDGrabHitAttack copy() {
         return new BTDGrabHitAttack(getCooldown(), getDuration(), getMoveDistance(), getDamage(), getStun(), getHitboxSize(),
                 getKnockback(), getOffset(), getHitMoments());
     }

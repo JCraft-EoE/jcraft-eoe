@@ -23,31 +23,31 @@ public class CoinTossAttack extends AbstractMove<CoinTossAttack, KillerQueenEnti
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(KillerQueenEntity stand, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(KillerQueenEntity attacker, LivingEntity user, MoveContext ctx) {
         ItemEntity coin = ctx.get(COIN);
         Vec3d lookVec = user.getRotationVector().multiply(0.75);
         if (coin != null) coin.discard();
-        coin = new ItemEntity(stand.world, user.getX(), user.getY() + user.getHeight() * 2 / 3, user.getZ(),
+        coin = new ItemEntity(attacker.world, user.getX(), user.getY() + user.getHeight() * 2 / 3, user.getZ(),
                 new ItemStack(JObjectRegistry.KQ_COIN, 1), lookVec.x, lookVec.y, lookVec.z);
         coin.setPickupDelayInfinite();
 
-        stand.world.spawnEntity(coin);
+        attacker.world.spawnEntity(coin);
 
         ctx.set(BombPlantAttack.BOMB_ENTITY, coin);
         ctx.set(BombPlantAttack.BOMB_POS, null);
 
-        stand.playSound(JSoundRegistry.COIN_TOSS, 1, 1);
+        attacker.playSound(JSoundRegistry.COIN_TOSS, 1, 1);
 
         return Set.of();
     }
 
     @Override
-    protected CoinTossAttack getThis() {
+    protected @NonNull CoinTossAttack getThis() {
         return this;
     }
 
     @Override
-    public CoinTossAttack copy() {
+    public @NonNull CoinTossAttack copy() {
         return new CoinTossAttack(getCooldown());
     }
 }

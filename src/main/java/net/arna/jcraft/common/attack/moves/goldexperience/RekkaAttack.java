@@ -31,8 +31,8 @@ public class RekkaAttack extends AbstractSimpleAttack<RekkaAttack, GoldExperienc
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(GoldExperienceEntity stand, LivingEntity user, MoveContext ctx) {
-        Set<LivingEntity> targets = super.perform(stand, user, ctx);
+    public @NonNull Set<LivingEntity> perform(GoldExperienceEntity attacker, LivingEntity user, MoveContext ctx) {
+        Set<LivingEntity> targets = super.perform(attacker, user, ctx);
 
         if (rekkaLevel == 3)
             for (LivingEntity target : targets)
@@ -47,12 +47,12 @@ public class RekkaAttack extends AbstractSimpleAttack<RekkaAttack, GoldExperienc
     }
 
     @Override
-    protected RekkaAttack getThis() {
+    protected @NonNull RekkaAttack getThis() {
         return this;
     }
 
     @Override
-    public RekkaAttack copy() {
+    public @NonNull RekkaAttack copy() {
         return new RekkaAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
                 getHitboxSize(), getKnockback(), getOffset(), getRekkaLevel(), getSwitchStart(), getNext(), getNextState());
     }

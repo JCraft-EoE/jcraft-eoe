@@ -21,6 +21,11 @@ public class MoveContext {
         return entry.getIntValue();
     }
 
+    public float getFloat(FloatMoveVariable variable) {
+        FloatMoveVariable.FloatEntry entry = (FloatMoveVariable.FloatEntry) getEntry(variable);
+        return entry.getFloatValue();
+    }
+
     public boolean getBoolean(BooleanMoveVariable variable) {
         BooleanMoveVariable.BooleanEntry entry = (BooleanMoveVariable.BooleanEntry) getEntry(variable);
         return entry.getBooleanValue();
@@ -32,6 +37,11 @@ public class MoveContext {
 
     public void setInt(IntMoveVariable variable, int value) {
         IntMoveVariable.IntEntry entry = (IntMoveVariable.IntEntry) getEntry(variable);
+        entry.setValue(value);
+    }
+
+    public void setFloat(FloatMoveVariable variable, float value) {
+        FloatMoveVariable.FloatEntry entry = (FloatMoveVariable.FloatEntry) getEntry(variable);
         entry.setValue(value);
     }
 

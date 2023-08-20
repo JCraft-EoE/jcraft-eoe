@@ -305,20 +305,20 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
 
     // Logic methods
     @Override
-    public @NonNull Set<LivingEntity> perform(S stand, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(S attacker, LivingEntity user, MoveContext ctx) {
         if (hitboxSize <= 0 && extraHitBoxes.isEmpty()) return Set.of();
 
         Vec3d upVec = GravityChangerAPI.getEyeOffset(user);
-        Vec3d hPos = getOffsetHeightPos(stand);
-        Vec3d rotVec = getRotVec(stand);
+        Vec3d hPos = getOffsetHeightPos(attacker);
+        Vec3d rotVec = getRotVec(attacker);
 
-        Vec3d fPos = getOffsetForwardPos(stand, hPos, upVec, rotVec);
+        Vec3d fPos = getOffsetForwardPos(attacker, hPos, upVec, rotVec);
 
-        DamageSource damageSource = getDamageSource(stand);
+        DamageSource damageSource = getDamageSource(attacker);
         Set<Box> boxes = new HashSet<>();
         boxes.add(createBox(fPos, hitboxSize));
         extraHitBoxes.forEach(hitBox -> boxes.add(createBox(hPos, rotVec, upVec, hitBox)));
-        return attackBoxes(stand, boxes, damageSource, fPos);
+        return attackBoxes(attacker, boxes, damageSource, fPos);
     }
 
     /**

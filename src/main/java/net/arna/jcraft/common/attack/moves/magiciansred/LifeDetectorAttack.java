@@ -1,12 +1,12 @@
 package net.arna.jcraft.common.attack.moves.magiciansred;
 
-import net.arna.jcraft.common.attack.moves.base.AbstractMove;
+import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.entity.projectile.LifeDetectorEntity;
 import net.arna.jcraft.common.entity.stand.MagiciansRedEntity;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.minecraft.entity.LivingEntity;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
@@ -17,22 +17,22 @@ public class LifeDetectorAttack extends AbstractMove<LifeDetectorAttack, Magicia
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(MagiciansRedEntity stand, LivingEntity user, MoveContext ctx) {
-        LifeDetectorEntity lifeDetector = new LifeDetectorEntity(JEntityTypeRegistry.LIFE_DETECTOR, stand.world);
+    public @NonNull Set<LivingEntity> perform(MagiciansRedEntity attacker, LivingEntity user, MoveContext ctx) {
+        LifeDetectorEntity lifeDetector = new LifeDetectorEntity(JEntityTypeRegistry.LIFE_DETECTOR, attacker.world);
         lifeDetector.setMaster(user);
-        lifeDetector.refreshPositionAndAngles(stand.getX(), stand.getY() + 1.5, stand.getZ(), stand.getYaw(), stand.getPitch());
-        stand.world.spawnEntity(lifeDetector);
+        lifeDetector.refreshPositionAndAngles(attacker.getX(), attacker.getY() + 1.5, attacker.getZ(), attacker.getYaw(), attacker.getPitch());
+        attacker.world.spawnEntity(lifeDetector);
 
         return Set.of();
     }
 
     @Override
-    protected LifeDetectorAttack getThis() {
+    protected @NonNull LifeDetectorAttack getThis() {
         return this;
     }
 
     @Override
-    public LifeDetectorAttack copy() {
+    public @NonNull LifeDetectorAttack copy() {
         return new LifeDetectorAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance());
     }
 }

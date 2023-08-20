@@ -22,22 +22,22 @@ public class BerryBushAttack extends AbstractSimpleAttack<BerryBushAttack, GoldE
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(GoldExperienceEntity stand, LivingEntity user, MoveContext ctx) {
-        World world = stand.world;
-        BlockPos blockPos = stand.getBlockPos();
+    public @NonNull Set<LivingEntity> perform(GoldExperienceEntity attacker, LivingEntity user, MoveContext ctx) {
+        World world = attacker.world;
+        BlockPos blockPos = attacker.getBlockPos();
         if (world.getBlockState(blockPos).isAir() && world.getBlockState(blockPos.down()).isOpaque())
             world.setBlockState(blockPos, berryBush);
 
-        return super.perform(stand, user, ctx);
+        return super.perform(attacker, user, ctx);
     }
 
     @Override
-    protected BerryBushAttack getThis() {
+    protected @NonNull BerryBushAttack getThis() {
         return this;
     }
 
     @Override
-    public BerryBushAttack copy() {
+    public @NonNull BerryBushAttack copy() {
         return new BerryBushAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
                 getHitboxSize(), getKnockback(), getOffset());
     }

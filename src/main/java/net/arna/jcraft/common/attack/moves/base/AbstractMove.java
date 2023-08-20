@@ -174,19 +174,24 @@ public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends Stand
     // Logic methods
 
     /**
+     * Called when this move is initialized.
+     */
+    public void onInitialize(S attacker) {}
+
+    /**
      * Called every tick so long as this move is active.
-     * Called separately for each stand.
+     * Called separately for each attacker.
      * Invokes the {@link #perform(StandEntity, LivingEntity, MoveContext)} method if {@link #shouldPerform(StandEntity)}
      * returns {@code true} by default and plays the sound, but can be overridden to do whatever you want it to.
-     * @param stand The stand to tick for.
+     * @param attacker The attacker to tick for.
      */
-    public void tick(S stand) {
+    public void tick(S attacker) {
         // Play the sound(s) in the first tick.
-        if (stand.getMoveStun() == getDuration())
-            sounds.forEach(sound -> stand.playSound(sound, 1f, 1f));
+        if (attacker.getMoveStun() == getDuration())
+            sounds.forEach(sound -> attacker.playSound(sound, 1f, 1f));
 
-        if (shouldPerform(stand))
-            perform(stand, stand.getUserOrThrow(), stand.getMoveContext());
+        if (shouldPerform(attacker))
+            perform(attacker, attacker.getUserOrThrow(), attacker.getMoveContext());
     }
 
     /**
@@ -200,12 +205,12 @@ public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends Stand
 
     /**
      * Performs this move.
-     * @param stand The stand that will be performing this move.
+     * @param attacker The stand that will be performing this move.
      * @param user The user of the stand. Will never be null.
      * @param ctx The move context in which to store data.
      * @return A set of all targeted entities.
      */
-    public abstract @NonNull Set<LivingEntity> perform(S stand, LivingEntity user, MoveContext ctx);
+    public abstract @NonNull Set<LivingEntity> perform(S attacker, LivingEntity user, MoveContext ctx);
 
     /**
      * Register entries in the move context of a stand to be used by this move.
@@ -225,6 +230,10 @@ public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends Stand
     }
 
     // Utility methods
+
+    public LivingEntity getUser(S attacker) {
+        return attacker.getUserOrThrow();//attacker instanceof StandEntity<?,?> stand ? stand.getUserOrThrow() : attacker;
+    }
 
     /**
      * Returns the point at which the windup has passed.
@@ -288,11 +297,11 @@ public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends Stand
      * AbstractSimpleAttack can be used standalone while also being able to be extended by other moves.
      * @return This move
      */
-    protected abstract T getThis();
+    protected abstract @NonNull T getThis();
 
     /**
      * Creates a copy of this attack.
      * @return A copy of this attack.
      */
-    public abstract T copy();
+    public abstract @NonNull T copy();
 }

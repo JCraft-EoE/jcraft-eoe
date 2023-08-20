@@ -35,13 +35,13 @@ public abstract class AbstractMultiHitAttack<T extends AbstractMultiHitAttack<T,
     }
 
     @Override
-    public int getBlow(S stand) {
-        int tick = getDuration() - stand.getMoveStun();
+    public int getBlow(S attacker) {
+        int tick = getDuration() - attacker.getMoveStun();
         AtomicInteger blow = new AtomicInteger(-1);
         hitMoments.forEach(i -> {
             if (i >= tick) blow.getAndIncrement();
         });
 
-        return super.getBlow(stand);
+        return super.getBlow(attacker);
     }
 }

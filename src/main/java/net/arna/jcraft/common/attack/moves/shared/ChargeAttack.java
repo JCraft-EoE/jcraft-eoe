@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.attack.moves.shared;
 
+import lombok.NonNull;
 import net.arna.jcraft.common.attack.moves.base.AbstractChargeAttack;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -12,12 +13,12 @@ public class ChargeAttack<S extends StandEntity<S, A>, A extends Enum<A> & Stand
     }
 
     @Override
-    protected ChargeAttack<S, A> getThis() {
+    protected @NonNull ChargeAttack<S, A> getThis() {
         return this;
     }
 
     @Override
-    public ChargeAttack<S, A> copy() {
+    public @NonNull ChargeAttack<S, A> copy() {
         return new ChargeAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
                 getHitboxSize(), getKnockback(), getOffset(), getHitAnimState());
     }

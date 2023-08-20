@@ -24,11 +24,11 @@ public abstract class AbstractGrabAttack<T extends AbstractGrabAttack<T, S, A>, 
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(S stand, LivingEntity user, MoveContext ctx) {
-        Set<LivingEntity> targets = super.perform(stand, user, ctx);
+    public @NonNull Set<LivingEntity> perform(S attacker, LivingEntity user, MoveContext ctx) {
+        Set<LivingEntity> targets = super.perform(attacker, user, ctx);
         if (targets.isEmpty()) return targets;
 
-        stand.setMove(hitMove, hitState);
+        attacker.setMove(hitMove, hitState);
         return targets;
     }
 }

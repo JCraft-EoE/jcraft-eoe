@@ -1,8 +1,10 @@
 package net.arna.jcraft.common.attack.moves.shared;
 
 import it.unimi.dsi.fastutil.ints.IntCollection;
+import lombok.NonNull;
 import net.arna.jcraft.common.attack.moves.base.AbstractMultiHitAttack;
 import net.arna.jcraft.common.entity.stand.StandEntity;
+import net.arna.jcraft.common.util.JParticleType;
 
 /**
  * The simplest implementation of {@link AbstractMultiHitAttack}.
@@ -30,13 +32,18 @@ public class SimpleMultiHitAttack<S extends StandEntity<?, ?>> extends AbstractM
                 attackDistance, offset, hitMoments);
     }
 
-    @Override
-    protected SimpleMultiHitAttack<S> getThis() {
+    public SimpleMultiHitAttack<S> withHitSpark(JParticleType particle) {
+        this.hitSpark = particle;
         return this;
     }
 
     @Override
-    public SimpleMultiHitAttack<S> copy() {
+    protected @NonNull SimpleMultiHitAttack<S> getThis() {
+        return this;
+    }
+
+    @Override
+    public @NonNull SimpleMultiHitAttack<S> copy() {
         return new SimpleMultiHitAttack<>(getCooldown(), getDuration(), getDamage(), getStun(), getHitboxSize(),
                 getKnockback(), getMoveDistance(), getOffset(), getHitMoments());
     }

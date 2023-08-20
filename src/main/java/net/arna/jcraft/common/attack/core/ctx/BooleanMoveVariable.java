@@ -24,5 +24,15 @@ public class BooleanMoveVariable extends MoveVariable<Boolean> {
         public void setValue(boolean value) {
             super.setValue(booleanValue = value);
         }
+
+        @Override
+        public void setValue(Boolean value) {
+            setValue(value.booleanValue());
+        }
+
+        @Override
+        public Boolean getValue() {
+            throw new UnsupportedOperationException("Use MoveContext#getBoolean(BooleanMoveVariable) to get boolean values.");
+        }
     }
 }

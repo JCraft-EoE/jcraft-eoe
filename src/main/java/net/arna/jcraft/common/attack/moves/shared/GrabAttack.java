@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.attack.moves.shared;
 
+import lombok.NonNull;
 import net.arna.jcraft.common.attack.moves.base.AbstractGrabAttack;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.entity.stand.StandEntity;
@@ -13,12 +14,12 @@ public class GrabAttack<S extends StandEntity<S, A>, A extends Enum<A> & StandAn
     }
 
     @Override
-    protected GrabAttack<S, A> getThis() {
+    protected @NonNull GrabAttack<S, A> getThis() {
         return this;
     }
 
     @Override
-    public GrabAttack<S, A> copy() {
+    public @NonNull GrabAttack<S, A> copy() {
         return new GrabAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
                 getHitboxSize(), getKnockback(), getOffset(), getHitMove(), getHitState());
     }

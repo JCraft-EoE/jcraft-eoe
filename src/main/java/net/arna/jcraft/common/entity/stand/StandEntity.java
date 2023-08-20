@@ -124,7 +124,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     public MoveQueue queuedAttack;
     public AbstractMove<?, ? super E> curMove;
-    public AbstractMove<?, ? super E> previousAttack;
+    public AbstractMove<?, ? super E> prevMove;
     public int armorPoints;
 
     public static final List<CooldownType> attackCooldowns = List.of(CooldownType.STAND_LIGHT, CooldownType.STAND_HEAVY,
@@ -598,6 +598,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * @param animState int identifier for which state to put the stand into
      */
     public void setMove(AbstractMove<?, ? super E> move, @Nullable S animState) {
+        move.onInitialize(getThis());
+
         // If the attack has a duration of 0, just perform it immediately.
         if (move.getDuration() == 0) {
             if (hasUser()) move.perform(getThis(), user, moveContext);
@@ -737,7 +739,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         getUserOrThrow().addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 5, 3, false, false, true));
     }
 
-    protected Vec3d timeSkip(double distance, @NotNull SoundEvent sound) {
+    protected void timeSkip(double distance, @NotNull SoundEvent sound) {
         LivingEntity user = getUserOrThrow();
         boolean hasVehicle = user.hasVehicle();
 
@@ -762,7 +764,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         else user.teleport(telePos.x, telePos.y, telePos.z);
         world.playSound(null, telePos.x, telePos.y, telePos.z, sound, SoundCategory.PLAYERS, 1f, 1f);
 
-        return telePos;
     }
 
     // Define desummon conditions
@@ -819,7 +820,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 user = living;
             return;
         } //else if (this.owner == null) { this.owner = player; }
-        Entity vehicle = user.getVehicle();
 
         setMoveStun(getMoveStun() - 1); // Counting down animation time or similar
         if (playSummonAnim && (getMoveStun() > 0 || age > summonAnimDuration))
@@ -986,11 +986,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             if (!client) tsTime--;
         }
 
-        if (this.curMove != this.previousAttack && this.curMove != null)
+        if (curMove != prevMove && curMove != null)
             //JCraft.LOGGER.info("Logged previous attack change: " + this.curAttack + " " + this.previousAttack);
-            this.previousAttack = this.curMove;
-
-        //this.pastAttack = this.curAttack;
+            prevMove = curMove;
     }
 
     /**
@@ -1071,8 +1069,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             StatusEffectInstance stun = victim.getStatusEffect(JStatusRegistry.DAZED);
             if (stun != null && stun.getAmplifier() != 2) //LOGGER.info("Target stun: " + stun.getDuration());
                 comboCounter.jcraft$incrementComboCount();
-            else
-                comboCounter.jcraft$setComboCount(1);
+            else comboCounter.jcraft$setComboCount(1);
 
             ComboCounterPacket.send(playerEntity, comboCounter.jcraft$getComboCount(), ((IDamageScaler) victim).jcraft$getDamageScaling());
         }

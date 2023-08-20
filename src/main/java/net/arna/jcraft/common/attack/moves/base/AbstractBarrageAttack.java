@@ -23,9 +23,9 @@ import java.util.Set;
 public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, S>, S extends StandEntity<?, ?>> extends AbstractSimpleAttack<T, S> {
     private final int interval;
 
-    protected AbstractBarrageAttack(int cooldown, int windup, int duration, float attackDistance, float damage,
+    protected AbstractBarrageAttack(int cooldown, int windup, int duration, float moveDistance, float damage,
                                     int stun, float hitboxSize, float knockback, float offset, int interval) {
-        super(cooldown, windup, duration, attackDistance, damage, stun, hitboxSize, knockback, offset);
+        super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset);
         barrage = true;
         this.interval = interval;
     }
@@ -45,15 +45,15 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, S
         // Which means that if your move stun is 22, windup is 6 and interval is 6,
         // the first blow will not be landed after 6 ticks (when stand move stun is 22 - 6 = 16),
         // but rather after 10 ticks (when stand move stun is 22 - 10 = 12).
-        return super.shouldPerform(stand) && (getDuration() - getWindup() - stand.getMoveStun()) % interval == 0;
+        return stand.hasUser() && (getDuration() - getWindup() - stand.getMoveStun()) % interval == 0;
     }
 
     @Override
-    public void tick(S stand) {
-        super.tick(stand);
+    public void tick(S attacker) {
+        super.tick(attacker);
 
-        if (stand.hasUser())
-            stand.getUserOrThrow().addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 10, 2, true, false));
+        if (attacker.hasUser())
+            attacker.getUserOrThrow().addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 10, 2, true, false));
     }
 
     @Override

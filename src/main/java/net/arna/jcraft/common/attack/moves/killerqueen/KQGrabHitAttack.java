@@ -30,17 +30,17 @@ public class KQGrabHitAttack extends AbstractMove<KQGrabHitAttack, KillerQueenEn
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(KillerQueenEntity stand, LivingEntity user, MoveContext ctx) {
-        stand.playSound(JSoundRegistry.KQ_DETONATE, 1, 1);
+    public @NonNull Set<LivingEntity> perform(KillerQueenEntity attacker, LivingEntity user, MoveContext ctx) {
+        attacker.playSound(JSoundRegistry.KQ_DETONATE, 1, 1);
 
         if (ctx.get(BombPlantAttack.BOMB_ENTITY) instanceof LivingEntity livingEntity) {
-            ServerWorld world = (ServerWorld) stand.world;
+            ServerWorld world = (ServerWorld) attacker.world;
 
             Vec3d pos = livingEntity.getPos();
             JCraft.createParticle(world, pos.x, pos.y, pos.z, JParticleType.BOOM);
             JUtils.serverPlaySound(JSoundRegistry.KQ_EXPLODE, world, pos, 96);
 
-            DamageSource damageSource = JDamageSources.stand(stand);
+            DamageSource damageSource = JDamageSources.stand(attacker);
 
             StandEntity.damageLogic(world, livingEntity, new Vec3d(0, 1, 0), stun, 3, true,
                     11f, false, 4, damageSource, user);
@@ -53,12 +53,12 @@ public class KQGrabHitAttack extends AbstractMove<KQGrabHitAttack, KillerQueenEn
     }
 
     @Override
-    protected KQGrabHitAttack getThis() {
+    protected @NonNull KQGrabHitAttack getThis() {
         return this;
     }
 
     @Override
-    public KQGrabHitAttack copy() {
+    public @NonNull KQGrabHitAttack copy() {
         return new KQGrabHitAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getStun());
     }
 }

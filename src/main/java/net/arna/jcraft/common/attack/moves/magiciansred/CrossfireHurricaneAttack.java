@@ -1,9 +1,10 @@
 package net.arna.jcraft.common.attack.moves.magiciansred;
 
+import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.ctx.IntMoveVariable;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
-import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.core.ctx.MoveVariable;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.stand.MagiciansRedEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
@@ -21,7 +22,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Set;
@@ -35,9 +35,9 @@ public class CrossfireHurricaneAttack extends AbstractMove<CrossfireHurricaneAtt
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(MagiciansRedEntity stand, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(MagiciansRedEntity attacker, LivingEntity user, MoveContext ctx) {
         ctx.setInt(HURRICANE_TIME, 50);
-        ctx.set(HURRICANE_POS, stand.getPos());
+        ctx.set(HURRICANE_POS, attacker.getPos());
         return Set.of();
     }
 
@@ -102,12 +102,12 @@ public class CrossfireHurricaneAttack extends AbstractMove<CrossfireHurricaneAtt
     }
 
     @Override
-    protected CrossfireHurricaneAttack getThis() {
+    protected @NonNull CrossfireHurricaneAttack getThis() {
         return this;
     }
 
     @Override
-    public CrossfireHurricaneAttack copy() {
+    public @NonNull CrossfireHurricaneAttack copy() {
         return new CrossfireHurricaneAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance());
     }
 }

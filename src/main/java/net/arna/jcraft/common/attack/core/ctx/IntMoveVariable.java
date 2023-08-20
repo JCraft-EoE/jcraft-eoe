@@ -23,5 +23,15 @@ public class IntMoveVariable extends MoveVariable<Integer> {
         public void setValue(int value) {
             super.setValue(this.intValue = value);
         }
+
+        @Override
+        public void setValue(Integer value) {
+            setValue(value.intValue());
+        }
+
+        @Override
+        public Integer getValue() {
+            throw new UnsupportedOperationException("Use MoveContext#getInt(IntMoveVariable) to get int values.");
+        }
     }
 }

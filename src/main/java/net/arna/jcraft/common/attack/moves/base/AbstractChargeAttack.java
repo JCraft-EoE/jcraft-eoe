@@ -30,31 +30,31 @@ public abstract class AbstractChargeAttack<T extends AbstractChargeAttack<T, S, 
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(S stand, LivingEntity user, MoveContext ctx) {
-        Set<LivingEntity> targets = super.perform(stand, user, ctx);
+    public @NonNull Set<LivingEntity> perform(S attacker, LivingEntity user, MoveContext ctx) {
+        Set<LivingEntity> targets = super.perform(attacker, user, ctx);
 
         if (!targets.isEmpty()) {
-            stand.curMove = null;
-            stand.setMoveStun(10);
-            stand.setState(hitAnimState);
+            attacker.curMove = null;
+            attacker.setMoveStun(10);
+            attacker.setState(hitAnimState);
         }
 
         return targets;
     }
 
     @Override
-    public void tick(S stand) {
-        super.tick(stand);
+    public void tick(S attacker) {
+        super.tick(attacker);
 
-        if (shouldPerform(stand)) {
+        if (shouldPerform(attacker)) {
             //float t = 1f - (float) curMoveStun / (float) realInitTime;
-            Vec3d newPos = stand.getPos().add(getRotVec(stand).multiply(getMoveDistance() / getWindupPoint()));
+            Vec3d newPos = attacker.getPos().add(getRotVec(attacker).multiply(getMoveDistance() / getWindupPoint()));
             //stand.setDistanceOffset(1 + attackDist * t * t);
-            stand.setFreePos(new Vec3f((float) newPos.x, (float) newPos.y, (float) newPos.z));
-            stand.setFree(true);
+            attacker.setFreePos(new Vec3f((float) newPos.x, (float) newPos.y, (float) newPos.z));
+            attacker.setFree(true);
         } else {
-            stand.setPosition(stand.getUserOrThrow().getPos());
-            stand.setRotationOffset(stand.attackRotation);
+            attacker.setPosition(attacker.getUserOrThrow().getPos());
+            attacker.setRotationOffset(attacker.attackRotation);
         }
     }
 

@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.attack.moves.shared;
 
+import lombok.NonNull;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.JParticleType;
@@ -20,11 +21,6 @@ public class SimpleAttack<S extends StandEntity<?, ?>> extends AbstractSimpleAtt
         super(cooldown, windup, duration, attackDistance, damage, stun, hitboxSize, knockback, offset);
     }
 
-    public SimpleAttack<S> withHitSpark(JParticleType particle) {
-        this.hitSpark = particle;
-        return this;
-    }
-
     /**
      * For light attacks
      * @param windup The windup of this attack in ticks. How long until the blow is landed.
@@ -38,13 +34,18 @@ public class SimpleAttack<S extends StandEntity<?, ?>> extends AbstractSimpleAtt
         return new SimpleAttack<>(30, windup, duration, damage, stun, 1.5f, knockback, attackDistance, offset);
     }
 
-    @Override
-    protected SimpleAttack<S> getThis() {
+    public SimpleAttack<S> withHitSpark(JParticleType particle) {
+        this.hitSpark = particle;
         return this;
     }
 
     @Override
-    public SimpleAttack<S> copy() {
+    protected @NonNull SimpleAttack<S> getThis() {
+        return this;
+    }
+
+    @Override
+    public @NonNull SimpleAttack<S> copy() {
         return new SimpleAttack<>(getCooldown(), getWindup(), getDuration(), getDamage(), getStun(), getHitboxSize(),
                 getKnockback(), getMoveDistance(), getOffset());
     }

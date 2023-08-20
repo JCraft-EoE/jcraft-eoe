@@ -1,14 +1,14 @@
 package net.arna.jcraft.common.attack.moves.shared;
 
 import lombok.Getter;
-import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
+import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
+import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
@@ -23,8 +23,8 @@ public class KnockdownAttack<S extends StandEntity<?, ?>> extends AbstractSimple
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(S stand, LivingEntity user, MoveContext ctx) {
-        Set<LivingEntity> targets = super.perform(stand, user, ctx);
+    public @NonNull Set<LivingEntity> perform(S attacker, LivingEntity user, MoveContext ctx) {
+        Set<LivingEntity> targets = super.perform(attacker, user, ctx);
         for (LivingEntity target : targets)
             if (!JUtils.isBlocking(target))
                 target.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, knockdownDuration, 0));
@@ -33,12 +33,12 @@ public class KnockdownAttack<S extends StandEntity<?, ?>> extends AbstractSimple
     }
 
     @Override
-    protected KnockdownAttack<S> getThis() {
+    protected @NonNull KnockdownAttack<S> getThis() {
         return this;
     }
 
     @Override
-    public KnockdownAttack<S> copy() {
+    public @NonNull KnockdownAttack<S> copy() {
         return new KnockdownAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
                 getHitboxSize(), getKnockback(), getOffset(), knockdownDuration);
     }

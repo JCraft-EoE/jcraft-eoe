@@ -16,8 +16,8 @@ public class KQGrabAttack extends AbstractGrabAttack<KQGrabAttack, KillerQueenEn
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(KillerQueenEntity stand, LivingEntity user, MoveContext ctx) {
-        Set<LivingEntity> targets = super.perform(stand, user, ctx);
+    public @NonNull Set<LivingEntity> perform(KillerQueenEntity attacker, LivingEntity user, MoveContext ctx) {
+        Set<LivingEntity> targets = super.perform(attacker, user, ctx);
 
         ctx.set(BombPlantAttack.BOMB_ENTITY, targets.stream().findFirst().orElseThrow());
         ctx.set(BombPlantAttack.BOMB_POS, null);
@@ -26,12 +26,12 @@ public class KQGrabAttack extends AbstractGrabAttack<KQGrabAttack, KillerQueenEn
     }
 
     @Override
-    protected KQGrabAttack getThis() {
+    protected @NonNull KQGrabAttack getThis() {
         return this;
     }
 
     @Override
-    public KQGrabAttack copy() {
+    public @NonNull KQGrabAttack copy() {
         return new KQGrabAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
                 getHitboxSize(), getKnockback(), getOffset(), getHitMove(), getHitState());
     }

@@ -17,22 +17,22 @@ public class SheerHeartAttackAttack extends AbstractMove<SheerHeartAttackAttack,
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(KillerQueenEntity stand, LivingEntity user, MoveContext ctx) {
-        SheerHeartAttackEntity sha = new SheerHeartAttackEntity(JEntityTypeRegistry.SHEER_HEART_ATTACK, stand.world);
+    public @NonNull Set<LivingEntity> perform(KillerQueenEntity attacker, LivingEntity user, MoveContext ctx) {
+        SheerHeartAttackEntity sha = new SheerHeartAttackEntity(JEntityTypeRegistry.SHEER_HEART_ATTACK, attacker.world);
         sha.setMaster(user);
-        sha.refreshPositionAndAngles(stand.getX(), stand.getY() + 0.5, stand.getZ(), stand.getYaw(), stand.getPitch());
-        stand.world.spawnEntity(sha);
+        sha.refreshPositionAndAngles(attacker.getX(), attacker.getY() + 0.5, attacker.getZ(), attacker.getYaw(), attacker.getPitch());
+        attacker.world.spawnEntity(sha);
 
         return Set.of();
     }
 
     @Override
-    protected SheerHeartAttackAttack getThis() {
+    protected @NonNull SheerHeartAttackAttack getThis() {
         return this;
     }
 
     @Override
-    public SheerHeartAttackAttack copy() {
+    public @NonNull SheerHeartAttackAttack copy() {
         return new SheerHeartAttackAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance());
     }
 }
