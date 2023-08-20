@@ -86,6 +86,11 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
         } else super.initMove(type);
     }
 
+    @Override
+    protected KillerQueenEntity getThis() {
+        return this;
+    }
+
     // Animations
     public enum State implements StandAnimationState<KillerQueenEntity> {
         IDLE(builder -> builder.loop("animation.killerqueen.idle")),

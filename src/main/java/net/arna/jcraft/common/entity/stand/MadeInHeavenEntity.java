@@ -185,7 +185,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
 
     @Override
     public void cancelAttack() {
-        if (curAttack != null && curAttack.id == 8) endCircle();
+        if (curMove != null && curMove.id == 8) endCircle();
         super.cancelAttack();
     }
 
@@ -281,7 +281,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
         int cdMult = (this.getAccelTime() > 0) ? 10 : 20;
         cooldowns.setCooldown(cooldownType, (int) (attack.cooldown * cdMult));
 
-        setAttack(attack, animState);
+        setMove(attack, animState);
         return true;
     }
 
@@ -299,7 +299,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
 
         switch (attack.id) {
             case (2) -> {
-                if (getMoveStun() < 10) curAttack = barrageFinisher;
+                if (getMoveStun() < 10) curMove = barrageFinisher;
             }
             case (4) -> {
                 if (user == null) return;
@@ -337,7 +337,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             }
             case (7) -> {
                 if (user == null) return;
-                curAttack = null;
+                curMove = null;
                 speedSlice(user, user.getEyePos(), user.getEyePos().add(user.getRotationVector().multiply(8)), 6, 1, 1.5);
             }
             case (8) -> startCircle();
@@ -452,7 +452,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                 circleTime = 1;
             else {
                 circleOrbitProg += 0.15f;
-                boolean toExit = curAttack != null && curAttack.id != 8;
+                boolean toExit = curMove != null && curMove.id != 8;
                 Vec3d rotVec = user.getRotationVector();
                 Vec3d exitVel = Vec3d.ZERO;
                 double side = getRemoteSideInput();

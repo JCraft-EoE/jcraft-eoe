@@ -182,12 +182,12 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
 
         boolean idling = getMoveStun() < 1;
 
-        if (curAttack != heavy) {
+        if (curMove != heavy) {
             if (idling && handleMove(heavy, CooldownType.STAND_HEAVY, State.HEAVY)) {
                 playSound(JSoundRegistry.KC_HEAVY, 1, 1);
             }
         } else if (getMoveStun() < 7) {
-            setAttack(overhead, State.OVERHEAD);
+            setMove(overhead, State.OVERHEAD);
             playSound(JSoundRegistry.KC_HEAVY2, 1, 1);
         }
     }
@@ -240,7 +240,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     @Override
     public void initUlt() {
         // If predicting, and Time Erase isn't on cooldown
-        if (curAttack != null && curAttack.id == 9 && hasUser()) {
+        if (curMove != null && curMove.id == 9 && hasUser()) {
             CooldownsComponent cooldowns = JComponents.getCooldowns(getUser());
             if (cooldowns.getCooldown(CooldownType.STAND_ULT) <= 0) {
                 cooldowns.setCooldown(CooldownType.STAND_ULT, 400);
@@ -347,7 +347,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     }
 
     private void moveCancel() {
-        curAttack = null;
+        curMove = null;
         queuedAttack = null;
         setMoveStun(2);
         setState(State.IDLE); // Basically state 1, but runs logic once
@@ -363,7 +363,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             }
             case (3) -> {
                 if (getMoveStun() < 4)
-                    curAttack = barrageFinisher;
+                    curMove = barrageFinisher;
             }
             case (4) -> {
                 for (LivingEntity ent : entities)
@@ -391,7 +391,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
 
                 setTETime((int) (timeerase.stun * 20));
 
-                curAttack = null;
+                curMove = null;
 
                 Vec3d pos = getEyePos();
                 List<Entity> toCatch = world.getEntitiesByClass(Entity.class,
@@ -507,7 +507,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
 
     @Override
     public void whiffCounter() {
-        setAttack(counterMiss, State.COUNTER_MISS);
+        setMove(counterMiss, State.COUNTER_MISS);
         stun(getUser(), counterMiss.moveStun, 0);
         playSound(JSoundRegistry.KC_RAGE, 1, 1);
     }
@@ -553,7 +553,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
 
         LivingEntity user = this.getUser();
         if (user == null) return;
-        Attack attack = curAttack;
+        Attack attack = curMove;
 
         boolean userIsPlayer = false;
         ServerPlayerEntity playerEntity = null;

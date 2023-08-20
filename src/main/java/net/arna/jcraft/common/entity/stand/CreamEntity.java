@@ -290,7 +290,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                         if (stand != null) stand.blocking = false;
                     }
 
-                    setAttack(grabhit, State.GRAB_HIT);
+                    setMove(grabhit, State.GRAB_HIT);
                 }
             }
             case (5) -> {
@@ -317,7 +317,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                 endHalfBall();
                 setVoidTime(120);
                 charging = false;
-                this.curAttack = null;
+                this.curMove = null;
             }
             case (8) -> beginHalfBall();
             case (9) -> endHalfBall();
@@ -397,7 +397,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
 
             if (server) {
                 if (!charging) {
-                    if (this.curAttack != null) {
+                    if (this.curMove != null) {
                         this.setVoidTime(0);
                         voiding = false;
                     }

@@ -104,6 +104,11 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
         CROSSFIRE_HURRICANE.tickHurricane(this);
     }
 
+    @Override
+    protected MagiciansRedEntity getThis() {
+        return this;
+    }
+
     // Animation code
     public enum State implements StandAnimationState<MagiciansRedEntity> {
         IDLE(builder -> builder.loop("animation.mr.idle")),

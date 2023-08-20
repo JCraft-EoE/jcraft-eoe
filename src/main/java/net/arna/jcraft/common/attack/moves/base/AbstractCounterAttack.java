@@ -37,6 +37,6 @@ public abstract class AbstractCounterAttack<T extends AbstractCounterAttack<T, S
      */
     public void counter(@NonNull S stand, Entity countered, DamageSource counteredDamageSource) {
         stand.setMoveStun(0);
-        stand.curAttack = null;
+        stand.curMove = null;
     }
 }

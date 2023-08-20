@@ -165,7 +165,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             case (-2) -> timeSkip(14, JSoundRegistry.STAR_PLATINUM_TIMESKIP);
             case (5) -> {
                 if (entities.isEmpty()) return;
-                setAttack(grabhit, State.GRAB_HIT);
+                setMove(grabhit, State.GRAB_HIT);
                 playSound(JSoundRegistry.SPTW_UPPERCUT, 1, 1);
 
                 for (LivingEntity ent : entities)
@@ -199,7 +199,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
 
         LivingEntity user = getUserOrThrow();
 
-        if (world.isClient || curAttack == null || curAttack.id != timestrike.id || getMoveStun() != 7) return;
+        if (world.isClient || curMove == null || curMove.id != timestrike.id || getMoveStun() != 7) return;
         /*
             NbtCompound userData = ((IEntityDataSaver)user).getPersistentData();
             if (userData.getInt(JCraft.utilCD) < 200)

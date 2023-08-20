@@ -60,7 +60,7 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, S
     protected Set<LivingEntity> validateTargets(S stand, Set<LivingEntity> targets) {
         // Barrage clashing logic.
         for (LivingEntity target : targets) {
-            if (!(target instanceof StandEntity<?,?> targetStand) || !targetStand.curAttack.isBarrage()) continue;
+            if (!(target instanceof StandEntity<?,?> targetStand) || !targetStand.curMove.isBarrage()) continue;
             onClash(stand.getUserOrThrow());
 
             // Override stun with high priority 0.5s stun, also stops all current sounds for cleaner audio cue

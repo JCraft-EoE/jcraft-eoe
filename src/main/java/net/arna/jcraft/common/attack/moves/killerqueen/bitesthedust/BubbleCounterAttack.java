@@ -20,7 +20,7 @@ public class BubbleCounterAttack extends AbstractCounterAttack<BubbleCounterAtta
 
     @Override
     public void whiff(@NonNull KQBTDEntity stand, @NonNull LivingEntity user) {
-        stand.setAttack(missAttack, KQBTDEntity.State.COUNTER_MISS);
+        stand.setMove(missAttack, KQBTDEntity.State.COUNTER_MISS);
         StandEntity.stun(user, missAttack.getDuration(), 0);
     }
 

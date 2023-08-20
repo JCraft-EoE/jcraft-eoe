@@ -22,7 +22,7 @@ public class FeignBarrageCounterAttack extends AbstractCounterAttack<FeignBarrag
 
     @Override
     public void whiff(@NonNull TheWorldEntity stand, @NonNull LivingEntity user) {
-        stand.setAttack(missAttack, TheWorldEntity.State.COUNTER_MISS);
+        stand.setMove(missAttack, TheWorldEntity.State.COUNTER_MISS);
         StandEntity.stun(user, missAttack.getDuration(), 0);
     }
 
@@ -46,7 +46,7 @@ public class FeignBarrageCounterAttack extends AbstractCounterAttack<FeignBarrag
                 counteredStand.cancelAttack();
         }
 
-        stand.setAttack(TheWorldEntity.COUNTER_FOLLOWUP, TheWorldEntity.State.COUNTER_HIT);
+        stand.setMove(TheWorldEntity.COUNTER_FOLLOWUP, TheWorldEntity.State.COUNTER_HIT);
         stand.playSound(JSoundRegistry.TIME_SKIP, 1, 1);
     }
 

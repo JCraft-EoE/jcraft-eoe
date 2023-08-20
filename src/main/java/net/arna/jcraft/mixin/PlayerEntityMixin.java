@@ -99,7 +99,7 @@ public abstract class PlayerEntityMixin implements IComboCounter {
         PlayerEntity player = ((PlayerEntity) (Object) this);
 
         if (player.getFirstPassenger() instanceof StandEntity<?, ?> stand) {
-            AbstractMove<?, ?> attack = stand.curAttack;
+            AbstractMove<?, ?> attack = stand.curMove;
             if (attack == null || !attack.isCounter() || stand.getMoveStun() >= (attack.getDuration() - attack.getWindup()))
                 return;
 

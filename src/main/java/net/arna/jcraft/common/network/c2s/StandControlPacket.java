@@ -46,7 +46,7 @@ public class StandControlPacket {
 	            if (stand != null) {
                     int moveStun = stand.getMoveStun();
                     if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT)
-                        stand.queuedAttack = AttackQueue.STANDSUMMON;
+                        stand.queuedAttack = AttackQueue.STAND_SUMMON;
                     else
                         stand.desummon();
                 } else if (world != null) JCraft.summon(world, player);
@@ -191,7 +191,7 @@ public class StandControlPacket {
                     int moveStun = stand.getMoveStun();
                     stand.initUtil();
                     if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking())
-                        stand.queuedAttack = AttackQueue.MIDDLEMOUSE;
+                        stand.queuedAttack = AttackQueue.MIDDLE_MOUSE;
                 } else {
                     StandEntity<?, ?> stand2 = JCraft.summon(world, player);
                     if (stand2 != null) stand2.initUtil();

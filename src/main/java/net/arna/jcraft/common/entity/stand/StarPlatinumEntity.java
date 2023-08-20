@@ -134,7 +134,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
                     player.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(player));
             }
             case (5) -> {
-                if (curAttack == null || entities.isEmpty()) return;
+                if (curMove == null || entities.isEmpty()) return;
                 Vec3d avgPos = Vec3d.ZERO;
                 float c = 0;
                 for (LivingEntity ent : entities) {
@@ -144,7 +144,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
                 }
                 avgPos = avgPos.multiply(1f / c);
                 lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, avgPos);
-                curAttack.attackDist = (float) avgPos.distanceTo(getPos());
+                curMove.attackDist = (float) avgPos.distanceTo(getPos());
             }
             case (6) -> setInhaleTime((int) (inhale.stun * 20));
             case (7) -> {

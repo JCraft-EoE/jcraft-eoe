@@ -145,10 +145,10 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
                 LivingEntity user = getUserOrThrow();
                 if (user.hasStatusEffect(JStatusRegistry.DAZED)) return;
                 boolean idling = this.getMoveStun() <= 0;
-                if (!(curAttack instanceof RekkaAttack rekka)) {
+                if (!(curMove instanceof RekkaAttack rekka)) {
                     if (idling) handleMove(MoveType.SPECIAL2);
                 } else if (rekka.getNext() != null && rekka.mayAdvance(this))
-                    setAttack(rekka.getNext(), rekka.getNextState());
+                    setMove(rekka.getNext(), rekka.getNextState());
             }
             case SPECIAL3 -> {
                 if (!canAttack() || !hasUser()) return;
@@ -202,8 +202,13 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
         super.tick();
         if (!hasUser()) return;
 
-        if (!world.isClient && curAttack == REKKA2 && queuedAttack == AttackQueue.SPECIAL2)
+        if (!world.isClient && curMove == REKKA2 && queuedAttack == AttackQueue.SPECIAL2)
             queuedAttack = null;
+    }
+
+    @Override
+    protected GoldExperienceEntity getThis() {
+        return this;
     }
 
     // Animation code

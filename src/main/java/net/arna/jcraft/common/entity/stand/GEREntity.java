@@ -261,7 +261,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
 
     @Override
     public void whiffCounter() {
-        setAttack(counterMiss, State.COUNTER_MISS);
+        setMove(counterMiss, State.COUNTER_MISS);
         stun(getUser(), counterMiss.moveStun, 0);
     }
 
@@ -331,7 +331,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
                 }
             }
             case (5) -> {
-                if (getMoveStun() < 12) this.curAttack = barrageFinisher;
+                if (getMoveStun() < 12) this.curMove = barrageFinisher;
             }
             case (6) -> {
                 if (user != null) user.heal(4f);

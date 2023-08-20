@@ -40,7 +40,7 @@ public class MoveDataCommand {
             if (standEntity == null) {
                 return 0;
             } else {
-                attack = standEntity.curAttack;
+                attack = standEntity.curMove;
                 if (attack == null) attack = standEntity.previousAttack;
             }
         } else {

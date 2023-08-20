@@ -250,14 +250,14 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
 
     @Override
     public void initSpecial1() {
-        if (curAttack != null && curAttack.id == pound.id && getMoveStun() < 12) initSlam(1);
+        if (curMove != null && curMove.id == pound.id && getMoveStun() < 12) initSlam(1);
         if (canAttack() && handleMove(pound, CooldownType.STAND_SP1, State.POUND_UP))
             playSound(JSoundRegistry.FOOL_BARK2, 1, 1);
     }
 
     @Override
     public void initSpecial2() {
-        if (curAttack != null && curAttack.id == pound.id && getMoveStun() < 12) initSlam(2);
+        if (curMove != null && curMove.id == pound.id && getMoveStun() < 12) initSlam(2);
 
         if (!canAttack()) return;
 
@@ -271,7 +271,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
 
     @Override
     public void initSpecial3() {
-        if (curAttack != null && curAttack.id == pound.id && getMoveStun() < 12) initSlam(3);
+        if (curMove != null && curMove.id == pound.id && getMoveStun() < 12) initSlam(3);
         if (canAttack() && handleMove(sandclone, CooldownType.STAND_SP3, State.CREATE)) {
             setSand(true);
             playSound(SoundEvents.BLOCK_SAND_PLACE, 1, 1);
@@ -307,7 +307,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
         if (hasUser()) {
             LivingEntity user = getUserOrThrow();
             if (JUtils.isAffectedByTimeStop(user) || user.hasStatusEffect(JStatusRegistry.DAZED)) return false;
-            if (curAttack != null && curAttack.id == glide.id) return true;
+            if (curMove != null && curMove.id == glide.id) return true;
             return getMoveStun() < 1;
         }
         return false;
@@ -317,8 +317,8 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     public void setAttack(Attack attack, State state) {
         if (getUser() != null && getUser().isSneaking()) {
             setSand(true);
-            super.setAttack(Attack.copyOf(attack).setDist(attack.attackDist / 2f), state);
-        } else super.setAttack(attack, state);
+            super.setMove(Attack.copyOf(attack).setDist(attack.attackDist / 2f), state);
+        } else super.setMove(attack, state);
     }
 
     @Override
@@ -552,7 +552,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
                     }
                 }
             } else {
-                Attack attack = curAttack;
+                Attack attack = curMove;
                 if (lastRemoteInputTime - age > 4) updateRemoteInputs(0, 0, false);
                 if (attack != null) {
                     if (attack.id == slam.id && slamType != 1) queuedAttack = null;

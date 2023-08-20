@@ -95,7 +95,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
     }
 
     protected void detonate() {
-        setAttack(DETONATE, getDetonateState());
+        setMove(DETONATE, getDetonateState());
         playSound(JSoundRegistry.KQ_DETONATE, 1, 1);
     }
 
@@ -109,7 +109,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
 
         if (type == MoveType.LIGHT) {
             boolean idling = getMoveStun() < 1;
-            if (curAttack != LIGHT) {
+            if (curMove != LIGHT) {
                 if (idling) {
                     if (user.isSneaking()) detonate();
                     else handleMove(MoveType.LIGHT);
@@ -117,7 +117,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
             } else if (getMoveStun() < 7) {
                 if (user.isSneaking())
                     detonate();
-                else setAttack(LOW, getLowState());
+                else setMove(LOW, getLowState());
             }
         } else super.initMove(type);
     }

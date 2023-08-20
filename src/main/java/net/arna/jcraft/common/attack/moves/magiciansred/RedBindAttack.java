@@ -9,7 +9,6 @@ import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.LivingEntity;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
@@ -31,7 +30,7 @@ public class RedBindAttack extends AbstractSimpleAttack<RedBindAttack, Magicians
         // Remove Stand
         StandEntity<?, ?> boundStand = JUtils.getStand(boundEntity);
         if (boundStand != null) {
-            boundStand.curAttack = null;
+            boundStand.curMove = null;
             boundStand.setMoveStun(0);
             boundStand.desummon();
         }

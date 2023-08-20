@@ -190,13 +190,13 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
 
     private void initOverwrite(int type) {
         setOverwriteType(type);
-        setAttack(overwrite, State.OVERWRITE);
+        setMove(overwrite, State.OVERWRITE);
         playSound(JSoundRegistry.TWOH_OVERWRITE, 1, 1);
     }
 
     @Override
     public void initSpecial1() {
-        if (curAttack == chargeoverwrite && getMoveStun() < 50) {
+        if (curMove == chargeoverwrite && getMoveStun() < 50) {
             initOverwrite(1);
             return;
         }
@@ -237,7 +237,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
 
     @Override
     public void initSpecial2() {
-        if (curAttack == chargeoverwrite && getMoveStun() < 50) {
+        if (curMove == chargeoverwrite && getMoveStun() < 50) {
             initOverwrite(2);
             return;
         }
@@ -252,7 +252,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
 
     @Override
     public void initSpecial3() {
-        if (curAttack == chargeoverwrite && getMoveStun() < 50) {
+        if (curMove == chargeoverwrite && getMoveStun() < 50) {
             initOverwrite(3);
             return;
         }
@@ -393,8 +393,8 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         int moveStun = getMoveStun();
         if (moveStun <= 0) {
             if (getOverwriteType() != 0) setOverwriteType(0);
-        } else if (curAttack != null && curAttack.id == crm1.id) {
-            if (moveStun <= 11 && moveStun > 5) curAttack.attackDist += 0.15f;
+        } else if (curMove != null && curMove.id == crm1.id) {
+            if (moveStun <= 11 && moveStun > 5) curMove.attackDist += 0.15f;
         }
 
         for (int i = 0; i < overwriteTimes.size(); i++) {
@@ -452,7 +452,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
 
     @Override
     protected void playSummonSound() {
-        if (!shouldPlaySummonSound()) return;
+        if (shouldNotPlaySummonSound()) return;
 
         playSound(JSoundRegistry.TWOH_SUMMON, 1f, 1f);
         playSound(JSoundRegistry.TW_SUMMON, 1f, 1f);

@@ -28,7 +28,7 @@ public abstract class AbstractGrabAttack<T extends AbstractGrabAttack<T, S, A>, 
         Set<LivingEntity> targets = super.perform(stand, user, ctx);
         if (targets.isEmpty()) return targets;
 
-        stand.setAttack(hitMove, hitState);
+        stand.setMove(hitMove, hitState);
         return targets;
     }
 }

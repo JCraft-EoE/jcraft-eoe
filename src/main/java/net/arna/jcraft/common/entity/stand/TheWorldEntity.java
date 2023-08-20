@@ -171,7 +171,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
     @Override
     public void setAttackRotationOffset() {
         // Prevents The World from going in front of the user while the Feign Barrage isn't active
-        if (curAttack == FEIGN_BARRAGE && getMoveStun() > FEIGN_BARRAGE.getDuration() - FEIGN_BARRAGE.getWindup()) {
+        if (curMove == FEIGN_BARRAGE && getMoveStun() > FEIGN_BARRAGE.getDuration() - FEIGN_BARRAGE.getWindup()) {
             setRotationOffset(idleRotation);
             return;
         }
@@ -180,7 +180,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
 
     @Override
     protected void playSummonSound() {
-        if (!shouldPlaySummonSound()) return;
+        if (shouldNotPlaySummonSound()) return;
 
         playSound(JSoundRegistry.TW_SUMMON, 1f, 1f);
         playSound(JSoundRegistry.MUDA_DA, 1f, 1f);

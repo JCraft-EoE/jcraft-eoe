@@ -174,13 +174,13 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
     @Override
     public void initUlt() {
         // Ability to cancel dimension hop
-        if (curAttack == dimhop_others) {
+        if (curMove == dimhop_others) {
             setMoveStun(0);
-            curAttack = null;
+            curMove = null;
         }
 
         if (getWorld().getRegistryKey().equals(JDimensionRegistry.AU_DIMENSION_KEY)) {
-            setAttack(dimhop_others, State.DIM_HOP);
+            setMove(dimhop_others, State.DIM_HOP);
             playSound(JSoundRegistry.D4C_DIMHOP, 1, 1);
             return;
         }
@@ -397,12 +397,12 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                             stand.blocking = false;
                     }
 
-                    setAttack(grabhit, State.THROW_HIT);
+                    setMove(grabhit, State.THROW_HIT);
                 } else getMainHandStack().decrement(1);
             }
             case (5) -> {
                 if (getMoveStun() == 17)
-                    curAttack = grabhitfinal;
+                    curMove = grabhitfinal;
                 playSound(JSoundRegistry.REVOLVER_FIRE, 1, 1);
             }
             case (6) -> {
@@ -491,7 +491,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
     private static final Attack counterMiss = new Attack(14, 0, 10, 11);
     @Override
     public void whiffCounter() {
-        setAttack(counterMiss, State.COUNTER_MISS);
+        setMove(counterMiss, State.COUNTER_MISS);
         stun(getUser(), counterMiss.moveStun, 0);
     }
 
