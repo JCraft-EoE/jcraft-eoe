@@ -11,7 +11,7 @@ import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.core.old.Attack;
-import net.arna.jcraft.common.attack.core.old.AttackQueue;
+import net.arna.jcraft.common.attack.core.old.MoveQueue;
 import net.arna.jcraft.common.attack.core.old.AttackType;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
@@ -122,7 +122,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     public float maxStandGauge = 90f;
 
-    public AttackQueue queuedAttack;
+    public MoveQueue queuedAttack;
     public AbstractMove<?, ? super E> curMove;
     public AbstractMove<?, ? super E> previousAttack;
     public int armorPoints;
@@ -489,7 +489,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         int i = 0;
         for (Attack attack : moves)
             // Marking an attack with the correct attack button
-            attack.button = AttackQueue.values()[i++];
+            attack.button = MoveQueue.values()[i++];
     }
 
     /**
@@ -939,7 +939,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             if (curMoveStun <= 0 && !blocking) {
                 // Attack buffering
                 if (queuedAttack != null) {
-                    if (queuedAttack == AttackQueue.STAND_SUMMON) {
+                    if (queuedAttack == MoveQueue.STAND_SUMMON) {
                         curMove = null;
                         desummon();
                     } else handleMove(queuedAttack.getMoveType());
@@ -1352,7 +1352,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 if (stand.curMove != null && stand.curMove.getFollowUp() != null)
                     shouldPerformMove = true;
 
-                mob.setSneaking(selectedAttack.isCrouchingVariation);
+                mob.setSneaking(selectedAttack.isCrouchingVariant());
                 if (selectedAttack.isAerialVariation) {
                     mobJumpControl.setActive();
                     mob.setOnGround(false);
@@ -1361,19 +1361,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 if (shouldPerformMove) {
                     //JCraft.LOGGER.info("Stand User AI: Performing attack " + selectedAttack);
 
-                    if (selectedAttack.button == null) {
-                        JCraft.LOGGER.error("Attempting to use attack with unset button: " + selectedAttack.name + ", stand: " + stand);
-                    } else switch (selectedAttack.button.ordinal()) {
-                        case 0 -> stand.initLightAttack();
-                        case 1 -> stand.initHeavyAttack();
-                        case 2 -> stand.initBarrage();
-                        case 3 -> stand.initSpecial1();
-                        case 4 -> stand.initUlt();
-                        case 5 -> stand.initSpecial2();
-                        case 6 -> stand.initSpecial3();
-                        case 7 -> stand.initUtil();
-                    }
-                } else stand.queuedAttack = selectedAttack.button;
+                    if (selectedAttack.getMoveType() == null) {
+                        JCraft.LOGGER.error("Attempting to use attack with unset MoveType: " + selectedAttack.getName().getString() + ", stand: " + stand);
+                    } else stand.handleMove(selectedAttack.getMoveType());
+                } else stand.queuedAttack = MoveQueue.fromMoveType(selectedAttack.getMoveType());
             }
 
             double sideswitchDistance = 1.25;
@@ -1383,8 +1374,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             boolean evade = enemyAttack != null;
             // If in range (to attack or get hit)
             if (
-                    (selectedAttack != null && distance < selectedAttack.getMoveDistance() + selectedAttack.hitboxSize * 0.75) ||
-                            (enemyAttack != null && !enemyAttack.isRanged() && distance < enemyAttack.getMoveDistance() + enemyAttack.hitboxSize * 1.5)
+                    (selectedAttack instanceof AbstractSimpleAttack<?,?> simpleAttack &&
+                            distance < selectedAttack.getMoveDistance() + simpleAttack.getHitboxSize() * 0.75) ||
+                            (enemyAttack instanceof AbstractSimpleAttack<?,?> simpleEnemyAttack && !enemyAttack.isRanged() &&
+                                    distance < enemyAttack.getMoveDistance() + simpleEnemyAttack.getHitboxSize() * 1.5)
             ) {
                 // Move towards or away depending on distance and intent
                 entityNavigation.setSpeed(evade ? -0.25 : 0.25);
@@ -1462,11 +1455,11 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
             for (MoveMap.Entry<E, S> entry : getMoveMap()) {
                 AbstractMove<?, ? super E> attack = entry.getMove();
-                int parentAttackIndex = attack.button.ordinal(); // ID of the highest level attack's button
-                int initTime = attack.realInitTime();
+                MoveType parentType = attack.getMoveType();
+                int windupPoint = attack.getWindupPoint();
 
                 // Discount any on-cooldown non-followup attacks
-                if (cooldowns.getCooldown(attackCooldowns.get(parentAttackIndex)) > 0) {
+                if (cooldowns.getCooldown(moveMap.getMove(parentType).getCooldownType()) > 0) {
                     movesOnCooldown++;
                     continue;
                 }
@@ -1540,8 +1533,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 }
 
                 // If the opponent isn't using a move, prioritize attack with higher or equal initiation time
-                if (initTime <= stunTicks && initTime >= selectedAttackInitTime) {
-                    selectedAttackInitTime = initTime;
+                if (windupPoint <= stunTicks && windupPoint >= selectedAttackInitTime) {
+                    selectedAttackInitTime = windupPoint;
                     selectedAttack = attack;
                 }
             }

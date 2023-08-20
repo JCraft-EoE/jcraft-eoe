@@ -44,14 +44,14 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
     private StunType stunType = StunType.BURSTABLE;
     private int stun;
     private boolean overrideStun;
-    private boolean lift = true, canBackStab = true;
+    private boolean lift = true, canBackstab = true;
     private int blockStun;
     private BlockableType blockableType = BlockableType.BLOCKABLE;
     protected JParticleType hitSpark = JParticleType.HIT_SPARK_1;
 
-    protected AbstractSimpleAttack(int cooldown, int windup, int duration, float attackDistance, float damage,
+    protected AbstractSimpleAttack(int cooldown, int windup, int duration, float moveDistance, float damage,
                                    int stun, float hitboxSize, float knockback, float offset) {
-        super(cooldown, windup, duration, attackDistance);
+        super(cooldown, windup, duration, moveDistance);
         this.damage = damage;
         this.stun = stun;
         this.hitboxSize = hitboxSize;
@@ -161,11 +161,11 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
     /**
      * Sets whether the user can be back-stabbed while performing this attack.
      * Defaults to {@code true}.
-     * @param canBackStab Whether the user can be back-stabbed
+     * @param canBackstab Whether the user can be backstabbed
      * @return This attack
      */
-    public T withBackStab(boolean canBackStab) {
-        this.canBackStab = canBackStab;
+    public T withBackstab(boolean canBackstab) {
+        this.canBackstab = canBackstab;
         return getThis();
     }
 
@@ -312,7 +312,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
         Vec3d hPos = getOffsetHeightPos(stand);
         Vec3d rotVec = getRotVec(stand);
 
-        Vec3d fPos = hPos.add(rotVec.multiply(getMoveDistance())).add(upVec.multiply(-offset));
+        Vec3d fPos = getOffsetForwardPos(stand, hPos, upVec, rotVec);
 
         DamageSource damageSource = getDamageSource(stand);
         Set<Box> boxes = new HashSet<>();
@@ -348,12 +348,16 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
         Vec3d kbVec = getRotVec(stand).multiply(knockback).add(new Vec3d(0.0, Math.abs(knockback) / 4, 0.0));
         for (LivingEntity target : validateTargets(stand, hurt))
             StandEntity.damageLogic(stand.world, target, kbVec, stun, stunType.ordinal(), overrideStun,
-                    damage, lift, blockStun, damageSource, stand.getUserOrThrow(), canBackStab, blockableType.isNonBlockable());
+                    damage, lift, blockStun, damageSource, stand.getUserOrThrow(), canBackstab, blockableType.isNonBlockable());
 
         return hurt;
     }
 
     protected Set<LivingEntity> validateTargets(S stand, Set<LivingEntity> targets) {
         return targets;
+    }
+
+    protected Vec3d getOffsetForwardPos(S stand, Vec3d offsetHeightPos, Vec3d upVec, Vec3d rotVec) {
+        return offsetHeightPos.add(rotVec.multiply(getMoveDistance())).add(upVec.multiply(-offset));
     }
 }

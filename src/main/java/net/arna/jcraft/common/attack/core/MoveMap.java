@@ -2,6 +2,7 @@ package net.arna.jcraft.common.attack.core;
 
 import lombok.Data;
 import lombok.Getter;
+import lombok.NonNull;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.CooldownType;
@@ -20,16 +21,19 @@ public class MoveMap<E extends StandEntity<E, S>, S extends Enum<S> & StandAnima
     @Getter
     private boolean frozen = false;
 
-    public Entry<E, S> register(MoveType type, AbstractMove<?, ? super E> move) {
+    public Entry<E, S> register(@NonNull MoveType type, @NonNull AbstractMove<?, ? super E> move) {
         return register(type, move, null);
     }
 
-    public Entry<E, S> register(MoveType type, AbstractMove<?, ? super E> move, S animState) {
+    public Entry<E, S> register(@NonNull MoveType type, @NonNull AbstractMove<?, ? super E> move, @Nullable S animState) {
         return register(type, move, type.getDefaultCooldownType(), animState);
     }
 
-    public Entry<E, S> register(MoveType type, AbstractMove<?, ? super E> move, CooldownType cooldownType, S animState) {
+    public Entry<E, S> register(@NonNull MoveType type, @NonNull AbstractMove<?, ? super E> move, @Nullable CooldownType cooldownType, @Nullable S animState) {
         checkFrozen();
+
+        move = move.copy();
+        move.onRegister(type);
 
         Entry<E, S> entry = new Entry<>(move, cooldownType, animState);
         moves.put(type, entry);

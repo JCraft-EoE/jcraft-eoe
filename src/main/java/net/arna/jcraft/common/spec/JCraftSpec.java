@@ -2,7 +2,7 @@ package net.arna.jcraft.common.spec;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.old.Attack;
-import net.arna.jcraft.common.attack.core.old.AttackQueue;
+import net.arna.jcraft.common.attack.core.old.MoveQueue;
 import net.arna.jcraft.common.attack.core.old.AttackType;
 import net.arna.jcraft.common.attack.core.HitBoxData;
 import net.arna.jcraft.common.component.CooldownsComponent;
@@ -46,7 +46,7 @@ public abstract class JCraftSpec {
     public int attackID = -1; // Client-only
     public Attack curAttack;
     public Attack previousAttack;
-    public AttackQueue queuedAttack;
+    public MoveQueue queuedAttack;
     public int armorPoints = 0;
 
     public Text getTranslatableName() {

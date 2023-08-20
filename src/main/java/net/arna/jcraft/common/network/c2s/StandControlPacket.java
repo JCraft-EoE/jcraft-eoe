@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.network.c2s;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.attack.core.old.AttackQueue;
+import net.arna.jcraft.common.attack.core.old.MoveQueue;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.StandComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
@@ -46,7 +46,7 @@ public class StandControlPacket {
 	            if (stand != null) {
                     int moveStun = stand.getMoveStun();
                     if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT)
-                        stand.queuedAttack = AttackQueue.STAND_SUMMON;
+                        stand.queuedAttack = MoveQueue.STAND_SUMMON;
                     else
                         stand.desummon();
                 } else if (world != null) JCraft.summon(world, player);
@@ -58,7 +58,7 @@ public class StandControlPacket {
                     int moveStun = stand.getMoveStun();
                     stand.initLightAttack();
                     if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking())
-                        stand.queuedAttack = AttackQueue.LIGHT;
+                        stand.queuedAttack = MoveQueue.LIGHT;
                 }
             });
             // 3 - BLOCK
@@ -83,13 +83,13 @@ public class StandControlPacket {
 
                     stand.initHeavyAttack();
                     if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking())
-                        stand.queuedAttack = AttackQueue.HEAVY;
+                        stand.queuedAttack = MoveQueue.HEAVY;
                 } else {
                     JCraftSpec spec = JUtils.getSpec(player);
                     if (spec != null) {
                         spec.initHeavyAttack(world);
                         if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT)
-                            spec.queuedAttack = AttackQueue.HEAVY;
+                            spec.queuedAttack = MoveQueue.HEAVY;
                     }
                 }
             });
@@ -101,13 +101,13 @@ public class StandControlPacket {
 
                     stand.initBarrage();
                     if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking())
-                        stand.queuedAttack = AttackQueue.BARRAGE;
+                        stand.queuedAttack = MoveQueue.BARRAGE;
                 } else {
                     JCraftSpec spec = JUtils.getSpec(player);
                     if (spec != null) {
                         spec.initBarrage(world);
                         if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT)
-                            spec.queuedAttack = AttackQueue.BARRAGE;
+                            spec.queuedAttack = MoveQueue.BARRAGE;
                     }
                 }
             });
@@ -119,13 +119,13 @@ public class StandControlPacket {
 
                     stand.initSpecial1();
                     if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking())
-                        stand.queuedAttack = AttackQueue.SPECIAL1;
+                        stand.queuedAttack = MoveQueue.SPECIAL1;
                 } else {
                     JCraftSpec spec = JUtils.getSpec(player);
                     if (spec != null) {
                         spec.initSpecial1(world);
                         if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT)
-                            spec.queuedAttack = AttackQueue.SPECIAL1;
+                            spec.queuedAttack = MoveQueue.SPECIAL1;
                     }
                 }
             });
@@ -137,13 +137,13 @@ public class StandControlPacket {
 
                     stand.initUlt();
                     if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking())
-                        stand.queuedAttack = AttackQueue.ULTIMATE;
+                        stand.queuedAttack = MoveQueue.ULTIMATE;
                 } else {
                     JCraftSpec spec = JUtils.getSpec(player);
                     if (spec != null) {
                         spec.initUlt(world);
                         if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT)
-                            spec.queuedAttack = AttackQueue.ULTIMATE;
+                            spec.queuedAttack = MoveQueue.ULTIMATE;
                     }
                 }
             });
@@ -155,13 +155,13 @@ public class StandControlPacket {
 
                     stand.initSpecial2();
                     if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking())
-                        stand.queuedAttack = AttackQueue.SPECIAL2;
+                        stand.queuedAttack = MoveQueue.SPECIAL2;
                 } else {
                     JCraftSpec spec = JUtils.getSpec(player);
                     if (spec != null) {
                         spec.initSpecial2(world);
                         if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT)
-                            spec.queuedAttack = AttackQueue.SPECIAL2;
+                            spec.queuedAttack = MoveQueue.SPECIAL2;
                     }
                 }
             });
@@ -173,13 +173,13 @@ public class StandControlPacket {
 
                     stand.initSpecial3();
                     if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking())
-                        stand.queuedAttack = AttackQueue.SPECIAL3;
+                        stand.queuedAttack = MoveQueue.SPECIAL3;
                 } else {
                     JCraftSpec spec = JUtils.getSpec(player);
                     if (spec != null) {
                         spec.initSpecial3(world);
                         if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT)
-                            spec.queuedAttack = AttackQueue.SPECIAL3;
+                            spec.queuedAttack = MoveQueue.SPECIAL3;
                     }
                 }
             });
@@ -191,7 +191,7 @@ public class StandControlPacket {
                     int moveStun = stand.getMoveStun();
                     stand.initUtil();
                     if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking())
-                        stand.queuedAttack = AttackQueue.MIDDLE_MOUSE;
+                        stand.queuedAttack = MoveQueue.MIDDLE_MOUSE;
                 } else {
                     StandEntity<?, ?> stand2 = JCraft.summon(world, player);
                     if (stand2 != null) stand2.initUtil();

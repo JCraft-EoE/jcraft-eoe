@@ -38,7 +38,7 @@ public final class Attack {
     public boolean canBackstab = true;
 
     // Info
-    public AttackQueue button;
+    public MoveQueue button;
     public String name = "UNNAMED";
     public String description = "";
 
@@ -307,7 +307,7 @@ public final class Attack {
      * @param desc description
      * @param b    which type of button the attack corresponds to
      */
-    public Attack setInfo(String name, String desc, AttackQueue b) {
+    public Attack setInfo(String name, String desc, MoveQueue b) {
         this.name = name;
         this.description = desc;
         this.button = b;

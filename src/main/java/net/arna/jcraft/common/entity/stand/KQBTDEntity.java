@@ -164,6 +164,11 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
          */
     }
 
+    @Override
+    protected KQBTDEntity getThis() {
+        return this;
+    }
+
     // Animations
     public enum State implements StandAnimationState<KQBTDEntity> {
         IDLE(builder -> builder.loop("animation.kqbtd.idle")),

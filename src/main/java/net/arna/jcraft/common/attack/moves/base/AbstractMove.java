@@ -2,6 +2,7 @@ package net.arna.jcraft.common.attack.moves.base;
 
 import lombok.Getter;
 import lombok.NonNull;
+import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.entity.stand.StandEntity;
@@ -12,6 +13,7 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,11 +22,13 @@ import java.util.Set;
 @Getter
 public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends StandEntity<?, ?>> {
     private final List<SoundEvent> sounds = new ArrayList<>(), impactSounds = new ArrayList<>();
+    private MoveType moveType;
     private int cooldown, windup;
     private int duration;
     private float moveDistance;
     private Text name, description;
     private AbstractMove<?, ? super S> crouchingVariant, followUp;
+    private boolean isCrouchingVariant;
     private int armor;
     protected MobilityType mobilityType;
     // Used to help AI know how and when to use this attack.
@@ -101,7 +105,8 @@ public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends Stand
     }
 
     public T withCrouchingVariant(AbstractMove<?, ? super S> crouchingVariant) {
-        this.crouchingVariant = crouchingVariant;
+        this.crouchingVariant = crouchingVariant.copy();
+        this.crouchingVariant.isCrouchingVariant = true;
         return getThis();
     }
 
@@ -111,7 +116,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends Stand
      * @return This move
      */
     public T withFollowUp(AbstractMove<?, ? super S> followUp) {
-        this.followUp = followUp;
+        this.followUp = followUp.copy();
         return getThis();
     }
 
@@ -154,6 +159,16 @@ public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends Stand
      */
     public T withHyperArmor() {
         return withArmor(Integer.MAX_VALUE);
+    }
+
+    /**
+     * Called when this move is registered to a {@link net.arna.jcraft.common.attack.core.MoveMap MoveMap}.
+     * Not supposed to be called by anything else.
+     * @param type The MoveType this move is registered as
+     */
+    @ApiStatus.Internal
+    public void onRegister(MoveType type) {
+        moveType = type;
     }
 
     // Logic methods
@@ -212,12 +227,20 @@ public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends Stand
     // Utility methods
 
     /**
+     * Returns the point at which the windup has passed.
+     * @return The point at which the windup has passed.
+     */
+    public int getWindupPoint() {
+        return duration - windup;
+    }
+
+    /**
      * Returns whether the windup has passed.
      * @param stand The stand to check for
      * @return Whether the windup has passed
      */
     public boolean hasWindupPassed(StandEntity<?, ?> stand) {
-        return stand.getMoveStun() <= duration - windup;
+        return stand.getMoveStun() <= getWindupPoint();
     }
 
     /**

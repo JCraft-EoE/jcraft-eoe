@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.spec;
 
 import net.arna.jcraft.common.attack.core.old.Attack;
-import net.arna.jcraft.common.attack.core.old.AttackQueue;
+import net.arna.jcraft.common.attack.core.old.MoveQueue;
 import net.arna.jcraft.common.attack.core.old.AttackType;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.registry.JSoundRegistry;
@@ -26,10 +26,10 @@ public class BrawlerSpec extends JCraftSpec {
     public static final Attack gut = new Attack(2, 17, 1f, 18, 11, 1.5, 6f, 0.8f, AttackType.BOX, 0.80f, 0, 0, JSoundRegistry.IMPACT_2)
             .setAnimation("br.gut")
             .setHitspark(2)
-            .setInfo("Gut Punch", "good stun", AttackQueue.SPECIAL1);
+            .setInfo("Gut Punch", "good stun", MoveQueue.SPECIAL1);
     public static final Attack low = new Attack(3, 15, 1f, 18, 11, 1.5, 5f, 0.6f, AttackType.BOX, 0.80f, 1, 0, JSoundRegistry.IMPACT_2)
             .setAnimation("br.low")
-            .setInfo("Sweep", "knocks down", AttackQueue.SPECIAL2);
+            .setInfo("Sweep", "knocks down", MoveQueue.SPECIAL2);
 
     // Info
     @Override

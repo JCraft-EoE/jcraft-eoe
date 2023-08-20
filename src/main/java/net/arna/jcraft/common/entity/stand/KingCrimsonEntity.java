@@ -3,7 +3,7 @@ package net.arna.jcraft.common.entity.stand;
 import io.netty.buffer.Unpooled;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.old.Attack;
-import net.arna.jcraft.common.attack.core.old.AttackQueue;
+import net.arna.jcraft.common.attack.core.old.MoveQueue;
 import net.arna.jcraft.common.attack.core.old.AttackType;
 import net.arna.jcraft.common.attack.core.HitBoxData;
 import net.arna.jcraft.common.component.CooldownsComponent;
@@ -70,10 +70,10 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             .setHitspark(2)
             .hyperArmor()
             .setLaunch()
-            .setInfo("Overhead Hook", "long windup, knockdown", AttackQueue.HEAVY);
+            .setInfo("Overhead Hook", "long windup, knockdown", MoveQueue.HEAVY);
     public static final Attack heavy = new Attack(1, 13, 0.85f, 19, 12, 1.5, 6f, 0.2f, AttackType.BOX, 1.25f, 0, 0, JSoundRegistry.IMPACT_9)
             .appendHitbox(new HitBoxData(0, 0.5, 1))
-            .setInfo("Vertical Chop", "medium windup combo starter, has a true followup in the form of a slow, armored knockdown", AttackQueue.HEAVY)
+            .setInfo("Vertical Chop", "medium windup combo starter, has a true followup in the form of a slow, armored knockdown", MoveQueue.HEAVY)
             .setFollowup(overhead);
     public static final Attack bloodthrow = new Attack(5, 25, 15, 10, 10, AttackType.BOX)
             .setRanged(true)

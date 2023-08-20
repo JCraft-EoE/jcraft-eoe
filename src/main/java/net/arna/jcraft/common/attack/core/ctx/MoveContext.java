@@ -11,7 +11,6 @@ import java.util.Map;
 public class MoveContext {
     private final Map<MoveVariable<?>, Entry<?>> entries = new HashMap<>();
 
-    @SuppressWarnings("unchecked")
     public <T> T get(MoveVariable<T> variable) {
         Entry<?> entry = getEntry(variable);
         return (T) entry.getValue();
@@ -41,7 +40,6 @@ public class MoveContext {
         entry.setValue(value);
     }
 
-    @SuppressWarnings("unchecked") // It is checked.
     @NotNull
     private <T> Entry<T> getEntry(MoveVariable<T> variable) {
         Entry<?> entry = entries.get(variable);

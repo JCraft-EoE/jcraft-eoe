@@ -2,7 +2,7 @@ package net.arna.jcraft.common.entity.stand;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.old.Attack;
-import net.arna.jcraft.common.attack.core.old.AttackQueue;
+import net.arna.jcraft.common.attack.core.old.MoveQueue;
 import net.arna.jcraft.common.attack.core.old.AttackType;
 import net.arna.jcraft.common.attack.core.HitBoxData;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
@@ -76,7 +76,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
                     has followups which create different sand patterns based on which key was pressed;
                     SPECIAL 1 - no sand
                     SPECIAL 2 - semicircle
-                    SPECIAL 3 - diagonal pattern (influenced by where the user is looking)""", AttackQueue.SPECIAL1);
+                    SPECIAL 3 - diagonal pattern (influenced by where the user is looking)""", MoveQueue.SPECIAL1);
     public static final Attack sandclone = new Attack(6, 30, 1, 11, 7, 0, 0f, 0.0f, AttackType.BOX)
             .setRanged(true)
             .setInfo("Sand Manipulation", "creates a blinding sand cloud, then a clone or (if crouching) circles of sand");

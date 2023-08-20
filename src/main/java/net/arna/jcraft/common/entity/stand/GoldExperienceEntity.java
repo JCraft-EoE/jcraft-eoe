@@ -4,7 +4,7 @@ import net.arna.jcraft.common.attack.core.BlockableType;
 import net.arna.jcraft.common.attack.core.HitBoxData;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
-import net.arna.jcraft.common.attack.core.old.AttackQueue;
+import net.arna.jcraft.common.attack.core.old.MoveQueue;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.goldexperience.*;
 import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
@@ -202,7 +202,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
         super.tick();
         if (!hasUser()) return;
 
-        if (!world.isClient && curMove == REKKA2 && queuedAttack == AttackQueue.SPECIAL2)
+        if (!world.isClient && curMove == REKKA2 && queuedAttack == MoveQueue.SPECIAL2)
             queuedAttack = null;
     }
 

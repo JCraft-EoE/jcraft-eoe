@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import net.arna.jcraft.common.attack.core.old.AttackQueue;
+import net.arna.jcraft.common.attack.core.old.MoveQueue;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.StandComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
@@ -24,52 +24,52 @@ public class InduceAttackCommand {
                 .then(CommandManager.argument("ents", EntityArgumentType.entities())
                         .then(CommandManager.literal("stand")
                                 .then(CommandManager.literal("light").executes(
-                                        context -> runAttack(context.getSource(), EntityArgumentType.getEntities(context, "ents"), true, AttackQueue.LIGHT)
+                                        context -> runAttack(context.getSource(), EntityArgumentType.getEntities(context, "ents"), true, MoveQueue.LIGHT)
                                 ))
                                 .then(CommandManager.literal("heavy").executes(
-                                        context -> runAttack(context.getSource(), EntityArgumentType.getEntities(context, "ents"), true, AttackQueue.HEAVY)
+                                        context -> runAttack(context.getSource(), EntityArgumentType.getEntities(context, "ents"), true, MoveQueue.HEAVY)
                                 ))
                                 .then(CommandManager.literal("barrage").executes(
-                                        context -> runAttack(context.getSource(), EntityArgumentType.getEntities(context, "ents"), true, AttackQueue.BARRAGE)
+                                        context -> runAttack(context.getSource(), EntityArgumentType.getEntities(context, "ents"), true, MoveQueue.BARRAGE)
                                 ))
                                 .then(CommandManager.literal("special1").executes(
-                                        context -> runAttack(context.getSource(), EntityArgumentType.getEntities(context, "ents"), true, AttackQueue.SPECIAL1)
+                                        context -> runAttack(context.getSource(), EntityArgumentType.getEntities(context, "ents"), true, MoveQueue.SPECIAL1)
                                 ))
                                 .then(CommandManager.literal("special2").executes(
-                                        context -> runAttack(context.getSource(), EntityArgumentType.getEntities(context, "ents"), true, AttackQueue.SPECIAL2)
+                                        context -> runAttack(context.getSource(), EntityArgumentType.getEntities(context, "ents"), true, MoveQueue.SPECIAL2)
                                 ))
                                 .then(CommandManager.literal("special3").executes(
-                                        context -> runAttack(context.getSource(), EntityArgumentType.getEntities(context, "ents"), true, AttackQueue.SPECIAL3)
+                                        context -> runAttack(context.getSource(), EntityArgumentType.getEntities(context, "ents"), true, MoveQueue.SPECIAL3)
                                 ))
                                 .then(CommandManager.literal("ultimate").executes(
-                                        context -> runAttack(context.getSource(), EntityArgumentType.getEntities(context, "ents"), true, AttackQueue.ULTIMATE)
+                                        context -> runAttack(context.getSource(), EntityArgumentType.getEntities(context, "ents"), true, MoveQueue.ULTIMATE)
                                 ))
                         )
                         .then(CommandManager.literal("spec")
                                 .then(CommandManager.literal("heavy").executes(
-                                        context -> runAttack(context.getSource(), EntityArgumentType.getEntities(context, "ents"), false, AttackQueue.HEAVY)
+                                        context -> runAttack(context.getSource(), EntityArgumentType.getEntities(context, "ents"), false, MoveQueue.HEAVY)
                                 ))
                                 .then(CommandManager.literal("barrage").executes(
-                                        context -> runAttack(context.getSource(), EntityArgumentType.getEntities(context, "ents"), false, AttackQueue.BARRAGE)
+                                        context -> runAttack(context.getSource(), EntityArgumentType.getEntities(context, "ents"), false, MoveQueue.BARRAGE)
                                 ))
                                 .then(CommandManager.literal("special1").executes(
-                                        context -> runAttack(context.getSource(), EntityArgumentType.getEntities(context, "ents"), false, AttackQueue.SPECIAL1)
+                                        context -> runAttack(context.getSource(), EntityArgumentType.getEntities(context, "ents"), false, MoveQueue.SPECIAL1)
                                 ))
                                 .then(CommandManager.literal("special2").executes(
-                                        context -> runAttack(context.getSource(), EntityArgumentType.getEntities(context, "ents"), false, AttackQueue.SPECIAL2)
+                                        context -> runAttack(context.getSource(), EntityArgumentType.getEntities(context, "ents"), false, MoveQueue.SPECIAL2)
                                 ))
                                 .then(CommandManager.literal("special3").executes(
-                                        context -> runAttack(context.getSource(), EntityArgumentType.getEntities(context, "ents"), false, AttackQueue.SPECIAL3)
+                                        context -> runAttack(context.getSource(), EntityArgumentType.getEntities(context, "ents"), false, MoveQueue.SPECIAL3)
                                 ))
                                 .then(CommandManager.literal("ultimate").executes(
-                                        context -> runAttack(context.getSource(), EntityArgumentType.getEntities(context, "ents"), false, AttackQueue.ULTIMATE)
+                                        context -> runAttack(context.getSource(), EntityArgumentType.getEntities(context, "ents"), false, MoveQueue.ULTIMATE)
                                 ))
                         )
                 )
         );
     }
 
-    public static int runAttack(ServerCommandSource source, Collection<? extends Entity> targets, boolean stand, AttackQueue type) {
+    public static int runAttack(ServerCommandSource source, Collection<? extends Entity> targets, boolean stand, MoveQueue type) {
         int flag = 0;
         if (stand) {
             for (Entity entity : targets) {

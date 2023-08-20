@@ -4,7 +4,7 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.old.Attack;
-import net.arna.jcraft.common.attack.core.old.AttackQueue;
+import net.arna.jcraft.common.attack.core.old.MoveQueue;
 import net.arna.jcraft.common.attack.core.old.AttackType;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.config.JServerConfig;
@@ -72,7 +72,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .setLaunch()
             .hyperArmor()
             .setUB(false)
-            .setInfo("Overwrite (Hit)", "", AttackQueue.SPECIAL1);
+            .setInfo("Overwrite (Hit)", "", MoveQueue.SPECIAL1);
     public static final Attack chargeoverwrite = new Attack(8, 30, 70, 71, 0, AttackType.BOX)
             .disableBackstab()
             .setFollowup(overwrite)
