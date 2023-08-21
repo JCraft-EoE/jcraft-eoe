@@ -138,7 +138,7 @@ public class BombPlantAttack extends AbstractSimpleAttack<BombPlantAttack, Abstr
 
     @Override
     public @NonNull BombPlantAttack copy() {
-        return new BombPlantAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getStun(), getHitboxSize(),
-                getOffset());
+        return copyExtras(new BombPlantAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getStun(), getHitboxSize(),
+                getOffset()));
     }
 }

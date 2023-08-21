@@ -22,7 +22,7 @@ public class BarrageAttack<A extends IAttacker<?, ?>> extends AbstractBarrageAtt
 
     @Override
     public @NonNull BarrageAttack<A> copy() {
-        return new BarrageAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getHitboxSize(), getKnockback(), getOffset(), getInterval());
+        return copyExtras(new BarrageAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
+                getHitboxSize(), getKnockback(), getOffset(), getInterval()));
     }
 }

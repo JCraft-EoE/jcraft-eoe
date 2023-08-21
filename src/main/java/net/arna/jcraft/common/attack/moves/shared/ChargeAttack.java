@@ -19,7 +19,7 @@ public class ChargeAttack<S extends StandEntity<S, A>, A extends Enum<A> & Stand
 
     @Override
     public @NonNull ChargeAttack<S, A> copy() {
-        return new ChargeAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getHitboxSize(), getKnockback(), getOffset(), getHitAnimState());
+        return copyExtras(new ChargeAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
+                getHitboxSize(), getKnockback(), getOffset(), getHitAnimState()));
     }
 }

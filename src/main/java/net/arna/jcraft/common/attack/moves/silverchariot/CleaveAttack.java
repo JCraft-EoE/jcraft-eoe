@@ -31,7 +31,7 @@ public class CleaveAttack extends AbstractSimpleAttack<CleaveAttack, SilverChari
 
     @Override
     public @NonNull CleaveAttack copy() {
-        return new CleaveAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getHitboxSize(), getKnockback(), getOffset());
+        return copyExtras(new CleaveAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
+                getHitboxSize(), getKnockback(), getOffset()));
     }
 }

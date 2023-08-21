@@ -20,7 +20,7 @@ public class GrabAttack<S extends StandEntity<S, A>, A extends Enum<A> & StandAn
 
     @Override
     public @NonNull GrabAttack<S, A> copy() {
-        return new GrabAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getHitboxSize(), getKnockback(), getOffset(), getHitMove(), getHitState());
+        return copyExtras(new GrabAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
+                getHitboxSize(), getKnockback(), getOffset(), getHitMove(), getHitState()));
     }
 }

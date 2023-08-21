@@ -34,7 +34,7 @@ public class GodOfDeathAttack extends AbstractSimpleAttack<GodOfDeathAttack, Sil
 
     @Override
     public @NonNull GodOfDeathAttack copy() {
-        return new GodOfDeathAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getHitboxSize(), getKnockback(), getOffset());
+        return copyExtras(new GodOfDeathAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
+                getHitboxSize(), getKnockback(), getOffset()));
     }
 }

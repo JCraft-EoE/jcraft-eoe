@@ -39,7 +39,7 @@ public class OverclockAttack extends AbstractSimpleAttack<OverclockAttack, GoldE
 
     @Override
     public @NonNull OverclockAttack copy() {
-        return new OverclockAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getHitboxSize(), getKnockback(), getOffset());
+        return copyExtras(new OverclockAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
+                getHitboxSize(), getKnockback(), getOffset()));
     }
 }

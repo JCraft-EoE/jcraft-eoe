@@ -40,6 +40,6 @@ public class CrossfireVariationAttack extends AbstractMove<CrossfireVariationAtt
 
     @Override
     public @NonNull CrossfireVariationAttack copy() {
-        return new CrossfireVariationAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance());
+        return copyExtras(new CrossfireVariationAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
     }
 }

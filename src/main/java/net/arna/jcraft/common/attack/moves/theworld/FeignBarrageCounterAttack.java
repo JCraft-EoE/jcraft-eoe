@@ -57,6 +57,6 @@ public class FeignBarrageCounterAttack extends AbstractCounterAttack<FeignBarrag
 
     @Override
     public @NonNull FeignBarrageCounterAttack copy() {
-        return new FeignBarrageCounterAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance());
+        return copyExtras(new FeignBarrageCounterAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
     }
 }

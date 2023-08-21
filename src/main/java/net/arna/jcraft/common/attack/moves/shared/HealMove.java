@@ -47,8 +47,8 @@ public class HealMove extends AbstractSimpleAttack<HealMove, StandEntity<?, ?>> 
 
     @Override
     public @NonNull HealMove copy() {
-        return new HealMove(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getHitboxSize(), getOffset(),
-                health, target, consumer);
+        return copyExtras(new HealMove(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getHitboxSize(), getOffset(),
+                health, target, consumer));
     }
 
     public enum HealTarget {

@@ -31,7 +31,7 @@ public class GodOfDeathHitAttack extends AbstractMultiHitAttack<GodOfDeathHitAtt
 
     @Override
     public @NonNull GodOfDeathHitAttack copy() {
-        return new GodOfDeathHitAttack(getCooldown(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getHitboxSize(), getKnockback(), getOffset(), getHitMoments());
+        return copyExtras(new GodOfDeathHitAttack(getCooldown(), getDuration(), getMoveDistance(), getDamage(), getStun(),
+                getHitboxSize(), getKnockback(), getOffset(), getHitMoments()));
     }
 }

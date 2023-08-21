@@ -31,21 +31,21 @@ import java.util.stream.Stream;
  * Moves that don't attack (i.e. don't have a hitbox) such as time-stop or dim-hop,
  * should probably not extend this. Anything else probably should.
  * @param <T>
- * @param <S>
+ * @param <A>
  */
 @SuppressWarnings("unused")
 @Getter
 public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>, A extends IAttacker<?, ?>> extends AbstractMove<T, A> {
     private final Set<HitBoxData> extraHitBoxes = new HashSet<>();
     private float damage;
+    private StunType stunType = StunType.BURSTABLE;
+    private int stun;
     private float hitboxSize;
     private float knockback;
     private float offset;
-    private StunType stunType = StunType.BURSTABLE;
-    private int stun;
     private boolean overrideStun;
     private boolean lift = true, canBackstab = true;
-    private int blockStun;
+    private int blockStun = -1;
     private BlockableType blockableType = BlockableType.BLOCKABLE;
     protected JParticleType hitSpark = JParticleType.HIT_SPARK_1;
 
@@ -57,7 +57,6 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
         this.hitboxSize = hitboxSize;
         this.knockback = knockback;
         this.offset = offset;
-        blockStun = (int) (damage + 4);
     }
 
     // Properties alteration methods
@@ -240,6 +239,10 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
         return getThis();
     }
 
+    public int getBlockStun() {
+        return blockStun < 0 ? (int) (damage + 4) : blockStun;
+    }
+
     // Utility methods
     public static Box createBox(Vec3d center, double size) {
         double axisSize = size / 2;
@@ -355,5 +358,18 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
 
     protected Vec3d getOffsetForwardPos(A attacker, Vec3d offsetHeightPos, Vec3d upVec, Vec3d rotVec) {
         return offsetHeightPos.add(rotVec.multiply(getMoveDistance())).add(upVec.multiply(-offset));
+    }
+
+    @Override
+    protected T copyExtras(T base) {
+        AbstractSimpleAttack<T, A> cast = super.copyExtras(base);
+        cast.stunType = stunType;
+        cast.overrideStun = overrideStun;
+        cast.lift = lift;
+        cast.canBackstab = canBackstab;
+        cast.blockStun = blockStun;
+        cast.blockableType = blockableType;
+        cast.hitSpark = hitSpark;
+        return base;
     }
 }

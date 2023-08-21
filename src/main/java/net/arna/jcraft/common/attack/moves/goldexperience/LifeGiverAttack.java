@@ -82,7 +82,7 @@ public class LifeGiverAttack extends AbstractMove<LifeGiverAttack, GoldExperienc
 
     @Override
     public @NonNull LifeGiverAttack copy() {
-        return new LifeGiverAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance());
+        return copyExtras(new LifeGiverAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
     }
 
     public enum LifeGiverType {

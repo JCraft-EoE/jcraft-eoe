@@ -40,6 +40,6 @@ public class ExplosiveDashAttack extends AbstractMove<ExplosiveDashAttack, Abstr
 
     @Override
     public @NonNull ExplosiveDashAttack copy() {
-        return new ExplosiveDashAttack(getCooldown());
+        return copyExtras(new ExplosiveDashAttack(getCooldown()));
     }
 }

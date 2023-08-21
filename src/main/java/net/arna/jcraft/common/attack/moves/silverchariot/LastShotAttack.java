@@ -37,6 +37,6 @@ public class LastShotAttack extends AbstractMove<LastShotAttack, SilverChariotEn
 
     @Override
     public @NonNull LastShotAttack copy() {
-        return new LastShotAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance());
+        return copyExtras(new LastShotAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
     }
 }

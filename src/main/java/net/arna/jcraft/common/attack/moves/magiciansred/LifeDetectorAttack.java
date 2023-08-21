@@ -33,6 +33,6 @@ public class LifeDetectorAttack extends AbstractMove<LifeDetectorAttack, Magicia
 
     @Override
     public @NonNull LifeDetectorAttack copy() {
-        return new LifeDetectorAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance());
+        return copyExtras(new LifeDetectorAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
     }
 }

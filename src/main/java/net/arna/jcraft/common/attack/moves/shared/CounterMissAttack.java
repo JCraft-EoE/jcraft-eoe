@@ -29,6 +29,6 @@ public class CounterMissAttack<A extends IAttacker<?, ?>> extends AbstractMove<C
 
     @Override
     public @NonNull CounterMissAttack<A> copy() {
-        return new CounterMissAttack<>(getDuration());
+        return copyExtras(new CounterMissAttack<>(getDuration()));
     }
 }

@@ -22,7 +22,7 @@ public class EffectInflictingAttack<S extends StandEntity<?, ?>> extends Abstrac
 
     @Override
     public @NonNull EffectInflictingAttack<S> copy() {
-        return new EffectInflictingAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getHitboxSize(), getKnockback(), getOffset(), getEffects());
+        return copyExtras(new EffectInflictingAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
+                getHitboxSize(), getKnockback(), getOffset(), getEffects()));
     }
 }

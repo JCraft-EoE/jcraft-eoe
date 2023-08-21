@@ -29,7 +29,7 @@ public class Rekka3Attack extends AbstractMultiHitAttack<Rekka3Attack, AnubisSpe
 
     @Override
     public @NonNull Rekka3Attack copy() {
-        return new Rekka3Attack(getCooldown(), getDuration(), getMoveDistance(), getDamage(), getStun(), getHitboxSize(),
-                getKnockback(), getOffset(), getHitMoments());
+        return copyExtras(new Rekka3Attack(getCooldown(), getDuration(), getMoveDistance(), getDamage(), getStun(), getHitboxSize(),
+                getKnockback(), getOffset(), getHitMoments()));
     }
 }

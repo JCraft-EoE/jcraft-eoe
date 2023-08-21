@@ -24,7 +24,7 @@ public class EffectInflictingMultiHitAttack<S extends StandEntity<?, ?>> extends
 
     @Override
     public @NonNull EffectInflictingMultiHitAttack<S> copy() {
-        return new EffectInflictingMultiHitAttack<>(getCooldown(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getHitboxSize(), getKnockback(), getOffset(), getHitMoments(), getEffects());
+        return copyExtras(new EffectInflictingMultiHitAttack<>(getCooldown(), getDuration(), getMoveDistance(), getDamage(), getStun(),
+                getHitboxSize(), getKnockback(), getOffset(), getHitMoments(), getEffects()));
     }
 }

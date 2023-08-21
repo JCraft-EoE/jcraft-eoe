@@ -37,7 +37,7 @@ public class TreeAttack extends AbstractSimpleAttack<TreeAttack, GoldExperienceE
 
     @Override
     public @NonNull TreeAttack copy() {
-        return new TreeAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getHitboxSize(), getKnockback(), getOffset());
+        return copyExtras(new TreeAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
+                getHitboxSize(), getKnockback(), getOffset()));
     }
 }

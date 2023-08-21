@@ -117,7 +117,7 @@ public class BTDPlantAttack extends AbstractSimpleAttack<BTDPlantAttack, KQBTDEn
 
     @Override
     public @NonNull BTDPlantAttack copy() {
-        return new BTDPlantAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getStun(), getHitboxSize(),
-                getOffset());
+        return copyExtras(new BTDPlantAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getStun(), getHitboxSize(),
+                getOffset()));
     }
 }

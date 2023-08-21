@@ -41,6 +41,6 @@ public class SCCounterAttack extends AbstractCounterAttack<SCCounterAttack, Silv
 
     @Override
     public @NonNull SCCounterAttack copy() {
-        return new SCCounterAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance());
+        return copyExtras(new SCCounterAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
     }
 }

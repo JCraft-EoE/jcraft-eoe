@@ -44,7 +44,7 @@ public class SimpleMultiHitAttack<A extends IAttacker<?, ?>> extends AbstractMul
 
     @Override
     public @NonNull SimpleMultiHitAttack<A> copy() {
-        return new SimpleMultiHitAttack<>(getCooldown(), getDuration(), getDamage(), getStun(), getHitboxSize(),
-                getKnockback(), getMoveDistance(), getOffset(), getHitMoments());
+        return copyExtras(new SimpleMultiHitAttack<>(getCooldown(), getDuration(), getDamage(), getStun(), getHitboxSize(),
+                getKnockback(), getMoveDistance(), getOffset(), getHitMoments()));
     }
 }

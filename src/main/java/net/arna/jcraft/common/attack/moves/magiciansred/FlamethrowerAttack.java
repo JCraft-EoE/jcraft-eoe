@@ -55,7 +55,7 @@ public class FlamethrowerAttack extends AbstractBarrageAttack<FlamethrowerAttack
 
     @Override
     public @NonNull FlamethrowerAttack copy() {
-        return new FlamethrowerAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDuration(),
-                getStun(), getHitboxSize(), getKnockback(), getOffset(), getInterval());
+        return copyExtras(new FlamethrowerAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDuration(),
+                getStun(), getHitboxSize(), getKnockback(), getOffset(), getInterval()));
     }
 }

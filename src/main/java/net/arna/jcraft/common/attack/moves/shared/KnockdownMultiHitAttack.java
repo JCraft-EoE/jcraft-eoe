@@ -34,7 +34,7 @@ public class KnockdownMultiHitAttack<A extends IAttacker<?, ?>> extends Abstract
 
     @Override
     public @NonNull KnockdownMultiHitAttack<A> copy() {
-        return new KnockdownMultiHitAttack<>(getCooldown(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getHitboxSize(), getKnockback(), getOffset(), getHitMoments(), knockdownDuration);
+        return copyExtras(new KnockdownMultiHitAttack<>(getCooldown(), getDuration(), getMoveDistance(), getDamage(), getStun(),
+                getHitboxSize(), getKnockback(), getOffset(), getHitMoments(), knockdownDuration));
     }
 }

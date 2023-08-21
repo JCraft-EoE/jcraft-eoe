@@ -48,6 +48,6 @@ public class ArmorOffAttack extends AbstractSimpleAttack<ArmorOffAttack, SilverC
 
     @Override
     public @NonNull ArmorOffAttack copy() {
-        return null;
+        return copyExtras(null);
     }
 }

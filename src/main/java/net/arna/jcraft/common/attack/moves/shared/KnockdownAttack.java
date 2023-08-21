@@ -27,7 +27,7 @@ public class KnockdownAttack<A extends IAttacker<?, ?>> extends AbstractEffectIn
 
     @Override
     public @NonNull KnockdownAttack<A> copy() {
-        return new KnockdownAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getHitboxSize(), getKnockback(), getOffset(), getKnockdownDuration());
+        return copyExtras(new KnockdownAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
+                getHitboxSize(), getKnockback(), getOffset(), getKnockdownDuration()));
     }
 }

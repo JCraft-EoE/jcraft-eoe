@@ -59,6 +59,6 @@ public class KQGrabHitAttack extends AbstractMove<KQGrabHitAttack, KillerQueenEn
 
     @Override
     public @NonNull KQGrabHitAttack copy() {
-        return new KQGrabHitAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getStun());
+        return copyExtras(new KQGrabHitAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getStun()));
     }
 }

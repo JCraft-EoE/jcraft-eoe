@@ -35,7 +35,7 @@ public class ElbowAttack extends AbstractSimpleAttack<ElbowAttack, KQBTDEntity> 
 
     @Override
     public @NonNull ElbowAttack copy() {
-        return new ElbowAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getHitboxSize(), getKnockback(), getOffset());
+        return copyExtras(new ElbowAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
+                getHitboxSize(), getKnockback(), getOffset()));
     }
 }

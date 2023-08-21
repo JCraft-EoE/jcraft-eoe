@@ -108,6 +108,6 @@ public class CrossfireHurricaneAttack extends AbstractMove<CrossfireHurricaneAtt
 
     @Override
     public @NonNull CrossfireHurricaneAttack copy() {
-        return new CrossfireHurricaneAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance());
+        return copyExtras(new CrossfireHurricaneAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
     }
 }

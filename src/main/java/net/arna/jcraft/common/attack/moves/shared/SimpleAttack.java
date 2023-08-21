@@ -46,7 +46,7 @@ public class SimpleAttack<A extends IAttacker<?, ?>> extends AbstractSimpleAttac
 
     @Override
     public @NonNull SimpleAttack<A> copy() {
-        return new SimpleAttack<>(getCooldown(), getWindup(), getDuration(), getDamage(), getStun(), getHitboxSize(),
-                getKnockback(), getMoveDistance(), getOffset());
+        return copyExtras(new SimpleAttack<>(getCooldown(), getWindup(), getDuration(), getDamage(), getStun(), getHitboxSize(),
+                getKnockback(), getMoveDistance(), getOffset()));
     }
 }

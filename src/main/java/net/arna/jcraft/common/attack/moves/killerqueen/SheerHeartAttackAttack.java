@@ -33,6 +33,6 @@ public class SheerHeartAttackAttack extends AbstractMove<SheerHeartAttackAttack,
 
     @Override
     public @NonNull SheerHeartAttackAttack copy() {
-        return new SheerHeartAttackAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance());
+        return copyExtras(new SheerHeartAttackAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
     }
 }

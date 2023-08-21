@@ -27,7 +27,7 @@ public class SpinBarrageAttack extends AbstractBarrageAttack<SpinBarrageAttack, 
 
     @Override
     public @NonNull SpinBarrageAttack copy() {
-        return new SpinBarrageAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getHitboxSize(), getKnockback(), getOffset(), getInterval());
+        return copyExtras(new SpinBarrageAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
+                getHitboxSize(), getKnockback(), getOffset(), getInterval()));
     }
 }

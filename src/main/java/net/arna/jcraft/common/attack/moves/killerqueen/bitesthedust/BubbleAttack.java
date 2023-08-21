@@ -55,6 +55,6 @@ public class BubbleAttack extends AbstractMove<BubbleAttack, KQBTDEntity> {
 
     @Override
     public @NonNull BubbleAttack copy() {
-        return new BubbleAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance());
+        return copyExtras(new BubbleAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
     }
 }

@@ -34,7 +34,7 @@ public class RayDartAttack extends AbstractSimpleAttack<RayDartAttack, SilverCha
 
     @Override
     public @NonNull RayDartAttack copy() {
-        return new RayDartAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
-                getStun(), getHitboxSize(), getKnockback(), getOffset());
+        return copyExtras(new RayDartAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
+                getStun(), getHitboxSize(), getKnockback(), getOffset()));
     }
 }

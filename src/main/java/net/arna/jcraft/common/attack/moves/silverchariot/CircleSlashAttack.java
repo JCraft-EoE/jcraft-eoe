@@ -61,7 +61,7 @@ public class CircleSlashAttack extends AbstractSimpleAttack<CircleSlashAttack, S
 
     @Override
     public @NonNull CircleSlashAttack copy() {
-        return new CircleSlashAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getHitboxSize(), getKnockback(), getOffset());
+        return copyExtras(new CircleSlashAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
+                getHitboxSize(), getKnockback(), getOffset()));
     }
 }

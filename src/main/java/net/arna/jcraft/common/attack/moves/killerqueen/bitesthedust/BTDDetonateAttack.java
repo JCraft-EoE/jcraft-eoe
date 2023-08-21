@@ -60,6 +60,6 @@ public class BTDDetonateAttack extends AbstractMove<BTDDetonateAttack, AbstractK
 
     @Override
     public @NonNull BTDDetonateAttack copy() {
-        return new BTDDetonateAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance());
+        return copyExtras(new BTDDetonateAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
     }
 }

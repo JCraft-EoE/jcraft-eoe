@@ -48,6 +48,6 @@ public class CoinTossAttack extends AbstractMove<CoinTossAttack, KillerQueenEnti
 
     @Override
     public @NonNull CoinTossAttack copy() {
-        return new CoinTossAttack(getCooldown());
+        return copyExtras(new CoinTossAttack(getCooldown()));
     }
 }

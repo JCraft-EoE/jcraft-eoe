@@ -29,8 +29,8 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     private int duration;
     private float moveDistance;
     private Text name, description;
-    private AbstractMove<?, ? super A> crouchingVariant, followUp;
-    private boolean isCrouchingVariant;
+    private AbstractMove<?, ? super A> crouchingVariant, aerialVariant, followUp;
+    private boolean isCrouchingVariant, isAerialVariant;
     private int armor;
     protected MobilityType mobilityType;
     // Used to help AI know how and when to use this attack.
@@ -106,9 +106,27 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         return getThis();
     }
 
+    /**
+     * Sets the crouching variant of this move. When invoking this move while crouching,
+     * this variant is invoked instead.
+     * @param crouchingVariant The crouching variant of this move.
+     * @return This move
+     */
     public T withCrouchingVariant(AbstractMove<?, ? super A> crouchingVariant) {
         this.crouchingVariant = crouchingVariant.copy();
         this.crouchingVariant.isCrouchingVariant = true;
+        return getThis();
+    }
+
+    /**
+     * Sets the aerial variant of this move. When invoking this move while in the air,
+     * this variant is invoked instead.
+     * @param aerialVariant The aerial variant of this move.
+     * @return This move
+     */
+    public T withAerialVariant(AbstractMove<?, ? super A> aerialVariant) {
+        this.aerialVariant = aerialVariant.copy();
+        this.aerialVariant.isAerialVariant = true;
         return getThis();
     }
 
@@ -320,6 +338,29 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * @return This move
      */
     protected abstract @NonNull T getThis();
+
+    /**
+     * Copies all extra data that is not included in the move's constructor to the copy.
+     * Should be called in {@link #copy()} and should always call the super method.
+     * @param base The instance to copy the data to.
+     * @return The given base with copied data.
+     */
+    protected T copyExtras(T base) {
+        AbstractMove<T, A> cast = base; // Required to access private fields
+        cast.sounds.addAll(sounds);
+        cast.impactSounds.addAll(impactSounds);
+        cast.conditions.addAll(conditions);
+        cast.moveType = moveType;
+        cast.name = name;
+        cast.description = description;
+        cast.crouchingVariant = crouchingVariant;
+        cast.aerialVariant = aerialVariant;
+        cast.isCrouchingVariant = isCrouchingVariant;
+        cast.isAerialVariant = isAerialVariant;
+        cast.armor = armor;
+        cast.mobilityType = mobilityType;
+        return base;
+    }
 
     /**
      * Creates a copy of this attack.

@@ -7,7 +7,6 @@ import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
-import net.arna.jcraft.common.attack.core.old.Attack;
 import net.arna.jcraft.common.attack.core.old.MoveQueue;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.base.AbstractMultiHitAttack;
@@ -30,7 +29,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.world.World;
 
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -57,6 +55,7 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
         moveMap.forEach(entry -> entry.getMove().registerContextEntries(moveContext));
     }
 
+    // TODO move these methods to SpecType
     public Text getTranslatableName() {
         return Text.translatable("spec.jcraft." + getInternalName());
     }
@@ -71,10 +70,6 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
 
     public String getDetails() {
         return "UNFINISHED";
-    }
-
-    public List<Attack> getAttacks() {
-        return null;
     }
 
     public int getId() {

@@ -61,7 +61,7 @@ public class DetonateAttack extends AbstractMove<DetonateAttack, AbstractKillerQ
 
     @Override
     public @NonNull DetonateAttack copy() {
-        return new DetonateAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance());
+        return copyExtras(new DetonateAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
     }
 
     public static void explode(AbstractKillerQueenEntity<?, ?> stand, Entity user, Vec3d pos) {
