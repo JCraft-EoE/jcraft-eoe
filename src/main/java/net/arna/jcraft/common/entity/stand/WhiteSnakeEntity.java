@@ -2,48 +2,69 @@ package net.arna.jcraft.common.entity.stand;
 
 import com.google.common.collect.Lists;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.attack.core.BlockableType;
+import net.arna.jcraft.common.attack.core.MoveMap;
+import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.old.Attack;
 import net.arna.jcraft.common.attack.core.old.AttackType;
+import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
+import net.arna.jcraft.common.attack.moves.shared.EffectInflictingAttack;
+import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
-import net.arna.jcraft.common.entity.projectile.WSAcidProjectile;
 import net.arna.jcraft.common.util.CooldownType;
+import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 
 public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEntity.State> {
-    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 14, 7, 1.5, 5f, 0.75f, AttackType.BOX, 0.6f, 0.2f, 0, JSoundRegistry.IMPACT_3)
-            .setInfo("Punch", "quick combo starter");
-    public static final Attack donut = new Attack(1, 18, 1f, 36, 17, 2, 10f, 0.0f, AttackType.BOX, 1.4f, 0, 0, JSoundRegistry.TW_DONUT_HIT)
-            .setHitspark(2)
-            .setInfo("Donut", "slow combo starter/extender");
-    public static final Attack barrage = Attack.barrageAttack(2, 17, 0.75f, 60, 0, 2, 1f, 0.25f, 1, 0, 3, JSoundRegistry.IMPACT_3)
-            .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
-    public static final Attack standdisk = new Attack(3, 30, 1f, 34, 22, 2, 8f, 0.0f, AttackType.BOX, 1f, 0, 0, JSoundRegistry.IMPACT_2)
-            .setHitspark(2)
-            .hyperArmor()
-            .setUB(true)
-            .setInfo("Stand Disk", "uninterruptable, removes enemy stand for 8s");
-    public static final Attack legcrusher = new Attack(4, 20, 0.75f, 22, 16, 1.75, 7f, 0.25f, AttackType.BOX, 1.6f, 0.2f, 0, JSoundRegistry.TW_KICK_HIT)
-            .setHitspark(2)
-            .setInfo("Leg Crusher", "high stun, medium windup");
-    public static final Attack memorydisk = new Attack(6, 30, 1f, 34, 22, 2, 7f, 0.0f, AttackType.BOX, 1f, 0, 0, JSoundRegistry.IMPACT_2)
-            .setHitspark(2)
-            .hyperArmor()
-            .setUB(true)
-            .setInfo("Memory Disk", "uninterruptable, mining fatigue & weakness for 30s");
+    public static final SimpleAttack<WhiteSnakeEntity> LIGHT = SimpleAttack.<WhiteSnakeEntity>lightAttack(7, 14, 5f, 12, 0.75f, 0.75f, 0.2f)
+            .withImpactSound(JSoundRegistry.IMPACT_3)
+            .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
+    public static final SimpleAttack<WhiteSnakeEntity> DONUT = new SimpleAttack<WhiteSnakeEntity>(280, 17, 36, 10, 28, 2, 0, 1, 0)
+            .withSound(JSoundRegistry.WS_DONUT)
+            .withImpactSound(JSoundRegistry.TW_DONUT_HIT)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withInfo(Text.literal("Donut"), Text.literal("slow combo starter/extender"));
+    public static final BarrageAttack<WhiteSnakeEntity> BARRAGE = new BarrageAttack<WhiteSnakeEntity>(340, 0, 60, 0.75f, 1, 20, 2, 0.25f, 0, 3)
+            .withSound(JSoundRegistry.WS_BARRAGE)
+            .withImpactSound(JSoundRegistry.IMPACT_3)
+            .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, medium stun"));
+    public static final EffectInflictingAttack<WhiteSnakeEntity> STAND_DISC = new EffectInflictingAttack<WhiteSnakeEntity>(600, 22, 34, 1, 8f, 20, 2, 0, 0, List.of(new StatusEffectInstance(JStatusRegistry.STANDLESS, 160, 0)))
+            .withSound(JSoundRegistry.WS_STAND_DISC)
+            .withImpactSound(JSoundRegistry.IMPACT_2)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHyperArmor()
+            .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
+            .withInfo(Text.literal("Stand Disk"), Text.literal("uninterruptable, removes enemy stand for 8s"));
+    public static final SimpleAttack<WhiteSnakeEntity> LEG_CRUSHER = new SimpleAttack<WhiteSnakeEntity>(400, 16, 22, 7, 32, 1.75f, 0.25f, 0.75f, 0.2f)
+            .withSound(JSoundRegistry.WS_LEGCRUSH)
+            .withImpactSound(JSoundRegistry.TW_KICK_HIT)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withInfo(Text.literal("Leg Crusher"), Text.literal("high stun, medium windup"))
+    public static final EffectInflictingAttack<WhiteSnakeEntity> MEMORY_DISC = new EffectInflictingAttack<WhiteSnakeEntity>(600, 22, 34, 1, 7f, 20, 2, 0, 0,
+            List.of(
+                    new StatusEffectInstance(StatusEffects.WEAKNESS, 600, 0),
+                    new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 600, 0)
+            ))
+            .withSound(JSoundRegistry.WS_MEMORY_DISC)
+            .withImpactSound(JSoundRegistry.IMPACT_2)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHyperArmor()
+            .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
+            .withInfo(Text.literal("Memory Disk"), Text.literal("uninterruptable, mining fatigue & weakness for 30s"));
     public static final Attack chargedspew = new Attack(7, 30, 0.75f, 26, 20, 2, 0f, 0, AttackType.BOX)
             .setUB(true)
             .setInfo("Charged Spew", "fires 5, slower acid balls");
@@ -77,15 +98,15 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
 
         freespace =
                 """
-                BNBs:
-                    -the el mayo (optimal damage with disk moves)
-                    Memory Disk>M1>Barrage>Leg Crusher>Stand Disk>M1
-                                
-                    -the gazebo (optimal damage without disk)
-                    M1>Barrage>Leg Crusher>Donut>M1
-                    
-                    -the protein shake (sets up mixups)
-                    M1>Barrage>Leg Crusher>Charged Spew""";
+                        BNBs:
+                            -the el mayo (optimal damage with disk moves)
+                            Memory Disk>M1>Barrage>Leg Crusher>Stand Disk>M1
+                                        
+                            -the gazebo (optimal damage without disk)
+                            M1>Barrage>Leg Crusher>Donut>M1
+                            
+                            -the protein shake (sets up mixups)
+                            M1>Barrage>Leg Crusher>Charged Spew""";
 
         moves = Lists.newArrayList(light, donut, barrage, memorydisk, standdisk, legcrusher, poisonspew,
                 new Attack().setInfo("Pilot Mode", ""));
@@ -93,32 +114,37 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         super.initialize();
     }
 
-    // Moveset
     @Override
-    public void initLightAttack() {
-        if (!canAttack()) return;
-        handleMove(light, CooldownType.STAND_LIGHT, State.LIGHT);
+    public void initMove(MoveType type) {
+        if (type != MoveType.UTIL) super.initMove(type);
+
+        if (!canAttack() || !hasUser()) return;
+        CooldownsComponent cooldowns = JComponents.getCooldowns(getUserOrThrow());
+        if (cooldowns.getCooldown(CooldownType.UTIL) > 0) return;
+
+        boolean newRemote = !getRemote();
+        setRemote(newRemote);
+
+        // TODO: update ultimate when going into/out of pilot mode
+        //if (newRemote) moves.set(4, meltyourheart);
+        //else moves.set(4, standdisk);
+
+        cooldowns.setCooldown(CooldownType.UTIL, 20);
     }
 
     @Override
-    public void initBarrage() {
-        if (!canAttack()) return;
-        if (handleMove(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
-            playSound(JSoundRegistry.WS_BARRAGE, 1, 1);
-    }
+    protected void registerMoves(MoveMap<WhiteSnakeEntity, State> moves) {
+        moves.register(MoveType.LIGHT, LIGHT, State.LIGHT);
+        moves.register(MoveType.HEAVY, DONUT, State.DONUT);
+        moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 
-    @Override
-    public void initHeavyAttack() {
-        if (!canAttack()) return;
-        if (handleMove(donut, CooldownType.STAND_HEAVY, State.DONUT))
-            playSound(JSoundRegistry.WS_DONUT, 1, 1);
-    }
+        moves.register(MoveType.SPECIAL1, MEMORY_DISC, State.DISC);
+        moves.register(MoveType.SPECIAL2, LEG_CRUSHER, State.LEG_CRUSHER);
+        moves.register(MoveType.SPECIAL3, POISON_SPEW, State.ACID_SPEW).withCrouchingVariant(State.ACID_SPEW_CHARGED);
+        moves.register(MoveType.ULT, STAND_DISC, State.DISC);
 
-    @Override
-    public void initSpecial1() {
-        if (!canAttack()) return;
-        if (handleMove(memorydisk, CooldownType.STAND_SP1, State.DISC))
-            playSound(JSoundRegistry.WS_MEMORY_DISC, 1, 1);
+        //todo: register pilot mode, but only as info
+        //moves.register(MoveType.UTIL, )
     }
 
     @Override
@@ -131,13 +157,6 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
     }
 
     @Override
-    public void initSpecial2() {
-        if (!canAttack()) return;
-        if (handleMove(legcrusher, CooldownType.STAND_SP2, State.LEG_CRUSHER))
-            playSound(JSoundRegistry.WS_LEGCRUSH, 1, 1);
-    }
-
-    @Override
     public void initSpecial3() {
         if (!canAttack() || !hasUser()) return;
 
@@ -146,65 +165,39 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         else handleMove(poisonspew, CooldownType.STAND_SP3, State.ACID_SPEW);
     }
 
-    @Override
-    public void initUtil() {
-        if (!canAttack() || !hasUser()) return;
-        CooldownsComponent cooldowns = JComponents.getCooldowns(getUser());
-        if (cooldowns.getCooldown(CooldownType.UTIL) > 0) return;
 
-        boolean newRemote = !getRemote();
-        setRemote(newRemote);
-
-        // Update movelist
-        if (newRemote) moves.set(4, meltyourheart);
-        else moves.set(4, standdisk);
-        cooldowns.setCooldown(CooldownType.UTIL, 20);
+    /*
+            case(5)->
+    { // Poison Spew
+        WSAcidProjectile acidProjectile = new WSAcidProjectile(world, user);
+        acidProjectile.setVelocity(user, user.getPitch(), user.getYaw(), 0, 1.33F, 0);
+        acidProjectile.setPosition(getEyePos());
+        world.spawnEntity(acidProjectile);
     }
 
-    @Override
-    public void specialAttack(Attack attack, Set<LivingEntity> entities) {
-        if (!hasUser()) return;
-
-        LivingEntity user = getUserOrThrow();
-        switch (attack.id) {
-            case (3) -> { // Stand Disc
-                for (LivingEntity ent : entities)
-                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegistry.STANDLESS, 160, 0, true, false));
-            }
-            case (5) -> { // Poison Spew
+            case(7)->
+    { // Charged Spew
+        for (int i = 0; i < 5; i++) {
+            WSAcidProjectile acidProjectile = new WSAcidProjectile(world, user);
+            acidProjectile.setVelocity(user, user.getPitch(), user.getYaw() - 75F + i * 37.5F, 0, 0.66F, 0);
+            acidProjectile.setPosition(getEyePos());
+            world.spawnEntity(acidProjectile);
+        }
+    }
+            case(8)->
+    { // Melt your Heart
+        for (int i = 0; i < 10; i++) {
+            float yaw = i * 36F - 180F + i * 3.6F;
+            for (int j = 0; j < 10; j++) {
                 WSAcidProjectile acidProjectile = new WSAcidProjectile(world, user);
-                acidProjectile.setVelocity(user, user.getPitch(), user.getYaw(), 0, 1.33F, 0);
+                acidProjectile.markMeltYourHeart();
+                acidProjectile.setVelocity(user, j * 36F - 180F, yaw, 0, 0.66F, 0);
                 acidProjectile.setPosition(getEyePos());
                 world.spawnEntity(acidProjectile);
             }
-            case (6) -> {
-                for (LivingEntity ent : entities) {
-                    ent.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 600, 0));
-                    ent.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 600, 0));
-                }
-            }
-            case (7) -> { // Charged Spew
-                for (int i = 0; i < 5; i++) {
-                    WSAcidProjectile acidProjectile = new WSAcidProjectile(world, user);
-                    acidProjectile.setVelocity(user, user.getPitch(), user.getYaw() - 75F + i * 37.5F, 0, 0.66F, 0);
-                    acidProjectile.setPosition(getEyePos());
-                    world.spawnEntity(acidProjectile);
-                }
-            }
-            case (8) -> { // Melt your Heart
-                for (int i = 0; i < 10; i++) {
-                    float yaw = i * 36F - 180F + i * 3.6F;
-                    for (int j = 0; j < 10; j++) {
-                        WSAcidProjectile acidProjectile = new WSAcidProjectile(world, user);
-                        acidProjectile.markMeltYourHeart();
-                        acidProjectile.setVelocity(user, j * 36F - 180F, yaw, 0, 0.66F, 0);
-                        acidProjectile.setPosition(getEyePos());
-                        world.spawnEntity(acidProjectile);
-                    }
-                }
-            }
         }
     }
+     */
 
     @Override
     public void tick() {
@@ -258,6 +251,11 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         addVelocity(remoteSpeed.x, remoteSpeed.y, remoteSpeed.z);
         velocityDirty = true;
         velocityModified = true;
+    }
+
+    @Override
+    protected WhiteSnakeEntity getThis() {
+        return this;
     }
 
     // Animation code

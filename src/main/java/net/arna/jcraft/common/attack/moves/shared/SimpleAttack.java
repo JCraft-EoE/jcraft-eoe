@@ -34,11 +34,6 @@ public class SimpleAttack<S extends StandEntity<?, ?>> extends AbstractSimpleAtt
         return new SimpleAttack<>(30, windup, duration, damage, stun, 1.5f, knockback, attackDistance, offset);
     }
 
-    public SimpleAttack<S> withHitSpark(JParticleType particle) {
-        this.hitSpark = particle;
-        return this;
-    }
-
     @Override
     protected @NonNull SimpleAttack<S> getThis() {
         return this;

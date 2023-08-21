@@ -159,9 +159,9 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
     }
 
     /**
-     * Sets whether the user can be back-stabbed while performing this attack.
+     * Sets whether the attack can backstab.
      * Defaults to {@code true}.
-     * @param canBackstab Whether the user can be backstabbed
+     * @param canBackstab Whether the attack can backstab
      * @return This attack
      */
     public T withBackstab(boolean canBackstab) {
@@ -232,6 +232,11 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
     public T withLaunch() {
         stunType = StunType.LAUNCH;
         overrideStun = true;
+        return getThis();
+    }
+
+    public T withHitSpark(JParticleType particle) {
+        hitSpark = particle;
         return getThis();
     }
 

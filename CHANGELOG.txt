@@ -1665,6 +1665,12 @@ Killer Queen: Bites the Dust
     >New Special 3 - Takedown
     >Taught the AI how to use KQ:BtD
 
+● 24/8/2023
+>Attack code optimized
+
+Whitesnake
+    >Donut cooldown reduced (18->14s)
+
 priority (top to bottom)
 todo: GE life giver changes
 
