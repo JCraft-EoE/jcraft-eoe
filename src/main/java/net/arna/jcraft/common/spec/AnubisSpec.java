@@ -140,4 +140,5 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
         public String getKey(AnubisSpec spec) {
             return key;
         }
-    }}
+    }
+}
