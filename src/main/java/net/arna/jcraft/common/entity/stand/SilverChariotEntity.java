@@ -313,7 +313,6 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             case REGULAR -> "";
             case ARMORLESS -> "_armorless";
             case POSSESSED -> "_possessed";
-            default -> throw new IllegalStateException("Unexpected value: " + silverChariot.getMode());
         })),
         STAB(builder -> builder.playAndHold("animation.silverchariot.stab")),
         BLOCK(builder -> builder.loop("animation.silverchariot.block")),
@@ -344,8 +343,8 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         }
 
         @Override
-        public void playAnimation(SilverChariotEntity stand, AnimationBuilder builder) {
-            animator.accept(stand, builder);
+        public void playAnimation(SilverChariotEntity attacker, AnimationBuilder builder) {
+            animator.accept(attacker, builder);
         }
     }
 

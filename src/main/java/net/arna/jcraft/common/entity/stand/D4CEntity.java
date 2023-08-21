@@ -7,6 +7,7 @@ import net.arna.jcraft.common.attack.core.StunType;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.item.MockItem;
 import net.arna.jcraft.common.util.*;
+import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.mixin.ChunkLightProviderAccessor;
 import net.arna.jcraft.mixin.LightStorageAccessor;
 import net.arna.jcraft.mixin.LightingProviderAccessor;
@@ -518,7 +519,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
         }
 
         @Override
-        public void playAnimation(D4CEntity stand, AnimationBuilder builder) {
+        public void playAnimation(D4CEntity attacker, AnimationBuilder builder) {
             animator.accept(builder);
         }
     }

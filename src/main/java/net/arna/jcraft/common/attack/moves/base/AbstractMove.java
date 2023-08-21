@@ -2,10 +2,10 @@ package net.arna.jcraft.common.attack.moves.base;
 
 import lombok.Getter;
 import lombok.NonNull;
+import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
-import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.MobilityType;
 import net.minecraft.entity.LivingEntity;
@@ -20,14 +20,14 @@ import java.util.List;
 import java.util.Set;
 
 @Getter
-public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends StandEntity<?, ?>> {
+public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAttacker<?, ?>> {
     private final List<SoundEvent> sounds = new ArrayList<>(), impactSounds = new ArrayList<>();
     private MoveType moveType;
     private int cooldown, windup;
     private int duration;
     private float moveDistance;
     private Text name, description;
-    private AbstractMove<?, ? super S> crouchingVariant, followUp;
+    private AbstractMove<?, ? super A> crouchingVariant, followUp;
     private boolean isCrouchingVariant;
     private int armor;
     protected MobilityType mobilityType;
@@ -104,7 +104,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends Stand
         return getThis();
     }
 
-    public T withCrouchingVariant(AbstractMove<?, ? super S> crouchingVariant) {
+    public T withCrouchingVariant(AbstractMove<?, ? super A> crouchingVariant) {
         this.crouchingVariant = crouchingVariant.copy();
         this.crouchingVariant.isCrouchingVariant = true;
         return getThis();
@@ -115,7 +115,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends Stand
      * @param followUp The move that will be initiated after this move is performed.
      * @return This move
      */
-    public T withFollowUp(AbstractMove<?, ? super S> followUp) {
+    public T withFollowUp(AbstractMove<?, ? super A> followUp) {
         this.followUp = followUp.copy();
         return getThis();
     }
@@ -175,32 +175,32 @@ public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends Stand
 
     /**
      * Called when this move is initialized.
+     * By default, only plays the sound(s).
      */
-    public void onInitialize(S attacker) {}
+    public void onInitialize(A attacker) {
+        if (attacker.getMoveStun() == getDuration())
+            sounds.forEach(sound -> attacker.playSound(sound, 1f, 1f));
+    }
 
     /**
      * Called every tick so long as this move is active.
      * Called separately for each attacker.
-     * Invokes the {@link #perform(StandEntity, LivingEntity, MoveContext)} method if {@link #shouldPerform(StandEntity)}
-     * returns {@code true} by default and plays the sound, but can be overridden to do whatever you want it to.
+     * Invokes the {@link #perform(IAttacker, LivingEntity, MoveContext)} method if {@link #shouldPerform(IAttacker)}
+     * returns {@code true} by default, but can be overridden to do whatever you want it to.
      * @param attacker The attacker to tick for.
      */
-    public void tick(S attacker) {
-        // Play the sound(s) in the first tick.
-        if (attacker.getMoveStun() == getDuration())
-            sounds.forEach(sound -> attacker.playSound(sound, 1f, 1f));
-
+    public void tick(A attacker) {
         if (shouldPerform(attacker))
             perform(attacker, attacker.getUserOrThrow(), attacker.getMoveContext());
     }
 
     /**
-     * Returns whether {@link #perform(StandEntity, LivingEntity, MoveContext)} should be called this tick.
-     * @param stand The stand to check for.
+     * Returns whether {@link #perform(IAttacker, LivingEntity, MoveContext)} should be called this tick.
+     * @param attacker The stand to check for.
      * @return Whether this move should be performed this tick.
      */
-    protected boolean shouldPerform(S stand) {
-        return stand.getMoveStun() == duration - windup && stand.hasUser();
+    protected boolean shouldPerform(A attacker) {
+        return attacker.getMoveStun() == duration - windup && attacker.hasUser();
     }
 
     /**
@@ -210,7 +210,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends Stand
      * @param ctx The move context in which to store data.
      * @return A set of all targeted entities.
      */
-    public abstract @NonNull Set<LivingEntity> perform(S attacker, LivingEntity user, MoveContext ctx);
+    public abstract @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user, MoveContext ctx);
 
     /**
      * Register entries in the move context of a stand to be used by this move.
@@ -225,13 +225,13 @@ public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends Stand
      * @param stand The stand to get the blow for
      * @return The current blow of this move for the given stand
      */
-    public int getBlow(S stand) {
+    public int getBlow(A stand) {
         return 0;
     }
 
     // Utility methods
 
-    public LivingEntity getUser(S attacker) {
+    public LivingEntity getUser(A attacker) {
         return attacker.getUserOrThrow();//attacker instanceof StandEntity<?,?> stand ? stand.getUserOrThrow() : attacker;
     }
 
@@ -248,7 +248,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends Stand
      * @param stand The stand to check for
      * @return Whether the windup has passed
      */
-    public boolean hasWindupPassed(StandEntity<?, ?> stand) {
+    public boolean hasWindupPassed(IAttacker<?, ?> stand) {
         return stand.getMoveStun() <= getWindupPoint();
     }
 
@@ -262,27 +262,28 @@ public abstract class AbstractMove<T extends AbstractMove<T, S>, S extends Stand
     }
 
     /**
-     * Acquires the rotation vector for the given stand, taking gravity into account.
-     * @param stand The stand to get the rotation vector for
-     * @return The rotation vector for the given stand
+     * Acquires the rotation vector for the given attacker, taking gravity into account.
+     * @param attacker The attacker to get the rotation vector for
+     * @return The rotation vector for the given attacker
      */
-    protected Vec3d getRotVec(S stand) {
-        Vec3d rotVec = stand.getRotationVector();
-        if (getGravDir(stand.getUserOrThrow()) == Direction.UP)
+    protected Vec3d getRotVec(A attacker) {
+        LivingEntity baseEntity = attacker.getBaseEntity();
+        Vec3d rotVec = baseEntity.getRotationVector();
+        if (getGravDir(attacker.getUserOrThrow()) == Direction.UP)
             rotVec = new Vec3d(rotVec.x, -rotVec.y, rotVec.z);
 
         return rotVec;
     }
 
     /**
-     * Acquires the position of the stand's eyes while taking the gravity of the user into account.
-     * @param stand The stand to get the eye position for
-     * @return The eye position of the given stand
+     * Acquires the position of the attacker's eyes while taking the gravity of the user into account.
+     * @param attacker The attacker to get the eye position for
+     * @return The eye position of the given attacker
      */
-    protected Vec3d getOffsetHeightPos(S stand) {
-        Vec3d upVec = GravityChangerAPI.getEyeOffset(stand.getUserOrThrow());
+    protected Vec3d getOffsetHeightPos(A attacker) {
+        Vec3d upVec = GravityChangerAPI.getEyeOffset(attacker.getUserOrThrow());
         Vec3d heightOffset = upVec.multiply(0.5);
-        return stand.getPos().add(heightOffset);
+        return attacker.getBaseEntity().getPos().add(heightOffset);
     }
 
     /**

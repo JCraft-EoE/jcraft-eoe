@@ -8,7 +8,7 @@ import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.network.s2c.JExplosionPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.common.spec.JCraftSpec;
+import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.splatter.JSplatterManager;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
@@ -169,7 +169,7 @@ public final class JUtils {
         return toReturn;
     }
 
-    public static JCraftSpec getSpec(PlayerEntity player) {
+    public static JSpec getSpec(PlayerEntity player) {
         return JComponents.getSpecData(player).getSpec();
     }
 

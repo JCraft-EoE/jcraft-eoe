@@ -234,7 +234,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
         }
 
         @Override
-        public void playAnimation(GoldExperienceEntity stand, AnimationBuilder builder) {
+        public void playAnimation(GoldExperienceEntity attacker, AnimationBuilder builder) {
             animator.accept(builder);
         }
     }

@@ -209,7 +209,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
         }
 
         @Override
-        public void playAnimation(TheWorldEntity stand, AnimationBuilder builder) {
+        public void playAnimation(TheWorldEntity attacker, AnimationBuilder builder) {
             animator.accept(builder);
         }
     }

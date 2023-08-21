@@ -130,7 +130,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
         }
 
         @Override
-        public void playAnimation(MagiciansRedEntity stand, AnimationBuilder builder) {
+        public void playAnimation(MagiciansRedEntity attacker, AnimationBuilder builder) {
             animator.accept(builder);
         }
     }

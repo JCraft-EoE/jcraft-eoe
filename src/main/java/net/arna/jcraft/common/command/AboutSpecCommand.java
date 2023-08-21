@@ -4,7 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.arna.jcraft.common.attack.core.old.Attack;
-import net.arna.jcraft.common.spec.JCraftSpec;
+import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -31,7 +31,7 @@ public class AboutSpecCommand {
     public static int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
 
-        JCraftSpec spec = JUtils.getSpec(player);
+        JSpec spec = JUtils.getSpec(player);
         if (spec != null) {
             StringBuilder readout = new StringBuilder("Name: §e");
 

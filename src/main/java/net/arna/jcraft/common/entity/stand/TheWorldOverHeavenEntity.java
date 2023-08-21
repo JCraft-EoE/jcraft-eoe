@@ -481,7 +481,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         }
 
         @Override
-        public void playAnimation(TheWorldOverHeavenEntity stand, AnimationBuilder builder) {
+        public void playAnimation(TheWorldOverHeavenEntity attacker, AnimationBuilder builder) {
             animator.accept(builder);
         }
     }

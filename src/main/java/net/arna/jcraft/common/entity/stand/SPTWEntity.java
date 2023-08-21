@@ -235,7 +235,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
         }
 
         @Override
-        public void playAnimation(SPTWEntity stand, AnimationBuilder builder) {
+        public void playAnimation(SPTWEntity attacker, AnimationBuilder builder) {
             animator.accept(builder);
         }
     }

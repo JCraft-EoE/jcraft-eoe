@@ -468,7 +468,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
         }
 
         @Override
-        public void playAnimation(CMoonEntity stand, AnimationBuilder builder) {
+        public void playAnimation(CMoonEntity attacker, AnimationBuilder builder) {
             animator.accept(builder);
         }
     }

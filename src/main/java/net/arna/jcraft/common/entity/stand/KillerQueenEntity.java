@@ -113,7 +113,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
         }
 
         @Override
-        public void playAnimation(KillerQueenEntity stand, AnimationBuilder builder) {
+        public void playAnimation(KillerQueenEntity attacker, AnimationBuilder builder) {
             animator.accept(builder);
         }
     }

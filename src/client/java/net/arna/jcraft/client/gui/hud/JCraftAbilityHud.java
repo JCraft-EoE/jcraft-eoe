@@ -5,33 +5,24 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import lombok.experimental.UtilityClass;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.JClientConfig;
-import net.arna.jcraft.client.JCraftClient;
 import net.arna.jcraft.client.util.RenderUtils;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.StandEntity;
-import net.arna.jcraft.common.spec.JCraftSpec;
-import net.arna.jcraft.common.util.ColorUtils;
+import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.random.Random;
-import org.apache.commons.lang3.StringUtils;
 
-import java.util.List;
 import java.util.Map;
-
-import static net.arna.jcraft.client.JCraftClient.*;
 
 @UtilityClass
 public class JCraftAbilityHud extends DrawableHelper {
@@ -126,7 +117,7 @@ public class JCraftAbilityHud extends DrawableHelper {
             int selectedX = getHudX(client.getWindow().getScaledWidth(), 48);
             int selectedY = isMid ? iconSpacing * 11 : 0;
 
-            JCraftSpec spec = JUtils.getSpec(player);
+            JSpec spec = JUtils.getSpec(player);
 
             if (stand == null) {
                 // Render cooldown HUD for specs

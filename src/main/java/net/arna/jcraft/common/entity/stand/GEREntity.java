@@ -467,7 +467,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         }
 
         @Override
-        public void playAnimation(GEREntity stand, AnimationBuilder builder) {
+        public void playAnimation(GEREntity attacker, AnimationBuilder builder) {
             animator.accept(builder);
         }
     }

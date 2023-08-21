@@ -1,9 +1,14 @@
 package net.arna.jcraft.common.spec;
 
+import net.arna.jcraft.common.attack.core.MoveMap;
+import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.old.Attack;
 import net.arna.jcraft.common.attack.core.old.AttackType;
+import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.util.CooldownType;
+import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.common.util.SpecAnimationState;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
@@ -12,16 +17,27 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
 
 import java.util.List;
 import java.util.Set;
 
-public class AnubisSpec extends JCraftSpec {
+public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
+    public static final SimpleAttack<AnubisSpec> SLASH = new SimpleAttack<AnubisSpec>(340, 9, 20, 6f,
+            15, 1.75f, 0.9f, 1f, 0f)
+            .withImpactSound(SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP)
+            .withHitSpark(JParticleType.SWEEP_ATTACK)
+            .withHyperArmor()
+            .withInfo(Text.literal("Slash"), Text.literal("uninterruptible get-off-me tool"));
     public static final Attack slash = new Attack(0, 17, 1f, 20, 9, 1.75, 6f, 0.9f, AttackType.BOX, 0.75f, 0, 0, SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP)
             .setAnimation("an.slsh")
             .setHitspark(-4)
             .hyperArmor()
             .setInfo("Slash", "uninterruptable get-off-me tool");
+    public static final SimpleAttack<AnubisSpec> POMMEL = new SimpleAttack<AnubisSpec>(280, 5, 8,
+            4f, 7, 1.25f, 0.3f, 1f, 0f)
+            .withSound(JSoundRegistry.ANUBIS_POMMEL)
+            .withImpactSound(JSoundRegistry.IMPACT_3);
     public static final Attack pommel = new Attack(1, 14, 1f, 8, 5, 1.25, 4f, 0.3f, AttackType.BOX, 0.35f, 0, 0, JSoundRegistry.IMPACT_3)
             .setAnimation("an.pom")
             .setInfo("Pommel Strike", "speedy counterpoke, usable while sheathed");
@@ -73,17 +89,26 @@ public class AnubisSpec extends JCraftSpec {
         return 2;
     }
 
+    @Override
+    protected void registerMoves(MoveMap<AnubisSpec, State> moves) {
+        moves.register(MoveType.SPECIAL1, SLASH, CooldownType.SP1, State.SLASH);
+    }
+
+    @Override
+    protected AnubisSpec getThis() {
+        return this;
+    }
+
     // Attacks
     @Override
     public void initHeavyAttack(ServerWorld serverWorld) {
         if (!canAttack()) return;
-        if (handleAttack(serverWorld, player.isHolding(JObjectRegistry.ANUBIS) ? pommel : pommelIn, CooldownType.HEAVY, attackSpeedMult))
-            JUtils.serverPlaySound(JSoundRegistry.ANUBIS_POMMEL, serverWorld, player.getPos());
+        handleMove(MoveType.HEAVY, attackSpeedMult);
     }
 
     /*
     @Override
-    public void InitBarrage(ServerWorld serverWorld) {
+    public void initBarrage(ServerWorld serverWorld) {
         if (!canAttack()) return;
         handleAttack(serverWorld, barrage, JCraft.barrageCD);
     }
@@ -93,7 +118,7 @@ public class AnubisSpec extends JCraftSpec {
     public void initSpecial1(ServerWorld serverWorld) {
         if (!canAttack()) return;
         if (!player.isHolding(JObjectRegistry.ANUBIS)) return;
-        if (handleAttack(serverWorld, slash, CooldownType.SP1, attackSpeedMult))
+        if (handleAttack(slash, CooldownType.SP1, attackSpeedMult))
             JUtils.serverPlaySound(JSoundRegistry.ANUBIS_SLASH, serverWorld, player.getPos());
     }
 
@@ -101,17 +126,17 @@ public class AnubisSpec extends JCraftSpec {
     public void initSpecial2(ServerWorld serverWorld) {
         if (!canAttack()) return;
         if (!player.isHolding(JObjectRegistry.ANUBIS)) return;
-        if (handleAttack(serverWorld, rekkas2, CooldownType.SP2, attackSpeedMult))
+        if (handleAttack(rekkas2, CooldownType.SP2, attackSpeedMult))
             JUtils.serverPlaySound(JSoundRegistry.ANUBIS_REKKA2, serverWorld, player.getPos());
     }
 
     @Override
     public void initSpecial3(ServerWorld serverWorld) {
         if (!canAttack()) return;
-        if (player.isHolding(JObjectRegistry.ANUBIS) && handleAttack(serverWorld, rekkas3, CooldownType.SP2, attackSpeedMult)) {
+        if (player.isHolding(JObjectRegistry.ANUBIS) && handleAttack(rekkas3, CooldownType.SP2, attackSpeedMult)) {
             JUtils.serverPlaySound(JSoundRegistry.ANUBIS_REKKA3, serverWorld, player.getPos());
         } else {
-            handleAttack(serverWorld, sweep, CooldownType.SP3, attackSpeedMult);
+            handleAttack(sweep, CooldownType.SP3, attackSpeedMult);
             player.addStatusEffect(
                     new StatusEffectInstance(StatusEffects.SLOWNESS, sweep.moveStun, 2, true, false)
             );
@@ -138,8 +163,28 @@ public class AnubisSpec extends JCraftSpec {
     public void tickSpec() {
         super.tickSpec();
         if (++ticksSinceLastHit > 100 && attackSpeedMult > 1f) {
-            ticksSinceLastHit = 0; // Technically untrue, but all this serves is for counting 5s since last hit then rolling over
+            ticksSinceLastHit = 0; // Technically untrue, but all this serves for is counting 5s since last hit then rolling over
             attackSpeedMult -= 0.25f;
+        }
+    }
+
+    public enum State implements SpecAnimationState<AnubisSpec> {
+        SLASH("an.slsh"),
+        POMMEL("an.pom"),
+        POMMEL_IN("an.pmi"),
+        REKKAS2("an.2hit"),
+        REKKAS3("an.3hit"),
+        SWEEP("an.swp");
+
+        private final String key;
+
+        State(String key) {
+            this.key = key;
+        }
+
+        @Override
+        public String getKey(AnubisSpec spec) {
+            return key;
         }
     }
 }

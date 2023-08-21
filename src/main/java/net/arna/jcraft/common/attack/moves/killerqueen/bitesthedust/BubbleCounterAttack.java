@@ -19,15 +19,15 @@ public class BubbleCounterAttack extends AbstractCounterAttack<BubbleCounterAtta
     }
 
     @Override
-    public void whiff(@NonNull KQBTDEntity stand, @NonNull LivingEntity user) {
-        stand.setMove(missAttack, KQBTDEntity.State.COUNTER_MISS);
+    public void whiff(@NonNull KQBTDEntity attacker, @NonNull LivingEntity user) {
+        attacker.setMove(missAttack, KQBTDEntity.State.COUNTER_MISS);
         StandEntity.stun(user, missAttack.getDuration(), 0);
     }
 
     @Override
-    public void counter(@NonNull KQBTDEntity stand, Entity countered, DamageSource counteredDamageSource) {
-        super.counter(stand, countered, counteredDamageSource);
-        if (countered == null || !stand.hasUser() || counteredDamageSource.isMagic()) return;
+    public void counter(@NonNull KQBTDEntity attacker, Entity countered, DamageSource counteredDamageSource) {
+        super.counter(attacker, countered, counteredDamageSource);
+        if (countered == null || !attacker.hasUser() || counteredDamageSource.isMagic()) return;
 
         if (countered instanceof LivingEntity livingEntity) {
             StandEntity.stun(livingEntity, 10, 3);
@@ -37,8 +37,8 @@ public class BubbleCounterAttack extends AbstractCounterAttack<BubbleCounterAtta
                 counteredStand.cancelAttack();
         }
 
-        stand.getMoveContext().set(BombPlantAttack.BOMB_ENTITY, countered);
-        stand.getMoveContext().set(BombPlantAttack.BOMB_POS, null);
+        attacker.getMoveContext().set(BombPlantAttack.BOMB_ENTITY, countered);
+        attacker.getMoveContext().set(BombPlantAttack.BOMB_POS, null);
         //stand.playSound(JSoundRegistry.BTD_COUNTER_HIT, 1, 1);
     }
 

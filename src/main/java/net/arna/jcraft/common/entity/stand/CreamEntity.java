@@ -588,8 +588,8 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         }
 
         @Override
-        public void playAnimation(CreamEntity stand, AnimationBuilder builder) {
-            animator.accept(stand, builder);
+        public void playAnimation(CreamEntity attacker, AnimationBuilder builder) {
+            animator.accept(attacker, builder);
         }
     }
 

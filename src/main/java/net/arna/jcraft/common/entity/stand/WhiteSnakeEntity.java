@@ -288,7 +288,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         }
 
         @Override
-        public void playAnimation(WhiteSnakeEntity stand, AnimationBuilder builder) {
+        public void playAnimation(WhiteSnakeEntity attacker, AnimationBuilder builder) {
             animator.accept(builder);
         }
     }

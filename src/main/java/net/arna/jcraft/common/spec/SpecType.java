@@ -22,7 +22,7 @@ public enum SpecType {
     private static final Int2ObjectMap<SpecType> byId = getAllSpecTypes().stream()
             .collect(Int2ObjectOpenHashMap::new, (map, type) -> map.put(type.getId(), type), Int2ObjectMap::putAll);
 
-    private final Supplier<@Nullable JCraftSpec> specSupplier;
+    private final Supplier<@Nullable JSpec> specSupplier;
     @Getter
     private final int id;
     @Getter
@@ -30,10 +30,10 @@ public enum SpecType {
     @Getter
     private final Text translatableName;
 
-    SpecType(Supplier<@Nullable JCraftSpec> specSupplier) {
+    SpecType(Supplier<@Nullable JSpec> specSupplier) {
         this.specSupplier = specSupplier;
 
-        JCraftSpec spec = createNew();
+        JSpec spec = createNew();
         if (spec != null) {
             id = spec.getId();
             internalName = spec.getInternalName();
@@ -45,7 +45,7 @@ public enum SpecType {
         }
     }
 
-    public JCraftSpec createNew() {
+    public JSpec createNew() {
         return specSupplier.get();
     }
 

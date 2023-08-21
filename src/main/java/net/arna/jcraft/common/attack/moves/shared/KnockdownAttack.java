@@ -2,9 +2,9 @@ package net.arna.jcraft.common.attack.moves.shared;
 
 import lombok.Getter;
 import lombok.NonNull;
+import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
-import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.LivingEntity;
@@ -13,7 +13,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import java.util.Set;
 
 @Getter
-public class KnockdownAttack<S extends StandEntity<?, ?>> extends AbstractSimpleAttack<KnockdownAttack<S>, S> {
+public class KnockdownAttack<A extends IAttacker<?, ?>> extends AbstractSimpleAttack<KnockdownAttack<A>, A> {
     private final int knockdownDuration;
 
     public KnockdownAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun,
@@ -23,7 +23,7 @@ public class KnockdownAttack<S extends StandEntity<?, ?>> extends AbstractSimple
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(S attacker, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user, MoveContext ctx) {
         Set<LivingEntity> targets = super.perform(attacker, user, ctx);
         for (LivingEntity target : targets)
             if (!JUtils.isBlocking(target))
@@ -33,12 +33,12 @@ public class KnockdownAttack<S extends StandEntity<?, ?>> extends AbstractSimple
     }
 
     @Override
-    protected @NonNull KnockdownAttack<S> getThis() {
+    protected @NonNull KnockdownAttack<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull KnockdownAttack<S> copy() {
+    public @NonNull KnockdownAttack<A> copy() {
         return new KnockdownAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
                 getHitboxSize(), getKnockback(), getOffset(), knockdownDuration);
     }

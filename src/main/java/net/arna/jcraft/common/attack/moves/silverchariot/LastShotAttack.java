@@ -21,8 +21,8 @@ public class LastShotAttack extends AbstractMove<LastShotAttack, SilverChariotEn
 
         RapierProjectile rapier = new RapierProjectile(attacker.world, user, attacker);
         rapier.setVelocity(attacker, user.getPitch(), user.getYaw(), 0, 2, 1);
-        rapier.setSkin(attacker.getMode() != 1 ?
-                        -attacker.getMode() + 1 : // Modes 2 and 3 output -1 and -2
+        rapier.setSkin(attacker.getMode() != SilverChariotEntity.Mode.ARMORLESS ?
+                        -attacker.getMode().ordinal() : // Armorless and possessed output -1 and -2
                         attacker.getSkin());
         attacker.world.spawnEntity(rapier);
         attacker.setHasRapier(false);

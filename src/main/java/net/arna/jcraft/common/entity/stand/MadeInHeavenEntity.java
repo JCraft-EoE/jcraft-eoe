@@ -551,7 +551,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
         }
 
         @Override
-        public void playAnimation(MadeInHeavenEntity stand, AnimationBuilder builder) {
+        public void playAnimation(MadeInHeavenEntity attacker, AnimationBuilder builder) {
             animator.accept(builder);
         }
     }

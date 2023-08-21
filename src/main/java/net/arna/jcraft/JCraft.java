@@ -18,7 +18,7 @@ import net.arna.jcraft.common.network.c2s.InputSyncPacket;
 import net.arna.jcraft.common.network.c2s.OnConnectedPacket;
 import net.arna.jcraft.common.network.c2s.StandControlPacket;
 import net.arna.jcraft.common.network.s2c.*;
-import net.arna.jcraft.common.spec.JCraftSpec;
+import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.*;
 import net.fabricmc.api.ModInitializer;
@@ -281,7 +281,7 @@ public class JCraft implements ModInitializer {
 
         // Syncs dash anim (unless already attacking with a spec) with every player in the vicinity
         if (entity instanceof ServerPlayerEntity player) {
-            JCraftSpec spec = JUtils.getSpec(player);
+            JSpec spec = JUtils.getSpec(player);
 
             if (spec == null || spec.moveStun < 1)
                 PlayerLookup.around((ServerWorld) entity.getWorld(), entity.getPos(), 96).forEach( //todo: find a less arbitrary number for radius here

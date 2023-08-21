@@ -193,7 +193,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
         }
 
         @Override
-        public void playAnimation(KQBTDEntity stand, AnimationBuilder builder) {
+        public void playAnimation(KQBTDEntity attacker, AnimationBuilder builder) {
             animator.accept(builder);
         }
     }

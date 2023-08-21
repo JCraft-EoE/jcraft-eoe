@@ -1,11 +1,11 @@
 package net.arna.jcraft.common.attack.moves.shared;
 
 import lombok.NonNull;
+import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
-import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.JParticleType;
 
-public class SimpleAttack<S extends StandEntity<?, ?>> extends AbstractSimpleAttack<SimpleAttack<S>, S> {
+public class SimpleAttack<A extends IAttacker<?, ?>> extends AbstractSimpleAttack<SimpleAttack<A>, A> {
     /**
      * Creates a new simple attack with a single hitbox.
      * @param cooldown The cooldown for this attack in ticks.
@@ -29,18 +29,23 @@ public class SimpleAttack<S extends StandEntity<?, ?>> extends AbstractSimpleAtt
      * @param attackDistance The distance at which the hitbox is placed.
      * @param offset The amount the hitbox is offset by.
      */
-    public static <S extends StandEntity<?, ?>> SimpleAttack<S> lightAttack(int windup, int duration, float damage,
+    public static <A extends IAttacker<?, ?>> SimpleAttack<A> lightAttack(int windup, int duration, float damage,
                                                                             int stun, float knockback, float attackDistance, float offset) {
         return new SimpleAttack<>(30, windup, duration, damage, stun, 1.5f, knockback, attackDistance, offset);
     }
 
-    @Override
-    protected @NonNull SimpleAttack<S> getThis() {
+    public SimpleAttack<A> withHitSpark(JParticleType particle) {
+        this.hitSpark = particle;
         return this;
     }
 
     @Override
-    public @NonNull SimpleAttack<S> copy() {
+    protected @NonNull SimpleAttack<A> getThis() {
+        return this;
+    }
+
+    @Override
+    public @NonNull SimpleAttack<A> copy() {
         return new SimpleAttack<>(getCooldown(), getWindup(), getDuration(), getDamage(), getStun(), getHitboxSize(),
                 getKnockback(), getMoveDistance(), getOffset());
     }

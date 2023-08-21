@@ -21,17 +21,17 @@ public class FeignBarrageCounterAttack extends AbstractCounterAttack<FeignBarrag
     }
 
     @Override
-    public void whiff(@NonNull TheWorldEntity stand, @NonNull LivingEntity user) {
-        stand.setMove(missAttack, TheWorldEntity.State.COUNTER_MISS);
+    public void whiff(@NonNull TheWorldEntity attacker, @NonNull LivingEntity user) {
+        attacker.setMove(missAttack, TheWorldEntity.State.COUNTER_MISS);
         StandEntity.stun(user, missAttack.getDuration(), 0);
     }
 
     @Override
-    public void counter(@NonNull TheWorldEntity stand, Entity countered, DamageSource counteredDamageSource) {
-        super.counter(stand, countered, counteredDamageSource);
+    public void counter(@NonNull TheWorldEntity attacker, Entity countered, DamageSource counteredDamageSource) {
+        super.counter(attacker, countered, counteredDamageSource);
 
-        if (countered == null || !stand.hasUser()) return;
-        LivingEntity user = stand.getUserOrThrow();
+        if (countered == null || !attacker.hasUser()) return;
+        LivingEntity user = attacker.getUserOrThrow();
         Vec3d behind = countered.getPos().subtract(countered.getRotationVector());
 
         user.setVelocity(0, 0, 0);
@@ -46,8 +46,8 @@ public class FeignBarrageCounterAttack extends AbstractCounterAttack<FeignBarrag
                 counteredStand.cancelAttack();
         }
 
-        stand.setMove(TheWorldEntity.COUNTER_FOLLOWUP, TheWorldEntity.State.COUNTER_HIT);
-        stand.playSound(JSoundRegistry.TIME_SKIP, 1, 1);
+        attacker.setMove(TheWorldEntity.COUNTER_FOLLOWUP, TheWorldEntity.State.COUNTER_HIT);
+        attacker.playSound(JSoundRegistry.TIME_SKIP, 1, 1);
     }
 
     @Override

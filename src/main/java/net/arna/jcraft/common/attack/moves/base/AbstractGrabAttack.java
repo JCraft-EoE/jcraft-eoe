@@ -2,21 +2,20 @@ package net.arna.jcraft.common.attack.moves.base;
 
 import lombok.Getter;
 import lombok.NonNull;
+import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
-import net.arna.jcraft.common.entity.stand.StandEntity;
-import net.arna.jcraft.common.util.StandAnimationState;
 import net.minecraft.entity.LivingEntity;
 
 import java.util.Set;
 
 @Getter
-public abstract class AbstractGrabAttack<T extends AbstractGrabAttack<T, S, A>, S extends StandEntity<S, A>, A extends Enum<A> & StandAnimationState<S>>
-        extends AbstractSimpleAttack<T, S> {
-    private final AbstractMove<?, S> hitMove;
-    private final A hitState;
+public abstract class AbstractGrabAttack<T extends AbstractGrabAttack<T, A, S>, A extends IAttacker<A, S>, S>
+        extends AbstractSimpleAttack<T, A> {
+    private final AbstractMove<?, ? super A> hitMove;
+    private final S hitState;
 
     public AbstractGrabAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun, float hitboxSize,
-                              float knockback, float offset, AbstractMove<?, S> hitMove, A hitState) {
+                              float knockback, float offset, AbstractMove<?, ? super A> hitMove, S hitState) {
         super(cooldown, windup, duration, attackDistance, damage, stun, hitboxSize, knockback, offset);
         grab = true;
         this.hitMove = hitMove;
@@ -24,7 +23,7 @@ public abstract class AbstractGrabAttack<T extends AbstractGrabAttack<T, S, A>, 
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(S attacker, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user, MoveContext ctx) {
         Set<LivingEntity> targets = super.perform(attacker, user, ctx);
         if (targets.isEmpty()) return targets;
 
