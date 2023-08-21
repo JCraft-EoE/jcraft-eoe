@@ -1,5 +1,7 @@
 package net.arna.jcraft.common.attack.core;
 
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.MultimapBuilder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NonNull;
@@ -8,14 +10,13 @@ import net.arna.jcraft.common.util.CooldownType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumMap;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class MoveMap<A extends IAttacker<A, S>, S> implements Iterable<MoveMap.Entry<A, S>> {
-    private final Map<MoveType, Entry<A, S>> moves = new EnumMap<>(MoveType.class);
+    private final ListMultimap<MoveType, Entry<A, S>> moves = MultimapBuilder.enumKeys(MoveType.class).arrayListValues().build();
     @Getter
     private boolean frozen = false;
 
@@ -44,9 +45,17 @@ public class MoveMap<A extends IAttacker<A, S>, S> implements Iterable<MoveMap.E
         frozen = true;
     }
 
-    public Entry<A, S> getEntry(MoveType type) {
-        return Optional.ofNullable(moves.get(type)).orElseThrow(() -> new IllegalArgumentException("MoveMap has no " +
-                "move of type " + type));
+    @NonNull
+    public List<Entry<A, S>> getEntries(MoveType type) {
+        return Collections.unmodifiableList(moves.get(type));
+    }
+
+    @Nullable
+    public Entry<A, S> getFirstValidEntry(MoveType type, A attacker) {
+        return getEntries(type).stream()
+                .filter(entry -> entry.getMove().onInitialize(attacker))
+                .findFirst()
+                .orElse(null);
     }
 
     private void checkFrozen() {

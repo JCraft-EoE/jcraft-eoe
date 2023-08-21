@@ -21,11 +21,12 @@ public class CircleSlashAttack extends AbstractSimpleAttack<CircleSlashAttack, S
     }
 
     @Override
-    public void onInitialize(SilverChariotEntity attacker) {
-        super.onInitialize(attacker);
+    public boolean onInitialize(SilverChariotEntity attacker) {
+        if (!super.onInitialize(attacker)) return false;
 
         // Reset damage
         withDamage(originalDamage);
+        return true;
     }
 
     @Override

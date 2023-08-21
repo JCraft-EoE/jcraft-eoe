@@ -20,9 +20,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class AbstractMultiHitAttack<T extends AbstractMultiHitAttack<T, A>, A extends IAttacker<?, ?>> extends AbstractSimpleAttack<T, A> {
     private IntSortedSet hitMoments;
 
-    protected AbstractMultiHitAttack(int cooldown, int duration, float attackDistance, float damage, int stun,
+    protected AbstractMultiHitAttack(int cooldown, int duration, float moveDistance, float damage, int stun,
                                      float hitboxSize, float knockback, float offset, @NonNull IntCollection hitMoments) {
-        super(cooldown, hitMoments.intStream().min().orElse(0), duration, attackDistance, damage, stun, hitboxSize, knockback, offset);
+        super(cooldown, hitMoments.intStream().min().orElse(0), duration, moveDistance, damage, stun, hitboxSize, knockback, offset);
 
         withHitMoments(hitMoments);
     }

@@ -26,7 +26,9 @@ public class DummyAttack<A extends IAttacker<?, ?>> extends AbstractMove<DummyAt
     }
 
     @Override
-    public void onInitialize(A attacker) {}
+    public boolean onInitialize(A attacker) {
+        return false;
+    }
 
     @Override
     public void tick(A attacker) {}

@@ -3,33 +3,21 @@ package net.arna.jcraft.common.attack.moves.shared;
 import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.IAttacker;
-import net.arna.jcraft.common.attack.core.ctx.MoveContext;
-import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
-import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.common.attack.moves.base.AbstractEffectInflictingAttack;
 import net.arna.jcraft.registry.JStatusRegistry;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 
-import java.util.Set;
+import java.util.List;
 
 @Getter
-public class KnockdownAttack<A extends IAttacker<?, ?>> extends AbstractSimpleAttack<KnockdownAttack<A>, A> {
+public class KnockdownAttack<A extends IAttacker<?, ?>> extends AbstractEffectInflictingAttack<KnockdownAttack<A>, A> {
     private final int knockdownDuration;
 
-    public KnockdownAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun,
+    public KnockdownAttack(int cooldown, int windup, int duration, float moveDistance, float damage, int stun,
                            float hitboxSize, float knockback, float offset, int knockdownDuration) {
-        super(cooldown, windup, duration, attackDistance, damage, stun, hitboxSize, knockback, offset);
+        super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset,
+                List.of(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, knockdownDuration, 0)));
         this.knockdownDuration = knockdownDuration;
-    }
-
-    @Override
-    public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user, MoveContext ctx) {
-        Set<LivingEntity> targets = super.perform(attacker, user, ctx);
-        for (LivingEntity target : targets)
-            if (!JUtils.isBlocking(target))
-                target.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, knockdownDuration, 0));
-
-        return targets;
     }
 
     @Override
@@ -40,6 +28,6 @@ public class KnockdownAttack<A extends IAttacker<?, ?>> extends AbstractSimpleAt
     @Override
     public @NonNull KnockdownAttack<A> copy() {
         return new KnockdownAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getHitboxSize(), getKnockback(), getOffset(), knockdownDuration);
+                getHitboxSize(), getKnockback(), getOffset(), getKnockdownDuration());
     }
 }

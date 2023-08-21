@@ -32,18 +32,26 @@ public interface IAttacker<A extends IAttacker<A, S>, S> {
 
     DamageSource getDamageSource();
 
+    boolean canAttack();
+
+    void cancelAttack();
+
     AbstractMove<?, ? super A> getCurrentMove();
 
     void setCurrentMove(AbstractMove<?, ? super A> move);
 
-    default void setMove(AbstractMove<?, ? super A> move, S state) {
+    default boolean setMove(AbstractMove<?, ? super A> move, S state) {
         setCurrentMove(move);
         setState(state);
+
+        return true;
     }
 
     S getState();
 
     void setState(S state);
 
-    void playSound(SoundEvent sound, float volume, float pitch);
+    default void playSound(SoundEvent sound, float volume, float pitch) {
+        getBaseEntity().playSound(sound, volume, pitch);
+    }
 }

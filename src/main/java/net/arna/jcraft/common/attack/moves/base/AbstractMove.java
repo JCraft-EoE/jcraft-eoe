@@ -18,10 +18,12 @@ import org.jetbrains.annotations.ApiStatus;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 @Getter
 public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAttacker<?, ?>> {
     private final List<SoundEvent> sounds = new ArrayList<>(), impactSounds = new ArrayList<>();
+    private final List<Predicate<A>> conditions = new ArrayList<>();
     private MoveType moveType;
     private int cooldown, windup;
     private int duration;
@@ -162,6 +164,18 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     }
 
     /**
+     * Adds a new condition to the list of conditions.
+     * All conditions must be met for a move to be allowed to be initiated.
+     * If any return {@code false}, the move is not initiated.
+     * @param condition The condition to add
+     * @return This move
+     */
+    public T withCondition(Predicate<A> condition) {
+        conditions.add(condition);
+        return getThis();
+    }
+
+    /**
      * Called when this move is registered to a {@link net.arna.jcraft.common.attack.core.MoveMap MoveMap}.
      * Not supposed to be called by anything else.
      * @param type The MoveType this move is registered as
@@ -176,10 +190,17 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     /**
      * Called when this move is initialized.
      * By default, only plays the sound(s).
+     *
+     * @return Whether this attack may be initiated
      */
-    public void onInitialize(A attacker) {
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted") // Don't care
+    public boolean onInitialize(A attacker) {
+        if (!attacker.canAttack() || !conditions.stream().allMatch(condition -> condition.test(attacker))) return false;
+
         if (attacker.getMoveStun() == getDuration())
             sounds.forEach(sound -> attacker.playSound(sound, 1f, 1f));
+
+        return true;
     }
 
     /**

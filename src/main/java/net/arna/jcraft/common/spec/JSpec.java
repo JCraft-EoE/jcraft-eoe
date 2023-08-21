@@ -27,14 +27,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.world.World;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * Class that needs to be instantiated per-player to contain temporary data relating to their current state.
@@ -53,6 +50,12 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
     public AbstractMove<?, ? super A> previousAttack;
     public MoveQueue queuedAttack;
     public int armorPoints = 0;
+
+    protected JSpec() {
+        registerMoves(moveMap);
+        moveMap.freeze();
+        moveMap.forEach(entry -> entry.getMove().registerContextEntries(moveContext));
+    }
 
     public Text getTranslatableName() {
         return Text.translatable("spec.jcraft." + getInternalName());
@@ -125,31 +128,10 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
                 player, serverPlayer, (this.state = state).getKey(getThis()), moveStun, 1f));
     }
 
-    @Override
-    public void playSound(SoundEvent sound, float volume, float pitch) {
-        getWorld().playSound(null, player.getBlockPos(), sound, SoundCategory.PLAYERS, volume, pitch);
-    }
-
     protected abstract void registerMoves(MoveMap<A, S> moves);
 
-    protected abstract A getThis();
-
-    public void initHeavyAttack(ServerWorld serverWorld) {
-    }
-
-    public void initBarrage(ServerWorld serverWorld) {
-    }
-
-    public void initSpecial1(ServerWorld serverWorld) {
-    }
-
-    public void initSpecial2(ServerWorld serverWorld) {
-    }
-
-    public void initSpecial3(ServerWorld serverWorld) {
-    }
-
-    public void initUlt(ServerWorld serverWorld) {
+    public void initMove(MoveType type) {
+        handleMove(type);
     }
 
     public boolean canAttack() {
@@ -161,16 +143,18 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
     }
 
     public boolean handleMove(MoveType type, float animationSpeed) {
-        MoveMap.Entry<A, S> entry = moveMap.getEntry(type);
+        MoveMap.Entry<A, S> entry = moveMap.getFirstValidEntry(type, getThis());
+        if (entry == null) return false;
+
         if (player.isSneaking() && entry.getCrouchingVariant() != null) entry = entry.getCrouchingVariant();
-        return handleAttack(entry.getMove(), entry.getCooldownType(), entry.getAnimState(), animationSpeed);
+        return handleMove(entry.getMove(), entry.getCooldownType(), entry.getAnimState(), animationSpeed);
     }
 
-    public boolean handleAttack(AbstractMove<?, ? super A> attack, CooldownType cooldownType, S state) {
-        return handleAttack(attack, cooldownType, state, 1f);
+    public boolean handleMove(AbstractMove<?, ? super A> attack, CooldownType cooldownType, S state) {
+        return handleMove(attack, cooldownType, state, 1f);
     }
 
-    public boolean handleAttack(AbstractMove<?, ? super A> attack, CooldownType cooldownType, S state, float animationSpeed) {
+    public boolean handleMove(AbstractMove<?, ? super A> attack, CooldownType cooldownType, S state, float animationSpeed) {
         CooldownsComponent cooldowns = JComponents.getCooldowns(player);
         int cd = cooldowns.getCooldown(cooldownType);
         if (cd > 0) return false;
@@ -189,8 +173,8 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
 
         armorPoints = attack.getArmor();
 
-        PlayerLookup.world((ServerWorld) player.getWorld()).forEach(
-                serverPlayer -> PlayerAnimPacket.sendSpec(player, serverPlayer, (this.state = state).getKey(getThis()), moveStun, animationSpeed));
+        PlayerLookup.world((ServerWorld) player.getWorld()).forEach(serverPlayer -> PlayerAnimPacket.sendSpec(
+                player, serverPlayer, (this.state = state).getKey(getThis()), moveStun, animationSpeed));
         return true;
     }
 
@@ -200,7 +184,7 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
         moveStun = 0;
 
         if (player == null) return;
-        // Cancel player animation if he exists
+        // Cancel player animation if it exists
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeShort(13);
         buf.writeInt(player.getId());
@@ -208,8 +192,6 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
         for (ServerPlayerEntity sendPlayer : serverWorld.getPlayers())
             ServerChannelFeedbackPacket.send(sendPlayer, buf);
     }
-
-    public void specialAttack(Attack attack, Set<LivingEntity> hurt) {}
 
     public boolean shouldSneak() {
         return false;
@@ -240,18 +222,9 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
 
         //JCraft.LOGGER.info("SERVER: Ticking spec " + this);
 
-        ServerWorld serverWorld = (ServerWorld) world;
-
         if (moveStun <= 0) {
             if (queuedAttack != null) {
-                switch (queuedAttack) {
-                    case HEAVY -> initHeavyAttack(serverWorld);
-                    case BARRAGE -> initBarrage(serverWorld);
-                    case ULTIMATE -> initUlt(serverWorld);
-                    case SPECIAL1 -> initSpecial1(serverWorld);
-                    case SPECIAL2 -> initSpecial2(serverWorld);
-                    case SPECIAL3 -> initSpecial3(serverWorld);
-                }
+                initMove(queuedAttack.getMoveType());
                 queuedAttack = null;
             }
 
@@ -269,4 +242,6 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
         moveStun--;
         if (attack != null) attack.tick(getThis());
     }
+
+    protected abstract A getThis();
 }

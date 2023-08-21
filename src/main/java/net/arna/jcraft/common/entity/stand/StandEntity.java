@@ -579,7 +579,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     }
 
     public boolean handleMove(MoveType type) {
-        MoveMap.Entry<E, S> entry = getMoveMap().getEntry(type);
+        MoveMap.Entry<E, S> entry = getMoveMap().getFirstValidEntry(type, getThis());
+        if (entry == null) return false;
 
         if (hasUser() && getUserOrThrow().isSneaking() && entry.getMove().getCrouchingVariant() != null)
             entry = Objects.requireNonNull(entry.getCrouchingVariant());
@@ -605,8 +606,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             cooldowns.setCooldown(cooldownType, move.getCooldown());
         }
 
-        setMove(move, animState);
-        return true;
+        return setMove(move, animState);
     }
 
     /**
@@ -614,20 +614,23 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      *
      * @param move    move to set
      * @param animState int identifier for which state to put the stand into
+     *
+     * @return Whether the attack has been initiated
      */
-    public void setMove(AbstractMove<?, ? super E> move, @Nullable S animState) {
-        move.onInitialize(getThis());
+    public boolean setMove(AbstractMove<?, ? super E> move, @Nullable S animState) {
+        if (!move.onInitialize(getThis())) return false;
 
         // If the attack has a duration of 0, just perform it immediately.
         if (move.getDuration() == 0) {
             if (hasUser()) move.perform(getThis(), user, moveContext);
-            return;
+            return true;
         }
 
         curMove = move;
         setMoveStun(move.getDuration());
         if (animState != null) this.setState(animState);
         armorPoints = move.getArmor();
+        return true;
     }
 
     /**
@@ -1465,16 +1468,18 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             if (curMove.getFollowUp() != null)
                 selectedAttack = curMove.getFollowUp();
         } else {
-            selectedAttack = getMoveMap().getEntry(MoveType.LIGHT).getMove();
+            MoveMap.Entry<E, S> lightEntry = getMoveMap().getFirstValidEntry(MoveType.LIGHT, getThis());
+            if (lightEntry == null) return null;
+
+            selectedAttack = lightEntry.getMove();
             int selectedAttackInitTime = selectedAttack.getDuration() - selectedAttack.getWindup();
 
             for (MoveMap.Entry<E, S> entry : getMoveMap()) {
                 AbstractMove<?, ? super E> attack = entry.getMove();
-                MoveType parentType = attack.getMoveType();
                 int windupPoint = attack.getWindupPoint();
 
                 // Discount any on-cooldown non-followup attacks
-                if (cooldowns.getCooldown(moveMap.getEntry(parentType).getCooldownType()) > 0) {
+                if (cooldowns.getCooldown(entry.getCooldownType()) > 0) {
                     movesOnCooldown++;
                     continue;
                 }

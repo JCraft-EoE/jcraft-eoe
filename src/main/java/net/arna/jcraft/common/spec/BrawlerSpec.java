@@ -61,25 +61,25 @@ public class BrawlerSpec extends JSpec {
     @Override
     public void initHeavyAttack(ServerWorld serverWorld) {
         if (!canAttack()) return;
-        handleAttack(serverWorld, heavy, CooldownType.HEAVY);
+        handleMove(serverWorld, heavy, CooldownType.HEAVY);
     }
 
     @Override
     public void initBarrage(ServerWorld serverWorld) {
         if (!canAttack()) return;
-        handleAttack(serverWorld, combo, CooldownType.BARRAGE);
+        handleMove(serverWorld, combo, CooldownType.BARRAGE);
     }
 
     @Override
     public void initSpecial1(ServerWorld serverWorld) {
         if (!canAttack()) return;
-        handleAttack(serverWorld, gut, CooldownType.SP1);
+        handleMove(serverWorld, gut, CooldownType.SP1);
     }
 
     @Override
     public void initSpecial2(ServerWorld serverWorld) {
         if (!canAttack()) return;
-        handleAttack(serverWorld, low, CooldownType.SP2);
+        handleMove(serverWorld, low, CooldownType.SP2);
     }
 
     @Override
