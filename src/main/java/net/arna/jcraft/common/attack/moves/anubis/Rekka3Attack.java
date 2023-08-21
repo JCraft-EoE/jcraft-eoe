@@ -17,7 +17,7 @@ public class Rekka3Attack extends AbstractMultiHitAttack<Rekka3Attack, AnubisSpe
 
     @Override
     public @NonNull Set<LivingEntity> perform(AnubisSpec attacker, LivingEntity user, MoveContext ctx) {
-        if (getBlow(attacker) == 1) attacker.curAttack = getFollowUp();
+        if (attacker.getAttackSpeedMult() == 1 && getBlow(attacker) == 1) attacker.curAttack = getFollowUp();
 
         return super.perform(attacker, user, ctx);
     }

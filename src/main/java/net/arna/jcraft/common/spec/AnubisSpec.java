@@ -45,7 +45,7 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
             15, 1.75f, 0.6f, -0.1f, IntSet.of(8, 20, 32))
             .withFollowUp(REKKA_FINISHER)
             .withImpactSound(JSoundRegistry.IMPACT_4)
-            .withInfo(Text.literal("Cleaving Strikes/Sweep"), Text.literal("3 hits, last knocks down/sweeps while sheathed"));
+            .withInfo(Text.literal("Cleaving Strikes/Sweep"), Text.literal("3 hits, if 0 Bloodlust, last hit knocks down/sweeps while sheathed"));
     public static final KnockdownAttack<AnubisSpec> SWEEP = new KnockdownAttack<AnubisSpec>(320, 10, 17,
             1.5f, 7f, 9, 1.33f, 0.3f, 0f, 35)
             .withImpactSound(JSoundRegistry.IMPACT_3)
@@ -53,6 +53,9 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
 
     private int ticksSinceLastHit = 0;
     private float attackSpeedMult = 1f;
+    public float getAttackSpeedMult() {
+        return attackSpeedMult;
+    }
 
     // Info
     @Override
@@ -67,7 +70,7 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
 
     @Override
     public String getDetails() {
-        return "untested";
+        return "PASSIVE: Bloodlust - landing blows on opponents speeds up Anubis' attacks up to 2x, with +0.25x per hit";
     }
 
     @Override
