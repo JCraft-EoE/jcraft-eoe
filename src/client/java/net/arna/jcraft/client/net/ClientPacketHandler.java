@@ -23,7 +23,7 @@ import net.arna.jcraft.common.config.ConfigOption;
 import net.arna.jcraft.common.entity.stand.MadeInHeavenEntity;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
-import net.arna.jcraft.common.spec.JCraftSpec;
+import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.splatter.Splatter;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
@@ -111,17 +111,14 @@ public class ClientPacketHandler {
         //JCraft.LOGGER.info("JCRAFT CLIENT:\nRecieving animation packet of animID: " + animID + " for entity ID: " + entID);
 
         int moveStun;
-        int attackID;
         float animationSpeed;
 
         if (isSpec) {
             moveStun = buf.readInt();
-            attackID = buf.readInt();
             animationSpeed = buf.readFloat();
             //JCraft.LOGGER.info("Animation packet is for specs, and has attached moveStun: " + moveStun + " and attackID: " + attackID);
         } else {
             moveStun = 0;
-            attackID = 0;
             animationSpeed = 0f;
         }
 
@@ -143,13 +140,12 @@ public class ClientPacketHandler {
 
                 // Synchronize spec values
                 if (isSpec) {
-                    JCraftSpec spec = JUtils.getSpec(player);
+                    JSpec spec = JUtils.getSpec(player);
                     if (spec == null) {
                         JCraft.LOGGER.error("Tried to set spec animation values on player without spec: " + player + ", in world " + client.world);
                     } else {
                         //JCraft.LOGGER.info("Spec: " + spec.getName());
                         spec.moveStun = moveStun;
-                        spec.attackID = attackID;
 
                         //JCraft.LOGGER.info("Speed: " + animationSpeed);
                         animationContainer.addModifierBefore(new SpeedModifier(animationSpeed));

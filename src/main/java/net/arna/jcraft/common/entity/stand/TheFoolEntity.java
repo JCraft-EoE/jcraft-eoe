@@ -661,8 +661,8 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
         }
 
         @Override
-        public void playAnimation(TheFoolEntity stand, AnimationBuilder builder) {
-            animator.accept(stand, builder);
+        public void playAnimation(TheFoolEntity attacker, AnimationBuilder builder) {
+            animator.accept(attacker, builder);
         }
     }
 

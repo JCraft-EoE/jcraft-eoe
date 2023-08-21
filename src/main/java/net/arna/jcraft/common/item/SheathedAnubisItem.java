@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.item;
 
-import net.arna.jcraft.common.spec.JCraftSpec;
+import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegistry;
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class SheathedAnubisItem extends SpecObtainmentItem {
-    public SheathedAnubisItem(Settings settings, JCraftSpec spec) {
+    public SheathedAnubisItem(Settings settings, JSpec spec) {
         super(settings, spec);
     }
 

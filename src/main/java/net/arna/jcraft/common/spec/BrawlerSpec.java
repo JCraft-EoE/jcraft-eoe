@@ -13,7 +13,7 @@ import net.minecraft.server.world.ServerWorld;
 import java.util.List;
 import java.util.Set;
 
-public class BrawlerSpec extends JCraftSpec {
+public class BrawlerSpec extends JSpec {
     public static final Attack heavy = new Attack(0, 17, 1f, 21, 10, 1.5, 6f, 0.8f, AttackType.BOX, 0.75f, 0, 0, JSoundRegistry.IMPACT_2)
             .setAnimation("br.upct")
             .setHitspark(2)

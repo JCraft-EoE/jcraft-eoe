@@ -18,14 +18,14 @@ public class SCCounterAttack extends AbstractCounterAttack<SCCounterAttack, Silv
     }
 
     @Override
-    public void whiff(@NonNull SilverChariotEntity stand, @NonNull LivingEntity user) {
-        stand.setMove(counterMiss, SilverChariotEntity.State.COUNTER_MISS);
+    public void whiff(@NonNull SilverChariotEntity attacker, @NonNull LivingEntity user) {
+        attacker.setMove(counterMiss, SilverChariotEntity.State.COUNTER_MISS);
         StandEntity.stun(user, counterMiss.getDuration(), 0);
     }
 
     @Override
-    public void counter(@NonNull SilverChariotEntity stand, Entity countered, DamageSource counteredDamageSource) {
-        super.counter(stand, countered, counteredDamageSource);
+    public void counter(@NonNull SilverChariotEntity attacker, Entity countered, DamageSource counteredDamageSource) {
+        super.counter(attacker, countered, counteredDamageSource);
 
         if (!(countered instanceof LivingEntity ent)) return;
 

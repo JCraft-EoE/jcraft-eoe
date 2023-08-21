@@ -5,7 +5,7 @@ import net.arna.jcraft.common.attack.core.old.MoveQueue;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.StandComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
-import net.arna.jcraft.common.spec.JCraftSpec;
+import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.command.argument.EntityArgumentType;
@@ -97,7 +97,7 @@ public class InduceAttackCommand {
                 if (!(entity instanceof PlayerEntity player)) continue;
                 JComponents.getCooldowns(player).clear();
 
-                JCraftSpec spec = JUtils.getSpec(player);
+                JSpec spec = JUtils.getSpec(player);
                 if (spec != null) {
                     ServerWorld serverWorld = source.getWorld();
                     switch (type) {

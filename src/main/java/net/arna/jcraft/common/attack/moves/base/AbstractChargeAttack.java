@@ -12,12 +12,12 @@ import net.minecraft.util.math.Vec3f;
 import java.util.Set;
 
 @Getter
-public abstract class AbstractChargeAttack<T extends AbstractChargeAttack<T, S, A>, S extends StandEntity<S, A>, A extends Enum<A> & StandAnimationState<S>>
-        extends AbstractSimpleAttack<T, S> {
-    private final A hitAnimState;
+public abstract class AbstractChargeAttack<T extends AbstractChargeAttack<T, A, S>, A extends StandEntity<A, S>, S extends Enum<S> & StandAnimationState<A>>
+        extends AbstractSimpleAttack<T, A> {
+    private final S hitAnimState;
 
     public AbstractChargeAttack(int cooldown, int windup, int duration, float moveDistance, float damage, int stun,
-                                float hitboxSize, float knockback, float offset, A hitAnimState) {
+                                float hitboxSize, float knockback, float offset, S hitAnimState) {
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset);
         this.hitAnimState = hitAnimState;
         charge = true;
@@ -25,16 +25,16 @@ public abstract class AbstractChargeAttack<T extends AbstractChargeAttack<T, S, 
     }
 
     @Override
-    protected boolean shouldPerform(S stand) {
-        return hasWindupPassed(stand);
+    protected boolean shouldPerform(A attacker) {
+        return hasWindupPassed(attacker);
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(S attacker, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user, MoveContext ctx) {
         Set<LivingEntity> targets = super.perform(attacker, user, ctx);
 
         if (!targets.isEmpty()) {
-            attacker.curMove = null;
+            attacker.setCurrentMove(null);
             attacker.setMoveStun(10);
             attacker.setState(hitAnimState);
         }
@@ -43,7 +43,7 @@ public abstract class AbstractChargeAttack<T extends AbstractChargeAttack<T, S, 
     }
 
     @Override
-    public void tick(S attacker) {
+    public void tick(A attacker) {
         super.tick(attacker);
 
         if (shouldPerform(attacker)) {
@@ -59,7 +59,7 @@ public abstract class AbstractChargeAttack<T extends AbstractChargeAttack<T, S, 
     }
 
     @Override
-    protected Vec3d getOffsetForwardPos(S stand, Vec3d offsetHeightPos, Vec3d upVec, Vec3d rotVec) {
+    protected Vec3d getOffsetForwardPos(A attacker, Vec3d offsetHeightPos, Vec3d upVec, Vec3d rotVec) {
         return offsetHeightPos.add(rotVec);
     }
 }

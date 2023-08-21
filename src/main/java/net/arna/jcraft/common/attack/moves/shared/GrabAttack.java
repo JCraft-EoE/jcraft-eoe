@@ -9,7 +9,7 @@ import net.arna.jcraft.common.util.StandAnimationState;
 public class GrabAttack<S extends StandEntity<S, A>, A extends Enum<A> & StandAnimationState<S>> extends AbstractGrabAttack<GrabAttack<S, A>, S, A> {
 
     public GrabAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun,
-                      float hitboxSize, float knockback, float offset, AbstractMove<?, S> hitMove, A hitState) {
+                      float hitboxSize, float knockback, float offset, AbstractMove<?, ? super S> hitMove, A hitState) {
         super(cooldown, windup, duration, attackDistance, damage, stun, hitboxSize, knockback, offset, hitMove, hitState);
     }
 

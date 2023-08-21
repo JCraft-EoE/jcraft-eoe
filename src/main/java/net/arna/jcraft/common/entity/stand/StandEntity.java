@@ -18,7 +18,7 @@ import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.network.s2c.ComboCounterPacket;
-import net.arna.jcraft.common.spec.JCraftSpec;
+import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.mixin.LivingEntityInvoker;
 import net.arna.jcraft.registry.JSoundRegistry;
@@ -69,7 +69,8 @@ import java.util.*;
 import static net.arna.jcraft.JCraft.comboBreak;
 import static net.minecraft.command.argument.EntityAnchorArgumentType.EntityAnchor;
 
-public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S> & StandAnimationState<E>> extends MobEntity implements IAnimatable, IAnimationTickable {
+public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S> & StandAnimationState<E>>
+        extends MobEntity implements IAnimatable, IAnimationTickable, IAttacker<E, S> {
 
     // TODO: finish custom player idle poses for all stands
 
@@ -126,9 +127,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     public AbstractMove<?, ? super E> curMove;
     public AbstractMove<?, ? super E> prevMove;
     public int armorPoints;
-
-    public static final List<CooldownType> attackCooldowns = List.of(CooldownType.STAND_LIGHT, CooldownType.STAND_HEAVY,
-            CooldownType.STAND_BARRAGE, CooldownType.STAND_SP1, CooldownType.STAND_ULT, CooldownType.STAND_SP2, CooldownType.STAND_SP3, CooldownType.UTIL);
 
     // Info
     public List<String> pros;
@@ -439,6 +437,26 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     }
 
     @Override
+    public LivingEntity getBaseEntity() {
+        return this;
+    }
+
+    @Override
+    public DamageSource getDamageSource() {
+        return JDamageSources.stand(this);
+    }
+
+    @Override
+    public AbstractMove<?, ? super E> getCurrentMove() {
+        return curMove;
+    }
+
+    @Override
+    public void setCurrentMove(AbstractMove<?, ? super E> move) {
+        curMove = move;
+    }
+
+    @Override
     public SoundCategory getSoundCategory() {
         return SoundCategory.PLAYERS;
     }
@@ -561,7 +579,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     }
 
     public boolean handleMove(MoveType type) {
-        MoveMap.Entry<E, S> entry = getMoveMap().getMove(type);
+        MoveMap.Entry<E, S> entry = getMoveMap().getEntry(type);
 
         if (hasUser() && getUserOrThrow().isSneaking() && entry.getMove().getCrouchingVariant() != null)
             entry = Objects.requireNonNull(entry.getCrouchingVariant());
@@ -1151,7 +1169,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         // Interrupting spec moves
         if (ent instanceof PlayerEntity playerEntity) {
-            JCraftSpec spec = JUtils.getSpec(playerEntity);
+            JSpec spec = JUtils.getSpec(playerEntity);
             if (spec != null && spec.curAttack != null && --spec.armorPoints < 0) spec.cancelAttack();
         }
 
@@ -1263,7 +1281,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         mob.lookAtEntity(target, 30, 30); // Point body at enemy
         mob.getLookControl().lookAt(target); // Usually detrimental not to
 
-        JCraftSpec enemySpec;
+        JSpec enemySpec;
         StandEntity<?, ?> enemyStand = JUtils.getStand(target);
         AbstractMove<?, ?> enemyAttack = null;
         boolean enemyHasStand = enemyStand != null;
@@ -1447,7 +1465,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             if (curMove.getFollowUp() != null)
                 selectedAttack = curMove.getFollowUp();
         } else {
-            selectedAttack = getMoveMap().getMove(MoveType.LIGHT).getMove();
+            selectedAttack = getMoveMap().getEntry(MoveType.LIGHT).getMove();
             int selectedAttackInitTime = selectedAttack.getDuration() - selectedAttack.getWindup();
 
             for (MoveMap.Entry<E, S> entry : getMoveMap()) {
@@ -1456,7 +1474,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 int windupPoint = attack.getWindupPoint();
 
                 // Discount any on-cooldown non-followup attacks
-                if (cooldowns.getCooldown(moveMap.getMove(parentType).getCooldownType()) > 0) {
+                if (cooldowns.getCooldown(moveMap.getEntry(parentType).getCooldownType()) > 0) {
                     movesOnCooldown++;
                     continue;
                 }

@@ -724,7 +724,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
         }
 
         @Override
-        public void playAnimation(KingCrimsonEntity stand, AnimationBuilder builder) {
+        public void playAnimation(KingCrimsonEntity attacker, AnimationBuilder builder) {
             animator.accept(builder);
         }
     }

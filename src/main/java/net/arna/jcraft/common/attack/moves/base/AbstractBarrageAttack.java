@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.attack.moves.base;
 
 import lombok.Getter;
+import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
@@ -17,10 +18,10 @@ import java.util.Set;
 /**
  * A simple attack that performs at a set interval.
  * @param <T>
- * @param <S>
+ * @param <A>
  */
 @Getter
-public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, S>, S extends StandEntity<?, ?>> extends AbstractSimpleAttack<T, S> {
+public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A>, A extends IAttacker<?, ?>> extends AbstractSimpleAttack<T, A> {
     private final int interval;
 
     protected AbstractBarrageAttack(int cooldown, int windup, int duration, float moveDistance, float damage,
@@ -31,7 +32,7 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, S
     }
 
     @Override
-    protected boolean shouldPerform(S stand) {
+    protected boolean shouldPerform(A attacker) {
         // If move stun is 22 ticks, windup is 6 and interval is 4, the first hit will occur at tick 6 (when move stun is 22 - 6 = 16),
         // the second at tick 10 (when move stun is 22 - 10 = 12), then at tick 14, etc.
         // For hit 2:
@@ -45,11 +46,11 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, S
         // Which means that if your move stun is 22, windup is 6 and interval is 6,
         // the first blow will not be landed after 6 ticks (when stand move stun is 22 - 6 = 16),
         // but rather after 10 ticks (when stand move stun is 22 - 10 = 12).
-        return stand.hasUser() && (getDuration() - getWindup() - stand.getMoveStun()) % interval == 0;
+        return attacker.hasUser() && (getDuration() - getWindup() - attacker.getMoveStun()) % interval == 0;
     }
 
     @Override
-    public void tick(S attacker) {
+    public void tick(A attacker) {
         super.tick(attacker);
 
         if (attacker.hasUser())
@@ -57,28 +58,30 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, S
     }
 
     @Override
-    protected Set<LivingEntity> validateTargets(S stand, Set<LivingEntity> targets) {
+    protected Set<LivingEntity> validateTargets(A attacker, Set<LivingEntity> targets) {
+        if (!(attacker instanceof StandEntity<?,?> stand)) return targets;
+
         // Barrage clashing logic.
         for (LivingEntity target : targets) {
             if (!(target instanceof StandEntity<?,?> targetStand) || !targetStand.curMove.isBarrage()) continue;
-            onClash(stand.getUserOrThrow());
+            onClash(attacker.getUserOrThrow());
 
             // Override stun with high priority 0.5s stun, also stops all current sounds for cleaner audio cue
             if (targetStand.hasUser()) {
                 onClash(targetStand.getUserOrThrow());
 
-                if (stand.getUser() instanceof ServerPlayerEntity serverPlayer)
+                if (attacker.getUser() instanceof ServerPlayerEntity serverPlayer)
                     serverPlayer.networkHandler.sendPacket(new StopSoundS2CPacket(null, SoundCategory.PLAYERS));
             }
-            if (stand.getUserOrThrow() instanceof ServerPlayerEntity serverPlayer)
+            if (attacker.getUserOrThrow() instanceof ServerPlayerEntity serverPlayer)
                 serverPlayer.networkHandler.sendPacket(new StopSoundS2CPacket(null, SoundCategory.PLAYERS));
 
             // Cancels both barrages
             stand.cancelAttack();
             targetStand.cancelAttack();
-            Vec3d midPos = stand.getPos().multiply(.5)
+            Vec3d midPos = attacker.getBaseEntity().getPos().multiply(.5)
                     .add(targetStand.getPos().multiply(.5));
-            stand.world.playSound(null, midPos.x, midPos.y, midPos.z, JSoundRegistry.IMPACT_1, SoundCategory.NEUTRAL, 1, 0.5f);
+            attacker.getWorld().playSound(null, midPos.x, midPos.y, midPos.z, JSoundRegistry.IMPACT_1, SoundCategory.NEUTRAL, 1, 0.5f);
 
             return Set.of();
         }

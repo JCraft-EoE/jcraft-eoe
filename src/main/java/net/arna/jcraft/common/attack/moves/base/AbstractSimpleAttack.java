@@ -5,9 +5,9 @@ import lombok.NonNull;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.BlockableType;
 import net.arna.jcraft.common.attack.core.HitBoxData;
+import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.StunType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
-import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.JParticleType;
@@ -35,7 +35,7 @@ import java.util.stream.Stream;
  */
 @SuppressWarnings("unused")
 @Getter
-public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>, S extends StandEntity<?, ?>> extends AbstractMove<T, S> {
+public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>, A extends IAttacker<?, ?>> extends AbstractMove<T, A> {
     private final Set<HitBoxData> extraHitBoxes = new HashSet<>();
     private float damage;
     private float hitboxSize;
@@ -251,61 +251,52 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
 
     /**
      * Finds all valid targets that can be damaged with the given damage source
-     * by the given stand, contained in the given boxes.
-     * Also maps all stands found to their user. I.e. redirecting damage done to stands to their users.
-     * @param stand The stand that will be doing the damage
+     * by the given attacker, contained in the given boxes.
+     * Also maps all attackers found to their user. I.e. redirecting damage done to attackers to their users.
+     * @param attacker The attacker that will be doing the damage
      * @param boxCenter The center of the box to check in
      * @param boxSize The size of the box to check in
      * @param damageSource The damage source to check for
      * @return All found valid targets
      */
-    public static Set<LivingEntity> findHits(StandEntity<?, ?> stand, Vec3d boxCenter, double boxSize, DamageSource damageSource) {
-        return findHits(stand, createBox(boxCenter, boxSize), damageSource);
+    public static Set<LivingEntity> findHits(IAttacker<?, ?> attacker, Vec3d boxCenter, double boxSize, DamageSource damageSource) {
+        return findHits(attacker, createBox(boxCenter, boxSize), damageSource);
     }
 
     /**
      * Finds all valid targets that can be damaged with the given damage source
-     * by the given stand, contained in the given boxes.
-     * Also maps all stands found to their user. I.e. redirecting damage done to stands to their users.
-     * @param stand The stand that will be doing the damage
+     * by the given attacker, contained in the given boxes.
+     * Also maps all attackers found to their user. I.e. redirecting damage done to attackers to their users.
+     * @param attacker The attacker that will be doing the damage
      * @param box The box to check in
      * @param damageSource The damage source to check for
      * @return All found valid targets
      */
-    public static Set<LivingEntity> findHits(StandEntity<?, ?> stand, Box box, DamageSource damageSource) {
-        return findHits(stand, Set.of(box), damageSource);
+    public static Set<LivingEntity> findHits(IAttacker<?, ?> attacker, Box box, DamageSource damageSource) {
+        return findHits(attacker, Set.of(box), damageSource);
     }
 
     /**
      * Finds all valid targets that can be damaged with the given damage source
-     * by the given stand, contained in the given boxes.
-     * Also maps all stands found to their user. I.e. redirecting damage done to stands to their users.
-     * @param stand The stand that will be doing the damage
+     * by the given attacker, contained in the given boxes.
+     * Also maps all attackers found to their user. I.e. redirecting damage done to attackers to their users.
+     * @param attacker The attacker that will be doing the damage
      * @param boxes The boxes to check in
      * @param damageSource The damage source to check for
      * @return All found valid targets
      */
-    public static Set<LivingEntity> findHits(StandEntity<?, ?> stand, Set<Box> boxes, DamageSource damageSource) {
+    public static Set<LivingEntity> findHits(IAttacker<?, ?> attacker, Set<Box> boxes, DamageSource damageSource) {
         return boxes.stream()
-                .flatMap(box -> stand.world.getEntitiesByClass(LivingEntity.class, box, EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e ->
-                        e != stand && e != stand.getUser() && e != stand.getUserOrThrow().getVehicle())).stream())
-                .flatMap(e -> e instanceof StandEntity<?,?> hitStand && stand.hasUser() ? Stream.of(e, hitStand.getUserOrThrow()) : Stream.of(e))
+                .flatMap(box -> attacker.getWorld().getEntitiesByClass(LivingEntity.class, box, EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e ->
+                        e != attacker && e != attacker.getUser() && e != attacker.getUserOrThrow().getVehicle())).stream())
+                .flatMap(e -> e instanceof StandEntity<?,?> hitStand && attacker.hasUser() ? Stream.of(e, hitStand.getUserOrThrow()) : Stream.of(e))
                 .filter(e -> JUtils.canDamage(damageSource, e)) // This must be done after the previous flatmap call as it excludes stands.
                 .collect(Collectors.toSet());
     }
 
-    /**
-     * Gets the damage source to use when applying damage to targets.
-     * @param stand The stand to get the damage source for
-     * @return The damage source
-     */
-    protected DamageSource getDamageSource(S stand) {
-        return JDamageSources.stand(stand);
-    }
-
     // Logic methods
     @Override
-    public @NonNull Set<LivingEntity> perform(S attacker, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user, MoveContext ctx) {
         if (hitboxSize <= 0 && extraHitBoxes.isEmpty()) return Set.of();
 
         Vec3d upVec = GravityChangerAPI.getEyeOffset(user);
@@ -314,7 +305,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
 
         Vec3d fPos = getOffsetForwardPos(attacker, hPos, upVec, rotVec);
 
-        DamageSource damageSource = getDamageSource(attacker);
+        DamageSource damageSource = attacker.getDamageSource();
         Set<Box> boxes = new HashSet<>();
         boxes.add(createBox(fPos, hitboxSize));
         extraHitBoxes.forEach(hitBox -> boxes.add(createBox(hPos, rotVec, upVec, hitBox)));
@@ -323,41 +314,41 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, S>,
 
     /**
      * Performs this attack on the given boxes.
-     * @param stand The stand that will be performing this attack.
+     * @param attacker The attacker that will be performing this attack.
      * @param boxes The boxes in which to search for targets.
      * @param damageSource The damage source to use when applying damage to the targets.
      * @param center The center of this attack. This is where the particle will be spawned at.
      * @return A set of all affected targets.
      */
-    protected Set<LivingEntity> attackBoxes(S stand, Set<Box> boxes, DamageSource damageSource, Vec3d center) {
+    protected Set<LivingEntity> attackBoxes(A attacker, Set<Box> boxes, DamageSource damageSource, Vec3d center) {
         // TODO allow this method to send boxes in bulk.
-        boxes.forEach(box -> JUtils.displayHitbox(stand.world, new Vec3d(box.minX, box.minY, box.minZ), new Vec3d(box.maxX, box.maxY, box.maxZ)));
+        boxes.forEach(box -> JUtils.displayHitbox(attacker.getWorld(), new Vec3d(box.minX, box.minY, box.minZ), new Vec3d(box.maxX, box.maxY, box.maxZ)));
 
-        Set<LivingEntity> hurt = findHits(stand, boxes, damageSource);
+        Set<LivingEntity> hurt = findHits(attacker, boxes, damageSource);
         if (hurt.isEmpty()) return Set.of();
 
-        Random random = stand.getRandom();
-        JCraft.createParticle((ServerWorld) stand.world,
+        Random random = Random.create();
+        JCraft.createParticle((ServerWorld) attacker.getWorld(),
                 center.x + random.nextGaussian() * 0.25,
                 center.y + random.nextGaussian() * 0.25,
                 center.z + random.nextGaussian() * 0.25,
                 hitSpark);
 
-        getImpactSounds().forEach(sound -> stand.playSound(sound, 1f, 1f));
+        getImpactSounds().forEach(sound -> attacker.playSound(sound, 1f, 1f));
 
-        Vec3d kbVec = getRotVec(stand).multiply(knockback).add(new Vec3d(0.0, Math.abs(knockback) / 4, 0.0));
-        for (LivingEntity target : validateTargets(stand, hurt))
-            StandEntity.damageLogic(stand.world, target, kbVec, stun, stunType.ordinal(), overrideStun,
-                    damage, lift, blockStun, damageSource, stand.getUserOrThrow(), canBackstab, blockableType.isNonBlockable());
+        Vec3d kbVec = getRotVec(attacker).multiply(knockback).add(new Vec3d(0.0, Math.abs(knockback) / 4, 0.0));
+        for (LivingEntity target : validateTargets(attacker, hurt))
+            StandEntity.damageLogic(attacker.getWorld(), target, kbVec, stun, stunType.ordinal(), overrideStun,
+                    damage, lift, blockStun, damageSource, attacker.getUserOrThrow(), canBackstab, blockableType.isNonBlockable());
 
         return hurt;
     }
 
-    protected Set<LivingEntity> validateTargets(S stand, Set<LivingEntity> targets) {
+    protected Set<LivingEntity> validateTargets(A attacker, Set<LivingEntity> targets) {
         return targets;
     }
 
-    protected Vec3d getOffsetForwardPos(S stand, Vec3d offsetHeightPos, Vec3d upVec, Vec3d rotVec) {
+    protected Vec3d getOffsetForwardPos(A attacker, Vec3d offsetHeightPos, Vec3d upVec, Vec3d rotVec) {
         return offsetHeightPos.add(rotVec.multiply(getMoveDistance())).add(upVec.multiply(-offset));
     }
 }
