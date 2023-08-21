@@ -53,7 +53,7 @@ public class MoveMap<A extends IAttacker<A, S>, S> implements Iterable<MoveMap.E
     @Nullable
     public Entry<A, S> getFirstValidEntry(MoveType type, A attacker) {
         return getEntries(type).stream()
-                .filter(entry -> entry.getMove().onInitialize(attacker))
+                .filter(entry -> entry.getMove().getConditions().stream().allMatch(c -> c.test(attacker)))
                 .findFirst()
                 .orElse(null);
     }
