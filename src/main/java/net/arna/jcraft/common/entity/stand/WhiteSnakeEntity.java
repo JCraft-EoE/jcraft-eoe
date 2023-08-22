@@ -1,7 +1,6 @@
 package net.arna.jcraft.common.entity.stand;
 
 import com.google.common.collect.Lists;
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.BlockableType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
@@ -25,7 +24,6 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -116,11 +114,11 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
 
     @Override
     public void initMove(MoveType type) {
-        if (type != MoveType.UTIL) super.initMove(type);
+        if (type != MoveType.UTILITY) super.initMove(type);
 
         if (!canAttack() || !hasUser()) return;
         CooldownsComponent cooldowns = JComponents.getCooldowns(getUserOrThrow());
-        if (cooldowns.getCooldown(CooldownType.UTIL) > 0) return;
+        if (cooldowns.getCooldown(CooldownType.UTILITY) > 0) return;
 
         boolean newRemote = !getRemote();
         setRemote(newRemote);
@@ -129,7 +127,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         //if (newRemote) moves.set(4, meltyourheart);
         //else moves.set(4, standdisk);
 
-        cooldowns.setCooldown(CooldownType.UTIL, 20);
+        cooldowns.setCooldown(CooldownType.UTILITY, 20);
     }
 
     @Override
@@ -141,7 +139,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         moves.register(MoveType.SPECIAL1, MEMORY_DISC, State.DISC);
         moves.register(MoveType.SPECIAL2, LEG_CRUSHER, State.LEG_CRUSHER);
         moves.register(MoveType.SPECIAL3, POISON_SPEW, State.ACID_SPEW).withCrouchingVariant(State.ACID_SPEW_CHARGED);
-        moves.register(MoveType.ULT, STAND_DISC, State.DISC);
+        moves.register(MoveType.ULTIMATE, STAND_DISC, State.DISC);
 
         //todo: register pilot mode, but only as info
         //moves.register(MoveType.UTIL, )

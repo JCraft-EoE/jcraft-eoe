@@ -26,7 +26,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
 import net.minecraft.world.World;
 
 import java.util.Objects;
@@ -35,45 +34,26 @@ import java.util.Objects;
  * Class that needs to be instantiated per-player to contain temporary data relating to their current state.
  * Used to handle stand-off attacks.
  */
+@Getter
 public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnimationState<A>> implements IAttacker<A, S> {
     private final MoveMap<A, S> moveMap = new MoveMap<>();
-    @Getter
     private final MoveContext moveContext = new MoveContext();
-    public PlayerEntity player;
-    @Getter @Setter
+    private final SpecType type;
+    public final PlayerEntity player;
+    @Setter
     public int moveStun = 0;
-    @Getter
     private S state;
     public AbstractMove<?, ? super A> curAttack;
     public AbstractMove<?, ? super A> previousAttack;
     public MoveQueue queuedAttack;
     public int armorPoints = 0;
 
-    protected JSpec() {
+    protected JSpec(SpecType type, PlayerEntity player) {
+        this.type = type;
+        this.player = player;
         registerMoves(moveMap);
         moveMap.freeze();
         moveMap.forEach(entry -> entry.getMove().registerContextEntries(moveContext));
-    }
-
-    // TODO move these methods to SpecType
-    public Text getTranslatableName() {
-        return Text.translatable("spec.jcraft." + getInternalName());
-    }
-
-    public String getInternalName() {
-        return "unnamed";
-    }
-
-    public String getDescription() {
-        return "UNDESCRIBED";
-    }
-
-    public String getDetails() {
-        return "UNFINISHED";
-    }
-
-    public int getId() {
-        return 0;
     }
 
     @Override

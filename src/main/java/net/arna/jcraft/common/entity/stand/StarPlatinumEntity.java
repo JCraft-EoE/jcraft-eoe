@@ -114,7 +114,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
     @Override
     public void initUtil() {
         if (!canAttack() || !hasUser() || !getUserOrThrow().isOnGround()) return;
-        handleMove(jump, CooldownType.UTIL, State.JUMP);
+        handleMove(jump, CooldownType.UTILITY, State.JUMP);
     }
 
     @Override

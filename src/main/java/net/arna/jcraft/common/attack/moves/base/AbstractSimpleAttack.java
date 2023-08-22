@@ -361,7 +361,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
     }
 
     @Override
-    protected T copyExtras(T base) {
+    protected @NonNull T copyExtras(@NonNull T base) {
         AbstractSimpleAttack<T, A> cast = super.copyExtras(base);
         cast.stunType = stunType;
         cast.overrideStun = overrideStun;

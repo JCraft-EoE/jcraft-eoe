@@ -326,7 +326,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
 
     @Override
     public void initUtil() {
-        if (!canAttack() || !hasUser() || !handleMove(timeskip, CooldownType.UTIL, State.TIMESKIP)) return;
+        if (!canAttack() || !hasUser() || !handleMove(timeskip, CooldownType.UTILITY, State.TIMESKIP)) return;
         LivingEntity user = getUserOrThrow();
 
         Vec3d pos = user.getPos();

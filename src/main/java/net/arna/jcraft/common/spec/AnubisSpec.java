@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.spec;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
+import lombok.Getter;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.moves.anubis.Rekka3Attack;
@@ -15,6 +16,7 @@ import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 
@@ -52,30 +54,11 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
             .withInfo(Text.literal("Sweep"), Text.empty());
 
     private int ticksSinceLastHit = 0;
+    @Getter
     private float attackSpeedMult = 1f;
-    public float getAttackSpeedMult() {
-        return attackSpeedMult;
-    }
 
-    // Info
-    @Override
-    public String getInternalName() {
-        return "anubis";
-    }
-
-    @Override
-    public String getDescription() {
-        return "Counterpoking tool";
-    }
-
-    @Override
-    public String getDetails() {
-        return "PASSIVE: Bloodlust - landing blows on opponents speeds up Anubis' attacks up to 2x, with +0.25x per hit";
-    }
-
-    @Override
-    public int getId() {
-        return 2;
+    public AnubisSpec(PlayerEntity player) {
+        super(SpecType.ANUBIS, player);
     }
 
     @Override

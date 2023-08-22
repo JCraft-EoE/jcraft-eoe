@@ -28,7 +28,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     private int cooldown, windup;
     private int duration;
     private float moveDistance;
-    private Text name, description;
+    private Text name = Text.empty(), description = Text.empty();
     private AbstractMove<?, ? super A> crouchingVariant, aerialVariant, followUp;
     private boolean isCrouchingVariant, isAerialVariant;
     private int armor;
@@ -100,7 +100,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * @param description The description of this move
      * @return This move
      */
-    public T withInfo(Text name, Text description) {
+    public T withInfo(@NonNull Text name, @NonNull Text description) {
         this.name = name;
         this.description = description;
         return getThis();
@@ -345,7 +345,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * @param base The instance to copy the data to.
      * @return The given base with copied data.
      */
-    protected T copyExtras(T base) {
+    protected @NonNull T copyExtras(@NonNull T base) {
         AbstractMove<T, A> cast = base; // Required to access private fields
         cast.sounds.addAll(sounds);
         cast.impactSounds.addAll(impactSounds);
@@ -353,8 +353,9 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         cast.moveType = moveType;
         cast.name = name;
         cast.description = description;
-        cast.crouchingVariant = crouchingVariant;
-        cast.aerialVariant = aerialVariant;
+        cast.followUp = followUp.copy();
+        cast.crouchingVariant = crouchingVariant.copy();
+        cast.aerialVariant = aerialVariant.copy();
         cast.isCrouchingVariant = isCrouchingVariant;
         cast.isAerialVariant = isAerialVariant;
         cast.armor = armor;

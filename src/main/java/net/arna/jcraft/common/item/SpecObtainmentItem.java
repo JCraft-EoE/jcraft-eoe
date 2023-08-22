@@ -10,9 +10,9 @@ import net.minecraft.text.Text;
 
 public abstract class SpecObtainmentItem extends Item {
     protected boolean warned = false;
-    protected final JSpec switchTo;
+    protected final SpecType switchTo;
 
-    public SpecObtainmentItem(Settings settings, JSpec switchTo) {
+    public SpecObtainmentItem(Settings settings, SpecType switchTo) {
         super(settings);
         this.switchTo = switchTo;
     }
@@ -20,14 +20,13 @@ public abstract class SpecObtainmentItem extends Item {
     private boolean setSpec(PlayerEntity player) {
         if (player == null) return false;
 
-        // TODO switchTo should probably be a SpecType rather than JCraftSpec.
-        JComponents.getSpecData(player).setType(SpecType.fromId(switchTo.getId()));
+        JComponents.getSpecData(player).setType(switchTo);
         warned = false;
         return true;
     }
 
     protected boolean tryGetSpec(PlayerEntity player) {
-        JSpec spec = JUtils.getSpec(player);
+        JSpec<?, ?> spec = JUtils.getSpec(player);
         if (spec != null) { // If the player already has a spec
             if (spec.getId() != switchTo.getId()) { // And it isn't the one that will be switched to
                 if (!warned) {

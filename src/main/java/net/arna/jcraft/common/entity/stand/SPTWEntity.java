@@ -156,7 +156,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
     @Override
     public void initUtil() {
         if (!canAttack() || tsTime > 0) return;
-        handleMove(timeskip, CooldownType.UTIL, State.TIME_SKIP);
+        handleMove(timeskip, CooldownType.UTILITY, State.TIME_SKIP);
     }
 
     @Override

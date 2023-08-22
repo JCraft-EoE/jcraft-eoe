@@ -58,7 +58,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
         moves.register(MoveType.SPECIAL1, BOMB_PLANT, State.BOMB_PLANT);
         moves.register(MoveType.SPECIAL2, GRAB, State.GRAB);
         moves.register(MoveType.SPECIAL3, COIN_TOSS); // No special state
-        moves.register(MoveType.ULT, SHEER_HEART_ATTACK, State.SHA);
+        moves.register(MoveType.ULTIMATE, SHEER_HEART_ATTACK, State.SHA);
     }
 
     // Move-set

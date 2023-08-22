@@ -261,9 +261,9 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         if (!canAttack()) return;
 
         if (isHalfBall()) {
-            if (handleMove(exit, CooldownType.UTIL, State.EXIT))
+            if (handleMove(exit, CooldownType.UTILITY, State.EXIT))
                 playSound(JSoundRegistry.CREAM_EXIT, 1, 1);
-        } else if (handleMove(enter, CooldownType.UTIL, State.ENTER))
+        } else if (handleMove(enter, CooldownType.UTILITY, State.ENTER))
             playSound(JSoundRegistry.CREAM_ENTER, 1, 1);
     }
 

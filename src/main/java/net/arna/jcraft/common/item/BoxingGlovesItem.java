@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.item;
 
-import net.arna.jcraft.common.spec.JSpec;
+import net.arna.jcraft.common.spec.SpecType;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class BoxingGlovesItem extends SpecObtainmentItem {
-    public BoxingGlovesItem(Settings settings, JSpec spec) {
+    public BoxingGlovesItem(Settings settings, SpecType spec) {
         super(settings, spec);
     }
 

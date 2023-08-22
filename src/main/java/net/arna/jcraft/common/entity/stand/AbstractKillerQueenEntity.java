@@ -85,7 +85,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
     protected void registerMoves(MoveMap<E, S> moves) {
         moves.register(MoveType.LIGHT, LIGHT, getLightState());
         moves.register(MoveType.BARRAGE, BARRAGE, getBarrageState());
-        moves.register(MoveType.UTIL, EXPLOSIVE_DASH); // No special state for this one.
+        moves.register(MoveType.UTILITY, EXPLOSIVE_DASH); // No special state for this one.
     }
 
     public Vec3d getBombPos() {

@@ -224,11 +224,11 @@ public class JCraftClient implements ClientModInitializer {
                     case STAND_LIGHT -> "M1";
                     case HEAVY, STAND_HEAVY -> generateName(heavyKey);
                     case BARRAGE, STAND_BARRAGE -> generateName(barrageKey);
-                    case ULT, STAND_ULT -> generateName(ultKey);
+                    case ULTIMATE, STAND_ULT -> generateName(ultKey);
                     case SP1, STAND_SP1 -> generateName(special1Key);
                     case SP2, STAND_SP2 -> generateName(special2Key);
                     case SP3, STAND_SP3 -> generateName(special3Key);
-                    case UTIL -> generateName(utility);
+                    case UTILITY -> generateName(utility);
                     case COMBO_BREAKER -> "Combo Breaker";
                     case COOLDOWN_CANCEL -> generateName(cooldownCancel);
                     case DASH -> generateName(dash);

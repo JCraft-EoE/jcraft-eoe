@@ -109,8 +109,8 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
         moves.register(MoveType.SPECIAL2, CHARGE, State.CHARGE);
         moves.register(MoveType.SPECIAL3, FEIGN_BARRAGE, State.BARRAGE);
 
-        moves.register(MoveType.ULT, TIMESTOP, State.TIME_STOP);
-        moves.register(MoveType.UTIL, TIMESKIP, State.IDLE);
+        moves.register(MoveType.ULTIMATE, TIMESTOP, State.TIME_STOP);
+        moves.register(MoveType.UTILITY, TIMESKIP, State.IDLE);
     }
 
     @Override
@@ -145,7 +145,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
 
     public void initUtil() {
         if (!canAttack() || tsTime > 0) return;
-        handleAttack(timeskip, CooldownType.UTIL, State.TIMESKIP);
+        handleAttack(timeskip, CooldownType.UTILITY, State.TIMESKIP);
     }
 
     public void specialAttack(Attack attack, Set<LivingEntity> entities) {

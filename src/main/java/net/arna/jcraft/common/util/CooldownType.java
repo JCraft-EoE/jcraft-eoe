@@ -19,10 +19,10 @@ public enum CooldownType {
     SP1(Category.SPEC),
     SP2(Category.SPEC),
     SP3(Category.SPEC),
-    ULT(Category.SPEC, true),
+    ULTIMATE(Category.SPEC, true),
 
     // Universal Cooldowns
-    UTIL(Category.UNIVERSAL),
+    UTILITY(Category.UNIVERSAL),
     COMBO_BREAKER(Category.UNIVERSAL, 1200, true),  // 60s
     COOLDOWN_CANCEL(Category.UNIVERSAL, 900, true), // 45s
     DASH(Category.UNIVERSAL, true);

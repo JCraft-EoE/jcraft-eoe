@@ -223,7 +223,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
     @Override
     public void initUtil() {
         if (!canAttack() || !hasUser()) return;
-        if (handleMove(flag, CooldownType.UTIL, State.FLAG)) {
+        if (handleMove(flag, CooldownType.UTILITY, State.FLAG)) {
             getUserOrThrow().addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, flag.moveStun, 0, true, false));
             getUserOrThrow().addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, flag.moveStun, 0, true, false));
             playSound(JSoundRegistry.D4C_UTILITY, 1, 1);

@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 public class SpecComponentImpl implements SpecComponent {
     private final PlayerEntity player;
     private SpecType type = SpecType.NONE;
-    private JSpec spec;
+    private JSpec<?, ?> spec;
 
     public SpecComponentImpl(PlayerEntity player) {
         this.player = player;
@@ -32,15 +32,12 @@ public class SpecComponentImpl implements SpecComponent {
 
     private void setTypeRaw(SpecType type) {
         this.type = type;
-        spec = type.createNew();
-
-        if (spec == null) return;
-        spec.player = player;
+        spec = type.createNew(player);
     }
 
     @Nullable
     @Override
-    public JSpec getSpec() {
+    public JSpec<?, ?> getSpec() {
         return spec;
     }
 

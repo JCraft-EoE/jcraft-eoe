@@ -204,8 +204,8 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         if (!canAttack() || !hasUser()) return;
 
         CooldownsComponent cooldowns = JComponents.getCooldowns(getUser());
-        if (cooldowns.getCooldown(CooldownType.UTIL) > 0) return;
-        cooldowns.setCooldown(CooldownType.UTIL, 360); // 18 second flight cd
+        if (cooldowns.getCooldown(CooldownType.UTILITY) > 0) return;
+        cooldowns.setCooldown(CooldownType.UTILITY, 360); // 18 second flight cd
         setFlightTime(20);
 
         playSound(JSoundRegistry.GER_FLY, 1, 1);

@@ -12,5 +12,5 @@ public interface SpecComponent extends Component, AutoSyncedComponent {
     void setType(@NonNull SpecType type);
 
     @Nullable
-    JSpec getSpec();
+    JSpec<?, ?> getSpec();
 }

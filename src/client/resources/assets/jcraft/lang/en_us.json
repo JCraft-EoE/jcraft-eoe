@@ -157,6 +157,15 @@
   "jcraft.commands.error.nospec": "No spec found!",
   "jcraft.commands.error.nostand": "No stand found!",
 
+  "jcraft.movetype.light": "Light",
+  "jcraft.movetype.heavy": "Heavy",
+  "jcraft.movetype.barrage": "Barrage",
+  "jcraft.movetype.special1": "Special 1",
+  "jcraft.movetype.special2": "Special 2",
+  "jcraft.movetype.special3": "Special 3",
+  "jcraft.movetype.ultimate": "Ultimate",
+  "jcraft.movetype.utility": "Utility",
+
   "warning.jcraft.spec.change": "Using this will change your spec, are you sure?",
 
   "death.attack.stand": "%1$s was retired",

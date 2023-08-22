@@ -181,8 +181,8 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         moves.register(MoveType.SPECIAL1, SPIN_BARRAGE, State.SPIN);
         moves.register(MoveType.SPECIAL2, isPossessed() ? RAY_DART : CHARGE, isPossessed() ? State.CHARGE : State.P_CHARGE);
         moves.register(MoveType.SPECIAL3, isPossessed() ? COUNTER : CLEAVE, isPossessed() ? State.COUNTER : State.CLEAVE);
-        moves.register(MoveType.ULT, isPossessed() ? GOD_OF_DEATH : ARMOR_OFF);
-        moves.register(MoveType.UTIL, CIRCLE_CHARGE, State.CIRCLE_CHARGE);
+        moves.register(MoveType.ULTIMATE, isPossessed() ? GOD_OF_DEATH : ARMOR_OFF);
+        moves.register(MoveType.UTILITY, CIRCLE_CHARGE, State.CIRCLE_CHARGE);
     }
 
     public Mode getMode() {
@@ -210,10 +210,10 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
 
     @Override
     public void initMove(MoveType type) {
-        if (type == MoveType.UTIL) {
-            if (curMove != null && curMove.getMoveType() == MoveType.UTIL && getMoveStun() <= 80)
+        if (type == MoveType.UTILITY) {
+            if (curMove != null && curMove.getMoveType() == MoveType.UTILITY && getMoveStun() <= 80)
                 setMove(CIRCLE_SLASH.copy(), State.CIRCLE_SLASH);
-            else handleMove(MoveType.UTIL);
+            else handleMove(MoveType.UTILITY);
         } else super.initMove(type);
     }
 

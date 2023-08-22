@@ -14,10 +14,10 @@ public enum MoveQueue {
     HEAVY(MoveType.HEAVY),
     BARRAGE(MoveType.BARRAGE),
     SPECIAL1(MoveType.SPECIAL1),
-    ULTIMATE(MoveType.ULT),
+    ULTIMATE(MoveType.ULTIMATE),
     SPECIAL2(MoveType.SPECIAL2),
     SPECIAL3(MoveType.SPECIAL3),
-    MIDDLE_MOUSE(MoveType.UTIL),
+    MIDDLE_MOUSE(MoveType.UTILITY),
     STAND_SUMMON(null);
 
     @Nullable

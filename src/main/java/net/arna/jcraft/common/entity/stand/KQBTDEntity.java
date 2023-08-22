@@ -97,7 +97,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
         moves.register(MoveType.SPECIAL1, BOMB_PLANT, State.BOMB_PLANT);
         moves.register(MoveType.SPECIAL2, BUBBLE, State.BUBBLE);
         moves.register(MoveType.SPECIAL3, GRAB, State.GRAB);
-        moves.register(MoveType.ULT, BTD_PLANT, State.BTD_PLANT);
+        moves.register(MoveType.ULTIMATE, BTD_PLANT, State.BTD_PLANT);
     }
 
     @Override
@@ -120,10 +120,10 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                     moveContext.set(BombPlantAttack.BOMB_POS, null);
                 }
             }
-            case ULT -> {
+            case ULTIMATE -> {
                 if (moveContext.get(BTDPlantAttack.BTD_ENTITY) != null)
-                    handleMove(BTD_DETONATE, CooldownType.ULT, State.DETONATE);
-                else handleMove(MoveType.ULT);
+                    handleMove(BTD_DETONATE, CooldownType.ULTIMATE, State.DETONATE);
+                else handleMove(MoveType.ULTIMATE);
             }
             default -> super.initMove(type);
         }

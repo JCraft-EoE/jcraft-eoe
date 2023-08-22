@@ -32,8 +32,7 @@ public class ArmorOffAttack extends AbstractSimpleAttack<ArmorOffAttack, SilverC
         int armorTime = stand.getMoveContext().getInt(ARMOR_TIME);
         if (--armorTime > 0)
             stand.getMoveContext().setInt(ARMOR_TIME, armorTime);
-        else
-            stand.setMode(SilverChariotEntity.Mode.REGULAR);
+        else stand.setMode(SilverChariotEntity.Mode.REGULAR);
     }
 
     @Override
@@ -48,8 +47,7 @@ public class ArmorOffAttack extends AbstractSimpleAttack<ArmorOffAttack, SilverC
 
     @Override
     public @NonNull ArmorOffAttack copy() {
-        return copyExtras(
-                new ArmorOffAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(), getHitboxSize(), getKnockback(), getOffset())
-        );
+        return copyExtras(new ArmorOffAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
+                getStun(), getHitboxSize(), getKnockback(), getOffset()));
     }
 }

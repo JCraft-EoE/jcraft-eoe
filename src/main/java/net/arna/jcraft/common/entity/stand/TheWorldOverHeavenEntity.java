@@ -276,7 +276,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
     @Override
     public void initUtil() {
         if (!canAttack() || tsTime > 0) return;
-        handleMove(timeskip, CooldownType.UTIL, State.TIMESKIP);
+        handleMove(timeskip, CooldownType.UTILITY, State.TIMESKIP);
     }
 
     @Override

@@ -238,7 +238,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
 
         if (!canAttack()) return;
         CooldownsComponent cooldowns = JComponents.getCooldowns(user);
-        if (cooldowns.getCooldown(CooldownType.UTIL) > 0) return;
+        if (cooldowns.getCooldown(CooldownType.UTILITY) > 0) return;
 
         if (user.isOnGround()) {
             user.addStatusEffect(new StatusEffectInstance(JStatusRegistry.WEIGHTLESS, 200, 1));
@@ -248,7 +248,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
         }
 
         user.velocityModified = true;
-        cooldowns.setCooldown(CooldownType.UTIL, 340);
+        cooldowns.setCooldown(CooldownType.UTILITY, 340);
     }
 
     @Override

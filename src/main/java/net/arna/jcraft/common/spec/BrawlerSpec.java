@@ -3,7 +3,6 @@ package net.arna.jcraft.common.spec;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
-import net.arna.jcraft.common.attack.core.old.Attack;
 import net.arna.jcraft.common.attack.moves.shared.KnockdownAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleMultiHitAttack;
@@ -11,6 +10,7 @@ import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.SpecAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 
 public class BrawlerSpec extends JSpec<BrawlerSpec, BrawlerSpec.State> {
@@ -35,25 +35,8 @@ public class BrawlerSpec extends JSpec<BrawlerSpec, BrawlerSpec.State> {
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withInfo(Text.literal("SWEEP"), Text.literal("knocks down"));
 
-    // Info
-    @Override
-    public String getInternalName() {
-        return "brawler";
-    }
-
-    @Override
-    public String getDescription() {
-        return "Close-range pressure and combo extension tool";
-    }
-
-    @Override
-    public String getDetails() {
-        return "Important hitconfirm: (any stand move)~stand.OFF>Combo>stand.ON+(any stand move)";
-    }
-
-    @Override
-    public int getId() {
-        return 1;
+    public BrawlerSpec(PlayerEntity player) {
+        super(SpecType.BRAWLER, player);
     }
 
     @Override
