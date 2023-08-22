@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.minecraft.entity.LivingEntity;
@@ -14,28 +13,25 @@ import net.minecraft.server.world.ServerWorld;
 
 import java.util.Set;
 
-public abstract class AbstractTimestopAttack<T extends AbstractTimestopAttack<T, A>, A extends IAttacker<?, ?>> extends AbstractMove<T, A> {
-    @Getter
+@Getter
+public abstract class AbstractTimeStopMove<T extends AbstractTimeStopMove<T, A>, A extends StandEntity<?, ?>> extends AbstractMove<T, A> {
     @Setter
-    protected int timestopDuration;
+    protected int timeStopDuration;
     private static final StatusEffectInstance tsBlind = new StatusEffectInstance(StatusEffects.BLINDNESS, 19, 0, true, false, false);
 
-    protected AbstractTimestopAttack(int cooldown, int windup, int duration, float moveDistance, int tsDuration) {
+    protected AbstractTimeStopMove(int cooldown, int windup, int duration, float moveDistance, int timeStopDuration) {
         super(cooldown, windup, duration, moveDistance);
-        this.timestopDuration = tsDuration;
+        this.timeStopDuration = timeStopDuration;
     }
 
     @Override
     public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user, MoveContext ctx) {
-        if (attacker instanceof StandEntity<?,?> stand) {
-            stand.setTsTime(timestopDuration);
-            stand.setCurrentMove(null);
+        attacker.setTsTime(timeStopDuration);
+        attacker.setCurrentMove(null);
 
-            user.addStatusEffect(tsBlind);
+        user.addStatusEffect(tsBlind);
 
-            JCraft.beginTimestop(user, stand.getPos(), (ServerWorld) stand.getWorld(), timestopDuration);
-        }
-
+        JCraft.beginTimestop(user, attacker.getPos(), (ServerWorld) attacker.getWorld(), timeStopDuration);
         return Set.of();
     }
 }

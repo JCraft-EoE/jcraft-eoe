@@ -2,6 +2,7 @@ package net.arna.jcraft.common.attack.moves.theworld;
 
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.moves.base.AbstractCounterAttack;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.shared.CounterMissAttack;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.TheWorldEntity;
@@ -15,9 +16,11 @@ import net.minecraft.util.math.Vec3d;
 
 public class FeignBarrageCounterAttack extends AbstractCounterAttack<FeignBarrageCounterAttack, TheWorldEntity> {
     private static final CounterMissAttack<TheWorldEntity> missAttack = new CounterMissAttack<>(10);
+    private final AbstractMove<?, ? super TheWorldEntity> hitMove;
 
-    public FeignBarrageCounterAttack(int cooldown, int windup, int duration, float moveDistance) {
+    public FeignBarrageCounterAttack(int cooldown, int windup, int duration, float moveDistance, AbstractMove<?, ? super TheWorldEntity> hitMove) {
         super(cooldown, windup, duration, moveDistance);
+        this.hitMove = hitMove;
     }
 
     @Override
@@ -46,7 +49,7 @@ public class FeignBarrageCounterAttack extends AbstractCounterAttack<FeignBarrag
                 counteredStand.cancelAttack();
         }
 
-        attacker.setMove(TheWorldEntity.COUNTER_FOLLOWUP, TheWorldEntity.State.COUNTER_HIT);
+        attacker.setMove(hitMove, TheWorldEntity.State.COUNTER_HIT);
         attacker.playSound(JSoundRegistry.TIME_SKIP, 1, 1);
     }
 
@@ -57,6 +60,6 @@ public class FeignBarrageCounterAttack extends AbstractCounterAttack<FeignBarrag
 
     @Override
     public @NonNull FeignBarrageCounterAttack copy() {
-        return copyExtras(new FeignBarrageCounterAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
+        return copyExtras(new FeignBarrageCounterAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), hitMove));
     }
 }

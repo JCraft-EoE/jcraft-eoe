@@ -30,6 +30,11 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     private int duration;
     private float moveDistance;
     private Text name = Text.empty(), description = Text.empty();
+    /**
+     * The move this move was copied from.
+     * Defaults to {@code this}.
+     */
+    private AbstractMove<T, A> originalMove = this;
     private @Nullable AbstractMove<?, ? super A> crouchingVariant, aerialVariant, followUp;
     private boolean isCrouchingVariant, isAerialVariant;
     private int armor;
@@ -220,12 +225,16 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      */
     @SuppressWarnings("BooleanMethodIsAlwaysInverted") // Don't care
     public boolean onInitialize(A attacker) {
-        if (!attacker.canAttack() || !conditions.stream().allMatch(condition -> condition.test(attacker))) return false;
+        if (!canBeInitiated(attacker)) return false;
 
         if (attacker.getMoveStun() == getDuration())
             sounds.forEach(sound -> attacker.playSound(sound, 1f, 1f));
 
         return true;
+    }
+
+    public boolean canBeInitiated(A attacker) {
+        return attacker.canAttack() && conditions.stream().allMatch(condition -> condition.test(attacker));
     }
 
     /**
@@ -367,6 +376,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         cast.isAerialVariant = isAerialVariant;
         cast.armor = armor;
         cast.mobilityType = mobilityType;
+        cast.originalMove = originalMove; // If this move was copied, this will set it to our original move on the copy.
         copiedExtras = true;
         return base;
     }

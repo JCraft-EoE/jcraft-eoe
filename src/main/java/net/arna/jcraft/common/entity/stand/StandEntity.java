@@ -48,9 +48,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
-import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.NotNull;
@@ -769,29 +767,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     }
 
     protected void timeSkip(double distance, @NotNull SoundEvent sound) {
-        LivingEntity user = getUserOrThrow();
-        boolean hasVehicle = user.hasVehicle();
-
-        if (hasVehicle)
-            distance /= 3;
-
-        Vec3d eyePos = user.getEyePos();
-        HitResult hitResult = world.raycast(
-                new RaycastContext(
-                        eyePos,
-                        eyePos.add(user.getRotationVector().multiply(distance)),
-                        RaycastContext.ShapeType.COLLIDER,
-                        RaycastContext.FluidHandling.NONE, user));
-        Vec3d telePos = hitResult.getPos();
-
-        // 3s minimum ult cooldown
-        CooldownsComponent cooldowns = JComponents.getCooldowns(user);
-        if (cooldowns.getCooldown(CooldownType.STAND_ULTIMATE) < 60)
-            cooldowns.setCooldown(CooldownType.STAND_ULTIMATE, 60);
-
-        if (hasVehicle) user.getRootVehicle().setPosition(telePos.x, telePos.y, telePos.z);
-        else user.teleport(telePos.x, telePos.y, telePos.z);
-        world.playSound(null, telePos.x, telePos.y, telePos.z, sound, SoundCategory.PLAYERS, 1f, 1f);
 
     }
 
@@ -1105,8 +1080,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             if (standAttack != null) {
                 // Counter check
                 if (!tsHit && standAttack.isCounter() && stand.getMoveStun() < (standAttack.getDuration() - standAttack.getWindup())) {
-                    //noinspection rawtypes,unchecked // Fine here
-                    ((AbstractCounterAttack) standAttack).counter(stand, attacker, source);
+                    ((AbstractCounterAttack<?, StandEntity<?, ?>>) standAttack).counter(stand, attacker, source);
                     ent.removeStatusEffect(JStatusRegistry.DAZED);
                     return;
                 }

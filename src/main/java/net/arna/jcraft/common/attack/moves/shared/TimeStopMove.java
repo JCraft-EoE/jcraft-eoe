@@ -1,0 +1,23 @@
+package net.arna.jcraft.common.attack.moves.shared;
+
+import lombok.Getter;
+import lombok.NonNull;
+import net.arna.jcraft.common.attack.moves.base.AbstractTimeStopMove;
+import net.arna.jcraft.common.entity.stand.StandEntity;
+
+@Getter
+public class TimeStopMove<A extends StandEntity<?, ?>> extends AbstractTimeStopMove<TimeStopMove<A>, A> {
+    public TimeStopMove(int cooldown, int windup, int duration, float moveDistance, int timeStopDuration) {
+        super(cooldown, windup, duration, moveDistance, timeStopDuration);
+    }
+
+    @Override
+    protected @NonNull TimeStopMove<A> getThis() {
+        return this;
+    }
+
+    @Override
+    public @NonNull TimeStopMove<A> copy() {
+        return copyExtras(new TimeStopMove<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getTimeStopDuration()));
+    }
+}
