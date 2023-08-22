@@ -60,7 +60,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             .hyperArmor()
             .setLaunch()
             .appendHitbox(new HitBoxData(0, 0, 1.5))
-            .setInfo("Overhead Smash", "slow, uninterruptable knockdown");
+            .setInfo("Overhead Smash", "slow, uninterruptible knockdown");
     public static final Attack barrage = Attack.barrageAttack(4, 14, 0.75f, 30, 0, 2, 1f, 0.25f, 1.5f, 0, 3)
             .aerialVariation(airbarrage)
             .setInfo("Barrage", "fast reliable combo starter/extender, high stun");

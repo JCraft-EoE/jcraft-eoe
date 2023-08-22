@@ -1,17 +1,15 @@
 package net.arna.jcraft.common.entity.stand;
 
-import com.google.common.collect.Lists;
 import net.arna.jcraft.common.attack.core.BlockableType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
-import net.arna.jcraft.common.attack.core.old.Attack;
-import net.arna.jcraft.common.attack.core.old.AttackType;
 import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.EffectInflictingAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
-import net.arna.jcraft.common.component.CooldownsComponent;
-import net.arna.jcraft.common.component.JComponents;
-import net.arna.jcraft.common.util.CooldownType;
+import net.arna.jcraft.common.attack.moves.whitesnake.ChargedSpewAttack;
+import net.arna.jcraft.common.attack.moves.whitesnake.MeltYourHeartAttack;
+import net.arna.jcraft.common.attack.moves.whitesnake.PilotModeMove;
+import net.arna.jcraft.common.attack.moves.whitesnake.PoisonSpewAttack;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
@@ -28,31 +26,38 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEntity.State> {
-    public static final SimpleAttack<WhiteSnakeEntity> LIGHT = SimpleAttack.<WhiteSnakeEntity>lightAttack(7, 14, 5f, 12, 0.75f, 0.75f, 0.2f)
+    public static final SimpleAttack<WhiteSnakeEntity> LIGHT = SimpleAttack.<WhiteSnakeEntity>lightAttack(7,
+                    14, 5f, 12, 0.75f, 0.75f, 0.2f)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
-    public static final SimpleAttack<WhiteSnakeEntity> DONUT = new SimpleAttack<WhiteSnakeEntity>(280, 17, 36, 10, 28, 2, 0, 1, 0)
+    public static final SimpleAttack<WhiteSnakeEntity> DONUT = new SimpleAttack<WhiteSnakeEntity>(280,
+            17, 36, 10, 28, 2, 0, 1, 0)
             .withSound(JSoundRegistry.WS_DONUT)
             .withImpactSound(JSoundRegistry.TW_DONUT_HIT)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Donut"), Text.literal("slow combo starter/extender"));
-    public static final BarrageAttack<WhiteSnakeEntity> BARRAGE = new BarrageAttack<WhiteSnakeEntity>(340, 0, 60, 0.75f, 1, 20, 2, 0.25f, 0, 3)
+    public static final BarrageAttack<WhiteSnakeEntity> BARRAGE = new BarrageAttack<WhiteSnakeEntity>(
+            340, 0, 60, 0.75f, 1, 20, 2, 0.25f, 0, 3)
             .withSound(JSoundRegistry.WS_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, medium stun"));
-    public static final EffectInflictingAttack<WhiteSnakeEntity> STAND_DISC = new EffectInflictingAttack<WhiteSnakeEntity>(600, 22, 34, 1, 8f, 20, 2, 0, 0, List.of(new StatusEffectInstance(JStatusRegistry.STANDLESS, 160, 0)))
+    public static final EffectInflictingAttack<WhiteSnakeEntity> STAND_DISC = new EffectInflictingAttack<WhiteSnakeEntity>(
+            600, 22, 34, 1, 8f, 20, 2, 0, 0,
+            List.of(new StatusEffectInstance(JStatusRegistry.STANDLESS, 160, 0)))
             .withSound(JSoundRegistry.WS_STAND_DISC)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHyperArmor()
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
-            .withInfo(Text.literal("Stand Disk"), Text.literal("uninterruptable, removes enemy stand for 8s"));
-    public static final SimpleAttack<WhiteSnakeEntity> LEG_CRUSHER = new SimpleAttack<WhiteSnakeEntity>(400, 16, 22, 7, 32, 1.75f, 0.25f, 0.75f, 0.2f)
+            .withInfo(Text.literal("Stand Disk"), Text.literal("uninterruptible, removes enemy stand for 8s"));
+    public static final SimpleAttack<WhiteSnakeEntity> LEG_CRUSHER = new SimpleAttack<WhiteSnakeEntity>(400,
+            16, 22, 7, 32, 1.75f, 0.25f, 0.75f, 0.2f)
             .withSound(JSoundRegistry.WS_LEGCRUSH)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withInfo(Text.literal("Leg Crusher"), Text.literal("high stun, medium windup"))
-    public static final EffectInflictingAttack<WhiteSnakeEntity> MEMORY_DISC = new EffectInflictingAttack<WhiteSnakeEntity>(600, 22, 34, 1, 7f, 20, 2, 0, 0,
+            .withInfo(Text.literal("Leg Crusher"), Text.literal("high stun, medium windup"));
+    public static final EffectInflictingAttack<WhiteSnakeEntity> MEMORY_DISC = new EffectInflictingAttack<WhiteSnakeEntity>(
+            600, 22, 34, 1, 7f, 20, 2, 0, 0,
             List.of(
                     new StatusEffectInstance(StatusEffects.WEAKNESS, 600, 0),
                     new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 600, 0)
@@ -62,19 +67,26 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHyperArmor()
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
-            .withInfo(Text.literal("Memory Disk"), Text.literal("uninterruptable, mining fatigue & weakness for 30s"));
-    public static final Attack chargedspew = new Attack(7, 30, 0.75f, 26, 20, 2, 0f, 0, AttackType.BOX)
-            .setUB(true)
-            .setInfo("Charged Spew", "fires 5, slower acid balls");
-    public static final Attack poisonspew = new Attack(5, 20, 0.75f, 14, 10, 2, 0f, 0, AttackType.BOX)
-            .setUB(true)
-            .crouchingVariation(chargedspew)
-            .setInfo("Poison Spew", "fires an acid projectile that slows enemies and persists on the surface it hits for 5s");
-    public static final Attack meltyourheart = new Attack(8, 40, 1f, 50, 40, 2, 3f, 1.0f, AttackType.BOX, 1f, 0, 0, JSoundRegistry.IMPACT_2)
-            .hyperArmor()
-            .setUB(true)
-            .setLaunch()
-            .setInfo("Melt your Heart", "remote-only and armored, expels a sphere of poison");
+            .withInfo(Text.literal("Memory Disk"), Text.literal("uninterruptible, mining fatigue & weakness for 30s"));
+    public static final ChargedSpewAttack CHARGED_SPEW = new ChargedSpewAttack(600, 20, 26,
+            0.75f, 0f, 0, 2f, 0f, 0f)
+            .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
+            .withInfo(Text.literal("Poison Spew"), Text.literal("fires an acid projectile that slows enemies and persists on the surface it hits for 5s"));
+    public static final PoisonSpewAttack POISON_SPEW = new PoisonSpewAttack(400, 10, 14,
+            0.75f, 0f, 0, 2f, 0f, 0f)
+            .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
+            .withCrouchingVariant(CHARGED_SPEW)
+            .withInfo(Text.literal("Poison Spew"), Text.literal("fires an acid projectile that slows enemies and persists on the surface it hits for 5s"));
+    public static final MeltYourHeartAttack MELT_YOUR_HEART = new MeltYourHeartAttack(800, 40, 50,
+            1f, 3f, 20, 2f, 1f, 0f)
+            .withSound(JSoundRegistry.WS_MYH)
+            .withImpactSound(JSoundRegistry.IMPACT_2)
+            .withHyperArmor()
+            .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
+            .withLaunch()
+            .withInfo(Text.literal("Melt your Heart"), Text.literal("remote-only and armored, expels a sphere of poison"));
+    public static final PilotModeMove PILOT_MODE = new PilotModeMove(20)
+            .withInfo(Text.literal("Pilot Mode"), Text.empty());
 
     public WhiteSnakeEntity(World worldIn) {
         super(StandType.WHITE_SNAKE, worldIn, JSoundRegistry.WS_SUMMON);
@@ -106,28 +118,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
                             -the protein shake (sets up mixups)
                             M1>Barrage>Leg Crusher>Charged Spew""";
 
-        moves = Lists.newArrayList(light, donut, barrage, memorydisk, standdisk, legcrusher, poisonspew,
-                new Attack().setInfo("Pilot Mode", ""));
-
         super.initialize();
-    }
-
-    @Override
-    public void initMove(MoveType type) {
-        if (type != MoveType.UTILITY) super.initMove(type);
-
-        if (!canAttack() || !hasUser()) return;
-        CooldownsComponent cooldowns = JComponents.getCooldowns(getUserOrThrow());
-        if (cooldowns.getCooldown(CooldownType.UTILITY) > 0) return;
-
-        boolean newRemote = !getRemote();
-        setRemote(newRemote);
-
-        // TODO: update ultimate when going into/out of pilot mode
-        //if (newRemote) moves.set(4, meltyourheart);
-        //else moves.set(4, standdisk);
-
-        cooldowns.setCooldown(CooldownType.UTILITY, 20);
     }
 
     @Override
@@ -139,69 +130,21 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         moves.register(MoveType.SPECIAL1, MEMORY_DISC, State.DISC);
         moves.register(MoveType.SPECIAL2, LEG_CRUSHER, State.LEG_CRUSHER);
         moves.register(MoveType.SPECIAL3, POISON_SPEW, State.ACID_SPEW).withCrouchingVariant(State.ACID_SPEW_CHARGED);
-        moves.register(MoveType.ULTIMATE, STAND_DISC, State.DISC);
+        moves.register(MoveType.ULTIMATE, isRemote() ? MELT_YOUR_HEART : STAND_DISC, isRemote() ? State.MELT_YOUR_HEART : State.DISC);
 
-        //todo: register pilot mode, but only as info
-        //moves.register(MoveType.UTIL, )
+        moves.register(MoveType.UTILITY, PILOT_MODE);
     }
 
-    @Override
-    public void initUlt() {
-        if (!canAttack()) return;
-        if (getRemote() && handleMove(meltyourheart, CooldownType.STAND_ULTIMATE, State.MELT_YOUR_HEART))
-            playSound(JSoundRegistry.WS_MYH, 1, 1);
-        else if (handleMove(standdisk, CooldownType.STAND_ULTIMATE, State.DISC))
-            playSound(JSoundRegistry.WS_STAND_DISC, 1, 1);
+    public void togglePilotMode() {
+        setRemote(!isRemote());
+        registerMoves(); // To switch the ultimate with the proper one.
     }
-
-    @Override
-    public void initSpecial3() {
-        if (!canAttack() || !hasUser()) return;
-
-        if (getUserOrThrow().isSneaking())
-            handleMove(chargedspew, CooldownType.STAND_SP3, State.ACID_SPEW_CHARGED);
-        else handleMove(poisonspew, CooldownType.STAND_SP3, State.ACID_SPEW);
-    }
-
-
-    /*
-            case(5)->
-    { // Poison Spew
-        WSAcidProjectile acidProjectile = new WSAcidProjectile(world, user);
-        acidProjectile.setVelocity(user, user.getPitch(), user.getYaw(), 0, 1.33F, 0);
-        acidProjectile.setPosition(getEyePos());
-        world.spawnEntity(acidProjectile);
-    }
-
-            case(7)->
-    { // Charged Spew
-        for (int i = 0; i < 5; i++) {
-            WSAcidProjectile acidProjectile = new WSAcidProjectile(world, user);
-            acidProjectile.setVelocity(user, user.getPitch(), user.getYaw() - 75F + i * 37.5F, 0, 0.66F, 0);
-            acidProjectile.setPosition(getEyePos());
-            world.spawnEntity(acidProjectile);
-        }
-    }
-            case(8)->
-    { // Melt your Heart
-        for (int i = 0; i < 10; i++) {
-            float yaw = i * 36F - 180F + i * 3.6F;
-            for (int j = 0; j < 10; j++) {
-                WSAcidProjectile acidProjectile = new WSAcidProjectile(world, user);
-                acidProjectile.markMeltYourHeart();
-                acidProjectile.setVelocity(user, j * 36F - 180F, yaw, 0, 0.66F, 0);
-                acidProjectile.setPosition(getEyePos());
-                world.spawnEntity(acidProjectile);
-            }
-        }
-    }
-     */
 
     @Override
     public void tick() {
         super.tick();
 
-        if (!getRemote() || world.isClient) return;
+        if (!isRemote() || world.isClient) return;
 
         double f = getRemoteForwardInput();
         double s = getRemoteSideInput();

@@ -14,6 +14,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,12 +30,13 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     private int duration;
     private float moveDistance;
     private Text name = Text.empty(), description = Text.empty();
-    private AbstractMove<?, ? super A> crouchingVariant, aerialVariant, followUp;
+    private @Nullable AbstractMove<?, ? super A> crouchingVariant, aerialVariant, followUp;
     private boolean isCrouchingVariant, isAerialVariant;
     private int armor;
     protected MobilityType mobilityType;
     // Used to help AI know how and when to use this attack.
     protected boolean ranged, barrage, multiHit, charge, counter, dash, grab;
+    private boolean copiedExtras; // See #testCopy()
 
     protected AbstractMove(int cooldown, int windup, int duration, float moveDistance) {
         this.cooldown = cooldown;
@@ -113,6 +115,8 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * @return This move
      */
     public T withCrouchingVariant(AbstractMove<?, ? super A> crouchingVariant) {
+        if (isCrouchingVariant) throw new IllegalStateException("Can't assign a crouching variant to a crouching variant.");
+
         this.crouchingVariant = crouchingVariant.copy();
         this.crouchingVariant.isCrouchingVariant = true;
         return getThis();
@@ -125,6 +129,8 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * @return This move
      */
     public T withAerialVariant(AbstractMove<?, ? super A> aerialVariant) {
+        if (isAerialVariant) throw new IllegalStateException("Can't assign an aerial variant to an aerial variant.");
+
         this.aerialVariant = aerialVariant.copy();
         this.aerialVariant.isAerialVariant = true;
         return getThis();
@@ -199,8 +205,9 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * @param type The MoveType this move is registered as
      */
     @ApiStatus.Internal
-    public void onRegister(MoveType type) {
+    public final void onRegister(MoveType type) {
         moveType = type;
+        testCopy();
     }
 
     // Logic methods
@@ -353,13 +360,14 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         cast.moveType = moveType;
         cast.name = name;
         cast.description = description;
-        cast.followUp = followUp.copy();
-        cast.crouchingVariant = crouchingVariant.copy();
-        cast.aerialVariant = aerialVariant.copy();
+        cast.followUp = followUp == null ? null : followUp.copy();
+        cast.crouchingVariant = crouchingVariant == null ? null : crouchingVariant.copy();
+        cast.aerialVariant = aerialVariant == null ? null : aerialVariant.copy();
         cast.isCrouchingVariant = isCrouchingVariant;
         cast.isAerialVariant = isAerialVariant;
         cast.armor = armor;
         cast.mobilityType = mobilityType;
+        copiedExtras = true;
         return base;
     }
 
@@ -368,4 +376,23 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * @return A copy of this attack.
      */
     public abstract @NonNull T copy();
+
+    /**
+     * Ensures the copy method does not return {@code null} and calls {@link #copyExtras(AbstractMove)}
+     * (and the override calls the super method if applicable).
+     * This is to prevent mistakes that are easily made and easily fixed but can have devastating consequences.
+     * Called in {@link #onRegister(MoveType)}.
+     */
+    private void testCopy() {
+        copiedExtras = false;
+        T copy = copy();
+        //noinspection ConstantValue // That's the idea.
+        if (copy == null) throw new NullPointerException(getClass().getSimpleName() + "#copy() returned null");
+        if (!copiedExtras) throw new IllegalStateException(getClass().getSimpleName() + "#copy() does not" +
+                "call #copyExtras(AbstractMove).");
+
+        if (crouchingVariant != null) crouchingVariant.testCopy();
+        if (aerialVariant != null) aerialVariant.testCopy();
+        if (followUp != null) followUp.testCopy();
+    }
 }

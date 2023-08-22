@@ -77,7 +77,7 @@ public abstract class LivingEntityMixin implements IDamageScaler {
         if (
                 entity.hasStatusEffect(JStatusRegistry.KNOCKDOWN) || // Knocked down
                         (stun != null && stun.getAmplifier() != 2) || // Stunned (not blocking)
-                        (stand != null && stand.getRemote()) // Stand ON in remote mode
+                        (stand != null && stand.isRemote()) // Stand ON in remote mode
         ) cir.setReturnValue(-1.0D); // Nullify jump
         /*
         else if (stand != null && (stand.curAttack != null && stand.curAttack.attackType == AttackType.BARRAGE)) { // Stand ON and barraging

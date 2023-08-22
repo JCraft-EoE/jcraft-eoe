@@ -140,7 +140,7 @@ public class ClientPacketHandler {
 
                 // Synchronize spec values
                 if (isSpec) {
-                    JSpec spec = JUtils.getSpec(player);
+                    JSpec<?, ?> spec = JUtils.getSpec(player);
                     if (spec == null) {
                         JCraft.LOGGER.error("Tried to set spec animation values on player without spec: " + player + ", in world " + client.world);
                     } else {

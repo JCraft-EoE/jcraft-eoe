@@ -47,7 +47,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public static final Attack heavy = new Attack(1, 14, 1f, 30, 20, 1.5, 8f, 0.1f, AttackType.BOX, 2, 0, 0, JSoundRegistry.IMPACT_3)
             .setHitspark(2)
             .hyperArmor()
-            .setInfo("Vertical Chop", "slow, uninterruptable combo starter");
+            .setInfo("Vertical Chop", "slow, uninterruptible combo starter");
     public static final Attack combo = new Attack(2, 17, 0.75f, 36, 0, 2.0, 5f, 0.1f, AttackType.MULTIHIT, 1, 0, List.of(10, 17, 25), JSoundRegistry.IMPACT_3)
             .setInfo("3-hit Combo", "medium windup, good stun");
     public static final Attack grab = new Attack(3, 20, 1f, 20, 8, 1.5, 3f, 0f, AttackType.BOX, 1.5f, 0, 0)
@@ -70,7 +70,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             .setStunType(StunType.LAUNCH)
             .hyperArmor()
             .setUB(false)
-            .setInfo("Destroy", "slow, uninterruptable, unblockable knockdown");
+            .setInfo("Destroy", "slow, uninterruptible, unblockable knockdown");
     public static final Attack consume = new Attack(7, 32, 1f, 40, 35, 2.0, 2f, 0f, AttackType.BOX)
             .setRanged(true)
             .setInfo("Void", "high windup, 6 seconds");
@@ -85,7 +85,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             .setHitspark(2)
             .hyperArmor()
             .setLaunch()
-            .setInfo("Overhead Smash", "slow, uninterruptable launcher");
+            .setInfo("Overhead Smash", "slow, uninterruptible launcher");
     public static final Attack ballcombo = new Attack(12, 14, 0.1f, 36, 0, 2, 7f, 0.1f, AttackType.MULTIHIT, 0.75f, 0.3f, List.of(10, 17, 25), JSoundRegistry.IMPACT_3)
             .setInfo("3-hit Combo", "less stun than grounded version");
     public static final Attack ballcharge = new Attack(13, 20, 28, 13, 0, AttackType.BOX)

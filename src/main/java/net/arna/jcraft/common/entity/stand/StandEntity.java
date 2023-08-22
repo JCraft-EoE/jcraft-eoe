@@ -66,7 +66,6 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static net.arna.jcraft.JCraft.comboBreak;
 import static net.minecraft.command.argument.EntityAnchorArgumentType.EntityAnchor;
@@ -368,7 +367,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         lastRemoteInputTime = age;
     }
 
-    public boolean getRemote() {
+    public boolean isRemote() {
         return this.dataTracker.get(REMOTE);
     }
 
@@ -585,8 +584,14 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         MoveMap.Entry<E, S> entry = getMoveMap().getFirstValidEntry(type, getThis());
         if (entry == null) return false;
 
-        if (hasUser() && getUserOrThrow().isSneaking() && entry.getMove().getCrouchingVariant() != null)
-            entry = Objects.requireNonNull(entry.getCrouchingVariant());
+        if (hasUser() && !getUserOrThrow().isOnGround() && entry.getAerialVariant() != null)
+            entry = entry.getAerialVariant();
+        // This means crouching aerial variants are also supported. :O
+        if (hasUser() && getUserOrThrow().isSneaking() && entry.getCrouchingVariant() != null)
+            entry = entry.getCrouchingVariant();
+        // Ensure a crouching variant of an aerial variant and an aerial variant of a crouching variant both work.
+        if (hasUser() && !getUserOrThrow().isOnGround() && entry.getAerialVariant() != null)
+            entry = entry.getAerialVariant();
 
         return handleMove(entry.getMove(), entry.getCooldownType(), entry.getAnimState());
     }
@@ -813,12 +818,12 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * Returns whether the stand defaults to returning to the user while idle and detached
      */
     public boolean defaultToNear() {
-        return !getRemote();
+        return !isRemote();
     }
 
     @Override
     public boolean hasNoGravity() {
-        if (getFree() && !getRemote()) return true;
+        if (getFree() && !isRemote()) return true;
         return super.hasNoGravity();
     }
 
@@ -859,7 +864,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             rotVec = new Vec3d(rotVec.x, -rotVec.y, rotVec.z);
 
         boolean isFree = getFree();
-        boolean isRemote = getRemote();
+        boolean isRemote = isRemote();
 
         // Common code for remote mode
         if (isRemote) {
@@ -1109,7 +1114,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 if (--stand.armorPoints < 0) stand.cancelAttack();
             }
 
-            if (stand.blocking && !stand.getRemote()) {
+            if (stand.blocking && !stand.isRemote()) {
                 double delta = Math.abs((ent.headYaw + 90.0f) % 360.0f - (attacker.getHeadYaw() + 90.0f) % 360.0f);
                 if (canBackstab && (360.0 - delta % 360.0 < 90 || delta % 360.0 < 90) && ent.squaredDistanceTo(attacker.getPos()) >= 1.5625) { // Backstab logic
                     JCraft.createParticle((ServerWorld) attacker.getWorld(), ent.getX(), attacker.getEyeY(), ent.getZ(), JParticleType.BACK_STAB);
@@ -1199,7 +1204,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if (getVehicle() == null) return;
 
         super.stopRiding();
-        if (getRemote() || world.isClient) return;
+        if (isRemote() || world.isClient) return;
 
         playSound(JSoundRegistry.STAND_DESUMMON, 1, 1);
         discard();

@@ -84,7 +84,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .appendHitbox(new HitBoxData(1.5))
             .setHitspark(2)
             .hyperArmor()
-            .setInfo("Launch", "uninterruptable, slow, launching uppercut");
+            .setInfo("Launch", "uninterruptible, slow, launching uppercut");
     public static final Attack slam = new Attack(10, 0, 1.25f, 10, 4, 2, 4f, 0.2f, AttackType.BOX, 1.2f, 0.1f, 0, JSoundRegistry.IMPACT_2);
     public static final Attack pound = new Attack(4, 13, 1.25f, 22, 7, 1.5, 4f, 0.1f, AttackType.BOX, 1.25f, -0.1f, 0, JSoundRegistry.IMPACT_2)
             .setLift(false)

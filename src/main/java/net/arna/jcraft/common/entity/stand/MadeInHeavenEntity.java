@@ -67,7 +67,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     public static final Attack donut = new Attack(1, 23, 0.75f, 32, 26, 2, 8.5f, 0.0f, AttackType.BOX, 2f, 0.2f, 0, JSoundRegistry.IMPACT_7)
             .hyperArmor()
             .setHitspark(2)
-            .setInfo("Roundabout Donut", "feigns stand desummon, uninterruptable combo starter");
+            .setInfo("Roundabout Donut", "feigns stand desummon, uninterruptible combo starter");
     public static final Attack timeaccel = new Attack(6, 70, 40, 20, 0, AttackType.BOX)
             .setInfo("Time Acceleration",
                     """

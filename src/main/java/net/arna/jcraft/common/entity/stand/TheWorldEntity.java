@@ -51,7 +51,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
             .setHitspark(2)
             .appendHitbox(new HitBoxData(0, 0, 1.5))
             .hyperArmor()
-            .setInfo("Donut", "slow, uninterruptable combo starter/extender, 1.5s stun on whiff");
+            .setInfo("Donut", "slow, uninterruptible combo starter/extender, 1.5s stun on whiff");
     private static final Attack timeskip = new Attack(-2, 18, 2, 2)
             .setMobility(MobilityType.TELEPORT)
             .setInfo("Timeskip", "14m range");

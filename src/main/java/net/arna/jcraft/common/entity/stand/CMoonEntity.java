@@ -54,7 +54,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             .hyperArmor()
             .setLaunch()
             .appendHitbox(new HitBoxData(0, 0.25, 1.25))
-            .setInfo("Gut Punch", "slow, uninterruptable combo finisher");
+            .setInfo("Gut Punch", "slow, uninterruptible combo finisher");
     public static final Attack launch = new Attack(4, 22, 0.75f, 21, 14, 1.75, 5f, 0.9f, AttackType.BOX, 0.95f, 0.3f, 0, JSoundRegistry.IMPACT_5)
             .setHitspark(2)
             .setRanged(true)
