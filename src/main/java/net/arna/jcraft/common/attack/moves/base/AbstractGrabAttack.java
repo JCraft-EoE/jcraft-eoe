@@ -2,7 +2,9 @@ package net.arna.jcraft.common.attack.moves.base;
 
 import lombok.Getter;
 import lombok.NonNull;
+import net.arna.jcraft.common.attack.core.BlockableType;
 import net.arna.jcraft.common.attack.core.IAttacker;
+import net.arna.jcraft.common.attack.core.StunType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.minecraft.entity.LivingEntity;
 
@@ -17,9 +19,15 @@ public abstract class AbstractGrabAttack<T extends AbstractGrabAttack<T, A, S>, 
     public AbstractGrabAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun, float hitboxSize,
                               float knockback, float offset, AbstractMove<?, ? super A> hitMove, S hitState) {
         super(cooldown, windup, duration, attackDistance, damage, stun, hitboxSize, knockback, offset);
+
         grab = true;
+
         this.hitMove = hitMove;
         this.hitState = hitState;
+
+        // Grabs cannot be burst out of, or blocked
+        this.withStunType(StunType.UNBURSTABLE);
+        this.withBlockableType(BlockableType.NON_BLOCKABLE);
     }
 
     @Override

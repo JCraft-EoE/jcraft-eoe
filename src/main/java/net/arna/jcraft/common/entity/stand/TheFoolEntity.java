@@ -1,14 +1,24 @@
 package net.arna.jcraft.common.entity.stand;
 
+import it.unimi.dsi.fastutil.ints.IntSet;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.attack.core.old.Attack;
-import net.arna.jcraft.common.attack.core.old.MoveQueue;
-import net.arna.jcraft.common.attack.core.old.AttackType;
 import net.arna.jcraft.common.attack.core.HitBoxData;
+import net.arna.jcraft.common.attack.core.MoveMap;
+import net.arna.jcraft.common.attack.core.MoveType;
+import net.arna.jcraft.common.attack.core.old.Attack;
+import net.arna.jcraft.common.attack.core.old.AttackType;
+import net.arna.jcraft.common.attack.core.old.MoveQueue;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
+import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
+import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
+import net.arna.jcraft.common.attack.moves.shared.SimpleMultiHitAttack;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.entity.projectile.SandTornadoEntity;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.common.util.*;
+import net.arna.jcraft.common.util.CooldownType;
+import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.common.util.MobilityType;
+import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegistry;
@@ -38,6 +48,7 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
@@ -54,11 +65,17 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.State> {
-    public static final Attack light = new Attack(0, JCraft.lightCooldown, 1.5f, 14, 7, 2, 6f, 0.8f, AttackType.BOX, 0.75f, -0.1f, 0, JSoundRegistry.IMPACT_2)
-            .appendHitbox(new HitBoxData(0, 0.25, 1))
-            .setInfo("Swipe", "slow, long-reaching poke");
-    public static final Attack airbarrage = Attack.barrageAttack(3, 17, 1f, 30, 0, 2, 1f, 0.1f, 0.5f, 0, 3)
-            .setInfo("Burn Rubber", "slows down all movement, combo starter/extender");
+    public static final SimpleMultiHitAttack<TheFoolEntity> DRILL = new SimpleMultiHitAttack<TheFoolEntity>(30, 14, 2.5f, 5, 1.5f, 0.2f, 1.5f, 0.25f, IntSet.of(5, 8, 11))
+            .withBlockStun(4)
+            .withInfo(Text.literal("Drill"), Text.literal("fast, multi-hitting combo starter, low stun and blockstun"));
+    public static final SimpleAttack<TheFoolEntity> LIGHT = new SimpleAttack<TheFoolEntity>( 30, 7, 14, 6, 15, 2, 0.8f, 1.5f, -0.1f)
+            .withImpactSound(JSoundRegistry.IMPACT_2)
+            .withExtraHitBox(0, 0.25, 1)
+            .withCrouchingVariant(DRILL)
+            .withInfo(Text.literal("Swipe"), Text.literal("slow, long-reaching poke"));
+    //todo: air barrage slows down movement
+    public static final BarrageAttack<TheFoolEntity> AIR_BARRAGE = new BarrageAttack<TheFoolEntity>(340, 0, 30, 1, 1, 10, 2, 0.1f, 0, 3)
+            .withInfo(Text.literal("Burn Rubber"), Text.literal("slows down all movement, combo starter/extender"));
     public static final Attack combo = new Attack(2, 15, 1.5f, 29, 0, 1.75, 4.5f, 0.1f, AttackType.MULTIHIT, 1f, -0.1f, List.of(6, 14, 18, 19), JSoundRegistry.IMPACT_2)
             .appendHitbox(new HitBoxData(0.5, 0, 1.25))
             .aerialVariation(airbarrage)
@@ -89,7 +106,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .disableBackstab()
             .aerialVariation(glide)
             .setInfo("Sandwave", "The Fool turns into a quick sandwave that knocks anything it touches down");
-    //todo: sand tornado tracking
+    //todo: sand tornado tracking (projectile-only code)
     public static final Attack tornado = new Attack(11, 25, 1, 13, 12, 0, 0f, 0.0f, AttackType.BOX)
             .setRanged(true)
             .setInfo("Sand Tornado", "summons a slow, stunning sand tornado");
@@ -105,7 +122,6 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .hyperArmor()
             .setUB(true)
             .setInfo("Suffocating Sandstorm", "very slow, traps the opponent in a cloud of slowing sand");
-    //todo: replace this with a funny local storm?
 
     private static final TrackedData<Boolean> ISSAND;
     private static final TrackedData<Boolean> ISWAVE;
@@ -123,7 +139,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
 
         pros = List.of(
                 "long reach",
-                "easy, accessible space control using crouching (reduces attack distance) and multiple armored options",
+                "easy, accessible space control using crouching and multiple armored options",
                 "easy setups",
                 "good combo tools",
                 "doesn't receive chip damage on block"
@@ -139,6 +155,8 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
 
         freespace =
                 """
+                        CROUCHING reduces attack distance by half, allowing better space control
+                        
                         BNBs:
                             M1>Pound~Slam>Launch>M1>Burn Rubber>Finisher*
                             Burn Rubber>M1>Pound~Slam>Launch>Finisher*
@@ -157,6 +175,11 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
         moves = List.of(light, launch, combo, pound, sandstorm, charge, sandclone, sandwave);
 
         super.initialize();
+    }
+
+    @Override
+    protected void registerMoves(MoveMap<TheFoolEntity, State> moves) {
+        moves.register(MoveType.LIGHT, LIGHT, State.SWIPE).withCrouchingVariant(State.DRILL);
     }
 
     public boolean isSand() {
@@ -314,11 +337,11 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     }
 
     @Override
-    public void setAttack(Attack attack, State state) {
+    public boolean setMove(AbstractMove<?, ? super TheFoolEntity> move, @Nullable State animState) {
         if (getUser() != null && getUser().isSneaking()) {
             setSand(true);
-            super.setMove(Attack.copyOf(attack).setDist(attack.attackDist / 2f), state);
-        } else super.setMove(attack, state);
+            return super.setMove(move.copy().withMoveDistance(move.getMoveDistance() / 2f), animState);
+        } else return super.setMove(move, animState);
     }
 
     @Override
@@ -552,7 +575,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
                     }
                 }
             } else {
-                Attack attack = curMove;
+                AbstractMove<?, ? super TheFoolEntity> attack = curMove;
                 if (lastRemoteInputTime - age > 4) updateRemoteInputs(0, 0, false);
                 if (attack != null) {
                     if (attack.id == slam.id && slamType != 1) queuedAttack = null;
@@ -648,7 +671,8 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
         SAND_WAVE(builder -> builder.loop("animation.thefool.sandwave")),
         SANDSTORM(builder -> builder.playAndHold("animation.thefool.sandstorm")),
         GLIDE(builder -> builder.loop("animation.thefool.glide")),
-        TORNADO(builder -> builder.loop("animation.thefool.tornado"));
+        TORNADO(builder -> builder.loop("animation.thefool.tornado")),
+        DRILL(builder -> builder.loop("animation.thefool.drill"));
 
         private final BiConsumer<TheFoolEntity, AnimationBuilder> animator;
 

@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.entity.stand;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.old.Attack;
 import net.arna.jcraft.common.attack.core.old.AttackType;
 import net.arna.jcraft.common.attack.core.HitBoxData;
@@ -49,6 +50,10 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .setInfo("Slice", "quick combo starter");
     public static final Attack barrage = Attack.barrageAttack(2, 17, 0.85f, 32, 0, 2, 1.5f, 0.1f, 0.5f, 0, 3, JSoundRegistry.IMPACT_1)
             .setInfo("Barrage", "short, knocks back");
+    private static final Attack barrageFinisher = new Attack(8, 17, 0.85f, 9, 6, 1.5, 1f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegistry.TW_KICK_HIT)
+            .setHitspark(2)
+            .setLaunch()
+            .setInfo("Barrage (Final Hit)", "");
     public static final Attack speedslice = new Attack(7, 18, 1.25f, 11, 10, 0, 6f, 0.5f, AttackType.BOX, 1f, 0, 0)
             .setRanged(true)
             .setMobility(MobilityType.TELEPORT)
@@ -79,6 +84,43 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     public static final Attack judgement = Attack.barrageAttack(5, 33, 1.25f, 60, 20, 0, 0f, 0.5f, 0, 0, 2)
             .crouchingVariation(circle)
             .setInfo("Divine Severance", "Made in Heaven rapidly speed slices an area, then finishes with a large, launching slice");
+
+    public MadeInHeavenEntity(World worldIn) {
+        super(StandType.MADE_IN_HEAVEN, worldIn, JSoundRegistry.MIH_SUMMON);
+        idleRotation = -45f;
+
+        description = "Lightspeed RUSHDOWN";
+
+        pros = List.of(
+                "best mobility",
+                "great mixups",
+                "good pressure",
+                "low cooldowns"
+        );
+
+        cons = List.of(
+                "bad defensive options",
+                "relies on good spacing"
+        );
+
+        freespace =
+                """
+                PASSIVE: Speed I
+                
+                BNBs:
+                    -the white supremacist
+                    (Donut>M1>)Speed Slice>Leg Crusher>Fury Chop>M1>Barrage""";
+
+        moves = List.of(light, donut, barrage, legcrusher, timeaccel, furychop, judgement, speedslice);
+
+        super.initialize();
+    }
+
+    @Override
+    protected void registerMoves(MoveMap<MadeInHeavenEntity, State> moves) {
+
+    }
+
     private static final TrackedData<Integer> ACCELTIME;
     private static final TrackedData<Integer> TARGETID;
     private static final TrackedData<Integer> SPEEDOMETER;
@@ -141,37 +183,6 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
 
     private void setTargetId(int id) {
         dataTracker.set(TARGETID, id);
-    }
-
-    public MadeInHeavenEntity(World worldIn) {
-        super(StandType.MADE_IN_HEAVEN, worldIn, JSoundRegistry.MIH_SUMMON);
-        idleRotation = -45f;
-
-        description = "Lightspeed RUSHDOWN";
-
-        pros = List.of(
-                "best mobility",
-                "great mixups",
-                "good pressure",
-                "low cooldowns"
-        );
-
-        cons = List.of(
-                "bad defensive options",
-                "relies on good spacing"
-        );
-
-        freespace =
-                """
-                PASSIVE: Speed I
-                
-                BNBs:
-                    -the white supremacist
-                    (Donut>M1>)Speed Slice>Leg Crusher>Fury Chop>M1>Barrage""";
-
-        moves = List.of(light, donut, barrage, legcrusher, timeaccel, furychop, judgement, speedslice);
-
-        super.initialize();
     }
 
     @Override
@@ -284,11 +295,6 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
         setMove(attack, animState);
         return true;
     }
-
-    private static final Attack barrageFinisher = new Attack(8, 17, 0.85f, 9, 6, 1.5, 1f, 1.1f, AttackType.BOX, 0.5f, 0, 0, JSoundRegistry.TW_KICK_HIT)
-            .setHitspark(2)
-            .setLaunch()
-            .setInfo("Barrage (Final Hit)", "");
 
     @Override
     public void specialAttack(Attack attack, Set<LivingEntity> entities) {

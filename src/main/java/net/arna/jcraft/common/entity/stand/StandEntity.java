@@ -4,15 +4,17 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.attack.core.*;
+import net.arna.jcraft.common.attack.core.IAttacker;
+import net.arna.jcraft.common.attack.core.MoveMap;
+import net.arna.jcraft.common.attack.core.MoveType;
+import net.arna.jcraft.common.attack.core.ctx.MoveContext;
+import net.arna.jcraft.common.attack.core.old.Attack;
+import net.arna.jcraft.common.attack.core.old.AttackType;
+import net.arna.jcraft.common.attack.core.old.MoveQueue;
 import net.arna.jcraft.common.attack.moves.base.AbstractBarrageAttack;
 import net.arna.jcraft.common.attack.moves.base.AbstractCounterAttack;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
-import net.arna.jcraft.common.attack.core.ctx.MoveContext;
-import net.arna.jcraft.common.attack.core.old.Attack;
-import net.arna.jcraft.common.attack.core.old.MoveQueue;
-import net.arna.jcraft.common.attack.core.old.AttackType;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
@@ -41,7 +43,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -64,7 +65,9 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import static net.arna.jcraft.JCraft.comboBreak;
 import static net.minecraft.command.argument.EntityAnchorArgumentType.EntityAnchor;
@@ -108,6 +111,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     private final SoundEvent summonSound;
     private final boolean playGenericSummonSound;
 
+    @Setter
     protected int tsTime = 0;
     @Getter
     private float prevAlpha = 1f;
@@ -854,7 +858,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         Vec3d rotVec = getRotationVector();
         if (gravDir == Direction.UP)
             rotVec = new Vec3d(rotVec.x, -rotVec.y, rotVec.z);
-        Vec3d eyePos = pos.add(GravityChangerAPI.getEyeOffset(this));
+
         boolean isFree = getFree();
         boolean isRemote = getRemote();
 
@@ -915,45 +919,34 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             int curMoveStun = this.getMoveStun();
 
             // Attack logic
-            if (attack != null) attack.tick(getThis());
+            if (attack != null) {
+                attack.tick(getThis());
 
-            if (curMoveStun >= 0 && !this.blocking && attack != null) {
-                int stunTicks = 0;
-                //LOGGER.info("Stun ticks: " + stunTicks);
+                if (curMoveStun >= 0 && !blocking) {
+                    int moveStun = attack.getDuration();
+                    float attackDist = attack.getMoveDistance();
 
-                int moveStun = attack.getDuration();
-                float attackDist = attack.getMoveDistance();
+                    int realInitTime = (moveStun - attack.getWindup());
 
-                int realInitTime = (moveStun - attack.getWindup());
-
-                boolean isChargeAttack = attack.isCharge();
-                // Positioning
-                if (isChargeAttack) {
-                    if (curMoveStun <= realInitTime) {
-                        //float t = 1f - (float) curMoveStun / (float) realInitTime;
-                        Vec3d newPos = pos.add(rotVec.multiply(attackDist / realInitTime));
-                        //this.setDistanceOffset(1 + attackDist * t * t);
-                        this.setFreePos(new Vec3f((float) newPos.x, (float) newPos.y, (float) newPos.z));
-                        this.setFree(true);
+                    boolean isChargeAttack = attack.isCharge();
+                    // Positioning
+                    if (isChargeAttack) {
+                        if (curMoveStun <= realInitTime) {
+                            //float t = 1f - (float) curMoveStun / (float) realInitTime;
+                            Vec3d newPos = pos.add(rotVec.multiply(attackDist / realInitTime));
+                            //this.setDistanceOffset(1 + attackDist * t * t);
+                            this.setFreePos(new Vec3f((float) newPos.x, (float) newPos.y, (float) newPos.z));
+                            this.setFree(true);
+                        } else {
+                            setPosition(user.getPos());
+                            setRotationOffset(attackRotation);
+                        }
                     } else {
-                        setPosition(user.getPos());
-                        setRotationOffset(attackRotation);
+                        user.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 5, 4, true, false));
+
+                        setAttackRotationOffset();
+                        setDistanceOffset(attackDist);
                     }
-                } else {
-                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 5, 4, true, false));
-
-                    setAttackRotationOffset();
-                    setDistanceOffset(attackDist);
-                }
-
-                if (attack.attackType == AttackType.TIMESTOP && curMoveStun == realInitTime) {
-                    tsTime = stunTicks;
-                    this.curMove = null;
-
-                    StatusEffectInstance tsBlind = new StatusEffectInstance(StatusEffects.BLINDNESS, 19, 0, false, false, false);
-                    user.addStatusEffect(tsBlind);
-
-                    JCraft.beginTimestop(user, pos, (ServerWorld) world, stunTicks);
                 }
             }
 
@@ -989,23 +982,11 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 setRotationOffset(attackRotation);
                 standBlock();
             }
+
+            tsTime--;
         }
 
         // JCraft.LOGGER.info( "State: " + this.getState() + " Movestun: " + curMoveStun + " Currently attacking: " + (this.curAttack != null)); // Massive debug log
-
-        // Minor aspects of timestop logic, actual stopping is handled at JServerTickEvents
-        if (tsTime > 0) {
-            for (int h = 0; h < 1500 / tsTime; ++h)
-                world.addParticle(
-                        ParticleTypes.MYCELIUM,
-                        eyePos.x + random.nextTriangular(0, tsTime),
-                        eyePos.y + random.nextTriangular(0, tsTime) / 4,
-                        eyePos.z + random.nextTriangular(0, tsTime),
-                        0.0, 0.0, 0.0
-                );
-
-            if (!client) tsTime--;
-        }
 
         if (curMove != prevMove && curMove != null)
             //JCraft.LOGGER.info("Logged previous attack change: " + this.curAttack + " " + this.previousAttack);
@@ -1172,7 +1153,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         // Interrupting spec moves
         if (ent instanceof PlayerEntity playerEntity) {
-            JSpec spec = JUtils.getSpec(playerEntity);
+            JSpec<?, ?> spec = JUtils.getSpec(playerEntity);
             if (spec != null && spec.curAttack != null && --spec.armorPoints < 0) spec.cancelAttack();
         }
 
@@ -1284,7 +1265,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         mob.lookAtEntity(target, 30, 30); // Point body at enemy
         mob.getLookControl().lookAt(target); // Usually detrimental not to
 
-        JSpec enemySpec;
+        JSpec<?, ?> enemySpec;
         StandEntity<?, ?> enemyStand = JUtils.getStand(target);
         AbstractMove<?, ?> enemyAttack = null;
         boolean enemyHasStand = enemyStand != null;
@@ -1371,7 +1352,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                     shouldPerformMove = true;
 
                 mob.setSneaking(selectedAttack.isCrouchingVariant());
-                if (selectedAttack.isAerialVariation) {
+                if (selectedAttack.isAerialVariant()) {
                     mobJumpControl.setActive();
                     mob.setOnGround(false);
                 }

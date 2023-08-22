@@ -19,9 +19,14 @@ public abstract class AbstractChargeAttack<T extends AbstractChargeAttack<T, A, 
     public AbstractChargeAttack(int cooldown, int windup, int duration, float moveDistance, float damage, int stun,
                                 float hitboxSize, float knockback, float offset, S hitAnimState) {
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset);
+
         this.hitAnimState = hitAnimState;
+
         charge = true;
         ranged = true;
+
+        // Charge attacks can't backstab
+        this.withBackstab(false);
     }
 
     @Override

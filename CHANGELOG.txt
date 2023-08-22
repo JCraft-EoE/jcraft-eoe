@@ -1671,6 +1671,9 @@ Killer Queen: Bites the Dust
 Whitesnake
     >Donut cooldown reduced (18->14s)
 
+The Fool
+    >Added crouching variant to Light
+
 priority (top to bottom)
 todo: GE life giver changes
 

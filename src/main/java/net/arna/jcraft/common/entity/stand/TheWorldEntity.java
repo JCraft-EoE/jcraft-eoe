@@ -3,9 +3,7 @@ package net.arna.jcraft.common.entity.stand;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.old.Attack;
-import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
-import net.arna.jcraft.common.attack.moves.shared.KnockdownAttack;
-import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
+import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.attack.moves.theworld.FeignBarrageCounterAttack;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.util.CooldownType;
@@ -54,20 +52,19 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
             .appendHitbox(new HitBoxData(0, 0, 1.5))
             .hyperArmor()
             .setInfo("Donut", "slow, uninterruptable combo starter/extender, 1.5s stun on whiff");
-    public static final Attack charge = new Attack(4, 20, 7.5f, 19, 5, 1.5, 5f, 0.25f, AttackType.CHARGE, 1, 0, State.CHARGE_HIT.ordinal(), JSoundRegistry.TW_CHARGE_HIT)
-            .setRanged(true)
-            .disableBackstab()
-            .setBlockstun(11)
-            .setInfo("Forward Charge", "The World detaches from the user and lunges forward, combo starter");
-    public static final Attack timestop = new Attack(6, 70, 52, 45, 4, AttackType.TIMESTOP)
-            .setUB(true)
-            .setInfo("Timestop", "4 seconds");
     private static final Attack timeskip = new Attack(-2, 18, 2, 2)
             .setMobility(MobilityType.TELEPORT)
             .setInfo("Timeskip", "14m range");
     private static final Attack counterMiss = new Attack(8, 0, 10, 11)
             .setInfo("Counter (Whiff)", "");
      */
+    public static final ChargeAttack<TheWorldEntity, TheWorldEntity.State> CHARGE = new ChargeAttack<>(400, 5, 19, 7.5f, 5, 20, 1.5f, 0.25f, 0, State.CHARGE_HIT)
+            .withSound(JSoundRegistry.TW_CHARGE)
+            .withImpactSound(JSoundRegistry.TW_CHARGE_HIT)
+            .withBlockStun(11)
+            .withInfo(Text.literal("Forward Charge"), Text.literal("The World detaches from the user and lunges forward, combo starter"));
+    public static final TimestopAttack<TheWorldEntity> TIMESTOP = new TimestopAttack<TheWorldEntity>(1400, 45, 52, 1, 80)
+            .withInfo(Text.literal("Timestop"), Text.literal("4 seconds"));
 
     public TheWorldEntity(World worldIn) {
         super(StandType.THE_WORLD, worldIn, JSoundRegistry.TW_SUMMON);
@@ -99,12 +96,12 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
         super.initialize();
 
         if (world.isClient) return;
-        TIMESTOP.stun = JServerConfig.TW_TIME_STOP_DURATION.getValue() / 20.0f;
+        TIMESTOP.setTimestopDuration(JServerConfig.TW_TIME_STOP_DURATION.getValue() / 20);
     }
 
     @Override
     protected void registerMoves(MoveMap<TheWorldEntity, State> moves) {
-        moves.register(MoveType.LIGHT, LIGHT, State.LIGHT);
+        moves.register(MoveType.LIGHT, LIGHT, State.LIGHT).withCrouchingVariant(State.LOW);
         moves.register(MoveType.HEAVY, DONUT, State.DONUT);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 
@@ -184,6 +181,11 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
 
         playSound(JSoundRegistry.TW_SUMMON, 1f, 1f);
         playSound(JSoundRegistry.MUDA_DA, 1f, 1f);
+    }
+
+    @Override
+    protected TheWorldEntity getThis() {
+        return this;
     }
 
     // Animation code
