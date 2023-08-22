@@ -312,7 +312,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * @param user The user to get the gravity direction for
      * @return The gravity direction for the given user
      */
-    protected Direction getGravDir(LivingEntity user) {
+    public static Direction getGravDir(LivingEntity user) {
         return GravityChangerAPI.getGravityDirection(user);
     }
 
@@ -321,7 +321,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * @param attacker The attacker to get the rotation vector for
      * @return The rotation vector for the given attacker
      */
-    protected Vec3d getRotVec(A attacker) {
+    public static Vec3d getRotVec(IAttacker<?, ?> attacker) {
         LivingEntity baseEntity = attacker.getBaseEntity();
         Vec3d rotVec = baseEntity.getRotationVector();
         if (getGravDir(attacker.getUserOrThrow()) == Direction.UP)

@@ -68,7 +68,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     public static final SimpleMultiHitAttack<TheFoolEntity> DRILL = new SimpleMultiHitAttack<TheFoolEntity>(30, 14, 2.5f, 5, 1.5f, 0.2f, 1.5f, 0.25f, IntSet.of(5, 8, 11))
             .withBlockStun(4)
             .withInfo(Text.literal("Drill"), Text.literal("fast, multi-hitting combo starter, low stun and blockstun"));
-    public static final SimpleAttack<TheFoolEntity> LIGHT = new SimpleAttack<TheFoolEntity>( 30, 7, 14, 6, 15, 2, 0.8f, 1.5f, -0.1f)
+    public static final SimpleAttack<TheFoolEntity> LIGHT = new SimpleAttack<TheFoolEntity>( 30, 7, 14, 1.5f, 6, 15, 2, 0.8f, -0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withExtraHitBox(0, 0.25, 1)
             .withCrouchingVariant(DRILL)

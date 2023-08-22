@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.entity.stand;
 
+import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.moves.killerqueen.CoinTossAttack;
@@ -25,7 +26,7 @@ import java.util.function.Consumer;
 
 public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQueenEntity, KillerQueenEntity.State> {
     public static final SimpleAttack<KillerQueenEntity> HEAVY = new SimpleAttack<KillerQueenEntity>(
-            240, 16, 24, 9f, 10, 2f, 1.75f, 0.75f, 0f)
+            240, 16, 24, 0.75f, 9f, 10, 2f, 1.75f, 0f)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withSound(JSoundRegistry.KQ_UPPERCUT)
             .withSound(JSoundRegistry.KQ_HEAVY)
@@ -87,7 +88,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
     }
 
     @Override
-    protected KillerQueenEntity getThis() {
+    protected @NonNull KillerQueenEntity getThis() {
         return this;
     }
 

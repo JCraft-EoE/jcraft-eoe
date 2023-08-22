@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.entity.stand;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
+import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.StunType;
@@ -49,7 +50,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withSound(JSoundRegistry.SC_BARRAGE)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
     public static final SimpleAttack<SilverChariotEntity> HEAVY = new SimpleAttack<SilverChariotEntity>(
-            15, 20, 28, 8f, 10, 2f, 1.5f, 0.65f, 0f)
+            15, 20, 28, 0.65f, 8f, 10, 2f, 1.5f, 0f)
             .withSound(JSoundRegistry.SC_HEAVY)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHyperArmor()
@@ -110,7 +111,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withLaunch()
             .withInfo(Text.literal("Circle Slash (Hit)"), Text.empty());
     public static final SimpleAttack<SilverChariotEntity> CIRCLE_CHARGE = new SimpleAttack<SilverChariotEntity>(
-            340, 101, 100, 0f, 0, 0f, 0f, 0.65f, 0f)
+            340, 101, 100, 0.65f, 0f, 0, 0f, 0f, 0f)
             .withFollowUp(CIRCLE_SLASH)
             .withArmor(2)
             .withInfo(Text.literal("Circle Slash"), Text.literal("charges for a minimum of 1 second, tap again to release, 2 armor points"));
@@ -297,7 +298,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
     }
 
     @Override
-    protected SilverChariotEntity getThis() {
+    protected @NonNull SilverChariotEntity getThis() {
         return this;
     }
 

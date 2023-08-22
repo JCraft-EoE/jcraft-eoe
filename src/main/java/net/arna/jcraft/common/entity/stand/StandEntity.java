@@ -1204,7 +1204,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         return super.damage(source, amount);
     }
 
-    protected abstract E getThis();
+    protected abstract @NonNull E getThis();
 
     // Physical properties
     @Override

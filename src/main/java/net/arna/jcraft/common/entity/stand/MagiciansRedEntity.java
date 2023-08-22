@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.entity.stand;
 
+import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.moves.magiciansred.*;
@@ -105,7 +106,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
     }
 
     @Override
-    protected MagiciansRedEntity getThis() {
+    protected @NonNull MagiciansRedEntity getThis() {
         return this;
     }
 

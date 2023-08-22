@@ -12,6 +12,7 @@ import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.predicate.entity.EntityPredicates;
@@ -19,6 +20,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -267,7 +269,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
      * @param damageSource The damage source to check for
      * @return All found valid targets
      */
-    public static Set<LivingEntity> findHits(IAttacker<?, ?> attacker, Vec3d boxCenter, double boxSize, DamageSource damageSource) {
+    public static Set<LivingEntity> findHits(IAttacker<?, ?> attacker, Vec3d boxCenter, double boxSize, @Nullable DamageSource damageSource) {
         return findHits(attacker, createBox(boxCenter, boxSize), damageSource);
     }
 
@@ -280,7 +282,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
      * @param damageSource The damage source to check for
      * @return All found valid targets
      */
-    public static Set<LivingEntity> findHits(IAttacker<?, ?> attacker, Box box, DamageSource damageSource) {
+    public static Set<LivingEntity> findHits(IAttacker<?, ?> attacker, Box box, @Nullable DamageSource damageSource) {
         return findHits(attacker, Set.of(box), damageSource);
     }
 
@@ -293,12 +295,28 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
      * @param damageSource The damage source to check for
      * @return All found valid targets
      */
-    public static Set<LivingEntity> findHits(IAttacker<?, ?> attacker, Set<Box> boxes, DamageSource damageSource) {
+    public static Set<LivingEntity> findHits(IAttacker<?, ?> attacker, Set<Box> boxes, @Nullable DamageSource damageSource) {
+        return findHits(attacker, boxes, damageSource, LivingEntity.class);
+    }
+
+    /**
+     * Finds all valid targets that can be damaged with the given damage source
+     * by the given attacker, contained in the given boxes.
+     * Also maps all attackers found to their user. I.e. redirecting damage done to stands to their users.
+     * @param attacker The attacker that will be doing the damage
+     * @param boxes The boxes to check in
+     * @param damageSource The damage source to check for
+     * @param type The type of entities to look for
+     * @return All found valid targets
+     */
+    public static <T extends Entity> Set<T> findHits(IAttacker<?, ?> attacker, Set<Box> boxes,
+                                                     @Nullable DamageSource damageSource, Class<T> type) {
         return boxes.stream()
-                .flatMap(box -> attacker.getWorld().getEntitiesByClass(LivingEntity.class, box, EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e ->
+                .flatMap(box -> attacker.getWorld().getEntitiesByClass(type, box, EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e ->
                         e != attacker && e != attacker.getUser() && e != attacker.getUserOrThrow().getVehicle())).stream())
-                .flatMap(e -> e instanceof StandEntity<?,?> hitStand && attacker.hasUser() ? Stream.of(e, hitStand.getUserOrThrow()) : Stream.of(e))
-                .filter(e -> JUtils.canDamage(damageSource, e)) // This must be done after the previous flatmap call as it excludes stands.
+                .flatMap(e -> e instanceof StandEntity<?,?> hitStand && hitStand.hasUser() &&
+                        type.isInstance(hitStand.getUserOrThrow()) ? Stream.of(e, type.cast(hitStand.getUserOrThrow())) : Stream.of(e))
+                .filter(e -> damageSource == null || JUtils.canDamage(damageSource, e)) // This must be done after the previous flatmap call as it excludes stands.
                 .collect(Collectors.toSet());
     }
 

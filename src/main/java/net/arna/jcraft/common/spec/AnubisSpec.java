@@ -21,8 +21,8 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 
 public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
-    public static final SimpleAttack<AnubisSpec> SLASH = new SimpleAttack<AnubisSpec>(340, 9, 20, 6f,
-            15, 1.75f, 0.9f, 1f, 0f)
+    public static final SimpleAttack<AnubisSpec> SLASH = new SimpleAttack<AnubisSpec>(340, 9, 20, 1f, 6f,
+            15, 1.75f, 0.9f, 0f)
             .withCondition(AnubisSpec::isHoldingAnubis)
             .withSound(JSoundRegistry.ANUBIS_SLASH)
             .withImpactSound(SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP)
@@ -30,7 +30,7 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
             .withHyperArmor()
             .withInfo(Text.literal("Slash"), Text.literal("uninterruptible get-off-me tool"));
     public static final SimpleAttack<AnubisSpec> POMMEL = new SimpleAttack<AnubisSpec>(280, 5, 8,
-            4f, 7, 1.25f, 0.3f, 1f, 0f)
+            1f, 4f, 7, 1.25f, 0.3f, 0f)
             .withSound(JSoundRegistry.ANUBIS_POMMEL)
             .withImpactSound(JSoundRegistry.IMPACT_3);
     public static final SimpleMultiHitAttack<AnubisSpec> REKKA2 = new SimpleMultiHitAttack<AnubisSpec>(400,

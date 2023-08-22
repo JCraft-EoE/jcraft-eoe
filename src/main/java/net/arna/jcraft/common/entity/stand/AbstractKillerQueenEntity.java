@@ -29,7 +29,7 @@ import java.util.List;
 public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQueenEntity<E, S>, S extends Enum<S> & StandAnimationState<E>> extends StandEntity<E, S>
         permits KillerQueenEntity, KQBTDEntity {
     public static final SimpleAttack<AbstractKillerQueenEntity<?, ?>> LOW = new SimpleAttack<AbstractKillerQueenEntity<?, ?>>(
-            0, 8, 13, 4f, 10, 1.5f, 0.5f, 0.85f, 0.1f)
+            0, 8, 13, 0.85f, 4f, 10, 1.5f, 0.5f, 0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_6)
             .withInfo(Text.literal("Low Punch"), Text.literal("frametrap tool, low stun"));
     public static final DetonateAttack DETONATE = new DetonateAttack(20, 5, 6, 1f)

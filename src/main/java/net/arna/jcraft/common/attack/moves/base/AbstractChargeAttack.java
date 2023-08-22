@@ -51,9 +51,13 @@ public abstract class AbstractChargeAttack<T extends AbstractChargeAttack<T, A, 
     public void tick(A attacker) {
         super.tick(attacker);
 
-        if (shouldPerform(attacker)) {
+        tickChargeAttack(attacker, shouldPerform(attacker), getMoveDistance(), getWindupPoint());
+    }
+
+    public static void tickChargeAttack(StandEntity<?, ?> attacker, boolean shouldPerform, float moveDistance, int windupPoint) {
+        if (shouldPerform) {
             //float t = 1f - (float) curMoveStun / (float) realInitTime;
-            Vec3d newPos = attacker.getPos().add(getRotVec(attacker).multiply(getMoveDistance() / getWindupPoint()));
+            Vec3d newPos = attacker.getPos().add(getRotVec(attacker).multiply(moveDistance / windupPoint));
             //stand.setDistanceOffset(1 + attackDist * t * t);
             attacker.setFreePos(new Vec3f((float) newPos.x, (float) newPos.y, (float) newPos.z));
             attacker.setFree(true);

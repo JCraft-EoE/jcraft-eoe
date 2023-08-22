@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.entity.stand;
 
+import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.HitBoxData;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
@@ -20,7 +21,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.State> {
-    public static final SimpleAttack<TheWorldEntity> LOW_KICK = new SimpleAttack<TheWorldEntity>(30, 8, 14, 6f, 17, 1.5f, 0.2f, 0.75f, 0.85f)
+    public static final SimpleAttack<TheWorldEntity> LOW_KICK = new SimpleAttack<TheWorldEntity>(30, 8, 14, 0.75f, 6f, 17, 1.5f, 0.2f, 0.85f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(0, 0, 1)
             .withInfo(Text.literal("Low Kick"), Text.literal("slower, higher stun"));
@@ -31,7 +32,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
     public static final BarrageAttack<TheWorldEntity> BARRAGE = new BarrageAttack<TheWorldEntity>(340, 0, 50, 0.75f, 1f, 30, 2, 0.1f, 0, 3)
             .withSound(JSoundRegistry.TW_BARRAGE)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
-    public static final SimpleAttack<TheWorldEntity> ROUNDHOUSE = new SimpleAttack<TheWorldEntity>(160, 7, 13, 5f, 9, 1.75f, 0.1f, 0.75f, -0.1f)
+    public static final SimpleAttack<TheWorldEntity> ROUNDHOUSE = new SimpleAttack<TheWorldEntity>(160, 7, 13, 0.75f, 5f, 9, 1.75f, 0.1f, -0.1f)
             .withSound(JSoundRegistry.TW_KICK)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withInfo(Text.literal("Roundhouse"), Text.literal("fast poke, low stun"));
@@ -145,7 +146,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
     }
 
     @Override
-    protected TheWorldEntity getThis() {
+    protected @NonNull TheWorldEntity getThis() {
         return this;
     }
 

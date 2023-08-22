@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.entity.stand;
 
+import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.BlockableType;
 import net.arna.jcraft.common.attack.core.HitBoxData;
 import net.arna.jcraft.common.attack.core.MoveMap;
@@ -31,12 +32,12 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withInfo(Text.literal("Place Berry Bush"), Text.literal("places an almost-ripe berry bush on the ground, this move cannot be aimed up or down"));
     public static final SimpleAttack<GoldExperienceEntity> LIGHT = new SimpleAttack<GoldExperienceEntity>(
-            15, 6, 9, 5f, 7, 1.5f, 0.75f, 0.75f, -0.1f)
+            15, 6, 9, 0.75f, 5f, 7, 1.5f, 0.75f, -0.1f)
             .withCrouchingVariant(BERRY_BUSH)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
     public static final SimpleAttack<GoldExperienceEntity> HEAVY = new SimpleAttack<GoldExperienceEntity>(
-            280, 13, 22, 9f, 10, 1.5f, 1.5f, 1f, 0f)
+            280, 13, 22, 1f, 9f, 10, 1.5f, 1.5f, 0f)
             .withExtraHitBox(new HitBoxData(0, 0, 1.25))
 //            .withSound(JSoundRegistry.GE_HEAVY)
             .withImpactSound(JSoundRegistry.IMPACT_2)
@@ -207,7 +208,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
     }
 
     @Override
-    protected GoldExperienceEntity getThis() {
+    protected @NonNull GoldExperienceEntity getThis() {
         return this;
     }
 

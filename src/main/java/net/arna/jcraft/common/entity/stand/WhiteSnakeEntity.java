@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.entity.stand;
 
+import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.BlockableType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
@@ -31,7 +32,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
     public static final SimpleAttack<WhiteSnakeEntity> DONUT = new SimpleAttack<WhiteSnakeEntity>(280,
-            17, 36, 10, 28, 2, 0, 1, 0)
+            17, 36, 1, 10, 28, 2, 0, 0)
             .withSound(JSoundRegistry.WS_DONUT)
             .withImpactSound(JSoundRegistry.TW_DONUT_HIT)
             .withHitSpark(JParticleType.HIT_SPARK_2)
@@ -51,7 +52,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withInfo(Text.literal("Stand Disk"), Text.literal("uninterruptible, removes enemy stand for 8s"));
     public static final SimpleAttack<WhiteSnakeEntity> LEG_CRUSHER = new SimpleAttack<WhiteSnakeEntity>(400,
-            16, 22, 7, 32, 1.75f, 0.25f, 0.75f, 0.2f)
+            16, 22, 0.75f, 7, 32, 1.75f, 0.25f, 0.2f)
             .withSound(JSoundRegistry.WS_LEGCRUSH)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withHitSpark(JParticleType.HIT_SPARK_2)
@@ -195,7 +196,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
     }
 
     @Override
-    protected WhiteSnakeEntity getThis() {
+    protected @NonNull WhiteSnakeEntity getThis() {
         return this;
     }
 

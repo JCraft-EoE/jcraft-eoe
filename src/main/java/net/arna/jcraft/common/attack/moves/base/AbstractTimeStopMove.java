@@ -29,7 +29,7 @@ public abstract class AbstractTimeStopMove<T extends AbstractTimeStopMove<T, A>,
         attacker.setTsTime(timeStopDuration);
         attacker.setCurrentMove(null);
 
-        user.addStatusEffect(tsBlind);
+        user.addStatusEffect(new StatusEffectInstance(tsBlind));
 
         JCraft.beginTimestop(user, attacker.getPos(), (ServerWorld) attacker.getWorld(), timeStopDuration);
         return Set.of();

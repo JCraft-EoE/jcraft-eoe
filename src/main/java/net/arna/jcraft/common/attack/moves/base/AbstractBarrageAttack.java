@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.attack.moves.base;
 
 import lombok.Getter;
+import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.registry.JSoundRegistry;
@@ -23,6 +24,7 @@ import java.util.Set;
 @Getter
 public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A>, A extends IAttacker<?, ?>> extends AbstractSimpleAttack<T, A> {
     private final int interval;
+    protected boolean inflictsSlowness;
 
     protected AbstractBarrageAttack(int cooldown, int windup, int duration, float moveDistance, float damage,
                                     int stun, float hitboxSize, float knockback, float offset, int interval) {
@@ -92,5 +94,12 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A
     protected void onClash(LivingEntity entity) {
         entity.removeStatusEffect(JStatusRegistry.DAZED);
         entity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.DAZED, 10, 3, true, false));
+    }
+
+    @Override
+    protected @NonNull T copyExtras(@NonNull T base) {
+        AbstractBarrageAttack<T, A> cast = super.copyExtras(base);
+        cast.inflictsSlowness = inflictsSlowness;
+        return base;
     }
 }

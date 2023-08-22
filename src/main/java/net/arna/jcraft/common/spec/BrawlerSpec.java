@@ -15,7 +15,7 @@ import net.minecraft.text.Text;
 
 public class BrawlerSpec extends JSpec<BrawlerSpec, BrawlerSpec.State> {
     public static final SimpleAttack<BrawlerSpec> HEAVY = new SimpleAttack<BrawlerSpec>(340, 10,
-            21, 6f, 15, 1.5f, 0.8f, 1f, 0f)
+            21, 1f, 6f, 15, 1.5f, 0.8f, 0f)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHyperArmor()
@@ -26,7 +26,7 @@ public class BrawlerSpec extends JSpec<BrawlerSpec, BrawlerSpec.State> {
             .withBlockStun(5)
             .withInfo(Text.literal("Combo"), Text.literal("hits 3 times, combo starter/extender"));
     public static final SimpleAttack<BrawlerSpec> GUT = new SimpleAttack<BrawlerSpec>(340, 11, 18,
-            6f, 16, 1.5f, 0.8f, 1f, 0f)
+            1f, 6f, 16, 1.5f, 0.8f, 0f)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Gut Punch"), Text.literal("good stun"));
