@@ -242,8 +242,8 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
         // If predicting, and Time Erase isn't on cooldown
         if (curMove != null && curMove.id == 9 && hasUser()) {
             CooldownsComponent cooldowns = JComponents.getCooldowns(getUser());
-            if (cooldowns.getCooldown(CooldownType.STAND_ULT) <= 0) {
-                cooldowns.setCooldown(CooldownType.STAND_ULT, 400);
+            if (cooldowns.getCooldown(CooldownType.STAND_ULTIMATE) <= 0) {
+                cooldowns.setCooldown(CooldownType.STAND_ULTIMATE, 400);
                 finishPrediction();
             }
         }
@@ -257,7 +257,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             return;
         }
 
-        if (handleMove(timeerase, CooldownType.STAND_ULT, State.TIME_ERASE)) {
+        if (handleMove(timeerase, CooldownType.STAND_ULTIMATE, State.TIME_ERASE)) {
             if (getUser() instanceof ServerPlayerEntity player)
                 player.networkHandler.sendPacket(new PlaySoundS2CPacket(JSoundRegistry.TIME_ERASE, SoundCategory.PLAYERS, getX(), getY(), getZ(), 1, 1, 0));
         }
@@ -296,8 +296,8 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             moveCancel();
 
             // 7 second time erase cooldown
-            if (cooldowns.getCooldown(CooldownType.STAND_ULT) < 140)
-                cooldowns.setCooldown(CooldownType.STAND_ULT, 140);
+            if (cooldowns.getCooldown(CooldownType.STAND_ULTIMATE) < 140)
+                cooldowns.setCooldown(CooldownType.STAND_ULTIMATE, 140);
 
             // Particle effects
             Vec3d oPos = user.getPos();
@@ -539,7 +539,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     private void cancelTE() {
         LivingEntity user = getUserOrThrow();
         CooldownsComponent cooldowns = JComponents.getCooldowns(user);
-        cooldowns.setCooldown(CooldownType.STAND_ULT, cooldowns.getCooldown(CooldownType.STAND_ULT) - getTETime() * 2);
+        cooldowns.setCooldown(CooldownType.STAND_ULTIMATE, cooldowns.getCooldown(CooldownType.STAND_ULTIMATE) - getTETime() * 2);
 
         setTETime(0);
         doppelganger.discard();

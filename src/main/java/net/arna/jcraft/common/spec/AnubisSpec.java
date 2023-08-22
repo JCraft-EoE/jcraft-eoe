@@ -64,10 +64,10 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
     @Override
     protected void registerMoves(MoveMap<AnubisSpec, State> moves) {
         moves.register(MoveType.HEAVY, POMMEL, CooldownType.HEAVY, State.POMMEL);
-        moves.register(MoveType.SPECIAL1, SLASH, CooldownType.SP1, State.SLASH);
-        moves.register(MoveType.SPECIAL2, REKKA2, CooldownType.SP2, State.REKKA2);
-        moves.register(MoveType.SPECIAL3, REKKA3, CooldownType.SP3, State.REKKA3);
-        moves.register(MoveType.SPECIAL3, SWEEP, CooldownType.SP3, State.SWEEP);
+        moves.register(MoveType.SPECIAL1, SLASH, CooldownType.SPECIAL1, State.SLASH);
+        moves.register(MoveType.SPECIAL2, REKKA2, CooldownType.SPECIAL2, State.REKKA2);
+        moves.register(MoveType.SPECIAL3, REKKA3, CooldownType.SPECIAL3, State.REKKA3);
+        moves.register(MoveType.SPECIAL3, SWEEP, CooldownType.SPECIAL3, State.SWEEP);
     }
 
     private static boolean isHoldingAnubis(AnubisSpec spec) {
@@ -86,9 +86,9 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
             case HEAVY -> handleMove(POMMEL, CooldownType.HEAVY, isHoldingAnubis(this) ? State.POMMEL : State.POMMEL_IN, attackSpeedMult);
             case SPECIAL3 -> {
                 if (isHoldingAnubis(this)) {
-                    handleMove(REKKA3, CooldownType.SP2, State.REKKA3, attackSpeedMult);
+                    handleMove(REKKA3, CooldownType.SPECIAL2, State.REKKA3, attackSpeedMult);
                 } else {
-                    handleMove(SWEEP, CooldownType.SP3, State.SWEEP, attackSpeedMult);
+                    handleMove(SWEEP, CooldownType.SPECIAL3, State.SWEEP, attackSpeedMult);
                     player.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, SWEEP.getDuration(), 2, true, false));
                 }
             }

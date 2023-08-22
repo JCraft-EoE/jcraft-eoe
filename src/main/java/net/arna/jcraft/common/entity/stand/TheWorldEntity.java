@@ -133,7 +133,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
 
     public void initUlt() {
         if (!canAttack()) return;
-        if (handleAttack(timestop, CooldownType.STAND_ULT, State.TIME_STOP))
+        if (handleAttack(timestop, CooldownType.STAND_ULTIMATE, State.TIME_STOP))
             playSound(JSoundRegistry.TW_TS, 1, 1);
     }
 

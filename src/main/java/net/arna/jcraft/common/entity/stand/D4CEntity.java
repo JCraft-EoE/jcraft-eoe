@@ -187,7 +187,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
         }
 
         if (!canAttack()) return;
-        if (handleMove(dimhop_others, CooldownType.STAND_ULT, State.DIM_HOP))
+        if (handleMove(dimhop_others, CooldownType.STAND_ULTIMATE, State.DIM_HOP))
             playSound(JSoundRegistry.D4C_DIMHOP, 1, 1);
     }
 

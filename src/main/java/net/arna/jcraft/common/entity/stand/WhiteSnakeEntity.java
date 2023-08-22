@@ -148,9 +148,9 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        if (getRemote() && handleMove(meltyourheart, CooldownType.STAND_ULT, State.MELT_YOUR_HEART))
+        if (getRemote() && handleMove(meltyourheart, CooldownType.STAND_ULTIMATE, State.MELT_YOUR_HEART))
             playSound(JSoundRegistry.WS_MYH, 1, 1);
-        else if (handleMove(standdisk, CooldownType.STAND_ULT, State.DISC))
+        else if (handleMove(standdisk, CooldownType.STAND_ULTIMATE, State.DISC))
             playSound(JSoundRegistry.WS_STAND_DISC, 1, 1);
     }
 

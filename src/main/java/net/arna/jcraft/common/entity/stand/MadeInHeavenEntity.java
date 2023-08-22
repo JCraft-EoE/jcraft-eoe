@@ -234,7 +234,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        if (handleAttack(timeaccel, CooldownType.STAND_ULT, State.TIME_ACCELERATION))
+        if (handleAttack(timeaccel, CooldownType.STAND_ULTIMATE, State.TIME_ACCELERATION))
             playSound(JSoundRegistry.MIH_TACCEL, 1, 1);
     }
 

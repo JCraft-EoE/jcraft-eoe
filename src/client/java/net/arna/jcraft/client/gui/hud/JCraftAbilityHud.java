@@ -65,7 +65,7 @@ public class JCraftAbilityHud extends DrawableHelper {
             .put(CooldownType.STAND_LIGHT, LIGHT)
             .put(CooldownType.STAND_HEAVY, HEAVY)
             .put(CooldownType.STAND_BARRAGE, BARRAGE)
-            .put(CooldownType.STAND_ULT, ULT)
+            .put(CooldownType.STAND_ULTIMATE, ULT)
             .put(CooldownType.STAND_SP1, SPECIAL_1)
             .put(CooldownType.STAND_SP2, SPECIAL_2)
             .put(CooldownType.STAND_SP3, SPECIAL_3)
@@ -76,7 +76,7 @@ public class JCraftAbilityHud extends DrawableHelper {
             .put(CooldownType.STAND_LIGHT, LIGHT)
             .put(CooldownType.STAND_HEAVY, HEAVY)
             .put(CooldownType.STAND_BARRAGE, BARRAGE)
-            .put(CooldownType.STAND_ULT, MID_ULT)
+            .put(CooldownType.STAND_ULTIMATE, MID_ULT)
             .put(CooldownType.STAND_SP1, MID_SPECIAL_1)
             .put(CooldownType.STAND_SP2, MID_SPECIAL_2)
             .put(CooldownType.STAND_SP3, MID_SPECIAL_3)
@@ -91,9 +91,9 @@ public class JCraftAbilityHud extends DrawableHelper {
             .put(CooldownType.HEAVY, SPEC_HEAVY)
             .put(CooldownType.BARRAGE, SPEC_BARRAGE)
             .put(CooldownType.ULTIMATE, SPEC_ULT)
-            .put(CooldownType.SP1, SPEC_SPECIAL_1)
-            .put(CooldownType.SP2, SPEC_SPECIAL_2)
-            .put(CooldownType.SP3, SPEC_SPECIAL_3)
+            .put(CooldownType.SPECIAL1, SPEC_SPECIAL_1)
+            .put(CooldownType.SPECIAL2, SPEC_SPECIAL_2)
+            .put(CooldownType.SPECIAL3, SPEC_SPECIAL_3)
             .build();
 
     public static int getHudX(int scaledX, int rightOffset) {

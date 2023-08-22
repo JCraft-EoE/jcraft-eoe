@@ -269,7 +269,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
     public void initUlt() {
         if (!canAttack()) return;
         if (rtzEntityData.isEmpty()) {
-            if (handleMove(rtz, CooldownType.STAND_ULT, State.SETUP)) // Setup
+            if (handleMove(rtz, CooldownType.STAND_ULTIMATE, State.SETUP)) // Setup
                 playSound(JSoundRegistry.GER_SETUP, 1, 1);
         } else {
             returnToZero();

@@ -134,7 +134,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        if (handleMove(timestop, CooldownType.STAND_ULT, State.TIME_STOP))
+        if (handleMove(timestop, CooldownType.STAND_ULTIMATE, State.TIME_STOP))
             playSound(JSoundRegistry.STAR_PLATINUM_THE_WORLD, 1, 1);
     }
 

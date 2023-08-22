@@ -206,9 +206,9 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
     public void initUlt() {
         if (!canAttack()) return;
         if (getShiftTime() <= 0) {
-            if (getUserOrThrow().isSneaking() && handleMove(gravshift, CooldownType.STAND_ULT, State.GRAV_SHIFT))
+            if (getUserOrThrow().isSneaking() && handleMove(gravshift, CooldownType.STAND_ULTIMATE, State.GRAV_SHIFT))
                 playSound(JSoundRegistry.CMOON_GRAVSHIFT, 1, 1);
-            else if (handleMove(directionalshift, CooldownType.STAND_ULT, State.DIRECTIONAL_SHIFT))
+            else if (handleMove(directionalshift, CooldownType.STAND_ULTIMATE, State.DIRECTIONAL_SHIFT))
                 playSound(JSoundRegistry.CMOON_GRAVSHIFT_DIRECTIONAL, 1, 1);
 
         } else {

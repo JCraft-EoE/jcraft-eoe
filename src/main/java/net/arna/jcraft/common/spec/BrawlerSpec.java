@@ -43,8 +43,8 @@ public class BrawlerSpec extends JSpec<BrawlerSpec, BrawlerSpec.State> {
     protected void registerMoves(MoveMap<BrawlerSpec, State> moves) {
         moves.register(MoveType.HEAVY, HEAVY, CooldownType.HEAVY, State.HEAVY);
         moves.register(MoveType.BARRAGE, COMBO, CooldownType.BARRAGE, State.COMBO);
-        moves.register(MoveType.SPECIAL1, GUT, CooldownType.SP1, State.GUT);
-        moves.register(MoveType.SPECIAL2, SWEEP, CooldownType.SP2, State.SWEEP);
+        moves.register(MoveType.SPECIAL1, GUT, CooldownType.SPECIAL1, State.GUT);
+        moves.register(MoveType.SPECIAL2, SWEEP, CooldownType.SPECIAL2, State.SWEEP);
     }
 
     @Override

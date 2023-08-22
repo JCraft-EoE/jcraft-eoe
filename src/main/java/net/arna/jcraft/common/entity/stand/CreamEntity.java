@@ -217,7 +217,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public void initUlt() {
         if (!canAttack()) return;
 
-        if (handleMove(consume, CooldownType.STAND_ULT, State.CONSUME))
+        if (handleMove(consume, CooldownType.STAND_ULTIMATE, State.CONSUME))
             playSound(JSoundRegistry.CREAM_CONSUME, 1, 1);
     }
 

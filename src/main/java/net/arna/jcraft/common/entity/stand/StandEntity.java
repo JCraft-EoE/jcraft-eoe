@@ -9,7 +9,6 @@ import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.core.old.Attack;
-import net.arna.jcraft.common.attack.core.old.AttackType;
 import net.arna.jcraft.common.attack.core.old.MoveQueue;
 import net.arna.jcraft.common.attack.moves.base.AbstractBarrageAttack;
 import net.arna.jcraft.common.attack.moves.base.AbstractCounterAttack;
@@ -782,8 +781,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         // 3s minimum ult cooldown
         CooldownsComponent cooldowns = JComponents.getCooldowns(user);
-        if (cooldowns.getCooldown(CooldownType.STAND_ULT) < 60)
-            cooldowns.setCooldown(CooldownType.STAND_ULT, 60);
+        if (cooldowns.getCooldown(CooldownType.STAND_ULTIMATE) < 60)
+            cooldowns.setCooldown(CooldownType.STAND_ULTIMATE, 60);
 
         if (hasVehicle) user.getRootVehicle().setPosition(telePos.x, telePos.y, telePos.z);
         else user.teleport(telePos.x, telePos.y, telePos.z);

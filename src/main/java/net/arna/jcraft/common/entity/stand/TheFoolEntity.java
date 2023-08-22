@@ -261,7 +261,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        if (handleMove(sandstorm, CooldownType.STAND_ULT, State.SANDSTORM))
+        if (handleMove(sandstorm, CooldownType.STAND_ULTIMATE, State.SANDSTORM))
             playSound(JSoundRegistry.FOOL_ULT, 1, 1);
     }
 

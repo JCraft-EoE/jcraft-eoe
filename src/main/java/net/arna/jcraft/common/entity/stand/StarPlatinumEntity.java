@@ -91,7 +91,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
     @Override
     public void initUlt() {
         if (!canAttack()) return;
-        if (handleMove(inhale, CooldownType.STAND_ULT, State.INHALE)) {
+        if (handleMove(inhale, CooldownType.STAND_ULTIMATE, State.INHALE)) {
             //playSound(JSoundRegister.STAR_SUCK, 1, 1);
         }
     }

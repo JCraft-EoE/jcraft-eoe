@@ -265,7 +265,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
     public void initUlt() {
         if (!canAttack()) return;
         if (tsTime <= 0) {
-            if (handleMove(timestop, CooldownType.STAND_ULT, State.TIME_STOP))
+            if (handleMove(timestop, CooldownType.STAND_ULTIMATE, State.TIME_STOP))
                 playSound(JSoundRegistry.TWOH_TS, 1, 1);
         } else {
             JCraft.stopTimestop(getUserOrThrow());
