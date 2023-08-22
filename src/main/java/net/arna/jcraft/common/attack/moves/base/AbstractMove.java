@@ -34,7 +34,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * The move this move was copied from.
      * Defaults to {@code this}.
      */
-    private AbstractMove<T, A> originalMove = this;
+    private T originalMove = getThis();
     private @Nullable AbstractMove<?, ? super A> crouchingVariant, aerialVariant, followUp;
     private boolean isCrouchingVariant, isAerialVariant;
     private int armor;

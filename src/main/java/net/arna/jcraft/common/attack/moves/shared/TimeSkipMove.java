@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.attack.moves.shared;
 
+import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
@@ -15,8 +16,10 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 
+import java.util.List;
 import java.util.Set;
 
+@Getter
 public class TimeSkipMove<A extends IAttacker<?, ?>> extends AbstractMove<TimeSkipMove<A>, A> {
     private final double distance;
 
@@ -33,8 +36,13 @@ public class TimeSkipMove<A extends IAttacker<?, ?>> extends AbstractMove<TimeSk
 
     @Override
     public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user, MoveContext ctx) {
+        doTimeSkip(attacker, user, distance, getSounds());
+
+        return Set.of();
+    }
+
+    public static void doTimeSkip(IAttacker<?, ?> attacker, LivingEntity user, double distance, List<SoundEvent> sounds) {
         boolean hasVehicle = user.hasVehicle();
-        double distance = this.distance;
 
         if (hasVehicle)
             distance /= 3;
@@ -46,20 +54,18 @@ public class TimeSkipMove<A extends IAttacker<?, ?>> extends AbstractMove<TimeSk
                         eyePos.add(user.getRotationVector().multiply(distance)),
                         RaycastContext.ShapeType.COLLIDER,
                         RaycastContext.FluidHandling.NONE, user));
-        Vec3d telePos = hitResult.getPos();
+        Vec3d tpPos = hitResult.getPos();
 
         // 3s minimum ult cooldown
         CooldownsComponent cooldowns = JComponents.getCooldowns(user);
         if (cooldowns.getCooldown(CooldownType.STAND_ULTIMATE) < 60)
             cooldowns.setCooldown(CooldownType.STAND_ULTIMATE, 60);
 
-        if (hasVehicle) user.getRootVehicle().setPosition(telePos.x, telePos.y, telePos.z);
-        else user.teleport(telePos.x, telePos.y, telePos.z);
+        if (hasVehicle) user.getRootVehicle().setPosition(tpPos.x, tpPos.y, tpPos.z);
+        else user.teleport(tpPos.x, tpPos.y, tpPos.z);
 
-        for (SoundEvent sound : getSounds())
-            attacker.getWorld().playSound(null, telePos.x, telePos.y, telePos.z, sound, SoundCategory.PLAYERS, 1f, 1f);
-
-        return Set.of();
+        for (SoundEvent sound : sounds)
+            attacker.getWorld().playSound(null, tpPos.x, tpPos.y, tpPos.z, sound, SoundCategory.PLAYERS, 1f, 1f);
     }
 
     @Override
@@ -69,6 +75,6 @@ public class TimeSkipMove<A extends IAttacker<?, ?>> extends AbstractMove<TimeSk
 
     @Override
     public @NonNull TimeSkipMove<A> copy() {
-        return null;
+        return copyExtras(new TimeSkipMove<>(getCooldown(), distance));
     }
 }

@@ -6,6 +6,8 @@ import net.arna.jcraft.common.attack.core.BlockableType;
 import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.StunType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
+import net.arna.jcraft.common.entity.stand.StandEntity;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.LivingEntity;
 
 import java.util.Set;
@@ -36,6 +38,12 @@ public abstract class AbstractGrabAttack<T extends AbstractGrabAttack<T, A, S>, 
         if (targets.isEmpty()) return targets;
 
         attacker.setMove(hitMove, hitState);
+
+        for (LivingEntity target : targets) {
+            StandEntity<?, ?> stand = JUtils.getStand(target);
+            if (stand != null) stand.blocking = false;
+        }
+
         return targets;
     }
 }

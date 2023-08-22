@@ -70,7 +70,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
             .withBlockStun(11)
             .withInfo(Text.literal("Forward Charge"), Text.literal("The World detaches from the user and lunges forward, combo starter"));
     public static final TimeStopMove<TheWorldEntity> TIME_STOP = new TimeStopMove<TheWorldEntity>(
-            1400, 45, 52, 1, 80)
+            1400, 45, 52, 80)
             .withInfo(Text.literal("Timestop"), Text.literal("4 seconds"));
 
     public TheWorldEntity(World worldIn) {

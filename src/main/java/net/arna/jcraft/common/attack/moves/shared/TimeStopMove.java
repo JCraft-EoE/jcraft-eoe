@@ -7,8 +7,8 @@ import net.arna.jcraft.common.entity.stand.StandEntity;
 
 @Getter
 public class TimeStopMove<A extends StandEntity<?, ?>> extends AbstractTimeStopMove<TimeStopMove<A>, A> {
-    public TimeStopMove(int cooldown, int windup, int duration, float moveDistance, int timeStopDuration) {
-        super(cooldown, windup, duration, moveDistance, timeStopDuration);
+    public TimeStopMove(int cooldown, int windup, int duration, int timeStopDuration) {
+        super(cooldown, windup, duration, 1f, timeStopDuration);
     }
 
     @Override
@@ -18,6 +18,6 @@ public class TimeStopMove<A extends StandEntity<?, ?>> extends AbstractTimeStopM
 
     @Override
     public @NonNull TimeStopMove<A> copy() {
-        return copyExtras(new TimeStopMove<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getTimeStopDuration()));
+        return copyExtras(new TimeStopMove<>(getCooldown(), getWindup(), getDuration(), getTimeStopDuration()));
     }
 }

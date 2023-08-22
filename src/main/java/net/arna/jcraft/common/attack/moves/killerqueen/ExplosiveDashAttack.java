@@ -14,6 +14,7 @@ import java.util.Set;
 public class ExplosiveDashAttack extends AbstractMove<ExplosiveDashAttack, AbstractKillerQueenEntity<?, ?>> {
     public ExplosiveDashAttack(int cooldown) {
         super(cooldown, 0, 0, 0);
+        dash = true;
     }
 
     @Override
