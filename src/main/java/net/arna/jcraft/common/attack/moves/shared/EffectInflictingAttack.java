@@ -10,9 +10,9 @@ import java.util.List;
 
 @Getter
 public class EffectInflictingAttack<S extends StandEntity<?, ?>> extends AbstractEffectInflictingAttack<EffectInflictingAttack<S>, S> {
-    public EffectInflictingAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun,
+    public EffectInflictingAttack(int cooldown, int windup, int duration, float moveDistance, float damage, int stun,
                                   float hitboxSize, float knockback, float offset, @NonNull List<StatusEffectInstance> effects) {
-        super(cooldown, windup, duration, attackDistance, damage, stun, hitboxSize, knockback, offset, effects);
+        super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset, effects);
     }
 
     @Override

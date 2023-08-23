@@ -16,7 +16,7 @@ public abstract class AbstractChargeAttack<T extends AbstractChargeAttack<T, A, 
         extends AbstractSimpleAttack<T, A> {
     private final S hitAnimState;
 
-    public AbstractChargeAttack(int cooldown, int windup, int duration, float moveDistance, float damage, int stun,
+    protected AbstractChargeAttack(int cooldown, int windup, int duration, float moveDistance, float damage, int stun,
                                 float hitboxSize, float knockback, float offset, S hitAnimState) {
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset);
 

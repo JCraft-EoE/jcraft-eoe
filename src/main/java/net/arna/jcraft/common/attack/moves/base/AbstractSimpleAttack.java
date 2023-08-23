@@ -236,6 +236,11 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
         return getThis();
     }
 
+    /**
+     * Sets the hit spark particle this attack will use when it hits something.
+     * @param particle The hit spark particle to use
+     * @return This attack
+     */
     public T withHitSpark(JParticleType particle) {
         hitSpark = particle;
         return getThis();

@@ -8,6 +8,7 @@ import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.MobilityType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
@@ -205,14 +206,39 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     }
 
     /**
+     * Sets the mobility type the Stand User AI will use to determine how to use this attack.
+     * @param mobilityType The mobility type of this attack
+     * @return This attack
+     */
+    public T withMobilityType(MobilityType mobilityType) {
+        this.mobilityType = mobilityType;
+        return getThis();
+    }
+
+    /**
+     * Sets the ranged field to the given value.
+     * This field is used to determine how to use this move by the Stand User AI.
+     * @param ranged Whether this move is ranged
+     * @return This move
+     */
+    public T withRanged(boolean ranged) {
+        this.ranged = ranged;
+        return getThis();
+    }
+
+    /**
      * Called when this move is registered to a {@link net.arna.jcraft.common.attack.core.MoveMap MoveMap}.
-     * Not supposed to be called by anything else.
+     * Not supposed to be called anywhere else.
      * @param type The MoveType this move is registered as
      */
     @ApiStatus.Internal
     public final void onRegister(MoveType type) {
         moveType = type;
+
+        // TODO convert these to actual tests
+        if (!FabricLoader.getInstance().isDevelopmentEnvironment()) return;
         testCopy();
+        testGetThis();
     }
 
     // Logic methods
@@ -404,5 +430,12 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         if (crouchingVariant != null) crouchingVariant.testCopy();
         if (aerialVariant != null) aerialVariant.testCopy();
         if (followUp != null) followUp.testCopy();
+    }
+
+    /**
+     * Ensures {@link #getThis()} actually returns {@code this}.
+     */
+    private void testGetThis() {
+        if (getThis() != this) throw new IllegalStateException(getClass().getSimpleName() + "#getThis() does not return this!");
     }
 }

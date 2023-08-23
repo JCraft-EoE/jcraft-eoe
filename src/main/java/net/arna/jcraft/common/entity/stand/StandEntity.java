@@ -62,7 +62,6 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static net.arna.jcraft.JCraft.comboBreak;
@@ -75,8 +74,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     // All variables that the player can see in action (i.e. time erase time, timestop time, alpha, state) have to be tracked.
     public List<Attack> moves = List.of();
-    @SuppressWarnings("FieldMayBeFinal")
-    private List<Attack> allMoves = new ArrayList<>();
     @Getter(onMethod_ = @NonNull)
     private MoveMap<E, S> moveMap;
     @Getter
@@ -112,16 +109,20 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     @Getter
     private float prevAlpha = 1f;
 
+    @Getter @Setter
+    @Nullable
+    private LivingEntity user = null;
 
-    public Boolean blocking = false;
-    public Boolean idleOverride = false;
 
-    public float idleDistance = 1.25f;
-    public float idleRotation = -45f;
+    public boolean blocking = false;
+    protected boolean idleOverride = false;
+
+    protected float idleDistance = 1.25f;
+    protected float idleRotation = -45f;
     public final float attackRotation = 90f;
-    public float blockDistance = 0.75f;
+    protected float blockDistance = 0.75f;
 
-    public float maxStandGauge = 90f;
+    protected float maxStandGauge = 90f;
 
     public MoveQueue queuedAttack;
     public AbstractMove<?, ? super E> curMove;
@@ -147,7 +148,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     private final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
     protected int summonAnimDuration = 19;
-    protected boolean playSummonAnim = true;
+    private boolean playSummonAnim = true;
 
     protected StandEntity(StandType type, World world) {
         this(type, world, null, true);
@@ -159,6 +160,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     protected StandEntity(StandType type, World world, @Nullable SoundEvent summonSound, boolean playGenericSummonSound) {
         super(type.getEntityType(), world);
+        noClip = true;
         standType = type;
         this.summonSound = summonSound;
         this.playGenericSummonSound = playGenericSummonSound;
@@ -189,11 +191,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         FREEY = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.FLOAT);
         FREEZ = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.FLOAT);
     }
-
-    @Getter
-    @Setter
-    @Nullable
-    private LivingEntity user = null;
 
     @NotNull
     public LivingEntity getUserOrThrow() {
@@ -486,66 +483,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         dataTracker.startTracking(FREEZ, 0f);
     }
 
-    /**
-     * Must be called after moves is assigned to.
-     * Assigns certain properties to the stand, marks the correct button for each move, stores all available moves in a list.
-     */
-    public void initialize() {
-        noClip = true;
-        addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 999999, 9, false, false));
-
-        markAllAttackButtons();
-
-        gatherAllAttacks();
-    }
-
-    /**
-     * Marks the correct attack button (in the form of an AttackQueue) for each attack.
-     */
-    protected void markAllAttackButtons() {
-        if (moves.isEmpty()) throw new IllegalStateException("StandEntity.markAllAttackButtons() was called without moves being set for: " + this);
-        int i = 0;
-        for (Attack attack : moves)
-            // Marking an attack with the correct attack button
-            attack.button = MoveQueue.values()[i++];
-    }
-
-    /**
-     * Stores all possible attacks a stand may do, and assigns the correct button to each variation and followup.
-     */
-    protected void gatherAllAttacks() {
-        if (moves.isEmpty()) throw new IllegalStateException("StandEntity.gatherAllAttacks() was called without moves being set for: " + this);
-        for (Attack attack : moves) {
-            allMoves.add(attack);
-            if (attack.hasFollowup()) {
-                Attack followup = attack.followup;
-                addFollowup(followup, 1);
-                followup.button = attack.button;
-            }
-            if (attack.variations.containsKey(VariationType.AERIAL)) {
-                Attack aerial = attack.getAerialVariationOrThrow();
-                allMoves.add(aerial);
-                aerial.button = attack.button;
-            }
-            if (attack.variations.containsKey(VariationType.CROUCHING)) {
-                Attack crouching = attack.getCrouchingVariationOrThrow();
-                allMoves.add(crouching);
-                crouching.button = attack.button;
-            }
-        }
-    }
-
-    private void addFollowup(Attack followup, int recursion) {
-        if (recursion > 127) {
-            JCraft.LOGGER.fatal("Stopping possible stack overflow, attack has over 127 followups");
-            return;
-        }
-
-        allMoves.add(followup);
-        if (followup.hasFollowup())
-            addFollowup(followup.followup, ++recursion);
-    }
-
     // Attack controls
 
     /**
@@ -766,10 +703,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         getUserOrThrow().addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 5, 3, false, false, true));
     }
 
-    protected void timeSkip(double distance, @NotNull SoundEvent sound) {
-
-    }
-
     // Define desummon conditions
     public void desummon() {
         if (curMove != null || getMoveStun() > 0) return;
@@ -777,7 +710,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     }
 
     // Define idle override
-    public void idleOverride(LivingEntity player) {} // TODO this isn't used.
+    public void idleOverride() {}
 
     /**
      * Cancels the stands attack instantly
@@ -951,7 +884,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                         setDistanceOffset(idleDistance);
                         setRotationOffset(idleRotation);
                     }
-                } else idleOverride(user);
+                } else idleOverride();
             } else if (blocking) { // Process block
                 curMove = null;
                 setStateNoReset(getBlockState());
