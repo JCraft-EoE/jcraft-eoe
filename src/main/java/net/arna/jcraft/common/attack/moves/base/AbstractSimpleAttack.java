@@ -314,7 +314,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
      * @param type The type of entities to look for
      * @return All found valid targets
      */
-    public static <T extends Entity> Set<T> findHits(IAttacker<?, ?> attacker, Set<Box> boxes,
+    public static <T extends Entity> @NonNull Set<T> findHits(IAttacker<?, ?> attacker, @NonNull Set<Box> boxes,
                                                      @Nullable DamageSource damageSource, Class<T> type) {
         return boxes.stream()
                 .flatMap(box -> attacker.getWorld().getEntitiesByClass(type, box, EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e ->
@@ -355,8 +355,8 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
         // TODO allow this method to send boxes in bulk.
         boxes.forEach(box -> JUtils.displayHitbox(attacker.getWorld(), new Vec3d(box.minX, box.minY, box.minZ), new Vec3d(box.maxX, box.maxY, box.maxZ)));
 
-        Set<LivingEntity> hurt = findHits(attacker, boxes, damageSource);
-        if (hurt.isEmpty()) return Set.of();
+        Set<LivingEntity> targets = findHits(attacker, boxes, damageSource);
+        if (targets.isEmpty()) return Set.of();
 
         Random random = Random.create();
         JCraft.createParticle((ServerWorld) attacker.getWorld(),
@@ -366,13 +366,14 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
                 hitSpark);
 
         getImpactSounds().forEach(sound -> attacker.playSound(sound, 1f, 1f));
+        if (getDamage() <= 0) return targets;
 
         Vec3d kbVec = getRotVec(attacker).multiply(knockback).add(new Vec3d(0.0, Math.abs(knockback) / 4, 0.0));
-        for (LivingEntity target : validateTargets(attacker, hurt))
+        for (LivingEntity target : validateTargets(attacker, targets))
             StandEntity.damageLogic(attacker.getWorld(), target, kbVec, stun, stunType.ordinal(), overrideStun,
                     damage, lift, blockStun, damageSource, attacker.getUserOrThrow(), canBackstab, blockableType.isNonBlockable());
 
-        return hurt;
+        return targets;
     }
 
     protected Set<LivingEntity> validateTargets(A attacker, Set<LivingEntity> targets) {

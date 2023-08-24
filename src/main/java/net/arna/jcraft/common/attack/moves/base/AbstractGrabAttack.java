@@ -28,8 +28,9 @@ public abstract class AbstractGrabAttack<T extends AbstractGrabAttack<T, A, S>, 
         this.hitState = hitState;
 
         // Grabs cannot be burst out of, or blocked
-        this.withStunType(StunType.UNBURSTABLE);
-        this.withBlockableType(BlockableType.NON_BLOCKABLE);
+        withStunType(StunType.UNBURSTABLE);
+        withOverrideStun();
+        withBlockableType(BlockableType.NON_BLOCKABLE);
     }
 
     @Override

@@ -3,7 +3,6 @@ package net.arna.jcraft.common.attack.moves.shared;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
-import net.arna.jcraft.common.util.JParticleType;
 
 public class SimpleAttack<A extends IAttacker<?, ?>> extends AbstractSimpleAttack<SimpleAttack<A>, A> {
     /**
@@ -33,11 +32,6 @@ public class SimpleAttack<A extends IAttacker<?, ?>> extends AbstractSimpleAttac
     public static <A extends IAttacker<?, ?>> SimpleAttack<A> lightAttack(int windup, int duration, float damage,
                                                                             int stun, float knockback, float attackDistance, float offset) {
         return new SimpleAttack<>(30, windup, duration, attackDistance, damage, stun, 1.5f, knockback, offset);
-    }
-
-    public SimpleAttack<A> withHitSpark(JParticleType particle) {
-        this.hitSpark = particle;
-        return this;
     }
 
     @Override

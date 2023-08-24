@@ -34,7 +34,7 @@ public class MoveMap<A extends IAttacker<A, S>, S> implements Iterable<MoveMap.E
         move = move.copy();
         move.onRegister(type);
 
-        Entry<A, S> entry = new Entry<A, S>(type, move, cooldownType, animState);
+        Entry<A, S> entry = new Entry<A, S>(null, type, move, cooldownType, animState);
         moves.put(type, entry);
         return entry;
     }

@@ -4,7 +4,6 @@ import it.unimi.dsi.fastutil.ints.IntCollection;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.moves.base.AbstractMultiHitAttack;
-import net.arna.jcraft.common.util.JParticleType;
 
 /**
  * The simplest implementation of {@link AbstractMultiHitAttack}.
@@ -30,11 +29,6 @@ public class SimpleMultiHitAttack<A extends IAttacker<?, ?>> extends AbstractMul
                                                                                     float offset, IntCollection hitMoments) {
         return new SimpleMultiHitAttack<>(30, moveStunTicks, damage, stun, 1.5f, 0.75f,
                 attackDistance, offset, hitMoments);
-    }
-
-    public SimpleMultiHitAttack<A> withHitSpark(JParticleType particle) {
-        this.hitSpark = particle;
-        return this;
     }
 
     @Override

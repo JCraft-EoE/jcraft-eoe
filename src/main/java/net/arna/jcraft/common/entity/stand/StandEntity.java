@@ -165,6 +165,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         this.summonSound = summonSound;
         this.playGenericSummonSound = playGenericSummonSound;
 
+        assert getThis() == this;
+
         registerMoves();
     }
 
@@ -319,7 +321,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         this.dataTracker.set(STANDGAUGE, standGauge);
     }
 
-    public boolean getFree() {
+    public boolean isFree() {
         return this.dataTracker.get(FREE);
     }
 
@@ -731,7 +733,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     @Override
     public boolean hasNoGravity() {
-        if (getFree() && !isRemote()) return true;
+        if (isFree() && !isRemote()) return true;
         return super.hasNoGravity();
     }
 
@@ -771,7 +773,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if (gravDir == Direction.UP)
             rotVec = new Vec3d(rotVec.x, -rotVec.y, rotVec.z);
 
-        boolean isFree = getFree();
+        boolean isFree = isFree();
         boolean isRemote = isRemote();
 
         // Common code for remote mode
@@ -784,7 +786,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 setHeadYaw(user.getHeadYaw());
                 setRotation(user.getYaw(), user.getPitch());
             } else discard();
-        } else if (!hasVehicle() && !getFree())
+        } else if (!hasVehicle() && !isFree())
             startRiding(user, true);
 
         /*

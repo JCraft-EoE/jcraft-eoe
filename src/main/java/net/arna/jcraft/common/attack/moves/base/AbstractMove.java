@@ -238,7 +238,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         // TODO convert these to actual tests
         if (!FabricLoader.getInstance().isDevelopmentEnvironment()) return;
         testCopy();
-        testGetThis();
+        assert getThis() == this;
     }
 
     // Logic methods
@@ -430,12 +430,5 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         if (crouchingVariant != null) crouchingVariant.testCopy();
         if (aerialVariant != null) aerialVariant.testCopy();
         if (followUp != null) followUp.testCopy();
-    }
-
-    /**
-     * Ensures {@link #getThis()} actually returns {@code this}.
-     */
-    private void testGetThis() {
-        if (getThis() != this) throw new IllegalStateException(getClass().getSimpleName() + "#getThis() does not return this!");
     }
 }
