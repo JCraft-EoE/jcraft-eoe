@@ -75,8 +75,9 @@ dependencies {
 	// MixinExtras
 	implementation include(annotationProcessor("com.github.llamalad7.mixinextras:mixinextras-fabric:0.2.0-beta.9"))
 
-	runtimeOnly('org.joml:joml:1.10.4')
-	modImplementation("maven.modrinth:sodium:${project.sodium}")
+	compileOnly "com.google.guava:guava:32.1.2-jre" // To make TypeToken not 'unstable' :)
+	runtimeOnly "org.joml:joml:1.10.4"
+	modImplementation "maven.modrinth:sodium:${project.sodium}"
 	modImplementation "com.ptsmods:devlogin:3.3.2" // To login into your Minecraft account
 	modRuntimeOnly "com.sk89q.worldedit:worldedit-fabric-mc1.19.2:7.2.12"
 

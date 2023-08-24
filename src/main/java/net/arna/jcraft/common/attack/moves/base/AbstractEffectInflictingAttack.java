@@ -3,14 +3,14 @@ package net.arna.jcraft.common.attack.moves.base;
 import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.IAttacker;
-import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 public abstract class AbstractEffectInflictingAttack<T extends AbstractEffectInflictingAttack<T, A>, A extends IAttacker<?, ?>>
@@ -24,24 +24,14 @@ public abstract class AbstractEffectInflictingAttack<T extends AbstractEffectInf
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user, MoveContext ctx) {
-        Set<LivingEntity> targets = super.perform(attacker, user, ctx);
-        inflictEffects(targets, effects, getBlockableType().isNonBlockableEffects());
+    protected void processTarget(A attacker, LivingEntity target, Vec3d kbVec, DamageSource damageSource) {
+        super.processTarget(attacker, target, kbVec, damageSource);
 
-        return targets;
+        inflictEffects(target, effects, getBlockableType().isNonBlockableEffects());
     }
 
-    static void inflictEffects(Set<LivingEntity> targets, List<StatusEffectInstance> effects, boolean nonBlockableEffects) {
-        // Copy the effects
-        effects = effects.stream()
-                .map(StatusEffectInstance::new)
-                .toList();
-
-        if (nonBlockableEffects)
-            for (LivingEntity target : targets)
-                effects.forEach(target::addStatusEffect);
-        else for (LivingEntity target : targets)
-            if (!JUtils.isBlocking(target))
-                effects.forEach(target::addStatusEffect);
+    static void inflictEffects(LivingEntity target, List<StatusEffectInstance> effects, boolean nonBlockableEffects) {
+        if (nonBlockableEffects || !JUtils.isBlocking(target))
+            effects.forEach(effect -> target.addStatusEffect(new StatusEffectInstance(effect)));
     }
 }

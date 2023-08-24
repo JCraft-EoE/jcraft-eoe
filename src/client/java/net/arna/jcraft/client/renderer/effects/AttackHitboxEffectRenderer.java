@@ -19,24 +19,28 @@ import net.minecraft.util.math.Vec3d;
 import java.util.*;
 
 @UtilityClass
-public class AttackHitBoxEffectRenderer {
+public class AttackHitboxEffectRenderer {
     // Use an evicting queue to limit the amount of hit boxes rendered at a time to 8.
     // If there are already 8 hit boxes, and we wish to add more, old ones will be removed.
     @SuppressWarnings("UnstableApiUsage") // I do not care. (based)
-    private static final Queue<Pair<LongLongPair, Box>> hitBoxes = EvictingQueue.create(8);
+    private static final Queue<Pair<LongLongPair, Box>> hitboxes = EvictingQueue.create(8);
     private static final List<Pair<LongLongPair, Box>> highPriorityBoxes = new ArrayList<>(); // These do not get evicted.
 
     public static void init() {
-        WorldRenderEvents.AFTER_ENTITIES.register(AttackHitBoxEffectRenderer::render);
+        WorldRenderEvents.AFTER_ENTITIES.register(AttackHitboxEffectRenderer::render);
     }
 
-    public static void addHitBox(Box box) {
-        addHitBox(box, 2500, false);
+    public static void addHitboxes(Iterable<Box> boxes) {
+        boxes.forEach(AttackHitboxEffectRenderer::addHitbox);
+    }
+
+    public static void addHitbox(Box box) {
+        addHitbox(box, 2500, false);
     }
 
     @Synchronized
-    public static void addHitBox(Box box, long duration, boolean highPriority) {
-        (highPriority ? highPriorityBoxes : hitBoxes).add(Pair.of(LongLongPair.of(Util.getEpochTimeMs(), duration), box));
+    public static void addHitbox(Box box, long duration, boolean highPriority) {
+        (highPriority ? highPriorityBoxes : hitboxes).add(Pair.of(LongLongPair.of(Util.getEpochTimeMs(), duration), box));
     }
 
     @Synchronized
@@ -48,7 +52,7 @@ public class AttackHitBoxEffectRenderer {
         matrices.push();
         matrices.translate(-camPos.x, -camPos.y, -camPos.z);
 
-        renderBoxes(ctx, matrices, hitBoxes);
+        renderBoxes(ctx, matrices, hitboxes);
         renderBoxes(ctx, matrices, highPriorityBoxes);
 
         matrices.pop();

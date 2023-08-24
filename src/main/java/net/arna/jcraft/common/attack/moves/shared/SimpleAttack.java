@@ -17,7 +17,8 @@ public class SimpleAttack<A extends IAttacker<?, ?>> extends AbstractSimpleAttac
      * @param knockback    The strength of the knock-back.
      * @param offset       The amount the hitbox is offset by.
      */
-    public SimpleAttack(int cooldown, int windup, int duration, float moveDistance, float damage, int stun, float hitboxSize, float knockback, float offset) {
+    public SimpleAttack(int cooldown, int windup, int duration, float moveDistance, float damage, int stun,
+                        float hitboxSize, float knockback, float offset) {
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset);
     }
 
@@ -26,12 +27,12 @@ public class SimpleAttack<A extends IAttacker<?, ?>> extends AbstractSimpleAttac
      * @param windup The windup of this attack in ticks. How long until the blow is landed.
      * @param duration The duration after which a new attack can be initiated in ticks.
      * @param damage The damage this attack deals.
-     * @param attackDistance The distance at which the hitbox is placed.
+     * @param moveDistance The distance at which the hitbox is placed.
      * @param offset The amount the hitbox is offset by.
      */
-    public static <A extends IAttacker<?, ?>> SimpleAttack<A> lightAttack(int windup, int duration, float damage,
-                                                                            int stun, float knockback, float attackDistance, float offset) {
-        return new SimpleAttack<>(30, windup, duration, attackDistance, damage, stun, 1.5f, knockback, offset);
+    public static <A extends IAttacker<?, ?>> SimpleAttack<A> lightAttack(int windup, int duration, float damage, int stun,
+                                                                          float knockback, float moveDistance, float offset) {
+        return new SimpleAttack<>(30, windup, duration, moveDistance, damage, stun, 1.5f, knockback, offset);
     }
 
     @Override
@@ -41,7 +42,7 @@ public class SimpleAttack<A extends IAttacker<?, ?>> extends AbstractSimpleAttac
 
     @Override
     public @NonNull SimpleAttack<A> copy() {
-        return copyExtras(new SimpleAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(), getHitboxSize(),
-                getKnockback(), getOffset()));
+        return copyExtras(new SimpleAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
+                getStun(), getHitboxSize(), getKnockback(), getOffset()));
     }
 }

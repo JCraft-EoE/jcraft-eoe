@@ -3,13 +3,13 @@ package net.arna.jcraft.common.attack.moves.base;
 import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.IAttacker;
-import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 public abstract class AbstractEffectInflictingBarrageAttack<T extends AbstractEffectInflictingBarrageAttack<T, A>, A extends IAttacker<?, ?>>
@@ -24,10 +24,9 @@ public abstract class AbstractEffectInflictingBarrageAttack<T extends AbstractEf
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user, MoveContext ctx) {
-        Set<LivingEntity> targets = super.perform(attacker, user, ctx);
-        AbstractEffectInflictingAttack.inflictEffects(targets, effects, getBlockableType().isNonBlockableEffects());
+    protected void processTarget(A attacker, LivingEntity target, Vec3d kbVec, DamageSource damageSource) {
+        super.processTarget(attacker, target, kbVec, damageSource);
 
-        return targets;
+        AbstractEffectInflictingAttack.inflictEffects(target, effects, getBlockableType().isNonBlockableEffects());
     }
 }

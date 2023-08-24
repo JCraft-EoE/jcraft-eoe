@@ -73,24 +73,50 @@ public final class JUtils {
         }
     }
 
-    public static void displayHitbox(World world, Vec3d v1, Vec3d v2) {
-        if (v1.equals(v2)) return;
+    public static void displayHitbox(World world, Vec3d min, Vec3d max) {
+        displayHitbox(world, new Box(min, max));
+    }
 
+    public static void displayHitbox(World world, Box box) {
+        displayHitboxes(world, Set.of(box));
+    }
+
+    public static void displayHitboxes(World world, Collection<Box> boxes) {
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeShort(1);
-        buf.writeDouble(v1.x);
-        buf.writeDouble(v1.y);
-        buf.writeDouble(v1.z);
+        buf.writeVarInt(boxes.size());
 
-        buf.writeDouble(v2.x);
-        buf.writeDouble(v2.y);
-        buf.writeDouble(v2.z);
+        double minX = Double.MAX_VALUE;
+        double minY = Double.MAX_VALUE;
+        double minZ = Double.MAX_VALUE;
 
-        Vec3d center = new Box(v1, v2).getCenter();
+        double maxX = Double.MIN_VALUE;
+        double maxY = Double.MIN_VALUE;
+        double maxZ = Double.MIN_VALUE;
+
+        for (Box box : boxes) {
+            if (box.minX < minX) minX = box.minX;
+            if (box.minY < minY) minY = box.minY;
+            if (box.minZ < minZ) minZ = box.minZ;
+
+            if (box.maxX < maxX) maxX = box.maxX;
+            if (box.maxY < maxY) maxY = box.maxY;
+            if (box.maxZ < maxZ) maxZ = box.maxZ;
+
+            buf.writeDouble(box.minX);
+            buf.writeDouble(box.minY);
+            buf.writeDouble(box.minZ);
+
+            buf.writeDouble(box.maxX);
+            buf.writeDouble(box.maxY);
+            buf.writeDouble(box.maxZ);
+        }
+
+        Box entireBox = new Box(minX, minY, minZ, maxX, maxY, maxZ).expand(48);
         world.getPlayers().stream()
                 .filter(p -> p instanceof ServerPlayerEntity)
                 .map(p -> (ServerPlayerEntity) p)
-                .filter(p -> p.getPos().squaredDistanceTo(center) < 48 * 48)
+                .filter(p -> entireBox.contains(p.getPos()))
                 .forEach(p -> ServerChannelFeedbackPacket.send(p, buf));
     }
 

@@ -13,12 +13,11 @@ import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.JCraftClient;
 import net.arna.jcraft.client.gui.ServerConfigUI;
 import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
-import net.arna.jcraft.client.renderer.effects.AttackHitBoxEffectRenderer;
+import net.arna.jcraft.client.renderer.effects.AttackHitboxEffectRenderer;
 import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer;
 import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
 import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
 import net.arna.jcraft.client.util.JClientUtils;
-import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.config.ConfigOption;
 import net.arna.jcraft.common.entity.stand.MadeInHeavenEntity;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
@@ -47,11 +46,13 @@ import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.stream.IntStream;
 
 import static net.arna.jcraft.registry.JPacketRegistry.*;
 import static net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.registerGlobalReceiver;
@@ -165,16 +166,24 @@ public class ClientPacketHandler {
         switch (control) {
             // Attack hit boxes
             case (1) -> {
-                double x1 = buf.readDouble();
-                double y1 = buf.readDouble();
-                double z1 = buf.readDouble();
+                int count = buf.readVarInt();
 
-                double x2 = buf.readDouble();
-                double y2 = buf.readDouble();
-                double z2 = buf.readDouble();
+                List<Box> boxes = IntStream.range(0, count)
+                        .mapToObj(i -> {
+                            double minX = buf.readDouble();
+                            double minY = buf.readDouble();
+                            double minZ = buf.readDouble();
+
+                            double maxX = buf.readDouble();
+                            double maxY = buf.readDouble();
+                            double maxZ = buf.readDouble();
+
+                            return new Box(minX, minY, minZ, maxX, maxY, maxZ);
+                        })
+                        .toList();
 
                 // Run on render thread to avoid concurrency issues.
-                RenderSystem.recordRenderCall(() -> AttackHitBoxEffectRenderer.addHitBox(new Box(x1, y1, z1, x2, y2, z2)));
+                RenderSystem.recordRenderCall(() -> AttackHitboxEffectRenderer.addHitboxes(boxes));
             }
 
             // Time erase trackers
@@ -528,9 +537,9 @@ public class ClientPacketHandler {
         Splatter splatter = JUtils.getSplatterManager(world).readSplatter(buf);
 
         long ageMs = splatter.getType().getMaxAge() * 50L;
-        AttackHitBoxEffectRenderer.addHitBox(splatter.getMainBox(), ageMs, true);
+        AttackHitboxEffectRenderer.addHitbox(splatter.getMainBox(), ageMs, true);
         splatter.getSections().stream()
                 .filter(section -> !section.isRemoved())
-                .forEach(section -> AttackHitBoxEffectRenderer.addHitBox(section.getHitBox(), ageMs, true));
+                .forEach(section -> AttackHitboxEffectRenderer.addHitbox(section.getHitBox(), ageMs, true));
     }
 }

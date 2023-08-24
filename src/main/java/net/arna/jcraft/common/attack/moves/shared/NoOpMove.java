@@ -17,7 +17,11 @@ import java.util.Set;
  */
 public class NoOpMove<A extends IAttacker<?, ?>> extends AbstractMove<NoOpMove<A>, A> {
     public NoOpMove() {
-        super(0, 0, 0, 0);
+        this(0, 0, 0f);
+    }
+
+    public NoOpMove(int cooldown, int duration, float moveDistance) {
+        super(cooldown, duration + 1, duration, moveDistance);
     }
 
     @Override
@@ -32,6 +36,6 @@ public class NoOpMove<A extends IAttacker<?, ?>> extends AbstractMove<NoOpMove<A
 
     @Override
     public @NonNull NoOpMove<A> copy() {
-        return copyExtras(new NoOpMove<>());
+        return copyExtras(new NoOpMove<>(getCooldown(), getDuration(), getMoveDistance()));
     }
 }

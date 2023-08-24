@@ -13,7 +13,7 @@ import net.arna.jcraft.client.registry.JClientEventsRegistry;
 import net.arna.jcraft.client.registry.JEntityRendererRegister;
 import net.arna.jcraft.client.registry.JRenderLayerRegistry;
 import net.arna.jcraft.client.renderer.block.ShaderTestBlockEntityRenderer;
-import net.arna.jcraft.client.renderer.effects.AttackHitBoxEffectRenderer;
+import net.arna.jcraft.client.renderer.effects.AttackHitboxEffectRenderer;
 import net.arna.jcraft.client.renderer.effects.SplatterEffectRenderer;
 import net.arna.jcraft.client.renderer.effects.TimeAccelerationEffectRenderer;
 import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer;
@@ -152,7 +152,7 @@ public class JCraftClient implements ClientModInitializer {
 
         ClientPacketHandler.init();
 
-        AttackHitBoxEffectRenderer.init();
+        AttackHitboxEffectRenderer.init();
         TimeAccelerationEffectRenderer.init();
         TimeErasePredictionEffectRenderer.init();
         SplatterEffectRenderer.init();

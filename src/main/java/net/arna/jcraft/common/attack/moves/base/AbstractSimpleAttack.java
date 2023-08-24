@@ -20,6 +20,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
@@ -328,19 +329,37 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
     // Logic methods
     @Override
     public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user, MoveContext ctx) {
-        if (hitboxSize <= 0 && extraHitBoxes.isEmpty()) return Set.of();
-
         Vec3d upVec = GravityChangerAPI.getEyeOffset(user);
         Vec3d hPos = getOffsetHeightPos(attacker);
         Vec3d rotVec = getRotVec(attacker);
 
         Vec3d fPos = getOffsetForwardPos(attacker, hPos, upVec, rotVec);
 
+        Set<Box> boxes = calculateBoxes(attacker, user, rotVec, upVec, hPos, fPos);
         DamageSource damageSource = attacker.getDamageSource();
+        return attackBoxes(attacker, boxes, damageSource, fPos);
+    }
+
+    /**
+     * Calculates the boxes for this attack.
+     * Called in {@link #perform(IAttacker, LivingEntity, MoveContext)}
+     *
+     * @param attacker The attacker that invoked this attack
+     * @param user     The user of the attacker
+     * @param rotVec   The rotation vector of the attacker
+     * @param upVec    The up-facing vector
+     * @param hPos     The offset height position
+     * @param fPos     The offset forward position
+     * @return All boxes that should be attacked
+     */
+    protected Set<Box> calculateBoxes(A attacker, LivingEntity user, Vec3d rotVec, Vec3d upVec, Vec3d hPos, Vec3d fPos) {
+        if (hitboxSize <= 0 && extraHitBoxes.isEmpty()) return Set.of();
+
         Set<Box> boxes = new HashSet<>();
         boxes.add(createBox(fPos, hitboxSize));
         extraHitBoxes.forEach(hitBox -> boxes.add(createBox(hPos, rotVec, upVec, hitBox)));
-        return attackBoxes(attacker, boxes, damageSource, fPos);
+
+        return boxes;
     }
 
     /**
@@ -352,8 +371,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
      * @return A set of all affected targets.
      */
     protected Set<LivingEntity> attackBoxes(A attacker, Set<Box> boxes, DamageSource damageSource, Vec3d center) {
-        // TODO allow this method to send boxes in bulk.
-        boxes.forEach(box -> JUtils.displayHitbox(attacker.getWorld(), new Vec3d(box.minX, box.minY, box.minZ), new Vec3d(box.maxX, box.maxY, box.maxZ)));
+        JUtils.displayHitboxes(attacker.getWorld(), boxes);
 
         Set<LivingEntity> targets = findHits(attacker, boxes, damageSource);
         if (targets.isEmpty()) return Set.of();
@@ -370,10 +388,22 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
 
         Vec3d kbVec = getRotVec(attacker).multiply(knockback).add(new Vec3d(0.0, Math.abs(knockback) / 4, 0.0));
         for (LivingEntity target : validateTargets(attacker, targets))
-            StandEntity.damageLogic(attacker.getWorld(), target, kbVec, stun, stunType.ordinal(), overrideStun,
-                    damage, lift, blockStun, damageSource, attacker.getUserOrThrow(), canBackstab, blockableType.isNonBlockable());
+            processTarget(attacker, target, kbVec, damageSource);
 
         return targets;
+    }
+
+    /**
+     * Gets called for every target hit by {@link #attackBoxes(IAttacker, Set, DamageSource, Vec3d)}.
+     * @param attacker The attacker that performed this
+     * @param target The target to process
+     * @param kbVec The knockback vector to pass to {@link StandEntity#damageLogic(World, LivingEntity, Vec3d, int, int,
+     * boolean, float, boolean, int, DamageSource, Entity, boolean, boolean)}
+     * @param damageSource The damage source to apply damage with
+     */
+    protected void processTarget(A attacker, LivingEntity target, Vec3d kbVec, DamageSource damageSource) {
+        StandEntity.damageLogic(attacker.getWorld(), target, kbVec, stun, stunType.ordinal(), overrideStun,
+                damage, lift, blockStun, damageSource, attacker.getUserOrThrow(), canBackstab, blockableType.isNonBlockable());
     }
 
     protected Set<LivingEntity> validateTargets(A attacker, Set<LivingEntity> targets) {

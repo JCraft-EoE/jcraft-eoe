@@ -926,7 +926,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * @param damage       damage in half hearts
      * @param lift         will the attack lift the victim upon an aerial hit?
      */
-    public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunLevel, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, boolean canBackstab, boolean unblockable) {
+    public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunLevel,
+                                   boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source,
+                                   Entity attacker, boolean canBackstab, boolean unblockable) {
         if (world == null || world.isClient || ent == null || !ent.canTakeDamage()) return;
         if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && attacker instanceof ServerPlayerEntity playerEntity)
             comboCounterLogic(playerEntity, ent);
