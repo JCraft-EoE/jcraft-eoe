@@ -2,19 +2,14 @@ package net.arna.jcraft.common.entity.stand;
 
 import lombok.Data;
 import lombok.NonNull;
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.BlockableType;
-import net.arna.jcraft.common.attack.core.HitBoxData;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
-import net.arna.jcraft.common.attack.core.old.Attack;
-import net.arna.jcraft.common.attack.core.old.AttackType;
 import net.arna.jcraft.common.attack.moves.cmoon.*;
 import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.entity.projectile.BlockProjectile;
 import net.arna.jcraft.common.util.JParticleType;
-import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
@@ -49,25 +44,18 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withTargetProcessor(CMoonEntity::addInversionPunchInversion)
             .withInfo(Text.literal("Inversion Punch"), Text.literal("very low stun, delayed slowness"));
-    public static final Attack crm1 = new Attack(0, JCraft.lightCooldown, 0.75f, 12, 6, 1.5, 5f, 0.75f, AttackType.BOX, 0.45f, -0.1f, 0, JSoundRegistry.IMPACT_1)
-            .setInfo("Inversion Punch", "very low stun, delayed slowness");
     public static final SimpleAttack<CMoonEntity> PUNCH = SimpleAttack.<CMoonEntity>lightAttack(5, 7,
             5f, 10, 0.75f, 0.75f, -0.1f)
             .withCrouchingVariant(INVERSION_PUNCH)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withTargetProcessor(CMoonEntity::addInversion)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
-    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 5, 1.5, 5f, 0.75f, AttackType.BOX, 0.5f, -0.1f, 0, JSoundRegistry.IMPACT_1)
-            .crouchingVariation(crm1)
-            .setInfo("Punch", "quick combo starter");
     public static final BarrageAttack<CMoonEntity> BARRAGE = new BarrageAttack<CMoonEntity>(340, 0, 50,
             0.75f, 0.75f, 20, 2f, 0.25f, 0f, 4)
             .withSound(JSoundRegistry.CMOON_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withTargetProcessor(CMoonEntity::addBarrageInversion)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, medium stun"));
-    public static final Attack barrage = Attack.barrageAttack(2, 17, 0.75f, 50, 0, 2, 0.75f, 0.25f, 1, 0, 4, JSoundRegistry.IMPACT_3)
-            .setInfo("Barrage", "fast reliable combo starter/extender, medium stun");
     public static final SimpleAttack<CMoonEntity> GUT_PUNCH = new SimpleAttack<CMoonEntity>(340, 19, 30,
             1f, 8f, 10, 2f, 1.5f, 0f)
             .withSound(JSoundRegistry.CMOON_DONUT)
@@ -78,22 +66,12 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             .withLaunch()
             .withExtraHitBox(0, 0.25, 1.25)
             .withInfo(Text.literal("Gut Punch"), Text.literal("slow, uninterruptible combo finisher"));
-    public static final Attack gutpunch = new Attack(1, 17, 1f, 30, 19, 2.0, 8f, 1.5f, AttackType.BOX, 0.5f, 0, 0, JSoundRegistry.TW_KICK_HIT)
-            .setHitspark(2)
-            .hyperArmor()
-            .setLaunch()
-            .appendHitbox(new HitBoxData(0, 0.25, 1.25))
-            .setInfo("Gut Punch", "slow, uninterruptible combo finisher");
     public static final LaunchAttack LAUNCH = new LaunchAttack(440, 14, 21, 0.75f,
             5f, 19, 1.75f, 0.9f, 0.3f)
             .withSound(JSoundRegistry.CMOON_GROUNDSHOOT)
             .withImpactSound(JSoundRegistry.IMPACT_5)
             .withTargetProcessor(CMoonEntity::addInversion)
             .withInfo(Text.literal("Block Launch"), Text.literal("lifts a block from the ground and launches it at a delay/crouching and using this button resets the delay on nearby blocks"));
-    public static final Attack launch = new Attack(4, 22, 0.75f, 21, 14, 1.75, 5f, 0.9f, AttackType.BOX, 0.95f, 0.3f, 0, JSoundRegistry.IMPACT_5)
-            .setHitspark(2)
-            .setRanged(true)
-            .setInfo("Block Launch", "lifts a block from the ground and launches it at a delay/crouching and using this button resets the delay on nearby blocks");
     public static final GravPunchAttack GRAV_PUNCH = new GravPunchAttack(480, 20, 32, 1f,
             8f, 45, 1.75f, 0.35f, -0.3f)
             .withSound(JSoundRegistry.CMOON_GRAV_PUNCH)
@@ -103,12 +81,6 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withExtraHitBox(1d)
             .withInfo(Text.literal("Only One Punch"), Text.literal("floats enemy on hit, high stun"));
-    public static final Attack gravpunch = new Attack(3, 24, 1f, 32, 20, 1.75, 8f, 0.35f, AttackType.BOX, 2.25f, -0.3f, 0, JSoundRegistry.CMOON_GRAV_PUNCH_HIT)
-            .setHitspark(2)
-            .hyperArmor()
-            .setUB(true)
-            .appendHitbox(new HitBoxData(1))
-            .setInfo("Only One Punch", "floats enemy on hit, high stun");
     public static final GroundSlamAttack GROUND_SLAM = new GroundSlamAttack(460, 10, 18,
             1f, 7f,  17, 3f, 0.2f, 1.4f)
             .withSound(JSoundRegistry.CMOON_GROUNDSLAM)
@@ -116,29 +88,17 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             .withTargetProcessor(CMoonEntity::addInversion)
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withInfo(Text.literal("Ground Slam"), Text.literal("launches downwards, combo starter/extender, knocks down if used crouching"));
-    public static final Attack groundslam = new Attack(5, 23, 1f, 18, 10, 3, 7f, 0.2f, AttackType.BOX, 0.85f, 1.4f, 0, JSoundRegistry.IMPACT_10)
-            .setUB(true)
-            .setInfo("Ground Slam", "launches downwards, combo starter/extender, knocks down if used crouching");
     public static final GravityShiftMove GRAV_SHIFT = new GravityShiftMove(1400, 20, 32, 1f)
             .withSound(JSoundRegistry.CMOON_GRAVSHIFT)
             .withInfo(Text.literal("Gravity Shift"), Text.literal("""
                     increases user jump height, changes the gravity of everything in a 64 block radius
                     Types: REPULSE, ATTRACT, NONE
                     swap between types by pressing the key again"""));
-    public static final Attack gravshift = new Attack(6, 70, 32, 20, 7, AttackType.BOX)
-            .setInfo("Gravity Shift", """
-                    increases user jump height, changes the gravity of everything in a 64 block radius
-                    Types: REPULSE, ATTRACT, NONE
-                    swap between types by pressing the key again""");
     public static final GravityShiftPulseMove GRAV_SHIFT_PULSE = new GravityShiftPulseMove(1400, 20, 32, 1f)
             .withCrouchingVariant(GRAV_SHIFT)
             .withSound(JSoundRegistry.CMOON_GRAVSHIFT_DIRECTIONAL)
             .withInfo(Text.literal("Gravity Shift Pulse"), Text.literal("changes the gravitational direction of nearby entities " +
                     "to the direction the user is looking in"));
-    public static final Attack directionalshift = new Attack(7, 70, 32, 20, 7, AttackType.BOX)
-            .crouchingVariation(gravshift)
-            .setInfo("Gravity Shift Pulse", """
-                    changes the gravitational direction of nearby entities to the users looked direction""");
     public static final GravitationalHopMove GRAVITATIONAL_HOP = new GravitationalHopMove(340)
             .withInfo(Text.literal("Gravitational Hop/Local Gravity Change"),
                     Text.literal("jumps up and grants 2s slow falling/crouch to change your gravitational direction"));
@@ -176,11 +136,6 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
                     M1>Barrage>jump>Block Launch>M1>Only One Punch>Block Launch (Projectile Hit)>...
                         ...Grav. Hop>Ground Slam
                         ...Gut Punch""";
-
-        moves = List.of(light, gutpunch, barrage, gravpunch, directionalshift, launch, groundslam,
-                new Attack().setMobility(MobilityType.HIGHJUMP)
-                        .setInfo("Gravitational Hop/Local Gravity Change", "jumps up and grants 2s slow falling/crouch to change your gravitational direction")
-        );
     }
 
     private static void addInversion(CMoonEntity attacker, LivingEntity target, Vec3d kbVec, DamageSource damageSource) {
