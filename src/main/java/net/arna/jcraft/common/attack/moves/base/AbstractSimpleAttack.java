@@ -23,7 +23,9 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -39,6 +41,7 @@ import java.util.stream.Stream;
 @SuppressWarnings("unused")
 @Getter
 public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>, A extends IAttacker<?, ?>> extends AbstractMove<T, A> {
+    private final List<TargetProcessor<? super A>> targetProcessors = new ArrayList<>();
     private final Set<HitBoxData> extraHitBoxes = new HashSet<>();
     private float damage;
     private StunType stunType = StunType.BURSTABLE;
@@ -247,6 +250,16 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
         return getThis();
     }
 
+    /**
+     * Adds a new target processor to this attack.
+     * @param targetProcessor The target processor to add
+     * @return This attack
+     */
+    public T withTargetProcessor(TargetProcessor<? super A> targetProcessor) {
+        targetProcessors.add(targetProcessor);
+        return getThis();
+    }
+
     public int getBlockStun() {
         return blockStun < 0 ? (int) (damage + 4) : blockStun;
     }
@@ -370,7 +383,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
      * @param center The center of this attack. This is where the particle will be spawned at.
      * @return A set of all affected targets.
      */
-    protected Set<LivingEntity> attackBoxes(A attacker, Set<Box> boxes, DamageSource damageSource, Vec3d center) {
+    protected final Set<LivingEntity> attackBoxes(A attacker, Set<Box> boxes, DamageSource damageSource, Vec3d center) {
         JUtils.displayHitboxes(attacker.getWorld(), boxes);
 
         Set<LivingEntity> targets = findHits(attacker, boxes, damageSource);
@@ -387,8 +400,10 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
         if (getDamage() <= 0) return targets;
 
         Vec3d kbVec = getRotVec(attacker).multiply(knockback).add(new Vec3d(0.0, Math.abs(knockback) / 4, 0.0));
-        for (LivingEntity target : validateTargets(attacker, targets))
+        for (LivingEntity target : validateTargets(attacker, targets)) {
+            targetProcessors.forEach(processor -> processor.processTarget(attacker, target, kbVec, damageSource));
             processTarget(attacker, target, kbVec, damageSource);
+        }
 
         return targets;
     }
@@ -417,6 +432,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
     @Override
     protected @NonNull T copyExtras(@NonNull T base) {
         AbstractSimpleAttack<T, A> cast = super.copyExtras(base);
+        cast.targetProcessors.addAll(targetProcessors);
         cast.stunType = stunType;
         cast.overrideStun = overrideStun;
         cast.lift = lift;
@@ -425,5 +441,10 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
         cast.blockableType = blockableType;
         cast.hitSpark = hitSpark;
         return base;
+    }
+
+    @FunctionalInterface
+    public interface TargetProcessor<A extends IAttacker<?, ?>> {
+        void processTarget(A attacker, LivingEntity target, Vec3d kbVec, DamageSource damageSource);
     }
 }

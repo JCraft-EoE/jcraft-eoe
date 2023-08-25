@@ -24,7 +24,7 @@ public class SCChargeAttack extends AbstractChargeAttack<SCChargeAttack, SilverC
         LivingEntity user = attacker.getUserOrThrow();
         float lookDirY = (float) user.getRotationVector().y;
         lookDirY *= MathHelper.abs(lookDirY);
-        attacker.getMoveContext().set(LOOK_DIR_Y, lookDirY);
+        attacker.getMoveContext().setFloat(LOOK_DIR_Y, lookDirY);
 
         return true;
     }

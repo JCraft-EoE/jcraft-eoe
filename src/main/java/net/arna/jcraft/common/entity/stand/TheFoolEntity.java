@@ -97,7 +97,6 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             1f, 0, 2f, 0.1f, 0f, 3)
             .withAerialVariant(GLIDE)
             .withMobilityType(MobilityType.DASH)
-            .withRanged(true)
             .withBackstab(false)
             .withInfo(Text.literal("Sandwave"), Text.literal("The Fool turns into a quick sandwave that knocks anything it touches down"));
     //todo: sand tornado tracking (projectile-only code)

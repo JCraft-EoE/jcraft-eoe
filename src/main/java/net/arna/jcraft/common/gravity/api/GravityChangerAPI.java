@@ -125,7 +125,7 @@ public abstract class GravityChangerAPI {
         }
     }
 
-    public static void setGravity(Entity entity, ArrayList<Gravity> gravity) {
+    public static void setGravity(Entity entity, List<Gravity> gravity) {
         if (onWrongSide(entity) || !EntityTags.canChangeGravity(entity)) return;
         maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
             gc.setGravity(gravity, false);

@@ -5,12 +5,16 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor()
+@RequiredArgsConstructor
 public class MoveVariable<T> {
-    public final Class<T> type;
+    private final Class<T> type;
 
-    @SuppressWarnings("UnstableApiUsage")
     public MoveVariable(TypeToken<T> typeToken) {
+        // For parameterized types, this simply returns a Class object of the raw type.
+        // This does not matter, however, as at compile-time, Java thinks it returns
+        // a class of a parameterized type, which is good enough for what we are trying to achieve.
+        // I.e. if T is List<Entity>, this returns Class<List> and not Class<List<Entity>>, but at
+        // compile-time, Java thinks it does return Class<List<Entity>>, so that's good enough.
         this((Class<T>) typeToken.getRawType());
     }
 

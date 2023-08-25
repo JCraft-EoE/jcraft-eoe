@@ -168,8 +168,8 @@ public interface JSoundRegistry {
     //C-Moon
     SoundEvent CMOON_SUMMON = registerSound("cmoonsummon");
     SoundEvent CMOON_BARRAGE = registerSound("cmoonbarrage");
-    SoundEvent CMOON_GRAVPUNCH = registerSound("cmoongravpunch");
-    SoundEvent CMOON_GRAVPUNCHHIT = registerSound("cmoongravpunchhit");
+    SoundEvent CMOON_GRAV_PUNCH = registerSound("cmoongravpunch");
+    SoundEvent CMOON_GRAV_PUNCH_HIT = registerSound("cmoongravpunchhit");
     SoundEvent CMOON_GROUNDSLAM = registerSound("cmoongroundslam");
     SoundEvent CMOON_GRAVSHIFT = registerSound("cmoongravshift");
     SoundEvent CMOON_GRAVSHIFT_DIRECTIONAL = registerSound("cmoondirectionalshift");

@@ -3,12 +3,11 @@ package net.arna.jcraft.common.attack.moves.shared;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.moves.base.AbstractBarrageAttack;
-import net.arna.jcraft.common.entity.stand.StandEntity;
 
 /**
  * A simple attack that performs at a set interval.
  */
-public class BarrageAttack<A extends IAttacker<?, ?>> extends AbstractBarrageAttack<BarrageAttack<A>, StandEntity<?, ?>> {
+public class BarrageAttack<A extends IAttacker<?, ?>> extends AbstractBarrageAttack<BarrageAttack<A>, A> {
 
     public BarrageAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun,
                          float hitboxSize, float knockback, float offset, int interval) {

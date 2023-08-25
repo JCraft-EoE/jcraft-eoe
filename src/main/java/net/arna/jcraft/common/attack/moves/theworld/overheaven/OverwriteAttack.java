@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.attack.moves.theworld.overheaven;
 
 import com.google.common.reflect.TypeToken;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
@@ -15,6 +16,7 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.util.math.Vec3d;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OverwriteAttack extends AbstractSimpleAttack<OverwriteAttack, TheWorldOverHeavenEntity> {
@@ -54,6 +56,12 @@ public class OverwriteAttack extends AbstractSimpleAttack<OverwriteAttack, TheWo
                 overwriteTargets.add(target);
             }
         }
+    }
+
+    @Override
+    public void registerContextEntries(MoveContext ctx) {
+        ctx.register(OVERWRITE_TIMES, new IntArrayList());
+        ctx.register(OVERWRITE_TARGETS, new ArrayList<>());
     }
 
     @Override

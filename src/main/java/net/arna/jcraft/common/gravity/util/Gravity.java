@@ -22,6 +22,10 @@ public class Gravity {
         this(_direction, _priority, _duration, _source, new RotationParameters());
     }
 
+    public Gravity(Gravity copyFrom) {
+        this(copyFrom.direction(), copyFrom.priority(), copyFrom.duration(), copyFrom.source(), copyFrom.rotationParameters());
+    }
+
     public Direction direction() {
         return direction;
     }

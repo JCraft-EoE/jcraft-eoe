@@ -25,7 +25,8 @@ import java.util.function.Predicate;
 @Getter
 public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAttacker<?, ?>> {
     private final List<SoundEvent> sounds = new ArrayList<>(), impactSounds = new ArrayList<>();
-    private final List<Predicate<A>> conditions = new ArrayList<>();
+    private final List<Predicate<? super A>> conditions = new ArrayList<>();
+    private final List<MoveAction<? super A>> actions = new ArrayList<>();
     private MoveType moveType;
     private int cooldown, windup;
     private int duration;
@@ -122,6 +123,8 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      */
     public T withCrouchingVariant(AbstractMove<?, ? super A> crouchingVariant) {
         if (isCrouchingVariant) throw new IllegalStateException("Can't assign a crouching variant to a crouching variant.");
+        if (crouchingVariant.getCrouchingVariant() != null) throw new IllegalArgumentException("Given move has a " +
+                "crouching variant. Crouching variants cannot have crouching variants.");
 
         this.crouchingVariant = crouchingVariant.copy();
         this.crouchingVariant.isCrouchingVariant = true;
@@ -200,8 +203,19 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * @param condition The condition to add
      * @return This move
      */
-    public T withCondition(Predicate<A> condition) {
+    public T withCondition(Predicate<? super A> condition) {
         conditions.add(condition);
+        return getThis();
+    }
+
+    /**
+     * Adds an action to this move.
+     * Actions are called before {@link #perform(IAttacker, LivingEntity, MoveContext)} is called.
+     * @param action An action
+     * @return This move
+     */
+    public T withAction(MoveAction<? super A> action) {
+        actions.add(action);
         return getThis();
     }
 
@@ -212,17 +226,6 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      */
     public T withMobilityType(MobilityType mobilityType) {
         this.mobilityType = mobilityType;
-        return getThis();
-    }
-
-    /**
-     * Sets the ranged field to the given value.
-     * This field is used to determine how to use this move by the Stand User AI.
-     * @param ranged Whether this move is ranged
-     * @return This move
-     */
-    public T withRanged(boolean ranged) {
-        this.ranged = ranged;
         return getThis();
     }
 
@@ -271,8 +274,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * @param attacker The attacker to tick for.
      */
     public void tick(A attacker) {
-        if (shouldPerform(attacker))
-            perform(attacker, attacker.getUserOrThrow(), attacker.getMoveContext());
+        if (shouldPerform(attacker)) doPerform(attacker);
     }
 
     /**
@@ -282,6 +284,18 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      */
     protected boolean shouldPerform(A attacker) {
         return attacker.getMoveStun() == duration - windup && attacker.hasUser();
+    }
+
+    /**
+     * Invokes all {@link #withAction(MoveAction) actions} and calls {@link #perform(IAttacker, LivingEntity, MoveContext)}.
+     * @param attacker The attacker that will be performing this move.
+     */
+    public final void doPerform(A attacker) {
+        LivingEntity user = attacker.getUserOrThrow();
+        MoveContext ctx = attacker.getMoveContext();
+
+        actions.forEach(action -> action.perform(attacker, user, ctx));
+        perform(attacker, user, ctx);
     }
 
     /**
@@ -392,6 +406,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         cast.sounds.addAll(sounds);
         cast.impactSounds.addAll(impactSounds);
         cast.conditions.addAll(conditions);
+        cast.actions.addAll(actions);
         cast.moveType = moveType;
         cast.name = name;
         cast.description = description;
@@ -430,5 +445,10 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         if (crouchingVariant != null) crouchingVariant.testCopy();
         if (aerialVariant != null) aerialVariant.testCopy();
         if (followUp != null) followUp.testCopy();
+    }
+
+    @FunctionalInterface
+    public interface MoveAction<A extends IAttacker<?, ?>> {
+        void perform(A attacker, LivingEntity user, MoveContext ctx);
     }
 }
