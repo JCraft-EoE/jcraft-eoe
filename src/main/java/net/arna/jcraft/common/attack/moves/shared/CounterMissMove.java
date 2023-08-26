@@ -12,8 +12,8 @@ import java.util.Set;
  * Not really an attack, but rather a placeholder to indicate that you've
  * missed your counter and are punished for it.
  */
-public class CounterMissAttack<A extends IAttacker<? extends A, ?>> extends AbstractMove<CounterMissAttack<A>, A> {
-    public CounterMissAttack(int duration) {
+public class CounterMissMove<A extends IAttacker<? extends A, ?>> extends AbstractMove<CounterMissMove<A>, A> {
+    public CounterMissMove(int duration) {
         super(0, duration + 1, duration, 1f);
     }
 
@@ -23,12 +23,12 @@ public class CounterMissAttack<A extends IAttacker<? extends A, ?>> extends Abst
     }
 
     @Override
-    protected @NonNull CounterMissAttack<A> getThis() {
+    protected @NonNull CounterMissMove<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull CounterMissAttack<A> copy() {
-        return copyExtras(new CounterMissAttack<>(getDuration()));
+    public @NonNull CounterMissMove<A> copy() {
+        return copyExtras(new CounterMissMove<>(getDuration()));
     }
 }

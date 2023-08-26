@@ -27,7 +27,7 @@ import java.util.function.Predicate;
 public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAttacker<? extends A, ?>> {
     private final List<SoundEvent> sounds = new ArrayList<>(), impactSounds = new ArrayList<>();
     private final List<Predicate<? super A>> conditions = new ArrayList<>();
-    private final List<MoveAction<? super A>> actions = new ArrayList<>();
+    private final List<MoveAction<? super A>> initActions = new ArrayList<>(), actions = new ArrayList<>();
     private MoveType moveType;
     private int cooldown, windup;
     private int duration;
@@ -211,6 +211,17 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     }
 
     /**
+     * Adds a new init action to this move.
+     * Init actions are called at the end of {@link #onInitialize(IAttacker)}.
+     * @param action An action
+     * @return This move
+     */
+    public T withInitAction(MoveAction<? super A> action) {
+        initActions.add(action);
+        return getThis();
+    }
+
+    /**
      * Adds an action to this move.
      * Actions are called before {@link #perform(IAttacker, LivingEntity, MoveContext)} is called.
      * @param action An action
@@ -233,6 +244,10 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
 
     /**
      * Sets the move this move should switch to and at what point.
+     * When the given tick is reached, the current move of the attacker will switch
+     * seamlessly to the given attack without changing any values. (Such as move stun or cooldown)
+     * This allows for some quick and dirty ways to achieve special handling without making a new move for it
+     * or without reusing code from other moves.
      * @param tick How many ticks after the initiation of this attack the switch should occur
      * @param move The move to switch to
      * @return This move
@@ -269,8 +284,8 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     public boolean onInitialize(A attacker) {
         if (!canBeInitiated(attacker)) return false;
 
-        if (attacker.getMoveStun() == getDuration())
-            sounds.forEach(sound -> attacker.playSound(sound, 1f, 1f));
+        initActions.forEach(action -> action.perform(attacker, attacker.getUser(), attacker.getMoveContext()));
+        sounds.forEach(sound -> attacker.playSound(sound, 1f, 1f));
 
         return true;
     }

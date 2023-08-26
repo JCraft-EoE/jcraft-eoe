@@ -3,7 +3,7 @@ package net.arna.jcraft.common.attack.moves.theworld;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.moves.base.AbstractCounterAttack;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
-import net.arna.jcraft.common.attack.moves.shared.CounterMissAttack;
+import net.arna.jcraft.common.attack.moves.shared.CounterMissMove;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.TheWorldEntity;
 import net.arna.jcraft.registry.JSoundRegistry;
@@ -15,7 +15,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.util.math.Vec3d;
 
 public class FeignBarrageCounterAttack extends AbstractCounterAttack<FeignBarrageCounterAttack, TheWorldEntity> {
-    private static final CounterMissAttack<TheWorldEntity> missAttack = new CounterMissAttack<>(10);
+    private static final CounterMissMove<TheWorldEntity> missAttack = new CounterMissMove<>(10);
     private final AbstractMove<?, ? super TheWorldEntity> hitMove;
 
     public FeignBarrageCounterAttack(int cooldown, int windup, int duration, float moveDistance, AbstractMove<?, ? super TheWorldEntity> hitMove) {

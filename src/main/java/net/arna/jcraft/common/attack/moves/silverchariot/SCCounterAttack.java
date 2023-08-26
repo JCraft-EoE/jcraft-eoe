@@ -2,7 +2,7 @@ package net.arna.jcraft.common.attack.moves.silverchariot;
 
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.moves.base.AbstractCounterAttack;
-import net.arna.jcraft.common.attack.moves.shared.CounterMissAttack;
+import net.arna.jcraft.common.attack.moves.shared.CounterMissMove;
 import net.arna.jcraft.common.entity.stand.SilverChariotEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.JUtils;
@@ -11,7 +11,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 
 public class SCCounterAttack extends AbstractCounterAttack<SCCounterAttack, SilverChariotEntity> {
-    private final CounterMissAttack<SilverChariotEntity> counterMiss = new CounterMissAttack<>(20);
+    private final CounterMissMove<SilverChariotEntity> counterMiss = new CounterMissMove<>(20);
 
     public SCCounterAttack(int cooldown, int windup, int duration, float moveDistance) {
         super(cooldown, windup, duration, moveDistance);
