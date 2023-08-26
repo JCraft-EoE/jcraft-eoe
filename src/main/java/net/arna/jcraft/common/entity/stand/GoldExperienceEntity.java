@@ -49,11 +49,13 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             280, 0, 30, 0.75f, 1f, 30, 2f, 0.25f, 0f, 3)
             .withSound(JSoundRegistry.GE_BARRAGE)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
-    public static HealMove HEAL_OTHERS = new HealMove(520, 10, 16, 1f, 1.25f,
+    public static HealMove<GoldExperienceEntity> HEAL_OTHERS = new HealMove<GoldExperienceEntity>(520, 10,
+            16, 1f, 1.25f,
             0f, 4f, HealMove.HealTarget.TARGETS)
             .withSound(JSoundRegistry.GE_HEAL)
             .withInfo(Text.literal("Healing Hand (others)"), Text.empty());
-    public static HealMove HEAL_SELF = new HealMove(520, 10, 14, 1f, 0,
+    public static HealMove<GoldExperienceEntity> HEAL_SELF = new HealMove<GoldExperienceEntity>(520, 10,
+            14, 1f, 0,
             0, 4f, HealMove.HealTarget.USER)
             .withCrouchingVariant(HEAL_OTHERS)
             .withSound(JSoundRegistry.GE_HEAL)
@@ -121,8 +123,6 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
                     
                     -the superprince of gaming
                     Rekka 1~2>M1>Barrage>M1>Tree>Heavy""";
-
-        super.initialize();
     }
 
     @Override
@@ -130,10 +130,12 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
         moves.register(MoveType.LIGHT, LIGHT, State.LIGHT).withCrouchingVariant(State.LIFE_GIVER);
         moves.register(MoveType.HEAVY, HEAVY, State.HEAVY);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
+
         moves.register(MoveType.SPECIAL1, HEAL_SELF).withCrouchingVariant(State.HEAL);
         moves.register(MoveType.SPECIAL2, REKKA1, State.REKKA1);
         moves.register(MoveType.SPECIAL3, LIFE_GIVER, State.LIFE_GIVER);
         moves.register(MoveType.ULTIMATE, OVERCLOCK, State.OVERCLOCK);
+
         moves.register(MoveType.UTILITY, TREE, State.TREE);
     }
 
