@@ -80,8 +80,6 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
                         
                         -the "this move is fire"
                         M1>Red Bind>Hurricane""";
-
-        super.initialize();
     }
 
     @Override

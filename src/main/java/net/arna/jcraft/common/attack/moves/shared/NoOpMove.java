@@ -15,7 +15,7 @@ import java.util.Set;
  * in either the stand or the spec.
  * @param <A>
  */
-public class NoOpMove<A extends IAttacker<?, ?>> extends AbstractMove<NoOpMove<A>, A> {
+public class NoOpMove<A extends IAttacker<? extends A, ?>> extends AbstractMove<NoOpMove<A>, A> {
     public NoOpMove() {
         this(0, 0, 0f);
     }

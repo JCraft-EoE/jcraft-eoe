@@ -118,8 +118,6 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
                             
                             -the protein shake (sets up mixups)
                             M1>Barrage>Leg Crusher>Charged Spew""";
-
-        super.initialize();
     }
 
     @Override

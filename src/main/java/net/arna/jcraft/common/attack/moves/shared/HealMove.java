@@ -2,9 +2,9 @@ package net.arna.jcraft.common.attack.moves.shared;
 
 import lombok.Getter;
 import lombok.NonNull;
+import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
-import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.minecraft.entity.LivingEntity;
 
 import java.util.Set;
@@ -12,7 +12,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 @Getter
-public class HealMove extends AbstractSimpleAttack<HealMove, StandEntity<?, ?>> {
+public class HealMove<A extends IAttacker<? extends A, ?>> extends AbstractSimpleAttack<HealMove<A>, A> {
     private final float health;
     private final HealTarget target;
     private final Consumer<LivingEntity> consumer;
@@ -31,7 +31,7 @@ public class HealMove extends AbstractSimpleAttack<HealMove, StandEntity<?, ?>> 
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(StandEntity<?, ?> attacker, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user, MoveContext ctx) {
         Set<LivingEntity> targets = target.pickTargets(super.perform(attacker, user, ctx), user);
         targets.forEach(e -> {
             e.heal(health);
@@ -41,13 +41,13 @@ public class HealMove extends AbstractSimpleAttack<HealMove, StandEntity<?, ?>> 
     }
 
     @Override
-    protected @NonNull HealMove getThis() {
+    protected @NonNull HealMove<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull HealMove copy() {
-        return copyExtras(new HealMove(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getHitboxSize(), getOffset(),
+    public @NonNull HealMove<A> copy() {
+        return copyExtras(new HealMove<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getHitboxSize(), getOffset(),
                 health, target, consumer));
     }
 

@@ -14,7 +14,7 @@ import net.minecraft.util.math.Vec3d;
 import java.util.Set;
 
 @Getter
-public class JumpMove<A extends IAttacker<?, ?>> extends AbstractMove<JumpMove<A>, A> {
+public class JumpMove<A extends IAttacker<? extends A, ?>> extends AbstractMove<JumpMove<A>, A> {
     private final float strength;
 
     public JumpMove(int cooldown, int windup, int duration, float moveDistance, float strength) {

@@ -108,7 +108,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             .withLaunch()
             .withInfo(Text.literal("Overhead Smash"), Text.literal("slow, uninterruptible launcher"));
     public static final SimpleMultiHitAttack<CreamEntity> BALL_COMBO = new SimpleMultiHitAttack<CreamEntity>(280,
-            36, 7f, 15, 2f, 0.1f, 0.1f, 0.3f, IntSet.of(10, 17, 25))
+            36, 0.1f, 7f, 15, 2f, 0.1f, 0.3f, IntSet.of(10, 17, 25))
             .withSound(JSoundRegistry.CREAM_COMBO)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withInfo(Text.literal("3-hit Combo"), Text.literal("less stun than grounded version"));

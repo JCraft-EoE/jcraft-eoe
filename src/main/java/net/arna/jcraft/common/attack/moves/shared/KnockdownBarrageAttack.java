@@ -10,7 +10,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import java.util.List;
 
 @Getter
-public class KnockdownBarrageAttack<A extends IAttacker<?, ?>> extends AbstractEffectInflictingBarrageAttack<KnockdownBarrageAttack<A>, A> {
+public class KnockdownBarrageAttack<A extends IAttacker<? extends A, ?>> extends AbstractEffectInflictingBarrageAttack<KnockdownBarrageAttack<A>, A> {
     private final int knockdownDuration;
 
     public KnockdownBarrageAttack(int cooldown, int windup, int duration, float moveDistance, float damage, int stun,

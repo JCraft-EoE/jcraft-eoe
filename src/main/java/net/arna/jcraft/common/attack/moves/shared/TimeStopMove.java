@@ -6,7 +6,7 @@ import net.arna.jcraft.common.attack.moves.base.AbstractTimeStopMove;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 
 @Getter
-public class TimeStopMove<A extends StandEntity<?, ?>> extends AbstractTimeStopMove<TimeStopMove<A>, A> {
+public class TimeStopMove<A extends StandEntity<? extends A, ?>> extends AbstractTimeStopMove<TimeStopMove<A>, A> {
     public TimeStopMove(int cooldown, int windup, int duration, int timeStopDuration) {
         super(cooldown, windup, duration, 1f, timeStopDuration);
     }

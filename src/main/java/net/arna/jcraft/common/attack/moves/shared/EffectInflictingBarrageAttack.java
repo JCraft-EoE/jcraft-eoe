@@ -2,14 +2,14 @@ package net.arna.jcraft.common.attack.moves.shared;
 
 import lombok.Getter;
 import lombok.NonNull;
+import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.moves.base.AbstractEffectInflictingBarrageAttack;
-import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 
 import java.util.List;
 
 @Getter
-public class EffectInflictingBarrageAttack<S extends StandEntity<?, ?>> extends AbstractEffectInflictingBarrageAttack<EffectInflictingBarrageAttack<S>, S> {
+public class EffectInflictingBarrageAttack<A extends IAttacker<? extends A, ?>> extends AbstractEffectInflictingBarrageAttack<EffectInflictingBarrageAttack<A>, A> {
     public EffectInflictingBarrageAttack(int cooldown, int windup, int duration, float attackDistance, float damage,
                                          int stun, float hitboxSize, float knockback, float offset, int interval,
                                          @NonNull List<StatusEffectInstance> effects) {
@@ -17,12 +17,12 @@ public class EffectInflictingBarrageAttack<S extends StandEntity<?, ?>> extends 
     }
 
     @Override
-    protected @NonNull EffectInflictingBarrageAttack<S> getThis() {
+    protected @NonNull EffectInflictingBarrageAttack<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull EffectInflictingBarrageAttack<S> copy() {
+    public @NonNull EffectInflictingBarrageAttack<A> copy() {
         return copyExtras(new EffectInflictingBarrageAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(),
                 getDamage(), getStun(), getHitboxSize(), getKnockback(), getOffset(), getInterval(), getEffects()));
     }

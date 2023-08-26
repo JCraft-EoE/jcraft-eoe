@@ -22,7 +22,7 @@ import java.util.Set;
  * @param <A>
  */
 @Getter
-public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A>, A extends IAttacker<?, ?>> extends AbstractSimpleAttack<T, A> {
+public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A>, A extends IAttacker<? extends A, ?>> extends AbstractSimpleAttack<T, A> {
     private final int interval;
     protected boolean inflictsSlowness;
 

@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @param <A>
  */
 @Getter
-public abstract class AbstractMultiHitAttack<T extends AbstractMultiHitAttack<T, A>, A extends IAttacker<?, ?>> extends AbstractSimpleAttack<T, A> {
+public abstract class AbstractMultiHitAttack<T extends AbstractMultiHitAttack<T, A>, A extends IAttacker<? extends A, ?>> extends AbstractSimpleAttack<T, A> {
     private IntSortedSet hitMoments;
 
     protected AbstractMultiHitAttack(int cooldown, int duration, float moveDistance, float damage, int stun,

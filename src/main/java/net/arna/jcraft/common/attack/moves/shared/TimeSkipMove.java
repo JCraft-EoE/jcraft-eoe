@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 @Getter
-public class TimeSkipMove<A extends IAttacker<?, ?>> extends AbstractMove<TimeSkipMove<A>, A> {
+public class TimeSkipMove<A extends IAttacker<? extends A, ?>> extends AbstractMove<TimeSkipMove<A>, A> {
     private final double distance;
 
     public TimeSkipMove(int cooldown, double distance) {

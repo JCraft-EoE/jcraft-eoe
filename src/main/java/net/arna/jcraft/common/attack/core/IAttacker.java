@@ -13,7 +13,7 @@ import net.minecraft.world.World;
  * @param <A> The type of the class implementing this interface
  * @param <S> The type of the animation state enum
  */
-public interface IAttacker<A extends IAttacker<A, S>, S> {
+public interface IAttacker<A extends IAttacker<? extends A, S>, S> {
     MoveContext getMoveContext();
 
     boolean hasUser();

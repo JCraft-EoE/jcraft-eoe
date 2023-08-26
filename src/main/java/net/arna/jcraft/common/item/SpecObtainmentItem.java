@@ -28,7 +28,7 @@ public abstract class SpecObtainmentItem extends Item {
     protected boolean tryGetSpec(PlayerEntity player) {
         JSpec<?, ?> spec = JUtils.getSpec(player);
         if (spec != null) { // If the player already has a spec
-            if (spec.getId() != switchTo.getId()) { // And it isn't the one that will be switched to
+            if (spec.getType().getId() != switchTo.getId()) { // And it isn't the one that will be switched to
                 if (!warned) {
                     player.sendMessage(Text.translatable("warning.jcraft.spec.change"));
                     warned = true;

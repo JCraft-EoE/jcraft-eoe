@@ -85,8 +85,6 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                     
                     the ol razzle dazzle
                     (Already bomb planted) M1~Low>Barrage>M1>Elbow>Detonate""";
-
-        super.initialize();
     }
 
     @Override

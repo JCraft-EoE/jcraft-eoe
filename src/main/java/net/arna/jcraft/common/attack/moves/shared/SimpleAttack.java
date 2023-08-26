@@ -4,7 +4,7 @@ import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 
-public class SimpleAttack<A extends IAttacker<?, ?>> extends AbstractSimpleAttack<SimpleAttack<A>, A> {
+public class SimpleAttack<A extends IAttacker<? extends A, ?>> extends AbstractSimpleAttack<SimpleAttack<A>, A> {
     /**
      * Creates a new simple attack with a single hitbox.
      *
@@ -30,7 +30,7 @@ public class SimpleAttack<A extends IAttacker<?, ?>> extends AbstractSimpleAttac
      * @param moveDistance The distance at which the hitbox is placed.
      * @param offset The amount the hitbox is offset by.
      */
-    public static <A extends IAttacker<?, ?>> SimpleAttack<A> lightAttack(int windup, int duration, float damage, int stun,
+    public static <A extends IAttacker<? extends A, ?>> SimpleAttack<A> lightAttack(int windup, int duration, float damage, int stun,
                                                                           float knockback, float moveDistance, float offset) {
         return new SimpleAttack<>(30, windup, duration, moveDistance, damage, stun, 1.5f, knockback, offset);
     }

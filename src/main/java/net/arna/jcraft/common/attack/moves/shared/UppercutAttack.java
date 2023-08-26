@@ -12,7 +12,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import java.util.Set;
 
 @Getter
-public class UppercutAttack<A extends IAttacker<?, ?>> extends AbstractSimpleAttack<UppercutAttack<A>, A> {
+public class UppercutAttack<A extends IAttacker<? extends A, ?>> extends AbstractSimpleAttack<UppercutAttack<A>, A> {
     private final float strength;
 
     public UppercutAttack(int cooldown, int windup, int duration, float moveDistance, float damage, int stun,

@@ -21,7 +21,7 @@ public class BrawlerSpec extends JSpec<BrawlerSpec, BrawlerSpec.State> {
             .withHyperArmor()
             .withInfo(Text.literal("Uppercut"), Text.literal("uninterruptible, medium speed"));
     public static final SimpleMultiHitAttack<BrawlerSpec> COMBO = new SimpleMultiHitAttack<BrawlerSpec>(400,
-            26, 4, 15, 1.5f, 0.6f, 1f, -0.1f, IntSet.of(5, 10, 19))
+            26, 1f, 4, 15, 1.5f, 0.6f, -0.1f, IntSet.of(5, 10, 19))
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withBlockStun(5)
             .withInfo(Text.literal("Combo"), Text.literal("hits 3 times, combo starter/extender"));

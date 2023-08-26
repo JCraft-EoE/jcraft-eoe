@@ -11,7 +11,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import java.util.List;
 
 @Getter
-public class KnockdownMultiHitAttack<A extends IAttacker<?, ?>> extends AbstractEffectInflictingMultiHitAttack<KnockdownMultiHitAttack<A>, A> {
+public class KnockdownMultiHitAttack<A extends IAttacker<? extends A, ?>> extends AbstractEffectInflictingMultiHitAttack<KnockdownMultiHitAttack<A>, A> {
     private final int knockdownDuration;
 
     public KnockdownMultiHitAttack(int cooldown, int duration, float attackDistance, float damage, int stun, float hitboxSize,

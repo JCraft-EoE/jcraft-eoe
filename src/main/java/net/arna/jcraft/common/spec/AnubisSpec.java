@@ -34,7 +34,7 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
             .withSound(JSoundRegistry.ANUBIS_POMMEL)
             .withImpactSound(JSoundRegistry.IMPACT_3);
     public static final SimpleMultiHitAttack<AnubisSpec> REKKA2 = new SimpleMultiHitAttack<AnubisSpec>(400,
-            26, 4f, 15, 1.75f, 0.6f, 1f, -0.1f, IntSet.of(8, 20))
+            26, 1f, 4f, 15, 1.75f, 0.6f, -0.1f, IntSet.of(8, 20))
             .withCondition(AnubisSpec::isHoldingAnubis)
             .withSound(JSoundRegistry.ANUBIS_REKKA2)
             .withImpactSound(JSoundRegistry.IMPACT_4)

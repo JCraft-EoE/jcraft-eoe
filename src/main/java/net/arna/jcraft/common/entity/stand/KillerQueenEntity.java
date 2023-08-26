@@ -46,8 +46,6 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
 
     public KillerQueenEntity(World worldIn) {
         super(StandType.KILLER_QUEEN, worldIn, null);
-
-        super.initialize();
     }
 
     @Override

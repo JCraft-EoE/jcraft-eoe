@@ -35,7 +35,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
     public static final DetonateAttack DETONATE = new DetonateAttack(20, 5, 6, 1f)
             .withInfo(Text.literal("Detonate"), Text.literal("slight windup"));
     public static final SimpleMultiHitAttack<AbstractKillerQueenEntity<?, ?>> LIGHT = SimpleMultiHitAttack.<AbstractKillerQueenEntity<?, ?>>lightAttack(
-            19, 3f, 20, 0.75f, 0, IntSet.of(6, 11))
+            19, 0.75f, 3f, 20, 0, IntSet.of(6, 11))
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withCrouchingVariant(DETONATE)
             .withFollowUp(LOW)

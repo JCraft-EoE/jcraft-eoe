@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.attack.moves.base;
 
+import it.unimi.dsi.fastutil.ints.IntObjectPair;
 import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.IAttacker;
@@ -23,7 +24,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 @Getter
-public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAttacker<?, ?>> {
+public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAttacker<? extends A, ?>> {
     private final List<SoundEvent> sounds = new ArrayList<>(), impactSounds = new ArrayList<>();
     private final List<Predicate<? super A>> conditions = new ArrayList<>();
     private final List<MoveAction<? super A>> actions = new ArrayList<>();
@@ -40,6 +41,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     private @Nullable AbstractMove<?, ? super A> crouchingVariant, aerialVariant, followUp;
     private boolean isCrouchingVariant, isAerialVariant;
     private int armor;
+    private IntObjectPair<AbstractMove<?, ? super A>> moveSwitch;
     protected MobilityType mobilityType;
     // Used to help AI know how and when to use this attack.
     protected boolean ranged, barrage, multiHit, charge, counter, dash, grab;
@@ -230,6 +232,17 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     }
 
     /**
+     * Sets the move this move should switch to and at what point.
+     * @param tick How many ticks after the initiation of this attack the switch should occur
+     * @param move The move to switch to
+     * @return This move
+     */
+    public T withSwitch(int tick, AbstractMove<?, ? super A> move) {
+        moveSwitch = IntObjectPair.of(tick, move);
+        return getThis();
+    }
+
+    /**
      * Called when this move is registered to a {@link net.arna.jcraft.common.attack.core.MoveMap MoveMap}.
      * Not supposed to be called anywhere else.
      * @param type The MoveType this move is registered as
@@ -274,6 +287,8 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * @param attacker The attacker to tick for.
      */
     public void tick(A attacker) {
+        if (moveSwitch != null && moveSwitch.leftInt() == duration - attacker.getMoveStun())
+            attacker.setCurrentMove(moveSwitch.right());
         if (shouldPerform(attacker)) doPerform(attacker);
     }
 
@@ -448,7 +463,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     }
 
     @FunctionalInterface
-    public interface MoveAction<A extends IAttacker<?, ?>> {
+    public interface MoveAction<A extends IAttacker<? extends A, ?>> {
         void perform(A attacker, LivingEntity user, MoveContext ctx);
     }
 }

@@ -14,7 +14,7 @@ import net.minecraft.server.world.ServerWorld;
 import java.util.Set;
 
 @Getter
-public abstract class AbstractTimeStopMove<T extends AbstractTimeStopMove<T, A>, A extends StandEntity<?, ?>> extends AbstractMove<T, A> {
+public abstract class AbstractTimeStopMove<T extends AbstractTimeStopMove<T, A>, A extends StandEntity<? extends A, ?>> extends AbstractMove<T, A> {
     @Setter
     protected int timeStopDuration;
     private static final StatusEffectInstance tsBlind = new StatusEffectInstance(StatusEffects.BLINDNESS, 19, 0, true, false, false);

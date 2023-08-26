@@ -46,7 +46,7 @@ import java.util.function.Consumer;
 
 public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.State> {
     public static final SimpleMultiHitAttack<TheFoolEntity> DRILL = new SimpleMultiHitAttack<TheFoolEntity>(
-            30, 14, 2.5f, 5, 1.5f, 0.2f, 1.5f, 0.25f, IntSet.of(5, 8, 11))
+            30, 14, 1.5f, 2.5f, 5, 1.5f, 0.2f, 0.25f, IntSet.of(5, 8, 11))
             .withBlockStun(4)
             .withInfo(Text.literal("Drill"), Text.literal("fast, multi-hitting combo starter, low stun and blockstun"));
     public static final SimpleAttack<TheFoolEntity> LIGHT = new SimpleAttack<TheFoolEntity>( 30, 7,

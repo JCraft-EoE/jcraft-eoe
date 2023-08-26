@@ -40,7 +40,7 @@ import java.util.stream.Stream;
  */
 @SuppressWarnings("unused")
 @Getter
-public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>, A extends IAttacker<?, ?>> extends AbstractMove<T, A> {
+public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>, A extends IAttacker<? extends A, ?>> extends AbstractMove<T, A> {
     private final List<TargetProcessor<? super A>> targetProcessors = new ArrayList<>();
     private final Set<HitBoxData> extraHitBoxes = new HashSet<>();
     private float damage;
@@ -444,7 +444,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
     }
 
     @FunctionalInterface
-    public interface TargetProcessor<A extends IAttacker<?, ?>> {
+    public interface TargetProcessor<A extends IAttacker<? extends A, ?>> {
         void processTarget(A attacker, LivingEntity target, Vec3d kbVec, DamageSource damageSource);
     }
 }

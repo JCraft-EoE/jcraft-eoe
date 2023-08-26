@@ -90,8 +90,6 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
                         -the superman
                         M1>cr.Time Strike>Backhand>What an Ugly Watch>delay M1>Timestop~Star Breaker>dash/Timeskip>Barrage>M1""";
 
-        super.initialize();
-
         if (world.isClient) return;
 //        timestop.stun = JServerConfig.SPTW_TIME_STOP_DURATION.getValue() / 20.0f; // TODO
     }

@@ -3,10 +3,7 @@ package net.arna.jcraft.common.entity.stand;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
-import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
-import net.arna.jcraft.common.attack.moves.shared.JumpMove;
-import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
-import net.arna.jcraft.common.attack.moves.shared.UppercutAttack;
+import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.attack.moves.starplatinum.ChargeBarrageAttack;
 import net.arna.jcraft.common.attack.moves.starplatinum.InhaleAttack;
 import net.arna.jcraft.common.util.CooldownType;
@@ -66,8 +63,6 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
 
     public StarPlatinumEntity(World worldIn) {
         super(StandType.STAR_PLATINUM, worldIn);
-
-        super.initialize();
     }
 
     @Override

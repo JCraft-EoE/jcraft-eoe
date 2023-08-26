@@ -83,7 +83,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
     public static final Attack counter = new Attack(7, 32, 0.5f, 34, 4, 0, 0, 0, AttackType.COUNTER)
             .setInfo("Counter", "0.2s windup, 1.5s duration, stuns when hit");
     public static final SimpleMultiHitAttack<SilverChariotEntity> GOD_OF_DEATH_FINAL = new SimpleMultiHitAttack<SilverChariotEntity>(
-            0, 59, 6f, 20, 2.5f, 1.25f, 0.65f, 0f,
+            0, 59, 0.65f, 6f, 20, 2.5f, 1.25f, 0f,
             IntSet.of(54))
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withLaunch()
@@ -142,8 +142,6 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         );
 
         setNormalDesc();
-
-        super.initialize();
     }
 
     private void setNormalDesc() {

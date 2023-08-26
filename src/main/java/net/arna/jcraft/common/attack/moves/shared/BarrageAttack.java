@@ -7,7 +7,7 @@ import net.arna.jcraft.common.attack.moves.base.AbstractBarrageAttack;
 /**
  * A simple attack that performs at a set interval.
  */
-public class BarrageAttack<A extends IAttacker<?, ?>> extends AbstractBarrageAttack<BarrageAttack<A>, A> {
+public class BarrageAttack<A extends IAttacker<? extends A, ?>> extends AbstractBarrageAttack<BarrageAttack<A>, A> {
 
     public BarrageAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun,
                          float hitboxSize, float knockback, float offset, int interval) {

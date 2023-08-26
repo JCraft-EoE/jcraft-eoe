@@ -9,7 +9,7 @@ import net.minecraft.entity.damage.DamageSource;
 
 import java.util.Set;
 
-public abstract class AbstractCounterAttack<T extends AbstractCounterAttack<T, A>, A extends IAttacker<?, ?>> extends AbstractMove<T, A> {
+public abstract class AbstractCounterAttack<T extends AbstractCounterAttack<T, A>, A extends IAttacker<? extends A, ?>> extends AbstractMove<T, A> {
     protected AbstractCounterAttack(int cooldown, int windup, int duration, float moveDistance) {
         super(cooldown, windup, duration, moveDistance);
         counter = true;
