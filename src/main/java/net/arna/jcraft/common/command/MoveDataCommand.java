@@ -1,7 +1,13 @@
 package net.arna.jcraft.common.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import net.arna.jcraft.common.attack.core.old.Attack;
+import it.unimi.dsi.fastutil.ints.IntSortedSet;
+import net.arna.jcraft.common.attack.core.BlockableType;
+import net.arna.jcraft.common.attack.core.IAttacker;
+import net.arna.jcraft.common.attack.moves.base.AbstractBarrageAttack;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
+import net.arna.jcraft.common.attack.moves.base.AbstractMultiHitAttack;
+import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.util.JUtils;
@@ -10,8 +16,8 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
-import java.util.List;
-
+//todo: replace with a Patchouli in-game wikipedia
+@Deprecated(forRemoval = true)
 public class MoveDataCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(CommandManager.literal("movedata")
@@ -33,57 +39,74 @@ public class MoveDataCommand {
         if (player == null)
             return 0;
 
-        Attack attack;
+        AbstractMove<?, ? extends IAttacker<?, ?>> move;
 
         if (stand) {
             StandEntity<?, ?> standEntity = JUtils.getStand(player);
-            if (standEntity == null) {
+            if (standEntity == null)
                 return 0;
-            } else {
-                attack = standEntity.curMove;
-                if (attack == null) attack = standEntity.prevMove;
+            else {
+                move = standEntity.curMove;
+                if (move == null) move = standEntity.prevMove;
             }
         } else {
-            JSpec spec = JUtils.getSpec(player);
-            if (spec != null) {
-                attack = spec.curAttack;
-                if (attack == null) {
-                    attack = spec.previousAttack;
-                }
-            } else {
+            JSpec<?, ?> spec = JUtils.getSpec(player);
+            if (spec == null) {
                 return 0;
+            } else {
+                move = spec.curAttack;
+                if (move == null) move = spec.previousAttack;
             }
         }
 
-        if (attack == null) {
-            return 0;
-        }
+        if (move == null) return 0;
 
-        int moveStun = attack.moveStun;
-        int initTime = attack.realInitTime();
-        int stun = (int) (attack.stun * 20f);
-        if (initTime > 0) {
-            initTime -= 1;
-        }
+        int moveStun = move.getDuration();
+        int initTime = move.getWindupPoint();
 
-        StringBuilder frames = new StringBuilder();
+        if (initTime > 0) initTime -= 1;
 
         int startup = initTime;
-        int recovery = 0;
+        StringBuilder frames = new StringBuilder("§41§r");
+        int recovery = move.getDuration() - initTime - 1;
 
-        // Multihit vars
-        boolean start = true;
-        boolean fRec = false;
-        int j = 0; // inter-recovery measurement
+        String advOnHit = "No physical hit\n";
+        String advOnBlock = "";
 
-        switch (attack.attackType) {
-            case CHARGE -> {
+        String mainFDMessage =
+                "======== Attack Stats for: §2" + move.getName() + "§r ========\n" +
+                        "Attack distance: §6" + move.getMoveDistance() + "§r m\n";
+
+
+        int armor = move.getArmor();
+        if (armor > 0)
+            mainFDMessage = mainFDMessage.concat("§r\nAttack has: §7" + (armor == Byte.MAX_VALUE ? "Hyper Armor" : armor + " Armor Points"));
+
+        if (move instanceof AbstractSimpleAttack<?, ?> attack) {
+            if (attack.getHitboxSize() > 0) {
+                advOnHit = "Advantage on hit: §c" + (attack.getStun() - recovery - 1) + "§r ticks of " + attack.getStunType() + " Stun\n";
+                advOnBlock = (attack.getBlockableType() == BlockableType.NON_BLOCKABLE) ? "§5Unblockable§r\n" : "Advantage on block: §5" + (attack.getBlockStun() - recovery) + "§r ticks\n";
+
+                mainFDMessage = mainFDMessage.concat(
+                        "Damage: §6" + attack.getDamage() / 2f + "§r hearts\n" +
+                                "Knockback: §6" + attack.getKnockback());
+            }
+
+            if (attack.getBlockableType() == BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
+                mainFDMessage = mainFDMessage.concat("§r\nEffects on hit are §5UNBLOCKABLE");
+
+            // Multihit vars
+            boolean start = true;
+            boolean fRec = false;
+            int j = 0; // inter-recovery measurement
+
+            if (attack.isCharge()) {
                 frames = new StringBuilder("§4until hit§r");
                 recovery = 10;
             }
             // I REALLY don't want to go through the mental gymnastics of figuring out the maths that would do this faster, so I'm just going to simulate
-            case CHARGEBARRAGE, BARRAGE -> {
-                int interval = attack.interval;
+            if (attack instanceof AbstractBarrageAttack<?, ?> barrage) {
+                int interval = barrage.getInterval();
                 for (int i = moveStun - 1; i > -1; i--) {
                     //JCraft.LOGGER.info(i + " " + (i % interval == 0) + " " + interval);
                     if (i % interval == 0) {
@@ -109,9 +132,8 @@ public class MoveDataCommand {
                     }
                 }
             }
-            //if (j > 0 && !fRec) { frames.append(j); }
-            case MULTIHIT -> {
-                List<Integer> atks = attack.attackTimes;
+            if (attack instanceof AbstractMultiHitAttack<?, ?> multiHitAttack) {
+                IntSortedSet atks = multiHitAttack.getHitMoments();
                 int c = 0;
                 for (int i = moveStun - 1; i > -1; i--) {
                     //JCraft.LOGGER.info(i + " " + (moveStun - i) + " " + atks);
@@ -139,40 +161,17 @@ public class MoveDataCommand {
                     }
                 }
             }
-            default -> {
-                frames = new StringBuilder("§41§r");
-                recovery = attack.moveStun - initTime - 1;
-            }
         }
 
-        boolean effectOnlyUB = attack.ubEffectsOnly;
-        String advOnHit = "No physical hit\n";
-        String advOnBlock = "";
-        if (attack.hitboxSize > 0) {
-            advOnHit = "Advantage on hit: §c" + (stun - recovery - 1) + "§r ticks of " + attack.stunTypeName() + " Stun\n";
-            advOnBlock = (attack.unblockable && !effectOnlyUB) ? "§5Unblockable§r\n" : "Advantage on block: §5" + (attack.getEffectiveBlockstun() - recovery) + "§r ticks\n";
-        }
-
-        String mainFDMessage =
-                "======== Attack Stats for: §2" + attack.name + "§r ========\n" +
-                        "Startup: §b" + startup + "§r ticks\n" +
+        mainFDMessage = mainFDMessage.concat(
+                "Startup: §b" + startup + "§r ticks\n" +
                         "Active: " + frames + " ticks\n" +
-                        "Recovery: §a" + recovery + "§r ticks\n" +
-                        advOnHit +
-                        advOnBlock +
-                        "Attack distance: §6" + attack.attackDist + "§r m\n" +
-                        "Damage: §6" + attack.damage / 2f + "§r hearts\n" +
-                        "Knockback: §6" + attack.knockback;
-
-        if (effectOnlyUB)
-            mainFDMessage = mainFDMessage.concat("§r\nEffects on hit are §5UNBLOCKABLE");
-        byte armor = attack.armor;
-        if (armor > 0)
-            mainFDMessage = mainFDMessage.concat("§r\nAttack has: §7" + (armor == Byte.MAX_VALUE ? "Hyper Armor" : armor + " Armor Points") );
+                        "Recovery: §a" + recovery + "§r ticks\n"
+        );
+        mainFDMessage = mainFDMessage.concat(advOnHit);
+        mainFDMessage = mainFDMessage.concat(advOnBlock);
 
         player.sendMessage(Text.of(mainFDMessage), false);
         return 1;
     }
-
-
 }
