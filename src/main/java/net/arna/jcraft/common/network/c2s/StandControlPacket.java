@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.network.c2s;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.old.MoveQueue;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.StandComponent;
@@ -54,12 +55,13 @@ public class StandControlPacket {
             // 2 - LIGHT ATTACK
             case 2 -> server.execute(() -> {
                 StandEntity<?, ?> stand = JUtils.getStand(player);
-	            if (stand != null) {
-                    int moveStun = stand.getMoveStun();
-                    stand.initLightAttack();
-                    if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking())
-                        stand.queuedAttack = MoveQueue.LIGHT;
-                }
+	            if (stand == null) return;
+
+                int moveStun = stand.getMoveStun();
+
+                if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking())
+                    stand.queuedAttack = MoveQueue.LIGHT;
+                else stand.handleMove(MoveType.LIGHT);
             });
             // 3 - BLOCK
             case 3 -> {
