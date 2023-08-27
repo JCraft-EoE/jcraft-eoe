@@ -27,7 +27,8 @@ import java.util.function.Predicate;
 public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAttacker<? extends A, ?>> {
     private final List<SoundEvent> sounds = new ArrayList<>(), impactSounds = new ArrayList<>();
     private final List<Predicate<? super A>> conditions = new ArrayList<>();
-    private final List<MoveAction<? super A>> initActions = new ArrayList<>(), actions = new ArrayList<>();
+    private final List<InitAction<? super A>> initActions = new ArrayList<>();
+    private final List<MoveAction<? super A>> actions = new ArrayList<>();
     private MoveType moveType;
     private int cooldown, windup;
     private int duration;
@@ -41,7 +42,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     private @Nullable AbstractMove<?, ? super A> crouchingVariant, aerialVariant, followUp;
     private boolean isCrouchingVariant, isAerialVariant;
     private int armor;
-    private IntObjectPair<AbstractMove<?, ? super A>> moveSwitch;
+    private IntObjectPair<AbstractMove<?, ? super A>> finisher;
     protected MobilityType mobilityType;
     // Used to help AI know how and when to use this attack.
     protected boolean ranged, barrage, multiHit, charge, counter, dash, grab;
@@ -216,14 +217,14 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * @param action An action
      * @return This move
      */
-    public T withInitAction(MoveAction<? super A> action) {
+    public T withInitAction(InitAction<? super A> action) {
         initActions.add(action);
         return getThis();
     }
 
     /**
      * Adds an action to this move.
-     * Actions are called before {@link #perform(IAttacker, LivingEntity, MoveContext)} is called.
+     * Actions are called after {@link #perform(IAttacker, LivingEntity, MoveContext)} is called.
      * @param action An action
      * @return This move
      */
@@ -243,7 +244,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     }
 
     /**
-     * Sets the move this move should switch to and at what point.
+     * Sets the move this move should finish with and when.
      * When the given tick is reached, the current move of the attacker will switch
      * seamlessly to the given attack without changing any values. (Such as move stun or cooldown)
      * This allows for some quick and dirty ways to achieve special handling without making a new move for it
@@ -252,8 +253,8 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * @param move The move to switch to
      * @return This move
      */
-    public T withSwitch(int tick, AbstractMove<?, ? super A> move) {
-        moveSwitch = IntObjectPair.of(tick, move);
+    public T withFinisher(int tick, AbstractMove<?, ? super A> move) {
+        finisher = IntObjectPair.of(tick, move);
         return getThis();
     }
 
@@ -295,6 +296,11 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     }
 
     /**
+     * Called when this move is cancelled. Does nothing by default.
+     */
+    public void onCancel(A attacker) {}
+
+    /**
      * Called every tick so long as this move is active.
      * Called separately for each attacker.
      * Invokes the {@link #perform(IAttacker, LivingEntity, MoveContext)} method if {@link #shouldPerform(IAttacker)}
@@ -302,8 +308,8 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * @param attacker The attacker to tick for.
      */
     public void tick(A attacker) {
-        if (moveSwitch != null && moveSwitch.leftInt() == duration - attacker.getMoveStun())
-            attacker.setCurrentMove(moveSwitch.right());
+        if (finisher != null && finisher.leftInt() == duration - attacker.getMoveStun())
+            attacker.setCurrentMove(finisher.right());
         if (shouldPerform(attacker)) doPerform(attacker);
     }
 
@@ -324,8 +330,8 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         LivingEntity user = attacker.getUserOrThrow();
         MoveContext ctx = attacker.getMoveContext();
 
-        actions.forEach(action -> action.perform(attacker, user, ctx));
-        perform(attacker, user, ctx);
+        Set<LivingEntity> targets = perform(attacker, user, ctx);
+        actions.forEach(action -> action.perform(attacker, user, ctx, targets));
     }
 
     /**
@@ -436,6 +442,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         cast.sounds.addAll(sounds);
         cast.impactSounds.addAll(impactSounds);
         cast.conditions.addAll(conditions);
+        cast.initActions.addAll(initActions);
         cast.actions.addAll(actions);
         cast.moveType = moveType;
         cast.name = name;
@@ -478,7 +485,12 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     }
 
     @FunctionalInterface
-    public interface MoveAction<A extends IAttacker<? extends A, ?>> {
+    public interface InitAction<A extends IAttacker<? extends A, ?>> {
         void perform(A attacker, LivingEntity user, MoveContext ctx);
+    }
+
+    @FunctionalInterface
+    public interface MoveAction<A extends IAttacker<? extends A, ?>> {
+        void perform(A attacker, LivingEntity user, MoveContext ctx, Set<LivingEntity> targets);
     }
 }

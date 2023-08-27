@@ -197,7 +197,7 @@ public class JServerTickEvents {
         }
 
         // Handle items of interest
-        HashMap<Entity, EntityInterest> entitiesOfInterest = JCraft.getEntitiesOfInterest();
+        Map<Entity, EntityInterest> entitiesOfInterest = JCraft.getEntitiesOfInterest();
         HashMap<Entity, EntityInterest> newItemsOfInterest = new HashMap<>();
 
         for (Map.Entry<Entity, EntityInterest> entityAndInterest : entitiesOfInterest.entrySet()) {

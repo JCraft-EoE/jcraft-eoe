@@ -54,10 +54,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.example.GeckoLibMod;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static net.arna.jcraft.common.entity.stand.StandEntity.stun;
 
@@ -97,20 +94,19 @@ public class JCraft implements ModInitializer {
 
     public static final List<DashData> dashes = new ArrayList<>();
 
-    private static final HashMap<Entity, EntityInterest> entitiesOfInterest = new HashMap<>();
+    @Getter
+    private static final Map<Entity, EntityInterest> entitiesOfInterest = new HashMap<>();
 
     // Standardized cooldowns
     public static final int dashCooldown = 40;
 
+    public static final int LIGHT_COOLDOWN = 30;
     public static final double lightCooldown = 1.5;
 
     @Getter
     @Setter
     private static IClientEntityHandler clientEntityHandler = DummyClientEntityHandler.INSTANCE;
 
-    public static HashMap<Entity, EntityInterest> getEntitiesOfInterest() {
-        return entitiesOfInterest;
-    }
     public static void markItemOfInterest(@NotNull Entity entity, @NotNull EntityInterest interest) {
         entitiesOfInterest.put(entity, interest);
     }

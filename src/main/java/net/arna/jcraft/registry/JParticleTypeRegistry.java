@@ -18,7 +18,7 @@ public interface JParticleTypeRegistry {
     DefaultParticleType HITSPARK_2 = FabricParticleTypes.simple();
     DefaultParticleType KCPARTICLE = FabricParticleTypes.simple();
     DefaultParticleType BACKSTAB = FabricParticleTypes.simple();
-    DefaultParticleType SPEEDPARTICLE = FabricParticleTypes.simple();
+    DefaultParticleType SPEED_PARTICLE = FabricParticleTypes.simple();
     DefaultParticleType BITES_THE_DUST = FabricParticleTypes.simple();
     DefaultParticleType BOOM_1 = FabricParticleTypes.simple();
 
@@ -45,7 +45,7 @@ public interface JParticleTypeRegistry {
         registerParticle("hitspark_2", HITSPARK_2);
         registerParticle("kcparticle", KCPARTICLE);
         registerParticle("backstab", BACKSTAB);
-        registerParticle("speedparticle", SPEEDPARTICLE);
+        registerParticle("speedparticle", SPEED_PARTICLE);
         registerParticle("btd", BITES_THE_DUST);
         registerParticle("boom_1", BOOM_1);
     }

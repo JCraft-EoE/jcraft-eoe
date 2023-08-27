@@ -718,6 +718,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * Cancels the stands attack instantly
      */
     public void cancelAttack() {
+        if (curMove != null) curMove.onCancel(getThis());
         curMove = null;
         setMoveStun(0);
         setState(getIdleState());
