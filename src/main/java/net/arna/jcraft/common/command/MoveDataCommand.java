@@ -16,8 +16,6 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
-//todo: replace with a Patchouli in-game wikipedia
-@Deprecated(forRemoval = true)
 public class MoveDataCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(CommandManager.literal("movedata")
