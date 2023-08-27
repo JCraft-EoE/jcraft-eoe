@@ -12,6 +12,8 @@ import net.minecraft.text.Text;
 
 import java.util.List;
 
+//todo: replace with a Patchouli in-game wikipedia
+@Deprecated(forRemoval = true)
 public class AboutStandCommand {
     private static final List<String> buttons = List.of(
             "Light",
