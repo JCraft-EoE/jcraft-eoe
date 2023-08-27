@@ -1675,11 +1675,8 @@ The Fool
     >Added crouching variant to Light
 
 priority (top to bottom)
-todo: GE life giver changes
-
 todo: counters that invalidate hit effects
 todo: fix predict not working with new projectiles
 
 TODO: stand summon particles
-TODO: patchouli and the stand users manual
 TODO: Knockdown() method
