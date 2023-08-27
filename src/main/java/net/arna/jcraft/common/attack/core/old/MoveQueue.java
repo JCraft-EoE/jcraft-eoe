@@ -20,6 +20,8 @@ public enum MoveQueue {
     MIDDLE_MOUSE(MoveType.UTILITY),
     STAND_SUMMON(null);
 
+    public static final int types = 9;
+
     @Nullable
     private final MoveType moveType;
 
