@@ -43,9 +43,9 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
     @Setter
     public int moveStun = 0;
     private S state;
-    public AbstractMove<?, ? super A> curAttack;
+    public AbstractMove<?, ? super A> curMove;
     public AbstractMove<?, ? super A> previousAttack;
-    public MoveQueue queuedAttack;
+    public MoveQueue queuedMove;
     public int armorPoints = 0;
 
     protected JSpec(SpecType type, PlayerEntity player) {
@@ -88,13 +88,13 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
 
     @Override
     public AbstractMove<?, ? super A> getCurrentMove() {
-        return curAttack;
+        return curMove;
     }
 
     @Override
     public void setCurrentMove(AbstractMove<?, ? super A> move) {
-        previousAttack = curAttack;
-        curAttack = move;
+        previousAttack = curMove;
+        curMove = move;
     }
 
     @Override
@@ -137,11 +137,11 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
 
         //JCraft.LOGGER.info("SERVER: Handling spec attack: " + attack + " in world: " + serverWorld);
 
-        curAttack = attack.copy()
+        curMove = attack.copy()
                 .withDuration((int) (attack.getDuration() / animationSpeed))
                 .withWindup((int) (attack.getWindup() / animationSpeed));
 
-        if (curAttack instanceof AbstractMultiHitAttack<?,?> multiHitAttack)
+        if (curMove instanceof AbstractMultiHitAttack<?,?> multiHitAttack)
             multiHitAttack.withHitMoments(IntSet.of(multiHitAttack.getHitMoments().intStream()
                     .map(i -> (int) (i / animationSpeed))
                     .toArray()));
@@ -154,8 +154,9 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
     }
 
     public void cancelAttack() {
-        curAttack = null;
-        queuedAttack = null;
+        if (curMove != null) curMove.onCancel(getThis());
+        curMove = null;
+        queuedMove = null;
         moveStun = 0;
 
         if (player == null) return;
@@ -198,12 +199,12 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
         //JCraft.LOGGER.info("SERVER: Ticking spec " + this);
 
         if (moveStun <= 0) {
-            if (queuedAttack != null) {
-                initMove(queuedAttack.getMoveType());
-                queuedAttack = null;
+            if (queuedMove != null) {
+                initMove(queuedMove.getMoveType());
+                queuedMove = null;
             }
 
-            if (curAttack != previousAttack && curAttack != null) previousAttack = curAttack;
+            if (curMove != previousAttack && curMove != null) previousAttack = curMove;
             return;
         }
 
@@ -213,7 +214,7 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
         player.setSneaking(shouldSneak());
 
         // Process attack
-        AbstractMove<?, ? super A> attack = this.curAttack;
+        AbstractMove<?, ? super A> attack = this.curMove;
         moveStun--;
         if (attack != null) attack.tick(getThis());
     }

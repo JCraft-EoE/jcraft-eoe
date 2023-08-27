@@ -91,7 +91,7 @@ public class StandControlPacket {
                     if (spec != null) {
                         spec.initHeavyAttack(world);
                         if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT)
-                            spec.queuedAttack = MoveQueue.HEAVY;
+                            spec.queuedMove = MoveQueue.HEAVY;
                     }
                 }
             });
@@ -109,7 +109,7 @@ public class StandControlPacket {
                     if (spec != null) {
                         spec.initBarrage(world);
                         if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT)
-                            spec.queuedAttack = MoveQueue.BARRAGE;
+                            spec.queuedMove = MoveQueue.BARRAGE;
                     }
                 }
             });
@@ -127,7 +127,7 @@ public class StandControlPacket {
                     if (spec != null) {
                         spec.initSpecial1(world);
                         if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT)
-                            spec.queuedAttack = MoveQueue.SPECIAL1;
+                            spec.queuedMove = MoveQueue.SPECIAL1;
                     }
                 }
             });
@@ -145,7 +145,7 @@ public class StandControlPacket {
                     if (spec != null) {
                         spec.initUlt(world);
                         if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT)
-                            spec.queuedAttack = MoveQueue.ULTIMATE;
+                            spec.queuedMove = MoveQueue.ULTIMATE;
                     }
                 }
             });
@@ -163,7 +163,7 @@ public class StandControlPacket {
                     if (spec != null) {
                         spec.initSpecial2(world);
                         if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT)
-                            spec.queuedAttack = MoveQueue.SPECIAL2;
+                            spec.queuedMove = MoveQueue.SPECIAL2;
                     }
                 }
             });
@@ -181,7 +181,7 @@ public class StandControlPacket {
                     if (spec != null) {
                         spec.initSpecial3(world);
                         if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT)
-                            spec.queuedAttack = MoveQueue.SPECIAL3;
+                            spec.queuedMove = MoveQueue.SPECIAL3;
                     }
                 }
             });

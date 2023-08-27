@@ -52,7 +52,7 @@ public class MoveDataCommand {
             if (spec == null) {
                 return 0;
             } else {
-                move = spec.curAttack;
+                move = spec.curMove;
                 if (move == null) move = spec.previousAttack;
             }
         }

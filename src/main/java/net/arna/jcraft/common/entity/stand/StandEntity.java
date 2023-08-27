@@ -1070,7 +1070,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         // Interrupting spec moves
         if (ent instanceof PlayerEntity playerEntity) {
             JSpec<?, ?> spec = JUtils.getSpec(playerEntity);
-            if (spec != null && spec.curAttack != null && --spec.armorPoints < 0) spec.cancelAttack();
+            if (spec != null && spec.curMove != null && --spec.armorPoints < 0) spec.cancelAttack();
         }
 
         // Aerial hits keep the victim up
@@ -1207,7 +1207,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
                 if (enemySpec != null) {
                     enemyMoveStun = enemySpec.moveStun;
-                    enemyAttack = enemySpec.curAttack;
+                    enemyAttack = enemySpec.curMove;
                 }
             }
         }
