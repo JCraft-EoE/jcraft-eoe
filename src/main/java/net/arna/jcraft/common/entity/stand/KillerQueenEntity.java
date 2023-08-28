@@ -63,8 +63,6 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
     // Move-set
     @Override
     public void initMove(MoveType type) {
-        if (!hasUser()) return;
-
         if (type == MoveType.SPECIAL1) {
             LivingEntity user = getUserOrThrow();
             CooldownsComponent cooldowns = JComponents.getCooldowns(user);

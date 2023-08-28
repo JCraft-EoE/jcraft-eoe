@@ -19,7 +19,7 @@ public class KQGrabAttack extends AbstractGrabAttack<KQGrabAttack, KillerQueenEn
     public @NonNull Set<LivingEntity> perform(KillerQueenEntity attacker, LivingEntity user, MoveContext ctx) {
         Set<LivingEntity> targets = super.perform(attacker, user, ctx);
 
-        ctx.set(BombPlantAttack.BOMB_ENTITY, targets.stream().findFirst().orElseThrow());
+        ctx.set(BombPlantAttack.BOMB_ENTITY, targets.stream().findFirst().orElse(null));
         ctx.set(BombPlantAttack.BOMB_POS, null);
 
         return targets;

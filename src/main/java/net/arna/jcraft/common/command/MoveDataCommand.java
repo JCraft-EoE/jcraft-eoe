@@ -72,7 +72,7 @@ public class MoveDataCommand {
         String advOnBlock = "";
 
         String mainFDMessage =
-                "======== Attack Stats for: §2" + move.getName() + "§r ========\n" +
+                "======== Attack Stats for: §2" + move.getName().getString() + "§r ========\n" +
                         "Attack distance: §6" + move.getMoveDistance() + "§r m\n";
 
 
@@ -87,7 +87,7 @@ public class MoveDataCommand {
 
                 mainFDMessage = mainFDMessage.concat(
                         "Damage: §6" + attack.getDamage() / 2f + "§r hearts\n" +
-                                "Knockback: §6" + attack.getKnockback());
+                                "Knockback: §6" + attack.getKnockback()) + "§r\n";
             }
 
             if (attack.getBlockableType() == BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)

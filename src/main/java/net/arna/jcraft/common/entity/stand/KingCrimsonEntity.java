@@ -170,7 +170,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     @Override
     protected void registerMoves(MoveMap<KingCrimsonEntity, State> moves) {
         moves.register(MoveType.LIGHT, DUAL_CHOP, State.DUAL_CHOP).withCrouchingVariant(State.SWEEP);
-        moves.register(MoveType.HEAVY, VERTICAL_CHOP, State.HEAVY);
+        moves.register(MoveType.HEAVY, VERTICAL_CHOP, State.HEAVY).withFollowUp(State.OVERHEAD);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 
         moves.register(MoveType.SPECIAL1, EYE_CHOP, State.EYE_CHOP).withCrouchingVariant(State.BLOOD_THROW);

@@ -24,7 +24,7 @@ import java.util.Set;
 @Getter
 public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A>, A extends IAttacker<? extends A, ?>> extends AbstractSimpleAttack<T, A> {
     private final int interval;
-    protected boolean inflictsSlowness;
+    protected boolean inflictsSlowness = true;
 
     protected AbstractBarrageAttack(int cooldown, int windup, int duration, float moveDistance, float damage,
                                     int stun, float hitboxSize, float knockback, float offset, int interval) {
@@ -55,7 +55,7 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A
     public void tick(A attacker) {
         super.tick(attacker);
 
-        if (attacker.hasUser())
+        if (attacker.hasUser() && inflictsSlowness)
             attacker.getUserOrThrow().addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 10, 2, true, false));
     }
 

@@ -172,7 +172,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         moves.register(MoveType.SPECIAL1, SPIN_BARRAGE, State.SPIN);
         moves.register(MoveType.SPECIAL2, isPossessed() ? RAY_DART : CHARGE, isPossessed() ? State.CHARGE : State.P_CHARGE);
         moves.register(MoveType.SPECIAL3, isPossessed() ? COUNTER : CLEAVE, isPossessed() ? State.COUNTER : State.CLEAVE);
-        moves.register(MoveType.ULTIMATE, isPossessed() ? GOD_OF_DEATH : ARMOR_OFF);
+        moves.register(MoveType.ULTIMATE, isPossessed() ? GOD_OF_DEATH : ARMOR_OFF, isPossessed() ? State.BEAT_DOWN_START : State.ARMOR_OFF);
         moves.register(MoveType.UTILITY, CIRCLE_CHARGE, State.CIRCLE_CHARGE);
     }
 
