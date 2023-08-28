@@ -1,11 +1,8 @@
 package net.arna.jcraft.common.entity.stand;
 
 import lombok.NonNull;
-import net.arna.jcraft.common.attack.core.HitBoxData;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
-import net.arna.jcraft.common.attack.core.old.Attack;
-import net.arna.jcraft.common.attack.core.old.AttackType;
 import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.attack.moves.theworld.FeignBarrageCounterAttack;
 import net.arna.jcraft.common.attack.moves.theworld.TWDonutAttack;
@@ -57,12 +54,6 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
     public static final TimeSkipMove<TheWorldEntity> TIME_SKIP = new TimeSkipMove<TheWorldEntity>(360, 14)
             .withSound(JSoundRegistry.TIME_SKIP)
             .withInfo(Text.literal("Timeskip"), Text.literal("14m range"));
-    public static final Attack donut = new Attack(1, 14, 1f, 42, 20, 2, 9f, 1.0f, AttackType.BOX, 2.6f, 0, 0, JSoundRegistry.TW_DONUT_HIT)
-            .setLaunch()
-            .setHitspark(2)
-            .appendHitbox(new HitBoxData(0, 0, 1.5))
-            .hyperArmor()
-            .setInfo("Donut", "slow, uninterruptible combo starter/extender, 1.5s stun on whiff");
     public static final ChargeAttack<TheWorldEntity, TheWorldEntity.State> CHARGE = new ChargeAttack<>(
             400, 5, 19, 7.5f, 5, 20, 1.5f, 0.25f, 0, State.CHARGE_HIT)
             .withSound(JSoundRegistry.TW_CHARGE)
@@ -114,8 +105,8 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
         moves.register(MoveType.SPECIAL1, ROUNDHOUSE, State.ROUNDHOUSE);
         moves.register(MoveType.SPECIAL2, CHARGE, State.CHARGE);
         moves.register(MoveType.SPECIAL3, FEIGN_BARRAGE, State.BARRAGE);
-
         moves.register(MoveType.ULTIMATE, TIME_STOP, State.TIME_STOP);
+
         moves.register(MoveType.UTILITY, TIME_SKIP, State.IDLE);
     }
 

@@ -36,7 +36,7 @@ public class ChargedSpewAttack extends AbstractSimpleAttack<ChargedSpewAttack, W
 
     @Override
     public @NonNull ChargedSpewAttack copy() {
-        return new ChargedSpewAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getHitboxSize(), getKnockback(), getOffset());
+        return copyExtras(new ChargedSpewAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
+                getHitboxSize(), getKnockback(), getOffset()));
     }
 }

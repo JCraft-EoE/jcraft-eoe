@@ -2,7 +2,7 @@ package net.arna.jcraft.common.network.c2s;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.MoveType;
-import net.arna.jcraft.common.attack.core.old.MoveQueue;
+import net.arna.jcraft.common.attack.core.MoveQueue;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.StandComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;

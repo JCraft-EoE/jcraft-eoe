@@ -57,6 +57,7 @@ public class SlamAttack extends AbstractSimpleAttack<SlamAttack, TheFoolEntity> 
 
     @Override
     public @NonNull SlamAttack copy() {
-        return null;
+        return copyExtras(new SlamAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
+                getStun(), getHitboxSize(), getKnockback(), getOffset()));
     }
 }

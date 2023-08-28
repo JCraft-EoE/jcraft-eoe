@@ -187,6 +187,11 @@ public class TimeEraseMove extends AbstractMove<TimeEraseMove, KingCrimsonEntity
     }
 
     @Override
+    public void registerContextEntries(MoveContext ctx) {
+        ctx.register(DOPPELGANGER);
+    }
+
+    @Override
     protected @NonNull TimeEraseMove getThis() {
         return this;
     }

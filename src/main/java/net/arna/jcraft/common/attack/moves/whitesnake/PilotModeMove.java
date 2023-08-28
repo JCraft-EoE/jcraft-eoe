@@ -26,6 +26,6 @@ public class PilotModeMove extends AbstractMove<PilotModeMove, WhiteSnakeEntity>
 
     @Override
     public @NonNull PilotModeMove copy() {
-        return null;
+        return copyExtras(new PilotModeMove(getCooldown()));
     }
 }

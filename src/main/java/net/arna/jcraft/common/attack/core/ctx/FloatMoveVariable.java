@@ -9,7 +9,7 @@ public class FloatMoveVariable extends MoveVariable<Float> {
 
     @Override
     MoveContext.Entry<Float> createEntry() {
-        return super.createEntry();
+        return new FloatEntry();
     }
 
     @Getter

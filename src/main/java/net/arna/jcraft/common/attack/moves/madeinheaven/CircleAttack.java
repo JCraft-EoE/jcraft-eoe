@@ -64,7 +64,8 @@ public class CircleAttack extends AbstractMove<CircleAttack, MadeInHeavenEntity>
         ctx.setInt(CIRCLING_TIME, 100);
         attacker.setAfterimage(true);
         attacker.updateRemoteInputs(0, 0, false);
-        return Set.of(ctx.get(TARGET));
+        LivingEntity target = ctx.get(TARGET);
+        return target == null ? Set.of() : Set.of(target);
     }
 
     public void endCircle(MadeInHeavenEntity attacker) {

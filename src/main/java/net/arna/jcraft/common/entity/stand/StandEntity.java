@@ -8,8 +8,7 @@ import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
-import net.arna.jcraft.common.attack.core.old.Attack;
-import net.arna.jcraft.common.attack.core.old.MoveQueue;
+import net.arna.jcraft.common.attack.core.MoveQueue;
 import net.arna.jcraft.common.attack.moves.base.AbstractBarrageAttack;
 import net.arna.jcraft.common.attack.moves.base.AbstractCounterAttack;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
@@ -72,8 +71,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     // TODO: finish custom player idle poses for all stands
 
-    // All variables that the player can see in action (i.e. time erase time, timestop time, alpha, state) have to be tracked.
-    public List<Attack> moves = List.of();
     @Getter(onMethod_ = @NonNull)
     private MoveMap<E, S> moveMap;
     @Getter

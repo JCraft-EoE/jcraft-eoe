@@ -5,7 +5,6 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
-import net.arna.jcraft.common.attack.core.old.Attack;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.madeinheaven.*;
 import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
@@ -60,8 +59,6 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .withSound(JSoundRegistry.MIH_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("Barrage"), Text.literal("short, knocks back"));
-    public static final Attack barrage = Attack.barrageAttack(2, 17, 0.85f, 32, 0, 2, 1.5f, 0.1f, 0.5f, 0, 3, JSoundRegistry.IMPACT_1)
-            .setInfo("Barrage", "short, knocks back");
     public static final SpeedSliceAttack SPEED_SLICE = new SpeedSliceAttack(360, 10, 11,
             1.25f, 6f, 1.5f, 1f)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)

@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.attack.core.ctx;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
@@ -59,11 +60,11 @@ public class MoveContext {
         return (Entry<T>) entry;
     }
 
-    public <T> void register(MoveVariable<T> variable) {
+    public <T> void register(@NonNull MoveVariable<T> variable) {
         entries.put(variable, variable.createEntry());
     }
 
-    public <T> void register(MoveVariable<T> variable, T initialValue) {
+    public <T> void register(@NonNull MoveVariable<T> variable, T initialValue) {
         register(variable);
         set(variable, initialValue);
     }

@@ -10,6 +10,7 @@ import net.arna.jcraft.common.util.CooldownType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.stream.Stream;
 
 public class MoveMap<A extends IAttacker<A, S>, S> implements Iterable<MoveMap.Entry<A, S>> {
     private final ListMultimap<MoveType, Entry<A, S>> moves = MultimapBuilder.enumKeys(MoveType.class).arrayListValues().build();
+    private final List<Entry<A, S>> extraMoves = new ArrayList<>();
     @Getter
     private boolean frozen = false;
 
@@ -31,11 +33,26 @@ public class MoveMap<A extends IAttacker<A, S>, S> implements Iterable<MoveMap.E
     public Entry<A, S> register(@NonNull MoveType type, @NonNull AbstractMove<?, ? super A> move, @Nullable CooldownType cooldownType, @Nullable S animState) {
         checkFrozen();
 
-        move = move.copy();
-        move.onRegister(type);
+        AbstractMove<?, ? super A> copy = move.copy();
+        //noinspection ConstantValue // That's the idea
+        if (copy == null) throw new IllegalStateException(move.getClass().getSimpleName() + "#copy() returned null.");
 
-        Entry<A, S> entry = new Entry<A, S>(null, type, move, cooldownType, animState);
+        copy.onRegister(type);
+
+        Entry<A, S> entry = new Entry<A, S>(null, type, copy, cooldownType, animState);
         moves.put(type, entry);
+        return entry;
+    }
+
+    /**
+     * For any move that does not get referenced directly by any other move and is not invoked by a move-type,
+     * but should still be included.
+     * @param move The move to register
+     * @return The entry for the given move
+     */
+    public Entry<A, S> registerExtra(@NonNull AbstractMove<?, ? super A> move) {
+        Entry<A, S> entry = new Entry<A, S>(null, null, move, null, null);
+        extraMoves.add(entry);
         return entry;
     }
 
@@ -66,7 +83,7 @@ public class MoveMap<A extends IAttacker<A, S>, S> implements Iterable<MoveMap.E
     @Override
     public Iterator<MoveMap.Entry<A, S>> iterator() {
         // Ensure we add all variants here too.
-        return moves.values().stream()
+        return Stream.concat(moves.values().stream(), extraMoves.stream())
                 .flatMap(this::streamEntryAndChildren)
                 .iterator();
     }
@@ -76,6 +93,8 @@ public class MoveMap<A extends IAttacker<A, S>, S> implements Iterable<MoveMap.E
         builder.add(entry);
         if (entry.getCrouchingVariant() != null)
             streamEntryAndChildren(entry.getCrouchingVariant()).forEach(builder::add);
+        if (entry.getAerialVariant() != null)
+            streamEntryAndChildren(entry.getAerialVariant()).forEach(builder::add);
         if (entry.getFollowUp() != null)
             streamEntryAndChildren(entry.getFollowUp()).forEach(builder::add);
 
@@ -99,10 +118,13 @@ public class MoveMap<A extends IAttacker<A, S>, S> implements Iterable<MoveMap.E
             this.animState = animState;
 
             if (move.getCrouchingVariant() != null)
-                crouchingVariant = new Entry<A, S>(null, null, move.getCrouchingVariant(), cooldownType, animState);
+                crouchingVariant = new Entry<>(this, type, move.getCrouchingVariant(), cooldownType, animState);
 
             if (move.getAerialVariant() != null)
-                aerialVariant = new Entry<A, S>(null, null, move.getAerialVariant(), cooldownType, animState);
+                aerialVariant = new Entry<>(this, type, move.getAerialVariant(), cooldownType, animState);
+
+            if (move.getFollowUp() != null)
+                followUp = new Entry<>(this, type, move.getFollowUp(), cooldownType, animState);
         }
 
         /**
@@ -133,7 +155,7 @@ public class MoveMap<A extends IAttacker<A, S>, S> implements Iterable<MoveMap.E
         public Entry<A, S> withCrouchingVariant(CooldownType cooldownType, S animState) {
             if (move.getCrouchingVariant() == null) throw new IllegalArgumentException("The move of this entry has " +
                     "no crouching variant.");
-            crouchingVariant = new Entry<>(this, null, move.getCrouchingVariant(), cooldownType, animState);
+            crouchingVariant = new Entry<>(this, type, move.getCrouchingVariant(), cooldownType, animState);
             return crouchingVariant;
         }
 
@@ -148,7 +170,7 @@ public class MoveMap<A extends IAttacker<A, S>, S> implements Iterable<MoveMap.E
          * @return The aerial variant entry
          */
         public Entry<A, S> withAerialVariant(S animState) {
-            return withCrouchingVariant(cooldownType, animState);
+            return withAerialVariant(cooldownType, animState);
         }
 
         /**
@@ -165,7 +187,7 @@ public class MoveMap<A extends IAttacker<A, S>, S> implements Iterable<MoveMap.E
         public Entry<A, S> withAerialVariant(CooldownType cooldownType, S animState) {
             if (move.getAerialVariant() == null) throw new IllegalArgumentException("The move of this entry has " +
                     "no aerial variant.");
-            aerialVariant = new Entry<>(this, null, move.getAerialVariant(), cooldownType, animState);
+            aerialVariant = new Entry<>(this, type, move.getAerialVariant(), cooldownType, animState);
             return aerialVariant;
         }
 
@@ -197,7 +219,7 @@ public class MoveMap<A extends IAttacker<A, S>, S> implements Iterable<MoveMap.E
         public Entry<A, S> withFollowUp(CooldownType cooldownType, S animState) {
             if (move.getFollowUp() == null) throw new IllegalArgumentException("The move of this entry has " +
                     "no follow-up.");
-            followUp = new Entry<>(this, null, move.getFollowUp(), cooldownType, animState);
+            followUp = new Entry<>(this, type, move.getFollowUp(), cooldownType, animState);
             return followUp;
         }
     }

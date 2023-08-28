@@ -293,12 +293,9 @@ public class ClientPacketHandler {
                 double x = buf.readDouble();
                 double y = buf.readDouble();
                 double z = buf.readDouble();
-                buf.readEnumConstant(JParticleType.class);
-                int id = buf.readInt();
+                JParticleType particleType = buf.readEnumConstant(JParticleType.class);
 
-                client.execute(() -> client.world.addParticle(
-                        JParticleTypeRegistry.particles.get(id), true,
-                        x, y, z,
+                client.execute(() -> client.world.addParticle(particleType.getParticleType(), true, x, y, z,
                         0, 0, 0));
             }
 

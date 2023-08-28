@@ -5,8 +5,6 @@ import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.StunType;
-import net.arna.jcraft.common.attack.core.old.Attack;
-import net.arna.jcraft.common.attack.core.old.AttackType;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
@@ -74,14 +72,8 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             5f, 17, 1.5f, 0.25f, 0f, State.P_CHARGE_HIT)
             .withBackstab(false)
             .withInfo(Text.literal("Shooting Star"), Text.literal("Silver Chariot detaches from the user and charges in the looked direction, combo starter/extender"));
-    public static final Attack charge = new Attack(6, 18, 8f, 19, 5, 1.5, 5f, 0.25f, AttackType.CHARGE, 0.85f, 0, State.P_CHARGE_HIT.ordinal())
-            .setRanged(true)
-            .disableBackstab()
-            .setInfo("Shooting Star", "Silver Chariot detaches from the user and charges in the looked direction, combo starter/extender");
     public static final SCCounterAttack COUNTER = new SCCounterAttack(640, 4, 34, 0.5f)
             .withInfo(Text.literal("Counter"), Text.literal("0.2s windup, 1.5s duration, stuns when hit"));
-    public static final Attack counter = new Attack(7, 32, 0.5f, 34, 4, 0, 0, 0, AttackType.COUNTER)
-            .setInfo("Counter", "0.2s windup, 1.5s duration, stuns when hit");
     public static final SimpleMultiHitAttack<SilverChariotEntity> GOD_OF_DEATH_FINAL = new SimpleMultiHitAttack<SilverChariotEntity>(
             0, 59, 0.65f, 6f, 20, 2.5f, 1.25f, 0f,
             IntSet.of(54))

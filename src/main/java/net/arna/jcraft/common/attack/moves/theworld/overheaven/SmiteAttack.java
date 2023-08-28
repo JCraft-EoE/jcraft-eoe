@@ -104,6 +104,12 @@ public class SmiteAttack extends AbstractEffectInflictingAttack<SmiteAttack, The
     }
 
     @Override
+    public void registerContextEntries(MoveContext ctx) {
+        ctx.register(LIGHTNING_POS);
+        ctx.register(BOLT);
+    }
+
+    @Override
     protected @NonNull SmiteAttack getThis() {
         return this;
     }

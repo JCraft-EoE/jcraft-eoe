@@ -69,6 +69,6 @@ public class FlightMove extends AbstractMove<FlightMove, GEREntity> {
 
     @Override
     public @NonNull FlightMove copy() {
-        return null;
+        return copyExtras(new FlightMove(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
     }
 }

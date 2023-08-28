@@ -1,10 +1,11 @@
-package net.arna.jcraft.common.attack.core.old;
+package net.arna.jcraft.common.attack.core;
 
+import com.google.common.collect.ImmutableMap;
+import lombok.AccessLevel;
 import lombok.Getter;
-import net.arna.jcraft.common.attack.core.MoveType;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumMap;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 
@@ -21,21 +22,20 @@ public enum MoveQueue {
     STAND_SUMMON(null);
 
     public static final int types = 9;
+    @Getter(value = AccessLevel.PRIVATE, lazy = true)
+    private static final Map<MoveType, MoveQueue> fromMoveType = Arrays.stream(values())
+            .filter(v -> v.getMoveType() != null)
+            .collect(ImmutableMap.toImmutableMap(MoveQueue::getMoveType, v -> v));
 
     @Nullable
     private final MoveType moveType;
 
     MoveQueue(@Nullable MoveType moveType) {
         this.moveType = moveType;
-        FromMoveTypeHolder.fromMoveType.put(moveType, this);
     }
 
     public static MoveQueue fromMoveType(MoveType moveType) {
-        return Objects.requireNonNull(FromMoveTypeHolder.fromMoveType.get(moveType), "No MoveQueue has been " +
+        return Objects.requireNonNull(getFromMoveType().get(moveType), "No MoveQueue has been " +
                 "associated with the given MoveType.");
-    }
-
-    private static class FromMoveTypeHolder {
-        private static final Map<MoveType, MoveQueue> fromMoveType = new EnumMap<>(MoveType.class);
     }
 }

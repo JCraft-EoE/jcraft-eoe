@@ -339,11 +339,11 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             return;
         }
 
-        AbstractMove<?, ? super TheFoolEntity> attack = curMove;
+        AbstractMove<?, ? super TheFoolEntity> move = curMove;
         if (lastRemoteInputTime - age > 4) updateRemoteInputs(0, 0, false);
-        if (attack != null) {
-            int slamType = getMoveContext().getInt(SlamAttack.VARIANT);
-            if (attack.getOriginalMove() == SLAM && slamType != 1) queuedAttack = null;
+        if (move != null) {
+            int slamType = moveContext.getInt(SlamAttack.VARIANT);
+            if (move.getOriginalMove() == SLAM && slamType != 1) queuedAttack = null;
         } else if (!blocking && getMoveStun() < 1) { // If idle, reset back to normal material
             setSand(false);
             setWave(false);

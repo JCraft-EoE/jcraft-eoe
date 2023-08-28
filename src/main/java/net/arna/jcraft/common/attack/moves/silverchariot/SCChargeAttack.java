@@ -52,7 +52,7 @@ public class SCChargeAttack extends AbstractChargeAttack<SCChargeAttack, SilverC
     @NotNull
     @Override
     public SCChargeAttack copy() {
-        return new SCChargeAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getHitboxSize(), getKnockback(), getOffset(), getHitAnimState());
+        return copyExtras(new SCChargeAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
+                getHitboxSize(), getKnockback(), getOffset(), getHitAnimState()));
     }
 }

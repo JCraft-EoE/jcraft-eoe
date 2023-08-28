@@ -2,7 +2,7 @@ package net.arna.jcraft.common.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import net.arna.jcraft.common.argumenttype.AttackArgumentType;
-import net.arna.jcraft.common.attack.core.old.MoveQueue;
+import net.arna.jcraft.common.attack.core.MoveQueue;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.StandComponent;

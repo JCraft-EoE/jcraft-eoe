@@ -276,6 +276,11 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     public final void onRegister(MoveType type) {
         moveType = type;
 
+        if (crouchingVariant != null) crouchingVariant.onRegister(type);
+        if (aerialVariant != null) aerialVariant.onRegister(type);
+        if (followUp != null) followUp.onRegister(type);
+        if (finisher != null) finisher.right().onRegister(type);
+
         // TODO convert these to actual tests
         if (!FabricLoader.getInstance().isDevelopmentEnvironment()) return;
         testCopy();
@@ -481,7 +486,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         T copy = copy();
         //noinspection ConstantValue // That's the idea.
         if (copy == null) throw new NullPointerException(getClass().getSimpleName() + "#copy() returned null");
-        if (!copiedExtras) throw new IllegalStateException(getClass().getSimpleName() + "#copy() does not" +
+        if (!copiedExtras) throw new IllegalStateException(getClass().getSimpleName() + "#copy() does not " +
                 "call #copyExtras(AbstractMove).");
 
         if (crouchingVariant != null) crouchingVariant.testCopy();

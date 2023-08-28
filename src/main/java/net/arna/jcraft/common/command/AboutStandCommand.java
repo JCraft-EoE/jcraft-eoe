@@ -3,7 +3,6 @@ package net.arna.jcraft.common.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.attack.core.old.Attack;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandManager;
@@ -62,18 +61,19 @@ public class AboutStandCommand {
             // Attacks
             readout.append("§2ATTACKS:§r\n");
             int i = 0;
-            for (Attack a : stand.moves) {
-                readout.append("§2● ").append(buttons.get(i)).append("§r - §5").append(a.name).append("§r - ").append(a.description).append("\n");
-
-                Attack cV = a.getCrouchingVariation();
-                if (cV != null)
-                    readout.append("§3  ● CROUCHING ").append(buttons.get(i)).append("§r - §5").append(cV.name).append("§r - ").append(cV.description).append("\n");
-
-                Attack aV = a.getAerialVariation();
-                if (aV != null)
-                    readout.append("§6  ● AERIAL ").append(buttons.get(i)).append("§r - §5").append(aV.name).append("§r - ").append(aV.description).append("\n");
-                i++;
-            }
+            // TODO
+//            for (Attack a : stand.moves) {
+//                readout.append("§2● ").append(buttons.get(i)).append("§r - §5").append(a.name).append("§r - ").append(a.description).append("\n");
+//
+//                Attack cV = a.getCrouchingVariation();
+//                if (cV != null)
+//                    readout.append("§3  ● CROUCHING ").append(buttons.get(i)).append("§r - §5").append(cV.name).append("§r - ").append(cV.description).append("\n");
+//
+//                Attack aV = a.getAerialVariation();
+//                if (aV != null)
+//                    readout.append("§6  ● AERIAL ").append(buttons.get(i)).append("§r - §5").append(aV.name).append("§r - ").append(aV.description).append("\n");
+//                i++;
+//            }
 
             // Free Space
             readout.append(stand.freespace);

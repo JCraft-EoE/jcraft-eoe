@@ -42,6 +42,11 @@ public class CoinTossAttack extends AbstractMove<CoinTossAttack, KillerQueenEnti
     }
 
     @Override
+    public void registerContextEntries(MoveContext ctx) {
+        ctx.register(COIN);
+    }
+
+    @Override
     protected @NonNull CoinTossAttack getThis() {
         return this;
     }
