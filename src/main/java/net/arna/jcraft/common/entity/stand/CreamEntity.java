@@ -359,7 +359,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                             stun(ent, 4, 0);
 
                             StandEntity<?, ?> enemyStand = JUtils.getStand(ent);
-                            if (enemyStand != null) enemyStand.cancelAttack();
+                            if (enemyStand != null) enemyStand.cancelMove();
                         }
 
                         ent.damage(DamageSource.OUT_OF_WORLD, 5);
@@ -370,7 +370,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                             stun(ent, 2, 0);
 
                             StandEntity<?, ?> enemyStand = JUtils.getStand(ent);
-                            if (enemyStand != null) enemyStand.cancelAttack();
+                            if (enemyStand != null) enemyStand.cancelMove();
                         }
 
                         ent.damage(DamageSource.OUT_OF_WORLD, 2.5f);

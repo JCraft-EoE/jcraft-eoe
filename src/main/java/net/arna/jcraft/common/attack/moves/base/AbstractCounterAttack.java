@@ -20,6 +20,8 @@ public abstract class AbstractCounterAttack<T extends AbstractCounterAttack<T, A
         return Set.of();
     }
 
+    // TODO these implementations are almost always pretty much the same
+    // We should probably make a default implementation for this instead.
     /**
      * Called when this counter-attack missed.
      * Typically, sets the attack to a counter miss attack and stuns the user.

@@ -40,7 +40,7 @@ public interface JObjectRegistry {
 
     Item STAND_DISC = register("stand_disc", new StandDiscItem(settings().rarity(Rarity.RARE).fireproof().maxCount(1)));
 
-    Item FVREVOLVER = register("fv_revolver", new FVRevolverItem(settings().rarity(Rarity.UNCOMMON).maxDamage(1200)));
+    Item FV_REVOLVER = register("fv_revolver", new FVRevolverItem(settings().rarity(Rarity.UNCOMMON).maxDamage(1200)));
 
     Item BULLET = register("bullet", new BulletItem(settings()));
 

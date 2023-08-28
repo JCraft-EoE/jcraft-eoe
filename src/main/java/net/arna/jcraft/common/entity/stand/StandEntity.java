@@ -715,9 +715,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     public void idleOverride() {}
 
     /**
-     * Cancels the stands attack instantly
+     * Cancels the stand's move instantly
      */
-    public void cancelAttack() {
+    public void cancelMove() {
         if (curMove != null) curMove.onCancel(getThis());
         curMove = null;
         setMoveStun(0);
@@ -1023,7 +1023,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                     return;
                 }
 
-                if (--stand.armorPoints < 0) stand.cancelAttack();
+                if (--stand.armorPoints < 0) stand.cancelMove();
             }
 
             if (stand.blocking && !stand.isRemote()) {
@@ -1070,7 +1070,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         // Interrupting spec moves
         if (ent instanceof PlayerEntity playerEntity) {
             JSpec<?, ?> spec = JUtils.getSpec(playerEntity);
-            if (spec != null && spec.curMove != null && --spec.armorPoints < 0) spec.cancelAttack();
+            if (spec != null && spec.curMove != null && --spec.armorPoints < 0) spec.cancelMove();
         }
 
         // Aerial hits keep the victim up

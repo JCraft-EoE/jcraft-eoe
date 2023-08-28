@@ -31,7 +31,7 @@ public class SCCounterAttack extends AbstractCounterAttack<SCCounterAttack, Silv
 
         StandEntity.stun(ent, 30, 0);
         StandEntity<?, ?> counteredStand = JUtils.getStand(ent);
-        if (counteredStand != null) counteredStand.cancelAttack();
+        if (counteredStand != null) counteredStand.cancelMove();
     }
 
     @Override

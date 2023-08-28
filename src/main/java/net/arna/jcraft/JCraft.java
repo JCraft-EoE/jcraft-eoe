@@ -181,7 +181,7 @@ public class JCraft implements ModInitializer {
         stacks.add(new ItemStack(JObjectRegistry.ANUBISSHEATHED));
         stacks.add(new ItemStack(JObjectRegistry.KNIFE));
         stacks.add(new ItemStack(JObjectRegistry.KNIFEBUNDLE));
-        stacks.add(JObjectRegistry.FVREVOLVER.getDefaultStack());
+        stacks.add(JObjectRegistry.FV_REVOLVER.getDefaultStack());
         stacks.add(JObjectRegistry.BULLET.getDefaultStack());
 
         stacks.add(new ItemStack(JObjectRegistry.SINNERSSOUL));

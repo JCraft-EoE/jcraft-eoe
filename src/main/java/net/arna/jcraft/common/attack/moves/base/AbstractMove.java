@@ -362,10 +362,6 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
 
     // Utility methods
 
-    public LivingEntity getUser(A attacker) {
-        return attacker.getUserOrThrow();//attacker instanceof StandEntity<?,?> stand ? stand.getUserOrThrow() : attacker;
-    }
-
     /**
      * Returns the point at which the windup has passed.
      * @return The point at which the windup has passed.

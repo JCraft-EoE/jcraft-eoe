@@ -153,7 +153,7 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
         return true;
     }
 
-    public void cancelAttack() {
+    public void cancelMove() {
         if (curMove != null) curMove.onCancel(getThis());
         curMove = null;
         queuedMove = null;

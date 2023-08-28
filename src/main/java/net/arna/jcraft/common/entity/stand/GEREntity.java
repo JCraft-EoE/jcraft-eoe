@@ -248,7 +248,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
 
         StandEntity<?, ?> stand = entity instanceof LivingEntity living ? JUtils.getStand(living) : null;
         if (stand != null)
-            stand.cancelAttack();
+            stand.cancelMove();
 
         if (entity instanceof LivingEntity living)
             stun(living, 10, 0);

@@ -7,6 +7,7 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.util.CooldownType;
+import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -71,7 +72,7 @@ public class CooldownsComponentImpl implements CooldownsComponent {
 
         Vec3d pPos = entity.getEyePos();
         entity.world.playSoundFromEntity(null, entity, JSoundRegistry.COOLDOWN_CANCEL, SoundCategory.PLAYERS, 1, 1);
-        if (!entity.world.isClient) JCraft.createParticle((ServerWorld) entity.world, pPos.x, pPos.y, pPos.z, 1);
+        if (!entity.world.isClient) JCraft.createParticle((ServerWorld) entity.world, pPos.x, pPos.y, pPos.z, JParticleType.HIT_SPARK_1);
 
         sync();
     }

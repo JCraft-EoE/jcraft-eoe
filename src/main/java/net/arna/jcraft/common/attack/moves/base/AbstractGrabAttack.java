@@ -18,7 +18,7 @@ public abstract class AbstractGrabAttack<T extends AbstractGrabAttack<T, A, S>, 
     private final AbstractMove<?, ? super A> hitMove;
     private final S hitState;
 
-    public AbstractGrabAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun, float hitboxSize,
+    protected AbstractGrabAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun, float hitboxSize,
                               float knockback, float offset, AbstractMove<?, ? super A> hitMove, S hitState) {
         super(cooldown, windup, duration, attackDistance, damage, stun, hitboxSize, knockback, offset);
 

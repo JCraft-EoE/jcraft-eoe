@@ -46,7 +46,7 @@ public class EpitaphAttack extends AbstractCounterAttack<EpitaphAttack, KingCrim
         if (countered instanceof LivingEntity livingEntity) {
             StandEntity.stun(livingEntity, 20, 0);
             StandEntity<?, ?> stand = JUtils.getStand(livingEntity);
-            if (stand != null) stand.cancelAttack();
+            if (stand != null) stand.cancelMove();
         }
 
         attacker.getWorld().playSound(null, ePos.x, ePos.y, ePos.z, JSoundRegistry.TE_TP, SoundCategory.PLAYERS, 1f, 1f);

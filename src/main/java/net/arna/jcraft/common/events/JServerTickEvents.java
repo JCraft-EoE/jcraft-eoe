@@ -135,14 +135,14 @@ public class JServerTickEvents {
                 if (ent instanceof StandEntity<?, ?> stand) {
                     if (stand.hasUser()) {
                         stun(stand.getUser(), 10, 3);
-                        stand.cancelAttack();
+                        stand.cancelMove();
                     }
                 } else if (ent.getFirstPassenger() instanceof StandEntity<?, ?> stand) { // Stands should not have passengers
                     if (stand.blocking) pushAway = false;
                     else if (ent instanceof LivingEntity living) { // Stand users that aren't blocking get launched and their stand attacks are cancelled
                         //awayVector = awayVector.multiply(0.5);
                         stun(living, 10, 3);
-                        stand.cancelAttack();
+                        stand.cancelMove();
                     }
                 }
 

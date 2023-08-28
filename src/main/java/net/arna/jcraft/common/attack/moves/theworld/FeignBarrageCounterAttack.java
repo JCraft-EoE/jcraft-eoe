@@ -46,7 +46,7 @@ public class FeignBarrageCounterAttack extends AbstractCounterAttack<FeignBarrag
             livingEntity.removeStatusEffect(JStatusRegistry.DAZED);
             StandEntity.stun(livingEntity, 20, 0);
             if (countered.getFirstPassenger() instanceof StandEntity<?, ?> counteredStand)
-                counteredStand.cancelAttack();
+                counteredStand.cancelMove();
         }
 
         attacker.setMove(hitMove, TheWorldEntity.State.COUNTER_HIT);

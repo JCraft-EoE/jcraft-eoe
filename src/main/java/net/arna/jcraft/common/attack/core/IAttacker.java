@@ -34,7 +34,7 @@ public interface IAttacker<A extends IAttacker<? extends A, S>, S> {
 
     boolean canAttack();
 
-    void cancelAttack();
+    void cancelMove();
 
     AbstractMove<?, ? super A> getCurrentMove();
 

@@ -40,7 +40,7 @@ public class SCChargeAttack extends AbstractChargeAttack<SCChargeAttack, SilverC
 
     @Override
     public void registerContextEntries(MoveContext ctx) {
-        ctx.register(LOOK_DIR_Y, 0f);
+        ctx.register(LOOK_DIR_Y);
     }
 
     @NotNull

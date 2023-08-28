@@ -79,8 +79,8 @@ public interface JEventsRegistry {
                             return;
                         }
 
-                        if (stack.isOf(JObjectRegistry.FVREVOLVER)) {
-                            JCraft.markItemOfInterest(item, EntityInterest.itemAttractionInterest(JObjectRegistry.FVREVOLVER));
+                        if (stack.isOf(JObjectRegistry.FV_REVOLVER)) {
+                            JCraft.markItemOfInterest(item, EntityInterest.itemAttractionInterest(JObjectRegistry.FV_REVOLVER));
                             return;
                         }
 
