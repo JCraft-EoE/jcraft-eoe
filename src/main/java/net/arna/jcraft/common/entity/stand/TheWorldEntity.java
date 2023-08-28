@@ -100,8 +100,6 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
                             the no ts racist
                             Donut>Roundhouse>Charge>M1>Barrage>M1""";
 
-        super.initialize();
-
         if (world.isClient) return;
         // TODO use a supplier here. Will do after attack refactor. (Along with the rest of the config values)
         TIME_STOP.setTimeStopDuration(JServerConfig.TW_TIME_STOP_DURATION.getValue() / 20);

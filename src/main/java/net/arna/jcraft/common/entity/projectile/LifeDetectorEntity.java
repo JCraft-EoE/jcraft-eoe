@@ -71,7 +71,7 @@ public class LifeDetectorEntity extends JAttackEntity implements IAnimatable {
         velocityModified = true;
 
         Vec3d pos = getPos();
-        Set<LivingEntity> hurt = JUtils.generateHitbox(world, pos, 2.25, null);
+        Set<LivingEntity> hurt = JUtils.generateHitbox(world, pos, 2.25, e -> true);
         for (LivingEntity living : hurt) {
             if (!canTarget(living)) continue;
             LivingEntity target = JUtils.getUserIfStand(living);

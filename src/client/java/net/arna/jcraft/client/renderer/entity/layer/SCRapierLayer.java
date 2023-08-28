@@ -31,11 +31,11 @@ public class SCRapierLayer extends GeoLayerRenderer<SilverChariotEntity> {
     @Override
     public void render(MatrixStack matrixStackIn, VertexConsumerProvider bufferIn, int packedLightIn, SilverChariotEntity entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         if (entitylivingbaseIn.hasRapier()) {
-            int mode = entitylivingbaseIn.getMode();
+            SilverChariotEntity.Mode mode = entitylivingbaseIn.getMode();
 
             RenderLayer cameo = RenderLayer.getArmorCutoutNoCull(
-                    mode == 3 ? POSSESSED_TEXTURE :
-                            mode == 2 ? ARMOR_OFF_TEXTURE :
+                    mode == SilverChariotEntity.Mode.POSSESSED ? POSSESSED_TEXTURE :
+                            mode == SilverChariotEntity.Mode.ARMORLESS ? ARMOR_OFF_TEXTURE :
                                     skins.get(entitylivingbaseIn.getSkin())
             );
 

@@ -258,6 +258,15 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         return getThis();
     }
 
+    // Lombok does not understand these variable names already start with 'is'.
+    public boolean isCrouchingVariant() {
+        return isCrouchingVariant;
+    }
+
+    public boolean isAerialVariant() {
+        return isAerialVariant;
+    }
+
     /**
      * Called when this move is registered to a {@link net.arna.jcraft.common.attack.core.MoveMap MoveMap}.
      * Not supposed to be called anywhere else.
