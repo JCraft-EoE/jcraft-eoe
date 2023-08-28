@@ -2,6 +2,7 @@ package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.util.IOwnable;
+import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.block.Blocks;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
@@ -162,9 +163,9 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                 for (double i = 0; i < 6; i++) {
                     double lerp = i / 6;
                     world.addParticle(
-                            isCharged() ? ParticleTypes.WITCH : ParticleTypes.COMPOSTER
-                            , x + towardsVec.x * lerp, y + towardsVec.y * lerp, z + towardsVec.z * lerp
-                            , towardsVec.x, towardsVec.y, towardsVec.z);
+                            isCharged() ? ParticleTypes.WITCH : ParticleTypes.COMPOSTER,
+                            x + towardsVec.x * lerp, y + towardsVec.y * lerp, z + towardsVec.z * lerp,
+                            towardsVec.x, towardsVec.y, towardsVec.z);
                 }
             } else if (landedTimer == 1) { // Landing burst
                 for (int i = 0; i < 8; i++) {
@@ -207,7 +208,7 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                                 curPos.x + random.nextGaussian() * 0.25,
                                 curPos.y + random.nextGaussian() * 0.25,
                                 curPos.z + random.nextGaussian() * 0.25,
-                                2);
+                                JParticleType.HIT_SPARK_1);
                     }
                 } else {
                     landedTimer += 1;
