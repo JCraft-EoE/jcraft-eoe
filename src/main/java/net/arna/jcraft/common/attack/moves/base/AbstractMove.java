@@ -326,7 +326,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * @param attacker The attacker to tick for.
      */
     public void tick(A attacker) {
-        if (finisher != null && finisher.leftInt() == duration - attacker.getMoveStun())
+        if (finisher != null && finisher.leftInt() == getDuration() - attacker.getMoveStun())
             attacker.setCurrentMove(finisher.right());
         if (shouldPerform(attacker)) doPerform(attacker);
     }
@@ -337,7 +337,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * @return Whether this move should be performed this tick.
      */
     protected boolean shouldPerform(A attacker) {
-        return attacker.getMoveStun() == duration - windup && attacker.hasUser();
+        return attacker.getMoveStun() == getWindupPoint() && attacker.hasUser();
     }
 
     /**
