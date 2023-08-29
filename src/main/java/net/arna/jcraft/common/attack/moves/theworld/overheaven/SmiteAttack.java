@@ -40,8 +40,8 @@ public class SmiteAttack extends AbstractEffectInflictingAttack<SmiteAttack, The
     }
 
     @Override
-    public void onInitialize(TheWorldOverHeavenEntity attacker) {
-        super.onInitialize(attacker);
+    public void onInitiate(TheWorldOverHeavenEntity attacker) {
+        super.onInitiate(attacker);
 
         LivingEntity user = attacker.getUserOrThrow();
         MoveContext ctx = attacker.getMoveContext();

@@ -29,8 +29,8 @@ public class SurpriseMove extends AbstractMove<SurpriseMove, CreamEntity> {
     }
 
     @Override
-    public void onInitialize(CreamEntity attacker) {
-        super.onInitialize(attacker);
+    public void onInitiate(CreamEntity attacker) {
+        super.onInitiate(attacker);
 
         LivingEntity user = attacker.getUserOrThrow();
         Vec3d eyePos = user.getEyePos();

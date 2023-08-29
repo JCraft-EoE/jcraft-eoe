@@ -30,7 +30,7 @@ public class TimeSkipMove<A extends IAttacker<? extends A, ?>> extends AbstractM
     }
 
     @Override
-    public void onInitialize(A attacker) {
+    public void onInitiate(A attacker) {
         // Don't play the sounds
         getInitActions().forEach(action -> action.perform(attacker, attacker.getUser(), attacker.getMoveContext()));
     }

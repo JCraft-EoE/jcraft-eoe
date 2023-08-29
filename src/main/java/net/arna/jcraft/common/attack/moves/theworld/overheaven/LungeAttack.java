@@ -14,8 +14,8 @@ public class LungeAttack extends AbstractSimpleAttack<LungeAttack, TheWorldOverH
     }
 
     @Override
-    public void onInitialize(TheWorldOverHeavenEntity attacker) {
-        super.onInitialize(attacker);
+    public void onInitiate(TheWorldOverHeavenEntity attacker) {
+        super.onInitiate(attacker);
 
         // Reset move distance
         withMoveDistance(originalMoveDistance);

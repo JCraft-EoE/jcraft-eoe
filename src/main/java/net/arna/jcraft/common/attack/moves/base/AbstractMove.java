@@ -214,7 +214,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
 
     /**
      * Adds a new init action to this move.
-     * Init actions are called at the end of {@link #onInitialize(IAttacker)}.
+     * Init actions are called at the end of {@link #onInitiate(IAttacker)}.
      * @param action An action
      * @return This move
      */
@@ -308,7 +308,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * Called when this move is initialized.
      * By default, only plays the sound(s) and invokes the init actions, if any.
      */
-    public void onInitialize(A attacker) {
+    public void onInitiate(A attacker) {
         initActions.forEach(action -> action.perform(attacker, attacker.getUser(), attacker.getMoveContext()));
         sounds.forEach(sound -> attacker.playSound(sound, 1f, 1f));
     }

@@ -39,8 +39,8 @@ public class TimeEraseMove extends AbstractMove<TimeEraseMove, KingCrimsonEntity
     }
 
     @Override
-    public void onInitialize(KingCrimsonEntity attacker) {
-        super.onInitialize(attacker);
+    public void onInitiate(KingCrimsonEntity attacker) {
+        super.onInitiate(attacker);
 
         if (attacker.getUser() instanceof ServerPlayerEntity player)
             player.networkHandler.sendPacket(new PlaySoundS2CPacket(JSoundRegistry.TIME_ERASE, SoundCategory.PLAYERS,

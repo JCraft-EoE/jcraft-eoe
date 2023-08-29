@@ -15,8 +15,8 @@ public class RayDartAttack extends AbstractSimpleAttack<RayDartAttack, SilverCha
     }
 
     @Override
-    public void onInitialize(SilverChariotEntity attacker) {
-        super.onInitialize(attacker);
+    public void onInitiate(SilverChariotEntity attacker) {
+        super.onInitiate(attacker);
 
         LivingEntity user = attacker.getUser();
         if (user != null && user.isOnGround()) {

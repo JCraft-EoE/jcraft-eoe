@@ -18,8 +18,8 @@ public class BloodThrowAttack extends AbstractMove<BloodThrowAttack, KingCrimson
     }
 
     @Override
-    public void onInitialize(KingCrimsonEntity attacker) {
-        super.onInitialize(attacker);
+    public void onInitiate(KingCrimsonEntity attacker) {
+        super.onInitiate(attacker);
 
         attacker.getUserOrThrow().damage(DamageSource.MAGIC, 0.1f); // User throws their blood, dealing a bit of damage.
     }

@@ -524,7 +524,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      */
     public boolean handleMove(AbstractMove<?, ? super E> move, CooldownType cooldownType, @Nullable S animState) {
         if (!move.canBeInitiated(getThis())) return false;
-        move.onInitialize(getThis());
 
         if (cooldownType != null && move.getCooldown() > 0) {
             CooldownsComponent cooldowns = JComponents.getCooldowns(getUser());
@@ -540,12 +539,14 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     }
 
     /**
-     * Instantly sets the stand's move
+     * Instantly sets the stand's move without checking if it can be.
      *
      * @param move    move to set
      * @param animState int identifier for which state to put the stand into
      */
     public void setMove(AbstractMove<?, ? super E> move, @Nullable S animState) {
+        move.onInitiate(getThis());
+
         // If the attack has a duration of 0, just perform it immediately.
         if (move.getDuration() == 0) {
             move.doPerform(getThis());

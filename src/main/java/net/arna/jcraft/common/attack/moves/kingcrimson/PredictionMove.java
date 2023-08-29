@@ -36,8 +36,8 @@ public class PredictionMove extends AbstractMove<PredictionMove, KingCrimsonEnti
     }
 
     @Override
-    public void onInitialize(KingCrimsonEntity attacker) {
-        super.onInitialize(attacker);
+    public void onInitiate(KingCrimsonEntity attacker) {
+        super.onInitiate(attacker);
 
         attacker.getMoveContext().get(PREDICTION_INFO).clear();
 

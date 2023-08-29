@@ -31,8 +31,8 @@ public class ItemPlaceMove extends AbstractMove<ItemPlaceMove, D4CEntity> {
     }
 
     @Override
-    public void onInitialize(D4CEntity attacker) {
-        super.onInitialize(attacker);
+    public void onInitiate(D4CEntity attacker) {
+        super.onInitiate(attacker);
 
         MoveContext ctx = attacker.getMoveContext();
         boolean placingFirstStack = ctx.getBoolean(PLACING_FIRST_STACK);

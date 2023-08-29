@@ -131,7 +131,7 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
 
     public boolean handleMove(AbstractMove<?, ? super A> move, CooldownType cooldownType, S state, float animationSpeed) {
         if (!move.canBeInitiated(getThis())) return false;
-        move.onInitialize(getThis());
+        move.onInitiate(getThis());
 
         CooldownsComponent cooldowns = JComponents.getCooldowns(player);
         int cd = cooldowns.getCooldown(cooldownType);
