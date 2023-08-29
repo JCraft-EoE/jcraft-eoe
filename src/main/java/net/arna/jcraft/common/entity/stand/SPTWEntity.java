@@ -5,6 +5,7 @@ import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.attack.moves.starplatinum.theworld.GroundSlamAttack;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
@@ -59,7 +60,8 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .withAction((attacker, user, ctx, targets) -> attacker.playSound(JSoundRegistry.SPTW_UPPERCUT, 1f, 1f))
             .withBlockStun(4)
             .withInfo(Text.literal("What an Ugly Watch"), Text.literal("grab, high recovery"));
-    public static final TimeStopMove<SPTWEntity> TIME_STOP = new TimeStopMove<SPTWEntity>(600, 5, 10, 35)
+    public static final TimeStopMove<SPTWEntity> TIME_STOP = new TimeStopMove<SPTWEntity>(600, 5, 10,
+            JServerConfig.SPTW_TIME_STOP_DURATION::getValue)
             .withSound(JSoundRegistry.STAR_PLATINUM_THE_WORLD)
             .withInfo(Text.literal("Timestop"), Text.literal("1.75 seconds, extremely low windup"));
     public static final TimeSkipMove<SPTWEntity> TIME_SKIP = new TimeSkipMove<SPTWEntity>(360, 14)

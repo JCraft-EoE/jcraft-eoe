@@ -9,6 +9,7 @@ import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.attack.moves.theworld.overheaven.*;
 import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
@@ -100,7 +101,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withBlockStun(6)
             .withInfo(Text.literal("Divine Finisher"), Text.literal("fires 4 stunning knives that launch at a delay/in air summons and launches 8 knives"));
     public static final TimeStopMove<TheWorldOverHeavenEntity> TIME_STOP = new TimeStopMove<TheWorldOverHeavenEntity>(
-            1400, 45, 50, 100)
+            1400, 45, 50, JServerConfig.TWOH_TIME_STOP_DURATION::getValue)
             .withSound(JSoundRegistry.TWOH_TS)
             .withInfo(Text.literal("Timestop"), Text.literal("5 seconds"));
 

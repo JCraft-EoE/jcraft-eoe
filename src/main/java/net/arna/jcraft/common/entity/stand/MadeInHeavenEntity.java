@@ -12,6 +12,7 @@ import net.arna.jcraft.common.attack.moves.shared.EffectInflictingAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -85,7 +86,8 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .withHyperArmor()
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Roundabout Donut"), Text.literal("feigns stand desummon, uninterruptible combo starter"));
-    public static final TimeAccelerationMove TIME_ACCELERATION = new TimeAccelerationMove(1400, 20, 40, 1f)
+    public static final TimeAccelerationMove TIME_ACCELERATION = new TimeAccelerationMove(1400, 20,
+            40, 1f, JServerConfig.MIH_TIME_ACCELERATION_DURATION::getValue)
             .withSound(JSoundRegistry.MIH_TACCEL)
             .withInfo(Text.literal("Time Acceleration"), Text.literal("""
                             allows charging the speedometer for 30s

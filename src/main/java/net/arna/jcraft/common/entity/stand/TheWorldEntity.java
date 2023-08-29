@@ -60,8 +60,8 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
             .withImpactSound(JSoundRegistry.TW_CHARGE_HIT)
             .withBlockStun(11)
             .withInfo(Text.literal("Forward Charge"), Text.literal("The World detaches from the user and lunges forward, combo starter"));
-    public static final TimeStopMove<TheWorldEntity> TIME_STOP = new TimeStopMove<TheWorldEntity>(
-            1400, 45, 52, 80)
+    public static final TimeStopMove<TheWorldEntity> TIME_STOP = new TimeStopMove<TheWorldEntity>(1400,
+            45, 52, JServerConfig.TW_TIME_STOP_DURATION::getValue)
             .withSound(JSoundRegistry.TW_TS)
             .withInfo(Text.literal("Timestop"), Text.literal("4 seconds"));
 
@@ -91,10 +91,6 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
                             
                             the no ts racist
                             Donut>Roundhouse>Charge>M1>Barrage>M1""";
-
-        if (world.isClient) return;
-        // TODO use a supplier here. Will do after attack refactor. (Along with the rest of the config values)
-        TIME_STOP.setTimeStopDuration(JServerConfig.TW_TIME_STOP_DURATION.getValue() / 20);
     }
 
     @Override

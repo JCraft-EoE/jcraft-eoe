@@ -5,9 +5,11 @@ import lombok.NonNull;
 import net.arna.jcraft.common.attack.moves.base.AbstractTimeStopMove;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 
+import java.util.function.IntSupplier;
+
 @Getter
 public class TimeStopMove<A extends StandEntity<? extends A, ?>> extends AbstractTimeStopMove<TimeStopMove<A>, A> {
-    public TimeStopMove(int cooldown, int windup, int duration, int timeStopDuration) {
+    public TimeStopMove(int cooldown, int windup, int duration, IntSupplier timeStopDuration) {
         super(cooldown, windup, duration, 1f, timeStopDuration);
     }
 

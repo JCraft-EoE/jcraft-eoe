@@ -1,9 +1,9 @@
 package net.arna.jcraft.common.attack.moves.madeinheaven;
 
+import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
-import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.entity.stand.MadeInHeavenEntity;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
 import net.arna.jcraft.registry.JStatusRegistry;
@@ -15,15 +15,20 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.IntSupplier;
 
+@Getter
 public class TimeAccelerationMove extends AbstractMove<TimeAccelerationMove, MadeInHeavenEntity> {
-    public TimeAccelerationMove(int cooldown, int windup, int duration, float moveDistance) {
+    private final IntSupplier accelerationDuration;
+
+    public TimeAccelerationMove(int cooldown, int windup, int duration, float moveDistance, IntSupplier accelerationDuration) {
         super(cooldown, windup, duration, moveDistance);
+        this.accelerationDuration = accelerationDuration;
     }
 
     @Override
     public @NonNull Set<LivingEntity> perform(MadeInHeavenEntity attacker, LivingEntity user, MoveContext ctx) {
-        int accelTime = JServerConfig.MIH_TIME_ACCELERATION_DURATION.getValue();
+        int accelTime = accelerationDuration.getAsInt();
         attacker.setAccelTime(accelTime);
         attacker.setAfterimage(true);
         TimeAccelStatePacket.sendStart(Objects.requireNonNull(attacker.getServer()).getPlayerManager(), attacker, accelTime);
@@ -65,6 +70,7 @@ public class TimeAccelerationMove extends AbstractMove<TimeAccelerationMove, Mad
 
     @Override
     public @NonNull TimeAccelerationMove copy() {
-        return copyExtras(new TimeAccelerationMove(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
+        return copyExtras(new TimeAccelerationMove(getCooldown(), getWindup(), getDuration(), getMoveDistance(),
+                getAccelerationDuration()));
     }
 }
