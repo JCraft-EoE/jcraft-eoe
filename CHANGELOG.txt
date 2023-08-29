@@ -1666,7 +1666,8 @@ Killer Queen: Bites the Dust
     >Taught the AI how to use KQ:BtD
 
 ● 24/8/2023
->Attack code optimized
+>Attack code completely reworked
+>Packet spam from clients significantly reduced
 
 Whitesnake
     >Donut cooldown reduced (18->14s)
