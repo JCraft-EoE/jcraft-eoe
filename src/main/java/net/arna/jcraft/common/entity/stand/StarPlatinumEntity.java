@@ -72,10 +72,12 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
         moves.register(MoveType.LIGHT, LIGHT, State.PUNCH).withCrouchingVariant(State.UPPERCUT);
         moves.register(MoveType.HEAVY, STAR_BREAKER, State.HEAVY);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
+
         moves.register(MoveType.SPECIAL1, STAR_FINGER, State.STAR_FINGER);
         moves.register(MoveType.SPECIAL2, ROUNDHOUSE, State.LOW_KICK);
         moves.register(MoveType.SPECIAL3, CHARGE_BARRAGE, State.BARRAGE);
         moves.register(MoveType.ULTIMATE, INHALE, State.INHALE);
+
         moves.register(MoveType.UTILITY, JUMP, State.JUMP);
     }
 
