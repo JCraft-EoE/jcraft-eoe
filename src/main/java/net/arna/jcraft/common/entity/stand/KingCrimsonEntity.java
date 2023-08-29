@@ -193,7 +193,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             case HEAVY -> {
                 boolean idling = getMoveStun() <= 0;
 
-                if (curMove != null && curMove.getOriginalMove() != VERTICAL_CHOP) {
+                if (curMove == null || curMove.getOriginalMove() != VERTICAL_CHOP) {
                     if (idling) super.initMove(type);
                 } else if (getMoveStun() < 7) setMove(OVERHEAD_HOOK, State.OVERHEAD);
             }
