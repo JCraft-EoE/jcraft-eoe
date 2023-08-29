@@ -211,7 +211,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
 
     @Override
     public boolean handleMove(AbstractMove<?, ? super SilverChariotEntity> move, CooldownType cooldownType, State animState) {
-        if (!hasUser()) return false;
+        if (!move.canBeInitiated(this)) return false;
 
         LivingEntity user = getUserOrThrow();
         CooldownsComponent cooldowns = JComponents.getCooldowns(user);

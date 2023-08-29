@@ -24,6 +24,7 @@ import java.util.function.Consumer;
 public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPlatinumEntity, StarPlatinumEntity.State> {
     public static final UppercutAttack<StarPlatinumEntity> UPPERCUT = new UppercutAttack<StarPlatinumEntity>(30,
             8, 14, 0.75f, 6f, 20, 1.5f, 0.25f, -0.4f, 0.25f)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(0, 0.35, 1.25)
             .withInfo(Text.literal("Uppercut"), Text.literal("slower combo starter, launches"));
     public static final SimpleAttack<StarPlatinumEntity> LIGHT = SimpleAttack.<StarPlatinumEntity>lightAttack(
