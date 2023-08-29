@@ -31,7 +31,7 @@ public class InputSyncPacket {
                 ServerPlayerEntity player = entry.getKey();
                 StateManager stateManager = entry.getValue();
                 JComponents.getMiscData(player).updateRemoteInputs(
-                        stateManager.forward, stateManager.side, stateManager.jumping);
+                        stateManager.calcForward(), stateManager.calcSide(), stateManager.jumping);
 
                 if (!stateManager.jumping) continue;
 
@@ -61,27 +61,44 @@ public class InputSyncPacket {
     }
 
     public static void handle(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler network, PacketByteBuf buf, PacketSender sender) {
-        StateManager stateManager = stateManagers.computeIfAbsent(player, p -> new StateManager());
+        StateManager sm = stateManagers.computeIfAbsent(player, p -> new StateManager());
         int count = buf.readVarInt();
         boolean dash = false;
 
         for (int i = 0; i < count; i++) {
             MovementInputType type = buf.readEnumConstant(MovementInputType.class);
             boolean pressed = buf.readBoolean();
-            int multiplier = pressed ? 1 : -1;
 
-            stateManager.forward += type.getForward() * multiplier;
-            stateManager.side += type.getSide() * multiplier;
+            switch (type) {
+                case FORWARD -> sm.forward = pressed;
+                case BACKWARD -> sm.backward = pressed;
+                case LEFT -> sm.left = pressed;
+                case RIGHT -> sm.right = pressed;
+            }
 
-            if (type == MovementInputType.JUMP) stateManager.jumping = pressed;
+            if (type == MovementInputType.JUMP) sm.jumping = pressed;
             if (type == MovementInputType.DASH) dash = true;
         }
 
-        if (dash) JCraft.tryDash(stateManager.forward, stateManager.side, player);
+        if (dash) JCraft.tryDash(sm.calcForward(), sm.calcSide(), player);
     }
 
     private static class StateManager {
-        public int forward, side;
+        public boolean forward, backward, left, right;
         public boolean jumping;
+
+        public int calcForward() {
+            int forward = 0;
+            if (this.forward) forward++;
+            if (backward) forward--;
+            return forward;
+        }
+
+        public int calcSide() {
+            int side = 0;
+            if (left) side++;
+            if (right) side--;
+            return side;
+        }
     }
 }
