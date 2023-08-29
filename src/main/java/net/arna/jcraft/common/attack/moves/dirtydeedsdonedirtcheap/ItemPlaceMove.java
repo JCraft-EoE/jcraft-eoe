@@ -6,6 +6,7 @@ import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.core.ctx.MoveVariable;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.entity.stand.D4CEntity;
+import net.arna.jcraft.common.item.MockItem;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
@@ -46,7 +47,7 @@ public class ItemPlaceMove extends AbstractMove<ItemPlaceMove, D4CEntity> {
     public @NonNull Set<LivingEntity> perform(D4CEntity attacker, LivingEntity user, MoveContext ctx) {
         ItemStack offHandStack = attacker.getOffHandStack();
         ItemEntity item = new ItemEntity(attacker.getWorld(), attacker.getX(), attacker.getY() + 0.2, attacker.getZ(),
-                ctx.get(PLACING).copy(), 0, 0, 0);
+                MockItem.createMockStack(ctx.get(PLACING)), 0, 0, 0);
         item.setPickupDelay(200);
         attacker.getWorld().spawnEntity(item);
         offHandStack.decrement(1);
