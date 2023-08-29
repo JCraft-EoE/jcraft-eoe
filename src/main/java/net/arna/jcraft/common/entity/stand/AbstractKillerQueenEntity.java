@@ -42,6 +42,8 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
             .withInfo(Text.literal("Dual Punch"), Text.literal("combo starter, decent speed, has followup with more blockstun"));
     public static final BarrageAttack<AbstractKillerQueenEntity<?, ?>> BARRAGE = new BarrageAttack<AbstractKillerQueenEntity<?, ?>>(
             340, 0, 50, 0.75f, 1f, 20, 1.5f, 0.1f, 0, 3)
+            .withSound(JSoundRegistry.KQ_BARRAGE)
+            .withImpactSound(JSoundRegistry.IMPACT_4)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, medium stun"));
     public static final BombPlantAttack BOMB_PLANT = new BombPlantAttack(600, 12, 20, 1f, 9, 1.5f, 0f)
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
@@ -112,7 +114,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
             if (curMove == null || curMove.getOriginalMove() != LIGHT) {
                 if (idling) {
                     if (user.isSneaking()) detonate();
-                    else handleMove(MoveType.LIGHT);
+                    else super.initMove(MoveType.LIGHT);
                 }
             } else if (getMoveStun() < 7) {
                 if (user.isSneaking()) detonate();
