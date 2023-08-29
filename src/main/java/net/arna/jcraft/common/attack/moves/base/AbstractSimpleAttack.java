@@ -433,6 +433,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
     protected @NonNull T copyExtras(@NonNull T base) {
         AbstractSimpleAttack<T, A> cast = super.copyExtras(base);
         cast.targetProcessors.addAll(targetProcessors);
+        cast.extraHitBoxes.addAll(extraHitBoxes);
         cast.stunType = stunType;
         cast.overrideStun = overrideStun;
         cast.lift = lift;
