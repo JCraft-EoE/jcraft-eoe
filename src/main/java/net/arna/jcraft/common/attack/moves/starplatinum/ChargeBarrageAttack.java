@@ -13,12 +13,22 @@ import net.minecraft.util.math.Vec3d;
 import java.util.Set;
 
 public class ChargeBarrageAttack extends AbstractBarrageAttack<ChargeBarrageAttack, StarPlatinumEntity> {
+    private final float originalMoveDistance;
+
     public ChargeBarrageAttack(int cooldown, int windup, int duration, float moveDistance, float damage, int stun,
-                                  float hitboxSize, float knockback, float offset, int interval) {
+                               float hitboxSize, float knockback, float offset, int interval) {
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset, interval);
+        this.originalMoveDistance = moveDistance;
         charge = true;
         ranged = true;
         inflictsSlowness = false;
+    }
+
+    @Override
+    public void onInitiate(StarPlatinumEntity attacker) {
+        super.onInitiate(attacker);
+
+        withMoveDistance(originalMoveDistance);
     }
 
     @Override
