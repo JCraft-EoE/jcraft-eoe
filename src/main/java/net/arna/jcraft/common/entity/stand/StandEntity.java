@@ -722,8 +722,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             return;
         } //else if (this.owner == null) { this.owner = player; }
 
-        setMoveStun(getMoveStun() - 1); // Counting down animation time or similar
-        if (playSummonAnim && (getMoveStun() > 0 || age > summonAnimDuration))
+        int moveStun = getMoveStun();
+        if (moveStun > 0) setMoveStun(--moveStun); // Counting down animation time or similar
+        if (playSummonAnim && (moveStun > 0 || age > summonAnimDuration))
             playSummonAnim = false;
 
         AbstractMove<?, ? super E> attack = this.curMove;
@@ -776,7 +777,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             }
 
 
-            if (defaultToNear() && getMoveStun() < 1) {
+            if (defaultToNear() && moveStun <= 0) {
                 if (attack == null) {
                     if (this.queuedAttack == null)
                         setFree(false);
@@ -792,24 +793,21 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             // Remote mode
             if (isRemote) user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 5, 9, true, false));
 
-            int curMoveStun = this.getMoveStun();
-
             // Attack logic
             if (attack != null) {
                 attack.tick(getThis());
 
-                if (curMoveStun >= 0 && !blocking) {
-                    int moveStun = attack.getDuration();
+                if (moveStun >= 0 && !blocking) {
                     float attackDist = attack.getMoveDistance();
-
-                    int realInitTime = (moveStun - attack.getWindup());
-
+                    int windupPoint = attack.getWindupPoint();
                     boolean isChargeAttack = attack.isCharge();
+
+                    // TODO this can probably be incorporated into the new attack system.
                     // Positioning
                     if (isChargeAttack) {
-                        if (curMoveStun <= realInitTime) {
+                        if (moveStun <= windupPoint) {
                             //float t = 1f - (float) curMoveStun / (float) realInitTime;
-                            Vec3d newPos = pos.add(rotVec.multiply(attackDist / realInitTime));
+                            Vec3d newPos = pos.add(rotVec.multiply(attackDist / windupPoint));
                             //this.setDistanceOffset(1 + attackDist * t * t);
                             this.setFreePos(new Vec3f((float) newPos.x, (float) newPos.y, (float) newPos.z));
                             this.setFree(true);
@@ -826,7 +824,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 }
             }
 
-            if (curMoveStun <= 0 && !blocking) {
+            if (moveStun <= 0 && !blocking) {
                 // Attack buffering
                 if (queuedAttack != null) {
                     if (queuedAttack == MoveQueue.STAND_SUMMON) {
@@ -853,7 +851,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 curMove = null;
                 setStateNoReset(getBlockState());
 
-                if (curMoveStun < 4) setMoveStun(4);
+                if (moveStun < 4) setMoveStun(4);
                 setDistanceOffset(blockDistance);
                 setRotationOffset(attackRotation);
                 standBlock();

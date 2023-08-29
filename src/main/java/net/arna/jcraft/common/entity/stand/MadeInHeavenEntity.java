@@ -213,7 +213,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
 
     @Override
     public boolean handleMove(AbstractMove<?, ? super MadeInHeavenEntity> move, CooldownType cooldownType, State animState) {
-        if (!hasUser()) return false;
+        if (!move.canBeInitiated(this)) return false;
         LivingEntity player = getUserOrThrow();
 
         CooldownsComponent cooldowns = JComponents.getCooldowns(player);

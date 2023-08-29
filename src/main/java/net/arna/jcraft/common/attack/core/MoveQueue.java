@@ -15,10 +15,10 @@ public enum MoveQueue {
     HEAVY(MoveType.HEAVY),
     BARRAGE(MoveType.BARRAGE),
     SPECIAL1(MoveType.SPECIAL1),
-    ULTIMATE(MoveType.ULTIMATE),
     SPECIAL2(MoveType.SPECIAL2),
     SPECIAL3(MoveType.SPECIAL3),
-    MIDDLE_MOUSE(MoveType.UTILITY),
+    ULTIMATE(MoveType.ULTIMATE),
+    UTILITY(MoveType.UTILITY),
     STAND_SUMMON(null);
 
     public static final int types = 9;

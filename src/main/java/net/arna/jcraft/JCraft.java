@@ -13,10 +13,7 @@ import net.arna.jcraft.common.gravity.util.GravityChannel;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.item.StandDiscItem;
 import net.arna.jcraft.common.loot.JLootTableHelper;
-import net.arna.jcraft.common.network.c2s.ConfigUpdatePacket;
-import net.arna.jcraft.common.network.c2s.InputSyncPacket;
-import net.arna.jcraft.common.network.c2s.OnConnectedPacket;
-import net.arna.jcraft.common.network.c2s.StandControlPacket;
+import net.arna.jcraft.common.network.c2s.*;
 import net.arna.jcraft.common.network.s2c.*;
 import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.util.*;
@@ -350,10 +347,12 @@ public class JCraft implements ModInitializer {
         JEnchantmentRegistry.init();
         JLootTableHelper.init();
 
-        ServerPlayNetworking.registerGlobalReceiver(StandControlPacket.ID, StandControlPacket::handle);
-        ServerPlayNetworking.registerGlobalReceiver(InputSyncPacket.ID, InputSyncPacket::handle);
+        ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_STAND_CONTROL, StandControlPacket::handle);
+        ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_INPUT_SYNC, InputSyncPacket::handle);
         ServerPlayNetworking.registerGlobalReceiver(OnConnectedPacket.ID, OnConnectedPacket::handle);
         ServerPlayNetworking.registerGlobalReceiver(ConfigUpdatePacket.ID, ConfigUpdatePacket::handle);
+        ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_STAND_BLOCK, StandBlockPacket::handle);
+        ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_COOLDOWN_CANCEL, CooldownCancelPacket::handle);
     }
 
 
@@ -395,7 +394,6 @@ public class JCraft implements ModInitializer {
     public static @Nullable <T extends Entity> T teleportToWorld(T e, ServerWorld w, double x, double y, double z) {
         if (!e.isRemoved()) {
             e.detach();
-            //noinspection unchecked
             T entity = (T) e.getType().create(w);
             if (entity != null) {
                 entity.copyFrom(e);

@@ -1,5 +1,8 @@
 package net.arna.jcraft.client;
 
+import com.google.common.collect.ImmutableMap;
+import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
+import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import lombok.Getter;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
@@ -25,21 +28,21 @@ import net.arna.jcraft.client.rendering.handler.UIShaderHandler;
 import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
 import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
+import net.arna.jcraft.client.util.TrackedKeyBinding;
+import net.arna.jcraft.common.attack.core.MoveQueue;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.network.c2s.InputSyncPacket;
+import net.arna.jcraft.common.network.c2s.StandBlockPacket;
 import net.arna.jcraft.common.network.c2s.StandControlPacket;
-import net.arna.jcraft.common.util.ColorUtils;
-import net.arna.jcraft.common.util.CooldownType;
-import net.arna.jcraft.common.util.DimValues;
-import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JBlockEntityTypeRegistry;
 import net.arna.jcraft.registry.JObjectRegistry;
+import net.arna.jcraft.registry.JPacketRegistry;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
@@ -59,7 +62,6 @@ import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
@@ -76,26 +78,38 @@ import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import static net.arna.jcraft.client.gui.hud.JCraftAbilityHud.getHudX;
 import static net.arna.jcraft.client.util.JClientUtils.activeTimestops;
 
 public class JCraftClient implements ClientModInitializer {
     // Keybinds
-    public static KeyBinding standSummon;
-    public static KeyBinding heavyKey;
-    public static KeyBinding barrageKey;
-    public static KeyBinding ultKey;
-    public static KeyBinding special1Key;
-    public static KeyBinding special2Key;
-    public static KeyBinding special3Key;
-    public static KeyBinding comboBreaker;
-    public static KeyBinding cooldownCancel;
-    public static KeyBinding utility;
-    public static KeyBinding dash;
+    private static TrackedKeyBinding standSummon, heavyKey, barrageKey, ultKey, special1Key, special2Key, special3Key,
+            comboBreaker, cooldownCancel, utility, dash;
+    @SuppressWarnings({"ConstantValue", "DataFlowIssue"}) // Not the case here cuz of the lazy getter.
+    @Getter(lazy = true)
+    private static final Map<TrackedKeyBinding, MoveQueue> bindings = ImmutableMap.<TrackedKeyBinding, MoveQueue>builder()
+            .put(standSummon, MoveQueue.STAND_SUMMON)
+            .put(TrackedKeyBinding.wrap(MinecraftClient.getInstance().options.attackKey), MoveQueue.LIGHT)
+            .put(heavyKey, MoveQueue.HEAVY)
+            .put(barrageKey, MoveQueue.BARRAGE)
+            .put(special1Key, MoveQueue.SPECIAL1)
+            .put(special2Key, MoveQueue.SPECIAL2)
+            .put(special3Key, MoveQueue.SPECIAL3)
+            .put(ultKey, MoveQueue.ULTIMATE)
+            .put(utility, MoveQueue.UTILITY)
+            .build();
+    @Getter(lazy = true)
+    private static final Map<TrackedKeyBinding, MovementInputType> movementBindings = createMovementBindingsMap();
+    @Getter(lazy = true)
+    private static final TrackedKeyBinding trackedUseKey = TrackedKeyBinding.wrap(MinecraftClient.getInstance().options.useKey);
     // TODO this should probably be updated when the Minecraft language is updated.
     @Getter(lazy = true)
-    private static final DecimalFormat decimalFormat = new DecimalFormat("#.#", DecimalFormatSymbols.getInstance(Locale.forLanguageTag(MinecraftClient.getInstance().options.language)));
+    private static final DecimalFormat decimalFormat = new DecimalFormat("#.#", DecimalFormatSymbols.getInstance(
+            Locale.forLanguageTag(MinecraftClient.getInstance().options.language)));
+    private static boolean comboStarted = false;
+    private static int framesSinceComboStarted = 0;
 
     @Override
     public void onInitializeClient() {
@@ -134,21 +148,22 @@ public class JCraftClient implements ClientModInitializer {
         JArmorRendererRegistry.registerArmorRenderers();
         BlockEntityRendererFactories.register(JBlockEntityTypeRegistry.SHADER_TEST_BLOCK_ENTITY, ShaderTestBlockEntityRenderer::new);
 
-        // Keybind registration
-        standSummon = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.standsummon", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_N, "key.category.jcraft"));
-        heavyKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.heavy", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_R, "key.category.jcraft"));
-        barrageKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.barrage", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_B, "key.category.jcraft"));
-        ultKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.ult", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_H, "key.category.jcraft"));
-        special1Key = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.special1", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_V, "key.category.jcraft"));
-        special2Key = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.special2", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_G, "key.category.jcraft"));
-        special3Key = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.special3", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_M, "key.category.jcraft"));
-        //comboBreaker = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.combobreaker", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_ALT, "key.category.jcraft"));
-        cooldownCancel = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.cooldowncancel", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_ALT, "key.category.jcraft"));
-        utility = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.utility", InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_5, "key.category.jcraft"));
-        dash = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.dash", InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_4, "key.category.jcraft"));
-
+        // This HAS to be registered before TrackingKeyBinding is initialized.
         ClientTickEvents.END_CLIENT_TICK.register(this::tickClient);
         ClientTickEvents.END_WORLD_TICK.register(new SkyBoxManager());
+
+        // Keybinding registration
+        standSummon = TrackedKeyBinding.createAndRegister("key.jcraft.standsummon", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_N, "key.category.jcraft");
+        heavyKey = TrackedKeyBinding.createAndRegister("key.jcraft.heavy", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_R, "key.category.jcraft");
+        barrageKey = TrackedKeyBinding.createAndRegister("key.jcraft.barrage", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_B, "key.category.jcraft");
+        ultKey = TrackedKeyBinding.createAndRegister("key.jcraft.ult", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_H, "key.category.jcraft");
+        special1Key = TrackedKeyBinding.createAndRegister("key.jcraft.special1", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_V, "key.category.jcraft");
+        special2Key = TrackedKeyBinding.createAndRegister("key.jcraft.special2", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_G, "key.category.jcraft");
+        special3Key = TrackedKeyBinding.createAndRegister("key.jcraft.special3", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_M, "key.category.jcraft");
+        //comboBreaker = TrackingKeyBinding.createAndRegister("key.jcraft.combobreaker", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_ALT, "key.category.jcraft");
+        cooldownCancel = TrackedKeyBinding.createAndRegister("key.jcraft.cooldowncancel", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_ALT, "key.category.jcraft");
+        utility = TrackedKeyBinding.createAndRegister("key.jcraft.utility", InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_5, "key.category.jcraft");
+        dash = TrackedKeyBinding.createAndRegister("key.jcraft.dash", InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_4, "key.category.jcraft");
 
         ClientPacketHandler.init();
 
@@ -222,16 +237,16 @@ public class JCraftClient implements ClientModInitializer {
                 // to be done here and cannot be done in CooldownType.
                 String keyBindText = switch (type) {
                     case STAND_LIGHT -> "M1";
-                    case HEAVY, STAND_HEAVY -> generateName(heavyKey);
-                    case BARRAGE, STAND_BARRAGE -> generateName(barrageKey);
-                    case ULTIMATE, STAND_ULTIMATE -> generateName(ultKey);
-                    case SPECIAL1, STAND_SP1 -> generateName(special1Key);
-                    case SPECIAL2, STAND_SP2 -> generateName(special2Key);
-                    case SPECIAL3, STAND_SP3 -> generateName(special3Key);
-                    case UTILITY -> generateName(utility);
+                    case HEAVY, STAND_HEAVY -> generateName(heavyKey.getParent());
+                    case BARRAGE, STAND_BARRAGE -> generateName(barrageKey.getParent());
+                    case ULTIMATE, STAND_ULTIMATE -> generateName(ultKey.getParent());
+                    case SPECIAL1, STAND_SP1 -> generateName(special1Key.getParent());
+                    case SPECIAL2, STAND_SP2 -> generateName(special2Key.getParent());
+                    case SPECIAL3, STAND_SP3 -> generateName(special3Key.getParent());
+                    case UTILITY -> generateName(utility.getParent());
                     case COMBO_BREAKER -> "Combo Breaker";
-                    case COOLDOWN_CANCEL -> generateName(cooldownCancel);
-                    case DASH -> generateName(dash);
+                    case COOLDOWN_CANCEL -> generateName(cooldownCancel.getParent());
+                    case DASH -> generateName(dash.getParent());
                 };
 
                 CooldownType.Category category = type.getCategory();
@@ -293,11 +308,21 @@ public class JCraftClient implements ClientModInitializer {
         }
     }
 
-    private static boolean comboStarted = false;
-    private static int framesSinceComboStarted = 0;
     public static void markComboStarted() {
         comboStarted = true;
         framesSinceComboStarted = 0;
+    }
+
+    private static Map<TrackedKeyBinding, MovementInputType> createMovementBindingsMap() {
+        GameOptions options = MinecraftClient.getInstance().options;
+        return ImmutableMap.<TrackedKeyBinding, MovementInputType>builder()
+                .put(TrackedKeyBinding.wrap(options.forwardKey), MovementInputType.FORWARD)
+                .put(TrackedKeyBinding.wrap(options.backKey), MovementInputType.BACKWARD)
+                .put(TrackedKeyBinding.wrap(options.leftKey), MovementInputType.LEFT)
+                .put(TrackedKeyBinding.wrap(options.rightKey), MovementInputType.RIGHT)
+                .put(TrackedKeyBinding.wrap(options.jumpKey), MovementInputType.JUMP)
+                .put(dash, MovementInputType.DASH)
+                .build();
     }
 
     /**
@@ -342,105 +367,32 @@ public class JCraftClient implements ClientModInitializer {
         activeTimestops = newActiveTimestops;
 
         // Handle JCraft inputs (stand, spec, universal controls)
-        GameOptions go = minecraftClient.options;
-
         StandEntity<?, ?> stand = JComponents.getStandData(player).getStand();
         boolean standOn = stand != null;
 
-        //todo: reformat this into 2 more packets (stand block packet, attack packet)
-        if (player.isAlive()) { // Send movement inputs to server
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeBoolean(go.forwardKey.isPressed()); // W
-            buf.writeBoolean(go.leftKey.isPressed()); // A
-            buf.writeBoolean(go.backKey.isPressed()); // S
-            buf.writeBoolean(go.rightKey.isPressed()); // D
-            buf.writeBoolean(go.jumpKey.isPressed()); // Space
-            buf.writeBoolean(dash.isPressed()); // Dash
-            ClientPlayNetworking.send(InputSyncPacket.ID, buf);
+        if (player.isAlive()) {
+            Object2BooleanMap<MovementInputType> input = getMovementBindings().entrySet().stream()
+                    .filter(entry -> entry.getKey().isChangedThisTick())
+                    .collect(Object2BooleanOpenHashMap::new, (map, entry) -> map.put(entry.getValue(), entry.getKey().isPressedThisTick()),
+                            Object2BooleanMap::putAll);
+
+            if (!input.isEmpty())
+                ClientPlayNetworking.send(JPacketRegistry.C2S_INPUT_SYNC, InputSyncPacket.write(input));
         }
 
-        // Block (3)
-        if (standOn) {
-            PacketByteBuf buf = PacketByteBufs.create();
-            boolean rmb = go.useKey.wasPressed() || go.useKey.isPressed();
-            buf.writeShort(3);
-            buf.writeBoolean(rmb);
-            sendStandControlPacket(buf);
-        }
+        // Block
+        if (standOn && getTrackedUseKey().isChangedThisTick()) ClientPlayNetworking.send(JPacketRegistry.C2S_STAND_BLOCK,
+                StandBlockPacket.write(getTrackedUseKey().isPressedThisTick()));
 
-        // (De)summon (1)
-        if (standSummon.wasPressed()) {
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(1);
-            sendStandControlPacket(buf);
-        }
-        // Light attack (2)
-        if (go.attackKey.isPressed()) { // wasPressed() simply doesn't work
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(2);
-            sendStandControlPacket(buf);
-        }
-        // Heavy (4)
-        if (heavyKey.isPressed()) {
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(4);
-            sendStandControlPacket(buf);
-        }
-        // Barrage (5)
-        if (barrageKey.isPressed()) {
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(5);
-            sendStandControlPacket(buf);
-        }
-        // Special 1 (6)
-        if (special1Key.wasPressed()) {
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(6);
-            sendStandControlPacket(buf);
-        }
-        // Ult (7)
-        if (ultKey.wasPressed()) {
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(7);
-            sendStandControlPacket(buf);
-        }
-        // Special 2 (8)
-        if (special2Key.wasPressed()) {
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(8);
-            sendStandControlPacket(buf);
-        }
-        // Special 3 (9)
-        if (special3Key.wasPressed()) {
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(9);
-            sendStandControlPacket(buf);
-        }
-        // Utility (10)
-        if (utility.isPressed()) {
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(10);
-            /*
-            if (standOn) {
-                if (stand.allowUtilityUse())
-                    sendStandControlPacket(buf);
-                else
-                    stand.initClientUtility();
-            } else {
-             */
-            sendStandControlPacket(buf);
-            //}
-        }
-        // Cooldown Cancel (13)
-        if (cooldownCancel.wasPressed()) {
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeShort(13);
-            sendStandControlPacket(buf);
-        }
-    }
+        // All regular moves
+        getBindings().forEach((binding, type) -> {
+            if (!binding.isPressedThisTick()) return;
+            ClientPlayNetworking.send(JPacketRegistry.C2S_STAND_CONTROL, StandControlPacket.write(type));
+        });
 
-    private void sendStandControlPacket(PacketByteBuf buf) {
-        ClientPlayNetworking.send(StandControlPacket.ID, buf);
+        // Cooldown Cancel
+        if (cooldownCancel.isPressedThisTick())
+            ClientPlayNetworking.send(JPacketRegistry.C2S_COOLDOWN_CANCEL, PacketByteBufs.create());
     }
 
     @Nullable
