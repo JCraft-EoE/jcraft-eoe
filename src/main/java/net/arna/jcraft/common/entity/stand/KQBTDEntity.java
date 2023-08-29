@@ -55,6 +55,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
             .withInfo(Text.literal("Bites the Dust Plant"), Text.literal("press the same button to detonate, sending the affected enemy back to their previous location"));
     public static final BTDGrabHitAttack GRAB_HIT = new BTDGrabHitAttack(0, 42, 0.75f,
             5f, 15, 2f, 0f, 0.5f, IntSet.of(8, 22, 32))
+            .withImpactSound(JSoundRegistry.IMPACT_1)
             .withStunType(StunType.UNBURSTABLE)
             .withInfo(Text.literal("Takedown (hit)"), Text.empty());
     public static final GrabAttack<KQBTDEntity, State> GRAB = new GrabAttack<>(440, 12, 28,
