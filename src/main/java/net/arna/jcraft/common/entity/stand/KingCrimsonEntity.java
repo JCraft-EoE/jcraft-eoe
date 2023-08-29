@@ -194,7 +194,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                 boolean idling = getMoveStun() <= 0;
 
                 if (curMove != null && curMove.getOriginalMove() != VERTICAL_CHOP) {
-                    if (idling) initMove(type);
+                    if (idling) super.initMove(type);
                 } else if (getMoveStun() < 7) setMove(OVERHEAD_HOOK, State.OVERHEAD);
             }
             case ULTIMATE -> {
@@ -216,7 +216,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                     return;
                 }
 
-                initMove(type);
+                super.initMove(type);
             }
             case UTILITY -> {
                 LivingEntity user = getUserOrThrow();
@@ -224,7 +224,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                 boolean start = getMoveStun() <= 0;
 
                 if (start) {
-                    initMove(type);
+                    super.initMove(type);
                     return;
                 }
 
