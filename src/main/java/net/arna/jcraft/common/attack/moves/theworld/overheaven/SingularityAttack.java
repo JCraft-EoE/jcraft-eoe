@@ -1,11 +1,13 @@
 package net.arna.jcraft.common.attack.moves.theworld.overheaven;
 
 import lombok.NonNull;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.TheWorldOverHeavenEntity;
 import net.arna.jcraft.common.util.JParticleType;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.util.math.Vec3d;
@@ -20,7 +22,8 @@ public class SingularityAttack extends AbstractSimpleAttack<SingularityAttack, T
     @Override
     protected void processTarget(TheWorldOverHeavenEntity attacker, LivingEntity target, Vec3d kbVec, DamageSource damageSource) {
         super.processTarget(attacker, target, kbVec, damageSource);
-
+        target.removeStatusEffect(JStatusRegistry.DAZED);
+        StandEntity.stun(target, getStun(), 0);
         StandEntity.trueDamage(6, JDamageSources.stand(attacker), target);
     }
 

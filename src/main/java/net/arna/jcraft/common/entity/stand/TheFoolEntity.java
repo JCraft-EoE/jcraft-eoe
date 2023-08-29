@@ -209,6 +209,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
                 setSand(true);
                 setFree(false);
             }
+            default -> super.initMove(type);
         }
     }
 
@@ -283,11 +284,11 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     }
 
     @Override
-    public boolean setMove(AbstractMove<?, ? super TheFoolEntity> move, @Nullable State animState) {
+    public void setMove(AbstractMove<?, ? super TheFoolEntity> move, @Nullable State animState) {
         if (getUser() != null && getUser().isSneaking()) {
             setSand(true);
-            return super.setMove(move.copy().withMoveDistance(move.getMoveDistance() / 2f), animState);
-        } else return super.setMove(move, animState);
+            super.setMove(move.copy().withMoveDistance(move.getMoveDistance() / 2f), animState);
+        } else super.setMove(move, animState);
     }
 
     @Override

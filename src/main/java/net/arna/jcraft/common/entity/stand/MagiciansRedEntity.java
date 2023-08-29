@@ -24,7 +24,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             .withCrouchingVariant(REDIRECT)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
-    public static final KnockdownAttack<MagiciansRedEntity> HEAVY = new KnockdownAttack<MagiciansRedEntity>(280, 12, 22, 7f, 1.75f, 10, .5f, 1f, 0.6f, 40)
+    public static final KnockdownAttack<MagiciansRedEntity> HEAVY = new KnockdownAttack<MagiciansRedEntity>(280, 12, 22, 1, 7f, 10, 1.75f, 0.5f, 0.6f, 40)
             .withSound(JSoundRegistry.MR_HEAVY)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withInfo(Text.literal("Low Kick"), Text.literal("medium windup knockdown"));

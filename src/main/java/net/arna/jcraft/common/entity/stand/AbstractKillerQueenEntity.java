@@ -83,7 +83,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
 
     @Override
     protected void registerMoves(MoveMap<E, S> moves) {
-        moves.register(MoveType.LIGHT, LIGHT, getLightState());
+        moves.register(MoveType.LIGHT, LIGHT, getLightState()).withCrouchingVariant(getDetonateState());
         moves.register(MoveType.BARRAGE, BARRAGE, getBarrageState());
         moves.register(MoveType.UTILITY, EXPLOSIVE_DASH); // No special state for this one.
     }
@@ -102,7 +102,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
     // Moveset
     @Override
     public void initMove(MoveType type) {
-        if (!canAttack() || !hasUser()) return;
+        if (!hasUser()) return;
 
         LivingEntity user = getUserOrThrow();
         if (user.hasStatusEffect(JStatusRegistry.DAZED)) return;
@@ -115,8 +115,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
                     else handleMove(MoveType.LIGHT);
                 }
             } else if (getMoveStun() < 7) {
-                if (user.isSneaking())
-                    detonate();
+                if (user.isSneaking()) detonate();
                 else setMove(LOW, getLowState());
             }
         } else super.initMove(type);

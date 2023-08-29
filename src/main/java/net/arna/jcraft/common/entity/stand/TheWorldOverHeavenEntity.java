@@ -193,6 +193,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
                     tsTime = 0;
                 }
             }
+            default -> super.initMove(type);
         }
     }
 

@@ -539,17 +539,19 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * @param animState    int identifier for which state to put the stand into
      */
     public boolean handleMove(AbstractMove<?, ? super E> move, CooldownType cooldownType, @Nullable S animState) {
+        if (!move.onInitialize(getThis())) return false;
+
         if (cooldownType != null && move.getCooldown() > 0) {
             CooldownsComponent cooldowns = JComponents.getCooldowns(getUser());
             int cooldown = cooldowns.getCooldown(cooldownType);
 
-            if (cooldown > 0)
-                return false;
+            if (cooldown > 0) return false;
 
             cooldowns.setCooldown(cooldownType, move.getCooldown());
         }
 
-        return setMove(move, animState);
+        setMove(move, animState);
+        return true;
     }
 
     /**
@@ -560,20 +562,17 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      *
      * @return Whether the attack has been initiated
      */
-    public boolean setMove(AbstractMove<?, ? super E> move, @Nullable S animState) {
-        if (!move.onInitialize(getThis())) return false;
-
+    public void setMove(AbstractMove<?, ? super E> move, @Nullable S animState) {
         // If the attack has a duration of 0, just perform it immediately.
         if (move.getDuration() == 0) {
             move.doPerform(getThis());
-            return true;
+            return;
         }
 
         curMove = move;
         setMoveStun(move.getDuration());
-        if (animState != null) this.setState(animState);
+        if (animState != null) setState(animState);
         armorPoints = move.getArmor();
-        return true;
     }
 
     /**

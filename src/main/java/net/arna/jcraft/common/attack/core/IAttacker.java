@@ -40,11 +40,9 @@ public interface IAttacker<A extends IAttacker<? extends A, S>, S> {
 
     void setCurrentMove(AbstractMove<?, ? super A> move);
 
-    default boolean setMove(AbstractMove<?, ? super A> move, S state) {
+    default void setMove(AbstractMove<?, ? super A> move, S state) {
         setCurrentMove(move);
         setState(state);
-
-        return true;
     }
 
     S getState();
