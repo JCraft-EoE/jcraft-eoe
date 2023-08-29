@@ -31,6 +31,7 @@ public class ChargeBarrageAttack extends AbstractBarrageAttack<ChargeBarrageAtta
     @Override
     public @NonNull Set<LivingEntity> perform(StarPlatinumEntity attacker, LivingEntity user, MoveContext ctx) {
         Set<LivingEntity> targets = super.perform(attacker, user, ctx);
+        if (targets.isEmpty()) return targets;
 
         Vec3d avgPos = Vec3d.ZERO;
         float c = 0;
