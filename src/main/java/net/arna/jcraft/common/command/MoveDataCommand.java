@@ -78,7 +78,7 @@ public class MoveDataCommand {
 
         int armor = move.getArmor();
         if (armor > 0)
-            mainFDMessage = mainFDMessage.concat("§r\nAttack has: §7" + (armor == Byte.MAX_VALUE ? "Hyper Armor" : armor + " Armor Points"));
+            mainFDMessage = mainFDMessage.concat("§rAttack has: §7" + (armor > 100 ? "Hyper Armor§r\n" : armor + " Armor Points§r\n"));
 
         if (move instanceof AbstractSimpleAttack<?, ?> attack) {
             if (attack.getHitboxSize() > 0) {

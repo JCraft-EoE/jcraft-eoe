@@ -100,7 +100,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
 
     @Override
     protected void registerMoves(MoveMap<SPTWEntity, State> moves) {
-        moves.register(MoveType.LIGHT, PUNCH, State.PUNCH);
+        moves.register(MoveType.LIGHT, PUNCH, State.PUNCH).withCrouchingVariant(State.GROUND_SLAM);
         moves.register(MoveType.HEAVY, STAR_BREAKER, State.HEAVY);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 
