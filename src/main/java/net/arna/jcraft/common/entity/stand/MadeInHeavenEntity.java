@@ -98,6 +98,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .withInfo(Text.literal("Divine Severance"), Text.literal("Made in Heaven rapidly speed slices an area, then finishes with a large, launching slice"));
     public static final CircleAttack CIRCLE = new CircleAttack(800, 13, 14, 1.25f)
             .withCrouchingVariant(JUDGEMENT)
+            .withSound(JSoundRegistry.MIH_CIRCLE)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
             .withInfo(Text.literal("Heaven's Judgement"), Text.literal("rapidly circles a looked-at target within 4m at a radius of 7m"));
     private static final TrackedData<Integer> ACCEL_TIME;

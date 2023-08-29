@@ -46,6 +46,7 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
     public static final Rekka3Attack REKKA3 = new Rekka3Attack(400, 40, 1f, 4f,
             15, 1.75f, 0.6f, -0.1f, IntSet.of(8, 20, 32))
             .withFollowup(REKKA_FINISHER)
+            .withSound(JSoundRegistry.ANUBIS_REKKA3)
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withInfo(Text.literal("Cleaving Strikes/Sweep"), Text.literal("3 hits, if 0 Bloodlust, last hit knocks down/sweeps while sheathed"));
     public static final KnockdownAttack<AnubisSpec> SWEEP = new KnockdownAttack<AnubisSpec>(320, 10, 17,

@@ -88,6 +88,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             .withInfo(Text.literal("Destroy"), Text.literal("slow, uninterruptible, unblockable knockdown"));
     public static final ConsumeAttack CONSUME = new ConsumeAttack(640, 35, 40, 1f,
             2f, 0, 2f, 0f, 0f)
+            .withSound(JSoundRegistry.CREAM_CONSUME)
             .withInfo(Text.literal("Void"), Text.literal("high windup, 6 seconds"));
     public static final BallModeMove ENTER = new BallModeMove(40, 10, 15, 0f, true)
             .withSound(JSoundRegistry.CREAM_ENTER)

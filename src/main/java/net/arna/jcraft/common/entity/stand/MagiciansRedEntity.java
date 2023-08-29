@@ -22,7 +22,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, MagiciansRedEntity.State> {
-    public static final RedirectAttack REDIRECT = new RedirectAttack(100, 7, 10, 0.75f);
+    public static final RedirectAttack REDIRECT = new RedirectAttack(100, 7, 10, 0.75f)
+            .withSound(JSoundRegistry.MR_REDIRECT);
     public static final SimpleAttack<MagiciansRedEntity> LIGHT = new SimpleAttack<MagiciansRedEntity>(JCraft.LIGHT_COOLDOWN,
             5, 8, 0.75f, 5f, 16, 1.5f, 0.75f, -0.1f)
             .withCrouchingVariant(REDIRECT)
@@ -52,7 +53,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withInfo(Text.literal("Red Bind"), Text.literal("on hit, wraps opponent in fiery rings that launch them in the direction they are hit"));
     public static final LifeDetectorAttack LIFE_DETECTOR = new LifeDetectorAttack(500, 13, 20, 0.75f)
-            .withSound(JSoundRegistry.MR_REDBIND)
+            .withSound(JSoundRegistry.MR_DETECTOR)
             .withInfo(Text.literal("Life Detector"), Text.literal("tracks down nearby life, lasts 15s"));
 
     public MagiciansRedEntity(World worldIn) {

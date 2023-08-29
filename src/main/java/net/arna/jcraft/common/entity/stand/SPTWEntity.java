@@ -41,6 +41,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .withInfo(Text.literal("Time Strike"), Text.literal("teleports forward 2.5m after a short windup, then delivers a fast, low stun hit/crouch to turn around after teleport"));
     public static final SimpleAttack<SPTWEntity> BACKHAND = new SimpleAttack<SPTWEntity>(12, 7, 12,
             0.75f, 6f, 20, 1.5f, 0.25f, 0f)
+            .withSound(JSoundRegistry.SPTW_BACKHAND)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(1f)
             .withInfo(Text.literal("Backhand"), Text.literal("fast poke, decent stun"));
@@ -55,6 +56,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             1f, 2f, 20, 1.5f, 0.1f, 0f, GRAB_HIT, State.GRAB_HIT)
             .withSound(JSoundRegistry.SPTW_GRAB)
             .withImpactSound(JSoundRegistry.SPTW_GRABHIT)
+            .withAction((attacker, user, ctx, targets) -> attacker.playSound(JSoundRegistry.SPTW_UPPERCUT, 1f, 1f))
             .withBlockStun(4)
             .withInfo(Text.literal("What an Ugly Watch"), Text.literal("grab, high recovery"));
     public static final TimeStopMove<SPTWEntity> TIME_STOP = new TimeStopMove<SPTWEntity>(600, 5, 10, 35)
@@ -62,7 +64,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .withInfo(Text.literal("Timestop"), Text.literal("1.75 seconds, extremely low windup"));
     public static final TimeSkipMove<SPTWEntity> TIME_SKIP = new TimeSkipMove<SPTWEntity>(360, 14)
             .withSound(JSoundRegistry.STAR_PLATINUM_TIMESKIP)
-            .withInfo(Text.literal("Timeksip"), Text.empty());
+            .withInfo(Text.literal("Timeskip"), Text.empty());
     private boolean turnAround;
 
     public SPTWEntity(World worldIn) {

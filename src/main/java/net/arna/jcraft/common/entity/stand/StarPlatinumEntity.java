@@ -37,6 +37,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
     public static final SimpleAttack<StarPlatinumEntity> STAR_FINGER = new SimpleAttack<StarPlatinumEntity>(400,
             12, 20, 0.75f, 5f, 30, 1.75f, -0.25f, -0.25f)
+            .withSound(JSoundRegistry.STAR_FINGER)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withExtraHitBox(2, 0.5, 1)
             .withInfo(Text.literal("Star Finger"), Text.literal("medium windup, combo starter/extender"));

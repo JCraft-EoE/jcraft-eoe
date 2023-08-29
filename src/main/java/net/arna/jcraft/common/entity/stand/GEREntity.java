@@ -93,6 +93,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             .withInfo(Text.literal("Nullification"), Text.literal("0.25s windup, 1.5s counter, stuns on hit"));
 
     public static final ReturnToZeroMove RETURN_TO_ZERO = new ReturnToZeroMove(1200, 30, 32, 1f)
+            .withSound(JSoundRegistry.GER_SETUP)
             .withInfo(Text.literal("Return to Zero"), Text.literal("initial press: saves the state of " +
                     "every entity in a 4 chunk radius, second press: reverts all states except users\nDoesn't affect player inventories"));
     public static final FlightMove FLIGHT = new FlightMove(360, 1, 0, 0f)

@@ -70,6 +70,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withInfo(Text.literal("Cleave"), Text.literal("Silver Chariot detaches from the user, delivering an uninterruptible, combo-starting slice"));
     public static final SCChargeAttack CHARGE = new SCChargeAttack(360, 5, 19, 8f,
             5f, 17, 1.5f, 0.25f, 0f, State.P_CHARGE_HIT)
+            .withSound(JSoundRegistry.SC_CHARGE)
             .withBackstab(false)
             .withInfo(Text.literal("Shooting Star"), Text.literal("Silver Chariot detaches from the user and charges in the looked direction, combo starter/extender"));
     public static final SCCounterAttack COUNTER = new SCCounterAttack(640, 4, 34, 0.5f)
