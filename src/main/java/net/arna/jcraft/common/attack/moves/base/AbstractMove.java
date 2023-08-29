@@ -468,6 +468,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         cast.isAerialVariant = isAerialVariant;
         cast.isFollowup = isFollowup;
         cast.armor = armor;
+        cast.finisher = finisher == null ? null : IntObjectPair.of(finisher.leftInt(), finisher.right().copy());
         cast.mobilityType = mobilityType;
         cast.originalMove = originalMove; // If this move was copied, this will set it to our original move on the copy.
         copiedExtras = true;
