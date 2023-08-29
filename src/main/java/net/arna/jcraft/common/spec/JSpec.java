@@ -26,6 +26,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.world.World;
 
 import java.util.Objects;
@@ -101,6 +103,12 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
     public void setState(S state) {
         PlayerLookup.world((ServerWorld) player.getWorld()).forEach(serverPlayer -> PlayerAnimPacket.sendSpec(
                 player, serverPlayer, (this.state = state).getKey(getThis()), moveStun, 1f));
+    }
+
+    @Override
+    public void playSound(SoundEvent sound, float volume, float pitch) {
+        player.world.playSound(null, player.getX(), player.getY(), player.getZ(), sound, SoundCategory.PLAYERS,
+                volume, pitch);
     }
 
     protected abstract void registerMoves(MoveMap<A, S> moves);
