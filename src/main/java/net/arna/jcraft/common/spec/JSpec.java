@@ -125,28 +125,32 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
         return handleMove(entry.getMove(), entry.getCooldownType(), entry.getAnimState(), animationSpeed);
     }
 
-    public boolean handleMove(AbstractMove<?, ? super A> attack, CooldownType cooldownType, S state) {
-        return handleMove(attack, cooldownType, state, 1f);
+    public boolean handleMove(AbstractMove<?, ? super A> move, CooldownType cooldownType, S state) {
+        return handleMove(move, cooldownType, state, 1f);
     }
 
-    public boolean handleMove(AbstractMove<?, ? super A> attack, CooldownType cooldownType, S state, float animationSpeed) {
+    public boolean handleMove(AbstractMove<?, ? super A> move, CooldownType cooldownType, S state, float animationSpeed) {
+        if (!move.canBeInitiated(getThis())) return false;
+        move.onInitialize(getThis());
+
         CooldownsComponent cooldowns = JComponents.getCooldowns(player);
         int cd = cooldowns.getCooldown(cooldownType);
         if (cd > 0) return false;
-        cooldowns.setCooldown(cooldownType, attack.getCooldown());
+        cooldowns.setCooldown(cooldownType, move.getCooldown());
 
         //JCraft.LOGGER.info("SERVER: Handling spec attack: " + attack + " in world: " + serverWorld);
 
-        curMove = attack.copy()
-                .withDuration((int) (attack.getDuration() / animationSpeed))
-                .withWindup((int) (attack.getWindup() / animationSpeed));
+        curMove = move.copy()
+                .withDuration((int) (move.getDuration() / animationSpeed))
+                .withWindup((int) (move.getWindup() / animationSpeed));
+        moveStun = curMove.getDuration();
 
         if (curMove instanceof AbstractMultiHitAttack<?,?> multiHitAttack)
             multiHitAttack.withHitMoments(IntSet.of(multiHitAttack.getHitMoments().intStream()
                     .map(i -> (int) (i / animationSpeed))
                     .toArray()));
 
-        armorPoints = attack.getArmor();
+        armorPoints = move.getArmor();
 
         PlayerLookup.world((ServerWorld) player.getWorld()).forEach(serverPlayer -> PlayerAnimPacket.sendSpec(
                 player, serverPlayer, (this.state = state).getKey(getThis()), moveStun, animationSpeed));
