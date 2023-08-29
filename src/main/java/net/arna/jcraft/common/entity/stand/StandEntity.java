@@ -832,7 +832,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                     if (queuedAttack == MoveQueue.STAND_SUMMON) {
                         curMove = null;
                         desummon();
-                    } else handleMove(queuedAttack.getMoveType());
+                    } else initMove(queuedAttack.getMoveType());
 
                     queuedAttack = null;
                 } else if (!idleOverride) {
@@ -1239,7 +1239,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
                     if (selectedAttack.getMoveType() == null) {
                         JCraft.LOGGER.error("Attempting to use attack with unset MoveType: " + selectedAttack.getName().getString() + ", stand: " + stand);
-                    } else stand.handleMove(selectedAttack.getMoveType());
+                    } else stand.initMove(selectedAttack.getMoveType());
                 } else stand.queuedAttack = MoveQueue.fromMoveType(selectedAttack.getMoveType());
             }
 

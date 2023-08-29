@@ -62,7 +62,7 @@ public class StandControlPacket {
 
                 if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking())
                     stand.queuedAttack = MoveQueue.LIGHT;
-                else stand.handleMove(MoveType.LIGHT);
+                else stand.initMove(MoveType.LIGHT);
             });
             // 3 - BLOCK
             case 3 -> {

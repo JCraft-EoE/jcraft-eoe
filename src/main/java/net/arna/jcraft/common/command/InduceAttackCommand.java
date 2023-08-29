@@ -56,7 +56,7 @@ public class InduceAttackCommand {
 
                 StandEntity<?, ?> standEntity = standData.getStand();
                 if (standEntity != null) {
-                    standEntity.handleMove(queue.getMoveType());
+                    standEntity.initMove(queue.getMoveType());
                     flag = 1;
                 }
             }
