@@ -71,8 +71,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     // TODO: finish custom player idle poses for all stands
 
-    @Getter(onMethod_ = @NonNull)
-    private MoveMap<E, S> moveMap;
+    @SuppressWarnings("NotNullFieldNotInitialized") // It does get initialized by a method called in the constructor.
+    @Getter
+    private @NonNull MoveMap<E, S> moveMap;
     @Getter
     protected final MoveContext moveContext = new MoveContext();
 
