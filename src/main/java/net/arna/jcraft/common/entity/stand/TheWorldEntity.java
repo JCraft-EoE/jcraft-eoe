@@ -49,6 +49,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
             .withSound(JSoundRegistry.TW_DONUT)
             .withImpactSound(JSoundRegistry.TW_DONUT_HIT)
             .withExtraHitBox(1.5)
+            .withLaunch()
             .withHyperArmor()
             .withInfo(Text.literal("Donut"), Text.literal("slow, uninterruptible combo starter/extender, 1.5s stun on whiff"));
     public static final TimeSkipMove<TheWorldEntity> TIME_SKIP = new TimeSkipMove<TheWorldEntity>(360, 14)
