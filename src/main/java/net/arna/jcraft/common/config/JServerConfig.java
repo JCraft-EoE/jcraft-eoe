@@ -5,12 +5,14 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import lombok.SneakyThrows;
 import lombok.Synchronized;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.spec.SpecType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.WorldSavePath;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -61,6 +63,8 @@ public class JServerConfig {
                 ConfigOption option = ConfigOption.getImmutableOptions().get(key);
                 option.read(data.get(key));
             }
+        } catch (IOException e) {
+            JCraft.LOGGER.error("An error occurred trying to read the server config.", e);
         }
     }
 
