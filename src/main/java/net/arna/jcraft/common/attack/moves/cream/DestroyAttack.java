@@ -1,7 +1,6 @@
 package net.arna.jcraft.common.attack.moves.cream;
 
 import lombok.NonNull;
-import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractEffectInflictingAttack;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.stand.CreamEntity;
@@ -11,9 +10,9 @@ import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.List;
-import java.util.Set;
 
 public class DestroyAttack extends AbstractEffectInflictingAttack<DestroyAttack, CreamEntity> {
     public DestroyAttack(int cooldown, int windup, int duration, float moveDistance, float damage, int stun,
@@ -24,14 +23,10 @@ public class DestroyAttack extends AbstractEffectInflictingAttack<DestroyAttack,
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(CreamEntity attacker, LivingEntity user, MoveContext ctx) {
-        Set<LivingEntity> targets = super.perform(attacker, user, ctx);
+    protected void processTarget(CreamEntity attacker, LivingEntity target, Vec3d kbVec, DamageSource damageSource) {
+        super.processTarget(attacker, target, kbVec, damageSource);
 
-        DamageSource source = JDamageSources.stand(attacker);
-        for (LivingEntity target : targets)
-            StandEntity.trueDamage(8, source, target);
-
-        return targets;
+        StandEntity.trueDamage(8, JDamageSources.stand(attacker), target);
     }
 
     @Override

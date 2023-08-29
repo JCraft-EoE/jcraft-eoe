@@ -397,7 +397,6 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
                 hitSpark);
 
         getImpactSounds().forEach(sound -> attacker.playSound(sound, 1f, 1f));
-        if (getDamage() <= 0) return targets;
 
         Vec3d kbVec = getRotVec(attacker).multiply(knockback).add(new Vec3d(0.0, Math.abs(knockback) / 4, 0.0));
         for (LivingEntity target : validateTargets(attacker, targets)) {
