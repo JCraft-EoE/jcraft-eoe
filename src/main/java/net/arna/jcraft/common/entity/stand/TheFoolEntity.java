@@ -12,7 +12,6 @@ import net.arna.jcraft.common.attack.moves.shared.SimpleMultiHitAttack;
 import net.arna.jcraft.common.attack.moves.thefool.*;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegistry;
@@ -68,6 +67,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             16, 20, 1.25f, 8f, 25, 2f, 0.5f, -0.3f,
             List.of(new StatusEffectInstance(StatusEffects.LEVITATION, 5, 19, true, false)))
             .withSound(JSoundRegistry.FOOL_LAUNCH)
+            .withInitAction((attacker, user, ctx) -> attacker.setSand(true))
             .withExtraHitBox(1.5)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHyperArmor()
@@ -96,7 +96,6 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     public static final SandWaveAttack SAND_WAVE = new SandWaveAttack(540, 0, 80, 0f,
             1f, 0, 2f, 0.1f, 0f, 3)
             .withAerialVariant(GLIDE)
-            .withMobilityType(MobilityType.DASH)
             .withBackstab(false)
             .withInfo(Text.literal("Sandwave"), Text.literal("The Fool turns into a quick sandwave that knocks anything it touches down"));
     //todo: sand tornado tracking (projectile-only code)
@@ -188,10 +187,6 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
         if (!canAttack()) return;
 
         switch (type) {
-            case HEAVY -> {
-                setSand(true);
-                super.initMove(type);
-            }
             case SPECIAL1, SPECIAL2, SPECIAL3 -> {
                 if (curMove != null && curMove.getOriginalMove() == POUND && getMoveStun() <= 11)
                     initSlam(switch (type) {
@@ -203,11 +198,6 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
                 super.initMove(type);
                 if (type == MoveType.SPECIAL2 && !getUserOrThrow().isOnGround() || type == MoveType.SPECIAL3)
                     setSand(true);
-            }
-            case UTILITY -> {
-                super.initMove(type);
-                setSand(true);
-                setFree(false);
             }
             default -> super.initMove(type);
         }
