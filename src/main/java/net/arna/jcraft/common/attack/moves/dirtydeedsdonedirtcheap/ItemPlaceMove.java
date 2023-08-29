@@ -56,7 +56,7 @@ public class ItemPlaceMove extends AbstractMove<ItemPlaceMove, D4CEntity> {
 
     @Override
     public void registerContextEntries(MoveContext ctx) {
-        ctx.register(PLACING_FIRST_STACK);
+        ctx.register(PLACING_FIRST_STACK, true);
         ctx.register(PLACING);
     }
 

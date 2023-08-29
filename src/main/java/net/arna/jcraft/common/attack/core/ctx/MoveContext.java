@@ -69,6 +69,21 @@ public class MoveContext {
         set(variable, initialValue);
     }
 
+    public void register(@NonNull IntMoveVariable variable, int initialValue) {
+        register(variable);
+        setInt(variable, initialValue);
+    }
+
+    public void register(@NonNull FloatMoveVariable variable, float initialValue) {
+        register(variable);
+        setFloat(variable, initialValue);
+    }
+
+    public void register(@NonNull BooleanMoveVariable variable, boolean initialValue) {
+        register(variable);
+        setBoolean(variable, initialValue);
+    }
+
     @Getter
     @RequiredArgsConstructor
     static class Entry<T> {
