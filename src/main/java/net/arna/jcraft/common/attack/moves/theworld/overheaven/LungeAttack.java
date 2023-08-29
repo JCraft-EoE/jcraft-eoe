@@ -14,12 +14,11 @@ public class LungeAttack extends AbstractSimpleAttack<LungeAttack, TheWorldOverH
     }
 
     @Override
-    public boolean onInitialize(TheWorldOverHeavenEntity attacker) {
-        if (!super.onInitialize(attacker)) return false;
+    public void onInitialize(TheWorldOverHeavenEntity attacker) {
+        super.onInitialize(attacker);
 
         // Reset move distance
         withMoveDistance(originalMoveDistance);
-        return true;
     }
 
     @Override

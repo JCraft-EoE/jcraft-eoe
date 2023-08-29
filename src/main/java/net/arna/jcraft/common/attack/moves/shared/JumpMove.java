@@ -24,8 +24,8 @@ public class JumpMove<A extends IAttacker<? extends A, ?>> extends AbstractMove<
     }
 
     @Override
-    public boolean onInitialize(A attacker) {
-        return attacker.getBaseEntity().isOnGround() && super.onInitialize(attacker);
+    public boolean canBeInitiated(A attacker) {
+        return attacker.getBaseEntity().isOnGround() && super.canBeInitiated(attacker);
     }
 
     @Override

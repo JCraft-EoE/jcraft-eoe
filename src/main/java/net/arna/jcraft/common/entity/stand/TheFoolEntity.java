@@ -78,7 +78,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withImpactSound(JSoundRegistry.IMPACT_2);
     public static final PoundAttack POUND = new PoundAttack(260, 7, 22, 1.25f,
             4f, 25, 1.5f, 0.1f, -0.1f)
-            .withFollowUp(SLAM)
+            .withFollowup(SLAM)
             .withSound(JSoundRegistry.FOOL_BARK2)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withLift(false)

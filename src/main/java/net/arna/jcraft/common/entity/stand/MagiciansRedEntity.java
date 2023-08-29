@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.entity.stand;
 
 import lombok.NonNull;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.moves.magiciansred.*;
@@ -10,7 +11,9 @@ import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -20,15 +23,18 @@ import java.util.function.Consumer;
 
 public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, MagiciansRedEntity.State> {
     public static final RedirectAttack REDIRECT = new RedirectAttack(100, 7, 10, 0.75f);
-    public static final SimpleAttack<MagiciansRedEntity> LIGHT = SimpleAttack.<MagiciansRedEntity>lightAttack(5, 8, 5f, 16, 0.75f, 0.75f, -0.1f)
+    public static final SimpleAttack<MagiciansRedEntity> LIGHT = new SimpleAttack<MagiciansRedEntity>(JCraft.LIGHT_COOLDOWN,
+            5, 8, 0.75f, 5f, 16, 1.5f, 0.75f, -0.1f)
             .withCrouchingVariant(REDIRECT)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
-    public static final KnockdownAttack<MagiciansRedEntity> HEAVY = new KnockdownAttack<MagiciansRedEntity>(280, 12, 22, 1, 7f, 10, 1.75f, 0.5f, 0.6f, 40)
+    public static final KnockdownAttack<MagiciansRedEntity> HEAVY = new KnockdownAttack<MagiciansRedEntity>(280,
+            12, 22, 1f, 7f, 10, 1.75f, 0.5f, 0.6f, 40)
             .withSound(JSoundRegistry.MR_HEAVY)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withInfo(Text.literal("Low Kick"), Text.literal("medium windup knockdown"));
-    public static final FlamethrowerAttack FLAMETHROWER = new FlamethrowerAttack(340, 0, 60, 0.4f, 0, 2, 0.25f, 0.75f, 0, 3)
+    public static final FlamethrowerAttack FLAMETHROWER = new FlamethrowerAttack(340, 0, 60,
+            0.75f, 0.4f, 0, 2, 0.25f, 0, 3)
             .withArmor(1)
             .withSound(JSoundRegistry.MR_BARRAGE)
             .withInfo(Text.literal("Flamethrower"), Text.literal("fast reliable damage cash-out tool, no stun, burns for 3 seconds"));
@@ -99,6 +105,26 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
         super.tick();
 
         if (!hasUser()) return;
+
+        if (world.isClient && getState() == State.BARRAGE && FLAMETHROWER.hasWindupPassed(this)) {
+            Vec3d rotVec = getRotationVector();
+            Vec3d mouthPos = getEyePos().add(rotVec);
+            for (int i = 0; i < 16; i++) {
+                Vec3d vel = getUserOrThrow().getVelocity().add(
+                        rotVec
+                                .rotateX(random.nextFloat() - 0.5f)
+                                .rotateY(random.nextFloat() - 0.5f)
+                                .rotateZ(random.nextFloat() - 0.5f)
+                                .multiply(0.2)
+                );
+                world.addParticle(
+                        random.nextInt(6) == 5 ? ParticleTypes.LAVA : ParticleTypes.FLAME,
+                        mouthPos.x, mouthPos.y, mouthPos.z,
+                        vel.x, vel.y, vel.z
+                );
+            }
+        }
+
         getUserOrThrow().addStatusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 20, 0, true, false));
         CROSSFIRE_HURRICANE.tickHurricane(this);
     }

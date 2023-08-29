@@ -14,14 +14,11 @@ public class CleaveAttack extends AbstractSimpleAttack<CleaveAttack, SilverChari
     }
 
     @Override
-    public boolean onInitialize(SilverChariotEntity attacker) {
-        if (!super.onInitialize(attacker)) return false;
+    public void onInitialize(SilverChariotEntity attacker) {
+        super.onInitialize(attacker);
 
-        if (!attacker.hasUser()) return false;
         attacker.setFreePos(new Vec3f(attacker.getUserOrThrow().getPos().add(attacker.getUserOrThrow().getRotationVector().multiply(1.5))));
         attacker.setFree(true);
-
-        return true;
     }
 
     @Override

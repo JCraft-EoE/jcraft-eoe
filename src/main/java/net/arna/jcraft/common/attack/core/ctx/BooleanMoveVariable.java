@@ -7,7 +7,7 @@ public class BooleanMoveVariable extends MoveVariable<Boolean> {
 
     @Override
     MoveContext.Entry<Boolean> createEntry() {
-        return super.createEntry();
+        return new BooleanEntry();
     }
 
     public static class BooleanEntry extends MoveContext.Entry<Boolean> {

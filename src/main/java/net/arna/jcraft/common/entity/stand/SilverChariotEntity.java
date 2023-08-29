@@ -83,13 +83,13 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withInfo(Text.literal("God of Death (Final Hit)"), Text.empty());
     public static final GodOfDeathHitAttack GOD_OF_DEATH_HIT = new GodOfDeathHitAttack(0, 59, 0.65f,
             4.5f, 32, 2f, 0.75f, 0f, IntSet.of(13, 23))
-            .withFollowUp(GOD_OF_DEATH_FINAL)
+            .withFollowup(GOD_OF_DEATH_FINAL)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withStunType(StunType.UNBURSTABLE)
             .withInfo(Text.literal("God of Death (Hit)"), Text.empty());
     public static final GodOfDeathAttack GOD_OF_DEATH = new GodOfDeathAttack(1000, 23, 28,
             0.65f, 4f, 40, 1.75f, 0f, 0f)
-            .withFollowUp(GOD_OF_DEATH_HIT)
+            .withFollowup(GOD_OF_DEATH_HIT)
             .withStunType(StunType.UNBURSTABLE)
             .withInfo(Text.literal("God of Death"), Text.literal("high-damage beatdown, 1.5s stun on whiff, cannot be combo broken"));
     public static final ArmorOffAttack ARMOR_OFF = new ArmorOffAttack(1200, 6, 15, 0.65f,
@@ -104,7 +104,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withInfo(Text.literal("Circle Slash (Hit)"), Text.empty());
     public static final SimpleAttack<SilverChariotEntity> CIRCLE_CHARGE = new SimpleAttack<SilverChariotEntity>(
             340, 101, 100, 0.65f, 0f, 0, 0f, 0f, 0f)
-            .withFollowUp(CIRCLE_SLASH)
+            .withFollowup(CIRCLE_SLASH)
             .withArmor(2)
             .withInfo(Text.literal("Circle Slash"), Text.literal("charges for a minimum of 1 second, tap again to release, 2 armor points"));
     private static final TrackedData<Boolean> HAS_RAPIER;

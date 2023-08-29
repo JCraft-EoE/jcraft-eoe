@@ -75,7 +75,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             .withInfo(Text.literal("Overhead Hook"), Text.literal("long windup, knockdown"));
     public static final SimpleAttack<KingCrimsonEntity> VERTICAL_CHOP = new SimpleAttack<KingCrimsonEntity>(260,
             12, 19, 0.85f, 6f, 25, 1.5f, 0.2f, 0f)
-            .withFollowUp(OVERHEAD_HOOK)
+            .withFollowup(OVERHEAD_HOOK)
             .withSound(JSoundRegistry.KC_HEAVY)
             .withImpactSound(JSoundRegistry.IMPACT_9)
             .withExtraHitBox(0, 0.5, 1)

@@ -31,8 +31,8 @@ public class ItemPlaceMove extends AbstractMove<ItemPlaceMove, D4CEntity> {
     }
 
     @Override
-    public boolean onInitialize(D4CEntity attacker) {
-        if (!super.onInitialize(attacker)) return false;
+    public void onInitialize(D4CEntity attacker) {
+        super.onInitialize(attacker);
 
         MoveContext ctx = attacker.getMoveContext();
         boolean placingFirstStack = ctx.getBoolean(PLACING_FIRST_STACK);
@@ -40,8 +40,6 @@ public class ItemPlaceMove extends AbstractMove<ItemPlaceMove, D4CEntity> {
 
         attacker.equipStack(EquipmentSlot.OFFHAND, ctx.get(PLACING).copy());
         ctx.setBoolean(PLACING_FIRST_STACK, !placingFirstStack);
-
-        return true;
     }
 
     @Override

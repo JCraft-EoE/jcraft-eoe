@@ -79,7 +79,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
     // Does absolutely nothing on its own.
     public static final NoOpMove<TheWorldOverHeavenEntity> CHARGE_OVERWRITE = new NoOpMove<TheWorldOverHeavenEntity>(
             600, 70, 1f)
-            .withFollowUp(OVERWRITE)
+            .withFollowup(OVERWRITE)
             .withSound(JSoundRegistry.TWOH_CHARGE_OVERWRITE)
             .withInfo(Text.literal("Reality Overwrite"), Text.literal("""
                             charges (for a minimum of 1s) an unblockable punch that changes the reality of the hit victims

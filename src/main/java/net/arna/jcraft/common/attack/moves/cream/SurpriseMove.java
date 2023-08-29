@@ -24,8 +24,13 @@ public class SurpriseMove extends AbstractMove<SurpriseMove, CreamEntity> {
     }
 
     @Override
-    public boolean onInitialize(CreamEntity attacker) {
-        if (attacker.isHalfBall() || !super.onInitialize(attacker)) return false;
+    public boolean canBeInitiated(CreamEntity attacker) {
+        return !attacker.isHalfBall() && super.canBeInitiated(attacker);
+    }
+
+    @Override
+    public void onInitialize(CreamEntity attacker) {
+        super.onInitialize(attacker);
 
         LivingEntity user = attacker.getUserOrThrow();
         Vec3d eyePos = user.getEyePos();
@@ -36,8 +41,6 @@ public class SurpriseMove extends AbstractMove<SurpriseMove, CreamEntity> {
         attacker.setFree(true);
         attacker.setFreePos(new Vec3f(user.getPos()));
         attacker.getMoveContext().set(OUT_POS, new Vec3f(hitResult.getPos()));
-
-        return true;
     }
 
     @Override

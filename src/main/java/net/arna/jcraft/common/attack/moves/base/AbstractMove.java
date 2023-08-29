@@ -39,8 +39,8 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * Defaults to {@code this}.
      */
     private T originalMove = getThis();
-    private @Nullable AbstractMove<?, ? super A> crouchingVariant, aerialVariant, followUp;
-    private boolean isCrouchingVariant, isAerialVariant;
+    private @Nullable AbstractMove<?, ? super A> crouchingVariant, aerialVariant, followup;
+    private boolean isCrouchingVariant, isAerialVariant, isFollowup;
     private int armor;
     private IntObjectPair<AbstractMove<?, ? super A>> finisher;
     protected MobilityType mobilityType;
@@ -150,11 +150,12 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
 
     /**
      * Sets the move that will be initiated after this move is performed.
-     * @param followUp The move that will be initiated after this move is performed.
+     * @param followup The move that will be initiated after this move is performed.
      * @return This move
      */
-    public T withFollowUp(AbstractMove<?, ? super A> followUp) {
-        this.followUp = followUp.copy();
+    public T withFollowup(AbstractMove<?, ? super A> followup) {
+        this.followup = followup.copy();
+        this.followup.isFollowup = true;
         return getThis();
     }
 
@@ -267,6 +268,10 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         return isAerialVariant;
     }
 
+    public boolean isFollowup() {
+        return isFollowup;
+    }
+
     /**
      * Called when this move is registered to a {@link net.arna.jcraft.common.attack.core.MoveMap MoveMap}.
      * Not supposed to be called anywhere else.
@@ -278,7 +283,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
 
         if (crouchingVariant != null) crouchingVariant.onRegister(type);
         if (aerialVariant != null) aerialVariant.onRegister(type);
-        if (followUp != null) followUp.onRegister(type);
+        if (followup != null) followup.onRegister(type);
         if (finisher != null) finisher.right().onRegister(type);
 
         // TODO convert these to actual tests
@@ -290,23 +295,22 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     // Logic methods
 
     /**
-     * Called when this move is initialized.
-     * By default, only plays the sound(s).
-     *
+     * Whether this attack may be initiated.
+     * @param attacker The attacker to check for
      * @return Whether this attack may be initiated
      */
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted") // Don't care
-    public boolean onInitialize(A attacker) {
-        if (!canBeInitiated(attacker)) return false;
-
-        initActions.forEach(action -> action.perform(attacker, attacker.getUser(), attacker.getMoveContext()));
-        sounds.forEach(sound -> attacker.playSound(sound, 1f, 1f));
-
-        return true;
+    public boolean canBeInitiated(A attacker) {
+        // Followups generally don't check canAttack() cuz they require that move-stun > 0 while canAttack() requires the opposite.
+        return (isFollowup() || attacker.canAttack()) && conditions.stream().allMatch(condition -> condition.test(attacker));
     }
 
-    public boolean canBeInitiated(A attacker) {
-        return attacker.canAttack() && conditions.stream().allMatch(condition -> condition.test(attacker));
+    /**
+     * Called when this move is initialized.
+     * By default, only plays the sound(s) and invokes the init actions, if any.
+     */
+    public void onInitialize(A attacker) {
+        initActions.forEach(action -> action.perform(attacker, attacker.getUser(), attacker.getMoveContext()));
+        sounds.forEach(sound -> attacker.playSound(sound, 1f, 1f));
     }
 
     /**
@@ -457,11 +461,12 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         cast.moveType = moveType;
         cast.name = name;
         cast.description = description;
-        cast.followUp = followUp == null ? null : followUp.copy();
+        cast.followup = followup == null ? null : followup.copy();
         cast.crouchingVariant = crouchingVariant == null ? null : crouchingVariant.copy();
         cast.aerialVariant = aerialVariant == null ? null : aerialVariant.copy();
         cast.isCrouchingVariant = isCrouchingVariant;
         cast.isAerialVariant = isAerialVariant;
+        cast.isFollowup = isFollowup;
         cast.armor = armor;
         cast.mobilityType = mobilityType;
         cast.originalMove = originalMove; // If this move was copied, this will set it to our original move on the copy.
@@ -491,7 +496,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
 
         if (crouchingVariant != null) crouchingVariant.testCopy();
         if (aerialVariant != null) aerialVariant.testCopy();
-        if (followUp != null) followUp.testCopy();
+        if (followup != null) followup.testCopy();
     }
 
     @FunctionalInterface

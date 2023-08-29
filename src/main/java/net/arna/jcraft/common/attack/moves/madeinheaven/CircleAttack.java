@@ -34,8 +34,8 @@ public class CircleAttack extends AbstractMove<CircleAttack, MadeInHeavenEntity>
     }
 
     @Override
-    public boolean onInitialize(MadeInHeavenEntity attacker) {
-        if (!super.onInitialize(attacker)) return false;
+    public void onInitialize(MadeInHeavenEntity attacker) {
+        super.onInitialize(attacker);
 
         LivingEntity user = attacker.getUserOrThrow();
         LivingEntity target = AbstractSimpleAttack.findHits(attacker, user.getEyePos().add(attacker.getRotationVector()), 2d, null)
@@ -50,8 +50,6 @@ public class CircleAttack extends AbstractMove<CircleAttack, MadeInHeavenEntity>
         attacker.setCirclingTarget(target);
         ctx.set(TARGET, target);
         ctx.setFloat(ORBIT_PROG, user.getHeadYaw());
-
-        return true;
     }
 
     @Override

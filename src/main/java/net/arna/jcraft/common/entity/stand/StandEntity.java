@@ -489,7 +489,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * @return whether the stand should be able to attack
      */
     public boolean canAttack() {
-        return hasUser() && this.getMoveStun() < 1 && !JUtils.isAffectedByTimeStop(user) && !getUserOrThrow().hasStatusEffect(JStatusRegistry.DAZED);
+        return hasUser() && getMoveStun() <= 0 && !JUtils.isAffectedByTimeStop(user) && !getUserOrThrow().hasStatusEffect(JStatusRegistry.DAZED);
     }
 
     /**
@@ -497,22 +497,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      */
     public boolean shouldOffsetHeight() {
         return getState().ordinal() > 1;
-    }
-
-    /**
-     * Struct used for storing extra information relating to the stands ability to attack
-     */
-    public record CanAttackData(LivingEntity user, boolean canAttack) {}
-
-    /**
-     * Returns a {@link CanAttackData} with information relating to the stands ability to attack
-     */
-    public CanAttackData canAttackWithData() {
-        if (hasUser()) {
-            return new CanAttackData(user, getMoveStun() <= 0 && !JUtils.isAffectedByTimeStop(user) &&
-                    !getUserOrThrow().hasStatusEffect(JStatusRegistry.DAZED));
-        }
-        return new CanAttackData(null, false);
     }
 
     public boolean handleMove(MoveType type) {
@@ -534,12 +518,13 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     /**
      * Initiates an attack with the stand
      *
-     * @param move       attack to handle
+     * @param move         move to handle
      * @param cooldownType type of cooldown to start
-     * @param animState    int identifier for which state to put the stand into
+     * @param animState    the state to put the stand into
      */
     public boolean handleMove(AbstractMove<?, ? super E> move, CooldownType cooldownType, @Nullable S animState) {
-        if (!move.onInitialize(getThis())) return false;
+        if (!move.canBeInitiated(getThis())) return false;
+        move.onInitialize(getThis());
 
         if (cooldownType != null && move.getCooldown() > 0) {
             CooldownsComponent cooldowns = JComponents.getCooldowns(getUser());
@@ -559,8 +544,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      *
      * @param move    move to set
      * @param animState int identifier for which state to put the stand into
-     *
-     * @return Whether the attack has been initiated
      */
     public void setMove(AbstractMove<?, ? super E> move, @Nullable S animState) {
         // If the attack has a duration of 0, just perform it immediately.
@@ -607,6 +590,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         damage = ((LivingEntityInvoker) ent).invokeModifyAppliedDamage(damageSource, damage);
 
         // Apply absorption
+        applyAbsorptionAndStats(damage, damageSource, ent);
+    }
+
+    private static void applyAbsorptionAndStats(float damage, DamageSource damageSource, LivingEntity ent) {
         float f = damage;
         damage = Math.max(damage - ent.getAbsorptionAmount(), 0.0F);
         ent.setAbsorptionAmount(ent.getAbsorptionAmount() - (f - damage));
@@ -652,31 +639,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         damage = DamageUtil.getDamageLeft(damage, (float) ent.getArmor() * 0.9f, (float) ent.getAttributeValue(EntityAttributes.GENERIC_ARMOR_TOUGHNESS) * 0.9f);
 
         // Apply absorption
-        float f = damage;
-        damage = Math.max(damage - ent.getAbsorptionAmount(), 0.0F);
-        ent.setAbsorptionAmount(ent.getAbsorptionAmount() - (f - damage));
-
-        if (damage <= 0) return;
-
-        float h = ent.getHealth();
-
-        LivingEntityInvoker invoker = (LivingEntityInvoker) ent;
-
-        // Statistics
-        World world = ent.getWorld();
-        if (!(ent instanceof PlayerEntity)) world.sendEntityStatus(ent, (byte) 2);
-
-        invoker.setLastDamageTaken(damage);
-        invoker.setLastDamageSource(damageSource);
-        invoker.setLastDamageTime(world.getTime());
-
-        ent.timeUntilRegen = 20;
-        ent.maxHurtTime = ent.hurtTime = 10;
-
-        ent.setHealth(h - damage);
-        ent.getDamageTracker().onDamage(damageSource, h, damage);
-        ent.emitGameEvent(GameEvent.ENTITY_DAMAGE);
-        if (ent.isDead()) ent.onDeath(damageSource);
+        applyAbsorptionAndStats(damage, damageSource, ent);
     }
 
     // Stock attacks to define
@@ -1261,7 +1224,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             if (selectedAttack != null) {
                 boolean shouldPerformMove = stand.getMoveStun() < 1;
 
-                if (stand.curMove != null && stand.curMove.getFollowUp() != null)
+                if (stand.curMove != null && stand.curMove.getFollowup() != null)
                     shouldPerformMove = true;
 
                 mob.setSneaking(selectedAttack.isCrouchingVariant());
@@ -1359,8 +1322,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         int movesOnCooldown = 0;
 
         if (curMove != null) {
-            if (curMove.getFollowUp() != null)
-                selectedAttack = curMove.getFollowUp();
+            if (curMove.getFollowup() != null)
+                selectedAttack = curMove.getFollowup();
         } else {
             MoveMap.Entry<E, S> lightEntry = getMoveMap().getFirstValidEntry(MoveType.LIGHT, getThis());
             if (lightEntry == null) return null;

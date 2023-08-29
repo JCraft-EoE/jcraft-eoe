@@ -30,8 +30,9 @@ public class TimeSkipMove<A extends IAttacker<? extends A, ?>> extends AbstractM
     }
 
     @Override
-    public boolean onInitialize(A attacker) {
-        return canBeInitiated(attacker); // Don't play the sounds.
+    public void onInitialize(A attacker) {
+        // Don't play the sounds
+        getInitActions().forEach(action -> action.perform(attacker, attacker.getUser(), attacker.getMoveContext()));
     }
 
     @Override

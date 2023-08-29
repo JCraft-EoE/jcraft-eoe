@@ -38,7 +38,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
             19, 0.75f, 3f, 20, 0, IntSet.of(6, 11))
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withCrouchingVariant(DETONATE)
-            .withFollowUp(LOW)
+            .withFollowup(LOW)
             .withInfo(Text.literal("Dual Punch"), Text.literal("combo starter, decent speed, has followup with more blockstun"));
     public static final BarrageAttack<AbstractKillerQueenEntity<?, ?>> BARRAGE = new BarrageAttack<AbstractKillerQueenEntity<?, ?>>(
             340, 0, 50, 0.75f, 1f, 20, 1.5f, 0.1f, 0, 3)
@@ -108,8 +108,8 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
         if (user.hasStatusEffect(JStatusRegistry.DAZED)) return;
 
         if (type == MoveType.LIGHT) {
-            boolean idling = getMoveStun() < 1;
-            if (curMove != LIGHT) {
+            boolean idling = getMoveStun() <= 0;
+            if (curMove == null || curMove.getOriginalMove() != LIGHT) {
                 if (idling) {
                     if (user.isSneaking()) detonate();
                     else handleMove(MoveType.LIGHT);

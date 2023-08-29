@@ -40,8 +40,8 @@ public class SmiteAttack extends AbstractEffectInflictingAttack<SmiteAttack, The
     }
 
     @Override
-    public boolean onInitialize(TheWorldOverHeavenEntity attacker) {
-        if (!super.onInitialize(attacker)) return false;
+    public void onInitialize(TheWorldOverHeavenEntity attacker) {
+        super.onInitialize(attacker);
 
         LivingEntity user = attacker.getUserOrThrow();
         MoveContext ctx = attacker.getMoveContext();
@@ -72,8 +72,6 @@ public class SmiteAttack extends AbstractEffectInflictingAttack<SmiteAttack, The
 
         attacker.getWorld().playSound(null, lightningPos.x, lightningPos.y, lightningPos.z,
                 JSoundRegistry.TWOH_CHARGE, SoundCategory.PLAYERS, 1, 1);
-
-        return true;
     }
 
     @Override

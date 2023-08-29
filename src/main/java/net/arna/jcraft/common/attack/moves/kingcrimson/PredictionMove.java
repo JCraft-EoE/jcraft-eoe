@@ -36,8 +36,8 @@ public class PredictionMove extends AbstractMove<PredictionMove, KingCrimsonEnti
     }
 
     @Override
-    public boolean onInitialize(KingCrimsonEntity attacker) {
-        if (!super.onInitialize(attacker)) return false;
+    public void onInitialize(KingCrimsonEntity attacker) {
+        super.onInitialize(attacker);
 
         attacker.getMoveContext().get(PREDICTION_INFO).clear();
 
@@ -45,8 +45,6 @@ public class PredictionMove extends AbstractMove<PredictionMove, KingCrimsonEnti
         if (attacker.getUser() instanceof ServerPlayerEntity player)
             ServerPlayNetworking.send(player, JPacketRegistry.S2C_EPITAPH_STATE,
                     new PacketByteBuf(Unpooled.buffer().writeBoolean(true)));
-
-        return true;
     }
 
     @Override

@@ -21,11 +21,10 @@ public class SandWaveAttack extends AbstractEffectInflictingBarrageAttack<SandWa
     }
 
     @Override
-    public boolean onInitialize(TheFoolEntity attacker) {
-        if (!super.onInitialize(attacker)) return false;
+    public void onInitialize(TheFoolEntity attacker) {
+        super.onInitialize(attacker);
 
         attacker.setWave(true);
-        return true;
     }
 
     @Override

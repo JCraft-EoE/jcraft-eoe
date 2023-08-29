@@ -123,8 +123,8 @@ public class MoveMap<A extends IAttacker<A, S>, S> implements Iterable<MoveMap.E
             if (move.getAerialVariant() != null)
                 aerialVariant = new Entry<>(this, type, move.getAerialVariant(), cooldownType, animState);
 
-            if (move.getFollowUp() != null)
-                followUp = new Entry<>(this, type, move.getFollowUp(), cooldownType, animState);
+            if (move.getFollowup() != null)
+                followUp = new Entry<>(this, type, move.getFollowup(), cooldownType, animState);
         }
 
         /**
@@ -217,9 +217,9 @@ public class MoveMap<A extends IAttacker<A, S>, S> implements Iterable<MoveMap.E
          * @return The followup entry
          */
         public Entry<A, S> withFollowUp(CooldownType cooldownType, S animState) {
-            if (move.getFollowUp() == null) throw new IllegalArgumentException("The move of this entry has " +
+            if (move.getFollowup() == null) throw new IllegalArgumentException("The move of this entry has " +
                     "no follow-up.");
-            followUp = new Entry<>(this, type, move.getFollowUp(), cooldownType, animState);
+            followUp = new Entry<>(this, type, move.getFollowup(), cooldownType, animState);
             return followUp;
         }
     }

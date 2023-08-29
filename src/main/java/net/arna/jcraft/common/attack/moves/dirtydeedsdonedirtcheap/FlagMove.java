@@ -19,15 +19,13 @@ public class FlagMove extends AbstractMove<FlagMove, D4CEntity> {
     }
 
     @Override
-    public boolean onInitialize(D4CEntity attacker) {
-        if (!super.onInitialize(attacker)) return false;
+    public void onInitialize(D4CEntity attacker) {
+        super.onInitialize(attacker);
 
         attacker.getUserOrThrow().addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, getDuration(),
                 0, true, false));
         attacker.getUserOrThrow().addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, getDuration(),
                 0, true, false));
-
-        return true;
     }
 
     @Override

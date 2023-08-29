@@ -18,15 +18,13 @@ public class SCChargeAttack extends AbstractChargeAttack<SCChargeAttack, SilverC
     }
 
     @Override
-    public boolean onInitialize(SilverChariotEntity attacker) {
-        if (!super.onInitialize(attacker) || !attacker.hasUser()) return false;
+    public void onInitialize(SilverChariotEntity attacker) {
+        super.onInitialize(attacker);
 
         LivingEntity user = attacker.getUserOrThrow();
         float lookDirY = (float) user.getRotationVector().y;
         lookDirY *= MathHelper.abs(lookDirY);
         attacker.getMoveContext().setFloat(LOOK_DIR_Y, lookDirY);
-
-        return true;
     }
 
     @Override

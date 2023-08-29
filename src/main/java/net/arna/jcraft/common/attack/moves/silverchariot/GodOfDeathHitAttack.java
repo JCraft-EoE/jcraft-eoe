@@ -19,7 +19,7 @@ public class GodOfDeathHitAttack extends AbstractMultiHitAttack<GodOfDeathHitAtt
     public @NonNull Set<LivingEntity> perform(SilverChariotEntity attacker, LivingEntity user, MoveContext ctx) {
         Set<LivingEntity> targets = super.perform(attacker, user, ctx);
 
-        if (getBlow(attacker) == 1) attacker.curMove = getFollowUp();
+        if (getBlow(attacker) == 1) attacker.curMove = getFollowup();
 
         return targets;
     }
