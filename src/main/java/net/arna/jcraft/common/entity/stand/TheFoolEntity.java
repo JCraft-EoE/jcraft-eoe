@@ -2,6 +2,7 @@ package net.arna.jcraft.common.entity.stand;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.NonNull;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.BlockableType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
@@ -185,20 +186,21 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
 
     @Override
     public void initMove(MoveType type) {
-        if (!canAttack()) return;
-
         switch (type) {
             case HEAVY -> {
                 setSand(true);
                 super.initMove(type);
             }
             case SPECIAL1, SPECIAL2, SPECIAL3 -> {
-                if (curMove != null && curMove.getOriginalMove() == POUND && getMoveStun() <= 11)
+                if (curMove != null && curMove.getOriginalMove() == POUND && getMoveStun() <= 11) {
                     initSlam(switch (type) {
                         default -> 1;
                         case SPECIAL2 -> 2;
                         case SPECIAL3 -> 3;
                     });
+
+                    return;
+                }
 
                 super.initMove(type);
                 if (type == MoveType.SPECIAL2 && !getUserOrThrow().isOnGround() || type == MoveType.SPECIAL3)
@@ -214,6 +216,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     }
 
     private void initSlam(int type) {
+        JCraft.LOGGER.info("TRYING TO INITIALIZE SLAM OF TYPE: " + type);
         getMoveContext().setInt(SlamAttack.VARIANT, type);
         setMove(SLAM, State.POUND_DOWN);
         playSound(JSoundRegistry.FOOL_BARK1, 1, 1);
