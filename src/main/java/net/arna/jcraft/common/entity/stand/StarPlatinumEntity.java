@@ -32,7 +32,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
             .withCrouchingVariant(UPPERCUT)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
-    public static final BarrageAttack<StarPlatinumEntity> BARRAGE = new BarrageAttack<StarPlatinumEntity>(340,
+    public static final BarrageAttack<StarPlatinumEntity> BARRAGE = new BarrageAttack<StarPlatinumEntity>(280,
             0, 60, 0.75f, 1f, 30, 2f, 0.25f, 0f, 3)
             .withSound(JSoundRegistry.STAR_PLATINUM_BARRAGE)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));

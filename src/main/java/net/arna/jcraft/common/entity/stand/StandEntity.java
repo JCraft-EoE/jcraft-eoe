@@ -496,7 +496,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * @return whether the stand should change its height depending on the user's look pitch
      */
     public boolean shouldOffsetHeight() {
-        return getState().ordinal() > 1;
+        return getState().ordinal() > 0;
     }
 
     public boolean handleMove(MoveType type) {

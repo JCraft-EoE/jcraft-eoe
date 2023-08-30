@@ -60,20 +60,20 @@ public class MoveDataCommand {
         if (move == null) return 0;
 
         int moveStun = move.getDuration();
-        int initTime = move.getWindupPoint();
+        int initTime = move.getWindup();
 
         if (initTime > 0) initTime -= 1;
 
         int startup = initTime;
-        StringBuilder frames = new StringBuilder("§41§r");
+        StringBuilder frames = new StringBuilder();
         int recovery = move.getDuration() - initTime - 1;
 
         String advOnHit = "No physical hit\n";
         String advOnBlock = "";
 
         String mainFDMessage =
-                "======== Attack Stats for: §2" + move.getName().getString() + "§r ========\n" +
-                        "Attack distance: §6" + move.getMoveDistance() + "§r m\n";
+                "======== Move stats for: §2" + move.getName().getString() + "§r ========\n" +
+                        "Move distance: §6" + move.getMoveDistance() + "§r m\n";
 
 
         int armor = move.getArmor();
@@ -81,15 +81,6 @@ public class MoveDataCommand {
             mainFDMessage = mainFDMessage.concat("§rAttack has: §7" + (armor > 100 ? "Hyper Armor§r\n" : armor + " Armor Points§r\n"));
 
         if (move instanceof AbstractSimpleAttack<?, ?> attack) {
-            if (attack.getHitboxSize() > 0) {
-                advOnHit = "Advantage on hit: §c" + (attack.getStun() - recovery - 1) + "§r ticks of " + attack.getStunType() + " Stun\n";
-                advOnBlock = (attack.getBlockableType() == BlockableType.NON_BLOCKABLE) ? "§5Unblockable§r\n" : "Advantage on block: §5" + (attack.getBlockStun() - recovery) + "§r ticks\n";
-
-                mainFDMessage = mainFDMessage.concat(
-                        "Damage: §6" + attack.getDamage() / 2f + "§r hearts\n" +
-                                "Knockback: §6" + attack.getKnockback()) + "§r\n";
-            }
-
             if (attack.getBlockableType() == BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
                 mainFDMessage = mainFDMessage.concat("§r\nEffects on hit are §5UNBLOCKABLE");
 
@@ -103,7 +94,7 @@ public class MoveDataCommand {
                 recovery = 10;
             }
             // I REALLY don't want to go through the mental gymnastics of figuring out the maths that would do this faster, so I'm just going to simulate
-            if (attack instanceof AbstractBarrageAttack<?, ?> barrage) {
+            else if (attack instanceof AbstractBarrageAttack<?, ?> barrage) {
                 int interval = barrage.getInterval();
                 for (int i = moveStun - 1; i > -1; i--) {
                     //JCraft.LOGGER.info(i + " " + (i % interval == 0) + " " + interval);
@@ -129,8 +120,8 @@ public class MoveDataCommand {
                         j += 1;
                     }
                 }
-            }
-            if (attack instanceof AbstractMultiHitAttack<?, ?> multiHitAttack) {
+                if (fRec) recovery = 0;
+            } else if (attack instanceof AbstractMultiHitAttack<?, ?> multiHitAttack) {
                 IntSortedSet atks = multiHitAttack.getHitMoments();
                 int c = 0;
                 for (int i = moveStun - 1; i > -1; i--) {
@@ -158,6 +149,17 @@ public class MoveDataCommand {
                         j += 1;
                     }
                 }
+            } else {
+                frames.append("§41§r");
+            }
+
+            if (attack.getHitboxSize() > 0) {
+                advOnHit = "Advantage on hit: §c" + (attack.getStun() - recovery - 1) + "§r ticks of " + attack.getStunType() + " Stun\n";
+                advOnBlock = (attack.getBlockableType() == BlockableType.NON_BLOCKABLE) ? "§5Unblockable§r\n" : "Advantage on block: §5" + (attack.getBlockStun() - recovery) + "§r ticks";
+
+                mainFDMessage = mainFDMessage.concat(
+                        "Damage: §6" + attack.getDamage() / 2f + "§r hearts\n" +
+                                "Knockback: §6" + attack.getKnockback()) + "§r\n";
             }
         }
 

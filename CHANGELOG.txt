@@ -1668,6 +1668,13 @@ Killer Queen: Bites the Dust
 ● 24/8/2023
 >Attack code completely reworked
 >Packet spam from clients significantly reduced
+>Stands can now aim their M1s up and down
+
+Star Platinum
+    >Barrage cooldown reduced (17->14s)
+    >Star Breaker
+        >Cooldown reduced (17->9s)
+        >Advantage on block reduced (+4->-1)
 
 Whitesnake
     >Donut cooldown reduced (18->14s)

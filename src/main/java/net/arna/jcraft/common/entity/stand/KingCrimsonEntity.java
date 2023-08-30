@@ -3,6 +3,7 @@ package net.arna.jcraft.common.entity.stand;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.NonNull;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.moves.kingcrimson.*;
@@ -218,9 +219,8 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
 
                 super.initMove(type);
             }
-            case UTILITY -> {
+            case SPECIAL3 -> {
                 LivingEntity user = getUserOrThrow();
-                CooldownsComponent cooldowns = JComponents.getCooldowns(user);
                 boolean start = getMoveStun() <= 0;
 
                 if (start) {
@@ -232,6 +232,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                 moveCancel();
 
                 // 7 second time erase cooldown
+                CooldownsComponent cooldowns = JComponents.getCooldowns(user);
                 if (cooldowns.getCooldown(CooldownType.STAND_ULTIMATE) < 140)
                     cooldowns.setCooldown(CooldownType.STAND_ULTIMATE, 140);
 
@@ -253,6 +254,10 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                 // Stop epitaph state
                 if (user instanceof ServerPlayerEntity player)
                     ServerPlayNetworking.send(player, JPacketRegistry.S2C_EPITAPH_STATE, new PacketByteBuf(Unpooled.buffer().writeBoolean(false)));
+            }
+            case UTILITY -> {
+                if (getTETime() > 0) cancelTE();
+                super.initMove(type);
             }
             default -> super.initMove(type);
         }
@@ -280,7 +285,8 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
         curMove = null;
         queuedAttack = null;
         setMoveStun(2);
-        setState(State.IDLE); // Basically state 1, but runs logic once
+        setState(State.IDLE);
+        setReset(true);
     }
 
     @Override
