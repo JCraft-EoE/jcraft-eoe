@@ -1,5 +1,7 @@
 package net.arna.jcraft;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntRBTreeMap;
 import lombok.Getter;
 import lombok.Setter;
 import net.arna.jcraft.common.component.CooldownsComponent;
@@ -87,7 +89,7 @@ public class JCraft implements ModInitializer {
     public static final List<DimValues> pastDimensions = new ArrayList<>();
     private static final List<ChunkPos> preloadedChunks = new ArrayList<>();
 
-    public static final Map<LivingEntity, Integer> burstTimers = new HashMap<>();
+    public static final Object2IntMap<LivingEntity> burstTimers = new Object2IntRBTreeMap<>();
 
     public static final List<DashData> dashes = new ArrayList<>();
 

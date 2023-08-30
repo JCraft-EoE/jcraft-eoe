@@ -1,7 +1,10 @@
 package net.arna.jcraft.common.events;
 
+import it.unimi.dsi.fastutil.objects.Object2IntAVLTreeMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.JCraft.DashData;
+import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.*;
@@ -25,10 +28,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static net.arna.jcraft.common.entity.stand.StandEntity.standUserAI;
 import static net.arna.jcraft.common.entity.stand.StandEntity.stun;
@@ -106,14 +106,14 @@ public class JServerTickEvents {
         activeTimestops.addAll(newActiveTimestops);
 
         // Burst handling
-        Map<LivingEntity, Integer> newBurstTimers = new HashMap<>();
+        Object2IntMap<LivingEntity> newBurstTimers = new Object2IntAVLTreeMap<>();
 
-        for (Map.Entry<LivingEntity, Integer> burst : JCraft.burstTimers.entrySet()) {
+        for (Object2IntMap.Entry<LivingEntity> burst : JCraft.burstTimers.object2IntEntrySet()) {
             LivingEntity player = burst.getKey();
-            burst.setValue(burst.getValue() - 1);
-            int newVal = burst.getValue();
+            burst.setValue(burst.getIntValue() - 1);
+            int newVal = burst.getIntValue();
 
-            List<Entity> filter = new ArrayList<>();
+            Set<Entity> filter = new HashSet<>();
             filter.add(player);
             if (player.hasPassengers()) filter.addAll(player.getPassengerList());
 
@@ -125,7 +125,8 @@ public class JServerTickEvents {
             player.removeStatusEffect(JStatusRegistry.DAZED);
             stun(player, 10, 1);
             Vec3d pPos = player.getEyePos();
-            List<? extends Entity> toPush = JUtils.generateHitbox(player.world, pPos, 4, Entity.class, filter);
+            List<? extends Entity> toPush = player.world.getEntitiesByClass(Entity.class, AbstractSimpleAttack.createBox(pPos, 4),
+                    EntityPredicates.VALID_LIVING_ENTITY.and(e -> !filter.contains(e)));
 
             for (Entity ent : toPush) {
                 Vec3d awayVector = ent.getPos().subtract(pPos).normalize();
