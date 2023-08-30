@@ -335,7 +335,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
                         e != attacker && e != attacker.getUser() && e != attacker.getUserOrThrow().getVehicle())).stream())
                 .flatMap(e -> e instanceof StandEntity<?,?> hitStand && hitStand.hasUser() &&
                         type.isInstance(hitStand.getUserOrThrow()) ? Stream.of(e, type.cast(hitStand.getUserOrThrow())) : Stream.of(e))
-                .filter(e -> damageSource == null || JUtils.canDamage(damageSource, e)) // This must be done after the previous flatmap call as it excludes stands.
+                .filter(damageSource == null ? e -> true : e -> JUtils.canDamage(damageSource, e)) // This must be done after the previous flatmap call as it excludes stands.
                 .collect(Collectors.toSet());
     }
 
@@ -343,7 +343,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
     @Override
     public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user, MoveContext ctx) {
         Vec3d upVec = GravityChangerAPI.getEyeOffset(user);
-        Vec3d hPos = getOffsetHeightPos(attacker);
+        Vec3d hPos = attacker.getBaseEntity().getPos().add(upVec.multiply(0.5));
         Vec3d rotVec = getRotVec(attacker);
 
         Vec3d fPos = getOffsetForwardPos(attacker, hPos, upVec, rotVec);

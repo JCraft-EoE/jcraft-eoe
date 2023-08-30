@@ -1,6 +1,7 @@
 package net.arna.jcraft.client.renderer.effects;
 
 import com.google.common.collect.EvictingQueue;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.longs.LongLongPair;
@@ -46,6 +47,8 @@ public class AttackHitboxEffectRenderer {
     @Synchronized
     private static void render(WorldRenderContext ctx) {
         if (!MinecraftClient.getInstance().getEntityRenderDispatcher().shouldRenderHitboxes()) return;
+
+        RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
 
         Vec3d camPos = ctx.camera().getPos();
         MatrixStack matrices = ctx.matrixStack();
