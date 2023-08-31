@@ -18,14 +18,19 @@ import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
+import net.minecraft.command.argument.EntityAnchorArgumentType;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -256,8 +261,47 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                 user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 40, 0, true, false));
         }
 
+        if (world.isClient) {
+            Entity clientCircleTarget = getCircleTarget();
+            if (clientCircleTarget != null)
+                lookAtWithoutReset(user, EntityAnchorArgumentType.EntityAnchor.EYES, clientCircleTarget.getEyePos());
+
+            if (getAccelTime() > 1) { // Updating on the client, to make sure all is smooth
+                CircleAttack.createSpeedParticles(this, this);
+
+                List<Entity> toCatch = getWorld().getEntitiesByClass(Entity.class, // Lower range by 32 to reduce lag
+                        getBoundingBox().expand(96), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+
+                for (Entity entity : toCatch) {
+                    if (entity instanceof LivingEntity) continue;
+                    if (entity.getPos().squaredDistanceTo(new Vec3d(entity.prevX, entity.prevY, entity.prevZ)) > 0)
+                        CircleAttack.createSpeedParticles(this, entity);
+                    entity.tick();
+                }
+            }
+
+            return;
+        }
+
         // Tracking
-        if (!world.isClient) setSpeedometer(speedometer);
+        setSpeedometer(speedometer);
+    }
+
+    // Copied from Entity#lookAt(EntityAnchor, Vec3d), but doesn't set prevYaw, prevPitch and prevHeadYaw to get rid of jitter.
+    private static void lookAtWithoutReset(LivingEntity entity, EntityAnchorArgumentType.EntityAnchor anchorPoint, Vec3d target) {
+        entity.prevYaw = entity.getYaw();
+        entity.prevBodyYaw = entity.getBodyYaw();
+        entity.prevHeadYaw = entity.getHeadYaw();
+        entity.prevPitch = entity.getPitch();
+
+        Vec3d vec3d = anchorPoint.positionAt(entity);
+        double d = target.x - vec3d.x;
+        double e = target.y - vec3d.y;
+        double f = target.z - vec3d.z;
+        double g = Math.sqrt(d * d + f * f);
+        entity.setPitch(MathHelper.wrapDegrees((float)(-(MathHelper.atan2(e, g) * 57.2957763671875))));
+        entity.setYaw(MathHelper.wrapDegrees((float)(MathHelper.atan2(f, d) * 57.2957763671875) - 90.0f));
+        entity.setHeadYaw(entity.getYaw());
     }
 
     @Override

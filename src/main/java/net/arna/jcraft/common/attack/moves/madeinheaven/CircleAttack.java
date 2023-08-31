@@ -5,21 +5,18 @@ import net.arna.jcraft.common.attack.core.ctx.*;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.entity.stand.MadeInHeavenEntity;
-import net.arna.jcraft.common.entity.stand.StandEntity;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
-import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
-import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 
-import java.util.List;
 import java.util.Set;
 
 public class CircleAttack extends AbstractMove<CircleAttack, MadeInHeavenEntity> {
@@ -40,10 +37,8 @@ public class CircleAttack extends AbstractMove<CircleAttack, MadeInHeavenEntity>
         LivingEntity user = attacker.getUserOrThrow();
         LivingEntity target = AbstractSimpleAttack.findHits(attacker, user.getEyePos().add(attacker.getRotationVector()), 2d, null)
                 .stream()
-                .filter(e -> e != attacker && e != user && e instanceof StandEntity<?, ?> stand && stand.hasUser())
-                .map(e -> (StandEntity<?, ?>) e)
+                .map(JUtils::getUserIfStand)
                 .findFirst()
-                .map(StandEntity::getUser)
                 .orElse(null);
 
         MoveContext ctx = attacker.getMoveContext();
@@ -70,6 +65,7 @@ public class CircleAttack extends AbstractMove<CircleAttack, MadeInHeavenEntity>
         MoveContext ctx = attacker.getMoveContext();
         ctx.setInt(CIRCLING_TIME, 0);
         ctx.set(TARGET, null);
+        attacker.setCirclingTarget(null);
         if (attacker.getAccelTime() <= 0) attacker.setAfterimage(false);
     }
 
@@ -79,28 +75,6 @@ public class CircleAttack extends AbstractMove<CircleAttack, MadeInHeavenEntity>
         if (circlingTime <= 0 || !attacker.hasUser()) return;
 
         LivingEntity user = attacker.getUserOrThrow();
-
-        if (attacker.getWorld().isClient) {
-            Entity clientCircleTarget = attacker.getCircleTarget();
-            if (clientCircleTarget != null)
-                user.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, clientCircleTarget.getEyePos());
-
-            if (attacker.getAccelTime() > 1) { // Updating on the client, to make sure all is smooth
-                createSpeedParticles(attacker, attacker);
-
-                List<Entity> toCatch = attacker.getWorld().getEntitiesByClass(Entity.class, // Lower range by 32 to reduce lag
-                        attacker.getBoundingBox().expand(96), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
-
-                for (Entity entity : toCatch) {
-                    if (entity instanceof LivingEntity) continue;
-                    if (entity.getPos().squaredDistanceTo(new Vec3d(entity.prevX, entity.prevY, entity.prevZ)) > 0)
-                        createSpeedParticles(attacker, entity);
-                    entity.tick();
-                }
-            }
-
-            return;
-        }
 
         ctx.setInt(CIRCLING_TIME, --circlingTime);
         LivingEntity target = ctx.get(TARGET);
@@ -146,7 +120,7 @@ public class CircleAttack extends AbstractMove<CircleAttack, MadeInHeavenEntity>
         if (circlingTime == 1 || user.hasStatusEffect(JStatusRegistry.DAZED)) endCircle(attacker);
     }
 
-    private void createSpeedParticles(MadeInHeavenEntity attacker, Entity entity) {
+    public static void createSpeedParticles(MadeInHeavenEntity attacker, Entity entity) {
         Random random = attacker.getRandom();
         Box box = entity.getBoundingBox();
         for (int i = 0; i < box.getAverageSideLength(); i++)
