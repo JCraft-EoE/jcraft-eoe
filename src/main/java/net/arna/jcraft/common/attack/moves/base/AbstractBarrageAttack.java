@@ -99,6 +99,12 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A
     }
 
     @Override
+    public int getBlow(A attacker) {
+        int tick = getDuration() - attacker.getMoveStun();
+        return tick <= getWindup() ? 0 : (tick - getWindup()) / getInterval();
+    }
+
+    @Override
     protected @NonNull T copyExtras(@NonNull T base) {
         AbstractBarrageAttack<T, A> cast = super.copyExtras(base);
         cast.inflictsSlowness = inflictsSlowness;
