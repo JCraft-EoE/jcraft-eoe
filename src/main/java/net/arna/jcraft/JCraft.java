@@ -1,7 +1,7 @@
 package net.arna.jcraft;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntRBTreeMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
 import net.arna.jcraft.common.component.CooldownsComponent;
@@ -54,7 +54,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.example.GeckoLibMod;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static net.arna.jcraft.common.entity.stand.StandEntity.stun;
 
@@ -90,7 +93,7 @@ public class JCraft implements ModInitializer {
     public static final List<DimValues> pastDimensions = new ArrayList<>();
     private static final List<ChunkPos> preloadedChunks = new ArrayList<>();
 
-    public static final Object2IntMap<LivingEntity> burstTimers = new Object2IntRBTreeMap<>();
+    public static final Object2IntMap<LivingEntity> burstTimers = new Object2IntOpenHashMap<>();
 
     public static final List<DashData> dashes = new ArrayList<>();
 
