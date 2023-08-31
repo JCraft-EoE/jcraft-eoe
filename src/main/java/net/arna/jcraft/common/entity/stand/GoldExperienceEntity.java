@@ -131,7 +131,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
         moves.register(MoveType.HEAVY, HEAVY, State.HEAVY);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 
-        moves.register(MoveType.SPECIAL1, HEAL_SELF).withCrouchingVariant(State.HEAL);
+        moves.register(MoveType.SPECIAL1, HEAL_SELF, State.HEAL_SELF).withCrouchingVariant(State.HEAL);
         moves.register(MoveType.SPECIAL2, REKKA1, State.REKKA1);
         moves.register(MoveType.SPECIAL3, LIFE_GIVER, State.LIFE_GIVER);
         moves.register(MoveType.ULTIMATE, OVERCLOCK, State.OVERCLOCK);
