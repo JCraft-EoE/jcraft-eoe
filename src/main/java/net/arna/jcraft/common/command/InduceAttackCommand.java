@@ -2,7 +2,7 @@ package net.arna.jcraft.common.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import net.arna.jcraft.common.argumenttype.AttackArgumentType;
-import net.arna.jcraft.common.attack.core.MoveQueue;
+import net.arna.jcraft.common.attack.core.MoveInputType;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.StandComponent;
@@ -27,7 +27,7 @@ public class InduceAttackCommand {
                                         context -> runAttack(
                                                 EntityArgumentType.getEntities(context, "ents"),
                                                 true,
-                                                context.getArgument("attack", MoveQueue.class)
+                                                context.getArgument("attack", MoveInputType.class)
                                         )
                                 ))
                         )
@@ -36,7 +36,7 @@ public class InduceAttackCommand {
                                         context -> runAttack(
                                                 EntityArgumentType.getEntities(context, "ents"),
                                                 false,
-                                                context.getArgument("attack", MoveQueue.class)
+                                                context.getArgument("attack", MoveInputType.class)
                                         )
                                 ))
                         )
@@ -44,7 +44,7 @@ public class InduceAttackCommand {
         );
     }
 
-    public static int runAttack(Collection<? extends Entity> targets, boolean stand, MoveQueue queue) {
+    public static int runAttack(Collection<? extends Entity> targets, boolean stand, MoveInputType queue) {
         int flag = 0;
 
         if (stand) {

@@ -7,7 +7,7 @@ import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
-import net.arna.jcraft.common.attack.core.MoveQueue;
+import net.arna.jcraft.common.attack.core.MoveInputType;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.base.AbstractMultiHitAttack;
 import net.arna.jcraft.common.component.CooldownsComponent;
@@ -47,7 +47,7 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
     private S state;
     public AbstractMove<?, ? super A> curMove;
     public AbstractMove<?, ? super A> previousAttack;
-    public MoveQueue queuedMove;
+    public MoveInputType queuedMove;
     public int armorPoints = 0;
 
     protected JSpec(SpecType type, PlayerEntity player) {
