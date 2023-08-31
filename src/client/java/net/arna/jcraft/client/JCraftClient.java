@@ -29,13 +29,12 @@ import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
 import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
 import net.arna.jcraft.client.util.TrackedKeyBinding;
-import net.arna.jcraft.common.attack.core.MoveQueue;
+import net.arna.jcraft.common.attack.core.MoveInputType;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.StandEntity;
-import net.arna.jcraft.common.network.c2s.InputSyncPacket;
+import net.arna.jcraft.common.network.c2s.PlayerInputPacket;
 import net.arna.jcraft.common.network.c2s.StandBlockPacket;
-import net.arna.jcraft.common.network.c2s.StandControlPacket;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JBlockEntityTypeRegistry;
 import net.arna.jcraft.registry.JObjectRegistry;
@@ -89,16 +88,16 @@ public class JCraftClient implements ClientModInitializer {
             comboBreaker, cooldownCancel, utility, dash;
     @SuppressWarnings({"ConstantValue", "DataFlowIssue"}) // Not the case here cuz of the lazy getter.
     @Getter(lazy = true)
-    private static final Map<TrackedKeyBinding, MoveQueue> bindings = ImmutableMap.<TrackedKeyBinding, MoveQueue>builder()
-            .put(standSummon, MoveQueue.STAND_SUMMON)
-            .put(TrackedKeyBinding.wrap(MinecraftClient.getInstance().options.attackKey), MoveQueue.LIGHT)
-            .put(heavyKey, MoveQueue.HEAVY)
-            .put(barrageKey, MoveQueue.BARRAGE)
-            .put(special1Key, MoveQueue.SPECIAL1)
-            .put(special2Key, MoveQueue.SPECIAL2)
-            .put(special3Key, MoveQueue.SPECIAL3)
-            .put(ultKey, MoveQueue.ULTIMATE)
-            .put(utility, MoveQueue.UTILITY)
+    private static final Map<TrackedKeyBinding, MoveInputType> bindings = ImmutableMap.<TrackedKeyBinding, MoveInputType>builder()
+            .put(standSummon, MoveInputType.STAND_SUMMON)
+            .put(TrackedKeyBinding.wrap(MinecraftClient.getInstance().options.attackKey), MoveInputType.LIGHT)
+            .put(heavyKey, MoveInputType.HEAVY)
+            .put(barrageKey, MoveInputType.BARRAGE)
+            .put(special1Key, MoveInputType.SPECIAL1)
+            .put(special2Key, MoveInputType.SPECIAL2)
+            .put(special3Key, MoveInputType.SPECIAL3)
+            .put(ultKey, MoveInputType.ULTIMATE)
+            .put(utility, MoveInputType.UTILITY)
             .build();
     @Getter(lazy = true)
     private static final Map<TrackedKeyBinding, MovementInputType> movementBindings = createMovementBindingsMap();
@@ -367,32 +366,29 @@ public class JCraftClient implements ClientModInitializer {
         activeTimestops = newActiveTimestops;
 
         // Handle JCraft inputs (stand, spec, universal controls)
-        StandEntity<?, ?> stand = JComponents.getStandData(player).getStand();
-        boolean standOn = stand != null;
-
+        // Regular input (all moves, regular Minecraft movement (WASD and jumping) and dashing)
         if (player.isAlive()) {
-            Object2BooleanMap<MovementInputType> input = getMovementBindings().entrySet().stream()
-                    .filter(entry -> entry.getKey().isChangedThisTick())
-                    .collect(Object2BooleanOpenHashMap::new, (map, entry) -> map.put(entry.getValue(), entry.getKey().isPressedThisTick()),
-                            Object2BooleanMap::putAll);
+            Object2BooleanMap<MovementInputType> movementInput = getChangedInputs(getMovementBindings());
+            Object2BooleanMap<MoveInputType> moveInput = getChangedInputs(getBindings());
 
-            if (!input.isEmpty())
-                ClientPlayNetworking.send(JPacketRegistry.C2S_INPUT_SYNC, InputSyncPacket.write(input));
+            if (!movementInput.isEmpty() || !moveInput.isEmpty())
+                ClientPlayNetworking.send(JPacketRegistry.C2S_PLAYER_INPUT, PlayerInputPacket.write(movementInput, moveInput));
         }
 
         // Block
-        if (standOn && getTrackedUseKey().isChangedThisTick()) ClientPlayNetworking.send(JPacketRegistry.C2S_STAND_BLOCK,
+        if (getTrackedUseKey().isChangedThisTick()) ClientPlayNetworking.send(JPacketRegistry.C2S_STAND_BLOCK,
                 StandBlockPacket.write(getTrackedUseKey().isPressedThisTick()));
-
-        // All regular moves
-        getBindings().forEach((binding, type) -> {
-            if (!binding.isPressedThisTick()) return;
-            ClientPlayNetworking.send(JPacketRegistry.C2S_STAND_CONTROL, StandControlPacket.write(type));
-        });
 
         // Cooldown Cancel
         if (cooldownCancel.isPressedThisTick())
             ClientPlayNetworking.send(JPacketRegistry.C2S_COOLDOWN_CANCEL, PacketByteBufs.create());
+    }
+
+    private static <E extends Enum<E>> Object2BooleanMap<E> getChangedInputs(Map<TrackedKeyBinding, E> bindings) {
+        return bindings.entrySet().stream()
+                .filter(entry -> entry.getKey().isChangedThisTick())
+                .collect(Object2BooleanOpenHashMap::new, (map, entry) -> map.put(entry.getValue(), entry.getKey().isPressedThisTick()),
+                        Object2BooleanMap::putAll);
     }
 
     @Nullable

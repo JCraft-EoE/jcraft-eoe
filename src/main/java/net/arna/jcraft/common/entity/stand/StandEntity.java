@@ -8,7 +8,7 @@ import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
-import net.arna.jcraft.common.attack.core.MoveQueue;
+import net.arna.jcraft.common.attack.core.MoveInputType;
 import net.arna.jcraft.common.attack.moves.base.AbstractBarrageAttack;
 import net.arna.jcraft.common.attack.moves.base.AbstractCounterAttack;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
@@ -122,7 +122,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     protected float maxStandGauge = 90f;
 
-    public MoveQueue queuedAttack;
+    public MoveInputType queuedAttack;
     public AbstractMove<?, ? super E> curMove;
     public AbstractMove<?, ? super E> prevMove;
     public int armorPoints;
@@ -833,7 +833,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             if (moveStun <= 0 && !blocking) {
                 // Attack buffering
                 if (queuedAttack != null) {
-                    if (queuedAttack == MoveQueue.STAND_SUMMON) {
+                    if (queuedAttack == MoveInputType.STAND_SUMMON) {
                         curMove = null;
                         desummon();
                     } else initMove(queuedAttack.getMoveType());
@@ -1244,7 +1244,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                     if (selectedAttack.getMoveType() == null) {
                         JCraft.LOGGER.error("Attempting to use attack with unset MoveType: " + selectedAttack.getName().getString() + ", stand: " + stand);
                     } else stand.initMove(selectedAttack.getMoveType());
-                } else stand.queuedAttack = MoveQueue.fromMoveType(selectedAttack.getMoveType());
+                } else stand.queuedAttack = MoveInputType.fromMoveType(selectedAttack.getMoveType());
             }
 
             double sideswitchDistance = 1.25;

@@ -302,10 +302,10 @@ public class JCraft implements ModInitializer {
         auWorld.setChunkForced(chunkX, chunkZ, true);
     }
 
-    public static StandEntity<?, ?> summon(World world, LivingEntity player) {
-        if (player.hasStatusEffect(JStatusRegistry.STANDLESS)) return null;
+    public static StandEntity<?, ?> summon(World world, LivingEntity user) {
+        if (user.hasStatusEffect(JStatusRegistry.STANDLESS)) return null;
 
-        StandComponent standData = JComponents.STAND.get(player);
+        StandComponent standData = JComponents.STAND.get(user);
         StandType type = standData.getType();
         StandEntity<?, ?> stand = type == null ? null : type.createNew(world);
 
@@ -313,9 +313,12 @@ public class JCraft implements ModInitializer {
 
         int skin = standData.getSkin();
         stand.setSkin(skin);
-        stand.setPosition(player.getPos().subtract(player.getRotationVector()));
-        stand.startRiding(player);
-        stand.setUser(player);
+        stand.setPosition(user.getPos().subtract(user.getRotationVector()));
+        stand.startRiding(user);
+        stand.setUser(user);
+
+        if (user instanceof ServerPlayerEntity player && StandBlockPacket.isBlocking(player))
+            stand.blocking = true;
 
         world.spawnEntity(stand);
 
@@ -350,8 +353,7 @@ public class JCraft implements ModInitializer {
         JEnchantmentRegistry.init();
         JLootTableHelper.init();
 
-        ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_STAND_CONTROL, StandControlPacket::handle);
-        ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_INPUT_SYNC, InputSyncPacket::handle);
+        ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_PLAYER_INPUT, PlayerInputPacket::handle);
         ServerPlayNetworking.registerGlobalReceiver(OnConnectedPacket.ID, OnConnectedPacket::handle);
         ServerPlayNetworking.registerGlobalReceiver(ConfigUpdatePacket.ID, ConfigUpdatePacket::handle);
         ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_STAND_BLOCK, StandBlockPacket::handle);

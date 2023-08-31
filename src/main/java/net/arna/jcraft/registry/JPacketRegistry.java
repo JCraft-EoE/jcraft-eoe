@@ -17,8 +17,7 @@ public interface JPacketRegistry {
     Identifier S2C_TIME_STOP = JCraft.id("time_stop");
     Identifier S2C_SPLATTER = JCraft.id("splatter");
 
-    Identifier C2S_STAND_CONTROL = JCraft.id("stand_control");
     Identifier C2S_STAND_BLOCK = JCraft.id("stand_block");
     Identifier C2S_COOLDOWN_CANCEL = JCraft.id("cooldown_cancel");
-    Identifier C2S_INPUT_SYNC = JCraft.id("input_sync");
+    Identifier C2S_PLAYER_INPUT = JCraft.id("player_input");
 }
