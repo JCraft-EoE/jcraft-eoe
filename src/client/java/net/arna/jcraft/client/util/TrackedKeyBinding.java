@@ -15,13 +15,21 @@ import java.util.Map;
 @Getter
 public class TrackedKeyBinding {
     private static final Map<KeyBinding, TrackedKeyBinding> bindings = new HashMap<>();
+    private static boolean resetForScreen = false;
     private final KeyBinding parent;
     private boolean changedThisTick, pressedThisTick, releasedThisTick;
 
     static {
         // Reset values
-        ClientTickEvents.END_CLIENT_TICK.register(client -> bindings.values().forEach(binding ->
-                binding.changedThisTick = binding.pressedThisTick = binding.releasedThisTick = false));
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            bindings.values().forEach(TrackedKeyBinding::reset);
+            if (client.currentScreen != null) {
+                bindings.values().stream()
+                        .filter(binding -> binding.getParent().isPressed())
+                        .forEach(TrackedKeyBinding::markReleased);
+                resetForScreen = true;
+            } else resetForScreen = false;
+        });
     }
 
     private TrackedKeyBinding(KeyBinding parent) {
@@ -39,11 +47,26 @@ public class TrackedKeyBinding {
     }
 
     public static void onKeyPressSet(KeyBinding binding, boolean pressed) {
-        TrackedKeyBinding trackingBinding = bindings.get(binding);
-        if (trackingBinding == null) return;
+        TrackedKeyBinding trackedBinding = bindings.get(binding);
+        if (trackedBinding == null) return;
 
-        trackingBinding.changedThisTick = true;
-        if (pressed) trackingBinding.pressedThisTick = true;
-        else trackingBinding.releasedThisTick = true;
+        if (pressed) trackedBinding.markPressed();
+        else trackedBinding.markReleased();
+    }
+
+    private void markPressed() {
+        changedThisTick = true;
+        if (!releasedThisTick) pressedThisTick = true;
+    }
+
+    private void markReleased() {
+        // Released takes precedence.
+        changedThisTick = true;
+        pressedThisTick = false;
+        releasedThisTick = true;
+    }
+
+    private void reset() {
+        changedThisTick = pressedThisTick = releasedThisTick = false;
     }
 }
