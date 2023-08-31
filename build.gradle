@@ -129,11 +129,12 @@ loom {
 	accessWidenerPath = file("src/main/resources/jcraft.accesswidener")
 	runs {
 		datagen {
-			server()
+			inherit client
 
 			name "Data Generation"
 			vmArg "-Dfabric-api.datagen"
 			vmArg "-Dfabric-api.datagen.output-dir=${file("src/main/generated")}"
+			vmArg "-Dfabric-api.datagen.modid=jcraft"
 
 			runDir "build/datagen"
 		}
