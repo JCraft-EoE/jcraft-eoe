@@ -16,10 +16,10 @@ import java.util.Map;
 public class KeyBindingMixin {
     @Shadow @Final private static Map<InputUtil.Key, KeyBinding> KEY_TO_BINDINGS;
 
-    @Inject(method = "setKeyPressed", at = @At("HEAD"))
-    private static void queueKeyPressOrRelease(InputUtil.Key key, boolean pressed, CallbackInfo ci) {
-        KeyBinding binding = KEY_TO_BINDINGS.get(key);
-        if (binding == null || pressed == binding.isPressed()) return;
+    @Inject(method = "setPressed", at = @At("HEAD"))
+    private void queueKeyPressOrRelease(boolean pressed, CallbackInfo ci) {
+        KeyBinding binding = (KeyBinding) (Object) (this);
+        if (pressed == binding.isPressed()) return;
         TrackedKeyBinding.onKeyPressSet(binding, pressed);
     }
 }

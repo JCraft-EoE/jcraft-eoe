@@ -336,11 +336,29 @@ public class JCraftClient implements ClientModInitializer {
         return StringUtils.capitalize(secondLast) + StringUtils.capitalize(last);
     }
 
-    private void tickClient(MinecraftClient minecraftClient) {
-        ClientPlayerEntity player = minecraftClient.player;
+    private void tickClient(MinecraftClient client) {
+        ClientPlayerEntity player = client.player;
         if (player == null) return;
 
-        if (minecraftClient.isPaused() && minecraftClient.isInSingleplayer()) return;
+        // Handle JCraft inputs (stand, spec, universal controls)
+        // Regular input (all moves, regular Minecraft movement (WASD and jumping) and dashing)
+        if (player.isAlive()) {
+            Object2BooleanMap<MovementInputType> movementInput = getChangedInputs(getMovementBindings());
+            Object2BooleanMap<MoveInputType> moveInput = getChangedInputs(getBindings());
+
+            if (!movementInput.isEmpty() || !moveInput.isEmpty())
+                ClientPlayNetworking.send(JPacketRegistry.C2S_PLAYER_INPUT, PlayerInputPacket.write(movementInput, moveInput));
+        }
+
+        // Block
+        if (getTrackedUseKey().isChangedThisTick()) ClientPlayNetworking.send(JPacketRegistry.C2S_STAND_BLOCK,
+                StandBlockPacket.write(getTrackedUseKey().isPressedThisTick()));
+
+        // Cooldown Cancel
+        if (cooldownCancel.isPressedThisTick())
+            ClientPlayNetworking.send(JPacketRegistry.C2S_COOLDOWN_CANCEL, PacketByteBufs.create());
+
+        if (client.isPaused() && client.isInSingleplayer()) return;
 
         // Timestop handling (nearly identical to serverside, but toStop is obtained in user.world instead of server world)
         ArrayList<DimValues> newActiveTimestops = new ArrayList<>();
@@ -364,24 +382,6 @@ public class JCraftClient implements ClientModInitializer {
         }
 
         activeTimestops = newActiveTimestops;
-
-        // Handle JCraft inputs (stand, spec, universal controls)
-        // Regular input (all moves, regular Minecraft movement (WASD and jumping) and dashing)
-        if (player.isAlive()) {
-            Object2BooleanMap<MovementInputType> movementInput = getChangedInputs(getMovementBindings());
-            Object2BooleanMap<MoveInputType> moveInput = getChangedInputs(getBindings());
-
-            if (!movementInput.isEmpty() || !moveInput.isEmpty())
-                ClientPlayNetworking.send(JPacketRegistry.C2S_PLAYER_INPUT, PlayerInputPacket.write(movementInput, moveInput));
-        }
-
-        // Block
-        if (getTrackedUseKey().isChangedThisTick()) ClientPlayNetworking.send(JPacketRegistry.C2S_STAND_BLOCK,
-                StandBlockPacket.write(getTrackedUseKey().isPressedThisTick()));
-
-        // Cooldown Cancel
-        if (cooldownCancel.isPressedThisTick())
-            ClientPlayNetworking.send(JPacketRegistry.C2S_COOLDOWN_CANCEL, PacketByteBufs.create());
     }
 
     private static <E extends Enum<E>> Object2BooleanMap<E> getChangedInputs(Map<TrackedKeyBinding, E> bindings) {
