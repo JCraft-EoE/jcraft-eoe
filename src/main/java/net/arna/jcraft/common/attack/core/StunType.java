@@ -4,5 +4,6 @@ public enum StunType {
     UNBURSTABLE,
     BURSTABLE,
     BLOCK,
-    LAUNCH
+    LAUNCH,
+    WINDED
 }

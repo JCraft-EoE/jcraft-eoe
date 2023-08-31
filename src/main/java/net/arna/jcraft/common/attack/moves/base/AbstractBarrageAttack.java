@@ -3,6 +3,7 @@ package net.arna.jcraft.common.attack.moves.base;
 import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.IAttacker;
+import net.arna.jcraft.common.attack.core.StunType;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
@@ -31,6 +32,7 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset);
         barrage = true;
         this.interval = interval;
+        this.withStunType(StunType.WINDED);
     }
 
     @Override

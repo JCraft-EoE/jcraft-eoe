@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.attack.moves.starplatinum;
 
 import lombok.NonNull;
+import net.arna.jcraft.common.attack.core.StunType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractBarrageAttack;
 import net.arna.jcraft.common.attack.moves.base.AbstractChargeAttack;
@@ -19,6 +20,7 @@ public class ChargeBarrageAttack extends AbstractBarrageAttack<ChargeBarrageAtta
                                float hitboxSize, float knockback, float offset, int interval) {
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset, interval);
         this.originalMoveDistance = moveDistance;
+        this.withStunType(StunType.BURSTABLE);
         charge = true;
         ranged = true;
         inflictsSlowness = false;

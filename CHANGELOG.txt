@@ -1670,6 +1670,8 @@ Killer Queen: Bites the Dust
 >Packet spam from clients significantly reduced
 >Stands can now aim their M1s up and down
 >Grabs now cancel any move they hit, including armored ones
+>All (standard) Barrages now inflict Winded stun, which allows slowed movement while affected
+>Improved /attack command
 
 Star Platinum
     >Barrage cooldown reduced (17->14s)

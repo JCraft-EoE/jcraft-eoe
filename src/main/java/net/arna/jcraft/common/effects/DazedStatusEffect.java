@@ -24,23 +24,31 @@ public class DazedStatusEffect extends StatusEffect {
         return true;
     }
 
+    public static boolean canBeComboBroken(int amplifier) {
+        return switch (amplifier) {
+            case (1), (4) -> true;
+            default -> false;
+        };
+    }
+
     // Stun heavily reduces horizontal speed and prevents mobs from attacking
     // Amplifier = Source ID
-    // 0 - Soft stun, un combo breakable
-    // 1 - Regular stun, combo breakable
-    // 2 - Blocking, un combo breakable
-    // 3 - Launch, un combo breakable
+    // 0 - Hitstun, not combo breakable
+    // 1 - Hitstun, combo breakable
+    // 2 - Blocking, not combo breakable
+    // 3 - Launch, not combo breakable
+    // 4 - ???, no movement penalty, combo breakable
     @Override
     public void applyUpdateEffect(LivingEntity entity, int amplifier) {
         Vec3d eVel = entity.getVelocity();
         double yVel = eVel.y;
         double horizontalMult = 0.4;
-        if (amplifier < 2) { // Hitstun
+
+        if (amplifier < 2) { // Immobilizing stun
             yVel = MathHelper.clamp(yVel, -0.5, 0.5);
             horizontalMult = 0.2;
-        }
+        } else if (amplifier == 3) horizontalMult = 1;
 
-        if (amplifier == 3) horizontalMult = 1;
         entity.setVelocity(eVel.x * horizontalMult, yVel, eVel.z * horizontalMult);
 
         if (!(entity instanceof MobEntity mob)) return;

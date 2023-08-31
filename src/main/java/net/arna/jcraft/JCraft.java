@@ -7,6 +7,7 @@ import lombok.Setter;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.StandComponent;
+import net.arna.jcraft.common.effects.DazedStatusEffect;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.StandType;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
@@ -380,7 +381,7 @@ public class JCraft implements ModInitializer {
         if (player.isSpectator()) return;
         CooldownsComponent cooldowns = JComponents.getCooldowns(player);
 
-        if (stun.getDuration() > 1 && stun.getAmplifier() == 1 && cooldowns.getCooldown(CooldownType.COMBO_BREAKER) <= 0) {
+        if (stun.getDuration() > 1 && DazedStatusEffect.canBeComboBroken(stun.getAmplifier()) && cooldowns.getCooldown(CooldownType.COMBO_BREAKER) <= 0) {
             cooldowns.startCooldown(CooldownType.COMBO_BREAKER);
 
             stun(player, 5, 2); // Player is slowed down considerably pre-burst

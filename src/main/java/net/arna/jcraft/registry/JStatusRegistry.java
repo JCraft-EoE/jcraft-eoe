@@ -33,6 +33,11 @@ public interface JStatusRegistry {
                         "778B48FC-485B-5BA7-58C7-E0D755CE354D",
                         0,
                         EntityAttributeModifier.Operation.MULTIPLY_TOTAL
+                ).addAttributeModifier(
+                        EntityAttributes.GENERIC_FLYING_SPEED,
+                        "516B532C-D1D9-C3A0-8970-A2C0A38CC452",
+                        0,
+                        EntityAttributeModifier.Operation.MULTIPLY_TOTAL
                 )
         );
 
