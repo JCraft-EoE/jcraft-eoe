@@ -12,7 +12,7 @@ public enum MoveType {
     SPECIAL1(CooldownType.STAND_SP1),
     SPECIAL2(CooldownType.STAND_SP2),
     SPECIAL3(CooldownType.STAND_SP3),
-    ULTIMATE(CooldownType.ULTIMATE),
+    ULTIMATE(CooldownType.STAND_ULTIMATE),
     UTILITY(CooldownType.UTILITY);
 
     private final Text friendlyName;

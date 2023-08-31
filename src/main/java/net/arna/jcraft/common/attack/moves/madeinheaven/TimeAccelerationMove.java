@@ -32,7 +32,6 @@ public class TimeAccelerationMove extends AbstractMove<TimeAccelerationMove, Mad
         attacker.setAccelTime(accelTime);
         attacker.setAfterimage(true);
         TimeAccelStatePacket.sendStart(Objects.requireNonNull(attacker.getServer()).getPlayerManager(), attacker, accelTime);
-        attacker.setSpeedometer(0);
 
         return Set.of();
     }

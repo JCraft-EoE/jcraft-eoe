@@ -343,7 +343,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
     @Override
     public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user, MoveContext ctx) {
         Vec3d upVec = GravityChangerAPI.getEyeOffset(user);
-        Vec3d hPos = attacker.getBaseEntity().getPos().add(upVec.multiply(0.5));
+        Vec3d hPos = getOffsetHeightPos(attacker);
         Vec3d rotVec = getRotVec(attacker);
 
         Vec3d fPos = getOffsetForwardPos(attacker, hPos, upVec, rotVec);
