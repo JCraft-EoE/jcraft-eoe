@@ -14,17 +14,6 @@ import java.util.List;
 //todo: replace with a Patchouli in-game wikipedia
 @Deprecated(forRemoval = true)
 public class AboutStandCommand {
-    private static final List<String> buttons = List.of(
-            "Light",
-            "Heavy",
-            "Barrage",
-            "Special 1",
-            "Ultimate",
-            "Special 2",
-            "Special 3",
-            "Utility"
-    );
-
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(CommandManager.literal("stand")
                 .then(CommandManager.literal("about").executes(AboutStandCommand::run)));
