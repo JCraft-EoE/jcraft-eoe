@@ -737,7 +737,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         } //else if (this.owner == null) { this.owner = player; }
 
         int moveStun = getMoveStun();
-        if (moveStun > 0) setMoveStun(--moveStun); // Counting down animation time or similar
+        if (moveStun > 0 && !(blocking && wantToBlock && moveStun == 1))
+            setMoveStun(--moveStun); // Counting down animation time or similar
         if (playSummonAnim && (moveStun > 0 || age > summonAnimDuration))
             playSummonAnim = false;
 
@@ -866,12 +867,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                     curMove = null;
                     setStateNoReset(getBlockState());
 
-                    if (moveStun < 2) setMoveStun(2);
+                    if (moveStun < 1) setMoveStun(1);
                     setDistanceOffset(blockDistance);
                     setRotationOffset(attackRotation);
                     standBlock();
-
-                    JCraft.LOGGER.info("Blocking, with remaining movestun: " + moveStun);
                 } else tryUnblock();
             }
 
@@ -1011,7 +1010,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                     stand.blocking = false;
                     overrideStun = true;
                 } else if (!unblockable) { // Didn't backstab, not unblockable
-                    JCraft.LOGGER.info("Enemy blocked attack, setting blockstun to: " + blockstun);
+                    //JCraft.LOGGER.info("Enemy blocked attack, setting blockstun to: " + blockstun);
                     stand.setMoveStun(blockstun);
                     stand.setStandGauge(stand.getStandGauge() - 2 * damage);
                     stand.playSound(JSoundRegistry.STAND_BLOCK, 1, 1);

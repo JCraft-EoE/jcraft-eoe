@@ -417,7 +417,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
      */
     protected void processTarget(A attacker, LivingEntity target, Vec3d kbVec, DamageSource damageSource) {
         StandEntity.damageLogic(attacker.getWorld(), target, kbVec, stun, stunType.ordinal(), overrideStun,
-                damage, lift, blockStun, damageSource, attacker.getUserOrThrow(), canBackstab, blockableType.isNonBlockable());
+                damage, lift, getBlockStun(), damageSource, attacker.getUserOrThrow(), canBackstab, blockableType.isNonBlockable());
     }
 
     protected Set<LivingEntity> validateTargets(A attacker, Set<LivingEntity> targets) {
