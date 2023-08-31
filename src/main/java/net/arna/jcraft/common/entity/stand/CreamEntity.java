@@ -407,6 +407,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             // Player Half-Ball controls
             if (user instanceof ServerPlayerEntity serverPlayer) {
                 if (lastRemoteInputTime - age > 4) updateRemoteInputs(0, 0, false);
+                JCraft.LOGGER.info(lastRemoteInputTime);
 
                 Vec3d finalSpeed = Vec3d.ZERO;
                 if (!blocking && !user.hasStatusEffect(JStatusRegistry.DAZED)) {

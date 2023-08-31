@@ -46,8 +46,10 @@ public class SurpriseMove extends AbstractMove<SurpriseMove, CreamEntity> {
     @Override
     public @NonNull Set<LivingEntity> perform(CreamEntity attacker, LivingEntity user, MoveContext ctx) {
         attacker.setCharging(true);
+
         Vec3f outDir = GravityChangerAPI.getGravityDirection(attacker).getUnitVector();
         outDir.scale(-1f);
+        ctx.set(OUT_DIR, outDir);
 
         ctx.get(OUT_POS).subtract(outDir);
         attacker.setFreePos(ctx.get(OUT_POS));
