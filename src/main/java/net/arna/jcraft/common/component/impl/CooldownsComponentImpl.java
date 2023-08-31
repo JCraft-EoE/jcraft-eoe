@@ -72,7 +72,7 @@ public class CooldownsComponentImpl implements CooldownsComponent {
 
         Vec3d pPos = entity.getEyePos();
         entity.world.playSoundFromEntity(null, entity, JSoundRegistry.COOLDOWN_CANCEL, SoundCategory.PLAYERS, 1, 1);
-        if (!entity.world.isClient) JCraft.createParticle((ServerWorld) entity.world, pPos.x, pPos.y, pPos.z, JParticleType.HIT_SPARK_1);
+        if (!entity.world.isClient) JCraft.createParticle((ServerWorld) entity.world, pPos.x, pPos.y, pPos.z, JParticleType.COOLDOWN_CANCEL);
 
         sync();
     }
