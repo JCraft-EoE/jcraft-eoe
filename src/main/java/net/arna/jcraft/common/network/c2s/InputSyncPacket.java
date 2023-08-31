@@ -3,6 +3,7 @@ package net.arna.jcraft.common.network.c2s;
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MovementInputType;
@@ -30,8 +31,14 @@ public class InputSyncPacket {
             for (Map.Entry<ServerPlayerEntity, StateManager> entry : stateManagers.entrySet()) {
                 ServerPlayerEntity player = entry.getKey();
                 StateManager stateManager = entry.getValue();
+
+                int forward = stateManager.calcForward();
+                int side = stateManager.calcSide();
                 JComponents.getMiscData(player).updateRemoteInputs(
-                        stateManager.calcForward(), stateManager.calcSide(), stateManager.jumping);
+                        forward, stateManager.calcSide(), stateManager.jumping);
+
+                StandEntity<?, ?> stand = JUtils.getStand(player);
+                if (stand != null) stand.updateRemoteInputs(forward, side, stateManager.jumping);
 
                 if (!stateManager.jumping) continue;
 
