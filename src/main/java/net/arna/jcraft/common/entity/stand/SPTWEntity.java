@@ -31,7 +31,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .withCrouchingVariant(GROUND_SLAM)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("PUNCH"), Text.literal("quick combo starter, low knockback"));
-    public static final BarrageAttack<SPTWEntity> BARRAGE = new BarrageAttack<SPTWEntity>(340, 0, 60,
+    public static final BarrageAttack<SPTWEntity> BARRAGE = new BarrageAttack<SPTWEntity>(280, 0, 60,
             0.75f, 1f, 40, 2f, 0.25f, 0f, 3)
             .withSound(JSoundRegistry.STAR_PLATINUM_BARRAGE)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));

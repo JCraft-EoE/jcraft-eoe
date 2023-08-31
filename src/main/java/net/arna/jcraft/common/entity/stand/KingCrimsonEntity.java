@@ -56,13 +56,13 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             .withCrouchingVariant(SWEEP)
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withInfo(Text.literal("Dual Chop"), Text.literal("quick combo starter"));
-    public static final BarrageAttack<KingCrimsonEntity> BARRAGE_FINISHER = new BarrageAttack<KingCrimsonEntity>(340,
+    public static final BarrageAttack<KingCrimsonEntity> BARRAGE_FINISHER = new BarrageAttack<KingCrimsonEntity>(0,
             0, 50, 0.85f, 1f, 10, 1.5f, 1.1f, 0f, 3)
             .withImpactSound(JSoundRegistry.IMPACT_6)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withLaunch()
             .withInfo(Text.literal("Barrage (Final Hit)"), Text.empty());
-    public static final BarrageAttack<KingCrimsonEntity> BARRAGE = new BarrageAttack<KingCrimsonEntity>(340,
+    public static final BarrageAttack<KingCrimsonEntity> BARRAGE = new BarrageAttack<KingCrimsonEntity>(280,
             0, 50, 0.85f, 1f, 20, 1.5f, 0.1f, 0f, 3)
             .withFinisher(46, BARRAGE_FINISHER)
             .withSound(JSoundRegistry.KC_BARRAGE)
@@ -71,10 +71,11 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             22, 32, 0.85f, 9f, 11, 2f, 1.5f, 0f, 35)
             .withSound(JSoundRegistry.KC_HEAVY2)
             .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withBlockStun(10)
             .withHyperArmor()
             .withLaunch()
             .withInfo(Text.literal("Overhead Hook"), Text.literal("long windup, knockdown"));
-    public static final SimpleAttack<KingCrimsonEntity> VERTICAL_CHOP = new SimpleAttack<KingCrimsonEntity>(260,
+    public static final SimpleAttack<KingCrimsonEntity> VERTICAL_CHOP = new SimpleAttack<KingCrimsonEntity>(240,
             12, 19, 0.85f, 6f, 25, 1.5f, 0.2f, 0f)
             .withFollowup(OVERHEAD_HOOK)
             .withSound(JSoundRegistry.KC_HEAVY)
@@ -84,7 +85,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     public static final BloodThrowAttack BLOOD_THROW = new BloodThrowAttack(500, 10, 15, 1f)
             .withInfo(Text.literal("Blood Throw"), Text.literal("throws a stunning, blinding blood projectile"));
     public static final EffectInflictingAttack<KingCrimsonEntity> EYE_CHOP = new EffectInflictingAttack<KingCrimsonEntity>(
-            400, 25, 34, 1f, 9f, 27, 1.75f, 0.3f, -0.3f,
+            280, 25, 34, 1f, 9f, 27, 1.75f, 0.3f, -0.3f,
             List.of(new StatusEffectInstance(StatusEffects.BLINDNESS, 200, 0)))
             .withCrouchingVariant(BLOOD_THROW)
             .withSound(JSoundRegistry.KC_EYE_CHOP)
@@ -99,7 +100,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHyperArmor()
             .withInfo(Text.literal("Donut"), Text.literal("huge windup, huge stun"));
-    public static final EpitaphAttack EPITAPH = new EpitaphAttack(600, 4, 34, -1f)
+    public static final EpitaphAttack EPITAPH = new EpitaphAttack(480, 4, 34, -1f)
             .withInfo(Text.literal("Epitaph"), Text.literal("0.2s windup, 1.5s counter"));
     public static final PredictionMove PREDICTION = new PredictionMove(600, 4, 104, -1f)
             .withCrouchingVariant(EPITAPH)

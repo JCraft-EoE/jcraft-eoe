@@ -1672,12 +1672,34 @@ Killer Queen: Bites the Dust
 >Grabs now cancel any move they hit, including armored ones
 >All (standard) Barrages now inflict Winded stun, which allows slowed movement while affected
 >Improved /attack command
+>Stands can now be summoned blocking, removing the 1 tick gap that used to exist
 
 Star Platinum
     >Barrage cooldown reduced (17->14s)
     >Star Breaker
         >Cooldown reduced (17->9s)
         >Advantage on block reduced (+4->-1)
+    >Star Finger cooldown reduced (20->12s)
+    >Roundhouse cooldown reduced (8->3s)
+    >Advancing barrage cooldown reduced (26->14s)
+    >Jump cooldown reduced (18->15s)
+    >Inhale cooldown reduced (50->40s)
+
+The World
+    >Barrage cooldown reduced (17->14s)
+    >Donut cooldown reduced (14->13s)
+    >Roundhouse cooldown reduced (8->3s)
+    >Charge cooldown reduced (20->15s)
+    >Feign Barrage cooldown reduced (30->20s)
+    >Timeskip cooldown reduced (18->15s)
+    >Knockback values adjusted
+
+King Crimson
+    >Barrage cooldown reduced (17->14s)
+    >Vertical Chop cooldown reduced (13->12s)
+    >Advantage on block reduced (+3~+13 -> -3~+7) for Overhead Hook
+    >Eye Chop cooldown reduced (20->14s)
+    >Epitaph cooldown reduced (30->24s)
 
 Whitesnake
     >Donut cooldown reduced (18->14s)
@@ -1687,6 +1709,12 @@ The Fool
 
 The World: Over Heaven
     >Added icons
+
+Star Platinum: The World
+    >Barrage cooldown reduced (17->14s)
+    >Star Breaker
+        >Cooldown reduced (17->9s)
+        >Advantage on block reduced (+4->-1)
 
 priority (top to bottom)
 todo: counters that invalidate hit effects

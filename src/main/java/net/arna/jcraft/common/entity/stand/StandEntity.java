@@ -111,7 +111,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     @Nullable
     private LivingEntity user = null;
 
-
+    public boolean wantToBlock = false;
     public boolean blocking = false;
     protected boolean idleOverride = false;
 
@@ -672,6 +672,14 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         getUserOrThrow().addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 5, 3, false, false, true));
     }
 
+    public void tryBlock() {
+        if (canAttack()) blocking = true;
+    }
+
+    public void tryUnblock() {
+        if (getMoveStun() < 1) blocking = false;
+    }
+
     // Define desummon conditions
     public void desummon() {
         if (curMove != null || getMoveStun() > 0) return;
@@ -854,13 +862,17 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                     }
                 } else idleOverride();
             } else if (blocking) { // Process block
-                curMove = null;
-                setStateNoReset(getBlockState());
+                if (wantToBlock) {
+                    curMove = null;
+                    setStateNoReset(getBlockState());
 
-                if (moveStun < 4) setMoveStun(4);
-                setDistanceOffset(blockDistance);
-                setRotationOffset(attackRotation);
-                standBlock();
+                    if (moveStun < 2) setMoveStun(2);
+                    setDistanceOffset(blockDistance);
+                    setRotationOffset(attackRotation);
+                    standBlock();
+
+                    JCraft.LOGGER.info("Blocking, with remaining movestun: " + moveStun);
+                } else tryUnblock();
             }
 
             tsTime--;
@@ -999,14 +1011,13 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                     stand.blocking = false;
                     overrideStun = true;
                 } else if (!unblockable) { // Didn't backstab, not unblockable
+                    JCraft.LOGGER.info("Enemy blocked attack, setting blockstun to: " + blockstun);
                     stand.setMoveStun(blockstun);
                     stand.setStandGauge(stand.getStandGauge() - 2 * damage);
                     stand.playSound(JSoundRegistry.STAND_BLOCK, 1, 1);
                     hit = false;
                     overrideStun = false;
-                } else {
-                    stand.blocking = false;
-                }
+                } else stand.blocking = false;
             }
         }
 

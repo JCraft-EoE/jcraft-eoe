@@ -34,10 +34,11 @@ public class StandBlockPacket {
             if (!JCraft.isDashing(player) && stand != null) {
                 boolean blocking = stand.blocking;
                 if (!blocking && stand.canAttack() && blockDown) {
-                    if (player.getMainHandStack().getUseAction() == UseAction.NONE &&
-                            player.getOffHandStack().getUseAction() == UseAction.NONE)
-                        stand.blocking = true;
-                } else if (blocking && !blockDown) stand.blocking = false;
+                    if (player.getMainHandStack().getUseAction() == UseAction.NONE && player.getOffHandStack().getUseAction() == UseAction.NONE) {
+                        stand.wantToBlock = true;
+                        stand.blocking = true; // Unnecessary to use tryBlock() as canAttack() is already true
+                    }
+                } else if (blocking && !blockDown) stand.wantToBlock = false;
             }
         });
     }

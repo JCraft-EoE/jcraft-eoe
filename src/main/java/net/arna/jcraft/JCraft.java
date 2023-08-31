@@ -317,8 +317,10 @@ public class JCraft implements ModInitializer {
         stand.startRiding(user);
         stand.setUser(user);
 
-        if (user instanceof ServerPlayerEntity player && StandBlockPacket.isBlocking(player))
+        if (user instanceof ServerPlayerEntity player && StandBlockPacket.isBlocking(player)) {
+            stand.wantToBlock = true;
             stand.blocking = true;
+        }
 
         world.spawnEntity(stand);
 

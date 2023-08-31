@@ -36,26 +36,26 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
             0, 60, 0.75f, 1f, 30, 2f, 0.25f, 0f, 3)
             .withSound(JSoundRegistry.STAR_PLATINUM_BARRAGE)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
-    public static final SimpleAttack<StarPlatinumEntity> STAR_FINGER = new SimpleAttack<StarPlatinumEntity>(400,
+    public static final SimpleAttack<StarPlatinumEntity> STAR_FINGER = new SimpleAttack<StarPlatinumEntity>(240,
             12, 20, 0.75f, 5f, 30, 1.75f, -0.25f, -0.25f)
             .withSound(JSoundRegistry.STAR_FINGER)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withExtraHitBox(2, 0.5, 1)
             .withInfo(Text.literal("Star Finger"), Text.literal("medium windup, combo starter/extender"));
-    public static final SimpleAttack<StarPlatinumEntity> ROUNDHOUSE = new SimpleAttack<StarPlatinumEntity>(160,
+    public static final SimpleAttack<StarPlatinumEntity> ROUNDHOUSE = new SimpleAttack<StarPlatinumEntity>(60,
             7, 12, 0.75f, 6f, 8, 1.5f, 0.25f, 0f)
             .withSound(JSoundRegistry.STAR_PLATINUM_KICK)
             .withImpactSound(JSoundRegistry.IMPACT_6)
             .withInfo(Text.literal("Roundhouse"), Text.literal("fast poke, low stun"));
-    public static final ChargeBarrageAttack CHARGE_BARRAGE = new ChargeBarrageAttack(520, 5, 55,
+    public static final ChargeBarrageAttack CHARGE_BARRAGE = new ChargeBarrageAttack(280, 5, 55,
             5f, 0.6f, 20, 1.5f, 0.3f, 0f, 3)
             .withSound(JSoundRegistry.STAR_PLATINUM_ADVANCING_BARRAGE)
             .withBackstab(false)
             .withInfo(Text.literal("Advancing Barrage"), Text.literal("fast combo starter/extender, medium stun, extremely punishable on whiff"));
-    public static final JumpMove<StarPlatinumEntity> JUMP = new JumpMove<StarPlatinumEntity>(360, 5,
+    public static final JumpMove<StarPlatinumEntity> JUMP = new JumpMove<StarPlatinumEntity>(300, 5,
             14, 1f, 1.5f)
             .withInfo(Text.literal("Stand Jump"), Text.literal("jumps in looked direction with slight upward bias, you must stay on the ground until Star Platinum jumps"));
-    public static final InhaleAttack INHALE = new InhaleAttack(1000, 5, 5, 1f, 80)
+    public static final InhaleAttack INHALE = new InhaleAttack(800, 5, 5, 1f, 80)
             .withInfo(Text.literal("Inhale"), Text.literal("vacuums nearby entities for 4 seconds"));
     private static final TrackedData<Integer> INHALE_TIME;
 
