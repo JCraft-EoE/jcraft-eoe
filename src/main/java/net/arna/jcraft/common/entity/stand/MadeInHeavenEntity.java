@@ -89,6 +89,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     public static final TimeAccelerationMove TIME_ACCELERATION = new TimeAccelerationMove(1400, 20,
             40, 1f, JServerConfig.MIH_TIME_ACCELERATION_DURATION::getValue)
             .withSound(JSoundRegistry.MIH_TACCEL)
+            .withAction((attacker, user, ctx, targets) -> attacker.speedometer = 0) // Clear speedometer
             .withInfo(Text.literal("Time Acceleration"), Text.literal("""
                             allows charging the speedometer for 30s
                             it is charged by landing hits
@@ -256,7 +257,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
         }
 
         // Tracking
-        setSpeedometer(speedometer);
+        if (!world.isClient) setSpeedometer(speedometer);
     }
 
     @Override
