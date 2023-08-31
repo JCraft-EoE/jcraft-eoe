@@ -97,7 +97,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     /**
      * Sets the move distance of this move.
      * This is how far away the stand is moved from the user when performing this move.
-     * Should be set via the constructor, this is only to modify copies.
+     * This should be set via the constructor; this is only to modify copies.
      * @param moveDistance The move distance of this move
      * @return This move
      */
@@ -182,8 +182,8 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     }
 
     /**
-     * Sets the amount of hits this attack can withstand before breaking.
-     * @param armor The amount of hits this attack can withstand
+     * Sets the number of hits this attack can withstand before breaking.
+     * @param armor The number of hits this attack can withstand
      * @return This move
      */
     public T withArmor(int armor) {
@@ -333,7 +333,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
 
     /**
      * Returns whether {@link #perform(IAttacker, LivingEntity, MoveContext)} should be called this tick.
-     * @param attacker The stand to check for.
+     * @param attacker The attacker to check for.
      * @return Whether this move should be performed this tick.
      */
     protected boolean shouldPerform(A attacker) {
@@ -354,15 +354,15 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
 
     /**
      * Performs this move.
-     * @param attacker The stand that will be performing this move.
-     * @param user The user of the stand. Will never be null.
+     * @param attacker The attacker that will be performing this move.
+     * @param user The user of the attacker. Will never be null.
      * @param ctx The move context in which to store data.
      * @return A set of all targeted entities.
      */
     public abstract @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user, MoveContext ctx);
 
     /**
-     * Register entries in the move context of a stand to be used by this move.
+     * Register entries in the move context of an attacker to be used by this move.
      * @param ctx The context in which to register entries.
      */
     public void registerContextEntries(MoveContext ctx) {}
@@ -371,10 +371,10 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * Gets the current blow this move is at.
      * For simple moves, this will always be 0.
      * For barrages or multi-hit moves, this can be greater than 0.
-     * @param stand The stand to get the blow for
-     * @return The current blow of this move for the given stand
+     * @param attacker The attacker to get the blow for
+     * @return The current blow of this move for the given attacker
      */
-    public int getBlow(A stand) {
+    public int getBlow(A attacker) {
         return 0;
     }
 
@@ -390,11 +390,11 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
 
     /**
      * Returns whether the windup has passed.
-     * @param stand The stand to check for
+     * @param attacker The attacker to check for
      * @return Whether the windup has passed
      */
-    public boolean hasWindupPassed(IAttacker<?, ?> stand) {
-        return stand.getMoveStun() <= getWindupPoint();
+    public boolean hasWindupPassed(IAttacker<?, ?> attacker) {
+        return attacker.getMoveStun() <= getWindupPoint();
     }
 
     /**
@@ -425,7 +425,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * Simply returns {@code this}. Can only be implemented by final moves.
      * This means that any intermediary move class (one that forms a base for other moves)
      * cannot implement this.
-     * This also means that this cannot be overridden by subclasses.
+     * This also means that subclasses cannot override this.
      * This all together means that you must create an abstract class that represents your move
      * and an (empty) implementation if you wish to use this move both standalone and as a basis for other moves.
      * An example of this is {@link SimpleAttack SimpleAttack} and
