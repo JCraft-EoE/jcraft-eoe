@@ -454,6 +454,12 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     }
 
     @Override
+    public Vec3d getRotationVector() {
+        // Ignore pitch in rotation vectors.
+        return getRotationVector(0, getYaw());
+    }
+
+    @Override
     public SoundCategory getSoundCategory() {
         return SoundCategory.PLAYERS;
     }
