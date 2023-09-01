@@ -26,7 +26,11 @@ public interface IAttacker<A extends IAttacker<? extends A, S>, S> {
 
     void setMoveStun(int moveStun);
 
-    World getWorld();
+    // This cannot be called getWorld because it doesn't get remapped since it's in an interface.
+    // StandEntity implements
+    default World getEntityWorld() {
+        return getBaseEntity().getWorld();
+    }
 
     LivingEntity getBaseEntity();
 

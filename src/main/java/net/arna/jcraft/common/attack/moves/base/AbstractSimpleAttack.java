@@ -331,7 +331,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
     public static <T extends Entity> @NonNull Set<T> findHits(IAttacker<?, ?> attacker, @NonNull Set<Box> boxes,
                                                      @Nullable DamageSource damageSource, Class<T> type) {
         return boxes.stream()
-                .flatMap(box -> attacker.getWorld().getEntitiesByClass(type, box, EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e ->
+                .flatMap(box -> attacker.getEntityWorld().getEntitiesByClass(type, box, EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e ->
                         e != attacker && e != attacker.getUser() && e != attacker.getUserOrThrow().getVehicle())).stream())
                 .flatMap(e -> e instanceof StandEntity<?,?> hitStand && hitStand.hasUser() &&
                         type.isInstance(hitStand.getUserOrThrow()) ? Stream.of(e, type.cast(hitStand.getUserOrThrow())) : Stream.of(e))
@@ -384,13 +384,13 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
      * @return A set of all affected targets.
      */
     protected final Set<LivingEntity> attackBoxes(A attacker, Set<Box> boxes, DamageSource damageSource, Vec3d center) {
-        JUtils.displayHitboxes(attacker.getWorld(), boxes);
+        JUtils.displayHitboxes(attacker.getEntityWorld(), boxes);
 
         Set<LivingEntity> targets = findHits(attacker, boxes, damageSource);
         if (targets.isEmpty()) return Set.of();
 
         Random random = Random.create();
-        JCraft.createParticle((ServerWorld) attacker.getWorld(),
+        JCraft.createParticle((ServerWorld) attacker.getEntityWorld(),
                 center.x + random.nextGaussian() * 0.25,
                 center.y + random.nextGaussian() * 0.25,
                 center.z + random.nextGaussian() * 0.25,
@@ -416,7 +416,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
      * @param damageSource The damage source to apply damage with
      */
     protected void processTarget(A attacker, LivingEntity target, Vec3d kbVec, DamageSource damageSource) {
-        StandEntity.damageLogic(attacker.getWorld(), target, kbVec, stun, stunType.ordinal(), overrideStun,
+        StandEntity.damageLogic(attacker.getEntityWorld(), target, kbVec, stun, stunType.ordinal(), overrideStun,
                 damage, lift, getBlockStun(), damageSource, attacker.getUserOrThrow(), canBackstab, blockableType.isNonBlockable());
     }
 

@@ -85,7 +85,7 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A
             targetStand.cancelMove();
             Vec3d midPos = attacker.getBaseEntity().getPos().multiply(.5)
                     .add(targetStand.getPos().multiply(.5));
-            attacker.getWorld().playSound(null, midPos.x, midPos.y, midPos.z, JSoundRegistry.IMPACT_1, SoundCategory.NEUTRAL, 1, 0.5f);
+            attacker.getEntityWorld().playSound(null, midPos.x, midPos.y, midPos.z, JSoundRegistry.IMPACT_1, SoundCategory.NEUTRAL, 1, 0.5f);
 
             return Set.of();
         }

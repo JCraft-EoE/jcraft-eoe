@@ -64,11 +64,6 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
     }
 
     @Override
-    public World getWorld() {
-        return player.getWorld();
-    }
-
-    @Override
     public LivingEntity getBaseEntity() {
         return player;
     }

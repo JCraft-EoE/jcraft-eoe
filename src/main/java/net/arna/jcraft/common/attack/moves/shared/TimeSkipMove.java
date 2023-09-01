@@ -49,7 +49,7 @@ public class TimeSkipMove<A extends IAttacker<? extends A, ?>> extends AbstractM
             distance /= 3;
 
         Vec3d eyePos = user.getEyePos();
-        HitResult hitResult = attacker.getWorld().raycast(
+        HitResult hitResult = attacker.getEntityWorld().raycast(
                 new RaycastContext(
                         eyePos,
                         eyePos.add(user.getRotationVector().multiply(distance)),
@@ -66,7 +66,7 @@ public class TimeSkipMove<A extends IAttacker<? extends A, ?>> extends AbstractM
         else user.teleport(tpPos.x, tpPos.y, tpPos.z);
 
         for (SoundEvent sound : sounds)
-            attacker.getWorld().playSound(null, tpPos.x, tpPos.y, tpPos.z, sound, SoundCategory.PLAYERS, 1f, 1f);
+            attacker.getEntityWorld().playSound(null, tpPos.x, tpPos.y, tpPos.z, sound, SoundCategory.PLAYERS, 1f, 1f);
     }
 
     @Override
