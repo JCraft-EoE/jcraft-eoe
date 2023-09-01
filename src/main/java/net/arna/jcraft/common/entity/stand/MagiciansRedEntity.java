@@ -23,7 +23,8 @@ import java.util.function.Consumer;
 
 public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, MagiciansRedEntity.State> {
     public static final RedirectAttack REDIRECT = new RedirectAttack(100, 7, 10, 0.75f)
-            .withSound(JSoundRegistry.MR_REDIRECT);
+            .withSound(JSoundRegistry.MR_REDIRECT)
+            .withInfo(Text.literal("Redirect"), Text.literal("redirects all the users ankhs to where they're looking"));
     public static final SimpleAttack<MagiciansRedEntity> LIGHT = new SimpleAttack<MagiciansRedEntity>(JCraft.LIGHT_COOLDOWN,
             5, 8, 0.75f, 5f, 16, 1.5f, 0.75f, -0.1f)
             .withCrouchingVariant(REDIRECT)
