@@ -53,5 +53,7 @@ public interface IAttacker<A extends IAttacker<? extends A, S>, S> {
 
     void setState(S state);
 
-    void playSound(SoundEvent sound, float volume, float pitch);
+    default void playAttackerSound(SoundEvent sound, float volume, float pitch)  {
+        getBaseEntity().playSound(sound, volume, pitch);
+    }
 }

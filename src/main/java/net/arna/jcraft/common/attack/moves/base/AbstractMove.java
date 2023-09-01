@@ -311,7 +311,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      */
     public void onInitiate(A attacker) {
         initActions.forEach(action -> action.perform(attacker, attacker.getUser(), attacker.getMoveContext()));
-        sounds.forEach(sound -> attacker.playSound(sound, 1f, 1f));
+        sounds.forEach(sound -> attacker.playAttackerSound(sound, 1f, 1f));
     }
 
     /**
