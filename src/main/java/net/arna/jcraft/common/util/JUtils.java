@@ -376,7 +376,7 @@ public final class JUtils {
 
     @Nullable
     public static StandEntity<?, ?> getStand(LivingEntity entity) {
-        return entity instanceof StandEntity<?, ?> stand ? stand : JComponents.getStandData(entity).getStand();
+        return entity == null ? null : entity instanceof StandEntity<?, ?> stand ? stand : JComponents.getStandData(entity).getStand();
     }
 
     public static boolean isAffectedByTimeStop(Entity entity) {
