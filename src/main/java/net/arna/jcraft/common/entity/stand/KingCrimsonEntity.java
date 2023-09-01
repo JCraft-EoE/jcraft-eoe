@@ -3,7 +3,6 @@ package net.arna.jcraft.common.entity.stand;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.NonNull;
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.moves.kingcrimson.*;
@@ -28,7 +27,6 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -337,11 +335,6 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     @Override
     protected @NonNull KingCrimsonEntity getThis() {
         return this;
-    }
-
-    @Override
-    public boolean isInvisibleTo(PlayerEntity player) {
-        return getTETime() > 0 || super.isInvisibleTo(player);
     }
 
     // Animations

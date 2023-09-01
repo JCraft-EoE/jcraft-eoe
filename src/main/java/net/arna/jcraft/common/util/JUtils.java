@@ -246,7 +246,8 @@ public final class JUtils {
     }
 
     public static boolean shouldForceRender(Entity entity) {
-        if (entity instanceof D4CEntity d4c && d4c.getState() == D4CEntity.State.FLAG)
+        if (entity instanceof D4CEntity d4c && d4c.getState() == D4CEntity.State.FLAG ||
+            entity instanceof KingCrimsonEntity kc && kc.getTETime() > 0)
             return true;
         return entity instanceof CreamEntity cream && cream.isHalfBall();
     }

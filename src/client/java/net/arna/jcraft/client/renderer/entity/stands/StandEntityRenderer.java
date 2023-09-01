@@ -42,7 +42,7 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends GeoEntityR
 
     }
 
-    // Adds ability to change render alpha
+    // Adds the ability to change render alpha
     @Override
     public void render(GeoModel model, T stand, float tickDelta, RenderLayer type, MatrixStack matrixStackIn,
                        VertexConsumerProvider vertexConsumerProvider, VertexConsumer vertexConsumer, int packedLightIn,
