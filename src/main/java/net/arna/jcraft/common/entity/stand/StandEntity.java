@@ -730,7 +730,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         int moveStun = getMoveStun();
         if (moveStun > 0 && !(blocking && wantToBlock && moveStun == 1))
             setMoveStun(--moveStun); // Counting down animation time or similar
-        if (playSummonAnim && (moveStun > 0 || age > summonAnimDuration))
+        if (playSummonAnim && (moveStun > 0 || age > summonAnimDuration || getState() == getBlockState()))
             playSummonAnim = false;
 
         Direction gravDir = GravityChangerAPI.getGravityDirection(user);
