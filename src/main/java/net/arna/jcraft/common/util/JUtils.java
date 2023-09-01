@@ -2,9 +2,6 @@ package net.arna.jcraft.common.util;
 
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
 import net.arna.jcraft.common.component.JComponents;
-import net.arna.jcraft.common.entity.stand.CreamEntity;
-import net.arna.jcraft.common.entity.stand.D4CEntity;
-import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.network.s2c.JExplosionPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
@@ -243,20 +240,6 @@ public final class JUtils {
         if (entity instanceof StandEntity<?, ?> stand) return stand.blocking;
         if (entity.getFirstPassenger() instanceof StandEntity<?, ?> stand) return stand.blocking;
         return false;
-    }
-
-    public static boolean shouldForceRender(Entity entity) {
-        if (entity instanceof D4CEntity d4c && d4c.getState() == D4CEntity.State.FLAG ||
-            entity instanceof KingCrimsonEntity kc && kc.getTETime() > 0)
-            return true;
-        return entity instanceof CreamEntity cream && cream.isHalfBall();
-    }
-
-    public static boolean shouldNotRender(Entity entity) {
-        Entity passenger = entity.getFirstPassenger();
-        return passenger instanceof KingCrimsonEntity kc && kc.getTETime() > 0 ||
-                passenger instanceof D4CEntity d4c && d4c.getState() == D4CEntity.State.FLAG ||
-                passenger instanceof CreamEntity cream && cream.isHalfBall();
     }
 
     public static @Nullable DimValues getTimestop(Entity entity) {

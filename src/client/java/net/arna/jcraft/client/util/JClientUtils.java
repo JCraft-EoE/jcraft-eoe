@@ -1,8 +1,12 @@
 package net.arna.jcraft.client.util;
 
 import net.arna.jcraft.client.model.entity.StandEntityModel;
+import net.arna.jcraft.common.entity.stand.CreamEntity;
+import net.arna.jcraft.common.entity.stand.D4CEntity;
+import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.DimValues;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
@@ -95,5 +99,19 @@ public class JClientUtils {
                 head.setRotationX(headPitch + hPO);
             }
         }
+    }
+
+    public static boolean shouldForceRender(Entity entity) {
+        if (entity instanceof D4CEntity d4c && d4c.getState() == D4CEntity.State.FLAG ||
+            entity instanceof KingCrimsonEntity kc && kc.getTETime() > 0 && kc.getUser() == MinecraftClient.getInstance().player)
+            return true;
+        return entity instanceof CreamEntity cream && cream.isHalfBall();
+    }
+
+    public static boolean shouldNotRender(Entity entity) {
+        Entity passenger = entity.getFirstPassenger();
+        return passenger instanceof KingCrimsonEntity kc && kc.getTETime() > 0 ||
+                passenger instanceof D4CEntity d4c && d4c.getState() == D4CEntity.State.FLAG ||
+                passenger instanceof CreamEntity cream && cream.isHalfBall();
     }
 }
