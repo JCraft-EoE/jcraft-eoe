@@ -25,7 +25,7 @@ public class MeltYourHeartAttack extends AbstractSimpleAttack<MeltYourHeartAttac
                 WSAcidProjectile acidProjectile = new WSAcidProjectile(attacker.getWorld(), user);
                 acidProjectile.markMeltYourHeart();
                 acidProjectile.setVelocity(user, j * 36F - 180F, yaw, 0, 0.66F, 0);
-                acidProjectile.setPosition(acidProjectile.getEyePos());
+                acidProjectile.setPosition(attacker.getEyePos());
                 attacker.getWorld().spawnEntity(acidProjectile);
             }
         }
