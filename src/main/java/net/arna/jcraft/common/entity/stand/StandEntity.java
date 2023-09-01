@@ -721,28 +721,17 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if (user == null && getVehicle() instanceof LivingEntity vehicle) user = vehicle;
 
         super.tick();
-
         if (isDead()) return;
 
         if (age == 1) playSummonSound();
-
         boolean client = world.isClient;
-
         prevAlpha = getAlphaOverride();
-
-        if (user == null) {
-            if (client && getVehicle() instanceof LivingEntity living)
-                user = living;
-            return;
-        } //else if (this.owner == null) { this.owner = player; }
 
         int moveStun = getMoveStun();
         if (moveStun > 0 && !(blocking && wantToBlock && moveStun == 1))
             setMoveStun(--moveStun); // Counting down animation time or similar
         if (playSummonAnim && (moveStun > 0 || age > summonAnimDuration))
             playSummonAnim = false;
-
-        AbstractMove<?, ? super E> attack = this.curMove;
 
         Direction gravDir = GravityChangerAPI.getGravityDirection(user);
 
@@ -792,11 +781,13 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             }
 
 
+            AbstractMove<?, ? super E> move = this.curMove;
             if (defaultToNear() && moveStun <= 0) {
-                if (attack == null) {
+                if (move == null) {
                     if (this.queuedAttack == null)
                         setFree(false);
-                } else if (attack.isCounter()) ((AbstractCounterAttack<?, ? super E>) attack).whiff(getThis(), user);
+                } else if (move.isCounter()) //noinspection unchecked // not an issue here
+                    ((AbstractCounterAttack<?, ? super E>) move).whiff(getThis(), user);
             }
 
             // Rotate with user
@@ -809,13 +800,13 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             if (isRemote) user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 5, 9, true, false));
 
             // Attack logic
-            if (attack != null) {
-                attack.tick(getThis());
+            if (move != null) {
+                move.tick(getThis());
 
                 if (moveStun >= 0 && !blocking) {
-                    float attackDist = attack.getMoveDistance();
-                    int windupPoint = attack.getWindupPoint();
-                    boolean isChargeAttack = attack.isCharge();
+                    float attackDist = move.getMoveDistance();
+                    int windupPoint = move.getWindupPoint();
+                    boolean isChargeAttack = move.isCharge();
 
                     // TODO this can probably be incorporated into the new attack system.
                     // Positioning
