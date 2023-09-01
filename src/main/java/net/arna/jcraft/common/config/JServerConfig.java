@@ -33,6 +33,8 @@ public class JServerConfig {
     public static final BooleanOption IGNORE_ARMOR = new BooleanOption("ignoreArmor", BALANCE, true);
     public static final BooleanOption INVIS_CREAM_VOID = new BooleanOption("invisCreamVoid", BALANCE, false);
     public static final BooleanOption TIME_SKIP_USE_UTIL = new BooleanOption("timeSkipUseUtil", BALANCE, false);
+    public static final FloatOption DAMAGE_SCALING_MINIMUM = new FloatOption("damageScalingMinimum", BALANCE, 0.4f);
+    public static final FloatOption SCALING_PENALTY_PER_HIT = new FloatOption("scalingPenaltyPerHit", BALANCE, 0.02f);
 
     // Interaction options
     private static final String INTERACTION = "interaction";

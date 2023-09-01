@@ -206,6 +206,8 @@
   "jcraft.serverconfig.option.ignoreArmor": "Stands Ignore Armor",
   "jcraft.serverconfig.option.invisCreamVoid": "Cream's Void Invisible",
   "jcraft.serverconfig.option.timeSkipUseUtil": "Time Skip uses Util",
+  "jcraft.serverconfig.option.damageScalingMinimum": "Damage Scaling Minimum",
+  "jcraft.serverconfig.option.scalingPenaltyPerHit": "Scaling Penalty per Hit",
 
   "jcraft.serverconfig.category.interaction": "Interaction",
   "jcraft.serverconfig.option.universalAbilities": "Universal Abilities",

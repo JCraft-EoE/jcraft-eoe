@@ -4,6 +4,7 @@ import net.arna.jcraft.common.attack.moves.base.AbstractCounterAttack;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.MiscComponent;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.IDamageScaler;
@@ -27,33 +28,36 @@ public abstract class LivingEntityMixin implements IDamageScaler {
     private float damageScaling = 1.00f;
     @Unique
     private int hitCount = 0;
+
     @Override
     public float jcraft$getDamageScaling() {
-        return this.damageScaling;
+        return damageScaling;
     }
+
     @Override
     public int jcraft$getHitCount() {
-        return this.hitCount;
+        return hitCount;
     }
+
     @Override
     public void jcraft$increaseHitCount() {
         hitCount++;
-        if (damageScaling > 0.42f)
-            damageScaling -= 0.02f;
+        damageScaling = Math.max(JServerConfig.DAMAGE_SCALING_MINIMUM.getValue(),
+                damageScaling - JServerConfig.SCALING_PENALTY_PER_HIT.getValue());
     }
+
     @Override
     public void jcraft$resetHitCount() {
         damageScaling = 1.00f;
         hitCount = 0;
     }
 
-    // Called serverside, if the LivingEntity wasn't removed
+    // Called serverside if the LivingEntity wasn't removed
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;tickMovement()V", shift = At.Shift.AFTER))
     public void jcraft$tick(CallbackInfo callbackInfo) {
         LivingEntity living = LivingEntity.class.cast(this);
-        if ( hitCount > 0 && !living.hasStatusEffect(JStatusRegistry.DAZED) ) {
+        if (hitCount > 0 && !living.hasStatusEffect(JStatusRegistry.DAZED))
             ((IDamageScaler) this).jcraft$resetHitCount();
-        }
     }
 
     // Make stand users rideable entities in water (prevents stand desummon)
