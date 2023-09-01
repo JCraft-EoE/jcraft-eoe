@@ -155,7 +155,7 @@ public class JCraftClient implements ClientModInitializer {
         standSummon = TrackedKeyBinding.createAndRegister("key.jcraft.standsummon", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_N, "key.category.jcraft");
         heavyKey = TrackedKeyBinding.createAndRegister("key.jcraft.heavy", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_R, "key.category.jcraft");
         barrageKey = TrackedKeyBinding.createAndRegister("key.jcraft.barrage", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_B, "key.category.jcraft");
-        ultKey = TrackedKeyBinding.createAndRegister("key.jcraft.ult", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_H, "key.category.jcraft");
+        ultKey = TrackedKeyBinding.createAndRegister("key.jcraft.ultimate", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_H, "key.category.jcraft");
         special1Key = TrackedKeyBinding.createAndRegister("key.jcraft.special1", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_V, "key.category.jcraft");
         special2Key = TrackedKeyBinding.createAndRegister("key.jcraft.special2", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_G, "key.category.jcraft");
         special3Key = TrackedKeyBinding.createAndRegister("key.jcraft.special3", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_M, "key.category.jcraft");

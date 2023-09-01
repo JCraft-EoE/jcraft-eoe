@@ -6,7 +6,7 @@ import net.minecraft.text.Text;
 
 @Getter
 public enum MoveType {
-    LIGHT(CooldownType.STAND_LIGHT),
+    LIGHT(CooldownType.STAND_LIGHT, "key.attack"),
     HEAVY(CooldownType.STAND_HEAVY),
     BARRAGE(CooldownType.STAND_BARRAGE),
     SPECIAL1(CooldownType.STAND_SP1),
@@ -16,10 +16,16 @@ public enum MoveType {
     UTILITY(CooldownType.UTILITY);
 
     private final Text friendlyName;
+    private final Text key;
     private final CooldownType defaultCooldownType;
 
     MoveType(CooldownType defaultCooldownType) {
+        this(defaultCooldownType, null);
+    }
+
+    MoveType(CooldownType defaultCooldownType, String key) {
         friendlyName = Text.translatable("jcraft.movetype." + name().toLowerCase());
+        this.key = Text.keybind(key == null ? "key.jcraft." + name().toLowerCase() : key);
         this.defaultCooldownType = defaultCooldownType;
     }
 }

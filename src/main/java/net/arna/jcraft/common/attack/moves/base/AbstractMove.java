@@ -33,6 +33,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     private int cooldown, windup;
     private int duration;
     private float moveDistance;
+    @NonNull
     private Text name = Text.empty(), description = Text.empty();
     /**
      * The move this move was copied from.
