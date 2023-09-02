@@ -34,34 +34,28 @@ public class PlayerInputPacket {
         ServerTickEvents.START_SERVER_TICK.register(server -> {
             for (Map.Entry<ServerPlayerEntity, StateManager> entry : stateManagers.entrySet()) {
                 ServerPlayerEntity player = entry.getKey();
-                StateManager stateManager = entry.getValue();
+                StateManager sm = entry.getValue();
 
                 // Handle held inputs
-                stateManager.heldInputs.forEach(type -> handleMoveInput(server, player, type));
+                sm.heldInputs.forEach(type -> handleMoveInput(server, player, type));
 
-                int forward = stateManager.calcForward();
-                int side = stateManager.calcSide();
+                int forward = sm.calcForward();
+                int side = sm.calcSide();
                 JComponents.getMiscData(player).updateRemoteInputs(
-                        forward, stateManager.calcSide(), stateManager.jumping);
+                        forward, sm.calcSide(), sm.jumping);
 
                 StandEntity<?, ?> stand = JUtils.getStand(player);
-                if (stand != null) stand.updateRemoteInputs(forward, side, stateManager.jumping);
+                if (stand != null) stand.updateRemoteInputs(forward, side, sm.jumping);
 
-                if (stateManager.dashing) JCraft.tryDash(forward, side, player);
+                if (sm.dashing) JCraft.tryDash(forward, side, player);
 
-                if (!stateManager.jumping) continue;
+                if (!sm.jumping) continue;
 
                 if (JCraft.isDashing(player))
                     // 5s cooldown for superjumping
                     JComponents.getCooldowns(player).setCooldown(CooldownType.DASH, 100);
 
-                // Combo break if stunned, jumping and crouching
-                if (player.isSneaking()) {
-                    StatusEffectInstance stun = player.getStatusEffect(JStatusRegistry.DAZED);
-                    if (JUtils.isBlocking(player)) return;
-                    if (stun != null)
-                        comboBreak(player.getWorld(), player, stun);
-                }
+                checkComboBreak(player);
             }
         });
     }
@@ -107,6 +101,8 @@ public class PlayerInputPacket {
                 if (pressed) server.execute(() -> JCraft.tryDash(sm.calcForward(), sm.calcSide(), player));
             }
         }
+
+        if (sm.jumping) server.execute(() -> checkComboBreak(player));
     }
 
 
@@ -182,6 +178,15 @@ public class PlayerInputPacket {
         stand.initMove(type.getMoveType());
         if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking())
             stand.queuedAttack = type;
+    }
+
+    private static void checkComboBreak(ServerPlayerEntity player) {
+        // Combo break if stunned, jumping and crouching
+        StateManager sm = stateManagers.get(player);
+        if (sm == null || !sm.jumping || !player.isSneaking() || JUtils.isBlocking(player)) return;
+
+        StatusEffectInstance stun = player.getStatusEffect(JStatusRegistry.DAZED);
+        if (stun != null) JCraft.comboBreak(player.getWorld(), player, stun);
     }
 
     private static class StateManager {
