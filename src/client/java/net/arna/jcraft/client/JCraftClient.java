@@ -118,7 +118,7 @@ public class JCraftClient implements ClientModInitializer {
         AutoConfig.register(JClientConfig.class, JanksonConfigSerializer::new);
         JClientConfig.load();
 
-        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new DecimalFormatUpdater());
+//        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new DecimalFormatUpdater());
 
         GravityChannelClient.init();
 
