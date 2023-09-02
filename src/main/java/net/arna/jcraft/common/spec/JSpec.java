@@ -133,6 +133,7 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
     }
 
     public boolean handleMove(AbstractMove<?, ? super A> move, CooldownType cooldownType, S state, float animationSpeed) {
+        move = moveMap.getRegisteredMoveFor(move);
         if (!move.canBeInitiated(getThis())) return false;
         move.onInitiate(getThis());
 

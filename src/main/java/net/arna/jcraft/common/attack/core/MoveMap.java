@@ -1,24 +1,27 @@
 package net.arna.jcraft.common.attack.core;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
+import com.google.common.collect.Streams;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.util.CooldownType;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 public class MoveMap<A extends IAttacker<A, S>, S> implements Iterable<MoveMap.Entry<A, S>> {
     private final ListMultimap<MoveType, Entry<A, S>> moves = MultimapBuilder.enumKeys(MoveType.class).arrayListValues().build();
     private final List<Entry<A, S>> extraMoves = new ArrayList<>();
+    @Getter
+    private Map<AbstractMove<?, ? super A>, AbstractMove<?, ? super A>> copyMap = Map.of();
     @Getter
     private boolean frozen = false;
 
@@ -60,6 +63,7 @@ public class MoveMap<A extends IAttacker<A, S>, S> implements Iterable<MoveMap.E
         checkFrozen();
 
         frozen = true;
+        buildCopyMap();
     }
 
     @NonNull
@@ -77,6 +81,20 @@ public class MoveMap<A extends IAttacker<A, S>, S> implements Iterable<MoveMap.E
 
     private void checkFrozen() {
         if (frozen) throw new IllegalStateException("MoveMap is already frozen.");
+    }
+
+    private void buildCopyMap() {
+        copyMap = Streams.stream(this)
+                .collect(Collector.of(ImmutableMap::<AbstractMove<?, ? super A>, AbstractMove<?, ? super A>>builder,
+                        (b, entry) -> b.put(entry.getMove().getOriginalMove(), entry.getMove()),
+                        (b1, b2) -> b1.putAll(b2.build()), ImmutableMap.Builder::build));
+    }
+
+    // Upon registering, the move registered is copied before being put in this map.
+    // At any point you want the registered version for a move, use this method.
+    @Contract("!null -> !null; null -> null")
+    public AbstractMove<?, ? super A> getRegisteredMoveFor(AbstractMove<?, ? super A> move) {
+        return copyMap.getOrDefault(move, move);
     }
 
     @NotNull

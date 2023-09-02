@@ -551,6 +551,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * @param animState int identifier for which state to put the stand into
      */
     public void setMove(AbstractMove<?, ? super E> move, @Nullable S animState) {
+        move = moveMap.getRegisteredMoveFor(move);
         move.onInitiate(getThis());
 
         // If the attack has a duration of 0, just perform it immediately.
