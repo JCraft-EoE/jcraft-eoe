@@ -1,13 +1,15 @@
 package net.arna.jcraft.common.events;
 
-import it.unimi.dsi.fastutil.objects.Object2IntAVLTreeMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.JCraft.DashData;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.StandEntity;
-import net.arna.jcraft.common.util.*;
+import net.arna.jcraft.common.util.DimValues;
+import net.arna.jcraft.common.util.EntityInterest;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.block.Blocks;
@@ -106,7 +108,7 @@ public class JServerTickEvents {
         activeTimestops.addAll(newActiveTimestops);
 
         // Burst handling
-        Object2IntMap<LivingEntity> newBurstTimers = new Object2IntAVLTreeMap<>();
+        Object2IntMap<LivingEntity> newBurstTimers = new Object2IntOpenHashMap<>();
 
         for (Object2IntMap.Entry<LivingEntity> burst : JCraft.burstTimers.object2IntEntrySet()) {
             LivingEntity player = burst.getKey();

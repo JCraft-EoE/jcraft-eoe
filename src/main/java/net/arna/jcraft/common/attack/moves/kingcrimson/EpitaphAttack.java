@@ -32,6 +32,7 @@ public class EpitaphAttack extends AbstractCounterAttack<EpitaphAttack, KingCrim
     public void counter(@NonNull KingCrimsonEntity attacker, Entity countered, DamageSource counteredDamageSource) {
         super.counter(attacker, countered, counteredDamageSource);
 
+        if (countered == null) return;
         LivingEntity user = attacker.getUserOrThrow();
         Vec3d ePos = countered.getPos();
         if (!countered.isInsideWall()) {

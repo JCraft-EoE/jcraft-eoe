@@ -988,7 +988,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             AbstractMove<?, ?> standAttack = stand.curMove;
             if (standAttack != null) {
                 // Counter check
-                if (!tsHit && standAttack.isCounter() && stand.getMoveStun() < (standAttack.getDuration() - standAttack.getWindup())) {
+                if (!tsHit && standAttack.isCounter() && stand.getMoveStun() < standAttack.getWindupPoint()) {
+                    //noinspection unchecked
                     ((AbstractCounterAttack<?, StandEntity<?, ?>>) standAttack).counter(stand, attacker, source);
                     ent.removeStatusEffect(JStatusRegistry.DAZED);
                     return;
