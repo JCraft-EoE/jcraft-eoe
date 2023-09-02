@@ -67,6 +67,7 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Unit;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -118,7 +119,7 @@ public class JCraftClient implements ClientModInitializer {
         AutoConfig.register(JClientConfig.class, JanksonConfigSerializer::new);
         JClientConfig.load();
 
-//        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new DecimalFormatUpdater());
+        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new DecimalFormatUpdater());
 
         GravityChannelClient.init();
 
@@ -417,8 +418,8 @@ public class JCraftClient implements ClientModInitializer {
         @Override
         public CompletableFuture<Void> reload(Synchronizer synchronizer, ResourceManager manager, Profiler prepareProfiler,
                                               Profiler applyProfiler, Executor prepareExecutor, Executor applyExecutor) {
-            decimalFormat = Suppliers.memoize(JCraftClient::createDecimalFormat);
-            return CompletableFuture.completedFuture(null);
+            return synchronizer.whenPrepared(Unit.INSTANCE).thenRunAsync(() ->
+                    decimalFormat = Suppliers.memoize(JCraftClient::createDecimalFormat), applyExecutor);
         }
     }
 }
