@@ -15,7 +15,9 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3f;
+import net.minecraft.world.LightType;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.example.client.DefaultBipedBoneIdents;
 import software.bernie.geckolib3.core.processor.IBone;
@@ -41,13 +43,27 @@ public class D4CRenderer extends ExtendedGeoEntityRenderer<D4CEntity> {
                 RenderLayer.getEntityNoOutline(textureLocation) : RenderLayer.getEntityCutout(textureLocation);
     }
 
-    // Adds ability to change render alpha
+    // Adds the ability to change render alpha
     @Override
     public void render(GeoModel model, D4CEntity animatable, float tickDelta, RenderLayer type, MatrixStack matrixStackIn, VertexConsumerProvider renderTypeBuffer, VertexConsumer vertexBuilder, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
         float a = StandEntityRenderer.getAlpha(animatable, tickDelta);
         float gR = 1.0f - a;
 
         super.render(model, animatable, tickDelta, type, matrixStackIn, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green - gR, blue, a);
+    }
+
+    @Override
+    protected int getBlockLight(D4CEntity stand, BlockPos pos) {
+        if (!stand.hasUser()) return super.getBlockLight(stand, pos);
+
+        if (stand.isOnFire() || stand.getUserOrThrow().isOnFire()) return 15;
+        return stand.world.getLightLevel(LightType.BLOCK, stand.getUserOrThrow().getBlockPos());
+    }
+
+    @Override
+    protected int getSkyLight(D4CEntity stand, BlockPos pos) {
+        return stand.hasUser() ? stand.world.getLightLevel(LightType.SKY, stand.getUserOrThrow().getBlockPos()) :
+                super.getSkyLight(stand, pos);
     }
 
     /*

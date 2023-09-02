@@ -1,5 +1,6 @@
 package net.arna.jcraft.client;
 
+import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
@@ -48,6 +49,7 @@ import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
@@ -62,22 +64,24 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.util.profiler.Profiler;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.function.Supplier;
 
 import static net.arna.jcraft.client.gui.hud.JCraftAbilityHud.getHudX;
 import static net.arna.jcraft.client.util.JClientUtils.activeTimestops;
@@ -103,20 +107,18 @@ public class JCraftClient implements ClientModInitializer {
     private static final Map<TrackedKeyBinding, MovementInputType> movementBindings = createMovementBindingsMap();
     @Getter(lazy = true)
     private static final TrackedKeyBinding trackedUseKey = TrackedKeyBinding.wrap(MinecraftClient.getInstance().options.useKey);
-    // TODO this should probably be updated when the Minecraft language is updated.
-    @Getter(lazy = true)
-    private static final DecimalFormat decimalFormat = new DecimalFormat("#.#", DecimalFormatSymbols.getInstance(
-            Locale.forLanguageTag(MinecraftClient.getInstance().options.language)));
+    private static Supplier<DecimalFormat> decimalFormat = Suppliers.memoize(JCraftClient::createDecimalFormat);
     private static boolean comboStarted = false;
     private static int framesSinceComboStarted = 0;
 
     @Override
     public void onInitializeClient() {
         JCraft.setClientEntityHandler(ClientEntityHandlerImpl.INSTANCE);
-        // MidnightConfig.init(JCraft.MOD_ID, JConfig.class);
 
         AutoConfig.register(JClientConfig.class, JanksonConfigSerializer::new);
         JClientConfig.load();
+
+        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new DecimalFormatUpdater());
 
         GravityChannelClient.init();
 
@@ -255,7 +257,7 @@ public class JCraftClient implements ClientModInitializer {
                 float defaultAlpha = 0.65f;
                 int xOffset = 0;
 
-                String finalText = keyBindText + " - " + JCraftClient.getDecimalFormat().format(MathHelper.clamp(cooldown, 0.0, 9999.0)) + "s";
+                String finalText = keyBindText + " - " + decimalFormat.get().format(MathHelper.clamp(cooldown, 0.0, 9999.0)) + "s";
 
                 if (category == CooldownType.Category.STAND || isSpec) {
                     if (!isSpec) finalText = "s." + finalText;
@@ -401,5 +403,22 @@ public class JCraftClient implements ClientModInitializer {
                 .map(e -> (StandEntity<?, ?>) e)
                 .findFirst()
                 .orElse(null);
+    }
+
+    private static DecimalFormat createDecimalFormat() {
+        return new DecimalFormat("#.#", DecimalFormatSymbols.getInstance(
+                Locale.forLanguageTag(MinecraftClient.getInstance().options.language)));
+    }
+
+    @Getter
+    private static class DecimalFormatUpdater implements IdentifiableResourceReloadListener {
+        private final Identifier fabricId = JCraft.id("decimal_format_updater");
+
+        @Override
+        public CompletableFuture<Void> reload(Synchronizer synchronizer, ResourceManager manager, Profiler prepareProfiler,
+                                              Profiler applyProfiler, Executor prepareExecutor, Executor applyExecutor) {
+            decimalFormat = Suppliers.memoize(JCraftClient::createDecimalFormat);
+            return CompletableFuture.completedFuture(null);
+        }
     }
 }
