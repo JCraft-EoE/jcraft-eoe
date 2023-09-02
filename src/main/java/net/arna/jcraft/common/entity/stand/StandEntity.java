@@ -733,6 +733,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if (playSummonAnim && (moveStun > 0 || age > summonAnimDuration || getState() == getBlockState()))
             playSummonAnim = false;
 
+        if (!hasUser()) return;
+
         Direction gravDir = GravityChangerAPI.getGravityDirection(user);
 
         Vec3d pos = this.getPos();
