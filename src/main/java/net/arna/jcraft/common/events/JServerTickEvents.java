@@ -195,8 +195,7 @@ public class JServerTickEvents {
                         standUserAI(mob, target, stand);
                     else if (biggestAttacker != null && biggestAttacker.isAlive() && stand.canTarget(biggestAttacker))
                         mob.setTarget(biggestAttacker);
-                } else if (JComponents.getStandData(mob).getType() != null && mob.getFirstPassenger() == null)
-                    JCraft.summon(serverWorld, mob);
+                } else if (JComponents.getStandData(mob).getType() != null) JCraft.summon(serverWorld, mob);
             }
         }
 
