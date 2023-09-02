@@ -32,7 +32,7 @@ public class JumpMove<A extends IAttacker<? extends A, ?>> extends AbstractMove<
     public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user, MoveContext ctx) {
         if (!user.isOnGround()) return Set.of();
 
-        Vec3d jumpVel = getRotVec(attacker).multiply(strength).add(0, 0.5, 0);
+        Vec3d jumpVel = user.getRotationVector().multiply(strength).add(0, 0.5, 0);
 
         user.addVelocity(jumpVel.x, jumpVel.y, jumpVel.z);
         user.velocityModified = true;
