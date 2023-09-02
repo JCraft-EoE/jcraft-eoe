@@ -830,6 +830,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 }
             }
 
+            if (wantToBlock && !blocking && canAttack()) blocking = true;
+
             if (moveStun <= 0 && !blocking) {
                 // Attack buffering
                 if (queuedAttack != null) {

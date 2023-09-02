@@ -221,8 +221,7 @@ public final class JUtils {
         DamageSource source;
         if (owner == null)
             source = DamageSource.GENERIC;
-        else
-            source = DamageSource.thrownProjectile(proj, owner);
+        else source = DamageSource.thrownProjectile(proj, owner);
 
         if (ent instanceof LivingEntity living) {
             LivingEntity target = living;
@@ -238,8 +237,8 @@ public final class JUtils {
     //To check method ms usage, use spark[something]
     public static boolean isBlocking(LivingEntity entity) {
         if (entity instanceof StandEntity<?, ?> stand) return stand.blocking;
-        if (entity.getFirstPassenger() instanceof StandEntity<?, ?> stand) return stand.blocking;
-        return false;
+        StandEntity<?, ?> stand = JUtils.getStand(entity);
+        return stand != null && stand.blocking;
     }
 
     public static @Nullable DimValues getTimestop(Entity entity) {

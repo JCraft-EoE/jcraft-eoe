@@ -33,10 +33,10 @@ public class StandBlockPacket {
             StandEntity<?, ?> stand = JUtils.getStand(player);
             if (!JCraft.isDashing(player) && stand != null) {
                 boolean blocking = stand.blocking;
-                if (!blocking && stand.canAttack() && blockDown) {
+                if (!blocking && blockDown) {
                     if (player.getMainHandStack().getUseAction() == UseAction.NONE && player.getOffHandStack().getUseAction() == UseAction.NONE) {
                         stand.wantToBlock = true;
-                        stand.blocking = true; // Unnecessary to use tryBlock() as canAttack() is already true
+                        if (stand.canAttack()) stand.blocking = true;
                     }
                 } else if (blocking && !blockDown) stand.wantToBlock = false;
             }
