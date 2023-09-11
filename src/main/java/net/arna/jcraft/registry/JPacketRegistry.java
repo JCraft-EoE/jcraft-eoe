@@ -16,6 +16,7 @@ public interface JPacketRegistry {
     Identifier S2C_COMBO_COUNTER = JCraft.id("combo_counter");
     Identifier S2C_TIME_STOP = JCraft.id("time_stop");
     Identifier S2C_SPLATTER = JCraft.id("splatter");
+    Identifier S2C_STAND_HURT = JCraft.id("stand_hurt");
 
     Identifier C2S_STAND_BLOCK = JCraft.id("stand_block");
     Identifier C2S_COOLDOWN_CANCEL = JCraft.id("cooldown_cancel");

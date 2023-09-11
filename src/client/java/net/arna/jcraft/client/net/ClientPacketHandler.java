@@ -73,6 +73,7 @@ public class ClientPacketHandler {
         register(S2C_COMBO_COUNTER, ClientPacketHandler::handleComboCounter);
         register(S2C_TIME_STOP, ClientPacketHandler::handleTimeStop);
         register(S2C_SPLATTER, ClientPacketHandler::handleSplatter);
+        register(S2C_STAND_HURT, ClientPacketHandler::handleStandHurt);
     }
 
     private static void handleTimeStop(@NotNull MinecraftClient client, PacketByteBuf buf) {
@@ -538,5 +539,21 @@ public class ClientPacketHandler {
         splatter.getSections().stream()
                 .filter(section -> !section.isRemoved())
                 .forEach(section -> AttackHitboxEffectRenderer.addHitbox(section.getHitBox(), ageMs, true));
+    }
+
+    private static void handleStandHurt(MinecraftClient client, PacketByteBuf buf) {
+        int entityId = buf.readVarInt();
+        client.execute(() -> {
+            if (client.world == null) return;
+
+            Entity entity = client.world.getEntityById(entityId);
+            if (!(entity instanceof LivingEntity living)) return;
+
+            // LivingEntity#handleStatus(byte) case 2, but without the sound
+            living.limbDistance = 1.5f;
+            living.timeUntilRegen = 20;
+            living.hurtTime = living.maxHurtTime = 10;
+            living.knockbackVelocity = 0f;
+        });
     }
 }

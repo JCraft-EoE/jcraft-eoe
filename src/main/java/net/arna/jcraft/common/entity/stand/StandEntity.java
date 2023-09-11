@@ -21,8 +21,11 @@ import net.arna.jcraft.common.network.s2c.ComboCounterPacket;
 import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.mixin.LivingEntityInvoker;
+import net.arna.jcraft.registry.JPacketRegistry;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -618,7 +621,13 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         // Statistics
         World world = ent.getWorld();
-        if (!(ent instanceof PlayerEntity)) world.sendEntityStatus(ent, (byte) 2);
+        if (ent instanceof PlayerEntity) {
+            if (world instanceof ServerWorld serverWorld)
+                serverWorld.getChunkManager().sendToNearbyPlayers(ent, ServerPlayNetworking.createS2CPacket(
+                        JPacketRegistry.S2C_STAND_HURT, PacketByteBufs.create().writeVarInt(ent.getId())));
+        } else {
+            world.sendEntityStatus(ent, (byte) 2);
+        }
 
         invoker.setLastDamageTaken(damage);
         invoker.setLastDamageSource(damageSource);
