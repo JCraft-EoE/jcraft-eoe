@@ -28,7 +28,7 @@ public class SilverChariotRenderer extends StandEntityRenderer<SilverChariotEnti
                        float red, float green, float blue, float alpha) {
         super.render(model, animatable, tickDelta, type, matrixStack, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 
-        if (animatable.getMode() == 2 && animatable.hasUser()) for (double i = 0; i < 3; i++)
+        if (animatable.getMode() == SilverChariotEntity.Mode.ARMORLESS && animatable.hasUser()) for (double i = 0; i < 3; i++)
             renderAfter(animatable.getUserOrThrow(), JUtils.deltaPos(animatable).multiply(i * 2.0), 1f,
                     model, animatable, tickDelta, RenderLayer.getEntityNoOutline(getTextureLocation(animatable)),
                     matrixStack, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue,

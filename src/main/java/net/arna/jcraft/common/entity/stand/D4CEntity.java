@@ -1,91 +1,92 @@
 package net.arna.jcraft.common.entity.stand;
 
+import it.unimi.dsi.fastutil.ints.IntSet;
+import lombok.NonNull;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.attack.Attack;
-import net.arna.jcraft.common.attack.AttackType;
-import net.arna.jcraft.common.attack.StunType;
-import net.arna.jcraft.common.entity.PlayerCloneEntity;
-import net.arna.jcraft.common.item.MockItem;
-import net.arna.jcraft.common.util.*;
-import net.arna.jcraft.mixin.ChunkLightProviderAccessor;
-import net.arna.jcraft.mixin.LightStorageAccessor;
-import net.arna.jcraft.mixin.LightingProviderAccessor;
+import net.arna.jcraft.common.attack.core.MoveMap;
+import net.arna.jcraft.common.attack.core.MoveType;
+import net.arna.jcraft.common.attack.core.StunType;
+import net.arna.jcraft.common.attack.core.ctx.MoveContext;
+import net.arna.jcraft.common.attack.moves.dirtydeedsdonedirtcheap.*;
+import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
+import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
+import net.arna.jcraft.common.attack.moves.shared.SimpleMultiHitAttack;
+import net.arna.jcraft.common.util.JParticleType;
+import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JDimensionRegistry;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegistry;
-import net.arna.jcraft.registry.JStatusRegistry;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.minecraft.entity.*;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.*;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.ChunkNibbleArray;
-import net.minecraft.world.chunk.ChunkSection;
-import net.minecraft.world.chunk.ChunkToNibbleArrayMap;
-import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.world.chunk.light.LightingProvider;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
-    public static final Attack crm1 = new Attack(11, JCraft.lightCooldown, 0.75f, 15, 11, 0, 0, 0f, AttackType.BOX)
-            .setInfo("Item Place", "places an item from an alternate universe on the ground, attracts other such items");
-    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 15, 9, 1.5, 5f, 0.75f, AttackType.BOX, 1.1f, -0.1f, 0, JSoundRegistry.IMPACT_2)
-            .crouchingVariation(crm1)
-            .setInfo("Chop", "quick combo starter");
-    public static final Attack barrage = Attack.barrageAttack(2, 17, 0.75f, 70, 0, 2, 0.8f, 0.25f, 1.5f, 0, 3, JSoundRegistry.IMPACT_2)
-            .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public static final Attack heavy = new Attack(1, 15, 1, 25, 14, 2, 8f, 1.5f, AttackType.BOX, 0.6f, -0.2f, 0, JSoundRegistry.IMPACT_2)
-            .setHitspark(2)
-            .hyperArmor()
-            .setLaunch()
-            .setInfo("Charge", "user & stand charge forward, uninterruptable launcher");
-    public static final Attack dimhop_others = new Attack(3, 60, 1, 60, 40, 1.75, 0f, 0.0f, AttackType.BOX)
-            .setInfo("Dimensional Hop", "travels to a random dimension at exact coordinates, if user was hit in the last 30s, he is forced back, certified death button");
-
-    public static final Attack givegun = new Attack(6, 25, 14, 10, 0, 0.75f, AttackType.BOX)
-            .setInfo("Summon Gun", "gives the user a revolver");
-    public static final Attack grab = new Attack(4, 20, 0.75f, 21, 12, 1.5, 0f, 0.0f, AttackType.BOX, 2, 0, 0, null)
-            .setGrab()
-            .crouchingVariation(givegun)
-            .setInfo("Grab", "unblockable, combo finisher");
-    public static final Attack grabhit = new Attack(5, 0, 0.75f, 34, 0, 2, 4f, 0f, AttackType.MULTIHIT, 0.5f, 0, List.of(11, 17, 26), JSoundRegistry.IMPACT_1)
-            .setStunType(StunType.UNBURSTABLE)
-            .setInfo("Grab (Hit)", "");
-    private static final Attack grabhitfinal = new Attack(10, 0, 0.75f, 34, 0, 2, 4f, 1.2f, AttackType.MULTIHIT, 0.45f, 0, List.of(11, 17, 26), JSoundRegistry.IMPACT_1)
-            .setHitspark(2)
-            .setLaunch()
-            .setInfo("Grab (Final Hit)", "");
-    public static final Attack counter = new Attack(7, 30, 35, 5, 0, 0.75f, AttackType.COUNTER)
-            .setInfo("Counter", "0.25s startup, 1.5s duration, high damage, knocks back when hit");
+    public static final ItemPlaceMove ITEM_PLACE = new ItemPlaceMove(JCraft.LIGHT_COOLDOWN, 11, 15, 0.75f)
+            .withInfo(Text.literal("Item Place"), Text.literal("places an item from an alternate universe on the ground, attracts other such items"));
+    public static final SimpleAttack<D4CEntity> CHOP = new SimpleAttack<D4CEntity>(JCraft.LIGHT_COOLDOWN,
+            9, 15, 0.75f, 5f, 22, 1.5f, 0.75f, -0.1f)
+            .withCrouchingVariant(ITEM_PLACE)
+            .withSound(JSoundRegistry.D4C_LIGHT)
+            .withImpactSound(JSoundRegistry.IMPACT_2)
+            .withInfo(Text.literal("Chop"), Text.literal("quick combo starter"));
+    public static final BarrageAttack<D4CEntity> BARRAGE = new BarrageAttack<D4CEntity>(340, 0, 70,
+            0.75f, 0.8f, 30, 2f, 0.25f, 0f, 3)
+            .withSound(JSoundRegistry.D4C_BARRAGE)
+            .withImpactSound(JSoundRegistry.IMPACT_2)
+            .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
+    public static final SimpleAttack<D4CEntity> CHARGE = new SimpleAttack<D4CEntity>(300, 14, 25,
+            1f, 8f, 12, 2f, 1.5f, -0.2f)
+            .withInitAction(D4CEntity::doCharge)
+            .withSound(JSoundRegistry.D4C_HEAVY)
+            .withImpactSound(JSoundRegistry.IMPACT_2)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHyperArmor()
+            .withLaunch()
+            .withInfo(Text.literal("Charge"), Text.literal("user & stand charge forward, uninterruptible launcher"));
+    public static final DimensionalHopMove DIM_HOP = new DimensionalHopMove(1200, 40, 60,
+            1f, 0f, 0, 1.75f, 0f, 0f)
+            .withSound(JSoundRegistry.D4C_DIMHOP)
+            .withInfo(Text.literal("Dimensional Hop"), Text.literal("travels to a random dimension at exact coordinates, " +
+                    "if user was hit in the last 30s, he is forced back, certified death button"));
+    public static final GiveGunMove GIVE_GUN = new GiveGunMove(500, 10, 14, 0.75f)
+            .withSound(JSoundRegistry.D4C_THROW)
+            .withInitAction(D4CEntity::equipRevolver)
+            .withInfo(Text.literal("Summon Gun"), Text.literal("gives the user a revolver"));
+    public static final SimpleAttack<D4CEntity> GRAB_HIT_FINAL = new SimpleAttack<D4CEntity>(0, 26,
+            34, 0.75f, 4f, 9, 2f, 1.2f, 0f)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withLaunch()
+            .withInfo(Text.literal("Grab (Final Hit)"), Text.empty());
+    public static final SimpleMultiHitAttack<D4CEntity> GRAB_HIT = new SimpleMultiHitAttack<D4CEntity>(0,
+            34, 0.75f, 4f, 10, 2f, 0f, 0f, IntSet.of(11, 17, 26))
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            // Play sound regardless of whether something hit.
+            .withAction((attacker, user, ctx, targets) -> attacker.playSound(JSoundRegistry.REVOLVER_FIRE, 1, 1))
+            .withStunType(StunType.UNBURSTABLE)
+            .withFinisher(17, GRAB_HIT_FINAL)
+            .withInfo(Text.literal("Grab (Final Hit)"), Text.empty());
+    public static final D4CGrabAttack GRAB = new D4CGrabAttack(400, 12, 21, 0.75f,
+            0f, 40, 1.5f, 0f, 0f, GRAB_HIT, State.THROW_HIT)
+            .withCrouchingVariant(GIVE_GUN)
+            .withSound(JSoundRegistry.D4C_THROW)
+            .withInitAction(D4CEntity::equipRevolver)
+            .withInfo(Text.literal("Grab"), Text.literal("unblockable, combo finisher"));
+    public static final D4CCounterAttack COUNTER = new D4CCounterAttack(600, 5, 35, 0.75f)
+            .withInfo(Text.literal("Counter"), Text.literal("0.25s startup, 1.5s duration, high damage, knocks back when hit"));
     //todo: make them spawn without weapons unless you are crouching
-    public static final Attack clonespawn = new Attack(8, 40, 1, 50, 40, 0, 0f, 0.0f, AttackType.BOX)
-            .setRanged(true)
-            .setInfo("Dimensional Clone", "summons an unlimited number of servants");
-    public static final Attack flag = new Attack(9, 20, 60, 10, 0, 0, AttackType.BOX)
-            .setInfo("Dimensional Phase", "hides in a flag in an un-stunnable, floating state")
-            .setMobility(MobilityType.HIGHJUMP);
-
-    public static ServerWorld auWorld;
+    public static final CloneSpawnMove CLONE_SPAWN = new CloneSpawnMove(800, 40, 50, 1f)
+            .withSound(JSoundRegistry.D4C_DIMHOP)
+            .withInfo(Text.literal("Dimensional Clone"), Text.literal("summons an unlimited number of servants"));
+    public static final FlagMove FLAG = new FlagMove(400, 10, 60, 0f)
+            .withSound(JSoundRegistry.D4C_UTILITY)
+            .withInfo(Text.literal("Dimensional Phase"), Text.literal("hides in a flag in an un-stunnable, floating state"));
 
     public D4CEntity(World worldIn) {
         super(StandType.D4C, worldIn, JSoundRegistry.D4C_SUMMON, true);
@@ -114,98 +115,48 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                             
                             the western
                             M1>Summon Gun>Barrage>M1~stand.OFF>M2>M2>M2>M2>M2>M2~s.ON+M1>Charge""";
-
-        moves = List.of(light, heavy, barrage, dimhop_others, clonespawn, grab, counter, flag);
-
-        super.initialize();
-
-        if (world.isClient) return;
-        auWorld = Objects.requireNonNull(getServer()).getWorld(JDimensionRegistry.AU_DIMENSION_KEY);
     }
 
-    private static final List<ItemStack> placeableStacks = List.of(
-            Items.STICK.getDefaultStack(),
-            Items.COBBLESTONE.getDefaultStack(),
-            Items.DEAD_BUSH.getDefaultStack(),
-            Items.APPLE.getDefaultStack(),
-            Items.OAK_SAPLING.getDefaultStack()
-    );
-    private boolean placingFirstStack = true;
-    private ItemStack placing;
     @Override
-    public void initLightAttack() {
-        if (!canAttack()) return;
-        if (getUserOrThrow().isSneaking() && handleAttack(crm1, CooldownType.STAND_LIGHT, State.ITEM_PLACE)) {
-            if (placingFirstStack) {
-                placing = MockItem.createMockStack( placeableStacks.get(random.nextInt(placeableStacks.size())) );
+    protected void registerMoves(MoveMap<D4CEntity, State> moves) {
+        moves.register(MoveType.LIGHT, CHOP, State.LIGHT).withCrouchingVariant(State.ITEM_PLACE);
+        moves.register(MoveType.HEAVY, CHARGE, State.HEAVY);
+        moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
+
+        moves.register(MoveType.SPECIAL1, CLONE_SPAWN, State.DIM_HOP);
+        moves.register(MoveType.SPECIAL2, GRAB, State.THROW).withCrouchingVariant(State.GIVE_GUN);
+        moves.register(MoveType.SPECIAL3, COUNTER, State.COUNTER);
+        moves.register(MoveType.ULTIMATE, DIM_HOP, State.DIM_HOP);
+
+        moves.register(MoveType.UTILITY, FLAG, State.FLAG);
+    }
+
+    private static void doCharge(D4CEntity attacker, LivingEntity user, MoveContext ctx) {
+        if (!user.isOnGround()) return;
+        user.setVelocity(user.getVelocity().add(attacker.getRotationVector().multiply(0.75)).add(0.0, 0.15, 0.0));
+        user.velocityModified = true;
+    }
+
+    private static void equipRevolver(D4CEntity attacker, LivingEntity user, MoveContext ctx) {
+        attacker.equipStack(EquipmentSlot.MAINHAND, JObjectRegistry.FV_REVOLVER.getDefaultStack());
+    }
+
+    @Override
+    public void initMove(MoveType type) {
+        if (type == MoveType.ULTIMATE) {
+            if (curMove != null && curMove.getOriginalMove() == DIM_HOP) {
+                setMoveStun(0);
+                curMove = null;
             }
-            equipStack(EquipmentSlot.OFFHAND, placing.copy());
-            placingFirstStack = !placingFirstStack;
-        } else if (handleAttack(light, CooldownType.STAND_LIGHT, State.LIGHT))
-            playSound(JSoundRegistry.D4C_LIGHT, 1, 1);
-    }
 
-    @Override
-    public void initHeavyAttack() {
-        if (!canAttack() || !handleAttack(heavy, CooldownType.STAND_HEAVY, State.HEAVY)) return;
-
-        playSound(JSoundRegistry.D4C_HEAVY, 1, 1);
-        Entity ent = getUserOrThrow();
-
-        if (!ent.isOnGround()) return;
-        ent.setVelocity(ent.getVelocity().add(this.getRotationVector().multiply(0.75)).add(0.0, 0.15, 0.0));
-        ent.velocityModified = true;
-    }
-
-    @Override
-    public void initBarrage() {
-        if (!canAttack()) return;
-        if (handleAttack(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
-            playSound(JSoundRegistry.D4C_BARRAGE, 1, 1);
-    }
-
-    @Override
-    public void initSpecial1() {
-        if (!canAttack()) return;
-        if (handleAttack(clonespawn, CooldownType.STAND_SP1, State.DIM_HOP))
-            playSound(JSoundRegistry.D4C_DIMHOP, 1, 1);
-    }
-
-    @Override
-    public void initUlt() {
-        // Ability to cancel dimension hop
-        if (curAttack == dimhop_others) {
-            setMoveStun(0);
-            curAttack = null;
+            if (getWorld().getRegistryKey().equals(JDimensionRegistry.AU_DIMENSION_KEY)) {
+                setMove(DIM_HOP, State.DIM_HOP);
+                playSound(JSoundRegistry.D4C_DIMHOP, 1, 1);
+                return;
+            }
         }
 
-        if (getWorld().getRegistryKey().equals(JDimensionRegistry.AU_DIMENSION_KEY)) {
-            setAttack(dimhop_others, State.DIM_HOP);
-            playSound(JSoundRegistry.D4C_DIMHOP, 1, 1);
-            return;
-        }
-
-        if (!canAttack()) return;
-        if (handleAttack(dimhop_others, CooldownType.STAND_ULT, State.DIM_HOP))
-            playSound(JSoundRegistry.D4C_DIMHOP, 1, 1);
-    }
-
-    @Override
-    public void initSpecial2() {
-        if (!canAttack() || !hasUser()) return;
-        if (getUserOrThrow().isSneaking() && handleAttack(givegun, CooldownType.STAND_SP2, State.GIVE_GUN)) {
-            playSound(JSoundRegistry.D4C_THROW, 1, 1);
-            equipStack(EquipmentSlot.MAINHAND, JObjectRegistry.FVREVOLVER.getDefaultStack());
-        } else if (handleAttack(grab, CooldownType.STAND_SP2, State.THROW)) {
-            playSound(JSoundRegistry.D4C_THROW, 1, 1);
-            equipStack(EquipmentSlot.MAINHAND, JObjectRegistry.FVREVOLVER.getDefaultStack());
-        }
-    }
-
-    @Override
-    public void initSpecial3() {
-        if (!canAttack()) return;
-        handleAttack(counter, CooldownType.STAND_SP3, State.COUNTER);
+        super.initMove(type);
     }
 
     @Override
@@ -217,16 +168,6 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             return new Box(x + 0.5, y + 0.5, z + 0.5, x - 0.5, y, z - 0.5);
         }
         return super.calculateBoundingBox();
-    }
-
-    @Override
-    public void initUtil() {
-        if (!canAttack() || !hasUser()) return;
-        if (handleAttack(flag, CooldownType.UTIL, State.FLAG)) {
-            getUserOrThrow().addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, flag.moveStun, 0, true, false));
-            getUserOrThrow().addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, flag.moveStun, 0, true, false));
-            playSound(JSoundRegistry.D4C_UTILITY, 1, 1);
-        }
     }
 
     /* -- OLD GUN THROW CODE
@@ -249,250 +190,9 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                 world.spawnEntity(revolver2);
     */
 
-    @SuppressWarnings("DataFlowIssue") // There is no issue.
     @Override
-    public void specialAttack(Attack attack, Set<LivingEntity> entities) {
-        LivingEntity user = getUser();
-        switch (attack.id) {
-            case (3) -> {
-                ServerWorld world = (ServerWorld) getWorld();
-
-                if (world.getRegistryKey().equals(JDimensionRegistry.AU_DIMENSION_KEY)) {
-                    if (user instanceof ServerPlayerEntity serverPlayer) { // Logic for cancelling dimhop early, and generating failsafe data
-                        boolean isStored = false; // Should always be true
-                        for (DimValues dimV : JCraft.pastDimensions) {
-                            if (entities.contains(dimV.user)) {
-                                dimV.timer = 1;
-                                continue;
-                            }
-
-                            if (dimV.user != user)
-                                continue;
-                            isStored = true;
-                            dimV.timer = 1;
-                        }
-
-                        if (!isStored) { // If not stored, force your way back
-                            BlockPos spawnPos = serverPlayer.getSpawnPointPosition(); // Prioritize spawn point
-                            // Use current position if all else fails
-                            if (spawnPos == null) spawnPos = serverPlayer.getBlockPos();
-                            JCraft.pastDimensions.add(new DimValues(user,
-                                    new Vec3d(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()),
-                                    serverPlayer.getSpawnPointDimension()));
-                        }
-                    }
-                } else {
-                    ChunkPos origin = getChunkPos();
-
-                    // Lighting providers are too complicated, man. Wth
-                    // We got 2 providers, every provider has 2 storages and every storage has 2 storages.
-                    LightingProvider ogLightingProvider = world.getLightingProvider();
-                    LightingProvider auLightingProvider = auWorld.getLightingProvider();
-
-                    ChunkLightProviderAccessor ogBlockLightProvider = (ChunkLightProviderAccessor)
-                            ((LightingProviderAccessor) ogLightingProvider).getBlockLightProvider();
-                    ChunkLightProviderAccessor auBlockLightProvider = (ChunkLightProviderAccessor)
-                            ((LightingProviderAccessor) auLightingProvider).getBlockLightProvider();
-                    ChunkLightProviderAccessor ogSkyLightProvider = (ChunkLightProviderAccessor)
-                            ((LightingProviderAccessor) ogLightingProvider).getSkyLightProvider();
-                    ChunkLightProviderAccessor auSkyLightProvider = (ChunkLightProviderAccessor)
-                            ((LightingProviderAccessor) auLightingProvider).getSkyLightProvider();
-
-                    LightStorageAccessor ogBlockLightStorage0 = ogBlockLightProvider == null ? null :
-                            (LightStorageAccessor) ogBlockLightProvider.getLightStorage();
-                    LightStorageAccessor auBlockLightStorage0 = auBlockLightProvider == null ? null :
-                            (LightStorageAccessor) auBlockLightProvider.getLightStorage();
-                    LightStorageAccessor ogSkyLightStorage0 = ogSkyLightProvider == null ? null :
-                            (LightStorageAccessor) ogSkyLightProvider.getLightStorage();
-                    LightStorageAccessor auSkyLightStorage0 = auSkyLightProvider == null ? null :
-                            (LightStorageAccessor) auSkyLightProvider.getLightStorage();
-
-                    // Whether some mod (like Starlight or Phosphor) overwrote the lighting system.
-                    // If so, our method of copying light data is not going to work.
-                    boolean someModMessedUpLight = Stream.of(ogBlockLightStorage0, auBlockLightStorage0, ogSkyLightStorage0, auSkyLightStorage0)
-                            .anyMatch(Objects::isNull);
-
-                    ChunkToNibbleArrayMap<?> ogBlockLightStorage = someModMessedUpLight ? null : ogBlockLightStorage0.getStorage();
-                    ChunkToNibbleArrayMap<?> ogUncachedBlockLightStorage = someModMessedUpLight ? null : ogBlockLightStorage0.getUncachedStorage();
-                    ChunkToNibbleArrayMap<?> auBlockLightStorage = someModMessedUpLight ? null : auBlockLightStorage0.getStorage();
-                    ChunkToNibbleArrayMap<?> auUncachedBlockLightStorage = someModMessedUpLight ? null : auBlockLightStorage0.getUncachedStorage();
-                    ChunkToNibbleArrayMap<?> ogSkyLightStorage = someModMessedUpLight ? null : ogSkyLightStorage0.getStorage();
-                    ChunkToNibbleArrayMap<?> ogUncachedSkyLightStorage = someModMessedUpLight ? null : ogSkyLightStorage0.getUncachedStorage();
-                    ChunkToNibbleArrayMap<?> auSkyLightStorage = someModMessedUpLight ? null : auSkyLightStorage0.getStorage();
-                    ChunkToNibbleArrayMap<?> auUncachedSkyLightStorage = someModMessedUpLight ? null : auSkyLightStorage0.getUncachedStorage();
-
-                    someModMessedUpLight |= Stream.of(ogBlockLightStorage, ogUncachedBlockLightStorage, auBlockLightStorage, auUncachedBlockLightStorage,
-                                    ogSkyLightStorage, ogUncachedSkyLightStorage, auSkyLightStorage, auUncachedBlockLightStorage)
-                            .anyMatch(Objects::isNull);
-
-                    for (int x = -3; x < 4; x++) {
-                        for (int z = -3; z < 4; z++) {
-                            int cX = origin.x + x;
-                            int cZ = origin.z + z;
-                            JCraft.preloadChunk(auWorld, cX, cZ);
-
-                            WorldChunk ogChunk = world.getChunk(cX, cZ);
-                            WorldChunk auChunk = auWorld.getChunk(cX, cZ);
-
-                            ChunkSection[] sections = ogChunk.getSectionArray();
-                            ChunkSection[] copies = IntStream.range(0, sections.length)
-                                    .mapToObj(i -> {
-                                        ChunkSection copy = new ChunkSection(world.sectionIndexToCoord(i),
-                                                world.getRegistryManager().get(Registry.BIOME_KEY));
-
-                                        PacketByteBuf serialized = PacketByteBufs.create();
-                                        sections[i].toPacket(serialized);
-                                        copy.fromPacket(serialized);
-                                        return copy;
-                                    })
-                                    .toArray(ChunkSection[]::new);
-
-                            ChunkSection[] auSec = auChunk.getSectionArray();
-                            System.arraycopy(copies, 0, auSec, 0, Math.min(copies.length, auSec.length));
-
-                            // Copy light for every section.
-                            if (!someModMessedUpLight)
-                                for (int y = auWorld.getBottomY(); y < auWorld.getTopY(); y += 16) {
-                                    long cPos = ChunkSectionPos.toLong(new BlockPos(cX * 16, y, cZ * 16));
-                                    ChunkNibbleArray a;
-                                    a = ogBlockLightStorage.get(cPos);
-                                    if (a != null) auBlockLightStorage.put(cPos, a);
-
-                                    a = ogUncachedBlockLightStorage.get(cPos);
-                                    if (a != null) auUncachedBlockLightStorage.put(cPos, a);
-
-                                    a = ogSkyLightStorage.get(cPos);
-                                    if (a != null) auSkyLightStorage.put(cPos, a);
-
-                                    a = ogUncachedSkyLightStorage.get(cPos);
-                                    if (a != null) auUncachedSkyLightStorage.put(cPos, a);
-                                }
-                        }
-                    }
-
-                    for (BlockPos pos : BlockPos.iterate(new BlockPos(origin.getStartX() - 3 * 16, world.getBottomY(), origin.getStartZ() - 3 * 16),
-                            new BlockPos(origin.getEndX() + 3 * 16, world.getTopY(), origin.getEndZ() + 3 * 16))) {
-                        auWorld.removeBlockEntity(pos); // Ensure the old one is gone.
-                        auWorld.getBlockEntity(pos); // Creates the BE if it does not yet exist while there should be one.
-
-                        // If some mod felt the need to overwrite the light system,
-                        // they have probably improved the efficiency of this method.
-                        // Thus, it should theoretically be fine to call this for every block.
-                        if (someModMessedUpLight) auWorld.getLightingProvider().checkBlock(pos);
-                    }
-
-                    List<LivingEntity> toHop = new ArrayList<>(entities);
-                    toHop.add(user);
-                    int heightOffset = auWorld.getHeight() - world.getHeight();
-                    for (LivingEntity entity : toHop)
-                        JCraft.dimensionHop(entity, heightOffset / 2);
-                }
-            }
-            case (4) -> {
-                if (!entities.isEmpty()) {
-                    // Grab bypasses and disables block
-                    for (LivingEntity ent : entities) {
-                        stun(ent, 34, 0);
-                        if (ent.getFirstPassenger() instanceof StandEntity<?, ?> stand)
-                            stand.blocking = false;
-                    }
-
-                    setAttack(grabhit, State.THROW_HIT);
-                } else getMainHandStack().decrement(1);
-            }
-            case (5) -> {
-                if (getMoveStun() == 17)
-                    curAttack = grabhitfinal;
-                playSound(JSoundRegistry.REVOLVER_FIRE, 1, 1);
-            }
-            case (6) -> {
-                if (user instanceof PlayerEntity playerEntity) {
-                    playerEntity.giveItemStack(JObjectRegistry.FVREVOLVER.getDefaultStack());
-                    getMainHandStack().decrement(1);
-                }
-            }
-            case (8) -> {
-                ItemStack weapon = new ItemStack(Items.IRON_SWORD);
-                weapon.setDamage(249);
-
-                if (user instanceof ServerPlayerEntity playerEntity) {
-                    PlayerCloneEntity clone = new PlayerCloneEntity(this.world);
-                    clone.copyPositionAndRotation(playerEntity);
-                    clone.setMaster(playerEntity);
-
-                    world.spawnEntity(clone);
-                    clone.equipStack(EquipmentSlot.MAINHAND, weapon);
-                } else if (user instanceof MobEntity mob) { //Code sourced from MobEntity.class convertTo()
-                    EntityType<?> entityType = mob.getType();
-                    MobEntity newMob = (MobEntity) entityType.create(world);
-
-                    if (newMob == null) {
-                        JCraft.LOGGER.error("Failed to create D4C clone mob of type " + entityType + " in world " + world);
-                        return;
-                    }
-
-                    newMob.copyPositionAndRotation(mob);
-                    newMob.setBaby(mob.isBaby());
-
-                    if (mob.hasCustomName()) {
-                        newMob.setCustomName(mob.getCustomName());
-                        newMob.setCustomNameVisible(mob.isCustomNameVisible());
-                    }
-
-                    newMob.age = mob.age;
-
-                    world.spawnEntity(newMob);
-                    newMob.equipStack(EquipmentSlot.MAINHAND, weapon);
-                }
-            }
-            case (9) -> {
-                if (!hasUser()) return;
-
-                int duration = flag.moveStun - flag.initTime;
-                getUserOrThrow().addStatusEffect(new StatusEffectInstance(StatusEffects.INVISIBILITY, duration, 0, true, false));
-                getUserOrThrow().addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, duration, 2, true, false));
-            }
-            case (10) -> getMainHandStack().decrement(1);
-            case (11) -> {
-                ItemStack offHandStack = getOffHandStack();
-                ItemEntity item = new ItemEntity(getWorld(), getX(), getY() + 0.2, getZ(), placing.copy(), 0, 0, 0);
-                item.setPickupDelay(200);
-                world.spawnEntity(item);
-                offHandStack.decrement(1);
-            }
-        }
-    }
-
-    @Override
-    public void counter(Entity entity, DamageSource source) {
-        super.counter(entity, source);
-
-        if (entity == null || !hasUser()) return;
-        LivingEntity user = getUserOrThrow();
-        if (!source.isProjectile() && !source.isMagic()) {
-            Vec3d trueKnockback = entity.getPos().subtract(user.getPos()).normalize().multiply(1.5);
-            entity.addVelocity(trueKnockback.x, 0.5, trueKnockback.z);
-            entity.velocityModified = true;
-
-            if (entity instanceof LivingEntity livingEntity) {
-                livingEntity.damage(DamageSource.mob(user), 10);
-                stun(livingEntity, 20, 3);
-
-                StandEntity<?, ?> stand = JUtils.getStand(livingEntity);
-                if (stand != null)
-                    stand.cancelAttack();
-            }
-
-            world.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1f, 1f);
-            playSound(JSoundRegistry.D4C_COUNTER, 1, 1);
-        }
-    }
-
-    private static final Attack counterMiss = new Attack(14, 0, 10, 11);
-    @Override
-    public void whiffCounter() {
-        setAttack(counterMiss, State.COUNTER_MISS);
-        stun(getUser(), counterMiss.moveStun, 0);
+    protected @NonNull D4CEntity getThis() {
+        return this;
     }
 
     // Animation code
@@ -518,7 +218,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
         }
 
         @Override
-        public void playAnimation(D4CEntity stand, AnimationBuilder builder) {
+        public void playAnimation(D4CEntity attacker, AnimationBuilder builder) {
             animator.accept(builder);
         }
     }

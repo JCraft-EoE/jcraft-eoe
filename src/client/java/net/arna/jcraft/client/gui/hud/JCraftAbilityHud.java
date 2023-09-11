@@ -5,33 +5,24 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import lombok.experimental.UtilityClass;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.JClientConfig;
-import net.arna.jcraft.client.JCraftClient;
 import net.arna.jcraft.client.util.RenderUtils;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.StandEntity;
-import net.arna.jcraft.common.spec.JCraftSpec;
-import net.arna.jcraft.common.util.ColorUtils;
+import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.random.Random;
-import org.apache.commons.lang3.StringUtils;
 
-import java.util.List;
 import java.util.Map;
-
-import static net.arna.jcraft.client.JCraftClient.*;
 
 @UtilityClass
 public class JCraftAbilityHud extends DrawableHelper {
@@ -74,22 +65,22 @@ public class JCraftAbilityHud extends DrawableHelper {
             .put(CooldownType.STAND_LIGHT, LIGHT)
             .put(CooldownType.STAND_HEAVY, HEAVY)
             .put(CooldownType.STAND_BARRAGE, BARRAGE)
-            .put(CooldownType.STAND_ULT, ULT)
+            .put(CooldownType.STAND_ULTIMATE, ULT)
             .put(CooldownType.STAND_SP1, SPECIAL_1)
             .put(CooldownType.STAND_SP2, SPECIAL_2)
             .put(CooldownType.STAND_SP3, SPECIAL_3)
-            .put(CooldownType.UTIL, UTILITY)
+            .put(CooldownType.UTILITY, UTILITY)
             .build();
     // Used for JConfig.UIPos.MIDDLE, to prevent overwhelming verticality
     private static final Map<CooldownType, IconPos> STAND_ICONS_MID = ImmutableMap.<CooldownType, IconPos>builder()
             .put(CooldownType.STAND_LIGHT, LIGHT)
             .put(CooldownType.STAND_HEAVY, HEAVY)
             .put(CooldownType.STAND_BARRAGE, BARRAGE)
-            .put(CooldownType.STAND_ULT, MID_ULT)
+            .put(CooldownType.STAND_ULTIMATE, MID_ULT)
             .put(CooldownType.STAND_SP1, MID_SPECIAL_1)
             .put(CooldownType.STAND_SP2, MID_SPECIAL_2)
             .put(CooldownType.STAND_SP3, MID_SPECIAL_3)
-            .put(CooldownType.UTIL, UTILITY)
+            .put(CooldownType.UTILITY, UTILITY)
             .build();
     private static final Map<CooldownType, IconPos> UNIVERSAL_ICONS = ImmutableMap.<CooldownType, IconPos>builder()
             .put(CooldownType.COMBO_BREAKER, COMBO_BREAKER)
@@ -99,10 +90,10 @@ public class JCraftAbilityHud extends DrawableHelper {
     private static final Map<CooldownType, IconPos> SPEC_ICONS = ImmutableMap.<CooldownType, IconPos>builder()
             .put(CooldownType.HEAVY, SPEC_HEAVY)
             .put(CooldownType.BARRAGE, SPEC_BARRAGE)
-            .put(CooldownType.ULT, SPEC_ULT)
-            .put(CooldownType.SP1, SPEC_SPECIAL_1)
-            .put(CooldownType.SP2, SPEC_SPECIAL_2)
-            .put(CooldownType.SP3, SPEC_SPECIAL_3)
+            .put(CooldownType.ULTIMATE, SPEC_ULT)
+            .put(CooldownType.SPECIAL1, SPEC_SPECIAL_1)
+            .put(CooldownType.SPECIAL2, SPEC_SPECIAL_2)
+            .put(CooldownType.SPECIAL3, SPEC_SPECIAL_3)
             .build();
 
     public static int getHudX(int scaledX, int rightOffset) {
@@ -126,12 +117,12 @@ public class JCraftAbilityHud extends DrawableHelper {
             int selectedX = getHudX(client.getWindow().getScaledWidth(), 48);
             int selectedY = isMid ? iconSpacing * 11 : 0;
 
-            JCraftSpec spec = JUtils.getSpec(player);
+            JSpec<?, ?> spec = JUtils.getSpec(player);
 
             if (stand == null) {
                 // Render cooldown HUD for specs
                 if (spec != null)
-                    renderIcons(matrices, SPEC_ICONS, selectedX, selectedY, spec.getInternalName().toLowerCase(), renderCooldownOverlay);
+                    renderIcons(matrices, SPEC_ICONS, selectedX, selectedY, spec.getType().getInternalName().toLowerCase(), renderCooldownOverlay);
             } else {
                 // Render cooldown HUD for stands
                 renderIcons(matrices, isMid ? STAND_ICONS_MID : STAND_ICONS, selectedX, selectedY, stand.getType().getUntranslatedName(), renderCooldownOverlay);

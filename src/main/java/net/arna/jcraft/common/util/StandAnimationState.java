@@ -1,9 +1,9 @@
 package net.arna.jcraft.common.util;
 
-import net.arna.jcraft.common.entity.stand.StandEntity;
+import net.arna.jcraft.common.attack.core.IAttacker;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
-public interface StandAnimationState<E extends StandEntity<E, ?>> {
+public interface StandAnimationState<A extends IAttacker<A, ?>> {
 
-    void playAnimation(E stand, AnimationBuilder builder);
+    void playAnimation(A attacker, AnimationBuilder builder);
 }

@@ -9,7 +9,9 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.LightType;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.geo.render.built.GeoModel;
 import software.bernie.geckolib3.model.AnimatedGeoModel;
@@ -42,7 +44,7 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends GeoEntityR
 
     }
 
-    // Adds ability to change render alpha
+    // Adds the ability to change render alpha
     @Override
     public void render(GeoModel model, T stand, float tickDelta, RenderLayer type, MatrixStack matrixStackIn,
                        VertexConsumerProvider vertexConsumerProvider, VertexConsumer vertexConsumer, int packedLightIn,
@@ -53,6 +55,20 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends GeoEntityR
 
         super.render(model, stand, tickDelta, type, matrixStackIn, vertexConsumerProvider, vertexConsumer, packedLightIn,
                 packedOverlayIn, getRed(stand, red, a), getGreen(stand, green, a), getBlue(stand, blue, a), a);
+    }
+
+    @Override
+    protected int getBlockLight(T stand, BlockPos pos) {
+        if (!stand.hasUser()) return super.getBlockLight(stand, pos);
+
+        if (stand.isOnFire() || stand.getUserOrThrow().isOnFire()) return 15;
+        return stand.world.getLightLevel(LightType.BLOCK, stand.getUserOrThrow().getBlockPos());
+    }
+
+    @Override
+    protected int getSkyLight(T stand, BlockPos pos) {
+        return stand.hasUser() ? stand.world.getLightLevel(LightType.SKY, stand.getUserOrThrow().getBlockPos()) :
+                super.getSkyLight(stand, pos);
     }
 
     public static boolean shouldApplyAlpha(StandEntity<?, ?> stand) {

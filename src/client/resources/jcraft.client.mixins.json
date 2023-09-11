@@ -21,6 +21,7 @@
     "InGameHudMixin",
     "IntegratedServerLoaderMixin",
     "ItemRendererMixin",
+    "KeyBindingMixin",
     "LivingEntityRendererMixin",
     "ParticleAccessor",
     "ParticleManagerMixin",

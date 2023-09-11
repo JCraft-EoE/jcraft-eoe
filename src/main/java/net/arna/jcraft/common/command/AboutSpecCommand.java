@@ -3,80 +3,88 @@ package net.arna.jcraft.common.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.arna.jcraft.common.attack.Attack;
-import net.arna.jcraft.common.spec.JCraftSpec;
+import net.arna.jcraft.common.attack.core.MoveMap;
+import net.arna.jcraft.common.spec.JSpec;
+import net.arna.jcraft.common.spec.SpecType;
 import net.arna.jcraft.common.util.JUtils;
-import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-
-import java.util.List;
+import net.minecraft.util.Formatting;
 
 public class AboutSpecCommand {
-    private static final List<String> buttons = List.of(
-            "Heavy",
-            "Barrage",
-            "Special 1",
-            "Special 2",
-            "Special 3",
-            "Ultimate"
-    );
+    private static final Text newLine = Text.literal("\n");
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(CommandManager.literal("spec")
-                .then(CommandManager.literal("about").executes(AboutSpecCommand::run)));
+                .then(CommandManager.literal("about")
+                        .executes(AboutSpecCommand::run)));
     }
 
     public static int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
 
-        JCraftSpec spec = JUtils.getSpec(player);
-        if (spec != null) {
-            StringBuilder readout = new StringBuilder("Name: §e");
-
-            // Name
-            readout.append(spec.getTranslatableName().getString()).append("§r\n");
-
-            // Description
-            readout.append("§a").append(spec.getDescription()).append("§r\n\n");
-
-            /*
-            // Pros & Cons
-            readout.append("§3PROS:§r\n");
-            for (String s : stand.pros) {
-                readout.append("§3●§r ").append(s).append("\n");
-            }
-            readout.append("§4CONS:§r\n");
-            for (String s : stand.cons) {
-                readout.append("§4●§r ").append(s).append("\n");
-            }
-
-            readout.append("\n");
-             */
-
-            // Attacks
-            readout.append("§2ATTACKS:§r\n");
-            int i = 0;
-            for (Attack a : spec.getAttacks()) {
-                readout.append("§2● ").append(buttons.get(i)).append("§r - §5").append(a.name).append("§r - ").append(a.description).append("\n");
-                if (a.getCrouchingVariation() != null)
-                    readout.append("§3  ●CROUCHING ").append(buttons.get(i)).append("§r - §5").append(a.name).append("§r - ").append(a.description).append("\n");
-                if (a.getAerialVariation() != null)
-                    readout.append("§4  ●AERIAL ").append(buttons.get(i)).append("§r - §5").append(a.name).append("§r - ").append(a.description).append("\n");
-                i++;
-            }
-
-            // Details
-            readout.append(spec.getDetails());
-
-            player.sendMessage(Text.of(readout.toString()));
-        } else {
+        JSpec<?, ?> spec = JUtils.getSpec(player);
+        if (spec == null) {
             player.sendMessage(Text.translatable("jcraft.commands.error.nospec"), false);
             return 0;
         }
 
+        SpecType type = spec.getType();
+        MutableText text = Text.empty();
+
+        // Name
+        text.append(Text.empty()
+                .append(Text.literal("Name: "))
+                .append(type.getTranslatableName().copy().formatted(Formatting.YELLOW))
+                .append(newLine));
+
+        // Description
+        text.append(type.getDescription().copy().formatted(Formatting.GREEN));
+        text.append(Text.empty().append(newLine).append(newLine));
+
+        /*
+        // Pros & Cons
+        readout.append("§3PROS:§r\n");
+        for (String s : stand.pros) {
+            readout.append("§3●§r ").append(s).append("\n");
+        }
+        readout.append("§4CONS:§r\n");
+        for (String s : stand.cons) {
+            readout.append("§4●§r ").append(s).append("\n");
+        }
+
+        readout.append("\n");
+         */
+
+        // Attacks
+        text.append(Text.literal("Attacks:").formatted(Formatting.GREEN));
+        for (MoveMap.Entry<?, ?> entry : spec.getMoveMap()) {
+            if (entry.getType() == null) continue; // Some variant of another attack.
+
+            appendVariant(text, entry, Formatting.DARK_GREEN, Text.literal("● "));
+            if (entry.getCrouchingVariant() != null)
+                appendVariant(text, entry.getCrouchingVariant(), Formatting.DARK_AQUA, Text.literal("  ●CROUCHING "));
+            if (entry.getAerialVariant() != null)
+                appendVariant(text, entry.getAerialVariant(), Formatting.DARK_RED, Text.literal("  ●AERIAL "));
+        }
+
+        // Details
+        text.append(type.getDetails());
+
+        player.sendMessage(text);
         return 1;
+    }
+
+    private static void appendVariant(MutableText base, MoveMap.Entry<?, ?> entry, Formatting color, Text variantName) {
+        base.append(Text.empty()
+                .append(Text.empty().formatted(color)
+                        .append(variantName)
+                        .append(entry.getType() == null ? Text.empty() : entry.getType().getFriendlyName()))
+                .append(entry.getMove().getName().copy().formatted(Formatting.DARK_PURPLE))
+                .append(entry.getMove().getDescription().copy())
+                .append(newLine));
     }
 }

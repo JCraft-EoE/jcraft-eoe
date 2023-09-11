@@ -3,11 +3,11 @@ package net.arna.jcraft.common.splatter;
 import lombok.Data;
 import lombok.Getter;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
-import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -83,7 +83,7 @@ public class Splatter {
 
         if (!world.isClient) {
             if (type == SplatterType.ACID && age % 4 == 0)
-                for (LivingEntity hit : JUtils.generateHitbox(world, mainBox))
+                for (LivingEntity hit : world.getEntitiesByClass(LivingEntity.class, mainBox, EntityPredicates.VALID_LIVING_ENTITY))
                     if (!hit.isConnectedThroughVehicle(creator) && intersects(hit.getBoundingBox())) {
                         hit.addStatusEffect(new StatusEffectInstance(JStatusRegistry.WSPOISON, 20, 0, true, false));
                         hit.damage(JDamageSources.whitesnakePoison(creator), 2f);

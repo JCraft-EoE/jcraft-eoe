@@ -168,8 +168,8 @@ public interface JSoundRegistry {
     //C-Moon
     SoundEvent CMOON_SUMMON = registerSound("cmoonsummon");
     SoundEvent CMOON_BARRAGE = registerSound("cmoonbarrage");
-    SoundEvent CMOON_GRAVPUNCH = registerSound("cmoongravpunch");
-    SoundEvent CMOON_GRAVPUNCHHIT = registerSound("cmoongravpunchhit");
+    SoundEvent CMOON_GRAV_PUNCH = registerSound("cmoongravpunch");
+    SoundEvent CMOON_GRAV_PUNCH_HIT = registerSound("cmoongravpunchhit");
     SoundEvent CMOON_GROUNDSLAM = registerSound("cmoongroundslam");
     SoundEvent CMOON_GRAVSHIFT = registerSound("cmoongravshift");
     SoundEvent CMOON_GRAVSHIFT_DIRECTIONAL = registerSound("cmoondirectionalshift");
@@ -197,7 +197,7 @@ public interface JSoundRegistry {
     SoundEvent TWOH_TS = registerSound("twohtimestop");
     SoundEvent TWOH_HEAVY = registerSound("twohheavy");
     SoundEvent TWOH_SMITE = registerSound("twohsmite");
-    SoundEvent TWOH_CHARGEOVERWRITE = registerSound("twohchargeoverwrite");
+    SoundEvent TWOH_CHARGE_OVERWRITE = registerSound("twohchargeoverwrite");
     SoundEvent TWOH_CHARGE = registerSound("twohcharge");
     SoundEvent TWOH_OVERWRITE = registerSound("twohoverwrite");
     SoundEvent TWOH_KNIFETHROW = registerSound("twohowarida");

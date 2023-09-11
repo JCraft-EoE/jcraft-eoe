@@ -7,12 +7,10 @@ import net.minecraft.network.PacketByteBuf;
 
 import java.util.Arrays;
 
+@Getter
 public class EnumOption<E extends Enum<?>> extends ConfigOption {
-    @Getter
     private final Class<E> clazz;
-    @Getter
     private E value;
-    @Getter
     private final E defaultValue;
 
     public EnumOption(String key, String category, Class<E> clazz, E value) {

@@ -3,7 +3,7 @@ package net.arna.jcraft.common.component.impl;
 import lombok.NonNull;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.SpecComponent;
-import net.arna.jcraft.common.spec.JCraftSpec;
+import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.spec.SpecType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 public class SpecComponentImpl implements SpecComponent {
     private final PlayerEntity player;
     private SpecType type = SpecType.NONE;
-    private JCraftSpec spec;
+    private JSpec<?, ?> spec;
 
     public SpecComponentImpl(PlayerEntity player) {
         this.player = player;
@@ -32,15 +32,12 @@ public class SpecComponentImpl implements SpecComponent {
 
     private void setTypeRaw(SpecType type) {
         this.type = type;
-        spec = type.createNew();
-
-        if (spec == null) return;
-        spec.player = player;
+        spec = type.createNew(player);
     }
 
     @Nullable
     @Override
-    public JCraftSpec getSpec() {
+    public JSpec<?, ?> getSpec() {
         return spec;
     }
 

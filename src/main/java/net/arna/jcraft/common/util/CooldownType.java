@@ -11,18 +11,18 @@ public enum CooldownType {
     STAND_SP1,
     STAND_SP2,
     STAND_SP3,
-    STAND_ULT(true),
+    STAND_ULTIMATE(true),
 
     // Spec Cooldowns
     HEAVY(Category.SPEC),
     BARRAGE(Category.SPEC, true),
-    SP1(Category.SPEC),
-    SP2(Category.SPEC),
-    SP3(Category.SPEC),
-    ULT(Category.SPEC, true),
+    SPECIAL1(Category.SPEC),
+    SPECIAL2(Category.SPEC),
+    SPECIAL3(Category.SPEC),
+    ULTIMATE(Category.SPEC, true),
 
     // Universal Cooldowns
-    UTIL(Category.UNIVERSAL),
+    UTILITY(Category.UNIVERSAL),
     COMBO_BREAKER(Category.UNIVERSAL, 1200, true),  // 60s
     COOLDOWN_CANCEL(Category.UNIVERSAL, 900, true), // 45s
     DASH(Category.UNIVERSAL, true);

@@ -3,7 +3,7 @@ package net.arna.jcraft.client.renderer.effects;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.arna.jcraft.client.JCraftClient;
 import net.arna.jcraft.client.util.RenderUtils;
-import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
+import net.arna.jcraft.common.attack.moves.kingcrimson.PredictionMove;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
@@ -52,7 +52,7 @@ public class TimeErasePredictionEffectRenderer {
         ticksLeft = length;
 
         MinecraftClient client = MinecraftClient.getInstance();
-        for (Entity entity : KingCrimsonEntity.getEntitiesToCatch(client.world, JCraftClient.getStandEntity(), client.player))
+        for (Entity entity : PredictionMove.getEntitiesToCatch(client.world, JCraftClient.getStandEntity(), client.player))
             predictions.put(entity, entity.getPos());
     }
 
@@ -146,6 +146,6 @@ public class TimeErasePredictionEffectRenderer {
             predictionsSet = new HashSet<>(predictions.entrySet());
         }
 
-        KingCrimsonEntity.updatePredictions(predictionsSet, ticksLeft);
+        PredictionMove.updatePredictions(predictionsSet, ticksLeft);
     }
 }

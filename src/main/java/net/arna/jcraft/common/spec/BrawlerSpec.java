@@ -1,91 +1,72 @@
 package net.arna.jcraft.common.spec;
 
-import net.arna.jcraft.common.attack.Attack;
-import net.arna.jcraft.common.attack.AttackQueue;
-import net.arna.jcraft.common.attack.AttackType;
+import it.unimi.dsi.fastutil.ints.IntSet;
+import net.arna.jcraft.common.attack.core.MoveMap;
+import net.arna.jcraft.common.attack.core.MoveType;
+import net.arna.jcraft.common.attack.moves.shared.KnockdownAttack;
+import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
+import net.arna.jcraft.common.attack.moves.shared.SimpleMultiHitAttack;
 import net.arna.jcraft.common.util.CooldownType;
+import net.arna.jcraft.common.util.JParticleType;
+import net.arna.jcraft.common.util.SpecAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
-import net.arna.jcraft.registry.JStatusRegistry;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.Text;
 
-import java.util.List;
-import java.util.Set;
+public class BrawlerSpec extends JSpec<BrawlerSpec, BrawlerSpec.State> {
+    public static final SimpleAttack<BrawlerSpec> HEAVY = new SimpleAttack<BrawlerSpec>(340, 10,
+            21, 1f, 6f, 15, 1.5f, 0.8f, 0f)
+            .withImpactSound(JSoundRegistry.IMPACT_2)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHyperArmor()
+            .withInfo(Text.literal("Uppercut"), Text.literal("uninterruptible, medium speed"));
+    public static final SimpleMultiHitAttack<BrawlerSpec> COMBO = new SimpleMultiHitAttack<BrawlerSpec>(400,
+            26, 1f, 4, 15, 1.5f, 0.6f, -0.1f, IntSet.of(5, 10, 19))
+            .withImpactSound(JSoundRegistry.IMPACT_2)
+            .withBlockStun(5)
+            .withInfo(Text.literal("Combo"), Text.literal("hits 3 times, combo starter/extender"));
+    public static final SimpleAttack<BrawlerSpec> GUT = new SimpleAttack<BrawlerSpec>(340, 11, 18,
+            1f, 6f, 16, 1.5f, 0.8f, 0f)
+            .withImpactSound(JSoundRegistry.IMPACT_2)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withInfo(Text.literal("Gut Punch"), Text.literal("good stun"));
+    public static final KnockdownAttack<BrawlerSpec> SWEEP = new KnockdownAttack<BrawlerSpec>(300, 11, 18,
+            1f, 5f, 16, 1.5f, 0.6f, 1f, 25)
+            .withImpactSound(JSoundRegistry.IMPACT_2)
+            .withInfo(Text.literal("SWEEP"), Text.literal("knocks down"));
 
-public class BrawlerSpec extends JCraftSpec {
-    public static final Attack heavy = new Attack(0, 17, 1f, 21, 10, 1.5, 6f, 0.8f, AttackType.BOX, 0.75f, 0, 0, JSoundRegistry.IMPACT_2)
-            .setAnimation("br.upct")
-            .setHitspark(2)
-            .hyperArmor()
-            .setInfo("Uppercut", "uninterruptable, medium speed");
-    public static final Attack combo = new Attack(1, 20, 1f, 26, 0, 1.5, 4f, 0.6f, AttackType.MULTIHIT, 0.75f, -0.1f, List.of(5, 10, 19), JSoundRegistry.IMPACT_2)
-            .setBlockstun(5)
-            .setAnimation("br.3hit")
-            .setInfo("Combo", "hits 3 times, combo starter/extender");
-    public static final Attack gut = new Attack(2, 17, 1f, 18, 11, 1.5, 6f, 0.8f, AttackType.BOX, 0.80f, 0, 0, JSoundRegistry.IMPACT_2)
-            .setAnimation("br.gut")
-            .setHitspark(2)
-            .setInfo("Gut Punch", "good stun", AttackQueue.SPECIAL1);
-    public static final Attack low = new Attack(3, 15, 1f, 18, 11, 1.5, 5f, 0.6f, AttackType.BOX, 0.80f, 1, 0, JSoundRegistry.IMPACT_2)
-            .setAnimation("br.low")
-            .setInfo("Sweep", "knocks down", AttackQueue.SPECIAL2);
-
-    // Info
-    @Override
-    public String getInternalName() {
-        return "brawler";
+    public BrawlerSpec(PlayerEntity player) {
+        super(SpecType.BRAWLER, player);
     }
 
     @Override
-    public String getDescription() {
-        return "Close-range pressure and combo extension tool";
+    protected void registerMoves(MoveMap<BrawlerSpec, State> moves) {
+        moves.register(MoveType.HEAVY, HEAVY, CooldownType.HEAVY, State.HEAVY);
+        moves.register(MoveType.BARRAGE, COMBO, CooldownType.BARRAGE, State.COMBO);
+        moves.register(MoveType.SPECIAL1, GUT, CooldownType.SPECIAL1, State.GUT);
+        moves.register(MoveType.SPECIAL2, SWEEP, CooldownType.SPECIAL2, State.SWEEP);
     }
 
     @Override
-    public String getDetails() {
-        return "Important hitconfirm: (any stand move)~stand.OFF>Combo>stand.ON+(any stand move)";
+    protected BrawlerSpec getThis() {
+        return this;
     }
 
-    @Override
-    public List<Attack> getAttacks() {
-        return List.of(heavy, combo, gut, low);
-    }
+    public enum State implements SpecAnimationState<BrawlerSpec> {
+        HEAVY("br.upct"),
+        COMBO("br.3hit"),
+        GUT("br.gut"),
+        SWEEP("br.low");
 
-    @Override
-    public int getId() {
-        return 1;
-    }
+        private final String key;
 
-    // Attacks
-    @Override
-    public void initHeavyAttack(ServerWorld serverWorld) {
-        if (!canAttack()) return;
-        handleAttack(serverWorld, heavy, CooldownType.HEAVY);
-    }
+        State(String key) {
+            this.key = key;
+        }
 
-    @Override
-    public void initBarrage(ServerWorld serverWorld) {
-        if (!canAttack()) return;
-        handleAttack(serverWorld, combo, CooldownType.BARRAGE);
-    }
-
-    @Override
-    public void initSpecial1(ServerWorld serverWorld) {
-        if (!canAttack()) return;
-        handleAttack(serverWorld, gut, CooldownType.SP1);
-    }
-
-    @Override
-    public void initSpecial2(ServerWorld serverWorld) {
-        if (!canAttack()) return;
-        handleAttack(serverWorld, low, CooldownType.SP2);
-    }
-
-    @Override
-    public void specialAttack(Attack attack, Set<LivingEntity> hurt) {
-        if (attack.id == low.id)
-            for (LivingEntity ent : hurt)
-                ent.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 25, 0, true, true));
+        @Override
+        public String getKey(BrawlerSpec spec) {
+            return key;
+        }
     }
 }

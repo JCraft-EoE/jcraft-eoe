@@ -6,8 +6,7 @@ import net.arna.jcraft.common.block.ShaderTestBlock;
 import net.arna.jcraft.common.block.SoulBlock;
 import net.arna.jcraft.common.entity.projectile.KnifeProjectile;
 import net.arna.jcraft.common.item.*;
-import net.arna.jcraft.common.spec.AnubisSpec;
-import net.arna.jcraft.common.spec.BrawlerSpec;
+import net.arna.jcraft.common.spec.SpecType;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
@@ -41,11 +40,11 @@ public interface JObjectRegistry {
 
     Item STAND_DISC = register("stand_disc", new StandDiscItem(settings().rarity(Rarity.RARE).fireproof().maxCount(1)));
 
-    Item FVREVOLVER = register("fv_revolver", new FVRevolverItem(settings().rarity(Rarity.UNCOMMON).maxDamage(1200)));
+    Item FV_REVOLVER = register("fv_revolver", new FVRevolverItem(settings().rarity(Rarity.UNCOMMON).maxDamage(1200)));
 
     Item BULLET = register("bullet", new BulletItem(settings()));
 
-    Item KQCOIN = register("kq_coin", new KQCoinItem(settings()));
+    Item KQ_COIN = register("kq_coin", new KQCoinItem(settings()));
 
     Item GREENBABY = register("green_baby", new GreenBabyItem(settings().rarity(Rarity.RARE)));
 
@@ -60,9 +59,9 @@ public interface JObjectRegistry {
     Item ANUBIS = register("anubis", new AnubisItem(settings().rarity(Rarity.RARE).maxCount(1)));
 
     // Spec Obtainment Items
-    Item ANUBISSHEATHED = register("anubis_sheathed", new SheathedAnubisItem(settings().rarity(Rarity.RARE).maxCount(1), new AnubisSpec()));
+    Item ANUBISSHEATHED = register("anubis_sheathed", new SheathedAnubisItem(settings().rarity(Rarity.RARE).maxCount(1), SpecType.ANUBIS));
 
-    Item BOXINGGLOVES = register("boxing_gloves", new BoxingGlovesItem(settings().maxCount(1), new BrawlerSpec()));
+    Item BOXINGGLOVES = register("boxing_gloves", new BoxingGlovesItem(settings().maxCount(1), SpecType.BRAWLER));
 
 
     Item REQUIEMRUBY = register("requiem_ruby", new Item(settings().rarity(Rarity.EPIC).fireproof()));

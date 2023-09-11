@@ -1,10 +1,13 @@
 package net.arna.jcraft;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.StandComponent;
+import net.arna.jcraft.common.effects.DazedStatusEffect;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.StandType;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
@@ -13,12 +16,9 @@ import net.arna.jcraft.common.gravity.util.GravityChannel;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.item.StandDiscItem;
 import net.arna.jcraft.common.loot.JLootTableHelper;
-import net.arna.jcraft.common.network.c2s.ConfigUpdatePacket;
-import net.arna.jcraft.common.network.c2s.InputSyncPacket;
-import net.arna.jcraft.common.network.c2s.OnConnectedPacket;
-import net.arna.jcraft.common.network.c2s.StandControlPacket;
+import net.arna.jcraft.common.network.c2s.*;
 import net.arna.jcraft.common.network.s2c.*;
-import net.arna.jcraft.common.spec.JCraftSpec;
+import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.*;
 import net.fabricmc.api.ModInitializer;
@@ -93,24 +93,23 @@ public class JCraft implements ModInitializer {
     public static final List<DimValues> pastDimensions = new ArrayList<>();
     private static final List<ChunkPos> preloadedChunks = new ArrayList<>();
 
-    public static final Map<LivingEntity, Integer> burstTimers = new HashMap<>();
+    public static final Object2IntMap<LivingEntity> burstTimers = new Object2IntOpenHashMap<>();
 
     public static final List<DashData> dashes = new ArrayList<>();
 
-    private static final HashMap<Entity, EntityInterest> entitiesOfInterest = new HashMap<>();
+    @Getter
+    private static final Map<Entity, EntityInterest> entitiesOfInterest = new HashMap<>();
 
     // Standardized cooldowns
     public static final int dashCooldown = 40;
 
+    public static final int LIGHT_COOLDOWN = 30;
     public static final double lightCooldown = 1.5;
 
     @Getter
     @Setter
     private static IClientEntityHandler clientEntityHandler = DummyClientEntityHandler.INSTANCE;
 
-    public static HashMap<Entity, EntityInterest> getEntitiesOfInterest() {
-        return entitiesOfInterest;
-    }
     public static void markItemOfInterest(@NotNull Entity entity, @NotNull EntityInterest interest) {
         entitiesOfInterest.put(entity, interest);
     }
@@ -185,7 +184,7 @@ public class JCraft implements ModInitializer {
         stacks.add(new ItemStack(JObjectRegistry.ANUBISSHEATHED));
         stacks.add(new ItemStack(JObjectRegistry.KNIFE));
         stacks.add(new ItemStack(JObjectRegistry.KNIFEBUNDLE));
-        stacks.add(JObjectRegistry.FVREVOLVER.getDefaultStack());
+        stacks.add(JObjectRegistry.FV_REVOLVER.getDefaultStack());
         stacks.add(JObjectRegistry.BULLET.getDefaultStack());
 
         stacks.add(new ItemStack(JObjectRegistry.SINNERSSOUL));
@@ -206,7 +205,7 @@ public class JCraft implements ModInitializer {
         stacks.add(new ItemStack(JObjectRegistry.JOTAROPANTS));
         stacks.add(new ItemStack(JObjectRegistry.JOTAROBOOTS));
 
-        stacks.add(new ItemStack(JObjectRegistry.KQCOIN));
+        stacks.add(new ItemStack(JObjectRegistry.KQ_COIN));
         stacks.add(new ItemStack(JObjectRegistry.FOOLISH_SAND_BLOCK.asItem()));
 
         stacks.add(new ItemStack(JObjectRegistry.CINDERELLA_MASK));
@@ -281,7 +280,7 @@ public class JCraft implements ModInitializer {
 
         // Syncs dash anim (unless already attacking with a spec) with every player in the vicinity
         if (entity instanceof ServerPlayerEntity player) {
-            JCraftSpec spec = JUtils.getSpec(player);
+            JSpec spec = JUtils.getSpec(player);
 
             if (spec == null || spec.moveStun < 1)
                 PlayerLookup.around((ServerWorld) entity.getWorld(), entity.getPos(), 96).forEach( //todo: find a less arbitrary number for radius here
@@ -306,10 +305,10 @@ public class JCraft implements ModInitializer {
         auWorld.setChunkForced(chunkX, chunkZ, true);
     }
 
-    public static StandEntity<?, ?> summon(World world, LivingEntity player) {
-        if (player.hasStatusEffect(JStatusRegistry.STANDLESS)) return null;
+    public static StandEntity<?, ?> summon(World world, LivingEntity user) {
+        if (user.hasStatusEffect(JStatusRegistry.STANDLESS)) return null;
 
-        StandComponent standData = JComponents.STAND.get(player);
+        StandComponent standData = JComponents.STAND.get(user);
         StandType type = standData.getType();
         StandEntity<?, ?> stand = type == null ? null : type.createNew(world);
 
@@ -317,9 +316,14 @@ public class JCraft implements ModInitializer {
 
         int skin = standData.getSkin();
         stand.setSkin(skin);
-        stand.setPosition(player.getPos().subtract(player.getRotationVector()));
-        stand.startRiding(player);
-        stand.setUser(player);
+        stand.setPosition(user.getPos().subtract(user.getRotationVector()));
+        stand.startRiding(user);
+        stand.setUser(user);
+
+        if (user instanceof ServerPlayerEntity player && StandBlockPacket.isBlocking(player)) {
+            stand.wantToBlock = true;
+            stand.blocking = true;
+        }
 
         world.spawnEntity(stand);
 
@@ -354,21 +358,22 @@ public class JCraft implements ModInitializer {
         JEnchantmentRegistry.init();
         JLootTableHelper.init();
 
-        ServerPlayNetworking.registerGlobalReceiver(StandControlPacket.ID, StandControlPacket::handle);
-        ServerPlayNetworking.registerGlobalReceiver(InputSyncPacket.ID, InputSyncPacket::handle);
+        ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_PLAYER_INPUT, PlayerInputPacket::handle);
         ServerPlayNetworking.registerGlobalReceiver(OnConnectedPacket.ID, OnConnectedPacket::handle);
         ServerPlayNetworking.registerGlobalReceiver(ConfigUpdatePacket.ID, ConfigUpdatePacket::handle);
+        ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_STAND_BLOCK, StandBlockPacket::handle);
+        ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_COOLDOWN_CANCEL, CooldownCancelPacket::handle);
     }
 
 
-    public static void createParticle(ServerWorld world, double x, double y, double z, int id) {
+    public static void createParticle(ServerWorld world, double x, double y, double z, JParticleType type) {
         PacketByteBuf buf = PacketByteBufs.create();
 
         buf.writeShort(8);
         buf.writeDouble(x);
         buf.writeDouble(y);
         buf.writeDouble(z);
-        buf.writeInt(id);
+        buf.writeEnumConstant(type);
 
         PlayerLookup.around(world, new Vec3d(x, y, z), 128).forEach(
                 serverPlayer -> ServerChannelFeedbackPacket.send(serverPlayer, buf)
@@ -383,7 +388,7 @@ public class JCraft implements ModInitializer {
         if (player.isSpectator()) return;
         CooldownsComponent cooldowns = JComponents.getCooldowns(player);
 
-        if (stun.getDuration() > 1 && stun.getAmplifier() == 1 && cooldowns.getCooldown(CooldownType.COMBO_BREAKER) <= 0) {
+        if (stun.getDuration() > 1 && DazedStatusEffect.canBeComboBroken(stun.getAmplifier()) && cooldowns.getCooldown(CooldownType.COMBO_BREAKER) <= 0) {
             cooldowns.startCooldown(CooldownType.COMBO_BREAKER);
 
             stun(player, 5, 2); // Player is slowed down considerably pre-burst
@@ -392,14 +397,13 @@ public class JCraft implements ModInitializer {
 
             Vec3d pPos = player.getEyePos();
             burstTimers.put(player, 4);
-            createParticle(world, pPos.x, pPos.y, pPos.z, 0);
+            createParticle(world, pPos.x, pPos.y, pPos.z, JParticleType.COMBO_BREAK);
         }
     }
 
     public static @Nullable <T extends Entity> T teleportToWorld(T e, ServerWorld w, double x, double y, double z) {
         if (!e.isRemoved()) {
             e.detach();
-            //noinspection unchecked
             T entity = (T) e.getType().create(w);
             if (entity != null) {
                 entity.copyFrom(e);

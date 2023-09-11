@@ -1,12 +1,14 @@
 package net.arna.jcraft.common.entity.projectile;
 
 import net.arna.jcraft.common.entity.stand.StandEntity;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Vec3d;
@@ -48,6 +50,7 @@ public class RedBindEntity extends JAttackEntity implements IAnimatable {
         this.boundHealth = boundEntity.getHealth();
         this.dataTracker.set(WIDTH, (float) boundEntity.getBoundingBox().getAverageSideLength());
         this.startRiding(boundEntity, true);
+        boundEntity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.STANDLESS, timeLeft, 0, true, false));
     }
 
     @Override
@@ -79,6 +82,11 @@ public class RedBindEntity extends JAttackEntity implements IAnimatable {
                 discard();
             else if ( !hasExploded() && (--timeLeft <= 0 || boundEntity.getHealth() < boundHealth) )
                 detonate();
+
+            // In practice, redbind lasts slightly longer than the duration, so to account for this,
+            // we add two ticks of standless until we're actually done.
+            if (boundEntity != null && boundEntity.getStatusEffect(JStatusRegistry.STANDLESS) == null)
+                boundEntity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.STANDLESS, 2, 0, true, false));
         }
 
         super.tick();

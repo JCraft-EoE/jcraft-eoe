@@ -1,13 +1,17 @@
 package net.arna.jcraft.common.entity.stand;
 
+import it.unimi.dsi.fastutil.ints.IntSet;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.attack.Attack;
-import net.arna.jcraft.common.attack.AttackType;
-import net.arna.jcraft.common.attack.StunType;
-import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
-import net.arna.jcraft.common.util.CooldownType;
+import net.arna.jcraft.common.attack.core.BlockableType;
+import net.arna.jcraft.common.attack.core.MoveMap;
+import net.arna.jcraft.common.attack.core.MoveType;
+import net.arna.jcraft.common.attack.moves.cream.*;
+import net.arna.jcraft.common.attack.moves.shared.*;
+import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
@@ -25,76 +29,99 @@ import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.hit.HitResult;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
 import java.util.List;
-import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import static net.arna.jcraft.common.attack.Attack.unusable;
-
 public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
-    public static final Attack crm1 = new Attack(14, JCraft.lightCooldown, 0.75f, 15, 9, 1.75, 5f, 0.75f, AttackType.BOX, 1f, 0.3f, 0, JSoundRegistry.IMPACT_3)
-            .setInfo("Bite", "applies Slowness II (2s) on hit");
-    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 14, 6, 1.5, 5f, 0.75f, AttackType.BOX, 1f, 0.1f, 0, JSoundRegistry.IMPACT_3)
-            .crouchingVariation(crm1)
-            .setInfo("Punch", "quick combo starter");
-    public static final Attack heavy = new Attack(1, 14, 1f, 30, 20, 1.5, 8f, 0.1f, AttackType.BOX, 2, 0, 0, JSoundRegistry.IMPACT_3)
-            .setHitspark(2)
-            .hyperArmor()
-            .setInfo("Vertical Chop", "slow, uninterruptable combo starter");
-    public static final Attack combo = new Attack(2, 17, 0.75f, 36, 0, 2.0, 5f, 0.1f, AttackType.MULTIHIT, 1, 0, List.of(10, 17, 25), JSoundRegistry.IMPACT_3)
-            .setInfo("3-hit Combo", "medium windup, good stun");
-    public static final Attack grab = new Attack(3, 20, 1f, 20, 8, 1.5, 3f, 0f, AttackType.BOX, 1.5f, 0, 0)
-            .setGrab()
-            .setInfo("Grab", "unblockable, knocks back");
-    public static final Attack grabhit = new Attack(4, 0, 1f, 20, 13, 2.0, 6f, 1.5f, AttackType.BOX, 0.25f, 0, 0, JSoundRegistry.IMPACT_1)
-            .setLaunch()
-            .setHitspark(2)
-            .setInfo("Grab (Hit)", "");
-    /*
-    public static final Attack charge = new Attack(5, 20, 4f, 13, 5, 1.5, 8f, 0.25f, AttackType.CHARGE, 1, 0, State.CHARGE_HIT.ordinal(), JSoundRegistry.IMPACT_3)
-            .setRanged(true)
-            .setInfo("Charge", "3.5 block range, combo starter/extender");
-     */
-    public static final Attack surprise = new Attack(5, 20, 24, 14, 0, AttackType.BOX)
-            .setInfo("Surprise", "Cream disappears into the ground, then pops out in a nearby looked location");
-    public static final Attack destroy = new Attack(6, 20, 1f, 30, 21, 2, 0f, 1.25f, AttackType.BOX, 0.25f, 0f, 0, JSoundRegistry.IMPACT_5)
-            .setHitspark(2)
-            .setStunOverride(true)
-            .setStunType(StunType.LAUNCH)
-            .hyperArmor()
-            .setUB(false)
-            .setInfo("Destroy", "slow, uninterruptable, unblockable knockdown");
-    public static final Attack consume = new Attack(7, 32, 1f, 40, 35, 2.0, 2f, 0f, AttackType.BOX)
-            .setRanged(true)
-            .setInfo("Void", "high windup, 6 seconds");
-    public static final Attack enter = new Attack(8, 2, 15, 10, 0, 0f, AttackType.BOX)
-            .setInfo("Enter Cream", "cream consumes itself and the user halfway, increasing mobility and decreasing defense").setMobility(MobilityType.FLIGHT);
-    public static final Attack exit = new Attack(9, 2, 15, 5, 0, 0f, AttackType.BOX)
-            .setInfo("Exit Cream", "cream and its user return from the void");
-
-    public static final Attack balllight = new Attack(10, 2, 0.1f, 14, 7, 2, 5f, 0.75f, AttackType.BOX, 1f, 0.2f, 0, JSoundRegistry.IMPACT_3)
-            .setInfo("Swipe", "quick air-to-ground poke");
-    public static final Attack ballheavy = new Attack(11, 14, 0.1f, 20, 14, 2, 9f, 1.25f, AttackType.BOX, 0.75f, 0.3f, 0, JSoundRegistry.TW_KICK_HIT)
-            .setHitspark(2)
-            .hyperArmor()
-            .setLaunch()
-            .setInfo("Overhead Smash", "slow, uninterruptable launcher");
-    public static final Attack ballcombo = new Attack(12, 14, 0.1f, 36, 0, 2, 7f, 0.1f, AttackType.MULTIHIT, 0.75f, 0.3f, List.of(10, 17, 25), JSoundRegistry.IMPACT_3)
-            .setInfo("3-hit Combo", "less stun than grounded version");
-    public static final Attack ballcharge = new Attack(13, 20, 28, 13, 0, AttackType.BOX)
-            .setInfo("Void Charge", "cream quickly transforms into a black hole and charges in the pointed direction");
+    public static final EffectInflictingAttack<CreamEntity> BITE = new EffectInflictingAttack<CreamEntity>(30,
+            9, 15, 0.75f, 5f, 20, 1.75f, 0.75f, 0.3f,
+            List.of(new StatusEffectInstance(StatusEffects.SLOWNESS, 40, 1)))
+            .withInfo(Text.literal("Bite"), Text.literal("applies Slowness II (2s) on hit"));
+    public static final SimpleAttack<CreamEntity> PUNCH = SimpleAttack.<CreamEntity>lightAttack(6, 14,
+            5f, 20, 0.75f, 0.75f, 0.1f)
+            .withCrouchingVariant(BITE)
+            .withImpactSound(JSoundRegistry.IMPACT_3)
+            .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
+    public static final SimpleAttack<CreamEntity> VERTICAL_CHOP = new SimpleAttack<CreamEntity>(280, 20,
+            30, 1f, 8f, 40, 1.5f, 0.1f, 0f)
+            .withSound(JSoundRegistry.CREAM_HEAVY)
+            .withImpactSound(JSoundRegistry.IMPACT_3)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHyperArmor()
+            .withInfo(Text.literal("Vertical Chop"), Text.literal("slow, uninterruptible combo starter"));
+    public static final CreamComboAttack COMBO = new CreamComboAttack(340, 36, 0.75f,
+            5f, 20, 2f, 0.1f, 0f, IntSet.of(10, 17, 25))
+            .withSound(JSoundRegistry.CREAM_COMBO)
+            .withImpactSound(JSoundRegistry.IMPACT_3)
+            .withInfo(Text.literal("3-hit Combo"), Text.literal("medium windup, good stun"));
+    public static final SimpleAttack<CreamEntity> GRAB_HIT = new SimpleAttack<CreamEntity>(0, 13, 20,
+            1f, 6f, 5, 2f, 1.5f, 0f)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withLaunch()
+            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withInfo(Text.literal("Grab (Hit)"), Text.empty());
+    public static final GrabAttack<CreamEntity, State> GRAB = new GrabAttack<>(400, 8, 20,
+            1f, 3f, 30, 1.5f, 0f, 0f, GRAB_HIT, State.GRAB_HIT)
+            .withSound(JSoundRegistry.CREAM_GRAB)
+            .withInfo(Text.literal("Grab"), Text.literal("unblockable, knocks back"));
+//    public static final ChargeAttack<CreamEntity, State> CHARGE = new ChargeAttack<>(400, 5, 13,
+//            4f, 8f, 20, 1.5f, 0.25f, 0f, State.CHARGE_HIT)
+//            .withImpactSound(JSoundRegistry.IMPACT_3)
+//            .withInfo(Text.literal("Charge"), Text.literal("3.5 block range, combo starter/extender"));
+    public static final SurpriseMove SURPRISE = new SurpriseMove(400, 14, 24, 1f)
+            .withSound(JSoundRegistry.CREAM_SUMMON)
+            .withInfo(Text.literal("Surprise"), Text.literal("Cream disappears into the ground, then pops out in a nearby looked location"));
+    public static final DestroyAttack DESTROY = new DestroyAttack(400, 21, 30, 1f,
+            0f, 5, 2f, 1.25f, 0f)
+            .withSound(JSoundRegistry.CREAM_OVERHEAD)
+            .withImpactSound(JSoundRegistry.IMPACT_5)
+            .withLaunch()
+            .withHyperArmor()
+            .withBlockableType(BlockableType.NON_BLOCKABLE)
+            .withInfo(Text.literal("Destroy"), Text.literal("slow, uninterruptible, unblockable knockdown"));
+    public static final ConsumeAttack CONSUME = new ConsumeAttack(640, 35, 40, 1f,
+            2f, 0, 2f, 0f, 0f)
+            .withSound(JSoundRegistry.CREAM_CONSUME)
+            .withInfo(Text.literal("Void"), Text.literal("high windup, 6 seconds"));
+    public static final BallModeMove ENTER = new BallModeMove(40, 10, 15, 0f, true)
+            .withSound(JSoundRegistry.CREAM_ENTER)
+            .withInfo(Text.literal("Enter Cream"), Text.literal("cream consumes itself and the user halfway, increasing mobility and decreasing defense"));
+    public static final BallModeMove EXIT = new BallModeMove(40, 5, 15, 0f, false)
+            .withSound(JSoundRegistry.CREAM_EXIT)
+            .withInfo(Text.literal("Exit Cream"), Text.literal("cream and its user return from the void"));
+    public static final SimpleAttack<CreamEntity> SWIPE = new SimpleAttack<CreamEntity>(40, 7,
+            14, 0.1f, 5f, 20, 2f, 0.75f, 0.2f)
+            .withImpactSound(JSoundRegistry.IMPACT_3)
+            .withInfo(Text.literal("Swipe"), Text.literal("quick air-to-ground poke"));
+    public static final KnockdownAttack<CreamEntity> OVERHEAD_SMASH = new KnockdownAttack<CreamEntity>(280,
+            14, 20, 0.1f, 9f, 15, 2f, 1.25f, 0.3f, 35)
+            .withSound(JSoundRegistry.CREAM_SMASH)
+            .withImpactSound(JSoundRegistry.TW_KICK_HIT)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHyperArmor()
+            .withLaunch()
+            .withInfo(Text.literal("Overhead Smash"), Text.literal("slow, uninterruptible launcher"));
+    public static final SimpleMultiHitAttack<CreamEntity> BALL_COMBO = new SimpleMultiHitAttack<CreamEntity>(280,
+            36, 0.1f, 7f, 15, 2f, 0.1f, 0.3f, IntSet.of(10, 17, 25))
+            .withSound(JSoundRegistry.CREAM_COMBO)
+            .withImpactSound(JSoundRegistry.IMPACT_3)
+            .withInfo(Text.literal("3-hit Combo"), Text.literal("less stun than grounded version"));
+    public static final BallChargeAttack BALL_CHARGE = new BallChargeAttack(400, 13, 28, 1f)
+            .withSound(JSoundRegistry.CREAM_BALLDASH)
+            .withInfo(Text.literal("Void Charge"), Text.literal("cream quickly transforms into a black hole and charges in the pointed direction"));
 
     private static final TrackedData<Integer> VOID_TIME;
     private static final TrackedData<Boolean> HALF_BALL;
+    @Setter
     private Vec3d chargeDir;
-    private Vec3f outDir;
+    @Getter @Setter
     private boolean charging = false;
 
     static {
@@ -127,10 +154,6 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                     M1>Combo>M1>Charge>Grab
                     Chop>Void
                     i.M1>land+s.OFF>s.ON+Combo>M1>Charge>Grab""";
-
-        moves = List.of(light, heavy, combo, grab, consume, surprise, destroy, enter);
-
-        super.initialize();
     }
 
     public void beginHalfBall() {
@@ -139,9 +162,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         blockDistance = 0f;
         maxStandGauge = 45f;
 
-        moves = List.of(balllight, ballheavy, ballcombo, ballcharge, consume, unusable, unusable, exit);
-        markAllAttackButtons();
-        gatherAllAttacks();
+        registerMoves();
     }
 
     public void endHalfBall() {
@@ -150,9 +171,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         blockDistance = 0.75f;
         maxStandGauge = 90f;
 
-        moves = List.of(light, heavy, combo, grab, consume, surprise, destroy, enter);
-        markAllAttackButtons();
-        gatherAllAttacks();
+        registerMoves();
     }
 
     public boolean isHalfBall() {
@@ -169,6 +188,31 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     }
 
     @Override
+    protected void registerMoves(MoveMap<CreamEntity, State> moves) {
+        if (isHalfBall()) {
+            moves.register(MoveType.LIGHT, SWIPE, State.BALL_LIGHT);
+            moves.register(MoveType.HEAVY, OVERHEAD_SMASH, State.BALL_HEAVY);
+            moves.register(MoveType.BARRAGE, BALL_COMBO, State.BALL_COMBO);
+
+            moves.register(MoveType.SPECIAL1, BALL_CHARGE, State.BALL_CONSUME);
+
+            moves.register(MoveType.UTILITY, EXIT, State.EXIT);
+        } else {
+            moves.register(MoveType.LIGHT, PUNCH, State.LIGHT).withCrouchingVariant(State.BITE);
+            moves.register(MoveType.HEAVY, VERTICAL_CHOP, State.HEAVY);
+            moves.register(MoveType.BARRAGE, COMBO, State.COMBO);
+
+            moves.register(MoveType.SPECIAL1, GRAB, State.GRAB);
+
+            moves.register(MoveType.UTILITY, ENTER, State.ENTER);
+        }
+
+        moves.register(MoveType.SPECIAL2, SURPRISE, State.SURPRISE);
+        moves.register(MoveType.SPECIAL3, DESTROY, State.DESTROY);
+        moves.register(MoveType.ULTIMATE, CONSUME, State.CONSUME);
+    }
+
+    @Override
     protected void initDataTracker() {
         super.initDataTracker();
         getDataTracker().startTracking(VOID_TIME, 0);
@@ -180,165 +224,6 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         if (hasUser() && !(getUser() instanceof PlayerEntity) && getVoidTime() > 0)
             return false; // Prevents mobs from attacking while in void state and cancelling void early
         return super.canAttack();
-    }
-
-    // Moveset
-    @Override
-    public void initLightAttack() {
-        if (!canAttack()) return;
-
-        if (isHalfBall()) handleAttack(balllight, CooldownType.STAND_LIGHT, State.BALL_LIGHT);
-        else if (getUserOrThrow().isSneaking()) handleAttack(crm1, CooldownType.STAND_LIGHT, State.BITE);
-        else handleAttack(light, CooldownType.STAND_LIGHT, State.LIGHT);
-    }
-
-    @Override
-    public void initHeavyAttack() {
-        if (!canAttack()) return;
-
-        if (isHalfBall()) {
-            if (handleAttack(ballheavy, CooldownType.STAND_HEAVY, State.BALL_HEAVY))
-                playSound(JSoundRegistry.CREAM_SMASH, 1, 1);
-        } else if (handleAttack(heavy, CooldownType.STAND_HEAVY, State.HEAVY))
-            playSound(JSoundRegistry.CREAM_HEAVY, 1, 1);
-    }
-
-    @Override
-    public void initBarrage() {
-        if (!canAttack()) return;
-
-        if (isHalfBall() && handleAttack(ballcombo, CooldownType.STAND_BARRAGE, State.BALL_COMBO))
-            playSound(JSoundRegistry.CREAM_COMBO, 1, 1);
-        else if (handleAttack(combo, CooldownType.STAND_BARRAGE, State.COMBO))
-            playSound(JSoundRegistry.CREAM_COMBO, 1, 1);
-    }
-
-    @Override
-    public void initUlt() {
-        if (!canAttack()) return;
-
-        if (handleAttack(consume, CooldownType.STAND_ULT, State.CONSUME))
-            playSound(JSoundRegistry.CREAM_CONSUME, 1, 1);
-    }
-
-    @Override
-    public void initSpecial1() {
-        if (!canAttack()) return;
-
-        if (isHalfBall() && handleAttack(ballcharge, CooldownType.STAND_SP1, State.BALL_CONSUME))
-            playSound(JSoundRegistry.CREAM_BALLDASH, 1, 1);
-        else if (handleAttack(grab, CooldownType.STAND_SP1, State.GRAB))
-            playSound(JSoundRegistry.CREAM_GRAB, 1, 1);
-    }
-
-    private Vec3f outPos;
-    @Override
-    public void initSpecial2() {
-        if (isHalfBall() || !canAttack()) return;
-        LivingEntity user = getUserOrThrow();
-        Vec3d eyePos = user.getEyePos();
-        Vec3d rotVec = user.getRotationVector();
-        HitResult hitResult = world.raycast(new RaycastContext(eyePos, eyePos.add(rotVec.multiply(16)), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user));
-
-        if (hitResult.getType() != HitResult.Type.MISS && handleAttack(surprise, CooldownType.STAND_SP2, State.SURPRISE)) {
-            setFree(true);
-            setFreePos(new Vec3f(user.getPos()));
-            outPos = new Vec3f(hitResult.getPos());
-            playSound(JSoundRegistry.CREAM_SUMMON, 1, 1);
-        }
-    }
-
-    @Override
-    public void initSpecial3() {
-        if (!canAttack()) return;
-
-        if (!isHalfBall() && handleAttack(destroy, CooldownType.STAND_SP3, State.DESTROY))
-            playSound(JSoundRegistry.CREAM_OVERHEAD, 1, 1);
-    }
-
-    @Override
-    public void initUtil() {
-        if (!canAttack()) return;
-
-        if (isHalfBall()) {
-            if (handleAttack(exit, CooldownType.UTIL, State.EXIT))
-                playSound(JSoundRegistry.CREAM_EXIT, 1, 1);
-        } else if (handleAttack(enter, CooldownType.UTIL, State.ENTER))
-            playSound(JSoundRegistry.CREAM_ENTER, 1, 1);
-    }
-
-    @Override
-    public void specialAttack(Attack attack, Set<LivingEntity> entities) {
-        switch (attack.id) {
-            case (2) -> {
-                if (getMoveStun() == 11) {
-                    Vec3d rV = getRotationVector();
-
-                    for (LivingEntity ent : entities) {
-                        ent.takeKnockback(1, rV.x, rV.z);
-                        ent.velocityModified = true;
-                    }
-                }
-            }
-            case (3) -> {
-                if (!entities.isEmpty()) {
-                    // Grab bypasses and disables block
-                    for (LivingEntity ent : entities) {
-                        stun(ent, 20, 0);
-
-                        if (ent.getFirstPassenger() instanceof StandEntity<?, ?> stand) stand.blocking = false;
-                    }
-
-                    setAttack(grabhit, State.GRAB_HIT);
-                }
-            }
-            case (5) -> {
-                charging = true;
-                outDir = GravityChangerAPI.getGravityDirection(this).getUnitVector();
-                outDir.scale(-1f);
-
-                outPos.subtract(outDir);
-                setFreePos(outPos);
-
-                setVoidTime(surprise.moveStun - surprise.initTime);
-
-                playSound(JSoundRegistry.IMPACT_5, 1, 0.75f);
-            }
-            case (6) -> {
-                DamageSource playerSource = DamageSource.mob(getUser());
-
-                for (LivingEntity ent : entities) {
-                    trueDamage(8, playerSource, ent);
-                    ent.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0));
-                }
-            }
-            case (7) -> {
-                endHalfBall();
-                setVoidTime(120);
-                charging = false;
-                this.curAttack = null;
-            }
-            case (8) -> beginHalfBall();
-            case (9) -> endHalfBall();
-            case (11) -> {
-                for (LivingEntity ent : entities)
-                    if (!JUtils.isBlocking(ent))
-                        ent.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0));
-            }
-            case (13) -> {
-                if (!hasUser()) return;
-
-                playSound(JSoundRegistry.CREAM_CHARGE, 1, 1);
-                charging = true;
-                chargeDir = getUserOrThrow().getRotationVector().multiply(0.5);
-                setVoidTime(15);
-            }
-            case (14) -> {
-                for (LivingEntity ent : entities)
-                    if (!JUtils.isBlocking(ent))
-                        ent.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 40, 1));
-            }
-        }
     }
 
     @Override
@@ -377,181 +262,186 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         super.tick();
         boolean server = !this.world.isClient();
 
-        if (hasUser()) {
-            LivingEntity user = getUserOrThrow();
-            boolean isPlayer = false;
-            boolean notCorS = false;
+        if (!hasUser()) return;
+        LivingEntity user = getUserOrThrow();
+        boolean isPlayer = false;
+        boolean notCorS = false;
 
-            Vec3d pos = this.getEyePos();
-            int vTime = this.getVoidTime();
-            boolean voiding = (vTime > 0);
+        Vec3d pos = this.getEyePos();
+        int vTime = this.getVoidTime();
+        boolean voiding = (vTime > 0);
 
-            // Players get creative flight, and mobs get nogravved and y level equalization (see: if voiding)
-            if (user instanceof PlayerEntity playerEntity) {
-                notCorS = (!playerEntity.isCreative() && !playerEntity.isSpectator());
-                if (notCorS && !charging)
-                    playerEntity.getAbilities().flying = voiding;
-                isPlayer = true;
-            }
-
-            if (server) {
-                if (!charging) {
-                    if (this.curAttack != null) {
-                        this.setVoidTime(0);
-                        voiding = false;
-                    }
-                    this.idleOverride = this.getVoidTime() > 0;
-                }
-
-                user.setInvulnerable(this.getVoidTime() > 0);
-            }
-
-            if (voiding) {
-                if (server) {
-                    if (world.getGameRules().getBoolean(JCraft.STAND_GRIEFING)) {
-                        // Unfun 3x4x3 void code
-                        for (int x = -1; x < 2; x++) {
-                            for (int y = -1; y < 3; y++) {
-                                for (int z = -1; z < 2; z++) {
-                                    BlockPos curPos = this.getBlockPos().add(x, y, z);
-                                    if (this.world.getBlockState(curPos).getBlock().getBlastResistance() > 100.1f)
-                                        continue;
-                                    this.world.setBlockState(curPos, Block.getStateFromRawId(0));
-                                }
-                            }
-                        }
-                    }
-
-                    if (charging) {
-                        if (getFree()) {
-                            Vec3f newPos = getFreePos().copy();
-                            newPos.add(outDir);
-                            setFreePos(newPos);
-                        } else if (chargeDir != null) {
-                            user.setVelocity(chargeDir);
-                            user.velocityModified = true;
-                            if (user instanceof ServerPlayerEntity player)
-                                player.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(user));
-                        }
-                    } else {
-                        setStateNoReset(State.IDLE);
-
-                        if (!isPlayer) {
-                            double y = user.getY();
-                            Vec3d vel = new Vec3d(user.getVelocity().x, 0.0, user.getVelocity().z);
-
-                            // Targetting priority
-                            LivingEntity targetEntity = user.getDamageTracker().getBiggestAttacker();
-                            if (targetEntity == null && user instanceof MobEntity mob)
-                                targetEntity = mob.getTarget();
-                            if (targetEntity == null)
-                                targetEntity = user.getAttacker();
-
-                            // If target wasn't found, thrash around
-                            Vec3d target = targetEntity != null ? targetEntity.getPos() : this.getPos().add(Math.sin(this.age * 0.2) * 2, Math.sin(this.age * 0.2) / 4, Math.cos(this.age * 0.2) * 2);
-
-                            double dY = MathHelper.clamp(target.getY() - y, -1, 1);
-                            y += dY;
-
-                            vel = vel.add(target.subtract(user.getPos().add(random.nextDouble() * 2, random.nextDouble() * 3, random.nextDouble() * 3)).normalize()).multiply(0.3);
-
-                            user.setVelocity(vel);
-                            user.setPos(user.getX(), y, user.getZ());
-
-                            if (vTime < 10)
-                                user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 5, 1, true, false));
-                        }
-                    }
-
-                    List<LivingEntity> toDamage = world.getEntitiesByClass(LivingEntity.class,
-                            new Box(pos.add(1.5, 1.5, 1.5), pos.subtract(1.5, 1.5, 1.5)), EntityPredicates.VALID_ENTITY);
-
-                    toDamage.remove(user);
-                    toDamage.remove(this);
-
-                    if (charging) {
-                        for (LivingEntity ent : toDamage) {
-                            if (getMoveStun() % 2 == 0) { // More consistent
-                                stun(ent, 4, 0);
-
-                                StandEntity<?, ?> enemyStand = JUtils.getStand(ent);
-                                if (enemyStand != null) enemyStand.cancelAttack();
-                            }
-
-                            ent.damage(DamageSource.OUT_OF_WORLD, 5);
-                        }
-                    } else {
-                        for (LivingEntity ent : toDamage) {
-                            if (age % 4 == 0) {
-                                stun(ent, 2, 0);
-
-                                StandEntity<?, ?> enemyStand = JUtils.getStand(ent);
-                                if (enemyStand != null) enemyStand.cancelAttack();
-                            }
-
-                            ent.damage(DamageSource.OUT_OF_WORLD, 2.5f);
-                        }
-
-                        setAlphaOverride(0);
-                    }
-
-                    if (notCorS && !getFree())
-                        user.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 25, 0, false, false));
-                } else {
-                    for (int i = 0; i < 16; i++)
-                        world.addParticle(ParticleTypes.MYCELIUM,
-                                pos.x + (random.nextFloat() - 0.5f) * 2f,
-                                pos.y + (random.nextFloat() - 0.5f) * 2f,
-                                pos.z + (random.nextFloat() - 0.5f) * 2f,
-                                0, 0, 0);
-                }
-
-                setVoidTime(vTime - 1);
-                setDistanceOffset(0);
-            } else {
-                if (isIdle() && charging) {
-                    charging = false;
-                    setFree(false);
-                }
-
-                if (!isHalfBall()) return;
-                setAlphaOverride(0.1f);
-                user.onLanding();
-                user.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 5, 9, true, false));
-
-                // Player Half-Ball controls
-                if (user instanceof ServerPlayerEntity serverPlayer) {
-                    if (lastRemoteInputTime - age > 4) updateRemoteInputs(0, 0, false);
-
-                    Vec3d finalSpeed = Vec3d.ZERO;
-                    if (!blocking && !user.hasStatusEffect(JStatusRegistry.DAZED)) {
-                        Vec3d eP = user.getEyePos();
-                        Vec3d groundPos = world.raycast(
-                                new RaycastContext(eP, eP.add(0, -24, 0), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user)
-                        ).getPos();
-
-                        double groundDist = groundPos.distanceTo(pos);
-                        double stabilization = user.getVelocity().y;
-                        if (stabilization < 0) stabilization *= -0.75;
-                        else stabilization = 0;
-
-                        if (getRemoteJumpInput()) {
-                            if (groundDist < 5) {
-                                user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 10, 2, true, false));
-                                if (groundDist < 3)
-                                    finalSpeed = finalSpeed.add(0, 0.25 / groundDist + stabilization, 0);
-                            }
-                        }
-
-                        Vec3d rotVec = user.getRotationVector();
-                        finalSpeed = finalSpeed.add(rotVec.multiply(getRemoteForwardInput() / 30)); // Forward movement
-                        finalSpeed = finalSpeed.add(rotVec.rotateY(1.5707963f).multiply(getRemoteSideInput() / 30)); // Side movement
-                        user.addVelocity(finalSpeed.x, finalSpeed.y, finalSpeed.z);
-                        serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(user));
-                    }
-                } else resetAlphaOverride();
-            }
+        // Players get creative flight, and mobs get nogravved and y level equalization (see: if voiding)
+        if (user instanceof PlayerEntity playerEntity) {
+            notCorS = (!playerEntity.isCreative() && !playerEntity.isSpectator());
+            if (notCorS && !charging)
+                playerEntity.getAbilities().flying = voiding;
+            isPlayer = true;
         }
+
+        if (server) {
+            if (!charging) {
+                if (this.curMove != null) {
+                    this.setVoidTime(0);
+                    voiding = false;
+                }
+                this.idleOverride = this.getVoidTime() > 0;
+            }
+
+            user.setInvulnerable(this.getVoidTime() > 0);
+        }
+
+        if (voiding) {
+            if (server) {
+                if (world.getGameRules().getBoolean(JCraft.STAND_GRIEFING)) {
+                    // Unfun 3x4x3 void code
+                    for (int x = -1; x < 2; x++) {
+                        for (int y = -1; y < 3; y++) {
+                            for (int z = -1; z < 2; z++) {
+                                BlockPos curPos = this.getBlockPos().add(x, y, z);
+                                if (this.world.getBlockState(curPos).getBlock().getBlastResistance() > 100.1f)
+                                    continue;
+                                this.world.setBlockState(curPos, Block.getStateFromRawId(0));
+                            }
+                        }
+                    }
+                }
+
+                if (charging) {
+                    if (isFree()) {
+                        Vec3f newPos = getFreePos().copy();
+                        newPos.add(getMoveContext().get(SurpriseMove.OUT_DIR));
+                        setFreePos(newPos);
+                    } else if (chargeDir != null) {
+                        user.setVelocity(chargeDir);
+                        user.velocityModified = true;
+                        if (user instanceof ServerPlayerEntity player)
+                            player.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(user));
+                    }
+                } else {
+                    setStateNoReset(State.IDLE);
+
+                    if (!isPlayer) {
+                        double y = user.getY();
+                        Vec3d vel = new Vec3d(user.getVelocity().x, 0.0, user.getVelocity().z);
+
+                        // Targeting priority
+                        LivingEntity targetEntity = user.getDamageTracker().getBiggestAttacker();
+                        if (targetEntity == null && user instanceof MobEntity mob)
+                            targetEntity = mob.getTarget();
+                        if (targetEntity == null)
+                            targetEntity = user.getAttacker();
+
+                        // If target wasn't found, thrash around
+                        Vec3d target = targetEntity != null ? targetEntity.getPos() : this.getPos().add(Math.sin(this.age * 0.2) * 2, Math.sin(this.age * 0.2) / 4, Math.cos(this.age * 0.2) * 2);
+
+                        double dY = MathHelper.clamp(target.getY() - y, -1, 1);
+                        y += dY;
+
+                        vel = vel.add(target.subtract(user.getPos().add(random.nextDouble() * 2, random.nextDouble() * 3, random.nextDouble() * 3)).normalize()).multiply(0.3);
+
+                        user.setVelocity(vel);
+                        user.setPos(user.getX(), y, user.getZ());
+
+                        if (vTime < 10)
+                            user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 5, 1, true, false));
+                    }
+                }
+
+                List<LivingEntity> toDamage = world.getEntitiesByClass(LivingEntity.class,
+                        new Box(pos.add(1.5, 1.5, 1.5), pos.subtract(1.5, 1.5, 1.5)), EntityPredicates.VALID_ENTITY);
+
+                toDamage.remove(user);
+                toDamage.remove(this);
+
+                if (charging) {
+                    for (LivingEntity ent : toDamage) {
+                        if (getMoveStun() % 2 == 0) { // More consistent
+                            stun(ent, 4, 0);
+
+                            StandEntity<?, ?> enemyStand = JUtils.getStand(ent);
+                            if (enemyStand != null) enemyStand.cancelMove();
+                        }
+
+                        ent.damage(DamageSource.OUT_OF_WORLD, 5);
+                    }
+                } else {
+                    for (LivingEntity ent : toDamage) {
+                        if (age % 4 == 0) {
+                            stun(ent, 2, 0);
+
+                            StandEntity<?, ?> enemyStand = JUtils.getStand(ent);
+                            if (enemyStand != null) enemyStand.cancelMove();
+                        }
+
+                        ent.damage(DamageSource.OUT_OF_WORLD, 2.5f);
+                    }
+
+                    setAlphaOverride(0);
+                }
+
+                if (notCorS && !isFree())
+                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 25, 0, false, false));
+            } else {
+                for (int i = 0; i < 16; i++)
+                    world.addParticle(ParticleTypes.MYCELIUM,
+                            pos.x + (random.nextFloat() - 0.5f) * 2f,
+                            pos.y + (random.nextFloat() - 0.5f) * 2f,
+                            pos.z + (random.nextFloat() - 0.5f) * 2f,
+                            0, 0, 0);
+            }
+
+            setVoidTime(vTime - 1);
+            setDistanceOffset(0);
+        } else {
+            if (isIdle() && charging) {
+                charging = false;
+                setFree(false);
+            }
+
+            if (!isHalfBall()) return;
+            setAlphaOverride(0.1f);
+            user.onLanding();
+            user.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 5, 9, true, false));
+
+            // Player Half-Ball controls
+            if (user instanceof ServerPlayerEntity serverPlayer) {
+                if (lastRemoteInputTime - age > 4) updateRemoteInputs(0, 0, false);
+                JCraft.LOGGER.info(lastRemoteInputTime);
+
+                Vec3d finalSpeed = Vec3d.ZERO;
+                if (!blocking && !user.hasStatusEffect(JStatusRegistry.DAZED)) {
+                    Vec3d eP = user.getEyePos();
+                    Vec3d groundPos = world.raycast(
+                            new RaycastContext(eP, eP.add(0, -24, 0), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user)
+                    ).getPos();
+
+                    double groundDist = groundPos.distanceTo(pos);
+                    double stabilization = user.getVelocity().y;
+                    if (stabilization < 0) stabilization *= -0.75;
+                    else stabilization = 0;
+
+                    if (getRemoteJumpInput()) {
+                        if (groundDist < 5) {
+                            user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 10, 2, true, false));
+                            if (groundDist < 3)
+                                finalSpeed = finalSpeed.add(0, 0.25 / groundDist + stabilization, 0);
+                        }
+                    }
+
+                    Vec3d rotVec = user.getRotationVector();
+                    finalSpeed = finalSpeed.add(rotVec.multiply(getRemoteForwardInput() / 30)); // Forward movement
+                    finalSpeed = finalSpeed.add(rotVec.rotateY(1.5707963f).multiply(getRemoteSideInput() / 30)); // Side movement
+                    user.addVelocity(finalSpeed.x, finalSpeed.y, finalSpeed.z);
+                    serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(user));
+                }
+            } else resetAlphaOverride();
+        }
+    }
+
+    @Override
+    protected @NonNull CreamEntity getThis() {
+        return this;
     }
 
     // Animation code
@@ -587,8 +477,8 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         }
 
         @Override
-        public void playAnimation(CreamEntity stand, AnimationBuilder builder) {
-            animator.accept(stand, builder);
+        public void playAnimation(CreamEntity attacker, AnimationBuilder builder) {
+            animator.accept(attacker, builder);
         }
     }
 

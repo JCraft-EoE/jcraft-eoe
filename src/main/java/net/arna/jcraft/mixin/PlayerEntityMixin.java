@@ -1,11 +1,11 @@
 package net.arna.jcraft.mixin;
 
-import net.arna.jcraft.common.attack.Attack;
-import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.attack.moves.base.AbstractCounterAttack;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.network.s2c.ComboCounterPacket;
-import net.arna.jcraft.common.spec.JCraftSpec;
+import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.util.IComboCounter;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JStatusRegistry;
@@ -58,7 +58,7 @@ public abstract class PlayerEntityMixin implements IComboCounter {
 
     @Inject(at = @At("TAIL"), method = "tick")
     public void jcraft$playerTick(CallbackInfo info) {
-        JCraftSpec spec = JComponents.getSpecData((PlayerEntity) (Object) this).getSpec();
+        JSpec spec = JComponents.getSpecData((PlayerEntity) (Object) this).getSpec();
         if (spec != null) spec.tickSpec();
 
         if (lastAttacked == null || !lastAttacked.isAlive()) return;
@@ -89,7 +89,7 @@ public abstract class PlayerEntityMixin implements IComboCounter {
     public void jcraft$attack(Entity target, CallbackInfo info) {
         if (JUtils.isAffectedByTimeStop((PlayerEntity) (Object) this)) info.cancel();
 
-        JCraftSpec spec = JComponents.getSpecData((PlayerEntity) (Object) this).getSpec();
+        JSpec spec = JComponents.getSpecData((PlayerEntity) (Object) this).getSpec();
         if (spec != null && spec.moveStun > 0) info.cancel();
     }
 
@@ -99,14 +99,15 @@ public abstract class PlayerEntityMixin implements IComboCounter {
         PlayerEntity player = ((PlayerEntity) (Object) this);
 
         if (player.getFirstPassenger() instanceof StandEntity<?, ?> stand) {
-            Attack attack = stand.curAttack;
-            if (attack != null) {
-                if (attack.attackType == AttackType.COUNTER && stand.getMoveStun() < (attack.moveStun - attack.initTime)) {
-                    stand.counter(source.getAttacker(), source); // Initiate counter
-                    player.removeStatusEffect(JStatusRegistry.DAZED);
-                    info.cancel();
-                }
-            }
+            AbstractMove<?, ?> attack = stand.curMove;
+            if (attack == null || !attack.isCounter() || stand.getMoveStun() >= (attack.getDuration() - attack.getWindup()))
+                return;
+
+            //noinspection unchecked,rawtypes // Generic types can be annoying sometimes. This is fine.
+            ((AbstractCounterAttack) attack).counter(stand, source.getAttacker(), source);
+//            stand.counter(source.getAttacker(), source); // Initiate counter
+            player.removeStatusEffect(JStatusRegistry.DAZED);
+            info.cancel();
         }
     }
 }

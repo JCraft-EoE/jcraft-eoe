@@ -107,7 +107,7 @@ public class GravityComponentImpl implements GravityComponent {
         } else if (rotationParameters.alternateCenter()) {
             EntityDimensions dimensions = entity.getDimensions(entity.getPose());
             if (newGravity.getOpposite() == oldGravity) {
-                //In the center of the hit-box
+                //In the center of the hitbox
                 relativeRotationCentre = new Vec3d(0, dimensions.height / 2, 0);
             } else {
                 //Around the ankles
@@ -235,11 +235,7 @@ public class GravityComponentImpl implements GravityComponent {
 
     @Nullable
     private Gravity getHighestPriority() {
-        if (!gravityList.isEmpty()) {
-            return Collections.max(gravityList, Comparator.comparingInt(Gravity::priority));
-        } else {
-            return null;
-        }
+        return !gravityList.isEmpty() ? Collections.max(gravityList, Comparator.comparingInt(Gravity::priority)) : null;
     }
 
     @Override
@@ -255,7 +251,7 @@ public class GravityComponentImpl implements GravityComponent {
         if (canChangeGravity()) {
             gravityList.removeIf(g -> Objects.equals(g.source(), gravity.source()));
             if (gravity.direction() != null)
-                gravityList.add(gravity);
+                gravityList.add(new Gravity(gravity));
             updateGravity(gravity.rotationParameters(), initialGravity);
         }
     }
@@ -268,19 +264,15 @@ public class GravityComponentImpl implements GravityComponent {
     @Override
     public void setGravity(List<Gravity> _gravityList, boolean initialGravity) {
         Gravity highestBefore = getHighestPriority();
-        gravityList = _gravityList;
+        gravityList = new ArrayList<>(_gravityList);
         Gravity highestAfter = getHighestPriority();
-        if (highestBefore != highestAfter) {
-            if (highestBefore == null) {
-                updateGravity(highestAfter.rotationParameters(), initialGravity);
-            } else if (highestAfter == null) {
-                updateGravity(highestBefore.rotationParameters(), initialGravity);
-            } else if (highestBefore.priority() > highestAfter.priority()) {
-                updateGravity(highestBefore.rotationParameters(), initialGravity);
-            } else {
-                updateGravity(highestAfter.rotationParameters(), initialGravity);
-            }
-        }
+
+        if (highestBefore == highestAfter) return;
+        if (highestBefore == null) updateGravity(highestAfter.rotationParameters(), initialGravity);
+        else if (highestAfter == null) updateGravity(highestBefore.rotationParameters(), initialGravity);
+        else if (highestBefore.priority() > highestAfter.priority())
+            updateGravity(highestBefore.rotationParameters(), initialGravity);
+        else updateGravity(highestAfter.rotationParameters(), initialGravity);
     }
 
     @Override

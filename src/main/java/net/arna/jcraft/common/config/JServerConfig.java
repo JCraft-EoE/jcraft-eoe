@@ -5,12 +5,14 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import lombok.SneakyThrows;
 import lombok.Synchronized;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.spec.SpecType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.WorldSavePath;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -31,6 +33,8 @@ public class JServerConfig {
     public static final BooleanOption IGNORE_ARMOR = new BooleanOption("ignoreArmor", BALANCE, true);
     public static final BooleanOption INVIS_CREAM_VOID = new BooleanOption("invisCreamVoid", BALANCE, false);
     public static final BooleanOption TIME_SKIP_USE_UTIL = new BooleanOption("timeSkipUseUtil", BALANCE, false);
+    public static final FloatOption DAMAGE_SCALING_MINIMUM = new FloatOption("damageScalingMinimum", BALANCE, 0.4f);
+    public static final FloatOption SCALING_PENALTY_PER_HIT = new FloatOption("scalingPenaltyPerHit", BALANCE, 0.02f);
 
     // Interaction options
     private static final String INTERACTION = "interaction";
@@ -61,6 +65,8 @@ public class JServerConfig {
                 ConfigOption option = ConfigOption.getImmutableOptions().get(key);
                 option.read(data.get(key));
             }
+        } catch (IOException e) {
+            JCraft.LOGGER.error("An error occurred trying to read the server config.", e);
         }
     }
 

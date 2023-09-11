@@ -12,6 +12,5 @@ public class JDataGen implements DataGeneratorEntrypoint {
         generator.addProvider(JLootTableProviders.EntityLoot::new);
         generator.addProvider(JTagProviders.JBlockTags::new);
         generator.addProvider(JTagProviders.JItemTags::new);
-
     }
 }

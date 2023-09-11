@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.item;
 
 import net.arna.jcraft.common.component.JComponents;
-import net.arna.jcraft.common.spec.JCraftSpec;
+import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.spec.SpecType;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.player.PlayerEntity;
@@ -10,9 +10,9 @@ import net.minecraft.text.Text;
 
 public abstract class SpecObtainmentItem extends Item {
     protected boolean warned = false;
-    protected final JCraftSpec switchTo;
+    protected final SpecType switchTo;
 
-    public SpecObtainmentItem(Settings settings, JCraftSpec switchTo) {
+    public SpecObtainmentItem(Settings settings, SpecType switchTo) {
         super(settings);
         this.switchTo = switchTo;
     }
@@ -20,16 +20,15 @@ public abstract class SpecObtainmentItem extends Item {
     private boolean setSpec(PlayerEntity player) {
         if (player == null) return false;
 
-        // TODO switchTo should probably be a SpecType rather than JCraftSpec.
-        JComponents.getSpecData(player).setType(SpecType.fromId(switchTo.getId()));
+        JComponents.getSpecData(player).setType(switchTo);
         warned = false;
         return true;
     }
 
     protected boolean tryGetSpec(PlayerEntity player) {
-        JCraftSpec spec = JUtils.getSpec(player);
+        JSpec<?, ?> spec = JUtils.getSpec(player);
         if (spec != null) { // If the player already has a spec
-            if (spec.getId() != switchTo.getId()) { // And it isn't the one that will be switched to
+            if (spec.getType().getId() != switchTo.getId()) { // And it isn't the one that will be switched to
                 if (!warned) {
                     player.sendMessage(Text.translatable("warning.jcraft.spec.change"));
                     warned = true;

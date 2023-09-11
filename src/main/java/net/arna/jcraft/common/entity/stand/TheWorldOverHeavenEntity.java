@@ -1,110 +1,115 @@
 package net.arna.jcraft.common.entity.stand;
 
-import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import lombok.NonNull;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.attack.Attack;
-import net.arna.jcraft.common.attack.AttackQueue;
-import net.arna.jcraft.common.attack.AttackType;
+import net.arna.jcraft.common.attack.core.BlockableType;
+import net.arna.jcraft.common.attack.core.MoveMap;
+import net.arna.jcraft.common.attack.core.MoveType;
+import net.arna.jcraft.common.attack.moves.shared.*;
+import net.arna.jcraft.common.attack.moves.theworld.overheaven.*;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.config.JServerConfig;
-import net.arna.jcraft.common.entity.damage.JDamageSources;
-import net.arna.jcraft.common.entity.projectile.KnifeProjectile;
-import net.arna.jcraft.common.util.CooldownType;
-import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.common.util.MobilityType;
+import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
-import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
-import net.minecraft.entity.*;
-import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.predicate.entity.EntityPredicates;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
+import net.minecraft.text.Text;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
 public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEntity, TheWorldOverHeavenEntity.State> {
-    public static final Attack crm1 = new Attack(9, JCraft.lightCooldown, 0.75f, 16, 10, 1.75, 8f, 1f, AttackType.BOX, 0.8f, 0, 0, JSoundRegistry.TW_KICK_HIT)
-            .setLaunch()
-            .setHitspark(2)
-            .setInfo("Lunge", "medium speed launcher");
-    public static final Attack light = new Attack(0, JCraft.lightCooldown, 0.75f, 7, 4, 1.5, 6f, 0.75f, AttackType.BOX, 0.55f, -0.1f, 0, JSoundRegistry.IMPACT_1)
-            .crouchingVariation(crm1)
-            .setInfo("Punch", "quick combo starter");
-    public static final Attack barrage = new Attack(2, 17, 0.75f, 50, 0, 2, 1f, 0.1f, AttackType.BARRAGE, 1.5f, 0, 3, JSoundRegistry.IMPACT_1)
-            .setInfo("Barrage", "fast reliable combo starter/extender, high stun");
-    public static final Attack heavy = new Attack(1, 19, 1f, 22, 10, 2, 0f, 0.0f, AttackType.BOX, 1, 0, 0, JSoundRegistry.IMPACT_12)
-            .setHitspark(2)
-            .setUB(true)
-            .setInfo("Singularity", "block bypass, low stun, medium windup");
-    //airsmite isn't actually used in attack processing, but it is used for AI and info display
-    public static final Attack airsmite = new Attack(3, 0, 1f, 20, 10, 0, 6f, 0.0f, AttackType.BOX, 1.05f)
-            .setRanged(true)
-            .setInfo("You won't run away!", "summons a weaker lightning bolt at the aimed position");
-    public static final Attack smite = new Attack(3, 21, 1f, 20, 10, 0, 6f, 0.0f, AttackType.BOX, 1.05f)
-            .setBlockstun(13)
-            .aerialVariation(airsmite)
-            .setInfo("Evaporate", "summons a powerful lightning bolt that deals high damage and stun");
+    public static final LungeAttack LUNGE = new LungeAttack(30, 10, 16, 0.75f,
+            8f, 16, 1.75f, 1f, 0f)
+            .withSound(JSoundRegistry.MUDA_DA)
+            .withImpactSound(JSoundRegistry.TW_KICK_HIT)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withLaunch()
+            .withInfo(Text.literal("Lunge"), Text.literal("medium speed launcher"));
+    public static final SimpleAttack<TheWorldOverHeavenEntity> PUNCH = SimpleAttack.<TheWorldOverHeavenEntity>lightAttack(
+            4, 7, 6f, 11, 0.75f, 0.75f, -0.1f)
+            .withCrouchingVariant(LUNGE)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
+    public static final BarrageAttack<TheWorldOverHeavenEntity> BARRAGE = new BarrageAttack<TheWorldOverHeavenEntity>(
+            340, 0, 50, 0.75f, 1f, 30, 2f, 0.1f, 0f, 3)
+            .withSound(JSoundRegistry.TWOH_BARRAGE)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
+    public static final SingularityAttack SINGULARITY = new SingularityAttack(380, 10, 22,
+            1f, 0f, 20, 2f, 0f, 0f)
+            .withSound(JSoundRegistry.TWOH_HEAVY)
+            .withImpactSound(JSoundRegistry.IMPACT_12)
+            .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
+            .withInfo(Text.literal("Singularity"), Text.literal("block bypass, low stun, medium windup"));
+    public static final SmiteAttack AIR_SMITE = new SmiteAttack(420, 10, 20, 1f,
+            6f, 21, 3f, 0f, 0f, true)
+            .withSound(JSoundRegistry.TWOH_SMITE)
+            .withBlockStun(13)
+            .withInfo(Text.literal("You won't run away!"), Text.literal("summons a weaker lightning bolt at the aimed position"));
+    public static final SmiteAttack SMITE = new SmiteAttack(420, 10, 20, 1f,
+            8f, 21, 3f, 0f, 0f, false)
+            .withAerialVariant(AIR_SMITE)
+            .withSound(JSoundRegistry.TWOH_SMITE)
+            .withBlockStun(13)
+            .withInfo(Text.literal("Evaporate"), Text.literal("summons a powerful lightning bolt that deals high damage and stun"));
     //todo: delay twoh smite until TS ends
-    public static final Attack overwrite = new Attack(6, 0, 1f, 23, 7, 2, 0f, 1.0f, AttackType.BOX, 2, 0, 0, JSoundRegistry.IMPACT_5)
-            .setHitspark(2)
-            .setLaunch()
-            .hyperArmor()
-            .setUB(false)
-            .setInfo("Overwrite (Hit)", "", AttackQueue.SPECIAL1);
-    public static final Attack chargeoverwrite = new Attack(8, 30, 70, 71, 0, AttackType.BOX)
-            .disableBackstab()
-            .setFollowup(overwrite)
-            .setInfo("Reality Overwrite",
-                    """
+    public static final OverwriteAttack OVERWRITE = new OverwriteAttack(0, 7, 23, 1f,
+            0f, 40, 2f, 1f, 0f)
+            .withSound(JSoundRegistry.TWOH_OVERWRITE)
+            .withImpactSound(JSoundRegistry.IMPACT_5)
+            .withLaunch()
+            .withHyperArmor()
+            .withBlockableType(BlockableType.NON_BLOCKABLE)
+            .withInfo(Text.literal("Overwrite (Hit)"), Text.empty());
+    // Does absolutely nothing on its own.
+    public static final NoOpMove<TheWorldOverHeavenEntity> CHARGE_OVERWRITE = new NoOpMove<TheWorldOverHeavenEntity>(
+            600, 70, 1f)
+            .withFollowup(OVERWRITE)
+            .withSound(JSoundRegistry.TWOH_CHARGE_OVERWRITE)
+            .withInfo(Text.literal("Reality Overwrite"), Text.literal("""
                             charges (for a minimum of 1s) an unblockable punch that changes the reality of the hit victims
                             While charging, (de)activate overwrite by pressing:
                             SPECIAL 1 - makes victims unable to look at you
                             SPECIAL 2 - applies every damage over time effect to victims
-                            SPECIAL 3 - heals and enslaves mobs""");
-    public static final Attack knives = new Attack(4, 19, 0.75f, 22, 16, 1.5, 0f, 0.0f, AttackType.BOX, 1)
-            .setBlockstun(6)
-            .setRanged(true)
-            .setInfo("Aerial Divine Finisher", "");
-    public static final Attack delayknives = new Attack(5, 19, 0.75f, 22, 16, 1.5, 0f, 0.0f, AttackType.BOX, 1)
-            .setBlockstun(6)
-            .setRanged(true)
-            .aerialVariation(knives)
-            .setInfo("Divine Finisher", "fires 4 stunning knives that launch at a delay/in air summons and launches 8 knives");
+                            SPECIAL 3 - heals and enslaves mobs"""));
 
-    public static final Attack timestop = new Attack(7, 70, 50, 45, 5, AttackType.TIMESTOP)
-            .setUB(true)
-            .setInfo("Timestop", "5 seconds");
-    private static final Attack timeskip = new Attack(-2, 18, 2, 2)
-            .setMobility(MobilityType.TELEPORT)
-            .setInfo("Timeskip", "14m range");
+    public static final AerialDivineFinisherAttack AERIAL_DIVINE_FINISHER = new AerialDivineFinisherAttack(380,
+            16, 22, 0.75f, 0f, 20, 1.5f, 0f, 0f)
+            .withSound(JSoundRegistry.TWOH_KNIFETHROW)
+            .withBlockStun(6)
+            .withInfo(Text.literal("Aerial Divine Finisher"), Text.empty());
+    public static final DivineFinisherAttack DIVINE_FINISHER = new DivineFinisherAttack(380, 16, 22,
+            0.75f, 0f, 20, 1.5f, 0f, 0f)
+            .withAerialVariant(AERIAL_DIVINE_FINISHER)
+            .withSound(JSoundRegistry.TWOH_AIRKNIVES)
+            .withBlockStun(6)
+            .withInfo(Text.literal("Divine Finisher"), Text.literal("fires 4 stunning knives that launch at a delay/in air summons and launches 8 knives"));
+    public static final TimeStopMove<TheWorldOverHeavenEntity> TIME_STOP = new TimeStopMove<TheWorldOverHeavenEntity>(
+            1400, 45, 50, JServerConfig.TWOH_TIME_STOP_DURATION::getValue)
+            .withSound(JSoundRegistry.TWOH_TS)
+            .withInfo(Text.literal("Timestop"), Text.literal("5 seconds"));
 
+    public static final TimeSkipMove<TheWorldOverHeavenEntity> TIME_SKIP = new TimeSkipMove<TheWorldOverHeavenEntity>(
+            360, 14)
+            .withSound(JSoundRegistry.TWOH_TIMESKIP)
+            .withInfo(Text.literal("Timeskip"), Text.literal("14m range"));
     private static final TrackedData<Integer> OVERWRITE_TYPE;
-    private Vec3d lightningPos;
-    private final List<LivingEntity> overwriteEnts = new ArrayList<>();
-    private final IntList overwriteTimes = new IntArrayList();
-    private float smiteDamage = 6f;
 
     static {
         OVERWRITE_TYPE = DataTracker.registerData(TheWorldOverHeavenEntity.class, TrackedDataHandlerRegistry.INTEGER);
@@ -137,11 +142,9 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
                             -the ultrakill
                             M1>Barrage>M1>Knives>Overwrite~S2/S3>dash>Smite>Heavy>M1""";
 
-        moves = List.of(light, heavy, barrage, smite, timestop, delayknives, chargeoverwrite, timeskip);
-        super.initialize();
-
         if (world.isClient) return;
-        timestop.stun = JServerConfig.TWOH_TIME_STOP_DURATION.getValue() / 20.0f;
+        // TODO
+//        timestop.stun = JServerConfig.TWOH_TIME_STOP_DURATION.getValue() / 20.0f;
     }
 
     public int getOverwriteType() {
@@ -159,213 +162,52 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
     }
 
     @Override
-    protected void initDataTracker() {
-        super.initDataTracker();
-        dataTracker.startTracking(OVERWRITE_TYPE, 0);
-    }
+    protected void registerMoves(MoveMap<TheWorldOverHeavenEntity, State> moves) {
+        moves.register(MoveType.LIGHT, PUNCH, State.LIGHT).withCrouchingVariant(State.LUNGE);
+        moves.register(MoveType.HEAVY, SINGULARITY, State.HEAVY);
+        moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 
-    // Moveset
-    @Override
-    public void initLightAttack() {
-        if (!canAttack()) return;
-        if (getUserOrThrow().isSneaking() && handleAttack(Attack.copyOf(crm1), CooldownType.STAND_LIGHT, State.LUNGE))
-            playSound(JSoundRegistry.MUDA_DA, 1, 1);
-        else
-            handleAttack(light, CooldownType.STAND_LIGHT, State.LIGHT);
-    }
+        moves.register(MoveType.SPECIAL1, SMITE, State.SMITE);
+        moves.register(MoveType.SPECIAL2, DIVINE_FINISHER, State.AIR_KNIVES).withAerialVariant(State.THROW);
+        moves.register(MoveType.SPECIAL3, CHARGE_OVERWRITE, State.CHARGE_OVERWRITE);
+        moves.register(MoveType.ULTIMATE, TIME_STOP, State.TIME_STOP);
 
-    @Override
-    public void initBarrage() {
-        if (!canAttack()) return;
-        if (handleAttack(barrage, CooldownType.STAND_BARRAGE, State.BARRAGE))
-            playSound(JSoundRegistry.TWOH_BARRAGE, 1, 1);
+        moves.register(MoveType.UTILITY, TIME_SKIP, State.TIME_SKIP);
     }
 
     @Override
-    public void initHeavyAttack() {
-        if (!canAttack()) return;
-        if (handleAttack(heavy, CooldownType.STAND_HEAVY, State.HEAVY))
-            playSound(JSoundRegistry.TWOH_HEAVY, 1, 1);
+    public void initMove(MoveType type) {
+        switch (type) {
+            case SPECIAL1, SPECIAL2, SPECIAL3 -> {
+                if (curMove != null && curMove.getOriginalMove() == CHARGE_OVERWRITE && getMoveStun() < 50)
+                    initOverwrite(switch (type) {
+                        default -> 1;
+                        case SPECIAL2 -> 2;
+                        case SPECIAL3 -> 3;
+                    });
+                else super.initMove(type);
+            }
+            case ULTIMATE -> {
+                if (tsTime <= 0) super.initMove(type);
+                else if (hasUser()) {
+                    JCraft.stopTimestop(getUserOrThrow());
+                    tsTime = 0;
+                }
+            }
+            default -> super.initMove(type);
+        }
     }
 
     private void initOverwrite(int type) {
         setOverwriteType(type);
-        setAttack(overwrite, State.OVERWRITE);
+        setMove(OVERWRITE, State.OVERWRITE);
         playSound(JSoundRegistry.TWOH_OVERWRITE, 1, 1);
     }
 
     @Override
-    public void initSpecial1() {
-        if (curAttack == chargeoverwrite && getMoveStun() < 50) {
-            initOverwrite(1);
-            return;
-        }
-
-        if (canAttack() && handleAttack(smite, CooldownType.STAND_SP1, State.SMITE) && hasUser()) {
-            LivingEntity user = getUserOrThrow();
-            if (user.isOnGround()) {
-                smiteDamage = 8f;
-                this.lightningPos = user.getPos();
-            } else {
-                smiteDamage = 6f;
-                Vec3d eP = user.getEyePos();
-                Vec3d rangeMod = user.getRotationVector().multiply(24);
-                EntityHitResult eHit = ProjectileUtil.raycast(user, eP, eP.add(rangeMod),
-                        user.getBoundingBox().expand(24),
-                        EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR,
-                        576 // Squared
-                );
-
-                if (eHit != null) lightningPos = eHit.getPos();
-                else
-                    lightningPos = world.raycast(new RaycastContext(eP, eP.add(rangeMod), RaycastContext.ShapeType.COLLIDER,
-                            RaycastContext.FluidHandling.NONE, user)).getPos();
-            }
-
-            AreaEffectCloudEntity effectCloud = new AreaEffectCloudEntity(world, lightningPos.x, lightningPos.y, lightningPos.z);
-            effectCloud.setOwner(user);
-            effectCloud.setRadius(smiteDamage / 2f);
-            effectCloud.setWaitTime(10);
-            effectCloud.setRadiusGrowth(-0.5f);
-
-            world.spawnEntity(effectCloud);
-
-            world.playSound(null, lightningPos.x, lightningPos.y, lightningPos.z, JSoundRegistry.TWOH_CHARGE, SoundCategory.PLAYERS, 1, 1);
-            playSound(JSoundRegistry.TWOH_SMITE, 1, 1);
-        }
-    }
-
-    @Override
-    public void initSpecial2() {
-        if (curAttack == chargeoverwrite && getMoveStun() < 50) {
-            initOverwrite(2);
-            return;
-        }
-
-        CanAttackData cad = this.canAttackWithData();
-        if (!cad.canAttack()) return;
-
-        if (cad.user().isOnGround() && handleAttack(delayknives, CooldownType.STAND_SP2, State.AIR_KNIVES))
-            playSound(JSoundRegistry.TWOH_AIRKNIVES, 1, 1);
-        else if (handleAttack(knives, CooldownType.STAND_SP2, State.THROW)) playSound(JSoundRegistry.TWOH_KNIFETHROW, 1, 1);
-    }
-
-    @Override
-    public void initSpecial3() {
-        if (curAttack == chargeoverwrite && getMoveStun() < 50) {
-            initOverwrite(3);
-            return;
-        }
-
-        if (canAttack() && handleAttack(chargeoverwrite, CooldownType.STAND_SP3, State.CHARGE_OVERWRITE))
-            playSound(JSoundRegistry.TWOH_CHARGEOVERWRITE, 1, 1);
-    }
-
-    @Override
-    public void initUlt() {
-        if (!canAttack()) return;
-        if (tsTime <= 0) {
-            if (handleAttack(timestop, CooldownType.STAND_ULT, State.TIME_STOP))
-                playSound(JSoundRegistry.TWOH_TS, 1, 1);
-        } else {
-            JCraft.stopTimestop(getUserOrThrow());
-            tsTime = 0;
-        }
-    }
-
-    @Override
-    public void initUtil() {
-        if (!canAttack() || tsTime > 0) return;
-        handleAttack(timeskip, CooldownType.UTIL, State.TIMESKIP);
-    }
-
-    @Override
-    public void specialAttack(Attack attack, Set<LivingEntity> entities) {
-        if (!hasUser()) return;
-        LivingEntity user = getUserOrThrow();
-        DamageSource damageSource = JDamageSources.stand(this);
-
-        switch (attack.id) {
-            case (-2) -> timeSkip(14, JSoundRegistry.TWOH_TIMESKIP);
-            case (1) -> { // TWOH's heavy is a mini-overwrite that ignores block
-                for (LivingEntity ent : entities) {
-                    stun(ent, 20, 1);
-                    trueDamage(6, JDamageSources.stand(this), ent);
-                }
-            }
-            case (3) -> {
-                Vec3d lP = lightningPos;
-
-                LightningEntity lightning = new LightningEntity(EntityType.LIGHTNING_BOLT, this.world);
-                lightning.setCosmetic(true);
-                lightning.setPosition(lP);
-
-                List<? extends Entity> hit = JUtils.generateHitbox(world, lP, 3, Entity.class, List.of(this, user));
-                for (Entity ent : hit) {
-                    if (ent instanceof LivingEntity living) {
-                        LivingEntity target = JUtils.getUserIfStand(living);
-                        target.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 7, 9, true, false));
-                        damageLogic(world, target, Vec3d.ZERO, 21, 1, false, smiteDamage, false, 13, damageSource, user);
-                    }
-
-                    ent.onStruckByLightning((ServerWorld) world, lightning);
-                }
-
-                world.spawnEntity(lightning);
-            }
-            case (4) -> {
-                for (int i = 0; i < 8; i++) {
-                    KnifeProjectile knife = new KnifeProjectile(world, user);
-                    knife.setLightning(true);
-                    knife.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
-                    knife.setVelocity(user, user.getPitch(), user.getYaw(), 0.0F, 2F, 1F);
-                    knife.setPosition(user.getPos().add(
-                            random.nextTriangular(0, 0.5),
-                            random.nextTriangular(1.5, 0.5),
-                            random.nextTriangular(0, 0.5)));
-                    world.spawnEntity(knife);
-                }
-            }
-            case (5) -> {
-                Vec3d rotVec = user.getRotationVector();
-
-                for (int i = 0; i < 4; i++) {
-                    KnifeProjectile knife = new KnifeProjectile(world, user);
-                    knife.setDelayedLightning(10 + i * 5);
-                    knife.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
-                    knife.setNoGravity(true);
-                    knife.setVelocity(new Vec3d(rotVec.x * 0.7, 0, rotVec.z * 0.7).rotateY(1.5708f * i));
-                    knife.setPosition(getEyePos());
-                    world.spawnEntity(knife);
-                }
-            }
-            case (6) -> {
-                for (LivingEntity ent : entities) {
-                    ent.removeStatusEffect(JStatusRegistry.DAZED);
-                    stun(ent, 30, 3);
-
-                    if (getOverwriteType() == 1) {
-                        overwriteTimes.add(200);
-                        overwriteEnts.add(ent);
-                    }
-
-                    if (getOverwriteType() == 2) {
-                        ent.setOnFireFor(5);
-                        ent.addStatusEffect(new StatusEffectInstance(StatusEffects.HUNGER, 100, 0, false, true));
-                        ent.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 100, 0, false, true));
-                        ent.addStatusEffect(new StatusEffectInstance(StatusEffects.WITHER, 100, 0, false, true));
-                    }
-
-                    if (getOverwriteType() != 3) continue;
-                    ent.heal(4f);
-
-                    if (!(ent instanceof MobEntity)) continue;
-                    JComponents.getMiscData(ent).setSlavedTo(user.getUuid());
-                    overwriteTimes.add(1048576);
-                    overwriteEnts.add(ent);
-                }
-            }
-        }
+    protected void initDataTracker() {
+        super.initDataTracker();
+        dataTracker.startTracking(OVERWRITE_TYPE, 0);
     }
 
     @Override
@@ -373,7 +215,11 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         super.tick();
 
         if (!hasUser()) return;
+
+        IntList overwriteTimes = moveContext.get(OverwriteAttack.OVERWRITE_TIMES);
+        List<LivingEntity> overwriteTargets = moveContext.get(OverwriteAttack.OVERWRITE_TARGETS);
         LivingEntity user = getUserOrThrow();
+
         if (age == 1) {
             List<LivingEntity> hit = world.getEntitiesByClass(LivingEntity.class, new Box(
                             getPos().add(-64, -64, -64), getPos().add(64, 64, 64)),
@@ -383,7 +229,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
                 UUID slavedTo = JComponents.getMiscData(ent).getSlavedTo();
 
                 if (slavedTo == null || !slavedTo.equals(user.getUuid())) continue;
-                overwriteEnts.add(ent);
+                overwriteTargets.add(ent);
                 overwriteTimes.add(1048576); // 2 to the whatever
             }
         }
@@ -391,11 +237,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         if (world.isClient) return;
 
         int moveStun = getMoveStun();
-        if (moveStun <= 0) {
-            if (getOverwriteType() != 0) setOverwriteType(0);
-        } else if (curAttack != null && curAttack.id == crm1.id) {
-            if (moveStun <= 11 && moveStun > 5) curAttack.attackDist += 0.15f;
-        }
+        if (moveStun <= 0 && getOverwriteType() != 0) setOverwriteType(0);
 
         for (int i = 0; i < overwriteTimes.size(); i++) {
             int time = overwriteTimes.getInt(i);
@@ -403,21 +245,17 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
 
             if (time < 1) {
                 overwriteTimes.removeInt(i);
-                overwriteEnts.remove(i);
+                overwriteTargets.remove(i);
                 i--;
             } else {
-                LivingEntity entity = overwriteEnts.get(i);
+                LivingEntity entity = overwriteTargets.get(i);
 
                 if (entity instanceof MobEntity mob && time > 200) { // Targeting and movement for mobs
                     LivingEntity victim = user.getAttacking();
                     if (victim == null) {
                         LivingEntity adv = user.getPrimeAdversary();
-                        if (adv != null && adv.isAlive()) {
-                            mob.setTarget(adv);
-                        }
-                    } else if (victim.isAlive()) {
-                        mob.setTarget(victim);
-                    }
+                        if (adv != null && adv.isAlive()) mob.setTarget(adv);
+                    } else if (victim.isAlive()) mob.setTarget(victim);
 
                     if (mob.squaredDistanceTo(this) > 256)
                         mob.getNavigation().startMovingTo(this, 1);
@@ -431,12 +269,9 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
                         .stretch(entity.getRotationVec(1.0F).multiply(range))
                         .expand(1.0D);
                 EntityHitResult hitResult = ProjectileUtil.raycast(
-                        entity,
-                        entity.getEyePos(),
+                        entity, entity.getEyePos(),
                         entity.getEyePos().add(entity.getRotationVector().multiply(range)),
-                        box,
-                        EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR,
-                        range);
+                        box, EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR, range);
 
                 if (hitResult == null) continue;
                 Entity lookEntity = hitResult.getEntity();
@@ -452,10 +287,15 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
 
     @Override
     protected void playSummonSound() {
-        if (!shouldPlaySummonSound()) return;
+        if (shouldNotPlaySummonSound()) return;
 
         playSound(JSoundRegistry.TWOH_SUMMON, 1f, 1f);
         playSound(JSoundRegistry.TW_SUMMON, 1f, 1f);
+    }
+
+    @Override
+    protected @NonNull TheWorldOverHeavenEntity getThis() {
+        return this;
     }
 
     // Animation code
@@ -471,7 +311,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         OVERWRITE(builder -> builder.playAndHold("animation.twoh.overwrite")),
         THROW(builder -> builder.playAndHold("animation.twoh.throw")),
         AIR_KNIVES(builder -> builder.playAndHold("animation.twoh.airknives")),
-        TIMESKIP(builder -> builder.loop("animation.twoh.idle")),
+        TIME_SKIP(builder -> builder.loop("animation.twoh.idle")),
         LUNGE(builder -> builder.loop("animation.twoh.lunge"));
 
         private final Consumer<AnimationBuilder> animator;
@@ -481,7 +321,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         }
 
         @Override
-        public void playAnimation(TheWorldOverHeavenEntity stand, AnimationBuilder builder) {
+        public void playAnimation(TheWorldOverHeavenEntity attacker, AnimationBuilder builder) {
             animator.accept(builder);
         }
     }

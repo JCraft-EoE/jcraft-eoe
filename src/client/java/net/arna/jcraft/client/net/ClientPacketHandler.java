@@ -13,8 +13,7 @@ import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.JCraftClient;
 import net.arna.jcraft.client.gui.ServerConfigUI;
 import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
-import net.arna.jcraft.client.gui.hud.JCraftAbilityHud;
-import net.arna.jcraft.client.renderer.effects.AttackHitBoxEffectRenderer;
+import net.arna.jcraft.client.renderer.effects.AttackHitboxEffectRenderer;
 import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer;
 import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
 import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
@@ -23,7 +22,7 @@ import net.arna.jcraft.common.config.ConfigOption;
 import net.arna.jcraft.common.entity.stand.MadeInHeavenEntity;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
-import net.arna.jcraft.common.spec.JCraftSpec;
+import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.splatter.Splatter;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
@@ -47,11 +46,13 @@ import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.stream.IntStream;
 
 import static net.arna.jcraft.registry.JPacketRegistry.*;
 import static net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.registerGlobalReceiver;
@@ -72,6 +73,7 @@ public class ClientPacketHandler {
         register(S2C_COMBO_COUNTER, ClientPacketHandler::handleComboCounter);
         register(S2C_TIME_STOP, ClientPacketHandler::handleTimeStop);
         register(S2C_SPLATTER, ClientPacketHandler::handleSplatter);
+        register(S2C_STAND_HURT, ClientPacketHandler::handleStandHurt);
     }
 
     private static void handleTimeStop(@NotNull MinecraftClient client, PacketByteBuf buf) {
@@ -111,17 +113,14 @@ public class ClientPacketHandler {
         //JCraft.LOGGER.info("JCRAFT CLIENT:\nRecieving animation packet of animID: " + animID + " for entity ID: " + entID);
 
         int moveStun;
-        int attackID;
         float animationSpeed;
 
         if (isSpec) {
             moveStun = buf.readInt();
-            attackID = buf.readInt();
             animationSpeed = buf.readFloat();
             //JCraft.LOGGER.info("Animation packet is for specs, and has attached moveStun: " + moveStun + " and attackID: " + attackID);
         } else {
             moveStun = 0;
-            attackID = 0;
             animationSpeed = 0f;
         }
 
@@ -143,13 +142,12 @@ public class ClientPacketHandler {
 
                 // Synchronize spec values
                 if (isSpec) {
-                    JCraftSpec spec = JUtils.getSpec(player);
+                    JSpec<?, ?> spec = JUtils.getSpec(player);
                     if (spec == null) {
                         JCraft.LOGGER.error("Tried to set spec animation values on player without spec: " + player + ", in world " + client.world);
                     } else {
                         //JCraft.LOGGER.info("Spec: " + spec.getName());
                         spec.moveStun = moveStun;
-                        spec.attackID = attackID;
 
                         //JCraft.LOGGER.info("Speed: " + animationSpeed);
                         animationContainer.addModifierBefore(new SpeedModifier(animationSpeed));
@@ -169,16 +167,24 @@ public class ClientPacketHandler {
         switch (control) {
             // Attack hit boxes
             case (1) -> {
-                double x1 = buf.readDouble();
-                double y1 = buf.readDouble();
-                double z1 = buf.readDouble();
+                int count = buf.readVarInt();
 
-                double x2 = buf.readDouble();
-                double y2 = buf.readDouble();
-                double z2 = buf.readDouble();
+                List<Box> boxes = IntStream.range(0, count)
+                        .mapToObj(i -> {
+                            double minX = buf.readDouble();
+                            double minY = buf.readDouble();
+                            double minZ = buf.readDouble();
+
+                            double maxX = buf.readDouble();
+                            double maxY = buf.readDouble();
+                            double maxZ = buf.readDouble();
+
+                            return new Box(minX, minY, minZ, maxX, maxY, maxZ);
+                        })
+                        .toList();
 
                 // Run on render thread to avoid concurrency issues.
-                RenderSystem.recordRenderCall(() -> AttackHitBoxEffectRenderer.addHitBox(new Box(x1, y1, z1, x2, y2, z2)));
+                RenderSystem.recordRenderCall(() -> AttackHitboxEffectRenderer.addHitboxes(boxes));
             }
 
             // Time erase trackers
@@ -288,11 +294,9 @@ public class ClientPacketHandler {
                 double x = buf.readDouble();
                 double y = buf.readDouble();
                 double z = buf.readDouble();
-                int id = buf.readInt();
+                JParticleType particleType = buf.readEnumConstant(JParticleType.class);
 
-                client.execute(() -> client.world.addParticle(
-                        JParticleTypeRegistry.particles.get(id), true,
-                        x, y, z,
+                client.execute(() -> client.world.addParticle(particleType.getParticleType(), true, x, y, z,
                         0, 0, 0));
             }
 
@@ -531,9 +535,25 @@ public class ClientPacketHandler {
         Splatter splatter = JUtils.getSplatterManager(world).readSplatter(buf);
 
         long ageMs = splatter.getType().getMaxAge() * 50L;
-        AttackHitBoxEffectRenderer.addHitBox(splatter.getMainBox(), ageMs, true);
+        AttackHitboxEffectRenderer.addHitbox(splatter.getMainBox(), ageMs, true);
         splatter.getSections().stream()
                 .filter(section -> !section.isRemoved())
-                .forEach(section -> AttackHitBoxEffectRenderer.addHitBox(section.getHitBox(), ageMs, true));
+                .forEach(section -> AttackHitboxEffectRenderer.addHitbox(section.getHitBox(), ageMs, true));
+    }
+
+    private static void handleStandHurt(MinecraftClient client, PacketByteBuf buf) {
+        int entityId = buf.readVarInt();
+        client.execute(() -> {
+            if (client.world == null) return;
+
+            Entity entity = client.world.getEntityById(entityId);
+            if (!(entity instanceof LivingEntity living)) return;
+
+            // LivingEntity#handleStatus(byte) case 2, but without the sound
+            living.limbDistance = 1.5f;
+            living.timeUntilRegen = 20;
+            living.hurtTime = living.maxHurtTime = 10;
+            living.knockbackVelocity = 0f;
+        });
     }
 }

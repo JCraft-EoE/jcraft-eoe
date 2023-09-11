@@ -44,7 +44,7 @@ public class ShaderActivationPacket {
 
         @Override
         public String asString() {
-            return this == ZA_WARUDO ? ZA_WARUDO.name : this == CRIMSON ? CRIMSON.name : NONE.name;
+            return name;
         }
 
         public String getName() {

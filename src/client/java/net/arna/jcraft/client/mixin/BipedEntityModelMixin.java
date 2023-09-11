@@ -49,7 +49,7 @@ public abstract class BipedEntityModelMixin<T extends LivingEntity> {
 
     @Inject(method = "setAngles(Lnet/minecraft/entity/LivingEntity;FFFFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/ModelPart;copyTransform(Lnet/minecraft/client/model/ModelPart;)V", shift = At.Shift.BEFORE))
     public void jcraft$setAngles(T livingEntity, float f, float g, float h, float i, float j, CallbackInfo info) {
-        if (livingEntity.isHolding(JObjectRegistry.FVREVOLVER))
+        if (livingEntity.isHolding(JObjectRegistry.FV_REVOLVER))
             CrossbowPosing.hold(rightArm, leftArm, head, livingEntity.getMainArm() == Arm.RIGHT);
 
         if (livingEntity.getPose() == EntityPose.STANDING && livingEntity.getFirstPassenger() instanceof StandEntity<?, ?> stand) {

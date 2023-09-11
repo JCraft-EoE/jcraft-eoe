@@ -2,8 +2,8 @@ package net.arna.jcraft.client.mixin;
 
 import net.arna.jcraft.client.renderer.entity.PlayerCloneRenderer;
 import net.arna.jcraft.client.rendering.CloneSkinTracker;
+import net.arna.jcraft.client.util.JClientUtils;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
-import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.render.Frustum;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.EntityRenderer;
@@ -32,7 +32,7 @@ public abstract class EntityRenderDispatcherMixin {
     private <E extends Entity> void jcraft$shouldRender(E entity, Frustum frustum, double x, double y, double z, CallbackInfoReturnable<Boolean> cir) {
         Entity e = entity;
         do {
-            if (JUtils.shouldForceRender(e)) {
+            if (JClientUtils.shouldForceRender(e)) {
                 cir.setReturnValue(true);
                 return;
             }
@@ -43,7 +43,7 @@ public abstract class EntityRenderDispatcherMixin {
                 return;
             }
 
-            if (JUtils.shouldNotRender(e)) {
+            if (JClientUtils.shouldNotRender(e)) {
                 cir.setReturnValue(false);
                 return;
             }
