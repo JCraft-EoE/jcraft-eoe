@@ -1,6 +1,7 @@
 package net.arna.jcraft.client.renderer.entity;
 
 import net.arna.jcraft.client.rendering.CloneSkinTracker;
+import net.arna.jcraft.client.util.PlayerCloneClientPlayerEntity;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -41,7 +42,9 @@ public class PlayerCloneRenderer extends BipedEntityRenderer<PlayerCloneEntity, 
 
     @Override
     public void render(PlayerCloneEntity clone, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
-        parent.render(CloneSkinTracker.toPlayer(clone), f, g, matrixStack, vertexConsumerProvider, i);
+        PlayerCloneClientPlayerEntity clonePlayer = CloneSkinTracker.toPlayer(clone);
+        if (clonePlayer == null) return;
+        parent.render(clonePlayer, f, g, matrixStack, vertexConsumerProvider, i);
     }
 }
 

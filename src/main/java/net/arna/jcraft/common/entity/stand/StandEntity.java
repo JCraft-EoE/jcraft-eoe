@@ -147,6 +147,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     private final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
     protected int summonAnimDuration = 19;
     private boolean playSummonAnim = true;
+    @Setter
+    private boolean playSummonSound = true;
+    @Setter
+    private boolean playDesummonSound = true;
 
     protected StandEntity(StandType type, World world) {
         this(type, world, null, true);
@@ -683,7 +687,12 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     // Define desummon conditions
     public void desummon() {
+        desummon(true);
+    }
+
+    public void desummon(boolean playSound) {
         if (curMove != null || getMoveStun() > 0) return;
+        playDesummonSound = playSound;
         discard();
     }
 
@@ -1072,7 +1081,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     }
 
     protected boolean shouldNotPlaySummonSound() {
-        return user instanceof ArmorStandEntity;
+        return user instanceof ArmorStandEntity || !playSummonSound;
     }
 
     protected void playSummonSound() {
@@ -1090,7 +1099,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         super.stopRiding();
         if (isRemote() || world.isClient) return;
 
-        playSound(JSoundRegistry.STAND_DESUMMON, 1, 1);
+        if (playDesummonSound) playSound(JSoundRegistry.STAND_DESUMMON, 1, 1);
         discard();
     }
 

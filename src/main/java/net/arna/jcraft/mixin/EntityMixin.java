@@ -7,6 +7,7 @@ import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
@@ -61,4 +62,15 @@ public abstract class EntityMixin {
             cir.setReturnValue(false);
     }
     //todo (polishing): stand position autosolver
+
+    @SuppressWarnings("ConstantValue")
+    @Inject(method = "moveToWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;copyFrom(Lnet/minecraft/entity/Entity;)V"))
+    private void doNotPlayDesummonSoundWhenMovingWorld(ServerWorld destination, CallbackInfoReturnable<Entity> cir) {
+        if (!((Object) this instanceof LivingEntity living)) return;
+
+        StandEntity<?, ?> stand = JUtils.getStand(living);
+        if (stand == null) return;
+
+        stand.setPlayDesummonSound(false);
+    }
 }

@@ -30,6 +30,7 @@ public class CloneSkinTracker {
     }
 
     public static PlayerCloneClientPlayerEntity toPlayer(PlayerCloneEntity clone) {
+        if (clone.getGameProfile() == null) return null;
         PlayerCloneClientPlayerEntity clonePlayer = playerCache.computeIfAbsent(clone, PlayerCloneClientPlayerEntity::new);
         clonePlayer.updateData();
         return clonePlayer;
