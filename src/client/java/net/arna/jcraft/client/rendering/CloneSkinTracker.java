@@ -21,12 +21,12 @@ public class CloneSkinTracker {
     public static Identifier getSkinFor(PlayerCloneEntity clone, MinecraftProfileTexture.Type type) {
         if (!skinCache.containsKey(clone)) load(clone);
         Identifier skin = skinCache.getOrDefault(clone, Collections.emptyMap()).get(type);
-        return skin == null ? DefaultSkinHelper.getTexture(clone.getMasterId()) : skin;
+        return skin == null && type == MinecraftProfileTexture.Type.SKIN ? DefaultSkinHelper.getTexture(clone.getMasterId()) : skin;
     }
 
     public static String getModelFor(PlayerCloneEntity clone) {
         if (!skinCache.containsKey(clone)) load(clone);
-        return modelCache.getOrDefault(clone, DefaultSkinHelper.getModel(clone.getMasterId()));
+        return modelCache.getOrDefault(clone, clone.getMasterId() == null ? "default" : DefaultSkinHelper.getModel(clone.getMasterId()));
     }
 
     public static PlayerCloneClientPlayerEntity toPlayer(PlayerCloneEntity clone) {
