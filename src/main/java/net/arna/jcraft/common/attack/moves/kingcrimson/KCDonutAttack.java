@@ -15,6 +15,7 @@ public class KCDonutAttack extends AbstractSimpleAttack<KCDonutAttack, KingCrims
 
     @Override
     protected void processTarget(KingCrimsonEntity attacker, LivingEntity target, Vec3d kbVec, DamageSource damageSource) {
+        super.processTarget(attacker, target, kbVec, damageSource);
         Vec3d pos = attacker.getPos().add(attacker.getRotationVector().multiply(1.5));
         target.teleport(pos.x, target.getY(), pos.z);
     }
