@@ -35,12 +35,12 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             .withSound(JSoundRegistry.D4C_LIGHT)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withInfo(Text.literal("Chop"), Text.literal("quick combo starter"));
-    public static final BarrageAttack<D4CEntity> BARRAGE = new BarrageAttack<D4CEntity>(340, 0, 70,
+    public static final BarrageAttack<D4CEntity> BARRAGE = new BarrageAttack<D4CEntity>(240, 0, 70,
             0.75f, 0.8f, 30, 2f, 0.25f, 0f, 3)
             .withSound(JSoundRegistry.D4C_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
-    public static final SimpleAttack<D4CEntity> CHARGE = new SimpleAttack<D4CEntity>(300, 14, 25,
+    public static final SimpleAttack<D4CEntity> CHARGE = new SimpleAttack<D4CEntity>(200, 14, 25,
             1f, 8f, 12, 2f, 1.5f, -0.2f)
             .withInitAction(D4CEntity::doCharge)
             .withSound(JSoundRegistry.D4C_HEAVY)
@@ -54,7 +54,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             .withSound(JSoundRegistry.D4C_DIMHOP)
             .withInfo(Text.literal("Dimensional Hop"), Text.literal("travels to a random dimension at exact coordinates, " +
                     "if user was hit in the last 30s, he is forced back, certified death button"));
-    public static final GiveGunMove GIVE_GUN = new GiveGunMove(500, 10, 14, 0.75f)
+    public static final GiveGunMove GIVE_GUN = new GiveGunMove(280, 10, 14, 0.75f)
             .withSound(JSoundRegistry.D4C_THROW)
             .withInitAction(D4CEntity::equipRevolver)
             .withInfo(Text.literal("Summon Gun"), Text.literal("gives the user a revolver"));
@@ -72,19 +72,19 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             .withStunType(StunType.UNBURSTABLE)
             .withFinisher(17, GRAB_HIT_FINAL)
             .withInfo(Text.literal("Grab (Final Hit)"), Text.empty());
-    public static final D4CGrabAttack GRAB = new D4CGrabAttack(400, 12, 21, 0.75f,
+    public static final D4CGrabAttack GRAB = new D4CGrabAttack(280, 12, 21, 0.75f,
             0f, 40, 1.5f, 0f, 0f, GRAB_HIT, State.THROW_HIT)
             .withCrouchingVariant(GIVE_GUN)
             .withSound(JSoundRegistry.D4C_THROW)
             .withInitAction(D4CEntity::equipRevolver)
             .withInfo(Text.literal("Grab"), Text.literal("unblockable, combo finisher"));
-    public static final D4CCounterAttack COUNTER = new D4CCounterAttack(600, 5, 35, 0.75f)
+    public static final D4CCounterAttack COUNTER = new D4CCounterAttack(400, 5, 35, 0.75f)
             .withInfo(Text.literal("Counter"), Text.literal("0.25s startup, 1.5s duration, high damage, knocks back when hit"));
     //todo: make them spawn without weapons unless you are crouching
-    public static final CloneSpawnMove CLONE_SPAWN = new CloneSpawnMove(800, 40, 50, 1f)
+    public static final CloneSpawnMove CLONE_SPAWN = new CloneSpawnMove(400, 40, 50, 1f)
             .withSound(JSoundRegistry.D4C_DIMHOP)
             .withInfo(Text.literal("Dimensional Clone"), Text.literal("summons an unlimited number of servants"));
-    public static final FlagMove FLAG = new FlagMove(400, 10, 60, 0f)
+    public static final FlagMove FLAG = new FlagMove(280, 10, 60, 0f)
             .withSound(JSoundRegistry.D4C_UTILITY)
             .withInfo(Text.literal("Dimensional Phase"), Text.literal("hides in a flag in an un-stunnable, floating state"));
 

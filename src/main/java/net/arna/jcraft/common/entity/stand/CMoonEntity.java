@@ -50,13 +50,13 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withTargetProcessor(CMoonEntity::addInversion)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
-    public static final BarrageAttack<CMoonEntity> BARRAGE = new BarrageAttack<CMoonEntity>(340, 0, 50,
+    public static final BarrageAttack<CMoonEntity> BARRAGE = new BarrageAttack<CMoonEntity>(280, 0, 50,
             0.75f, 0.75f, 20, 2f, 0.25f, 0f, 4)
             .withSound(JSoundRegistry.CMOON_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withTargetProcessor(CMoonEntity::addBarrageInversion)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, medium stun"));
-    public static final SimpleAttack<CMoonEntity> GUT_PUNCH = new SimpleAttack<CMoonEntity>(340, 19, 30,
+    public static final SimpleAttack<CMoonEntity> GUT_PUNCH = new SimpleAttack<CMoonEntity>(200, 19, 30,
             1f, 8f, 10, 2f, 1.5f, 0f)
             .withSound(JSoundRegistry.CMOON_DONUT)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
@@ -66,13 +66,13 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             .withLaunch()
             .withExtraHitBox(0, 0.25, 1.25)
             .withInfo(Text.literal("Gut Punch"), Text.literal("slow, uninterruptible combo finisher"));
-    public static final LaunchAttack LAUNCH = new LaunchAttack(440, 14, 21, 0.75f,
+    public static final LaunchAttack LAUNCH = new LaunchAttack(260, 14, 21, 0.75f,
             5f, 19, 1.75f, 0.9f, 0.3f)
             .withSound(JSoundRegistry.CMOON_GROUNDSHOOT)
             .withImpactSound(JSoundRegistry.IMPACT_5)
             .withTargetProcessor(CMoonEntity::addInversion)
             .withInfo(Text.literal("Block Launch"), Text.literal("lifts a block from the ground and launches it at a delay/crouching and using this button resets the delay on nearby blocks"));
-    public static final GravPunchAttack GRAV_PUNCH = new GravPunchAttack(480, 20, 32, 1f,
+    public static final GravPunchAttack GRAV_PUNCH = new GravPunchAttack(300, 20, 32, 1f,
             8f, 45, 1.75f, 0.35f, -0.3f)
             .withSound(JSoundRegistry.CMOON_GRAV_PUNCH)
             .withImpactSound(JSoundRegistry.CMOON_GRAV_PUNCH_HIT)
@@ -81,7 +81,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withExtraHitBox(1d)
             .withInfo(Text.literal("Only One Punch"), Text.literal("floats enemy on hit, high stun"));
-    public static final GroundSlamAttack GROUND_SLAM = new GroundSlamAttack(460, 10, 18,
+    public static final GroundSlamAttack GROUND_SLAM = new GroundSlamAttack(240, 10, 18,
             1f, 7f,  17, 3f, 0.2f, 1.4f)
             .withSound(JSoundRegistry.CMOON_GROUNDSLAM)
             .withImpactSound(JSoundRegistry.IMPACT_10)

@@ -33,7 +33,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
             .withImpactSound(JSoundRegistry.IMPACT_6)
             .withInfo(Text.literal("Low Punch"), Text.literal("frametrap tool, low stun"));
     public static final DetonateAttack DETONATE = new DetonateAttack(20, 5, 6, 1f)
-            .withInfo(Text.literal("Detonate"), Text.literal("slight windup"));
+            .withInfo(Text.literal("Detonate"), Text.literal("tiny windup, move queueing is disabled while Detonate is active"));
     public static final SimpleMultiHitAttack<AbstractKillerQueenEntity<?, ?>> LIGHT = SimpleMultiHitAttack.<AbstractKillerQueenEntity<?, ?>>lightAttack(
             19, 0.75f, 3f, 20, 0, IntSet.of(6, 11))
             .withImpactSound(JSoundRegistry.IMPACT_4)
@@ -41,15 +41,15 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
             .withFollowup(LOW)
             .withInfo(Text.literal("Dual Punch"), Text.literal("combo starter, decent speed, has followup with more blockstun"));
     public static final BarrageAttack<AbstractKillerQueenEntity<?, ?>> BARRAGE = new BarrageAttack<AbstractKillerQueenEntity<?, ?>>(
-            340, 0, 50, 0.75f, 1f, 20, 1.5f, 0.1f, 0, 3)
+            240, 0, 50, 0.75f, 1f, 20, 1.5f, 0.1f, 0, 3)
             .withSound(JSoundRegistry.KQ_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, medium stun"));
-    public static final BombPlantAttack BOMB_PLANT = new BombPlantAttack(600, 12, 20, 1f, 9, 1.5f, 0f)
+    public static final BombPlantAttack BOMB_PLANT = new BombPlantAttack(280, 12, 20, 1f, 9, 1.5f, 0f)
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withBlockStun(8)
             .withInfo(Text.literal("Bomb Plant"), Text.literal("crouch to plant on the ground below you, stealthily"));
-    public static final ExplosiveDashAttack EXPLOSIVE_DASH = new ExplosiveDashAttack(360);
+    public static final ExplosiveDashAttack EXPLOSIVE_DASH = new ExplosiveDashAttack(240);
 
     protected ItemEntity coin;
     protected Entity bombEntity;
@@ -142,7 +142,10 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
     public void tick() {
         super.tick();
 
-        if (hasUser()) BOMB_PLANT.tickBomb(this);
+        if (hasUser()) {
+            BOMB_PLANT.tickBomb(this);
+            if (getCurrentMove() instanceof DetonateAttack) queuedAttack = null;
+        }
     }
 
     // Animation code

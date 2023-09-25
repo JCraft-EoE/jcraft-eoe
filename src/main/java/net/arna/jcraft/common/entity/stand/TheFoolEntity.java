@@ -55,16 +55,16 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withExtraHitBox(0, 0.25, 1)
             .withCrouchingVariant(DRILL)
             .withInfo(Text.literal("Swipe"), Text.literal("slow, long-reaching poke"));
-    public static final AirBarrageAttack AIR_BARRAGE = new AirBarrageAttack(340, 0, 30,
+    public static final AirBarrageAttack AIR_BARRAGE = new AirBarrageAttack(240, 0, 30,
             1f, 1f, 10, 2f, 0.1f, 0f, 3)
             .withInfo(Text.literal("Burn Rubber"), Text.literal("slows down all movement, combo starter/extender"));
-    public static final TFComboAttack COMBO = new TFComboAttack(300, 29, 1.5f, 4.5f,
+    public static final TFComboAttack COMBO = new TFComboAttack(200, 29, 1.5f, 4.5f,
             20, 1.75f, 0.1f, -0.1f, IntSet.of(6, 14, 18, 19))
             .withAerialVariant(AIR_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withExtraHitBox(0.5, 0, 1.25)
             .withInfo(Text.literal("3-hit Combo"), Text.literal("fst knockdown provider"));
-    public static final EffectInflictingAttack<TheFoolEntity> LAUNCH = new EffectInflictingAttack<TheFoolEntity>(320,
+    public static final EffectInflictingAttack<TheFoolEntity> LAUNCH = new EffectInflictingAttack<TheFoolEntity>(240,
             16, 20, 1.25f, 8f, 25, 2f, 0.5f, -0.3f,
             List.of(new StatusEffectInstance(StatusEffects.LEVITATION, 5, 19, true, false)))
             .withSound(JSoundRegistry.FOOL_LAUNCH)
@@ -88,22 +88,22 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
                     SPECIAL 1 - no sand
                     SPECIAL 2 - semicircle
                     SPECIAL 3 - diagonal pattern (influenced by where the user is looking)"""));
-    public static final SandCloneMove SAND_CLONE = new SandCloneMove(600, 7, 11, 1f)
+    public static final SandCloneMove SAND_CLONE = new SandCloneMove(300, 7, 11, 1f)
             .withSound(SoundEvents.BLOCK_SAND_PLACE)
             .withInfo(Text.literal("Sand Manipulation"), Text.literal("creates a blinding sand cloud, then a clone or (if crouching) circles of sand"));
-    public static final GlideMove GLIDE = new GlideMove(540, 5, 85, 0f)
+    public static final GlideMove GLIDE = new GlideMove(300, 5, 85, 0f)
             .withSound(JSoundRegistry.FOOL_GLIDE)
             .withInfo(Text.literal("Glider"), Text.literal("turns The Fool into a glider"));
-    public static final SandWaveAttack SAND_WAVE = new SandWaveAttack(540, 0, 80, 0f,
+    public static final SandWaveAttack SAND_WAVE = new SandWaveAttack(340, 0, 80, 0f,
             1f, 0, 2f, 0.1f, 0f, 3)
             .withAerialVariant(GLIDE)
             .withBackstab(false)
             .withInfo(Text.literal("Sandwave"), Text.literal("The Fool turns into a quick sandwave that knocks anything it touches down"));
     //todo: sand tornado tracking (projectile-only code)
-    public static final SandTornadoMove SAND_TORNADO = new SandTornadoMove(500, 12, 13, 1f)
+    public static final SandTornadoMove SAND_TORNADO = new SandTornadoMove(280, 12, 13, 1f)
             .withSound(JSoundRegistry.FOOL_LAUNCH)
             .withInfo(Text.literal("Sand Tornado"), Text.literal("summons a slow, stunning sand tornado"));
-    public static final TFChargeAttack CHARGE = new TFChargeAttack(400, 5, 20, 7f,
+    public static final TFChargeAttack CHARGE = new TFChargeAttack(260, 5, 20, 7f,
             6f, 10, 1.5f, 1.2f, 0f, State.CHARGE_HIT)
             .withSound(JSoundRegistry.FOOL_CHARGE)
             .withImpactSound(JSoundRegistry.IMPACT_2)

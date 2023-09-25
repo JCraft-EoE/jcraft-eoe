@@ -12,7 +12,7 @@ import java.util.List;
 public abstract sealed class AbstractStarPlatinumEntity<E extends AbstractStarPlatinumEntity<E, S>, S extends Enum<S> & StandAnimationState<E>> extends StandEntity<E, S>
         permits StarPlatinumEntity, SPTWEntity {
     public static final SimpleAttack<AbstractStarPlatinumEntity<?, ?>> STAR_BREAKER = new SimpleAttack<AbstractStarPlatinumEntity<?, ?>>(
-            180, 20, 30, 1f, 10f, 14, 2f, 1.5f, 0f)
+            200, 20, 30, 1f, 10f, 14, 2f, 1.5f, 0f)
             .withSound(JSoundRegistry.STAR_BREAKER)
             .withImpactSound(JSoundRegistry.IMPACT_8)
             .withHitSpark(JParticleType.HIT_SPARK_2)

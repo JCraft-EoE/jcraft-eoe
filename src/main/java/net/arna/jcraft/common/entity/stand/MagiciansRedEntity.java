@@ -30,12 +30,12 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             .withCrouchingVariant(REDIRECT)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
-    public static final KnockdownAttack<MagiciansRedEntity> HEAVY = new KnockdownAttack<MagiciansRedEntity>(280,
+    public static final KnockdownAttack<MagiciansRedEntity> HEAVY = new KnockdownAttack<MagiciansRedEntity>(160,
             12, 22, 1f, 7f, 10, 1.75f, 0.5f, 0.6f, 40)
             .withSound(JSoundRegistry.MR_HEAVY)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withInfo(Text.literal("Low Kick"), Text.literal("medium windup knockdown"));
-    public static final FlamethrowerAttack FLAMETHROWER = new FlamethrowerAttack(340, 0, 60,
+    public static final FlamethrowerAttack FLAMETHROWER = new FlamethrowerAttack(300, 0, 60,
             0.75f, 0.4f, 0, 2, 0.25f, 0, 3)
             .withArmor(1)
             .withSound(JSoundRegistry.MR_BARRAGE)
@@ -46,14 +46,14 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
     public static final CrossfireVariationAttack CROSSFIRE_VARIATION = new CrossfireVariationAttack(600, 12, 17, 0.75f)
             .withSound(JSoundRegistry.MR_CROSSFIRE)
             .withInfo(Text.literal("Crossfire Variation"), Text.literal("summons 6 ankhs that orbit around the user, crouch to increase orbit distance"));
-    public static final CrossfireHurricaneAttack CROSSFIRE_HURRICANE = new CrossfireHurricaneAttack(1200, 18, 22, 0.75f)
+    public static final CrossfireHurricaneAttack CROSSFIRE_HURRICANE = new CrossfireHurricaneAttack(800, 18, 22, 0.75f)
             .withSound(JSoundRegistry.MR_ULT)
             .withInfo(Text.literal("Crossfire Hurricane"), Text.literal("summons slow, homing fire hurricane that knocks down, lasts for 3 seconds after hitting anything"));
-    public static final RedBindAttack RED_BIND = new RedBindAttack(400, 12, 22, 0.75f, 3, 15, 1.5f, 0, 0)
+    public static final RedBindAttack RED_BIND = new RedBindAttack(300, 12, 22, 0.75f, 3, 15, 1.5f, 0, 0)
             .withSound(JSoundRegistry.MR_REDBIND)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withInfo(Text.literal("Red Bind"), Text.literal("on hit, wraps opponent in fiery rings that launch them in the direction they are hit"));
-    public static final LifeDetectorAttack LIFE_DETECTOR = new LifeDetectorAttack(500, 13, 20, 0.75f)
+    public static final LifeDetectorAttack LIFE_DETECTOR = new LifeDetectorAttack(280, 13, 20, 0.75f)
             .withSound(JSoundRegistry.MR_DETECTOR)
             .withInfo(Text.literal("Life Detector"), Text.literal("tracks down nearby life, lasts 15s"));
 

@@ -171,7 +171,7 @@ public final class JUtils {
 
         Vec3d blockPos = bHit.getPos();
 
-        if (entityHit) {
+        if (entityHit && !eHit.getEntity().isConnectedThroughVehicle(entity)) {
             Vec3d entityPos = eHit.getPos();
             if (blockPos.squaredDistanceTo(start) > entityPos.squaredDistanceTo(start))
                 return entityPos;

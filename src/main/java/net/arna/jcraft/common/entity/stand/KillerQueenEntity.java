@@ -26,7 +26,7 @@ import java.util.function.Consumer;
 
 public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQueenEntity, KillerQueenEntity.State> {
     public static final SimpleAttack<KillerQueenEntity> HEAVY = new SimpleAttack<KillerQueenEntity>(
-            240, 16, 24, 0.75f, 9f, 10, 2f, 1.75f, 0f)
+            200, 16, 24, 0.75f, 9f, 10, 2f, 1.75f, 0f)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withSound(JSoundRegistry.KQ_UPPERCUT)
             .withSound(JSoundRegistry.KQ_HEAVY)
@@ -39,10 +39,10 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
             .withInfo(Text.literal("Sheer Heart Attack"), Text.literal("creates an automatic, heat-seeking sub-stand that explodes on contact, reflects 25% damage back to owner"));
     public static final KQGrabHitAttack GRAB_HIT = new KQGrabHitAttack(0, 13, 20, 1f, 2)
             .withInfo(Text.literal("Grab (hit)"), Text.empty());
-    public static final KQGrabAttack GRAB = new KQGrabAttack(440, 12, 20, 0.75f,
+    public static final KQGrabAttack GRAB = new KQGrabAttack(300, 12, 20, 0.75f,
             0f, 20, 1.75f, 0.1f, 0f, GRAB_HIT, State.GRAB_HIT)
             .withInfo(Text.literal("Grab"), Text.literal("grabs opponent by the face, then detonates them, launching them upwards"));
-    public static final CoinTossAttack COIN_TOSS = new CoinTossAttack(500);
+    public static final CoinTossAttack COIN_TOSS = new CoinTossAttack(240);
 
     public KillerQueenEntity(World worldIn) {
         super(StandType.KILLER_QUEEN, worldIn, null);

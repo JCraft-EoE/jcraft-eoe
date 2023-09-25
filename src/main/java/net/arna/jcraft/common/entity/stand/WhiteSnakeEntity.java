@@ -27,23 +27,23 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEntity.State> {
-    public static final SimpleAttack<WhiteSnakeEntity> LIGHT = SimpleAttack.<WhiteSnakeEntity>lightAttack(7,
-                    14, 5f, 12, 0.75f, 0.75f, 0.2f)
+    public static final SimpleAttack<WhiteSnakeEntity> LIGHT = SimpleAttack.<WhiteSnakeEntity>lightAttack(
+            7, 14, 5f, 12, 0.75f, 0.75f, 0.2f)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
-    public static final SimpleAttack<WhiteSnakeEntity> DONUT = new SimpleAttack<WhiteSnakeEntity>(280,
-            17, 36, 1, 10, 28, 2, 0, 0)
+    public static final SimpleAttack<WhiteSnakeEntity> DONUT = new SimpleAttack<WhiteSnakeEntity>(
+            200, 17, 36, 1, 10, 28, 2, 0, 0)
             .withSound(JSoundRegistry.WS_DONUT)
             .withImpactSound(JSoundRegistry.TW_DONUT_HIT)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Donut"), Text.literal("slow combo starter/extender"));
     public static final BarrageAttack<WhiteSnakeEntity> BARRAGE = new BarrageAttack<WhiteSnakeEntity>(
-            340, 0, 60, 0.75f, 1, 20, 2, 0.25f, 0, 3)
+            240, 0, 60, 0.75f, 1, 20, 2, 0.25f, 0, 3)
             .withSound(JSoundRegistry.WS_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, medium stun"));
     public static final EffectInflictingAttack<WhiteSnakeEntity> STAND_DISC = new EffectInflictingAttack<WhiteSnakeEntity>(
-            600, 22, 34, 1, 8f, 20, 2, 0, 0,
+            480, 22, 34, 1, 8f, 20, 2, 0, 0,
             List.of(new StatusEffectInstance(JStatusRegistry.STANDLESS, 160, 0)))
             .withSound(JSoundRegistry.WS_STAND_DISC)
             .withImpactSound(JSoundRegistry.IMPACT_2)
@@ -51,14 +51,14 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withHyperArmor()
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withInfo(Text.literal("Stand Disk"), Text.literal("uninterruptible, removes enemy stand for 8s"));
-    public static final SimpleAttack<WhiteSnakeEntity> LEG_CRUSHER = new SimpleAttack<WhiteSnakeEntity>(400,
-            16, 22, 0.75f, 7, 32, 1.75f, 0.25f, 0.2f)
+    public static final SimpleAttack<WhiteSnakeEntity> LEG_CRUSHER = new SimpleAttack<WhiteSnakeEntity>(
+            240, 16, 22, 0.75f, 7, 32, 1.75f, 0.25f, 0.2f)
             .withSound(JSoundRegistry.WS_LEGCRUSH)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Leg Crusher"), Text.literal("high stun, medium windup"));
     public static final EffectInflictingAttack<WhiteSnakeEntity> MEMORY_DISC = new EffectInflictingAttack<WhiteSnakeEntity>(
-            600, 22, 34, 1, 7f, 20, 2, 0, 0,
+            280, 22, 34, 1, 7f, 20, 2, 0, 0,
             List.of(
                     new StatusEffectInstance(StatusEffects.WEAKNESS, 600, 0),
                     new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 600, 0)
@@ -69,17 +69,17 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withHyperArmor()
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withInfo(Text.literal("Memory Disk"), Text.literal("uninterruptible, mining fatigue & weakness for 30s"));
-    public static final ChargedSpewAttack CHARGED_SPEW = new ChargedSpewAttack(600, 20, 26,
-            0.75f, 0f, 0, 2f, 0f, 0f)
+    public static final ChargedSpewAttack CHARGED_SPEW = new ChargedSpewAttack(
+            200, 20, 26, 0.75f, 0f, 0, 2f, 0f, 0f)
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withInfo(Text.literal("Poison Spew"), Text.literal("fires an acid projectile that slows enemies and persists on the surface it hits for 5s"));
-    public static final PoisonSpewAttack POISON_SPEW = new PoisonSpewAttack(400, 10, 14,
-            0.75f, 0f, 0, 2f, 0f, 0f)
+    public static final PoisonSpewAttack POISON_SPEW = new PoisonSpewAttack(
+            200, 10, 14, 0.75f, 0f, 0, 2f, 0f, 0f)
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withCrouchingVariant(CHARGED_SPEW)
             .withInfo(Text.literal("Poison Spew"), Text.literal("fires an acid projectile that slows enemies and persists on the surface it hits for 5s"));
-    public static final MeltYourHeartAttack MELT_YOUR_HEART = new MeltYourHeartAttack(800, 40, 50,
-            1f, 3f, 20, 2f, 1f, 0f)
+    public static final MeltYourHeartAttack MELT_YOUR_HEART = new MeltYourHeartAttack(
+            800, 40, 50, 1f, 3f, 20, 2f, 1f, 0f)
             .withSound(JSoundRegistry.WS_MYH)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withHyperArmor()

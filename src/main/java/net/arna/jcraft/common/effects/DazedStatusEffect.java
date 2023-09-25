@@ -37,7 +37,7 @@ public class DazedStatusEffect extends StatusEffect {
     // 1 - Hitstun, combo breakable
     // 2 - Blocking, not combo breakable
     // 3 - Launch, not combo breakable
-    // 4 - ???, no movement penalty, combo breakable
+    // 4 - Winded, small movement penalty, combo breakable
     @Override
     public void applyUpdateEffect(LivingEntity entity, int amplifier) {
         Vec3d eVel = entity.getVelocity();
@@ -60,6 +60,7 @@ public class DazedStatusEffect extends StatusEffect {
     public double adjustModifierAmount(int amplifier, EntityAttributeModifier modifier) {
         if (Objects.equals(modifier.getId(), slowUUID)) return switch (amplifier) {
             case 3, 1, 0 -> -1;
+            case 4 -> -0.25;
             default -> 0;
         };
 

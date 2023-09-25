@@ -30,19 +30,19 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQBTDEntity.State> {
-    public static final ElbowAttack ELBOW = new ElbowAttack(240, 5, 9, 0.75f,
+    public static final ElbowAttack ELBOW = new ElbowAttack(180, 5, 9, 0.75f,
             7.5f, 10, 1f, 1.1f, 0f)
             .withSound(JSoundRegistry.KQBTD_ELBOW)
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withInfo(Text.literal("Elbow"), Text.literal("fast, short-range knockback"));
-    public static final BarrageAttack<KQBTDEntity> BARRAGE = new BarrageAttack<KQBTDEntity>(340, 0, 50,
+    public static final BarrageAttack<KQBTDEntity> BARRAGE = new BarrageAttack<KQBTDEntity>(240, 0, 50,
             0.75f, 1f, 20, 1.5f, 0.1f, 0, 3)
             .withSound(JSoundRegistry.KQ_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, medium stun"));
-    public static final BubbleCounterAttack BUBBLE_COUNTER = new BubbleCounterAttack(540, 5, 20, 1f)
+    public static final BubbleCounterAttack BUBBLE_COUNTER = new BubbleCounterAttack(480, 5, 20, 1f)
             .withInfo(Text.literal("Stray Cat Counter"), Text.literal("0.25s windup counter, turns opponent into your primary bomb"));
-    public static final BubbleAttack BUBBLE = new BubbleAttack(460, 15, 18, 0.75f)
+    public static final BubbleAttack BUBBLE = new BubbleAttack(320, 15, 18, 0.75f)
             .withCrouchingVariant(BUBBLE_COUNTER)
             .withSound(JSoundRegistry.KQ_UPPERCUT)
             .withInfo(Text.literal("Stray Cat Bubble"), Text.literal("launches an explosive bubble"));
@@ -58,7 +58,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withStunType(StunType.UNBURSTABLE)
             .withInfo(Text.literal("Takedown (hit)"), Text.empty());
-    public static final GrabAttack<KQBTDEntity, State> GRAB = new GrabAttack<>(440, 12, 28,
+    public static final GrabAttack<KQBTDEntity, State> GRAB = new GrabAttack<>(300, 12, 28,
             0.75f, 0f, 20, 1.75f, 0.1f, 0f, GRAB_HIT, State.GRAB_HIT)
             .withInfo(Text.literal("Takedown"), Text.literal("high damage grab"));
 

@@ -1717,6 +1717,131 @@ Star Platinum: The World
         >Cooldown reduced (17->9s)
         >Advantage on block reduced (+4->-1)
 
+● 24/9/2023
+>Winded stun now has 25% speed reduction (up from 0%)
+
+Star Platinum
+    >Star Breaker cooldown increased (9->10s)
+
+D4C
+    >Barrage cooldown reduced (17->12s)
+    >Charge cooldown reduced (15->10s)
+    >Grab/Summon gun cooldown reduced (20/25->14s)
+    >Counter cooldown reduced (30->20s)
+    >Dimensional Clone cooldown reduced (40->20s)
+    >Dimensional Phase cooldown reduced (20->14s)
+
+Cream
+    >Vertical Chop cooldown reduced (14->10s)
+    >Assault cooldown reduced (17->14s)
+    >Grab cooldown reduced (20->16s)
+    >Surprise cooldown reduced (20->15s)
+    >Destroy cooldown reduced (20->16s)
+
+    >(half ball) Swipe cooldown reduced (1.5->1s)
+    >Overhead Smash cooldown reduced (14->8s)
+    >Aerial Assault cooldown reduced (14->10s)
+    >Void Charge cooldown reduced (20->15s)
+
+Killer Queen
+    >Barrage cooldown reduced (17->12s)
+    >Haymaker cooldown reduced (12->10s)
+    >Bomb Plant cooldown reduced (30->14s)
+    >Explosive Dash cooldown reduced (19->12s)
+    >Grab cooldown reduced (22->15s)
+    >Coin Toss cooldown reduced (25->12s)
+
+Whitesnake
+    >Barrage cooldown reduced (17->12s)
+    >Donut cooldown reduced (14->10s)
+    >Memory Disc cooldown reduced (30->14s)
+    >Leg Crusher cooldown reduced (20->12s)
+    >Stand Disc cooldown reduced (30->24s)
+    >Poison Spew (both versions) cooldown reduced (20/30->10s)
+
+Silver Chariot
+    >Barrage cooldown reduced (17->12s)
+    >Impaling Thrust cooldown reduced (15->10s)
+    >Spinning Blade cooldown reduced (25->12s)
+    >Shooting Star cooldown reduced (18->14s)
+    BUG: SHOOTING STAR CANNOT BE AIMED IN 3D
+    >Cleave cooldown reduced (20->13s)
+    >Circle Slash cooldown reduced (17->13s)
+    >Counter cooldown reduced (32->24s)
+    >Ray Dart cooldown reduced (13->8s)
+
+Magician's Red
+    >Barrage cooldown reduced (17->15s)
+    >Sweep cooldown reduced (14->8s)
+    >Crossfire Hurricane cooldown reduced (60->40s)
+    >Red Bind cooldown reduced (20->15s)
+    >Life Detector cooldown reduced (25->14s)
+
+The Fool
+    >3-hit Combo cooldown reduced (15->10s)
+    >Burn Rubber cooldown reduced (17->12s)
+    >Launch cooldown reduced (16->12s)
+    >Sand Manipulation cooldown reduced (30->15s)
+    >Glide cooldown reduced (27->15s)
+    >Sandwave cooldown reduced (27->17s)
+    BUG: SANDWAVE IS INVISIBLE, NO PARTICLES
+    >Charge cooldown reduced (20->13s)
+    >Sand Tornado cooldown reduced (25->14s)
+
+Golden Experience
+    >Shoulder Smash cooldown reduced (14->10s)
+    >Rekka Series cooldown reduced (28->10s)
+    >Tree cooldown reduced (??->15s)
+    >Life Giver cooldown reduced (36->20s)
+
+C-Moon
+    >Barrage cooldown reduced (17->14s)
+    >Gut Punch cooldown reduced (17->10s)
+    >Only One Punch cooldown reduced (24->15s)
+    >Block Launch cooldown reduced (22->13s)
+    >Ground Slam cooldown reduced (23->12s)
+
+Made in Heaven
+    >Barrage cooldown reduced (17->10s)
+    >Roundabout Donut
+        >Cooldown reduced (23->10s)
+        >Blockstun reduced (+6->-2 on block)
+    >Leg Crusher cooldown reduced (16->4s)
+    >Fury Chop cooldown reduced (19->10s)
+    >Divine Severance cooldown reduced (33->15s)
+    >Heaven's Judgement cooldown reduced (40->20s)
+    >Speed Slice cooldown reduced (18->15s)
+
+The World: Over Heaven
+     >Barrage cooldown reduced (17->14s)
+     >Singularity cooldown reduced (19->13s)
+     >Evaporate cooldown reduced (21->15s)
+     >Reality Overwrite cooldown reduced (30->18s)
+     >Divine Finisher (both versions) cooldown reduced (19->14s)
+     >Timeskip cooldown reduced (18->15s)
+
+Killer Queen: Bites the Dust
+    >Barrage cooldown reduced (17->12s)
+    >Elbow cooldown reduced (12->9s)
+    >Bomb Plant cooldown reduced (30->14s)
+    >Stray Cat Bubble cooldown reduced (23->16s)
+    >Stray Cat Counter cooldown reduced (27->24s)
+    >Takedown cooldown reduced (22->15s)
+    >Explosive Dash cooldown reduced (19->12s)
+
+Golden Experience: Requiem
+    >Overhead Kick/Smash cooldown reduced (17->11s)
+    >Life Beam cooldown reduced (24->14s)
+    >Nullification cooldown reduced (26->24s)
+    >Flight cooldown reduced (18->16s)
+
+Star Platinum: The World
+    >Barrage cooldown reduced (17->14s)
+    >Star Breaker cooldown increased (9->10s)
+    >Time Strike cooldown reduced (20->15s)
+    >What an ugly watch cooldown reduced (26->16s)
+    >Timeskip cooldown reduced (18->15s)
+
 priority (top to bottom)
 todo: counters that invalidate hit effects
 todo: fix predict not working with new projectiles

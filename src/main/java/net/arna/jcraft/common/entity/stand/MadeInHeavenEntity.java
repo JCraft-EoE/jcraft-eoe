@@ -52,43 +52,44 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .withImpactSound(SoundEvents.ITEM_TRIDENT_HIT)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
             .withInfo(Text.literal("Slice"), Text.literal("quick combo starter"));
-    public static final SimpleAttack<MadeInHeavenEntity> BARRAGE_FINISHER = new SimpleAttack<MadeInHeavenEntity>(340,
+    public static final SimpleAttack<MadeInHeavenEntity> BARRAGE_FINISHER = new SimpleAttack<MadeInHeavenEntity>(0,
             6, 9, 0.85f, 1f, 10, 1.5f, 1.1f, 0f)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withLaunch()
             .withInfo(Text.literal("Barrage (Final Hit)"), Text.empty());
-    public static final BarrageAttack<MadeInHeavenEntity> BARRAGE = new BarrageAttack<MadeInHeavenEntity>(340,
+    public static final BarrageAttack<MadeInHeavenEntity> BARRAGE = new BarrageAttack<MadeInHeavenEntity>(200,
             0, 32, 0.85f, 1.5f, 10, 2f, 0.1f, 0f, 3)
             .withFinisher(23, BARRAGE_FINISHER)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
             .withSound(JSoundRegistry.MIH_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("Barrage"), Text.literal("short, knocks back"));
-    public static final SpeedSliceAttack SPEED_SLICE = new SpeedSliceAttack(360, 10, 11,
+    public static final SpeedSliceAttack SPEED_SLICE = new SpeedSliceAttack(300, 10, 11,
             1.25f, 6f, 1.5f, 1f)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
             .withSound(JSoundRegistry.MIH_SPEEDSLICE)
             .withInfo(Text.literal("Speed Slice"), Text.literal("short windup, harming teleport with hitstun and light knockback"));
-    public static final SimpleAttack<MadeInHeavenEntity> LEG_CRUSHER = new SimpleAttack<MadeInHeavenEntity>(320,
+    public static final SimpleAttack<MadeInHeavenEntity> LEG_CRUSHER = new SimpleAttack<MadeInHeavenEntity>(80,
             8, 17, 0.85f, 7f, 30, 1.5f, 0.25f, 0.2f)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
             .withSound(JSoundRegistry.MIH_LEGCRUSHER)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withExtraHitBox(0, -0.5, 1)
             .withInfo(Text.literal("Leg Crusher"), Text.literal("combo starter/extender, mih hoofs the enemies legs in a quick, stunning attack"));
-    public static final FuryChopAttack FURY_CHOP = new FuryChopAttack(380, 15, 24, 0.85f,
+    public static final FuryChopAttack FURY_CHOP = new FuryChopAttack(200, 15, 24, 0.85f,
             7f, 20, 1.6f, 0.25f, 0.2f)
             .withSound(JSoundRegistry.MIH_FURYCHOP)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
             .withInfo(Text.literal("Fury Chop"), Text.literal("combo extender, on hit gives haste(8s) to user and mining fatigue(8s) to victim, on whiff the fatigue goes to user"));
-    public static final SimpleAttack<MadeInHeavenEntity> DONUT = new SimpleAttack<MadeInHeavenEntity>(460,
+    public static final SimpleAttack<MadeInHeavenEntity> DONUT = new SimpleAttack<MadeInHeavenEntity>(200,
             26, 32, 0.75f, 8.5f, 40, 2f, 0f, 0.2f)
             .withSound(JSoundRegistry.STAND_DESUMMON)
             .withImpactSound(JSoundRegistry.IMPACT_7)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
             .withHyperArmor()
+            .withBlockStun(4)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Roundabout Donut"), Text.literal("feigns stand desummon, uninterruptible combo starter"));
     public static final TimeAccelerationMove TIME_ACCELERATION = new TimeAccelerationMove(1400, 20,
@@ -100,11 +101,11 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                             it is charged by landing hits
                             the speedometer impacts the level of speed and haste granted by Time Acceleration
                             if the speedometer is full and the charging period finishes, enemies become standless for 15s"""));
-    public static final JudgementAttack JUDGEMENT = new JudgementAttack(660, 20, 60, 1.25f, 2)
+    public static final JudgementAttack JUDGEMENT = new JudgementAttack(300, 20, 60, 1.25f, 2)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
             .withSound(JSoundRegistry.MIH_JUDGEMENT)
             .withInfo(Text.literal("Divine Severance"), Text.literal("Made in Heaven rapidly speed slices an area, then finishes with a large, launching slice"));
-    public static final CircleAttack CIRCLE = new CircleAttack(800, 13, 14, 1.25f)
+    public static final CircleAttack CIRCLE = new CircleAttack(400, 13, 14, 1.25f)
             .withCrouchingVariant(JUDGEMENT)
             .withSound(JSoundRegistry.MIH_CIRCLE)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)

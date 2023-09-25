@@ -44,36 +44,36 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withSound(JSoundRegistry.SC_POKE)
             .withInfo(Text.literal("Stab"), Text.literal("quick combo starter, links into Spinning Blade while armor is off"));
     public static final BarrageAttack<SilverChariotEntity> BARRAGE = new BarrageAttack<SilverChariotEntity>(
-            340, 0, 60, 0.65f, 0.9f, 25, 2.25f, 0.1f, 0f, 3)
+            240, 0, 60, 0.65f, 0.9f, 25, 2.25f, 0.1f, 0f, 3)
             .withSound(JSoundRegistry.SC_BARRAGE)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
     public static final SimpleAttack<SilverChariotEntity> HEAVY = new SimpleAttack<SilverChariotEntity>(
-            300, 20, 28, 0.65f, 8f, 10, 2f, 1.5f, 0f)
+            200, 20, 28, 0.65f, 8f, 10, 2f, 1.5f, 0f)
             .withSound(JSoundRegistry.SC_HEAVY)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHyperArmor()
             .withLaunch()
             .withInfo(Text.literal("Impaling Thrust"), Text.literal("slow, uninterruptible launcher"));
     //todo: spin barrage deflecting projectiles, launch stun
-    public static final SpinBarrageAttack SPIN_BARRAGE = new SpinBarrageAttack(500, 7, 24,
+    public static final SpinBarrageAttack SPIN_BARRAGE = new SpinBarrageAttack(240, 7, 24,
             0.65f, 1f, 10, 2f, 0.1f, 0f, 2)
             .withSound(JSoundRegistry.SC_SPIN)
             .withInfo(Text.literal("Spinning Blade"), Text.literal("fast reliable combo starter/extender, low stun"));
-    public static final RayDartAttack RAY_DART = new RayDartAttack(260, 13, 25,
+    public static final RayDartAttack RAY_DART = new RayDartAttack(160, 13, 25,
             0.65f, 5f, 15, 1.75f, 0.25f, -0.2f)
             .withBlockStun(17)
             .withInfo(Text.literal("Ray Dart"), Text.literal("Silver Chariot and the user charge forward, combo finisher"));
-    public static final CleaveAttack CLEAVE = new CleaveAttack(400, 12, 21, 0.75f, 9f,
+    public static final CleaveAttack CLEAVE = new CleaveAttack(260, 12, 21, 0.75f, 9f,
             20, 2.5f, 0.8f, 0f)
             .withSound(JSoundRegistry.SC_CLEAVE)
             .withHyperArmor()
             .withInfo(Text.literal("Cleave"), Text.literal("Silver Chariot detaches from the user, delivering an uninterruptible, combo-starting slice"));
-    public static final SCChargeAttack CHARGE = new SCChargeAttack(360, 5, 19, 8f,
+    public static final SCChargeAttack CHARGE = new SCChargeAttack(280, 5, 19, 8f,
             5f, 17, 1.5f, 0.25f, 0f, State.P_CHARGE_HIT)
             .withSound(JSoundRegistry.SC_CHARGE)
             .withBackstab(false)
             .withInfo(Text.literal("Shooting Star"), Text.literal("Silver Chariot detaches from the user and charges in the looked direction, combo starter/extender"));
-    public static final SCCounterAttack COUNTER = new SCCounterAttack(640, 4, 34, 0.5f)
+    public static final SCCounterAttack COUNTER = new SCCounterAttack(480, 4, 34, 0.5f)
             .withInfo(Text.literal("Counter"), Text.literal("0.2s windup, 1.5s duration, stuns when hit"));
     public static final SimpleMultiHitAttack<SilverChariotEntity> GOD_OF_DEATH_FINAL = new SimpleMultiHitAttack<SilverChariotEntity>(
             0, 59, 0.65f, 6f, 20, 2.5f, 1.25f, 0f,
@@ -104,7 +104,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withLaunch()
             .withInfo(Text.literal("Circle Slash (Hit)"), Text.empty());
     public static final SimpleAttack<SilverChariotEntity> CIRCLE_CHARGE = new SimpleAttack<SilverChariotEntity>(
-            340, 101, 100, 0.65f, 0f, 0, 0f, 0f, 0f)
+            260, 101, 100, 0.65f, 0f, 0, 0f, 0f, 0f)
             .withFollowup(CIRCLE_SLASH)
             .withArmor(2)
             .withInfo(Text.literal("Circle Slash"), Text.literal("charges for a minimum of 1 second, tap again to release, 2 armor points"));

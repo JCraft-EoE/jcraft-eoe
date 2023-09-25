@@ -35,12 +35,12 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             0.75f, 1f, 40, 2f, 0.25f, 0f, 3)
             .withSound(JSoundRegistry.STAR_PLATINUM_BARRAGE)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
-    public static final SimpleAttack<SPTWEntity> TIME_STRIKE = new SimpleAttack<SPTWEntity>(400, 7,
+    public static final SimpleAttack<SPTWEntity> TIME_STRIKE = new SimpleAttack<SPTWEntity>(300, 7,
             11, 0.75f, 5f, 12, 1.5f, 0.75f, -0.25f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(1f)
             .withInfo(Text.literal("Time Strike"), Text.literal("teleports forward 2.5m after a short windup, then delivers a fast, low stun hit/crouch to turn around after teleport"));
-    public static final SimpleAttack<SPTWEntity> BACKHAND = new SimpleAttack<SPTWEntity>(12, 7, 12,
+    public static final SimpleAttack<SPTWEntity> BACKHAND = new SimpleAttack<SPTWEntity>(240, 7, 12,
             0.75f, 6f, 20, 1.5f, 0.25f, 0f)
             .withSound(JSoundRegistry.SPTW_BACKHAND)
             .withImpactSound(JSoundRegistry.IMPACT_1)
@@ -49,22 +49,21 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
     public static final EffectInflictingAttack<SPTWEntity> GRAB_HIT = new EffectInflictingAttack<SPTWEntity>(0,
             16, 24, 1f, 9f, 20, 1.75f, 0.4f, 0f,
             List.of(new StatusEffectInstance(StatusEffects.LEVITATION, 5, 10, true, false)))
+            .withSound(JSoundRegistry.SPTW_UPPERCUT)
             .withImpactSound(JSoundRegistry.IMPACT_6)
             .withLaunch()
             .withHyperArmor()
-            .withInfo(Text.literal("What an Ugly Watch (Hit)"), Text.empty());
-    public static final GrabAttack<SPTWEntity, State> GRAB = new GrabAttack<>(520, 8, 20,
+            .withInfo(Text.literal("What an ugly watch (Hit)"), Text.empty());
+    public static final GrabAttack<SPTWEntity, State> GRAB = new GrabAttack<>(280, 8, 20,
             1f, 2f, 20, 1.5f, 0.1f, 0f, GRAB_HIT, State.GRAB_HIT)
             .withSound(JSoundRegistry.SPTW_GRAB)
             .withImpactSound(JSoundRegistry.SPTW_GRABHIT)
-            .withAction((attacker, user, ctx, targets) -> attacker.playSound(JSoundRegistry.SPTW_UPPERCUT, 1f, 1f))
-            .withBlockStun(4)
-            .withInfo(Text.literal("What an Ugly Watch"), Text.literal("grab, high recovery"));
+            .withInfo(Text.literal("What an ugly watch"), Text.literal("grab, high recovery"));
     public static final TimeStopMove<SPTWEntity> TIME_STOP = new TimeStopMove<SPTWEntity>(600, 5, 10,
             JServerConfig.SPTW_TIME_STOP_DURATION::getValue)
             .withSound(JSoundRegistry.STAR_PLATINUM_THE_WORLD)
             .withInfo(Text.literal("Timestop"), Text.literal("1.75 seconds, extremely low windup"));
-    public static final TimeSkipMove<SPTWEntity> TIME_SKIP = new TimeSkipMove<SPTWEntity>(360, 14)
+    public static final TimeSkipMove<SPTWEntity> TIME_SKIP = new TimeSkipMove<SPTWEntity>(300, 14)
             .withSound(JSoundRegistry.STAR_PLATINUM_TIMESKIP)
             .withInfo(Text.literal("Timeskip"), Text.empty());
     private boolean turnAround;

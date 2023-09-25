@@ -32,13 +32,13 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(0, -1, 1)
             .withInfo(Text.literal("Downward Kick"), Text.literal("medium stun combo starter, low hitbox, low blockstun"));
-    public static final OverheadKickAttack OVERHEAD_KICK = new OverheadKickAttack(340, 14, 24,
+    public static final OverheadKickAttack OVERHEAD_KICK = new OverheadKickAttack(220, 14, 24,
             1f, 9f, 40, 1.5f, 0.8f, 0.25f)
             .withSound(JSoundRegistry.GER_HEAVY)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(0, -1, 1)
             .withInfo(Text.literal("Overhead Kick"), Text.literal("slow, high stun combo starter"));
-    public static final SimpleAttack<GEREntity> KICK_BARRAGE_FINISHER = new SimpleAttack<GEREntity>(340,
+    public static final SimpleAttack<GEREntity> KICK_BARRAGE_FINISHER = new SimpleAttack<GEREntity>(0,
             6, 9, 1f, 1f, 10, 1.75f, 1.1f, 0f)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withHitSpark(JParticleType.HIT_SPARK_2)
@@ -55,7 +55,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             .withAerialVariant(DOWNWARD_KICK)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("Punch/Downward Kick"), Text.literal("quick combo starter"));
-    public static KnockdownAttack<GEREntity> OVERHEAD_SMASH = new KnockdownAttack<GEREntity>(340, 10, 19,
+    public static KnockdownAttack<GEREntity> OVERHEAD_SMASH = new KnockdownAttack<GEREntity>(220, 10, 19,
             1f, 9f, 10, 1.5f, 1.1f, 0f, 30)
             .withAerialVariant(OVERHEAD_KICK)
             .withSound(JSoundRegistry.GER_HEAVY)
@@ -79,16 +79,16 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             .withCrouchingVariant(HEAL)
             .withSound(JSoundRegistry.GE_HEAL)
             .withInfo(Text.literal("Healing Hand"), Text.literal("standing: heals user for 2 hearts, crouching: heals others for 3 hearts, pacifies angered mobs"));
-    public static final LifeBeamAttack CHARGED_LIFE_BEAM = new LifeBeamAttack(480, 18, 28,
+    public static final LifeBeamAttack CHARGED_LIFE_BEAM = new LifeBeamAttack(280, 18, 28,
             1.1f, true)
             .withSound(JSoundRegistry.GER_SLOW_LASER)
             .withInfo(Text.literal("Life Beam (Charged)"), Text.literal("slower, poisoning variant"));
-    public static final LifeBeamAttack LIFE_BEAM = new LifeBeamAttack(480, 10, 20, 1f, false)
+    public static final LifeBeamAttack LIFE_BEAM = new LifeBeamAttack(280, 10, 20, 1f, false)
             .withCrouchingVariant(CHARGED_LIFE_BEAM)
             .withSound(JSoundRegistry.GER_LASER)
             .withInfo(Text.literal("Life Beam"), Text.literal("summons a quick, stunning rock projectile " +
                     "that turns into a scorpion a small time after landing"));
-    public static final NullificationAttack NULLIFICATION = new NullificationAttack(520, 5, 35, 1f)
+    public static final NullificationAttack NULLIFICATION = new NullificationAttack(480, 5, 35, 1f)
             .withSound(JSoundRegistry.GE_HEAL)
             .withInfo(Text.literal("Nullification"), Text.literal("0.25s windup, 1.5s counter, stuns on hit"));
 
@@ -96,7 +96,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             .withSound(JSoundRegistry.GER_SETUP)
             .withInfo(Text.literal("Return to Zero"), Text.literal("initial press: saves the state of " +
                     "every entity in a 4 chunk radius, second press: reverts all states except users\nDoesn't affect player inventories"));
-    public static final FlightMove FLIGHT = new FlightMove(360, 1, 0, 0f)
+    public static final FlightMove FLIGHT = new FlightMove(320, 1, 0, 0f)
             .withSound(JSoundRegistry.GER_FLY)
             .withInfo(Text.literal("Flight"), Text.literal("1 second of flight"));
 
