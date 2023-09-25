@@ -1844,7 +1844,7 @@ Star Platinum: The World
 
 priority (top to bottom)
 todo: counters that invalidate hit effects
-todo: fix predict not working with new projectiles
+todo: fix predict not working with projectiles spawned after it started
 
 TODO: stand summon particles
 TODO: Knockdown() method
