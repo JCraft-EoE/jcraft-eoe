@@ -49,12 +49,10 @@ public class NullificationAttack extends AbstractCounterAttack<NullificationAtta
                 ServerChannelFeedbackPacket.send(serverPlayerEntity, buf);
         JComponents.getTimeStopData(countered).setTicks(counterStopTime);
 
-        StandEntity<?, ?> stand = countered instanceof LivingEntity living ? JUtils.getStand(living) : null;
-        if (stand != null)
-            stand.cancelMove();
-
-        if (countered instanceof LivingEntity living)
+        if (countered instanceof LivingEntity living) {
             StandEntity.stun(living, 10, 0);
+            JUtils.cancelMoves(living);
+        }
 
         Vec3d eP = attacker.getEyePos();
         JCraft.createParticle((ServerWorld) attacker.getWorld(), eP.x, eP.y, eP.z, JParticleType.FLASH);

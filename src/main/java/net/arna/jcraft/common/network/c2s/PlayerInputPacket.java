@@ -136,7 +136,7 @@ public class PlayerInputPacket {
                     if (stand != null) {
                         int moveStun = stand.getMoveStun();
                         if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT)
-                            stand.queuedAttack = MoveInputType.STAND_SUMMON;
+                            stand.queueMove(MoveInputType.STAND_SUMMON);
                         else stand.desummon();
                     } else if (world != null) JCraft.summon(world, player);
                 }
@@ -177,7 +177,7 @@ public class PlayerInputPacket {
 
         stand.initMove(type.getMoveType());
         if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking())
-            stand.queuedAttack = type;
+            stand.queueMove(type);
     }
 
     private static void checkComboBreak(ServerPlayerEntity player) {

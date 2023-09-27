@@ -282,7 +282,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
 
     public void moveCancel() {
         curMove = null;
-        queuedAttack = null;
+        queuedMove = null;
         setMoveStun(2);
         setState(State.IDLE);
         setReset(true);
@@ -327,7 +327,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
 
         if (world.isClient) return;
         if (curMove != null && curMove.getOriginalMove() == OVERHEAD_HOOK)
-            queuedAttack = null;
+            queuedMove = null;
 
         TIME_ERASE.tickTimeErase(this);
     }

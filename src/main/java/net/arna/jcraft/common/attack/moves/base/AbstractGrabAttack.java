@@ -42,10 +42,8 @@ public abstract class AbstractGrabAttack<T extends AbstractGrabAttack<T, A, S>, 
 
         for (LivingEntity target : targets) {
             StandEntity<?, ?> stand = JUtils.getStand(target);
-            if (stand != null) {
-                stand.blocking = false;
-                stand.cancelMove();
-            }
+            if (stand != null) stand.blocking = false;
+            JUtils.cancelMoves(target);
         }
 
         return targets;

@@ -144,7 +144,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
 
         if (hasUser()) {
             BOMB_PLANT.tickBomb(this);
-            if (getCurrentMove() instanceof DetonateAttack) queuedAttack = null;
+            if (getCurrentMove() instanceof DetonateAttack) queuedMove = null;
         }
     }
 

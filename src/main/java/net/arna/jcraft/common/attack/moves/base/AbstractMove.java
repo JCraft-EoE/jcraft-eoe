@@ -9,6 +9,7 @@ import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.MobilityType;
+import net.arna.jcraft.common.util.StandAnimationState;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.sound.SoundEvent;
@@ -33,6 +34,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     private int cooldown, windup;
     private int duration;
     private float moveDistance;
+    private Enum<?> animation;
     @NonNull
     private Text name = Text.empty(), description = Text.empty();
     /**
@@ -79,6 +81,16 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      */
     public T withWindup(int windup) {
         this.windup = windup;
+        return getThis();
+    }
+
+    /**
+     * Assigns an animation state to be used by the move, in case it can't be done in the movemap
+     * @param state This moves animation
+     * @return This move
+     */
+    public T withAnim(Enum<?> state) {
+        this.animation = state;
         return getThis();
     }
 
@@ -423,6 +435,13 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     }
 
     /**
+     * @return This moves assigned animation
+     */
+    public Enum<?> getAnimation() {
+        return animation;
+    }
+
+    /**
      * Simply returns {@code this}. Can only be implemented by final moves.
      * This means that any intermediary move class (one that forms a base for other moves)
      * cannot implement this.
@@ -462,6 +481,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         cast.finisher = finisher == null ? null : IntObjectPair.of(finisher.leftInt(), finisher.right().copy());
         cast.mobilityType = mobilityType;
         cast.originalMove = originalMove; // If this move was copied, this will set it to our original move on the copy.
+        cast.animation = animation;
         copiedExtras = true;
         return base;
     }

@@ -28,10 +28,8 @@ public class SCCounterAttack extends AbstractCounterAttack<SCCounterAttack, Silv
         super.counter(attacker, countered, counteredDamageSource);
 
         if (!(countered instanceof LivingEntity ent)) return;
-
         StandEntity.stun(ent, 30, 0);
-        StandEntity<?, ?> counteredStand = JUtils.getStand(ent);
-        if (counteredStand != null) counteredStand.cancelMove();
+        JUtils.cancelMoves(ent);
     }
 
     @Override

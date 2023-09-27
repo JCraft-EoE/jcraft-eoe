@@ -3,6 +3,7 @@ package net.arna.jcraft.common.entity.stand;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.attack.moves.starplatinum.ChargeBarrageAttack;
 import net.arna.jcraft.common.attack.moves.starplatinum.InhaleAttack;
@@ -27,8 +28,17 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(0, 0.35, 1.25)
             .withInfo(Text.literal("Uppercut"), Text.literal("slower combo starter, launches"));
+    public static final SimpleAttack<StarPlatinumEntity> LIGHT_FOLLOWUP = new SimpleAttack<StarPlatinumEntity>(
+            0, 5, 9, 0.75f, 6f, 30, 1.5f, 1f, -0.25f)
+            .withAnim(State.LIGHT_FOLLOWUP)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withLaunch()
+            .withBlockStun(4)
+            .withExtraHitBox(0, 0, 1)
+            .withInfo(Text.literal("Punch"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<StarPlatinumEntity> LIGHT = SimpleAttack.<StarPlatinumEntity>lightAttack(
             5, 7, 5f, 10, 0.2f, 0.75f, -0.1f)
+            .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(UPPERCUT)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
@@ -97,6 +107,14 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
 
     @Override
     public void initMove(MoveType type) {
+        if (type == MoveType.LIGHT && curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
+            AbstractMove<?, ? super StarPlatinumEntity> followup = curMove.getFollowup();
+            if (followup != null) {
+                setMove(followup, (State) followup.getAnimation());
+                return;
+            }
+        }
+
         if (type == MoveType.SPECIAL3) handleMove(CHARGE_BARRAGE.copy(), CooldownType.SPECIAL3, State.BARRAGE);
         else super.initMove(type);
     }
@@ -117,7 +135,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
     public enum State implements StandAnimationState<StarPlatinumEntity> {
         IDLE((starPlatinum, builder) -> builder.loop("animation.starplatinum." +
                 (starPlatinum.getInhaleTime() > 0 ? "inhaleidle" : "idle"))),
-        PUNCH(builder -> builder.playAndHold("animation.starplatinum.punch")),
+        PUNCH(builder -> builder.playAndHold("animation.starplatinum.light")),
         BLOCK(builder -> builder.loop("animation.starplatinum.block")),
         HEAVY(builder -> builder.playAndHold("animation.starplatinum.heavy")),
         BARRAGE(builder -> builder.loop("animation.starplatinum.barrage")),
@@ -125,7 +143,8 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
         INHALE(builder -> builder.playAndHold("animation.starplatinum.inhale")),
         LOW_KICK(builder -> builder.playAndHold("animation.starplatinum.low_kick")),
         JUMP(builder -> builder.playAndHold("animation.starplatinum.jump")),
-        UPPERCUT(builder -> builder.playAndHold("animation.starplatinum.uppercut"));
+        UPPERCUT(builder -> builder.playAndHold("animation.starplatinum.uppercut")),
+        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.starplatinum.light_followup"));
 
         private final BiConsumer<StarPlatinumEntity, AnimationBuilder> animator;
 

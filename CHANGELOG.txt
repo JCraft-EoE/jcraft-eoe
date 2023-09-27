@@ -1842,9 +1842,20 @@ Star Platinum: The World
     >What an ugly watch cooldown reduced (26->16s)
     >Timeskip cooldown reduced (18->15s)
 
+● 27/9/2023
+>Fixed bug where grabs and counters do not cancel spec moves
+
+Star Platinum
+    >Updated model and animations
+    >Added followup to Light
+
+The World
+    >Added followup to Light
+
 priority (top to bottom)
 todo: counters that invalidate hit effects
 todo: fix predict not working with projectiles spawned after it started
+todo: dynamic hurtboxes
 
 TODO: stand summon particles
 TODO: Knockdown() method

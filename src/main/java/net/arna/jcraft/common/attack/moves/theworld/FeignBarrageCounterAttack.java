@@ -6,6 +6,7 @@ import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.shared.CounterMissMove;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.TheWorldEntity;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
@@ -45,8 +46,8 @@ public class FeignBarrageCounterAttack extends AbstractCounterAttack<FeignBarrag
         if (countered instanceof LivingEntity livingEntity) {
             livingEntity.removeStatusEffect(JStatusRegistry.DAZED);
             StandEntity.stun(livingEntity, 20, 0);
-            if (countered.getFirstPassenger() instanceof StandEntity<?, ?> counteredStand)
-                counteredStand.cancelMove();
+
+            JUtils.cancelMoves(livingEntity);
         }
 
         attacker.setMove(hitMove, TheWorldEntity.State.COUNTER_HIT);

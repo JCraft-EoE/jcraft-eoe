@@ -31,10 +31,7 @@ public class BubbleCounterAttack extends AbstractCounterAttack<BubbleCounterAtta
 
         if (countered instanceof LivingEntity livingEntity) {
             StandEntity.stun(livingEntity, 10, 3);
-
-            StandEntity<?, ?> counteredStand = JUtils.getStand(livingEntity);
-            if (counteredStand != null)
-                counteredStand.cancelMove();
+            JUtils.cancelMoves(livingEntity);
         }
 
         attacker.getMoveContext().set(BombPlantAttack.BOMB_ENTITY, countered);

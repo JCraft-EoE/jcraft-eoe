@@ -205,8 +205,8 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
         super.tick();
         if (!hasUser()) return;
 
-        if (!world.isClient && curMove == REKKA2 && queuedAttack == MoveInputType.SPECIAL2)
-            queuedAttack = null;
+        if (!world.isClient && curMove == REKKA2 && queuedMove == MoveInputType.SPECIAL2)
+            queuedMove = null;
     }
 
     @Override

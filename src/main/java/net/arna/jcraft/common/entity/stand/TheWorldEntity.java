@@ -1,14 +1,19 @@
 package net.arna.jcraft.common.entity.stand;
 
 import lombok.NonNull;
+import net.arna.jcraft.common.attack.core.MoveInputType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.attack.moves.theworld.FeignBarrageCounterAttack;
 import net.arna.jcraft.common.attack.moves.theworld.TWDonutAttack;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.config.JServerConfig;
+import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.text.Text;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -22,8 +27,17 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(0, 0, 1)
             .withInfo(Text.literal("Low Kick"), Text.literal("slower, higher stun"));
+    public static final SimpleAttack<TheWorldEntity> LIGHT_FOLLOWUP = new SimpleAttack<TheWorldEntity>(
+            0, 7, 11, 0.75f, 6f, 8, 1.5f, 1f, 0)
+            .withAnim(State.LIGHT_FOLLOWUP)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withLaunch()
+            .withBlockStun(4)
+            .withExtraHitBox(0, 0, 1)
+            .withInfo(Text.literal("Punch"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<TheWorldEntity> LIGHT = SimpleAttack.<TheWorldEntity>lightAttack(5, 7, 5, 10, 0.1f, 0.75f, -0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(LOW_KICK)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
     public static final BarrageAttack<TheWorldEntity> BARRAGE = new BarrageAttack<TheWorldEntity>(280, 0, 50, 0.75f, 1f, 30, 2, 0.25f, 0, 3)
@@ -110,6 +124,19 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
     }
 
     @Override
+    public void initMove(MoveType type) {
+        if (type == MoveType.LIGHT && curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
+            AbstractMove<?, ? super TheWorldEntity> followup = curMove.getFollowup();
+            if (followup != null) {
+                setMove(followup, (State) followup.getAnimation());
+                return;
+            }
+        }
+
+        super.initMove(type);
+    }
+
+    @Override
     public void desummon() {
         if (tsTime > 0) return;
         super.desummon();
@@ -152,7 +179,8 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
         COUNTER_HIT(builder -> builder.playAndHold("animation.theworld.counter_hit")),
         COUNTER_MISS(builder -> builder.playAndHold("animation.theworld.counter_miss")),
         LOW(builder -> builder.playAndHold("animation.theworld.low")),
-        TIMESKIP(builder -> builder.loop("animation.theworld.idle"));
+        TIMESKIP(builder -> builder.loop("animation.theworld.idle")),
+        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.theworld.light_followup"));
 
         private final Consumer<AnimationBuilder> animator;
 

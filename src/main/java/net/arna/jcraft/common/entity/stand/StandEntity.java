@@ -125,7 +125,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     protected float maxStandGauge = 90f;
 
-    public MoveInputType queuedAttack;
+    protected MoveInputType queuedMove;
     public AbstractMove<?, ? super E> curMove;
     public AbstractMove<?, ? super E> prevMove;
     public int armorPoints;
@@ -805,7 +805,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             AbstractMove<?, ? super E> move = this.curMove;
             if (defaultToNear() && moveStun <= 0) {
                 if (move == null) {
-                    if (this.queuedAttack == null)
+                    if (this.queuedMove == null)
                         setFree(false);
                 } else if (move.isCounter()) //noinspection unchecked // not an issue here
                     ((AbstractCounterAttack<?, ? super E>) move).whiff(getThis(), user);
@@ -855,13 +855,13 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
             if (moveStun <= 0 && !blocking) {
                 // Attack buffering
-                if (queuedAttack != null) {
-                    if (queuedAttack == MoveInputType.STAND_SUMMON) {
+                if (queuedMove != null) {
+                    if (queuedMove == MoveInputType.STAND_SUMMON) {
                         curMove = null;
                         desummon();
-                    } else initMove(queuedAttack.getMoveType());
+                    } else initMove(queuedMove.getMoveType());
 
-                    queuedAttack = null;
+                    queuedMove = null;
                 } else if (!idleOverride) {
                     // Process idle
                     curMove = null;
@@ -1269,7 +1269,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                     if (selectedAttack.getMoveType() == null) {
                         JCraft.LOGGER.error("Attempting to use attack with unset MoveType: " + selectedAttack.getName().getString() + ", stand: " + stand);
                     } else stand.initMove(selectedAttack.getMoveType());
-                } else stand.queuedAttack = MoveInputType.fromMoveType(selectedAttack.getMoveType());
+                } else stand.queuedMove = MoveInputType.fromMoveType(selectedAttack.getMoveType());
             }
 
             double sideswitchDistance = 1.25;
@@ -1315,8 +1315,16 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         } else if (stand.getMoveStun() > 4) { // if blocking & movestun > 4 means the enemy made you block
             // Don't buffer any attacks as you are minus and will DIE
-            stand.queuedAttack = null;
+            stand.queuedMove = null;
         }
+    }
+
+    public void queueMove(MoveInputType type) {
+        if (user == null) return;
+        // This check helps users intuitively use light and its followup without mis-inputting
+        // Such a check should be applied to any quick move with a followup
+        if (type != MoveInputType.LIGHT || JComponents.COOLDOWNS.get(user).getCooldown(CooldownType.STAND_LIGHT) <= 0)
+            queuedMove = type;
     }
 
     /**

@@ -2,6 +2,7 @@ package net.arna.jcraft.common.util;
 
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
 import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.component.SpecComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.network.s2c.JExplosionPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
@@ -385,5 +386,19 @@ public final class JUtils {
     public static boolean canDamage(DamageSource damageSource, Entity ent) {
         return ent != null && ent.isAlive() && ent.isAttackable() && !ent.isInvulnerableTo(damageSource) &&
                 !(ent instanceof ArmorStandEntity armorStand && armorStand.isMarker());
+    }
+
+    /**
+     * Cancels the Spec and Stand moves for a specified {@link LivingEntity}
+     * @param livingEntity Entity to cancel the moves of
+     */
+    public static void cancelMoves(LivingEntity livingEntity) {
+        if (livingEntity instanceof PlayerEntity player) {
+            JSpec<?, ?> spec = JUtils.getSpec(player);
+            if (spec != null) spec.cancelMove();
+        }
+
+        StandEntity<?, ?> stand = JUtils.getStand(livingEntity);
+        if (stand != null) stand.cancelMove();
     }
 }

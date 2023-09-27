@@ -42,9 +42,7 @@ public class D4CCounterAttack extends AbstractCounterAttack<D4CCounterAttack, D4
         if (countered instanceof LivingEntity livingEntity) {
             livingEntity.damage(DamageSource.mob(user), 10);
             StandEntity.stun(livingEntity, 20, 3);
-
-            StandEntity<?, ?> stand = JUtils.getStand(livingEntity);
-            if (stand != null) stand.cancelMove();
+            JUtils.cancelMoves(livingEntity);
         }
 
         attacker.getWorld().playSound(null, attacker.getX(), attacker.getY(), attacker.getZ(),
