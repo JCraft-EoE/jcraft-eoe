@@ -38,8 +38,16 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
     public static final LastShotAttack LAST_SHOT = new LastShotAttack(140, 12, 15, 1f)
             .withInfo(Text.literal("Last Shot"), Text.literal("Silver Chariot fires his rapier, " +
                     "which can bounce 5 times off walls, nerfs all hitboxes and damage by 25% until returned"));
+    public static final SimpleAttack<SilverChariotEntity> LIGHT_FOLLOWUP = new SimpleAttack<SilverChariotEntity>(
+            0, 6, 14, 0.65f, 6f, 12, 1.5f, 1.2f, -0.1f)
+            .withAnim(State.LIGHT_FOLLOWUP)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withLaunch()
+            .withBlockStun(4)
+            .withInfo(Text.literal("Slash"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<SilverChariotEntity> LIGHT = SimpleAttack.<SilverChariotEntity>lightAttack(5, 9, 5f,
                     11, 0.75f, 0.65f, -0.1f)
+            .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(LAST_SHOT)
             .withSound(JSoundRegistry.SC_POKE)
             .withInfo(Text.literal("Stab"), Text.literal("quick combo starter, links into Spinning Blade while armor is off"));
@@ -206,6 +214,9 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             if (curMove != null && curMove.getMoveType() == MoveType.UTILITY && getMoveStun() <= 80)
                 setMove(CIRCLE_SLASH.copy(), State.CIRCLE_SLASH);
             else handleMove(MoveType.UTILITY);
+        } else if (type == MoveType.LIGHT && curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
+            AbstractMove<?, ? super SilverChariotEntity> followup = curMove.getFollowup();
+            if (followup != null) setMove(followup, (State) followup.getAnimation());
         } else super.initMove(type);
     }
 
@@ -322,7 +333,8 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         COUNTER_MISS(builder -> builder.playAndHold("animation.silverchariot.counter_miss")),
         LAST_SHOT(builder -> builder.playAndHold("animation.silverchariot.lastshot")),
         CIRCLE_CHARGE(builder -> builder.playAndHold("animation.silverchariot.circle_charge")),
-        CIRCLE_SLASH(builder -> builder.playAndHold("animation.silverchariot.circle_slash"));
+        CIRCLE_SLASH(builder -> builder.playAndHold("animation.silverchariot.circle_slash")),
+        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.silverchariot.light_followup"));
 
         private final BiConsumer<SilverChariotEntity, AnimationBuilder> animator;
 

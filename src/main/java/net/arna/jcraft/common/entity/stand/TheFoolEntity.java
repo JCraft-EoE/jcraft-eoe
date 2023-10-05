@@ -49,10 +49,19 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             30, 14, 1.5f, 2.5f, 7, 1.5f, 0.2f, 0.25f, IntSet.of(5, 8, 11))
             .withBlockStun(4)
             .withInfo(Text.literal("Drill"), Text.literal("fast, multi-hitting combo starter, low stun and blockstun"));
+    public static final SimpleAttack<TheFoolEntity> LIGHT_FOLLOWUP = new SimpleAttack<TheFoolEntity>(
+            0, 9, 16, 1.5f, 6f, 9, 2f, 1.5f, 0)
+            .withAnim(State.LIGHT_FOLLOWUP)
+            .withImpactSound(JSoundRegistry.IMPACT_2)
+            .withLaunch()
+            .withBlockStun(4)
+            .withExtraHitBox(0, 0.25, 1)
+            .withInfo(Text.literal("Swipe"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<TheFoolEntity> LIGHT = new SimpleAttack<TheFoolEntity>( 30, 7,
             14, 1.5f, 6, 15, 2, 0.8f, -0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withExtraHitBox(0, 0.25, 1)
+            .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(DRILL)
             .withInfo(Text.literal("Swipe"), Text.literal("slow, long-reaching poke"));
     public static final AirBarrageAttack AIR_BARRAGE = new AirBarrageAttack(240, 0, 30,
@@ -201,12 +210,17 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
                 if (type == MoveType.SPECIAL2 && !getUserOrThrow().isOnGround() || type == MoveType.SPECIAL3)
                     setSand(true);
             }
+            case LIGHT -> {
+                if (curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
+                    AbstractMove<?, ? super TheFoolEntity> followup = curMove.getFollowup();
+                    if (followup != null) setMove(followup, (State) followup.getAnimation());
+                } else super.initMove(type);
+            }
             default -> super.initMove(type);
         }
     }
 
     private void initSlam(int type) {
-        JCraft.LOGGER.info("TRYING TO INITIALIZE SLAM OF TYPE: " + type);
         getMoveContext().setInt(SlamAttack.VARIANT, type);
         setMove(SLAM, State.POUND_DOWN);
         playSound(JSoundRegistry.FOOL_BARK1, 1, 1);
@@ -355,7 +369,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     // Animation code
     public enum State implements StandAnimationState<TheFoolEntity> {
         IDLE(builder -> builder.loop("animation.thefool.idle")),
-        SWIPE(builder -> builder.playAndHold("animation.thefool.swipe")),
+        SWIPE(builder -> builder.playAndHold("animation.thefool.light")),
         BLOCK((theFool, builder) -> builder.loop("animation.thefool." +
                 (theFool.isSand() ? "crouchblock" : "block"))),
         COMBO(builder -> builder.playAndHold("animation.thefool.combo")),
@@ -370,7 +384,8 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
         SANDSTORM(builder -> builder.playAndHold("animation.thefool.sandstorm")),
         GLIDE(builder -> builder.loop("animation.thefool.glide")),
         TORNADO(builder -> builder.loop("animation.thefool.tornado")),
-        DRILL(builder -> builder.loop("animation.thefool.drill"));
+        DRILL(builder -> builder.loop("animation.thefool.drill")),
+        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.thefool.light_followup"));
 
         private final BiConsumer<TheFoolEntity, AnimationBuilder> animator;
 

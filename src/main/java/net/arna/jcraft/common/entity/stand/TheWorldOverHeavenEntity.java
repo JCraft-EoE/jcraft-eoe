@@ -6,6 +6,7 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.BlockableType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.attack.moves.theworld.overheaven.*;
 import net.arna.jcraft.common.component.JComponents;
@@ -41,8 +42,17 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withLaunch()
             .withInfo(Text.literal("Lunge"), Text.literal("medium speed launcher"));
+    public static final SimpleAttack<TheWorldOverHeavenEntity> LIGHT_FOLLOWUP = new SimpleAttack<TheWorldOverHeavenEntity>(
+            0, 9, 13, 0.75f, 6, 8, 1.75f, 1.25f, -0.1f)
+            .withAnim(State.LIGHT_FOLLOWUP)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withLaunch()
+            .withBlockStun(4)
+            .withExtraHitBox(0, 0.25, 1)
+            .withInfo(Text.literal("Roundhouse"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<TheWorldOverHeavenEntity> PUNCH = SimpleAttack.<TheWorldOverHeavenEntity>lightAttack(
             4, 7, 6f, 11, 0.75f, 0.75f, -0.1f)
+            .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(LUNGE)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
@@ -194,6 +204,12 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
                     tsTime = 0;
                 }
             }
+            case LIGHT -> {
+                if (curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
+                    AbstractMove<?, ? super TheWorldOverHeavenEntity> followup = curMove.getFollowup();
+                    if (followup != null) setMove(followup, (State) followup.getAnimation());
+                } else super.initMove(type);
+            }
             default -> super.initMove(type);
         }
     }
@@ -312,7 +328,8 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         THROW(builder -> builder.playAndHold("animation.twoh.throw")),
         AIR_KNIVES(builder -> builder.playAndHold("animation.twoh.airknives")),
         TIME_SKIP(builder -> builder.loop("animation.twoh.idle")),
-        LUNGE(builder -> builder.loop("animation.twoh.lunge"));
+        LUNGE(builder -> builder.loop("animation.twoh.lunge")),
+        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.twoh.light_followup"));
 
         private final Consumer<AnimationBuilder> animator;
 

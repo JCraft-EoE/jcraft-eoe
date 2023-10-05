@@ -367,6 +367,7 @@ public class JCraft implements ModInitializer {
 
 
     public static void createParticle(ServerWorld world, double x, double y, double z, JParticleType type) {
+        if (world == null || type == null) return;
         PacketByteBuf buf = PacketByteBufs.create();
 
         buf.writeShort(8);

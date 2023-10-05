@@ -29,7 +29,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
             .withExtraHitBox(0, 0.35, 1.25)
             .withInfo(Text.literal("Uppercut"), Text.literal("slower combo starter, launches"));
     public static final SimpleAttack<StarPlatinumEntity> LIGHT_FOLLOWUP = new SimpleAttack<StarPlatinumEntity>(
-            0, 5, 9, 0.75f, 6f, 30, 1.5f, 1f, -0.25f)
+            0, 6, 10, 0.75f, 6f, 8, 1.5f, 1f, -0.25f)
             .withAnim(State.LIGHT_FOLLOWUP)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withLaunch()

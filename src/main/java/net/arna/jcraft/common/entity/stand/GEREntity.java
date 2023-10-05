@@ -4,6 +4,7 @@ import lombok.NonNull;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.goldexperience.requiem.*;
 import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.HealMove;
@@ -27,8 +28,17 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
+    public static final SimpleAttack<GEREntity> LIGHT_FOLLOWUP = new SimpleAttack<GEREntity>(
+            0, 6, 13, 0.75f, 6f, 8, 1.5f, 1f, -0.1f)
+            .withAnim(State.LIGHT_FOLLOWUP)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withLaunch()
+            .withBlockStun(4)
+            .withExtraHitBox(0, 0.25, 1)
+            .withInfo(Text.literal("Punch"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<GEREntity> DOWNWARD_KICK = new SimpleAttack<GEREntity>(JCraft.LIGHT_COOLDOWN,
             5, 12, 0.75f, 4f, 20, 1.25f, 0.75f, 0.33f)
+            .withFollowup(LIGHT_FOLLOWUP)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(0, -1, 1)
             .withInfo(Text.literal("Downward Kick"), Text.literal("medium stun combo starter, low hitbox, low blockstun"));
@@ -54,7 +64,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             5, 9, 0.75f, 5f, 8, 1.5f, 0.75f, -0.1f)
             .withAerialVariant(DOWNWARD_KICK)
             .withImpactSound(JSoundRegistry.IMPACT_1)
-            .withInfo(Text.literal("Punch/Downward Kick"), Text.literal("quick combo starter"));
+            .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
     public static KnockdownAttack<GEREntity> OVERHEAD_SMASH = new KnockdownAttack<GEREntity>(220, 10, 19,
             1f, 9f, 10, 1.5f, 1.1f, 0f, 30)
             .withAerialVariant(OVERHEAD_KICK)
@@ -91,7 +101,6 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
     public static final NullificationAttack NULLIFICATION = new NullificationAttack(480, 5, 35, 1f)
             .withSound(JSoundRegistry.GE_HEAL)
             .withInfo(Text.literal("Nullification"), Text.literal("0.25s windup, 1.5s counter, stuns on hit"));
-
     public static final ReturnToZeroMove RETURN_TO_ZERO = new ReturnToZeroMove(1200, 30, 32, 1f)
             .withSound(JSoundRegistry.GER_SETUP)
             .withInfo(Text.literal("Return to Zero"), Text.literal("initial press: saves the state of " +
@@ -158,7 +167,10 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
     public void initMove(MoveType type) {
         if (type == MoveType.ULTIMATE && !moveContext.get(ReturnToZeroMove.ENTITY_DATA).isEmpty())
             RETURN_TO_ZERO.returnToZero(this);
-        else super.initMove(type);
+        else if (type == MoveType.LIGHT && curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
+            AbstractMove<?, ? super GEREntity> followup = curMove.getFollowup();
+            if (followup != null) setMove(followup, (State) followup.getAnimation());
+        } else super.initMove(type);
     }
 
     public int getFlightTime() {
@@ -219,7 +231,8 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         AIR_HEAVY(builder -> builder.playAndHold("animation.ger.airheavy")),
         AIR_LIGHT(builder -> builder.playAndHold("animation.ger.airlight")),
         AIR_BARRAGE(builder -> builder.playAndHold("animation.ger.airbarrage")),
-        SETUP(builder -> builder.playAndHold("animation.ger.setup"));
+        SETUP(builder -> builder.playAndHold("animation.ger.setup")),
+        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.ger.light_followup"));
 
         private final Consumer<AnimationBuilder> animator;
 

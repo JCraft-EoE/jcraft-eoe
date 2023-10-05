@@ -37,6 +37,7 @@ public class SmiteAttack extends AbstractEffectInflictingAttack<SmiteAttack, The
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset,
                 List.of(new StatusEffectInstance(StatusEffects.LEVITATION, 7, 9, true, false)));
         this.aerial = ranged = aerial;
+        this.withHitSpark(null);
     }
 
     @Override

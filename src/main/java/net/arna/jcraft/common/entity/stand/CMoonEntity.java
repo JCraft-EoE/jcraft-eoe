@@ -5,6 +5,7 @@ import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.BlockableType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.cmoon.*;
 import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
@@ -44,8 +45,18 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withTargetProcessor(CMoonEntity::addInversionPunchInversion)
             .withInfo(Text.literal("Inversion Punch"), Text.literal("very low stun, delayed slowness"));
+    public static final SimpleAttack<CMoonEntity> LIGHT_FOLLOWUP = new SimpleAttack<CMoonEntity>(
+            0, 6, 12, 0.75f, 6, 7, 1.5f, 1f, -0.1f)
+            .withAnim(State.LIGHT_FOLLOWUP)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withLaunch()
+            .withBlockStun(4)
+            .withExtraHitBox(0, 0.25, 1)
+            .withTargetProcessor(CMoonEntity::addInversion)
+            .withInfo(Text.literal("Punch"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<CMoonEntity> PUNCH = SimpleAttack.<CMoonEntity>lightAttack(5, 7,
             5f, 10, 0.75f, 0.75f, -0.1f)
+            .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(INVERSION_PUNCH)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withTargetProcessor(CMoonEntity::addInversion)
@@ -218,6 +229,12 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
                     directionChangeCooldown = 10;
                 } else super.initMove(type);
             }
+            case LIGHT -> {
+                if (curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
+                    AbstractMove<?, ? super CMoonEntity> followup = curMove.getFollowup();
+                    if (followup != null) setMove(followup, (State) followup.getAnimation());
+                } else super.initMove(type);
+            }
             default -> super.initMove(type);
         }
     }
@@ -355,7 +372,8 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
         GROUND_SHOOT(builder -> builder.playAndHold("animation.cmoon.groundshoot")),
         GRAV_SHIFT(builder -> builder.playAndHold("animation.cmoon.gravshift")),
         DIRECTIONAL_SHIFT(builder -> builder.playAndHold("animation.cmoon.directionalshift")),
-        INVERSION_PUNCH(builder -> builder.playAndHold("animation.cmoon.inversionpunch"));
+        INVERSION_PUNCH(builder -> builder.playAndHold("animation.cmoon.inversionpunch")),
+        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.cmoon.light_followup"));
 
         private final Consumer<AnimationBuilder> animator;
 

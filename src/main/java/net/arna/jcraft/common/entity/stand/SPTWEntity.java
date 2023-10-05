@@ -3,6 +3,7 @@ package net.arna.jcraft.common.entity.stand;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.attack.moves.starplatinum.theworld.GroundSlamAttack;
 import net.arna.jcraft.common.config.JServerConfig;
@@ -26,8 +27,17 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .withImpactSound(JSoundRegistry.IMPACT_8)
             .withLaunch()
             .withInfo(Text.literal("Ground Slam"), Text.literal("low hitbox, decent damage, launches"));
+    public static final SimpleAttack<SPTWEntity> LIGHT_FOLLOWUP = new SimpleAttack<SPTWEntity>(
+            0, 5, 14, 0.75f, 6, 12, 1.5f, 1f, -0.1f)
+            .withAnim(State.LIGHT_FOLLOWUP)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withLaunch()
+            .withBlockStun(4)
+            .withExtraHitBox(0, 0.25, 1)
+            .withInfo(Text.literal("Punch"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<SPTWEntity> PUNCH = SimpleAttack.<SPTWEntity>lightAttack(5, 7,
             5f, 10, 0.2f, 0.75f, -0.1f)
+            .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(GROUND_SLAM)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("PUNCH"), Text.literal("quick combo starter, low knockback"));
@@ -119,9 +129,13 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
 
     @Override
     public void initMove(MoveType type) {
-        super.initMove(type);
-
-        if (type == MoveType.SPECIAL1) turnAround = getUserOrThrow().isSneaking();
+        if (type == MoveType.LIGHT && curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
+            AbstractMove<?, ? super SPTWEntity> followup = curMove.getFollowup();
+            if (followup != null) setMove(followup, (State) followup.getAnimation());
+        } else {
+            super.initMove(type);
+            if (type == MoveType.SPECIAL1) turnAround = getUserOrThrow().isSneaking();
+        }
     }
 
     @Override
@@ -161,7 +175,8 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
         GRAB(builder -> builder.playAndHold("animation.sptw.grab")),
         GRAB_HIT(builder -> builder.playAndHold("animation.sptw.grabhit")),
         TIME_SKIP(builder -> builder.loop("animation.sptw.idle")),
-        GROUND_SLAM(builder -> builder.playAndHold("animation.sptw.groundslam"));
+        GROUND_SLAM(builder -> builder.playAndHold("animation.sptw.groundslam")),
+        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.sptw.light_followup"));
 
         private final Consumer<AnimationBuilder> animator;
 

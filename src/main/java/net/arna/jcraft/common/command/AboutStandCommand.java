@@ -99,7 +99,7 @@ public class AboutStandCommand {
                                 .append(entry.getType().getFriendlyName())
                                 .append(Text.empty()
                                         .append(Text.literal(" ("))
-                                        .append(entry.getType().getKey())
+                                        .append(entry.getType().getKey().copy().formatted(Formatting.AQUA))
                                         .append(Text.literal(")")))))
                 .append(Text.literal(" - "))
                 .append(entry.getMove().getName().copy().formatted(Formatting.DARK_PURPLE))

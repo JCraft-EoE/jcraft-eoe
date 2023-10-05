@@ -1852,6 +1852,52 @@ Star Platinum
 The World
     >Added followup to Light
 
+D4C
+    >Added followup to Light
+
+Cream
+    >Added followup to Light
+
+● 4/10/2023
+Killer Queen
+    >Updated model and animations
+
+Whitesnake
+    >Added followup to Light
+
+Silver Chariot
+    >Added followup to Light
+
+Magician's Red
+    >Added followup to Light
+
+● 5/10/2023
+The Fool
+    >Added followup to Light
+
+Gold Experience
+    >Added followup to Light
+    >Rekka 3
+        >Animation adjusted
+        >Launches
+
+C-Moon
+    >Added followup to Light
+
+Made in Heaven
+    >Added followup to Light
+
+The World: Over Heaven
+    >Added followup to Light
+
+Gold Experience: Requiem
+    >Updated skins and animations
+    >Added followup to Aerial Light
+
+Star Platinum: The World
+    >Updated visuals and animations
+    >Added followup to Light
+
 priority (top to bottom)
 todo: counters that invalidate hit effects
 todo: fix predict not working with projectiles spawned after it started

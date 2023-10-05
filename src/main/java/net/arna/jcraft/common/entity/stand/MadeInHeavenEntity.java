@@ -46,8 +46,18 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .withImpactSound(SoundEvents.ITEM_TRIDENT_HIT)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
             .withInfo(Text.literal("Speed Chop"), Text.literal("tiny stun, procs bleed"));
+    public static final SimpleAttack<MadeInHeavenEntity> LIGHT_FOLLOWUP = new SimpleAttack<MadeInHeavenEntity>(
+            0, 6, 12, 0.75f, 5, 8, 1.5f, 1f, -0.1f)
+            .withAnim(State.LIGHT_FOLLOWUP)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withLaunch()
+            .withBlockStun(4)
+            .withExtraHitBox(0, 0.25, 1)
+            .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
+            .withInfo(Text.literal("Kick"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<MadeInHeavenEntity> SLICE = new SimpleAttack<MadeInHeavenEntity>(JCraft.LIGHT_COOLDOWN,
             5, 8, 0.75f, 4f, 10, 1.5f, 0.75f, -0.1f)
+            .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(SPEED_CHOP)
             .withImpactSound(SoundEvents.ITEM_TRIDENT_HIT)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
@@ -165,6 +175,14 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
         moves.register(MoveType.ULTIMATE, TIME_ACCELERATION, State.TIME_ACCELERATION);
 
         moves.register(MoveType.UTILITY, SPEED_SLICE, State.SPEED_SLICE);
+    }
+
+    @Override
+    public void initMove(MoveType type) {
+        if (type == MoveType.LIGHT && curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
+            AbstractMove<?, ? super MadeInHeavenEntity> followup = curMove.getFollowup();
+            if (followup != null) setMove(followup, (State) followup.getAnimation());
+        } else super.initMove(type);
     }
 
     public int getAccelTime() {
@@ -323,7 +341,8 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
         FURY_CHOP(builder -> builder.playAndHold("animation.mih.furychop")),
         TIME_ACCELERATION(builder -> builder.playAndHold("animation.mih.taccel")),
         CIRCLE_STARTUP(builder -> builder.playAndHold("animation.mih.circlestartup")),
-        SPEED_CHOP(builder -> builder.playAndHold("animation.mih.speedchop"));
+        SPEED_CHOP(builder -> builder.playAndHold("animation.mih.speedchop")),
+        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.mih.light_followup"));
 
         private final Consumer<AnimationBuilder> animator;
 

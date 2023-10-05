@@ -4,6 +4,7 @@ import lombok.NonNull;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.magiciansred.*;
 import net.arna.jcraft.common.attack.moves.shared.KnockdownAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
@@ -25,8 +26,16 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
     public static final RedirectAttack REDIRECT = new RedirectAttack(0, 7, 10, 0.75f)
             .withSound(JSoundRegistry.MR_REDIRECT)
             .withInfo(Text.literal("Redirect"), Text.literal("redirects all the users ankhs to where they're looking"));
+    public static final SimpleAttack<MagiciansRedEntity> LIGHT_FOLLOWUP = new SimpleAttack<MagiciansRedEntity>(
+            0, 6, 14, 0.65f, 6f, 12, 1.5f, 1.2f, -0.1f)
+            .withAnim(State.LIGHT_FOLLOWUP)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withLaunch()
+            .withBlockStun(4)
+            .withInfo(Text.literal("Punch"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<MagiciansRedEntity> LIGHT = new SimpleAttack<MagiciansRedEntity>(JCraft.LIGHT_COOLDOWN,
             5, 8, 0.75f, 5f, 16, 1.5f, 0.75f, -0.1f)
+            .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(REDIRECT)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
@@ -103,6 +112,14 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
     }
 
     @Override
+    public void initMove(MoveType type) {
+        if (type == MoveType.LIGHT && curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
+            AbstractMove<?, ? super MagiciansRedEntity> followup = curMove.getFollowup();
+            if (followup != null) setMove(followup, (State) followup.getAnimation());
+        } else super.initMove(type);
+    }
+
+    @Override
     public void tick() {
         super.tick();
 
@@ -148,7 +165,8 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
         CROSSFIRE_VARIATION(builder -> builder.playAndHold("animation.mr.crossfirevariation")),
         REDIRECT(builder -> builder.playAndHold("animation.mr.redirect")),
         RED_BIND(builder -> builder.playAndHold("animation.mr.redbind")),
-        DETECTOR(builder -> builder.playAndHold("animation.mr.detector"));
+        DETECTOR(builder -> builder.playAndHold("animation.mr.detector")),
+        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.mr.light_followup"));
 
         private final Consumer<AnimationBuilder> animator;
 

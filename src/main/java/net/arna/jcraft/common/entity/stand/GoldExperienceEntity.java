@@ -31,11 +31,20 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             1.25f, 4f, 5, 1.5f, 0.75f, 0.2f)
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withInfo(Text.literal("Place Berry Bush"), Text.literal("places an almost-ripe berry bush on the ground, this move cannot be aimed up or down"));
+    public static final SimpleAttack<GoldExperienceEntity> LIGHT_FOLLOWUP = new SimpleAttack<GoldExperienceEntity>(
+            0, 7, 12, 0.75f, 6, 7, 1.5f, 1f, -0.1f)
+            .withAnim(State.LIGHT_FOLLOWUP)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withLaunch()
+            .withBlockStun(4)
+            .withExtraHitBox(0, 0.25, 1)
+            .withInfo(Text.literal("Punch"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<GoldExperienceEntity> LIGHT = new SimpleAttack<GoldExperienceEntity>(
             15, 6, 9, 0.75f, 5f, 7, 1.5f, 0.75f, -0.1f)
+            .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(BERRY_BUSH)
             .withImpactSound(JSoundRegistry.IMPACT_1)
-            .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
+            .withInfo(Text.literal("Punch"), Text.literal("quick combo starter, low stun"));
     public static final SimpleAttack<GoldExperienceEntity> HEAVY = new SimpleAttack<GoldExperienceEntity>(
             200, 13, 22, 1f, 9f, 10, 1.5f, 1.5f, 0f)
             .withExtraHitBox(new HitBoxData(0, 0, 1.25))
@@ -78,8 +87,9 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .withBlockableType(BlockableType.NON_BLOCKABLE)
             .withInfo(Text.literal("Overclock"), Text.literal("slow, unblockable, devastating stun"));
     public static final RekkaAttack REKKA3 = new RekkaAttack(0, 12, 24, 1f, 7f,
-            15, 2f, 0.5f, 0f, 3, 0, null, null)
+            15, 2f, 0.75f, 0f, 3, 0, null, null)
             .withSound(JSoundRegistry.GE_REKKA3)
+            .withLaunch()
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withInfo(Text.literal("Rekka (Final Hit)"), Text.literal("knockdown"));
     public static final RekkaAttack REKKA2 = new RekkaAttack(0, 10, 18, 1f, 5f,
@@ -165,6 +175,12 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
 
                 handleMove(MoveType.SPECIAL3);
             }
+            case LIGHT -> {
+                if (curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
+                    AbstractMove<?, ? super GoldExperienceEntity> followup = curMove.getFollowup();
+                    if (followup != null) setMove(followup, (State) followup.getAnimation());
+                } else super.initMove(type);
+            }
             default -> super.initMove(type);
         }
     }
@@ -228,7 +244,8 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
         REKKA1(builder -> builder.playAndHold("animation.ge.rekka1")),
         REKKA2(builder -> builder.playAndHold("animation.ge.rekka2")),
         REKKA3(builder -> builder.playAndHold("animation.ge.rekka3")),
-        OVERCLOCK(builder -> builder.playAndHold("animation.ge.overclock"));
+        OVERCLOCK(builder -> builder.playAndHold("animation.ge.overclock")),
+        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.ge.light_followup"));
 
         private final Consumer<AnimationBuilder> animator;
 

@@ -4,6 +4,7 @@ import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.BlockableType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.EffectInflictingAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
@@ -27,8 +28,17 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEntity.State> {
+    public static final SimpleAttack<WhiteSnakeEntity> LIGHT_FOLLOWUP = new SimpleAttack<WhiteSnakeEntity>(
+            0, 7, 13, 0.75f, 6f, 10, 1.5f, 1f, 0.2f)
+            .withAnim(State.LIGHT_FOLLOWUP)
+            .withImpactSound(JSoundRegistry.IMPACT_3)
+            .withLaunch()
+            .withBlockStun(4)
+            .withInfo(Text.literal("Punch"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<WhiteSnakeEntity> LIGHT = SimpleAttack.<WhiteSnakeEntity>lightAttack(
             7, 14, 5f, 12, 0.75f, 0.75f, 0.2f)
+            .withFollowup(LIGHT_FOLLOWUP)
+            //TODO: WS CROUCHING M1
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
     public static final SimpleAttack<WhiteSnakeEntity> DONUT = new SimpleAttack<WhiteSnakeEntity>(
@@ -134,6 +144,14 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         moves.register(MoveType.UTILITY, PILOT_MODE);
     }
 
+    @Override
+    public void initMove(MoveType type) {
+        if (type == MoveType.LIGHT && curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
+            AbstractMove<?, ? super WhiteSnakeEntity> followup = curMove.getFollowup();
+            if (followup != null) setMove(followup, (State) followup.getAnimation());
+        } else super.initMove(type);
+    }
+
     public void togglePilotMode() {
         setRemote(!isRemote());
         registerMoves(); // To switch the ultimate with the proper one.
@@ -219,7 +237,8 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         LEFT_DASH(builder -> builder.loop("animation.whitesnake.ldash")),
         RIGHT_DASH(builder -> builder.loop("animation.whitesnake.rdash")),
 
-        MELT_YOUR_HEART(builder -> builder.playAndHold("animation.whitesnake.meltyourheart"));
+        MELT_YOUR_HEART(builder -> builder.playAndHold("animation.whitesnake.meltyourheart")),
+        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.whitesnake.light_followup"));
 
         private final Consumer<AnimationBuilder> animator;
 

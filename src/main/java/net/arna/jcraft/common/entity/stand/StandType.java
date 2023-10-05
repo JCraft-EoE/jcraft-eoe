@@ -52,7 +52,7 @@ public enum StandType {
     KILLER_QUEEN_BITES_THE_DUST(JEntityTypeRegistry.KILLER_QUEEN_BITES_THE_DUST, KQBTDEntity::new, "kqbtd",true,    // -4
             Text.literal("Veiled"), Text.literal("Back from the Dead"), Text.literal("Garf")),
     GOLD_EXPERIENCE_REQUIEM(JEntityTypeRegistry.GER, GEREntity::new, "ger", true,                                   // -5
-            Text.literal("Energized"), Text.literal("Manga"), Text.literal("Silver")),
+            Text.literal("Silver"), Text.literal("Manga"), Text.literal("Cherry Blossom")),
     STAR_PLATINUM_THE_WORLD(JEntityTypeRegistry.SPTW, SPTWEntity::new, "sptw", true,                                // -6
             Text.literal("Judge, Jury, Executioner"), Text.literal("Diamond"), Text.literal("Over Heaven"));
 

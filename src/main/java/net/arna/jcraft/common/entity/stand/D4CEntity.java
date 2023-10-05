@@ -7,6 +7,7 @@ import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.StunType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.dirtydeedsdonedirtcheap.*;
 import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
@@ -29,10 +30,19 @@ import java.util.function.Consumer;
 public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
     public static final ItemPlaceMove ITEM_PLACE = new ItemPlaceMove(JCraft.LIGHT_COOLDOWN, 11, 15, 0.75f)
             .withInfo(Text.literal("Item Place"), Text.literal("places an item from an alternate universe on the ground, attracts other such items"));
+    public static final SimpleAttack<D4CEntity> LIGHT_FOLLOWUP = new SimpleAttack<D4CEntity>(
+            0, 9, 14, 0.75f, 7f, 8, 1.75f, 1.25f, -0.1f)
+            .withAnim(State.LIGHT_FOLLOWUP)
+            .withSound(JSoundRegistry.D4C_LIGHT)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withLaunch()
+            .withBlockStun(4)
+            .withExtraHitBox(0, 0, 1)
+            .withInfo(Text.literal("Deadly Blow"), Text.literal("combo finisher, more blockstun than other light followups"));
     public static final SimpleAttack<D4CEntity> CHOP = new SimpleAttack<D4CEntity>(JCraft.LIGHT_COOLDOWN,
             9, 15, 0.75f, 5f, 22, 1.5f, 0.75f, -0.1f)
+            .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(ITEM_PLACE)
-            .withSound(JSoundRegistry.D4C_LIGHT)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withInfo(Text.literal("Chop"), Text.literal("quick combo starter"));
     public static final BarrageAttack<D4CEntity> BARRAGE = new BarrageAttack<D4CEntity>(240, 0, 70,
@@ -154,6 +164,12 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                 playSound(JSoundRegistry.D4C_DIMHOP, 1, 1);
                 return;
             }
+        } else if (type == MoveType.LIGHT && curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
+            AbstractMove<?, ? super D4CEntity> followup = curMove.getFollowup();
+            if (followup != null) {
+                setMove(followup, (State) followup.getAnimation());
+                return;
+            }
         }
 
         super.initMove(type);
@@ -209,7 +225,8 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
         COUNTER_MISS(builder -> builder.playAndHold("animation.d4c.counter_miss")),
         GIVE_GUN(builder -> builder.playAndHold("animation.d4c.givegun")),
         FLAG(builder -> builder.playAndHold("animation.d4c.flag")),
-        ITEM_PLACE(builder -> builder.playAndHold("animation.d4c.itemplace"));
+        ITEM_PLACE(builder -> builder.playAndHold("animation.d4c.itemplace")),
+        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.d4c.light_followup"));
 
         private final Consumer<AnimationBuilder> animator;
 
