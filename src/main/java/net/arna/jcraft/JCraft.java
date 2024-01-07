@@ -54,10 +54,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.example.GeckoLibMod;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static net.arna.jcraft.common.entity.stand.StandEntity.stun;
 
@@ -95,7 +92,7 @@ public class JCraft implements ModInitializer {
 
     public static final Object2IntMap<LivingEntity> burstTimers = new Object2IntOpenHashMap<>();
 
-    public static final List<DashData> dashes = new ArrayList<>();
+    public static final Map<LivingEntity, DashData> dashes = new WeakHashMap<>();
 
     @Getter
     private static final Map<Entity, EntityInterest> entitiesOfInterest = new HashMap<>();
@@ -244,16 +241,12 @@ public class JCraft implements ModInitializer {
         }
     }
 
-    public static boolean isDashing(LivingEntity player) {
-        for (DashData dash : dashes)
-            if (player == dash.entity) return true;
-        return false;
+    public static boolean isDashing(LivingEntity entity) {
+        return dashes.containsKey(entity);
     }
 
-    public static DashData getDash(LivingEntity player) {
-        for (DashData dash : dashes)
-            if (player == dash.entity) return dash;
-        return null;
+    public static DashData getDash(LivingEntity entity) {
+        return dashes.get(entity);
     }
 
     public static void tryDash(int forward, int side, LivingEntity entity) {
@@ -276,11 +269,11 @@ public class JCraft implements ModInitializer {
         }
 
         Vec3d dashDir = RotationUtil.vecPlayerToWorld( rotVec, GravityChangerAPI.getGravityDirection(entity) ); //todo: fix diagonal dashes while in custom gravity
-        dashes.add(new DashData(dashDir.normalize().multiply(dashSpeed), entity));
+        dashes.put(entity, new DashData(dashDir.normalize().multiply(dashSpeed), entity));
 
         // Syncs dash anim (unless already attacking with a spec) with every player in the vicinity
         if (entity instanceof ServerPlayerEntity player) {
-            JSpec spec = JUtils.getSpec(player);
+            JSpec<?, ?> spec = JUtils.getSpec(player);
 
             if (spec == null || spec.moveStun < 1)
                 PlayerLookup.around((ServerWorld) entity.getWorld(), entity.getPos(), 96).forEach( //todo: find a less arbitrary number for radius here

@@ -162,16 +162,13 @@ public class JServerTickEvents {
         JCraft.burstTimers.putAll(newBurstTimers);
 
         // Dash handling
-        List<DashData> newDashes = new ArrayList<>();
-
-        for (DashData dash : JCraft.dashes) {
+        for (Map.Entry<LivingEntity, DashData> entry : new HashSet<>(JCraft.dashes.entrySet())) {
+            DashData dash = entry.getValue();
             dash.tickDash();
-            if (dash.finished) continue;
-            newDashes.add(dash);
+
+            if (dash.finished) JCraft.dashes.remove(entry.getKey());
         }
 
-        JCraft.dashes.clear();
-        JCraft.dashes.addAll(newDashes);
 
         for (ServerWorld serverWorld : server.getWorlds()) {
             List<? extends MobEntity> mobEntities = serverWorld.getEntitiesByType(TypeFilter.instanceOf(MobEntity.class), EntityPredicates.VALID_ENTITY);
