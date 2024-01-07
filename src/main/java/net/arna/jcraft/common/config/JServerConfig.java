@@ -63,7 +63,7 @@ public class JServerConfig {
             JsonObject data = gson.fromJson(reader, JsonObject.class);
             for (String key : data.keySet()) {
                 ConfigOption option = ConfigOption.getImmutableOptions().get(key);
-                option.read(data.get(key));
+                if (option != null) option.read(data.get(key));
             }
         } catch (IOException e) {
             JCraft.LOGGER.error("An error occurred trying to read the server config.", e);
