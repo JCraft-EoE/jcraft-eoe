@@ -31,12 +31,13 @@ public class StandBlockPacket {
             else blocking.remove(player);
 
             StandEntity<?, ?> stand = JUtils.getStand(player);
-            if (JCraft.isDashing(player) || stand == null) return;
+            if (stand == null) return;
+
             boolean blocking = stand.wantToBlock;
             if (!blocking && blockDown) {
                 if (player.getMainHandStack().getUseAction() == UseAction.NONE && player.getOffHandStack().getUseAction() == UseAction.NONE) {
                     stand.wantToBlock = true;
-                    if (stand.canAttack()) stand.blocking = true;
+                    if (stand.canAttack() && !JCraft.isDashing(player)) stand.blocking = true;
                 }
             } else if (blocking && !blockDown) stand.wantToBlock = false;
         });

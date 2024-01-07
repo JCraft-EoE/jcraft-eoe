@@ -851,7 +851,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 }
             }
 
-            if (wantToBlock && !blocking && canAttack()) blocking = true;
+            if (wantToBlock && !blocking && (user == null || !JCraft.isDashing(user)) && canAttack()) blocking = true;
 
             if (moveStun <= 0 && !blocking) {
                 // Attack buffering
