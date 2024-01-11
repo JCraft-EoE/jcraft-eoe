@@ -328,7 +328,7 @@ public class JCraftClient implements ClientModInitializer {
     }
 
     /**
-     * @return cleaned up version of TranslatableText name of button
+     * @return a cleaned-up version of TranslatableText name of button
      */
     private String generateName(KeyBinding keyBinding) {
         String str = keyBinding.getBoundKeyTranslationKey();

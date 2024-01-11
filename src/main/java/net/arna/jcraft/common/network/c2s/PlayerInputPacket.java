@@ -9,9 +9,7 @@ import net.arna.jcraft.common.component.StandComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.spec.JSpec;
-import net.arna.jcraft.common.util.CooldownType;
-import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.common.util.MovementInputType;
+import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -28,21 +26,17 @@ import java.util.*;
 import static net.arna.jcraft.JCraft.*;
 
 public class PlayerInputPacket {
-    private static final Map<ServerPlayerEntity, StateManager> stateManagers = Collections.synchronizedMap(new WeakHashMap<>());
-
     static {
         ServerTickEvents.START_SERVER_TICK.register(server -> {
-            for (Map.Entry<ServerPlayerEntity, StateManager> entry : stateManagers.entrySet()) {
-                ServerPlayerEntity player = entry.getKey();
-                StateManager sm = entry.getValue();
+            for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+                InputStateManager sm = ((IJInputStateManagerHolder) player).jcraft$getJInputStateManager();
 
                 // Handle held inputs
                 sm.heldInputs.forEach(type -> handleMoveInput(server, player, type));
 
                 int forward = sm.calcForward();
                 int side = sm.calcSide();
-                JComponents.getMiscData(player).updateRemoteInputs(
-                        forward, sm.calcSide(), sm.jumping);
+                JComponents.getMiscData(player).updateRemoteInputs(forward, side, sm.jumping);
 
                 StandEntity<?, ?> stand = JUtils.getStand(player);
                 if (stand != null) stand.updateRemoteInputs(forward, side, sm.jumping);
@@ -76,12 +70,12 @@ public class PlayerInputPacket {
     }
 
     public static void handle(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler network, PacketByteBuf buf, PacketSender sender) {
-        StateManager sm = stateManagers.computeIfAbsent(player, p -> new StateManager());
+        InputStateManager sm = getInputStateManager(player);
         handleMovementInput(server, player, buf, sm);
         handleMoveInput(player, buf, sm);
     }
 
-    private static void handleMovementInput(MinecraftServer server, ServerPlayerEntity player, PacketByteBuf buf, StateManager sm) {
+    private static void handleMovementInput(MinecraftServer server, ServerPlayerEntity player, PacketByteBuf buf, InputStateManager sm) {
         int count = buf.readVarInt();
 
         for (int i = 0; i < count; i++) {
@@ -106,7 +100,7 @@ public class PlayerInputPacket {
     }
 
 
-    private static void handleMoveInput(ServerPlayerEntity player, PacketByteBuf buf, StateManager sm) {
+    private static void handleMoveInput(ServerPlayerEntity player, PacketByteBuf buf, InputStateManager sm) {
         int count = buf.readVarInt();
         for (int i = 0; i < count; i++) {
             MoveInputType type = buf.readEnumConstant(MoveInputType.class);
@@ -182,30 +176,14 @@ public class PlayerInputPacket {
 
     private static void checkComboBreak(ServerPlayerEntity player) {
         // Combo break if stunned, jumping and crouching
-        StateManager sm = stateManagers.get(player);
+        InputStateManager sm = getInputStateManager(player);
         if (sm == null || !sm.jumping || !player.isSneaking() || JUtils.isBlocking(player)) return;
 
         StatusEffectInstance stun = player.getStatusEffect(JStatusRegistry.DAZED);
         if (stun != null) JCraft.comboBreak(player.getWorld(), player, stun);
     }
 
-    private static class StateManager {
-        public Set<MoveInputType> heldInputs = EnumSet.noneOf(MoveInputType.class);
-        public boolean forward, backward, left, right;
-        public boolean dashing, jumping;
-
-        public int calcForward() {
-            int forward = 0;
-            if (this.forward) forward++;
-            if (backward) forward--;
-            return forward;
-        }
-
-        public int calcSide() {
-            int side = 0;
-            if (left) side++;
-            if (right) side--;
-            return side;
-        }
+    private static InputStateManager getInputStateManager(ServerPlayerEntity player) {
+        return ((IJInputStateManagerHolder) player).jcraft$getJInputStateManager();
     }
 }

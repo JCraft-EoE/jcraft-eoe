@@ -2,6 +2,8 @@ package net.arna.jcraft.mixin;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.stand.StandEntity;
+import net.arna.jcraft.common.util.IJInputStateManagerHolder;
+import net.arna.jcraft.common.util.InputStateManager;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -13,8 +15,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ServerPlayerEntity.class)
-public class ServerPlayerEntityMixin {
+public class ServerPlayerEntityMixin implements IJInputStateManagerHolder {
     private @Unique boolean hadStand = false;
+    private final @Unique InputStateManager inputStateManager = new InputStateManager();
 
     @Inject(method = "moveToWorld", at = @At("HEAD"))
     private void saveStandStateBeforeWorldMove(ServerWorld destination, CallbackInfoReturnable<Entity> cir) {
@@ -36,5 +39,10 @@ public class ServerPlayerEntityMixin {
         if (stand == null) return;
 
         stand.setPlayDesummonSound(false);
+    }
+
+    @Override
+    public InputStateManager jcraft$getJInputStateManager() {
+        return inputStateManager;
     }
 }

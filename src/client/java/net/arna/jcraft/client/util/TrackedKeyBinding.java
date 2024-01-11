@@ -25,7 +25,7 @@ public class TrackedKeyBinding {
             bindings.values().forEach(TrackedKeyBinding::reset);
             if (client.currentScreen != null) {
                 bindings.values().stream()
-                        .filter(binding -> binding.getParent().isPressed())
+                        .filter(TrackedKeyBinding::isDown)
                         .forEach(TrackedKeyBinding::markReleased);
                 resetForScreen = true;
             } else resetForScreen = false;
@@ -52,6 +52,10 @@ public class TrackedKeyBinding {
 
         if (pressed) trackedBinding.markPressed();
         else trackedBinding.markReleased();
+    }
+
+    public boolean isDown() {
+        return parent.isPressed();
     }
 
     private void markPressed() {
