@@ -23,4 +23,14 @@ public class InputStateManager {
         if (right) side--;
         return side;
     }
+
+    public void copyFrom(InputStateManager other) {
+        this.heldInputs = EnumSet.copyOf(other.heldInputs);
+        this.forward = other.forward;
+        this.backward = other.backward;
+        this.left = other.left;
+        this.right = other.right;
+        this.dashing = other.dashing;
+        this.jumping = other.jumping;
+    }
 }
