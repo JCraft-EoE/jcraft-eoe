@@ -5,6 +5,10 @@ import net.arna.jcraft.common.attack.core.MoveInputType;
 import java.util.EnumSet;
 import java.util.Set;
 
+/**
+ * Very simple datastructure that stores the state of the player's inputs.
+ * Look at PlayerInputPacket for usage.
+ */
 public class InputStateManager {
     public Set<MoveInputType> heldInputs = EnumSet.noneOf(MoveInputType.class);
     public boolean forward, backward, left, right;
