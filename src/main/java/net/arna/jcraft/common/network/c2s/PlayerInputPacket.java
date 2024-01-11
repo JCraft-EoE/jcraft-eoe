@@ -29,7 +29,7 @@ public class PlayerInputPacket {
     static {
         ServerTickEvents.START_SERVER_TICK.register(server -> {
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-                InputStateManager sm = ((IJInputStateManagerHolder) player).jcraft$getJInputStateManager();
+                InputStateManager sm = getInputStateManager(player);
 
                 // Handle held inputs
                 sm.heldInputs.forEach(type -> handleMoveInput(server, player, type));
