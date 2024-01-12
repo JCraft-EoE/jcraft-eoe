@@ -1898,6 +1898,13 @@ Star Platinum: The World
     >Updated visuals and animations
     >Added followup to Light
 
+● 01/12/2023
+Fixed input system failures
+Fixed being able to place liquids while stunned
+
+Silver Chariot
+    >Fixed
+
 priority (top to bottom)
 todo: counters that invalidate hit effects
 todo: fix predict not working with projectiles spawned after it started

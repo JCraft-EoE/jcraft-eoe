@@ -2,12 +2,12 @@ package net.arna.jcraft.common.util;
 
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
 import net.arna.jcraft.common.component.JComponents;
-import net.arna.jcraft.common.component.SpecComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.network.s2c.JExplosionPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.splatter.JSplatterManager;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.block.BlockState;
@@ -17,6 +17,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
@@ -69,6 +70,11 @@ public final class JUtils {
                 return vec;
             }
         }
+    }
+
+    public static boolean canAct(LivingEntity living) {
+        StatusEffectInstance stun = living.getStatusEffect(JStatusRegistry.DAZED);
+        return stun == null || stun.getAmplifier() == 2;
     }
 
     public static void displayHitbox(World world, Vec3d min, Vec3d max) {
@@ -142,7 +148,7 @@ public final class JUtils {
         return toReturn;
     }
 
-    public static JSpec getSpec(PlayerEntity player) {
+    public static JSpec<?,?> getSpec(PlayerEntity player) {
         return JComponents.getSpecData(player).getSpec();
     }
 
