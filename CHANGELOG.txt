@@ -1901,6 +1901,7 @@ Star Platinum: The World
 ● 14/12/2023
 Fixed input system failures
 Fixed being able to place liquids while stunned
+Fixed barrage clashing
 
 Brawler
     >Fixed Sweep hitbox being too low
@@ -1912,6 +1913,10 @@ Killer Queen
 
 Killer Queen: Bites the Dust
     >Standardized Barrage hitbox size
+
+Cream
+    >Fixed flying during Surprise
+    >Fixed Cream remaining invisible after Void
 
 Made in Heaven
     >Heaven's Judgement is now the crouching followup to Divine Severance

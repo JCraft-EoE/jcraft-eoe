@@ -2,9 +2,11 @@ package net.arna.jcraft.common.attack.moves.base;
 
 import lombok.Getter;
 import lombok.NonNull;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.StunType;
 import net.arna.jcraft.common.entity.stand.StandEntity;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.LivingEntity;
@@ -67,16 +69,16 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A
 
         // Barrage clashing logic.
         for (LivingEntity target : targets) {
-            if (!(target instanceof StandEntity<?,?> targetStand) || !targetStand.curMove.isBarrage()) continue;
+            StandEntity<?, ?> targetStand = JUtils.getStand(target);
+            Vec3d forwardPos = stand.getRotationVector();
+            forwardPos = new Vec3d(stand.getX() + forwardPos.x, stand.getY() + forwardPos.y, stand.getZ() + forwardPos.z);
+            if (targetStand == null || targetStand.curMove == null || !targetStand.curMove.isBarrage() || targetStand.squaredDistanceTo(forwardPos) > 4) continue;
             onClash(attacker.getUserOrThrow());
+            onClash(target);
 
             // Override stun with high priority 0.5s stun, also stops all current sounds for cleaner audio cue
-            if (targetStand.hasUser()) {
-                onClash(targetStand.getUserOrThrow());
-
-                if (attacker.getUser() instanceof ServerPlayerEntity serverPlayer)
-                    serverPlayer.networkHandler.sendPacket(new StopSoundS2CPacket(null, SoundCategory.PLAYERS));
-            }
+            if (target instanceof ServerPlayerEntity serverPlayer)
+                serverPlayer.networkHandler.sendPacket(new StopSoundS2CPacket(null, SoundCategory.PLAYERS));
             if (attacker.getUserOrThrow() instanceof ServerPlayerEntity serverPlayer)
                 serverPlayer.networkHandler.sendPacket(new StopSoundS2CPacket(null, SoundCategory.PLAYERS));
 

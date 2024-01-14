@@ -260,35 +260,36 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     @Override
     public void tick() {
         super.tick();
-        boolean server = !this.world.isClient();
+        boolean server = !world.isClient();
 
         if (!hasUser()) return;
         LivingEntity user = getUserOrThrow();
         boolean isPlayer = false;
         boolean notCorS = false;
 
-        Vec3d pos = this.getEyePos();
-        int vTime = this.getVoidTime();
-        boolean voiding = (vTime > 0);
+        Vec3d pos = getEyePos();
+        int voidTime = getVoidTime();
+        boolean voiding = (voidTime > 0);
 
-        // Players get creative flight, and mobs get nogravved and y level equalization (see: if voiding)
+        // Players get creative flight, and mobs get gravity removed and y level equalization with target; see: handleAIVoid()
         if (user instanceof PlayerEntity playerEntity) {
             notCorS = (!playerEntity.isCreative() && !playerEntity.isSpectator());
-            if (notCorS && !charging)
+            if (notCorS && !charging && !isFree())
                 playerEntity.getAbilities().flying = voiding;
             isPlayer = true;
         }
 
         if (server) {
             if (!charging) {
-                if (this.curMove != null) {
-                    this.setVoidTime(0);
+                if (curMove != null) {
+                    setVoidTime(0);
+                    resetAlphaOverride();
                     voiding = false;
                 }
-                this.idleOverride = this.getVoidTime() > 0;
+                idleOverride = getVoidTime() > 0;
             }
 
-            user.setInvulnerable(this.getVoidTime() > 0);
+            user.setInvulnerable(getVoidTime() > 0);
         }
 
         if (voiding) {
@@ -308,44 +309,21 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                 }
 
                 if (charging) {
-                    if (isFree()) {
+                    if (isFree()) { // Surprise move
                         Vec3f newPos = getFreePos().copy();
                         newPos.add(getMoveContext().get(SurpriseMove.OUT_DIR));
                         setFreePos(newPos);
-                    } else if (chargeDir != null) {
+                    } else if (chargeDir != null) { // Void Charge move
                         user.setVelocity(chargeDir);
                         user.velocityModified = true;
                         if (user instanceof ServerPlayerEntity player)
                             player.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(user));
                     }
-                } else {
+                } else { // Ultimate
                     setStateNoReset(State.IDLE);
 
-                    if (!isPlayer) {
-                        double y = user.getY();
-                        Vec3d vel = new Vec3d(user.getVelocity().x, 0.0, user.getVelocity().z);
-
-                        // Targeting priority
-                        LivingEntity targetEntity = user.getDamageTracker().getBiggestAttacker();
-                        if (targetEntity == null && user instanceof MobEntity mob)
-                            targetEntity = mob.getTarget();
-                        if (targetEntity == null)
-                            targetEntity = user.getAttacker();
-
-                        // If target wasn't found, thrash around
-                        Vec3d target = targetEntity != null ? targetEntity.getPos() : this.getPos().add(Math.sin(this.age * 0.2) * 2, Math.sin(this.age * 0.2) / 4, Math.cos(this.age * 0.2) * 2);
-
-                        double dY = MathHelper.clamp(target.getY() - y, -1, 1);
-                        y += dY;
-
-                        vel = vel.add(target.subtract(user.getPos().add(random.nextDouble() * 2, random.nextDouble() * 3, random.nextDouble() * 3)).normalize()).multiply(0.3);
-
-                        user.setVelocity(vel);
-                        user.setPos(user.getX(), y, user.getZ());
-
-                        if (vTime < 10)
-                            user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 5, 1, true, false));
-                    }
+                    if (!isPlayer)
+                        handleAIVoid(user, voidTime);
                 }
 
                 List<LivingEntity> toDamage = world.getEntitiesByClass(LivingEntity.class,
@@ -382,6 +360,12 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
 
                 if (notCorS && !isFree())
                     user.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 25, 0, false, false));
+
+                voidTime--;
+                if (voidTime < 1)
+                    resetAlphaOverride();
+                setVoidTime(voidTime);
+                setDistanceOffset(0);
             } else {
                 for (int i = 0; i < 16; i++)
                     world.addParticle(ParticleTypes.MYCELIUM,
@@ -390,10 +374,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                             pos.z + (random.nextFloat() - 0.5f) * 2f,
                             0, 0, 0);
             }
-
-            setVoidTime(vTime - 1);
-            setDistanceOffset(0);
-        } else {
+        } else { // Not voiding
             if (isIdle() && charging) {
                 charging = false;
                 setFree(false);
@@ -436,6 +417,32 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                 }
             } else resetAlphaOverride();
         }
+    }
+
+    private void handleAIVoid(LivingEntity user, int voidTime) {
+        double y = user.getY();
+        Vec3d vel = new Vec3d(user.getVelocity().x, 0.0, user.getVelocity().z);
+
+        // Targeting priority
+        LivingEntity targetEntity = user.getDamageTracker().getBiggestAttacker();
+        if (targetEntity == null && user instanceof MobEntity mob)
+            targetEntity = mob.getTarget();
+        if (targetEntity == null)
+            targetEntity = user.getAttacker();
+
+        // If target wasn't found, thrash around
+        Vec3d target = targetEntity != null ? targetEntity.getPos() : this.getPos().add(Math.sin(this.age * 0.2) * 2, Math.sin(this.age * 0.2) / 4, Math.cos(this.age * 0.2) * 2);
+
+        double dY = MathHelper.clamp(target.getY() - y, -1, 1);
+        y += dY;
+
+        vel = vel.add(target.subtract(user.getPos().add(random.nextDouble() * 2, random.nextDouble() * 3, random.nextDouble() * 3)).normalize()).multiply(0.3);
+
+        user.setVelocity(vel);
+        user.setPos(user.getX(), y, user.getZ());
+
+        if (voidTime < 10)
+            user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 5, 1, true, false));
     }
 
     @Override
