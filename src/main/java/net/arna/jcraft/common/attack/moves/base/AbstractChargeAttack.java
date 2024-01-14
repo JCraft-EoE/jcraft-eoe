@@ -2,6 +2,7 @@ package net.arna.jcraft.common.attack.moves.base;
 
 import lombok.Getter;
 import lombok.NonNull;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -54,10 +55,14 @@ public abstract class AbstractChargeAttack<T extends AbstractChargeAttack<T, A, 
         tickChargeAttack(attacker, shouldPerform(attacker), getMoveDistance(), getWindupPoint());
     }
 
-    public static void tickChargeAttack(StandEntity<?, ?> attacker, boolean shouldPerform, float moveDistance, int windupPoint) {
+    protected Vec3d advanceChargePos(StandEntity<?, ?> attacker, float moveDistance, int windupPoint) {
+        return attacker.getPos().add(getRotVec(attacker).multiply(moveDistance / windupPoint));
+    }
+
+    protected void tickChargeAttack(StandEntity<?, ?> attacker, boolean shouldPerform, float moveDistance, int windupPoint) {
         if (shouldPerform) {
             //float t = 1f - (float) curMoveStun / (float) realInitTime;
-            Vec3d newPos = attacker.getPos().add(getRotVec(attacker).multiply(moveDistance / windupPoint));
+            Vec3d newPos = advanceChargePos(attacker, moveDistance, windupPoint);
             //stand.setDistanceOffset(1 + attackDist * t * t);
             attacker.setFreePos(new Vec3f((float) newPos.x, (float) newPos.y, (float) newPos.z));
             attacker.setFree(true);

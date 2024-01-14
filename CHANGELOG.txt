@@ -1917,6 +1917,13 @@ Killer Queen: Bites the Dust
 Cream
     >Fixed flying during Surprise
     >Fixed Cream remaining invisible after Void
+    >Cream now returns to the state it was in before after Void
+
+Silver Chariot
+    >Circle Slash
+        >Fixed the attack not having a hitbox
+        >Minimum charge time reduced (1->0.75s)
+    >Fixed Shooting Star not being fully aimable
 
 Made in Heaven
     >Heaven's Judgement is now the crouching followup to Divine Severance

@@ -10,6 +10,7 @@ import net.arna.jcraft.common.entity.stand.StarPlatinumEntity;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3f;
 
 import java.util.Set;
 
@@ -37,7 +38,22 @@ public class ChargeBarrageAttack extends AbstractBarrageAttack<ChargeBarrageAtta
     public void tick(StarPlatinumEntity attacker) {
         super.tick(attacker);
 
-        AbstractChargeAttack.tickChargeAttack(attacker, shouldPerform(attacker), getMoveDistance(), getWindupPoint());
+        tickChargeBarrageAttack(attacker, shouldPerform(attacker), getMoveDistance(), getWindupPoint());
+    }
+
+    protected Vec3d advanceChargePos(StandEntity<?, ?> attacker, float moveDistance, int windupPoint) {
+        return attacker.getPos().add(getRotVec(attacker).multiply(moveDistance / windupPoint));
+    }
+
+    protected void tickChargeBarrageAttack(StandEntity<?, ?> attacker, boolean shouldPerform, float moveDistance, int windupPoint) {
+        if (shouldPerform) {
+            Vec3d newPos = advanceChargePos(attacker, moveDistance, windupPoint);
+            attacker.setFreePos(new Vec3f((float) newPos.x, (float) newPos.y, (float) newPos.z));
+            attacker.setFree(true);
+        } else {
+            attacker.setPosition(attacker.getUserOrThrow().getPos());
+            attacker.setRotationOffset(attacker.attackRotation);
+        }
     }
 
     @Override

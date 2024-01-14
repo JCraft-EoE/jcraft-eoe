@@ -18,7 +18,6 @@ public class ConsumeAttack extends AbstractSimpleAttack<ConsumeAttack, CreamEnti
     public @NonNull Set<LivingEntity> perform(CreamEntity attacker, LivingEntity user, MoveContext ctx) {
         Set<LivingEntity> targets = super.perform(attacker, user, ctx);
 
-        attacker.endHalfBall();
         attacker.setVoidTime(120);
         attacker.setCharging(false);
         attacker.setCurrentMove(null);

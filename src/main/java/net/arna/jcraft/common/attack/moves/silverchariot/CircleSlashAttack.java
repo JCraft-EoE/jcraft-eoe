@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.attack.moves.silverchariot;
 
 import lombok.NonNull;
+import net.arna.jcraft.common.attack.core.ctx.IntMoveVariable;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.entity.stand.SilverChariotEntity;
@@ -12,37 +13,22 @@ import net.minecraft.util.math.Vec3d;
 import java.util.Set;
 
 public class CircleSlashAttack extends AbstractSimpleAttack<CircleSlashAttack, SilverChariotEntity> {
-    private final float originalDamage;
+    public static final IntMoveVariable CHARGE_TIME = new IntMoveVariable(); // in half seconds
 
     public CircleSlashAttack(int cooldown, int windup, int duration, float moveDistance, float damage, int stun,
                              float hitboxSize, float knockback, float offset) {
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset);
-        originalDamage = damage;
-    }
-
-    @Override
-    public void onInitiate(SilverChariotEntity attacker) {
-        super.onInitiate(attacker);
-
-        // Reset damage
-        withDamage(originalDamage);
-    }
-
-    @Override
-    public void tick(SilverChariotEntity attacker) {
-        // This is fine cuz a copy is made when this attack is used.
-        if (attacker.getMoveStun() % 20 == 0) withDamage(getDamage() + 1.5f);
     }
 
     @Override
     public @NonNull Set<LivingEntity> perform(SilverChariotEntity attacker, LivingEntity user, MoveContext ctx) {
         Set<LivingEntity> targets = super.perform(attacker, user, ctx);
 
-        Vec3d pos = user.getPos();
+        withDamage(getDamage() + attacker.getMoveContext().getInt(CHARGE_TIME) * 0.75f);
         double launchMultiplier = getDamage() / 5; // damage [6.5 to 11]
 
         for (LivingEntity living : targets) {
-            Vec3d launchVec = living.getPos().subtract(pos).normalize().multiply(launchMultiplier);
+            Vec3d launchVec = living.getPos().subtract(user.getPos()).normalize().multiply(launchMultiplier);
             living.addVelocity(launchVec.x, launchVec.y + 0.2, launchVec.z);
 
             living.velocityModified = true;
@@ -51,6 +37,11 @@ public class CircleSlashAttack extends AbstractSimpleAttack<CircleSlashAttack, S
         }
 
         return targets;
+    }
+
+    @Override
+    public void registerContextEntries(MoveContext ctx) {
+        ctx.register(CHARGE_TIME);
     }
 
     @Override

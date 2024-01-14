@@ -756,10 +756,12 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         Direction gravDir = GravityChangerAPI.getGravityDirection(user);
 
+        /*
         Vec3d pos = this.getPos();
         Vec3d rotVec = getRotationVector();
         if (gravDir == Direction.UP)
             rotVec = new Vec3d(rotVec.x, -rotVec.y, rotVec.z);
+         */
 
         boolean isFree = isFree();
         boolean isRemote = isRemote();
@@ -826,23 +828,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
                 if (moveStun >= 0 && !blocking) {
                     float attackDist = move.getMoveDistance();
-                    int windupPoint = move.getWindupPoint();
-                    boolean isChargeAttack = move.isCharge();
 
-                    // TODO this can probably be incorporated into the new attack system.
-                    // Positioning
-                    if (isChargeAttack) {
-                        if (moveStun <= windupPoint) {
-                            //float t = 1f - (float) curMoveStun / (float) realInitTime;
-                            Vec3d newPos = pos.add(rotVec.multiply(attackDist / windupPoint));
-                            //this.setDistanceOffset(1 + attackDist * t * t);
-                            this.setFreePos(new Vec3f((float) newPos.x, (float) newPos.y, (float) newPos.z));
-                            this.setFree(true);
-                        } else {
-                            setPosition(user.getPos());
-                            setRotationOffset(attackRotation);
-                        }
-                    } else {
+                    if (!move.isCharge()) {
                         user.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 5, 4, true, false));
 
                         setAttackRotationOffset();

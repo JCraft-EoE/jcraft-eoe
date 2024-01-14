@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import static net.arna.jcraft.common.attack.moves.silverchariot.CircleSlashAttack.CHARGE_TIME;
+
 //todo: make crouching with SC increase attackDist
 public class SilverChariotEntity extends StandEntity<SilverChariotEntity, SilverChariotEntity.State> {
     public static final LastShotAttack LAST_SHOT = new LastShotAttack(140, 12, 15, 1f)
@@ -69,6 +71,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withInfo(Text.literal("Spinning Blade"), Text.literal("fast reliable combo starter/extender, low stun"));
     public static final RayDartAttack RAY_DART = new RayDartAttack(160, 13, 25,
             0.65f, 5f, 15, 1.75f, 0.25f, -0.2f)
+            .withSound(JSoundRegistry.SC_CHARGE)
             .withBlockStun(17)
             .withInfo(Text.literal("Ray Dart"), Text.literal("Silver Chariot and the user charge forward, combo finisher"));
     public static final CleaveAttack CLEAVE = new CleaveAttack(260, 12, 21, 0.75f, 9f,
@@ -78,7 +81,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withInfo(Text.literal("Cleave"), Text.literal("Silver Chariot detaches from the user, delivering an uninterruptible, combo-starting slice"));
     public static final SCChargeAttack CHARGE = new SCChargeAttack(280, 5, 19, 8f,
             5f, 17, 1.5f, 0.25f, 0f, State.P_CHARGE_HIT)
-            .withSound(JSoundRegistry.SC_CHARGE)
+            .withSound(JSoundRegistry.SC_SUMMON)
             .withBackstab(false)
             .withInfo(Text.literal("Shooting Star"), Text.literal("Silver Chariot detaches from the user and charges in the looked direction, combo starter/extender"));
     public static final SCCounterAttack COUNTER = new SCCounterAttack(480, 4, 34, 0.5f)
@@ -115,7 +118,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             260, 101, 100, 0.65f, 0f, 0, 0f, 0f, 0f)
             .withFollowup(CIRCLE_SLASH)
             .withArmor(2)
-            .withInfo(Text.literal("Circle Slash"), Text.literal("charges for a minimum of 1 second, tap again to release, 2 armor points"));
+            .withInfo(Text.literal("Circle Slash"), Text.literal("charges for a minimum of 0.75s, tap again to release, 2 armor points"));
     private static final TrackedData<Boolean> HAS_RAPIER;
     private static final TrackedData<Integer> MODE;
 
@@ -211,9 +214,12 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
     @Override
     public void initMove(MoveType type) {
         if (type == MoveType.UTILITY) {
-            if (curMove != null && curMove.getMoveType() == MoveType.UTILITY && getMoveStun() <= 80)
+            if (curMove != null && curMove.getMoveType() == MoveType.UTILITY && getMoveStun() <= 85)
                 setMove(CIRCLE_SLASH.copy(), State.CIRCLE_SLASH);
-            else handleMove(MoveType.UTILITY);
+            else { // Reset charge time, and begin charging again
+                getMoveContext().setInt(CHARGE_TIME, 0);
+                handleMove(MoveType.UTILITY);
+            }
         } else if (type == MoveType.LIGHT && curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
             AbstractMove<?, ? super SilverChariotEntity> followup = curMove.getFollowup();
             if (followup != null) setMove(followup, (State) followup.getAnimation());
@@ -258,6 +264,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         Mode mode = getMode();
 
         if (world.isClient) {
+            // Possession particles
             if (mode == Mode.POSSESSED)
                 for (int i = 0; i < 16; i++)
                     world.addParticle(
@@ -280,7 +287,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
                         0.0, 0.1, 0.0
                 );
 
-            // Possession state
+            // Set possession state
             setMode(Mode.POSSESSED);
             setPossessedDesc();
         } else if (!hasAnubis && mode == Mode.POSSESSED) {
@@ -297,6 +304,8 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         }
 
         ARMOR_OFF.tickArmor(this);
+        if (getMoveStun() % 10 == 0 && curMove != null && curMove.getOriginalMove() == CIRCLE_CHARGE)
+            getMoveContext().incrementInt(CHARGE_TIME, 1);
     }
 
     @Override

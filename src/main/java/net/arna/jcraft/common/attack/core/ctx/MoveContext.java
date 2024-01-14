@@ -51,6 +51,11 @@ public class MoveContext {
         entry.setValue(value);
     }
 
+    public void incrementInt(IntMoveVariable variable, int increment) {
+        IntMoveVariable.IntEntry entry = (IntMoveVariable.IntEntry) getEntry(variable);
+        entry.setValue(entry.getIntValue() + increment);
+    }
+
     @NotNull
     private <T> Entry<T> getEntry(MoveVariable<T> variable) {
         Entry<?> entry = entries.get(variable);
