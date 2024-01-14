@@ -35,7 +35,6 @@ import java.util.function.Consumer;
 
 import static net.arna.jcraft.common.attack.moves.silverchariot.CircleSlashAttack.CHARGE_TIME;
 
-//todo: make crouching with SC increase attackDist
 public class SilverChariotEntity extends StandEntity<SilverChariotEntity, SilverChariotEntity.State> {
     public static final LastShotAttack LAST_SHOT = new LastShotAttack(140, 12, 15, 1f)
             .withInfo(Text.literal("Last Shot"), Text.literal("Silver Chariot fires his rapier, " +
@@ -64,7 +63,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withHyperArmor()
             .withLaunch()
             .withInfo(Text.literal("Impaling Thrust"), Text.literal("slow, uninterruptible launcher"));
-    //todo: spin barrage deflecting projectiles, launch stun
+    //todo: spin barrage deflecting projectiles
     public static final SpinBarrageAttack SPIN_BARRAGE = new SpinBarrageAttack(240, 7, 24,
             0.65f, 1f, 10, 2f, 0.1f, 0f, 2)
             .withSound(JSoundRegistry.SC_SPIN)

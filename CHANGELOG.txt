@@ -1902,6 +1902,7 @@ Star Platinum: The World
 Fixed input system failures
 Fixed being able to place liquids while stunned
 Fixed barrage clashing
+Fixed being able to remotely block with stands out of detachment moves
 
 Brawler
     >Fixed Sweep hitbox being too low
@@ -1915,6 +1916,7 @@ Killer Queen: Bites the Dust
     >Standardized Barrage hitbox size
 
 Cream
+    >Added followup to Light
     >Fixed flying during Surprise
     >Fixed Cream remaining invisible after Void
     >Cream now returns to the state it was in before after Void
@@ -1925,11 +1927,11 @@ Silver Chariot
         >Minimum charge time reduced (1->0.75s)
     >Fixed Shooting Star not being fully aimable
 
+The Fool
+    >Sandstorm now stops when the target dies
+
 Made in Heaven
     >Heaven's Judgement is now the crouching followup to Divine Severance
-
-Silver Chariot
-    >DIDNT Fixed Circle Slash not having a hitbox
 
 priority (top to bottom)
 todo: counters that invalidate hit effects

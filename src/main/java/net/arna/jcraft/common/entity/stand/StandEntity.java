@@ -507,6 +507,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     /**
      * @return whether the stand should change its height depending on the user's look pitch
+     * As a general rule, low-hitbox moves should modify this to false, since otherwise players may move the hitbox into the ground
      */
     public boolean shouldOffsetHeight() {
         return getState().ordinal() > 0;
@@ -838,7 +839,11 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 }
             }
 
-            if (wantToBlock && !blocking && (user == null || !JCraft.isDashing(user)) && canAttack()) blocking = true;
+            if (wantToBlock && !blocking && (user == null || !JCraft.isDashing(user)) && canAttack()) {
+                if (isFree() && !isRemote())
+                    setFree(false);
+                blocking = true;
+            }
 
             if (moveStun <= 0 && !blocking) {
                 // Attack buffering

@@ -66,6 +66,12 @@ public class SandstormAttack extends AbstractSimpleAttack<SandstormAttack, TheFo
         }
 
         LivingEntity superTarget = ctx.get(SUPER_TARGET);
+
+        if (!superTarget.isAlive()) {
+            ctx.set(SUPER_TARGET, null);
+            return;
+        }
+
         superTarget.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 10, 0, true, false));
         superTarget.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 40, 0, true, false));
 

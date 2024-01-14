@@ -8,6 +8,7 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.BlockableType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.cream.*;
 import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.util.JParticleType;
@@ -44,10 +45,19 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             9, 15, 0.75f, 5f, 20, 1.75f, 0.75f, 0.3f,
             List.of(new StatusEffectInstance(StatusEffects.SLOWNESS, 40, 1)))
             .withInfo(Text.literal("Bite"), Text.literal("applies Slowness II (2s) on hit"));
+    public static final SimpleAttack<CreamEntity> LIGHT_FOLLOWUP = new SimpleAttack<CreamEntity>(
+            0, 7, 14, 0.75f, 6, 8, 1.75f, 1.1f, -0.1f)
+            .withAnim(State.LIGHT_FOLLOWUP)
+            .withImpactSound(JSoundRegistry.IMPACT_3)
+            .withLaunch()
+            .withBlockStun(4)
+            .withExtraHitBox(0, 0.25, 1)
+            .withInfo(Text.literal("Chop"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<CreamEntity> PUNCH = SimpleAttack.<CreamEntity>lightAttack(6, 14,
             5f, 20, 0.75f, 0.75f, 0.1f)
+            .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(BITE)
-            .withImpactSound(JSoundRegistry.IMPACT_3)
+            .withImpactSound(JSoundRegistry.IMPACT_4)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
     public static final SimpleAttack<CreamEntity> VERTICAL_CHOP = new SimpleAttack<CreamEntity>(200, 20,
             30, 1f, 8f, 40, 1.5f, 0.1f, 0f)
@@ -71,15 +81,11 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             1f, 3f, 30, 1.5f, 0f, 0f, GRAB_HIT, State.GRAB_HIT)
             .withSound(JSoundRegistry.CREAM_GRAB)
             .withInfo(Text.literal("Grab"), Text.literal("unblockable, knocks back"));
-//    public static final ChargeAttack<CreamEntity, State> CHARGE = new ChargeAttack<>(400, 5, 13,
-//            4f, 8f, 20, 1.5f, 0.25f, 0f, State.CHARGE_HIT)
-//            .withImpactSound(JSoundRegistry.IMPACT_3)
-//            .withInfo(Text.literal("Charge"), Text.literal("3.5 block range, combo starter/extender"));
     public static final SurpriseMove SURPRISE = new SurpriseMove(300, 14, 24, 1f)
             .withSound(JSoundRegistry.CREAM_SUMMON)
             .withInfo(Text.literal("Surprise"), Text.literal("Cream disappears into the ground, then pops out in a nearby looked location"));
     public static final DestroyAttack DESTROY = new DestroyAttack(320, 21, 30, 1f,
-            0f, 5, 2f, 1.25f, 0f)
+            8f, 5, 2f, 1.25f, 0f)
             .withSound(JSoundRegistry.CREAM_OVERHEAD)
             .withImpactSound(JSoundRegistry.IMPACT_5)
             .withLaunch()
@@ -211,6 +217,19 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         moves.register(MoveType.SPECIAL2, SURPRISE, State.SURPRISE);
         moves.register(MoveType.SPECIAL3, DESTROY, State.DESTROY);
         moves.register(MoveType.ULTIMATE, CONSUME, State.CONSUME);
+    }
+
+    @Override
+    public void initMove(MoveType type) {
+        if (type == MoveType.LIGHT && curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
+            AbstractMove<?, ? super CreamEntity> followup = curMove.getFollowup();
+            if (followup != null) {
+                setMove(followup, (State) followup.getAnimation());
+                return;
+            }
+        }
+
+        super.initMove(type);
     }
 
     @Override
@@ -455,6 +474,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public enum State implements StandAnimationState<CreamEntity> {
         IDLE((cream, builder) -> builder.loop("animation.cream." + ( cream.getVoidTime() > 0 ? "void" : cream.isHalfBall() ? "ball" : "" ) + "idle")),
         LIGHT(builder -> builder.playAndHold("animation.cream.light")),
+        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.cream.light_followup")),
         BALL_LIGHT(builder -> builder.playAndHold("animation.cream.balllight")),
         BLOCK(builder -> builder.loop("animation.cream.block")),
         BALL_BLOCK(builder -> builder.loop("animation.cream.ballblock")),
