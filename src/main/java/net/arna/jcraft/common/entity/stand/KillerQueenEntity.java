@@ -3,10 +3,7 @@ package net.arna.jcraft.common.entity.stand;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
-import net.arna.jcraft.common.attack.moves.killerqueen.CoinTossAttack;
-import net.arna.jcraft.common.attack.moves.killerqueen.KQGrabAttack;
-import net.arna.jcraft.common.attack.moves.killerqueen.KQGrabHitAttack;
-import net.arna.jcraft.common.attack.moves.killerqueen.SheerHeartAttackAttack;
+import net.arna.jcraft.common.attack.moves.killerqueen.*;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
@@ -66,17 +63,18 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
         if (type == MoveType.SPECIAL1) {
             LivingEntity user = getUserOrThrow();
             CooldownsComponent cooldowns = JComponents.getCooldowns(user);
-            if (user.isInSneakingPose() && cooldowns.getCooldown(CooldownType.STAND_SP1) < 1) {
+
+            if (user.isInSneakingPose() && cooldowns.getCooldown(CooldownType.STAND_SP1) <= 0) {
                 Block downBlock = world.getBlockState(user.getBlockPos().down()).getBlock();
-                boolean notAir = downBlock != Blocks.AIR && downBlock != Blocks.CAVE_AIR && downBlock != Blocks.VOID_AIR;
+                boolean notAir = (downBlock != Blocks.AIR && downBlock != Blocks.CAVE_AIR && downBlock != Blocks.VOID_AIR);
                 if (notAir) {
-                    bombEntity = null;
-                    bombBlock = user.getPos().add(0, -0.5, 0);
+                    moveContext.set(BombPlantAttack.BOMB_ENTITY, null);
+                    moveContext.set(BombPlantAttack.BOMB_POS, user.getPos().add(0, -0.5, 0));
                     cooldowns.setCooldown(CooldownType.STAND_SP1, BOMB_PLANT.getCooldown());
                 }
             } else {
                 handleMove(MoveType.SPECIAL1);
-                bombBlock = null;
+                moveContext.set(BombPlantAttack.BOMB_POS, null);
             }
 
             if (coin != null) coin.discard();

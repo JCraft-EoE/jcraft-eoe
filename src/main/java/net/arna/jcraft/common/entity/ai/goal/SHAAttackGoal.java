@@ -52,8 +52,8 @@ public class SHAAttackGoal extends Goal {
         double d = 3.0; // SHA_width^2 * 4
         double e = sha.squaredDistanceTo(target);
 
-        if (e <= d && cooldown-- <= 0) {
-            cooldown = 200;
+        if (cooldown-- <= 0 && e <= d) {
+            cooldown = 100;
             sha.Explode();
         }
     }

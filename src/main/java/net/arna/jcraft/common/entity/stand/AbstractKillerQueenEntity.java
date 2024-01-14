@@ -41,7 +41,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
             .withFollowup(LOW)
             .withInfo(Text.literal("Dual Punch"), Text.literal("combo starter, decent speed, has followup with more blockstun"));
     public static final BarrageAttack<AbstractKillerQueenEntity<?, ?>> BARRAGE = new BarrageAttack<AbstractKillerQueenEntity<?, ?>>(
-            240, 0, 50, 0.75f, 1f, 20, 1.5f, 0.1f, 0, 3)
+            240, 0, 50, 0.75f, 1f, 20, 2f, 0.1f, 0, 3)
             .withSound(JSoundRegistry.KQ_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, medium stun"));
@@ -50,10 +50,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
             .withBlockStun(8)
             .withInfo(Text.literal("Bomb Plant"), Text.literal("crouch to plant on the ground below you, stealthily"));
     public static final ExplosiveDashAttack EXPLOSIVE_DASH = new ExplosiveDashAttack(240);
-
     protected ItemEntity coin;
-    protected Entity bombEntity;
-    protected Vec3d bombBlock;
 
     protected AbstractKillerQueenEntity(StandType type, World worldIn, @Nullable SoundEvent summonSound) {
         super(type, worldIn, summonSound, true);

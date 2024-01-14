@@ -1898,12 +1898,26 @@ Star Platinum: The World
     >Updated visuals and animations
     >Added followup to Light
 
-● 01/12/2023
+● 14/12/2023
 Fixed input system failures
 Fixed being able to place liquids while stunned
 
+Brawler
+    >Fixed Sweep hitbox being too low
+
+Killer Queen
+    >Standardized Barrage hitbox size
+    >Fixed crouching Bomb Plant not working
+    >Sheer Heart Attack now detonates more consistently, every 5 seconds provided a target is close
+
+Killer Queen: Bites the Dust
+    >Standardized Barrage hitbox size
+
+Made in Heaven
+    >Heaven's Judgement is now the crouching followup to Divine Severance
+
 Silver Chariot
-    >Fixed
+    >DIDNT Fixed Circle Slash not having a hitbox
 
 priority (top to bottom)
 todo: counters that invalidate hit effects

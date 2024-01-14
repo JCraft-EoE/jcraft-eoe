@@ -108,7 +108,6 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withAerialVariant(GLIDE)
             .withBackstab(false)
             .withInfo(Text.literal("Sandwave"), Text.literal("The Fool turns into a quick sandwave that knocks anything it touches down"));
-    //todo: sand tornado tracking (projectile-only code)
     public static final SandTornadoMove SAND_TORNADO = new SandTornadoMove(280, 12, 13, 1f)
             .withSound(JSoundRegistry.FOOL_LAUNCH)
             .withInfo(Text.literal("Sand Tornado"), Text.literal("summons a slow, stunning sand tornado"));

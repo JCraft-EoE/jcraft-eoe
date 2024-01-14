@@ -111,15 +111,16 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                             it is charged by landing hits
                             the speedometer impacts the level of speed and haste granted by Time Acceleration
                             if the speedometer is full and the charging period finishes, enemies become standless for 15s"""));
-    public static final JudgementAttack JUDGEMENT = new JudgementAttack(300, 20, 60, 1.25f, 2)
-            .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
-            .withSound(JSoundRegistry.MIH_JUDGEMENT)
-            .withInfo(Text.literal("Divine Severance"), Text.literal("Made in Heaven rapidly speed slices an area, then finishes with a large, launching slice"));
     public static final CircleAttack CIRCLE = new CircleAttack(400, 13, 14, 1.25f)
-            .withCrouchingVariant(JUDGEMENT)
             .withSound(JSoundRegistry.MIH_CIRCLE)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
             .withInfo(Text.literal("Heaven's Judgement"), Text.literal("rapidly circles a looked-at target within 4m at a radius of 7m"));
+
+    public static final JudgementAttack JUDGEMENT = new JudgementAttack(300, 20, 60, 1.25f, 2)
+            .withCrouchingVariant(CIRCLE)
+            .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
+            .withSound(JSoundRegistry.MIH_JUDGEMENT)
+            .withInfo(Text.literal("Divine Severance"), Text.literal("Made in Heaven rapidly speed slices an area, then finishes with a large, launching slice"));
     private static final TrackedData<Integer> ACCEL_TIME;
     private static final TrackedData<Integer> SPEEDOMETER;
     private static final TrackedData<Boolean> AFTER_IMAGE;
@@ -171,7 +172,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
 
         moves.register(MoveType.SPECIAL1, LEG_CRUSHER, State.LEG_CRUSHER);
         moves.register(MoveType.SPECIAL2, FURY_CHOP, State.FURY_CHOP);
-        moves.register(MoveType.SPECIAL3, CIRCLE, State.CIRCLE_STARTUP).withCrouchingVariant(State.JUDGEMENT);
+        moves.register(MoveType.SPECIAL3, JUDGEMENT, State.JUDGEMENT).withCrouchingVariant(State.CIRCLE_STARTUP);
         moves.register(MoveType.ULTIMATE, TIME_ACCELERATION, State.TIME_ACCELERATION);
 
         moves.register(MoveType.UTILITY, SPEED_SLICE, State.SPEED_SLICE);
