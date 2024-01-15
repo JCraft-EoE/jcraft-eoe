@@ -24,7 +24,7 @@ public enum StandType {
     THE_WORLD(JEntityTypeRegistry.THE_WORLD, TheWorldEntity::new, "theworld",                                   // 2
             Text.literal("OVA"), Text.literal("Black"), Text.literal("Greatest High")),
     KING_CRIMSON(JEntityTypeRegistry.KING_CRIMSON, KingCrimsonEntity::new, "kingcrimson",                       // 3
-            Text.literal("Royal"), Text.literal("Manga"), Text.literal("Concept")),
+            Text.literal("Royal"), Text.literal("Manga"), Text.literal("Nightshade")),
     D4C(JEntityTypeRegistry.D4C, D4CEntity::new, "d4c",                                                         // 4
             Text.literal("Jojoveller"), Text.literal("Teaser"), Text.literal("Spangled")),
     CREAM(JEntityTypeRegistry.CREAM, CreamEntity::new, "cream",                                                 // 5

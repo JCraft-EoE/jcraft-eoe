@@ -46,13 +46,13 @@ public abstract sealed class AbstractStarPlatinumEntity<E extends AbstractStarPl
                         ~ represents a queued attack
                                                 
                             -the classic
-                            M1>Barrage>M1>Low Kick>Advancing Barrage~M1~Star Finger~Star Breaker
+                            M1>Barrage>M1>Roundhouse>Advancing Barrage~M1~Star Finger~Star Breaker
                             
                             -the blowback
                             Inhale>...>Star Finger>Star Breaker>Barrage>...
 
                             -the poke
-                            Star Finger>Low Kick>M1>Advancing Barrage~M1>Barrage>M1>Star Breaker""";
+                            Star Finger>Roundhouse>M1>Advancing Barrage~M1>Barrage>M1>Star Breaker""";
 
         //moves = List.of(light, heavy, barrage, starfinger, inhale, lowkick, starfinger, jump);
     }

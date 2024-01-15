@@ -1907,6 +1907,12 @@ Fixed being able to remotely block with stands out of detachment moves
 Brawler
     >Fixed Sweep hitbox being too low
 
+Star Platinum
+    >Fixed Advancing Barrage cooldown affecting spec special 3 instead of stand
+
+King Crimson
+    >Updated skins 2 and 3
+
 Killer Queen
     >Standardized Barrage hitbox size
     >Fixed crouching Bomb Plant not working
@@ -1916,6 +1922,7 @@ Killer Queen: Bites the Dust
     >Standardized Barrage hitbox size
 
 Cream
+    >Updated skins 1 and 2
     >Added followup to Light
     >Fixed flying during Surprise
     >Fixed Cream remaining invisible after Void

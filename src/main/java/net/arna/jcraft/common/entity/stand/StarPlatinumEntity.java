@@ -115,7 +115,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
             }
         }
 
-        if (type == MoveType.SPECIAL3) handleMove(CHARGE_BARRAGE.copy(), CooldownType.SPECIAL3, State.BARRAGE);
+        if (type == MoveType.SPECIAL3) handleMove(CHARGE_BARRAGE.copy(), CooldownType.STAND_SP3, State.BARRAGE);
         else super.initMove(type);
     }
 
