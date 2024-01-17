@@ -67,7 +67,7 @@ public class SandstormAttack extends AbstractSimpleAttack<SandstormAttack, TheFo
 
         LivingEntity superTarget = ctx.get(SUPER_TARGET);
 
-        if (!superTarget.isAlive()) {
+        if (superTarget == null || !superTarget.isAlive()) {
             ctx.set(SUPER_TARGET, null);
             return;
         }
