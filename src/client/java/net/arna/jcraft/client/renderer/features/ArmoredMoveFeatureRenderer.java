@@ -1,6 +1,5 @@
 package net.arna.jcraft.client.renderer.features;
 
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.component.JComponents;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;

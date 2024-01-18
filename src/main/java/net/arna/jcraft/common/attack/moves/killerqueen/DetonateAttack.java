@@ -6,6 +6,7 @@ import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
+import net.arna.jcraft.common.entity.projectile.BubbleProjectile;
 import net.arna.jcraft.common.entity.stand.AbstractKillerQueenEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.JParticleType;
@@ -39,8 +40,8 @@ public class DetonateAttack extends AbstractMove<DetonateAttack, AbstractKillerQ
 
             if (bombEntity != null) {
                 finalBombPos = bombEntity.getPos();
-                if (bombEntity instanceof ItemEntity)
-                    bombEntity.kill();
+                if (bombEntity instanceof ItemEntity || bombEntity instanceof BubbleProjectile)
+                    bombEntity.discard();
             }
             if (bombPos != null) finalBombPos = bombPos;
 

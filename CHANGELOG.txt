@@ -1952,14 +1952,18 @@ Anubis
     >Fixed being unable to block while Sheathed
     >Remodeled
 
+The Fool
+    >Updated skin 3
+
 C-Moon
     >Local Gravity Shift can now be used consistently
     >Gravity Shift Pulse activation range heavily reduced (64->16m)
 
+Killer Queen: Bites the Dust
+    >Fixed the bubble not being deleted after detonation
 
-CMOON IS INCONSISTENT (LOL IS IT EVEN MY FAULT?)
-kq:btd bubble doesnt despawn
-timeskip should be disabled in timestop :)
+Timestoppers
+    >Fixed being able to use Timeskip while in Timestop
 
 priority (top to bottom)
 todo: counters that invalidate hit effects

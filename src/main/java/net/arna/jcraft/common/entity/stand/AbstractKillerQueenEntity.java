@@ -49,7 +49,8 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withBlockStun(8)
             .withInfo(Text.literal("Bomb Plant"), Text.literal("crouch to plant on the ground below you, stealthily"));
-    public static final ExplosiveDashAttack EXPLOSIVE_DASH = new ExplosiveDashAttack(240);
+    public static final ExplosiveDashAttack EXPLOSIVE_DASH = new ExplosiveDashAttack(240)
+            .withInfo(Text.literal("Explosive Dash"), Text.literal("instantly boosts the user in the aimed direction"));
     protected ItemEntity coin;
 
     protected AbstractKillerQueenEntity(StandType type, World worldIn, @Nullable SoundEvent summonSound) {
