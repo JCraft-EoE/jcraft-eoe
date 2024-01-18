@@ -1943,6 +1943,7 @@ Made in Heaven
 ● 18/01/2024
 >Entities now flash when hit during an armored move
 >Added a unique sound to backstabs and armored hits
+>Stands now reflect most physical damage onto the user
 
 Commands
     >Fixed /attack not functioning when selecting a group of entities where only some have stands

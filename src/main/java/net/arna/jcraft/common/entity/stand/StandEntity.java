@@ -755,9 +755,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         if (!hasUser()) return;
 
+        /*
         Direction gravDir = GravityChangerAPI.getGravityDirection(user);
 
-        /*
         Vec3d pos = this.getPos();
         Vec3d rotVec = getRotationVector();
         if (gravDir == Direction.UP)
@@ -1055,7 +1055,12 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         // Interrupting spec moves
         if (ent instanceof PlayerEntity playerEntity) {
             JSpec<?, ?> spec = JUtils.getSpec(playerEntity);
-            if (spec != null && spec.curMove != null && --spec.armorPoints < 0) spec.cancelMove();
+            if (spec != null && spec.curMove != null) {
+                if (--spec.armorPoints < 0)
+                    spec.cancelMove();
+                else
+                    JComponents.getMiscData(playerEntity).displayArmoredHit();
+            }
         }
 
         // Aerial hits keep the victim up
