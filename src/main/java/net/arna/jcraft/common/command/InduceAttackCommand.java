@@ -1,7 +1,6 @@
 package net.arna.jcraft.common.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.argumenttype.AttackArgumentType;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.component.CooldownsComponent;
@@ -12,6 +11,7 @@ import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -54,16 +54,18 @@ public class InduceAttackCommand {
 
         if (stand) {
             for (Entity entity : targets) {
-                CooldownsComponent cooldowns = JComponents.COOLDOWNS.get(entity);
-                cooldowns.clear();
+                if (entity instanceof LivingEntity living) {
+                    CooldownsComponent cooldowns = JComponents.COOLDOWNS.get(living);
+                    cooldowns.clear();
 
-                StandComponent standData = JComponents.STAND.get(entity);
-                StandEntity<?, ?> standEntity = standData.getStand();
+                    StandComponent standData = JComponents.STAND.get(living);
+                    StandEntity<?, ?> standEntity = standData.getStand();
 
-                if (standEntity != null) {
-                    source.sendFeedback(Text.literal("Initiating stand attack " + typeName + " for " + entity.getName().getString()), true);
-                    standEntity.initMove(type);
-                    flag = 1;
+                    if (standEntity != null) {
+                        source.sendFeedback(Text.literal("Initiating stand attack " + typeName + " for " + living.getName().getString()), true);
+                        standEntity.initMove(type);
+                        flag = 1;
+                    }
                 }
             }
         } else {

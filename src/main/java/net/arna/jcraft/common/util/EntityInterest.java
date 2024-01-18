@@ -28,7 +28,7 @@ public class EntityInterest {
         BLOCK_ATTRACTION,
         ITEM_ATTRACTION,
         ENTITY_ATTRACTION, //todo: these two
-        STAND_USER;
+        STAND_USER
     }
 
     public static EntityInterest blockAttractionInterest(BlockPos attractionBlockPos) {

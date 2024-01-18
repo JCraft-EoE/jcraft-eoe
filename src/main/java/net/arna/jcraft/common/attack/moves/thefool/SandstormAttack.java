@@ -24,7 +24,6 @@ import java.util.Set;
 
 public class SandstormAttack extends AbstractSimpleAttack<SandstormAttack, TheFoolEntity> {
     public static final MoveVariable<LivingEntity> SUPER_TARGET = new MoveVariable<>(LivingEntity.class);
-    @SuppressWarnings("UnstableApiUsage") // Don't care
     public static final MoveVariable<List<FallingBlockEntity>> SANDS = new MoveVariable<>(new TypeToken<>() {});
 
     public SandstormAttack(int cooldown, int windup, int duration, float moveDistance, float damage, int stun, float hitboxSize, float knockback, float offset) {
@@ -45,7 +44,7 @@ public class SandstormAttack extends AbstractSimpleAttack<SandstormAttack, TheFo
         for (int i = 0; i < 8; i++) {
             FallingBlockEntity sand = FallingBlockEntity.spawnFromBlock(attacker.getWorld(), superTarget.getBlockPos(),
                     JObjectRegistry.FOOLISH_SAND_BLOCK.getDefaultState());
-            sand.timeFalling = -32767;
+            sand.timeFalling = -160;
             sand.noClip = true;
             sand.dropItem = false;
             sand.setBoundingBox(new Box(0, 0, 0, 0, 0, 0));
@@ -58,18 +57,22 @@ public class SandstormAttack extends AbstractSimpleAttack<SandstormAttack, TheFo
 
     public void tickSandstorm(TheFoolEntity attacker) {
         MoveContext ctx = attacker.getMoveContext();
+
         List<FallingBlockEntity> sands = ctx.get(SANDS);
-
-        if (sands.isEmpty()) {
-            ctx.set(SUPER_TARGET, null);
-            return;
-        }
-
         LivingEntity superTarget = ctx.get(SUPER_TARGET);
 
-        if (superTarget == null || !superTarget.isAlive()) {
-            ctx.set(SUPER_TARGET, null);
+        if (superTarget == null) {
             return;
+        } else {
+            if (sands.isEmpty()) {
+                ctx.set(SUPER_TARGET, null);
+                return;
+            }
+            if (!superTarget.isAlive()) {
+                ctx.set(SUPER_TARGET, null);
+                discardSands(attacker);
+                return;
+            }
         }
 
         superTarget.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 10, 0, true, false));

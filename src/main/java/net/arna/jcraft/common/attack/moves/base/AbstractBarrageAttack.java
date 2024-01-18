@@ -2,7 +2,6 @@ package net.arna.jcraft.common.attack.moves.base;
 
 import lombok.Getter;
 import lombok.NonNull;
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.StunType;
 import net.arna.jcraft.common.entity.stand.StandEntity;

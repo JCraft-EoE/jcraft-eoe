@@ -65,7 +65,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             .withAerialVariant(DOWNWARD_KICK)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
-    public static KnockdownAttack<GEREntity> OVERHEAD_SMASH = new KnockdownAttack<GEREntity>(220, 10, 19,
+    public static final KnockdownAttack<GEREntity> OVERHEAD_SMASH = new KnockdownAttack<GEREntity>(220, 10, 19,
             1f, 9f, 10, 1.5f, 1.1f, 0f, 30)
             .withAerialVariant(OVERHEAD_KICK)
             .withSound(JSoundRegistry.GER_HEAVY)

@@ -58,7 +58,7 @@ public abstract class PlayerEntityMixin implements IComboCounter {
 
     @Inject(at = @At("TAIL"), method = "tick")
     public void jcraft$playerTick(CallbackInfo info) {
-        JSpec spec = JComponents.getSpecData((PlayerEntity) (Object) this).getSpec();
+        JSpec<?, ?> spec = JComponents.getSpecData((PlayerEntity) (Object) this).getSpec();
         if (spec != null) spec.tickSpec();
 
         if (lastAttacked == null || !lastAttacked.isAlive()) return;
@@ -89,7 +89,7 @@ public abstract class PlayerEntityMixin implements IComboCounter {
     public void jcraft$attack(Entity target, CallbackInfo info) {
         if (JUtils.isAffectedByTimeStop((PlayerEntity) (Object) this)) info.cancel();
 
-        JSpec spec = JComponents.getSpecData((PlayerEntity) (Object) this).getSpec();
+        JSpec<?, ?> spec = JComponents.getSpecData((PlayerEntity) (Object) this).getSpec();
         if (spec != null && spec.moveStun > 0) info.cancel();
     }
 

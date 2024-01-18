@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class RapierModel extends AnimatedGeoModel<RapierProjectile> {
 
-    public static Map<Integer, Identifier> skins = new HashMap<>(
+    public static final Map<Integer, Identifier> skins = new HashMap<>(
             Map.ofEntries(
                     Map.entry(-1, RapierProjectile.ARMOR_OFF_TEXTURE),
                     Map.entry(-2, RapierProjectile.POSSESSED_TEXTURE)

@@ -23,6 +23,7 @@ public class ClearStandCommand {
                                 .executes(ClearStandCommand::run))));
     }
 
+    @SuppressWarnings("SameReturnValue")
     private static int run(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
         Collection<? extends Entity> targets = EntityArgumentType.getEntities(ctx, "targets");
 

@@ -1618,11 +1618,16 @@
 					},
 					"position": {
 						"0.0": {
-							"vector": [0, 12, 5]
+							"vector": [0, 10, 0]
 						},
 						"0.32": {
-							"vector": [0, 11, 1],
+							"vector": [0, 8, -5],
 							"easing": "easeOutSine"
+						},
+						"2.08": {
+							"vector": [0, 7.9, -5],
+							"easing": "easeInElastic",
+							"easingArgs": [10]
 						}
 					}
 				},
@@ -1648,8 +1653,7 @@
 						},
 						"2.08": {
 							"vector": [-27.31036, 45.7796, -32.20476],
-							"easing": "easeInOutElastic",
-							"easingArgs": [2]
+							"easing": "easeInOutSine"
 						}
 					}
 				},
@@ -1667,16 +1671,15 @@
 				"left_arm": {
 					"rotation": {
 						"0.0": {
-							"vector": [0, -35, 25]
+							"vector": [180, -145, 205]
 						},
 						"0.24": {
-							"vector": [0, -50, 25],
+							"vector": [180, -130, 205],
 							"easing": "easeOutSine"
 						},
 						"2.08": {
-							"vector": [0, -50, 25],
-							"easing": "easeInOutElastic",
-							"easingArgs": [2]
+							"vector": [188.84179, -130.58067, 216.57495],
+							"easing": "easeInOutSine"
 						}
 					}
 				},
@@ -1743,6 +1746,28 @@
 				"drill": {
 					"scale": {
 						"vector": [0, 0, 0]
+					}
+				},
+				"right_paw": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.48": {
+							"vector": [0, 0, -92.5],
+							"easing": "easeInOutSine"
+						}
+					}
+				},
+				"left_paw": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.48": {
+							"vector": [0, 0, -65],
+							"easing": "easeInOutSine"
+						}
 					}
 				}
 			}

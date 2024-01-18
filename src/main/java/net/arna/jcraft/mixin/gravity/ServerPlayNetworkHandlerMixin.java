@@ -21,9 +21,9 @@ public abstract class ServerPlayNetworkHandlerMixin {
 
     @Shadow public ServerPlayerEntity player;
 
-    @Shadow private static double clampHorizontal(double d) { return 0; };
+    @Shadow private static double clampHorizontal(double d) { return 0; }
 
-    @Shadow private static double clampVertical(double d) { return 0; };
+    @Shadow private static double clampVertical(double d) { return 0; }
 
     @Shadow private double updatedX;
 

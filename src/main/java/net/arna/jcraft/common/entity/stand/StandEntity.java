@@ -1006,14 +1006,17 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                     return;
                 }
 
-                if (--stand.armorPoints < 0) stand.cancelMove();
+                if (--stand.armorPoints < 0)
+                    stand.cancelMove();
+                else
+                    JComponents.getMiscData(ent).displayArmoredHit();
             }
 
             if (stand.blocking && !stand.isRemote()) {
                 double delta = Math.abs((ent.headYaw + 90.0f) % 360.0f - (attacker.getHeadYaw() + 90.0f) % 360.0f);
                 if (canBackstab && (360.0 - delta % 360.0 < 90 || delta % 360.0 < 90) && ent.squaredDistanceTo(attacker.getPos()) >= 1.5625) { // Backstab logic
                     JCraft.createParticle((ServerWorld) attacker.getWorld(), ent.getX(), attacker.getEyeY(), ent.getZ(), JParticleType.BACK_STAB);
-                    stand.playSound(SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, 1, 1);
+                    stand.playSound(JSoundRegistry.BACKSTAB, 1, 1);
                     stand.blocking = false;
                     overrideStun = true;
                 } else if (!unblockable) { // Didn't backstab, not unblockable
@@ -1120,8 +1123,14 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     @Override
     public boolean damage(DamageSource source, float amount) {
-        if (source.isMagic() || source.isExplosive()) return false;
-        return super.damage(source, amount);
+        if (user == null || user.isInvulnerableTo(source) || source.isFallingBlock()) return false;
+
+        if (source.isMagic() || source.isExplosive()) // AoE effects have damage nerfed
+            amount /= 2.0F;
+
+        if (getStandGauge() <= 0.0F || source.isOutOfWorld())
+            return super.damage(source, amount);
+        return user.damage(source, amount);
     }
 
     protected abstract @NonNull E getThis();
@@ -1149,7 +1158,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     @Override
     public boolean isAttackable() {
-        return false;
+        return true;
     }
 
     /**

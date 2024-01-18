@@ -47,7 +47,7 @@ public abstract class CameraMixin {
             )
     )
     private void redirect_update_setPos_0(Camera camera, double x, double y, double z, BlockView area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(focusedEntity);;
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(focusedEntity);
         Optional<RotationAnimation> animationOptional = GravityChangerAPI.getGravityAnimation(focusedEntity);
         if(animationOptional.isEmpty()){
             this.setPos(x, y, z);

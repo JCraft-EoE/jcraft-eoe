@@ -19,4 +19,7 @@ public interface MiscComponent extends Component, AutoSyncedComponent, CommonTic
 
     int getStuckKnifeCount();
     void stab();
+
+    int getArmoredHitTicks();
+    void displayArmoredHit();
 }

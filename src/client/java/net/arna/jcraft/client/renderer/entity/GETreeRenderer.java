@@ -6,8 +6,6 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3f;
 import software.bernie.geckolib3.renderers.geo.GeoEntityRenderer;
 
 public class GETreeRenderer extends GeoEntityRenderer<GETreeEntity> {

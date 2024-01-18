@@ -1,6 +1,7 @@
 package net.arna.jcraft.client.mixin;
 
 import net.arna.jcraft.client.registry.JRenderLayerRegistry;
+import net.arna.jcraft.client.renderer.features.ArmoredMoveFeatureRenderer;
 import net.arna.jcraft.client.renderer.features.StuckKnivesFeatureRenderer;
 import net.arna.jcraft.client.util.PlayerCloneClientPlayerEntity;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
@@ -40,9 +41,11 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
 
     @SuppressWarnings("unchecked")
     @Inject(at = @At("RETURN"), method = "<init>")
-    private void addStuckKnivesFeatureRenderer(EntityRendererFactory.Context ctx, EntityModel<?> model, float shadowRadius, CallbackInfo ci) {
-        if (model instanceof AnimalModel<?>)
+    private void addFeatureRenderers(EntityRendererFactory.Context ctx, EntityModel<?> model, float shadowRadius, CallbackInfo ci) {
+        if (model instanceof AnimalModel<?>) // StuckKnives
             addFeature((FeatureRenderer<T, M>) new StuckKnivesFeatureRenderer<>(ctx, (LivingEntityRenderer<T, ? extends AnimalModel<T>>) (Object) this));
+        if (model != null)
+            addFeature((FeatureRenderer<T, M>) new ArmoredMoveFeatureRenderer<>(ctx, (LivingEntityRenderer<T, ? extends EntityModel<T>>) (Object) this ));
     }
 
     @Inject(method = "hasLabel(Lnet/minecraft/entity/LivingEntity;)Z", at = @At("HEAD"), cancellable = true)

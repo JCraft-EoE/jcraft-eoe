@@ -1941,13 +1941,25 @@ Made in Heaven
     >Heaven's Judgement is now the crouching followup to Divine Severance
 
 ● 18/01/2024
+>Entities now flash when hit during an armored move
+>Added a unique sound to backstabs and armored hits
+
+Commands
+    >Fixed /attack not functioning when selecting a group of entities where only some have stands
+    >Fixed /stand block
 
 Anubis
+    >Fixed being unable to block while Sheathed
     >Remodeled
+
+C-Moon
+    >Local Gravity Shift can now be used consistently
+    >Gravity Shift Pulse activation range heavily reduced (64->16m)
 
 
 CMOON IS INCONSISTENT (LOL IS IT EVEN MY FAULT?)
 kq:btd bubble doesnt despawn
+timeskip should be disabled in timestop :)
 
 priority (top to bottom)
 todo: counters that invalidate hit effects

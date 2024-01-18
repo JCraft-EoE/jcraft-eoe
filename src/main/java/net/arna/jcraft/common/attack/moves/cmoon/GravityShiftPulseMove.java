@@ -36,7 +36,7 @@ public class GravityShiftPulseMove extends AbstractMove<GravityShiftPulseMove, C
     @Override
     public @NonNull Set<LivingEntity> perform(CMoonEntity attacker, LivingEntity user, MoveContext ctx) {
         Direction lookDir = JUtils.getLookDirection(user);
-        List<Entity> toCatch = attacker.getWorld().getEntitiesByClass(Entity.class, attacker.getBoundingBox().expand(64),
+        List<Entity> toCatch = attacker.getWorld().getEntitiesByClass(Entity.class, attacker.getBoundingBox().expand(16),
                 EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e -> e != attacker && e != user));
 
         ctx.setInt(SHIFT_AGE, attacker.age);

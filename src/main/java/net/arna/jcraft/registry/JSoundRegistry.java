@@ -17,6 +17,8 @@ public interface JSoundRegistry {
     SoundEvent STAND_SUMMON = registerSound("standsummon");
     SoundEvent STAND_DESUMMON = registerSound("desummon");
     SoundEvent STAND_BLOCK = registerSound("standblock");
+    SoundEvent BACKSTAB = registerSound("backstab");
+    SoundEvent ARMORED_HIT = registerSound("armoredhit");
     SoundEvent COMBO_BREAK = registerSound("combobreak");
     SoundEvent COOLDOWN_CANCEL = registerSound("cooldowncancel");
     SoundEvent IMPACT_1 = registerSound("impact1");

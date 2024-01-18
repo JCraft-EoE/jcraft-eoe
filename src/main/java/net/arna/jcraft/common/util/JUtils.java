@@ -47,7 +47,7 @@ import java.util.function.Predicate;
 import static net.arna.jcraft.common.entity.stand.StandEntity.damageLogic;
 
 public final class JUtils {
-    public static List<DimValues> activeTimestops = new ArrayList<>();
+    public static final List<DimValues> activeTimestops = new ArrayList<>();
 
     public static Vec3d adjustForGravity(Vec3d vec, Direction gravDir) {
         switch (gravDir) {

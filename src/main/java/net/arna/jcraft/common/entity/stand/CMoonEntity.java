@@ -225,18 +225,6 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
                     setShiftType(shiftType);
                 }
             }
-            case UTILITY -> {
-                LivingEntity user;
-                if (hasUser() && (user = getUserOrThrow()).isOnGround() && directionChangeCooldown <= 0) {
-                    StatusEffectInstance weightless = user.getStatusEffect(JStatusRegistry.WEIGHTLESS);
-                    if (weightless != null && weightless.getAmplifier() == 1) {
-                        user.removeStatusEffect(JStatusRegistry.WEIGHTLESS);
-                        user.addStatusEffect(new StatusEffectInstance(JStatusRegistry.WEIGHTLESS, weightless.getDuration(), 1));
-                    }
-
-                    directionChangeCooldown = 10;
-                } else super.initMove(type);
-            }
             case LIGHT -> {
                 if (curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
                     AbstractMove<?, ? super CMoonEntity> followup = curMove.getFollowup();

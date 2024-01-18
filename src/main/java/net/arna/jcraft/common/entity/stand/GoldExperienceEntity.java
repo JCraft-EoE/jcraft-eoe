@@ -54,16 +54,16 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .withHyperArmor()
             .withLaunch()
             .withInfo(Text.literal("Shoulder Smash"), Text.literal("slow, uninterruptible combo finisher"));
-    public static BarrageAttack<GoldExperienceEntity> BARRAGE = new BarrageAttack<GoldExperienceEntity>(
+    public static final BarrageAttack<GoldExperienceEntity> BARRAGE = new BarrageAttack<GoldExperienceEntity>(
             280, 0, 30, 0.75f, 1f, 30, 2f, 0.25f, 0f, 3)
             .withSound(JSoundRegistry.GE_BARRAGE)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
-    public static HealMove<GoldExperienceEntity> HEAL_OTHERS = new HealMove<GoldExperienceEntity>(520, 10,
+    public static final HealMove<GoldExperienceEntity> HEAL_OTHERS = new HealMove<GoldExperienceEntity>(520, 10,
             16, 1f, 1.25f,
             0f, 4f, HealMove.HealTarget.TARGETS)
             .withSound(JSoundRegistry.GE_HEAL)
             .withInfo(Text.literal("Healing Hand (others)"), Text.empty());
-    public static HealMove<GoldExperienceEntity> HEAL_SELF = new HealMove<GoldExperienceEntity>(520, 10,
+    public static final HealMove<GoldExperienceEntity> HEAL_SELF = new HealMove<GoldExperienceEntity>(520, 10,
             14, 1f, 0,
             0, 4f, HealMove.HealTarget.USER)
             .withCrouchingVariant(HEAL_OTHERS)

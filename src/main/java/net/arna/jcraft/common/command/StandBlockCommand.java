@@ -37,6 +37,7 @@ public class StandBlockCommand {
 
                 if (stand == null) continue;
                 stand.blocking = block;
+                stand.wantToBlock = block;
             }
         }
         return 1;

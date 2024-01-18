@@ -42,7 +42,7 @@ public class WeightlessStatusEffect extends StatusEffect {
             world.addParticle(
                     ParticleTypes.REVERSE_PORTAL,
                     pos.x + random.nextDouble() - 0.5,
-                    pos.y + random.nextDouble() * 1.8,
+                    pos.y + random.nextDouble() - 0.5,
                     pos.z + random.nextDouble() - 0.5,
                     0, 0, 0
             );
@@ -60,7 +60,7 @@ public class WeightlessStatusEffect extends StatusEffect {
             if (hitResult.getType() == HitResult.Type.BLOCK) {
                 hoverTime = 0;
             } else if (++hoverTime > 10) // If not near ground for a second
-                GravityChangerAPI.clearGravity(entity);
+                entity.removeStatusEffect(this);
         }
     }
 
@@ -78,6 +78,7 @@ public class WeightlessStatusEffect extends StatusEffect {
     public void onRemoved(LivingEntity entity, AttributeContainer attributes, int amplifier) {
         super.onRemoved(entity, attributes, amplifier);
         if (entity.getWorld().isClient) return;
+        GravityChangerAPI.clearGravity(entity);
         if (!previouslyNoGravved)
             entity.setNoGravity(false);
     }

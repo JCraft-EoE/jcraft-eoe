@@ -23,6 +23,20 @@
     ]
   },
 
+  "backstab": {
+    "subtitle": "subtitles.jcraft.backstab",
+    "sounds": [
+      "jcraft:generic/backstab"
+    ]
+  },
+
+  "armoredhit": {
+    "subtitle": "subtitles.jcraft.armoredhit",
+    "sounds": [
+      "jcraft:generic/armoredhit"
+    ]
+  },
+
   "combobreak": {
     "sounds": [
       "jcraft:generic/combobreak"
