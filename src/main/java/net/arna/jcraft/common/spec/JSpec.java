@@ -165,6 +165,7 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
         if (curMove != null) curMove.onCancel(getThis());
         curMove = null;
         queuedMove = null;
+        armorPoints = 0;
         moveStun = 0;
 
         if (player == null) return;
@@ -204,9 +205,9 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
             return;
         }
 
-        //JCraft.LOGGER.info("SERVER: Ticking spec " + this);
-
         if (moveStun <= 0) {
+            armorPoints = 0;
+
             if (queuedMove != null) {
                 initMove(queuedMove.getMoveType());
                 queuedMove = null;
