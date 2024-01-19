@@ -76,7 +76,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             .withExtraHitBox(1.5)
             .withInfo(Text.literal("Overhead Smash"), Text.literal("slow, uninterruptible knockdown"));
     public static final BarrageAttack<GEREntity> BARRAGE = new BarrageAttack<GEREntity>(280, 0, 30,
-            0.75f, 1f, 30, 2f, 0.25f, 0f, 3)
+            0.75f, 1f, 20, 2f, 0.25f, 0f, 3)
             .withAerialVariant(KICK_BARRAGE)
             .withSound(JSoundRegistry.GE_BARRAGE)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));

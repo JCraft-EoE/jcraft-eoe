@@ -34,19 +34,19 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withLaunch()
             .withBlockStun(4)
-            .withInfo(Text.literal("Punch"), Text.literal("quick combo finisher"));
+            .withInfo(Text.literal("Finisher"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<WhiteSnakeEntity> LIGHT = SimpleAttack.<WhiteSnakeEntity>lightAttack(
-            7, 14, 5f, 12, 0.75f, 0.75f, 0.2f)
+            7, 11, 5f, 13, 0.75f, 0.75f, 0.2f)
             .withFollowup(LIGHT_FOLLOWUP)
             //TODO: WS CROUCHING M1
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
-    public static final SimpleAttack<WhiteSnakeEntity> DONUT = new SimpleAttack<WhiteSnakeEntity>(
-            200, 17, 36, 1, 10, 28, 2, 0, 0)
-            .withSound(JSoundRegistry.WS_DONUT)
-            .withImpactSound(JSoundRegistry.TW_DONUT_HIT)
+    public static final SimpleAttack<WhiteSnakeEntity> MEDIUM = new SimpleAttack<WhiteSnakeEntity>(
+            60, 8, 13, 1, 7f, 16, 1.75f, 0, 0)
+            .withSound(JSoundRegistry.WS_DONUT) //todo: replace ws_donut sound
+            .withImpactSound(JSoundRegistry.IMPACT_1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withInfo(Text.literal("Donut"), Text.literal("slow combo starter/extender"));
+            .withInfo(Text.literal("Gut Punch"), Text.literal("combo starter/extender"));
     public static final BarrageAttack<WhiteSnakeEntity> BARRAGE = new BarrageAttack<WhiteSnakeEntity>(
             240, 0, 60, 0.75f, 1, 20, 2, 0.25f, 0, 3)
             .withSound(JSoundRegistry.WS_BARRAGE)
@@ -133,7 +133,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
     @Override
     protected void registerMoves(MoveMap<WhiteSnakeEntity, State> moves) {
         moves.register(MoveType.LIGHT, LIGHT, State.LIGHT);
-        moves.register(MoveType.HEAVY, DONUT, State.DONUT);
+        moves.register(MoveType.HEAVY, MEDIUM, State.MEDIUM);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 
         moves.register(MoveType.SPECIAL1, MEMORY_DISC, State.DISC);
@@ -221,7 +221,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         IDLE(builder -> builder.loop("animation.whitesnake.idle")),
         LIGHT(builder -> builder.playAndHold("animation.whitesnake.light")),
         BLOCK(builder -> builder.loop("animation.whitesnake.block")),
-        DONUT(builder -> builder.playAndHold("animation.whitesnake.donut")),
+        MEDIUM(builder -> builder.playAndHold("animation.whitesnake.medium")),
         BARRAGE(builder -> builder.loop("animation.whitesnake.barrage")),
         LEG_CRUSHER(builder -> builder.playAndHold("animation.whitesnake.legcrusher")),
         ACID_SPEW(builder -> builder.playAndHold("animation.whitesnake.acidspew")),

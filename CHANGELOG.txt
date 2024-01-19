@@ -1966,6 +1966,29 @@ Killer Queen: Bites the Dust
 Timestoppers
     >Fixed being able to use Timeskip while in Timestop
 
+● 19/01/2024
+
+Cream
+    >Void
+        >damage reduced (1.25->0.75 hearts)
+        >now cancels spec moves
+
+Whitesnake
+    >Acid no longer can hurt user
+    >M1 recovery reduced (7->4t)
+    >Donut replaced with a faster, more versatile Gut Punch
+
+Gold Experience
+    >Remodeled
+    >Updated animations
+    >Barrage stun reduced (30->20t)
+    >Tree
+        >cooldown reduced (15->14s)
+        >startup reduced (14->10t)
+
+Gold Experience: Requiem
+    >Barrage stun reduced (30->20t)
+
 priority (top to bottom)
 todo: counters that invalidate hit effects
 todo: fix predict not working with projectiles spawned after it started

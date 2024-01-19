@@ -55,7 +55,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .withLaunch()
             .withInfo(Text.literal("Shoulder Smash"), Text.literal("slow, uninterruptible combo finisher"));
     public static final BarrageAttack<GoldExperienceEntity> BARRAGE = new BarrageAttack<GoldExperienceEntity>(
-            280, 0, 30, 0.75f, 1f, 30, 2f, 0.25f, 0f, 3)
+            280, 0, 30, 0.75f, 1f, 20, 2f, 0.25f, 0f, 3)
             .withSound(JSoundRegistry.GE_BARRAGE)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
     public static final HealMove<GoldExperienceEntity> HEAL_OTHERS = new HealMove<GoldExperienceEntity>(520, 10,
@@ -69,7 +69,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .withCrouchingVariant(HEAL_OTHERS)
             .withSound(JSoundRegistry.GE_HEAL)
             .withInfo(Text.literal("Healing Hand"), Text.literal("standing: heals user for 2 hearts, crouching: heals others for 2 hearts, pacifies angered mobs"));
-    public static final TreeAttack TREE = new TreeAttack(300, 14, 24, 1f, 5f,
+    public static final TreeAttack TREE = new TreeAttack(280, 10, 24, 1f, 5f,
             15, 1.75f, 0.2f, -0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_8)
             .withSound(JSoundRegistry.GE_TREE)

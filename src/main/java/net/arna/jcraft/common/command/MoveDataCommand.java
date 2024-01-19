@@ -82,7 +82,7 @@ public class MoveDataCommand {
 
         if (move instanceof AbstractSimpleAttack<?, ?> attack) {
             if (attack.getBlockableType() == BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
-                mainFDMessage = mainFDMessage.concat("§r\nEffects on hit are §5UNBLOCKABLE");
+                mainFDMessage = mainFDMessage.concat("§rEffects on hit are §5UNBLOCKABLE\n");
 
             // Multihit vars
             boolean start = true;

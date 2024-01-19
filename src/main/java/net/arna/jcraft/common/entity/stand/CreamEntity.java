@@ -320,9 +320,9 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                         for (int y = -1; y < 3; y++) {
                             for (int z = -1; z < 2; z++) {
                                 BlockPos curPos = this.getBlockPos().add(x, y, z);
-                                if (this.world.getBlockState(curPos).getBlock().getBlastResistance() > 100.1f)
+                                if (world.getBlockState(curPos).getBlock().getBlastResistance() > 100.1f)
                                     continue;
-                                this.world.setBlockState(curPos, Block.getStateFromRawId(0));
+                                world.setBlockState(curPos, Block.getStateFromRawId(0));
                             }
                         }
                     }
@@ -356,9 +356,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                     for (LivingEntity ent : toDamage) {
                         if (getMoveStun() % 2 == 0) { // More consistent
                             stun(ent, 4, 0);
-
-                            StandEntity<?, ?> enemyStand = JUtils.getStand(ent);
-                            if (enemyStand != null) enemyStand.cancelMove();
+                            JUtils.cancelMoves(ent);
                         }
 
                         ent.damage(DamageSource.OUT_OF_WORLD, 5);
@@ -367,12 +365,10 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                     for (LivingEntity ent : toDamage) {
                         if (age % 4 == 0) {
                             stun(ent, 2, 0);
-
-                            StandEntity<?, ?> enemyStand = JUtils.getStand(ent);
-                            if (enemyStand != null) enemyStand.cancelMove();
+                            JUtils.cancelMoves(ent);
                         }
 
-                        ent.damage(DamageSource.OUT_OF_WORLD, 2.5f);
+                        ent.damage(DamageSource.OUT_OF_WORLD, 1.5f);
                     }
 
                     setAlphaOverride(0);

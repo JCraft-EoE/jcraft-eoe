@@ -40,7 +40,7 @@ public enum StandType {
     THE_FOOL(JEntityTypeRegistry.THE_FOOL, TheFoolEntity::new, "thefool",                                       // 10
             Text.literal("Chilled"), Text.literal("OVA"), Text.literal("Neon")),
     GOLD_EXPERIENCE(JEntityTypeRegistry.GOLD_EXPERIENCE, GoldExperienceEntity::new, "goldenexperience",       // 11
-            Text.literal("Passione"), Text.literal("Chosen One"), Text.literal("Life Energy")),
+            Text.literal("Anime"), Text.literal("Spectre"), Text.literal("Burning Passion")),
 
     // Evolutions
     C_MOON(JEntityTypeRegistry.C_MOON, CMoonEntity::new, "cmoon", true,                                             // -1
