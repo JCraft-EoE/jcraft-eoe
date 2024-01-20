@@ -87,6 +87,11 @@ public class JCraft implements ModInitializer {
     public static final GameRules.Key<GameRules.IntRule> DEFAULT_SPEC = GameRuleRegistry.register("defaultSpec", GameRules.Category.PLAYER, GameRuleFactory.createIntRule(0, 0, 2));
     //public static GameRules.Key<GameRules.IntRule> DAMAGE_MULT = GameRuleRegistry.register("jcraftDamageMult", GameRules.Category.MISC, GameRuleFactory.createIntRule(0, 0, 100));
     // Dimensional travel bullshit
+    /**
+     * Used to lock the AU chunks from being unloaded automatically by JServerTickEvents
+     */
+    public static int preloadLockTicks = 0;
+    public static ServerWorld auWorld;
     public static final List<DimValues> pastDimensions = new ArrayList<>();
     private static final List<ChunkPos> preloadedChunks = new ArrayList<>();
 
@@ -99,9 +104,7 @@ public class JCraft implements ModInitializer {
 
     // Standardized cooldowns
     public static final int dashCooldown = 40;
-
     public static final int LIGHT_COOLDOWN = 30;
-    public static final double lightCooldown = 1.5;
 
     @Getter
     @Setter
@@ -281,10 +284,11 @@ public class JCraft implements ModInitializer {
         }
     }
 
-    public static void clearPreloadedChunks(ServerWorld auWorld) {
-        if (preloadedChunks.isEmpty()) {
-            return;
-        }
+    /**
+     * Clears pre/force loaded chunks in the AU
+     */
+    public static void clearPreloadedChunks() {
+        if (preloadedChunks.isEmpty()) return;
         for (ChunkPos p : preloadedChunks)
             auWorld.setChunkForced(p.x, p.z, false);
         preloadedChunks.clear();
@@ -358,16 +362,32 @@ public class JCraft implements ModInitializer {
         ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_COOLDOWN_CANCEL, CooldownCancelPacket::handle);
     }
 
-
     public static void createParticle(ServerWorld world, double x, double y, double z, JParticleType type) {
         if (world == null || type == null) return;
         PacketByteBuf buf = PacketByteBufs.create();
 
-        buf.writeShort(8);
+        buf.writeShort(3);
         buf.writeDouble(x);
         buf.writeDouble(y);
         buf.writeDouble(z);
         buf.writeEnumConstant(type);
+
+        PlayerLookup.around(world, new Vec3d(x, y, z), 128).forEach(
+                serverPlayer -> ServerChannelFeedbackPacket.send(serverPlayer, buf)
+        );
+    }
+
+    public static void createHitsparks(ServerWorld world, double x, double y, double z, JParticleType type, int sparkCount, double sparkSpeed) {
+        if (world == null || type == null) return;
+        PacketByteBuf buf = PacketByteBufs.create();
+
+        buf.writeShort(5);
+        buf.writeDouble(x);
+        buf.writeDouble(y);
+        buf.writeDouble(z);
+        buf.writeEnumConstant(type);
+        buf.writeInt(sparkCount);
+        buf.writeDouble(sparkSpeed);
 
         PlayerLookup.around(world, new Vec3d(x, y, z), 128).forEach(
                 serverPlayer -> ServerChannelFeedbackPacket.send(serverPlayer, buf)

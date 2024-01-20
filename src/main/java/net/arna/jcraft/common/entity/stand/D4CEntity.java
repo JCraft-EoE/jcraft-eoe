@@ -93,7 +93,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
     //todo: make them spawn without weapons unless you are crouching
     public static final CloneSpawnMove CLONE_SPAWN = new CloneSpawnMove(400, 40, 50, 1f)
             .withSound(JSoundRegistry.D4C_DIMHOP)
-            .withInfo(Text.literal("Dimensional Clone"), Text.literal("summons an unlimited number of servants"));
+            .withInfo(Text.literal("Dimensional Clone"), Text.literal("summons an unlimited number of servants, crouch and interact to give/take items"));
     public static final FlagMove FLAG = new FlagMove(280, 10, 60, 0f)
             .withSound(JSoundRegistry.D4C_UTILITY)
             .withInfo(Text.literal("Dimensional Phase"), Text.literal("hides in a flag in an un-stunnable, floating state"));

@@ -1,0 +1,13 @@
+{
+  "textures": [
+    "jcraft:blockspark_right_0",
+    "jcraft:blockspark_right_1",
+    "jcraft:blockspark_final",
+    "jcraft:blockspark_mid_0",
+    "jcraft:blockspark_mid_1",
+    "jcraft:blockspark_final",
+    "jcraft:blockspark_left_0",
+    "jcraft:blockspark_left_1",
+    "jcraft:blockspark_final"
+  ]
+}

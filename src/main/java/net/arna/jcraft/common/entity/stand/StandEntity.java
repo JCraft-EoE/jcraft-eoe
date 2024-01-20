@@ -570,6 +570,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         curMove = move;
         setMoveStun(move.getDuration());
+        setReset(false);
         if (animState != null) setState(animState);
         armorPoints = move.getArmor();
     }
@@ -1128,7 +1129,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     @Override
     public boolean damage(DamageSource source, float amount) {
-        if (user == null || user.isInvulnerableTo(source) || source.isFallingBlock()) return false;
+        if (user == null || source.getAttacker() == user || user.isInvulnerableTo(source) || source.isFallingBlock()) return false;
 
         if (source.isMagic() || source.isExplosive()) // AoE effects have damage nerfed
             amount /= 2.0F;
@@ -1158,7 +1159,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     @Override
     public boolean isInvulnerableTo(DamageSource damageSource) {
-        return !damageSource.isOutOfWorld();
+        return !damageSource.isOutOfWorld() || damageSource.getAttacker() == this;
     }
 
     @Override

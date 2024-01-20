@@ -3,6 +3,7 @@ package net.arna.jcraft.common.attack.moves.base;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
+import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -17,6 +18,8 @@ public abstract class AbstractCounterAttack<T extends AbstractCounterAttack<T, A
 
     @Override
     public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user, MoveContext ctx) {
+        if (attacker instanceof StandEntity<?,?> stand && stand.isFree())
+            stand.setFree(false);
         return Set.of();
     }
 

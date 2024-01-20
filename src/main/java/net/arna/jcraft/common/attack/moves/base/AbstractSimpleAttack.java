@@ -10,6 +10,7 @@ import net.arna.jcraft.common.attack.core.StunType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.Entity;
@@ -390,17 +391,30 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
         Set<LivingEntity> targets = findHits(attacker, boxes, damageSource);
         if (targets.isEmpty()) return Set.of();
 
+        ServerWorld serverWorld = (ServerWorld) attacker.getEntityWorld();
+
+        // Particles
         Random random = Random.create();
-        JCraft.createParticle((ServerWorld) attacker.getEntityWorld(),
-                center.x + random.nextGaussian() * 0.25,
-                center.y + random.nextGaussian() * 0.25,
-                center.z + random.nextGaussian() * 0.25,
+
+        JCraft.createParticle(serverWorld,
+                center.x + random.nextGaussian() * 0.1,
+                center.y + random.nextGaussian() * 0.1,
+                center.z + random.nextGaussian() * 0.1,
                 hitSpark);
 
+        // Sounds
         getImpactSounds().forEach(sound -> attacker.playAttackerSound(sound, 1f, 1f));
 
+        // Process targets
         Vec3d kbVec = getRotVec(attacker).multiply(knockback).add(new Vec3d(0.0, Math.abs(knockback) / 4, 0.0));
         for (LivingEntity target : validateTargets(attacker, targets)) {
+            Vec3d pos = RotationUtil.vecPlayerToWorld(target.getEyePos(), GravityChangerAPI.getGravityDirection(target));
+            if (JUtils.isBlocking(target))
+                JCraft.createHitsparks(serverWorld, pos.getX(), pos.getY(), pos.getZ(), JParticleType.BLOCK_SPARK, 3, 0);
+            else
+                JCraft.createHitsparks(serverWorld, pos.getX(), pos.getY(), pos.getZ(), JParticleType.PIXEL, 2 + (int)damage * 2, 0.5);
+
+
             targetProcessors.forEach(processor -> processor.processTarget(attacker, target, kbVec, damageSource));
             processTarget(attacker, target, kbVec, damageSource);
         }

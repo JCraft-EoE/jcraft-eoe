@@ -1966,7 +1966,19 @@ Killer Queen: Bites the Dust
 Timestoppers
     >Fixed being able to use Timeskip while in Timestop
 
-● 19/01/2024
+● 20/01/2024
+>Added particles that signify which entities were hit by/blocked your attack
+>Counters now automatically bring your stand back from a remote state
+
+Brawler
+    >Gut Punch cooldown reduced (17->12s)
+    >Sweep cooldown reduced (15->10s)
+
+Anubis
+    >
+
+D4C
+    >You must now crouch to give items to clones
 
 Cream
     >Void

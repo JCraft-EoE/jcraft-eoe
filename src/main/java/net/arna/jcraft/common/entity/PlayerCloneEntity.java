@@ -224,7 +224,7 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
 
     @Override
     public ActionResult interactAt(PlayerEntity player, Vec3d hitPos, Hand hand) {
-        if (player != master || !allowItemExchange)
+        if (player != master || !player.isSneaking() || !allowItemExchange)
             return ActionResult.FAIL;
 
         ItemStack itemStack = player.getStackInHand(hand);

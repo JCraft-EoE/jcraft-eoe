@@ -10,6 +10,7 @@ import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.DimValues;
 import net.arna.jcraft.common.util.EntityInterest;
 import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.registry.JDimensionRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.block.Blocks;
@@ -37,7 +38,14 @@ import static net.arna.jcraft.common.entity.stand.StandEntity.stun;
 import static net.arna.jcraft.common.util.JUtils.activeTimestops;
 
 public class JServerTickEvents {
+    public static void finishLoading(MinecraftServer server) {
+        JCraft.auWorld = server.getWorld(JDimensionRegistry.AU_DIMENSION_KEY);
+    }
+
     public static void serverTick(MinecraftServer server) {
+        if (JCraft.preloadLockTicks > 0)
+            JCraft.preloadLockTicks--;
+
         // Player logic (cooldown handling and DamageTimer counting)
         for (ServerPlayerEntity player : PlayerLookup.all(server)) {
             if (player == null || !player.isAlive()) continue;
@@ -50,16 +58,12 @@ public class JServerTickEvents {
 
         for (DimValues dimValues : JCraft.pastDimensions) {
             Entity user = dimValues.user;
-            if (user == null || !user.isAlive() || user.isRemoved())
-                continue;
+            if (user == null || !user.isAlive()) continue;
 
-            ServerWorld au = (ServerWorld) user.getWorld();
             ServerWorld original = server.getWorld(dimValues.worldKey);
-            if (au == original)
-                continue;
+            if (user.getWorld() == original) continue;
 
-            dimValues.timer--;
-            if (dimValues.timer > 1) {
+            if (--dimValues.timer > 1) {
                 newPastDimensions.add(dimValues);
                 continue;
             }
@@ -68,10 +72,10 @@ public class JServerTickEvents {
             if (user instanceof ServerPlayerEntity player)
                 player.teleport(original, dimPos.x, dimPos.y, dimPos.z, player.getYaw(), player.getPitch());
             else JCraft.teleportToWorld(user, original, dimPos.x, dimPos.y, dimPos.z);
-
-            if (newPastDimensions.isEmpty()) // Nobody left in AU
-                JCraft.clearPreloadedChunks(au);
         }
+
+        if (JCraft.preloadLockTicks <= 0 && newPastDimensions.isEmpty()) // Nobody left in AU
+            JCraft.clearPreloadedChunks();
 
         JCraft.pastDimensions.clear();
         JCraft.pastDimensions.addAll(newPastDimensions);

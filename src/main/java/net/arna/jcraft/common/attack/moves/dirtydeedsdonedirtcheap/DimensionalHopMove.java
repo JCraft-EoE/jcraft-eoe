@@ -36,6 +36,13 @@ public class DimensionalHopMove extends AbstractSimpleAttack<DimensionalHopMove,
     }
 
     @Override
+    public void onInitiate(D4CEntity attacker) {
+        super.onInitiate(attacker);
+
+        JCraft.preloadLockTicks = getWindup();
+    }
+
+    @Override
     public @NonNull Set<LivingEntity> perform(D4CEntity attacker, LivingEntity user, MoveContext ctx) {
         Set<LivingEntity> targets = super.perform(attacker, user, ctx);
 
@@ -90,6 +97,8 @@ public class DimensionalHopMove extends AbstractSimpleAttack<DimensionalHopMove,
 
         // Lighting providers are too complicated, man. Wth
         // We got 2 providers, every provider has 2 storages and every storage has 2 storages.
+
+        //todo: fix this crashing the server repeatedly
         LightingProvider ogLightingProvider = world.getLightingProvider();
         LightingProvider auLightingProvider = auWorld.getLightingProvider();
 

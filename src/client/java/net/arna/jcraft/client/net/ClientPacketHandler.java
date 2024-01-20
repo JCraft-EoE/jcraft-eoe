@@ -35,6 +35,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.particle.BlockStateParticleEffect;
+import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Box;
@@ -211,12 +212,15 @@ public class ClientPacketHandler {
                 });
             }
 
-            // Cooldown tracking
+            // Generic single particle
             case (3) -> {
-                // TODO no longer needed, Cooldowns component is ticked on both sides.
-//                int index = buf.readInt(); // Doesn't start at 0
-//                double cd = buf.readDouble();
-//                JCraftClient.clientCooldowns.set(index - 1, cd);
+                double x = buf.readDouble();
+                double y = buf.readDouble();
+                double z = buf.readDouble();
+                JParticleType particleType = buf.readEnumConstant(JParticleType.class);
+
+                client.execute(() -> client.world.addParticle(particleType.getParticleType(), true, x, y, z,
+                        0, 0, 0));
             }
 
             // KQ bomb tracker
@@ -249,19 +253,25 @@ public class ClientPacketHandler {
                 });
             }
 
-            // Spec synchronization
+            // Complex hit spark
             case (5) -> {
-                // TODO this should not be necessary anymore as the spec component is synced.
-//                int specId = buf.readInt();
-//
-//                client.execute(() -> {
-//                    JCraftSpec spec = SpecType.fromId(specId).createNew();
-//
-//                    if (spec != null)
-//                        spec.player = client.player;
-//
-//                    ((ISpec)(client.player)).setClientSpec(spec);
-//                });
+                double x = buf.readDouble();
+                double y = buf.readDouble();
+                double z = buf.readDouble();
+                JParticleType particleType = buf.readEnumConstant(JParticleType.class);
+                int sparkCount = buf.readInt();
+                double speed = buf.readDouble();
+
+                client.execute(() -> {
+                    Random random = new Random();
+                    DefaultParticleType type = particleType.getParticleType();
+                    for (int i = 0; i < sparkCount; i++) {
+                        Vec3d vel = JUtils.randUnitVec(random);
+                        client.world.addParticle(type, false,
+                                x + random.nextGaussian() * 0.33, y + random.nextGaussian() * 0.33, z + random.nextGaussian() * 0.33,
+                                vel.x * speed, vel.y * speed, vel.z * speed);
+                    }
+                });
             }
 
             // WAS Combo counter
@@ -289,15 +299,9 @@ public class ClientPacketHandler {
                 });
             }
 
-            // Generic single particle
+            //
             case (8) -> {
-                double x = buf.readDouble();
-                double y = buf.readDouble();
-                double z = buf.readDouble();
-                JParticleType particleType = buf.readEnumConstant(JParticleType.class);
 
-                client.execute(() -> client.world.addParticle(particleType.getParticleType(), true, x, y, z,
-                        0, 0, 0));
             }
 
             // Bites the Dust tracker
@@ -399,19 +403,6 @@ public class ClientPacketHandler {
                         animationContainer.setAnimation(null);
                     }
                 });
-            }
-
-            // Clientside TS
-            case (14) -> {
-                // TODO not necessary anymore. TimeStop component is synced
-//                int entID = buf.readInt();
-//                int ticks = buf.readInt();
-//
-//                client.execute(() -> {
-//                    Entity ent = client.world.getEntityById(entID);
-//                    if (ent == null) return;
-//                    ((ITimeStop) ent).setTimeStopTicks(ticks);
-//                });
             }
         }
     }

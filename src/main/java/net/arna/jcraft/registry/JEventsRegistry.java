@@ -138,5 +138,6 @@ public interface JEventsRegistry {
                 ConfigUpdatePacket.sendOptionsToClient(handler.getPlayer(), ConfigOption.getImmutableOptions().values()));
 
         ServerLifecycleEvents.SERVER_STARTING.register(JServerConfig::load);
+        ServerLifecycleEvents.SERVER_STARTED.register(JServerTickEvents::finishLoading);
     }
 }

@@ -15,7 +15,9 @@ public enum JParticleType {
     COMBO_BREAK(JParticleTypeRegistry.COMBO_BREAK),
     COOLDOWN_CANCEL(JParticleTypeRegistry.COOLDOWN_CANCEL),
     HIT_SPARK_1(JParticleTypeRegistry.HITSPARK_1),
-    HIT_SPARK_2(JParticleTypeRegistry.HITSPARK_2);
+    HIT_SPARK_2(JParticleTypeRegistry.HITSPARK_2),
+    PIXEL(JParticleTypeRegistry.PIXEL),
+    BLOCK_SPARK(JParticleTypeRegistry.BLOCKSPARK);
 
     private final DefaultParticleType particleType;
 

@@ -21,8 +21,12 @@ public interface JParticleTypeRegistry {
     DefaultParticleType SPEED_PARTICLE = FabricParticleTypes.simple();
     DefaultParticleType BITES_THE_DUST = FabricParticleTypes.simple();
     DefaultParticleType BOOM_1 = FabricParticleTypes.simple();
+    DefaultParticleType PIXEL = FabricParticleTypes.simple();
+    DefaultParticleType BLOCKSPARK = FabricParticleTypes.simple();
 
     Int2ObjectMap<DefaultParticleType> particles = new Int2ObjectOpenHashMap<>(Map.ofEntries(
+            Map.entry(-7, JParticleTypeRegistry.BLOCKSPARK),
+            Map.entry(-6, JParticleTypeRegistry.PIXEL),
             Map.entry(-5, JParticleTypeRegistry.BOOM_1),
             Map.entry(-4, JParticleTypeRegistry.BITES_THE_DUST),
             Map.entry(-3, ParticleTypes.SWEEP_ATTACK),
@@ -48,5 +52,7 @@ public interface JParticleTypeRegistry {
         registerParticle("speedparticle", SPEED_PARTICLE);
         registerParticle("btd", BITES_THE_DUST);
         registerParticle("boom_1", BOOM_1);
+        registerParticle("pixel", PIXEL);
+        registerParticle("blockspark", BLOCKSPARK);
     }
 }

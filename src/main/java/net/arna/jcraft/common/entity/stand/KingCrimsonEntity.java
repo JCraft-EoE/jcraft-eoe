@@ -283,6 +283,9 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     public void moveCancel() {
         curMove = null;
         queuedMove = null;
+
+        getMoveContext().get(PredictionMove.PREDICTION_INFO).clear();
+
         setMoveStun(2);
         setState(State.IDLE);
         setReset(true);

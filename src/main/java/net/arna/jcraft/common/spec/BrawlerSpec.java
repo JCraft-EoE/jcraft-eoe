@@ -25,12 +25,12 @@ public class BrawlerSpec extends JSpec<BrawlerSpec, BrawlerSpec.State> {
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withBlockStun(5)
             .withInfo(Text.literal("Combo"), Text.literal("hits 3 times, combo starter/extender"));
-    public static final SimpleAttack<BrawlerSpec> GUT = new SimpleAttack<BrawlerSpec>(340, 11, 18,
+    public static final SimpleAttack<BrawlerSpec> GUT = new SimpleAttack<BrawlerSpec>(240, 11, 18,
             1f, 6f, 16, 1.5f, 0.8f, 0f)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Gut Punch"), Text.literal("good stun"));
-    public static final KnockdownAttack<BrawlerSpec> SWEEP = new KnockdownAttack<BrawlerSpec>(300, 11, 18,
+    public static final KnockdownAttack<BrawlerSpec> SWEEP = new KnockdownAttack<BrawlerSpec>(200, 11, 18,
             1f, 5f, 16, 1.5f, 0.6f, 0.65f, 25)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withInfo(Text.literal("SWEEP"), Text.literal("knocks down"));

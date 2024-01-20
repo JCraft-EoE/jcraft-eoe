@@ -49,6 +49,10 @@ import static net.arna.jcraft.common.entity.stand.StandEntity.damageLogic;
 public final class JUtils {
     public static final List<DimValues> activeTimestops = new ArrayList<>();
 
+    public static Vec3d randUnitVec(Random random) {
+        return new Vec3d(random.nextGaussian(), random.nextGaussian(), random.nextGaussian()).normalize();
+    }
+
     public static Vec3d adjustForGravity(Vec3d vec, Direction gravDir) {
         switch (gravDir) {
             case UP -> {

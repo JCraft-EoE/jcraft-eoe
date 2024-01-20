@@ -11,9 +11,8 @@ public class JGlowingParticle extends AbstractSlowingParticle {
     JGlowingParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, SpriteProvider spriteProvider) {
         super(world, x, y, z, velocityX, velocityY, velocityZ);
         this.spriteProvider = spriteProvider;
-        this.setSpriteForAge(spriteProvider);
-
         initialize();
+        this.setSpriteForAge(spriteProvider);
     }
 
     protected void initialize() {
