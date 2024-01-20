@@ -2,8 +2,10 @@ package net.arna.jcraft.common.spec;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.Getter;
+import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
+import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.anubis.Rekka3Attack;
 import net.arna.jcraft.common.attack.moves.shared.KnockdownAttack;
 import net.arna.jcraft.common.attack.moves.shared.KnockdownMultiHitAttack;
@@ -11,31 +13,38 @@ import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleMultiHitAttack;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.SpecAnimationState;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegistry;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 
+import java.util.Set;
+
 public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
     public static final SimpleAttack<AnubisSpec> SLASH = new SimpleAttack<AnubisSpec>(340, 9, 20, 1f, 6f,
             15, 1.75f, 0.9f, 0f)
             .withCondition(AnubisSpec::isHoldingAnubis)
+            .withAction(AnubisSpec::tryIncrementBloodlust)
             .withSound(JSoundRegistry.ANUBIS_SLASH)
             .withImpactSound(SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP)
             .withHitSpark(JParticleType.SWEEP_ATTACK)
             .withHyperArmor()
             .withInfo(Text.literal("Slash"), Text.literal("uninterruptible get-off-me tool"));
-    public static final SimpleAttack<AnubisSpec> POMMEL = new SimpleAttack<AnubisSpec>(280, 5, 8,
+    public static final SimpleAttack<AnubisSpec> POMMEL = new SimpleAttack<AnubisSpec>(180, 5, 8,
             1f, 4f, 7, 1.25f, 0.3f, 0f)
             .withSound(JSoundRegistry.ANUBIS_POMMEL)
+            .withAction(AnubisSpec::tryIncrementBloodlust)
             .withImpactSound(JSoundRegistry.IMPACT_3);
-    public static final SimpleMultiHitAttack<AnubisSpec> REKKA2 = new SimpleMultiHitAttack<AnubisSpec>(400,
+    public static final SimpleMultiHitAttack<AnubisSpec> REKKA2 = new SimpleMultiHitAttack<AnubisSpec>(280,
             26, 1f, 4f, 15, 1.75f, 0.6f, -0.1f, IntSet.of(8, 20))
             .withCondition(AnubisSpec::isHoldingAnubis)
+            .withAction(AnubisSpec::tryIncrementBloodlust)
             .withSound(JSoundRegistry.ANUBIS_REKKA2)
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withInfo(Text.literal("Cleaving Strikes"), Text.literal("2 hits"));
@@ -43,20 +52,30 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
             0, 40, 1f, 7f, 15, 2f, 0.9f, 0f,
             IntSet.of(32), 35)
             .withHitSpark(JParticleType.SWEEP_ATTACK);
-    public static final Rekka3Attack REKKA3 = new Rekka3Attack(400, 40, 1f, 4f,
+    public static final Rekka3Attack REKKA3 = new Rekka3Attack(280, 40, 1f, 4f,
             15, 1.75f, 0.6f, -0.1f, IntSet.of(8, 20, 32))
             .withFollowup(REKKA_FINISHER)
+            .withAction(AnubisSpec::tryIncrementBloodlust)
             .withSound(JSoundRegistry.ANUBIS_REKKA3)
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withInfo(Text.literal("Cleaving Strikes/Sweep"), Text.literal("3 hits, if 0 Bloodlust, last hit knocks down/sweeps while sheathed"));
-    public static final KnockdownAttack<AnubisSpec> SWEEP = new KnockdownAttack<AnubisSpec>(320, 10, 17,
+    public static final KnockdownAttack<AnubisSpec> SWEEP = new KnockdownAttack<AnubisSpec>(220, 10, 17,
             1.5f, 7f, 9, 1.33f, 0.3f, 0f, 35)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withInfo(Text.literal("Sweep"), Text.empty());
 
     private int ticksSinceLastHit = 0;
     @Getter
-    private float attackSpeedMult = 1f;
+    protected float attackSpeedMult = 1f;
+
+    private static void tryIncrementBloodlust(IAttacker<?, ?> attacker, LivingEntity living, MoveContext moveContext, Set<LivingEntity> targets) {
+        if (targets.isEmpty()) return;
+        if (living instanceof PlayerEntity player) {
+            AnubisSpec anubisSpec = (AnubisSpec) JUtils.getSpec(player);
+            if (anubisSpec.attackSpeedMult < 2.0f)
+                anubisSpec.attackSpeedMult += 0.25f;
+        }
+    }
 
     public AnubisSpec(PlayerEntity player) {
         super(SpecType.ANUBIS, player);

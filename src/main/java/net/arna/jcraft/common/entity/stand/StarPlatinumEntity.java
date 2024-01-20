@@ -52,7 +52,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withExtraHitBox(2, 0.5, 1)
             .withInfo(Text.literal("Star Finger"), Text.literal("medium windup, combo starter/extender"));
-    public static final SimpleAttack<StarPlatinumEntity> ROUNDHOUSE = new SimpleAttack<StarPlatinumEntity>(60,
+    public static final SimpleAttack<StarPlatinumEntity> ROUNDHOUSE = new SimpleAttack<StarPlatinumEntity>(40,
             7, 12, 0.75f, 6f, 8, 1.5f, 0.25f, 0f)
             .withSound(JSoundRegistry.STAR_PLATINUM_KICK)
             .withImpactSound(JSoundRegistry.IMPACT_6)

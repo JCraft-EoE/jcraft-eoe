@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQBTDEntity.State> {
-    public static final ElbowAttack ELBOW = new ElbowAttack(180, 5, 9, 0.75f,
+    public static final ElbowAttack ELBOW = new ElbowAttack(60, 5, 9, 0.75f,
             7.5f, 10, 1f, 1.1f, 0f)
             .withSound(JSoundRegistry.KQBTD_ELBOW)
             .withImpactSound(JSoundRegistry.IMPACT_4)

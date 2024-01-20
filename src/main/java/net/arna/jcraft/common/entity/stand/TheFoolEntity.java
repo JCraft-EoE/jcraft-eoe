@@ -83,9 +83,11 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withInfo(Text.literal("Launch"), Text.literal("uninterruptible, slow, launching uppercut"));
     public static final SlamAttack SLAM = new SlamAttack(0, 4, 10, 1.25f, 4f,
             24, 2f, 0.2f, 0.1f)
+            .withBlockStun(5)
             .withSound(JSoundRegistry.FOOL_BARK1)
-            .withImpactSound(JSoundRegistry.IMPACT_2);
-    public static final PoundAttack POUND = new PoundAttack(260, 7, 22, 1.25f,
+            .withImpactSound(JSoundRegistry.IMPACT_2)
+            .withInfo(Text.literal("Slam"), Text.literal(""));
+    public static final PoundAttack POUND = new PoundAttack(220, 7, 22, 1.25f,
             4f, 25, 1.5f, 0.1f, -0.1f)
             .withFollowup(SLAM)
             .withSound(JSoundRegistry.FOOL_BARK2)
@@ -110,7 +112,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     public static final SandTornadoMove SAND_TORNADO = new SandTornadoMove(280, 12, 13, 1f)
             .withSound(JSoundRegistry.FOOL_LAUNCH)
             .withInfo(Text.literal("Sand Tornado"), Text.literal("summons a slow, stunning sand tornado"));
-    public static final TFChargeAttack CHARGE = new TFChargeAttack(260, 5, 20, 7f,
+    public static final TFChargeAttack CHARGE = new TFChargeAttack(220, 5, 20, 7f,
             6f, 10, 1.5f, 1.2f, 0f, State.CHARGE_HIT)
             .withSound(JSoundRegistry.FOOL_CHARGE)
             .withImpactSound(JSoundRegistry.IMPACT_2)
@@ -237,6 +239,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     }
 
     public void setWave(boolean b) {
+        setAlphaOverride(b ? 1.0F : -1.0F);
         this.dataTracker.set(IS_WAVE, b);
     }
 

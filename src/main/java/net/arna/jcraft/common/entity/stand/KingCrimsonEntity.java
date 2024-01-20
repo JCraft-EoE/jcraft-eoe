@@ -80,7 +80,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             .withImpactSound(JSoundRegistry.IMPACT_9)
             .withExtraHitBox(0, 0.5, 1)
             .withInfo(Text.literal("Vertical Chop"), Text.literal("medium windup combo starter, has a true followup in the form of a slow, armored knockdown"));
-    public static final BloodThrowAttack BLOOD_THROW = new BloodThrowAttack(500, 10, 15, 1f)
+    public static final BloodThrowAttack BLOOD_THROW = new BloodThrowAttack(260, 10, 15, 1f)
             .withInfo(Text.literal("Blood Throw"), Text.literal("throws a stunning, blinding blood projectile"));
     public static final EffectInflictingAttack<KingCrimsonEntity> EYE_CHOP = new EffectInflictingAttack<KingCrimsonEntity>(
             280, 25, 34, 1f, 9f, 27, 1.75f, 0.3f, -0.3f,
@@ -91,7 +91,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withExtraHitBox(0, 0.5, 1)
             .withInfo(Text.literal("Eye Chop"), Text.literal("blindness on hit, donut combo extender"));
-    public static final KCDonutAttack DONUT = new KCDonutAttack(300, 42, 60, 1f,
+    public static final KCDonutAttack DONUT = new KCDonutAttack(260, 30, 48, 1f,
             14f, 60, 1.75f, 0f, 0.1f)
             .withSound(JSoundRegistry.KC_DONUT)
             .withImpactSound(JSoundRegistry.IMPACT_7)

@@ -802,6 +802,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             if (getStandGauge() < 1) {
                 user.addStatusEffect(new StatusEffectInstance(JStatusRegistry.DAZED, 40, 2));
                 playSound(SoundEvents.ITEM_TOTEM_USE, 1, 0.5f);
+                blocking = false;
                 kill();
             }
 

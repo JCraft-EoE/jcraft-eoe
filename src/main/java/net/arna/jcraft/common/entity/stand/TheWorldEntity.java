@@ -39,7 +39,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
     public static final BarrageAttack<TheWorldEntity> BARRAGE = new BarrageAttack<TheWorldEntity>(280, 0, 50, 0.75f, 1f, 30, 2, 0.25f, 0, 3)
             .withSound(JSoundRegistry.TW_BARRAGE)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
-    public static final SimpleAttack<TheWorldEntity> ROUNDHOUSE = new SimpleAttack<TheWorldEntity>(60, 7, 13, 0.75f, 5f, 9, 1.75f, 0.25f, -0.1f)
+    public static final SimpleAttack<TheWorldEntity> ROUNDHOUSE = new SimpleAttack<TheWorldEntity>(40, 7, 13, 0.75f, 5f, 9, 1.75f, 0.25f, -0.1f)
             .withSound(JSoundRegistry.TW_KICK)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withInfo(Text.literal("Roundhouse"), Text.literal("fast poke, low stun"));
@@ -54,7 +54,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
             50, 0.75f, COUNTER_FOLLOWUP)
             .withSound(JSoundRegistry.TW_BARRAGE)
             .withInfo(Text.literal("Feign Barrage"), Text.literal("counter, 0.25s windup, 2.25s duration, teleports and knocks down on hit"));
-    public static final TWDonutAttack DONUT = new TWDonutAttack(260, 20, 42, 1f,
+    public static final TWDonutAttack DONUT = new TWDonutAttack(220, 20, 42, 1f,
             9f, 52, 2f, 1f, 0f)
             .withSound(JSoundRegistry.TW_DONUT)
             .withImpactSound(JSoundRegistry.TW_DONUT_HIT)
@@ -67,7 +67,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
             .withSound(JSoundRegistry.TIME_SKIP)
             .withInfo(Text.literal("Timeskip"), Text.literal("14m range"));
     public static final ChargeAttack<TheWorldEntity, TheWorldEntity.State> CHARGE = new ChargeAttack<>(
-            300, 5, 19, 7.5f, 5, 20, 1.5f, 0.25f, 0, State.CHARGE_HIT)
+            280, 5, 19, 7.5f, 5, 20, 1.5f, 0.25f, 0, State.CHARGE_HIT)
             .withSound(JSoundRegistry.TW_CHARGE)
             .withImpactSound(JSoundRegistry.TW_CHARGE_HIT)
             .withBlockStun(11)

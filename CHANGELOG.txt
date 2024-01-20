@@ -1975,14 +1975,32 @@ Brawler
     >Sweep cooldown reduced (15->10s)
 
 Anubis
-    >
+    >Fixed bloodlust not incrementing
+    >Pommel
+        >cooldown reduced (14->9s)
+    >Cleaving strikes cooldown reduced (20->14s)
+    >Sweep cooldown reduced (16->11s)
+
+Star Platinum
+    >Roundhouse cooldown reduced (3->2s)
+
+The World
+    >Roundhouse cooldown reduced (3->2s)
+    >Donut cooldown reduced (13->11s)
+    >Charge cooldown reduced (15->14s)
+
+King Crimson
+    >Donut
+        >cooldown reduced (15->13s)
+        >startup reduced (41->29t)
+    >Blood Throw cooldown reduced (25->13s)
 
 D4C
     >You must now crouch to give items to clones
 
 Cream
     >Void
-        >damage reduced (1.25->0.75 hearts)
+        >damage per hit reduced (1.25->0.75 hearts)
         >now cancels spec moves
 
 Whitesnake
@@ -1990,16 +2008,35 @@ Whitesnake
     >M1 recovery reduced (7->4t)
     >Donut replaced with a faster, more versatile Gut Punch
 
+Magician's Red
+    >Remodeled
+
+The Fool
+    >Remodeled
+    >Pound
+        >Cooldown reduced (13->11s)
+        >Followup blockstun reduced (+2->-1 on block)
+    >Charge cooldown reduced (13->11s)
+    >Fixed Sandwave making the Fool invisible in first person mode
+
 Gold Experience
     >Remodeled
     >Updated animations
     >Barrage stun reduced (30->20t)
+    >Rekka cooldown reduced (10->8s)
     >Tree
         >cooldown reduced (15->14s)
         >startup reduced (14->10t)
 
+Killer Queen: Bites the Dust
+    >Elbow cooldown reduced (9->3s)
+
 Gold Experience: Requiem
     >Barrage stun reduced (30->20t)
+    >Overhead Kick cooldown reduced (11->7s)
+
+Made in Heaven
+    >Updated skins
 
 priority (top to bottom)
 todo: counters that invalidate hit effects

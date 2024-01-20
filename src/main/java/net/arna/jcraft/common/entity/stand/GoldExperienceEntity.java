@@ -98,7 +98,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withFollowup(REKKA3)
             .withInfo(Text.literal("Rekka (2nd Hit)"), Text.literal("links into Light"));
-    public static final RekkaAttack REKKA1 = new RekkaAttack(200, 8, 20, 1f, 5f,
+    public static final RekkaAttack REKKA1 = new RekkaAttack(160, 8, 20, 1f, 5f,
             15, 1.5f, 0.5f, 0f, 1, 12, REKKA2, State.REKKA2)
             .withSound(JSoundRegistry.GE_REKKA1)
             .withImpactSound(JSoundRegistry.IMPACT_2)

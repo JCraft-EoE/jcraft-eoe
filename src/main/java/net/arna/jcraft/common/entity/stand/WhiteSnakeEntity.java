@@ -43,7 +43,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
     public static final SimpleAttack<WhiteSnakeEntity> MEDIUM = new SimpleAttack<WhiteSnakeEntity>(
             60, 8, 13, 1, 7f, 16, 1.75f, 0, 0)
-            .withSound(JSoundRegistry.WS_DONUT) //todo: replace ws_donut sound
+            .withSound(JSoundRegistry.WS_DONUT)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Gut Punch"), Text.literal("combo starter/extender"));

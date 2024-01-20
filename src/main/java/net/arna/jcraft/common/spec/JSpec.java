@@ -3,6 +3,7 @@ package net.arna.jcraft.common.spec;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.Getter;
 import lombok.Setter;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
@@ -134,13 +135,14 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
 
     public boolean handleMove(AbstractMove<?, ? super A> move, CooldownType cooldownType, S state, float animationSpeed) {
         move = moveMap.getRegisteredMoveFor(move);
-        if (!move.canBeInitiated(getThis())) return false;
-        move.onInitiate(getThis());
 
         CooldownsComponent cooldowns = JComponents.getCooldowns(player);
         int cd = cooldowns.getCooldown(cooldownType);
         if (cd > 0) return false;
         cooldowns.setCooldown(cooldownType, move.getCooldown());
+
+        if (!move.canBeInitiated(getThis())) return false;
+        move.onInitiate(getThis());
 
         //JCraft.LOGGER.info("SERVER: Handling spec attack: " + attack + " in world: " + serverWorld);
 

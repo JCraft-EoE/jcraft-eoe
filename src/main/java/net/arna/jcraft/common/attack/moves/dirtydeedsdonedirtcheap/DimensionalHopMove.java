@@ -80,7 +80,7 @@ public class DimensionalHopMove extends AbstractSimpleAttack<DimensionalHopMove,
         ServerWorld auWorld = world.getServer().getWorld(JDimensionRegistry.AU_DIMENSION_KEY);
         if (auWorld == null) throw new IllegalStateException("Alternate Universe could not be found.");
 
-        fixLightInAU(attacker, world, auWorld);
+        //fixLightInAU(attacker, world, auWorld);
 
         Set<LivingEntity> toHop = new HashSet<>(targets);
         toHop.add(user);
@@ -91,6 +91,7 @@ public class DimensionalHopMove extends AbstractSimpleAttack<DimensionalHopMove,
         return targets;
     }
 
+    //todo: fix fixLightInAU() crashing the server repeatedly (its currently not called)
     @SuppressWarnings("DataFlowIssue") // There is no issue
     private static void fixLightInAU(D4CEntity attacker, ServerWorld world, ServerWorld auWorld) {
         ChunkPos origin = attacker.getChunkPos();
@@ -98,7 +99,6 @@ public class DimensionalHopMove extends AbstractSimpleAttack<DimensionalHopMove,
         // Lighting providers are too complicated, man. Wth
         // We got 2 providers, every provider has 2 storages and every storage has 2 storages.
 
-        //todo: fix this crashing the server repeatedly
         LightingProvider ogLightingProvider = world.getLightingProvider();
         LightingProvider auLightingProvider = auWorld.getLightingProvider();
 

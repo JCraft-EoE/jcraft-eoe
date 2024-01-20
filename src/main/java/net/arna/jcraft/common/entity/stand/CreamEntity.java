@@ -152,7 +152,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         cons = List.of(
                 "very variable reward on hit",
                 "blind and deaf in the void",
-                "below average speed"
+                "above average cooldowns"
         );
 
         freespace = """
