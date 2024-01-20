@@ -136,12 +136,13 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
     public boolean handleMove(AbstractMove<?, ? super A> move, CooldownType cooldownType, S state, float animationSpeed) {
         move = moveMap.getRegisteredMoveFor(move);
 
+        if (!move.canBeInitiated(getThis())) return false;
+
         CooldownsComponent cooldowns = JComponents.getCooldowns(player);
         int cd = cooldowns.getCooldown(cooldownType);
         if (cd > 0) return false;
         cooldowns.setCooldown(cooldownType, move.getCooldown());
 
-        if (!move.canBeInitiated(getThis())) return false;
         move.onInitiate(getThis());
 
         //JCraft.LOGGER.info("SERVER: Handling spec attack: " + attack + " in world: " + serverWorld);
