@@ -77,19 +77,20 @@ public class DimensionalHopMove extends AbstractSimpleAttack<DimensionalHopMove,
             return Set.of();
         }
 
-        ServerWorld auWorld = world.getServer().getWorld(JDimensionRegistry.AU_DIMENSION_KEY);
-        if (auWorld == null) throw new IllegalStateException("Alternate Universe could not be found.");
+        if (JCraft.auWorld == null) throw new IllegalStateException("Alternate Universe could not be found.");
 
-        //fixLightInAU(attacker, world, auWorld);
+        fixLightInAU(attacker, world, JCraft.auWorld);
 
         Set<LivingEntity> toHop = new HashSet<>(targets);
         toHop.add(user);
-        int heightOffset = auWorld.getHeight() - world.getHeight();
+        int heightOffset = JCraft.auWorld.getHeight() - world.getHeight();
         for (LivingEntity entity : toHop)
             JCraft.dimensionHop(entity, heightOffset / 2);
 
         return targets;
     }
+
+    static final boolean enableLightingFix = false;
 
     //todo: fix fixLightInAU() crashing the server repeatedly (its currently not called)
     @SuppressWarnings("DataFlowIssue") // There is no issue
@@ -99,44 +100,57 @@ public class DimensionalHopMove extends AbstractSimpleAttack<DimensionalHopMove,
         // Lighting providers are too complicated, man. Wth
         // We got 2 providers, every provider has 2 storages and every storage has 2 storages.
 
-        LightingProvider ogLightingProvider = world.getLightingProvider();
-        LightingProvider auLightingProvider = auWorld.getLightingProvider();
+        boolean someModMessedUpLight = true;
+        ChunkToNibbleArrayMap<?>
+                ogBlockLightStorage = null,
+                ogUncachedBlockLightStorage = null,
+                auBlockLightStorage = null,
+                auUncachedBlockLightStorage = null,
+                ogSkyLightStorage = null,
+                ogUncachedSkyLightStorage = null,
+                auSkyLightStorage = null,
+                auUncachedSkyLightStorage = null;
 
-        ChunkLightProviderAccessor ogBlockLightProvider = (ChunkLightProviderAccessor)
-                ((LightingProviderAccessor) ogLightingProvider).getBlockLightProvider();
-        ChunkLightProviderAccessor auBlockLightProvider = (ChunkLightProviderAccessor)
-                ((LightingProviderAccessor) auLightingProvider).getBlockLightProvider();
-        ChunkLightProviderAccessor ogSkyLightProvider = (ChunkLightProviderAccessor)
-                ((LightingProviderAccessor) ogLightingProvider).getSkyLightProvider();
-        ChunkLightProviderAccessor auSkyLightProvider = (ChunkLightProviderAccessor)
-                ((LightingProviderAccessor) auLightingProvider).getSkyLightProvider();
+        if (enableLightingFix) {
+            LightingProvider ogLightingProvider = world.getLightingProvider();
+            LightingProvider auLightingProvider = auWorld.getLightingProvider();
 
-        LightStorageAccessor ogBlockLightStorage0 = ogBlockLightProvider == null ? null :
-                (LightStorageAccessor) ogBlockLightProvider.getLightStorage();
-        LightStorageAccessor auBlockLightStorage0 = auBlockLightProvider == null ? null :
-                (LightStorageAccessor) auBlockLightProvider.getLightStorage();
-        LightStorageAccessor ogSkyLightStorage0 = ogSkyLightProvider == null ? null :
-                (LightStorageAccessor) ogSkyLightProvider.getLightStorage();
-        LightStorageAccessor auSkyLightStorage0 = auSkyLightProvider == null ? null :
-                (LightStorageAccessor) auSkyLightProvider.getLightStorage();
+            ChunkLightProviderAccessor ogBlockLightProvider = (ChunkLightProviderAccessor)
+                    ((LightingProviderAccessor) ogLightingProvider).getBlockLightProvider();
+            ChunkLightProviderAccessor auBlockLightProvider = (ChunkLightProviderAccessor)
+                    ((LightingProviderAccessor) auLightingProvider).getBlockLightProvider();
+            ChunkLightProviderAccessor ogSkyLightProvider = (ChunkLightProviderAccessor)
+                    ((LightingProviderAccessor) ogLightingProvider).getSkyLightProvider();
+            ChunkLightProviderAccessor auSkyLightProvider = (ChunkLightProviderAccessor)
+                    ((LightingProviderAccessor) auLightingProvider).getSkyLightProvider();
 
-        // Whether some mod (like Starlight or Phosphor) overwrote the lighting system.
-        // If so, our method of copying light data is not going to work.
-        boolean someModMessedUpLight = Stream.of(ogBlockLightStorage0, auBlockLightStorage0, ogSkyLightStorage0, auSkyLightStorage0)
-                .anyMatch(Objects::isNull);
+            LightStorageAccessor ogBlockLightStorage0 = ogBlockLightProvider == null ? null :
+                    (LightStorageAccessor) ogBlockLightProvider.getLightStorage();
+            LightStorageAccessor auBlockLightStorage0 = auBlockLightProvider == null ? null :
+                    (LightStorageAccessor) auBlockLightProvider.getLightStorage();
+            LightStorageAccessor ogSkyLightStorage0 = ogSkyLightProvider == null ? null :
+                    (LightStorageAccessor) ogSkyLightProvider.getLightStorage();
+            LightStorageAccessor auSkyLightStorage0 = auSkyLightProvider == null ? null :
+                    (LightStorageAccessor) auSkyLightProvider.getLightStorage();
 
-        ChunkToNibbleArrayMap<?> ogBlockLightStorage = someModMessedUpLight ? null : ogBlockLightStorage0.getStorage();
-        ChunkToNibbleArrayMap<?> ogUncachedBlockLightStorage = someModMessedUpLight ? null : ogBlockLightStorage0.getUncachedStorage();
-        ChunkToNibbleArrayMap<?> auBlockLightStorage = someModMessedUpLight ? null : auBlockLightStorage0.getStorage();
-        ChunkToNibbleArrayMap<?> auUncachedBlockLightStorage = someModMessedUpLight ? null : auBlockLightStorage0.getUncachedStorage();
-        ChunkToNibbleArrayMap<?> ogSkyLightStorage = someModMessedUpLight ? null : ogSkyLightStorage0.getStorage();
-        ChunkToNibbleArrayMap<?> ogUncachedSkyLightStorage = someModMessedUpLight ? null : ogSkyLightStorage0.getUncachedStorage();
-        ChunkToNibbleArrayMap<?> auSkyLightStorage = someModMessedUpLight ? null : auSkyLightStorage0.getStorage();
-        ChunkToNibbleArrayMap<?> auUncachedSkyLightStorage = someModMessedUpLight ? null : auSkyLightStorage0.getUncachedStorage();
+            // Whether some mod (like Starlight or Phosphor) overwrote the lighting system.
+            // If so, our method of copying light data is not going to work.
+            someModMessedUpLight = Stream.of(ogBlockLightStorage0, auBlockLightStorage0, ogSkyLightStorage0, auSkyLightStorage0)
+                    .anyMatch(Objects::isNull);
 
-        someModMessedUpLight |= Stream.of(ogBlockLightStorage, ogUncachedBlockLightStorage, auBlockLightStorage, auUncachedBlockLightStorage,
-                        ogSkyLightStorage, ogUncachedSkyLightStorage, auSkyLightStorage, auUncachedBlockLightStorage)
-                .anyMatch(Objects::isNull);
+            ogBlockLightStorage = someModMessedUpLight ? null : ogBlockLightStorage0.getStorage();
+            ogUncachedBlockLightStorage = someModMessedUpLight ? null : ogBlockLightStorage0.getUncachedStorage();
+            auBlockLightStorage = someModMessedUpLight ? null : auBlockLightStorage0.getStorage();
+            auUncachedBlockLightStorage = someModMessedUpLight ? null : auBlockLightStorage0.getUncachedStorage();
+            ogSkyLightStorage = someModMessedUpLight ? null : ogSkyLightStorage0.getStorage();
+            ogUncachedSkyLightStorage = someModMessedUpLight ? null : ogSkyLightStorage0.getUncachedStorage();
+            auSkyLightStorage = someModMessedUpLight ? null : auSkyLightStorage0.getStorage();
+            auUncachedSkyLightStorage = someModMessedUpLight ? null : auSkyLightStorage0.getUncachedStorage();
+
+            someModMessedUpLight |= Stream.of(ogBlockLightStorage, ogUncachedBlockLightStorage, auBlockLightStorage, auUncachedBlockLightStorage,
+                            ogSkyLightStorage, ogUncachedSkyLightStorage, auSkyLightStorage, auUncachedBlockLightStorage)
+                    .anyMatch(Objects::isNull);
+        }
 
         for (int x = -3; x < 4; x++) {
             for (int z = -3; z < 4; z++) {
@@ -191,7 +205,7 @@ public class DimensionalHopMove extends AbstractSimpleAttack<DimensionalHopMove,
             // If some mod felt the need to overwrite the light system,
             // they have probably improved the efficiency of this method.
             // Thus, it should theoretically be fine to call this for every block.
-            if (someModMessedUpLight) auWorld.getLightingProvider().checkBlock(pos);
+            if (enableLightingFix && someModMessedUpLight) auWorld.getLightingProvider().checkBlock(pos);
         }
     }
 

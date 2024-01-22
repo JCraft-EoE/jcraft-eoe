@@ -16,6 +16,8 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.entity.Entity;
@@ -27,6 +29,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -125,12 +128,22 @@ public interface JEventsRegistry {
 
         ServerTickEvents.END_SERVER_TICK.register(JServerTickEvents::serverTick);
 
-        // Disable item usage while stunned
+        // Disable item/block usage while stunned
         UseItemCallback.EVENT.register((player, world, hand) -> {
             ItemStack stack = player.getStackInHand(hand);
             if (!JUtils.canAct(player))
                 return TypedActionResult.fail(stack);
             return TypedActionResult.pass(stack);
+        });
+        AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {
+            if (!JUtils.canAct(player))
+                return ActionResult.FAIL;
+            return ActionResult.PASS;
+        });
+        UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
+            if (!JUtils.canAct(player))
+                return ActionResult.FAIL;
+            return ActionResult.PASS;
         });
 
         // Send initial values of server config options to the player.

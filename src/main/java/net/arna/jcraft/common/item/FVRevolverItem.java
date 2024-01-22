@@ -46,10 +46,10 @@ public class FVRevolverItem extends Item {
         if (shots < 1) return TypedActionResult.fail(user.getStackInHand(hand));
 
         data.putInt("Shots", shots - 1);
-        user.getItemCooldownManager().set(this, 8);
+        user.getItemCooldownManager().set(this, 11);
         world.playSound(null, user.getX(), user.getY(), user.getZ(), JSoundRegistry.REVOLVER_FIRE, SoundCategory.PLAYERS, 1f, 1f);
 
-        BulletProjectile bullet = new BulletProjectile(world, user, 9f, 10f, 10, 5);
+        BulletProjectile bullet = new BulletProjectile(world, user, 9f, 10f, 2, 5);
         bullet.setVelocity(user, user.getPitch(), user.getYaw(), 0f,  10, 0F);
         world.spawnEntity(bullet);
 
