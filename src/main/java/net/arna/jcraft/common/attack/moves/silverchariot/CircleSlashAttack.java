@@ -5,6 +5,7 @@ import net.arna.jcraft.common.attack.core.ctx.IntMoveVariable;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.entity.stand.SilverChariotEntity;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -29,11 +30,7 @@ public class CircleSlashAttack extends AbstractSimpleAttack<CircleSlashAttack, S
 
         for (LivingEntity living : targets) {
             Vec3d launchVec = living.getPos().subtract(user.getPos()).normalize().multiply(launchMultiplier);
-            living.addVelocity(launchVec.x, launchVec.y + 0.2, launchVec.z);
-
-            living.velocityModified = true;
-            if (living instanceof ServerPlayerEntity serverPlayer)
-                serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(serverPlayer));
+            JUtils.addVelocity(living, launchVec.x, launchVec.y + 0.2, launchVec.z);
         }
 
         return targets;

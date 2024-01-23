@@ -22,6 +22,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -74,6 +75,22 @@ public final class JUtils {
                 return vec;
             }
         }
+    }
+
+    public static void addVelocity(Entity entity, double x, double y, double z) {
+        entity.addVelocity(x, y, z);
+        syncVelocityUpdate(entity);
+    }
+
+    public static void setVelocity(Entity entity, double x, double y, double z) {
+        entity.setVelocity(x, y, z);
+        syncVelocityUpdate(entity);
+    }
+
+    public static void syncVelocityUpdate(Entity entity) {
+        entity.velocityModified = true;
+        if (entity instanceof ServerPlayerEntity serverPlayer)
+            serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(entity));
     }
 
     public static boolean canAct(LivingEntity living) {

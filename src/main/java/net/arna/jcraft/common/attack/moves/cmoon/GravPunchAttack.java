@@ -7,6 +7,7 @@ import net.arna.jcraft.common.entity.stand.CMoonEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.Gravity;
 import net.arna.jcraft.common.util.JParticleType;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -27,9 +28,11 @@ public class GravPunchAttack extends AbstractSimpleAttack<GravPunchAttack, CMoon
     protected void processTarget(CMoonEntity attacker, LivingEntity target, Vec3d kbVec, DamageSource damageSource) {
         super.processTarget(attacker, target, kbVec, damageSource);
 
-        GravityChangerAPI.addGravity(target, new Gravity(Direction.UP, 2, 60, GRAVITY_SOURCE));
+        Direction oppositeGravity = GravityChangerAPI.getGravityDirection(target).getOpposite();
+        GravityChangerAPI.addGravity(target, new Gravity(oppositeGravity, 2, 60, GRAVITY_SOURCE));
         target.addStatusEffect(new StatusEffectInstance(JStatusRegistry.WEIGHTLESS, 60, 0, true, false));
-        target.velocityModified = true;
+        // Launches them up relative to their original gravity, to prevent ground clipping
+        JUtils.setVelocity(target, oppositeGravity.getOffsetX() * 0.2, oppositeGravity.getOffsetY() * 0.2, oppositeGravity.getOffsetZ() * 0.2);
     }
 
     @Override

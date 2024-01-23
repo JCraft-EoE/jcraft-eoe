@@ -1045,13 +1045,13 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             damageScaler.jcraft$increaseHitCount();
 
             StatusEffectInstance stun = ent.getStatusEffect(JStatusRegistry.DAZED);
-            if (stun != null) {
+            if (stun != null)
                 if (overrideStun) ent.removeStatusEffect(JStatusRegistry.DAZED);
-            }
 
             stun(ent, stunTicks, stunLevel);
 
-            ent.addVelocity(kbVec.x, kbVec.y, kbVec.z);
+            if (!tsHit)
+                ent.addVelocity(kbVec.x, kbVec.y, kbVec.z);
         }
 
         // Interrupting spec moves
@@ -1083,12 +1083,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         damage(damage, source, ent);
 
-        if (!tsHit) {
-            // Velocity modification synchronisation
-            if (ent instanceof ServerPlayerEntity serverPlayer)
-                serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(serverPlayer));
-            else ent.velocityModified = true;
-        }
+        if (tsHit)
+            JComponents.getTimeStopData(ent).addTotalVelocity(kbVec);
+        else
+            JUtils.syncVelocityUpdate(ent);
     }
 
     protected boolean shouldNotPlaySummonSound() {

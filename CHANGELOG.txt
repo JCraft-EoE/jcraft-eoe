@@ -2038,8 +2038,23 @@ Gold Experience: Requiem
 Made in Heaven
     >Updated skins
 
-● 21/01/2024
+● 23/01/2024
 >Fixed being able to place and break blocks while stunned
+>Impact sounds now only play if one or more opponents are actually hit (as opposed to previously layering on top of blocking sounds)
+
+Timestops
+    >Fixed stun ticking down for players
+    >Fixed players not being launched
+
+King Crimson
+    >Updated skins 1 and 2
+    >Epitaph
+        >Fixed visual bugs
+        >Fixed animation
+    >Donut
+        >Updated animation
+        >Redone sound
+    >Eye Chop startup reduced (24->19t)
 
 Dirty Deeds Done Cheap
     >Bullet stun reduced (10->2t)
@@ -2049,11 +2064,7 @@ Magician's Red
     >Summoning sound is now quieter
 
 C-Moon
-    >
-
->MY AGENDA
-fix uppercut sending people into the ground
-
+    >Fixed Only One Punch sending the opponent into the ground
 
 priority (top to bottom)
 todo: counters that invalidate hit effects

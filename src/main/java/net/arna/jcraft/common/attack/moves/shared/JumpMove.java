@@ -5,6 +5,7 @@ import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
@@ -31,14 +32,8 @@ public class JumpMove<A extends IAttacker<? extends A, ?>> extends AbstractMove<
     @Override
     public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user, MoveContext ctx) {
         if (!user.isOnGround()) return Set.of();
-
         Vec3d jumpVel = user.getRotationVector().multiply(strength).add(0, 0.5, 0);
-
-        user.addVelocity(jumpVel.x, jumpVel.y, jumpVel.z);
-        user.velocityModified = true;
-
-        if (user instanceof ServerPlayerEntity player)
-            player.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(player));
+        JUtils.setVelocity(user, jumpVel.x, jumpVel.y, jumpVel.z);
 
         return Set.of();
     }

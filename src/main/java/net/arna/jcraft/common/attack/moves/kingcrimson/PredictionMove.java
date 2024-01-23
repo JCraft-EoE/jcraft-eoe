@@ -9,6 +9,7 @@ import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
+import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.registry.JPacketRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -22,6 +23,7 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
@@ -79,7 +81,7 @@ public class PredictionMove extends AbstractMove<PredictionMove, KingCrimsonEnti
         ServerPlayNetworking.send(player, JPacketRegistry.S2C_TIME_ERASE_PREDICTION_STATE, buf);
     }
 
-    public void finishPrediction(KingCrimsonEntity attacker) {
+    public static void finishPrediction(KingCrimsonEntity attacker) {
         Map<Entity, Vec3d> predictionInfo = attacker.getMoveContext().get(PREDICTION_INFO);
         for (Map.Entry<Entity, Vec3d> prediction : predictionInfo.entrySet()) {
             Entity entity = prediction.getKey();
@@ -89,13 +91,22 @@ public class PredictionMove extends AbstractMove<PredictionMove, KingCrimsonEnti
             entity.teleport(pos.x, pos.y, pos.z);
         }
 
+        cancelPrediction(attacker, predictionInfo);
+        attacker.cancelMove();
+    }
+
+    public static void cancelPrediction(KingCrimsonEntity attacker) {
+        Map<Entity, Vec3d> predictionInfo = attacker.getMoveContext().get(PREDICTION_INFO);
+        cancelPrediction(attacker, predictionInfo);
+    }
+
+    public static void cancelPrediction(KingCrimsonEntity attacker, Map<Entity, Vec3d> predictionInfo) {
         if (attacker.getUser() instanceof ServerPlayerEntity player) {
             ServerPlayNetworking.send(player, JPacketRegistry.S2C_EPITAPH_STATE, new PacketByteBuf(Unpooled.buffer().writeBoolean(false)));
             ServerPlayNetworking.send(player, JPacketRegistry.S2C_TIME_ERASE_PREDICTION_STATE, new PacketByteBuf(Unpooled.buffer().writeBoolean(false)));
         }
 
         predictionInfo.clear();
-        attacker.moveCancel();
     }
 
     public void tickPredictions(KingCrimsonEntity attacker) {
@@ -136,16 +147,19 @@ public class PredictionMove extends AbstractMove<PredictionMove, KingCrimsonEnti
         Vec3d futurePos = currentPos;
         boolean changed = false;
 
+        Vec3i gravity = GravityChangerAPI.getGravityDirection(entity).getVector();
+        Vec3d drop = new Vec3d(gravity.getX(), gravity.getY(), gravity.getZ()).multiply(9.81 / 400 * ticksLeft * ticksLeft);
+
         // If in air and not in a liquid, account for drop
         if (!entity.isOnGround() && !entity.isSubmergedInWater() && !entity.isInLava()) {
             //JCraft.LOGGER.info("Target is in air");
-            futurePos = futurePos.add(0, (-9.81 / 400) * ticksLeft * ticksLeft, 0);
+            futurePos = futurePos.add(drop);
             changed = true;
         }
 
         // If moving faster than 0.01 m/s, account for distance traveled
         Vec3d velocity = entity.getVelocity();
-        if (entity instanceof ServerPlayerEntity player) // EXTREMELY cursed implementation of player velocity because NOTHING ELSE WORKS
+        if (entity instanceof PlayerEntity player) // EXTREMELY cursed implementation of player velocity because NOTHING ELSE WORKS
             velocity = JComponents.MISC.get(player).getDesiredVelocity();
         //JCraft.LOGGER.info("Target is moving at a velocity of: " + velocity);
         if (velocity.lengthSquared() > 0.0001) {

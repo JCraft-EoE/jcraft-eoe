@@ -91,7 +91,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             .withHyperArmor()
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withExtraHitBox(1d)
-            .withInfo(Text.literal("Only One Punch"), Text.literal("floats enemy on hit, high stun"));
+            .withInfo(Text.literal("Only One Punch"), Text.literal("inverts enemy gravity and floats on hit (3s), high stun"));
     public static final GroundSlamAttack GROUND_SLAM = new GroundSlamAttack(240, 10, 18,
             1f, 7f,  17, 3f, 0.2f, 1.4f)
             .withSound(JSoundRegistry.CMOON_GROUNDSLAM)

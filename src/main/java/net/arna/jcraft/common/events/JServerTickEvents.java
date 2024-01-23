@@ -130,9 +130,13 @@ public class JServerTickEvents {
 
             player.removeStatusEffect(JStatusRegistry.DAZED);
             stun(player, 10, 1);
+
             Vec3d pPos = player.getEyePos();
-            List<? extends Entity> toPush = player.world.getEntitiesByClass(Entity.class, AbstractSimpleAttack.createBox(pPos, 4),
+
+            Box burstHitbox = AbstractSimpleAttack.createBox(pPos, 4);
+            List<? extends Entity> toPush = player.world.getEntitiesByClass(Entity.class, burstHitbox,
                     EntityPredicates.VALID_LIVING_ENTITY.and(e -> !filter.contains(e)));
+            JUtils.displayHitbox(player.world, burstHitbox);
 
             for (Entity ent : toPush) {
                 Vec3d awayVector = ent.getPos().subtract(pPos).normalize();
@@ -154,11 +158,7 @@ public class JServerTickEvents {
                 }
 
                 if (!pushAway) continue;
-                ent.setVelocity(awayVector.x, awayVector.y / 5 + 0.4, awayVector.z);
-                ent.velocityModified = true;
-
-                if (ent instanceof ServerPlayerEntity serverPlayer)
-                    serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(serverPlayer));
+                JUtils.setVelocity(ent, awayVector.x, awayVector.y / 5 + 0.4, awayVector.z);
             }
         }
 

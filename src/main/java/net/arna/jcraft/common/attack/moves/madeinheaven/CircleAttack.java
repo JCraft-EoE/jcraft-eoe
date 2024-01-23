@@ -101,20 +101,19 @@ public class CircleAttack extends AbstractMove<CircleAttack, MadeInHeavenEntity>
                 toExit = true;
             }
 
+            Vec3d newVelocity;
             if (toExit) {
-                user.setVelocity(exitVel.add(0, 0.5, 0));
+                newVelocity = exitVel.add(0, 0.5, 0);
                 endCircle(attacker);
             } else {
                 Vec3d orbitPos = target.getEyePos().add(Math.sin(orbitProg) * 7, 0, Math.cos(orbitProg) * 7);
                 Vec3d towardsVel = orbitPos.subtract(user.getPos()).normalize();
                 double stabilization = user.getPos().distanceTo(orbitPos);
                 if (stabilization > 0.5) stabilization = 0.5;
-                user.setVelocity(user.getVelocity().multiply(stabilization).add(towardsVel));
+                newVelocity = user.getVelocity().multiply(stabilization).add(towardsVel);
             }
 
-            if (user instanceof ServerPlayerEntity serverPlayer)
-                serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(serverPlayer));
-            else user.velocityModified = true;
+            JUtils.setVelocity(user, newVelocity.x, newVelocity.y, newVelocity.z);
         }
 
         if (circlingTime == 1 || user.hasStatusEffect(JStatusRegistry.DAZED)) endCircle(attacker);

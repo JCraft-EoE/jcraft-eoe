@@ -83,7 +83,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     public static final BloodThrowAttack BLOOD_THROW = new BloodThrowAttack(260, 10, 15, 1f)
             .withInfo(Text.literal("Blood Throw"), Text.literal("throws a stunning, blinding blood projectile"));
     public static final EffectInflictingAttack<KingCrimsonEntity> EYE_CHOP = new EffectInflictingAttack<KingCrimsonEntity>(
-            280, 25, 34, 1f, 9f, 27, 1.75f, 0.3f, -0.3f,
+            280, 20, 29, 1f, 9f, 27, 1.75f, 0.3f, -0.3f,
             List.of(new StatusEffectInstance(StatusEffects.BLINDNESS, 200, 0)))
             .withCrouchingVariant(BLOOD_THROW)
             .withSound(JSoundRegistry.KC_EYE_CHOP)
@@ -281,10 +281,12 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     }
 
     public void moveCancel() {
+        // Epitaph
+        PredictionMove.cancelPrediction(this);
+
+        // General
         curMove = null;
         queuedMove = null;
-
-        getMoveContext().get(PredictionMove.PREDICTION_INFO).clear();
 
         setMoveStun(2);
         setState(State.IDLE);

@@ -402,8 +402,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
                 center.z + random.nextGaussian() * 0.1,
                 hitSpark);
 
-        // Sounds
-        getImpactSounds().forEach(sound -> attacker.playAttackerSound(sound, 1f, 1f));
+        boolean anyHit = false;
 
         // Process targets
         Vec3d kbVec = getRotVec(attacker).multiply(knockback).add(new Vec3d(0.0, Math.abs(knockback) / 4, 0.0));
@@ -411,13 +410,18 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
             Vec3d pos = RotationUtil.vecPlayerToWorld(target.getEyePos(), GravityChangerAPI.getGravityDirection(target));
             if (JUtils.isBlocking(target))
                 JCraft.createHitsparks(serverWorld, pos.getX(), pos.getY(), pos.getZ(), JParticleType.BLOCK_SPARK, 3, 0);
-            else
-                JCraft.createHitsparks(serverWorld, pos.getX(), pos.getY(), pos.getZ(), JParticleType.PIXEL, 2 + (int)damage * 2, 0.5);
-
+            else {
+                JCraft.createHitsparks(serverWorld, pos.getX(), pos.getY(), pos.getZ(), JParticleType.PIXEL, 2 + (int) damage * 2, 0.5);
+                anyHit = true;
+            }
 
             targetProcessors.forEach(processor -> processor.processTarget(attacker, target, kbVec, damageSource));
             processTarget(attacker, target, kbVec, damageSource);
         }
+
+        // Sounds
+        if (anyHit)
+            getImpactSounds().forEach(sound -> attacker.playAttackerSound(sound, 1f, 1f));
 
         return targets;
     }

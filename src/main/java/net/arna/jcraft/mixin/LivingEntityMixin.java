@@ -120,6 +120,13 @@ public abstract class LivingEntityMixin implements IDamageScaler {
         doChecks(target, cir, (LivingEntity) (Object) this);
     }
 
+    // This is actually an implementation for players (mobs have their effect ticking properly stopped in TS), but PlayerEntity doesn't override this
+    @Inject(cancellable = true, at = @At("HEAD"), method = "tickStatusEffects")
+    protected void jcraft$tickStatusEffects(CallbackInfo ci) {
+        if (JComponents.getTimeStopData((LivingEntity) (Object) this).getTicks() > 0)
+            ci.cancel();
+    }
+
     private static @Unique void doChecks(Entity entity, CallbackInfoReturnable<Boolean> cir, LivingEntity livingEntity) {
         if ((livingEntity.hasStatusEffect(JStatusRegistry.DAZED) && !JUtils.isBlocking(livingEntity)) ||
                 livingEntity.hasStatusEffect(JStatusRegistry.KNOCKDOWN))

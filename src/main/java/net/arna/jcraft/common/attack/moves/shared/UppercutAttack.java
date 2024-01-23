@@ -5,6 +5,7 @@ import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -24,13 +25,8 @@ public class UppercutAttack<A extends IAttacker<? extends A, ?>> extends Abstrac
     @Override
     public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user, MoveContext ctx) {
         Set<LivingEntity> targets = super.perform(attacker, user, ctx);
-
-        for (LivingEntity target : targets) {
-            target.addVelocity(0, strength, 0);
-            target.velocityModified = true;
-            if (target instanceof ServerPlayerEntity player)
-                player.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(player));
-        }
+        for (LivingEntity target : targets)
+            JUtils.addVelocity(target, 0, strength, 0);
 
         return targets;
     }

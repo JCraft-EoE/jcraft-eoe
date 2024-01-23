@@ -57,9 +57,8 @@ public class SheathedAnubisItem extends SpecObtainmentItem {
                 JUtils.serverPlaySound(JSoundRegistry.ANUBIS_UNSHEATHE, serverWorld, user.getPos());
                 user.setStackInHand(hand, new ItemStack(JObjectRegistry.ANUBIS));
             }
-        } else { // Block
+        } else // Block
             user.setCurrentHand(hand);
-        }
         return TypedActionResult.consume(itemStack);
     }
 
