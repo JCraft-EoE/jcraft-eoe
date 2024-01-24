@@ -15,6 +15,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -43,6 +44,13 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
 
     public KillerQueenEntity(World worldIn) {
         super(StandType.KILLER_QUEEN, worldIn, null);
+
+        auraColors = new Vec3f[]{
+                new Vec3f(0.9f, 0.7f, 0.8f),
+                new Vec3f(1f, 1f, 1f),
+                new Vec3f(0.5f, 0.2f, 0.6f),
+                new Vec3f(0.4f, 0.7f, 1.0f)
+        };
     }
 
     @Override

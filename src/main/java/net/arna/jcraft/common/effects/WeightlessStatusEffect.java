@@ -1,5 +1,7 @@
 package net.arna.jcraft.common.effects;
 
+import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.component.MiscComponent;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.Gravity;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
@@ -10,6 +12,7 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
@@ -19,9 +22,7 @@ import java.util.Random;
 import static net.arna.jcraft.common.gravity.api.GravityChangerAPI.getGravityDirection;
 
 public class WeightlessStatusEffect extends StatusEffect {
-    private boolean previouslyNoGravved = false;
-    private final Random random = new Random();
-    private int hoverTime = 0;
+    private static final Random random = new Random();
 
     public WeightlessStatusEffect() {
         super(StatusEffectCategory.NEUTRAL, 0x000011);
@@ -47,6 +48,8 @@ public class WeightlessStatusEffect extends StatusEffect {
                     0, 0, 0
             );
         } else {
+            MiscComponent misc = JComponents.getMiscData(entity);
+
             HitResult hitResult = world.raycast(
                     new RaycastContext(
                             pos,
@@ -58,28 +61,39 @@ public class WeightlessStatusEffect extends StatusEffect {
             );
 
             if (hitResult.getType() == HitResult.Type.BLOCK) {
-                hoverTime = 0;
-            } else if (++hoverTime > 10) // If not near ground for a second
-                entity.removeStatusEffect(this);
+                misc.setHoverTime(0);
+            } else {
+                int newHoverTime = misc.getHoverTime() + 1;
+                misc.setHoverTime(newHoverTime);
+                if (newHoverTime > 10) // If not near ground for half a second
+                    entity.removeStatusEffect(this);
+            }
         }
     }
 
     @Override
     public void onApplied(LivingEntity entity, AttributeContainer attributes, int amplifier) {
         super.onApplied(entity, attributes, amplifier);
+
         if (entity.getWorld().isClient) return;
-        this.previouslyNoGravved = entity.hasNoGravity();
-        if (amplifier == 1)
-            GravityChangerAPI.addGravity(entity, new Gravity(JUtils.getLookDirection(entity), 1, 200, "effect") );
-        else entity.setNoGravity(true);
+        MiscComponent misc = JComponents.getMiscData(entity);
+        misc.setPrevNoGrav(entity.hasNoGravity());
+        misc.setHoverTime(0);
+
+        Direction lookDir = JUtils.getLookDirection(entity);
+        if (amplifier == 1) {
+            if (lookDir != GravityChangerAPI.getGravityDirection(entity))
+                GravityChangerAPI.addGravity(entity, new Gravity(lookDir, 1, 200, "effect"));
+        } else entity.setNoGravity(true);
     }
 
     @Override
     public void onRemoved(LivingEntity entity, AttributeContainer attributes, int amplifier) {
         super.onRemoved(entity, attributes, amplifier);
+
         if (entity.getWorld().isClient) return;
         GravityChangerAPI.clearGravity(entity);
-        if (!previouslyNoGravved)
+        if (!JComponents.getMiscData(entity).getPrevNoGrav())
             entity.setNoGravity(false);
     }
 }

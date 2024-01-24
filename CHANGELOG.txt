@@ -2066,6 +2066,29 @@ Magician's Red
 C-Moon
     >Fixed Only One Punch sending the opponent into the ground
 
+● 24/01/2024
+>Added stand auras
+>Fixed counter whiff animations not playing
+>Fixed stuck knives rendering being tied to arrows
+
+Barrages
+    >The main barrage of most stands may now be used (if started while crouching) to break blocks
+
+Star Platinum
+    >Updated ability icons
+
+The World
+    >Updated skin 2
+
+Whitesnake
+    >Added ability icons
+
+C-Moon
+    >Fixed Weightless effect being nonfunctional in multiplayer
+
+Gold Experience: Requiem
+    >Added ability icons
+
 priority (top to bottom)
 todo: counters that invalidate hit effects
 todo: fix predict not working with projectiles spawned after it started

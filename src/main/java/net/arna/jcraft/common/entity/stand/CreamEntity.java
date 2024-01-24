@@ -161,6 +161,13 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                     i.M1>land+s.OFF>s.ON+Assault>M1>Charge>Grab
                     Chop>Destroy>Surprise
                     Chop>Void""";
+
+        auraColors = new Vec3f[]{
+                new Vec3f(0.5f, 0.1f, 0.3f),
+                new Vec3f(0.5f, 0.6f, 0.8f),
+                new Vec3f(1.0f, 0.5f, 0.7f),
+                new Vec3f(1.0f, 0.6f, 0.6f)
+        };
     }
 
     public void beginHalfBall() {

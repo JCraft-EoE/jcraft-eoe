@@ -17,7 +17,10 @@ public enum JParticleType {
     HIT_SPARK_1(JParticleTypeRegistry.HITSPARK_1),
     HIT_SPARK_2(JParticleTypeRegistry.HITSPARK_2),
     PIXEL(JParticleTypeRegistry.PIXEL),
-    BLOCK_SPARK(JParticleTypeRegistry.BLOCKSPARK);
+    BLOCK_SPARK(JParticleTypeRegistry.BLOCKSPARK),
+    GO(JParticleTypeRegistry.GO),
+    AURA_ARC(JParticleTypeRegistry.AURA_ARC),
+    AURA_BLOB(JParticleTypeRegistry.AURA_BLOB);
 
     private final DefaultParticleType particleType;
 

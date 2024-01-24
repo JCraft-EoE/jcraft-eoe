@@ -8,18 +8,28 @@ import net.minecraft.util.math.Vec3d;
 import java.util.UUID;
 
 public interface MiscComponent extends Component, AutoSyncedComponent, CommonTickingComponent {
+    // General
     Vec3d getDesiredVelocity();
     void updateRemoteInputs(int forward, int sideways, boolean jumping);
-
-    UUID getSlavedTo();
-    void setSlavedTo(UUID uuid);
 
     void startDamageTimer();
     boolean isOnDamageTimer();
 
+    // TheWorldOverHeavenEntity
+    UUID getSlavedTo();
+    void setSlavedTo(UUID uuid);
+
+    // StuckKnivesFeatureRenderer
     int getStuckKnifeCount();
     void stab();
 
+    // WeightlessStatusEffect
+    int getHoverTime();
+    void setHoverTime(int hoverTime);
+    boolean getPrevNoGrav();
+    void setPrevNoGrav(boolean noGrav);
+
+    // Armored Hits
     int getArmoredHitTicks();
     void displayArmoredHit();
 }

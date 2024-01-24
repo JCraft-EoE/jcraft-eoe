@@ -5,13 +5,15 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.arna.jcraft.JCraft;
 import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes;
 import net.minecraft.particle.DefaultParticleType;
+import net.minecraft.particle.ParticleType;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.registry.Registry;
 
 import java.util.Map;
 
 public interface JParticleTypeRegistry {
-
+    DefaultParticleType AURA_ARC = FabricParticleTypes.simple();
+    DefaultParticleType AURA_BLOB = FabricParticleTypes.simple();
     DefaultParticleType COMBO_BREAK = FabricParticleTypes.simple();
     DefaultParticleType COOLDOWN_CANCEL = FabricParticleTypes.simple();
     DefaultParticleType HITSPARK_1 = FabricParticleTypes.simple();
@@ -23,8 +25,10 @@ public interface JParticleTypeRegistry {
     DefaultParticleType BOOM_1 = FabricParticleTypes.simple();
     DefaultParticleType PIXEL = FabricParticleTypes.simple();
     DefaultParticleType BLOCKSPARK = FabricParticleTypes.simple();
+    DefaultParticleType GO = FabricParticleTypes.simple();
 
     Int2ObjectMap<DefaultParticleType> particles = new Int2ObjectOpenHashMap<>(Map.ofEntries(
+            Map.entry(-8, JParticleTypeRegistry.GO),
             Map.entry(-7, JParticleTypeRegistry.BLOCKSPARK),
             Map.entry(-6, JParticleTypeRegistry.PIXEL),
             Map.entry(-5, JParticleTypeRegistry.BOOM_1),
@@ -38,7 +42,7 @@ public interface JParticleTypeRegistry {
             Map.entry(3, JParticleTypeRegistry.HITSPARK_2)
     ));
 
-    private static void registerParticle(String identifier, DefaultParticleType type) {
+    private static void registerParticle(String identifier, ParticleType<?> type) {
         Registry.register(Registry.PARTICLE_TYPE, JCraft.id(identifier), type);
     }
 
@@ -54,5 +58,8 @@ public interface JParticleTypeRegistry {
         registerParticle("boom_1", BOOM_1);
         registerParticle("pixel", PIXEL);
         registerParticle("blockspark", BLOCKSPARK);
+        registerParticle("go", GO);
+        registerParticle("aura_arc", AURA_ARC);
+        registerParticle("aura_blob", AURA_BLOB);
     }
 }

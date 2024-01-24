@@ -18,6 +18,7 @@ public class JClientConfig implements ConfigData {
 
     private UIPos uiPosition = UIPos.RIGHT;
     private boolean iconHud = true;
+    private boolean standAuras = true;
     private boolean timeEraseShader = true;
     private boolean epitaphOverlay = true;
 

@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.util;
 
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
+import net.arna.jcraft.common.entity.stand.StandEntity;
 
 // Dummy implementation of IClientEntityHandler used on the server.
 public class DummyClientEntityHandler implements IClientEntityHandler {
@@ -10,4 +11,6 @@ public class DummyClientEntityHandler implements IClientEntityHandler {
 
     @Override
     public void playerCloneEntityClientTick(PlayerCloneEntity entity) {}
+    @Override
+    public void standEntityClientTick(StandEntity<?,?> stand) {}
 }

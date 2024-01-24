@@ -6,13 +6,11 @@ import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.goldexperience.requiem.*;
-import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
-import net.arna.jcraft.common.attack.moves.shared.HealMove;
-import net.arna.jcraft.common.attack.moves.shared.KnockdownAttack;
-import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
+import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -20,6 +18,7 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.Angerable;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -75,8 +74,8 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             .withLaunch()
             .withExtraHitBox(1.5)
             .withInfo(Text.literal("Overhead Smash"), Text.literal("slow, uninterruptible knockdown"));
-    public static final BarrageAttack<GEREntity> BARRAGE = new BarrageAttack<GEREntity>(280, 0, 30,
-            0.75f, 1f, 20, 2f, 0.25f, 0f, 3)
+    public static final MainBarrageAttack<GEREntity> BARRAGE = new MainBarrageAttack<GEREntity>(280, 0, 30,
+            0.75f, 1f, 20, 2f, 0.25f, 0f, 3, Blocks.DEEPSLATE.getHardness())
             .withAerialVariant(KICK_BARRAGE)
             .withSound(JSoundRegistry.GE_BARRAGE)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
@@ -141,6 +140,13 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
                 (M1>)Barrage>jump>Overhead Kick>Life Beam>M1>Life Beam (second hit)
                 knockdown experience
                 M1>Barrage>Life Beam>M1~Overhead Smash>Life Beam (second hit)""";
+
+        auraColors = new Vec3f[]{
+                new Vec3f(0.7f, 0.8f, 1.0f),
+                new Vec3f(0.8f, 0.7f, 1.0f),
+                new Vec3f(1.0f, 0.3f, 0.7f),
+                new Vec3f(1.0f, 0.0f, 1.0f)
+        };
     }
 
     @Override

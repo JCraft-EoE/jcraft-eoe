@@ -8,12 +8,14 @@ import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.cmoon.*;
 import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
+import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.entity.projectile.BlockProjectile;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -29,6 +31,7 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
@@ -61,8 +64,8 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withTargetProcessor(CMoonEntity::addInversion)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
-    public static final BarrageAttack<CMoonEntity> BARRAGE = new BarrageAttack<CMoonEntity>(280, 0, 50,
-            0.75f, 0.75f, 20, 2f, 0.25f, 0f, 4)
+    public static final MainBarrageAttack<CMoonEntity> BARRAGE = new MainBarrageAttack<CMoonEntity>(280, 0, 50,
+            0.75f, 0.75f, 20, 2f, 0.25f, 0f, 4, Blocks.OBSIDIAN.getHardness())
             .withSound(JSoundRegistry.CMOON_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withTargetProcessor(CMoonEntity::addBarrageInversion)
@@ -147,6 +150,13 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
                     M1>Barrage>jump>Block Launch>M1>Only One Punch>Block Launch (Projectile Hit)>...
                         ...Grav. Hop>Ground Slam
                         ...Gut Punch""";
+
+        auraColors = new Vec3f[]{
+                new Vec3f(0.4f, 1.0f, 0.6f),
+                new Vec3f(1.0f, 0.4f, 0.6f),
+                new Vec3f(0.4f, 0.6f, 1.0f),
+                new Vec3f(1.0f, 0.6f, 0.2f)
+        };
     }
 
     private static void addInversion(CMoonEntity attacker, LivingEntity target, Vec3d kbVec, DamageSource damageSource) {

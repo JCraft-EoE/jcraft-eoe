@@ -54,7 +54,8 @@
   ],
 
   "suggests": {
-    "bettercombat": "*"
+    "bettercombat": "*",
+    "rebind_narrator": "fabric-1.19.2"
   },
 
   "depends": {

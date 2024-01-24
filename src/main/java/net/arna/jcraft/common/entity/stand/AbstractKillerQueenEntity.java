@@ -9,11 +9,13 @@ import net.arna.jcraft.common.attack.moves.killerqueen.BombPlantAttack;
 import net.arna.jcraft.common.attack.moves.killerqueen.DetonateAttack;
 import net.arna.jcraft.common.attack.moves.killerqueen.ExplosiveDashAttack;
 import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
+import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleMultiHitAttack;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
@@ -40,8 +42,8 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
             .withCrouchingVariant(DETONATE)
             .withFollowup(LOW)
             .withInfo(Text.literal("Dual Punch"), Text.literal("combo starter, decent speed, has followup with more blockstun"));
-    public static final BarrageAttack<AbstractKillerQueenEntity<?, ?>> BARRAGE = new BarrageAttack<AbstractKillerQueenEntity<?, ?>>(
-            240, 0, 50, 0.75f, 1f, 20, 2f, 0.1f, 0, 3)
+    public static final MainBarrageAttack<AbstractKillerQueenEntity<?, ?>> BARRAGE = new MainBarrageAttack<AbstractKillerQueenEntity<?, ?>>(
+            240, 0, 50, 0.75f, 1f, 20, 2f, 0.1f, 0, 3, Blocks.DEEPSLATE.getHardness())
             .withSound(JSoundRegistry.KQ_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, medium stun"));

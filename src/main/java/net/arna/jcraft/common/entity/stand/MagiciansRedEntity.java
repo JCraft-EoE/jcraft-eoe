@@ -15,6 +15,7 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -97,6 +98,13 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
                         
                         -the "this move is fire"
                         M1>Red Bind>Hurricane""";
+
+        auraColors = new Vec3f[]{
+                new Vec3f(0.9f, 0.6f, 0.3f),
+                new Vec3f(0.8f, 0.3f, 1.0f),
+                new Vec3f(1.0f, 0.0f, 0.0f),
+                new Vec3f(1.0f, 0.5f, 0.4f)
+        };
     }
 
     @Override

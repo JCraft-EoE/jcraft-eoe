@@ -9,12 +9,14 @@ import net.arna.jcraft.common.attack.moves.starplatinum.theworld.GroundSlamAttac
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
+import net.minecraft.block.Blocks;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
@@ -41,8 +43,8 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .withCrouchingVariant(GROUND_SLAM)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("PUNCH"), Text.literal("quick combo starter, low knockback"));
-    public static final BarrageAttack<SPTWEntity> BARRAGE = new BarrageAttack<SPTWEntity>(280, 0, 60,
-            0.75f, 1f, 40, 2f, 0.25f, 0f, 3)
+    public static final MainBarrageAttack<SPTWEntity> BARRAGE = new MainBarrageAttack<SPTWEntity>(280, 0, 60,
+            0.75f, 1f, 40, 2f, 0.25f, 0f, 3, Blocks.OBSIDIAN.getHardness())
             .withSound(JSoundRegistry.STAR_PLATINUM_BARRAGE)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
     public static final SimpleAttack<SPTWEntity> TIME_STRIKE = new SimpleAttack<SPTWEntity>(300, 7,
@@ -102,6 +104,13 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
                                             
                         -the superman
                         M1>cr.Time Strike>Backhand>What an Ugly Watch>delay M1>Timestop~Star Breaker>dash/Timeskip>Barrage>M1""";
+
+        auraColors = new Vec3f[]{
+                new Vec3f(0.8f, 0.6f, 1.0f),
+                new Vec3f(1.0f, 0.4f, 0.8f),
+                new Vec3f(0.7f, 0.7f, 1.0f),
+                new Vec3f(0.8f, 1.0f, 1.0f)
+        };
 
         if (world.isClient) return;
 //        timestop.stun = JServerConfig.SPTW_TIME_STOP_DURATION.getValue() / 20.0f; // TODO

@@ -10,14 +10,17 @@ import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.goldexperience.*;
 import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.HealMove;
+import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -54,8 +57,8 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .withHyperArmor()
             .withLaunch()
             .withInfo(Text.literal("Shoulder Smash"), Text.literal("slow, uninterruptible combo finisher"));
-    public static final BarrageAttack<GoldExperienceEntity> BARRAGE = new BarrageAttack<GoldExperienceEntity>(
-            280, 0, 30, 0.75f, 1f, 20, 2f, 0.25f, 0f, 3)
+    public static final MainBarrageAttack<GoldExperienceEntity> BARRAGE = new MainBarrageAttack<GoldExperienceEntity>(
+            280, 0, 30, 0.75f, 1f, 20, 2f, 0.25f, 0f, 3, Blocks.OAK_PLANKS.getHardness())
             .withSound(JSoundRegistry.GE_BARRAGE)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
     public static final HealMove<GoldExperienceEntity> HEAL_OTHERS = new HealMove<GoldExperienceEntity>(520, 10,
@@ -133,6 +136,13 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
                     
                     -the superprince of gaming
                     Rekka 1~2>M1>Barrage>M1>Tree>Heavy""";
+
+        auraColors = new Vec3f[]{
+                new Vec3f(1.0f, 0.7f, 0.2f),
+                new Vec3f(0.3f, 0.6f, 1.0f),
+                new Vec3f(1.0f, 0.3f, 0.7f),
+                new Vec3f(1.0f, 0.0f, 0.0f)
+        };
     }
 
     @Override

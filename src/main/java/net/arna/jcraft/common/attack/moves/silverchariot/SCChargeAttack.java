@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.attack.moves.silverchariot;
 
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.ctx.FloatMoveVariable;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractChargeAttack;

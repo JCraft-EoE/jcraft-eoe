@@ -7,7 +7,7 @@ import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.StunType;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
-import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
+import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleMultiHitAttack;
 import net.arna.jcraft.common.attack.moves.silverchariot.*;
@@ -25,6 +25,7 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -52,8 +53,8 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withCrouchingVariant(LAST_SHOT)
             .withSound(JSoundRegistry.SC_POKE)
             .withInfo(Text.literal("Stab"), Text.literal("quick combo starter, links into Spinning Blade while armor is off"));
-    public static final BarrageAttack<SilverChariotEntity> BARRAGE = new BarrageAttack<SilverChariotEntity>(
-            240, 0, 60, 0.65f, 0.9f, 25, 2.25f, 0.1f, 0f, 3)
+    public static final MainBarrageAttack<SilverChariotEntity> BARRAGE = new MainBarrageAttack<SilverChariotEntity>(
+            240, 0, 60, 0.65f, 0.9f, 25, 2.25f, 0.1f, 0f, 3, 1.25F)
             .withSound(JSoundRegistry.SC_BARRAGE)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
     public static final SimpleAttack<SilverChariotEntity> HEAVY = new SimpleAttack<SilverChariotEntity>(
@@ -145,6 +146,19 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         );
 
         setNormalDesc();
+
+        auraColors = new Vec3f[]{
+                new Vec3f(0.4f, 0.5f, 1f),
+                new Vec3f(0.9f, 0.6f, 0.3f),
+                new Vec3f(0.6f, 0.7f, 1f),
+                new Vec3f(0.8f, 0.8f, 0.8f)
+        };
+    }
+
+    @Override
+    public Vec3f getAuraColor() {
+        if (isPossessed()) return Vec3f.POSITIVE_X;
+        return super.getAuraColor();
     }
 
     private void setNormalDesc() {

@@ -20,6 +20,7 @@ import net.arna.jcraft.registry.JSoundRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -33,6 +34,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -60,8 +62,8 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withLaunch()
             .withInfo(Text.literal("Barrage (Final Hit)"), Text.empty());
-    public static final BarrageAttack<KingCrimsonEntity> BARRAGE = new BarrageAttack<KingCrimsonEntity>(280,
-            0, 50, 0.85f, 1f, 20, 1.5f, 0.1f, 0f, 3)
+    public static final MainBarrageAttack<KingCrimsonEntity> BARRAGE = new MainBarrageAttack<KingCrimsonEntity>(280,
+            0, 50, 0.85f, 1f, 20, 1.5f, 0.1f, 0f, 3, Blocks.OBSIDIAN.getHardness())
             .withFinisher(46, BARRAGE_FINISHER)
             .withSound(JSoundRegistry.KC_BARRAGE)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender/finisher, medium stun, knocks back"));
@@ -153,6 +155,13 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                     Donut>M1>Eye Chop>M1>Barrage>
                     ...Move Cancel>M1>Heavy~Overhead
                     ...Time Erase""";
+
+        auraColors = new Vec3f[]{
+                Vec3f.POSITIVE_X,
+                new Vec3f(0.9f, 0.5f, 0.7f),
+                new Vec3f(1.0f, 0.4f, 0.4f),
+                new Vec3f(0.3f, 0.0f, 0.0f)
+        };
     }
 
     static {

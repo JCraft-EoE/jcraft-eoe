@@ -9,6 +9,7 @@ import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.madeinheaven.*;
 import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.EffectInflictingAttack;
+import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
@@ -18,6 +19,7 @@ import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
+import net.minecraft.block.Blocks;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -31,6 +33,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -68,8 +71,8 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withLaunch()
             .withInfo(Text.literal("Barrage (Final Hit)"), Text.empty());
-    public static final BarrageAttack<MadeInHeavenEntity> BARRAGE = new BarrageAttack<MadeInHeavenEntity>(200,
-            0, 32, 0.85f, 1.5f, 10, 2f, 0.1f, 0f, 3)
+    public static final MainBarrageAttack<MadeInHeavenEntity> BARRAGE = new MainBarrageAttack<MadeInHeavenEntity>(200,
+            0, 32, 0.85f, 1.5f, 10, 2f, 0.1f, 0f, 3, Blocks.OAK_PLANKS.getHardness())
             .withFinisher(23, BARRAGE_FINISHER)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
             .withSound(JSoundRegistry.MIH_BARRAGE)
@@ -162,6 +165,13 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                 BNBs:
                     -the white supremacist
                     (Donut>M1>)Speed Slice>Leg Crusher>Fury Chop>M1>Barrage""";
+
+        auraColors = new Vec3f[]{
+                new Vec3f(0.9f, 0.8f, 0.8f),
+                new Vec3f(1.0f, 0.0f, 0.0f),
+                new Vec3f(0.0f, 0.0f, 0.0f),
+                new Vec3f(0.5f, 0.0f, 1.0f)
+        };
     }
 
     @Override

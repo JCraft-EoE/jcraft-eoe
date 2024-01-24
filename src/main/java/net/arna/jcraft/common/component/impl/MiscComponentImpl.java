@@ -2,12 +2,14 @@ package net.arna.jcraft.common.component.impl;
 
 import lombok.Getter;
 import lombok.NonNull;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.MiscComponent;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Vec3d;
 
@@ -25,6 +27,9 @@ public class MiscComponentImpl implements MiscComponent {
     private int stuckKnifeCount;
     @Getter
     private int armoredHitTicks;
+    @Getter
+    private int hoverTime;
+    private boolean prevNoGrav;
 
     public MiscComponentImpl(Entity entity) {
         this.entity = entity;
@@ -57,10 +62,23 @@ public class MiscComponentImpl implements MiscComponent {
         this.damageTimer = 600;
         sync();
     }
-
     @Override
     public boolean isOnDamageTimer() {
         return damageTimer > 0;
+    }
+
+    @Override
+    public void setHoverTime(int hoverTime) {
+        this.hoverTime = hoverTime;
+    }
+
+    @Override
+    public boolean getPrevNoGrav() {
+        return prevNoGrav;
+    }
+    @Override
+    public void setPrevNoGrav(boolean prevNoGrav) {
+        this.prevNoGrav = prevNoGrav;
     }
 
     @Override
@@ -78,17 +96,10 @@ public class MiscComponentImpl implements MiscComponent {
 
     @Override
     public void tick() {
-        /*
-        if (entity.getWorld().isClient) {
-            JCraft.LOGGER.info(entity + " client hit display ticks: " + armoredHitTicks);
-        } else {
-            JCraft.LOGGER.info(entity + " SERBER hit display ticks: " + armoredHitTicks);
-        }
-         */
         if (damageTimer > 0) damageTimer--;
         if (armoredHitTicks > 0) armoredHitTicks--;
 
-        if (stuckKnifeCount <= 0) return;
+        if (entity.world.isClient() || stuckKnifeCount <= 0) return;
         if (--knifeTimer <= 0) {
             stuckKnifeCount--;
             updateKnifeTimer();
@@ -97,6 +108,7 @@ public class MiscComponentImpl implements MiscComponent {
 
     private void updateKnifeTimer() {
         knifeTimer = 20 * (30 - stuckKnifeCount);
+        sync();
     }
 
     private void sync() {
@@ -109,13 +121,24 @@ public class MiscComponentImpl implements MiscComponent {
     }
 
     @Override
+    public void writeSyncPacket(PacketByteBuf buf, ServerPlayerEntity recipient) {
+        MiscComponent.super.writeSyncPacket(buf, recipient);
+        buf.writeVarInt(armoredHitTicks);
+        buf.writeVarInt(stuckKnifeCount);
+    }
+
+    @Override
+    public void applySyncPacket(PacketByteBuf buf) {
+        MiscComponent.super.applySyncPacket(buf);
+        armoredHitTicks = buf.readVarInt();
+        stuckKnifeCount = buf.readVarInt();
+    }
+
+    @Override
     public void readFromNbt(@NonNull NbtCompound tag) {
         NbtCompound dvComp = tag.getCompound("DesiredVelocity");
         desiredVelocity = new Vec3d(dvComp.getDouble("X"), dvComp.getDouble("Y"), dvComp.getDouble("Z"));
         damageTimer = tag.getInt("DamageTimer");
-        armoredHitTicks = tag.getInt("ArmoredHitTicks");
-
-        // Stuck knives are not persistent.
     }
 
     @Override
@@ -126,6 +149,5 @@ public class MiscComponentImpl implements MiscComponent {
         dvComp.putDouble("Z", desiredVelocity.getZ());
         tag.put("DesiredVelocity", dvComp);
         tag.putInt("DamageTimer", damageTimer);
-        tag.putInt("ArmoredHitTicks", armoredHitTicks);
     }
 }

@@ -195,10 +195,12 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        dataTracker.set(MASTER, Optional.of(nbt.getUuid("Master")));
-        dataTracker.set(MASTER_NAME, nbt.getString("MasterName"));
-        disabledSlots = nbt.getInt("DisabledSlots");
-        dataTracker.set(PART_MASK, nbt.getByte("PartMask"));
+        if (nbt.containsUuid("Master")) { // If one is here, then the rest should be too (unless the player manually modified NBT)
+            dataTracker.set(MASTER, Optional.ofNullable(nbt.getUuid("Master")));
+            dataTracker.set(MASTER_NAME, nbt.getString("MasterName"));
+            disabledSlots = nbt.getInt("DisabledSlots");
+            dataTracker.set(PART_MASK, nbt.getByte("PartMask"));
+        }
         updateAttackType();
     }
 

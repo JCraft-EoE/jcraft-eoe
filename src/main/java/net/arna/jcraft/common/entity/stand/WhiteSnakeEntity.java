@@ -7,6 +7,7 @@ import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.EffectInflictingAttack;
+import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.ChargedSpewAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.MeltYourHeartAttack;
@@ -16,10 +17,12 @@ import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -47,8 +50,8 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Gut Punch"), Text.literal("combo starter/extender"));
-    public static final BarrageAttack<WhiteSnakeEntity> BARRAGE = new BarrageAttack<WhiteSnakeEntity>(
-            240, 0, 60, 0.75f, 1, 20, 2, 0.25f, 0, 3)
+    public static final MainBarrageAttack<WhiteSnakeEntity> BARRAGE = new MainBarrageAttack<WhiteSnakeEntity>(
+            240, 0, 60, 0.75f, 1, 20, 2, 0.25f, 0, 3, Blocks.OAK_PLANKS.getHardness())
             .withSound(JSoundRegistry.WS_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, medium stun"));
@@ -128,6 +131,13 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
                             
                             -the protein shake (sets up mixups)
                             M1>Barrage>Leg Crusher>Charged Spew""";
+
+        auraColors = new Vec3f[]{
+                new Vec3f(1f, 1f, 1f),
+                new Vec3f(0.4f, 0.4f, 0.5f),
+                new Vec3f(1.0f, 0.0f, 0.0f),
+                new Vec3f(1f, 1f, 1f)
+        };
     }
 
     @Override

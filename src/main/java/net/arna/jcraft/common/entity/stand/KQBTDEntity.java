@@ -22,6 +22,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -86,6 +87,13 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                     
                     the ol razzle dazzle
                     (Already bomb planted) M1~Low>Barrage>M1>Elbow>Detonate""";
+
+        auraColors = new Vec3f[]{
+                new Vec3f(0.9f, 0.7f, 0.8f),
+                new Vec3f(0f, 0f, 0f),
+                new Vec3f(0.8f, 0.2f, 0.2f),
+                new Vec3f(0.8f, 0.6f, 0.2f)
+        };
     }
 
     @Override

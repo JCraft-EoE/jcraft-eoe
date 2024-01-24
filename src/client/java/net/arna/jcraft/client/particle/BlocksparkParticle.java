@@ -13,7 +13,6 @@ public class BlocksparkParticle extends AbstractSlowingParticle {
         super(world, x, y, z, velocityX, velocityY, velocityZ);
         this.spriteProvider = spriteProvider;
         this.setColor(0.3f, 0.9f, 1.0f);
-        this.alpha = 1f;
         this.maxAge = 6;
         setSpriteForAge(spriteProvider);
     }

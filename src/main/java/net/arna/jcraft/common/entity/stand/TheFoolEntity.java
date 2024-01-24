@@ -35,6 +35,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -176,6 +177,13 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
                             *Finisher: M1>...
                                        Charge/Tornado>...
                                        Sand Clone/Sandwave""";
+
+        auraColors = new Vec3f[]{
+                new Vec3f(1.0f, 0.8f, 0.4f),
+                new Vec3f(0.8f, 0.3f, 1.0f),
+                new Vec3f(1.0f, 0.6f, 0.2f),
+                new Vec3f(0.4f, 0.5f, 1.0f)
+        };
     }
 
     @Override

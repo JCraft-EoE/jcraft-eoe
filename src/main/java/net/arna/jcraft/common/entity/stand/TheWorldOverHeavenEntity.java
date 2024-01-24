@@ -14,6 +14,7 @@ import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
+import net.minecraft.block.Blocks;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -26,6 +27,7 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.text.Text;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -56,8 +58,8 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withCrouchingVariant(LUNGE)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
-    public static final BarrageAttack<TheWorldOverHeavenEntity> BARRAGE = new BarrageAttack<TheWorldOverHeavenEntity>(
-            280, 0, 50, 0.75f, 1f, 30, 2f, 0.1f, 0f, 3)
+    public static final MainBarrageAttack<TheWorldOverHeavenEntity> BARRAGE = new MainBarrageAttack<TheWorldOverHeavenEntity>(
+            280, 0, 50, 0.75f, 1f, 30, 2f, 0.1f, 0f, 3, Blocks.OBSIDIAN.getHardness())
             .withSound(JSoundRegistry.TWOH_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
@@ -151,6 +153,13 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
                         BNBs:
                             -the ultrakill
                             M1>Barrage>M1>Knives>Overwrite~S2/S3>dash>Smite>Heavy>M1""";
+
+        auraColors = new Vec3f[]{
+                new Vec3f(0.0f, 0.0f, 0.0f),
+                new Vec3f(1f, 1f, 1f),
+                new Vec3f(0.9f, 0.9f, 1.0f),
+                new Vec3f(1.0f, 0.0f, 0.2f)
+        };
 
         if (world.isClient) return;
         // TODO

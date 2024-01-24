@@ -10,6 +10,7 @@ import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.dirtydeedsdonedirtcheap.*;
 import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
+import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleMultiHitAttack;
 import net.arna.jcraft.common.util.JParticleType;
@@ -17,10 +18,12 @@ import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JDimensionRegistry;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegistry;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
@@ -45,8 +48,8 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             .withCrouchingVariant(ITEM_PLACE)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withInfo(Text.literal("Chop"), Text.literal("quick combo starter"));
-    public static final BarrageAttack<D4CEntity> BARRAGE = new BarrageAttack<D4CEntity>(240, 0, 70,
-            0.75f, 0.8f, 30, 2f, 0.25f, 0f, 3)
+    public static final MainBarrageAttack<D4CEntity> BARRAGE = new MainBarrageAttack<D4CEntity>(240, 0, 70,
+            0.75f, 0.8f, 30, 2f, 0.25f, 0f, 3, Blocks.DEEPSLATE.getHardness())
             .withSound(JSoundRegistry.D4C_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
@@ -125,6 +128,13 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                             
                             the western
                             M1>Summon Gun>Barrage>M1~stand.OFF>M2>M2>M2>M2>M2>M2~s.ON+M1>Charge""";
+
+        auraColors = new Vec3f[]{
+                new Vec3f(0.9f, 0.5f, 0.7f),
+                new Vec3f(0.5f, 0.8f, 0.9f),
+                new Vec3f(0.4f, 0.4f, 1.0f),
+                new Vec3f(1.0f, 0.5f, 0.2f)
+        };
     }
 
     @Override

@@ -10,7 +10,9 @@ import net.arna.jcraft.common.attack.moves.theworld.TWDonutAttack;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
+import net.minecraft.block.Blocks;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -36,7 +38,8 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(LOW_KICK)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
-    public static final BarrageAttack<TheWorldEntity> BARRAGE = new BarrageAttack<TheWorldEntity>(280, 0, 50, 0.75f, 1f, 30, 2, 0.25f, 0, 3)
+    public static final MainBarrageAttack<TheWorldEntity> BARRAGE = new MainBarrageAttack<TheWorldEntity>(280,
+            0, 50, 0.75f, 1f, 30, 2, 0.25f, 0, 3, Blocks.OBSIDIAN.getHardness())
             .withSound(JSoundRegistry.TW_BARRAGE)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
     public static final SimpleAttack<TheWorldEntity> ROUNDHOUSE = new SimpleAttack<TheWorldEntity>(40, 7, 13, 0.75f, 5f, 9, 1.75f, 0.25f, -0.1f)
@@ -99,10 +102,17 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
                 """
                         BNBs:
                             the saucy racist
-                            (M1>)Charge>M1>Roundhouse>Barrage>M1>Donut>M1
+                            (M1>)Charge>cr.M1>Roundhouse>Barrage>M1>Donut>M1~M1
                             
                             the no ts racist
                             Donut>Roundhouse>Charge>M1>Barrage>M1""";
+
+        auraColors = new Vec3f[]{
+                new Vec3f(1.0f, 0.8f, 0.3f),
+                Vec3f.POSITIVE_X,
+                Vec3f.ZERO,
+                new Vec3f(0.7f, 0.3f, 1.0f)
+        };
     }
 
     @Override

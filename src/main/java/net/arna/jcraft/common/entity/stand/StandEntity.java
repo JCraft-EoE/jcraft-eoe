@@ -5,10 +5,10 @@ import lombok.NonNull;
 import lombok.Setter;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.IAttacker;
+import net.arna.jcraft.common.attack.core.MoveInputType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
-import net.arna.jcraft.common.attack.core.MoveInputType;
 import net.arna.jcraft.common.attack.moves.base.AbstractBarrageAttack;
 import net.arna.jcraft.common.attack.moves.base.AbstractCounterAttack;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
@@ -43,14 +43,16 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.NotNull;
@@ -100,11 +102,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     private static final TrackedData<Boolean> FREE;
     private static final TrackedData<Boolean> REMOTE;
 
-    @Getter
-    @Nullable
-    private final SoundEvent summonSound;
-    private final boolean playGenericSummonSound;
-
     @Setter
     protected int tsTime = 0;
     @Getter
@@ -118,6 +115,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     public boolean blocking = false;
     protected boolean idleOverride = false;
 
+    // In meters and degrees
     protected float idleDistance = 1.25f;
     protected float idleRotation = -45f;
     public final float attackRotation = 90f;
@@ -136,6 +134,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     public String description = "UNDESCRIBED";
     public String freespace;
 
+    // Player Movement Input
     public int lastRemoteInputTime;
     public Vec3d remoteSpeed = Vec3d.ZERO;
     @Getter
@@ -144,16 +143,23 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     private double remoteSideInput = 0;
     private boolean remoteJumpInput = false;
 
+    // Summoning
     @Getter
-    private final StandType standType;
-
-    private final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+    @Nullable
+    private final SoundEvent summonSound;
+    private final boolean playGenericSummonSound;
     protected int summonAnimDuration = 19;
     private boolean playSummonAnim = true;
     @Setter
     private boolean playSummonSound = true;
     @Setter
     private boolean playDesummonSound = true;
+
+    // Data
+    @Getter
+    private final StandType standType;
+    private final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+    protected Vec3f[] auraColors = {Vec3f.ZERO, Vec3f.POSITIVE_X, Vec3f.POSITIVE_Y, Vec3f.POSITIVE_Z};
 
     protected StandEntity(StandType type, World world) {
         this(type, world, null, true);
@@ -570,7 +576,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         curMove = move;
         setMoveStun(move.getDuration());
-        setReset(false);
+        //setReset(false); // makes it worse
         if (animState != null) setState(animState);
         armorPoints = move.getArmor();
     }
@@ -688,10 +694,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         getUserOrThrow().addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 5, 3, false, false, true));
     }
 
-    public void tryBlock() {
-        if (canAttack()) blocking = true;
-    }
-
     public void tryUnblock() {
         if (getMoveStun() < 1) blocking = false;
     }
@@ -732,6 +734,13 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     public boolean hasNoGravity() {
         if (isFree() && !isRemote()) return true;
         return super.hasNoGravity();
+    }
+
+    @Override
+    public boolean isUndead() {
+        if (user != null)
+            return user.isUndead();
+        return super.isUndead();
     }
 
     /**
@@ -791,7 +800,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         );
          */
 
-        if (!client) {
+        if (client) {
+            JCraft.getClientEntityHandler().standEntityClientTick(this);
+        } else {
             // Reset samestate
             if (isSameState()) setSameState(false);
 
@@ -806,14 +817,15 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 kill();
             }
 
-
             AbstractMove<?, ? super E> move = this.curMove;
             if (defaultToNear() && moveStun <= 0) {
                 if (move == null) {
                     if (this.queuedMove == null)
                         setFree(false);
-                } else if (move.isCounter()) //noinspection unchecked // not an issue here
+                } else if (move.isCounter()) { //noinspection unchecked // not an issue here
                     ((AbstractCounterAttack<?, ? super E>) move).whiff(getThis(), user);
+                    moveStun = 1;
+                }
             }
 
             // Rotate with user
@@ -1331,6 +1343,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         // Such a check should be applied to any quick move with a followup
         if (type != MoveInputType.LIGHT || JComponents.COOLDOWNS.get(user).getCooldown(CooldownType.STAND_LIGHT) <= 0)
             queuedMove = type;
+    }
+
+    public Vec3f getAuraColor() {
+        return auraColors[getSkin()];
     }
 
     /**
