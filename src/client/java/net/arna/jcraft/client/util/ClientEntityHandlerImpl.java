@@ -1,6 +1,5 @@
 package net.arna.jcraft.client.util;
 
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.particle.AuraArcParticle;
 import net.arna.jcraft.client.particle.AuraBlobParticle;
@@ -11,6 +10,7 @@ import net.arna.jcraft.common.entity.stand.WhiteSnakeEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.util.IClientEntityHandler;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
@@ -25,6 +25,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.random.Random;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -161,8 +162,11 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
     }
 
     @Override
-    public void whiteSnakeRemoteClientTick(WhiteSnakeEntity whiteSnakeEntity) {
-        GameOptions options = MinecraftClient.getInstance().options;
+    public void whiteSnakeRemoteClientTick(@NotNull WhiteSnakeEntity whiteSnakeEntity) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (JUtils.getStand(client.player) != whiteSnakeEntity) return;
+
+        GameOptions options = client.options;
         float f = 0, s = 0;
         boolean jump = options.jumpKey.isPressed();
         if (options.forwardKey.isPressed())

@@ -102,7 +102,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     public static final SandCloneMove SAND_CLONE = new SandCloneMove(300, 7, 11, 1f)
             .withSound(SoundEvents.BLOCK_SAND_PLACE)
             .withInfo(Text.literal("Sand Manipulation"), Text.literal("creates a blinding sand cloud, then a clone or (if crouching) circles of sand"));
-    public static final GlideMove GLIDE = new GlideMove(300, 5, 85, 0f)
+    public static final GlideMove GLIDE = new GlideMove(300, 5, 125, 0f)
             .withSound(JSoundRegistry.FOOL_GLIDE)
             .withInfo(Text.literal("Glider"), Text.literal("turns The Fool into a glider"));
     public static final SandWaveAttack SAND_WAVE = new SandWaveAttack(340, 0, 80, 0f,

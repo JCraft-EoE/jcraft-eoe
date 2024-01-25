@@ -175,6 +175,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         if (!isRemote()) return;
 
         if (world.isClient) {
+            // Called for EVERYONE
             JCraft.getClientEntityHandler().whiteSnakeRemoteClientTick(this);
         } else {
             double f = getRemoteForwardInput();

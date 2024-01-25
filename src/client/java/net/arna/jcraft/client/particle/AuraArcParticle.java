@@ -26,7 +26,7 @@ public class AuraArcParticle extends AbstractSlowingParticle {
 
     private void tryMatchParent() {
         if (parent != null) {
-            Vec3d deltaPos = JUtils.deltaPos(parent.hasVehicle() ? parent.getRootVehicle() : parent);
+            Vec3d deltaPos = JUtils.deltaPos(parent);
             setVelocity(deltaPos.x, deltaPos.y, deltaPos.z);
         }
     }

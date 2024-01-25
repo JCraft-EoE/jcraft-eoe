@@ -2090,9 +2090,17 @@ Gold Experience: Requiem
     >Added ability icons
 
 ● 25/01/2024
+>Fixed being able to summon a blocking stand while stunned
+
 Stand Auras
     >Now account for visibility
     >Now stick to the player
+
+Star Platinum
+    >Uppercut
+        >launches higher
+        >updated animation
+    >Updated animation for Roundhouse
 
 Cream
     >Updated animations
@@ -2107,11 +2115,22 @@ Killer Queen
 Whitesnake
     >Improved handling on Pilot Mode
 
+The Fool
+    >Fixed Z fighting
+    >Glide duration increased (4->6s)
+
+Gold Experience
+    >Fixed frog not reflecting JCraft hits
+    >Heal Others now applies bone meal effect if the user is crouching as the move hits
+
 Star Platinum: The World
     >Added ability icons
 
 Killer Queen: Bites the Dust
     >Improved Bomb Plant
+
+Gold Experience: Requiem
+    >Heal Others now applies bone meal effect if the user is crouching as the move hits
 
 priority (top to bottom)
 todo: counters that invalidate hit effects

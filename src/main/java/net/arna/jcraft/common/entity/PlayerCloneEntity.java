@@ -84,6 +84,8 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
         updateAttackType();
 
         navigation = getNavigation();
+
+        this.ignoreCameraFrustum = true; // animation fuckery fix attempt
     }
 
     public void disableDrops() {

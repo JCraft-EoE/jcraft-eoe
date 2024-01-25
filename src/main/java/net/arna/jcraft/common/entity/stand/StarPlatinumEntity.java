@@ -26,7 +26,7 @@ import java.util.function.Consumer;
 
 public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPlatinumEntity, StarPlatinumEntity.State> {
     public static final UppercutAttack<StarPlatinumEntity> UPPERCUT = new UppercutAttack<StarPlatinumEntity>(30,
-            8, 14, 0.75f, 6f, 20, 1.5f, 0.25f, -0.4f, 0.25f)
+            8, 14, 0.75f, 6f, 20, 1.5f, 0.25f, -0.4f, 1.25f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(0, 0.35, 1.25)
             .withInfo(Text.literal("Uppercut"), Text.literal("slower combo starter, launches"));
@@ -92,7 +92,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 
         moves.register(MoveType.SPECIAL1, STAR_FINGER, State.STAR_FINGER);
-        moves.register(MoveType.SPECIAL2, ROUNDHOUSE, State.LOW_KICK);
+        moves.register(MoveType.SPECIAL2, ROUNDHOUSE, State.ROUNDHOUSE);
         moves.register(MoveType.SPECIAL3, CHARGE_BARRAGE, State.BARRAGE);
         moves.register(MoveType.ULTIMATE, INHALE, State.INHALE);
 
@@ -149,7 +149,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
         BARRAGE(builder -> builder.loop("animation.starplatinum.barrage")),
         STAR_FINGER(builder -> builder.playAndHold("animation.starplatinum.star_finger")),
         INHALE(builder -> builder.playAndHold("animation.starplatinum.inhale")),
-        LOW_KICK(builder -> builder.playAndHold("animation.starplatinum.low_kick")),
+        ROUNDHOUSE(builder -> builder.playAndHold("animation.starplatinum.roundhouse")),
         JUMP(builder -> builder.playAndHold("animation.starplatinum.jump")),
         UPPERCUT(builder -> builder.playAndHold("animation.starplatinum.uppercut")),
         LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.starplatinum.light_followup"));

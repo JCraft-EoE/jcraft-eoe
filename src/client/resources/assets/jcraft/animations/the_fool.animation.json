@@ -4393,13 +4393,7 @@
 						}
 					},
 					"scale": {
-						"0.0": {
-							"vector": [1, 1, 1]
-						},
-						"0.2": {
-							"vector": [-0.1, 0.1, 0.6],
-							"easing": "easeInOutSine"
-						}
+						"vector": [1, 1, 1]
 					}
 				},
 				"wheel": {

@@ -15,6 +15,7 @@ import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.entity.GEFrogEntity;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.network.s2c.ComboCounterPacket;
@@ -1005,6 +1006,12 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     private static void baseDamageLogic(LivingEntity ent, Vec3d kbVec, int stunTicks, int stunLevel, boolean overrideStun,
                                         float damage, boolean lift, int blockstun, DamageSource source, Entity attacker,
                                         boolean canBackstab, boolean unblockable) {
+        // If we need more damage reflection later, use an interface.
+        if (ent instanceof GEFrogEntity && attacker instanceof LivingEntity living) {
+            baseDamageLogic(living, kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, canBackstab, unblockable);
+            return;
+        }
+
         boolean hit = true;
         boolean tsHit = JUtils.isAffectedByTimeStop(ent);
 
