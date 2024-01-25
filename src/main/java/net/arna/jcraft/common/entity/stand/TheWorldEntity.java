@@ -108,7 +108,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
                             Donut>Roundhouse>Charge>M1>Barrage>M1""";
 
         auraColors = new Vec3f[]{
-                new Vec3f(1.0f, 0.8f, 0.3f),
+                new Vec3f(1.0f, 0.7f, 0.3f),
                 Vec3f.POSITIVE_X,
                 Vec3f.ZERO,
                 new Vec3f(0.7f, 0.3f, 1.0f)

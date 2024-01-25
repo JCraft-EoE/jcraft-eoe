@@ -1,24 +1,29 @@
 package net.arna.jcraft.client.util;
 
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.particle.AuraArcParticle;
 import net.arna.jcraft.client.particle.AuraBlobParticle;
 import net.arna.jcraft.common.component.BombTrackerComponent;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
+import net.arna.jcraft.common.entity.stand.WhiteSnakeEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.util.IClientEntityHandler;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.random.Random;
 
 import java.util.List;
@@ -97,8 +102,10 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
         if (JClientConfig.getInstance().isStandAuras()) {
             LivingEntity user = stand.getUser();
             if (user == null) return;
+            if (user.isInvisible()) return;
 
-            boolean isOwnerAndFP = user == minecraftClient.player && minecraftClient.options.getPerspective().isFirstPerson();
+            boolean isFP = minecraftClient.options.getPerspective().isFirstPerson();
+            boolean isOwnerAndFP = user == minecraftClient.player && isFP;
 
             ClientWorld clientWorld = (ClientWorld) stand.getWorld();
             Random random = clientWorld.getRandom();
@@ -107,7 +114,9 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
 
             Vec3f auraColor = stand.getAuraColor();
 
-            if ( (!isOwnerAndFP || stand.isFree()) && random.nextBoolean() )
+            if ( (!isOwnerAndFP || stand.isFree())
+                    && !(stand.isRemote() && isFP)
+                            && random.nextBoolean() )
                 displayAuraParticles(clientWorld, random, stand, RotationUtil.vecPlayerToWorld(stand.getWidth(), stand.getHeight(), stand.getWidth(), gravity), gravity, auraColor);
             if ( !isOwnerAndFP && random.nextBoolean() )
                 displayAuraParticles(clientWorld, random, user, RotationUtil.vecPlayerToWorld(user.getWidth(), user.getHeight(), user.getWidth(), gravity), gravity, auraColor);
@@ -116,6 +125,8 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
 
     private static final double metersPerTickSquared = 9.81 / 400;
     private void displayAuraParticles(ClientWorld clientWorld, Random random, Entity entity, Vec3f maxBox, Direction gravity, Vec3f color) {
+        if (JClientUtils.shouldNotRender(entity)) return;
+
         Vec3d pos = entity.getPos();
         Vec3d vel = Vec3d.of(gravity.getVector()).multiply(-metersPerTickSquared);
         /*
@@ -126,7 +137,9 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
          */
 
         // minecraft is single-threaded :)
+        AuraArcParticle.Factory.parent = entity;
         AuraArcParticle.Factory.color = color;
+        AuraBlobParticle.Factory.parent = entity;
         AuraBlobParticle.Factory.color = color;
 
         clientWorld.addParticle(JParticleTypeRegistry.AURA_ARC, false,
@@ -144,5 +157,24 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
 
     @Override
     public void playerCloneEntityClientTick(PlayerCloneEntity entity) {
+
+    }
+
+    @Override
+    public void whiteSnakeRemoteClientTick(WhiteSnakeEntity whiteSnakeEntity) {
+        GameOptions options = MinecraftClient.getInstance().options;
+        float f = 0, s = 0;
+        boolean jump = options.jumpKey.isPressed();
+        if (options.forwardKey.isPressed())
+            f += 1.0f;
+        if (options.backKey.isPressed())
+            f += 1.0f;
+        if (options.leftKey.isPressed())
+            s -= 1.0f;
+        if (options.rightKey.isPressed())
+            s += 1.0f;
+
+        //JCraft.LOGGER.info("Handling remote movement for: " + whiteSnakeEntity + " with " + f + " " + s + " " + jump);
+        whiteSnakeEntity.tickRemoteMovement(f, s, jump);
     }
 }

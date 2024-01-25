@@ -38,6 +38,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -322,7 +323,7 @@ public final class JUtils {
         return 0;
     }
 
-    public static Vec3d deltaPos(Entity ent) {
+    public static Vec3d deltaPos(@NotNull Entity ent) {
         return new Vec3d(
                 ent.getX() - ent.prevX,
                 ent.getY() - ent.prevY,

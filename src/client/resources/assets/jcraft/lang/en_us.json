@@ -192,6 +192,7 @@
 
   "text.autoconfig.jcraft.option.uiPosition": "UI Position",
   "text.autoconfig.jcraft.option.iconHud": "Icon HUD",
+  "text.autoconfig.jcraft.option.standAuras": "Stand Auras",
   "text.autoconfig.jcraft.option.timeEraseShader": "Time Erase Shader",
   "text.autoconfig.jcraft.option.epitaphOverlay": "Epitaph Overlay",
 

@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQBTDEntity.State> {
@@ -106,17 +107,11 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
 
     @Override
     public void initMove(MoveType type) {
-        switch (type) {
-            case SPECIAL1 -> {
-
-            }
-            case ULTIMATE -> {
-                if (moveContext.get(BTDPlantAttack.BTD_ENTITY) != null)
-                    handleMove(BTD_DETONATE, CooldownType.ULTIMATE, State.DETONATE);
-                else handleMove(MoveType.ULTIMATE);
-            }
-            default -> super.initMove(type);
-        }
+        if (type == MoveType.ULTIMATE) {
+            if (moveContext.get(BTDPlantAttack.BTD_ENTITY) != null)
+                handleMove(BTD_DETONATE, CooldownType.ULTIMATE, State.DETONATE);
+            else handleMove(MoveType.ULTIMATE);
+        } else super.initMove(type);
     }
 
     @Override
@@ -142,16 +137,6 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
 
         BUBBLE.tickBubble(this);
         BTD_PLANT.tickBomb(this);
-
-        /*
-        if (userData != null && !userData.isEmpty()) {
-            if (ticksDataStored++ > 400) {
-                ticksDataStored = 0;
-                userData = null;
-                targetData = null;
-            }
-        }
-         */
     }
 
     @Override

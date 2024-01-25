@@ -1,11 +1,11 @@
 package net.arna.jcraft.common.entity.stand;
 
 import lombok.NonNull;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.BlockableType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
-import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.EffectInflictingAttack;
 import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
@@ -28,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEntity.State> {
@@ -171,39 +172,45 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
     public void tick() {
         super.tick();
 
-        if (!isRemote() || world.isClient) return;
+        if (!isRemote()) return;
 
-        double f = getRemoteForwardInput();
-        double s = getRemoteSideInput();
-        boolean jump = getRemoteJumpInput();
+        if (world.isClient) {
+            JCraft.getClientEntityHandler().whiteSnakeRemoteClientTick(this);
+        } else {
+            double f = getRemoteForwardInput();
+            double s = getRemoteSideInput();
+            boolean jump = getRemoteJumpInput();
 
+            tickRemoteMovement(f, s, jump);
+
+            if (getState() == State.IDLE) { // Replace idle anim
+                if (s > 0) setStateNoReset(onGround ? State.RIGHT : State.RIGHT_DASH);
+                if (s < 0) setStateNoReset(onGround ? State.LEFT : State.LEFT_DASH);
+                if (f < 0) setStateNoReset(onGround ? State.BACKWARD : State.BACKWARD_DASH);
+                if (f > 0) setStateNoReset(onGround ? State.FORWARD : State.FORWARD_DASH);
+            }
+        }
+    }
+
+    public void tickRemoteMovement(double f, double s, boolean jump) {
         Vec3d pos = getPos();
 
-        // 3 ticks of inertia, helping movement be fluid as well as dealing with packet drops
-        if (lastRemoteInputTime - age > 4) updateRemoteInputs(0, 0, false);
+        // 2 ticks of inertia, helping movement be fluid as well as dealing with packet drops
+        if (lastRemoteInputTime - age > 3) updateRemoteInputs(0, 0, false);
         Vec3d rotVec = new Vec3d(getRotationVector().x, 0, getRotationVector().z).normalize();
 
         double dragMult = getMoveStun() > 0 ? 0.2 : 0.4;
         double moveSpeed = 0.24;
-        //HitResult groundCheck = this.world.raycast(new RaycastContext(getEyePos(), pos.add(0, -1.0E-5F, 0), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
         boolean onGround = isOnGround();
 
-        if (getState() == State.IDLE) { // Replace idle anim
-            if (s > 0) setStateNoReset(onGround ? State.RIGHT : State.RIGHT_DASH);
-            if (s < 0) setStateNoReset(onGround ? State.LEFT : State.LEFT_DASH);
-            if (f < 0) setStateNoReset(onGround ? State.BACKWARD : State.BACKWARD_DASH);
-            if (f > 0) setStateNoReset(onGround ? State.FORWARD : State.FORWARD_DASH);
-        }
-
-        if (onGround) { // If grounded
+        if (onGround) {
             if (jump && getMoveStun() < 1) {
-                remoteSpeed = new Vec3d(remoteSpeed.x, 0.25, remoteSpeed.z);
+                addVelocity(0, 1.0, 0);
                 setRemoteJumpInput(false);
             }
         } else {
             //JCraft.LOGGER.info("Airborne");
             moveSpeed = 0.024;
-            remoteSpeed = remoteSpeed.add(0, -9.81 / 200, 0); // Account for gravity
             dragMult = 0.4;
         }
 
@@ -211,7 +218,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
                 .add(rotVec.multiply(f * moveSpeed)) // Forward movement
                 .add(rotVec.rotateY(1.5707963f).multiply(s * moveSpeed)); // Side movement
 
-        remoteSpeed = remoteSpeed.multiply(dragMult, 1, dragMult);
+        remoteSpeed = remoteSpeed.multiply(dragMult);
 
         if (pos.add(remoteSpeed).squaredDistanceTo(getUserOrThrow().getPos()) > 400)
             remoteSpeed.multiply(-1);
@@ -221,6 +228,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         velocityModified = true;
     }
 
+
     @Override
     protected @NonNull WhiteSnakeEntity getThis() {
         return this;
@@ -228,7 +236,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
 
     // Animation code
     public enum State implements StandAnimationState<WhiteSnakeEntity> {
-        IDLE(builder -> builder.loop("animation.whitesnake.idle")),
+        IDLE((whitesnake, builder) -> builder.loop(whitesnake.isRemote() ? "animation.whitesnake.remote_idle" : "animation.whitesnake.idle")),
         LIGHT(builder -> builder.playAndHold("animation.whitesnake.light")),
         BLOCK(builder -> builder.loop("animation.whitesnake.block")),
         MEDIUM(builder -> builder.playAndHold("animation.whitesnake.medium")),
@@ -250,15 +258,19 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         MELT_YOUR_HEART(builder -> builder.playAndHold("animation.whitesnake.meltyourheart")),
         LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.whitesnake.light_followup"));
 
-        private final Consumer<AnimationBuilder> animator;
+        private final BiConsumer<WhiteSnakeEntity, AnimationBuilder> animator;
 
         State(Consumer<AnimationBuilder> animator) {
+            this((whiteSnake, builder) -> animator.accept(builder));
+        }
+
+        State(BiConsumer<WhiteSnakeEntity, AnimationBuilder> animator) {
             this.animator = animator;
         }
 
         @Override
         public void playAnimation(WhiteSnakeEntity attacker, AnimationBuilder builder) {
-            animator.accept(builder);
+            animator.accept(attacker, builder);
         }
     }
 

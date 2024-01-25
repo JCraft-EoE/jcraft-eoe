@@ -17,6 +17,8 @@ import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
@@ -58,7 +60,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(BITE)
             .withImpactSound(JSoundRegistry.IMPACT_4)
-            .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
+            .withInfo(Text.literal("Backhand"), Text.literal("quick combo starter"));
     public static final SimpleAttack<CreamEntity> VERTICAL_CHOP = new SimpleAttack<CreamEntity>(200, 20,
             30, 1f, 8f, 40, 1.5f, 0.1f, 0f)
             .withSound(JSoundRegistry.CREAM_HEAVY)
@@ -166,7 +168,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                 new Vec3f(0.5f, 0.1f, 0.3f),
                 new Vec3f(0.5f, 0.6f, 0.8f),
                 new Vec3f(1.0f, 0.5f, 0.7f),
-                new Vec3f(1.0f, 0.6f, 0.6f)
+                new Vec3f(1.0f, 0.5f, 0.5f)
         };
     }
 
@@ -353,32 +355,40 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                         handleAIVoid(user, voidTime);
                 }
 
-                List<LivingEntity> toDamage = world.getEntitiesByClass(LivingEntity.class,
-                        new Box(pos.add(1.5, 1.5, 1.5), pos.subtract(1.5, 1.5, 1.5)), EntityPredicates.VALID_ENTITY);
+                Box damageBox = new Box(pos.add(1.5, 1.5, 1.5), pos.subtract(1.5, 1.5, 1.5));
+                List<Entity> toDamage = world.getEntitiesByClass(Entity.class,
+                        damageBox, EntityPredicates.VALID_ENTITY);
+                JUtils.displayHitbox(world, damageBox);
 
                 toDamage.remove(user);
                 toDamage.remove(this);
 
+                boolean hurt;
+                int stun = 2;
+                float damage = 1.5f;
                 if (charging) {
-                    for (LivingEntity ent : toDamage) {
-                        if (getMoveStun() % 2 == 0) { // More consistent
-                            stun(ent, 4, 0);
-                            JUtils.cancelMoves(ent);
-                        }
-
-                        ent.damage(DamageSource.OUT_OF_WORLD, 5);
-                    }
+                    hurt = getMoveStun() % 2 == 0; // More consistent
+                    stun = 4;
+                    damage = 5.0f;
                 } else {
-                    for (LivingEntity ent : toDamage) {
-                        if (age % 4 == 0) {
-                            stun(ent, 2, 0);
-                            JUtils.cancelMoves(ent);
-                        }
-
-                        ent.damage(DamageSource.OUT_OF_WORLD, 1.5f);
-                    }
+                    hurt = age % 4 == 0;
 
                     setAlphaOverride(0);
+                }
+
+                for (Entity ent : toDamage) {
+                    if (ent instanceof ItemEntity) {
+                        ent.discard();
+                        continue;
+                    }
+                    if (ent instanceof LivingEntity livingEntity) {
+                        if (hurt) {
+                            stun(livingEntity, stun, 0);
+                            JUtils.cancelMoves(livingEntity);
+                        }
+
+                        livingEntity.damage(DamageSource.OUT_OF_WORLD, damage);
+                    }
                 }
 
                 if (notCorS && !isFree())

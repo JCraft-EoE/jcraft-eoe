@@ -50,9 +50,11 @@ public class SurpriseMove extends AbstractMove<SurpriseMove, CreamEntity> {
         Vec3f outDir = GravityChangerAPI.getGravityDirection(attacker).getUnitVector();
         outDir.scale(-1f);
         ctx.set(OUT_DIR, outDir);
-
         ctx.get(OUT_POS).subtract(outDir);
-        attacker.setFreePos(ctx.get(OUT_POS));
+
+        Vec3f outPos = ctx.get(OUT_POS);
+        attacker.setPosition(new Vec3d(outPos.getX(), outPos.getY(), outPos.getZ()));
+        attacker.setFreePos(outPos);
 
         attacker.setVoidTime(getWindupPoint());
 

@@ -2090,10 +2090,22 @@ Gold Experience: Requiem
     >Added ability icons
 
 ● 25/01/2024
+Stand Auras
+    >Now account for visibility
+    >Now stick to the player
+
+Cream
+    >Updated animations
+    >Void hitboxes now show with F3+B
+    >Void moves now delete items within their hitbox
+    >Fixed Surprise having one hitbox in front of the user
 
 Killer Queen
     >Updated skin 3
     >Improved Bomb Plant
+
+Whitesnake
+    >Improved handling on Pilot Mode
 
 Star Platinum: The World
     >Added ability icons

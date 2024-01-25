@@ -173,6 +173,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         super(type.getEntityType(), world);
         noClip = true;
         standType = type;
+        this.ignoreCameraFrustum = true;
         this.summonSound = summonSound;
         this.playGenericSummonSound = playGenericSummonSound;
 
@@ -394,8 +395,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         setFree(true);
 
         Vec3d fPos = user.getPos().add(user.getRotationVector());
-        remoteSpeed = user.getVelocity(); // Inertia
-        remoteSpeed = new Vec3d(remoteSpeed.x * 5, remoteSpeed.y / 2, remoteSpeed.z * 5);
+        remoteSpeed = user.getVelocity().multiply(5); // Inertia
 
         setAlphaOverride(0.1f);
 

@@ -25,6 +25,9 @@ public interface BombTrackerComponent extends Component, AutoSyncedComponent, Co
         }
 
         public @Nullable Vec3d getBombPos() {
+            // Failsafe due to clientside bullshit
+            if (bombEntity == null) isEntity = false;
+
             if (isEntity)
                 return bombEntity.getPos();
             if (isBlock)
