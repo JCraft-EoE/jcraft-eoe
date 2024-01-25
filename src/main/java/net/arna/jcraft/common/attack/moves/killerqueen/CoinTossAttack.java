@@ -4,6 +4,7 @@ import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.core.ctx.MoveVariable;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.KillerQueenEntity;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegistry;
@@ -33,8 +34,7 @@ public class CoinTossAttack extends AbstractMove<CoinTossAttack, KillerQueenEnti
 
         attacker.world.spawnEntity(coin);
 
-        ctx.set(BombPlantAttack.BOMB_ENTITY, coin);
-        ctx.set(BombPlantAttack.BOMB_POS, null);
+        JComponents.getBombTracker(user).getMainBomb().setBomb(coin);
 
         attacker.playSound(JSoundRegistry.COIN_TOSS, 1, 1);
 

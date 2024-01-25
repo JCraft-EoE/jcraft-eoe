@@ -7,17 +7,13 @@ import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.StunType;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
-import net.arna.jcraft.common.attack.moves.killerqueen.BombPlantAttack;
 import net.arna.jcraft.common.attack.moves.killerqueen.bitesthedust.*;
 import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.GrabAttack;
-import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.text.Text;
@@ -112,21 +108,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
     public void initMove(MoveType type) {
         switch (type) {
             case SPECIAL1 -> {
-                LivingEntity user = getUserOrThrow();
-                CooldownsComponent cooldowns = JComponents.getCooldowns(user);
 
-                if (user.isInSneakingPose() && cooldowns.getCooldown(CooldownType.STAND_SP1) <= 0) {
-                    Block downBlock = world.getBlockState(user.getBlockPos().down()).getBlock();
-                    boolean notAir = (downBlock != Blocks.AIR && downBlock != Blocks.CAVE_AIR && downBlock != Blocks.VOID_AIR);
-                    if (notAir) {
-                        moveContext.set(BombPlantAttack.BOMB_ENTITY, null);
-                        moveContext.set(BombPlantAttack.BOMB_POS, user.getPos().add(0, -0.5, 0));
-                        cooldowns.setCooldown(CooldownType.STAND_SP1, BOMB_PLANT.getCooldown());
-                    }
-                } else {
-                    handleMove(MoveType.SPECIAL1);
-                    moveContext.set(BombPlantAttack.BOMB_POS, null);
-                }
             }
             case ULTIMATE -> {
                 if (moveContext.get(BTDPlantAttack.BTD_ENTITY) != null)
@@ -143,7 +125,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                                                               double distance, StandEntity<?, ?> enemyStand, AbstractMove<?, ?> enemyAttack) {
         if (enemyStand != null && enemyStand.blocking) return MoveSelectionResult.STOP;
 
-        Vec3d bombPos = this.getBombPos();
+        Vec3d bombPos = JComponents.getBombTracker(mob).getMainBomb().getBombPos();
         if (attack == DETONATE && bombPos != null && target.squaredDistanceTo(bombPos) < 9.0D) {
             return MoveSelectionResult.USE;
         } else if (attack == BTD_PLANT && moveContext.get(BTDPlantAttack.BTD_ENTITY) != null) {

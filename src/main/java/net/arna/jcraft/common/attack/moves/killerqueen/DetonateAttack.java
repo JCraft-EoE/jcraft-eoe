@@ -5,6 +5,8 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
+import net.arna.jcraft.common.component.BombTrackerComponent;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.projectile.BubbleProjectile;
 import net.arna.jcraft.common.entity.stand.AbstractKillerQueenEntity;
@@ -30,27 +32,18 @@ public class DetonateAttack extends AbstractMove<DetonateAttack, AbstractKillerQ
 
     @Override
     public @NonNull Set<LivingEntity> perform(AbstractKillerQueenEntity<?, ?> attacker, LivingEntity user, MoveContext ctx) {
-        Entity bombEntity = ctx.get(BombPlantAttack.BOMB_ENTITY);
-        Vec3d bombPos = ctx.get(BombPlantAttack.BOMB_POS);
+        BombTrackerComponent.BombData bombData = JComponents.getBombTracker(user).getMainBomb();
 
-        if (bombEntity instanceof LivingEntity livingEntity) {
-            explode(attacker, user, livingEntity.getPos());
-        } else {
-            Vec3d finalBombPos = null;
+        Entity bombEntity = bombData.bombEntity;
+        Vec3d bombPos = bombData.getBombPos();
 
-            if (bombEntity != null) {
-                finalBombPos = bombEntity.getPos();
-                if (bombEntity instanceof ItemEntity || bombEntity instanceof BubbleProjectile)
-                    bombEntity.discard();
-            }
-            if (bombPos != null) finalBombPos = bombPos;
-
-            if (finalBombPos != null)
-                explode(attacker, user, finalBombPos);
+        if (bombPos != null) {
+            if (bombEntity instanceof ItemEntity || bombEntity instanceof BubbleProjectile)
+                bombEntity.discard();
+            explode(attacker, user, bombPos);
         }
 
-        ctx.set(BombPlantAttack.BOMB_ENTITY, null);
-        ctx.set(BombPlantAttack.BOMB_POS, null);
+        bombData.reset();
 
         return Set.of();
     }

@@ -5,6 +5,8 @@ import lombok.NonNull;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
+import net.arna.jcraft.common.component.BombTrackerComponent;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.stand.KillerQueenEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
@@ -33,7 +35,9 @@ public class KQGrabHitAttack extends AbstractMove<KQGrabHitAttack, KillerQueenEn
     public @NonNull Set<LivingEntity> perform(KillerQueenEntity attacker, LivingEntity user, MoveContext ctx) {
         attacker.playSound(JSoundRegistry.KQ_DETONATE, 1, 1);
 
-        if (ctx.get(BombPlantAttack.BOMB_ENTITY) instanceof LivingEntity livingEntity) {
+        BombTrackerComponent.BombData bombData = JComponents.getBombTracker(user).getMainBomb();
+
+        if (bombData.bombEntity instanceof LivingEntity livingEntity) {
             ServerWorld world = (ServerWorld) attacker.world;
 
             Vec3d pos = livingEntity.getPos();
@@ -47,7 +51,7 @@ public class KQGrabHitAttack extends AbstractMove<KQGrabHitAttack, KillerQueenEn
             livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0, true, false));
         }
 
-        ctx.set(BombPlantAttack.BOMB_ENTITY, null);
+        bombData.reset();
 
         return Set.of();
     }

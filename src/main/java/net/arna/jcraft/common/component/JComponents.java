@@ -25,6 +25,9 @@ public class JComponents implements EntityComponentInitializer {
     public static final ComponentKey<MiscComponent> MISC =
             ComponentRegistry.getOrCreate(JCraft.id("misc"), MiscComponent.class);
 
+    public static final ComponentKey<BombTrackerComponent> BOMB_TRACKER =
+            ComponentRegistry.getOrCreate(JCraft.id("bomb_tracker"), BombTrackerComponent.class);
+
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
         registry.registerFor(Entity.class, GRAVITY_MODIFIER, GravityComponentImpl::new);
@@ -42,6 +45,10 @@ public class JComponents implements EntityComponentInitializer {
                 .respawnStrategy(RespawnCopyStrategy.LOSSLESS_ONLY)
                 .impl(MiscComponentImpl.class)
                 .end(MiscComponentImpl::new);
+        registry.beginRegistration(LivingEntity.class, BOMB_TRACKER)
+                .respawnStrategy(RespawnCopyStrategy.NEVER_COPY)
+                .impl(BombTrackerComponentImpl.class)
+                .end(BombTrackerComponentImpl::new);
     }
 
     public static StandComponent getStandData(LivingEntity entity) {
@@ -62,5 +69,9 @@ public class JComponents implements EntityComponentInitializer {
 
     public static MiscComponent getMiscData(LivingEntity entity) {
         return MISC.get(entity);
+    }
+
+    public static BombTrackerComponent getBombTracker(LivingEntity entity) {
+        return BOMB_TRACKER.get(entity);
     }
 }

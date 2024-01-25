@@ -3,17 +3,14 @@ package net.arna.jcraft.common.entity.stand;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
-import net.arna.jcraft.common.attack.moves.killerqueen.*;
+import net.arna.jcraft.common.attack.moves.killerqueen.CoinTossAttack;
+import net.arna.jcraft.common.attack.moves.killerqueen.KQGrabAttack;
+import net.arna.jcraft.common.attack.moves.killerqueen.KQGrabHitAttack;
+import net.arna.jcraft.common.attack.moves.killerqueen.SheerHeartAttackAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
-import net.arna.jcraft.common.component.CooldownsComponent;
-import net.arna.jcraft.common.component.JComponents;
-import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
@@ -68,25 +65,10 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
     // Move-set
     @Override
     public void initMove(MoveType type) {
-        if (type == MoveType.SPECIAL1) {
-            LivingEntity user = getUserOrThrow();
-            CooldownsComponent cooldowns = JComponents.getCooldowns(user);
-
-            if (user.isInSneakingPose() && cooldowns.getCooldown(CooldownType.STAND_SP1) <= 0) {
-                Block downBlock = world.getBlockState(user.getBlockPos().down()).getBlock();
-                boolean notAir = (downBlock != Blocks.AIR && downBlock != Blocks.CAVE_AIR && downBlock != Blocks.VOID_AIR);
-                if (notAir) {
-                    moveContext.set(BombPlantAttack.BOMB_ENTITY, null);
-                    moveContext.set(BombPlantAttack.BOMB_POS, user.getPos().add(0, -0.5, 0));
-                    cooldowns.setCooldown(CooldownType.STAND_SP1, BOMB_PLANT.getCooldown());
-                }
-            } else {
-                handleMove(MoveType.SPECIAL1);
-                moveContext.set(BombPlantAttack.BOMB_POS, null);
-            }
-
+        if (type == MoveType.SPECIAL1)
             if (coin != null) coin.discard();
-        } else super.initMove(type);
+
+        super.initMove(type);
     }
 
     @Override

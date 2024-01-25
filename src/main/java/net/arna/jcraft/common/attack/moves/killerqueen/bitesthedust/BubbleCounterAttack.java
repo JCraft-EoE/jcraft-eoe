@@ -4,6 +4,7 @@ import lombok.NonNull;
 import net.arna.jcraft.common.attack.moves.base.AbstractCounterAttack;
 import net.arna.jcraft.common.attack.moves.shared.CounterMissMove;
 import net.arna.jcraft.common.attack.moves.killerqueen.BombPlantAttack;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.KQBTDEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.JUtils;
@@ -34,8 +35,7 @@ public class BubbleCounterAttack extends AbstractCounterAttack<BubbleCounterAtta
             JUtils.cancelMoves(livingEntity);
         }
 
-        attacker.getMoveContext().set(BombPlantAttack.BOMB_ENTITY, countered);
-        attacker.getMoveContext().set(BombPlantAttack.BOMB_POS, null);
+        JComponents.getBombTracker(attacker.getUser()).getMainBomb().setBomb(countered);
         //stand.playSound(JSoundRegistry.BTD_COUNTER_HIT, 1, 1);
     }
 

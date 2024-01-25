@@ -2089,6 +2089,18 @@ C-Moon
 Gold Experience: Requiem
     >Added ability icons
 
+● 25/01/2024
+
+Killer Queen
+    >Updated skin 3
+    >Improved Bomb Plant
+
+Star Platinum: The World
+    >Added ability icons
+
+Killer Queen: Bites the Dust
+    >Improved Bomb Plant
+
 priority (top to bottom)
 todo: counters that invalidate hit effects
 todo: fix predict not working with projectiles spawned after it started

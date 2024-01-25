@@ -8,20 +8,23 @@ import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.killerqueen.BombPlantAttack;
 import net.arna.jcraft.common.attack.moves.killerqueen.DetonateAttack;
 import net.arna.jcraft.common.attack.moves.killerqueen.ExplosiveDashAttack;
-import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleMultiHitAttack;
+import net.arna.jcraft.common.component.CooldownsComponent;
+import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -77,10 +80,10 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
         freespace = """
                 BNBs:
                     -Standard bomb plant confirm and SHA setup
-                    M1>Barrage>Bomb plant>Detonate(>Sheer Heart Attack)
+                    M1~M1>Barrage>Bomb plant>Detonate(>Sheer Heart Attack)
                     
                     -Confirm while bomb plant is on cd
-                    M1>Barrage>Heavy(>Sheer Heart Attack)""";
+                    M1~M1>Barrage>Heavy(>Sheer Heart Attack)""";
     }
 
     @Override
@@ -88,12 +91,6 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
         moves.register(MoveType.LIGHT, LIGHT, getLightState()).withCrouchingVariant(getDetonateState());
         moves.register(MoveType.BARRAGE, BARRAGE, getBarrageState());
         moves.register(MoveType.UTILITY, EXPLOSIVE_DASH); // No special state for this one.
-    }
-
-    public Vec3d getBombPos() {
-        Entity bombEntity = moveContext.get(BombPlantAttack.BOMB_ENTITY);
-        Vec3d bombPos = moveContext.get(BombPlantAttack.BOMB_POS);
-        return bombEntity != null ? bombEntity.getPos() : bombPos;
     }
 
     protected void detonate() {
@@ -109,18 +106,34 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
         LivingEntity user = getUserOrThrow();
         if (user.hasStatusEffect(JStatusRegistry.DAZED)) return;
 
-        if (type == MoveType.LIGHT) {
-            boolean idling = getMoveStun() <= 0;
-            if (curMove == null || curMove.getOriginalMove() != LIGHT) {
-                if (idling) {
+        switch (type) {
+            case LIGHT -> {
+                boolean idling = getMoveStun() <= 0;
+                if (curMove == null || curMove.getOriginalMove() != LIGHT) {
+                    if (idling) {
+                        if (user.isSneaking()) detonate();
+                        else super.initMove(MoveType.LIGHT);
+                    }
+                } else if (getMoveStun() < 7) {
                     if (user.isSneaking()) detonate();
-                    else super.initMove(MoveType.LIGHT);
+                    else setMove(LOW, getLowState());
                 }
-            } else if (getMoveStun() < 7) {
-                if (user.isSneaking()) detonate();
-                else setMove(LOW, getLowState());
             }
-        } else super.initMove(type);
+
+            case SPECIAL1 -> {
+                CooldownsComponent cooldowns = JComponents.getCooldowns(user);
+
+                if (user.isInSneakingPose() && cooldowns.getCooldown(CooldownType.STAND_SP1) <= 0) {
+                    BlockPos standingOn = user.getBlockPos().offset(GravityChangerAPI.getGravityDirection(user));
+                    if (!world.getBlockState(standingOn).isAir()) {
+                        JComponents.getBombTracker(user).getMainBomb().setBomb(standingOn);
+                        cooldowns.setCooldown(CooldownType.STAND_SP1, BOMB_PLANT.getCooldown());
+                    }
+                } else handleMove(MoveType.SPECIAL1);
+            }
+
+            default -> super.initMove(type);
+        }
     }
 
     @Override
@@ -133,7 +146,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
     public MoveSelectionResult specificMoveSelectionCriterion(AbstractMove<?, ? super E> attack, MobEntity mob, LivingEntity target, int stunTicks,
                                                               int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand, AbstractMove<?, ?> enemyAttack) {
         if (enemyStand != null && enemyStand.blocking) return MoveSelectionResult.STOP;
-        Vec3d bombPos = getBombPos();
+        Vec3d bombPos = JComponents.getBombTracker(mob).getMainBomb().getBombPos();
         return bombPos != null && attack == DETONATE && target.squaredDistanceTo(bombPos) < 9.0D ?
                 MoveSelectionResult.USE : MoveSelectionResult.PASS;
     }
@@ -142,10 +155,8 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
     public void tick() {
         super.tick();
 
-        if (hasUser()) {
-            BOMB_PLANT.tickBomb(this);
+        if (hasUser())
             if (getCurrentMove() instanceof DetonateAttack) queuedMove = null;
-        }
     }
 
     // Animation code

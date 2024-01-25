@@ -223,34 +223,9 @@ public class ClientPacketHandler {
                         0, 0, 0));
             }
 
-            // KQ bomb tracker
+            // WAS KQ bomb tracker
             case (4) -> {
-                double v1x = buf.readDouble();
-                double v1y = buf.readDouble();
-                double v1z = buf.readDouble();
 
-                double v2x = buf.readDouble();
-                double v2y = buf.readDouble();
-                double v2z = buf.readDouble();
-
-                boolean inRange = buf.readBoolean();
-
-                Vec3d mid = new Vec3d(v1x, v1y + v2y / 2, v1z);
-
-                client.execute(() -> {
-                    Random random = new Random();
-                    for (int h = 0; h < 16; ++h) {
-                        double x = v1x + random.nextDouble(v2x) - v2x / 2;
-                        double y = v1y + random.nextDouble(v2y);
-                        double z = v1z + random.nextDouble(v2z) - v2z / 2;
-                        Vec3d towardsVector = mid.subtract(x, y, z).normalize().multiply(0.1);
-
-                        client.world.addParticle(
-                                inRange ? ParticleTypes.WAX_ON : ParticleTypes.WITCH,
-                                x, y, z,
-                                towardsVector.x, towardsVector.y, towardsVector.z);
-                    }
-                });
             }
 
             // Complex hit spark
