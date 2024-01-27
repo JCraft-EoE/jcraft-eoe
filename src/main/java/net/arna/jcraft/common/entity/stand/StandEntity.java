@@ -396,7 +396,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         setFree(true);
 
         Vec3d fPos = user.getPos().add(user.getRotationVector());
-        remoteSpeed = user.getVelocity().multiply(5); // Inertia
+        remoteSpeed = user.getVelocity().multiply(2); // Inertia
 
         setAlphaOverride(0.1f);
 

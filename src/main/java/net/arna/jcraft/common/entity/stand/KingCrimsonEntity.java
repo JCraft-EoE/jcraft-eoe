@@ -83,7 +83,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             .withExtraHitBox(0, 0.5, 1)
             .withInfo(Text.literal("Vertical Chop"), Text.literal("medium windup combo starter, has a true followup in the form of a slow, armored knockdown"));
     public static final BloodThrowAttack BLOOD_THROW = new BloodThrowAttack(260, 10, 15, 1f)
-            .withInfo(Text.literal("Blood Throw"), Text.literal("throws a stunning, blinding blood projectile"));
+            .withInfo(Text.literal("Blood Throw"), Text.literal("throws a stunning, blinding blood projectile, crouch while it comes out for higher speed"));
     public static final EffectInflictingAttack<KingCrimsonEntity> EYE_CHOP = new EffectInflictingAttack<KingCrimsonEntity>(
             280, 20, 29, 1f, 9f, 27, 1.75f, 0.3f, -0.3f,
             List.of(new StatusEffectInstance(StatusEffects.BLINDNESS, 200, 0)))
@@ -99,14 +99,14 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             .withImpactSound(JSoundRegistry.IMPACT_7)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHyperArmor()
-            .withInfo(Text.literal("Donut"), Text.literal("huge windup, huge stun"));
+            .withInfo(Text.literal("Donut"), Text.literal("long windup, 3s stun"));
     public static final EpitaphAttack EPITAPH = new EpitaphAttack(480, 4, 34, -1f)
-            .withInfo(Text.literal("Epitaph"), Text.literal("0.2s windup, 1.5s counter"));
+            .withInfo(Text.literal("Epitaph"), Text.literal("0.2s windup, 1.5s counter, combo starter"));
     public static final PredictionMove PREDICTION = new PredictionMove(600, 4, 104, -1f)
             .withCrouchingVariant(EPITAPH)
             .withSound(JSoundRegistry.KC_EPITAPH)
             .withInfo(Text.literal("Prediction/Move Cancel"), Text.literal("""
-                              shows future location of nearby entities, said entities can be forced into it using Time Erase (20s cooldown)
+                              shows future location of nearby entities, which can be forced into it using Time Erase (20s cooldown)
                               you are slowed down while predicting
                               during a move: cancels it (puts Time Erase on a 7 second cooldown but doesn't require it to be usable)"""));
     public static final TimeEraseMove TIME_ERASE = new TimeEraseMove(1000, 5, 15, 1f, 120)
@@ -125,12 +125,10 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
         idleDistance = 1f;
         idleRotation = -65f;
 
-        ignoreCameraFrustum = true;
-
-        description = "Close-Range Deadly STRIKER";
+        description = "Close-Range Deadly PUNISHER";
 
         pros = List.of(
-                "high damage output",
+                "extremely high damage output",
                 "priceless move cancel",
                 "counter",
                 "easy setups"

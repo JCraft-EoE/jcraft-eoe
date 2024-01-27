@@ -145,11 +145,23 @@ public interface JEventsRegistry {
         AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {
             if (!JUtils.canAct(player))
                 return ActionResult.FAIL;
+
+            // Remote players do stuff with their stand, not themselves
+            StandEntity<?, ?> stand = JUtils.getStand(player);
+            if (stand != null && stand.isRemote())
+                return ActionResult.FAIL;
+
             return ActionResult.PASS;
         });
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
             if (!JUtils.canAct(player))
                 return ActionResult.FAIL;
+
+            // Remote players do stuff with their stand, not themselves
+            StandEntity<?, ?> stand = JUtils.getStand(player);
+            if (stand != null && stand.isRemote())
+                return ActionResult.FAIL;
+
             return ActionResult.PASS;
         });
 

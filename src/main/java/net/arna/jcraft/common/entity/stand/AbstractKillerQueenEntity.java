@@ -72,7 +72,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
         );
 
         cons = List.of(
-                "limited pressure tools",
+                "interactive offense",
                 "below-average speed",
                 "limited combo tools"
         );

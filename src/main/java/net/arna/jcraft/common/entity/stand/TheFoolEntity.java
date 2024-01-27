@@ -72,7 +72,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withAerialVariant(AIR_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withExtraHitBox(0.5, 0, 1.25)
-            .withInfo(Text.literal("3-hit Combo"), Text.literal("fst knockdown provider"));
+            .withInfo(Text.literal("3-hit Combo"), Text.literal("fast knockdown provider"));
     public static final EffectInflictingAttack<TheFoolEntity> LAUNCH = new EffectInflictingAttack<TheFoolEntity>(240,
             16, 20, 1.25f, 8f, 25, 2f, 0.5f, -0.3f,
             List.of(new StatusEffectInstance(StatusEffects.LEVITATION, 5, 19, true, false)))
@@ -81,7 +81,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withExtraHitBox(1.5)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHyperArmor()
-            .withInfo(Text.literal("Launch"), Text.literal("uninterruptible, slow, launching uppercut"));
+            .withInfo(Text.literal("Launch"), Text.literal("uninterruptible, slow, vertically launching uppercut"));
     public static final SlamAttack SLAM = new SlamAttack(0, 4, 10, 1.25f, 4f,
             24, 2f, 0.2f, 0.1f)
             .withBlockStun(5)
@@ -104,7 +104,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withInfo(Text.literal("Sand Manipulation"), Text.literal("creates a blinding sand cloud, then a clone or (if crouching) circles of sand"));
     public static final GlideMove GLIDE = new GlideMove(300, 5, 125, 0f)
             .withSound(JSoundRegistry.FOOL_GLIDE)
-            .withInfo(Text.literal("Glider"), Text.literal("turns The Fool into a glider"));
+            .withInfo(Text.literal("Glider"), Text.literal("turns The Fool into a glider for 6s"));
     public static final SandWaveAttack SAND_WAVE = new SandWaveAttack(340, 0, 80, 0f,
             1f, 0, 2f, 0.1f, 0f, 3)
             .withAerialVariant(GLIDE)
@@ -120,7 +120,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withAerialVariant(SAND_TORNADO)
             .withLaunch()
             .withBackstab(false)
-            .withInfo(Text.literal("Charge"), Text.literal("The Fool detaches from the user and charges forward, dealing knockback on hit"));
+            .withInfo(Text.literal("Charge"), Text.literal("The Fool detaches from the user and charges forward, launches on hit"));
     public static final SandstormAttack SANDSTORM = new SandstormAttack(800, 28, 41, 1.5f,
             7f, 20, 2f, 0.1f, 0f)
             .withSound(JSoundRegistry.FOOL_ULT)
@@ -128,7 +128,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withExtraHitBox(1.5)
             .withHyperArmor()
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
-            .withInfo(Text.literal("Suffocating Sandstorm"), Text.literal("very slow, traps the opponent in a cloud of slowing sand"));
+            .withInfo(Text.literal("Suffocating Sandstorm"), Text.literal("very slow, traps the opponent in a cloud of blinding and slowing sand"));
     private static final BlockState sandState = Blocks.SAND.getDefaultState();
     private static final TrackedData<Boolean> IS_SAND;
     private static final TrackedData<Boolean> IS_WAVE;

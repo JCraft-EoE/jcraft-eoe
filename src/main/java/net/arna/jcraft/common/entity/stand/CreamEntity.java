@@ -100,10 +100,10 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             .withInfo(Text.literal("Void"), Text.literal("high windup, 6 seconds"));
     public static final BallModeMove ENTER = new BallModeMove(40, 10, 15, 0f, true)
             .withSound(JSoundRegistry.CREAM_ENTER)
-            .withInfo(Text.literal("Enter Cream"), Text.literal("cream consumes itself and the user halfway, increasing mobility and decreasing defense"));
+            .withInfo(Text.literal("Enter Cream"), Text.literal("Cream consumes itself and the user halfway, increasing mobility and decreasing defense"));
     public static final BallModeMove EXIT = new BallModeMove(40, 5, 15, 0f, false)
             .withSound(JSoundRegistry.CREAM_EXIT)
-            .withInfo(Text.literal("Exit Cream"), Text.literal("cream and its user return from the void"));
+            .withInfo(Text.literal("Exit Cream"), Text.literal("Cream and its user return from the void"));
     public static final SimpleAttack<CreamEntity> SWIPE = new SimpleAttack<CreamEntity>(20, 7,
             14, 0.1f, 5f, 20, 2f, 0.75f, 0.2f)
             .withImpactSound(JSoundRegistry.IMPACT_3)
@@ -159,7 +159,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
 
         freespace = """
                 BNBs (i. - in Cream):
-                    M1>Assault>M1>Charge>Grab
+                    M1>Assault>M1>Grab
                     i.M1>land+s.OFF>s.ON+Assault>M1>Charge>Grab
                     Chop>Destroy>Surprise
                     Chop>Void""";

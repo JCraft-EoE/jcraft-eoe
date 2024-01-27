@@ -43,7 +43,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
     public static final BubbleAttack BUBBLE = new BubbleAttack(320, 15, 18, 0.75f)
             .withCrouchingVariant(BUBBLE_COUNTER)
             .withSound(JSoundRegistry.KQ_UPPERCUT)
-            .withInfo(Text.literal("Stray Cat Bubble"), Text.literal("launches an explosive bubble"));
+            .withInfo(Text.literal("Stray Cat Bubble"), Text.literal("launches an explosive bubble guided by your view rotation"));
     public static final BTDDetonateAttack BTD_DETONATE = new BTDDetonateAttack(20, 5, 6, 0.75f)
             .withSound(JSoundRegistry.KQ_DETONATE)
             .withInfo(Text.literal("Detonate"), Text.empty());
@@ -73,7 +73,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
         );
 
         cons = List.of(
-                "limited pressure tools",
+                "mediocre pressure tools",
                 "no armored moves"
         );
 

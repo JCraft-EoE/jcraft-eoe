@@ -18,3 +18,4 @@ accessible field net/minecraft/client/gl/ShaderEffect passes Ljava/util/List;
 accessible class net/minecraft/client/render/WorldRenderer$ChunkInfo
 accessible class net/minecraft/client/render/WorldRenderer$ChunkInfoList
 
+accessible field net/minecraft/block/entity/AbstractFurnaceBlockEntity burnTime I

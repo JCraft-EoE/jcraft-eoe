@@ -20,6 +20,7 @@ import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
@@ -64,7 +65,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHyperArmor()
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
-            .withInfo(Text.literal("Stand Disk"), Text.literal("uninterruptible, removes enemy stand for 8s"));
+            .withInfo(Text.literal("Stand Disk"), Text.literal("uninterruptible & unblockable, removes enemy stand for 8s"));
     public static final SimpleAttack<WhiteSnakeEntity> LEG_CRUSHER = new SimpleAttack<WhiteSnakeEntity>(
             240, 16, 22, 0.75f, 7, 32, 1.75f, 0.25f, 0.2f)
             .withSound(JSoundRegistry.WS_LEGCRUSH)
@@ -82,11 +83,11 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHyperArmor()
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
-            .withInfo(Text.literal("Memory Disk"), Text.literal("uninterruptible, mining fatigue & weakness for 30s"));
+            .withInfo(Text.literal("Memory Disk"), Text.literal("uninterruptible& unblockable, gives mining fatigue & weakness for 30s"));
     public static final ChargedSpewAttack CHARGED_SPEW = new ChargedSpewAttack(
             200, 20, 26, 0.75f, 0f, 0, 2f, 0f, 0f)
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
-            .withInfo(Text.literal("Poison Spew"), Text.literal("fires an acid projectile that slows enemies and persists on the surface it hits for 5s"));
+            .withInfo(Text.literal("Poison Spew"), Text.literal("fires a spread of 5 acid projectiles that slow enemies and persist on the surface they hits for 5s"));
     public static final PoisonSpewAttack POISON_SPEW = new PoisonSpewAttack(
             200, 10, 14, 0.75f, 0f, 0, 2f, 0f, 0f)
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
@@ -124,11 +125,14 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         freespace =
                 """
                         BNBs:
+                            -the gimp
+                            M1>Gut Punch>Poison Spew
+                        
                             -the el mayo (optimal damage with disk moves)
-                            Memory Disk>M1>Barrage>Leg Crusher>Stand Disk>M1
+                            Memory Disk>M1>Barrage>Leg Crusher>Stand Disk>M1~M1
                                         
                             -the gazebo (optimal damage without disk)
-                            M1>Barrage>Leg Crusher>Donut>M1
+                            M1>Barrage>Leg Crusher>Donut>M1~M1
                             
                             -the protein shake (sets up mixups)
                             M1>Barrage>Leg Crusher>Charged Spew""";
@@ -196,23 +200,27 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
     public void tickRemoteMovement(double f, double s, boolean jump) {
         Vec3d pos = getPos();
 
-        // 2 ticks of inertia, helping movement be fluid as well as dealing with packet drops
-        if (lastRemoteInputTime - age > 3) updateRemoteInputs(0, 0, false);
+        // 1 tick of inertia, helping movement be fluid as well as dealing with packet drops
+        if (lastRemoteInputTime - age > 2) updateRemoteInputs(0, 0, false);
         Vec3d rotVec = new Vec3d(getRotationVector().x, 0, getRotationVector().z).normalize();
 
         double dragMult = getMoveStun() > 0 ? 0.2 : 0.4;
         double moveSpeed = 0.24;
         boolean onGround = isOnGround();
 
-        if (onGround) {
-            if (jump && getMoveStun() < 1) {
-                addVelocity(0, 1.0, 0);
-                setRemoteJumpInput(false);
+        if (getBlockStateAtPos().streamTags().anyMatch(tag -> tag == BlockTags.CLIMBABLE) && jump && getMoveStun() < 1) { // Climb
+            addVelocity(0, 0.1, 0);
+        } else { // Jump
+            if (onGround) {
+                if (jump && getMoveStun() < 1) {
+                    addVelocity(0, 0.75, 0);
+                    setRemoteJumpInput(false);
+                }
+            } else {
+                //JCraft.LOGGER.info("Airborne");
+                moveSpeed = 0.024;
+                dragMult = 0.4;
             }
-        } else {
-            //JCraft.LOGGER.info("Airborne");
-            moveSpeed = 0.024;
-            dragMult = 0.4;
         }
 
         remoteSpeed = remoteSpeed
@@ -221,8 +229,9 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
 
         remoteSpeed = remoteSpeed.multiply(dragMult);
 
-        if (pos.add(remoteSpeed).squaredDistanceTo(getUserOrThrow().getPos()) > 400)
-            remoteSpeed.multiply(-1);
+        Vec3d userPos = getUserOrThrow().getPos();
+        if (pos.add(remoteSpeed).squaredDistanceTo(userPos) > 400)
+            remoteSpeed = userPos.subtract(pos).multiply(0.025); // 1/40th so it scales with distance
 
         addVelocity(remoteSpeed.x, remoteSpeed.y, remoteSpeed.z);
         velocityDirty = true;

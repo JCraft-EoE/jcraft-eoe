@@ -133,15 +133,14 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
 
         pros = List.of(
                 "fast m1",
-                "counter",
                 "two barrages",
-                "excellent pokes and pressure"
+                "excellent pokes and pressure",
+                "counter (Anubis only)"
         );
 
         cons = List.of(
                 "high execution requirement",
-                "individual forms have limited movesets",
-                "below-average damage output",
+                "low damage output",
                 "lacking in mobility"
         );
 
@@ -183,7 +182,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         freespace =
                 """
                 BNBs:
-                    (M1>)Charge~Barrage>M1>Spin
+                    (M1>)Charge~Barrage>M1>Spinning Blade>M1~M1
                     (M1>)Charge~Barrage>God of Death""";
 
         registerMoves();

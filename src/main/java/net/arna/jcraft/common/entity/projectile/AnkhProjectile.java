@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.entity.projectile;
 
+import net.arna.jcraft.common.entity.stand.MagiciansRedEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.minecraft.entity.Entity;
@@ -12,6 +13,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -84,6 +86,12 @@ public class AnkhProjectile extends PersistentProjectileEntity implements IAnima
         entity.setOnFireFor(3);
         JUtils.projectileDamageLogic(this, world, entity, Vec3d.ZERO, 5, 1, false, 3.5f, 8);
         discard();
+    }
+
+    @Override
+    protected void onBlockHit(BlockHitResult blockHitResult) {
+        MagiciansRedEntity.ignite(getWorld(), blockHitResult.getBlockPos());
+        super.onBlockHit(blockHitResult);
     }
 
     @Override

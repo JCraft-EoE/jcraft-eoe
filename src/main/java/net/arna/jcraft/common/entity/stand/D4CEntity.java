@@ -9,7 +9,6 @@ import net.arna.jcraft.common.attack.core.StunType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.dirtydeedsdonedirtcheap.*;
-import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleMultiHitAttack;
@@ -47,7 +46,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(ITEM_PLACE)
             .withImpactSound(JSoundRegistry.IMPACT_2)
-            .withInfo(Text.literal("Chop"), Text.literal("quick combo starter"));
+            .withInfo(Text.literal("Chop"), Text.literal("relatively quick combo starter"));
     public static final MainBarrageAttack<D4CEntity> BARRAGE = new MainBarrageAttack<D4CEntity>(240, 0, 70,
             0.75f, 0.8f, 30, 2f, 0.25f, 0f, 3, Blocks.DEEPSLATE.getHardness())
             .withSound(JSoundRegistry.D4C_BARRAGE)

@@ -10,16 +10,28 @@ import net.arna.jcraft.common.attack.moves.shared.KnockdownAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
+import net.minecraft.block.AbstractFurnaceBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.state.property.Properties;
+import net.minecraft.state.property.Property;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -103,7 +115,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
                 new Vec3f(0.9f, 0.6f, 0.3f),
                 new Vec3f(0.8f, 0.3f, 1.0f),
                 new Vec3f(1.0f, 0.0f, 0.0f),
-                new Vec3f(1.0f, 0.5f, 0.4f)
+                new Vec3f(1.0f, 0.2f, 0.4f)
         };
     }
 
@@ -125,6 +137,28 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             AbstractMove<?, ? super MagiciansRedEntity> followup = curMove.getFollowup();
             if (followup != null) setMove(followup, (State) followup.getAnimation());
         } else super.initMove(type);
+    }
+
+    public static void ignite(World world, BlockPos blockPos) {
+        BlockState state = world.getBlockState(blockPos);
+        Block block = state.getBlock();
+        Collection<Property<?>> properties = state.getProperties();
+
+        boolean cantIgnite = false;
+        if (properties.contains(Properties.WATERLOGGED))
+            cantIgnite = state.get(Properties.WATERLOGGED);
+        if (block == Blocks.REDSTONE_LAMP) return;
+        if (cantIgnite) return;
+
+        if (properties.contains(Properties.LIT))
+            world.setBlockState(blockPos, state.with(Properties.LIT, true));
+        if (block == Blocks.WET_SPONGE) { // WetSpongeBlock has no drying function to call
+            world.setBlockState(blockPos, Blocks.SPONGE.getDefaultState(), 3);
+            world.syncWorldEvent(2009, blockPos, 0);
+            world.playSound(null, blockPos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 1.0F, (1.0F + world.getRandom().nextFloat() * 0.2F) * 0.7F);
+        }
+        if (world.getBlockEntity(blockPos) instanceof AbstractFurnaceBlockEntity furnaceBlock)
+            furnaceBlock.burnTime = 220;
     }
 
     @Override

@@ -20,7 +20,7 @@ public abstract sealed class AbstractStarPlatinumEntity<E extends AbstractStarPl
             .withBlockStun(9)
             .withHyperArmor()
             .withLaunch()
-            .withInfo(Text.literal("Star Breaker"), Text.literal("uninterruptible launcher"));
+            .withInfo(Text.literal("Star Breaker"), Text.literal("slow, uninterruptible launcher"));
 
     protected AbstractStarPlatinumEntity(StandType type, World worldIn) {
         super(type, worldIn, JSoundRegistry.STAR_PLATINUM_SUMMON);
@@ -46,7 +46,10 @@ public abstract sealed class AbstractStarPlatinumEntity<E extends AbstractStarPl
                         ~ represents a queued attack
                                                 
                             -the classic
-                            M1>Barrage>M1>Roundhouse>Advancing Barrage~M1~Star Finger~Star Breaker
+                            M1>Barrage>M1>Roundhouse>Advancing Barrage~Star Finger~Star Breaker
+                            
+                            -the rushdown
+                            M1~M1>dash Barrage>cr.M1>Star Finger>Roundhouse>M1>Advancing Barrage>M1~M1
                             
                             -the blowback
                             Inhale>...>Star Finger>Star Breaker>Barrage>...

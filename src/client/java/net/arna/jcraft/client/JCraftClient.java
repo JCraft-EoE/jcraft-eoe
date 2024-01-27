@@ -349,6 +349,7 @@ public class JCraftClient implements ClientModInitializer {
     private void tickClient(MinecraftClient client) {
         ClientPlayerEntity player = client.player;
         if (player == null) return;
+        StandEntity<?, ?> stand = JUtils.getStand(player);
 
         // Handle JCraft inputs (stand, spec, universal controls)
         // Regular input (all moves, regular Minecraft movement (WASD and jumping) and dashing)
@@ -361,8 +362,12 @@ public class JCraftClient implements ClientModInitializer {
         }
 
         // Block
-        if (getTrackedUseKey().isChangedThisTick()) ClientPlayNetworking.send(JPacketRegistry.C2S_STAND_BLOCK,
-                StandBlockPacket.write(getTrackedUseKey().isPressedThisTick()));
+        if (getTrackedUseKey().isChangedThisTick()) {
+            boolean pressed = getTrackedUseKey().isPressedThisTick();
+                ClientPlayNetworking.send(JPacketRegistry.C2S_STAND_BLOCK, StandBlockPacket.write(pressed));
+            if (stand != null && stand.isRemote() && pressed)
+                ClientPlayNetworking.send(JPacketRegistry.C2S_REMOTE_STAND_INTERACT, PacketByteBufs.create());
+        }
 
         // Cooldown Cancel
         if (cooldownCancel.isPressedThisTick())

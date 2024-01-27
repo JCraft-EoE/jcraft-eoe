@@ -4,6 +4,7 @@ import net.arna.jcraft.JCraft;
 import net.minecraft.util.Identifier;
 
 public interface JPacketRegistry {
+    //todo: probably shorten these because strings suck ASS for network efficiency
     Identifier S2C_SERVER_CHANNEL_FEEDBACK = JCraft.id("sfchannel");
     Identifier S2C_PLAYER_ANIMATION = JCraft.id("anim_packet");
     Identifier S2C_SHADER_ACTIVATION = JCraft.id("shader_packet");
@@ -21,4 +22,5 @@ public interface JPacketRegistry {
     Identifier C2S_STAND_BLOCK = JCraft.id("stand_block");
     Identifier C2S_COOLDOWN_CANCEL = JCraft.id("cooldown_cancel");
     Identifier C2S_PLAYER_INPUT = JCraft.id("player_input");
+    Identifier C2S_REMOTE_STAND_INTERACT = JCraft.id("remote_stand_interact");
 }

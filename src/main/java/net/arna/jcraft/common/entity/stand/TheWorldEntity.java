@@ -24,7 +24,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
     public static final SimpleAttack<TheWorldEntity> LOW_KICK = new SimpleAttack<TheWorldEntity>(30, 8, 14, 0.75f, 6f, 17, 1.5f, 0.2f, 0.85f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(0, 0, 1)
-            .withInfo(Text.literal("Low Kick"), Text.literal("slower, higher stun"));
+            .withInfo(Text.literal("Low Kick"), Text.literal("slower, higher stun, low hitbox"));
     public static final SimpleAttack<TheWorldEntity> LIGHT_FOLLOWUP = new SimpleAttack<TheWorldEntity>(
             0, 7, 11, 0.75f, 6f, 8, 1.5f, 1f, 0)
             .withAnim(State.LIGHT_FOLLOWUP)
@@ -92,8 +92,8 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
         );
 
         cons = List.of(
-                "no knockdowns or knockbacks",
-                "heavy is useless outside of combos"
+                "no knockdowns",
+                "donut is high risk/high reward outside combos"
         );
 
         description = "Mid Range DOMINATOR";
@@ -102,10 +102,10 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
                 """
                         BNBs:
                             the saucy racist
-                            (M1>)Charge>cr.M1>Roundhouse>Barrage>M1>Donut>M1~M1
+                            (M1>)Charge>cr.M1>Roundhouse>Barrage>M1>Donut>Roundhouse>M1~M1
                             
-                            the no ts racist
-                            Donut>Roundhouse>Charge>M1>Barrage>M1""";
+                            the afternoon coffee
+                            Donut>Roundhouse>Charge>M1>Barrage>Roundhouse>M1~M1""";
 
         auraColors = new Vec3f[]{
                 new Vec3f(1.0f, 0.7f, 0.3f),

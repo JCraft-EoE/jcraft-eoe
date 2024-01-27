@@ -97,16 +97,17 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
 
     @Override
     public void standEntityClientTick(StandEntity<?, ?> stand) {
-        MinecraftClient minecraftClient = MinecraftClient.getInstance();
+        LivingEntity user = stand.getUser();
+        if (user == null) return;
+
+        MinecraftClient client = MinecraftClient.getInstance();
 
         // Stand Auras
         if (JClientConfig.getInstance().isStandAuras()) {
-            LivingEntity user = stand.getUser();
-            if (user == null) return;
             if (user.isInvisible()) return;
 
-            boolean isFP = minecraftClient.options.getPerspective().isFirstPerson();
-            boolean isOwnerAndFP = user == minecraftClient.player && isFP;
+            boolean isFP = client.options.getPerspective().isFirstPerson();
+            boolean isOwnerAndFP = user == client.player && isFP;
 
             ClientWorld clientWorld = (ClientWorld) stand.getWorld();
             Random random = clientWorld.getRandom();
