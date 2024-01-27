@@ -31,7 +31,7 @@ public class RemoteStandInteractPacket {
                 new RaycastContext(
                         eyePos,
                         eyePos.add(serverPlayer.getRotationVector().multiply(5.0)),
-                        RaycastContext.ShapeType.COLLIDER,
+                        RaycastContext.ShapeType.OUTLINE,
                         RaycastContext.FluidHandling.NONE,
                         stand
                 )

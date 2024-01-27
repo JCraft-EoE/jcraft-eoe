@@ -104,6 +104,7 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
 
         // Stand Auras
         if (JClientConfig.getInstance().isStandAuras()) {
+            if (stand.squaredDistanceTo(client.player) > 6400) return; // 5 chunk aura render distance
             if (user.isInvisible()) return;
 
             boolean isFP = client.options.getPerspective().isFirstPerson();

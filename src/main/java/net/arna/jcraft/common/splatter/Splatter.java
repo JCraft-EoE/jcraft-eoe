@@ -2,10 +2,8 @@ package net.arna.jcraft.common.splatter;
 
 import lombok.Data;
 import lombok.Getter;
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.stand.StandEntity;
-import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;

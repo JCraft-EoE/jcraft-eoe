@@ -24,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQBTDEntity.State> {

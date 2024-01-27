@@ -764,19 +764,14 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if (playSummonAnim && (moveStun > 0 || age > summonAnimDuration || getState() == getBlockState()))
             playSummonAnim = false;
 
-        if (!hasUser()) return;
-
-        /*
-        Direction gravDir = GravityChangerAPI.getGravityDirection(user);
-
-        Vec3d pos = this.getPos();
-        Vec3d rotVec = getRotationVector();
-        if (gravDir == Direction.UP)
-            rotVec = new Vec3d(rotVec.x, -rotVec.y, rotVec.z);
-         */
-
         boolean isFree = isFree();
         boolean isRemote = isRemote();
+
+        if (!hasUser()) {
+            if (!isFree && !isRemote)
+                discard();
+            return;
+        }
 
         // Common code for remote mode
         if (isRemote) {
@@ -1205,6 +1200,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         int enemyMoveStun = 0;
         int blockPlusTicks = 0;
 
+        boolean wantToBlock = false;
+
         // Get enemy stand attack (most common)
         if (enemyHasStand) {
             enemyMoveStun = enemyStand.getMoveStun();
@@ -1214,7 +1211,12 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 blockPlusTicks = enemyMoveStun;
 
             distance = enemyStand.distanceTo(mob);
+        } else { // Blocking logic against standless opponents
+            CooldownsComponent cooldowns = JComponents.getCooldowns(mob);
+            if (cooldowns.getCooldown(CooldownType.DASH) > 0) // Careful approach
+                wantToBlock = distance > 2 && distance < 5; // Block at range <2, 5>
         }
+
         // If none was found, try to find a spec attack
         if (enemyAttack == null) {
             if (target instanceof PlayerEntity player) {
@@ -1228,7 +1230,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         }
 
         // Blocking logic
-        boolean wantToBlock = false;
         if (enemyAttack != null && enemyMoveStun > 0) { // Only block if the attack is actually active
             // Block regardless of range if the attack is ranged, or is a barrage
             if (enemyAttack.isRanged() || enemyAttack instanceof AbstractBarrageAttack<?,?>)
@@ -1259,6 +1260,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         }
 
         //JCraft.LOGGER.info("Want to block: " + wantToBlock);
+        stand.wantToBlock = wantToBlock;
         stand.blocking = wantToBlock && stand.canAttack();
 
         StatusEffectInstance mobStun = mob.getStatusEffect(JStatusRegistry.DAZED);

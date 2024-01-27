@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OverwriteAttack extends AbstractSimpleAttack<OverwriteAttack, TheWorldOverHeavenEntity> {
-    public static MoveVariable<IntList> OVERWRITE_TIMES = new MoveVariable<>(IntList.class);
-    public static MoveVariable<List<LivingEntity>> OVERWRITE_TARGETS = new MoveVariable<>(new TypeToken<>() {});
+    public static final MoveVariable<IntList> OVERWRITE_TIMES = new MoveVariable<>(IntList.class);
+    public static final MoveVariable<List<LivingEntity>> OVERWRITE_TARGETS = new MoveVariable<>(new TypeToken<>() {});
 
     public OverwriteAttack(int cooldown, int windup, int duration, float moveDistance, float damage, int stun,
                            float hitboxSize, float knockback, float offset) {

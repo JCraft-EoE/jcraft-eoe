@@ -1,7 +1,6 @@
 package net.arna.jcraft.common.attack.moves.shared;
 
 import lombok.NonNull;
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.ctx.BooleanMoveVariable;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;

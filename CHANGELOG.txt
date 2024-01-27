@@ -2132,8 +2132,9 @@ Killer Queen: Bites the Dust
 Gold Experience: Requiem
     >Heal Others now applies bone meal effect if the user is crouching as the move hits
 
-● 26/01/2024
+● 27/01/2024
 >Fixed stands rotating when they aren't supposed to (stands now match head rotation when not detached, no longer track user rotation when deteched)
+>Fixed Stand User AIs not blocking
 >Updated /stand about pages
 
 Whitesnake
@@ -2145,6 +2146,7 @@ Whitesnake
 
 Magician's Red
     >Ankhs now interact with blocks they hit (i.e. unlit campfires, furnaces, wet sponges)
+
 
 
 priority (top to bottom)

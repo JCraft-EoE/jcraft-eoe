@@ -83,7 +83,7 @@ public abstract class EntityMixin {
     public abstract Box getBoundingBox();
 
     @Shadow
-    public static Vec3d adjustMovementForCollisions(Vec3d movement, Box entityBoundingBox, List<VoxelShape> collisions) {
+    private static Vec3d adjustMovementForCollisions(Vec3d movement, Box entityBoundingBox, List<VoxelShape> collisions) {
         return null;
     }
 

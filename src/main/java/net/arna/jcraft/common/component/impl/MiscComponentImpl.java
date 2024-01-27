@@ -2,7 +2,6 @@ package net.arna.jcraft.common.component.impl;
 
 import lombok.Getter;
 import lombok.NonNull;
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.MiscComponent;
 import net.arna.jcraft.registry.JSoundRegistry;

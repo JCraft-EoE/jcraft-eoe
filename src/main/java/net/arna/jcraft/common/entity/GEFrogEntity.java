@@ -1,7 +1,6 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.common.util.IOwnable;
-import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;

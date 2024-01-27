@@ -1,10 +1,8 @@
 package net.arna.jcraft.client.particle;
 
-import net.arna.jcraft.JCraft;
 import net.minecraft.client.particle.*;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.DefaultParticleType;
-import net.minecraft.util.math.random.Random;
 
 public class BlocksparkParticle extends AbstractSlowingParticle {
     protected final SpriteProvider spriteProvider;

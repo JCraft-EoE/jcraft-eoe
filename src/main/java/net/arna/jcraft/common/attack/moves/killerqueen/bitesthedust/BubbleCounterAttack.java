@@ -3,7 +3,6 @@ package net.arna.jcraft.common.attack.moves.killerqueen.bitesthedust;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.moves.base.AbstractCounterAttack;
 import net.arna.jcraft.common.attack.moves.shared.CounterMissMove;
-import net.arna.jcraft.common.attack.moves.killerqueen.BombPlantAttack;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.KQBTDEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;

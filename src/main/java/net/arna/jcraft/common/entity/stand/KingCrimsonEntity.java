@@ -210,7 +210,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                     CooldownsComponent cooldowns = JComponents.getCooldowns(getUser());
                     if (cooldowns.getCooldown(CooldownType.STAND_ULTIMATE) <= 0) {
                         cooldowns.setCooldown(CooldownType.STAND_ULTIMATE, 400);
-                        PREDICTION.finishPrediction(this);
+                        PredictionMove.finishPrediction(this);
                     }
                 }
 

@@ -55,29 +55,6 @@ public final class JUtils {
         return new Vec3d(random.nextGaussian(), random.nextGaussian(), random.nextGaussian()).normalize();
     }
 
-    public static Vec3d adjustForGravity(Vec3d vec, Direction gravDir) {
-        switch (gravDir) {
-            case UP -> {
-                return new Vec3d(vec.x, -vec.y, vec.z);
-            }
-            case NORTH -> {
-                return new Vec3d(vec.x, vec.y, vec.z);
-            }
-            case SOUTH -> {
-                return new Vec3d(vec.x, vec.y, vec.z);
-            }
-            case WEST -> {
-                return new Vec3d(vec.x, vec.y, vec.z);
-            }
-            case EAST -> {
-                return new Vec3d(vec.x, vec.y, vec.z);
-            }
-            default -> {
-                return vec;
-            }
-        }
-    }
-
     public static void addVelocity(Entity entity, double x, double y, double z) {
         entity.addVelocity(x, y, z);
         syncVelocityUpdate(entity);

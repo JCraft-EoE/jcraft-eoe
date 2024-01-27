@@ -207,8 +207,13 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         double dragMult = getMoveStun() > 0 ? 0.2 : 0.4;
         double moveSpeed = 0.24;
         boolean onGround = isOnGround();
+        boolean climbing = getBlockStateAtPos().streamTags().anyMatch(tag -> tag == BlockTags.CLIMBABLE);
+        boolean swimming = !world.getFluidState(getBlockPos()).isEmpty();
 
-        if (getBlockStateAtPos().streamTags().anyMatch(tag -> tag == BlockTags.CLIMBABLE) && jump && getMoveStun() < 1) { // Climb
+        if (climbing || swimming) dragMult *= 0.5;
+
+        if ( // Climb or Swim
+                (climbing || swimming ) && jump && getMoveStun() < 1) {
             addVelocity(0, 0.1, 0);
         } else { // Jump
             if (onGround) {
