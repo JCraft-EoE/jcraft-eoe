@@ -19,7 +19,6 @@
     "LivingEntityInvoker",
     "LivingEntityMixin",
     "LongUseItemMixin",
-    "MobEntityMixin",
     "NetherPortalBlockMixin",
     "PlayerEntityMixin",
     "RecipeManagerMixin",

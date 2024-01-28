@@ -24,15 +24,13 @@ public class JClientUtils {
     // Timestop tracking
     public static List<DimValues> activeTimestops = new ArrayList<>();
 
-    public static boolean removeTimestop(int timestopperId) {
+    public static void removeTimestop(int timestopperId) {
         for (DimValues timestop : activeTimestops) {
             Entity timestopper = timestop.user;
             if (timestopper.getId() != timestopperId) continue;
             activeTimestops.remove(timestop);
-            return true;
+            return;
         }
-
-        return false;
     }
 
     public static boolean isInTSRange(Vec3d pos) {

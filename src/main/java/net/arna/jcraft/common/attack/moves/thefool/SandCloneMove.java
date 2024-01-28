@@ -11,6 +11,7 @@ import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
@@ -76,6 +77,10 @@ public class SandCloneMove extends AbstractMove<SandCloneMove, TheFoolEntity> {
             playerCloneEntity.copyPositionAndRotation(player);
             playerCloneEntity.setMaster(player);
             playerCloneEntity.markSand();
+            playerCloneEntity.equipStack(EquipmentSlot.HEAD, user.getEquippedStack(EquipmentSlot.HEAD).copy());
+            playerCloneEntity.equipStack(EquipmentSlot.CHEST, user.getEquippedStack(EquipmentSlot.CHEST).copy());
+            playerCloneEntity.equipStack(EquipmentSlot.LEGS, user.getEquippedStack(EquipmentSlot.LEGS).copy());
+            playerCloneEntity.equipStack(EquipmentSlot.FEET, user.getEquippedStack(EquipmentSlot.FEET).copy());
 
             setSandClone(ctx, playerCloneEntity);
         } else if (user instanceof MobEntity mob) {
@@ -116,7 +121,6 @@ public class SandCloneMove extends AbstractMove<SandCloneMove, TheFoolEntity> {
     }
 
     private void setSandClone(MoveContext ctx, MobEntity clone) {
-        //JCraft.LOGGER.info("Setting sand clone to: " + clone + " from " + sandClone);
         MobEntity sandClone = ctx.get(SAND_CLONE);
         if (sandClone != null) sandClone.kill();
         ctx.set(SAND_CLONE, clone);
@@ -124,7 +128,6 @@ public class SandCloneMove extends AbstractMove<SandCloneMove, TheFoolEntity> {
         applySandCloneModifiers(clone);
     }
 
-    // FIXME This gets called twice for PlayerCloneEntities (once in PlayerCloneEntity#markSand() and once here)
     public static void applySandCloneModifiers(LivingEntity entity) {
         if (entity == null) {
             JCraft.LOGGER.error("Tried to apply sand clone attribute modifiers to invalid entity!");

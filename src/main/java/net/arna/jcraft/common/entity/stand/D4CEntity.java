@@ -3,6 +3,7 @@ package net.arna.jcraft.common.entity.stand;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.attack.core.MoveInputType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.StunType;
@@ -95,7 +96,13 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
     //todo: make them spawn without weapons unless you are crouching
     public static final CloneSpawnMove CLONE_SPAWN = new CloneSpawnMove(400, 40, 50, 1f)
             .withSound(JSoundRegistry.D4C_DIMHOP)
-            .withInfo(Text.literal("Dimensional Clone"), Text.literal("summons an unlimited number of servants, crouch and interact to give/take items"));
+            .withInfo(Text.literal("Dimensional Clone"), Text.literal("""
+                    summons an unlimited number of servants, crouch and interact to give/take items, press a special button to change their weapon
+                    Servant types:
+                    DEFAULT - Iron Sword
+                    SPECIAL 1 - Wooden Axe
+                    SPECIAL 2 - Bow
+                    SPECIAL 3 - None"""));
     public static final FlagMove FLAG = new FlagMove(280, 10, 60, 0f)
             .withSound(JSoundRegistry.D4C_UTILITY)
             .withInfo(Text.literal("Dimensional Phase"), Text.literal("hides in a flag in an un-stunnable, floating state"));
@@ -162,26 +169,41 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
 
     @Override
     public void initMove(MoveType type) {
-        if (type == MoveType.ULTIMATE) {
-            if (curMove != null && curMove.getOriginalMove() == DIM_HOP) {
-                setMoveStun(0);
-                curMove = null;
-            }
+        switch (type) {
+            case SPECIAL1 -> getMoveContext().set(CloneSpawnMove.CLONE_TYPE, CloneSpawnMove.CloneType.AXE);
+            case SPECIAL2 -> getMoveContext().set(CloneSpawnMove.CLONE_TYPE, CloneSpawnMove.CloneType.BOW);
+            case SPECIAL3 -> getMoveContext().set(CloneSpawnMove.CLONE_TYPE, CloneSpawnMove.CloneType.EMPTY);
+            case ULTIMATE -> {
+                if (curMove != null && curMove.getOriginalMove() == DIM_HOP) {
+                    setMoveStun(0);
+                    curMove = null;
+                }
 
-            if (getWorld().getRegistryKey().equals(JDimensionRegistry.AU_DIMENSION_KEY)) {
-                setMove(DIM_HOP, State.DIM_HOP);
-                playSound(JSoundRegistry.D4C_DIMHOP, 1, 1);
-                return;
+                if (getWorld().getRegistryKey().equals(JDimensionRegistry.AU_DIMENSION_KEY)) {
+                    setMove(DIM_HOP, State.DIM_HOP);
+                    playSound(JSoundRegistry.D4C_DIMHOP, 1, 1);
+                    return;
+                }
             }
-        } else if (type == MoveType.LIGHT && curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
-            AbstractMove<?, ? super D4CEntity> followup = curMove.getFollowup();
-            if (followup != null) {
-                setMove(followup, (State) followup.getAnimation());
-                return;
+            case LIGHT -> {
+                if (curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
+                    AbstractMove<?, ? super D4CEntity> followup = curMove.getFollowup();
+                    if (followup != null) {
+                        setMove(followup, (State) followup.getAnimation());
+                        return;
+                    }
+                }
             }
         }
 
         super.initMove(type);
+    }
+
+    @Override
+    public void queueMove(MoveInputType type) {
+        if (curMove != null && curMove.getOriginalMove() == CLONE_SPAWN)
+            return;
+        super.queueMove(type);
     }
 
     @Override

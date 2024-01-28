@@ -126,7 +126,7 @@ public interface JEntityTypeRegistry {
     EntityType<GETreeEntity> GE_TREE = Registry.register(
             Registry.ENTITY_TYPE,
             JCraft.id("getree"),
-            FabricEntityTypeBuilder.create(SpawnGroup.MISC, GETreeEntity::new).dimensions(EntityDimensions.fixed(0.6f, 0.8f)).build()
+            FabricEntityTypeBuilder.create(SpawnGroup.MISC, ((EntityType<GETreeEntity> type, World world) -> new GETreeEntity(type, world))).dimensions(EntityDimensions.fixed(0.6f, 0.8f)).build()
     );
     EntityType<GESnakeEntity> GE_SNAKE = Registry.register(
             Registry.ENTITY_TYPE,

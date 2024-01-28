@@ -590,7 +590,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * @param amplifier level of stun
      */
     public static void stun(LivingEntity entity, int duration, int amplifier) {
-        if (entity == null || duration == 0) return;
+        if (entity == null || !entity.isAlive() || duration == 0) return;
         entity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.DAZED, duration, amplifier, false, false, true));
         //JCraft.LOGGER.info("Stunned: " + entity.getEntityName() + " for: " + duration + " with stunType: " + amplifier);
     }
@@ -768,8 +768,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         boolean isRemote = isRemote();
 
         if (!hasUser()) {
-            if (!isFree && !isRemote)
-                discard();
+            if (!client && !isFree && !isRemote) discard();
             return;
         }
 
@@ -1458,12 +1457,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 Use a barrage (or variant thereof) if the opponent is stunned, not blocking, and it's off cooldown,
                 because it's a free combo extender and has a lower windup than light
                  */
-                if (distance < 1.4) {
+                if (distance <= 2) {
                     if (attack.isBarrage() || (attack.isMultiHit() && attack.hasWindupPassed(this))) {
-                        if (enemyStand == null) {
-                            selectedAttack = attack;
-                            break;
-                        } else if (!enemyStand.blocking) {
+                        if (enemyStand == null || !enemyStand.blocking) {
                             selectedAttack = attack;
                             break;
                         }

@@ -1,7 +1,6 @@
 package net.arna.jcraft.common.entity;
 
 import com.mojang.authlib.GameProfile;
-import net.arna.jcraft.common.attack.moves.thefool.SandCloneMove;
 import net.arna.jcraft.common.entity.ai.goal.CloneAttackGoal;
 import net.arna.jcraft.common.util.IOwnable;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
@@ -14,7 +13,9 @@ import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -39,6 +40,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -65,6 +67,7 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
 
     private LivingEntity persistTarget = null;
     private LivingEntity master;
+    private int cooldown, maxCooldown;
     private final EntityNavigation navigation;
     private int disabledSlots;
 
@@ -84,6 +87,8 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
         updateAttackType();
 
         navigation = getNavigation();
+        cooldown = 0;
+        maxCooldown = 10;
 
         this.ignoreCameraFrustum = true; // animation fuckery fix attempt
     }
@@ -151,7 +156,6 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
 
     public void markSand() {
         dataTracker.set(SAND, true);
-        SandCloneMove.applySandCloneModifiers(this);
     }
 
     public byte getPartMask() {
@@ -297,6 +301,16 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
     public void equipStack(EquipmentSlot slot, ItemStack stack) {
         super.equipStack(slot, stack);
         updateAttackType();
+        if (slot == EquipmentSlot.MAINHAND) {
+            double maxCooldown = 10.0;
+            Collection<EntityAttributeModifier> attackSpeedModifiers = getMainHandStack().getAttributeModifiers(EquipmentSlot.MAINHAND).get(EntityAttributes.GENERIC_ATTACK_SPEED);
+            for (EntityAttributeModifier attackSpeedModifier : attackSpeedModifiers)
+                maxCooldown *= -attackSpeedModifier.getValue();
+            if (maxCooldown < 0)
+                maxCooldown = 0;
+
+            this.maxCooldown = (int) maxCooldown;
+        }
     }
 
     @Override
@@ -327,7 +341,9 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
 
             LivingEntity attacker = getAttacker();
             if (attacker != null) setTarget(attacker);
-        } else { // Server & Master isn't null
+        } else { // Serverside, & Master isn't null
+            cooldown--;
+
             if (persistTarget == null) {
                 // Prioritize what the master is attacking, then what is attacking him
                 LivingEntity attacking = master.getAttacking();
@@ -368,6 +384,11 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
         else goalSelector.add(2, this.cloneAttackGoal);
     }
 
+    @Override
+    public boolean damage(DamageSource source, float amount) {
+        return super.damage(source, amount);
+    }
+
     // Ranged attack handling
     public void attack(LivingEntity target, float pullProgress) {
         ItemStack itemStack = this.getArrowType(this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW)));
@@ -391,5 +412,13 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
                 .add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK)
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 2)
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3);
+    }
+
+    public int getCooldown() {
+        return this.cooldown;
+    }
+
+    public void startCooldown() {
+        this.cooldown = maxCooldown;
     }
 }

@@ -6,37 +6,67 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.JCraft.DashData;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.component.StandComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
+import net.arna.jcraft.common.entity.stand.StandType;
+import net.arna.jcraft.common.item.MockItem;
 import net.arna.jcraft.common.util.DimValues;
 import net.arna.jcraft.common.util.EntityInterest;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JDimensionRegistry;
+import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.*;
+import net.minecraft.entity.attribute.EntityAttributeInstance;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.TypeFilter;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+import static net.arna.jcraft.JCraft.ALLOW_MOB_EVOLVED_STANDS;
+import static net.arna.jcraft.JCraft.CHANCE_MOB_SPAWNS_WITH_STAND;
 import static net.arna.jcraft.common.entity.stand.StandEntity.standUserAI;
 import static net.arna.jcraft.common.entity.stand.StandEntity.stun;
+import static net.arna.jcraft.common.util.EntityInterest.blockAttractionInterest;
+import static net.arna.jcraft.common.util.EntityInterest.itemAttractionInterest;
 import static net.arna.jcraft.common.util.JUtils.activeTimestops;
 
-public class JServerTickEvents {
+public class JServerEvents {
+    private static final List<Enchantment> jcraftArmorEnchants = List.of(
+            Enchantments.PROTECTION, Enchantments.PROJECTILE_PROTECTION, Enchantments.BLAST_PROTECTION, Enchantments.FIRE_PROTECTION, Enchantments.UNBREAKING);
+
+    private static final List<List<Item>> equipment = List.of(
+            List.of(Items.AIR, Items.GOLDEN_BOOTS, Items.CHAINMAIL_BOOTS, Items.IRON_BOOTS, Items.DIAMOND_BOOTS, Items.NETHERITE_BOOTS),
+            List.of(Items.AIR, Items.GOLDEN_LEGGINGS, Items.CHAINMAIL_LEGGINGS, Items.IRON_LEGGINGS, Items.DIAMOND_LEGGINGS, Items.NETHERITE_LEGGINGS),
+            List.of(Items.AIR, Items.GOLDEN_CHESTPLATE, Items.CHAINMAIL_CHESTPLATE, Items.IRON_CHESTPLATE, Items.DIAMOND_CHESTPLATE, Items.NETHERITE_CHESTPLATE),
+            List.of(Items.AIR, Items.GOLDEN_HELMET, Items.CHAINMAIL_HELMET, Items.IRON_HELMET, Items.DIAMOND_HELMET, Items.NETHERITE_HELMET)
+    );
+
+
     public static void finishLoading(MinecraftServer server) {
         JCraft.auWorld = server.getWorld(JDimensionRegistry.AU_DIMENSION_KEY);
     }
@@ -283,6 +313,103 @@ public class JServerTickEvents {
             ent.damage(explosion.getDamageSource(), 7);
             StandEntity.stun(ent, 10, 3);
             ent.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0));
+        }
+    }
+
+    public static void entityLoad(Entity entity, ServerWorld world) {
+        // If an item was spawned
+        if (entity instanceof ItemEntity item) {
+            ItemStack stack = item.getStack();
+
+            if (stack.isOf(JObjectRegistry.ANUBIS)) {
+                item.setPickupDelay(0);
+                return;
+            }
+
+            if (stack.isOf(JObjectRegistry.FV_REVOLVER)) {
+                JCraft.markItemOfInterest(item, EntityInterest.itemAttractionInterest(JObjectRegistry.FV_REVOLVER));
+                return;
+            }
+
+            // ... in the AU
+            if (world.getRegistryKey().equals(JDimensionRegistry.AU_DIMENSION_KEY)) {
+                if (item.getThrower() != null || MockItem.isMockItem(stack)) return;
+
+                ItemStack mockStack = MockItem.createMockStack(stack); // Convert it to a mock item (incompatible and useless)
+                if (stack.getItem() instanceof BlockItem) // ... and mark down all relevant data
+                    mockStack.getOrCreateNbt().putIntArray("AttractPos", new int[]{item.getBlockX(), item.getBlockY(), item.getBlockZ()});
+                item.setStack(mockStack);
+            } else { // ... outside the AU
+                if (MockItem.isMockItem(stack)) {
+                    // Mark it as an item of interest, and save relevant data
+                    NbtCompound stackData = stack.getOrCreateNbt();
+                    if (stackData.contains("AttractPos")) { // if attracted to a specific position
+                        String itemId = stackData.getString("MockItem");
+                        int[] attractPos = stackData.getIntArray("AttractPos");
+                        BlockPos attractBlockPos = new BlockPos(attractPos[0], attractPos[1], attractPos[2]);
+                        if ( // ... if the world has the specified block item
+                                Registry.ITEM.getId(
+                                        world.getBlockState(attractBlockPos).getBlock().asItem()
+                                ).toString().equals(itemId)
+                        )
+                            JCraft.markItemOfInterest(item, blockAttractionInterest(attractBlockPos));
+                    } else { // if not attracted to a specific position, it's a general item to attract
+                        JCraft.markItemOfInterest(item, itemAttractionInterest(stack.getItem()));
+                    }
+                }
+            }
+        }
+
+        // If a mob was spawned
+        if (entity instanceof MobEntity mob) {
+            if (mob.age > 0) return;
+
+            StandComponent standData = JComponents.getStandData(mob);
+
+            DefaultedList<ItemStack> handItems = (DefaultedList<ItemStack>) mob.getHandItems(), armorItems = (DefaultedList<ItemStack>) mob.getArmorItems();
+
+            if (standData.getType() != null) return;
+            EntityGroup group = mob.getGroup();
+
+            if (group != EntityGroup.UNDEAD && group != EntityGroup.ILLAGER && !(mob instanceof EndermanEntity)) return;
+            Random random = new Random();
+            GameRules gameRules = world.getGameRules();
+
+            // STAND
+            if (100 - random.nextInt(0, 100) > gameRules.getInt(CHANCE_MOB_SPAWNS_WITH_STAND)) return;
+            List<StandType> types = gameRules.getBoolean(ALLOW_MOB_EVOLVED_STANDS) ? StandType.getAllStandTypes() : StandType.getRegularStandTypes();
+            StandType type = types.get(random.nextInt(types.size()));
+            standData.setType(type);
+
+            // ATTRIBUTES
+            EntityAttributeInstance followRange = mob.getAttributeInstance(EntityAttributes.GENERIC_FOLLOW_RANGE);
+            if (followRange != null) followRange.setBaseValue(128.0);
+            EntityAttributeInstance movementSpeed = mob.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
+            if (movementSpeed != null && movementSpeed.getBaseValue() < 0.3) movementSpeed.setBaseValue(0.3);
+
+            // EQUIPMENT
+            if (world.getServer().getBossBarManager().getAll().stream().anyMatch(bossBar -> bossBar.getName().equals(mob.getDisplayName())))
+                return;
+
+            // Silver chariot users may spawn with Anubis (25% chance)
+            if (type == StandType.SILVER_CHARIOT && random.nextInt(5) == 4)
+                handItems.set(0, new ItemStack(JObjectRegistry.ANUBIS));
+
+            if (random.nextInt(0, 100) >= 90) {
+                handItems.set(1, new ItemStack(JObjectRegistry.STANDARROW));
+                mob.setEquipmentDropChance(EquipmentSlot.OFFHAND, 100f);
+            }
+
+            Enchantment enchantment;
+            ItemStack itemStack;
+            int baseArmorLevel = random.nextInt(1, 6);
+            int enchantsSize = jcraftArmorEnchants.size();
+            for (int i = 0; i < 3; i++) {
+                itemStack = new ItemStack(equipment.get(i).get(baseArmorLevel + random.nextInt(-1, 1)));
+                enchantment = jcraftArmorEnchants.get(random.nextInt(enchantsSize));
+                itemStack.addEnchantment(enchantment, enchantment.getMaxLevel());
+                armorItems.set(i, itemStack);
+            }
         }
     }
 }

@@ -3,6 +3,8 @@ package net.arna.jcraft.common.util;
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.StandEntity;
+import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.network.s2c.JExplosionPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.spec.JSpec;
@@ -29,6 +31,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -56,7 +59,7 @@ public final class JUtils {
     }
 
     public static void addVelocity(Entity entity, double x, double y, double z) {
-        entity.addVelocity(x, y, z);
+        GravityChangerAPI.addWorldVelocity(entity, x, y, z);
         syncVelocityUpdate(entity);
     }
 
@@ -159,6 +162,19 @@ public final class JUtils {
         PlayerLookup.around(serverWorld, pos, radius).forEach(
                 serverPlayer -> serverPlayer.networkHandler.sendPacket(
                         new PlaySoundS2CPacket(sound, SoundCategory.PLAYERS, pos.x, pos.y, pos.z, 1, 1, 0)
+                )
+        );
+    }
+
+    public static BlockHitResult genericBlockRaycast(World world, Entity entity, double range, RaycastContext.ShapeType shapeType, RaycastContext.FluidHandling fluidHandling) {
+        Vec3d eyePos = RotationUtil.vecPlayerToWorld(entity.getEyePos(), GravityChangerAPI.getGravityDirection(entity));
+        return world.raycast(
+                new RaycastContext(
+                        eyePos,
+                        eyePos.add(entity.getRotationVector().multiply(range)),
+                        shapeType,
+                        fluidHandling,
+                        entity
                 )
         );
     }

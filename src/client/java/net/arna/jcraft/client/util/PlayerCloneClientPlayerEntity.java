@@ -1,5 +1,6 @@
 package net.arna.jcraft.client.util;
 
+import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import net.arna.jcraft.client.rendering.CloneSkinTracker;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
@@ -15,13 +16,11 @@ import net.minecraft.util.Arm;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.*;
 
 public class PlayerCloneClientPlayerEntity extends AbstractClientPlayerEntity {
     private static final Set<PlayerCloneClientPlayerEntity> entities = Collections.newSetFromMap(new WeakHashMap<>());
+    private static final GameProfile CLONE_PROFILE = new GameProfile(UUID.nameUUIDFromBytes("jcraft$playerClone".getBytes()), null);
     private final PlayerCloneEntity clone;
 
     static {
@@ -34,7 +33,7 @@ public class PlayerCloneClientPlayerEntity extends AbstractClientPlayerEntity {
     }
 
     public PlayerCloneClientPlayerEntity(PlayerCloneEntity clone) {
-        super(Objects.requireNonNull(MinecraftClient.getInstance().world), clone.getGameProfile(), null);
+        super(Objects.requireNonNull(MinecraftClient.getInstance().world), CLONE_PROFILE, null);
         this.clone = clone;
         entities.add(this);
     }

@@ -2147,7 +2147,33 @@ Whitesnake
 Magician's Red
     >Ankhs now interact with blocks they hit (i.e. unlit campfires, furnaces, wet sponges)
 
+● 28/01/2024
+>Fixed mob clones being able to spawn with stands
 
+D4C
+    >Clones may now come pre-equipped with 4 different items depending on what was pressed while the flag was moving
+
+Gold Experience
+    >Updated Heavy and Rekka 2,3 animations
+    >Bone Meal effect of crouching Heal Others is now aimed from the user
+    >Tree Summon
+        >is now aimable
+        >increased launch speed
+    >Rekka 2
+        >added 1t stun, keeping it +6 on hit
+        >8->9t windup, 8->9t recovery and cancel window
+    >Reduced Rekka 3 damage (7->6)
+
+Gold Experience: Requiem
+    >Bone Meal effect of crouching Heal Others is now aimed from the user
+
+todo:
+remove boss monsters ability to spawn with armor please (and also remove clones from being able to get stands)
+GRAVSHIFT PULSE MUST BEHAVE DIFFERENTLY
+afterimages on ger ctr
+bloodlust indicator
+
+reverse attraction for d4c
 
 priority (top to bottom)
 todo: counters that invalidate hit effects

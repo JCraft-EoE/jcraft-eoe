@@ -6,9 +6,12 @@
 			"animation_length": 1.56,
 			"bones": {
 				"trunk": {
+					"rotation": {
+						"vector": [0, 0, -90]
+					},
 					"position": {
 						"0.0": {
-							"vector": [0, -10, 0]
+							"vector": [10, 0, 0]
 						},
 						"0.36": {
 							"vector": [0, 0, 0],
@@ -322,6 +325,11 @@
 							"easing": "easeInOutSine"
 						}
 					}
+				},
+				"trunk": {
+					"rotation": {
+						"vector": [0, 0, -90]
+					}
 				}
 			}
 		},
@@ -329,6 +337,9 @@
 			"animation_length": 1.36,
 			"bones": {
 				"trunk": {
+					"rotation": {
+						"vector": [0, 0, -90]
+					},
 					"position": {
 						"0.0": {
 							"vector": [0, 0, 0],

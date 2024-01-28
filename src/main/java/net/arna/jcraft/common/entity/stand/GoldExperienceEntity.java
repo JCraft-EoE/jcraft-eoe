@@ -88,14 +88,14 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .withImpactSound(JSoundRegistry.IMPACT_10)
             .withBlockableType(BlockableType.NON_BLOCKABLE)
             .withInfo(Text.literal("Overclock"), Text.literal("slow, unblockable, devastating stun"));
-    public static final RekkaAttack REKKA3 = new RekkaAttack(0, 12, 24, 1f, 7f,
+    public static final RekkaAttack REKKA3 = new RekkaAttack(0, 12, 24, 1f, 6f,
             15, 2f, 0.75f, 0f, 3, 0, null, null)
             .withSound(JSoundRegistry.GE_REKKA3)
             .withLaunch()
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withInfo(Text.literal("Rekka (Final Hit)"), Text.literal("knockdown"));
-    public static final RekkaAttack REKKA2 = new RekkaAttack(0, 10, 18, 1f, 5f,
-            15, 1.75f, 0.5f, 0f, 2, 8, REKKA3, State.REKKA3)
+    public static final RekkaAttack REKKA2 = new RekkaAttack(0, 9, 18, 1f, 5f,
+            16, 1.75f, 0.5f, 0f, 2, 9, REKKA3, State.REKKA3)
             .withSound(JSoundRegistry.GE_REKKA2)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withFollowup(REKKA3)
@@ -230,7 +230,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
         super.tick();
         if (!hasUser()) return;
 
-        if (!world.isClient && curMove == REKKA2 && queuedMove == MoveInputType.SPECIAL2)
+        if (!world.isClient && curMove != null && (curMove.getOriginalMove() == REKKA2 || curMove.getOriginalMove() == REKKA3) && queuedMove == MoveInputType.SPECIAL2)
             queuedMove = null;
     }
 

@@ -5,7 +5,7 @@ import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.config.ConfigOption;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.entity.stand.StandEntity;
-import net.arna.jcraft.common.events.JServerTickEvents;
+import net.arna.jcraft.common.events.JServerEvents;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.item.MockItem;
 import net.arna.jcraft.common.network.c2s.ConfigUpdatePacket;
@@ -74,59 +74,14 @@ public interface JEventsRegistry {
                 }
         );
 
-        ServerEntityEvents.ENTITY_LOAD.register(
-                (entity, world) -> {
-                    // If an item was spawned
-                    if (entity instanceof ItemEntity item) {
-                        ItemStack stack = item.getStack();
-
-                        if (stack.isOf(JObjectRegistry.ANUBIS)) {
-                            item.setPickupDelay(0);
-                            return;
-                        }
-
-                        if (stack.isOf(JObjectRegistry.FV_REVOLVER)) {
-                            JCraft.markItemOfInterest(item, EntityInterest.itemAttractionInterest(JObjectRegistry.FV_REVOLVER));
-                            return;
-                        }
-
-                        // ... in the AU
-                        if (world.getRegistryKey().equals(JDimensionRegistry.AU_DIMENSION_KEY)) {
-                            if (item.getThrower() != null || MockItem.isMockItem(stack)) return;
-
-                            ItemStack mockStack = MockItem.createMockStack(stack); // Convert it to a mock item (incompatible and useless)
-                            if (stack.getItem() instanceof BlockItem) // ... and mark down all relevant data
-                                mockStack.getOrCreateNbt().putIntArray("AttractPos", new int[]{item.getBlockX(), item.getBlockY(), item.getBlockZ()});
-                            item.setStack(mockStack);
-                        } else { // ... outside the AU
-                            if (MockItem.isMockItem(stack)) {
-                                // Mark it as an item of interest, and save relevant data
-                                NbtCompound stackData = stack.getOrCreateNbt();
-                                if (stackData.contains("AttractPos")) { // if attracted to a specific position
-                                    String itemId = stackData.getString("MockItem");
-                                    int[] attractPos = stackData.getIntArray("AttractPos");
-                                    BlockPos attractBlockPos = new BlockPos(attractPos[0], attractPos[1], attractPos[2]);
-                                    if ( // ... if the world has the specified block item
-                                            Registry.ITEM.getId(
-                                                    world.getBlockState(attractBlockPos).getBlock().asItem()
-                                            ).toString().equals(itemId)
-                                    )
-                                        JCraft.markItemOfInterest(item, blockAttractionInterest(attractBlockPos));
-                                } else { // if not attracted to a specific position, it's a general item to attract
-                                    JCraft.markItemOfInterest(item, itemAttractionInterest(stack.getItem()));
-                                }
-                            }
-                        }
-                    }
-                }
-        );
+        ServerEntityEvents.ENTITY_LOAD.register(JServerEvents::entityLoad);
 
         ServerLivingEntityEvents.AFTER_DEATH.register((living, source) -> {
             if (living instanceof ServerPlayerEntity && source.getAttacker() instanceof LivingEntity killer)
                 JComponents.getCooldowns(killer).clear(CooldownType.COMBO_BREAKER);
         });
 
-        ServerTickEvents.END_SERVER_TICK.register(JServerTickEvents::serverTick);
+        ServerTickEvents.END_SERVER_TICK.register(JServerEvents::serverTick);
 
         // Disable item/block usage while stunned
         UseItemCallback.EVENT.register((player, world, hand) -> {
@@ -164,6 +119,6 @@ public interface JEventsRegistry {
                 ConfigUpdatePacket.sendOptionsToClient(handler.getPlayer(), ConfigOption.getImmutableOptions().values()));
 
         ServerLifecycleEvents.SERVER_STARTING.register(JServerConfig::load);
-        ServerLifecycleEvents.SERVER_STARTED.register(JServerTickEvents::finishLoading);
+        ServerLifecycleEvents.SERVER_STARTED.register(JServerEvents::finishLoading);
     }
 }

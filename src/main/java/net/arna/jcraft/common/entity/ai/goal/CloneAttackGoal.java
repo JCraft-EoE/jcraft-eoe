@@ -16,7 +16,6 @@ public class CloneAttackGoal extends Goal {
     private final EntityNavigation cloneNavigation;
     private LivingEntity target;
     private final double speed;
-    private int cooldown;
     private long lastUpdateTime;
 
     public CloneAttackGoal(PlayerCloneEntity mob, double speed) {
@@ -56,7 +55,6 @@ public class CloneAttackGoal extends Goal {
 
     public void start() {
         clone.setAttacking(true);
-        cooldown = 0;
     }
 
     public void stop() {
@@ -76,8 +74,8 @@ public class CloneAttackGoal extends Goal {
         cloneNavigation.startMovingTo(target, speed);
         cloneLookControl.lookAt(target, 30.0F, 30.0F);
         double d = this.getSquaredMaxAttackDistance(target);
-        if (target.squaredDistanceTo(clone) <= d && cooldown-- <= 0) {
-            cooldown = 20;
+        if (target.squaredDistanceTo(clone) <= d && clone.getCooldown() <= 0) {
+            clone.startCooldown();
             clone.swingHand(Hand.MAIN_HAND);
             clone.tryAttack(target);
         }

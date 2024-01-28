@@ -5,6 +5,7 @@ import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Fertilizable;
 import net.minecraft.entity.LivingEntity;
@@ -12,8 +13,11 @@ import net.minecraft.item.BoneMealItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.RaycastContext;
 
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -48,23 +52,27 @@ public class HealMove<A extends IAttacker<? extends A, ?>> extends AbstractSimpl
 
         if (target == HealTarget.TARGETS && attacker.getUserOrThrow().isSneaking()) {
             ServerWorld world = (ServerWorld) user.getWorld();
-            BlockPos blockPos = attacker.getBaseEntity().getBlockPos();
+            BlockHitResult hitResult = JUtils.genericBlockRaycast(world, user, 2, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE);
+            if (hitResult.getType() == HitResult.Type.BLOCK) {
+                BlockPos blockPos = hitResult.getBlockPos();
+                BlockState blockState = world.getBlockState(blockPos);
 
-            BlockState blockState = world.getBlockState(blockPos);
-            boolean fertilized = false;
+                boolean fertilized = false;
 
-            if (blockState.getBlock() instanceof Fertilizable fertilizable) {
-                if (fertilizable.isFertilizable(world, blockPos, blockState, world.isClient))
-                    if (fertilizable.canGrow(world, world.random, blockPos, blockState)) {
-                        fertilizable.grow(world, world.random, blockPos, blockState);
-                        fertilized = true;
-                    }
+                if (blockState.getBlock() instanceof Fertilizable fertilizable) {
+                    if (fertilizable.isFertilizable(world, blockPos, blockState, false))
+                        if (fertilizable.canGrow(world, world.random, blockPos, blockState)) {
+                            for (int i = 0; i < 5; i++)
+                                fertilizable.grow(world, world.random, blockPos, blockState);
+                            fertilized = true;
+                        }
+                }
+
+                if (!fertilized)
+                    BoneMealItem.useOnGround(new ItemStack(Items.AIR), world, blockPos, Direction.DOWN);
+
+                world.syncWorldEvent(1505, blockPos, 0); // Display
             }
-
-            if (!fertilized)
-                BoneMealItem.useOnGround(new ItemStack(Items.AIR), world, blockPos, Direction.DOWN);
-
-            world.syncWorldEvent(1505, blockPos, 0); // Display
         }
 
         return targets;

@@ -3,7 +3,7 @@
 	"minecraft:geometry": [
 		{
 			"description": {
-				"identifier": "geometry.ge",
+				"identifier": "geometry.gold_experience",
 				"texture_width": 128,
 				"texture_height": 128,
 				"visible_bounds_width": 3,
@@ -131,6 +131,7 @@
 						{
 							"origin": [-4, 9, 2.225],
 							"size": [8, 4, 0],
+							"inflate": 0.01,
 							"uv": {
 								"north": {"uv": [39, 30], "uv_size": [8, 4]},
 								"east": {"uv": [0, 0], "uv_size": [0, 4]},
