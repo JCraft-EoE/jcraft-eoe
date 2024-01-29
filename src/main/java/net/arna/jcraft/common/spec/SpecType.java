@@ -16,8 +16,11 @@ public enum SpecType {
     NONE(player -> null, Text.empty(), Text.empty()),
     BRAWLER(BrawlerSpec::new, Text.literal("Close-range pressure and combo extension tool"), Text.literal(
             "Important hitconfirm: (any stand move)~stand.OFF>Combo>stand.ON+(any stand move)")),
-    ANUBIS(AnubisSpec::new, Text.literal("Counterpoking tool"), Text.literal("PASSIVE: Bloodlust - " +
-            "landing blows on opponents speeds up Anubis' attacks up to 2x, with +0.25x per hit"));
+    ANUBIS(AnubisSpec::new, Text.literal("Counterpoking tool"), Text.literal(
+            """
+                    PASSIVE: Bloodlust
+                    landing blows on opponents speeds up Anubis' attacks up to 2x, with +0.2x per hit
+                    not hitting opponents reduces Bloodlust by one stack every 4 seconds"""));
 
     @Getter(lazy = true)
     private static final List<SpecType> allSpecTypes = ImmutableList.copyOf(values());

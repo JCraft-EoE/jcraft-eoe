@@ -32,4 +32,8 @@ public interface MiscComponent extends Component, AutoSyncedComponent, CommonTic
     // Armored Hits
     int getArmoredHitTicks();
     void displayArmoredHit();
+
+    // AnubisSpec
+    float getAttackSpeedMult();
+    void setAttackSpeedMult(float speedMult);
 }

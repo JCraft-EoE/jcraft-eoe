@@ -73,7 +73,7 @@ public class AboutStandCommand {
         for (MoveType type : MoveType.values())
             for (MoveMap.Entry<?, ?> entry : moveMap.getEntries(type)) {
                 // Move itself
-                appendMove(entry, moves, Text.literal("● ").formatted(Formatting.DARK_GREEN), false);
+                appendMove(entry, moves, Text.literal("● ").formatted(Formatting.GREEN), false);
 
                 // Crouching variant
                 if (entry.getCrouchingVariant() != null)
@@ -92,7 +92,7 @@ public class AboutStandCommand {
         return 1;
     }
 
-    private static void appendMove(MoveMap.Entry<?, ?> entry, MutableText moves, MutableText base, boolean isVariant) {
+    public static void appendMove(MoveMap.Entry<?, ?> entry, MutableText moves, MutableText base, boolean isVariant) {
         moves
                 .append(base
                         .append(isVariant ? Text.empty() : Text.empty()

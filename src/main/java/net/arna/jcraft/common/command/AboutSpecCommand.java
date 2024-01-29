@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.arna.jcraft.common.attack.core.MoveMap;
+import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.spec.SpecType;
 import net.arna.jcraft.common.util.JUtils;
@@ -13,6 +14,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+
+import static net.arna.jcraft.common.command.AboutStandCommand.appendMove;
 
 public class AboutSpecCommand {
     private static final Text newLine = Text.literal("\n");
@@ -32,59 +35,44 @@ public class AboutSpecCommand {
             return 0;
         }
 
-        SpecType type = spec.getType();
+        SpecType specType = spec.getType();
         MutableText text = Text.empty();
 
         // Name
         text.append(Text.empty()
                 .append(Text.literal("Name: "))
-                .append(type.getTranslatableName().copy().formatted(Formatting.YELLOW))
+                .append(specType.getTranslatableName().copy().formatted(Formatting.YELLOW))
                 .append(newLine));
 
         // Description
-        text.append(type.getDescription().copy().formatted(Formatting.GREEN));
+        text.append(specType.getDescription().copy().formatted(Formatting.GREEN));
         text.append(Text.empty().append(newLine).append(newLine));
 
-        /*
-        // Pros & Cons
-        readout.append("§3PROS:§r\n");
-        for (String s : stand.pros) {
-            readout.append("§3●§r ").append(s).append("\n");
-        }
-        readout.append("§4CONS:§r\n");
-        for (String s : stand.cons) {
-            readout.append("§4●§r ").append(s).append("\n");
-        }
-
-        readout.append("\n");
-         */
-
         // Attacks
-        text.append(Text.literal("Attacks:").formatted(Formatting.GREEN));
-        for (MoveMap.Entry<?, ?> entry : spec.getMoveMap()) {
-            if (entry.getType() == null) continue; // Some variant of another attack.
+        MutableText moves = Text.empty()
+                .append(Text.literal("MOVES:").formatted(Formatting.DARK_GREEN))
+                .append(Text.literal("\n"));
 
-            appendVariant(text, entry, Formatting.DARK_GREEN, Text.literal("● "));
-            if (entry.getCrouchingVariant() != null)
-                appendVariant(text, entry.getCrouchingVariant(), Formatting.DARK_AQUA, Text.literal("  ●CROUCHING "));
-            if (entry.getAerialVariant() != null)
-                appendVariant(text, entry.getAerialVariant(), Formatting.DARK_RED, Text.literal("  ●AERIAL "));
-        }
+        MoveMap<?, ?> moveMap = spec.getMoveMap();
+        for (MoveType type : MoveType.values())
+            for (MoveMap.Entry<?, ?> entry : moveMap.getEntries(type)) {
+                // Move itself
+                appendMove(entry, moves, Text.literal("● ").formatted(Formatting.GREEN), false);
+
+                // Crouching variant
+                if (entry.getCrouchingVariant() != null)
+                    appendMove(entry.getCrouchingVariant(), moves, Text.literal("  ● CROUCHING ").formatted(Formatting.DARK_AQUA), true);
+
+                // Aerial variant
+                if (entry.getAerialVariant() != null)
+                    appendMove(entry.getAerialVariant(), moves, Text.literal("  ● AERIAL ").formatted(Formatting.GOLD), true);
+            }
+        text.append(moves);
 
         // Details
-        text.append(type.getDetails());
+        text.append(specType.getDetails());
 
         player.sendMessage(text);
         return 1;
-    }
-
-    private static void appendVariant(MutableText base, MoveMap.Entry<?, ?> entry, Formatting color, Text variantName) {
-        base.append(Text.empty()
-                .append(Text.empty().formatted(color)
-                        .append(variantName)
-                        .append(entry.getType() == null ? Text.empty() : entry.getType().getFriendlyName()))
-                .append(entry.getMove().getName().copy().formatted(Formatting.DARK_PURPLE))
-                .append(entry.getMove().getDescription().copy())
-                .append(newLine));
     }
 }

@@ -2,6 +2,7 @@ package net.arna.jcraft.common.spec;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.Getter;
+import lombok.Setter;
 import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
@@ -11,6 +12,7 @@ import net.arna.jcraft.common.attack.moves.shared.KnockdownAttack;
 import net.arna.jcraft.common.attack.moves.shared.KnockdownMultiHitAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleMultiHitAttack;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
@@ -61,19 +63,32 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
             .withInfo(Text.literal("Cleaving Strikes/Sweep"), Text.literal("3 hits, if 0 Bloodlust, last hit knocks down/sweeps while sheathed"));
     public static final KnockdownAttack<AnubisSpec> SWEEP = new KnockdownAttack<AnubisSpec>(220, 10, 17,
             1.5f, 7f, 9, 1.33f, 0.3f, 0f, 35)
+            .withAction(AnubisSpec::resetLastHitTime)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withInfo(Text.literal("Sweep"), Text.empty());
 
+    @Setter
     private int ticksSinceLastHit = 0;
     @Getter
     protected float attackSpeedMult = 1f;
 
     private static void tryIncrementBloodlust(IAttacker<?, ?> attacker, LivingEntity living, MoveContext moveContext, Set<LivingEntity> targets) {
         if (targets.isEmpty()) return;
-        if (living instanceof PlayerEntity player) {
-            AnubisSpec anubisSpec = (AnubisSpec) JUtils.getSpec(player);
-            if (anubisSpec.attackSpeedMult < 2.0f)
-                anubisSpec.attackSpeedMult += 0.25f;
+        if (living instanceof PlayerEntity playerEntity) {
+            AnubisSpec anubisSpec = (AnubisSpec) JUtils.getSpec(playerEntity);
+            anubisSpec.setTicksSinceLastHit(0);
+            if (anubisSpec.attackSpeedMult < 2.0f) {
+                anubisSpec.attackSpeedMult += 0.2f;
+                JComponents.getMiscData(playerEntity).setAttackSpeedMult(anubisSpec.attackSpeedMult);
+            }
+        }
+    }
+
+    private void resetLastHitTime(LivingEntity living, MoveContext moveContext, Set<LivingEntity> targets) {
+        if (targets.isEmpty()) return;
+        if (living instanceof PlayerEntity playerEntity) {
+            AnubisSpec anubisSpec = (AnubisSpec) JUtils.getSpec(playerEntity);
+            anubisSpec.setTicksSinceLastHit(0);
         }
     }
 
@@ -119,9 +134,10 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
     @Override
     public void tickSpec() {
         super.tickSpec();
-        if (++ticksSinceLastHit > 100 && attackSpeedMult > 1f) {
+        if (++ticksSinceLastHit > 80 && attackSpeedMult > 1f) {
             ticksSinceLastHit = 0; // Technically untrue, but all this serves for is counting 5s since last hit then rolling over
-            attackSpeedMult -= 0.25f;
+            attackSpeedMult -= 0.2f;
+            JComponents.getMiscData(player).setAttackSpeedMult(attackSpeedMult);
         }
     }
 

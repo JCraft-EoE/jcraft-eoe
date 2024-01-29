@@ -22,6 +22,7 @@ public interface BombTrackerComponent extends Component, AutoSyncedComponent, Co
             bombEntity = null;
             bombBlock = null;
             bombItem = null;
+            dirty = true;
         }
 
         public @Nullable Vec3d getBombPos() {

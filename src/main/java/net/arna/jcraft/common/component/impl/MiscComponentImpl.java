@@ -29,6 +29,8 @@ public class MiscComponentImpl implements MiscComponent {
     @Getter
     private int hoverTime;
     private boolean prevNoGrav;
+    @Getter
+    private float attackSpeedMult;
 
     public MiscComponentImpl(Entity entity) {
         this.entity = entity;
@@ -94,6 +96,12 @@ public class MiscComponentImpl implements MiscComponent {
     }
 
     @Override
+    public void setAttackSpeedMult(float speedMult) {
+        this.attackSpeedMult = speedMult;
+        sync();
+    }
+
+    @Override
     public void tick() {
         if (damageTimer > 0) damageTimer--;
         if (armoredHitTicks > 0) armoredHitTicks--;
@@ -124,6 +132,7 @@ public class MiscComponentImpl implements MiscComponent {
         MiscComponent.super.writeSyncPacket(buf, recipient);
         buf.writeVarInt(armoredHitTicks);
         buf.writeVarInt(stuckKnifeCount);
+        buf.writeFloat(attackSpeedMult);
     }
 
     @Override
@@ -131,6 +140,7 @@ public class MiscComponentImpl implements MiscComponent {
         MiscComponent.super.applySyncPacket(buf);
         armoredHitTicks = buf.readVarInt();
         stuckKnifeCount = buf.readVarInt();
+        attackSpeedMult = buf.readFloat();
     }
 
     @Override

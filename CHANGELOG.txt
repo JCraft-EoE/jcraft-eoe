@@ -2167,7 +2167,20 @@ Gold Experience
 Gold Experience: Requiem
     >Bone Meal effect of crouching Heal Others is now aimed from the user
 
+● 29/01/2024
+Anubis
+    >Added display for Bloodlust
+    >Bloodlust increment per hit changed (0.25x->0.2x)
+    >Bloodlust reduction (0.25x->0.2x) and interval (5s->4s) changed
+
+Killer Queen
+    >Bomb Plant will now plant bombs on walls if no entities are hit
+
 todo:
+MAKE GRABS GRAB
+kq bomb placement
+trails
+
 remove boss monsters ability to spawn with armor please (and also remove clones from being able to get stands)
 GRAVSHIFT PULSE MUST BEHAVE DIFFERENTLY
 afterimages on ger ctr
