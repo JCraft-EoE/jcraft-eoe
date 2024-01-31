@@ -2176,16 +2176,29 @@ Anubis
 Killer Queen
     >Bomb Plant will now plant bombs on walls if no entities are hit
 
-todo:
-MAKE GRABS GRAB
-kq bomb placement
-trails
+● 31/01/2024
+>Grabs now keep the opponent in front of you, provided you are not trying to push them into a wall
+>Stand user entities with over 100 natural max HP can no longer spawn with armor
 
-remove boss monsters ability to spawn with armor please (and also remove clones from being able to get stands)
+Cream
+    >Half-Ball State
+        >Attacks reach further
+        >Adjusted height
+
+Magician's Red
+    >Life detector can no longer backstab
+
+Gold Experience
+    >Tree hit can no longer backstab
+
+The Fool
+    >Sand Tornado can no longer backstab
+
+todo:
 GRAVSHIFT PULSE MUST BEHAVE DIFFERENTLY
 afterimages on ger ctr
-bloodlust indicator
 
+trails
 reverse attraction for d4c
 
 priority (top to bottom)

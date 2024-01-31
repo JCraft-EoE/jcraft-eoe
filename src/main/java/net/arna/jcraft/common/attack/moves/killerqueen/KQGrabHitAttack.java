@@ -47,7 +47,7 @@ public class KQGrabHitAttack extends AbstractMove<KQGrabHitAttack, KillerQueenEn
             DamageSource damageSource = JDamageSources.stand(attacker);
 
             StandEntity.damageLogic(world, livingEntity, new Vec3d(0, 1, 0), stun, 3, true,
-                    11f, false, 4, damageSource, user);
+                    11f, false, 4, damageSource, user, null);
             livingEntity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0, true, false));
         }
 

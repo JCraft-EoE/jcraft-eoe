@@ -11,8 +11,8 @@ import java.util.Set;
 
 public class D4CGrabAttack extends AbstractGrabAttack<D4CGrabAttack, D4CEntity, D4CEntity.State> {
     public D4CGrabAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun,
-                         float hitboxSize, float knockback, float offset, AbstractMove<?, ? super D4CEntity> hitMove, D4CEntity.State hitState) {
-        super(cooldown, windup, duration, attackDistance, damage, stun, hitboxSize, knockback, offset, hitMove, hitState);
+                         float hitboxSize, float knockback, float offset, AbstractMove<?, ? super D4CEntity> hitMove, D4CEntity.State hitState, int grabDuration, double grabOffset) {
+        super(cooldown, windup, duration, attackDistance, damage, stun, hitboxSize, knockback, offset, hitMove, hitState, grabDuration, grabOffset);
     }
 
     @Override
@@ -32,6 +32,6 @@ public class D4CGrabAttack extends AbstractGrabAttack<D4CGrabAttack, D4CEntity, 
     @Override
     public @NonNull D4CGrabAttack copy() {
         return copyExtras(new D4CGrabAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
-                getStun(), getHitboxSize(), getKnockback(), getOffset(), getHitMove(), getHitState()));
+                getStun(), getHitboxSize(), getKnockback(), getOffset(), getHitMove(), getHitState(), getGrabDuration(), getGrabOffset()));
     }
 }

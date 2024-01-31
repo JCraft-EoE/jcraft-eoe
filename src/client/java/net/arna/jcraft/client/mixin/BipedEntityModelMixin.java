@@ -1,5 +1,8 @@
 package net.arna.jcraft.client.mixin;
 
+import net.arna.jcraft.client.util.JClientUtils;
+import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.component.MiscComponent;
 import net.arna.jcraft.common.entity.stand.*;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JObjectRegistry;
@@ -49,6 +52,13 @@ public abstract class BipedEntityModelMixin<T extends LivingEntity> {
 
     @Inject(method = "setAngles(Lnet/minecraft/entity/LivingEntity;FFFFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/ModelPart;copyTransform(Lnet/minecraft/client/model/ModelPart;)V", shift = At.Shift.BEFORE))
     public void jcraft$setAngles(T livingEntity, float f, float g, float h, float i, float j, CallbackInfo info) {
+        MiscComponent miscComponent = JComponents.getMiscData(livingEntity);
+        long entHitAnimTime = miscComponent.endHitAnimTime();
+        if (entHitAnimTime > 0) {
+            JClientUtils.animateHit(miscComponent.getHitAnimation(), entHitAnimTime, head, hat, body, rightArm, leftArm, rightLeg, leftLeg);
+            return;
+        }
+
         if (livingEntity.isHolding(JObjectRegistry.FV_REVOLVER))
             CrossbowPosing.hold(rightArm, leftArm, head, livingEntity.getMainArm() == Arm.RIGHT);
 

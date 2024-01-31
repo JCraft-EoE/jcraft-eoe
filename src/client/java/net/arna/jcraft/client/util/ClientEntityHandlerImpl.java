@@ -121,7 +121,7 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
                     && !(stand.isRemote() && isFP)
                             && random.nextBoolean() )
                 displayAuraParticles(clientWorld, random, stand, RotationUtil.vecPlayerToWorld(stand.getWidth(), stand.getHeight(), stand.getWidth(), gravity), gravity, auraColor);
-            if ( !isOwnerAndFP && random.nextBoolean() )
+            if ( !isOwnerAndFP && random.nextBoolean() && !JClientUtils.shouldNotRender(user) )
                 displayAuraParticles(clientWorld, random, user, RotationUtil.vecPlayerToWorld(user.getWidth(), user.getHeight(), user.getWidth(), gravity), gravity, auraColor);
         }
     }

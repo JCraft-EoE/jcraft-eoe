@@ -56,7 +56,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
             .withStunType(StunType.UNBURSTABLE)
             .withInfo(Text.literal("Takedown (hit)"), Text.empty());
     public static final GrabAttack<KQBTDEntity, State> GRAB = new GrabAttack<>(300, 12, 28,
-            0.75f, 0f, 20, 1.75f, 0.1f, 0f, GRAB_HIT, State.GRAB_HIT)
+            0.75f, 0f, 20, 1.75f, 0.1f, 0f, GRAB_HIT, State.GRAB_HIT, 31, 1)
             .withInfo(Text.literal("Takedown"), Text.literal("high damage grab"));
 
     public KQBTDEntity(World worldIn) {

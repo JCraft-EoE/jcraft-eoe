@@ -31,6 +31,9 @@ public class MiscComponentImpl implements MiscComponent {
     private boolean prevNoGrav;
     @Getter
     private float attackSpeedMult;
+    @Getter
+    HitAnimation hitAnimation = null;
+    private long endHitAnimTime = 0;
 
     public MiscComponentImpl(Entity entity) {
         this.entity = entity;
@@ -102,6 +105,17 @@ public class MiscComponentImpl implements MiscComponent {
     }
 
     @Override
+    public long endHitAnimTime() {
+        return endHitAnimTime - entity.world.getTime();
+    }
+    @Override
+    public void setHitAnimation(HitAnimation hitAnimation, int duration) {
+        this.hitAnimation = hitAnimation;
+        this.endHitAnimTime = entity.world.getTime() + duration;
+        sync();
+    }
+
+    @Override
     public void tick() {
         if (damageTimer > 0) damageTimer--;
         if (armoredHitTicks > 0) armoredHitTicks--;
@@ -124,7 +138,7 @@ public class MiscComponentImpl implements MiscComponent {
 
     @Override
     public boolean shouldSyncWith(ServerPlayerEntity player) {
-        return player.squaredDistanceTo(entity) <= 1024;
+        return player.squaredDistanceTo(entity) <= 6400;
     }
 
     @Override
@@ -133,6 +147,10 @@ public class MiscComponentImpl implements MiscComponent {
         buf.writeVarInt(armoredHitTicks);
         buf.writeVarInt(stuckKnifeCount);
         buf.writeFloat(attackSpeedMult);
+
+        buf.writeVarLong(endHitAnimTime);
+        if (endHitAnimTime > 0)
+            buf.writeVarInt(hitAnimation.ordinal());
     }
 
     @Override
@@ -141,6 +159,10 @@ public class MiscComponentImpl implements MiscComponent {
         armoredHitTicks = buf.readVarInt();
         stuckKnifeCount = buf.readVarInt();
         attackSpeedMult = buf.readFloat();
+
+        endHitAnimTime = buf.readVarLong();
+        if (endHitAnimTime > 0)
+            hitAnimation = HitAnimation.values()[buf.readVarInt()];
     }
 
     @Override

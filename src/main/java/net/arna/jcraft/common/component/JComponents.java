@@ -24,9 +24,10 @@ public class JComponents implements EntityComponentInitializer {
             ComponentRegistry.getOrCreate(JCraft.id("time_stop"), TimeStopComponent.class);
     public static final ComponentKey<MiscComponent> MISC =
             ComponentRegistry.getOrCreate(JCraft.id("misc"), MiscComponent.class);
-
     public static final ComponentKey<BombTrackerComponent> BOMB_TRACKER =
             ComponentRegistry.getOrCreate(JCraft.id("bomb_tracker"), BombTrackerComponent.class);
+    public static final ComponentKey<GrabComponent> GRAB =
+            ComponentRegistry.getOrCreate(JCraft.id("grab"), GrabComponent.class);
 
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
@@ -49,6 +50,10 @@ public class JComponents implements EntityComponentInitializer {
                 .respawnStrategy(RespawnCopyStrategy.NEVER_COPY)
                 .impl(BombTrackerComponentImpl.class)
                 .end(BombTrackerComponentImpl::new);
+        registry.beginRegistration(Entity.class, GRAB)
+                .respawnStrategy(RespawnCopyStrategy.NEVER_COPY)
+                .impl(GrabComponentImpl.class)
+                .end(GrabComponentImpl::new);
     }
 
     public static StandComponent getStandData(LivingEntity entity) {
@@ -73,5 +78,8 @@ public class JComponents implements EntityComponentInitializer {
 
     public static BombTrackerComponent getBombTracker(LivingEntity entity) {
         return BOMB_TRACKER.get(entity);
+    }
+    public static GrabComponent getGrab(LivingEntity entity) {
+        return GRAB.get(entity);
     }
 }

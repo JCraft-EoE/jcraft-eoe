@@ -8,6 +8,7 @@ import net.arna.jcraft.common.attack.core.HitBoxData;
 import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.StunType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
+import net.arna.jcraft.common.component.MiscComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
@@ -53,6 +54,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
     private boolean overrideStun;
     private boolean lift = true, canBackstab = true;
     private int blockStun = -1;
+    private @Nullable MiscComponent.HitAnimation hitAnimation = null;
     private BlockableType blockableType = BlockableType.BLOCKABLE;
     protected JParticleType hitSpark = JParticleType.HIT_SPARK_1;
 
@@ -195,6 +197,15 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
      */
     public T withBlockableType(@NonNull BlockableType blockableType) {
         this.blockableType = blockableType;
+        return getThis();
+    }
+
+    /**
+     * Sets the hit animation the enemy will perform when hit by this attack.
+     * @return This attack
+     */
+    public T withHitAnimation(@NonNull MiscComponent.HitAnimation hitAnimation) {
+        this.hitAnimation = hitAnimation;
         return getThis();
     }
 
@@ -431,12 +442,12 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
      * @param attacker The attacker that performed this
      * @param target The target to process
      * @param kbVec The knockback vector to pass to {@link StandEntity#damageLogic(World, LivingEntity, Vec3d, int, int,
-     * boolean, float, boolean, int, DamageSource, Entity, boolean, boolean)}
+     * boolean, float, boolean, int, DamageSource, Entity, MiscComponent.HitAnimation, boolean, boolean)}
      * @param damageSource The damage source to apply damage with
      */
     protected void processTarget(A attacker, LivingEntity target, Vec3d kbVec, DamageSource damageSource) {
         StandEntity.damageLogic(attacker.getEntityWorld(), target, kbVec, stun, stunType.ordinal(), overrideStun,
-                damage, lift, getBlockStun(), damageSource, attacker.getUserOrThrow(), canBackstab, blockableType.isNonBlockable());
+                damage, lift, getBlockStun(), damageSource, attacker.getUserOrThrow(), hitAnimation, canBackstab, blockableType.isNonBlockable());
     }
 
     protected Set<LivingEntity> validateTargets(A attacker, Set<LivingEntity> targets) {
@@ -459,6 +470,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
         cast.blockStun = blockStun;
         cast.blockableType = blockableType;
         cast.hitSpark = hitSpark;
+        cast.hitAnimation = hitAnimation;
         return base;
     }
 

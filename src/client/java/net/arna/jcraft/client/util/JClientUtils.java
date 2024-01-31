@@ -1,12 +1,14 @@
 package net.arna.jcraft.client.util;
 
 import net.arna.jcraft.client.model.entity.StandEntityModel;
+import net.arna.jcraft.common.component.MiscComponent;
 import net.arna.jcraft.common.entity.stand.CreamEntity;
 import net.arna.jcraft.common.entity.stand.D4CEntity;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.DimValues;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.model.ModelPart;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
@@ -111,5 +113,17 @@ public class JClientUtils {
         return passenger instanceof KingCrimsonEntity kc && kc.getTETime() > 0 ||
                 passenger instanceof D4CEntity d4c && d4c.getState() == D4CEntity.State.FLAG ||
                 passenger instanceof CreamEntity cream && cream.isHalfBall();
+    }
+
+    public static void animateHit(MiscComponent.HitAnimation hitAnimation, long entHitAnimTime, ModelPart head, ModelPart hat, ModelPart body, ModelPart rightArm, ModelPart leftArm, ModelPart rightLeg, ModelPart leftLeg) {
+        switch (hitAnimation) {
+            case LIGHT_MID -> {
+                head.pitch += entHitAnimTime * 0.017453292F;
+                body.pitch += entHitAnimTime * 0.017453292F;
+            }
+            case LIGHT_LOW -> {
+                throw new UnsupportedOperationException("implement this monkey");
+            }
+        }
     }
 }

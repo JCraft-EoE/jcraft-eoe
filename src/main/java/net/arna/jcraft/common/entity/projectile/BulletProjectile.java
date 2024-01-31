@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.entity.projectile;
 
+import net.arna.jcraft.common.component.MiscComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
@@ -135,7 +136,7 @@ public class BulletProjectile extends PersistentProjectileEntity implements IAni
                 Entity owner = getOwner();
                 LivingEntity target = JUtils.getUserIfStand(living);
                 StandEntity.damageLogic(getWorld(), target, getVelocity().normalize(), stunTicks, 1,
-                        false, damage, true, 4 + damage, DamageSource.thrownProjectile(this, owner), owner);
+                        false, damage, true, 4 + damage, DamageSource.thrownProjectile(this, owner), owner, MiscComponent.HitAnimation.LIGHT_MID);
                 JUtils.serverPlaySound(JSoundRegistry.BULLET_PENETRATE, (ServerWorld) world, getPos(), 32);
                 discard();
             }

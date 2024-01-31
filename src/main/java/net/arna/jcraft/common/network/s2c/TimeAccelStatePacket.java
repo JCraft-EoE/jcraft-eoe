@@ -17,7 +17,6 @@ import net.minecraft.world.World;
 
 import java.util.Map;
 
-// TODO: send packet when new user joins
 // TODO: fix time sync between server and client so it doesn't jump at the end
 
 /**

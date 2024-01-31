@@ -69,7 +69,7 @@ public class DetonateAttack extends AbstractMove<DetonateAttack, AbstractKillerQ
 
         for (LivingEntity living : toExplode) {
             Vec3d kbVec = living.getEyePos().subtract(pos).normalize();
-            StandEntity.damageLogic(stand.world, living, kbVec, 2, 3, true, 11f, false, 4, damageSource, user);
+            StandEntity.damageLogic(stand.world, living, kbVec, 2, 3, true, 11f, false, 4, damageSource, user, null);
             living.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0, true, false));
         }
     }

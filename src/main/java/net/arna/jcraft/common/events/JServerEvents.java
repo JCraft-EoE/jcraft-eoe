@@ -66,7 +66,6 @@ public class JServerEvents {
             List.of(Items.AIR, Items.GOLDEN_HELMET, Items.CHAINMAIL_HELMET, Items.IRON_HELMET, Items.DIAMOND_HELMET, Items.NETHERITE_HELMET)
     );
 
-
     public static void finishLoading(MinecraftServer server) {
         JCraft.auWorld = server.getWorld(JDimensionRegistry.AU_DIMENSION_KEY);
     }
@@ -388,8 +387,7 @@ public class JServerEvents {
             if (movementSpeed != null && movementSpeed.getBaseValue() < 0.3) movementSpeed.setBaseValue(0.3);
 
             // EQUIPMENT
-            if (world.getServer().getBossBarManager().getAll().stream().anyMatch(bossBar -> bossBar.getName().equals(mob.getDisplayName())))
-                return;
+            if (mob.getMaxHealth() > 100.0) return;
 
             // Silver chariot users may spawn with Anubis (25% chance)
             if (type == StandType.SILVER_CHARIOT && random.nextInt(5) == 4)
@@ -404,7 +402,7 @@ public class JServerEvents {
             ItemStack itemStack;
             int baseArmorLevel = random.nextInt(1, 6);
             int enchantsSize = jcraftArmorEnchants.size();
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 4; i++) {
                 itemStack = new ItemStack(equipment.get(i).get(baseArmorLevel + random.nextInt(-1, 1)));
                 enchantment = jcraftArmorEnchants.get(random.nextInt(enchantsSize));
                 itemStack.addEnchantment(enchantment, enchantment.getMaxLevel());

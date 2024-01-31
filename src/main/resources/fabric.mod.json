@@ -77,7 +77,8 @@
       "jcraft:cooldowns",
       "jcraft:time_stop",
       "jcraft:misc",
-      "jcraft:bomb_tracker"
+      "jcraft:bomb_tracker",
+      "jcraft:grab"
     ]
   }
 }

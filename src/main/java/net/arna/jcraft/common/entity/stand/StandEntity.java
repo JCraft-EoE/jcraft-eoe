@@ -15,6 +15,7 @@ import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.component.MiscComponent;
 import net.arna.jcraft.common.entity.GEFrogEntity;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
@@ -920,12 +921,12 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      */
     public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunLevel,
                                    boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source,
-                                   Entity attacker, boolean canBackstab, boolean unblockable) {
+                                   Entity attacker, MiscComponent.HitAnimation hitAnimation, boolean canBackstab, boolean unblockable) {
         if (world == null || world.isClient || ent == null || !ent.canTakeDamage()) return;
         if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && attacker instanceof ServerPlayerEntity playerEntity)
             comboCounterLogic(playerEntity, ent);
 
-        baseDamageLogic(ent, kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, canBackstab, unblockable);
+        baseDamageLogic(ent, kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, hitAnimation, canBackstab, unblockable);
     }
 
     /**
@@ -939,12 +940,12 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * @param damage       damage in half hearts
      * @param lift         will the attack lift the victim upon an aerial hit?
      */
-    public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunLevel, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, boolean canBackstab) {
+    public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunLevel, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, MiscComponent.HitAnimation hitAnimation, boolean canBackstab) {
         if (world == null || world.isClient || ent == null || !ent.canTakeDamage()) return;
         if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && attacker instanceof ServerPlayerEntity playerEntity)
             comboCounterLogic(playerEntity, ent);
 
-        baseDamageLogic(ent, kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, canBackstab, false);
+        baseDamageLogic(ent, kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, hitAnimation, canBackstab, false);
     }
 
     /**
@@ -958,11 +959,11 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * @param damage       damage in half hearts
      * @param lift         will the attack lift the victim upon an aerial hit?
      */
-    public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunLevel, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker) {
+    public static void damageLogic(World world, LivingEntity ent, Vec3d kbVec, int stunTicks, int stunLevel, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, MiscComponent.HitAnimation hitAnimation) {
         if (world == null || world.isClient || ent == null || !ent.canTakeDamage()) return;
         if (world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && attacker instanceof ServerPlayerEntity playerEntity)
             comboCounterLogic(playerEntity, ent);
-        baseDamageLogic(ent, kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, false, false);
+        baseDamageLogic(ent, kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, hitAnimation, false, false);
     }
 
     /**
@@ -996,13 +997,14 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * @param overrideStun will the attack override all other types of stun?
      * @param damage       damage in half hearts
      * @param lift         will the attack lift the victim upon an aerial hit?
+     * @param hitAnimation animation the opponent will do when they are hit
      */
     private static void baseDamageLogic(LivingEntity ent, Vec3d kbVec, int stunTicks, int stunLevel, boolean overrideStun,
                                         float damage, boolean lift, int blockstun, DamageSource source, Entity attacker,
-                                        boolean canBackstab, boolean unblockable) {
+                                        MiscComponent.HitAnimation hitAnimation, boolean canBackstab, boolean unblockable) {
         // If we need more damage reflection later, use an interface.
         if (ent instanceof GEFrogEntity && attacker instanceof LivingEntity living) {
-            baseDamageLogic(living, kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, canBackstab, unblockable);
+            baseDamageLogic(living, kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, hitAnimation, canBackstab, unblockable);
             return;
         }
 
@@ -1062,6 +1064,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 if (overrideStun) ent.removeStatusEffect(JStatusRegistry.DAZED);
 
             stun(ent, stunTicks, stunLevel);
+
+            JComponents.getMiscData(ent).setHitAnimation(hitAnimation, stunTicks);
 
             if (!tsHit)
                 ent.addVelocity(kbVec.x, kbVec.y, kbVec.z);

@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.entity.projectile;
 
+import net.arna.jcraft.common.component.MiscComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.IOwnable;
 import net.arna.jcraft.common.util.JUtils;
@@ -76,7 +77,8 @@ public class LifeDetectorEntity extends JAttackEntity implements IAnimatable {
             if (!canTarget(living)) continue;
             LivingEntity target = JUtils.getUserIfStand(living);
             Vec3d kbVec = target.getPos().subtract(pos).normalize();
-            StandEntity.damageLogic(world, target, kbVec, 10, 1, false, 5f, true, 9, DamageSource.mob(master), master);
+            StandEntity.damageLogic(world, target, kbVec, 10, 1, false, 5f, true, 9,
+                    DamageSource.mob(master), master, MiscComponent.HitAnimation.LIGHT_MID, false);
         }
 
         dataTracker.set(EXPLODED, true);

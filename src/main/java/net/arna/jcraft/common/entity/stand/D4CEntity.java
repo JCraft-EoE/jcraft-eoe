@@ -86,14 +86,13 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             .withFinisher(17, GRAB_HIT_FINAL)
             .withInfo(Text.literal("Grab (Final Hit)"), Text.empty());
     public static final D4CGrabAttack GRAB = new D4CGrabAttack(280, 12, 21, 0.75f,
-            0f, 40, 1.5f, 0f, 0f, GRAB_HIT, State.THROW_HIT)
+            0f, 40, 1.5f, 0f, 0f, GRAB_HIT, State.THROW_HIT, 25, 1)
             .withCrouchingVariant(GIVE_GUN)
             .withSound(JSoundRegistry.D4C_THROW)
             .withInitAction(D4CEntity::equipRevolver)
             .withInfo(Text.literal("Grab"), Text.literal("unblockable, combo finisher"));
     public static final D4CCounterAttack COUNTER = new D4CCounterAttack(400, 5, 35, 0.75f)
             .withInfo(Text.literal("Counter"), Text.literal("0.25s startup, 1.5s duration, high damage, knocks back when hit"));
-    //todo: make them spawn without weapons unless you are crouching
     public static final CloneSpawnMove CLONE_SPAWN = new CloneSpawnMove(400, 40, 50, 1f)
             .withSound(JSoundRegistry.D4C_DIMHOP)
             .withInfo(Text.literal("Dimensional Clone"), Text.literal("""

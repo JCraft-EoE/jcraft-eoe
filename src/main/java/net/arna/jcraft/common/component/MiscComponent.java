@@ -8,6 +8,11 @@ import net.minecraft.util.math.Vec3d;
 import java.util.UUID;
 
 public interface MiscComponent extends Component, AutoSyncedComponent, CommonTickingComponent {
+    enum HitAnimation {
+        LIGHT_MID,
+        LIGHT_LOW
+    }
+
     // General
     Vec3d getDesiredVelocity();
     void updateRemoteInputs(int forward, int sideways, boolean jumping);
@@ -36,4 +41,9 @@ public interface MiscComponent extends Component, AutoSyncedComponent, CommonTic
     // AnubisSpec
     float getAttackSpeedMult();
     void setAttackSpeedMult(float speedMult);
+
+    // Hit Animation
+    long endHitAnimTime();
+    HitAnimation getHitAnimation();
+    void setHitAnimation(HitAnimation hitAnimation, int duration);
 }

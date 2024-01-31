@@ -105,11 +105,11 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             .withSound(JSoundRegistry.CREAM_EXIT)
             .withInfo(Text.literal("Exit Cream"), Text.literal("Cream and its user return from the void"));
     public static final SimpleAttack<CreamEntity> SWIPE = new SimpleAttack<CreamEntity>(20, 7,
-            14, 0.1f, 5f, 20, 2f, 0.75f, 0.2f)
+            14, 0.5f, 5f, 20, 2f, 0.75f, 0.2f)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withInfo(Text.literal("Swipe"), Text.literal("quick air-to-ground poke"));
     public static final KnockdownAttack<CreamEntity> OVERHEAD_SMASH = new KnockdownAttack<CreamEntity>(160,
-            14, 20, 0.1f, 9f, 15, 2f, 1.25f, 0.3f, 35)
+            14, 20, 0.5f, 9f, 15, 2f, 1.25f, 0.3f, 35)
             .withSound(JSoundRegistry.CREAM_SMASH)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withHitSpark(JParticleType.HIT_SPARK_2)
@@ -117,7 +117,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             .withLaunch()
             .withInfo(Text.literal("Overhead Smash"), Text.literal("slow, uninterruptible launcher"));
     public static final SimpleMultiHitAttack<CreamEntity> BALL_COMBO = new SimpleMultiHitAttack<CreamEntity>(200,
-            36, 0.1f, 7f, 15, 2f, 0.1f, 0.3f, IntSet.of(10, 17, 25))
+            36, 0.5f, 7f, 15, 2f, 0.1f, 0.3f, IntSet.of(10, 17, 25))
             .withSound(JSoundRegistry.CREAM_COMBO)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withInfo(Text.literal("Aerial Assault"), Text.literal("less stun than grounded version"));
@@ -256,13 +256,19 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     }
 
     @Override
+    public boolean shouldOffsetHeight() {
+        if (isHalfBall()) return false;
+        return super.shouldOffsetHeight();
+    }
+
+    @Override
     protected Box calculateBoundingBox() {
         double x = getX();
         double y = getY();
         double z = getZ();
 
         if (isHalfBall())
-            return new Box(x - 0.6, y + 0.6, z - 0.6, x + 0.6, y + 2, z + 0.6);
+            return new Box(x - 0.6, y + 0.0, z - 0.6, x + 0.6, y + 1.4, z + 0.6);
         if (getState() == State.SURPRISE)
             return new Box(x - 0.6, y + 0, z - 0.6, x + 0.6, y + 0.3, z + 0.6);
         return super.calculateBoundingBox();

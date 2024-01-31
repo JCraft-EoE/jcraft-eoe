@@ -2,6 +2,7 @@ package net.arna.jcraft.common.util;
 
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
 import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.component.MiscComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
@@ -249,7 +250,7 @@ public final class JUtils {
             LivingEntity target = living;
             if (ent instanceof StandEntity<?, ?> stand)
                 target = stand.getUser();
-            damageLogic(world, target, kb, stunT, stunType, overrideStun, damage, false, blockstun, source, owner);
+            damageLogic(world, target, kb, stunT, stunType, overrideStun, damage, false, blockstun, source, owner, MiscComponent.HitAnimation.LIGHT_MID);
         }
 
         if (ent instanceof EndCrystalEntity endCrystal)

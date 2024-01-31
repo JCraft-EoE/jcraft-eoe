@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
+import net.arna.jcraft.common.component.MiscComponent;
 import net.arna.jcraft.common.entity.stand.MadeInHeavenEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.JUtils;
@@ -77,7 +78,7 @@ public class SpeedSliceAttack extends AbstractMove<SpeedSliceAttack, MadeInHeave
         for (LivingEntity ent : targets) {
             LivingEntity target = JUtils.getUserIfStand(ent);
             StandEntity.damageLogic(world, target, kbVec.multiply(knockback).add(0, knockback / 4, 0),
-                    20, 1, false, damage, true, (int) (4 + damage), playerSource, user);
+                    20, 1, false, damage, true, (int) (4 + damage), playerSource, user, MiscComponent.HitAnimation.LIGHT_MID);
         }
 
         if (attacker.getAccelTime() > 0 && !targets.isEmpty()) attacker.incrementSpeedometer();
