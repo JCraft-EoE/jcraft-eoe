@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.entity.projectile;
 
-import net.arna.jcraft.common.component.MiscComponent;
+import net.arna.jcraft.common.component.HitPropertyComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.IOwnable;
 import net.arna.jcraft.common.util.JUtils;
@@ -176,7 +176,7 @@ public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatab
                     if (target == master || target == this || !JUtils.canDamage(damageSource, target)) continue;
                     hit = true;
                     StandEntity.damageLogic(world, target, getVelocity(), 15, 1, true,
-                            6, false, 11, damageSource, master, MiscComponent.HitAnimation.LIGHT_MID, false);
+                            6, false, 11, damageSource, master, HitPropertyComponent.HitAnimation.MID, false);
                 }
             }
 

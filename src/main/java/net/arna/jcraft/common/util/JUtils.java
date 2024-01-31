@@ -1,8 +1,8 @@
 package net.arna.jcraft.common.util;
 
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
+import net.arna.jcraft.common.component.HitPropertyComponent;
 import net.arna.jcraft.common.component.JComponents;
-import net.arna.jcraft.common.component.MiscComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
@@ -54,6 +54,7 @@ import static net.arna.jcraft.common.entity.stand.StandEntity.damageLogic;
 
 public final class JUtils {
     public static final List<DimValues> activeTimestops = new ArrayList<>();
+    public static final float RAD_TO_DEG = 0.017453292F;
 
     public static Vec3d randUnitVec(Random random) {
         return new Vec3d(random.nextGaussian(), random.nextGaussian(), random.nextGaussian()).normalize();
@@ -250,7 +251,7 @@ public final class JUtils {
             LivingEntity target = living;
             if (ent instanceof StandEntity<?, ?> stand)
                 target = stand.getUser();
-            damageLogic(world, target, kb, stunT, stunType, overrideStun, damage, false, blockstun, source, owner, MiscComponent.HitAnimation.LIGHT_MID);
+            damageLogic(world, target, kb, stunT, stunType, overrideStun, damage, false, blockstun, source, owner, HitPropertyComponent.HitAnimation.MID);
         }
 
         if (ent instanceof EndCrystalEntity endCrystal)

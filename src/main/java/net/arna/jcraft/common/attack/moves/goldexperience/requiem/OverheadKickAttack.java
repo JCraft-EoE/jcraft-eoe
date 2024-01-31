@@ -4,6 +4,7 @@ import lombok.NonNull;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.entity.stand.GEREntity;
 import net.arna.jcraft.common.util.JParticleType;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -21,9 +22,8 @@ public class OverheadKickAttack extends AbstractSimpleAttack<OverheadKickAttack,
     protected void processTarget(GEREntity attacker, LivingEntity target, Vec3d kbVec, DamageSource damageSource) {
         super.processTarget(attacker, target, kbVec, damageSource);
 
-        target.addVelocity(0, -1, 0);
-        target.velocityModified = true;
-        target.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 5, 19, false, false));
+        JUtils.addVelocity(target, 0, -1, 0);
+        target.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 5, 23, false, false));
     }
 
     @Override

@@ -2179,6 +2179,7 @@ Killer Queen
 ● 31/01/2024
 >Grabs now keep the opponent in front of you, provided you are not trying to push them into a wall
 >Stand user entities with over 100 natural max HP can no longer spawn with armor
+>EXPERIMENTAL: added hit animations
 
 Cream
     >Half-Ball State
@@ -2193,6 +2194,9 @@ Gold Experience
 
 The Fool
     >Sand Tornado can no longer backstab
+
+Star Platinum: The World
+    >Barrage stun lowered (2->1.5s)
 
 todo:
 GRAVSHIFT PULSE MUST BEHAVE DIFFERENTLY

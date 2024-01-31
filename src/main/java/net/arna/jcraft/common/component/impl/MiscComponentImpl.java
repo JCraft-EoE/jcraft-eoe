@@ -2,6 +2,7 @@ package net.arna.jcraft.common.component.impl;
 
 import lombok.Getter;
 import lombok.NonNull;
+import net.arna.jcraft.common.component.HitPropertyComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.MiscComponent;
 import net.arna.jcraft.registry.JSoundRegistry;
@@ -11,6 +12,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 
 import java.util.UUID;
 
@@ -31,9 +33,6 @@ public class MiscComponentImpl implements MiscComponent {
     private boolean prevNoGrav;
     @Getter
     private float attackSpeedMult;
-    @Getter
-    HitAnimation hitAnimation = null;
-    private long endHitAnimTime = 0;
 
     public MiscComponentImpl(Entity entity) {
         this.entity = entity;
@@ -105,17 +104,6 @@ public class MiscComponentImpl implements MiscComponent {
     }
 
     @Override
-    public long endHitAnimTime() {
-        return endHitAnimTime - entity.world.getTime();
-    }
-    @Override
-    public void setHitAnimation(HitAnimation hitAnimation, int duration) {
-        this.hitAnimation = hitAnimation;
-        this.endHitAnimTime = entity.world.getTime() + duration;
-        sync();
-    }
-
-    @Override
     public void tick() {
         if (damageTimer > 0) damageTimer--;
         if (armoredHitTicks > 0) armoredHitTicks--;
@@ -147,10 +135,6 @@ public class MiscComponentImpl implements MiscComponent {
         buf.writeVarInt(armoredHitTicks);
         buf.writeVarInt(stuckKnifeCount);
         buf.writeFloat(attackSpeedMult);
-
-        buf.writeVarLong(endHitAnimTime);
-        if (endHitAnimTime > 0)
-            buf.writeVarInt(hitAnimation.ordinal());
     }
 
     @Override
@@ -159,10 +143,6 @@ public class MiscComponentImpl implements MiscComponent {
         armoredHitTicks = buf.readVarInt();
         stuckKnifeCount = buf.readVarInt();
         attackSpeedMult = buf.readFloat();
-
-        endHitAnimTime = buf.readVarLong();
-        if (endHitAnimTime > 0)
-            hitAnimation = HitAnimation.values()[buf.readVarInt()];
     }
 
     @Override

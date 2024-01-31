@@ -29,6 +29,9 @@ public class JComponents implements EntityComponentInitializer {
     public static final ComponentKey<GrabComponent> GRAB =
             ComponentRegistry.getOrCreate(JCraft.id("grab"), GrabComponent.class);
 
+    public static final ComponentKey<HitPropertyComponent> HIT_PROPERTY =
+            ComponentRegistry.getOrCreate(JCraft.id("hit_property"), HitPropertyComponent.class);
+
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
         registry.registerFor(Entity.class, GRAVITY_MODIFIER, GravityComponentImpl::new);
@@ -54,6 +57,10 @@ public class JComponents implements EntityComponentInitializer {
                 .respawnStrategy(RespawnCopyStrategy.NEVER_COPY)
                 .impl(GrabComponentImpl.class)
                 .end(GrabComponentImpl::new);
+        registry.beginRegistration(LivingEntity.class, HIT_PROPERTY)
+                .respawnStrategy(RespawnCopyStrategy.NEVER_COPY)
+                .impl(HitPropertyComponentImpl.class)
+                .end(HitPropertyComponentImpl::new);
     }
 
     public static StandComponent getStandData(LivingEntity entity) {
@@ -81,5 +88,9 @@ public class JComponents implements EntityComponentInitializer {
     }
     public static GrabComponent getGrab(LivingEntity entity) {
         return GRAB.get(entity);
+    }
+
+    public static HitPropertyComponent getHitProperties(LivingEntity livingEntity) {
+        return HIT_PROPERTY.get(livingEntity);
     }
 }

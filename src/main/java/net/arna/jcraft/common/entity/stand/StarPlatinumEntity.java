@@ -7,6 +7,7 @@ import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.attack.moves.starplatinum.ChargeBarrageAttack;
 import net.arna.jcraft.common.attack.moves.starplatinum.InhaleAttack;
+import net.arna.jcraft.common.component.HitPropertyComponent;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -58,6 +59,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
             7, 12, 0.75f, 6f, 8, 1.5f, 0.25f, 0f)
             .withSound(JSoundRegistry.STAR_PLATINUM_KICK)
             .withImpactSound(JSoundRegistry.IMPACT_6)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
             .withInfo(Text.literal("Roundhouse"), Text.literal("fast poke, low stun"));
     public static final ChargeBarrageAttack CHARGE_BARRAGE = new ChargeBarrageAttack(280, 5, 55,
             5f, 0.6f, 20, 1.5f, 0.3f, 0f, 3)

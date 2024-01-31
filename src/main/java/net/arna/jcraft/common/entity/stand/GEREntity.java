@@ -26,6 +26,8 @@ import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static net.arna.jcraft.common.component.HitPropertyComponent.HitAnimation.*;
+
 public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
     public static final SimpleAttack<GEREntity> LIGHT_FOLLOWUP = new SimpleAttack<GEREntity>(
             0, 6, 13, 0.75f, 6f, 8, 1.5f, 1f, -0.1f)
@@ -40,12 +42,14 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             .withFollowup(LIGHT_FOLLOWUP)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(0, -1, 1)
+            .withHitAnimation(HIGH)
             .withInfo(Text.literal("Downward Kick"), Text.literal("medium stun combo starter, low hitbox, low blockstun"));
     public static final OverheadKickAttack OVERHEAD_KICK = new OverheadKickAttack(140, 14, 24,
             1f, 9f, 40, 1.5f, 0.8f, 0.25f)
             .withSound(JSoundRegistry.GER_HEAVY)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(0, -1, 1)
+            .withHitAnimation(CRUSH)
             .withInfo(Text.literal("Overhead Kick"), Text.literal("slow, high stun combo starter"));
     public static final SimpleAttack<GEREntity> KICK_BARRAGE_FINISHER = new SimpleAttack<GEREntity>(0,
             6, 9, 1f, 1f, 10, 1.75f, 1.1f, 0f)

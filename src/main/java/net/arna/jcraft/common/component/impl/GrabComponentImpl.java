@@ -1,7 +1,9 @@
-package net.arna.jcraft.common.component;
+package net.arna.jcraft.common.component.impl;
 
 import lombok.Getter;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.component.GrabComponent;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.minecraft.entity.Entity;

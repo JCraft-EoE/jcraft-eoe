@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.entity.projectile;
 
-import net.arna.jcraft.common.component.MiscComponent;
+import net.arna.jcraft.common.component.HitPropertyComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.Entity;
@@ -50,7 +50,7 @@ public class GETreeEntity extends JAttackEntity implements IAnimatable, IAnimati
                 LivingEntity target = JUtils.getUserIfStand(living);
                 if (master != target)
                     StandEntity.damageLogic(world, target, Vec3d.ZERO, 25, 3,
-                            false, 7f, false, 11, ds, master, MiscComponent.HitAnimation.LIGHT_MID, false);
+                            false, 7f, false, 11, ds, master, HitPropertyComponent.HitAnimation.MID, false);
                 JUtils.addVelocity(target, launchVec.x, launchVec.y, launchVec.z);
             }
         }

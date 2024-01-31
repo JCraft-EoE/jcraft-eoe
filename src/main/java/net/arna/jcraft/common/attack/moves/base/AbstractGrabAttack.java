@@ -37,6 +37,7 @@ public abstract class AbstractGrabAttack<T extends AbstractGrabAttack<T, A, S>, 
         this.hitState = hitState;
         this.grabDuration = grabDuration;
         this.grabOffset = grabOffset;
+        withHitAnimation(null);
 
         // Grabs cannot be burst out of, or blocked
         withStunType(StunType.UNBURSTABLE);

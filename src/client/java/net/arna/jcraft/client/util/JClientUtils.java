@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.util;
 
 import net.arna.jcraft.client.model.entity.StandEntityModel;
-import net.arna.jcraft.common.component.MiscComponent;
+import net.arna.jcraft.common.component.HitPropertyComponent;
 import net.arna.jcraft.common.entity.stand.CreamEntity;
 import net.arna.jcraft.common.entity.stand.D4CEntity;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
@@ -19,6 +19,7 @@ import software.bernie.geckolib3.core.processor.IBone;
 import java.util.ArrayList;
 import java.util.List;
 
+import static net.arna.jcraft.common.util.JUtils.RAD_TO_DEG;
 import static net.arna.jcraft.common.util.JUtils.deltaPos;
 
 public class JClientUtils {
@@ -115,14 +116,99 @@ public class JClientUtils {
                 passenger instanceof CreamEntity cream && cream.isHalfBall();
     }
 
-    public static void animateHit(MiscComponent.HitAnimation hitAnimation, long entHitAnimTime, ModelPart head, ModelPart hat, ModelPart body, ModelPart rightArm, ModelPart leftArm, ModelPart rightLeg, ModelPart leftLeg) {
+    public static void animateHit(HitPropertyComponent.HitAnimation hitAnimation, long endHitAnimTime, Vec3d randomRotation, ModelPart head, ModelPart hat, ModelPart body, ModelPart rightArm, ModelPart leftArm, ModelPart rightLeg, ModelPart leftLeg) {
+        if (endHitAnimTime > 20L)
+            endHitAnimTime = 20L;
+        float angDegrees = endHitAnimTime * RAD_TO_DEG;
+
+        if (endHitAnimTime <= 1) {
+            leftLeg.resetTransform();
+            rightLeg.resetTransform();
+        } else {
+            body.yaw = (float) (randomRotation.x * angDegrees * 0.35);
+            body.roll = (float) (randomRotation.z * angDegrees * 0.35);
+        }
+
+        if (endHitAnimTime == 0) // If dead
+            return;
+
         switch (hitAnimation) {
-            case LIGHT_MID -> {
-                head.pitch += entHitAnimTime * 0.017453292F;
-                body.pitch += entHitAnimTime * 0.017453292F;
+            case HIGH -> {
+                head.pitch += angDegrees;
+
+                body.pitch -= angDegrees;
+
+                leftLeg.pivotZ -= endHitAnimTime * 0.25F;
+                rightLeg.pivotZ -= endHitAnimTime * 0.25F;
+
+                rightArm.roll += angDegrees;
+                leftArm.roll -= angDegrees;
             }
-            case LIGHT_LOW -> {
-                throw new UnsupportedOperationException("implement this monkey");
+            case MID -> {
+                head.pitch += angDegrees;
+
+                body.pitch += angDegrees;
+
+                leftLeg.pivotZ += endHitAnimTime * 0.25F;
+                rightLeg.pivotZ += endHitAnimTime * 0.25F;
+                leftLeg.pivotY -= endHitAnimTime * 0.175F;
+                rightLeg.pivotY -= endHitAnimTime * 0.175F;
+
+                rightLeg.pitch -= angDegrees;
+                leftLeg.pitch -= angDegrees;
+            }
+            case LOW -> {
+                head.pitch += angDegrees;
+
+                body.pitch += angDegrees;
+
+                leftLeg.pivotZ += endHitAnimTime * 0.25F;
+                rightLeg.pivotZ += endHitAnimTime * 0.25F;
+                leftLeg.pivotY -= endHitAnimTime * 0.175F;
+                rightLeg.pivotY -= endHitAnimTime * 0.175F;
+
+                rightLeg.pitch += angDegrees;
+                leftLeg.pitch += angDegrees;
+
+                rightArm.roll += angDegrees;
+                leftArm.roll -= angDegrees;
+            }
+            case CRUSH -> {
+                body.pitch += angDegrees;
+
+                leftLeg.pivotZ += endHitAnimTime * 0.25F;
+                rightLeg.pivotZ += endHitAnimTime * 0.25F;
+                leftLeg.pivotY -= endHitAnimTime * 0.175F;
+                rightLeg.pivotY -= endHitAnimTime * 0.175F;
+
+                angDegrees *= 1.75F;
+
+                head.pitch += MathHelper.sin(endHitAnimTime * 0.1F);
+
+                rightArm.roll += angDegrees;
+                leftArm.roll -= angDegrees;
+                rightLeg.pitch -= angDegrees;
+                leftLeg.pitch -= angDegrees;
+            }
+            case LAUNCH -> {
+                //angDegrees *= 4.0F;
+
+                head.pitch += angDegrees;
+
+                body.pitch += angDegrees;
+
+                leftLeg.pivotZ += endHitAnimTime * 0.125F;
+                rightLeg.pivotZ += endHitAnimTime * 0.125F;
+                leftLeg.pivotY -= endHitAnimTime * 0.125F;
+                rightLeg.pivotY -= endHitAnimTime * 0.125F;
+
+                rightArm.roll += angDegrees;
+                leftArm.roll -= angDegrees;
+                rightLeg.pitch -= angDegrees;
+                leftLeg.pitch -= angDegrees;
+            }
+            case ROLL -> {
+
             }
         }
     }

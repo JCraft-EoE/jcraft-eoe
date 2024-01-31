@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.component.MiscComponent;
+import net.arna.jcraft.common.component.HitPropertyComponent;
 import net.arna.jcraft.common.util.IOwnable;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
@@ -202,7 +202,7 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                         for (LivingEntity l : hurtAll) {
                             LivingEntity target = JUtils.getUserIfStand(l);
                             damageLogic(world, target, getVelocity(), rockStun, 1, false, 6f,
-                                    true, 10, damageSource, owner, MiscComponent.HitAnimation.LIGHT_MID);
+                                    true, 10, damageSource, owner, HitPropertyComponent.HitAnimation.MID);
                         }
                         Transform();
                         JCraft.createParticle((ServerWorld) this.world,
@@ -227,11 +227,11 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                         if (isCharged()) for (LivingEntity l : hurt) {
                             LivingEntity target = JUtils.getUserIfStand(l);
                             target.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 60, 0, false, true));
-                            damageLogic(world, target, Vec3d.ZERO, 15, 1, false, 3f, true, 7, damageSource, owner, MiscComponent.HitAnimation.LIGHT_MID);
+                            damageLogic(world, target, Vec3d.ZERO, 15, 1, false, 3f, true, 7, damageSource, owner, HitPropertyComponent.HitAnimation.MID);
                         }
                         else for (LivingEntity l : hurt) {
                             LivingEntity target = JUtils.getUserIfStand(l);
-                            damageLogic(world, target, Vec3d.ZERO, 15, 1, false, 3f, true, 7, damageSource, owner, MiscComponent.HitAnimation.LIGHT_MID);
+                            damageLogic(world, target, Vec3d.ZERO, 15, 1, false, 3f, true, 7, damageSource, owner, HitPropertyComponent.HitAnimation.MID);
                         }
                     }
                 }

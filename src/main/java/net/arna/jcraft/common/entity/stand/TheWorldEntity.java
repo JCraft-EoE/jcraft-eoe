@@ -7,6 +7,7 @@ import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.attack.moves.theworld.FeignBarrageCounterAttack;
 import net.arna.jcraft.common.attack.moves.theworld.TWDonutAttack;
+import net.arna.jcraft.common.component.HitPropertyComponent;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
@@ -24,6 +25,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
     public static final SimpleAttack<TheWorldEntity> LOW_KICK = new SimpleAttack<TheWorldEntity>(30, 8, 14, 0.75f, 6f, 17, 1.5f, 0.2f, 0.85f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(0, 0, 1)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
             .withInfo(Text.literal("Low Kick"), Text.literal("slower, higher stun, low hitbox"));
     public static final SimpleAttack<TheWorldEntity> LIGHT_FOLLOWUP = new SimpleAttack<TheWorldEntity>(
             0, 7, 11, 0.75f, 6f, 8, 1.5f, 1f, 0)
@@ -62,7 +64,6 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
             .withSound(JSoundRegistry.TW_DONUT)
             .withImpactSound(JSoundRegistry.TW_DONUT_HIT)
             .withExtraHitBox(1.5)
-            .withLaunch()
             .withHyperArmor()
             .withLaunch()
             .withInfo(Text.literal("Donut"), Text.literal("slow, uninterruptible combo starter/extender, 1.5s stun on whiff"));

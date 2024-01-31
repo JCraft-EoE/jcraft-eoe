@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.entity.projectile;
 
-import net.arna.jcraft.common.component.MiscComponent;
+import net.arna.jcraft.common.component.HitPropertyComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.IOwnable;
 import net.arna.jcraft.common.util.JUtils;
@@ -109,7 +109,7 @@ public class SandTornadoEntity extends LivingEntity implements IAnimatable, IOwn
                     LivingEntity target = JUtils.getUserIfStand(living);
                     if (target.isConnectedThroughVehicle(master)) return;
                     StandEntity.damageLogic(world, target, circulation, 10, 1, false, 2f, true, 6,
-                            DamageSource.mob(master), master, MiscComponent.HitAnimation.LIGHT_MID, false);
+                            DamageSource.mob(master), master, HitPropertyComponent.HitAnimation.MID, false);
                 }
                 hitsLeft--;
             }

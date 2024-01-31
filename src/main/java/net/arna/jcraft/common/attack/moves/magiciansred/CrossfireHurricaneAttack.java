@@ -5,7 +5,7 @@ import net.arna.jcraft.common.attack.core.ctx.IntMoveVariable;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.core.ctx.MoveVariable;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
-import net.arna.jcraft.common.component.MiscComponent;
+import net.arna.jcraft.common.component.HitPropertyComponent;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.stand.MagiciansRedEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
@@ -78,7 +78,7 @@ public class CrossfireHurricaneAttack extends AbstractMove<CrossfireHurricaneAtt
             LivingEntity target = JUtils.getUserIfStand(living);
             if (hurricaneTime > 1) {
                 StandEntity.damageLogic(world, target, new Vec3d(Math.sin(stand.age / 10.0) * 3, 0.0, Math.cos(stand.age / 10.0) * 3),
-                        10, 1, false, 0.5f, true, 5, JDamageSources.stand(stand), user, MiscComponent.HitAnimation.LIGHT_MID);
+                        10, 1, false, 0.5f, true, 5, JDamageSources.stand(stand), user, HitPropertyComponent.HitAnimation.MID);
                 if (hurricaneTime > 15)
                     ctx.setInt(HURRICANE_TIME, 15); // Allows for zoning up until it hits something
             } else target.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 20, 0));

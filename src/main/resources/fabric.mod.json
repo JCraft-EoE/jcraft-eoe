@@ -78,7 +78,8 @@
       "jcraft:time_stop",
       "jcraft:misc",
       "jcraft:bomb_tracker",
-      "jcraft:grab"
+      "jcraft:grab",
+      "jcraft:hit_property"
     ]
   }
 }

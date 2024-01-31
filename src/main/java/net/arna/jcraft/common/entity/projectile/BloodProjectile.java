@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.entity.projectile;
 
-import net.arna.jcraft.common.component.MiscComponent;
+import net.arna.jcraft.common.component.HitPropertyComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.minecraft.entity.Entity;
@@ -55,7 +55,7 @@ public class BloodProjectile extends PersistentProjectileEntity implements IAnim
             if (entity instanceof StandEntity<?, ?> stand && stand.hasUser())
                 target = stand.getUserOrThrow();
             damageLogic(world, target, Vec3d.ZERO, 10, 1, false, 2f,
-                    false, 6, DamageSource.thrownProjectile(this, owner), owner, MiscComponent.HitAnimation.LIGHT_MID);
+                    false, 6, DamageSource.thrownProjectile(this, owner), owner, HitPropertyComponent.HitAnimation.MID);
             target.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 60, 0, false, true));
             discard();
         }

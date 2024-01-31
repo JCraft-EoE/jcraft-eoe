@@ -8,6 +8,7 @@ import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.moves.kingcrimson.*;
 import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.component.CooldownsComponent;
+import net.arna.jcraft.common.component.HitPropertyComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
@@ -81,6 +82,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             .withSound(JSoundRegistry.KC_HEAVY)
             .withImpactSound(JSoundRegistry.IMPACT_9)
             .withExtraHitBox(0, 0.5, 1)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
             .withInfo(Text.literal("Vertical Chop"), Text.literal("medium windup combo starter, has a true followup in the form of a slow, armored knockdown"));
     public static final BloodThrowAttack BLOOD_THROW = new BloodThrowAttack(260, 10, 15, 1f)
             .withInfo(Text.literal("Blood Throw"), Text.literal("throws a stunning, blinding blood projectile, crouch while it comes out for higher speed"));
@@ -92,6 +94,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             .withImpactSound(JSoundRegistry.IMPACT_9)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withExtraHitBox(0, 0.5, 1)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
             .withInfo(Text.literal("Eye Chop"), Text.literal("blindness on hit, donut combo extender"));
     public static final KCDonutAttack DONUT = new KCDonutAttack(260, 30, 48, 1f,
             14f, 60, 1.75f, 0f, 0.1f)

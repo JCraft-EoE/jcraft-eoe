@@ -8,7 +8,7 @@ import net.arna.jcraft.common.attack.core.HitBoxData;
 import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.StunType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
-import net.arna.jcraft.common.component.MiscComponent;
+import net.arna.jcraft.common.component.HitPropertyComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
@@ -54,9 +54,9 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
     private boolean overrideStun;
     private boolean lift = true, canBackstab = true;
     private int blockStun = -1;
-    private @Nullable MiscComponent.HitAnimation hitAnimation = null;
+    private @Nullable HitPropertyComponent.HitAnimation hitAnimation = HitPropertyComponent.HitAnimation.MID;
     private BlockableType blockableType = BlockableType.BLOCKABLE;
-    protected JParticleType hitSpark = JParticleType.HIT_SPARK_1;
+    protected @Nullable JParticleType hitSpark = JParticleType.HIT_SPARK_1;
 
     protected AbstractSimpleAttack(int cooldown, int windup, int duration, float moveDistance, float damage,
                                    int stun, float hitboxSize, float knockback, float offset) {
@@ -204,7 +204,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
      * Sets the hit animation the enemy will perform when hit by this attack.
      * @return This attack
      */
-    public T withHitAnimation(@NonNull MiscComponent.HitAnimation hitAnimation) {
+    public T withHitAnimation(HitPropertyComponent.HitAnimation hitAnimation) {
         this.hitAnimation = hitAnimation;
         return getThis();
     }
@@ -249,6 +249,8 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
     public T withLaunch() {
         stunType = StunType.LAUNCH;
         overrideStun = true;
+        // EXPERIMENTAL
+        hitAnimation = HitPropertyComponent.HitAnimation.LAUNCH;
         return getThis();
     }
 
@@ -442,7 +444,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
      * @param attacker The attacker that performed this
      * @param target The target to process
      * @param kbVec The knockback vector to pass to {@link StandEntity#damageLogic(World, LivingEntity, Vec3d, int, int,
-     * boolean, float, boolean, int, DamageSource, Entity, MiscComponent.HitAnimation, boolean, boolean)}
+     * boolean, float, boolean, int, DamageSource, Entity, HitPropertyComponent.HitAnimation, boolean, boolean)}
      * @param damageSource The damage source to apply damage with
      */
     protected void processTarget(A attacker, LivingEntity target, Vec3d kbVec, DamageSource damageSource) {
