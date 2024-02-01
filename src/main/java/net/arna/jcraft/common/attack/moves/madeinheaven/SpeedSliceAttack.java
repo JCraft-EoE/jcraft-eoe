@@ -41,10 +41,10 @@ public class SpeedSliceAttack extends AbstractMove<SpeedSliceAttack, MadeInHeave
     @Override
     public @NonNull Set<LivingEntity> perform(MadeInHeavenEntity attacker, LivingEntity user, MoveContext ctx) {
         return doSpeedSlice(attacker, user.getEyePos(), user.getEyePos().add(user.getRotationVector().multiply(8)),
-                getDamage(), getKnockback(),getHitboxSize());
+                getDamage(), getKnockback(),getHitboxSize(), 20, 1);
     }
 
-    public static Set<LivingEntity> doSpeedSlice(MadeInHeavenEntity attacker, Vec3d start, Vec3d end, float damage, float knockback, float size) {
+    public static Set<LivingEntity> doSpeedSlice(MadeInHeavenEntity attacker, Vec3d start, Vec3d end, float damage, float knockback, float size, int stunTicks, int stunType) {
         World world = attacker.getWorld();
         LivingEntity user = attacker.getUserOrThrow();
         HitResult hitResult = world.raycast(new RaycastContext(start, end, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user));
@@ -78,7 +78,7 @@ public class SpeedSliceAttack extends AbstractMove<SpeedSliceAttack, MadeInHeave
         for (LivingEntity ent : targets) {
             LivingEntity target = JUtils.getUserIfStand(ent);
             StandEntity.damageLogic(world, target, kbVec.multiply(knockback).add(0, knockback / 4, 0),
-                    20, 1, false, damage, true, (int) (4 + damage), playerSource, user, HitPropertyComponent.HitAnimation.MID);
+                    stunTicks, stunType, false, damage, true, (int) (4 + damage), playerSource, user, HitPropertyComponent.HitAnimation.MID);
         }
 
         if (attacker.getAccelTime() > 0 && !targets.isEmpty()) attacker.incrementSpeedometer();

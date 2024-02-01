@@ -11,6 +11,7 @@ import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.cream.*;
 import net.arna.jcraft.common.attack.moves.shared.*;
+import net.arna.jcraft.common.component.HitPropertyComponent;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -46,6 +47,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public static final EffectInflictingAttack<CreamEntity> BITE = new EffectInflictingAttack<CreamEntity>(30,
             9, 15, 0.75f, 5f, 20, 1.75f, 0.75f, 0.3f,
             List.of(new StatusEffectInstance(StatusEffects.SLOWNESS, 40, 1)))
+            .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
             .withInfo(Text.literal("Bite"), Text.literal("applies Slowness II (2s) on hit"));
     public static final SimpleAttack<CreamEntity> LIGHT_FOLLOWUP = new SimpleAttack<CreamEntity>(
             0, 7, 14, 0.75f, 6, 8, 1.75f, 1.1f, -0.1f)
@@ -67,6 +69,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHyperArmor()
+            .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
             .withInfo(Text.literal("Vertical Chop"), Text.literal("slow, uninterruptible combo starter"));
     public static final CreamComboAttack COMBO = new CreamComboAttack(280, 36, 0.75f,
             5f, 20, 2f, 0.1f, 0f, IntSet.of(10, 17, 25))
@@ -107,6 +110,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public static final SimpleAttack<CreamEntity> SWIPE = new SimpleAttack<CreamEntity>(20, 7,
             14, 0.5f, 5f, 20, 2f, 0.75f, 0.2f)
             .withImpactSound(JSoundRegistry.IMPACT_3)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
             .withInfo(Text.literal("Swipe"), Text.literal("quick air-to-ground poke"));
     public static final KnockdownAttack<CreamEntity> OVERHEAD_SMASH = new KnockdownAttack<CreamEntity>(160,
             14, 20, 0.5f, 9f, 15, 2f, 1.25f, 0.3f, 35)
@@ -120,6 +124,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             36, 0.5f, 7f, 15, 2f, 0.1f, 0.3f, IntSet.of(10, 17, 25))
             .withSound(JSoundRegistry.CREAM_COMBO)
             .withImpactSound(JSoundRegistry.IMPACT_3)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
             .withInfo(Text.literal("Aerial Assault"), Text.literal("less stun than grounded version"));
     public static final BallChargeAttack BALL_CHARGE = new BallChargeAttack(300, 13, 28, 1f)
             .withSound(JSoundRegistry.CREAM_BALLDASH)

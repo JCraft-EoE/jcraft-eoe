@@ -2198,6 +2198,29 @@ The Fool
 Star Platinum: The World
     >Barrage stun lowered (2->1.5s)
 
+● 01/02/2024
+>Fixed dashing in different gravities
+>Fixed
+>AI Stand Users now block a lot more when fighting standless opponents
+
+Barrages
+    >Blockstun universally reduced (4/5->3t)
+
+Star Platinum
+    >Inhale
+        >Fixed hitboxes not rendering
+        >Can now be aimed in 3D provided the stand is not detached
+
+King Crimson
+    >Donut now launches, stuns far less
+    >Eye Chop blockstun reduced (13->4t)
+
+Made in Heaven
+    >Fixed being able to combo extend out of Divine Severance
+
+Gold Experience: Requiem
+    >Updated model
+
 todo:
 GRAVSHIFT PULSE MUST BEHAVE DIFFERENTLY
 afterimages on ger ctr

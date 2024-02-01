@@ -9,6 +9,7 @@ import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.attack.moves.theworld.overheaven.*;
+import net.arna.jcraft.common.component.HitPropertyComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.util.JParticleType;
@@ -68,19 +69,21 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withSound(JSoundRegistry.TWOH_HEAVY)
             .withImpactSound(JSoundRegistry.IMPACT_12)
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
             .withInfo(Text.literal("Singularity"), Text.literal("block bypass, low stun, medium windup"));
     public static final SmiteAttack AIR_SMITE = new SmiteAttack(300, 10, 20, 1f,
             6f, 21, 3f, 0f, 0f, true)
             .withSound(JSoundRegistry.TWOH_SMITE)
             .withBlockStun(13)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
             .withInfo(Text.literal("You won't run away!"), Text.literal("summons a weaker lightning bolt at the aimed position"));
     public static final SmiteAttack SMITE = new SmiteAttack(300, 10, 20, 1f,
             8f, 21, 3f, 0f, 0f, false)
             .withAerialVariant(AIR_SMITE)
             .withSound(JSoundRegistry.TWOH_SMITE)
             .withBlockStun(13)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
             .withInfo(Text.literal("Evaporate"), Text.literal("summons a powerful lightning bolt that deals high damage and stun"));
-    //todo: delay twoh smite until TS ends
     public static final OverwriteAttack OVERWRITE = new OverwriteAttack(0, 7, 23, 1f,
             0f, 40, 2f, 1f, 0f)
             .withSound(JSoundRegistry.TWOH_OVERWRITE)

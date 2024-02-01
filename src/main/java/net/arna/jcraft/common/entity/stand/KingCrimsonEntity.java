@@ -94,15 +94,17 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             .withImpactSound(JSoundRegistry.IMPACT_9)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withExtraHitBox(0, 0.5, 1)
+            .withBlockStun(4)
             .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
-            .withInfo(Text.literal("Eye Chop"), Text.literal("blindness on hit, donut combo extender"));
+            .withInfo(Text.literal("Eye Chop"), Text.literal("blindness on hit, combo starter, low blockstun"));
     public static final KCDonutAttack DONUT = new KCDonutAttack(260, 30, 48, 1f,
-            14f, 60, 1.75f, 0f, 0.1f)
+            14f, 10, 1.75f, 1.5f, 0.1f)
             .withSound(JSoundRegistry.KC_DONUT)
             .withImpactSound(JSoundRegistry.IMPACT_7)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHyperArmor()
-            .withInfo(Text.literal("Donut"), Text.literal("long windup, 3s stun"));
+            .withLaunch()
+            .withInfo(Text.literal("Donut"), Text.literal("slow, uninterruptable, extremely damaging launcher"));
     public static final EpitaphAttack EPITAPH = new EpitaphAttack(480, 4, 34, -1f)
             .withInfo(Text.literal("Epitaph"), Text.literal("0.2s windup, 1.5s counter, combo starter"));
     public static final PredictionMove PREDICTION = new PredictionMove(600, 4, 104, -1f)

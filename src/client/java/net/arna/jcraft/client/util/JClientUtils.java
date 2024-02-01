@@ -9,6 +9,7 @@ import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.DimValues;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.model.ModelPart;
+import net.minecraft.client.model.ModelTransform;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
@@ -116,6 +117,13 @@ public class JClientUtils {
                 passenger instanceof CreamEntity cream && cream.isHalfBall();
     }
 
+    public static void resetPartAngles(ModelPart part) {
+        ModelTransform defaultTransform = part.getDefaultTransform();
+        part.pitch = defaultTransform.pitch;
+        part.yaw = defaultTransform.yaw;
+        part.roll = defaultTransform.roll;
+    }
+
     public static void animateHit(HitPropertyComponent.HitAnimation hitAnimation, long endHitAnimTime, Vec3d randomRotation, ModelPart head, ModelPart hat, ModelPart body, ModelPart rightArm, ModelPart leftArm, ModelPart rightLeg, ModelPart leftLeg) {
         if (endHitAnimTime > 20L)
             endHitAnimTime = 20L;
@@ -124,6 +132,7 @@ public class JClientUtils {
         if (endHitAnimTime <= 1) {
             leftLeg.resetTransform();
             rightLeg.resetTransform();
+            resetPartAngles(body);
         } else {
             body.yaw = (float) (randomRotation.x * angDegrees * 0.35);
             body.roll = (float) (randomRotation.z * angDegrees * 0.35);
@@ -162,10 +171,10 @@ public class JClientUtils {
 
                 body.pitch += angDegrees;
 
-                leftLeg.pivotZ += endHitAnimTime * 0.25F;
-                rightLeg.pivotZ += endHitAnimTime * 0.25F;
-                leftLeg.pivotY -= endHitAnimTime * 0.175F;
-                rightLeg.pivotY -= endHitAnimTime * 0.175F;
+                leftLeg.pivotZ += endHitAnimTime * 0.175F;
+                rightLeg.pivotZ += endHitAnimTime * 0.175F;
+                leftLeg.pivotY -= endHitAnimTime * 0.0875F;
+                rightLeg.pivotY -= endHitAnimTime * 0.0875F;
 
                 rightLeg.pitch += angDegrees;
                 leftLeg.pitch += angDegrees;

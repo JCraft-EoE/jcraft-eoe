@@ -13,6 +13,7 @@ import net.arna.jcraft.common.attack.moves.whitesnake.ChargedSpewAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.MeltYourHeartAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.PilotModeMove;
 import net.arna.jcraft.common.attack.moves.whitesnake.PoisonSpewAttack;
+import net.arna.jcraft.common.component.HitPropertyComponent;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
@@ -51,6 +52,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withSound(JSoundRegistry.WS_DONUT)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
             .withInfo(Text.literal("Gut Punch"), Text.literal("combo starter/extender"));
     public static final MainBarrageAttack<WhiteSnakeEntity> BARRAGE = new MainBarrageAttack<WhiteSnakeEntity>(
             240, 0, 60, 0.75f, 1, 20, 2, 0.25f, 0, 3, Blocks.OAK_PLANKS.getHardness())
@@ -65,12 +67,14 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHyperArmor()
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
             .withInfo(Text.literal("Stand Disk"), Text.literal("uninterruptible & unblockable, removes enemy stand for 8s"));
     public static final SimpleAttack<WhiteSnakeEntity> LEG_CRUSHER = new SimpleAttack<WhiteSnakeEntity>(
             240, 16, 22, 0.75f, 7, 32, 1.75f, 0.25f, 0.2f)
             .withSound(JSoundRegistry.WS_LEGCRUSH)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
             .withInfo(Text.literal("Leg Crusher"), Text.literal("high stun, medium windup"));
     public static final EffectInflictingAttack<WhiteSnakeEntity> MEMORY_DISC = new EffectInflictingAttack<WhiteSnakeEntity>(
             280, 22, 34, 1, 7f, 20, 2, 0, 0,
@@ -83,6 +87,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHyperArmor()
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
             .withInfo(Text.literal("Memory Disk"), Text.literal("uninterruptible& unblockable, gives mining fatigue & weakness for 30s"));
     public static final ChargedSpewAttack CHARGED_SPEW = new ChargedSpewAttack(
             200, 20, 26, 0.75f, 0f, 0, 2f, 0f, 0f)

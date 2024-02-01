@@ -1219,6 +1219,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             CooldownsComponent cooldowns = JComponents.getCooldowns(mob);
             if (cooldowns.getCooldown(CooldownType.DASH) > 0) // Careful approach
                 wantToBlock = distance > 2 && distance < 5; // Block at range <2, 5>
+            else
+                wantToBlock = false;
         }
 
         // If none was found, try to find a spec attack
@@ -1265,7 +1267,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         //JCraft.LOGGER.info("Want to block: " + wantToBlock);
         stand.wantToBlock = wantToBlock;
-        stand.blocking = wantToBlock && stand.canAttack();
+        if (wantToBlock)
+            stand.blocking = stand.canAttack() && !JCraft.isDashing(mob);
+        else
+            stand.blocking = false;
 
         StatusEffectInstance mobStun = mob.getStatusEffect(JStatusRegistry.DAZED);
         // If stunned, and about to get hit by another move, combo break sometimes

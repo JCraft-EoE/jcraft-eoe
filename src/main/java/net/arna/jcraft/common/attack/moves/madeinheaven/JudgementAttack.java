@@ -33,14 +33,14 @@ public class JudgementAttack extends AbstractBarrageAttack<JudgementAttack, Made
                         initPos.add(initRot.multiply(random.nextTriangular(2, 2))),
                         initPos.add(random.nextTriangular(0, 5), random.nextTriangular(0, 5),
                                 random.nextTriangular(0, 5)),
-                        1f, 0.1f, 1.75f);
+                        1f, 0.1f, 1.75f, 20, 1);
             } else {
                 ctx.set(INIT_POS, user.getPos());
                 ctx.set(INIT_ROT, Vec3d.fromPolar(0, user.getYaw()));
             }
         } else targets = SpeedSliceAttack.doSpeedSlice(attacker,
                 initPos.subtract(user.getRotationVector().multiply(3)),
-                initPos.add(initRot.multiply(10)), 6, 3, 2f);
+                initPos.add(initRot.multiply(10)), 6, 3, 2f, 5, 3);
 
         return targets;
     }

@@ -33,6 +33,7 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset);
         barrage = true;
         this.interval = interval;
+        this.withBlockStun(3);
         this.withStunType(StunType.WINDED);
     }
 

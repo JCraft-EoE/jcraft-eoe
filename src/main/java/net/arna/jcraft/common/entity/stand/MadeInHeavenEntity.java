@@ -11,6 +11,7 @@ import net.arna.jcraft.common.attack.moves.shared.EffectInflictingAttack;
 import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.component.CooldownsComponent;
+import net.arna.jcraft.common.component.HitPropertyComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.util.CooldownType;
@@ -47,6 +48,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             List.of(new StatusEffectInstance(JStatusRegistry.BLEEDING, 80, 1, true, false, true)))
             .withImpactSound(SoundEvents.ITEM_TRIDENT_HIT)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
             .withInfo(Text.literal("Speed Chop"), Text.literal("tiny stun, procs bleed"));
     public static final SimpleAttack<MadeInHeavenEntity> LIGHT_FOLLOWUP = new SimpleAttack<MadeInHeavenEntity>(
             0, 6, 12, 0.75f, 5, 8, 1.5f, 1f, -0.1f)
@@ -88,12 +90,14 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .withSound(JSoundRegistry.MIH_LEGCRUSHER)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withExtraHitBox(0, -0.5, 1)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
             .withInfo(Text.literal("Leg Crusher"), Text.literal("combo starter/extender, mih hoofs the enemies legs in a quick, stunning attack"));
     public static final FuryChopAttack FURY_CHOP = new FuryChopAttack(200, 15, 24, 0.85f,
             7f, 20, 1.6f, 0.25f, 0.2f)
             .withSound(JSoundRegistry.MIH_FURYCHOP)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
             .withInfo(Text.literal("Fury Chop"), Text.literal("combo extender, on hit gives haste(8s) to user and mining fatigue(8s) to victim, on whiff the fatigue goes to user"));
     public static final SimpleAttack<MadeInHeavenEntity> DONUT = new SimpleAttack<MadeInHeavenEntity>(200,
             26, 32, 0.75f, 8.5f, 40, 2f, 0f, 0.2f)
@@ -103,6 +107,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .withHyperArmor()
             .withBlockStun(4)
             .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
             .withInfo(Text.literal("Roundabout Donut"), Text.literal("feigns stand desummon, uninterruptible combo starter"));
     public static final TimeAccelerationMove TIME_ACCELERATION = new TimeAccelerationMove(1400, 20,
             40, 1f, JServerConfig.MIH_TIME_ACCELERATION_DURATION::getValue)

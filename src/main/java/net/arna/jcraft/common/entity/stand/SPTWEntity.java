@@ -67,6 +67,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .withImpactSound(JSoundRegistry.IMPACT_6)
             .withLaunch()
             .withHyperArmor()
+            .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
             .withInfo(Text.literal("What an ugly watch (Hit)"), Text.empty());
     public static final GrabAttack<SPTWEntity, State> GRAB = new GrabAttack<>(280, 8, 20,
             1f, 2f, 20, 1.5f, 0.1f, 0f, GRAB_HIT, State.GRAB_HIT)

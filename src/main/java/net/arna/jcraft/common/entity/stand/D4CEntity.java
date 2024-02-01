@@ -13,6 +13,7 @@ import net.arna.jcraft.common.attack.moves.dirtydeedsdonedirtcheap.*;
 import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleMultiHitAttack;
+import net.arna.jcraft.common.component.HitPropertyComponent;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JDimensionRegistry;
@@ -47,6 +48,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(ITEM_PLACE)
             .withImpactSound(JSoundRegistry.IMPACT_2)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
             .withInfo(Text.literal("Chop"), Text.literal("relatively quick combo starter"));
     public static final MainBarrageAttack<D4CEntity> BARRAGE = new MainBarrageAttack<D4CEntity>(240, 0, 70,
             0.75f, 0.8f, 30, 2f, 0.25f, 0f, 3, Blocks.DEEPSLATE.getHardness())

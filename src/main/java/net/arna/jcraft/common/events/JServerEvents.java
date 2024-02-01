@@ -367,6 +367,7 @@ public class JServerEvents {
 
             DefaultedList<ItemStack> handItems = (DefaultedList<ItemStack>) mob.getHandItems(), armorItems = (DefaultedList<ItemStack>) mob.getArmorItems();
 
+            //todo: fix ents with no stand getting a new one after reloading
             if (standData.getType() != null) return;
             EntityGroup group = mob.getGroup();
 
