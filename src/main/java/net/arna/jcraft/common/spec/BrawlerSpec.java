@@ -33,6 +33,7 @@ public class BrawlerSpec extends JSpec<BrawlerSpec, BrawlerSpec.State> {
     public static final KnockdownAttack<BrawlerSpec> SWEEP = new KnockdownAttack<BrawlerSpec>(200, 11, 18,
             1f, 5f, 16, 1.5f, 0.6f, 0.65f, 25)
             .withImpactSound(JSoundRegistry.IMPACT_2)
+            .withStaticY()
             .withInfo(Text.literal("SWEEP"), Text.literal("knocks down"));
 
     public BrawlerSpec(PlayerEntity player) {

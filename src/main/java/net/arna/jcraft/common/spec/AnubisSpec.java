@@ -65,6 +65,7 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
             1.5f, 7f, 9, 1.33f, 0.3f, 0f, 35)
             .withAction(AnubisSpec::resetLastHitTime)
             .withImpactSound(JSoundRegistry.IMPACT_3)
+            .withStaticY()
             .withInfo(Text.literal("Sweep"), Text.empty());
 
     @Setter

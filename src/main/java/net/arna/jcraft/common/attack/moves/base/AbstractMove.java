@@ -10,6 +10,7 @@ import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.MobilityType;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
@@ -33,6 +34,10 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     private int cooldown, windup;
     private int duration;
     private float moveDistance;
+    /**
+     * This move's assigned animation
+     */
+    @Getter
     private Enum<?> animation;
     @NonNull
     private Text name = Text.empty(), description = Text.empty();
@@ -326,7 +331,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     }
 
     /**
-     * Called when this move is cancelled. Does nothing by default.
+     * Called when this move is canceled. Does nothing by default.
      */
     public void onCancel(A attacker) {}
 
@@ -431,13 +436,6 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         Vec3d upVec = GravityChangerAPI.getEyeOffset(attacker.getUserOrThrow());
         Vec3d heightOffset = upVec.multiply(0.5);
         return attacker.getBaseEntity().getPos().add(heightOffset);
-    }
-
-    /**
-     * @return This moves assigned animation
-     */
-    public Enum<?> getAnimation() {
-        return animation;
     }
 
     /**

@@ -20,6 +20,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
@@ -54,6 +55,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
     private boolean overrideStun;
     private boolean lift = true, canBackstab = true;
     private int blockStun = -1;
+    private boolean staticY;
     private @Nullable HitPropertyComponent.HitAnimation hitAnimation = HitPropertyComponent.HitAnimation.MID;
     private BlockableType blockableType = BlockableType.BLOCKABLE;
     protected @Nullable JParticleType hitSpark = JParticleType.HIT_SPARK_1;
@@ -181,11 +183,26 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
      * Sets the stun applied to the user when this attack is performed on a target that is blocking.
      * A positive value implies that the default calculation of {@code damage + 4} should be overridden
      * by the value passed here.
-     * @param blockStun The amount of ticks to stun for
+     * @param blockStun The number of ticks to stun for
      * @return This attack
      */
     public T withBlockStun(int blockStun) {
         this.blockStun = blockStun;
+        return getThis();
+    }
+
+    /**
+     * Sets whether the user's pitch should influence the positioning of hitboxes.
+     * If {@code false}, the hitbox will be moved up or down depending on the user's pitch,
+     * otherwise, the y-position (or whatever it is, depending on the gravity) will be static.
+     * @return This attack
+     */
+    public T withStaticY() {
+        return withStaticY(true);
+    }
+
+    public T withStaticY(boolean staticHeight) {
+        this.staticY = staticHeight;
         return getThis();
     }
 
@@ -335,7 +352,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
     /**
      * Finds all valid targets that can be damaged with the given damage source
      * by the given attacker, contained in the given boxes.
-     * Also maps all attackers found to their user. I.e. redirecting damage done to stands to their users.
+     * Also maps all attackers found to their user. I.e., redirecting damage done to stands to their users.
      * @param attacker The attacker that will be doing the damage
      * @param boxes The boxes to check in
      * @param damageSource The damage source to check for
@@ -360,6 +377,11 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
         Vec3d upVec = GravityChangerAPI.getEyeOffset(user);
         Vec3d hPos = getOffsetHeightPos(attacker);
         Vec3d rotVec = getRotVec(attacker);
+
+        if (staticY) {
+            Direction gravDir = GravityChangerAPI.getGravityDirection(attacker.getBaseEntity());
+            rotVec = rotVec.withAxis(gravDir.getAxis(), 0);
+        }
 
         Vec3d fPos = getOffsetForwardPos(attacker, hPos, upVec, rotVec);
 
@@ -470,6 +492,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
         cast.lift = lift;
         cast.canBackstab = canBackstab;
         cast.blockStun = blockStun;
+        cast.staticY = staticY;
         cast.blockableType = blockableType;
         cast.hitSpark = hitSpark;
         cast.hitAnimation = hitAnimation;
