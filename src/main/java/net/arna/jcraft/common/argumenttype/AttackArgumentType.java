@@ -23,8 +23,8 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor(staticName = "attack")
 public class AttackArgumentType implements ArgumentType<MoveType> {
     private static final SimpleCommandExceptionType NOT_FOUND = new SimpleCommandExceptionType(Text.literal("That attack type does not exist"));
-    private static final Map<String, MoveType> suggestions = Arrays.stream(MoveType.values()).collect(ImmutableMap.toImmutableMap(Enum::toString, type -> type));
-    @Getter
+    private static final Map<String, MoveType> suggestions = Arrays.stream(MoveType.values()).collect(
+            ImmutableMap.toImmutableMap(type -> type.name().toLowerCase(), type -> type));
     private final Collection<String> examples = ImmutableList.of("LIGHT", "BARRAGE", "UTILITY");
 
     @Override
