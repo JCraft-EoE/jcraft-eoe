@@ -1535,6 +1535,12 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         return age;
     }
 
+    @Override
+    public boolean isSilent() {
+        // Make stands silent if their users are.
+        return super.isSilent() || (user != null && user.isSilent());
+    }
+
     /**
      * Needed because the super constructor invokes some things that need this.
      * Meaning we can't use a constructor parameter.
