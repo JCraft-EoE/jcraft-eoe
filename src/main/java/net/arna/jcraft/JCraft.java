@@ -45,6 +45,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.GameRules;
@@ -272,7 +273,14 @@ public class JCraft implements ModInitializer {
             dashSpeed *= 0.75; // Backwards speed nerf
         }
 
-        Vec3d dashDir = RotationUtil.vecPlayerToWorld( rotVec, GravityChangerAPI.getGravityDirection(entity) ); //todo: fix diagonal dashes while in custom gravity
+        Direction gravDir = GravityChangerAPI.getGravityDirection(entity);
+        Direction.Axis gravAxis = gravDir.getAxis();
+        Vec3d dashDir = RotationUtil.vecPlayerToWorld(rotVec, gravDir); //todo: fix diagonal dashes while in custom gravity
+
+        // Fix dashing up and down being inverted when gravity is sideways.
+        if (gravAxis != Direction.Axis.Y)
+            dashDir = dashDir.withAxis(gravAxis, -dashDir.getComponentAlongAxis(gravAxis));
+
         dashes.put(entity, new DashData(dashDir.normalize().multiply(dashSpeed), entity));
 
         // Syncs dash anim (unless already attacking with a spec) with every player in the vicinity
