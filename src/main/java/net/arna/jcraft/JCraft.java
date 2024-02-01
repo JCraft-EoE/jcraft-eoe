@@ -275,7 +275,7 @@ public class JCraft implements ModInitializer {
 
         Direction gravDir = GravityChangerAPI.getGravityDirection(entity);
         Direction.Axis gravAxis = gravDir.getAxis();
-        Vec3d dashDir = RotationUtil.vecPlayerToWorld(rotVec, gravDir); //todo: fix diagonal dashes while in custom gravity
+        Vec3d dashDir = RotationUtil.vecPlayerToWorld(rotVec, gravDir);
 
         // Fix dashing up and down being inverted when gravity is sideways.
         if (gravAxis != Direction.Axis.Y)
