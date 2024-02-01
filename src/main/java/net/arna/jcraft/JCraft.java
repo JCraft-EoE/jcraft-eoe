@@ -262,7 +262,9 @@ public class JCraft implements ModInitializer {
         cooldowns.setCooldown(CooldownType.DASH, dashCooldown);
 
         double dashSpeed = 0.75;
-        Vec3d rotVec = entity.getRotationVector().rotateY(1.57079632679f * side); // L/R
+        Vec3d rotVec = Vec3d.fromPolar(entity.getPitch(), entity.getYaw());
+        rotVec = rotVec.rotateY(1.57079632679f * side); // L/R
+
         if (side != 0) {
             dashSpeed *= 0.75; // Sideways speed nerf
             if (forward == 1)
@@ -273,15 +275,7 @@ public class JCraft implements ModInitializer {
             dashSpeed *= 0.75; // Backwards speed nerf
         }
 
-        Direction gravDir = GravityChangerAPI.getGravityDirection(entity);
-        Direction.Axis gravAxis = gravDir.getAxis();
-        Vec3d dashDir = RotationUtil.vecPlayerToWorld(rotVec, gravDir);
-
-        // Fix dashing up and down being inverted when gravity is sideways.
-        if (gravAxis != Direction.Axis.Y)
-            dashDir = dashDir.withAxis(gravAxis, -dashDir.getComponentAlongAxis(gravAxis));
-
-        dashes.put(entity, new DashData(dashDir.normalize().multiply(dashSpeed), entity));
+        dashes.put(entity, new DashData(rotVec.normalize().multiply(dashSpeed), entity));
 
         // Syncs dash anim (unless already attacking with a spec) with every player in the vicinity
         if (entity instanceof ServerPlayerEntity player) {
