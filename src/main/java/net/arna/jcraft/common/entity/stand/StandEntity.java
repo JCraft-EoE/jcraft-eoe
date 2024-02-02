@@ -1146,7 +1146,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     @Override
     public boolean damage(DamageSource source, float amount) {
-        if (user == null || source.getAttacker() == user || user.isInvulnerableTo(source) || source.isFallingBlock()) return false;
+        if (user == null || source.getAttacker() == user || user.isInvulnerableTo(source) || source.isFallingBlock() || source == DamageSource.DROWN) return false;
 
         if (source.isMagic() || source.isExplosive()) // AoE effects have damage nerfed
             amount /= 2.0F;
@@ -1160,8 +1160,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     // Physical properties
     @Override
-    public void pushAwayFrom(Entity entity) {
-    }
+    public void pushAwayFrom(Entity entity) {}
 
     @Override
     public boolean collidesWith(Entity other) {
@@ -1215,12 +1214,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 blockPlusTicks = enemyMoveStun;
 
             distance = enemyStand.distanceTo(mob);
-        } else { // Blocking logic against standless opponents
-            CooldownsComponent cooldowns = JComponents.getCooldowns(mob);
-            if (cooldowns.getCooldown(CooldownType.DASH) > 0) // Careful approach
-                wantToBlock = distance > 2 && distance < 5; // Block at range <2, 5>
-            else
-                wantToBlock = false;
         }
 
         // If none was found, try to find a spec attack
@@ -1245,6 +1238,14 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                     enemyAttack.getMoveDistance() + simpleEnemyAttack.getHitboxSize() * 0.66 > distance &&
                     simpleEnemyAttack.getDamage() * 2 < stand.getStandGauge() && !simpleEnemyAttack.getBlockableType().isNonBlockable())
                 wantToBlock = true;
+        } else wantToBlock = false;
+
+        if (!enemyHasStand) { // Blocking logic against standless opponents
+            CooldownsComponent cooldowns = JComponents.getCooldowns(mob);
+            if (cooldowns.getCooldown(CooldownType.DASH) > 0) // Careful approach
+                wantToBlock = distance > 2 && distance < 5; // Block at range <2, 5>
+            else
+                wantToBlock = false;
         }
 
         // Block if falling or there are projectiles nearby

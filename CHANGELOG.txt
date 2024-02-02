@@ -2223,6 +2223,7 @@ Gold Experience: Requiem
 
 ● 02/02/2024
 >Added NONE stand type, which disables entities from automatically gaining one upon being reloaded
+>Stands can no longer take drowning damage
 
 Whitesnake
     >Can now give stands to standless entities, provided the user has a disk in their offhand
