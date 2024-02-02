@@ -51,6 +51,7 @@ public class DazedStatusEffect extends StatusEffect {
 
         entity.setVelocity(eVel.x * horizontalMult, yVel, eVel.z * horizontalMult);
 
+        if (amplifier == 2) return; // Blockstun should not disable targetting
         if (!(entity instanceof MobEntity mob)) return;
         mob.setTarget(null);
         mob.setAttacking(false);

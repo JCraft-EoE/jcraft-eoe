@@ -1,16 +1,13 @@
 package net.arna.jcraft.registry;
 
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.config.ConfigOption;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.events.JServerEvents;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
-import net.arna.jcraft.common.item.MockItem;
 import net.arna.jcraft.common.network.c2s.ConfigUpdatePacket;
 import net.arna.jcraft.common.util.CooldownType;
-import net.arna.jcraft.common.util.EntityInterest;
 import net.arna.jcraft.common.util.JUtils;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
@@ -22,22 +19,14 @@ import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.registry.Registry;
-
-import static net.arna.jcraft.common.util.EntityInterest.blockAttractionInterest;
-import static net.arna.jcraft.common.util.EntityInterest.itemAttractionInterest;
 
 public interface JEventsRegistry {
     static void registerEvents() {

@@ -6,7 +6,6 @@ import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.entity.projectile.GETreeEntity;
 import net.arna.jcraft.common.entity.stand.GoldExperienceEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
-import net.arna.jcraft.common.gravity.util.Gravity;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.registry.JEntityTypeRegistry;

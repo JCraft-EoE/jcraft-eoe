@@ -3,7 +3,7 @@
 	"minecraft:geometry": [
 		{
 			"description": {
-				"identifier": "geometry.whitesnake",
+				"identifier": "geometry.white_snake",
 				"texture_width": 64,
 				"texture_height": 64,
 				"visible_bounds_width": 4,
@@ -228,6 +228,12 @@
 					]
 				},
 				{
+					"name": "bipedHandRight",
+					"parent": "lowerRight",
+					"pivot": [-5, 12, -1],
+					"rotation": [90, 0, -180]
+				},
+				{
 					"name": "armLeft",
 					"parent": "upperBody",
 					"pivot": [5.25, 23.4, 0],
@@ -291,6 +297,11 @@
 							}
 						}
 					]
+				},
+				{
+					"name": "bipedHandLeft",
+					"parent": "lowerLeft",
+					"pivot": [5, 12, -1]
 				},
 				{
 					"name": "legRight",

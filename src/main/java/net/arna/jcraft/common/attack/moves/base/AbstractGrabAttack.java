@@ -10,7 +10,6 @@ import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.math.Vec3d;
 
 import java.util.Set;
 

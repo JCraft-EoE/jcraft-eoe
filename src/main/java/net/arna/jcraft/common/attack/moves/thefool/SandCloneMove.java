@@ -5,7 +5,9 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.core.ctx.MoveVariable;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
+import net.arna.jcraft.common.entity.stand.StandType;
 import net.arna.jcraft.common.entity.stand.TheFoolEntity;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -125,6 +127,7 @@ public class SandCloneMove extends AbstractMove<SandCloneMove, TheFoolEntity> {
         if (sandClone != null) sandClone.kill();
         ctx.set(SAND_CLONE, clone);
         if (clone == null) return;
+        JComponents.getStandData(clone).setType(StandType.NONE);
         applySandCloneModifiers(clone);
     }
 

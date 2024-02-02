@@ -2200,7 +2200,7 @@ Star Platinum: The World
 
 ● 01/02/2024
 >Fixed dashing in different gravities
->Fixed
+>Fixed stand positioning in different gravities
 >AI Stand Users now block a lot more when fighting standless opponents
 
 Barrages
@@ -2220,6 +2220,13 @@ Made in Heaven
 
 Gold Experience: Requiem
     >Updated model
+
+● 02/02/2024
+>Added NONE stand type, which disables entities from automatically gaining one upon being reloaded
+
+Whitesnake
+    >Can now give stands to standless entities, provided the user has a disk in their offhand
+    >Can now jump while attacking in remote mode
 
 todo:
 GRAVSHIFT PULSE MUST BEHAVE DIFFERENTLY

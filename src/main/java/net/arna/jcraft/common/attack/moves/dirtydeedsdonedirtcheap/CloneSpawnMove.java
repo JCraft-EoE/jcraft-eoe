@@ -5,8 +5,10 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.core.ctx.MoveVariable;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.entity.stand.D4CEntity;
+import net.arna.jcraft.common.entity.stand.StandType;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -57,6 +59,7 @@ public class CloneSpawnMove extends AbstractMove<CloneSpawnMove, D4CEntity> {
 
             attacker.getWorld().spawnEntity(clone);
             clone.equipStack(EquipmentSlot.MAINHAND, weapon);
+            JComponents.getStandData(clone).setType(StandType.NONE);
         } else if (user instanceof MobEntity mob) { //Code sourced from MobEntity.class convertTo()
             EntityType<?> entityType = mob.getType();
             MobEntity newMob = (MobEntity) entityType.create(attacker.getWorld());
@@ -78,6 +81,7 @@ public class CloneSpawnMove extends AbstractMove<CloneSpawnMove, D4CEntity> {
 
             attacker.getWorld().spawnEntity(newMob);
             newMob.equipStack(EquipmentSlot.MAINHAND, weapon);
+            JComponents.getStandData(newMob).setType(StandType.NONE);
         }
 
         return Set.of();

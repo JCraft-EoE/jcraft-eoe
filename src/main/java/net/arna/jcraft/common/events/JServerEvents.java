@@ -211,20 +211,26 @@ public class JServerEvents {
                 // Damage timer
                 if (mob.getAttacker() != null) JComponents.getMiscData(mob).startDamageTimer();
 
+                // Stand User AIs
                 if (mob.isAiDisabled()) continue;
-
-                // Target priority
-                if (mob.getFirstPassenger() instanceof StandEntity<?, ?> stand) {
-                    LivingEntity biggestAttacker = mob.getDamageTracker().getBiggestAttacker();
-                    LivingEntity primeAdversary = mob.getPrimeAdversary();
-                    LivingEntity target = mob.getTarget();
-                    if (primeAdversary != null && primeAdversary.isAlive() && stand.canTarget(primeAdversary))
-                        standUserAI(mob, primeAdversary, stand);
-                    else if (target != null && target.isAlive() && stand.canTarget(target))
-                        standUserAI(mob, target, stand);
-                    else if (biggestAttacker != null && biggestAttacker.isAlive() && stand.canTarget(biggestAttacker))
-                        mob.setTarget(biggestAttacker);
-                } else if (JComponents.getStandData(mob).getType() != null) JCraft.summon(serverWorld, mob);
+                StandComponent standComponent = JComponents.getStandData(mob);
+                if (standComponent.getType() != null) {
+                    StandEntity<?, ?> stand = standComponent.getStand();
+                    if (stand == null) {
+                        JCraft.summon(serverWorld, mob);
+                    } else {
+                        // Target priority
+                        LivingEntity biggestAttacker = mob.getDamageTracker().getBiggestAttacker();
+                        LivingEntity primeAdversary = mob.getPrimeAdversary();
+                        LivingEntity target = mob.getTarget();
+                        if (primeAdversary != null && primeAdversary.isAlive() && stand.canTarget(primeAdversary))
+                            standUserAI(mob, primeAdversary, stand);
+                        else if (target != null && target.isAlive() && stand.canTarget(target))
+                            standUserAI(mob, target, stand);
+                        else if (biggestAttacker != null && biggestAttacker.isAlive() && stand.canTarget(biggestAttacker))
+                            mob.setTarget(biggestAttacker);
+                    }
+                }
             }
         }
 
@@ -364,10 +370,6 @@ public class JServerEvents {
             if (mob.age > 0) return;
 
             StandComponent standData = JComponents.getStandData(mob);
-
-            DefaultedList<ItemStack> handItems = (DefaultedList<ItemStack>) mob.getHandItems(), armorItems = (DefaultedList<ItemStack>) mob.getArmorItems();
-
-            //todo: fix ents with no stand getting a new one after reloading
             if (standData.getType() != null) return;
             EntityGroup group = mob.getGroup();
 
@@ -390,6 +392,7 @@ public class JServerEvents {
             // EQUIPMENT
             if (mob.getMaxHealth() > 100.0) return;
 
+            DefaultedList<ItemStack> handItems = (DefaultedList<ItemStack>) mob.getHandItems(), armorItems = (DefaultedList<ItemStack>) mob.getArmorItems();
             // Silver chariot users may spawn with Anubis (25% chance)
             if (type == StandType.SILVER_CHARIOT && random.nextInt(5) == 4)
                 handItems.set(0, new ItemStack(JObjectRegistry.ANUBIS));

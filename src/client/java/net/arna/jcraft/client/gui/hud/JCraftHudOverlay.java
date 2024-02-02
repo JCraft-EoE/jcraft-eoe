@@ -2,7 +2,6 @@ package net.arna.jcraft.client.gui.hud;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.util.JClientUtils;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.MadeInHeavenEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;

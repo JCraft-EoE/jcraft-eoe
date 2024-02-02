@@ -9,10 +9,7 @@ import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.shared.EffectInflictingAttack;
 import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
-import net.arna.jcraft.common.attack.moves.whitesnake.ChargedSpewAttack;
-import net.arna.jcraft.common.attack.moves.whitesnake.MeltYourHeartAttack;
-import net.arna.jcraft.common.attack.moves.whitesnake.PilotModeMove;
-import net.arna.jcraft.common.attack.moves.whitesnake.PoisonSpewAttack;
+import net.arna.jcraft.common.attack.moves.whitesnake.*;
 import net.arna.jcraft.common.component.HitPropertyComponent;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -59,6 +56,13 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withSound(JSoundRegistry.WS_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, medium stun"));
+    public static final GiveStandAttack GIVE_STAND = new GiveStandAttack(400, 22, 34, 1, 1, 2, 0, 0)
+            .withSound(JSoundRegistry.WS_STAND_DISC)
+            .withImpactSound(JSoundRegistry.IMPACT_2)
+            .withHitSpark(null)
+            .withHyperArmor()
+            .withBlockableType(BlockableType.NON_BLOCKABLE)
+            .withInfo(Text.literal("Give Stand Disk"), Text.literal("gives a single hit target a stand, provided they do not have one already, from a disk in the user's off hand"));
     public static final EffectInflictingAttack<WhiteSnakeEntity> STAND_DISC = new EffectInflictingAttack<WhiteSnakeEntity>(
             480, 22, 34, 1, 8f, 20, 2, 0, 0,
             List.of(new StatusEffectInstance(JStatusRegistry.STANDLESS, 160, 0)))
@@ -68,7 +72,8 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withHyperArmor()
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
-            .withInfo(Text.literal("Stand Disk"), Text.literal("uninterruptible & unblockable, removes enemy stand for 8s"));
+            .withCrouchingVariant(GIVE_STAND)
+            .withInfo(Text.literal("Take Stand Disk"), Text.literal("uninterruptible & unblockable, removes enemy stand for 8s"));
     public static final SimpleAttack<WhiteSnakeEntity> LEG_CRUSHER = new SimpleAttack<WhiteSnakeEntity>(
             240, 16, 22, 0.75f, 7, 32, 1.75f, 0.25f, 0.2f)
             .withSound(JSoundRegistry.WS_LEGCRUSH)
@@ -88,7 +93,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withHyperArmor()
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
-            .withInfo(Text.literal("Memory Disk"), Text.literal("uninterruptible& unblockable, gives mining fatigue & weakness for 30s"));
+            .withInfo(Text.literal("Take Memory Disk"), Text.literal("uninterruptible& unblockable, gives mining fatigue & weakness for 30s"));
     public static final ChargedSpewAttack CHARGED_SPEW = new ChargedSpewAttack(
             200, 20, 26, 0.75f, 0f, 0, 2f, 0f, 0f)
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
@@ -156,10 +161,13 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         moves.register(MoveType.HEAVY, MEDIUM, State.MEDIUM);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 
-        moves.register(MoveType.SPECIAL1, MEMORY_DISC, State.DISC);
+        moves.register(MoveType.SPECIAL1, MEMORY_DISC, State.DISC_TAKE);
         moves.register(MoveType.SPECIAL2, LEG_CRUSHER, State.LEG_CRUSHER);
         moves.register(MoveType.SPECIAL3, POISON_SPEW, State.ACID_SPEW).withCrouchingVariant(State.ACID_SPEW_CHARGED);
-        moves.register(MoveType.ULTIMATE, isRemote() ? MELT_YOUR_HEART : STAND_DISC, isRemote() ? State.MELT_YOUR_HEART : State.DISC);
+        if (isRemote())
+            moves.register(MoveType.ULTIMATE, MELT_YOUR_HEART, State.MELT_YOUR_HEART);
+        else
+            moves.register(MoveType.ULTIMATE, STAND_DISC, State.DISC_TAKE).withCrouchingVariant(State.DISC_GIVE);
 
         moves.register(MoveType.UTILITY, PILOT_MODE);
     }
@@ -217,12 +225,11 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
 
         if (climbing || swimming) dragMult *= 0.5;
 
-        if ( // Climb or Swim
-                (climbing || swimming ) && jump && getMoveStun() < 1) {
+        if ( (climbing || swimming ) && jump) { // Climb or Swim
             addVelocity(0, 0.1, 0);
         } else { // Jump
             if (onGround) {
-                if (jump && getMoveStun() < 1) {
+                if (jump) {
                     addVelocity(0, 0.75, 0);
                     setRemoteJumpInput(false);
                 }
@@ -264,7 +271,8 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         LEG_CRUSHER(builder -> builder.playAndHold("animation.whitesnake.legcrusher")),
         ACID_SPEW(builder -> builder.playAndHold("animation.whitesnake.acidspew")),
         ACID_SPEW_CHARGED(builder -> builder.playAndHold("animation.whitesnake.acidspew_charged")),
-        DISC(builder -> builder.playAndHold("animation.whitesnake.disc")),
+        DISC_TAKE(builder -> builder.playAndHold("animation.whitesnake.disc_take")),
+        DISC_GIVE(builder -> builder.playAndHold("animation.whitesnake.disc_give")),
 
         FORWARD(builder -> builder.loop("animation.whitesnake.forw")),
         BACKWARD(builder -> builder.loop("animation.whitesnake.back")),

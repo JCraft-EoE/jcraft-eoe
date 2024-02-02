@@ -19,6 +19,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public enum StandType {
+    /**
+     * NONE marks an entity as processed.
+     * For players, this is functionally identical to null, for entities this disables obtaining a stand.
+     */
+    NONE(),
     STAR_PLATINUM(JEntityTypeRegistry.STAR_PLATINUM, StarPlatinumEntity::new, "starplatinum",                   // 1
             Text.literal("Manga"), Text.literal("Arcade"), Text.literal("OVA")),
     THE_WORLD(JEntityTypeRegistry.THE_WORLD, TheWorldEntity::new, "theworld",                                   // 2
@@ -95,6 +100,16 @@ public enum StandType {
         this.skinNames = ImmutableList.copyOf(skinNames);
 
         StaticFields.fromId.put(id, this);
+    }
+
+    StandType() {
+        this.entityType = null;
+        this.id = 0xff; // ain't no way we make 255 regular stands
+        this.ctor = null;
+        this.nameText = Text.translatable("entity.jcraft.nostand");
+        this.skinNames = List.of();
+
+        StaticFields.fromId.put(0xff, this);
     }
 
     @Nullable

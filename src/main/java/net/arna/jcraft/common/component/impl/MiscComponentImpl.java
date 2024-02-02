@@ -2,7 +2,6 @@ package net.arna.jcraft.common.component.impl;
 
 import lombok.Getter;
 import lombok.NonNull;
-import net.arna.jcraft.common.component.HitPropertyComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.MiscComponent;
 import net.arna.jcraft.registry.JSoundRegistry;
@@ -12,7 +11,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
 
 import java.util.UUID;
 

@@ -10,10 +10,8 @@ import net.arna.jcraft.common.component.StandComponent;
 import net.arna.jcraft.common.effects.DazedStatusEffect;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.StandType;
-import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.config.GravityChangerConfig;
 import net.arna.jcraft.common.gravity.util.GravityChannel;
-import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.item.StandDiscItem;
 import net.arna.jcraft.common.loot.JLootTableHelper;
 import net.arna.jcraft.common.network.RemoteStandInteractPacket;
@@ -45,7 +43,6 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.GameRules;
@@ -310,6 +307,7 @@ public class JCraft implements ModInitializer {
 
         StandComponent standData = JComponents.STAND.get(user);
         StandType type = standData.getType();
+        if (type == StandType.NONE) return null;
         StandEntity<?, ?> stand = type == null ? null : type.createNew(world);
 
         if (stand == null) return null;
@@ -418,6 +416,7 @@ public class JCraft implements ModInitializer {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static @Nullable <T extends Entity> T teleportToWorld(T e, ServerWorld w, double x, double y, double z) {
         if (!e.isRemoved()) {
             e.detach();

@@ -1262,15 +1262,19 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 }
             }
 
-            if (mob.fallDistance > 2 || anyInAir) wantToBlock = true;
+            if (anyInAir) wantToBlock = true;
         }
+
+        if (mob.fallDistance > 3) wantToBlock = true;
 
         //JCraft.LOGGER.info("Want to block: " + wantToBlock);
         stand.wantToBlock = wantToBlock;
-        if (wantToBlock)
-            stand.blocking = stand.canAttack() && !JCraft.isDashing(mob);
-        else
+        if (wantToBlock) {
+            if (!stand.blocking)
+                stand.blocking = stand.canAttack() && !JCraft.isDashing(mob);
+        } else {
             stand.blocking = false;
+        }
 
         StatusEffectInstance mobStun = mob.getStatusEffect(JStatusRegistry.DAZED);
         // If stunned, and about to get hit by another move, combo break sometimes

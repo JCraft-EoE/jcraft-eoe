@@ -49,6 +49,12 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends GeoEntityR
     SmoothCutout - Cutout
     Solid - no transparency
      */
+    public static RenderLayer renderTypeOf(StandEntity<?, ?> stand, Identifier textureLocation) {
+        MinecraftClient mcClient = MinecraftClient.getInstance();
+        return mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null && JUtils.getStand(mcClient.player) == stand ?
+                RenderLayer.getEntityNoOutline(textureLocation) : RenderLayer.getEntityTranslucent(textureLocation);
+    }
+
     @Override
     public RenderLayer getRenderType(T stand, float partialTicks, MatrixStack stack,
                                      @Nullable VertexConsumerProvider renderTypeBuffer, @Nullable VertexConsumer vertexBuilder,

@@ -40,7 +40,7 @@ public abstract class EntityMixin {
             float y = e.getYaw() + stand.getRotationOffset();
             y *= (float) Math.PI / 180;
 
-            double heightOffset = stand.shouldOffsetHeight() ? e.getRotationVector().y : 0;
+            double heightOffset = stand.shouldOffsetHeight() ? Vec3d.fromPolar(e.getPitch(), e.getYaw()).y : 0;
             Vec3d adjustedOffset = RotationUtil.vecPlayerToWorld(
                     MathHelper.cos(y) * dist,
                     passenger.getHeightOffset() + heightOffset,
