@@ -37,7 +37,7 @@ public enum StandType {
     KILLER_QUEEN(JEntityTypeRegistry.KILLER_QUEEN, KillerQueenEntity::new, "killerqueen",                       // 6
             Text.literal("Gunpowder"), Text.literal("Deadly"), Text.literal("1999")),
     WHITE_SNAKE(JEntityTypeRegistry.WHITE_SNAKE, WhiteSnakeEntity::new, "whitesnake",                           // 7
-            Text.literal("Mamba"), Text.literal("Kingsnake"), Text.literal("Melting")),
+            Text.literal("Melting"), Text.literal("Mamba"), Text.literal("Redsnake")),
     SILVER_CHARIOT(JEntityTypeRegistry.SILVER_CHARIOT, SilverChariotEntity::new, "silverchariot",               // 8
             Text.literal("Gold Chariot"), Text.literal("OVA"), Text.literal("Vento")),
     MAGICIANS_RED(JEntityTypeRegistry.MAGICIANS_RED, MagiciansRedEntity::new, "mr",                             // 9
@@ -49,7 +49,7 @@ public enum StandType {
 
     // Evolutions
     C_MOON(JEntityTypeRegistry.C_MOON, CMoonEntity::new, "cmoon", true,                                             // -1
-            Text.literal("Inversion"), Text.literal("Gravity"), Text.literal("Pale")),
+            Text.literal("Inversion"), Text.literal("Gravity"), Text.literal("Rose")),
     MADE_IN_HEAVEN(JEntityTypeRegistry.MADE_IN_HEAVEN, MadeInHeavenEntity::new, "mih", true,                        // -2
             Text.literal("Brick"), Text.literal("Daft"), Text.literal("Nightmare")),
     THE_WORLD_OVER_HEAVEN(JEntityTypeRegistry.THE_WORLD_OVER_HEAVEN, TheWorldOverHeavenEntity::new, "twoh", true,   // -3

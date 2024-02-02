@@ -2226,8 +2226,13 @@ Gold Experience: Requiem
 >Stands can no longer take drowning damage
 
 Whitesnake
+    >Updated skins
+    >Added crouching variant to Light
     >Can now give stands to standless entities, provided the user has a disk in their offhand
     >Can now jump while attacking in remote mode
+
+C-Moon
+    >Updated skins
 
 todo:
 GRAVSHIFT PULSE MUST BEHAVE DIFFERENTLY

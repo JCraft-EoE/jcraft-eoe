@@ -9,6 +9,7 @@ import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.shared.EffectInflictingAttack;
 import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
+import net.arna.jcraft.common.attack.moves.shared.UppercutAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.*;
 import net.arna.jcraft.common.component.HitPropertyComponent;
 import net.arna.jcraft.common.util.JParticleType;
@@ -38,10 +39,15 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withLaunch()
             .withBlockStun(4)
             .withInfo(Text.literal("Finisher"), Text.literal("quick combo finisher"));
+    public static final UppercutAttack<WhiteSnakeEntity> UPPERCUT = new UppercutAttack<WhiteSnakeEntity>(
+                    30, 8, 14, 1, 6f, 16, 1.25f, 0.5f, -0.4f, 0.5f)
+            .withImpactSound(JSoundRegistry.IMPACT_3)
+            .withExtraHitBox(1)
+            .withInfo(Text.literal("Uppercut"), Text.literal("decent stun, launches up"));
     public static final SimpleAttack<WhiteSnakeEntity> LIGHT = SimpleAttack.<WhiteSnakeEntity>lightAttack(
             7, 11, 5f, 13, 0.75f, 0.75f, 0.2f)
             .withFollowup(LIGHT_FOLLOWUP)
-            //TODO: WS CROUCHING M1
+            .withCrouchingVariant(UPPERCUT)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
     public static final SimpleAttack<WhiteSnakeEntity> MEDIUM = new SimpleAttack<WhiteSnakeEntity>(
@@ -149,15 +155,15 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
 
         auraColors = new Vec3f[]{
                 new Vec3f(1f, 1f, 1f),
+                new Vec3f(1f, 1f, 1f),
                 new Vec3f(0.4f, 0.4f, 0.5f),
-                new Vec3f(1.0f, 0.0f, 0.0f),
-                new Vec3f(1f, 1f, 1f)
+                new Vec3f(1.0f, 0.0f, 0.0f)
         };
     }
 
     @Override
     protected void registerMoves(MoveMap<WhiteSnakeEntity, State> moves) {
-        moves.register(MoveType.LIGHT, LIGHT, State.LIGHT);
+        moves.register(MoveType.LIGHT, LIGHT, State.LIGHT).withCrouchingVariant(State.UPPERCUT);
         moves.register(MoveType.HEAVY, MEDIUM, State.MEDIUM);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 
@@ -273,6 +279,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         ACID_SPEW_CHARGED(builder -> builder.playAndHold("animation.whitesnake.acidspew_charged")),
         DISC_TAKE(builder -> builder.playAndHold("animation.whitesnake.disc_take")),
         DISC_GIVE(builder -> builder.playAndHold("animation.whitesnake.disc_give")),
+        UPPERCUT(builder -> builder.playAndHold("animation.whitesnake.uppercut")),
 
         FORWARD(builder -> builder.loop("animation.whitesnake.forw")),
         BACKWARD(builder -> builder.loop("animation.whitesnake.back")),
