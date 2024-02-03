@@ -12,10 +12,6 @@
         {
           "name": "InvertSampler",
           "id": "to_invert"
-        },
-        {
-          "name": "InvertDepthSampler",
-          "id": "to_invert:depth"
         }
       ]
     },

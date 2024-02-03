@@ -42,9 +42,11 @@ public class JParticleTextureSheet {
         public void begin(BufferBuilder builder, TextureManager textureManager) {
             // Doesn't seem to work by using a blend function, so we'll use a shader instead.
             // Think that is because of the render order, but I'm not sure.
+            InversionShaderHandler.getToInvertBuffer().copyDepthFrom(MinecraftClient.getInstance().getFramebuffer()); // Copy depth buffer
             InversionShaderHandler.getToInvertBuffer().beginWrite(true); // Render to inversion buffer
 
             RenderSystem.disableBlend();
+            RenderSystem.enableDepthTest();
             RenderSystem.depthMask(true);
             RenderSystem.setShader(GameRenderer::getParticleShader);
             RenderSystem.setShaderTexture(0, SpriteAtlasTexture.PARTICLE_ATLAS_TEXTURE);

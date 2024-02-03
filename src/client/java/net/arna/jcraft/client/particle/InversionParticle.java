@@ -14,7 +14,7 @@ public class InversionParticle extends AbstractSlowingParticle {
     protected InversionParticle(ClientWorld clientWorld, double d, double e, double f, double g, double h, double i,
                                 SpriteProvider spriteProvider) {
         super(clientWorld, d, e, f, g, h, i);
-        scale = 4;
+        scale *= 1f;
         setSprite(spriteProvider);
     }
 
