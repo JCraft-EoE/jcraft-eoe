@@ -1,15 +1,10 @@
 package net.arna.jcraft.registry;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.arna.jcraft.JCraft;
 import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes;
 import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.particle.ParticleType;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.registry.Registry;
-
-import java.util.Map;
 
 public interface JParticleTypeRegistry {
     DefaultParticleType AURA_ARC = FabricParticleTypes.simple();
@@ -26,21 +21,7 @@ public interface JParticleTypeRegistry {
     DefaultParticleType PIXEL = FabricParticleTypes.simple();
     DefaultParticleType BLOCKSPARK = FabricParticleTypes.simple();
     DefaultParticleType GO = FabricParticleTypes.simple();
-
-    Int2ObjectMap<DefaultParticleType> particles = new Int2ObjectOpenHashMap<>(Map.ofEntries(
-            Map.entry(-8, JParticleTypeRegistry.GO),
-            Map.entry(-7, JParticleTypeRegistry.BLOCKSPARK),
-            Map.entry(-6, JParticleTypeRegistry.PIXEL),
-            Map.entry(-5, JParticleTypeRegistry.BOOM_1),
-            Map.entry(-4, JParticleTypeRegistry.BITES_THE_DUST),
-            Map.entry(-3, ParticleTypes.SWEEP_ATTACK),
-            Map.entry(-2, BACKSTAB),
-            Map.entry(-1, ParticleTypes.FLASH),
-            Map.entry(0, JParticleTypeRegistry.COMBO_BREAK),
-            Map.entry(1, JParticleTypeRegistry.COOLDOWN_CANCEL),
-            Map.entry(2, JParticleTypeRegistry.HITSPARK_1),
-            Map.entry(3, JParticleTypeRegistry.HITSPARK_2)
-    ));
+    DefaultParticleType INVERSION = FabricParticleTypes.simple();
 
     private static void registerParticle(String identifier, ParticleType<?> type) {
         Registry.register(Registry.PARTICLE_TYPE, JCraft.id(identifier), type);
@@ -61,5 +42,6 @@ public interface JParticleTypeRegistry {
         registerParticle("go", GO);
         registerParticle("aura_arc", AURA_ARC);
         registerParticle("aura_blob", AURA_BLOB);
+        registerParticle("inversion", INVERSION);
     }
 }

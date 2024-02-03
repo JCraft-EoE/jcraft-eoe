@@ -23,10 +23,7 @@ import net.arna.jcraft.client.renderer.effects.TimeAccelerationEffectRenderer;
 import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer;
 import net.arna.jcraft.client.renderer.item.BigItemRenderer;
 import net.arna.jcraft.client.rendering.RenderHandler;
-import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
-import net.arna.jcraft.client.rendering.handler.EpitaphVignetteShaderHandler;
-import net.arna.jcraft.client.rendering.handler.UIShaderHandler;
-import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
+import net.arna.jcraft.client.rendering.handler.*;
 import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
 import net.arna.jcraft.client.util.TrackedKeyBinding;
@@ -128,6 +125,7 @@ public class JCraftClient implements ClientModInitializer {
         RenderHandler.init();
         JClientEventsRegistry.registerClientEvents();
 
+        InversionShaderHandler.INSTANCE.init();
         ZaWarudoShaderHandler.INSTANCE.init();
         CrimsonShaderHandler.INSTANCE.init();
         EpitaphVignetteShaderHandler.INSTANCE.init();
@@ -149,6 +147,7 @@ public class JCraftClient implements ClientModInitializer {
         particleFactoryRegistry.register(JParticleTypeRegistry.GO, GoParticle.Factory::new);
         particleFactoryRegistry.register(JParticleTypeRegistry.AURA_ARC, AuraArcParticle.Factory::new);
         particleFactoryRegistry.register(JParticleTypeRegistry.AURA_BLOB, AuraBlobParticle.Factory::new);
+        particleFactoryRegistry.register(JParticleTypeRegistry.INVERSION, InversionParticle.Factory::new);
 
 
         // Renderer registration
