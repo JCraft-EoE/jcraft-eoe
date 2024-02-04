@@ -1,6 +1,6 @@
-package net.arna.jcraft.common.component.impl;
+package net.arna.jcraft.common.component.impl.entity;
 
-import net.arna.jcraft.common.component.GravityComponent;
+import net.arna.jcraft.common.component.entity.GravityComponent;
 import net.arna.jcraft.common.gravity.RotationAnimation;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.api.RotationParameters;

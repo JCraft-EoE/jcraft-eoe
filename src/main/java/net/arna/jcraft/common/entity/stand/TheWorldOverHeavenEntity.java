@@ -9,7 +9,7 @@ import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.attack.moves.theworld.overheaven.*;
-import net.arna.jcraft.common.component.HitPropertyComponent;
+import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.util.JParticleType;

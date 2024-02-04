@@ -6,7 +6,7 @@ import lombok.experimental.UtilityClass;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.util.RenderUtils;
-import net.arna.jcraft.common.component.CooldownsComponent;
+import net.arna.jcraft.common.component.living.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.spec.JSpec;

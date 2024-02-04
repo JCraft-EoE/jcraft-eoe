@@ -1,9 +1,9 @@
-package net.arna.jcraft.common.component.impl;
+package net.arna.jcraft.common.component.impl.living;
 
 import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.common.component.JComponents;
-import net.arna.jcraft.common.component.StandComponent;
+import net.arna.jcraft.common.component.living.StandComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.StandType;
 import net.minecraft.entity.Entity;

@@ -1,7 +1,7 @@
-package net.arna.jcraft.common.component.impl;
+package net.arna.jcraft.common.component.impl.living;
 
 import lombok.Getter;
-import net.arna.jcraft.common.component.HitPropertyComponent;
+import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;

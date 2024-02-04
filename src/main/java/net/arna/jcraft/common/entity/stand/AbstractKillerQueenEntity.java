@@ -11,7 +11,7 @@ import net.arna.jcraft.common.attack.moves.killerqueen.ExplosiveDashAttack;
 import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleMultiHitAttack;
-import net.arna.jcraft.common.component.CooldownsComponent;
+import net.arna.jcraft.common.component.living.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.CooldownType;

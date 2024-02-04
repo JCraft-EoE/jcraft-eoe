@@ -6,7 +6,7 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.JCraft.DashData;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.component.JComponents;
-import net.arna.jcraft.common.component.StandComponent;
+import net.arna.jcraft.common.component.living.StandComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.StandType;
 import net.arna.jcraft.common.item.MockItem;

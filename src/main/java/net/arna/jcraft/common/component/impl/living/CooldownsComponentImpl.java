@@ -1,10 +1,10 @@
-package net.arna.jcraft.common.component.impl;
+package net.arna.jcraft.common.component.impl.living;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntRBTreeMap;
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.component.CooldownsComponent;
+import net.arna.jcraft.common.component.living.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;

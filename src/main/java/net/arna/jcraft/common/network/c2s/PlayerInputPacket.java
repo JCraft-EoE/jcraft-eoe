@@ -5,7 +5,7 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.MoveInputType;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.component.JComponents;
-import net.arna.jcraft.common.component.StandComponent;
+import net.arna.jcraft.common.component.living.StandComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.spec.JSpec;

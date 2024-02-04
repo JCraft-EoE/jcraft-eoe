@@ -3,7 +3,7 @@ package net.arna.jcraft.client.util;
 import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.particle.AuraArcParticle;
 import net.arna.jcraft.client.particle.AuraBlobParticle;
-import net.arna.jcraft.common.component.BombTrackerComponent;
+import net.arna.jcraft.common.component.living.BombTrackerComponent;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.WhiteSnakeEntity;

@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.util;
 
-import net.arna.jcraft.common.component.BombTrackerComponent;
+import net.arna.jcraft.common.component.living.BombTrackerComponent;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.WhiteSnakeEntity;
