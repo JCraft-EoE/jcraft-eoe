@@ -1,15 +1,20 @@
 package net.arna.jcraft.common.item;
 
 import net.arna.jcraft.common.entity.projectile.BulletProjectile;
+import net.arna.jcraft.common.tickable.RevolverFire;
+import net.arna.jcraft.common.util.DimensionData;
+import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
@@ -19,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class FVRevolverItem extends Item {
+
     public FVRevolverItem(Settings settings) {
         super(settings);
     }
@@ -35,27 +41,35 @@ public class FVRevolverItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if (world.isClient()) return TypedActionResult.success(user.getStackInHand(hand));
-
         ItemStack itemStack = user.getStackInHand(hand);
         if (user.hasStatusEffect(JStatusRegistry.DAZED))
             return TypedActionResult.fail(itemStack);
-
         NbtCompound data = itemStack.getOrCreateNbt();
         int shots = data.getInt("Shots");
-        if (shots < 1) return TypedActionResult.fail(user.getStackInHand(hand));
+        if (shots < 1) return TypedActionResult.fail(itemStack);
+        if (!world.isClient) {
+            user.getItemCooldownManager().set(JObjectRegistry.FV_REVOLVER, 4); // Unusable until fires
+            RevolverFire.enqueue(new DimensionData(user, world.getRegistryKey(), 3));
+        }
+        return TypedActionResult.success(itemStack);
+    }
+
+    public static void fire(ItemStack itemStack, World world, LivingEntity user) {
+        NbtCompound data = itemStack.getOrCreateNbt();
+        int shots = data.getInt("Shots");
+        if (shots < 1) return;
 
         data.putInt("Shots", shots - 1);
-        user.getItemCooldownManager().set(this, 11);
         world.playSound(null, user.getX(), user.getY(), user.getZ(), JSoundRegistry.REVOLVER_FIRE, SoundCategory.PLAYERS, 1f, 1f);
 
         BulletProjectile bullet = new BulletProjectile(world, user, 9f, 10f, 2, 5);
         bullet.setVelocity(user, user.getPitch(), user.getYaw(), 0f,  10, 0F);
         world.spawnEntity(bullet);
 
-        //damageLogic(world, livingEntity, dir, 10, 1, false, 5, true, 4, DamageSource.mob(user), user);
-
-        return TypedActionResult.success(user.getStackInHand(hand));
+        if (user instanceof PlayerEntity player) {
+            player.getItemCooldownManager().set(JObjectRegistry.FV_REVOLVER, 11); // Refire time
+            player.incrementStat(Stats.USED.getOrCreateStat(JObjectRegistry.FV_REVOLVER));
+        }
     }
 
     @Override

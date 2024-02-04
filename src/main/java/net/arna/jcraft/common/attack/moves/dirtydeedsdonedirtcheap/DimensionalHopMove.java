@@ -5,7 +5,8 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.entity.stand.D4CEntity;
-import net.arna.jcraft.common.util.DimValues;
+import net.arna.jcraft.common.tickable.PastDimensions;
+import net.arna.jcraft.common.util.DimensionData;
 import net.arna.jcraft.mixin.ChunkLightProviderAccessor;
 import net.arna.jcraft.mixin.LightStorageAccessor;
 import net.arna.jcraft.mixin.LightingProviderAccessor;
@@ -52,26 +53,13 @@ public class DimensionalHopMove extends AbstractSimpleAttack<DimensionalHopMove,
             // Logic for cancelling dimhop early, and generating failsafe data
             if (!(user instanceof ServerPlayerEntity serverPlayer)) return Set.of();
 
-            boolean isStored = false; // Should always be true
-            for (DimValues dimV : JCraft.pastDimensions) {
-                if (targets.contains(dimV.user)) {
-                    dimV.timer = 1;
-                    continue;
-                }
-
-                if (dimV.user != user)
-                    continue;
-                isStored = true;
-                dimV.timer = 1;
-            }
+            boolean isStored = PastDimensions.tryExit(user, targets); // Should always be true
 
             if (!isStored) { // If not stored, force your way back
                 BlockPos spawnPos = serverPlayer.getSpawnPointPosition(); // Prioritize spawn point
                 // Use current position if all else fails
                 if (spawnPos == null) spawnPos = serverPlayer.getBlockPos();
-                JCraft.pastDimensions.add(new DimValues(user,
-                        new Vec3d(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()),
-                        serverPlayer.getSpawnPointDimension()));
+                PastDimensions.enqueue( new DimensionData(user, new Vec3d(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ()), serverPlayer.getSpawnPointDimension()) );
             }
 
             return Set.of();

@@ -2234,6 +2234,13 @@ Whitesnake
 C-Moon
     >Updated skins
 
+● 04/02/2024
+todo: redo aura colorz
+>Added inversion and shockwave particles
+
+D4C
+    >Revolver now has 3 ticks of prefire time
+
 todo:
 GRAVSHIFT PULSE MUST BEHAVE DIFFERENTLY
 afterimages on ger ctr

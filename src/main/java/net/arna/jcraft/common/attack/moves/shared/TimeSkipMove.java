@@ -7,6 +7,7 @@ import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.component.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.tickable.Timestops;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
@@ -32,7 +33,7 @@ public class TimeSkipMove<A extends IAttacker<? extends A, ?>> extends AbstractM
 
     @Override
     public boolean canBeInitiated(A attacker) {
-        if (JUtils.getTimestop(attacker.getUser()) != null)
+        if (Timestops.getTimestop(attacker.getUser()) != null)
             return false;
         return super.canBeInitiated(attacker);
     }

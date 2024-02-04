@@ -10,7 +10,9 @@ import net.arna.jcraft.common.component.StandComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.StandType;
 import net.arna.jcraft.common.item.MockItem;
-import net.arna.jcraft.common.util.DimValues;
+import net.arna.jcraft.common.tickable.PastDimensions;
+import net.arna.jcraft.common.tickable.RevolverFire;
+import net.arna.jcraft.common.tickable.Timestops;
 import net.arna.jcraft.common.util.EntityInterest;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JDimensionRegistry;
@@ -53,7 +55,6 @@ import static net.arna.jcraft.common.entity.stand.StandEntity.standUserAI;
 import static net.arna.jcraft.common.entity.stand.StandEntity.stun;
 import static net.arna.jcraft.common.util.EntityInterest.blockAttractionInterest;
 import static net.arna.jcraft.common.util.EntityInterest.itemAttractionInterest;
-import static net.arna.jcraft.common.util.JUtils.activeTimestops;
 
 public class JServerEvents {
     private static final List<Enchantment> jcraftArmorEnchants = List.of(
@@ -74,70 +75,16 @@ public class JServerEvents {
         if (JCraft.preloadLockTicks > 0)
             JCraft.preloadLockTicks--;
 
+        RevolverFire.tick(server);
+        PastDimensions.tick(server);
+        Timestops.tick(server);
+
         // Player logic (cooldown handling and DamageTimer counting)
         for (ServerPlayerEntity player : PlayerLookup.all(server)) {
             if (player == null || !player.isAlive()) continue;
 
             if (player.getAttacker() != null) JComponents.getMiscData(player).startDamageTimer();
         }
-
-        // Dimensional hop handling
-        List<DimValues> newPastDimensions = new ArrayList<>();
-
-        for (DimValues dimValues : JCraft.pastDimensions) {
-            Entity user = dimValues.user;
-            if (user == null || !user.isAlive()) continue;
-
-            ServerWorld original = server.getWorld(dimValues.worldKey);
-            if (user.getWorld() == original) continue;
-
-            if (--dimValues.timer > 1) {
-                newPastDimensions.add(dimValues);
-                continue;
-            }
-
-            Vec3d dimPos = user.getPos(); //dimValues.pos;
-            if (user instanceof ServerPlayerEntity player)
-                player.teleport(original, dimPos.x, dimPos.y, dimPos.z, player.getYaw(), player.getPitch());
-            else JCraft.teleportToWorld(user, original, dimPos.x, dimPos.y, dimPos.z);
-        }
-
-        if (JCraft.preloadLockTicks <= 0 && newPastDimensions.isEmpty()) // Nobody left in AU
-            JCraft.clearPreloadedChunks();
-
-        JCraft.pastDimensions.clear();
-        JCraft.pastDimensions.addAll(newPastDimensions);
-
-        // Timestop handling
-        List<DimValues> newActiveTimestops = new ArrayList<>();
-
-        for (DimValues timestop : activeTimestops) {
-            Entity user = timestop.user;
-            //JCraft.LOGGER.info("SERVER: Ticking timestop " + timestop + " with user " + user + " and duration " + timestop.timer);
-
-            if (user != null && user.isAlive() && timestop.timer-- > 0) {
-                ServerWorld world = server.getWorld(timestop.worldKey);
-                if (world == null) {
-                    JCraft.LOGGER.fatal("World that timestop belongs to no longer exists! Key: " + timestop.worldKey + " Timestopper: " + user);
-                    continue;
-                }
-
-                Vec3d pos = timestop.pos;
-
-                List<? extends Entity> toStop = world.getEntitiesByClass(Entity.class,
-                        new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
-
-                for (Entity entity : toStop)
-                    if (!entity.hasVehicle() && entity != user && (!(entity instanceof LivingEntity living) || entity != JUtils.getStand(living)) &&
-                            entity != user.getVehicle())
-                        JComponents.getTimeStopData(entity).setTicks(2);
-
-                newActiveTimestops.add(timestop);
-            }
-        }
-
-        activeTimestops.clear();
-        activeTimestops.addAll(newActiveTimestops);
 
         // Burst handling
         Object2IntMap<LivingEntity> newBurstTimers = new Object2IntOpenHashMap<>();

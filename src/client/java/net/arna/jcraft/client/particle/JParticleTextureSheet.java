@@ -19,7 +19,6 @@ import java.util.List;
 public class JParticleTextureSheet {
     public static ParticleTextureSheet PARTICLE_SHEET_AURA = new ParticleTextureSheet() {
         public void begin(BufferBuilder builder, TextureManager textureManager) {
-            //RenderSystem.setShader(GameRenderer::getParticleShader);
             RenderSystem.setShaderTexture(0, SpriteAtlasTexture.PARTICLE_ATLAS_TEXTURE);
 
             RenderSystem.depthMask(false);
@@ -65,5 +64,5 @@ public class JParticleTextureSheet {
         }
     };
 
-    public static final List<ParticleTextureSheet> J_SHEETS = ImmutableList.of(INVERSION_SHEET);
+    public static final List<ParticleTextureSheet> J_SHEETS = ImmutableList.of(INVERSION_SHEET, PARTICLE_SHEET_AURA);
 }

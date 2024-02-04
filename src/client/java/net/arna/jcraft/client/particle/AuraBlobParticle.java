@@ -38,7 +38,7 @@ public class AuraBlobParticle extends AbstractSlowingParticle {
     }
 
     public ParticleTextureSheet getType() {
-        return ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT;
+        return JParticleTextureSheet.PARTICLE_SHEET_AURA;
     }
 
     public static class Factory implements ParticleFactory<DefaultParticleType> {

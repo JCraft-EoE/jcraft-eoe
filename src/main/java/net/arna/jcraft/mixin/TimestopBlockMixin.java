@@ -1,5 +1,6 @@
 package net.arna.jcraft.mixin;
 
+import net.arna.jcraft.common.tickable.Timestops;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.block.Block;
 import net.minecraft.fluid.Fluid;
@@ -16,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public interface TimestopBlockMixin {
     @Inject(method = "createAndScheduleBlockTick(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;ILnet/minecraft/world/TickPriority;)V", at = @At("HEAD"), cancellable = true)
     private void jcraft$createAndScheduleBlockTick(BlockPos pos, Block block, int delay, TickPriority priority, CallbackInfo info) {
-        int ticks = JUtils.getTicksIfInTSRange(pos);
+        int ticks = Timestops.getTicksIfInTSRange(pos);
 
         if (ticks > 0) {
             WorldAccess worldAccess = (WorldAccess) this;
@@ -29,7 +30,7 @@ public interface TimestopBlockMixin {
 
     @Inject(method = "createAndScheduleBlockTick(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;I)V", at = @At("HEAD"), cancellable = true)
     private void jcraft$createAndScheduleBlockTick(BlockPos pos, Block block, int delay, CallbackInfo info) {
-        int ticks = JUtils.getTicksIfInTSRange(pos);
+        int ticks = Timestops.getTicksIfInTSRange(pos);
 
         if (ticks > 0) {
             WorldAccess worldAccess = (WorldAccess) this;
@@ -42,7 +43,7 @@ public interface TimestopBlockMixin {
 
     @Inject(method = "createAndScheduleFluidTick(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/fluid/Fluid;ILnet/minecraft/world/TickPriority;)V", at = @At("HEAD"), cancellable = true)
     private void jcraft$createAndScheduleFluidTick(BlockPos pos, Fluid fluid, int delay, TickPriority priority, CallbackInfo info) {
-        int ticks = JUtils.getTicksIfInTSRange(pos);
+        int ticks = Timestops.getTicksIfInTSRange(pos);
 
         if (ticks > 0) {
             WorldAccess worldAccess = (WorldAccess) this;
@@ -55,7 +56,7 @@ public interface TimestopBlockMixin {
 
     @Inject(method = "createAndScheduleFluidTick(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/fluid/Fluid;I)V", at = @At("HEAD"), cancellable = true)
     private void jcraft$createAndScheduleFluidTick(BlockPos pos, Fluid fluid, int delay, CallbackInfo info) {
-        int ticks = JUtils.getTicksIfInTSRange(pos);
+        int ticks = Timestops.getTicksIfInTSRange(pos);
 
         if (ticks > 0) {
             WorldAccess worldAccess = (WorldAccess) this;

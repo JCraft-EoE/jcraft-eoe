@@ -18,6 +18,8 @@ import net.arna.jcraft.common.network.RemoteStandInteractPacket;
 import net.arna.jcraft.common.network.c2s.*;
 import net.arna.jcraft.common.network.s2c.*;
 import net.arna.jcraft.common.spec.JSpec;
+import net.arna.jcraft.common.tickable.PastDimensions;
+import net.arna.jcraft.common.tickable.Timestops;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.*;
 import net.fabricmc.api.ModInitializer;
@@ -91,7 +93,6 @@ public class JCraft implements ModInitializer {
      */
     public static int preloadLockTicks = 0;
     public static ServerWorld auWorld;
-    public static final List<DimValues> pastDimensions = new ArrayList<>();
     private static final List<ChunkPos> preloadedChunks = new ArrayList<>();
 
     public static final Object2IntMap<LivingEntity> burstTimers = new Object2IntOpenHashMap<>();
@@ -122,9 +123,11 @@ public class JCraft implements ModInitializer {
      */
     //todo: make TS stop animated textures
     public static void beginTimestop(LivingEntity timestopper, Vec3d position, ServerWorld world, int duration) {
+        //JCraft.LOGGER.info(timestopper + " is stopping time in world " + world + " for " + duration + " ticks.");
+
         // Registration
         RegistryKey<World> worldRegistryKey = world.getRegistryKey();
-        JUtils.activeTimestops.add(new DimValues(timestopper, position, worldRegistryKey, duration));
+        Timestops.enqueue(new DimensionData(timestopper, position, worldRegistryKey, duration));
 
         // Synchronization
         PacketByteBuf buf = TimeStopStatePacket.createStartPacket(timestopper.getId(), position, worldRegistryKey, duration);
@@ -146,7 +149,7 @@ public class JCraft implements ModInitializer {
     }
 
     public static void stopTimestop(Entity timestopper) {
-        DimValues timestop = JUtils.getTimestop(timestopper);
+        DimensionData timestop = Timestops.getTimestop(timestopper);
         World world = timestopper.getWorld();
 
         if (timestop == null || !(world instanceof ServerWorld serverWorld)) return;
@@ -170,7 +173,7 @@ public class JCraft implements ModInitializer {
             serverPlayer.getItemCooldownManager().remove(serverPlayer.getOffHandStack().getItem());
         }
 
-        JUtils.activeTimestops.remove(timestop);
+        Timestops.remove(timestop);
     }
 
     private static void appendJcraftGroupStacks(List<ItemStack> stacks) {
@@ -461,6 +464,6 @@ public class JCraft implements ModInitializer {
         }
 
         finalEnt.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 100, 9, true, false, true));
-        pastDimensions.add(new DimValues(finalEnt, pos, original.getRegistryKey()));
+        PastDimensions.enqueue(new DimensionData(finalEnt, pos, original.getRegistryKey()));
     }
 }

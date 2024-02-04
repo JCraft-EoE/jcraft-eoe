@@ -374,9 +374,9 @@ public class JCraftClient implements ClientModInitializer {
         if (client.isPaused() && client.isInSingleplayer()) return;
 
         // Timestop handling (nearly identical to serverside, but toStop is obtained in user.world instead of server world)
-        ArrayList<DimValues> newActiveTimestops = new ArrayList<>();
+        ArrayList<DimensionData> newActiveTimestops = new ArrayList<>();
 
-        for (DimValues timestop : activeTimestops) {
+        for (DimensionData timestop : activeTimestops) {
             LivingEntity user = timestop.user;
             //JCraft.LOGGER.info("CLIENT: Ticking timestop " + timestop + " with user " + user + " and duration " + timestop.timer);
 

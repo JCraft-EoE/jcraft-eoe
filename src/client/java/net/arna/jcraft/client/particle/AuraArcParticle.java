@@ -37,7 +37,7 @@ public class AuraArcParticle extends AbstractSlowingParticle {
     }
 
     public ParticleTextureSheet getType() {
-        return ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT;
+        return JParticleTextureSheet.PARTICLE_SHEET_AURA;
     }
 
     @Override

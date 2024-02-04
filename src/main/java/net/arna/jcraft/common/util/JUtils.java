@@ -53,7 +53,6 @@ import java.util.function.Predicate;
 import static net.arna.jcraft.common.entity.stand.StandEntity.damageLogic;
 
 public final class JUtils {
-    public static final List<DimValues> activeTimestops = new ArrayList<>();
     public static final float RAD_TO_DEG = 0.017453292F;
 
     public static Vec3d randUnitVec(Random random) {
@@ -265,12 +264,6 @@ public final class JUtils {
         return stand != null && stand.blocking;
     }
 
-    public static @Nullable DimValues getTimestop(Entity entity) {
-        for (DimValues d : activeTimestops)
-            if (d.user == entity) return d;
-        return null;
-    }
-
     public static void stopTick(Entity entity) {
         if (entity instanceof LivingEntity livingEntity) {
             livingEntity.prevBodyYaw = livingEntity.bodyYaw;
@@ -291,31 +284,6 @@ public final class JUtils {
         entity.prevYaw = entity.getYaw();
 
         entity.prevHorizontalSpeed = entity.horizontalSpeed;
-    }
-
-    public static boolean isInTSRange(Vec3d pos) {
-        for (DimValues timeStop : activeTimestops)
-            if (timeStop != null)
-                if (timeStop.pos.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) <= 65536)
-                    return true;
-
-        return false;
-    }
-
-    public static boolean isInTSRange(BlockPos pos) {
-        for (DimValues timeStop : activeTimestops)
-            if (timeStop != null && timeStop.pos.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) <= 65536)
-                return true;
-
-        return false;
-    }
-
-    public static int getTicksIfInTSRange(BlockPos pos) {
-        for (DimValues timeStop : activeTimestops)
-            if (timeStop != null && timeStop.pos.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) <= 65536)
-                    return timeStop.timer;
-
-        return 0;
     }
 
     public static Vec3d deltaPos(@NotNull Entity ent) {

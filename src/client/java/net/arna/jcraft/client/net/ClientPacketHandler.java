@@ -91,7 +91,7 @@ public class ClientPacketHandler {
             client.execute(() -> {
                 Entity ent = client.world.getEntityById(entID);
                 if (!(ent instanceof LivingEntity livingEntity)) return;
-                JClientUtils.activeTimestops.add( new DimValues(livingEntity, position, registryKey, time) );
+                JClientUtils.activeTimestops.add( new DimensionData(livingEntity, position, registryKey, time) );
             });
         } else JClientUtils.removeTimestop(entID);
     }
