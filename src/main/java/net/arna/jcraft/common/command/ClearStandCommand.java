@@ -3,7 +3,7 @@ package net.arna.jcraft.common.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.arna.jcraft.common.component.StandComponent;
+import net.arna.jcraft.common.component.living.StandComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.component.JComponents;
 import net.minecraft.command.argument.EntityArgumentType;

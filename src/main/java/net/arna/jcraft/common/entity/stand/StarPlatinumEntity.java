@@ -7,7 +7,7 @@ import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.attack.moves.starplatinum.ChargeBarrageAttack;
 import net.arna.jcraft.common.attack.moves.starplatinum.InhaleAttack;
-import net.arna.jcraft.common.component.HitPropertyComponent;
+import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;

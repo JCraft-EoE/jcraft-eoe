@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.mixin;
 
 import net.arna.jcraft.client.util.JClientUtils;
-import net.arna.jcraft.common.component.HitPropertyComponent;
+import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.*;
 import net.arna.jcraft.common.util.JUtils;
@@ -20,7 +20,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static net.arna.jcraft.common.entity.stand.StandType.*;
 import static net.arna.jcraft.common.util.JUtils.RAD_TO_DEG;
 
 @Mixin(BipedEntityModel.class)

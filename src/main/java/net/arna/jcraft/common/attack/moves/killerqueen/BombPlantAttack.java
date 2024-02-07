@@ -3,7 +3,7 @@ package net.arna.jcraft.common.attack.moves.killerqueen;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
-import net.arna.jcraft.common.component.BombTrackerComponent;
+import net.arna.jcraft.common.component.living.BombTrackerComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.AbstractKillerQueenEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;

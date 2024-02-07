@@ -7,7 +7,7 @@ import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.attack.moves.theworld.FeignBarrageCounterAttack;
 import net.arna.jcraft.common.attack.moves.theworld.TWDonutAttack;
-import net.arna.jcraft.common.component.HitPropertyComponent;
+import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;

@@ -26,7 +26,7 @@ import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static net.arna.jcraft.common.component.HitPropertyComponent.HitAnimation.*;
+import static net.arna.jcraft.common.component.living.HitPropertyComponent.HitAnimation.*;
 
 public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
     public static final SimpleAttack<GEREntity> LIGHT_FOLLOWUP = new SimpleAttack<GEREntity>(

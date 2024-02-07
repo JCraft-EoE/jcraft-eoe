@@ -1,7 +1,7 @@
-package net.arna.jcraft.common.component.impl;
+package net.arna.jcraft.common.component.impl.living;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.component.BombTrackerComponent;
+import net.arna.jcraft.common.component.living.BombTrackerComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;

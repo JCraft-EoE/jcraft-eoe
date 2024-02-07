@@ -1,7 +1,7 @@
 package net.arna.jcraft.client.util;
 
 import net.arna.jcraft.client.model.entity.StandEntityModel;
-import net.arna.jcraft.common.component.HitPropertyComponent;
+import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.entity.stand.CreamEntity;
 import net.arna.jcraft.common.entity.stand.D4CEntity;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;

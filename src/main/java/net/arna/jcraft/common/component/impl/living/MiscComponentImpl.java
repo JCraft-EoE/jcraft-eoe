@@ -1,9 +1,9 @@
-package net.arna.jcraft.common.component.impl;
+package net.arna.jcraft.common.component.impl.living;
 
 import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.common.component.JComponents;
-import net.arna.jcraft.common.component.MiscComponent;
+import net.arna.jcraft.common.component.living.MiscComponent;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;

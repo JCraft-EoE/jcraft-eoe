@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.entity.projectile;
 
-import net.arna.jcraft.common.component.HitPropertyComponent;
+import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.EntityType;

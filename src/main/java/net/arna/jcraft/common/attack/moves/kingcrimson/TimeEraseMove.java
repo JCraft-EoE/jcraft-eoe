@@ -8,7 +8,7 @@ import net.arna.jcraft.common.attack.core.ctx.MoveVariable;
 import net.arna.jcraft.common.attack.core.ctx.WeakMoveVariable;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.component.JComponents;
-import net.arna.jcraft.common.component.StandComponent;
+import net.arna.jcraft.common.component.living.StandComponent;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;

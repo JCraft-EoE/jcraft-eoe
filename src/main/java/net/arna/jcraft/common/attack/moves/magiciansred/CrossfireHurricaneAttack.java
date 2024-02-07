@@ -5,7 +5,7 @@ import net.arna.jcraft.common.attack.core.ctx.IntMoveVariable;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.core.ctx.MoveVariable;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
-import net.arna.jcraft.common.component.HitPropertyComponent;
+import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.stand.MagiciansRedEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;

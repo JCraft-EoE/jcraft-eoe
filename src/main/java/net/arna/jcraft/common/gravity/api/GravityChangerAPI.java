@@ -5,7 +5,7 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.component.GravityComponent;
+import net.arna.jcraft.common.component.entity.GravityComponent;
 import net.arna.jcraft.common.gravity.RotationAnimation;
 import net.arna.jcraft.common.gravity.util.*;
 import net.arna.jcraft.common.gravity.util.packet.DefaultGravityPacket;

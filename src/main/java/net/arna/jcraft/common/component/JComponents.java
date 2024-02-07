@@ -5,13 +5,28 @@ import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
 import dev.onyxstudios.cca.api.v3.entity.RespawnCopyStrategy;
+import dev.onyxstudios.cca.api.v3.world.WorldComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.world.WorldComponentInitializer;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.component.impl.*;
+import net.arna.jcraft.common.component.entity.GrabComponent;
+import net.arna.jcraft.common.component.entity.GravityComponent;
+import net.arna.jcraft.common.component.entity.TimeStopComponent;
+import net.arna.jcraft.common.component.impl.entity.GrabComponentImpl;
+import net.arna.jcraft.common.component.impl.entity.GravityComponentImpl;
+import net.arna.jcraft.common.component.impl.entity.TimeStopComponentImpl;
+import net.arna.jcraft.common.component.impl.living.*;
+import net.arna.jcraft.common.component.impl.player.SpecComponentImpl;
+import net.arna.jcraft.common.component.impl.world.ShockwaveHandlerComponentImpl;
+import net.arna.jcraft.common.component.living.*;
+import net.arna.jcraft.common.component.player.SpecComponent;
+import net.arna.jcraft.common.component.world.ShockwaveHandlerComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 
-public class JComponents implements EntityComponentInitializer {
+public class JComponents implements EntityComponentInitializer, WorldComponentInitializer {
     public static final ComponentKey<GravityComponent> GRAVITY_MODIFIER =
             ComponentRegistry.getOrCreate(JCraft.id("gravity_direction"), GravityComponent.class);
     public static final ComponentKey<StandComponent> STAND =
@@ -28,9 +43,11 @@ public class JComponents implements EntityComponentInitializer {
             ComponentRegistry.getOrCreate(JCraft.id("bomb_tracker"), BombTrackerComponent.class);
     public static final ComponentKey<GrabComponent> GRAB =
             ComponentRegistry.getOrCreate(JCraft.id("grab"), GrabComponent.class);
-
     public static final ComponentKey<HitPropertyComponent> HIT_PROPERTY =
             ComponentRegistry.getOrCreate(JCraft.id("hit_property"), HitPropertyComponent.class);
+
+    public static final ComponentKey<ShockwaveHandlerComponent> SHOCKWAVE_HANDLER =
+            ComponentRegistry.getOrCreate(JCraft.id("shockwave_handler"), ShockwaveHandlerComponent.class);
 
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
@@ -63,6 +80,11 @@ public class JComponents implements EntityComponentInitializer {
                 .end(HitPropertyComponentImpl::new);
     }
 
+    @Override
+    public void registerWorldComponentFactories(@NotNull WorldComponentFactoryRegistry registry) {
+        registry.register(SHOCKWAVE_HANDLER, ShockwaveHandlerComponentImpl::new);
+    }
+
     public static StandComponent getStandData(LivingEntity entity) {
         return STAND.get(entity);
     }
@@ -86,11 +108,16 @@ public class JComponents implements EntityComponentInitializer {
     public static BombTrackerComponent getBombTracker(LivingEntity entity) {
         return BOMB_TRACKER.get(entity);
     }
+
     public static GrabComponent getGrab(LivingEntity entity) {
         return GRAB.get(entity);
     }
 
     public static HitPropertyComponent getHitProperties(LivingEntity livingEntity) {
         return HIT_PROPERTY.get(livingEntity);
+    }
+
+    public static ShockwaveHandlerComponent getShockwaveHandler(World world) {
+        return SHOCKWAVE_HANDLER.get(world);
     }
 }

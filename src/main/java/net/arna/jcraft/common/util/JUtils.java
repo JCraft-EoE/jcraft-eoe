@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.util;
 
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
-import net.arna.jcraft.common.component.HitPropertyComponent;
+import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;

@@ -17,10 +17,7 @@ import net.arna.jcraft.client.registry.JClientEventsRegistry;
 import net.arna.jcraft.client.registry.JEntityRendererRegister;
 import net.arna.jcraft.client.registry.JRenderLayerRegistry;
 import net.arna.jcraft.client.renderer.block.ShaderTestBlockEntityRenderer;
-import net.arna.jcraft.client.renderer.effects.AttackHitboxEffectRenderer;
-import net.arna.jcraft.client.renderer.effects.SplatterEffectRenderer;
-import net.arna.jcraft.client.renderer.effects.TimeAccelerationEffectRenderer;
-import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer;
+import net.arna.jcraft.client.renderer.effects.*;
 import net.arna.jcraft.client.renderer.item.BigItemRenderer;
 import net.arna.jcraft.client.rendering.RenderHandler;
 import net.arna.jcraft.client.rendering.handler.*;
@@ -28,7 +25,7 @@ import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
 import net.arna.jcraft.client.util.TrackedKeyBinding;
 import net.arna.jcraft.common.attack.core.MoveInputType;
-import net.arna.jcraft.common.component.CooldownsComponent;
+import net.arna.jcraft.common.component.living.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.network.c2s.PlayerInputPacket;
@@ -178,6 +175,7 @@ public class JCraftClient implements ClientModInitializer {
         TimeAccelerationEffectRenderer.init();
         TimeErasePredictionEffectRenderer.init();
         SplatterEffectRenderer.init();
+        ShockwaveEffectRenderer.init();
 
         HudRenderCallback.EVENT.register(this::renderHud);
 

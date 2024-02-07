@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.component.HitPropertyComponent;
+import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.util.IOwnable;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
