@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.item;
 
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.entity.player.PlayerEntity;
@@ -34,8 +35,11 @@ public class DebugWand extends Item {
         PlayerEntity player = context.getPlayer();
         if (player == null || context.getWorld().isClient) return ActionResult.PASS;
 
+        // Feel free to remove or modify these to debug other components/features.
         if (player.isSneaking())
             ShaderActivationPacket.send((ServerPlayerEntity) player, player, 0, 20 * 6, ShaderActivationPacket.Type.CRIMSON);
+        else
+            JComponents.getShockwaveHandler(context.getWorld()).addShockwave(context.getHitPos(), player.getPitch(), player.getYaw());
 
         return super.useOnBlock(context);
     }

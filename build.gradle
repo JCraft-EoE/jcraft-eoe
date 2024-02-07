@@ -94,6 +94,7 @@ dependencies {
 
 	include modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.0.2")
 	include modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.0.2")
+	include modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-world:5.0.2")
 	//include modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-item:5.0.2")
 
 	modApi "com.terraformersmc:modmenu:4.2.0-beta.2"

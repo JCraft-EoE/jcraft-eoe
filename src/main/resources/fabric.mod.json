@@ -66,6 +66,7 @@
     "player-animator": ">=0.3",
     "cardinal-components-base": "*",
     "cardinal-components-entity": "*",
+    "cardinal-components-world": "*",
     "cloth-config": "*"
   },
 
@@ -79,7 +80,8 @@
       "jcraft:misc",
       "jcraft:bomb_tracker",
       "jcraft:grab",
-      "jcraft:hit_property"
+      "jcraft:hit_property",
+      "jcraft:shockwave_handler"
     ]
   }
 }
