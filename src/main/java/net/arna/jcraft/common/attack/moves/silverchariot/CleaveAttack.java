@@ -1,9 +1,11 @@
 package net.arna.jcraft.common.attack.moves.silverchariot;
 
 import lombok.NonNull;
+import net.arna.jcraft.common.attack.moves.base.AbstractChargeAttack;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.entity.stand.SilverChariotEntity;
 import net.arna.jcraft.common.util.JParticleType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Vec3f;
 
 public class CleaveAttack extends AbstractSimpleAttack<CleaveAttack, SilverChariotEntity> {
@@ -17,7 +19,9 @@ public class CleaveAttack extends AbstractSimpleAttack<CleaveAttack, SilverChari
     public void onInitiate(SilverChariotEntity attacker) {
         super.onInitiate(attacker);
 
-        attacker.setFreePos(new Vec3f(attacker.getUserOrThrow().getPos().add(attacker.getUserOrThrow().getRotationVector().multiply(1.5))));
+        LivingEntity user = attacker.getUserOrThrow();
+        AbstractChargeAttack.prepDetachmentMove(attacker, user);
+        attacker.setFreePos(new Vec3f(user.getPos().add(attacker.getUserOrThrow().getRotationVector().multiply(1.5))));
         attacker.setFree(true);
     }
 

@@ -62,7 +62,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
             .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
             .withInfo(Text.literal("Roundhouse"), Text.literal("fast poke, low stun"));
     public static final ChargeBarrageAttack CHARGE_BARRAGE = new ChargeBarrageAttack(280, 5, 55,
-            5f, 0.6f, 20, 1.5f, 0.3f, 0f, 3)
+            7f, 0.6f, 20, 1.5f, 0.3f, 0f, 3)
             .withSound(JSoundRegistry.STAR_PLATINUM_ADVANCING_BARRAGE)
             .withBackstab(false)
             .withInfo(Text.literal("Advancing Barrage"), Text.literal("fast combo starter/extender, medium stun, extremely punishable on whiff"));

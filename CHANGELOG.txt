@@ -2235,11 +2235,16 @@ C-Moon
     >Updated skins
 
 ● 04/02/2024
-todo: redo aura colorz
 >Added inversion and shockwave particles
 
 D4C
     >Revolver now has 3 ticks of prefire time
+
+● 06/02/2024
+>Fixed detachment moves looking towards the side after some time
+
+Star Platinum
+    >Advancing Barrage has more range and tracks better
 
 todo:
 GRAVSHIFT PULSE MUST BEHAVE DIFFERENTLY

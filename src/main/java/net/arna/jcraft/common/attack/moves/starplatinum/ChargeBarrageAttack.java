@@ -13,6 +13,8 @@ import net.minecraft.util.math.Vec3f;
 
 import java.util.Set;
 
+import static net.arna.jcraft.common.attack.moves.base.AbstractChargeAttack.prepDetachmentMove;
+
 public class ChargeBarrageAttack extends AbstractBarrageAttack<ChargeBarrageAttack, StarPlatinumEntity> {
     private final float originalMoveDistance;
 
@@ -49,10 +51,7 @@ public class ChargeBarrageAttack extends AbstractBarrageAttack<ChargeBarrageAtta
             Vec3d newPos = advanceChargePos(attacker, moveDistance, windupPoint);
             attacker.setFreePos(new Vec3f((float) newPos.x, (float) newPos.y, (float) newPos.z));
             attacker.setFree(true);
-        } else {
-            attacker.setPosition(attacker.getUserOrThrow().getPos());
-            attacker.setRotationOffset(attacker.attackRotation);
-        }
+        } else prepDetachmentMove(attacker, attacker.getUserOrThrow());
     }
 
     @Override
@@ -69,7 +68,7 @@ public class ChargeBarrageAttack extends AbstractBarrageAttack<ChargeBarrageAtta
         }
         avgPos = avgPos.multiply(1f / c);
         attacker.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, avgPos);
-        withMoveDistance((float) avgPos.distanceTo(attacker.getPos()));
+        withMoveDistance((float) avgPos.squaredDistanceTo(attacker.getPos()) + 0.1f);
 
         return targets;
     }

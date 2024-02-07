@@ -65,10 +65,14 @@ public abstract class AbstractChargeAttack<T extends AbstractChargeAttack<T, A, 
             //stand.setDistanceOffset(1 + attackDist * t * t);
             attacker.setFreePos(new Vec3f((float) newPos.x, (float) newPos.y, (float) newPos.z));
             attacker.setFree(true);
-        } else {
-            attacker.setPosition(attacker.getUserOrThrow().getPos());
-            attacker.setRotationOffset(attacker.attackRotation);
-        }
+        } else prepDetachmentMove(attacker, attacker.getUserOrThrow());
+    }
+
+    public static void prepDetachmentMove(StandEntity<?, ?> attacker, LivingEntity user) {
+        attacker.setPosition(user.getPos());
+        attacker.setHeadYaw(user.getHeadYaw());
+        attacker.setBodyYaw(user.getHeadYaw());
+        attacker.setRotationOffset(attacker.attackRotation);
     }
 
     @Override
