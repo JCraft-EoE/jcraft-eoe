@@ -4,7 +4,10 @@ import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.StunType;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.StandEntity;
+import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
@@ -15,6 +18,7 @@ import net.minecraft.network.packet.s2c.play.StopSoundS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 
 import java.util.Set;
 
@@ -33,8 +37,25 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset);
         barrage = true;
         this.interval = interval;
-        this.withBlockStun(3);
-        this.withStunType(StunType.WINDED);
+        withBlockStun(3);
+        withHitSpark(null);
+        withStunType(StunType.WINDED);
+
+        withAction(((attacker, user, ctx, targets) -> {
+            if (targets.isEmpty()) return;
+            LivingEntity attackerEntity = attacker.getBaseEntity();
+            Random random = attackerEntity.getRandom();
+            Vec3d shockwavePos = attackerEntity.getPos().add(
+                    random.nextGaussian() / 3.0,
+                    random.nextGaussian() / 3.0,
+                    random.nextGaussian() / 3.0
+            );
+            Vec3d rotVec = Vec3d.fromPolar(attackerEntity.getPitch(), attackerEntity.getYaw());
+            shockwavePos = shockwavePos.add(rotVec);
+            shockwavePos = shockwavePos.add(RotationUtil.vecPlayerToWorld(new Vec3d(0, attackerEntity.getHeight() / 1.8 - offset, 0), GravityChangerAPI.getGravityDirection(user)));
+            JComponents.getShockwaveHandler(attacker.getEntityWorld())
+                    .addShockwave(shockwavePos, attackerEntity.getPitch(), attackerEntity.getYaw(), damage / 1.5f);
+        }));
     }
 
     @Override

@@ -2234,17 +2234,15 @@ Whitesnake
 C-Moon
     >Updated skins
 
-● 04/02/2024
->Added inversion and shockwave particles
-
-D4C
-    >Revolver now has 3 ticks of prefire time
-
 ● 06/02/2024
 >Fixed detachment moves looking towards the side after some time
+>Added shockwaves to launching moves and barrages
 
 Star Platinum
     >Advancing Barrage has more range and tracks better
+
+D4C
+    >Revolver now has 3 ticks of prefire time
 
 todo:
 GRAVSHIFT PULSE MUST BEHAVE DIFFERENTLY

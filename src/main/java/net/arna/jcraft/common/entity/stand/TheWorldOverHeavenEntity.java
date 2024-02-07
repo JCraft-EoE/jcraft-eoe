@@ -158,7 +158,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
                             M1>Barrage>M1>Knives>Overwrite~S2/S3>dash>Smite>Heavy>M1""";
 
         auraColors = new Vec3f[]{
-                new Vec3f(0.0f, 0.0f, 0.0f),
+                new Vec3f(0.1f, 0.1f, 0.1f),
                 new Vec3f(1f, 1f, 1f),
                 new Vec3f(0.9f, 0.9f, 1.0f),
                 new Vec3f(1.0f, 0.0f, 0.2f)

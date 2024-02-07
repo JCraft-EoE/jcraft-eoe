@@ -8,6 +8,7 @@ import net.arna.jcraft.common.attack.core.HitBoxData;
 import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.StunType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
@@ -264,9 +265,22 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
      * @return This attack
      */
     public T withLaunch() {
+        withLaunchNoShockwave();
+        withAction(((attacker, user, ctx, targets) -> {
+            if (targets.isEmpty()) return;
+            LivingEntity attackerEntity = attacker.getBaseEntity();
+            Vec3d shockwavePos = attackerEntity.getPos();
+            shockwavePos = shockwavePos.add(Vec3d.fromPolar(attackerEntity.getPitch(), attackerEntity.getYaw()));
+            shockwavePos = shockwavePos.add(RotationUtil.vecPlayerToWorld(new Vec3d(0, attackerEntity.getHeight() / 2.0 - offset, 0), GravityChangerAPI.getGravityDirection(user)));
+            JComponents.getShockwaveHandler(attacker.getEntityWorld())
+                    .addShockwave(shockwavePos, attackerEntity.getPitch(), attackerEntity.getYaw(), damage / 2.5f);
+        }));
+        return getThis();
+    }
+
+    public T withLaunchNoShockwave() {
         stunType = StunType.LAUNCH;
         overrideStun = true;
-        // EXPERIMENTAL
         hitAnimation = HitPropertyComponent.HitAnimation.LAUNCH;
         return getThis();
     }

@@ -111,7 +111,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
         auraColors = new Vec3f[]{
                 new Vec3f(1.0f, 0.7f, 0.3f),
                 Vec3f.POSITIVE_X,
-                Vec3f.ZERO,
+                new Vec3f(1.0f, 0.6f, 0.0f),
                 new Vec3f(0.7f, 0.3f, 1.0f)
         };
     }
