@@ -10,8 +10,8 @@ out vec4 fragColor;
 
 
 void main() {
-    vec4 source = texture2D(DiffuseSampler, texCoord);
-    vec4 invert = texture2D(InvertSampler, texCoord);
+    vec4 source = texture(DiffuseSampler, texCoord);
+    vec4 invert = texture(InvertSampler, texCoord);
 
     if (invert.a > 0.0) {
         fragColor = vec4(1.0 - source.r, 1.0 - source.g, 1.0 - source.b, 1.0);
