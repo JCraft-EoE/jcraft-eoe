@@ -38,9 +38,11 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A
         barrage = true;
         this.interval = interval;
         withBlockStun(3);
-        withHitSpark(null);
         withStunType(StunType.WINDED);
 
+        // TODO: aim shockwaves properly in other gravities
+        /*
+        withHitSpark(null);
         withAction(((attacker, user, ctx, targets) -> {
             if (targets.isEmpty()) return;
             LivingEntity attackerEntity = attacker.getBaseEntity();
@@ -56,6 +58,7 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A
             JComponents.getShockwaveHandler(attacker.getEntityWorld())
                     .addShockwave(shockwavePos, attackerEntity.getPitch(), attackerEntity.getYaw(), damage / 1.5f);
         }));
+         */
     }
 
     @Override
