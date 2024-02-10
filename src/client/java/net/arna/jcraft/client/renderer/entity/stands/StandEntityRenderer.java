@@ -145,7 +145,7 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends GeoEntityR
                 (limbSwingAmount <= -getSwingMotionAnimThreshold() || limbSwingAmount > getSwingMotionAnimThreshold()), Collections.singletonList(entityModelData));
         GeoModel model = this.modelProvider.getModel(this.modelProvider.getModelResource(animatable));
 
-        this.modelProvider.setLivingAnimations(animatable, getInstanceId(animatable), predicate); // TODO change to setCustomAnimations in 1.20+
+        this.modelProvider.setCustomAnimations(animatable, getInstanceId(animatable), predicate);
 
         poseStack.translate(0, 0.01f, 0);
         RenderSystem.setShaderTexture(0, getTextureLocation(animatable));

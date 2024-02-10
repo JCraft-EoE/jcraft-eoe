@@ -185,6 +185,7 @@ public class DimensionalHopMove extends AbstractSimpleAttack<DimensionalHopMove,
             }
         }
 
+        // todo: use auWorld.getLightingProvider().doLightUpdates()?
         for (BlockPos pos : BlockPos.iterate(new BlockPos(origin.getStartX() - 3 * 16, world.getBottomY(), origin.getStartZ() - 3 * 16),
                 new BlockPos(origin.getEndX() + 3 * 16, world.getTopY(), origin.getEndZ() + 3 * 16))) {
             auWorld.removeBlockEntity(pos); // Ensure the old one is gone.

@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-//todo: 3d, rotatable shockwave particle effect
 //todo: particles on gravpunch and both slams
 public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
     public static final int GRAVITY_CHANGE_DURATION = 600;

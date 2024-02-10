@@ -71,8 +71,6 @@ public class SandCloneMove extends AbstractMove<SandCloneMove, TheFoolEntity> {
             return Set.of();
         }
 
-        //todo: sand clone - copies player armor, aggros STUPID PEOPLE
-
         // Summon clone
         if (user instanceof ServerPlayerEntity player) {
             PlayerCloneEntity playerCloneEntity = new PlayerCloneEntity(attacker.getWorld());

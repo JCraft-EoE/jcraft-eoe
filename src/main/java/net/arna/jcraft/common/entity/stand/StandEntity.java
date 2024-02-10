@@ -1384,9 +1384,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         STOP
     }
 
-    //todo: make stand user AI aware of attack variations
-
-
     /**
      * Used to help AIs that use stands with unique moves
      */
