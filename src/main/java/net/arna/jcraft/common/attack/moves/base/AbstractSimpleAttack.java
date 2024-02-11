@@ -273,7 +273,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
             shockwavePos = shockwavePos.add(Vec3d.fromPolar(attackerEntity.getPitch(), attackerEntity.getYaw()));
             shockwavePos = shockwavePos.add(RotationUtil.vecPlayerToWorld(new Vec3d(0, attackerEntity.getHeight() / 2.0 - offset, 0), GravityChangerAPI.getGravityDirection(user)));
             JComponents.getShockwaveHandler(attacker.getEntityWorld())
-                    .addShockwave(shockwavePos, attackerEntity.getPitch(), attackerEntity.getYaw(), damage / 2.5f);
+                    .addShockwave(shockwavePos, attackerEntity.getRotationVector(), damage / 2.5f);
         }));
         return getThis();
     }

@@ -4,7 +4,9 @@ import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.tick.CommonTickingComponent;
 import lombok.Data;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.List;
@@ -22,6 +24,16 @@ public interface ShockwaveHandlerComponent extends Component, AutoSyncedComponen
 
     default void addShockwave(Vec3d pos, float pitch, float yaw) {
         addShockwave(pos.x, pos.y, pos.z, pitch, yaw);
+    }
+
+    default void addShockwave(Vec3d pos, Vec3d rotation, float scale) {
+        Vec2f polarRot = JUtils.rotationVectorToPolar(rotation);
+        addShockwave(pos.x, pos.y, pos.z, polarRot.x, polarRot.y, scale);
+    }
+
+    default void addShockwave(Vec3d pos, Vec3d rotation) {
+        Vec2f polarRot = JUtils.rotationVectorToPolar(rotation);
+        addShockwave(pos.x, pos.y, pos.z, polarRot.x, polarRot.y);
     }
 
     List<Shockwave> getShockwaves();

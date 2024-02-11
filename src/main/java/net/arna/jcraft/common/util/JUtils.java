@@ -35,10 +35,7 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
@@ -391,5 +388,26 @@ public final class JUtils {
 
         StandEntity<?, ?> stand = JUtils.getStand(livingEntity);
         if (stand != null) stand.cancelMove();
+    }
+
+    /**
+     * Converts a rotation vector to polar coordinates.
+     *
+     * @param rotationVector The rotation vector to convert
+     * @return A Vec2f containing the theta and phi angles
+     * @see Vec3d#fromPolar(Vec2f)
+     */
+    public static Vec2f rotationVectorToPolar(Vec3d rotationVector) {
+        double x = rotationVector.x;
+        double y = rotationVector.y;
+        double z = rotationVector.z;
+
+        // Calculate yaw (horizontal rotation)
+        double yaw = Math.atan2(x, z) * (180 / Math.PI);
+
+        // Calculate pitch (vertical rotation)
+        double pitch = Math.atan2(rotationVector.horizontalLength(), -y) * (180 / Math.PI);
+
+        return new Vec2f(90f - (float) pitch, (float) -yaw);
     }
 }

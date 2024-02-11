@@ -39,7 +39,7 @@ public class DebugWand extends Item {
         if (player.isSneaking())
             ShaderActivationPacket.send((ServerPlayerEntity) player, player, 0, 20 * 6, ShaderActivationPacket.Type.CRIMSON);
         else
-            JComponents.getShockwaveHandler(context.getWorld()).addShockwave(context.getHitPos(), player.getPitch(), player.getYaw());
+            JComponents.getShockwaveHandler(context.getWorld()).addShockwave(context.getHitPos(), player.getRotationVector());
 
         return super.useOnBlock(context);
     }
