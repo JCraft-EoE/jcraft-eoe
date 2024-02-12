@@ -65,7 +65,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             .withInfo(Text.literal("Crossfire"), Text.literal("fires 3 stunning ankhs"));
     public static final CrossfireVariationAttack CROSSFIRE_VARIATION = new CrossfireVariationAttack(600, 12, 17, 0.75f)
             .withSound(JSoundRegistry.MR_CROSSFIRE)
-            .withInfo(Text.literal("Crossfire Variation"), Text.literal("summons 6 ankhs that orbit around the user, crouch to increase orbit distance"));
+            .withInfo(Text.literal("Crossfire Variation"), Text.literal("summons 6 ankhs that orbit around the user, crouch as they come out to increase orbit distance"));
     public static final CrossfireHurricaneAttack CROSSFIRE_HURRICANE = new CrossfireHurricaneAttack(800, 18, 22, 0.75f)
             .withSound(JSoundRegistry.MR_ULT)
             .withInfo(Text.literal("Crossfire Hurricane"), Text.literal("summons slow, homing fire hurricane that knocks down, lasts for 3 seconds after hitting anything"));

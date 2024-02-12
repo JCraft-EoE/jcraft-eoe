@@ -39,6 +39,11 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
             .withInfo(Text.literal("Grab"), Text.literal("grabs opponent by the face, then detonates them, launching them upwards"));
     public static final CoinTossAttack COIN_TOSS = new CoinTossAttack(240);
 
+    // Light chain implementation
+    public static final SimpleAttack<AbstractKillerQueenEntity<?, ?>> LOW = AbstractKillerQueenEntity.LOW.copy().withAnim(KQBTDEntity.State.LOW);
+    public static final SimpleAttack<AbstractKillerQueenEntity<?, ?>> LIGHT_FOLLOWUP = AbstractKillerQueenEntity.LIGHT_FOLLOWUP.copy().withAnim(KQBTDEntity.State.LIGHT_FOLLOWUP).withFollowup(LOW);
+    public static final SimpleAttack<AbstractKillerQueenEntity<?, ?>> LIGHT = AbstractKillerQueenEntity.LIGHT.copy().withFollowup(LIGHT_FOLLOWUP);
+
     public KillerQueenEntity(World worldIn) {
         super(StandType.KILLER_QUEEN, worldIn, null);
 
@@ -54,7 +59,8 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
     protected void registerMoves(MoveMap<KillerQueenEntity, KillerQueenEntity.State> moves) {
         super.registerMoves(moves);
 
-        // Light, barrage and util are registered by the super class.
+        // Barrage and util are registered by the super class.
+        moves.register(MoveType.LIGHT, LIGHT, getLightState()).withCrouchingVariant(getDetonateState());
         moves.register(MoveType.HEAVY, HEAVY, State.HEAVY);
         moves.register(MoveType.SPECIAL1, BOMB_PLANT, State.BOMB_PLANT);
         moves.register(MoveType.SPECIAL2, GRAB, State.GRAB);
@@ -86,6 +92,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
         DETONATE(builder -> builder.playAndHold("animation.killerqueen.detonate")),
         BOMB_PLANT(builder -> builder.playAndHold("animation.killerqueen.bombplant")),
         SHA(builder -> builder.playAndHold("animation.killerqueen.sha")),
+        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.killerqueen.light_followup")),
         LOW(builder -> builder.playAndHold("animation.killerqueen.low")),
         GRAB(builder -> builder.playAndHold("animation.killerqueen.grab")),
         GRAB_HIT(builder -> builder.playAndHold("animation.killerqueen.grab_hit"));
@@ -121,11 +128,6 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
     @Override
     protected State getLightState() {
         return State.LIGHT;
-    }
-
-    @Override
-    protected State getLowState() {
-        return State.LOW;
     }
 
     @Override

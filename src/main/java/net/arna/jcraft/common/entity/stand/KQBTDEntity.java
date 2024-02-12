@@ -10,6 +10,7 @@ import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.killerqueen.bitesthedust.*;
 import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.GrabAttack;
+import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -59,6 +60,11 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
             0.75f, 0f, 20, 1.75f, 0.1f, 0f, GRAB_HIT, State.GRAB_HIT, 31, 1)
             .withInfo(Text.literal("Takedown"), Text.literal("high damage grab"));
 
+    // Light chain implementation
+    public static final SimpleAttack<AbstractKillerQueenEntity<?, ?>> LOW = AbstractKillerQueenEntity.LOW.copy().withAnim(KQBTDEntity.State.LOW);
+    public static final SimpleAttack<AbstractKillerQueenEntity<?, ?>> LIGHT_FOLLOWUP = AbstractKillerQueenEntity.LIGHT_FOLLOWUP.copy().withAnim(KQBTDEntity.State.LIGHT_FOLLOWUP).withFollowup(LOW);
+    public static final SimpleAttack<AbstractKillerQueenEntity<?, ?>> LIGHT = AbstractKillerQueenEntity.LIGHT.copy().withFollowup(LIGHT_FOLLOWUP);
+
     public KQBTDEntity(World worldIn) {
         super(StandType.KILLER_QUEEN_BITES_THE_DUST, worldIn, JSoundRegistry.KQBTD_SUMMON);
 
@@ -96,7 +102,8 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
     protected void registerMoves(MoveMap<KQBTDEntity, State> moves) {
         super.registerMoves(moves);
 
-        // Light, barrage and util are registered by the super class.
+        // Barrage and util are registered by the super class.
+        moves.register(MoveType.LIGHT, LIGHT, getLightState()).withCrouchingVariant(getDetonateState());
         moves.register(MoveType.HEAVY, ELBOW, State.HEAVY);
         moves.register(MoveType.SPECIAL1, BOMB_PLANT, State.BOMB_PLANT);
         moves.register(MoveType.SPECIAL2, BUBBLE, State.BUBBLE).withCrouchingVariant(State.BUBBLE_COUNTER);
@@ -153,6 +160,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
         DETONATE(builder -> builder.playAndHold("animation.kqbtd.detonate")),
         BOMB_PLANT(builder -> builder.playAndHold("animation.kqbtd.bombplant")),
         BUBBLE(builder -> builder.playAndHold("animation.kqbtd.bubble")),
+        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.kqbtd.light_followup")),
         LOW(builder -> builder.playAndHold("animation.kqbtd.low")),
         BUBBLE_COUNTER(builder -> builder.playAndHold("animation.kqbtd.bubblecounter")),
         COUNTER_MISS(builder -> builder.playAndHold("animation.kqbtd.counter_miss")),
@@ -190,11 +198,6 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
     @Override
     protected State getLightState() {
         return State.LIGHT;
-    }
-
-    @Override
-    protected State getLowState() {
-        return State.LOW;
     }
 
     @Override

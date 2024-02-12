@@ -39,10 +39,8 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A
         this.interval = interval;
         withBlockStun(3);
         withStunType(StunType.WINDED);
-
-        // TODO: aim shockwaves properly in other gravities
-        /*
         withHitSpark(null);
+
         withAction(((attacker, user, ctx, targets) -> {
             if (targets.isEmpty()) return;
             LivingEntity attackerEntity = attacker.getBaseEntity();
@@ -52,13 +50,12 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A
                     random.nextGaussian() / 3.0,
                     random.nextGaussian() / 3.0
             );
-            Vec3d rotVec = Vec3d.fromPolar(attackerEntity.getPitch(), attackerEntity.getYaw());
+            Vec3d rotVec = attackerEntity.getRotationVector();
             shockwavePos = shockwavePos.add(rotVec);
             shockwavePos = shockwavePos.add(RotationUtil.vecPlayerToWorld(new Vec3d(0, attackerEntity.getHeight() / 1.8 - offset, 0), GravityChangerAPI.getGravityDirection(user)));
             JComponents.getShockwaveHandler(attacker.getEntityWorld())
-                    .addShockwave(shockwavePos, attackerEntity.getPitch(), attackerEntity.getYaw(), damage / 1.5f);
+                    .addShockwave(shockwavePos, attackerEntity.getRotationVector(), damage / 1.5f);
         }));
-         */
     }
 
     @Override

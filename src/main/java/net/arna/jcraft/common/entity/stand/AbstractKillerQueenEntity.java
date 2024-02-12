@@ -1,6 +1,5 @@
 package net.arna.jcraft.common.entity.stand;
 
-import it.unimi.dsi.fastutil.ints.IntSet;
 import net.arna.jcraft.common.attack.core.BlockableType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
@@ -10,9 +9,8 @@ import net.arna.jcraft.common.attack.moves.killerqueen.DetonateAttack;
 import net.arna.jcraft.common.attack.moves.killerqueen.ExplosiveDashAttack;
 import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
-import net.arna.jcraft.common.attack.moves.shared.SimpleMultiHitAttack;
-import net.arna.jcraft.common.component.living.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.component.living.CooldownsComponent;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -33,18 +31,23 @@ import java.util.List;
 
 public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQueenEntity<E, S>, S extends Enum<S> & StandAnimationState<E>> extends StandEntity<E, S>
         permits KillerQueenEntity, KQBTDEntity {
-    public static final SimpleAttack<AbstractKillerQueenEntity<?, ?>> LOW = new SimpleAttack<AbstractKillerQueenEntity<?, ?>>(
+    public static SimpleAttack<AbstractKillerQueenEntity<?, ?>> LOW = new SimpleAttack<AbstractKillerQueenEntity<?, ?>>(
             0, 8, 13, 0.85f, 4f, 10, 1.5f, 0.5f, 0.1f)
-            .withImpactSound(JSoundRegistry.IMPACT_6)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("Low Punch"), Text.literal("frametrap tool, low stun"));
+    public static SimpleAttack<AbstractKillerQueenEntity<?, ?>> LIGHT_FOLLOWUP = new SimpleAttack<AbstractKillerQueenEntity<?, ?>>(
+            0, 6, 13, 0.8f, 3f, 20, 1.5f, 0.5f, 0.1f)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            // implement in class: .withFollowup(LOW)
+            .withInfo(Text.literal("Second Punch"), Text.literal("frametrap tool"));
     public static final DetonateAttack DETONATE = new DetonateAttack(20, 5, 6, 1f)
             .withInfo(Text.literal("Detonate"), Text.literal("tiny windup, move queueing is disabled while Detonate is active"));
-    public static final SimpleMultiHitAttack<AbstractKillerQueenEntity<?, ?>> LIGHT = SimpleMultiHitAttack.<AbstractKillerQueenEntity<?, ?>>lightAttack(
-            19, 0.75f, 3f, 20, 0, IntSet.of(6, 11))
-            .withImpactSound(JSoundRegistry.IMPACT_4)
+    public static final SimpleAttack<AbstractKillerQueenEntity<?, ?>> LIGHT = new SimpleAttack<AbstractKillerQueenEntity<?, ?>>(
+            30, 6, 10, 0.75f, 3f, 10, 1.5f, 0.5f, 0.1f)
+            .withImpactSound(JSoundRegistry.IMPACT_6)
             .withCrouchingVariant(DETONATE)
-            .withFollowup(LOW)
-            .withInfo(Text.literal("Dual Punch"), Text.literal("combo starter, decent speed, has followup with more blockstun"));
+            // implement in class: .withFollowup(LIGHT_FOLLOWUP)
+            .withInfo(Text.literal("Punch"), Text.literal("combo starter, decent speed, has two followups"));
     public static final MainBarrageAttack<AbstractKillerQueenEntity<?, ?>> BARRAGE = new MainBarrageAttack<AbstractKillerQueenEntity<?, ?>>(
             240, 0, 50, 0.75f, 1f, 20, 2f, 0.1f, 0, 3, Blocks.DEEPSLATE.getHardness())
             .withSound(JSoundRegistry.KQ_BARRAGE)
@@ -88,7 +91,6 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
 
     @Override
     protected void registerMoves(MoveMap<E, S> moves) {
-        moves.register(MoveType.LIGHT, LIGHT, getLightState()).withCrouchingVariant(getDetonateState());
         moves.register(MoveType.BARRAGE, BARRAGE, getBarrageState());
         moves.register(MoveType.UTILITY, EXPLOSIVE_DASH); // No special state for this one.
     }
@@ -109,14 +111,17 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
         switch (type) {
             case LIGHT -> {
                 boolean idling = getMoveStun() <= 0;
-                if (curMove == null || curMove.getOriginalMove() != LIGHT) {
+                if (curMove == null || curMove.getFollowup() == null) {
                     if (idling) {
                         if (user.isSneaking()) detonate();
                         else super.initMove(MoveType.LIGHT);
                     }
-                } else if (getMoveStun() < 7) {
+                } else if (getMoveStun() < curMove.getWindupPoint()) {
                     if (user.isSneaking()) detonate();
-                    else setMove(LOW, getLowState());
+                    else {
+                        AbstractMove<?, ? super E> followup = curMove.getFollowup();
+                        setMove(followup, (S) followup.getAnimation());
+                    }
                 }
             }
 
@@ -162,6 +167,5 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
     // Animation code
     protected abstract S getDetonateState();
     protected abstract S getLightState();
-    protected abstract S getLowState();
     protected abstract S getBarrageState();
 }
