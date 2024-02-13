@@ -35,6 +35,7 @@ import java.util.function.Consumer;
 
 public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, MagiciansRedEntity.State> {
     public static final RedirectAttack REDIRECT = new RedirectAttack(0, 7, 10, 0.75f)
+            .withAnim(State.REDIRECT)
             .withSound(JSoundRegistry.MR_REDIRECT)
             .withInfo(Text.literal("Redirect"), Text.literal("redirects all the users ankhs to where they're looking"));
     public static final SimpleAttack<MagiciansRedEntity> LIGHT_FOLLOWUP = new SimpleAttack<MagiciansRedEntity>(
@@ -119,13 +120,17 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
 
     @Override
     protected void registerMoves(MoveMap<MagiciansRedEntity, State> moves) {
-        moves.register(MoveType.LIGHT, LIGHT, State.LIGHT).withCrouchingVariant(State.REDIRECT);
+        moves.registerImmediate(MoveType.LIGHT, LIGHT, State.LIGHT);
+
         moves.register(MoveType.HEAVY, HEAVY, State.HEAVY);
         moves.register(MoveType.BARRAGE, FLAMETHROWER, State.BARRAGE);
+
         moves.register(MoveType.SPECIAL1, CROSSFIRE, State.CROSSFIRE);
         moves.register(MoveType.SPECIAL2, CROSSFIRE_VARIATION, State.CROSSFIRE_VARIATION);
         moves.register(MoveType.SPECIAL3, RED_BIND, State.RED_BIND);
+
         moves.register(MoveType.ULTIMATE, CROSSFIRE_HURRICANE, State.CROSSFIRE_HURRICANE);
+
         moves.register(MoveType.UTILITY, LIFE_DETECTOR, State.DETECTOR);
     }
 

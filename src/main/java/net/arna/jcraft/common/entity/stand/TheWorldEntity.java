@@ -22,7 +22,9 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.State> {
-    public static final SimpleAttack<TheWorldEntity> LOW_KICK = new SimpleAttack<TheWorldEntity>(30, 8, 14, 0.75f, 6f, 17, 1.5f, 0.2f, 0.85f)
+    public static final SimpleAttack<TheWorldEntity> LOW_KICK = new SimpleAttack<TheWorldEntity>(30, 8, 14, 0.75f,
+            6f, 17, 1.5f, 0.2f, 0.85f)
+            .withAnim(State.LOW)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(0, 0, 1)
             .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
@@ -118,7 +120,8 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
 
     @Override
     protected void registerMoves(MoveMap<TheWorldEntity, State> moves) {
-        moves.register(MoveType.LIGHT, LIGHT, State.LIGHT).withCrouchingVariant(State.LOW);
+        moves.registerImmediate(MoveType.LIGHT, LIGHT, State.LIGHT);
+
         moves.register(MoveType.HEAVY, DONUT, State.DONUT);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 

@@ -401,8 +401,22 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
 
         Set<Box> boxes = calculateBoxes(attacker, user, rotVec, upVec, hPos, fPos);
         DamageSource damageSource = attacker.getDamageSource();
-        return attackBoxes(attacker, boxes, damageSource, fPos);
+        Set<LivingEntity> targets = attackBoxes(attacker, boxes, damageSource, fPos);
+        performHook(attacker, targets, boxes, damageSource, fPos, rotVec, ctx);
+        return targets;
     }
+
+    /**
+     * A hook for processing the attack with more context than {@link #perform(IAttacker, LivingEntity, MoveContext)}
+     *
+     * @param targets           The valid targets found within the attack's hitboxes
+     * @param boxes             The attack's hitboxes
+     * @param damageSource      The attacker's damageSource
+     * @param forwardPos        The offset forward position
+     * @param rotationVector    The attacker's rotation unit vector
+     * @param ctx               The attacker's MoveContext instance
+     */
+    public void performHook(A attacker, Set<LivingEntity> targets, Set<Box> boxes, DamageSource damageSource, Vec3d forwardPos, Vec3d rotationVector, MoveContext ctx) {}
 
     /**
      * Calculates the boxes for this attack.

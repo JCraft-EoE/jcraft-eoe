@@ -155,7 +155,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
 
     @Override
     protected void registerMoves(MoveMap<GEREntity, State> moves) {
-        moves.register(MoveType.LIGHT, PUNCH, State.LIGHT).withAerialVariant(State.AIR_LIGHT);
+        moves.registerRecursive(MoveType.LIGHT, PUNCH, State.LIGHT);
         moves.register(MoveType.HEAVY, OVERHEAD_SMASH, State.HEAVY).withAerialVariant(State.AIR_HEAVY);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE).withAerialVariant(State.AIR_BARRAGE);
 

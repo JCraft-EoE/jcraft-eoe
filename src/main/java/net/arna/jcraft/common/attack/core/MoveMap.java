@@ -7,6 +7,7 @@ import com.google.common.collect.Streams;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NonNull;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.util.CooldownType;
 import org.jetbrains.annotations.Contract;
@@ -33,8 +34,48 @@ public class MoveMap<A extends IAttacker<A, S>, S> implements Iterable<MoveMap.E
         return register(type, move, type.getDefaultCooldownType(), animState);
     }
 
+    /**
+     * Registers a move and all its variants.
+     * Sub-moves must have an assigned animation state
+     */
+    public void registerRecursive(@NonNull MoveType type, @NonNull AbstractMove<?, ? super A> move, @Nullable S animState) {
+        Entry<A, S> entry = register(type, move, animState);
+
+        AbstractMove<?, ? super A> c = move.getCrouchingVariant();
+        if (c != null) {
+            entry.withCrouchingVariant((S) c.getAnimation());
+        }
+
+        AbstractMove<?, ? super A> a = move.getAerialVariant();
+        if (a != null) {
+            entry.withAerialVariant((S) a.getAnimation());
+        }
+
+        AbstractMove<?, ? super A> f = move.getFollowup();
+        if (f != null) {
+            registerRecursive(type, f, (S) f.getAnimation());
+            entry.withFollowUp((S) f.getAnimation());
+        }
+    }
+
+    /**
+     * Registers a move and its immediate followup and variants.
+     * Sub-moves must have an assigned animation state.
+     */
+    public void registerImmediate(@NonNull MoveType type, @NonNull AbstractMove<?, ? super A> move, @Nullable S animState) {
+        Entry<A, S> entry = register(type, move, animState);
+        if (move.getCrouchingVariant() != null)
+            entry.withCrouchingVariant((S) move.getCrouchingVariant().getAnimation());
+        if (move.getAerialVariant() != null)
+            entry.withAerialVariant((S) move.getAerialVariant().getAnimation());
+        if (move.getFollowup() != null)
+            entry.withFollowUp((S) move.getFollowup().getAnimation());
+    }
+
     public Entry<A, S> register(@NonNull MoveType type, @NonNull AbstractMove<?, ? super A> move, @Nullable CooldownType cooldownType, @Nullable S animState) {
         checkFrozen();
+
+        JCraft.LOGGER.info("Registering move " + move.getName().getString() + ", of type: " + type);
 
         AbstractMove<?, ? super A> copy = move.copy();
         //noinspection ConstantValue // That's the idea

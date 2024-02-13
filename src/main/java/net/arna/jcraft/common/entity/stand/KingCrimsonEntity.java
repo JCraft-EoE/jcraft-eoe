@@ -46,6 +46,7 @@ import java.util.function.Consumer;
 public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimsonEntity.State> {
     public static final KnockdownAttack<KingCrimsonEntity> SWEEP = new KnockdownAttack<KingCrimsonEntity>(50,
             10, 20, 0.85f, 5f, 20, 1.5f, 0.1f, 0.3f, 35)
+            .withAnim(State.SWEEP)
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withBlockStun(6)
             .withExtraHitBox(1)

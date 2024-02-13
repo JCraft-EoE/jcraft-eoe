@@ -38,6 +38,7 @@ import static net.arna.jcraft.common.attack.moves.silverchariot.CircleSlashAttac
 
 public class SilverChariotEntity extends StandEntity<SilverChariotEntity, SilverChariotEntity.State> {
     public static final LastShotAttack LAST_SHOT = new LastShotAttack(140, 12, 15, 1f)
+            .withAnim(State.LAST_SHOT)
             .withInfo(Text.literal("Last Shot"), Text.literal("Silver Chariot fires his rapier, " +
                     "which can bounce 5 times off walls, nerfs all hitboxes and damage by 25% until returned"));
     public static final SimpleAttack<SilverChariotEntity> LIGHT_FOLLOWUP = new SimpleAttack<SilverChariotEntity>(
@@ -190,7 +191,8 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
 
     @Override
     protected void registerMoves(MoveMap<SilverChariotEntity, State> moves) {
-        moves.register(MoveType.LIGHT, LIGHT, State.STAB).withCrouchingVariant(State.LAST_SHOT);
+        moves.registerImmediate(MoveType.LIGHT, LIGHT, State.STAB);
+
         moves.register(MoveType.HEAVY, HEAVY, State.HEAVY);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
         moves.register(MoveType.SPECIAL1, SPIN_BARRAGE, State.SPIN);

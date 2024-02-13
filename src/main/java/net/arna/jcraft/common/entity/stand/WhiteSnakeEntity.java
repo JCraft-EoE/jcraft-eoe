@@ -32,6 +32,12 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEntity.State> {
+    public static final UppercutAttack<WhiteSnakeEntity> UPPERCUT = new UppercutAttack<WhiteSnakeEntity>(
+            30, 8, 14, 1, 6f, 16, 1.25f, 0.5f, -0.4f, 0.5f)
+            .withAnim(State.UPPERCUT)
+            .withImpactSound(JSoundRegistry.IMPACT_3)
+            .withExtraHitBox(1)
+            .withInfo(Text.literal("Uppercut"), Text.literal("decent stun, launches up"));
     public static final SimpleAttack<WhiteSnakeEntity> LIGHT_FOLLOWUP = new SimpleAttack<WhiteSnakeEntity>(
             0, 7, 13, 0.75f, 6f, 10, 1.5f, 1f, 0.2f)
             .withAnim(State.LIGHT_FOLLOWUP)
@@ -39,11 +45,6 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withLaunch()
             .withBlockStun(4)
             .withInfo(Text.literal("Finisher"), Text.literal("quick combo finisher"));
-    public static final UppercutAttack<WhiteSnakeEntity> UPPERCUT = new UppercutAttack<WhiteSnakeEntity>(
-                    30, 8, 14, 1, 6f, 16, 1.25f, 0.5f, -0.4f, 0.5f)
-            .withImpactSound(JSoundRegistry.IMPACT_3)
-            .withExtraHitBox(1)
-            .withInfo(Text.literal("Uppercut"), Text.literal("decent stun, launches up"));
     public static final SimpleAttack<WhiteSnakeEntity> LIGHT = SimpleAttack.<WhiteSnakeEntity>lightAttack(
             7, 11, 5f, 13, 0.75f, 0.75f, 0.2f)
             .withFollowup(LIGHT_FOLLOWUP)
@@ -163,7 +164,8 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
 
     @Override
     protected void registerMoves(MoveMap<WhiteSnakeEntity, State> moves) {
-        moves.register(MoveType.LIGHT, LIGHT, State.LIGHT).withCrouchingVariant(State.UPPERCUT);
+        moves.registerImmediate(MoveType.LIGHT, LIGHT, State.LIGHT);
+
         moves.register(MoveType.HEAVY, MEDIUM, State.MEDIUM);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 

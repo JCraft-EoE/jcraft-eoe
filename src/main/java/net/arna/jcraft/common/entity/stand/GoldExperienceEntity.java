@@ -19,6 +19,7 @@ import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.stat.Stat;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
@@ -32,6 +33,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
     // JCraft.lightCooldown -> 0 | 0.5f -> 0.35f
     public static final BerryBushAttack BERRY_BUSH = new BerryBushAttack(120, 16, 20,
             1.25f, 4f, 5, 1.5f, 0.75f, 0.2f)
+            .withAnim(State.LIFE_GIVER)
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withInfo(Text.literal("Place Berry Bush"), Text.literal("places an almost-ripe berry bush on the ground, this move cannot be aimed up or down"));
     public static final SimpleAttack<GoldExperienceEntity> LIGHT_FOLLOWUP = new SimpleAttack<GoldExperienceEntity>(
@@ -149,7 +151,8 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
 
     @Override
     protected void registerMoves(MoveMap<GoldExperienceEntity, State> moves) {
-        moves.register(MoveType.LIGHT, LIGHT, State.LIGHT).withCrouchingVariant(State.LIFE_GIVER);
+        moves.registerImmediate(MoveType.LIGHT, LIGHT, State.LIGHT);
+
         moves.register(MoveType.HEAVY, HEAVY, State.HEAVY);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 

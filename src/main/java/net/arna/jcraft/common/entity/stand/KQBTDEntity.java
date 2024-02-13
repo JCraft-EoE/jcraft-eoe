@@ -103,7 +103,8 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
         super.registerMoves(moves);
 
         // Barrage and util are registered by the super class.
-        moves.register(MoveType.LIGHT, LIGHT, getLightState()).withCrouchingVariant(getDetonateState());
+        moves.registerRecursive(MoveType.LIGHT, LIGHT, getLightState());
+
         moves.register(MoveType.HEAVY, ELBOW, State.HEAVY);
         moves.register(MoveType.SPECIAL1, BOMB_PLANT, State.BOMB_PLANT);
         moves.register(MoveType.SPECIAL2, BUBBLE, State.BUBBLE).withCrouchingVariant(State.BUBBLE_COUNTER);

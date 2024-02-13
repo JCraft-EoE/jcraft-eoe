@@ -44,6 +44,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
     public static final int GRAVITY_CHANGE_DURATION = 600;
     public static final SimpleAttack<CMoonEntity> INVERSION_PUNCH = SimpleAttack.<CMoonEntity>lightAttack(6, 12,
             5f, 9, 0.75f, 0.75f, -0.1f)
+            .withAnim(State.INVERSION_PUNCH)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withTargetProcessor(CMoonEntity::addInversionPunchInversion)
             .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
@@ -189,7 +190,8 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
 
     @Override
     protected void registerMoves(MoveMap<CMoonEntity, State> moves) {
-        moves.register(MoveType.LIGHT, PUNCH, State.LIGHT).withCrouchingVariant(State.INVERSION_PUNCH);
+        moves.registerImmediate(MoveType.LIGHT, PUNCH, State.LIGHT);
+
         moves.register(MoveType.HEAVY, GUT_PUNCH, State.DONUT);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 

@@ -46,6 +46,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     public static final EffectInflictingAttack<MadeInHeavenEntity> SPEED_CHOP = new EffectInflictingAttack<MadeInHeavenEntity>(
             JCraft.LIGHT_COOLDOWN, 6, 11, 0.75f, 3f, 8, 1.5f, 0.75f, -0.1f,
             List.of(new StatusEffectInstance(JStatusRegistry.BLEEDING, 80, 1, true, false, true)))
+            .withAnim(State.SPEED_CHOP)
             .withImpactSound(SoundEvents.ITEM_TRIDENT_HIT)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
             .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
@@ -180,7 +181,8 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
 
     @Override
     protected void registerMoves(MoveMap<MadeInHeavenEntity, State> moves) {
-        moves.register(MoveType.LIGHT, SLICE, State.SLICE).withCrouchingVariant(State.SPEED_CHOP);
+        moves.registerImmediate(MoveType.LIGHT, SLICE, State.SLICE);
+
         moves.register(MoveType.HEAVY, DONUT, State.DONUT);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 

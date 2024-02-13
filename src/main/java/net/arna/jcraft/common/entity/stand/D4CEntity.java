@@ -33,6 +33,7 @@ import java.util.function.Consumer;
 
 public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
     public static final ItemPlaceMove ITEM_PLACE = new ItemPlaceMove(JCraft.LIGHT_COOLDOWN, 11, 15, 0.75f)
+            .withAnim(State.ITEM_PLACE)
             .withInfo(Text.literal("Item Place"), Text.literal("places an item from an alternate universe on the ground, attracts other such items"));
     public static final SimpleAttack<D4CEntity> LIGHT_FOLLOWUP = new SimpleAttack<D4CEntity>(
             0, 9, 14, 0.75f, 7f, 8, 1.75f, 1.25f, -0.1f)
@@ -146,7 +147,8 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
 
     @Override
     protected void registerMoves(MoveMap<D4CEntity, State> moves) {
-        moves.register(MoveType.LIGHT, CHOP, State.LIGHT).withCrouchingVariant(State.ITEM_PLACE);
+        moves.registerImmediate(MoveType.LIGHT, CHOP, State.LIGHT);
+
         moves.register(MoveType.HEAVY, CHARGE, State.HEAVY);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 

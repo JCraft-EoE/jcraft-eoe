@@ -48,6 +48,7 @@ import java.util.function.Consumer;
 public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.State> {
     public static final SimpleMultiHitAttack<TheFoolEntity> DRILL = new SimpleMultiHitAttack<TheFoolEntity>(
             30, 14, 1.5f, 2.5f, 7, 1.5f, 0.2f, 0.25f, IntSet.of(5, 8, 11))
+            .withAnim(State.DRILL)
             .withBlockStun(4)
             .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
             .withInfo(Text.literal("Drill"), Text.literal("fast, multi-hitting combo starter, low stun and blockstun"));
@@ -195,7 +196,8 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
 
     @Override
     protected void registerMoves(MoveMap<TheFoolEntity, State> moves) {
-        moves.register(MoveType.LIGHT, LIGHT, State.SWIPE).withCrouchingVariant(State.DRILL);
+        moves.registerImmediate(MoveType.LIGHT, LIGHT, State.SWIPE);
+
         moves.register(MoveType.HEAVY, LAUNCH, State.LAUNCH);
         moves.register(MoveType.BARRAGE, COMBO, State.COMBO).withAerialVariant(State.AIR_BARRAGE);
 

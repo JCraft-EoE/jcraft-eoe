@@ -11,6 +11,7 @@ public class LungeAttack extends AbstractSimpleAttack<LungeAttack, TheWorldOverH
                        float hitboxSize, float knockback, float offset) {
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset);
         originalMoveDistance = moveDistance;
+        this.ranged = true;
     }
 
     @Override

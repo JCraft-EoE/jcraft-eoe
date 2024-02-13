@@ -47,6 +47,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public static final EffectInflictingAttack<CreamEntity> BITE = new EffectInflictingAttack<CreamEntity>(30,
             9, 15, 0.75f, 5f, 20, 1.75f, 0.75f, 0.3f,
             List.of(new StatusEffectInstance(StatusEffects.SLOWNESS, 40, 1)))
+            .withAnim(State.BITE)
             .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
             .withInfo(Text.literal("Bite"), Text.literal("applies Slowness II (2s) on hit"));
     public static final SimpleAttack<CreamEntity> LIGHT_FOLLOWUP = new SimpleAttack<CreamEntity>(
@@ -219,7 +220,8 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
 
             moves.register(MoveType.UTILITY, EXIT, State.EXIT);
         } else {
-            moves.register(MoveType.LIGHT, PUNCH, State.LIGHT).withCrouchingVariant(State.BITE);
+            moves.registerImmediate(MoveType.LIGHT, PUNCH, State.LIGHT);
+
             moves.register(MoveType.HEAVY, VERTICAL_CHOP, State.HEAVY);
             moves.register(MoveType.BARRAGE, COMBO, State.COMBO);
 

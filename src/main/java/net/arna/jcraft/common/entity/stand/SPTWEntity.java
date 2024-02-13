@@ -27,8 +27,9 @@ import java.util.function.Consumer;
 public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPTWEntity.State> {
     public static final GroundSlamAttack GROUND_SLAM = new GroundSlamAttack(30, 12, 19,
             0.75f, 7f, 11, 1.8f, 0f, 0.8f)
+            .withAnim(State.GROUND_SLAM)
             .withImpactSound(JSoundRegistry.IMPACT_8)
-            .withLaunch()
+            .withLaunchNoShockwave()
             .withInfo(Text.literal("Ground Slam"), Text.literal("low hitbox, decent damage, launches"));
     public static final SimpleAttack<SPTWEntity> LIGHT_FOLLOWUP = new SimpleAttack<SPTWEntity>(
             0, 5, 14, 0.75f, 6, 12, 1.5f, 1f, -0.1f)
@@ -122,8 +123,9 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
 
     @Override
     protected void registerMoves(MoveMap<SPTWEntity, State> moves) {
-        moves.register(MoveType.LIGHT, PUNCH, State.PUNCH).withCrouchingVariant(State.GROUND_SLAM);
-        moves.register(MoveType.HEAVY, STAR_BREAKER, State.HEAVY);
+        moves.registerImmediate(MoveType.LIGHT, PUNCH, State.PUNCH);
+
+        moves.register(MoveType.HEAVY, STAR_BREAKER, State.HEAVY).withCrouchingVariant(State.GROUND_BREAKER);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 
         moves.register(MoveType.SPECIAL1, TIME_STRIKE, State.TIME_STRIKE);
@@ -181,6 +183,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
         PUNCH(builder -> builder.playAndHold("animation.sptw.punch")),
         BLOCK(builder -> builder.loop("animation.sptw.block")),
         HEAVY(builder -> builder.playAndHold("animation.sptw.heavy")),
+        GROUND_BREAKER(builder -> builder.playAndHold("animation.sptw.ground_break")),
         BARRAGE(builder -> builder.loop("animation.sptw.barrage")),
         TIME_STRIKE(builder -> builder.playAndHold("animation.sptw.timestrike")),
         TIME_STOP(builder -> builder.playAndHold("animation.sptw.timestop")),
@@ -188,7 +191,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
         GRAB(builder -> builder.playAndHold("animation.sptw.grab")),
         GRAB_HIT(builder -> builder.playAndHold("animation.sptw.grabhit")),
         TIME_SKIP(builder -> builder.loop("animation.sptw.idle")),
-        GROUND_SLAM(builder -> builder.playAndHold("animation.sptw.groundslam")),
+        GROUND_SLAM(builder -> builder.playAndHold("animation.sptw.ground_slam")),
         LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.sptw.light_followup"));
 
         private final Consumer<AnimationBuilder> animator;

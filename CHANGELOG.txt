@@ -2248,10 +2248,23 @@ D4C
 >Fixed shockwaves in other gravities
 >All barrages now display shockwaves instead of hitsparks
 
+Stand User AI
+    >Now attempts to mine through obstacles between it and its target with barrage
+    >Improved move selection logic
+
+Star Platinum (and SP:TW)
+    >Added crouching variant to Star Breaker
+
 Killer Queen (and Bites the Dust)
     >Light split into 3 moves
 
+C-Moon
+    >Fixed Ground Slam not raising blocks
+
 todo:
+entity tag for #jcraft:eligible_stand_user
+fix attack value underflow with weakness 3+ and blocking
+
 GRAVSHIFT PULSE MUST BEHAVE DIFFERENTLY
 afterimages on ger ctr
 

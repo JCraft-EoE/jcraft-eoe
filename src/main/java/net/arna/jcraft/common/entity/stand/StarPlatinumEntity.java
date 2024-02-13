@@ -28,6 +28,7 @@ import java.util.function.Consumer;
 public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPlatinumEntity, StarPlatinumEntity.State> {
     public static final UppercutAttack<StarPlatinumEntity> UPPERCUT = new UppercutAttack<StarPlatinumEntity>(30,
             8, 14, 0.75f, 6f, 20, 1.5f, 0.25f, -0.4f, 0.75f)
+            .withAnim(State.UPPERCUT)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(0, 0.35, 1.25)
             .withInfo(Text.literal("Uppercut"), Text.literal("slower combo starter, launches vertically"));
@@ -89,8 +90,9 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
 
     @Override
     protected void registerMoves(MoveMap<StarPlatinumEntity, State> moves) {
-        moves.register(MoveType.LIGHT, LIGHT, State.PUNCH).withCrouchingVariant(State.UPPERCUT);
-        moves.register(MoveType.HEAVY, STAR_BREAKER, State.HEAVY);
+        moves.registerImmediate(MoveType.LIGHT, LIGHT, State.PUNCH);
+
+        moves.register(MoveType.HEAVY, STAR_BREAKER, State.HEAVY).withCrouchingVariant(State.GROUND_BREAKER);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 
         moves.register(MoveType.SPECIAL1, STAR_FINGER, State.STAR_FINGER);
@@ -148,6 +150,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
         PUNCH(builder -> builder.playAndHold("animation.starplatinum.light")),
         BLOCK(builder -> builder.loop("animation.starplatinum.block")),
         HEAVY(builder -> builder.playAndHold("animation.starplatinum.heavy")),
+        GROUND_BREAKER(builder -> builder.playAndHold("animation.starplatinum.ground_slam")),
         BARRAGE(builder -> builder.loop("animation.starplatinum.barrage")),
         STAR_FINGER(builder -> builder.playAndHold("animation.starplatinum.star_finger")),
         INHALE(builder -> builder.playAndHold("animation.starplatinum.inhale")),
