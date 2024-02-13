@@ -51,8 +51,6 @@ public class MoveMap<A extends IAttacker<A, S>, S> implements Iterable<MoveMap.E
     public Entry<A, S> register(@NonNull MoveType type, @NonNull AbstractMove<?, ? super A> move, @Nullable CooldownType cooldownType, @Nullable S animState) {
         checkFrozen();
 
-        JCraft.LOGGER.info("Registering move " + move.getName().getString() + ", of type: " + type);
-
         AbstractMove<?, ? super A> copy = move.copy();
         //noinspection ConstantValue // That's the idea
         if (copy == null) throw new IllegalStateException(move.getClass().getSimpleName() + "#copy() returned null.");

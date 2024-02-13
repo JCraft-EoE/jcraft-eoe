@@ -2245,6 +2245,7 @@ D4C
     >Revolver now has 3 ticks of prefire time
 
 ● 13/02/2024
+>Fixed stands being hit by projectiles despite blocking
 >Fixed shockwaves in other gravities
 >All barrages now display shockwaves instead of hitsparks
 
@@ -2265,6 +2266,7 @@ C-Moon
 todo:
 entity tag for #jcraft:eligible_stand_user
 fix attack value underflow with weakness 3+ and blocking
+add specificMoveSelectionCriterion to stands like KC(movecancel), MR(redirect)
 
 GRAVSHIFT PULSE MUST BEHAVE DIFFERENTLY
 afterimages on ger ctr

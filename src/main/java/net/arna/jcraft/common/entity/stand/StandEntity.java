@@ -1148,7 +1148,14 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     @Override
     public boolean damage(DamageSource source, float amount) {
-        if (user == null || source.getAttacker() == user || user.isInvulnerableTo(source) || source.isFallingBlock() || source == DamageSource.DROWN) return false;
+        if (user == null ||
+                source.getAttacker() == user ||
+                user.isInvulnerableTo(source) ||
+                source.isFallingBlock() ||
+                source == DamageSource.DROWN ) return false;
+
+        if (blocking && source.isProjectile())
+            return false;
 
         if (source.isMagic() || source.isExplosive()) // AoE effects have damage nerfed
             amount /= 2.0F;
