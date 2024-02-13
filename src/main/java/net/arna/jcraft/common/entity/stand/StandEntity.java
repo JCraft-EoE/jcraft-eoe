@@ -1408,27 +1408,18 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if (enemyIsAttacking && enemyAttack.isCounter()) return null;
         int movesOnCooldown = 0;
 
-        /*
-        if (curMove != null) {
-            if (curMove.getFollowup() != null) {
-                selectedAttack = curMove.getFollowup();
-                // So far, followups don't require crouching
-            }
-        } else {
-         */
         MoveMap.Entry<E, S> lightEntry = getMoveMap().getFirstValidEntry(MoveType.LIGHT, getThis());
         if (lightEntry == null) return null;
 
         selectedAttack = lightEntry.getMove();
         int selectedAttackInitTime = selectedAttack.getDuration() - selectedAttack.getWindup();
 
-        for (MoveMap.Entry<E, S> entry : getMoveMap()) {
-            AbstractMove<?, ? super E> attack = entry.getMove();
+        for (AbstractMove<?, ? super E> attack : getMoveMap().asMovesList()) {
             needsCrouch = attack.isCrouchingVariant();
             int windupPoint = attack.getWindupPoint();
 
             // Discount any on-cooldown non-followup attacks
-            if (cooldowns.getCooldown(entry.getCooldownType()) > 0) {
+            if (!attack.isFollowup() && cooldowns.getCooldown(attack.getMoveType().getDefaultCooldownType()) > 0) {
                 movesOnCooldown++;
                 continue;
             }
@@ -1518,7 +1509,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 selectedAttack = attack;
             }
         }
-        //}
 
         if (movesOnCooldown > 5) cooldowns.cooldownCancel(); // >5 = 80+%
 

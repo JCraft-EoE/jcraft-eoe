@@ -60,7 +60,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
         super.registerMoves(moves);
 
         // Barrage and util are registered by the super class.
-        moves.registerRecursive(MoveType.LIGHT, LIGHT, getLightState());
+        moves.registerImmediate(MoveType.LIGHT, LIGHT, getLightState());
 
         moves.register(MoveType.HEAVY, HEAVY, State.HEAVY);
         moves.register(MoveType.SPECIAL1, BOMB_PLANT, State.BOMB_PLANT);

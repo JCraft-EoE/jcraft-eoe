@@ -35,30 +35,6 @@ public class MoveMap<A extends IAttacker<A, S>, S> implements Iterable<MoveMap.E
     }
 
     /**
-     * Registers a move and all its variants.
-     * Sub-moves must have an assigned animation state
-     */
-    public void registerRecursive(@NonNull MoveType type, @NonNull AbstractMove<?, ? super A> move, @Nullable S animState) {
-        Entry<A, S> entry = register(type, move, animState);
-
-        AbstractMove<?, ? super A> c = move.getCrouchingVariant();
-        if (c != null) {
-            entry.withCrouchingVariant((S) c.getAnimation());
-        }
-
-        AbstractMove<?, ? super A> a = move.getAerialVariant();
-        if (a != null) {
-            entry.withAerialVariant((S) a.getAnimation());
-        }
-
-        AbstractMove<?, ? super A> f = move.getFollowup();
-        if (f != null) {
-            registerRecursive(type, f, (S) f.getAnimation());
-            entry.withFollowUp((S) f.getAnimation());
-        }
-    }
-
-    /**
      * Registers a move and its immediate followup and variants.
      * Sub-moves must have an assigned animation state.
      */

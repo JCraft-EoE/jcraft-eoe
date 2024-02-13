@@ -39,6 +39,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             .withInfo(Text.literal("Punch"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<GEREntity> DOWNWARD_KICK = new SimpleAttack<GEREntity>(JCraft.LIGHT_COOLDOWN,
             5, 12, 0.75f, 4f, 20, 1.25f, 0.75f, 0.33f)
+            .withAnim(State.AIR_LIGHT)
             .withFollowup(LIGHT_FOLLOWUP)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(0, -1, 1)
@@ -155,7 +156,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
 
     @Override
     protected void registerMoves(MoveMap<GEREntity, State> moves) {
-        moves.registerRecursive(MoveType.LIGHT, PUNCH, State.LIGHT);
+        moves.registerImmediate(MoveType.LIGHT, PUNCH, State.LIGHT);
         moves.register(MoveType.HEAVY, OVERHEAD_SMASH, State.HEAVY).withAerialVariant(State.AIR_HEAVY);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE).withAerialVariant(State.AIR_BARRAGE);
 

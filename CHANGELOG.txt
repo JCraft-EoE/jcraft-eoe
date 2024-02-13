@@ -2251,6 +2251,7 @@ D4C
 Stand User AI
     >Now attempts to mine through obstacles between it and its target with barrage
     >Improved move selection logic
+    >AIs can now use their full movelist
 
 Star Platinum (and SP:TW)
     >Added crouching variant to Star Breaker
