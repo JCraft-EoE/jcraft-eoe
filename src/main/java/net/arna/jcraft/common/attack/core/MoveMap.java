@@ -112,6 +112,12 @@ public class MoveMap<A extends IAttacker<A, S>, S> implements Iterable<MoveMap.E
         return Collections.unmodifiableList(moves.get(type));
     }
 
+    /**
+     * Finds first move of the given type that matches all conditions for the given attacker.
+     * @param type The type of move to find
+     * @param attacker The attacker to test the move against
+     * @return The first valid entry for the given type, or null if none are found.
+     */
     @Nullable
     public Entry<A, S> getFirstValidEntry(MoveType type, A attacker) {
         return getEntries(type).stream()
@@ -120,6 +126,9 @@ public class MoveMap<A extends IAttacker<A, S>, S> implements Iterable<MoveMap.E
                 .orElse(null);
     }
 
+    /**
+     * Throws an {@link IllegalStateException} if this MoveMap is frozen.
+     */
     private void checkFrozen() {
         if (frozen) throw new IllegalStateException("MoveMap is already frozen.");
     }
