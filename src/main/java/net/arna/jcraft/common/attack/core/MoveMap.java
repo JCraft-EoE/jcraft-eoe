@@ -1,9 +1,7 @@
 package net.arna.jcraft.common.attack.core;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.MultimapBuilder;
-import com.google.common.collect.Streams;
+import com.google.common.collect.*;
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NonNull;
@@ -23,6 +21,8 @@ public class MoveMap<A extends IAttacker<A, S>, S> implements Iterable<MoveMap.E
     private final List<Entry<A, S>> extraMoves = new ArrayList<>();
     @Getter
     private Map<AbstractMove<?, ? super A>, AbstractMove<?, ? super A>> copyMap = Map.of();
+    @Getter(lazy = true, value = AccessLevel.PRIVATE)
+    private final List<AbstractMove<?, ? super A>> allMoves = toList();
     @Getter
     private boolean frozen = false;
 
@@ -154,6 +154,26 @@ public class MoveMap<A extends IAttacker<A, S>, S> implements Iterable<MoveMap.E
         return Stream.concat(moves.values().stream(), extraMoves.stream())
                 .flatMap(this::streamEntryAndChildren)
                 .iterator();
+    }
+
+    /**
+     * Builds a list of all moves in this map.
+     * @return A list of all moves in this map.
+     */
+    private List<AbstractMove<?, ? super A>> toList() {
+        return ImmutableList.copyOf(this).stream()
+                .map(Entry::getMove)
+                .collect(ImmutableList.toImmutableList());
+    }
+
+    /**
+     * Returns a list of all moves in this map.
+     * Includes variants and follow-ups, recursively.
+     * @return A list of all moves in this map.
+     */
+    public List<AbstractMove<?, ? super A>> asMovesList() {
+        // If the map is frozen, we can return the cached list.
+        return frozen ? getAllMoves() : toList();
     }
 
     private Stream<Entry<A, S>> streamEntryAndChildren(MoveMap.Entry<A, S> entry) {
