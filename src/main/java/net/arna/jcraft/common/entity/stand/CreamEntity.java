@@ -12,6 +12,8 @@ import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.cream.*;
 import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.component.living.HitPropertyComponent;
+import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -33,6 +35,7 @@ import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
@@ -437,33 +440,85 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
 
                 Vec3d finalSpeed = Vec3d.ZERO;
                 if (!blocking && !user.hasStatusEffect(JStatusRegistry.DAZED)) {
-                    Vec3d eP = user.getEyePos();
+                    Direction gravity = GravityChangerAPI.getGravityDirection(this);
+                    Vec3d gravityVec = new Vec3d(gravity.getUnitVector());
+
+                    Vec3d userVel = JUtils.deltaPos(user);
+                    Vec3d userPos = user.getPos();
                     Vec3d groundPos = world.raycast(
-                            new RaycastContext(eP, eP.add(0, -24, 0), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user)
-                    ).getPos();
+                            new RaycastContext(
+                                    userPos, userPos.add(gravityVec.multiply(24)),
+                                    RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, user) ).getPos();
 
                     double groundDist = groundPos.distanceTo(pos);
-                    double stabilization = user.getVelocity().y;
-                    if (stabilization < 0) stabilization *= -0.75;
-                    else stabilization = 0;
+                    if (groundDist < 2) groundDist = 2; // Prevents extremely high jumps
+                    Vec3d stabilization = userVel.multiply(gravityVec).multiply(10 / groundDist);
 
                     if (getRemoteJumpInput()) {
-                        if (groundDist < 5) {
-                            user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 10, 2, true, false));
-                            if (groundDist < 3)
-                                finalSpeed = finalSpeed.add(0, 0.25 / groundDist + stabilization, 0);
-                        }
+                        user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 10, 2, true, false));
+                        if (groundDist < 5)
+                            GravityChangerAPI.addWorldVelocity(user, stabilization.subtract(gravityVec.multiply(0.25 / groundDist)));
                     }
 
-                    Vec3d rotVec = user.getRotationVector();
-                    finalSpeed = finalSpeed.add(rotVec.multiply(getRemoteForwardInput() / 30)); // Forward movement
-                    finalSpeed = finalSpeed.add(rotVec.rotateY(1.5707963f).multiply(getRemoteSideInput() / 30)); // Side movement
+                    //JCraft.LOGGER.info("FS1: " + finalSpeed);
+
+                    Vec3d rotVec = Vec3d.fromPolar(getPitch(), getYaw());
+                    Vec3d moveRotVec = Vec3d.ZERO;
+                    float forward = (float) getRemoteForwardInput();
+                    if (forward != 0) moveRotVec = moveRotVec.add(rotVec.multiply(forward)); // Forward movement
+                    float side = (float) getRemoteSideInput();
+                    if (side != 0) moveRotVec = moveRotVec.add(rotVec.rotateY(1.57079632679f * side)); // Side movement
+
+                    finalSpeed = finalSpeed.add(moveRotVec.normalize().multiply(0.034));
+
+                    //JCraft.LOGGER.info("\nPRE Vel: " + user.getVelocity() + " | FS: " + finalSpeed);
                     user.addVelocity(finalSpeed.x, finalSpeed.y, finalSpeed.z);
-                    serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(user));
+                    user.velocityModified = true;
+                    //serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(user));
+                    //JCraft.LOGGER.info("POST Vel: " + user.getVelocity());
                 }
             } else resetAlphaOverride();
         }
     }
+
+    /* TODO: FIX CREAM HOVER IN DIFF GRAVITIES
+    Vec3d gravityVec = new Vec3d(GravityChangerAPI.getGravityDirection(this).getUnitVector());
+
+    Vec3d userVel = JUtils.deltaPos(user);
+    Vec3d userPos = user.getPos();
+    Vec3d groundPos = world.raycast(
+            new RaycastContext(
+                    userPos, userPos.add(gravityVec.multiply(24)),
+                    RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user) ).getPos();
+
+    double groundDistSqr = groundPos.squaredDistanceTo(pos);
+    Vec3d stabilization = userVel.multiply(gravityVec).multiply(-1 / groundDistSqr);
+
+                    if (getRemoteJumpInput()) {
+        if (groundDistSqr < 49) {
+            user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 10, 0, true, false));
+            if (groundDistSqr < 25)
+                finalSpeed = finalSpeed.add(stabilization.subtract(gravityVec.multiply(1 / groundDistSqr)));
+        }
+    }
+
+    //JCraft.LOGGER.info("FS1: " + finalSpeed);
+
+    Vec3d rotVec = Vec3d.fromPolar(getPitch(), getYaw());
+    Vec3d moveRotVec = Vec3d.ZERO;
+    float forward = (float) getRemoteForwardInput();
+                    if (forward != 0) moveRotVec = moveRotVec.add(rotVec.multiply(forward)); // Forward movement
+    float side = (float) getRemoteSideInput();
+                    if (side != 0) moveRotVec = moveRotVec.add(rotVec.rotateY(1.57079632679f * side)); // Side movement
+
+    finalSpeed = finalSpeed.add(moveRotVec.normalize().multiply(0.34));
+
+    //JCraft.LOGGER.info("\nPRE Vel: " + user.getVelocity() + " | FS: " + finalSpeed);
+                    user.addVelocity(finalSpeed.x, finalSpeed.y, finalSpeed.z);
+    user.velocityModified = true;
+    //serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(user));
+    //JCraft.LOGGER.info("POST Vel: " + user.getVelocity());
+    */
 
     private void handleAIVoid(LivingEntity user, int voidTime) {
         double y = user.getY();

@@ -2263,6 +2263,16 @@ Killer Queen (and Bites the Dust)
 C-Moon
     >Fixed Ground Slam not raising blocks
 
+● 14/02/2024
+C-Moon
+    >Only One Punch
+        >Added VFX
+        >Updated animation
+
+Cream
+    >Half-Ball State
+        >Fixed hovering not working in different gravities
+
 todo:
 entity tag for #jcraft:eligible_stand_user
 fix attack value underflow with weakness 3+ and blocking

@@ -2,7 +2,9 @@ package net.arna.jcraft.common.attack.moves.cmoon;
 
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.CMoonEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.Gravity;
@@ -12,8 +14,11 @@ import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+
+import java.util.Set;
 
 public class GravPunchAttack extends AbstractSimpleAttack<GravPunchAttack, CMoonEntity> {
     public static final String GRAVITY_SOURCE = JCraft.MOD_ID + "$" + GravPunchAttack.class.getSimpleName();
@@ -33,6 +38,12 @@ public class GravPunchAttack extends AbstractSimpleAttack<GravPunchAttack, CMoon
         target.addStatusEffect(new StatusEffectInstance(JStatusRegistry.WEIGHTLESS, 60, 0, true, false));
         // Launches them up relative to their original gravity, to prevent ground clipping
         JUtils.setVelocity(target, oppositeGravity.getOffsetX() * 0.2, oppositeGravity.getOffsetY() * 0.2, oppositeGravity.getOffsetZ() * 0.2);
+    }
+
+    @Override
+    public void performHook(CMoonEntity attacker, Set<LivingEntity> targets, Set<Box> boxes, DamageSource damageSource, Vec3d forwardPos, Vec3d rotationVector, MoveContext ctx) {
+        if (targets.isEmpty()) return;
+        JComponents.getShockwaveHandler(attacker.world).addShockwave(forwardPos, new Vec3d(GravityChangerAPI.getGravityDirection(attacker).getUnitVector()), 3.0f);
     }
 
     @Override
