@@ -23,7 +23,7 @@ import java.util.function.Consumer;
 
 public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.State> {
     public static final SimpleAttack<TheWorldEntity> LOW_KICK = new SimpleAttack<TheWorldEntity>(30, 8, 14, 0.75f,
-            6f, 17, 1.5f, 0.2f, 0.85f)
+            6f, 17, 1.5f, 0.2f, 0.65f)
             .withAnim(State.LOW)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(0, 0, 1)

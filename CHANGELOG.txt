@@ -2264,16 +2264,29 @@ C-Moon
     >Fixed Ground Slam not raising blocks
 
 ● 14/02/2024
+The World
+    >Updated skin 2
+
+    >Low Kick
+        >Moved hitbox up
+        >Updated animation
+
 C-Moon
     >Only One Punch
         >Added VFX
         >Updated animation
+    >Ground Slam
+        >Added shockwave
 
 Cream
     >Half-Ball State
         >Fixed hovering not working in different gravities
+        >Can now move freely in fluids
 
 todo:
+dynamic hurtboxes
+Knockdown() method
+counters that invalidate hit effects
 entity tag for #jcraft:eligible_stand_user
 fix attack value underflow with weakness 3+ and blocking
 add specificMoveSelectionCriterion to stands like KC(movecancel), MR(redirect)
@@ -2285,9 +2298,5 @@ trails
 reverse attraction for d4c
 
 priority (top to bottom)
-todo: counters that invalidate hit effects
-todo: fix predict not working with projectiles spawned after it started
-todo: dynamic hurtboxes
 
-TODO: stand summon particles
-TODO: Knockdown() method
+todo: fix predict not working with projectiles spawned after it started

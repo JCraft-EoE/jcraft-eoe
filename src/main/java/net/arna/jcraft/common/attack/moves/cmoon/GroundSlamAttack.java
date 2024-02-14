@@ -4,6 +4,7 @@ import lombok.NonNull;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.CMoonEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.registry.JStatusRegistry;
@@ -37,13 +38,14 @@ public class GroundSlamAttack extends AbstractSimpleAttack<GroundSlamAttack, CMo
     @Override
     public void performHook(CMoonEntity attacker, Set<LivingEntity> targets, Set<Box> boxes, DamageSource damageSource, Vec3d forwardPos, Vec3d rotationVector, MoveContext ctx) {
         World world = attacker.world;
+        Vec3i gravityVector = GravityChangerAPI.getGravityDirection(attacker).getVector();
+
         if (world.getGameRules().getBoolean(JCraft.STAND_GRIEFING)) {
             BlockPos bPos = attacker.getBlockPos();
 
             // Adjust pancake shape for gravity
             Vec3i min = new Vec3i(-2, -2, -2);
             Vec3i max = new Vec3i(3, 3, 3);
-            Vec3i gravityVector = GravityChangerAPI.getGravityDirection(attacker).getVector();
             min = min.subtract(gravityVector);
             max = max.add(gravityVector);
 
@@ -64,6 +66,8 @@ public class GroundSlamAttack extends AbstractSimpleAttack<GroundSlamAttack, CMo
                 }
             }
         }
+
+        JComponents.getShockwaveHandler(attacker.world).addShockwave(attacker.getPos().add(rotationVector), new Vec3d(GravityChangerAPI.getGravityDirection(attacker).getUnitVector()), 4.0f);
     }
 
     @Override

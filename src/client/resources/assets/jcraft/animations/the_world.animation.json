@@ -1278,7 +1278,7 @@
 							"easing": "easeInOutSine"
 						},
 						"0.48": {
-							"vector": [-16.20704, 27.11686, -4.71977],
+							"vector": [-14.52241, 7.81596, 0.80961],
 							"easing": "easeOutBack"
 						}
 					}
@@ -1297,8 +1297,8 @@
 							"easing": "easeOutSine"
 						},
 						"0.84": {
-							"vector": [12.5, 0, 0],
-							"easing": "easeInOutQuad"
+							"vector": [10, 0, 0],
+							"easing": "easeInOutSine"
 						}
 					}
 				},
@@ -1314,6 +1314,10 @@
 						"0.52": {
 							"vector": [-20.76543, -19.39035, 76.82878],
 							"easing": "easeInOutBack"
+						},
+						"0.84": {
+							"vector": [-18.09727, -21.88928, 69.27078],
+							"easing": "easeInOutSine"
 						}
 					}
 				},
@@ -1344,6 +1348,10 @@
 						"0.44": {
 							"vector": [57.27971, 7.90892, -44.19163],
 							"easing": "easeInOutSine"
+						},
+						"0.84": {
+							"vector": [57.61529, 1.58454, -40.14425],
+							"easing": "easeInOutSine"
 						}
 					}
 				},
@@ -1368,11 +1376,11 @@
 							"easing": "easeOutSine"
 						},
 						"0.4": {
-							"vector": [15.69676, -22.7796, -6.73693],
+							"vector": [14.52253, -5.87483, -2.0458],
 							"easing": "easeOutSine"
 						},
 						"0.84": {
-							"vector": [11.46608, -20.99948, -0.51459],
+							"vector": [18.3222, -8.73317, 1.9803],
 							"easing": "easeOutSine"
 						}
 					},
@@ -1405,7 +1413,7 @@
 						},
 						"0.84": {
 							"vector": [-35, 0, 0],
-							"easing": "easeInOutSine"
+							"easing": "easeInSine"
 						}
 					},
 					"position": {
@@ -1427,13 +1435,9 @@
 							"vector": [65, 0, 0],
 							"easing": "easeOutSine"
 						},
-						"0.4": {
-							"vector": [5, 0, 0],
-							"easing": "easeOutSine"
-						},
-						"0.84": {
-							"vector": [0, 0, 0],
-							"easing": "easeInOutSine"
+						"0.52": {
+							"vector": [2.5, 0, 0],
+							"easing": "easeOutBack"
 						}
 					}
 				},
@@ -1443,8 +1447,8 @@
 							"vector": [2.5, 0, 0]
 						},
 						"0.24": {
-							"vector": [-17.5, 0, 0],
-							"easing": "easeInOutSine"
+							"vector": [-25, 0, 0],
+							"easing": "easeOutSine"
 						},
 						"0.44": {
 							"vector": [35, 0, 0],
@@ -1505,11 +1509,11 @@
 							"vector": [0, 0, 0]
 						},
 						"0.24": {
-							"vector": [0, 0, 2],
+							"vector": [0, 0, 3],
 							"easing": "easeOutSine"
 						},
-						"0.52": {
-							"vector": [0, 0, -3],
+						"0.64": {
+							"vector": [0, -3, -8],
 							"easing": "easeOutBack"
 						}
 					}
