@@ -2283,28 +2283,22 @@ Cream
         >Fixed hovering not working in different gravities
         >Can now move freely in fluids
 
-● 16/02/2024
-
+● 17/02/2024
 C-Moon
     >Gravity Shift now persists when the stand is desummoned
+    >Removed jump boost effect of Gravity Shift Radial
+    >Removed feather falling effect on victims of Gravity Shift Directional
 
 Made in Heaven
     >Fixed Heaven's Judgement not starting
 
 todo:
 dynamic hurtboxes
-Knockdown() method
 counters that invalidate hit effects
 entity tag for #jcraft:eligible_stand_user
 fix attack value underflow with weakness 3+ and blocking
 add specificMoveSelectionCriterion to stands like KC(movecancel), MR(redirect)
-
-GRAVSHIFT PULSE MUST BEHAVE DIFFERENTLY
 afterimages on ger ctr
-
 trails
 reverse attraction for d4c
-
-priority (top to bottom)
-
-todo: fix predict not working with projectiles spawned after it started
+fix predict not working with projectiles spawned after it started
