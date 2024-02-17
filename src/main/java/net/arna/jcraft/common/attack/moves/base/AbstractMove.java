@@ -476,7 +476,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         cast.armor = armor;
         cast.finisher = finisher == null ? null : IntObjectPair.of(finisher.leftInt(), finisher.right().copy());
         cast.mobilityType = mobilityType;
-        cast.originalMove = getThis(); // Set the original move to this move
+        cast.originalMove = originalMove; // Set the original move to this move
         cast.animation = animation;
         copiedExtras = true;
         return base;

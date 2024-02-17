@@ -65,6 +65,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
     public static final ChargeBarrageAttack CHARGE_BARRAGE = new ChargeBarrageAttack(280, 5, 55,
             7f, 0.6f, 20, 1.5f, 0.3f, 0f, 3)
             .withSound(JSoundRegistry.STAR_PLATINUM_ADVANCING_BARRAGE)
+            .withBarrageShockwaves()
             .withBackstab(false)
             .withInfo(Text.literal("Advancing Barrage"), Text.literal("fast combo starter/extender, medium stun, extremely punishable on whiff"));
     public static final JumpMove<StarPlatinumEntity> JUMP = new JumpMove<StarPlatinumEntity>(300, 5,

@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.StunType;
+import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
@@ -40,22 +41,6 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A
         withBlockStun(3);
         withStunType(StunType.WINDED);
         withHitSpark(null);
-
-        withAction(((attacker, user, ctx, targets) -> {
-            if (targets.isEmpty()) return;
-            LivingEntity attackerEntity = attacker.getBaseEntity();
-            Random random = attackerEntity.getRandom();
-            Vec3d shockwavePos = attackerEntity.getPos().add(
-                    random.nextGaussian() / 3.0,
-                    random.nextGaussian() / 3.0,
-                    random.nextGaussian() / 3.0
-            );
-            Vec3d rotVec = attackerEntity.getRotationVector();
-            shockwavePos = shockwavePos.add(rotVec);
-            shockwavePos = shockwavePos.add(RotationUtil.vecPlayerToWorld(new Vec3d(0, attackerEntity.getHeight() / 1.8 - offset, 0), GravityChangerAPI.getGravityDirection(user)));
-            JComponents.getShockwaveHandler(attacker.getEntityWorld())
-                    .addShockwave(shockwavePos, attackerEntity.getRotationVector(), damage / 1.5f);
-        }));
     }
 
     @Override
@@ -125,6 +110,24 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A
     public int getBlow(A attacker) {
         int tick = getDuration() - attacker.getMoveStun();
         return tick <= getWindup() ? 0 : (tick - getWindup()) / getInterval();
+    }
+
+    public T withBarrageShockwaves() {
+        return this.withAction(((attacker, user, ctx, targets) -> {
+            if (targets.isEmpty()) return;
+            LivingEntity attackerEntity = attacker.getBaseEntity();
+            Random random = attackerEntity.getRandom();
+            Vec3d shockwavePos = attackerEntity.getPos().add(
+                    random.nextGaussian() / 3.0,
+                    random.nextGaussian() / 3.0,
+                    random.nextGaussian() / 3.0
+            );
+            Vec3d rotVec = attackerEntity.getRotationVector();
+            shockwavePos = shockwavePos.add(rotVec);
+            shockwavePos = shockwavePos.add(RotationUtil.vecPlayerToWorld(new Vec3d(0, attackerEntity.getHeight() / 1.8 - getOffset(), 0), GravityChangerAPI.getGravityDirection(user)));
+            JComponents.getShockwaveHandler(attacker.getEntityWorld())
+                    .addShockwave(shockwavePos, attackerEntity.getRotationVector(), getDamage() / 1.5f);
+        }));
     }
 
     @Override
