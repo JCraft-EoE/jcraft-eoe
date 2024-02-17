@@ -32,30 +32,46 @@ public interface JEventsRegistry {
     static void registerEvents() {
         ServerLivingEntityEvents.ALLOW_DAMAGE.register(
                 (entity, source, amount) -> {
+                    boolean toLaunch = false;
                     Entity attacker = source.getAttacker();
-                    if (!(attacker instanceof LivingEntity living)) return true;
+                    StatusEffectInstance stun = entity.getStatusEffect(JStatusRegistry.DAZED);
 
-                    // Only apply stun nerfs if hit with a weapon or a projectile
-                    boolean hasWeapon = source.isProjectile();
-                    if (!hasWeapon) {
-                        hasWeapon = !living.getMainHandStack().getAttributeModifiers(EquipmentSlot.MAINHAND).isEmpty();
-                    }
+                    if (stun != null) {
+                        // Only apply stun nerfs if hit with a weapon or a projectile
+                        if (attacker instanceof LivingEntity living) {
+                            boolean hasWeapon = source.isProjectile();
+                            if (!hasWeapon)
+                                hasWeapon = !living.getMainHandStack().getAttributeModifiers(EquipmentSlot.MAINHAND).isEmpty();
+                            toLaunch = hasWeapon;
+                        }
 
-                    if (hasWeapon) {
-                        StatusEffectInstance stun = entity.getStatusEffect(JStatusRegistry.DAZED);
-                        if (stun != null) {
+                        if (source.isExplosive()) {
+                            toLaunch = true;
+                            if (amount > 6.0f)
+                                amount = 6.0f;
+                        }
+
+                        if (toLaunch) {
                             int duration = stun.getDuration() / 3;
 
                             entity.removeStatusEffect(JStatusRegistry.DAZED);
                             StandEntity.stun(entity, duration, 3);
 
                             Vec3i upVec = GravityChangerAPI.getGravityDirection(entity).getVector();
+                            Vec3d upVecD = new Vec3d(-upVec.getX() / 3.0, -upVec.getY() / 3.0, -upVec.getZ() / 3.0);
 
-                            Vec3d knockback = entity.getPos().subtract(attacker.getPos()).normalize()
-                                            .add(-upVec.getX() / 3.0, -upVec.getY() / 3.0, -upVec.getZ() / 3.0);
+                            Vec3d sourcePos = source.getPosition();
+                            if (sourcePos == null) { // RNG Launch upwards
+                                sourcePos = new Vec3d(
+                                    entity.getRandom().nextGaussian(),
+                                    entity.getRandom().nextGaussian(),
+                                    entity.getRandom().nextGaussian())
+                                        .add(entity.getPos())
+                                        .subtract(upVecD);
+                            }
 
+                            Vec3d knockback = entity.getPos().subtract(sourcePos).normalize().add(upVecD);
                             GravityChangerAPI.setWorldVelocity(entity, knockback);
-
                             entity.velocityModified = true;
                         }
                     }

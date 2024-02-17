@@ -66,7 +66,7 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
             .withAction(AnubisSpec::resetLastHitTime)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withStaticY()
-            .withInfo(Text.literal("Sweep"), Text.empty());
+            .withInfo(Text.literal("Sweep"), Text.literal("sheathed-only, knocks down"));
 
     @Setter
     private int ticksSinceLastHit = 0;

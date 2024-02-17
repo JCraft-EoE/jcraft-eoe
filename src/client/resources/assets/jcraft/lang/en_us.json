@@ -213,6 +213,9 @@
   "jcraft.serverconfig.option.damageScalingMinimum": "Damage Scaling Minimum",
   "jcraft.serverconfig.option.scalingPenaltyPerHit": "Scaling Penalty per Hit",
 
+  "jcraft.serverconfig.category.minecraft_rebalance": "Minecraft Balance",
+  "jcraft.serverconfig.option.reduceDeadlyExplosions": "Reduce Deadly Explosion Power (End Crystals, Beds, Respawn Anchors)",
+
   "jcraft.serverconfig.category.interaction": "Interaction",
   "jcraft.serverconfig.option.universalAbilities": "Universal Abilities",
   "jcraft.serverconfig.option.exclusiveStands": "Exclusive Stands",

@@ -6,7 +6,9 @@
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "AnvilScreenHandlerMixin",
+    "BedBlockMixin",
     "ChunkLightProviderAccessor",
+    "EndCrystalEntityMixin",
     "EndPortalBlockMixin",
     "EntityMixin",
     "EntityTypeMixin",
@@ -22,6 +24,7 @@
     "NetherPortalBlockMixin",
     "PlayerEntityMixin",
     "RecipeManagerMixin",
+    "RespawnAnchorBlockMixin",
     "ServerNetworkHandlerMixin",
     "ServerPlayerEntityMixin",
     "ServerWorldMixin",
