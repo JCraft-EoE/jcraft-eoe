@@ -11,6 +11,7 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.component.entity.GrabComponent;
 import net.arna.jcraft.common.component.entity.GravityComponent;
 import net.arna.jcraft.common.component.entity.TimeStopComponent;
+import net.arna.jcraft.common.component.impl.GravityShiftComponentImpl;
 import net.arna.jcraft.common.component.impl.entity.GrabComponentImpl;
 import net.arna.jcraft.common.component.impl.entity.GravityComponentImpl;
 import net.arna.jcraft.common.component.impl.entity.TimeStopComponentImpl;
@@ -45,6 +46,8 @@ public class JComponents implements EntityComponentInitializer, WorldComponentIn
             ComponentRegistry.getOrCreate(JCraft.id("grab"), GrabComponent.class);
     public static final ComponentKey<HitPropertyComponent> HIT_PROPERTY =
             ComponentRegistry.getOrCreate(JCraft.id("hit_property"), HitPropertyComponent.class);
+    public static final ComponentKey<GravityShiftComponent> GRAVITY_SHIFT =
+            ComponentRegistry.getOrCreate(JCraft.id("gravity_shift"), GravityShiftComponent.class);
 
     public static final ComponentKey<ShockwaveHandlerComponent> SHOCKWAVE_HANDLER =
             ComponentRegistry.getOrCreate(JCraft.id("shockwave_handler"), ShockwaveHandlerComponent.class);
@@ -78,6 +81,10 @@ public class JComponents implements EntityComponentInitializer, WorldComponentIn
                 .respawnStrategy(RespawnCopyStrategy.NEVER_COPY)
                 .impl(HitPropertyComponentImpl.class)
                 .end(HitPropertyComponentImpl::new);
+        registry.beginRegistration(LivingEntity.class, GRAVITY_SHIFT)
+                .respawnStrategy(RespawnCopyStrategy.CHARACTER)
+                .impl(GravityShiftComponentImpl.class)
+                .end(GravityShiftComponentImpl::new);
     }
 
     @Override
@@ -115,6 +122,10 @@ public class JComponents implements EntityComponentInitializer, WorldComponentIn
 
     public static HitPropertyComponent getHitProperties(LivingEntity livingEntity) {
         return HIT_PROPERTY.get(livingEntity);
+    }
+
+    public static GravityShiftComponent getGravityShift(LivingEntity livingEntity) {
+        return GRAVITY_SHIFT.get(livingEntity);
     }
 
     public static ShockwaveHandlerComponent getShockwaveHandler(World world) {

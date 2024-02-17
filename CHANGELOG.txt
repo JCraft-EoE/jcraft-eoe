@@ -2285,6 +2285,11 @@ Cream
 
 ● 16/02/2024
 
+C-Moon
+    >Gravity Shift now persists when the stand is desummoned
+
+Made in Heaven
+    >Fixed Heaven's Judgement not starting
 
 todo:
 dynamic hurtboxes

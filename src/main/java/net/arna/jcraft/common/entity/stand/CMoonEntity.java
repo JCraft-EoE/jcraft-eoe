@@ -9,6 +9,8 @@ import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.cmoon.*;
 import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
+import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.component.living.GravityShiftComponent;
 import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.entity.projectile.BlockProjectile;
 import net.arna.jcraft.common.util.JParticleType;
@@ -106,26 +108,23 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             .withInfo(Text.literal("Ground Slam"), Text.literal("launches downwards, combo starter/extender, knocks down if it hits while user is crouching"));
     public static final GravityShiftMove GRAV_SHIFT = new GravityShiftMove(1400, 20, 32, 1f)
             .withSound(JSoundRegistry.CMOON_GRAVSHIFT)
-            .withInfo(Text.literal("Gravity Shift"), Text.literal("""
-                    increases user jump height, changes the gravity of everything in a 64 block radius
-                    Types: REPULSE, ATTRACT, NONE
-                    swap between types by pressing the key again"""));
+            .withInfo(Text.literal("Gravity Shift Radial"), Text.literal("""
+                    repulses or attracts entities within 64m
+                    lasts 10 seconds
+                    swap between attraction/repulsion by pressing ultimate again"""));
     public static final GravityShiftPulseMove GRAV_SHIFT_PULSE = new GravityShiftPulseMove(1400, 20, 32, 1f)
             .withCrouchingVariant(GRAV_SHIFT)
             .withSound(JSoundRegistry.CMOON_GRAVSHIFT_DIRECTIONAL)
-            .withInfo(Text.literal("Gravity Shift Pulse"), Text.literal("changes the gravitational direction of nearby entities " +
-                    "to the direction the user is looking in"));
+            .withInfo(Text.literal("Gravity Shift Directional"), Text.literal("""
+                    changes the gravitational direction of entities within 16m to the direction the user is looking in
+                    lasts 30 seconds
+                    all affected entities cannot take fall damage
+                    affected entities lose the gravity shift if they move 100m away from the user
+                    """));
     public static final GravitationalHopMove GRAVITATIONAL_HOP = new GravitationalHopMove(340)
             .withInfo(Text.literal("Gravitational Hop/Local Gravity Change"),
                     Text.literal("jumps up and grants 2s slow falling/crouch to change your gravitational direction"));
-    private static final TrackedData<Integer> SHIFT_TYPE;
-    private static final TrackedData<Integer> SHIFT_TIME;
     private final List<Inversion> inversions = new ArrayList<>();
-
-    static {
-        SHIFT_TIME = DataTracker.registerData(CMoonEntity.class, TrackedDataHandlerRegistry.INTEGER);
-        SHIFT_TYPE = DataTracker.registerData(CMoonEntity.class, TrackedDataHandlerRegistry.INTEGER);
-    }
 
     public CMoonEntity(World worldIn) {
         super(StandType.C_MOON, worldIn, JSoundRegistry.CMOON_SUMMON);
@@ -172,22 +171,6 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
         attacker.inversions.add(new Inversion(70, 0.5f, target, true));
     }
 
-    public int getShiftTime() {
-        return dataTracker.get(SHIFT_TIME);
-    }
-
-    public void setShiftTime(int sTime) {
-        dataTracker.set(SHIFT_TIME, sTime);
-    }
-
-    public int getShiftType() {
-        return dataTracker.get(SHIFT_TYPE);
-    }
-
-    public void setShiftType(int sType) {
-        dataTracker.set(SHIFT_TYPE, sType);
-    }
-
     @Override
     protected void registerMoves(MoveMap<CMoonEntity, State> moves) {
         moves.registerImmediate(MoveType.LIGHT, PUNCH, State.LIGHT);
@@ -201,13 +184,6 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
         moves.register(MoveType.ULTIMATE, GRAV_SHIFT_PULSE, State.DIRECTIONAL_SHIFT).withCrouchingVariant(State.GRAV_SHIFT);
 
         moves.register(MoveType.UTILITY, GRAVITATIONAL_HOP);
-    }
-
-    @Override
-    protected void initDataTracker() {
-        super.initDataTracker();
-        getDataTracker().startTracking(SHIFT_TIME, 0);
-        getDataTracker().startTracking(SHIFT_TYPE, 0);
     }
 
     @Override
@@ -228,14 +204,10 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
                 else super.initMove(type);
             }
             case ULTIMATE -> {
-                if (getShiftTime() <= 0) {
-                    super.initMove(type);
-                } else {
-                    int shiftType = getShiftType();
-                    if (++shiftType > 2)
-                        shiftType = 0;
-                    setShiftType(shiftType);
-                }
+                GravityShiftComponent shiftComponent = JComponents.getGravityShift(getUserOrThrow());
+                if (shiftComponent.isActive())
+                    shiftComponent.swapRadialType();
+                else super.initMove(type);
             }
             case LIGHT -> {
                 if (curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
@@ -270,29 +242,8 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
 
         if (!hasUser()) return;
         LivingEntity user = getUserOrThrow();
-        Vec3d pos = getPos();
-        int sTime = getShiftTime();
 
-        if (world.isClient) {
-            if (sTime > 0) {
-                for (int h = 0; h < 256; ++h) {
-                    Vec3d vel = Vec3d.ZERO;
-                    double x = pos.x + random.nextTriangular(0, 100);
-                    double y = pos.y + random.nextTriangular(0, 10);
-                    double z = pos.z + random.nextTriangular(0, 100);
-                    switch (getShiftType()) {
-                        case (0) -> vel = new Vec3d(x, y, z).subtract(pos);
-                        case (1) -> vel = pos.subtract(x, y, z);
-                    }
-                    world.addParticle(
-                            ParticleTypes.REVERSE_PORTAL,
-                            x, y, z,
-                            vel.x, vel.y, vel.z);
-                }
-            }
-
-            return;
-        }
+        if (world.isClient) return;
 
         for (int i = 0; i < inversions.size(); i++) {
             Inversion inversion = inversions.get(i);
@@ -309,35 +260,6 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
                 i--;
             }
         }
-
-        GRAV_SHIFT_PULSE.tickGravShift(this);
-
-        if (sTime <= 0 || user.hasStatusEffect(JStatusRegistry.DAZED)) return;
-        List<Entity> toCatch = world.getEntitiesByClass(Entity.class, getBoundingBox().expand(64), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
-
-        toCatch.remove(this);
-        toCatch.remove(user);
-
-        for (Entity entity : toCatch) {
-            if (entity instanceof BlockProjectile block && block.getMaster() == user)
-                continue;
-            //Vec3d vel = entity.getVelocity();
-            switch (getShiftType()) {
-                //case (0) -> entity.addVelocity(-vel.x / 3.0, -0.1, -vel.z / 3.0);
-                case (0) -> entity.setVelocity(
-                        entity.getVelocity().add(entity.getPos().subtract(pos).normalize().multiply(0.1))
-                );
-                case (1) -> entity.setVelocity(
-                        entity.getVelocity().add(pos.subtract(entity.getPos()).normalize().multiply(0.1))
-                );
-            }
-
-            if (entity instanceof ServerPlayerEntity serverPlayerEntity)
-                serverPlayerEntity.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(serverPlayerEntity));
-            entity.velocityModified = true;
-        }
-
-        setShiftTime(sTime - 1);
     }
 
     @Override

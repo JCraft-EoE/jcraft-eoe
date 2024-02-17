@@ -81,7 +81,8 @@
       "jcraft:bomb_tracker",
       "jcraft:grab",
       "jcraft:hit_property",
-      "jcraft:shockwave_handler"
+      "jcraft:shockwave_handler",
+      "jcraft:gravity_shift"
     ]
   }
 }
