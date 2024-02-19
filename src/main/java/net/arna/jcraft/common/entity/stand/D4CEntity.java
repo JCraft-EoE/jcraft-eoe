@@ -15,6 +15,7 @@ import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleMultiHitAttack;
 import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.util.JParticleType;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JDimensionRegistry;
 import net.arna.jcraft.registry.JObjectRegistry;
@@ -45,7 +46,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             .withExtraHitBox(0, 0, 1)
             .withInfo(Text.literal("Deadly Blow"), Text.literal("combo finisher, more blockstun than other light followups"));
     public static final SimpleAttack<D4CEntity> CHOP = new SimpleAttack<D4CEntity>(JCraft.LIGHT_COOLDOWN,
-            9, 15, 0.75f, 5f, 22, 1.5f, 0.75f, -0.1f)
+            9, 15, 0.75f, 5f, 20, 1.5f, 0.75f, -0.1f)
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(ITEM_PLACE)
             .withImpactSound(JSoundRegistry.IMPACT_2)
@@ -162,8 +163,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
 
     private static void doCharge(D4CEntity attacker, LivingEntity user, MoveContext ctx) {
         if (!user.isOnGround()) return;
-        user.setVelocity(user.getVelocity().add(attacker.getRotationVector().multiply(0.75)).add(0.0, 0.15, 0.0));
-        user.velocityModified = true;
+        JUtils.addVelocity(user, attacker.getRotationVector().multiply(0.75).add(0.0, 0.15, 0.0));
     }
 
     private static void equipRevolver(D4CEntity attacker, LivingEntity user, MoveContext ctx) {

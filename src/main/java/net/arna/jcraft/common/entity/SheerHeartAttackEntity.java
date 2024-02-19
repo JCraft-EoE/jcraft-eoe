@@ -1,7 +1,13 @@
 package net.arna.jcraft.common.entity;
 
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.ai.goal.SHAAttackGoal;
 import net.arna.jcraft.common.util.IOwnable;
+import net.arna.jcraft.common.util.JExplosionModifier;
+import net.arna.jcraft.common.util.JParticleType;
+import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.registry.JParticleTypeRegistry;
+import net.arna.jcraft.registry.JSoundRegistry;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -56,7 +62,7 @@ public class SheerHeartAttackEntity extends MobEntity implements IAnimatable, IA
         setOwnerId(owner.getUuid());
     }
 
-    private UUID getOwnerId() {
+    public UUID getOwnerId() {
         return this.dataTracker.get(OWNER_ID).orElse(null);
     }
 
@@ -132,7 +138,10 @@ public class SheerHeartAttackEntity extends MobEntity implements IAnimatable, IA
     public void tick() {
         super.tick();
 
-        if (world.isClient()) return;
+        if (world.isClient()) {
+            JCraft.getClientEntityHandler().sheerHeartAttackEntityTick(this);
+            return;
+        }
 
         if (master == null) {
             // Run every 2 seconds (player lists are rather expensive)
@@ -148,8 +157,12 @@ public class SheerHeartAttackEntity extends MobEntity implements IAnimatable, IA
                 }
             }
 
-            setTarget(getAttacking());
+            if (canTarget(getAttacking()))
+                setTarget(getAttacking());
         } else {
+            if (age % 19 == 0 && isOnGround() && getVelocity().lengthSquared() > 0.005)
+                playSound(JSoundRegistry.SHA_TREAD, 0.5f, 1.0f);
+
             //50s is the cooldown period
             //15s is how long SHA can be out for
             if (age > 300 || !master.isAlive()) kill();
@@ -190,11 +203,16 @@ public class SheerHeartAttackEntity extends MobEntity implements IAnimatable, IA
                     if (hotTarget != null) setTarget(hotTarget);
                     else if (coldTarget != null) setTarget(coldTarget);
                 }
-            } else if (!canTarget(getTarget())) setTarget(null);
+            } else if (!canTarget(target)) setTarget(null);
         }
     }
 
     public void Explode() {
-        world.createExplosion(this, getX(), getY() + getHeight() / 2, getZ(), 1.8f, Explosion.DestructionType.NONE);
+        JUtils.explode(getWorld(), this, getX(), getY(), getZ(), 1.8f,
+                JExplosionModifier.builder().particle(JParticleTypeRegistry.BOOM_1)
+                        .destructionType(
+                        getWorld().getGameRules().getBoolean(JCraft.STAND_GRIEFING) ? Explosion.DestructionType.BREAK : Explosion.DestructionType.NONE)
+                        .particleVelocity(Vec3d.ZERO)
+                        .build());
     }
 }

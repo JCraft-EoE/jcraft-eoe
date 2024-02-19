@@ -36,7 +36,7 @@ public interface JEventsRegistry {
                     Entity attacker = source.getAttacker();
                     StatusEffectInstance stun = entity.getStatusEffect(JStatusRegistry.DAZED);
 
-                    if (stun != null) {
+                    if (stun != null && stun.getAmplifier() != 2) {
                         // Only apply stun nerfs if hit with a weapon or a projectile
                         if (attacker instanceof LivingEntity living) {
                             boolean hasWeapon = source.isProjectile();

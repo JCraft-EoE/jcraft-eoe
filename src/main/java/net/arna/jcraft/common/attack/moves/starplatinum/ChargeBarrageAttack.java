@@ -17,11 +17,14 @@ import static net.arna.jcraft.common.attack.moves.base.AbstractChargeAttack.prep
 
 public class ChargeBarrageAttack extends AbstractBarrageAttack<ChargeBarrageAttack, StarPlatinumEntity> {
     private final float originalMoveDistance;
+    private final boolean quadraticMovement;
 
     public ChargeBarrageAttack(int cooldown, int windup, int duration, float moveDistance, float damage, int stun,
-                               float hitboxSize, float knockback, float offset, int interval) {
+                               float hitboxSize, float knockback, float offset, int interval, boolean quadraticMovement) {
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset, interval);
         this.originalMoveDistance = moveDistance;
+        this.quadraticMovement = quadraticMovement;
+
         this.withStunType(StunType.BURSTABLE);
         charge = true;
         ranged = true;
@@ -31,18 +34,20 @@ public class ChargeBarrageAttack extends AbstractBarrageAttack<ChargeBarrageAtta
     @Override
     public void onInitiate(StarPlatinumEntity attacker) {
         super.onInitiate(attacker);
-
         withMoveDistance(originalMoveDistance);
     }
 
     @Override
     public void tick(StarPlatinumEntity attacker) {
         super.tick(attacker);
-
         tickChargeBarrageAttack(attacker, shouldPerform(attacker), getMoveDistance(), getWindupPoint());
     }
 
     protected Vec3d advanceChargePos(StandEntity<?, ?> attacker, float moveDistance, int windupPoint) {
+        if (quadraticMovement)
+            return attacker.getPos().add(getRotVec(attacker).multiply(
+                    (moveDistance * attacker.getMoveStun()) / (windupPoint * windupPoint)
+            ));
         return attacker.getPos().add(getRotVec(attacker).multiply(moveDistance / windupPoint));
     }
 
@@ -86,6 +91,6 @@ public class ChargeBarrageAttack extends AbstractBarrageAttack<ChargeBarrageAtta
     @Override
     public @NonNull ChargeBarrageAttack copy() {
         return copyExtras(new ChargeBarrageAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
-                getStun(), getHitboxSize(), getKnockback(), getOffset(), getInterval()));
+                getStun(), getHitboxSize(), getKnockback(), getOffset(), getInterval(), quadraticMovement));
     }
 }

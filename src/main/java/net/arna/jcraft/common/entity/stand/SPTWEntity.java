@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPTWEntity.State> {
-    public static final GroundSlamAttack GROUND_SLAM = new GroundSlamAttack(30, 12, 19,
+    public static final GroundSlamAttack GROUND_SLAM = new GroundSlamAttack(20, 12, 19,
             0.75f, 7f, 11, 1.8f, 0f, 0.8f)
             .withAnim(State.GROUND_SLAM)
             .withImpactSound(JSoundRegistry.IMPACT_8)

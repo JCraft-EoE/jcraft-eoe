@@ -56,11 +56,18 @@ public final class JUtils {
         return new Vec3d(random.nextGaussian(), random.nextGaussian(), random.nextGaussian()).normalize();
     }
 
+    public static void addVelocity(Entity entity, Vec3d vel) {
+        GravityChangerAPI.addWorldVelocity(entity, vel.x, vel.y, vel.z);
+        syncVelocityUpdate(entity);
+    }
     public static void addVelocity(Entity entity, double x, double y, double z) {
         GravityChangerAPI.addWorldVelocity(entity, x, y, z);
         syncVelocityUpdate(entity);
     }
-
+    public static void setVelocity(Entity entity, Vec3d vel) {
+        entity.setVelocity(vel.x, vel.y, vel.z);
+        syncVelocityUpdate(entity);
+    }
     public static void setVelocity(Entity entity, double x, double y, double z) {
         entity.setVelocity(x, y, z);
         syncVelocityUpdate(entity);

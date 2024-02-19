@@ -5,8 +5,10 @@ import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
+import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.Set;
 
@@ -23,8 +25,10 @@ public class UppercutAttack<A extends IAttacker<? extends A, ?>> extends Abstrac
     @Override
     public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user, MoveContext ctx) {
         Set<LivingEntity> targets = super.perform(attacker, user, ctx);
-        for (LivingEntity target : targets)
-            JUtils.addVelocity(target, 0, strength, 0);
+        for (LivingEntity target : targets) {
+            Vec3d upDir = new Vec3d(GravityChangerAPI.getGravityDirection(user).getUnitVector()).multiply(-strength);
+            JUtils.addVelocity(target, upDir);
+        }
 
         return targets;
     }

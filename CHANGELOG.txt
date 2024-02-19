@@ -2292,6 +2292,68 @@ C-Moon
 Made in Heaven
     >Fixed Heaven's Judgement not starting
 
+>Added config option for nerfing deadly explosions to prevent cheese
+>Getting hit by an explosion while stunned now converts that stun to launch stun
+
+● 19/02/2024
+>Standard M1 cooldown reduced (1.5->1s)
+>Fixed stun slashes activating while hitting blocking opponents
+
+Star Platinum
+    >Uppercut cooldown reduced (1.5->1s)
+    >Star Finger
+        >cooldown reduced (12->10s)
+        >blockstun reduced (+1 -> -3 on block)
+    >Added crouching variant to Advancing Barrage
+
+The World
+    >Low Kick cooldown reduced (1.5->1s)
+    >Added crouching variant to Charge
+
+King Crimson
+    >Light cooldown reduced (2.5->2s)
+    >Dual Chop stun reduced (23->21t)
+    >Can no longer buffer Special 3 and its variants
+
+D4C
+    >Chop stun reduced (22->20t)
+
+Cream
+    >Bite cooldown reduced (1.5->1s)
+    >Updated sound for Vertical Chop
+    >Surprise now retrieves the stand even if a move is buffered
+    >Properly implemented Destroy in half-ball form (previously was grounded version)
+
+Killer Queen
+    >Increased launch stun on grab hit (2->8t) so it's no longer punishable on hit
+    >Sheer Heart Attack
+        >now displays its remaining duration
+        >no longer tracks creative mode players
+        >added tread noise
+        >explosions now share an animation with Killer Queen's
+
+Whitesnake
+    >Uppercut cooldown reduced (1.5->1s)
+
+Gold Experience
+    >Updated Light animations
+    >Overclock
+        >Now deals launch stun
+        >Increased launch
+        >Updated animation
+
+Magician's Red
+    >Sweep is now the crouching Heavy
+    >Added new Heavy
+    >Increased orbit ranges for Crossfire Variation
+    >Added flame particles to Red Bind's swing
+
+The Fool
+    >Drill cooldown reduced (1.5->1s)
+
+Star Platinum: The World
+    >Ground Slam cooldown reduced (1.5->1s)
+
 todo:
 dynamic hurtboxes
 counters that invalidate hit effects
@@ -2302,3 +2364,6 @@ afterimages on ger ctr
 trails
 reverse attraction for d4c
 fix predict not working with projectiles spawned after it started
+
+particles for GE Soul punch(reanimate), Healing particles and special 3 life create,
+GER Heavy, healing move, RTZ, and sp 3 counter, and cream special 2 particles in a circle before appearing.

@@ -19,7 +19,7 @@ public class CrossfireVariationAttack extends AbstractMove<CrossfireVariationAtt
 
     @Override
     public @NonNull Set<LivingEntity> perform(MagiciansRedEntity attacker, LivingEntity user, MoveContext ctx) {
-        int orbitRange = user.isSneaking() ? 6 : 4;
+        int orbitRange = user.isSneaking() ? 7 : 5;
         for (int i = 0; i < variationAnkhs; i++) {
             AnkhProjectile ankh = new AnkhProjectile(attacker.world, user);
             ankh.setVelocity(0.0, 1.0, 0.0);

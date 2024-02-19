@@ -151,6 +151,12 @@
     ]
   },
 
+  "spadvbarrageshort": {
+    "sounds": [
+      "jcraft:stands/starplatinum/advbarrage_short"
+    ]
+  },
+
   "spkick": {
     "sounds": [
       "jcraft:stands/starplatinum/kick"
@@ -1023,6 +1029,12 @@
   "bulletpenetrate": {
     "sounds": [
       "jcraft:projectiles/bullet/penetrate"
+    ]
+  },
+
+  "shatread": {
+    "sounds": [
+      "jcraft:sheerheartattack/shatread"
     ]
   }
 }

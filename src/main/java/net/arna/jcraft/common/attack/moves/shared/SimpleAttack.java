@@ -32,7 +32,7 @@ public class SimpleAttack<A extends IAttacker<? extends A, ?>> extends AbstractS
      */
     public static <A extends IAttacker<? extends A, ?>> SimpleAttack<A> lightAttack(int windup, int duration, float damage, int stun,
                                                                           float knockback, float moveDistance, float offset) {
-        return new SimpleAttack<>(30, windup, duration, moveDistance, damage, stun, 1.5f, knockback, offset);
+        return new SimpleAttack<>(20, windup, duration, moveDistance, damage, stun, 1.5f, knockback, offset);
     }
 
     @Override

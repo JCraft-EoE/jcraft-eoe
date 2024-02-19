@@ -47,7 +47,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
-    public static final EffectInflictingAttack<CreamEntity> BITE = new EffectInflictingAttack<CreamEntity>(30,
+    public static final EffectInflictingAttack<CreamEntity> BITE = new EffectInflictingAttack<CreamEntity>(20,
             9, 15, 0.75f, 5f, 20, 1.75f, 0.75f, 0.3f,
             List.of(new StatusEffectInstance(StatusEffects.SLOWNESS, 40, 1)))
             .withAnim(State.BITE)
@@ -132,7 +132,11 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             .withInfo(Text.literal("Aerial Assault"), Text.literal("less stun than grounded version"));
     public static final BallChargeAttack BALL_CHARGE = new BallChargeAttack(300, 13, 28, 1f)
             .withSound(JSoundRegistry.CREAM_BALLDASH)
-            .withInfo(Text.literal("Void Charge"), Text.literal("cream quickly transforms into a black hole and charges in the pointed direction"));
+            .withInfo(Text.literal("Void Charge"), Text.literal("Cream quickly transforms into a black hole and charges in the pointed direction"));
+
+    public static final BallChargeAttack BALL_DESTROY = new BallChargeAttack(300, 13, 28, 1f)
+            .withSound(JSoundRegistry.CREAM_BALLDASH)
+            .withInfo(Text.literal("Destroy"), Text.literal("Cream quickly transforms into a black hole and charges in a downward curve"));
 
     private static final TrackedData<Integer> VOID_TIME;
     private static final TrackedData<Boolean> HALF_BALL;
@@ -220,6 +224,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             moves.register(MoveType.BARRAGE, BALL_COMBO, State.BALL_COMBO);
 
             moves.register(MoveType.SPECIAL1, BALL_CHARGE, State.BALL_CONSUME);
+            moves.register(MoveType.SPECIAL3, BALL_DESTROY, State.BALL_CONSUME);
 
             moves.register(MoveType.UTILITY, EXIT, State.EXIT);
         } else {
@@ -229,12 +234,12 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             moves.register(MoveType.BARRAGE, COMBO, State.COMBO);
 
             moves.register(MoveType.SPECIAL1, GRAB, State.GRAB);
+            moves.register(MoveType.SPECIAL3, DESTROY, State.DESTROY);
 
             moves.register(MoveType.UTILITY, ENTER, State.ENTER);
         }
 
         moves.register(MoveType.SPECIAL2, SURPRISE, State.SURPRISE);
-        moves.register(MoveType.SPECIAL3, DESTROY, State.DESTROY);
         moves.register(MoveType.ULTIMATE, CONSUME, State.CONSUME);
     }
 
@@ -358,11 +363,17 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                         Vec3f newPos = getFreePos().copy();
                         newPos.add(getMoveContext().get(SurpriseMove.OUT_DIR));
                         setFreePos(newPos);
+                        if (getMoveStun() == 1) setFree(false);
                     } else if (chargeDir != null) { // Void Charge move
                         user.setVelocity(chargeDir);
                         user.velocityModified = true;
                         if (user instanceof ServerPlayerEntity player)
                             player.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(user));
+
+                        if (curMove.getOriginalMove() == BALL_DESTROY)
+                            chargeDir = chargeDir.add(
+                                    new Vec3d(GravityChangerAPI.getGravityDirection(user).getUnitVector()).multiply(0.1)
+                            ).normalize().multiply(0.5);
                     }
                 } else { // Ultimate
                     setStateNoReset(State.IDLE);
@@ -435,7 +446,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             user.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 5, 9, true, false));
 
             // Player Half-Ball controls
-            if (user instanceof ServerPlayerEntity serverPlayer) {
+            if (user instanceof ServerPlayerEntity) {
                 if (lastRemoteInputTime - age > 4) updateRemoteInputs(0, 0, false);
 
                 Vec3d finalSpeed = Vec3d.ZERO;
@@ -480,45 +491,6 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             } else resetAlphaOverride();
         }
     }
-
-    /* TODO: FIX CREAM HOVER IN DIFF GRAVITIES
-    Vec3d gravityVec = new Vec3d(GravityChangerAPI.getGravityDirection(this).getUnitVector());
-
-    Vec3d userVel = JUtils.deltaPos(user);
-    Vec3d userPos = user.getPos();
-    Vec3d groundPos = world.raycast(
-            new RaycastContext(
-                    userPos, userPos.add(gravityVec.multiply(24)),
-                    RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user) ).getPos();
-
-    double groundDistSqr = groundPos.squaredDistanceTo(pos);
-    Vec3d stabilization = userVel.multiply(gravityVec).multiply(-1 / groundDistSqr);
-
-                    if (getRemoteJumpInput()) {
-        if (groundDistSqr < 49) {
-            user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 10, 0, true, false));
-            if (groundDistSqr < 25)
-                finalSpeed = finalSpeed.add(stabilization.subtract(gravityVec.multiply(1 / groundDistSqr)));
-        }
-    }
-
-    //JCraft.LOGGER.info("FS1: " + finalSpeed);
-
-    Vec3d rotVec = Vec3d.fromPolar(getPitch(), getYaw());
-    Vec3d moveRotVec = Vec3d.ZERO;
-    float forward = (float) getRemoteForwardInput();
-                    if (forward != 0) moveRotVec = moveRotVec.add(rotVec.multiply(forward)); // Forward movement
-    float side = (float) getRemoteSideInput();
-                    if (side != 0) moveRotVec = moveRotVec.add(rotVec.rotateY(1.57079632679f * side)); // Side movement
-
-    finalSpeed = finalSpeed.add(moveRotVec.normalize().multiply(0.34));
-
-    //JCraft.LOGGER.info("\nPRE Vel: " + user.getVelocity() + " | FS: " + finalSpeed);
-                    user.addVelocity(finalSpeed.x, finalSpeed.y, finalSpeed.z);
-    user.velocityModified = true;
-    //serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(user));
-    //JCraft.LOGGER.info("POST Vel: " + user.getVelocity());
-    */
 
     private void handleAIVoid(LivingEntity user, int voidTime) {
         double y = user.getY();

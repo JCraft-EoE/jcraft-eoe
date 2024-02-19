@@ -53,9 +53,21 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
     public static final KnockdownAttack<MagiciansRedEntity> HEAVY = new KnockdownAttack<MagiciansRedEntity>(160,
             12, 22, 1f, 7f, 10, 1.75f, 0.5f, 0.6f, 40)
+            .withAnim(State.HEAVY)
             .withSound(JSoundRegistry.MR_HEAVY)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withInfo(Text.literal("Low Kick"), Text.literal("medium windup knockdown"));
+    public static final SimpleAttack<MagiciansRedEntity> HAMMERFIST_FLARE = new SimpleAttack<MagiciansRedEntity>(0,
+            1, 5, 1f, 6f, 10, 1.75f, 1.5f, -0.2f)
+            .withLaunch()
+            .withImpactSound(SoundEvents.ITEM_FIRECHARGE_USE)
+            .withInfo(Text.literal("Hammerfist Flare"), Text.literal("launcher"));
+    public static final SimpleAttack<MagiciansRedEntity> HAMMERFIST = new SimpleAttack<MagiciansRedEntity>(100,
+            10, 20, 1f, 3f, 16, 1.75f, 0.75f, 0)
+            .withFinisher(15, HAMMERFIST_FLARE)
+            .withCrouchingVariant(HEAVY)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withInfo(Text.literal("Hammerfist"), Text.literal("two-hit launcher"));
     public static final FlamethrowerAttack FLAMETHROWER = new FlamethrowerAttack(300, 0, 60,
             0.75f, 0.4f, 0, 2, 0.25f, 0, 3)
             .withArmor(1)
@@ -122,7 +134,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
     protected void registerMoves(MoveMap<MagiciansRedEntity, State> moves) {
         moves.registerImmediate(MoveType.LIGHT, LIGHT, State.LIGHT);
 
-        moves.register(MoveType.HEAVY, HEAVY, State.HEAVY);
+        moves.registerImmediate(MoveType.HEAVY, HAMMERFIST, State.HAMMER);
         moves.register(MoveType.BARRAGE, FLAMETHROWER, State.BARRAGE);
 
         moves.register(MoveType.SPECIAL1, CROSSFIRE, State.CROSSFIRE);
@@ -211,7 +223,8 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
         REDIRECT(builder -> builder.playAndHold("animation.mr.redirect")),
         RED_BIND(builder -> builder.playAndHold("animation.mr.redbind")),
         DETECTOR(builder -> builder.playAndHold("animation.mr.detector")),
-        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.mr.light_followup"));
+        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.mr.light_followup")),
+        HAMMER(builder -> builder.playAndHold("animation.mr.hammer"));
 
         private final Consumer<AnimationBuilder> animator;
 

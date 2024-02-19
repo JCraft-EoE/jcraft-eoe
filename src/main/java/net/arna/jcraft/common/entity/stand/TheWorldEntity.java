@@ -3,15 +3,19 @@ package net.arna.jcraft.common.entity.stand;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
+import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.attack.moves.theworld.FeignBarrageCounterAttack;
 import net.arna.jcraft.common.attack.moves.theworld.TWDonutAttack;
 import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.config.JServerConfig;
+import net.arna.jcraft.common.util.JParticleType;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
@@ -22,7 +26,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.State> {
-    public static final SimpleAttack<TheWorldEntity> LOW_KICK = new SimpleAttack<TheWorldEntity>(30, 8, 14, 0.75f,
+    public static final SimpleAttack<TheWorldEntity> LOW_KICK = new SimpleAttack<TheWorldEntity>(20, 8, 14, 0.75f,
             6f, 17, 1.5f, 0.2f, 0.65f)
             .withAnim(State.LOW)
             .withImpactSound(JSoundRegistry.IMPACT_1)
@@ -37,7 +41,8 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
             .withBlockStun(4)
             .withExtraHitBox(0, 0, 1)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo finisher"));
-    public static final SimpleAttack<TheWorldEntity> LIGHT = SimpleAttack.<TheWorldEntity>lightAttack(5, 7, 5, 10, 0.1f, 0.75f, -0.1f)
+    public static final SimpleAttack<TheWorldEntity> LIGHT = SimpleAttack.<TheWorldEntity>lightAttack(
+            5, 7, 5, 10, 0.1f, 0.75f, -0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(LOW_KICK)
@@ -72,8 +77,22 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
     public static final TimeSkipMove<TheWorldEntity> TIME_SKIP = new TimeSkipMove<TheWorldEntity>(300, 14)
             .withSound(JSoundRegistry.TIME_SKIP)
             .withInfo(Text.literal("Timeskip"), Text.literal("14m range"));
+    public static final SimpleAttack<TheWorldEntity> LUNGE = new SimpleAttack<TheWorldEntity>(160, 9, 14,
+            1f, 5f, 12, 1.5f, 0.6f, 0.2f)
+            .withExtraHitBox(1)
+            .withInitAction(TheWorldEntity::doCharge)
+            .withSound(JSoundRegistry.TW_KICK)
+            .withImpactSound(JSoundRegistry.TW_KICK_HIT)
+            .withLaunch()
+            .withInfo(Text.literal("Lunge"), Text.literal("user & stand charge forward, launches"));
+    private static void doCharge(TheWorldEntity attacker, LivingEntity user, MoveContext moveContext) {
+        if (attacker.isFree()) return;
+        JUtils.addVelocity(user, attacker.getRotationVector().multiply(0.75));
+    }
+
     public static final ChargeAttack<TheWorldEntity, TheWorldEntity.State> CHARGE = new ChargeAttack<>(
-            280, 5, 19, 7.5f, 5, 20, 1.5f, 0.25f, 0, State.CHARGE_HIT)
+            280, 5, 19, 7.5f, 5f, 20, 1.5f, 0.25f, 0, State.CHARGE_HIT)
+            .withCrouchingVariant(LUNGE)
             .withSound(JSoundRegistry.TW_CHARGE)
             .withImpactSound(JSoundRegistry.TW_CHARGE_HIT)
             .withBlockStun(11)
@@ -126,7 +145,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 
         moves.register(MoveType.SPECIAL1, ROUNDHOUSE, State.ROUNDHOUSE);
-        moves.register(MoveType.SPECIAL2, CHARGE, State.CHARGE);
+        moves.register(MoveType.SPECIAL2, CHARGE, State.CHARGE).withCrouchingVariant(State.LUNGE);
         moves.register(MoveType.SPECIAL3, FEIGN_BARRAGE, State.BARRAGE);
         moves.register(MoveType.ULTIMATE, TIME_STOP, State.TIME_STOP);
 
@@ -185,7 +204,8 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
         COUNTER_MISS(builder -> builder.playAndHold("animation.theworld.counter_miss")),
         LOW(builder -> builder.playAndHold("animation.theworld.low")),
         TIMESKIP(builder -> builder.loop("animation.theworld.idle")),
-        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.theworld.light_followup"));
+        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.theworld.light_followup")),
+        LUNGE(builder -> builder.playAndHold("animation.theworld.lunge"));
 
         private final Consumer<AnimationBuilder> animator;
 

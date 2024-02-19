@@ -38,7 +38,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
     public static SimpleAttack<AbstractKillerQueenEntity<?, ?>> LIGHT_FOLLOWUP = new SimpleAttack<AbstractKillerQueenEntity<?, ?>>(
             0, 6, 13, 0.8f, 3f, 20, 1.5f, 0.5f, 0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
-            // implement in class: .withFollowup(LOW)
+            // implemented in class: .withFollowup(LOW)
             .withInfo(Text.literal("Second Punch"), Text.literal("frametrap tool"));
     public static final DetonateAttack DETONATE = new DetonateAttack(20, 5, 6, 1f)
             .withInfo(Text.literal("Detonate"), Text.literal("tiny windup, move queueing is disabled while Detonate is active"));
@@ -46,7 +46,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
             30, 6, 10, 0.75f, 3f, 10, 1.5f, 0.5f, 0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_6)
             .withCrouchingVariant(DETONATE)
-            // implement in class: .withFollowup(LIGHT_FOLLOWUP)
+            // implemented in class: .withFollowup(LIGHT_FOLLOWUP)
             .withInfo(Text.literal("Punch"), Text.literal("combo starter, decent speed, has two followups"));
     public static final MainBarrageAttack<AbstractKillerQueenEntity<?, ?>> BARRAGE = new MainBarrageAttack<AbstractKillerQueenEntity<?, ?>>(
             240, 0, 50, 0.75f, 1f, 20, 2f, 0.1f, 0, 3, Blocks.DEEPSLATE.getHardness())

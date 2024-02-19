@@ -5,6 +5,7 @@ import net.arna.jcraft.client.particle.AuraArcParticle;
 import net.arna.jcraft.client.particle.AuraBlobParticle;
 import net.arna.jcraft.common.component.living.BombTrackerComponent;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
+import net.arna.jcraft.common.entity.SheerHeartAttackEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.WhiteSnakeEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
@@ -20,10 +21,8 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.*;
 import net.minecraft.util.math.random.Random;
 import org.jetbrains.annotations.NotNull;
 
@@ -159,9 +158,7 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
     }
 
     @Override
-    public void playerCloneEntityClientTick(PlayerCloneEntity entity) {
-
-    }
+    public void playerCloneEntityClientTick(PlayerCloneEntity entity) { }
 
     @Override
     public void whiteSnakeRemoteClientTick(@NotNull WhiteSnakeEntity whiteSnakeEntity) {
@@ -182,5 +179,13 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
 
         //JCraft.LOGGER.info("Handling remote movement for: " + whiteSnakeEntity + " with " + f + " " + s + " " + jump);
         whiteSnakeEntity.tickRemoteMovement(f, s, jump);
+    }
+
+    @Override
+    public void sheerHeartAttackEntityTick(SheerHeartAttackEntity sHAEntity) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (sHAEntity.getOwnerId().equals(client.player.getUuid()) && sHAEntity.age <= 300) {
+            sHAEntity.setCustomName( Text.literal(15 - sHAEntity.age / 20 + "s") );
+        }
     }
 }

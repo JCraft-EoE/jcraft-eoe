@@ -38,7 +38,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEntity, TheWorldOverHeavenEntity.State> {
-    public static final LungeAttack LUNGE = new LungeAttack(30, 10, 16, 0.75f,
+    public static final LungeAttack LUNGE = new LungeAttack(JCraft.LIGHT_COOLDOWN, 10, 16, 0.75f,
             8f, 16, 1.75f, 1f, 0f)
             .withAnim(State.LUNGE)
             .withSound(JSoundRegistry.MUDA_DA)

@@ -3,6 +3,7 @@ package net.arna.jcraft.common.entity.stand;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.NonNull;
+import net.arna.jcraft.common.attack.core.MoveInputType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.moves.kingcrimson.*;
@@ -44,7 +45,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimsonEntity.State> {
-    public static final KnockdownAttack<KingCrimsonEntity> SWEEP = new KnockdownAttack<KingCrimsonEntity>(50,
+    public static final KnockdownAttack<KingCrimsonEntity> SWEEP = new KnockdownAttack<KingCrimsonEntity>(40,
             10, 20, 0.85f, 5f, 20, 1.5f, 0.1f, 0.3f, 35)
             .withAnim(State.SWEEP)
             .withImpactSound(JSoundRegistry.IMPACT_4)
@@ -52,7 +53,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             .withExtraHitBox(1)
             .withInfo(Text.literal("Sweep"), Text.literal("quick combo finisher, knocks down"));
     public static final SimpleMultiHitAttack<KingCrimsonEntity> DUAL_CHOP = new SimpleMultiHitAttack<KingCrimsonEntity>(
-            50, 23, 0.85f, 4f, 23, 1.5f, 0.1f, -0.1f,
+            40, 23, 0.85f, 4f, 21, 1.5f, 0.1f, -0.1f,
             IntSet.of(10, 16))
             .withSound(JSoundRegistry.KC_DUAL_CHOP)
             .withCrouchingVariant(SWEEP)
@@ -107,14 +108,15 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             .withLaunch()
             .withInfo(Text.literal("Donut"), Text.literal("slow, uninterruptable, extremely damaging launcher"));
     public static final EpitaphAttack EPITAPH = new EpitaphAttack(480, 4, 34, -1f)
-            .withInfo(Text.literal("Epitaph"), Text.literal("0.2s windup, 1.5s counter, combo starter"));
+            .withInfo(Text.literal("Epitaph"), Text.literal("0.2s windup, 1.5s counter, combo starter. Cannot be buffered."));
     public static final PredictionMove PREDICTION = new PredictionMove(600, 4, 104, -1f)
             .withCrouchingVariant(EPITAPH)
             .withSound(JSoundRegistry.KC_EPITAPH)
             .withInfo(Text.literal("Prediction/Move Cancel"), Text.literal("""
-                              shows future location of nearby entities, which can be forced into it using Time Erase (20s cooldown)
-                              you are slowed down while predicting
-                              during a move: cancels it (puts Time Erase on a 7 second cooldown but doesn't require it to be usable)"""));
+                              This move cannot be buffered.
+                              Shows the projected future location of nearby entities, using Time Erase will force them to the projected locations. (20s TE cooldown)
+                              While predicting, you are slowed down.
+                              Move Cancel - Using Special 3 during any move cancels it and puts Time Erase on a 7s cooldown. (But does not require TE to be usable)"""));
     public static final TimeEraseMove TIME_ERASE = new TimeEraseMove(1000, 5, 15, 1f, 120)
             .withInfo(Text.literal("Time Erase"), Text.literal("6 seconds duration, cancellable by doing anything with King Crimson"));
     public static final TimeSkipMove<KingCrimsonEntity> TIME_SKIP = new TimeSkipMove<KingCrimsonEntity>(300, 16)
@@ -156,15 +158,14 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                     Eye Chop>Donut>M1>Heavy~Overhead>Time Erase
                     
                     the red racist (death)
-                    Donut>M1>Eye Chop>M1>Barrage>
-                    ...Move Cancel>M1>Heavy~Overhead
-                    ...Time Erase""";
+                    Donut>Move Cancel>Timeskip>Barrage>Move Cancel>M1>Heavy>Move Cancel>Eye Chop>Sweep
+                    """;
 
         auraColors = new Vec3f[]{
                 Vec3f.POSITIVE_X,
                 new Vec3f(0.9f, 0.5f, 0.7f),
                 new Vec3f(1.0f, 0.4f, 0.4f),
-                new Vec3f(0.3f, 0.0f, 0.0f)
+                new Vec3f(0.3f, 0.0f, 0.5f)
         };
     }
 
@@ -348,6 +349,12 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             queuedMove = null;
 
         TIME_ERASE.tickTimeErase(this);
+    }
+
+    @Override
+    public void queueMove(MoveInputType type) {
+        if (type == MoveInputType.SPECIAL3) return;
+        super.queueMove(type);
     }
 
     @Override

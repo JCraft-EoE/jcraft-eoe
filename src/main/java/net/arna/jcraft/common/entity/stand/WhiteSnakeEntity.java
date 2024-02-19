@@ -33,7 +33,7 @@ import java.util.function.Consumer;
 
 public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEntity.State> {
     public static final UppercutAttack<WhiteSnakeEntity> UPPERCUT = new UppercutAttack<WhiteSnakeEntity>(
-            30, 8, 14, 1, 6f, 16, 1.25f, 0.5f, -0.4f, 0.5f)
+            20, 8, 14, 1, 6f, 16, 1.25f, 0.5f, -0.4f, 0.5f)
             .withAnim(State.UPPERCUT)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withExtraHitBox(1)

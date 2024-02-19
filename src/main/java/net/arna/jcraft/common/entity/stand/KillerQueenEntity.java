@@ -32,7 +32,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
     public static final SheerHeartAttackAttack SHEER_HEART_ATTACK = new SheerHeartAttackAttack(1000, 16, 20, 1f)
 //            .withSound(JSoundRegistry.KQ_SHA)
             .withInfo(Text.literal("Sheer Heart Attack"), Text.literal("creates an automatic, heat-seeking sub-stand that explodes on contact, reflects 25% damage back to owner"));
-    public static final KQGrabHitAttack GRAB_HIT = new KQGrabHitAttack(0, 13, 20, 1f, 2)
+    public static final KQGrabHitAttack GRAB_HIT = new KQGrabHitAttack(0, 13, 20, 1f, 8)
             .withInfo(Text.literal("Grab (hit)"), Text.empty());
     public static final KQGrabAttack GRAB = new KQGrabAttack(300, 12, 20, 0.75f,
             0f, 20, 1.75f, 0.1f, 0f, GRAB_HIT, State.GRAB_HIT)

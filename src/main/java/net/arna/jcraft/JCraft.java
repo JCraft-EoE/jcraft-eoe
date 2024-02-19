@@ -104,7 +104,7 @@ public class JCraft implements ModInitializer {
 
     // Standardized cooldowns
     public static final int dashCooldown = 40;
-    public static final int LIGHT_COOLDOWN = 30;
+    public static final int LIGHT_COOLDOWN = 20;
 
     @Getter
     @Setter

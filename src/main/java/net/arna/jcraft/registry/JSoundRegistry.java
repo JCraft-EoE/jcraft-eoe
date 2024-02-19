@@ -41,6 +41,7 @@ public interface JSoundRegistry {
     SoundEvent STAR_PLATINUM_TIMESKIP = registerSound("sptimeskip");
     SoundEvent STAR_PLATINUM_BARRAGE = registerSound("spbarrage");
     SoundEvent STAR_PLATINUM_ADVANCING_BARRAGE = registerSound("spadvbarrage");
+    SoundEvent STAR_PLATINUM_LUNGING_BARRAGE = registerSound("spadvbarrageshort");
     SoundEvent STAR_PLATINUM_THE_WORLD = registerSound("sptw");
     SoundEvent STAR_PLATINUM_KICK = registerSound("spkick");
     SoundEvent STAR_BREAKER = registerSound("starbreaker");
@@ -105,6 +106,7 @@ public interface JSoundRegistry {
     SoundEvent KQ_DETONATE = registerSound("kqdetonate");
     SoundEvent KQ_UPPERCUT = registerSound("kquppercut");
     SoundEvent KQ_EXPLODE = registerSound("kqexplode");
+    SoundEvent SHA_TREAD = registerSound("shatread");
 
     //Killer Queen: Bites The Dust
     SoundEvent KQBTD_ELBOW = registerSound("kqbtdelbow");
