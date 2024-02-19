@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.attack.moves.starplatinum;
 
 import lombok.NonNull;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.StunType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractBarrageAttack;
@@ -40,7 +41,7 @@ public class ChargeBarrageAttack extends AbstractBarrageAttack<ChargeBarrageAtta
     @Override
     public void tick(StarPlatinumEntity attacker) {
         super.tick(attacker);
-        tickChargeBarrageAttack(attacker, shouldPerform(attacker), getMoveDistance(), getWindupPoint());
+        tickChargeBarrageAttack(attacker, attacker.getMoveStun() < getWindupPoint(), getMoveDistance(), getWindupPoint());
     }
 
     protected Vec3d advanceChargePos(StandEntity<?, ?> attacker, float moveDistance, int windupPoint) {

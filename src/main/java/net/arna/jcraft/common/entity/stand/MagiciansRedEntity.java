@@ -51,7 +51,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             .withCrouchingVariant(REDIRECT)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
-    public static final KnockdownAttack<MagiciansRedEntity> HEAVY = new KnockdownAttack<MagiciansRedEntity>(160,
+    public static final KnockdownAttack<MagiciansRedEntity> HEAVY = new KnockdownAttack<MagiciansRedEntity>(100,
             12, 22, 1f, 7f, 10, 1.75f, 0.5f, 0.6f, 40)
             .withAnim(State.HEAVY)
             .withSound(JSoundRegistry.MR_HEAVY)
@@ -104,7 +104,6 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
 
         cons = List.of(
                 "easily blockable projectiles",
-                "slower than average",
                 "no mobility options",
                 "no armored options"
         );
@@ -113,14 +112,16 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
                     PASSIVE: Fire Resistance
     
                     BNBs:
+                        -the "this move is fire"
+                        M1>Crossfire
+                        
                         -the happy camper
                         M1>Low Kick>Variation/Life Detector
                         
                         -the "omg i have setups????"
-                        M1>Red Bind>dash past enemy>Life Detector/Variation>any physical hit
-                        
-                        -the "this move is fire"
-                        M1>Red Bind>Hurricane""";
+                        M1>Hammerfist>dash>M1>Red Bind>
+                        ...Life Detector/Variation>any physical hit
+                        ...Hurricane""";
 
         auraColors = new Vec3f[]{
                 new Vec3f(0.9f, 0.6f, 0.3f),
