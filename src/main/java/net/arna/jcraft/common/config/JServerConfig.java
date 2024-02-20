@@ -89,7 +89,8 @@ public class JServerConfig {
         JsonObject data = new JsonObject();
         ConfigOption.getImmutableOptions().forEach((key, option) -> data.add(key, option.write()));
 
-        try (BufferedWriter writer = Files.newBufferedWriter(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
+        try (BufferedWriter writer = Files.newBufferedWriter(path, StandardOpenOption.CREATE,
+                StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)) {
             gson.toJson(data, writer);
         }
     }
