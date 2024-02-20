@@ -39,12 +39,12 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
             .withHyperArmor()
             .withInfo(Text.literal("Slash"), Text.literal("uninterruptible get-off-me tool"));
     public static final SimpleAttack<AnubisSpec> POMMEL = new SimpleAttack<AnubisSpec>(180, 5, 8,
-            1f, 4f, 7, 1.25f, 0.3f, 0f)
+            1f, 4f, 7, 1.25f, 0.2f, 0f)
             .withSound(JSoundRegistry.ANUBIS_POMMEL)
             .withAction(AnubisSpec::tryIncrementBloodlust)
             .withImpactSound(JSoundRegistry.IMPACT_3);
     public static final SimpleMultiHitAttack<AnubisSpec> REKKA2 = new SimpleMultiHitAttack<AnubisSpec>(280,
-            26, 1f, 4f, 15, 1.75f, 0.6f, -0.1f, IntSet.of(8, 20))
+            26, 1f, 4f, 15, 1.75f, 0.2f, -0.1f, IntSet.of(8, 20))
             .withCondition(AnubisSpec::isHoldingAnubis)
             .withAction(AnubisSpec::tryIncrementBloodlust)
             .withSound(JSoundRegistry.ANUBIS_REKKA2)

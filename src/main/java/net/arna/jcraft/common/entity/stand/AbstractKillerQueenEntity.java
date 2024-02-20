@@ -32,7 +32,7 @@ import java.util.List;
 public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQueenEntity<E, S>, S extends Enum<S> & StandAnimationState<E>> extends StandEntity<E, S>
         permits KillerQueenEntity, KQBTDEntity {
     public static SimpleAttack<AbstractKillerQueenEntity<?, ?>> LOW = new SimpleAttack<AbstractKillerQueenEntity<?, ?>>(
-            0, 8, 13, 0.85f, 4f, 10, 1.5f, 0.5f, 0.1f)
+            0, 8, 13, 0.85f, 4f, 10, 1.5f, 0.25f, 0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("Low Punch"), Text.literal("frametrap tool, low stun"));
     public static SimpleAttack<AbstractKillerQueenEntity<?, ?>> LIGHT_FOLLOWUP = new SimpleAttack<AbstractKillerQueenEntity<?, ?>>(
@@ -43,7 +43,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
     public static final DetonateAttack DETONATE = new DetonateAttack(20, 5, 6, 1f)
             .withInfo(Text.literal("Detonate"), Text.literal("tiny windup, move queueing is disabled while Detonate is active"));
     public static final SimpleAttack<AbstractKillerQueenEntity<?, ?>> LIGHT = new SimpleAttack<AbstractKillerQueenEntity<?, ?>>(
-            30, 6, 10, 0.75f, 3f, 10, 1.5f, 0.5f, 0.1f)
+            30, 6, 10, 0.75f, 3f, 10, 1.5f, 0.25f, 0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_6)
             .withCrouchingVariant(DETONATE)
             // implemented in class: .withFollowup(LIGHT_FOLLOWUP)

@@ -26,7 +26,7 @@ public class DazedStatusEffect extends StatusEffect {
 
     public static boolean canBeComboBroken(int amplifier) {
         return switch (amplifier) {
-            case (1), (4) -> true;
+            case (1), (3), (4) -> true;
             default -> false;
         };
     }
@@ -46,7 +46,7 @@ public class DazedStatusEffect extends StatusEffect {
 
         if (amplifier < 2) { // Immobilizing stun
             yVel = MathHelper.clamp(yVel, -0.5, 0.5);
-            horizontalMult = 0.2;
+            horizontalMult = 0.8;
         } else if (amplifier == 3) horizontalMult = 1;
 
         entity.setVelocity(eVel.x * horizontalMult, yVel, eVel.z * horizontalMult);

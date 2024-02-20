@@ -1,11 +1,7 @@
 package net.arna.jcraft.common.entity.stand;
 
 import lombok.NonNull;
-import net.arna.jcraft.common.attack.core.BlockableType;
-import net.arna.jcraft.common.attack.core.HitBoxData;
-import net.arna.jcraft.common.attack.core.MoveMap;
-import net.arna.jcraft.common.attack.core.MoveType;
-import net.arna.jcraft.common.attack.core.MoveInputType;
+import net.arna.jcraft.common.attack.core.*;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.goldexperience.*;
 import net.arna.jcraft.common.attack.moves.shared.HealMove;
@@ -19,7 +15,6 @@ import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.stat.Stat;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
@@ -45,7 +40,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .withExtraHitBox(0, 0.25, 1)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<GoldExperienceEntity> LIGHT = new SimpleAttack<GoldExperienceEntity>(
-            15, 6, 9, 0.75f, 5f, 7, 1.5f, 0.75f, -0.1f)
+            15, 6, 9, 0.75f, 5f, 7, 1.5f, 0.2f, -0.1f)
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(BERRY_BUSH)
             .withImpactSound(JSoundRegistry.IMPACT_1)

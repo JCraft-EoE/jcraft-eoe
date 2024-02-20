@@ -61,7 +61,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withExtraHitBox(0, 0.25, 1)
             .withInfo(Text.literal("Swipe"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<TheFoolEntity> LIGHT = new SimpleAttack<TheFoolEntity>( 30, 7,
-            14, 1.5f, 6, 15, 2, 0.8f, -0.1f)
+            14, 1.5f, 6, 15, 2, 0.5f, -0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withExtraHitBox(0, 0.25, 1)
             .withFollowup(LIGHT_FOLLOWUP)

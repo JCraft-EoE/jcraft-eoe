@@ -8,6 +8,7 @@ import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.magiciansred.*;
 import net.arna.jcraft.common.attack.moves.shared.KnockdownAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
+import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.block.Block;
@@ -46,7 +47,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             .withBlockStun(4)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<MagiciansRedEntity> LIGHT = new SimpleAttack<MagiciansRedEntity>(JCraft.LIGHT_COOLDOWN,
-            5, 8, 0.75f, 5f, 16, 1.5f, 0.75f, -0.1f)
+            5, 8, 0.75f, 5f, 16, 1.5f, 0.2f, -0.1f)
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(REDIRECT)
             .withImpactSound(JSoundRegistry.IMPACT_1)
@@ -60,13 +61,15 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
     public static final SimpleAttack<MagiciansRedEntity> HAMMERFIST_FLARE = new SimpleAttack<MagiciansRedEntity>(0,
             1, 5, 1f, 6f, 10, 1.75f, 1.5f, -0.2f)
             .withLaunch()
-            .withImpactSound(SoundEvents.ITEM_FIRECHARGE_USE)
+            .withAction((attacker, user, ctx, targets) -> attacker.playSound(SoundEvents.ITEM_FIRECHARGE_USE, 1.0f, 1.0f))
             .withInfo(Text.literal("Hammerfist Flare"), Text.literal("launcher"));
     public static final SimpleAttack<MagiciansRedEntity> HAMMERFIST = new SimpleAttack<MagiciansRedEntity>(100,
-            10, 20, 1f, 3f, 16, 1.75f, 0.75f, 0)
+            10, 20, 1f, 3f, 13, 1.75f, 0.2f, 0)
+            .withSound(JSoundRegistry.MR_CROSSFIRE)
             .withFinisher(15, HAMMERFIST_FLARE)
             .withCrouchingVariant(HEAVY)
             .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
             .withInfo(Text.literal("Hammerfist"), Text.literal("two-hit launcher"));
     public static final FlamethrowerAttack FLAMETHROWER = new FlamethrowerAttack(300, 0, 60,
             0.75f, 0.4f, 0, 2, 0.25f, 0, 3)

@@ -15,18 +15,18 @@ import net.minecraft.text.Text;
 
 public class BrawlerSpec extends JSpec<BrawlerSpec, BrawlerSpec.State> {
     public static final SimpleAttack<BrawlerSpec> HEAVY = new SimpleAttack<BrawlerSpec>(340, 10,
-            21, 1f, 6f, 15, 1.5f, 0.8f, 0f)
+            21, 1f, 6f, 15, 1.5f, 0.3f, 0f)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHyperArmor()
             .withInfo(Text.literal("Uppercut"), Text.literal("uninterruptible, medium speed"));
     public static final SimpleMultiHitAttack<BrawlerSpec> COMBO = new SimpleMultiHitAttack<BrawlerSpec>(400,
-            26, 1f, 4, 15, 1.5f, 0.6f, -0.1f, IntSet.of(5, 10, 19))
+            26, 1f, 4, 15, 1.5f, 0.2f, -0.1f, IntSet.of(5, 10, 19))
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withBlockStun(5)
             .withInfo(Text.literal("Combo"), Text.literal("hits 3 times, combo starter/extender"));
     public static final SimpleAttack<BrawlerSpec> GUT = new SimpleAttack<BrawlerSpec>(240, 11, 18,
-            1f, 6f, 16, 1.5f, 0.8f, 0f)
+            1f, 6f, 16, 1.5f, 0.4f, 0f)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Gut Punch"), Text.literal("good stun"));

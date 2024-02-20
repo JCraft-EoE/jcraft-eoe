@@ -82,7 +82,7 @@ public class SandTornadoEntity extends LivingEntity implements IAnimatable, IOwn
         super.tick();
         if (hasDisappeared()) return;
 
-        Vec3d circulation = new Vec3d(MathHelper.sin(age * 0.25f), 0.0, MathHelper.cos(age * 0.25f));
+        Vec3d circulation = new Vec3d(MathHelper.sin(age * 0.25f) * 0.3f, 0.0, MathHelper.cos(age * 0.25f) * 0.3f);
 
         if (world.isClient) {
             for (int i = 0; i < 3; i++)

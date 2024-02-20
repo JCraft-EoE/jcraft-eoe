@@ -1,7 +1,6 @@
 package net.arna.jcraft.client.renderer.entity.stands;
 
 import net.arna.jcraft.client.model.entity.GoldenExperienceModel;
-import net.arna.jcraft.common.entity.stand.CMoonEntity;
 import net.arna.jcraft.common.entity.stand.GoldExperienceEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.render.RenderLayer;
@@ -10,11 +9,9 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector3d;
-import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.random.Random;
 import software.bernie.geckolib3.geo.render.built.GeoModel;
 

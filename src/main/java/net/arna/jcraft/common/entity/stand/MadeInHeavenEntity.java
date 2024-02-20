@@ -44,7 +44,7 @@ import java.util.function.Consumer;
 
 public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHeavenEntity.State> {
     public static final EffectInflictingAttack<MadeInHeavenEntity> SPEED_CHOP = new EffectInflictingAttack<MadeInHeavenEntity>(
-            JCraft.LIGHT_COOLDOWN, 6, 11, 0.75f, 3f, 8, 1.5f, 0.75f, -0.1f,
+            JCraft.LIGHT_COOLDOWN, 6, 11, 0.75f, 3f, 8, 1.5f, 0.5f, -0.1f,
             List.of(new StatusEffectInstance(JStatusRegistry.BLEEDING, 80, 1, true, false, true)))
             .withAnim(State.SPEED_CHOP)
             .withImpactSound(SoundEvents.ITEM_TRIDENT_HIT)
@@ -61,7 +61,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
             .withInfo(Text.literal("Kick"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<MadeInHeavenEntity> SLICE = new SimpleAttack<MadeInHeavenEntity>(JCraft.LIGHT_COOLDOWN,
-            5, 8, 0.75f, 4f, 10, 1.5f, 0.75f, -0.1f)
+            5, 8, 0.75f, 4f, 10, 1.5f, 0.15f, -0.1f)
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(SPEED_CHOP)
             .withImpactSound(SoundEvents.ITEM_TRIDENT_HIT)
@@ -101,7 +101,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
             .withInfo(Text.literal("Fury Chop"), Text.literal("combo extender, on hit gives haste(8s) to user and mining fatigue(8s) to victim, on whiff the fatigue goes to user"));
     public static final SimpleAttack<MadeInHeavenEntity> DONUT = new SimpleAttack<MadeInHeavenEntity>(200,
-            26, 32, 0.75f, 8.5f, 40, 2f, 0f, 0.2f)
+            26, 32, 0.75f, 8.5f, 40, 2f, -0.2f, 0.2f)
             .withSound(JSoundRegistry.STAND_DESUMMON)
             .withImpactSound(JSoundRegistry.IMPACT_7)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)

@@ -46,13 +46,13 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withBlockStun(4)
             .withInfo(Text.literal("Finisher"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<WhiteSnakeEntity> LIGHT = SimpleAttack.<WhiteSnakeEntity>lightAttack(
-            7, 11, 5f, 13, 0.75f, 0.75f, 0.2f)
+            7, 11, 0.75f, 5f, 13, 0.2f, 0.2f)
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(UPPERCUT)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
     public static final SimpleAttack<WhiteSnakeEntity> MEDIUM = new SimpleAttack<WhiteSnakeEntity>(
-            60, 8, 13, 1, 7f, 16, 1.75f, 0, 0)
+            60, 8, 13, 1, 7f, 16, 1.75f, 0.4f, 0)
             .withSound(JSoundRegistry.WS_DONUT)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
@@ -71,7 +71,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withBlockableType(BlockableType.NON_BLOCKABLE)
             .withInfo(Text.literal("Give Stand Disk"), Text.literal("gives a single hit target a stand, provided they do not have one already, from a disk in the user's off hand"));
     public static final EffectInflictingAttack<WhiteSnakeEntity> STAND_DISC = new EffectInflictingAttack<WhiteSnakeEntity>(
-            480, 22, 34, 1, 8f, 20, 2, 0, 0,
+            480, 22, 34, 1, 8f, 20, 2, 0.5f, 0,
             List.of(new StatusEffectInstance(JStatusRegistry.STANDLESS, 160, 0)))
             .withSound(JSoundRegistry.WS_STAND_DISC)
             .withImpactSound(JSoundRegistry.IMPACT_2)
@@ -82,14 +82,14 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withCrouchingVariant(GIVE_STAND)
             .withInfo(Text.literal("Take Stand Disk"), Text.literal("uninterruptible & unblockable, removes enemy stand for 8s"));
     public static final SimpleAttack<WhiteSnakeEntity> LEG_CRUSHER = new SimpleAttack<WhiteSnakeEntity>(
-            240, 16, 22, 0.75f, 7, 32, 1.75f, 0.25f, 0.2f)
+            240, 16, 22, 0.75f, 7, 32, 1.75f, 0.35f, 0.2f)
             .withSound(JSoundRegistry.WS_LEGCRUSH)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
             .withInfo(Text.literal("Leg Crusher"), Text.literal("high stun, medium windup"));
     public static final EffectInflictingAttack<WhiteSnakeEntity> MEMORY_DISC = new EffectInflictingAttack<WhiteSnakeEntity>(
-            280, 22, 34, 1, 7f, 20, 2, 0, 0,
+            280, 22, 34, 1, 7f, 20, 2, 0.5f, 0,
             List.of(
                     new StatusEffectInstance(StatusEffects.WEAKNESS, 600, 0),
                     new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 600, 0)

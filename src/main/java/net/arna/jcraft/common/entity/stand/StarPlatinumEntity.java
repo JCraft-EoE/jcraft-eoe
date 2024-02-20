@@ -41,7 +41,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
             .withExtraHitBox(0, 0, 1)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<StarPlatinumEntity> LIGHT = SimpleAttack.<StarPlatinumEntity>lightAttack(
-            5, 7, 5f, 10, 0.2f, 0.75f, -0.1f)
+            5, 7, 0.75f, 5f, 10, 0.2f, -0.1f)
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(UPPERCUT)
             .withImpactSound(JSoundRegistry.IMPACT_1)
@@ -55,6 +55,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
             .withSound(JSoundRegistry.STAR_FINGER)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withBlockStun(5)
+            .withLaunchNoShockwave()
             .withExtraHitBox(2, 0.5, 1)
             .withInfo(Text.literal("Star Finger"), Text.literal("medium windup, combo starter/extender"));
     public static final SimpleAttack<StarPlatinumEntity> ROUNDHOUSE = new SimpleAttack<StarPlatinumEntity>(40,
@@ -64,13 +65,13 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
             .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
             .withInfo(Text.literal("Roundhouse"), Text.literal("fast poke, low stun"));
     public static final ChargeBarrageAttack SHORT_CHARGE_BARRAGE = new ChargeBarrageAttack(280, 5, 25,
-            6f, 0.6f, 15, 1.5f, 0.3f, 0f, 3, true)
+            6f, 0.6f, 15, 1.5f, 0.1f, 0f, 3, true)
             .withSound(JSoundRegistry.STAR_PLATINUM_LUNGING_BARRAGE)
             .withBarrageShockwaves()
             .withBackstab(false)
             .withInfo(Text.literal("Lunging Barrage"), Text.literal("fast combo starter/extender, medium stun"));
     public static final ChargeBarrageAttack CHARGE_BARRAGE = new ChargeBarrageAttack(280, 5, 55,
-            7f, 0.6f, 15, 1.5f, 0.3f, 0f, 3, false)
+            7f, 0.6f, 15, 1.5f, 0.1f, 0f, 3, false)
             .withSound(JSoundRegistry.STAR_PLATINUM_ADVANCING_BARRAGE)
             .withBarrageShockwaves()
             .withBackstab(false)

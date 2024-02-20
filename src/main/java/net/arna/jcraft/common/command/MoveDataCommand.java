@@ -89,7 +89,7 @@ public class MoveDataCommand {
             boolean fRec = false;
             int j = 0; // inter-recovery measurement
 
-            if (attack.isCharge()) {
+            if (attack.isCharge() && !attack.isBarrage()) {
                 frames = new StringBuilder("§4until hit§r");
                 recovery = 10;
             }

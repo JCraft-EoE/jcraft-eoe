@@ -46,7 +46,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             .withExtraHitBox(0, 0, 1)
             .withInfo(Text.literal("Deadly Blow"), Text.literal("combo finisher, more blockstun than other light followups"));
     public static final SimpleAttack<D4CEntity> CHOP = new SimpleAttack<D4CEntity>(JCraft.LIGHT_COOLDOWN,
-            9, 15, 0.75f, 5f, 20, 1.5f, 0.75f, -0.1f)
+            9, 15, 0.75f, 5f, 20, 1.5f, 0.25f, -0.1f)
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(ITEM_PLACE)
             .withImpactSound(JSoundRegistry.IMPACT_2)

@@ -1,7 +1,6 @@
 package net.arna.jcraft.common.attack.moves.starplatinum;
 
 import lombok.NonNull;
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.StunType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractBarrageAttack;

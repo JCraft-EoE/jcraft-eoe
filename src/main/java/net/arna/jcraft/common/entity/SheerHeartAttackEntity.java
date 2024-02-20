@@ -4,7 +4,6 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.ai.goal.SHAAttackGoal;
 import net.arna.jcraft.common.util.IOwnable;
 import net.arna.jcraft.common.util.JExplosionModifier;
-import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
 import net.arna.jcraft.registry.JSoundRegistry;

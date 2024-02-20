@@ -38,7 +38,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             .withExtraHitBox(0, 0.25, 1)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<GEREntity> DOWNWARD_KICK = new SimpleAttack<GEREntity>(JCraft.LIGHT_COOLDOWN,
-            5, 12, 0.75f, 4f, 20, 1.25f, 0.75f, 0.33f)
+            5, 12, 0.75f, 4f, 20, 1.25f, 0.4f, 0.33f)
             .withAnim(State.AIR_LIGHT)
             .withFollowup(LIGHT_FOLLOWUP)
             .withImpactSound(JSoundRegistry.IMPACT_1)
@@ -56,7 +56,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             6, 9, 1f, 1f, 10, 1.75f, 1.1f, 0f)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withLaunch()
+            .withLaunchNoShockwave()
             .withInfo(Text.literal("Kick Barrage (Final Hit)"), Text.empty());
     public static final BarrageAttack<GEREntity> KICK_BARRAGE = new BarrageAttack<GEREntity>(280, 0, 48,
             1f, 1f, 20, 1.5f, 0.3f, 0f, 3)
@@ -65,7 +65,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             .withInfo(Text.literal("Kick Barrage"), Text.literal("fast combo finisher, knocks back"));
     // JCraft.lightCooldown -> 0 | 0.55f -> 0.4f
     public static final SimpleAttack<GEREntity> PUNCH = new SimpleAttack<GEREntity>(JCraft.LIGHT_COOLDOWN / 2,
-            5, 9, 0.75f, 5f, 8, 1.5f, 0.75f, -0.1f)
+            5, 9, 0.75f, 5f, 8, 1.5f, 0.2f, -0.1f)
             .withAerialVariant(DOWNWARD_KICK)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));

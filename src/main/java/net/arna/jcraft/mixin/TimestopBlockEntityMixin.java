@@ -1,7 +1,6 @@
 package net.arna.jcraft.mixin;
 
 import net.arna.jcraft.common.tickable.Timestops;
-import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
 import org.spongepowered.asm.mixin.Mixin;

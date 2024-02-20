@@ -46,14 +46,14 @@ import java.util.function.Consumer;
 
 public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimsonEntity.State> {
     public static final KnockdownAttack<KingCrimsonEntity> SWEEP = new KnockdownAttack<KingCrimsonEntity>(40,
-            10, 20, 0.85f, 5f, 20, 1.5f, 0.1f, 0.3f, 35)
+            10, 20, 0.85f, 5f, 20, 1.5f, 0.4f, 0.3f, 35)
             .withAnim(State.SWEEP)
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withBlockStun(6)
             .withExtraHitBox(1)
             .withInfo(Text.literal("Sweep"), Text.literal("quick combo finisher, knocks down"));
     public static final SimpleMultiHitAttack<KingCrimsonEntity> DUAL_CHOP = new SimpleMultiHitAttack<KingCrimsonEntity>(
-            40, 23, 0.85f, 4f, 21, 1.5f, 0.1f, -0.1f,
+            40, 23, 0.85f, 4f, 21, 1.5f, 0.2f, -0.1f,
             IntSet.of(10, 16))
             .withSound(JSoundRegistry.KC_DUAL_CHOP)
             .withCrouchingVariant(SWEEP)
@@ -79,7 +79,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             .withLaunch()
             .withInfo(Text.literal("Overhead Hook"), Text.literal("long windup, knockdown"));
     public static final SimpleAttack<KingCrimsonEntity> VERTICAL_CHOP = new SimpleAttack<KingCrimsonEntity>(240,
-            12, 19, 0.85f, 6f, 25, 1.5f, 0.2f, 0f)
+            12, 19, 0.85f, 6f, 25, 1.5f, 0.6f, 0f)
             .withFollowup(OVERHEAD_HOOK)
             .withSound(JSoundRegistry.KC_HEAVY)
             .withImpactSound(JSoundRegistry.IMPACT_9)
@@ -89,7 +89,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     public static final BloodThrowAttack BLOOD_THROW = new BloodThrowAttack(260, 10, 15, 1f)
             .withInfo(Text.literal("Blood Throw"), Text.literal("throws a stunning, blinding blood projectile, crouch while it comes out for higher speed"));
     public static final EffectInflictingAttack<KingCrimsonEntity> EYE_CHOP = new EffectInflictingAttack<KingCrimsonEntity>(
-            280, 20, 29, 1f, 9f, 27, 1.75f, 0.3f, -0.3f,
+            280, 20, 29, 1f, 9f, 27, 1.75f, 0.7f, -0.3f,
             List.of(new StatusEffectInstance(StatusEffects.BLINDNESS, 200, 0)))
             .withCrouchingVariant(BLOOD_THROW)
             .withSound(JSoundRegistry.KC_EYE_CHOP)

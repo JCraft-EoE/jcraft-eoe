@@ -48,8 +48,8 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withLaunch()
             .withBlockStun(4)
             .withInfo(Text.literal("Slash"), Text.literal("quick combo finisher"));
-    public static final SimpleAttack<SilverChariotEntity> LIGHT = SimpleAttack.<SilverChariotEntity>lightAttack(5, 9, 5f,
-                    11, 0.75f, 0.65f, -0.1f)
+    public static final SimpleAttack<SilverChariotEntity> LIGHT = SimpleAttack.<SilverChariotEntity>lightAttack(5, 9, 0.65f, 5f,
+                    11, 0.15f, -0.1f)
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(LAST_SHOT)
             .withSound(JSoundRegistry.SC_POKE)
@@ -70,7 +70,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             0.65f, 1f, 10, 2f, 0.1f, 0f, 2)
             .withSound(JSoundRegistry.SC_SPIN)
             .withInfo(Text.literal("Spinning Blade"), Text.literal("fast reliable combo starter/extender, low stun"));
-    public static final RayDartAttack RAY_DART = new RayDartAttack(160, 13, 25,
+    public static final RayDartAttack RAY_DART = new RayDartAttack(100, 13, 25,
             0.65f, 5f, 15, 1.75f, 0.25f, -0.2f)
             .withSound(JSoundRegistry.SC_CHARGE)
             .withBlockStun(17)
@@ -95,7 +95,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("God of Death (Final Hit)"), Text.empty());
     public static final GodOfDeathHitAttack GOD_OF_DEATH_HIT = new GodOfDeathHitAttack(0, 59, 0.65f,
-            4.5f, 32, 2f, 0.75f, 0f, IntSet.of(13, 23))
+            4.5f, 32, 2f, 0.25f, 0f, IntSet.of(13, 23))
             .withFollowup(GOD_OF_DEATH_FINAL)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withStunType(StunType.UNBURSTABLE)

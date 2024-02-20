@@ -55,7 +55,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withExtraHitBox(0, 0.25, 1)
             .withInfo(Text.literal("Roundhouse"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<TheWorldOverHeavenEntity> PUNCH = SimpleAttack.<TheWorldOverHeavenEntity>lightAttack(
-            4, 7, 6f, 11, 0.75f, 0.75f, -0.1f)
+            4, 7, 0.75f, 6f, 11, 0.2f, -0.1f)
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(LUNGE)
             .withImpactSound(JSoundRegistry.IMPACT_1)
@@ -66,7 +66,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
     public static final SingularityAttack SINGULARITY = new SingularityAttack(260, 10, 22,
-            1f, 0f, 20, 2f, 0f, 0f)
+            1f, 0f, 20, 2f, 0.3f, 0f)
             .withSound(JSoundRegistry.TWOH_HEAVY)
             .withImpactSound(JSoundRegistry.IMPACT_12)
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)

@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import lombok.SneakyThrows;
 import lombok.Synchronized;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.spec.SpecType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.WorldSavePath;
 
