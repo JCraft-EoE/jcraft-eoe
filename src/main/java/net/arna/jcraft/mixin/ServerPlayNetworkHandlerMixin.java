@@ -4,8 +4,20 @@ import net.minecraft.server.network.ServerPlayNetworkHandler;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(ServerPlayNetworkHandler.class)
-public abstract class ServerNetworkHandlerMixin {
+public abstract class ServerPlayNetworkHandlerMixin {
     /*
+    @Redirect(
+            method = "onPlayerAction",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/server/network/ServerPlayerEntity;dropSelectedItem(Z)Z",
+                    ordinal = 0
+            )
+    )
+    private boolean jcraft$dropSelectedItem(ServerPlayerEntity instance, boolean entireStack) {
+        return false;
+    }
+
     @Shadow
     public ServerPlayerEntity player;
     @Inject(cancellable = true, at = @At(

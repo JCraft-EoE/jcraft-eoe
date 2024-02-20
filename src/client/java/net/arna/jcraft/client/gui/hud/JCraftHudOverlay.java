@@ -1,6 +1,7 @@
 package net.arna.jcraft.client.gui.hud;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import lombok.Setter;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.MadeInHeavenEntity;
@@ -54,7 +55,7 @@ public class JCraftHudOverlay {
         }
     }
 
-    protected record Gauge(float red, float green, float blue, int max) {
+    protected record Gauge(float red, float green, float blue, @Setter int max) {
         public Gauge(Vec3f color, int max) {
             this(color.getX(), color.getY(), color.getZ(), max);
         }

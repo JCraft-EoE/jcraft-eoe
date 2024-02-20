@@ -185,6 +185,12 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         };
     }
 
+    @Override
+    public Vec3f getAuraColor() {
+        if (getVoidTime() > 0) return Vec3f.ZERO;
+        return super.getAuraColor();
+    }
+
     public void beginHalfBall() {
         dataTracker.set(HALF_BALL, true);
         idleDistance = 0f;
@@ -358,6 +364,9 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                     }
                 }
 
+                if (notCorS && !isFree())
+                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 15, 0, false, false));
+
                 if (charging) {
                     if (isFree()) { // Surprise move
                         Vec3f newPos = getFreePos().copy();
@@ -417,9 +426,6 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                         livingEntity.damage(DamageSource.OUT_OF_WORLD, damage);
                     }
                 }
-
-                if (notCorS && !isFree())
-                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 25, 0, false, false));
 
                 voidTime--;
                 if (voidTime < 1)

@@ -5,7 +5,11 @@ import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.IJInputStateManagerHolder;
 import net.arna.jcraft.common.util.InputStateManager;
 import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import org.spongepowered.asm.mixin.Mixin;
@@ -52,5 +56,11 @@ public class ServerPlayerEntityMixin implements IJInputStateManagerHolder {
         if (!alive) return;
         InputStateManager old = ((IJInputStateManagerHolder) oldPlayer).jcraft$getJInputStateManager();
         inputStateManager.copyFrom(old);
+    }
+
+    @Inject(method = "dropItem", at = @At(value = "HEAD"), cancellable = true)
+    private void jcraft$dropItem(ItemStack stack, boolean throwRandomly, boolean retainOwnership, CallbackInfoReturnable<ItemEntity> cir) {
+        if (!JUtils.canAct(((ServerPlayerEntity) (Object) this)))
+            cir.cancel();
     }
 }

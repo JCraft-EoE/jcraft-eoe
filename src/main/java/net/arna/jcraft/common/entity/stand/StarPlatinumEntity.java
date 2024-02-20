@@ -51,12 +51,11 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
             .withSound(JSoundRegistry.STAR_PLATINUM_BARRAGE)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
     public static final SimpleAttack<StarPlatinumEntity> STAR_FINGER = new SimpleAttack<StarPlatinumEntity>(200,
-            12, 20, 0.75f, 5f, 30, 1.75f, -0.25f, -0.25f)
+            12, 20, 0.75f, 5f, 30, 1.75f, -0.4f, -0.25f)
             .withSound(JSoundRegistry.STAR_FINGER)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withBlockStun(5)
-            .withLaunchNoShockwave()
-            .withExtraHitBox(2, 0.5, 1)
+            .withExtraHitBox(2, 0.1, 1)
             .withInfo(Text.literal("Star Finger"), Text.literal("medium windup, combo starter/extender"));
     public static final SimpleAttack<StarPlatinumEntity> ROUNDHOUSE = new SimpleAttack<StarPlatinumEntity>(40,
             7, 12, 0.75f, 6f, 8, 1.5f, 0.25f, 0f)

@@ -32,6 +32,7 @@ import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import software.bernie.geckolib3.core.util.Color;
 
 import java.util.List;
 import java.util.UUID;
@@ -160,7 +161,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
 
         auraColors = new Vec3f[]{
                 new Vec3f(0.1f, 0.1f, 0.1f),
-                new Vec3f(1f, 1f, 1f),
+                new Vec3f(1f, 0.6f, 0.8f),
                 new Vec3f(0.9f, 0.9f, 1.0f),
                 new Vec3f(1.0f, 0.0f, 0.2f)
         };
@@ -168,6 +169,14 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         if (world.isClient) return;
         // TODO
 //        timestop.stun = JServerConfig.TWOH_TIME_STOP_DURATION.getValue() / 20.0f;
+    }
+
+    @Override
+    public Vec3f getAuraColor() {
+        if (getSkin() > 0)
+            return super.getAuraColor();
+        Color auraColor = Color.ofHSB(age % 360f / 360f, 0.5f, 0.5f);
+        return new Vec3f(auraColor.getRed(), auraColor.getGreen(), auraColor.getBlue());
     }
 
     public int getOverwriteType() {

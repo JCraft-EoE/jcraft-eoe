@@ -25,7 +25,7 @@
     "PlayerEntityMixin",
     "RecipeManagerMixin",
     "RespawnAnchorBlockMixin",
-    "ServerNetworkHandlerMixin",
+    "ServerPlayNetworkHandlerMixin",
     "ServerPlayerEntityMixin",
     "ServerWorldMixin",
     "TimestopBlockEntityMixin",

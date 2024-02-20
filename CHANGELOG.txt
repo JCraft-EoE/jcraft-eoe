@@ -2374,6 +2374,15 @@ Star Platinum: The World
         >Added crouching variant
     >Ground Slam cooldown reduced (1.5->1s)
 
+● 20/02/2024 pt.2
+>Disabled throwing items while stunned
+
+Star Platinum
+    >Star Finger animation updated
+
+Cream
+    >Fixed Surprise blindness bug
+
 todo:
 dynamic hurtboxes
 counters that invalidate hit effects
