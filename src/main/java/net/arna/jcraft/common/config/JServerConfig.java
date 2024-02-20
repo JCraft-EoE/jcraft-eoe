@@ -58,6 +58,10 @@ public class JServerConfig {
     // TODO list options
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
+    // Empty method to force class initialization.
+    // Not doing this breaks the /jconfig command (cuz this class won't be initialized on clients).
+    public static void init() {}
+
     @SneakyThrows
     public static void load(MinecraftServer server) {
         Path path = server.getSavePath(WorldSavePath.ROOT).resolve("jcraft.json");

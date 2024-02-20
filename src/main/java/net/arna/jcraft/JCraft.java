@@ -7,6 +7,7 @@ import lombok.Setter;
 import net.arna.jcraft.common.component.living.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.living.StandComponent;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.effects.DazedStatusEffect;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.StandType;
@@ -358,6 +359,7 @@ public class JCraft implements ModInitializer {
         JArgumentTypeRegistry.registerArgumentTypes();
         JEnchantmentRegistry.init();
         JLootTableHelper.init();
+        JServerConfig.init();
 
 
         ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_PLAYER_INPUT, PlayerInputPacket::handle);
