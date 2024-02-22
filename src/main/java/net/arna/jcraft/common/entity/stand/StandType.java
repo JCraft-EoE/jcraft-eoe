@@ -63,7 +63,7 @@ public enum StandType {
 
 
     @Getter(lazy = true)
-    private static final List<StandType> regularStandTypes = Arrays.stream(values()).filter(t -> !t.isEvolution()).collect(ImmutableList.toImmutableList());
+    private static final List<StandType> regularStandTypes = Arrays.stream(values()).filter(t -> !t.isEvolution() && t != NONE).collect(ImmutableList.toImmutableList());
     @Getter(lazy = true)
     private static final List<StandType> evoStandTypes = Arrays.stream(values()).filter(StandType::isEvolution).collect(ImmutableList.toImmutableList());
     @Getter(lazy = true)

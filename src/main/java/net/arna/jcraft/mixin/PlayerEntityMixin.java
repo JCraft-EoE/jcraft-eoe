@@ -58,18 +58,20 @@ public abstract class PlayerEntityMixin implements IComboCounter {
 
     @Inject(at = @At("TAIL"), method = "tick")
     public void jcraft$playerTick(CallbackInfo info) {
-        JSpec<?, ?> spec = JComponents.getSpecData((PlayerEntity) (Object) this).getSpec();
+        PlayerEntity player = (PlayerEntity) (Object) this;
+        if (JUtils.isAffectedByTimeStop(player)) return;
+
+        JSpec<?, ?> spec = JComponents.getSpecData(player).getSpec();
         if (spec != null) spec.tickSpec();
 
         if (lastAttacked == null || !lastAttacked.isAlive()) return;
 
         LivingEntity attacker = lastAttacked.getAttacker();
-        if (attacker == null || attacker == (Object) this) return;
+        if (attacker == null || attacker == player) return;
         lastAttacked = null;
         comboCount = 0;
 
-        //noinspection ConstantValue // Incorrect
-        if ((Object) this instanceof ServerPlayerEntity serverPlayer)
+        if (player instanceof ServerPlayerEntity serverPlayer)
             ComboCounterPacket.send(serverPlayer, 0, 1.00f);
     }
 

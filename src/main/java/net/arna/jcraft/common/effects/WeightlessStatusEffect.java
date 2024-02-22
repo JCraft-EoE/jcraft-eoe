@@ -76,9 +76,12 @@ public class WeightlessStatusEffect extends StatusEffect {
         super.onApplied(entity, attributes, amplifier);
 
         if (entity.getWorld().isClient) return;
+
         MiscComponent misc = JComponents.getMiscData(entity);
         misc.setPrevNoGrav(entity.hasNoGravity());
         misc.setHoverTime(0);
+
+        if (entity.isDead()) return; // Don't screw with the gravity of dead entities, it will persist on players
 
         Direction lookDir = JUtils.getLookDirection(entity);
         if (amplifier == 1) {

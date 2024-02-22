@@ -2383,6 +2383,13 @@ Star Platinum
 Cream
     >Fixed Surprise blindness bug
 
+● 22/02/2024
+>Fixed /jconfig not working on servers
+>Fixed Weightless effect modifying gravity on dead entities
+>Fixed being able to roll no stand
+>Fixed specs acting in timestop
+
+
 todo:
 dynamic hurtboxes
 counters that invalidate hit effects
