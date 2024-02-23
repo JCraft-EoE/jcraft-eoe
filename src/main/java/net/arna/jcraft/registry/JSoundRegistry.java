@@ -43,7 +43,7 @@ public interface JSoundRegistry {
     SoundEvent STAR_PLATINUM_ADVANCING_BARRAGE = registerSound("spadvbarrage");
     SoundEvent STAR_PLATINUM_LUNGING_BARRAGE = registerSound("spadvbarrageshort");
     SoundEvent STAR_PLATINUM_THE_WORLD = registerSound("sptw");
-    SoundEvent STAR_PLATINUM_KICK = registerSound("spkick");
+    SoundEvent STAR_PLATINUM_KNEE = registerSound("spknee");
     SoundEvent STAR_BREAKER = registerSound("starbreaker");
     SoundEvent STAR_FINGER = registerSound("starfinger");
 

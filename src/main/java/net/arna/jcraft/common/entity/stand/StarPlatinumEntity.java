@@ -31,6 +31,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
             .withAnim(State.UPPERCUT)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(0, 0.35, 1.25)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Uppercut"), Text.literal("slower combo starter, launches vertically"));
     public static final SimpleAttack<StarPlatinumEntity> LIGHT_FOLLOWUP = new SimpleAttack<StarPlatinumEntity>(
             0, 6, 10, 0.75f, 6f, 8, 1.5f, 1f, -0.25f)
@@ -39,6 +40,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
             .withLaunch()
             .withBlockStun(4)
             .withExtraHitBox(0, 0, 1)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<StarPlatinumEntity> LIGHT = SimpleAttack.<StarPlatinumEntity>lightAttack(
             5, 7, 0.75f, 5f, 10, 0.2f, -0.1f)
@@ -53,16 +55,15 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
     public static final SimpleAttack<StarPlatinumEntity> STAR_FINGER = new SimpleAttack<StarPlatinumEntity>(200,
             12, 20, 0.75f, 5f, 30, 1.75f, -0.4f, -0.25f)
             .withSound(JSoundRegistry.STAR_FINGER)
-            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withBlockStun(5)
             .withExtraHitBox(2, 0.1, 1)
             .withInfo(Text.literal("Star Finger"), Text.literal("medium windup, combo starter/extender"));
-    public static final SimpleAttack<StarPlatinumEntity> ROUNDHOUSE = new SimpleAttack<StarPlatinumEntity>(40,
-            7, 12, 0.75f, 6f, 8, 1.5f, 0.25f, 0f)
-            .withSound(JSoundRegistry.STAR_PLATINUM_KICK)
+    public static final SimpleAttack<StarPlatinumEntity> KNEE = new SimpleAttack<StarPlatinumEntity>(40,
+            7, 12, 0.75f, 6f, 9, 1.5f, 0.3f, 0f)
+            .withSound(JSoundRegistry.STAR_PLATINUM_KNEE)
             .withImpactSound(JSoundRegistry.IMPACT_6)
-            .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
-            .withInfo(Text.literal("Roundhouse"), Text.literal("fast poke, low stun"));
+            .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
+            .withInfo(Text.literal("Knee"), Text.literal("fast poke, low stun"));
     public static final ChargeBarrageAttack SHORT_CHARGE_BARRAGE = new ChargeBarrageAttack(280, 5, 25,
             6f, 0.6f, 15, 1.5f, 0.1f, 0f, 3, true)
             .withSound(JSoundRegistry.STAR_PLATINUM_LUNGING_BARRAGE)
@@ -105,7 +106,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 
         moves.register(MoveType.SPECIAL1, STAR_FINGER, State.STAR_FINGER);
-        moves.register(MoveType.SPECIAL2, ROUNDHOUSE, State.ROUNDHOUSE);
+        moves.register(MoveType.SPECIAL2, KNEE, State.KNEE);
         moves.register(MoveType.SPECIAL3, CHARGE_BARRAGE, State.BARRAGE).withCrouchingVariant(State.BARRAGE);
         moves.register(MoveType.ULTIMATE, INHALE, State.INHALE);
 
@@ -164,7 +165,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
         BARRAGE(builder -> builder.loop("animation.starplatinum.barrage")),
         STAR_FINGER(builder -> builder.playAndHold("animation.starplatinum.star_finger")),
         INHALE(builder -> builder.playAndHold("animation.starplatinum.inhale")),
-        ROUNDHOUSE(builder -> builder.playAndHold("animation.starplatinum.roundhouse")),
+        KNEE(builder -> builder.playAndHold("animation.starplatinum.knee")),
         JUMP(builder -> builder.playAndHold("animation.starplatinum.jump")),
         UPPERCUT(builder -> builder.playAndHold("animation.starplatinum.uppercut")),
         LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.starplatinum.light_followup"));

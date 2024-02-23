@@ -157,9 +157,9 @@
     ]
   },
 
-  "spkick": {
+  "spknee": {
     "sounds": [
-      "jcraft:stands/starplatinum/kick"
+      "jcraft:stands/starplatinum/knee"
     ]
   },
 

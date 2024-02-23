@@ -2398,6 +2398,10 @@ The World: Over Heaven
 ● 23/02/2024
 >Updated hitsparks
 
+Star Platinum
+    >Roundhouse is now a Knee
+        >Increased stun (8->9t)
+
 The World
     >Roundhouse
         >Updated animation

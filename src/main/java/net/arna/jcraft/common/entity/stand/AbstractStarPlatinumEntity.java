@@ -16,7 +16,7 @@ public abstract sealed class AbstractStarPlatinumEntity<E extends AbstractStarPl
             200, 20, 30, 1f, 10f, 12, 2f, 1.5f, 0.5f)
             .withSound(JSoundRegistry.STAR_BREAKER)
             .withImpactSound(JSoundRegistry.IMPACT_8)
-            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHitSpark(JParticleType.HIT_SPARK_3)
             .withExtraHitBox(1.5)
             .withBlockStun(9)
             .withHyperArmor()
@@ -26,7 +26,7 @@ public abstract sealed class AbstractStarPlatinumEntity<E extends AbstractStarPl
             200, 20, 30, 1f, 10f, 14, 2f, 1.5f, 0f)
             .withSound(JSoundRegistry.STAR_BREAKER)
             .withImpactSound(JSoundRegistry.IMPACT_8)
-            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHitSpark(JParticleType.HIT_SPARK_3)
             .withExtraHitBox(1.5)
             .withBlockStun(9)
             .withHyperArmor()
@@ -58,16 +58,16 @@ public abstract sealed class AbstractStarPlatinumEntity<E extends AbstractStarPl
                         ~ represents a queued attack
                                                 
                             -the classic
-                            M1>Barrage>M1>Roundhouse>Advancing Barrage~Star Finger~Star Breaker
+                            M1>Barrage>M1>Knee>Advancing Barrage~Star Finger~Star Breaker
                             
                             -the rushdown
-                            M1~M1>dash Barrage>cr.M1>Star Finger>Roundhouse>M1>Advancing Barrage>M1~M1
+                            M1~M1>dash Barrage>cr.M1>Star Finger>Knee>M1>Advancing Barrage>M1~M1
                             
                             -the blowback
                             Inhale>...>Star Finger>Star Breaker>Barrage>...
 
                             -the poke
-                            Star Finger>Roundhouse>M1>Advancing Barrage~M1>Barrage>M1>Star Breaker""";
+                            Star Finger>Knee>M1>Advancing Barrage~M1>Barrage>M1>Star Breaker""";
 
         //moves = List.of(light, heavy, barrage, starfinger, inhale, lowkick, starfinger, jump);
     }
