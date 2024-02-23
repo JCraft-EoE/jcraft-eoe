@@ -13,6 +13,7 @@ public interface JParticleTypeRegistry {
     DefaultParticleType COOLDOWN_CANCEL = FabricParticleTypes.simple();
     DefaultParticleType HITSPARK_1 = FabricParticleTypes.simple();
     DefaultParticleType HITSPARK_2 = FabricParticleTypes.simple();
+    DefaultParticleType HITSPARK_3 = FabricParticleTypes.simple();
     DefaultParticleType KCPARTICLE = FabricParticleTypes.simple();
     DefaultParticleType BACKSTAB = FabricParticleTypes.simple();
     DefaultParticleType SPEED_PARTICLE = FabricParticleTypes.simple();
@@ -32,6 +33,7 @@ public interface JParticleTypeRegistry {
         registerParticle("cooldown_cancel", COOLDOWN_CANCEL);
         registerParticle("hitspark_1", HITSPARK_1);
         registerParticle("hitspark_2", HITSPARK_2);
+        registerParticle("hitspark_3", HITSPARK_3);
         registerParticle("kcparticle", KCPARTICLE);
         registerParticle("backstab", BACKSTAB);
         registerParticle("speedparticle", SPEED_PARTICLE);

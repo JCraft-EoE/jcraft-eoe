@@ -1,11 +1,11 @@
 {
   "textures": [
-    "jcraft:aura_arc_0",
-    "jcraft:aura_arc_1",
-    "jcraft:aura_arc_2",
-    "jcraft:aura_arc_3",
-    "jcraft:aura_arc_4",
-    "jcraft:aura_arc_5",
-    "jcraft:aura_arc_6"
+    "jcraft:aura_arc/0",
+    "jcraft:aura_arc/1",
+    "jcraft:aura_arc/2",
+    "jcraft:aura_arc/3",
+    "jcraft:aura_arc/4",
+    "jcraft:aura_arc/5",
+    "jcraft:aura_arc/6"
   ]
 }

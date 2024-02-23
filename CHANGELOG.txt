@@ -2389,6 +2389,20 @@ Cream
 >Fixed being able to roll no stand
 >Fixed specs acting in timestop
 
+D4C
+    >Updated skins
+
+The World: Over Heaven
+    >Updated skins 1 and 2
+
+● 23/02/2024
+>Updated hitsparks
+
+The World
+    >Roundhouse
+        >Updated animation
+        >Launches slightly
+        >Increased stun (9->10t)
 
 todo:
 dynamic hurtboxes

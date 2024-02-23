@@ -10,6 +10,7 @@ import net.arna.jcraft.common.attack.moves.theworld.FeignBarrageCounterAttack;
 import net.arna.jcraft.common.attack.moves.theworld.TWDonutAttack;
 import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.config.JServerConfig;
+import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
@@ -30,12 +31,14 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
             .withAnim(State.LOW)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(0, 0, 1)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
             .withInfo(Text.literal("Low Kick"), Text.literal("slower, higher stun, low hitbox"));
     public static final SimpleAttack<TheWorldEntity> LIGHT_FOLLOWUP = new SimpleAttack<TheWorldEntity>(
             0, 7, 11, 0.75f, 6f, 8, 1.5f, 1f, 0)
             .withAnim(State.LIGHT_FOLLOWUP)
             .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withLaunch()
             .withBlockStun(4)
             .withExtraHitBox(0, 0, 1)
@@ -50,10 +53,12 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
             0, 50, 0.75f, 1f, 30, 2, 0.25f, 0, 3, Blocks.OBSIDIAN.getHardness())
             .withSound(JSoundRegistry.TW_BARRAGE)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
-    public static final SimpleAttack<TheWorldEntity> ROUNDHOUSE = new SimpleAttack<TheWorldEntity>(40, 7, 13, 0.75f, 5f, 9, 1.75f, 0.25f, -0.1f)
+    public static final UppercutAttack<TheWorldEntity> ROUNDHOUSE = new UppercutAttack<TheWorldEntity>(40, 7, 13, 0.75f, 5f,
+            10, 1.75f, 0.25f, -0.1f, 0.4f)
             .withSound(JSoundRegistry.TW_KICK)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
-            .withInfo(Text.literal("Roundhouse"), Text.literal("fast poke, low stun"));
+            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withInfo(Text.literal("Roundhouse"), Text.literal("low stun"));
     public static final KnockdownAttack<TheWorldEntity> COUNTER_FOLLOWUP = new KnockdownAttack<TheWorldEntity>(0, 5, 9, 0.75f, 9f, 16, 1.75f, 0.7f, 0.1f, 35)
             .withSound(JSoundRegistry.TW_COUNTER)
             .withImpactSound(JSoundRegistry.IMPACT_4)
@@ -82,6 +87,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
             .withInitAction(TheWorldEntity::doCharge)
             .withSound(JSoundRegistry.TW_KICK)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withLaunch()
             .withInfo(Text.literal("Lunge"), Text.literal("user & stand charge forward, launches"));
     private static void doCharge(TheWorldEntity attacker, LivingEntity user, MoveContext moveContext) {
@@ -94,6 +100,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
             .withCrouchingVariant(LUNGE)
             .withSound(JSoundRegistry.TW_CHARGE)
             .withImpactSound(JSoundRegistry.TW_CHARGE_HIT)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withBlockStun(11)
             .withInfo(Text.literal("Forward Charge"), Text.literal("The World detaches from the user and lunges forward, combo starter"));
     public static final TimeStopMove<TheWorldEntity> TIME_STOP = new TimeStopMove<TheWorldEntity>(1400,

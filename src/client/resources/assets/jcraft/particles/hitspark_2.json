@@ -1,11 +1,11 @@
 {
   "textures": [
-    "jcraft:hitspark_2_0",
-    "jcraft:hitspark_2_1",
-    "jcraft:hitspark_2_2",
-    "jcraft:hitspark_2_3",
-    "jcraft:hitspark_2_4",
-    "jcraft:hitspark_2_5",
-    "jcraft:hitspark_2_6"
+    "jcraft:hitspark/mid/0",
+    "jcraft:hitspark/mid/1",
+    "jcraft:hitspark/mid/2",
+    "jcraft:hitspark/mid/3",
+    "jcraft:hitspark/mid/4",
+    "jcraft:hitspark/mid/5",
+    "jcraft:hitspark/mid/6"
   ]
 }

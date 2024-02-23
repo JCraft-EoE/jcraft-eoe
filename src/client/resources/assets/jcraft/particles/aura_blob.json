@@ -1,10 +1,10 @@
 {
   "textures": [
-    "jcraft:aura_blob_0",
-    "jcraft:aura_blob_1",
-    "jcraft:aura_blob_2",
-    "jcraft:aura_blob_3",
-    "jcraft:aura_blob_4",
-    "jcraft:aura_blob_5"
+    "jcraft:aura_blob/0",
+    "jcraft:aura_blob/1",
+    "jcraft:aura_blob/2",
+    "jcraft:aura_blob/3",
+    "jcraft:aura_blob/4",
+    "jcraft:aura_blob/5"
   ]
 }

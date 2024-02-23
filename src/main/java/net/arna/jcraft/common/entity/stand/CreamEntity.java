@@ -365,7 +365,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                 }
 
                 if (notCorS && !isFree())
-                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 15, 0, false, false));
+                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 25, 0, false, false));
 
                 if (charging) {
                     if (isFree()) { // Surprise move
