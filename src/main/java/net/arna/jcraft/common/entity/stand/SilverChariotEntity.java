@@ -47,6 +47,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withLaunch()
             .withBlockStun(4)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Slash"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<SilverChariotEntity> LIGHT = SimpleAttack.<SilverChariotEntity>lightAttack(5, 9, 0.65f, 5f,
                     11, 0.15f, -0.1f)
@@ -61,7 +62,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
     public static final SimpleAttack<SilverChariotEntity> HEAVY = new SimpleAttack<SilverChariotEntity>(
             200, 20, 28, 0.65f, 8f, 10, 2f, 1.5f, 0f)
             .withSound(JSoundRegistry.SC_HEAVY)
-            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHitSpark(JParticleType.HIT_SPARK_3)
             .withHyperArmor()
             .withLaunch()
             .withInfo(Text.literal("Impaling Thrust"), Text.literal("slow, uninterruptible launcher"));
@@ -92,7 +93,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             IntSet.of(54))
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withLaunch()
-            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHitSpark(JParticleType.HIT_SPARK_3)
             .withInfo(Text.literal("God of Death (Final Hit)"), Text.empty());
     public static final GodOfDeathHitAttack GOD_OF_DEATH_HIT = new GodOfDeathHitAttack(0, 59, 0.65f,
             4.5f, 32, 2f, 0.25f, 0f, IntSet.of(13, 23))
@@ -114,6 +115,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             0.65f, 5f, 20, 1.75f, 0f, 0f)
             .withExtraHitBox(-0.65, 0, 2)
             .withLaunch()
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Circle Slash (Hit)"), Text.empty());
     public static final SimpleAttack<SilverChariotEntity> CIRCLE_CHARGE = new SimpleAttack<SilverChariotEntity>(
             260, 101, 100, 0.65f, 0f, 0, 0f, 0f, 0f)

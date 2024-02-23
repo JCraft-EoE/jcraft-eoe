@@ -92,6 +92,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withExtraHitBox(0, -0.5, 1)
             .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Leg Crusher"), Text.literal("combo starter/extender, mih hoofs the enemies legs in a quick, stunning attack"));
     public static final FuryChopAttack FURY_CHOP = new FuryChopAttack(200, 15, 24, 0.85f,
             7f, 20, 1.6f, 0.25f, 0.2f)
@@ -99,6 +100,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
             .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Fury Chop"), Text.literal("combo extender, on hit gives haste(8s) to user and mining fatigue(8s) to victim, on whiff the fatigue goes to user"));
     public static final SimpleAttack<MadeInHeavenEntity> DONUT = new SimpleAttack<MadeInHeavenEntity>(200,
             26, 32, 0.75f, 8.5f, 40, 2f, -0.2f, 0.2f)
@@ -107,7 +109,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
             .withHyperArmor()
             .withBlockStun(4)
-            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHitSpark(JParticleType.HIT_SPARK_3)
             .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
             .withInfo(Text.literal("Roundabout Donut"), Text.literal("feigns stand desummon, uninterruptible combo starter"));
     public static final TimeAccelerationMove TIME_ACCELERATION = new TimeAccelerationMove(1400, 20,

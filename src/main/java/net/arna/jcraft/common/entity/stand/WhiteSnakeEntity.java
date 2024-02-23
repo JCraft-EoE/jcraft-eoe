@@ -44,6 +44,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withLaunch()
             .withBlockStun(4)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Finisher"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<WhiteSnakeEntity> LIGHT = SimpleAttack.<WhiteSnakeEntity>lightAttack(
             7, 11, 0.75f, 5f, 13, 0.2f, 0.2f)
@@ -85,7 +86,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             240, 16, 22, 0.75f, 7, 32, 1.75f, 0.35f, 0.2f)
             .withSound(JSoundRegistry.WS_LEGCRUSH)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
-            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHitSpark(JParticleType.HIT_SPARK_3)
             .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
             .withInfo(Text.literal("Leg Crusher"), Text.literal("high stun, medium windup"));
     public static final EffectInflictingAttack<WhiteSnakeEntity> MEMORY_DISC = new EffectInflictingAttack<WhiteSnakeEntity>(

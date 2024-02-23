@@ -13,6 +13,7 @@ import net.arna.jcraft.common.attack.moves.shared.GrabAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.util.CooldownType;
+import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.entity.LivingEntity;
@@ -32,6 +33,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
             7.5f, 10, 1f, 1.1f, 0f)
             .withSound(JSoundRegistry.KQBTD_ELBOW)
             .withImpactSound(JSoundRegistry.IMPACT_4)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Elbow"), Text.literal("fast, short-range knockback"));
     public static final BarrageAttack<KQBTDEntity> BARRAGE = new BarrageAttack<KQBTDEntity>(240, 0, 50,
             0.75f, 1f, 20, 1.5f, 0.1f, 0, 3)

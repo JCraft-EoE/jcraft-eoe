@@ -38,6 +38,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .withLaunch()
             .withBlockStun(4)
             .withExtraHitBox(0, 0.25, 1)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<GoldExperienceEntity> LIGHT = new SimpleAttack<GoldExperienceEntity>(
             15, 6, 9, 0.75f, 5f, 7, 1.5f, 0.2f, -0.1f)
@@ -50,7 +51,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .withExtraHitBox(new HitBoxData(0, 0, 1.25))
 //            .withSound(JSoundRegistry.GE_HEAVY)
             .withImpactSound(JSoundRegistry.IMPACT_2)
-            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHitSpark(JParticleType.HIT_SPARK_3)
             .withHyperArmor()
             .withLaunch()
             .withInfo(Text.literal("Shoulder Smash"), Text.literal("slow, uninterruptible combo finisher"));

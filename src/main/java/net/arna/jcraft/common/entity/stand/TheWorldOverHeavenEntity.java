@@ -54,6 +54,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withLaunch()
             .withBlockStun(4)
             .withExtraHitBox(0, 0.25, 1)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Roundhouse"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<TheWorldOverHeavenEntity> PUNCH = SimpleAttack.<TheWorldOverHeavenEntity>lightAttack(
             4, 7, 0.75f, 6f, 11, 0.2f, -0.1f)
@@ -93,6 +94,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withLaunch()
             .withHyperArmor()
             .withBlockableType(BlockableType.NON_BLOCKABLE)
+            .withHitSpark(JParticleType.HIT_SPARK_3)
             .withInfo(Text.literal("Overwrite (Hit)"), Text.empty());
     // Does absolutely nothing on its own.
     public static final NoOpMove<TheWorldOverHeavenEntity> CHARGE_OVERWRITE = new NoOpMove<TheWorldOverHeavenEntity>(

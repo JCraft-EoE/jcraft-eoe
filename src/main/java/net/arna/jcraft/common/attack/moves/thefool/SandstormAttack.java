@@ -28,7 +28,7 @@ public class SandstormAttack extends AbstractSimpleAttack<SandstormAttack, TheFo
 
     public SandstormAttack(int cooldown, int windup, int duration, float moveDistance, float damage, int stun, float hitboxSize, float knockback, float offset) {
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset);
-        hitSpark = JParticleType.HIT_SPARK_2;
+        hitSpark = JParticleType.HIT_SPARK_3;
     }
 
     @Override

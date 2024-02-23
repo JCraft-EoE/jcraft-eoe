@@ -52,6 +52,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             .withAnim(State.BITE)
             .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
             .withImpactSound(SoundEvents.ENTITY_EVOKER_FANGS_ATTACK)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Bite"), Text.literal("applies Slowness II (2s) on hit"));
     public static final SimpleAttack<CreamEntity> LIGHT_FOLLOWUP = new SimpleAttack<CreamEntity>(
             0, 7, 14, 0.75f, 6, 8, 1.75f, 1.1f, -0.1f)
@@ -60,6 +61,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             .withLaunch()
             .withBlockStun(4)
             .withExtraHitBox(0, 0.25, 1)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Chop"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<CreamEntity> PUNCH = SimpleAttack.<CreamEntity>lightAttack(6, 14,
                     0.75f, 5f, 20, 0.3f, -0.1f)
@@ -71,7 +73,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             30, 1f, 8f, 40, 1.5f, 0.8f, 0f)
             .withSound(JSoundRegistry.CREAM_HEAVY)
             .withImpactSound(JSoundRegistry.IMPACT_3)
-            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHitSpark(JParticleType.HIT_SPARK_3)
             .withHyperArmor()
             .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
             .withInfo(Text.literal("Vertical Chop"), Text.literal("slow, uninterruptible combo starter"));
@@ -79,6 +81,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             5f, 20, 2f, 0.2f, 0f, IntSet.of(10, 17, 25))
             .withSound(JSoundRegistry.CREAM_COMBO)
             .withImpactSound(JSoundRegistry.IMPACT_3)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Assault"), Text.literal("medium windup, good stun"));
     public static final SimpleAttack<CreamEntity> GRAB_HIT = new SimpleAttack<CreamEntity>(0, 13, 20,
             1f, 6f, 5, 2f, 1.5f, 0f)
@@ -120,7 +123,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             14, 20, 0.5f, 9f, 15, 2f, 1.25f, 0.3f, 35)
             .withSound(JSoundRegistry.CREAM_SMASH)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
-            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHitSpark(JParticleType.HIT_SPARK_3)
             .withHyperArmor()
             .withLaunch()
             .withInfo(Text.literal("Overhead Smash"), Text.literal("slow, uninterruptible launcher"));

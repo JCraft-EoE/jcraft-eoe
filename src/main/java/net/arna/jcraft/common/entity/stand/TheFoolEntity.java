@@ -59,6 +59,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withLaunch()
             .withBlockStun(4)
             .withExtraHitBox(0, 0.25, 1)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Swipe"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<TheFoolEntity> LIGHT = new SimpleAttack<TheFoolEntity>( 30, 7,
             14, 1.5f, 6, 15, 2, 0.5f, -0.1f)
@@ -76,6 +77,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withAerialVariant(AIR_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withExtraHitBox(0.5, 0, 1.25)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("3-hit Combo"), Text.literal("fast knockdown provider"));
     public static final EffectInflictingAttack<TheFoolEntity> LAUNCH = new EffectInflictingAttack<TheFoolEntity>(240,
             16, 20, 1.25f, 8f, 25, 2f, 0.5f, -0.3f,
@@ -83,7 +85,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withSound(JSoundRegistry.FOOL_LAUNCH)
             .withInitAction((attacker, user, ctx) -> attacker.setSand(true))
             .withExtraHitBox(1.5)
-            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHitSpark(JParticleType.HIT_SPARK_3)
             .withHyperArmor()
             .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
             .withInfo(Text.literal("Launch"), Text.literal("uninterruptible, slow, vertically launching uppercut"));
@@ -93,6 +95,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withSound(JSoundRegistry.FOOL_BARK1)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Slam"), Text.literal(""));
     public static final PoundAttack POUND = new PoundAttack(220, 7, 22, 1.25f,
             4f, 25, 1.5f, 0.1f, -0.1f)
@@ -101,6 +104,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withLift(false)
             .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Pound"), Text.literal("""
                     has followups which create different sand patterns based on which key was pressed:
                     SPECIAL 1 - no sand
@@ -127,6 +131,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withAerialVariant(SAND_TORNADO)
             .withLaunch()
             .withBackstab(false)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Charge"), Text.literal("The Fool detaches from the user and charges forward, launches on hit"));
     public static final SandstormAttack SANDSTORM = new SandstormAttack(800, 28, 41, 1.5f,
             7f, 20, 2f, 0.1f, 0f)

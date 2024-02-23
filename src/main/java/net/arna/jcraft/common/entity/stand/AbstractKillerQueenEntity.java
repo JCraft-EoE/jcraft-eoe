@@ -13,6 +13,7 @@ import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.living.CooldownsComponent;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.CooldownType;
+import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
@@ -38,6 +39,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
     public static SimpleAttack<AbstractKillerQueenEntity<?, ?>> LIGHT_FOLLOWUP = new SimpleAttack<AbstractKillerQueenEntity<?, ?>>(
             0, 6, 13, 0.8f, 3f, 20, 1.5f, 0.5f, 0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             // implemented in class: .withFollowup(LOW)
             .withInfo(Text.literal("Second Punch"), Text.literal("frametrap tool"));
     public static final DetonateAttack DETONATE = new DetonateAttack(20, 5, 6, 1f)

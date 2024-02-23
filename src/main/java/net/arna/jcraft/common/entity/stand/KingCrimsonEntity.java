@@ -73,7 +73,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     public static final KnockdownAttack<KingCrimsonEntity> OVERHEAD_HOOK = new KnockdownAttack<KingCrimsonEntity>(160,
             22, 32, 0.85f, 9f, 11, 2f, 1.5f, 0f, 35)
             .withSound(JSoundRegistry.KC_HEAVY2)
-            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHitSpark(JParticleType.HIT_SPARK_3)
             .withBlockStun(10)
             .withHyperArmor()
             .withLaunch()
@@ -85,6 +85,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             .withImpactSound(JSoundRegistry.IMPACT_9)
             .withExtraHitBox(0, 0.5, 1)
             .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Vertical Chop"), Text.literal("medium windup combo starter, has a true followup in the form of a slow, armored knockdown"));
     public static final BloodThrowAttack BLOOD_THROW = new BloodThrowAttack(260, 10, 15, 1f)
             .withInfo(Text.literal("Blood Throw"), Text.literal("throws a stunning, blinding blood projectile, crouch while it comes out for higher speed"));
@@ -103,7 +104,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             14f, 10, 1.75f, 1.5f, 0.1f)
             .withSound(JSoundRegistry.KC_DONUT)
             .withImpactSound(JSoundRegistry.IMPACT_7)
-            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHitSpark(JParticleType.HIT_SPARK_3)
             .withHyperArmor()
             .withLaunch()
             .withInfo(Text.literal("Donut"), Text.literal("slow, uninterruptable, extremely damaging launcher"));

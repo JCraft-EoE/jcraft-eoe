@@ -19,7 +19,7 @@ public class DestroyAttack extends AbstractEffectInflictingAttack<DestroyAttack,
                          float hitboxSize, float knockback, float offset) {
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset,
                 List.of(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0, true, false)));
-        hitSpark = JParticleType.HIT_SPARK_2;
+        hitSpark = JParticleType.HIT_SPARK_3;
     }
 
     @Override

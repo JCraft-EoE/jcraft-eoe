@@ -36,6 +36,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             .withLaunch()
             .withBlockStun(4)
             .withExtraHitBox(0, 0.25, 1)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<GEREntity> DOWNWARD_KICK = new SimpleAttack<GEREntity>(JCraft.LIGHT_COOLDOWN,
             5, 12, 0.75f, 4f, 20, 1.25f, 0.4f, 0.33f)
@@ -74,7 +75,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             .withAerialVariant(OVERHEAD_KICK)
             .withSound(JSoundRegistry.GER_HEAVY)
             .withImpactSound(JSoundRegistry.IMPACT_2)
-            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHitSpark(JParticleType.HIT_SPARK_3)
             .withHyperArmor()
             .withLaunch()
             .withExtraHitBox(1.5)

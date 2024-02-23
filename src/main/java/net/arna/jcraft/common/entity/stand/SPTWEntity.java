@@ -31,6 +31,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .withAnim(State.GROUND_SLAM)
             .withImpactSound(JSoundRegistry.IMPACT_8)
             .withLaunchNoShockwave()
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Ground Slam"), Text.literal("low hitbox, decent damage, launches"));
     public static final SimpleAttack<SPTWEntity> LIGHT_FOLLOWUP = new SimpleAttack<SPTWEntity>(
             0, 5, 14, 0.75f, 6, 12, 1.5f, 1f, -0.1f)
@@ -39,6 +40,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .withLaunch()
             .withBlockStun(4)
             .withExtraHitBox(0, 0.25, 1)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<SPTWEntity> PUNCH = SimpleAttack.<SPTWEntity>lightAttack(5, 7,
                     0.75f, 5f, 10, 0.2f, -0.1f)
@@ -63,6 +65,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(1f)
             .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Backhand"), Text.literal("fast poke, great stun"));
     public static final KnockdownAttack<SPTWEntity> GRAB_SLAM = new KnockdownAttack<SPTWEntity>(0,
             16, 24, 1f, 9f, 10, 1.75f, 0.4f, 0f, 25)
@@ -70,7 +73,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withHyperArmor()
             .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
-            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHitSpark(JParticleType.HIT_SPARK_3)
             .withInfo(Text.literal("What an ugly watch (Slam)"), Text.empty());
     public static final GrabAttack<SPTWEntity, State> GRAB2 = new GrabAttack<>(280, 8, 20,
             1f, 2f, 20, 1.5f, 0.1f, 0f, GRAB_SLAM, State.GRAB_HIT2)
@@ -86,6 +89,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .withLaunch()
             .withHyperArmor()
             .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("What an ugly watch (Uppercut)"), Text.empty());
     public static final GrabAttack<SPTWEntity, State> GRAB = new GrabAttack<>(280, 8, 20,
             1f, 2f, 20, 1.5f, 0.1f, 0f, GRAB_HIT, State.GRAB_HIT)

@@ -9,6 +9,7 @@ import net.arna.jcraft.common.attack.moves.magiciansred.*;
 import net.arna.jcraft.common.attack.moves.shared.KnockdownAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.component.living.HitPropertyComponent;
+import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.block.Block;
@@ -45,6 +46,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withLaunch()
             .withBlockStun(4)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<MagiciansRedEntity> LIGHT = new SimpleAttack<MagiciansRedEntity>(JCraft.LIGHT_COOLDOWN,
             5, 8, 0.75f, 5f, 16, 1.5f, 0.2f, -0.1f)
@@ -62,6 +64,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             1, 5, 1f, 6f, 10, 1.75f, 1.5f, -0.2f)
             .withLaunch()
             .withAction((attacker, user, ctx, targets) -> attacker.playSound(SoundEvents.ITEM_FIRECHARGE_USE, 1.0f, 1.0f))
+            .withHitSpark(JParticleType.HIT_SPARK_3)
             .withInfo(Text.literal("Hammerfist Flare"), Text.literal("launcher"));
     public static final SimpleAttack<MagiciansRedEntity> HAMMERFIST = new SimpleAttack<MagiciansRedEntity>(100,
             10, 20, 1f, 3f, 13, 1.75f, 0.2f, 0)

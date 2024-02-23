@@ -20,7 +20,7 @@ public class OverclockAttack extends AbstractSimpleAttack<OverclockAttack, GoldE
                            float hitboxSize, float knockback, float offset) {
         super(cooldown, windup, duration, attackDistance, damage, stun, hitboxSize, knockback, offset);
         withStunType(StunType.LAUNCH);
-        hitSpark = JParticleType.HIT_SPARK_2;
+        hitSpark = JParticleType.HIT_SPARK_3;
     }
 
     @Override

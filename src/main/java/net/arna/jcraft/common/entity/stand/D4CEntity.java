@@ -44,6 +44,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             .withLaunch()
             .withBlockStun(4)
             .withExtraHitBox(0, 0, 1)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Deadly Blow"), Text.literal("combo finisher, more blockstun than other light followups"));
     public static final SimpleAttack<D4CEntity> CHOP = new SimpleAttack<D4CEntity>(JCraft.LIGHT_COOLDOWN,
             9, 15, 0.75f, 5f, 20, 1.5f, 0.25f, -0.1f)
@@ -62,7 +63,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             .withInitAction(D4CEntity::doCharge)
             .withSound(JSoundRegistry.D4C_HEAVY)
             .withImpactSound(JSoundRegistry.IMPACT_2)
-            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHitSpark(JParticleType.HIT_SPARK_3)
             .withHyperArmor()
             .withLaunch()
             .withInfo(Text.literal("Charge"), Text.literal("user & stand charge forward, uninterruptible launcher"));

@@ -51,6 +51,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             .withBlockStun(4)
             .withExtraHitBox(0, 0.25, 1)
             .withTargetProcessor(CMoonEntity::addInversion)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo finisher"));
     public static final SimpleAttack<CMoonEntity> PUNCH = SimpleAttack.<CMoonEntity>lightAttack(5, 7,
                     0.75f, 5f, 10, 0.2f, -0.1f)
@@ -70,7 +71,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             .withSound(JSoundRegistry.CMOON_DONUT)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withTargetProcessor(CMoonEntity::addInversion)
-            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHitSpark(JParticleType.HIT_SPARK_3)
             .withHyperArmor()
             .withLaunch()
             .withExtraHitBox(0, 0.25, 1.25)
@@ -97,6 +98,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             .withImpactSound(JSoundRegistry.IMPACT_10)
             .withTargetProcessor(CMoonEntity::addInversion)
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Ground Slam"), Text.literal("launches downwards, combo starter/extender, knocks down if it hits while user is crouching"));
     public static final GravityShiftMove GRAV_SHIFT = new GravityShiftMove(1400, 20, 32, 1f)
             .withSound(JSoundRegistry.CMOON_GRAVSHIFT)
