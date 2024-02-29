@@ -63,7 +63,6 @@ public class TimeAccelStatePacket {
         }
     }
 
-    // TODO: some kind of stop condition? Player/stand dies or something?
     public static void sendStop(PlayerManager playerManager, MadeInHeavenEntity mih) {
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeVarInt(State.STOP.ordinal());

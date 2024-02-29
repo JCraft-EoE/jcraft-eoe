@@ -14,6 +14,7 @@ import net.arna.jcraft.common.component.living.CooldownsComponent;
 import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.config.JServerConfig;
+import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -39,6 +40,7 @@ import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -274,6 +276,13 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
 
     private static void tryIncrementSpeedometer(MadeInHeavenEntity attacker, LivingEntity user, MoveContext ctx, Set<LivingEntity> targets) {
         if (attacker.getAccelTime() > 0 && !targets.isEmpty()) attacker.incrementSpeedometer();
+    }
+
+    @Override
+    public void desummon() {
+        if (getAccelTime() > 0)
+            TimeAccelStatePacket.sendStop(Objects.requireNonNull(getServer()).getPlayerManager(), this);
+        super.desummon();
     }
 
     @Override
