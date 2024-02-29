@@ -5,8 +5,9 @@ import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.moves.base.AbstractGrabAttack;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.util.StandAnimationState;
+import software.bernie.geckolib3.core.IAnimatable;
 
-public class GrabAttack<A extends IAttacker<A, S>, S extends Enum<S> & StandAnimationState<A>> extends AbstractGrabAttack<GrabAttack<A, S>, A, S> {
+public class GrabAttack<A extends IAttacker<A, S> & IAnimatable, S extends Enum<S> & StandAnimationState<A>> extends AbstractGrabAttack<GrabAttack<A, S>, A, S> {
 
     public GrabAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun,
                       float hitboxSize, float knockback, float offset, AbstractMove<?, ? super A> hitMove, S hitState, int grabDuration, double grabOffset) {
