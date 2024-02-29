@@ -47,7 +47,7 @@ public class InhaleAttack extends AbstractMove<InhaleAttack, StarPlatinumEntity>
                 new Vec3d(attacker.getFreePos()).add(RotationUtil.vecPlayerToWorld(new Vec3d(0, attacker.getHeight(), 0), GravityChangerAPI.getGravityDirection(attacker)))
                 : attacker.getEyePos();
         Vec3d fPos = eyePos.add(rotVec.multiply(1.75));
-        Vec3d ffPos = eyePos.add(rotVec.multiply(3));
+        Vec3d ffPos = eyePos.add(rotVec.multiply(3.25));
 
         if (attacker.getWorld().isClient) {
             // Display particles for the two hitboxes
@@ -77,16 +77,20 @@ public class InhaleAttack extends AbstractMove<InhaleAttack, StarPlatinumEntity>
             if (attacker.age % 2 != 0) return;
 
             Box fBox = createBox(fPos, 2);
-            Box ffBox = createBox(ffPos, 1.5);
+            Box ffBox = createBox(ffPos, 2);
 
             JUtils.displayHitbox(attacker.getWorld(), fBox);
             JUtils.displayHitbox(attacker.getWorld(), ffBox);
             Set<Entity> hits = AbstractSimpleAttack.findHits(attacker, Set.of(fBox, ffBox), null, Entity.class);
 
             for (Entity entity : hits) {
+                double distance = entity.getPos().distanceTo(eyePos);
+                if (distance > 3) // Falloff
+                    distance -= distance * distance * 0.1;
+
                 entity.setVelocity(entity.getVelocity()
                         .subtract(rotVec.x, 0, rotVec.z)
-                        .multiply(0.2 * entity.distanceTo(attacker)));
+                        .multiply(0.2 * distance));
 
                 entity.velocityModified = true;
 

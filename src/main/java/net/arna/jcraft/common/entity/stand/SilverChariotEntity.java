@@ -72,7 +72,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             0.65f, 1f, 10, 2f, 0.1f, 0f, 2)
             .withSound(JSoundRegistry.SC_SPIN)
             .withInfo(Text.literal("Spinning Blade"), Text.literal("fast reliable combo starter/extender, low stun"));
-    public static final RayDartAttack RAY_DART = new RayDartAttack(100, 13, 25,
+    public static final RayDartAttack RAY_DART = new RayDartAttack(100, 13, 21,
             0.65f, 5f, 15, 1.75f, 0.25f, -0.2f)
             .withSound(JSoundRegistry.SC_CHARGE)
             .withBlockStun(17)

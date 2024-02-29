@@ -1,9 +1,9 @@
 {
   "textures": [
-    "jcraft:speedparticle_0",
-    "jcraft:speedparticle_1",
-    "jcraft:speedparticle_2",
-    "jcraft:speedparticle_3",
-    "jcraft:speedparticle_4"
+    "jcraft:speedparticle/0",
+    "jcraft:speedparticle/1",
+    "jcraft:speedparticle/2",
+    "jcraft:speedparticle/3",
+    "jcraft:speedparticle/4"
   ]
 }

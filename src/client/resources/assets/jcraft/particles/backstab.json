@@ -1,13 +1,13 @@
 {
   "textures": [
-    "jcraft:backstab_0",
-    "jcraft:backstab_1",
-    "jcraft:backstab_2",
-    "jcraft:backstab_3",
-    "jcraft:backstab_4",
-    "jcraft:backstab_5",
-    "jcraft:backstab_6",
-    "jcraft:backstab_7",
-    "jcraft:backstab_8"
+    "jcraft:backstab/0",
+    "jcraft:backstab/1",
+    "jcraft:backstab/2",
+    "jcraft:backstab/3",
+    "jcraft:backstab/4",
+    "jcraft:backstab/5",
+    "jcraft:backstab/6",
+    "jcraft:backstab/7",
+    "jcraft:backstab/8"
   ]
 }

@@ -2408,8 +2408,18 @@ The World
         >Launches slightly
         >Increased stun (9->10t)
 
-● 24/02/2024
+● 29/02/2024
+>Fixed clones dropping items
+>Fixed Silver Chariot not having sped-up animations while Armor Off
 
+Star Platinum
+    >Increased Inhale range
+
+Silver Chariot + Anubis
+    >Reduced recovery on Ray Dart (12->8t)
+
+Made in Heaven
+    >Updated speed particles
 
 todo:
 dynamic hurtboxes
