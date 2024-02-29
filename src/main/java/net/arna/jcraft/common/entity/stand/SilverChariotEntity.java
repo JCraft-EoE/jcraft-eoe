@@ -29,6 +29,7 @@ import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import software.bernie.geckolib3.core.controller.AnimationController;
 
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -374,6 +375,11 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         @Override
         public void playAnimation(SilverChariotEntity attacker, AnimationBuilder builder) {
             animator.accept(attacker, builder);
+        }
+
+        @Override
+        public void configureController(SilverChariotEntity attacker, AnimationController<SilverChariotEntity> controller) {
+            controller.setAnimationSpeed(attacker.getMode() == Mode.ARMORLESS ? 1.5f : 1f);
         }
     }
 

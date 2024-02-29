@@ -1539,8 +1539,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     // Animation code
     @Override
     public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, event -> {
-            AnimationController<StandEntity<E, S>> controller = event.getController();
+        animationData.addAnimationController(new AnimationController<>(getThis(), "controller", 0, event -> {
+            AnimationController<E> controller = event.getController();
             AnimationBuilder builder = new AnimationBuilder();
 
             String summonAnimation = getSummonAnimation();
@@ -1551,8 +1551,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
             if (isSameState()) controller.markNeedsReload();
 
-            getState().playAnimation(getThis(), builder);
+            S state = getState();
+            state.playAnimation(getThis(), builder);
             controller.setAnimation(builder);
+            state.configureController(getThis(), controller);
 
             return PlayState.CONTINUE;
         }));
