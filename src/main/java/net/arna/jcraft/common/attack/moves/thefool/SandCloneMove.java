@@ -77,6 +77,8 @@ public class SandCloneMove extends AbstractMove<SandCloneMove, TheFoolEntity> {
             playerCloneEntity.copyPositionAndRotation(player);
             playerCloneEntity.setMaster(player);
             playerCloneEntity.markSand();
+            playerCloneEntity.disableDrops();
+
             playerCloneEntity.equipStack(EquipmentSlot.HEAD, user.getEquippedStack(EquipmentSlot.HEAD).copy());
             playerCloneEntity.equipStack(EquipmentSlot.CHEST, user.getEquippedStack(EquipmentSlot.CHEST).copy());
             playerCloneEntity.equipStack(EquipmentSlot.LEGS, user.getEquippedStack(EquipmentSlot.LEGS).copy());

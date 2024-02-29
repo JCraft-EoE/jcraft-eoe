@@ -56,6 +56,7 @@ public class CloneSpawnMove extends AbstractMove<CloneSpawnMove, D4CEntity> {
             PlayerCloneEntity clone = new PlayerCloneEntity(attacker.getWorld());
             clone.copyPositionAndRotation(playerEntity);
             clone.setMaster(playerEntity);
+            clone.disableDrops();
 
             attacker.getWorld().spawnEntity(clone);
             clone.equipStack(EquipmentSlot.MAINHAND, weapon);

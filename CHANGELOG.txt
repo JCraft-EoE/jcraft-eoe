@@ -2408,6 +2408,9 @@ The World
         >Launches slightly
         >Increased stun (9->10t)
 
+● 24/02/2024
+
+
 todo:
 dynamic hurtboxes
 counters that invalidate hit effects
