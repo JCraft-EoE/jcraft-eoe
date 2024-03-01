@@ -1,6 +1,5 @@
 package net.arna.jcraft.client;
 
-import com.llamalad7.mixinextras.MixinExtrasBootstrap;
 import net.fabricmc.loader.api.FabricLoader;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
@@ -19,7 +18,7 @@ public class JClientMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public void onLoad(String mixinPackage) {
-        MixinExtrasBootstrap.init();
+        //MixinExtrasBootstrap.init();
     }
 
     @Override

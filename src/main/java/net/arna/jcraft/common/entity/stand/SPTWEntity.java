@@ -138,9 +138,6 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
                 new Vec3f(0.7f, 0.7f, 1.0f),
                 new Vec3f(0.8f, 1.0f, 1.0f)
         };
-
-        if (world.isClient) return;
-//        timestop.stun = JServerConfig.SPTW_TIME_STOP_DURATION.getValue() / 20.0f; // TODO
     }
 
     @Override

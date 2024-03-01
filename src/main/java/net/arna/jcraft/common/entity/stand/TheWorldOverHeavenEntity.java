@@ -167,10 +167,6 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
                 new Vec3f(0.9f, 0.9f, 1.0f),
                 new Vec3f(1.0f, 0.0f, 0.2f)
         };
-
-        if (world.isClient) return;
-        // TODO
-//        timestop.stun = JServerConfig.TWOH_TIME_STOP_DURATION.getValue() / 20.0f;
     }
 
     @Override

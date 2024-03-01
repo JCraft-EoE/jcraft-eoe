@@ -81,7 +81,7 @@ dependencies {
 	modImplementation include("io.github.ladysnake:satin:${project.satin_version}")
 
 	// MixinExtras
-	implementation include(annotationProcessor("com.github.llamalad7.mixinextras:mixinextras-fabric:0.2.0-beta.9"))
+	// implementation include(annotationProcessor("com.github.llamalad7.mixinextras:mixinextras-fabric:0.2.0-beta.9"))
 
 	compileOnly "com.google.guava:guava:32.1.2-jre" // To make TypeToken not 'unstable' :)
 	runtimeOnly "org.joml:joml:1.10.4"
