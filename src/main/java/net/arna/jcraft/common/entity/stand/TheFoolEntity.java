@@ -2,6 +2,7 @@ package net.arna.jcraft.common.entity.stand;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.NonNull;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.BlockableType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
@@ -276,6 +277,10 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     public void standBlock() {
         LivingEntity user = getUser();
         if (user == null) return;
+
+        // Clear glider
+        if (getState() == State.GLIDE)
+            cancelMove();
 
         // The Fool does a special block depending on your height
         boolean sand = user.getHeight() < 1.8f;

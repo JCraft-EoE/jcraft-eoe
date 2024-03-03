@@ -33,7 +33,7 @@ public class BTDDetonateAttack extends AbstractMove<BTDDetonateAttack, AbstractK
         btdEntity.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0, true, false));
 
         Vec3d pos = btdEntity.getPos();
-        JCraft.createParticle((ServerWorld) attacker.world, pos.x, pos.y + 2, pos.z, JParticleType.BITES_THE_DUST);
+        JCraft.createParticle((ServerWorld) attacker.world, pos.x, pos.y + 5, pos.z, JParticleType.BITES_THE_DUST);
         Vec3d v1 = pos.add(3, 3, 3);
         Vec3d v2 = pos.add(-3, -3, -3);
         List<LivingEntity> list = attacker.world.getEntitiesByClass(LivingEntity.class, new Box(v1, v2),

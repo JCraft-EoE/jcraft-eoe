@@ -5,6 +5,7 @@ import net.arna.jcraft.common.attack.core.ctx.IntMoveVariable;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.entity.stand.TheFoolEntity;
+import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Vec3d;
 
@@ -22,6 +23,8 @@ public class SlamAttack extends AbstractSimpleAttack<SlamAttack, TheFoolEntity> 
     public @NonNull Set<LivingEntity> perform(TheFoolEntity attacker, LivingEntity user, MoveContext ctx) {
         Set<LivingEntity> targets = super.perform(attacker, user, ctx);
 
+        attacker.playSound(JSoundRegistry.IMPACT_11, 1, 1);
+
         switch (ctx.getInt(VARIANT)) {
             case 2 -> {
                 Vec3d leftVec = user.getRotationVector().rotateY(1.75f);
@@ -33,11 +36,11 @@ public class SlamAttack extends AbstractSimpleAttack<SlamAttack, TheFoolEntity> 
             }
             case 3 -> {
                 Vec3d rotVec = user.getRotationVector();
-                for (double i = 0; i < 8; i++)
-                    for (double j = 0; j < i; j++) {
-                        double hDiv = 5.0 * (1 + j / i);
+                for (double i = 0; i < 7; i++)
+                    for (double y = 0; y < i; y++) {
+                        double hDiv = 4.5 * (1 + y / i);
                         TheFoolEntity.createFoolishSand(attacker.getWorld(), attacker.getBlockPos(),
-                                new Vec3d(rotVec.x * Math.sqrt(i) / hDiv, j / 5.0, rotVec.z * Math.sqrt(i) / hDiv));
+                                new Vec3d(rotVec.x * Math.sqrt(i) / hDiv, y / 4.3, rotVec.z * Math.sqrt(i) / hDiv));
                     }
             }
         }

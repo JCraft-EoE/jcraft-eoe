@@ -2408,20 +2408,38 @@ The World
         >Launches slightly
         >Increased stun (9->10t)
 
-● 29/02/2024
+● 03/03/2024
+>Specs no longer force you to uncrouch while performing moves
+>Fixed Sodium dependency
 >Fixed clones dropping items
 >Fixed Silver Chariot not having sped-up animations while Armor Off
 
 Star Platinum
     >Increased Inhale range
 
-Silver Chariot + Anubis
+Killer Queen (and Bites the Dust)
+    >Updated icons
+
+Silver Chariot
+    >Added icons
     >Reduced recovery on Ray Dart (12->8t)
 
+The Fool
+    >Fixed block-cancelling glider forcing the stand to block for a long time
+    >Fine-tuned Slam (Special 3 version) to generate diagonal stairs better
+    >Updated Charge animation
+    >Added icons
+
+C-Moon
+    >Added icons
+
 Made in Heaven
+    >Added icons
     >Updated speed particles
 
 todo:
+research SoundInstance class for stopping jcraft sounds and having them consistently track ents
+
 dynamic hurtboxes
 counters that invalidate hit effects
 entity tag for #jcraft:eligible_stand_user

@@ -197,7 +197,7 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
             if (moveStun > 0) {
                 //JCraft.LOGGER.info("CLIENT: Movestun is " + moveStun);
 
-                player.setSneaking(shouldSneak());
+                //player.setSneaking(shouldSneak());
 
                 // Process attack
                 moveStun--;
@@ -220,9 +220,6 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
         }
 
         //JCraft.LOGGER.info("SERVER: Movestun is " + moveStun);
-
-        // Likely will be changed later, but at the moment this serves to prevent animations breaking
-        player.setSneaking(shouldSneak());
 
         // Process attack
         AbstractMove<?, ? super A> attack = this.curMove;

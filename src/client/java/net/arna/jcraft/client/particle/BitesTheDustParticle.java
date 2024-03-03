@@ -14,7 +14,7 @@ public class BitesTheDustParticle extends JGlowingParticle {
 
     @Override
     protected void initialize() {
-        this.scale = 4;
+        this.scale = 8;
         this.maxAge = 30;
     }
 

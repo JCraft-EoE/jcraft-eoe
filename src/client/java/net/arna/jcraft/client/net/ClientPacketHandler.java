@@ -223,11 +223,6 @@ public class ClientPacketHandler {
                         0, 0, 0));
             }
 
-            // WAS KQ bomb tracker
-            case (4) -> {
-
-            }
-
             // Complex hit spark
             case (5) -> {
                 double x = buf.readDouble();
@@ -247,11 +242,6 @@ public class ClientPacketHandler {
                                 vel.x * speed, vel.y * speed, vel.z * speed);
                     }
                 });
-            }
-
-            // WAS Combo counter
-            case (6) -> {
-
             }
 
             // Return to Zero trackers
@@ -274,11 +264,6 @@ public class ClientPacketHandler {
                 });
             }
 
-            //
-            case (8) -> {
-
-            }
-
             // Bites the Dust tracker
             case (9) -> {
                 double v1x = buf.readDouble();
@@ -295,32 +280,27 @@ public class ClientPacketHandler {
 
                 boolean inRange = buf.readBoolean();
 
-                Vec3d mid = new Vec3d(v1x, v1y + v2y / 2, v1z);
-
                 client.execute(() -> {
                     Random random = new Random();
 
                     for (int h = 0; h < 16; ++h) {
                         double x = v1x + random.nextDouble(v2x) - v2x / 2;
-                        double y = v1y + random.nextDouble(v2y);
+                        double y = v1y + random.nextDouble(v2y) - v2y / 2;
                         double z = v1z + random.nextDouble(v2z) - v2z / 2;
-                        Vec3d towardsVector = mid.subtract(x, y, z).normalize().multiply(0.1);
 
                         client.world.addParticle(
                                 inRange ? ParticleTypes.WAX_OFF : ParticleTypes.GLOW,
-                                x, y, z,
-                                towardsVector.x, towardsVector.y, towardsVector.z);
+                                x, y, z, 0, 0, 0);
                     }
 
                     for (int h = 0; h < 8; ++h) {
                         double x = oX + random.nextDouble(v2x) - v2x / 2;
-                        double y = oY + random.nextDouble(v2y);
+                        double y = oY + random.nextDouble(v2y) - v2y / 2;
                         double z = oZ + random.nextDouble(v2z) - v2z / 2;
 
                         client.world.addParticle(
                                 ParticleTypes.GLOW,
-                                x, y, z,
-                                0, 0, 0);
+                                x, y, z, 0, 0, 0);
                     }
                 });
             }
@@ -360,11 +340,6 @@ public class ClientPacketHandler {
                                 0, 0, 0);
                     }
                 });
-            }
-
-            // WAS Spec Animations
-            case (12) -> {
-
             }
 
             // Reset Player Animation

@@ -883,12 +883,13 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             } else if (blocking) { // Process block
                 if (wantToBlock) {
                     curMove = null;
-                    setStateNoReset(getBlockState());
 
                     if (moveStun < 1) setMoveStun(1);
+
                     setDistanceOffset(blockDistance);
                     setRotationOffset(attackRotation);
                     standBlock();
+                    setStateNoReset(getBlockState()); // Set after standBlock() so blocking logic can account for previous state
                 } else tryUnblock();
             }
 

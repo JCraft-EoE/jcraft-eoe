@@ -115,14 +115,7 @@
                     "yaw":0.0
                 }
             },
-            {
-                "tick":6,
-                "easing": "EASEINOUTQUAD",
-                "turn": 0,
-                "torso":{
-                    "yaw":0.09947514533996582
-                }
-            },
+
             {
                 "tick":17,
                 "easing": "EASEOUTBACK",

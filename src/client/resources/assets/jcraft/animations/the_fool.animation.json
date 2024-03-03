@@ -2743,7 +2743,7 @@
 		},
 		"animation.thefool.charge_hit": {
 			"loop": true,
-			"animation_length": 0.52,
+			"animation_length": 0.72,
 			"bones": {
 				"leftarm": {
 					"rotation": {
@@ -2870,26 +2870,18 @@
 						"0.0": {
 							"vector": [-3.65653, 17.8194, 3.65653]
 						},
-						"0.24": {
-							"vector": [-3.53069, -9.62858, 5.36815],
-							"easing": "easeOutBack"
-						},
 						"0.52": {
-							"vector": [6.48624, 7.83887, 4.29705],
-							"easing": "easeInOutSine"
+							"vector": [-3.53069, -9.62858, 5.36815],
+							"easing": "easeOutSine"
 						}
 					},
 					"position": {
 						"0.0": {
 							"vector": [0, 0, 0]
 						},
-						"0.24": {
-							"vector": [0, 0, -6],
-							"easing": "easeOutBack"
-						},
 						"0.52": {
-							"vector": [0, 0, 0],
-							"easing": "easeInOutSine"
+							"vector": [0, 0, -15],
+							"easing": "easeOutSine"
 						}
 					}
 				},
@@ -3029,9 +3021,9 @@
 						"0.0": {
 							"vector": [0, 0, 0]
 						},
-						"0.52": {
-							"vector": [0, -13, 0],
-							"easing": "linear"
+						"0.24": {
+							"vector": [0, -10, -3],
+							"easing": "easeOutBack"
 						}
 					},
 					"scale": {
@@ -3039,8 +3031,12 @@
 							"vector": [1, 1, 1]
 						},
 						"0.52": {
-							"vector": [1, 0.75, 1],
-							"easing": "easeOutBack"
+							"vector": [1, 0.5, 1],
+							"easing": "easeInBack"
+						},
+						"0.72": {
+							"vector": [0, 0, 0],
+							"easing": "easeOutSine"
 						}
 					}
 				},
@@ -3052,6 +3048,11 @@
 				"left_paw": {
 					"rotation": {
 						"vector": [0, 0, 82.5]
+					}
+				},
+				"drill": {
+					"scale": {
+						"vector": [0, 0, 0]
 					}
 				}
 			}

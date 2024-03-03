@@ -35,29 +35,28 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
 
     @Override
     public void bombTrackerParticleTick(Entity entity, BombTrackerComponent.BombData bombData) {
-        ClientWorld clientWorld = (ClientWorld) entity.getWorld();
-
         Vec3d bombPos = bombData.getBombPos();
         if (bombPos == null) return;
+        ClientWorld clientWorld = (ClientWorld) entity.getWorld();
 
-        double width = 1.0;
-        double height = 1.0;
+        DefaultParticleType particleType = ParticleTypes.WITCH; // Far particle
+        Vec3d v1 = bombPos.add(3, 3, 3);
+        Vec3d v2 = bombPos.add(-3, -3, -3);
+        List<LivingEntity> list = clientWorld.getEntitiesByClass(LivingEntity.class, new Box(v1, v2), EntityPredicates.VALID_LIVING_ENTITY);
 
+        double xLength = 0, yLength = 0, zLength = 0;
         if (!bombData.isBlock) {
             Entity bombEntity = bombData.bombEntity;
             if (bombEntity == null)
                 bombEntity = bombData.bombItem.getHolder();
             if (bombEntity == null)
                 return;
-            width = bombEntity.getWidth();
-            height = bombEntity.getHeight();
+            list.remove(bombEntity);
+            xLength = bombEntity.getBoundingBox().getXLength();
+            yLength = bombEntity.getBoundingBox().getYLength();
+            zLength = bombEntity.getBoundingBox().getZLength();
         }
 
-        DefaultParticleType particleType = ParticleTypes.WITCH; // Far particle
-        Vec3d v1 = bombPos.add(3, 3, 3);
-        Vec3d v2 = bombPos.add(-3, -3, -3);
-        List<LivingEntity> list = clientWorld.getEntitiesByClass(LivingEntity.class, new Box(v1, v2), EntityPredicates.VALID_LIVING_ENTITY);
-        if (bombData.isEntity) list.remove(bombData.bombEntity);
         for (LivingEntity l : list)
             if (l.squaredDistanceTo(bombPos) < 9) {
                 particleType = ParticleTypes.WAX_ON; // Near particle
@@ -66,24 +65,14 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
 
         Random random = clientWorld.getRandom();
 
-        if (bombData.isEntity) {
-            Direction gravity = GravityChangerAPI.getGravityDirection(entity);
-            for (int h = 0; h < 16; ++h) {
-                Vec3d randOffset = RotationUtil.vecPlayerToWorld(
-                        new Vec3d(
-                                random.nextTriangular(0, 0.5) * width,
-                                random.nextDouble() * height,
-                                random.nextTriangular(0, 0.5) * width
-                        ),
-                        gravity
-                );
+        //TODO: fix bomb particle rendering in other gravities
+        if (bombData.isEntity)
+            for (int h = 0; h < 16; ++h)
                 clientWorld.addParticle(particleType,
-                        bombPos.x + randOffset.x,
-                        bombPos.y + randOffset.y,
-                        bombPos.z + randOffset.z,
+                        bombPos.x + random.nextTriangular(0, 1) * xLength,
+                        bombPos.y + random.nextTriangular(0, 1) * yLength,
+                        bombPos.z + random.nextTriangular(0, 1) * zLength,
                         0, 0, 0);
-            }
-        }
 
         if (bombData.isBlock)
             for (int h = 0; h < 16; ++h)
