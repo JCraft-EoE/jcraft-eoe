@@ -120,7 +120,7 @@ public interface JEntityTypeRegistry {
 
     EntityType<GoldExperienceEntity> GOLD_EXPERIENCE = Registry.register(
             Registry.ENTITY_TYPE,
-            JCraft.id("goldenexperience"),
+            JCraft.id("goldexperience"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(GoldExperienceEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
     EntityType<GETreeEntity> GE_TREE = Registry.register(

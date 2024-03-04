@@ -152,13 +152,13 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
 
         freespace = """
                 BNBs:
-                    the gamer (THE bnb)
+                    -the gamer (THE bnb)
                     M1>Barrage>delay.Move Cancel>M1>Heavy~Overhead
                     
-                    the loop zoopler (sub optimal damage for a setup that kills them if you guess right)
+                    -the loop zoopler (sub optimal damage for a setup that kills them if you guess right)
                     Eye Chop>Donut>M1>Heavy~Overhead>Time Erase
                     
-                    hits like a firetruck (death)
+                    -hits like a firetruck (death)
                     Donut>Move Cancel>Timeskip>Barrage>Move Cancel>M1>Heavy>Move Cancel>Eye Chop>Sweep
                     """;
 

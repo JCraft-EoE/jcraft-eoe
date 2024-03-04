@@ -2437,6 +2437,13 @@ Made in Heaven
     >Added icons
     >Updated speed particles
 
+● 04/03/2024
+Whitesnake
+    >Fixed crash when using certain blocks in remote mode
+
+Golden Experience (and Requiem)
+    >Renamed to Gold Experience
+
 todo:
 research SoundInstance class for stopping jcraft sounds and having them consistently track ents
 

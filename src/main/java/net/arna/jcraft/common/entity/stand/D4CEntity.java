@@ -133,11 +133,11 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
         freespace =
                 """
                         BNBs:
-                            the lazy zoner
+                            -the lazy zoner
                             M1>Barrage>M1>Grab/Charge
                             
-                            the western
-                            M1>Summon Gun>Barrage>M1~stand.OFF>M2>M2>M2>M2>M2>M2~s.ON+M1>Charge""";
+                            -the western
+                            M1>Summon Gun>Barrage>M1~stand.OFF>M2>M2>M2>~s.ON+M1>Charge""";
 
         auraColors = new Vec3f[]{
                 new Vec3f(0.9f, 0.5f, 0.7f),

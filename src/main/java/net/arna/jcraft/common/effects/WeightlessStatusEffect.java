@@ -50,6 +50,11 @@ public class WeightlessStatusEffect extends StatusEffect {
         } else {
             MiscComponent misc = JComponents.getMiscData(entity);
 
+            if (!entity.isAlive()) {
+                entity.removeStatusEffect(this);
+                return;
+            }
+
             HitResult hitResult = world.raycast(
                     new RaycastContext(
                             pos,

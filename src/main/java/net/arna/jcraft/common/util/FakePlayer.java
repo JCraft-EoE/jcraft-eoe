@@ -2,6 +2,9 @@ package net.arna.jcraft.common.util;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.network.ClientConnection;
+import net.minecraft.network.NetworkSide;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.stat.Stat;
@@ -14,6 +17,7 @@ public class FakePlayer extends ServerPlayerEntity {
 
     public FakePlayer(ServerWorld world) {
         super(world.getServer(), world, FAKE_PROFILE, null);
+        this.networkHandler = new ServerPlayNetworkHandler(world.getServer(), new ClientConnection(NetworkSide.CLIENTBOUND), this);
     }
 
     @Override

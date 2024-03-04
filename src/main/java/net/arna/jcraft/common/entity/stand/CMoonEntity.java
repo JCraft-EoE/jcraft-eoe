@@ -139,7 +139,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
                 Passive: Inversion, all physical hits deal an extra half heart after 2s
 
                     BNBs:
-                    going up?
+                    -going up?
                     M1>Barrage>jump>Block Launch>M1>Only One Punch>Block Launch (Projectile Hit)>...
                         ...Grav. Hop>Ground Slam
                         ...Gut Punch""";

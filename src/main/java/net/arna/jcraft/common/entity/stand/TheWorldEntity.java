@@ -129,10 +129,10 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
         freespace =
                 """
                         BNBs:
-                            the sauce boss
+                            -the sauce boss
                             (M1>)Charge>cr.M1>Roundhouse>Barrage>M1>Donut>Roundhouse>M1~M1
                             
-                            the afternoon coffee
+                            -the afternoon coffee
                             Donut>Roundhouse>Charge>M1>Barrage>Roundhouse>M1~M1""";
 
         auraColors = new Vec3f[]{
