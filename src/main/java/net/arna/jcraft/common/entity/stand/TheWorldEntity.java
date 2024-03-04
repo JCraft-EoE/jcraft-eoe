@@ -129,7 +129,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
         freespace =
                 """
                         BNBs:
-                            the saucy racist
+                            the sauce boss
                             (M1>)Charge>cr.M1>Roundhouse>Barrage>M1>Donut>Roundhouse>M1~M1
                             
                             the afternoon coffee
