@@ -158,7 +158,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                     the loop zoopler (sub optimal damage for a setup that kills them if you guess right)
                     Eye Chop>Donut>M1>Heavy~Overhead>Time Erase
                     
-                    the red racist (death)
+                    hits like a firetruck (death)
                     Donut>Move Cancel>Timeskip>Barrage>Move Cancel>M1>Heavy>Move Cancel>Eye Chop>Sweep
                     """;
 
