@@ -172,7 +172,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                 PASSIVE: Speed I
                 
                 BNBs:
-                    -the white supremacist
+                    -the flashbang
                     (Donut>M1>)Speed Slice>Leg Crusher>Fury Chop>M1>Barrage""";
 
         auraColors = new Vec3f[]{
