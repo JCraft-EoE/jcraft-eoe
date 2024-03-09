@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.entity.projectile;
 
 import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.arna.jcraft.registry.JObjectRegistry;
@@ -156,7 +157,7 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
             blockstun = 6;
         } else dropStack(asItemStack(), 0.1F);
 
-        JUtils.projectileDamageLogic(this, world, entity, Vec3d.ZERO, stunT, 1, false, 2, blockstun);
+        JUtils.projectileDamageLogic(this, world, entity, Vec3d.ZERO, stunT, 1, false, 2, blockstun, HitPropertyComponent.HitAnimation.MID);
         playSound(SoundEvents.ITEM_TRIDENT_HIT, 1, 1);
         if (entity instanceof LivingEntity living) JComponents.getMiscData(living).stab();
         discard();

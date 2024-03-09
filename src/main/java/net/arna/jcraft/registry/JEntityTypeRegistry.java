@@ -205,6 +205,13 @@ public interface JEntityTypeRegistry {
                     .dimensions(EntityDimensions.fixed(0.5f, 0.5f)).trackRangeChunks(4).trackedUpdateRate(10).build()
     );
 
+    EntityType<LaserProjectile> LASER_PROJECTILE = Registry.register(
+            Registry.ENTITY_TYPE,
+            JCraft.id("laserprojectile"),
+            FabricEntityTypeBuilder.<LaserProjectile>create(SpawnGroup.MISC, LaserProjectile::new)
+                    .dimensions(EntityDimensions.fixed(0.5f, 0.5f)).trackRangeChunks(4).trackedUpdateRate(10).build()
+    );
+
     EntityType<LifeDetectorEntity> LIFE_DETECTOR = Registry.register(
             Registry.ENTITY_TYPE,
             JCraft.id("lifedetector"),

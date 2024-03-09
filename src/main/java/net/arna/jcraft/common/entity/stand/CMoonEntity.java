@@ -116,7 +116,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
                     """));
     public static final GravitationalHopMove GRAVITATIONAL_HOP = new GravitationalHopMove(340)
             .withInfo(Text.literal("Gravitational Hop/Local Gravity Change"),
-                    Text.literal("jumps up and grants 2s slow falling/crouch to change your gravitational direction"));
+                    Text.literal("if used mid air, jumps up and grants 2s slow falling/otherwise changes your gravitational direction"));
     private final List<Inversion> inversions = new ArrayList<>();
 
     public CMoonEntity(World worldIn) {

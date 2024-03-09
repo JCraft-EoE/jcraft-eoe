@@ -20,7 +20,12 @@ public enum SpecType {
             """
                     PASSIVE: Bloodlust
                     landing blows on opponents speeds up Anubis' attacks up to 2x, with +0.2x per hit
-                    not hitting opponents reduces Bloodlust by one stack every 4 seconds"""));
+                    not hitting opponents reduces Bloodlust by one stack every 4 seconds""")),
+
+    VAMPIRE(VampireSpec::new, Text.literal("Supernatural all-ranger"), Text.literal(
+            """
+                    PASSIVES: ???
+                    comand grab :D"""));
 
     @Getter(lazy = true)
     private static final List<SpecType> allSpecTypes = ImmutableList.copyOf(values());

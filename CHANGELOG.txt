@@ -2444,6 +2444,18 @@ Whitesnake
 Golden Experience (and Requiem)
     >Renamed to Gold Experience
 
+● 09/03/2024
+>Fixed being able to use /stand skin while not op-ed
+
+Cream
+    >Removed ability to fly with Elytra while in Half-Ball mode
+
+The Fool
+    >Fixed Sand Clones being able to drop items
+
+The reason the easings dont work is because kosmx is fucking stupid,
+see: dev.kosmx.playerAnim.core.util.Easing
+
 todo:
 research SoundInstance class for stopping jcraft sounds and having them consistently track ents
 

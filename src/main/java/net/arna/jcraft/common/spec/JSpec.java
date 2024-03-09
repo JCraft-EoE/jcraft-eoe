@@ -158,9 +158,14 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
 
         armorPoints = move.getArmor();
 
-        PlayerLookup.world((ServerWorld) player.getWorld()).forEach(serverPlayer -> PlayerAnimPacket.sendSpec(
-                player, serverPlayer, (this.state = state).getKey(getThis()), moveStun, animationSpeed));
+        setPlayerAnimation((this.state = state).getKey(getThis()), moveStun, animationSpeed);
+
         return true;
+    }
+
+    public void setPlayerAnimation(String animationID, int duration, float animationSpeed) {
+        PlayerLookup.world((ServerWorld) player.getWorld()).forEach(serverPlayer -> PlayerAnimPacket.sendSpec(
+                player, serverPlayer, animationID, duration, animationSpeed));
     }
 
     public void cancelMove() {

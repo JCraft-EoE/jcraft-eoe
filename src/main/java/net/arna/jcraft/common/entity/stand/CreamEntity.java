@@ -382,7 +382,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                         if (user instanceof ServerPlayerEntity player)
                             player.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(user));
 
-                        if (curMove.getOriginalMove() == BALL_DESTROY)
+                        if (curMove != null && curMove.getOriginalMove() == BALL_DESTROY)
                             chargeDir = chargeDir.add(
                                     new Vec3d(GravityChangerAPI.getGravityDirection(user).getUnitVector()).multiply(0.1)
                             ).normalize().multiply(0.5);
@@ -455,7 +455,10 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             user.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 5, 9, true, false));
 
             // Player Half-Ball controls
-            if (user instanceof ServerPlayerEntity) {
+            if (user instanceof ServerPlayerEntity serverPlayer) {
+                if (serverPlayer.isFallFlying())
+                    serverPlayer.stopFallFlying();
+
                 if (lastRemoteInputTime - age > 4) updateRemoteInputs(0, 0, false);
 
                 Vec3d finalSpeed = Vec3d.ZERO;
@@ -480,8 +483,6 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                             GravityChangerAPI.addWorldVelocity(user, stabilization.subtract(gravityVec.multiply(0.25 / groundDist)));
                     }
 
-                    //JCraft.LOGGER.info("FS1: " + finalSpeed);
-
                     Vec3d rotVec = Vec3d.fromPolar(getPitch(), getYaw());
                     Vec3d moveRotVec = Vec3d.ZERO;
                     float forward = (float) getRemoteForwardInput();
@@ -491,11 +492,8 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
 
                     finalSpeed = finalSpeed.add(moveRotVec.normalize().multiply(0.034));
 
-                    //JCraft.LOGGER.info("\nPRE Vel: " + user.getVelocity() + " | FS: " + finalSpeed);
                     user.addVelocity(finalSpeed.x, finalSpeed.y, finalSpeed.z);
                     user.velocityModified = true;
-                    //serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(user));
-                    //JCraft.LOGGER.info("POST Vel: " + user.getVelocity());
                 }
             } else resetAlphaOverride();
         }

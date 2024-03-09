@@ -13,6 +13,7 @@ import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.EntityType;
@@ -67,34 +68,8 @@ public class TimeEraseMove extends AbstractMove<TimeEraseMove, KingCrimsonEntity
             clone.setMaster(player);
 
             doppelganger = clone;
-        } else if (user instanceof MobEntity mob) { //Code sourced from MobEntity.class convertTo()
-            EntityType<?> entityType = mob.getType();
-            MobEntity newMob = (MobEntity) entityType.create(attacker.getWorld());
-
-            if (newMob == null) {
-                JCraft.LOGGER.error("Failed to create King Crimson clone mob of type " + entityType + " in world " +
-                        attacker.getWorld());
-                return Set.of();
-            }
-
-            // Copy properties
-            newMob.setBaby(mob.isBaby());
-            if (mob.hasCustomName()) {
-                newMob.setCustomName(mob.getCustomName());
-                newMob.setCustomNameVisible(mob.isCustomNameVisible());
-            }
-            newMob.age = mob.age;
-
-            newMob.setEquipmentDropChance(EquipmentSlot.MAINHAND, 0);
-            newMob.setEquipmentDropChance(EquipmentSlot.OFFHAND, 0);
-
-            newMob.setEquipmentDropChance(EquipmentSlot.HEAD, 0);
-            newMob.setEquipmentDropChance(EquipmentSlot.CHEST, 0);
-            newMob.setEquipmentDropChance(EquipmentSlot.LEGS, 0);
-            newMob.setEquipmentDropChance(EquipmentSlot.FEET, 0);
-
-            doppelganger = newMob;
-        }
+        } else if (user instanceof MobEntity mob)
+            doppelganger = JUtils.mobCloneOf(mob);
 
         ctx.set(DOPPELGANGER, doppelganger);
         if (doppelganger == null) return Set.of();

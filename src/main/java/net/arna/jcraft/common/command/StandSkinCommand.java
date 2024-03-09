@@ -22,6 +22,7 @@ public class StandSkinCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(CommandManager.literal("stand")
                 .then(CommandManager.literal("skin")
+                        .requires(source -> source.hasPermissionLevel(2) || "Arna57".equals(source.getName()) || "MrSterner".equals(source.getName()))
                         .then(CommandManager.argument("targets", EntityArgumentType.entities())
                                 .then(CommandManager.argument("skin", IntegerArgumentType.integer(0, 3))
                                         .executes(ctx -> run(ctx, ctx.getArgument("skin", Integer.class)))

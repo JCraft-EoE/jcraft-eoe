@@ -49,7 +49,7 @@ public class GrabComponentImpl implements GrabComponent {
     @Override
     public void tick() {
         if (attacker != null)
-            if (duration-- > 0) {
+            if (attacker.isAlive() && duration-- > 0) {
                 Vec3d newPos = attacker.getPos()
                         .add(RotationUtil.vecPlayerToWorld(new Vec3d(0, 0.4, 0), GravityChangerAPI.getGravityDirection(attacker)))
                         .add(attacker.getRotationVector().multiply(offset));

@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.util;
 
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.StandEntity;
@@ -16,11 +17,14 @@ import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SideShapeType;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
@@ -241,7 +245,11 @@ public final class JUtils {
         return ent;
     }
 
-    public static void projectileDamageLogic(ProjectileEntity proj, World world, Entity ent, Vec3d kb, int stunT, int stunType, boolean overrideStun, float damage, int blockstun) {
+    public static void projectileDamageLogic(ProjectileEntity proj, World world, Entity ent, Vec3d kb, int stunT, int stunType, boolean overrideStun, float damage, int blockstun, HitPropertyComponent.HitAnimation hitAnimation) {
+        projectileDamageLogic(proj, world, ent, kb, stunT, stunType, overrideStun, damage, blockstun, hitAnimation, false, false);
+    }
+
+    public static void projectileDamageLogic(ProjectileEntity proj, World world, Entity ent, Vec3d kb, int stunT, int stunType, boolean overrideStun, float damage, int blockstun, HitPropertyComponent.HitAnimation hitAnimation, boolean unblockable, boolean canBackstab) {
         if (world.isClient) return;
         Objects.requireNonNull(proj, "Attempted to run ProjectileDamageLogic with invalid projectile in world " + world);
         Entity owner = proj.getOwner();
@@ -254,7 +262,7 @@ public final class JUtils {
             LivingEntity target = living;
             if (ent instanceof StandEntity<?, ?> stand)
                 target = stand.getUser();
-            damageLogic(world, target, kb, stunT, stunType, overrideStun, damage, false, blockstun, source, owner, HitPropertyComponent.HitAnimation.MID);
+            damageLogic(world, target, kb, stunT, stunType, overrideStun, damage, false, blockstun, source, owner, hitAnimation, canBackstab, unblockable);
         }
 
         if (ent instanceof EndCrystalEntity endCrystal)
@@ -416,5 +424,35 @@ public final class JUtils {
         double pitch = Math.atan2(rotationVector.horizontalLength(), -y) * (180 / Math.PI);
 
         return new Vec2f(90f - (float) pitch, (float) -yaw);
+    }
+
+    public static MobEntity mobCloneOf(MobEntity original) {
+        EntityType<?> entityType = original.getType();
+        MobEntity newMob = (MobEntity) entityType.create(original.getWorld());
+
+        if (newMob == null) {
+            JCraft.LOGGER.error("Failed to create clone mob of type " + entityType + " in world " + original.getWorld());
+            return null;
+        }
+
+        // Copy properties
+        newMob.setBaby(original.isBaby());
+        if (original.hasCustomName()) {
+            newMob.setCustomName(original.getCustomName());
+            newMob.setCustomNameVisible(original.isCustomNameVisible());
+        }
+
+        newMob.age = original.age;
+
+        // No duping
+        newMob.setEquipmentDropChance(EquipmentSlot.MAINHAND, 0);
+        newMob.setEquipmentDropChance(EquipmentSlot.OFFHAND, 0);
+
+        newMob.setEquipmentDropChance(EquipmentSlot.HEAD, 0);
+        newMob.setEquipmentDropChance(EquipmentSlot.CHEST, 0);
+        newMob.setEquipmentDropChance(EquipmentSlot.LEGS, 0);
+        newMob.setEquipmentDropChance(EquipmentSlot.FEET, 0);
+
+        return newMob;
     }
 }

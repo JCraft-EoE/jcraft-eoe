@@ -1,0 +1,25 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.knife",
+				"texture_width": 112,
+				"texture_height": 10,
+				"visible_bounds_width": 4,
+				"visible_bounds_height": 1.5,
+				"visible_bounds_offset": [0, 0.25, 0]
+			},
+			"bones": [
+				{
+					"name": "beam",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [-24, 0, -0.5], "size": [48, 1, 1], "uv": [0, 6]},
+						{"origin": [-24, -1, -1.5], "size": [48, 3, 3], "inflate": -0.5, "uv": [0, 0]}
+					]
+				}
+			]
+		}
+	]
+}

@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.entity.projectile;
 
+import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.entity.stand.MagiciansRedEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
@@ -84,7 +85,7 @@ public class AnkhProjectile extends PersistentProjectileEntity implements IAnima
         if (owner.hasPassenger(entity) || entity == owner) return;
 
         entity.setOnFireFor(3);
-        JUtils.projectileDamageLogic(this, world, entity, Vec3d.ZERO, 5, 1, false, 3.5f, 8);
+        JUtils.projectileDamageLogic(this, world, entity, Vec3d.ZERO, 5, 1, false, 3.5f, 8, HitPropertyComponent.HitAnimation.MID);
         discard();
     }
 

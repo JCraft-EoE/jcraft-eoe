@@ -10,6 +10,7 @@ import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.entity.stand.StandType;
 import net.arna.jcraft.common.entity.stand.TheFoolEntity;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
+import net.arna.jcraft.common.util.JUtils;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.EntityType;
@@ -86,24 +87,7 @@ public class SandCloneMove extends AbstractMove<SandCloneMove, TheFoolEntity> {
 
             setSandClone(ctx, playerCloneEntity);
         } else if (user instanceof MobEntity mob) {
-            EntityType<?> entityType = mob.getType();
-            MobEntity newMob = (MobEntity) entityType.create(attacker.getWorld());
-
-            if (newMob == null) {
-                JCraft.LOGGER.error("Failed to create sand clone of " + mob + " in world " + attacker.getWorld());
-                return Set.of();
-            }
-
-            newMob.copyPositionAndRotation(attacker);
-            newMob.setBaby(mob.isBaby());
-
-            if (mob.hasCustomName()) {
-                newMob.setCustomName(mob.getCustomName());
-                newMob.setCustomNameVisible(mob.isCustomNameVisible());
-            }
-
-            newMob.age = mob.age;
-
+            MobEntity newMob = JUtils.mobCloneOf(mob);
             setSandClone(ctx, newMob);
         }
 
