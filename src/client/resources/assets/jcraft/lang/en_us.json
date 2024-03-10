@@ -19,6 +19,7 @@
   "item.jcraft.anubis_sheathed": "Sheathed Anubis",
   "item.jcraft.cinderella_mask": "Cinderella Mask",
   "item.jcraft.mock_item": "Mock Item",
+  "item.jcraft.blood_bottle": "Blood Bottle",
 
   "item.jcraft.dio_headband": "DIO's Headband",
   "item.jcraft.dio_jacket": "DIO's Jacket",
@@ -213,6 +214,7 @@
   "jcraft.serverconfig.option.timeSkipUseUtil": "Time Skip uses Util",
   "jcraft.serverconfig.option.damageScalingMinimum": "Damage Scaling Minimum",
   "jcraft.serverconfig.option.scalingPenaltyPerHit": "Scaling Penalty per Hit",
+  "jcraft.serverconfig.option.killVampirism": "Kill Vampirism",
 
   "jcraft.serverconfig.category.minecraft_rebalance": "Minecraft Balance",
   "jcraft.serverconfig.option.reduceDeadlyExplosions": "Reduce Deadly Explosion Power (End Crystals, Beds, Respawn Anchors)",

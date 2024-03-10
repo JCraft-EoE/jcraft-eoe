@@ -6,11 +6,14 @@ import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.living.MiscComponent;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -19,7 +22,8 @@ public class MiscComponentImpl implements MiscComponent {
     @Getter
     private Vec3d desiredVelocity = Vec3d.ZERO;
     @Getter
-    private UUID slavedTo;
+    private @Nullable UUID slavedTo = null;
+    private LivingEntity master = null;
     private int damageTimer;
     private int knifeTimer;
     @Getter
@@ -106,10 +110,33 @@ public class MiscComponentImpl implements MiscComponent {
         if (damageTimer > 0) damageTimer--;
         if (armoredHitTicks > 0) armoredHitTicks--;
 
-        if (entity.world.isClient() || stuckKnifeCount <= 0) return;
-        if (--knifeTimer <= 0) {
-            stuckKnifeCount--;
-            updateKnifeTimer();
+        if (entity.world.isClient()) return;
+
+        if (slavedTo != null) {
+            if (master == null) {
+                if (entity.age % 20 == 0) {
+                    //TODO: make SlavedTo properly load from NBT for non-players
+                    master = entity.world.getPlayerByUuid(slavedTo);
+                }
+            } else {
+                if (entity instanceof MobEntity mob) { // Targeting and movement for mobs
+                    LivingEntity victim = master.getAttacking();
+                    if (victim == null) {
+                        LivingEntity adv = master.getPrimeAdversary();
+                        if (adv != null && adv.isAlive()) mob.setTarget(adv);
+                    } else if (victim.isAlive()) mob.setTarget(victim);
+
+                    if (mob.squaredDistanceTo(entity) > 256)
+                        mob.getNavigation().startMovingTo(entity, 1);
+                }
+            }
+        }
+
+        if (stuckKnifeCount <= 0) {
+            if (--knifeTimer <= 0) {
+                stuckKnifeCount--;
+                updateKnifeTimer();
+            }
         }
     }
 
@@ -148,6 +175,8 @@ public class MiscComponentImpl implements MiscComponent {
         NbtCompound dvComp = tag.getCompound("DesiredVelocity");
         desiredVelocity = new Vec3d(dvComp.getDouble("X"), dvComp.getDouble("Y"), dvComp.getDouble("Z"));
         damageTimer = tag.getInt("DamageTimer");
+        if (tag.containsUuid("SlavedTo"))
+            slavedTo = tag.getUuid("SlavedTo");
     }
 
     @Override
@@ -158,5 +187,7 @@ public class MiscComponentImpl implements MiscComponent {
         dvComp.putDouble("Z", desiredVelocity.getZ());
         tag.put("DesiredVelocity", dvComp);
         tag.putInt("DamageTimer", damageTimer);
+        if (slavedTo != null)
+            tag.putUuid("SlavedTo", slavedTo);
     }
 }

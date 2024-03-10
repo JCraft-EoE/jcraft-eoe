@@ -12,17 +12,23 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.util.math.Vec3d;
 
 public class SingularityAttack extends AbstractSimpleAttack<SingularityAttack, TheWorldOverHeavenEntity> {
+    private final boolean blockBypass;
+
     public SingularityAttack(int cooldown, int windup, int duration, float moveDistance, float damage, int stun,
-                             float hitboxSize, float knockback, float offset) {
+                             float hitboxSize, float knockback, float offset, boolean blockBypass) {
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset);
-        hitSpark = JParticleType.HIT_SPARK_2;
+        this.blockBypass = blockBypass;
     }
 
     @Override
     protected void processTarget(TheWorldOverHeavenEntity attacker, LivingEntity target, Vec3d kbVec, DamageSource damageSource) {
         super.processTarget(attacker, target, kbVec, damageSource);
-        target.removeStatusEffect(JStatusRegistry.DAZED);
-        StandEntity.stun(target, getStun(), 0);
+
+        if (blockBypass) {
+            target.removeStatusEffect(JStatusRegistry.DAZED);
+            StandEntity.stun(target, getStun(), 0);
+        }
+
         StandEntity.trueDamage(6, JDamageSources.stand(attacker), target);
     }
 
@@ -34,6 +40,6 @@ public class SingularityAttack extends AbstractSimpleAttack<SingularityAttack, T
     @Override
     public @NonNull SingularityAttack copy() {
         return copyExtras(new SingularityAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(),
-                getDamage(), getStun(), getHitboxSize(), getKnockback(), getOffset()));
+                getDamage(), getStun(), getHitboxSize(), getKnockback(), getOffset(), blockBypass));
     }
 }

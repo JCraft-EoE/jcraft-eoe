@@ -23,10 +23,14 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static net.arna.jcraft.common.entity.stand.StandEntity.damageLogic;
 
 public class LaserProjectile extends PersistentProjectileEntity implements IAnimatable {
     private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+    private List<Entity> hit = new ArrayList<>();
 
     public LaserProjectile(EntityType<? extends LaserProjectile> entityType, World world) {
         super(entityType, world);
@@ -35,7 +39,6 @@ public class LaserProjectile extends PersistentProjectileEntity implements IAnim
 
     public LaserProjectile(World world, LivingEntity owner) {
         super(JEntityTypeRegistry.LASER_PROJECTILE, owner, world);
-        this.setNoGravity(true);
         this.setOwner(owner);
     }
 
@@ -52,13 +55,23 @@ public class LaserProjectile extends PersistentProjectileEntity implements IAnim
             Vec3d vel = getVelocity();
 
             if (age == 1) {
-                for (int i = 0; i < 30; i++) {
+                for (int i = 0; i < 20; i++) {
                     world.addParticle(
                             ParticleTypes.FIREWORK,
-                            x, y, z,
-                            (vel.x + random.nextGaussian() * 0.8) * 0.2
-                            , (vel.y + random.nextGaussian() * 0.8) * 0.2
-                            , (vel.z + random.nextGaussian() * 0.8) * 0.2
+                            x, y, z
+                            , (vel.x + random.nextGaussian() * 0.5) * 0.2
+                            , (vel.y + random.nextGaussian() * 0.5) * 0.2
+                            , (vel.z + random.nextGaussian() * 0.5) * 0.2
+                    );
+                }
+                for (int i = 0; i < 10; i++) {
+                    Vec3d frontVel = vel.multiply(random.nextDouble());
+                    world.addParticle(
+                            ParticleTypes.FIREWORK,
+                            x, y, z
+                            , frontVel.x
+                            , frontVel.y
+                            , frontVel.z
                     );
                 }
             } else {
@@ -77,11 +90,11 @@ public class LaserProjectile extends PersistentProjectileEntity implements IAnim
         Entity owner = getOwner();
         if (owner == null) return;
         Entity entity = entityHitResult.getEntity();
-        if (owner.hasPassenger(entity) || entity == owner) return;
+        if (owner.hasPassenger(entity) || entity == owner || hit.contains(entity)) return;
 
-        JUtils.projectileDamageLogic(this, world, entity, getRotationVector(), 20, 1, false,
+        JUtils.projectileDamageLogic(this, world, entity, getVelocity(), 20, 1, false,
                 5f, 0, HitPropertyComponent.HitAnimation.CRUSH, true, false);
-        discard();
+        hit.add(entity);
     }
 
     @Override
@@ -91,14 +104,12 @@ public class LaserProjectile extends PersistentProjectileEntity implements IAnim
 
     @Override
     public boolean hasNoGravity() {
-        return false;
+        return true;
     }
 
     // Animations
     @Override
-    public void registerControllers(AnimationData data) {
-    }
-
+    public void registerControllers(AnimationData data) { }
     @Override
     public AnimationFactory getFactory() {
         return this.factory;

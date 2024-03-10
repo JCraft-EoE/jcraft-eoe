@@ -3,6 +3,7 @@ package net.arna.jcraft.common.attack.moves.vampire;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
+import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.projectile.AnkhProjectile;
 import net.arna.jcraft.common.entity.projectile.LaserProjectile;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
@@ -25,7 +26,7 @@ public class SpaceRipperAttack extends AbstractMove<SpaceRipperAttack, VampireSp
 
         for (int i = -1; i < 3; i += 2) {
             LaserProjectile laser = new LaserProjectile(attacker.getEntityWorld(), user);
-            laser.setVelocity(user, user.getPitch(), user.getYaw(), 0.0F, 2F, 0);
+            laser.setVelocity(getRotVec(attacker).multiply(2));
 
             Vec3d sideOffset = rotVec.rotateY(1.57079632679f * i).multiply(0.125);
             Vec3d offset = RotationUtil.vecPlayerToWorld(sideOffset.x, sideOffset.y + (double) user.getStandingEyeHeight(), sideOffset.z, GravityChangerAPI.getGravityDirection(user));
@@ -33,6 +34,8 @@ public class SpaceRipperAttack extends AbstractMove<SpaceRipperAttack, VampireSp
             laser.setPosition(offsetHeightPos);
 
             attacker.getEntityWorld().spawnEntity(laser);
+
+            JComponents.getShockwaveHandler(user.getWorld()).addShockwave(offsetHeightPos, rotVec, 2);
         }
 
         return Set.of();

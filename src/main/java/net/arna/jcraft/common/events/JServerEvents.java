@@ -11,6 +11,7 @@ import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.StandType;
 import net.arna.jcraft.common.item.MockItem;
 import net.arna.jcraft.common.tickable.PastDimensions;
+import net.arna.jcraft.common.tickable.Revivables;
 import net.arna.jcraft.common.tickable.RevolverFire;
 import net.arna.jcraft.common.tickable.Timestops;
 import net.arna.jcraft.common.util.EntityInterest;
@@ -78,6 +79,7 @@ public class JServerEvents {
         RevolverFire.tick(server);
         PastDimensions.tick(server);
         Timestops.tick(server);
+        Revivables.tick(server);
 
         // Player logic (cooldown handling and DamageTimer counting)
         for (ServerPlayerEntity player : PlayerLookup.all(server)) {

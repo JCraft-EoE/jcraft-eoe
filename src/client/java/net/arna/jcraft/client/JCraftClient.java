@@ -12,10 +12,7 @@ import net.arna.jcraft.client.gravity.util.GravityChannelClient;
 import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
 import net.arna.jcraft.client.net.ClientPacketHandler;
 import net.arna.jcraft.client.particle.*;
-import net.arna.jcraft.client.registry.JArmorRendererRegistry;
-import net.arna.jcraft.client.registry.JClientEventsRegistry;
-import net.arna.jcraft.client.registry.JEntityRendererRegister;
-import net.arna.jcraft.client.registry.JRenderLayerRegistry;
+import net.arna.jcraft.client.registry.*;
 import net.arna.jcraft.client.renderer.block.ShaderTestBlockEntityRenderer;
 import net.arna.jcraft.client.renderer.effects.*;
 import net.arna.jcraft.client.renderer.item.BigItemRenderer;
@@ -121,6 +118,7 @@ public class JCraftClient implements ClientModInitializer {
         JRenderLayerRegistry.init();
         RenderHandler.init();
         JClientEventsRegistry.registerClientEvents();
+        JModelPredicateProviderRegistry.register();
 
         InversionShaderHandler.INSTANCE.init();
         ZaWarudoShaderHandler.INSTANCE.init();

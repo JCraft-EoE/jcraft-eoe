@@ -12,6 +12,7 @@ import net.arna.jcraft.common.component.entity.GrabComponent;
 import net.arna.jcraft.common.component.entity.GravityComponent;
 import net.arna.jcraft.common.component.entity.TimeStopComponent;
 import net.arna.jcraft.common.component.impl.GravityShiftComponentImpl;
+import net.arna.jcraft.common.component.impl.VampireComponentImpl;
 import net.arna.jcraft.common.component.impl.entity.GrabComponentImpl;
 import net.arna.jcraft.common.component.impl.entity.GravityComponentImpl;
 import net.arna.jcraft.common.component.impl.entity.TimeStopComponentImpl;
@@ -48,9 +49,10 @@ public class JComponents implements EntityComponentInitializer, WorldComponentIn
             ComponentRegistry.getOrCreate(JCraft.id("hit_property"), HitPropertyComponent.class);
     public static final ComponentKey<GravityShiftComponent> GRAVITY_SHIFT =
             ComponentRegistry.getOrCreate(JCraft.id("gravity_shift"), GravityShiftComponent.class);
-
     public static final ComponentKey<ShockwaveHandlerComponent> SHOCKWAVE_HANDLER =
             ComponentRegistry.getOrCreate(JCraft.id("shockwave_handler"), ShockwaveHandlerComponent.class);
+    public static final ComponentKey<VampireComponent> VAMPIRE =
+            ComponentRegistry.getOrCreate(JCraft.id("vampire"), VampireComponent.class);
 
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
@@ -85,6 +87,10 @@ public class JComponents implements EntityComponentInitializer, WorldComponentIn
                 .respawnStrategy(RespawnCopyStrategy.CHARACTER)
                 .impl(GravityShiftComponentImpl.class)
                 .end(GravityShiftComponentImpl::new);
+        registry.beginRegistration(LivingEntity.class, VAMPIRE)
+                .respawnStrategy(RespawnCopyStrategy.CHARACTER)
+                .impl(VampireComponentImpl.class)
+                .end(VampireComponentImpl::new);
     }
 
     @Override
@@ -130,5 +136,9 @@ public class JComponents implements EntityComponentInitializer, WorldComponentIn
 
     public static ShockwaveHandlerComponent getShockwaveHandler(World world) {
         return SHOCKWAVE_HANDLER.get(world);
+    }
+
+    public static VampireComponent getVampirism(LivingEntity living) {
+        return VAMPIRE.get(living);
     }
 }

@@ -1,0 +1,15 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "jcraft:item/blood_bottle0"
+  },
+  "overrides": [
+    { "predicate": { "jcraft:blood": 0 }, "model": "jcraft:item/blood_bottle0" },
+    { "predicate": { "jcraft:blood": 0.0625 }, "model": "jcraft:item/blood_bottle1" },
+    { "predicate": { "jcraft:blood": 0.25 }, "model": "jcraft:item/blood_bottle2" },
+    { "predicate": { "jcraft:blood": 0.5 }, "model": "jcraft:item/blood_bottle3" },
+    { "predicate": { "jcraft:blood": 0.6875 }, "model": "jcraft:item/blood_bottle4" },
+    { "predicate": { "jcraft:blood": 0.875 }, "model": "jcraft:item/blood_bottle5" },
+    { "predicate": { "jcraft:blood": 1 }, "model": "jcraft:item/blood_bottle6" }
+  ]
+}

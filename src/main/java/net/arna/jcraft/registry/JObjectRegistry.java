@@ -88,6 +88,8 @@ public interface JObjectRegistry {
 
     Item CINDERELLA_MASK = register("cinderella_mask", new CinderellaMaskItem());
 
+    Item BLOOD_BOTTLE = register("blood_bottle", new BloodBottleItem(settings().maxCount(1)));
+
     Item MOCK_ITEM = register("mock_item", new MockItem());
 
     //Block

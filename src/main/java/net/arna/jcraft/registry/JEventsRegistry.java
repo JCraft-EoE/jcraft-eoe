@@ -7,6 +7,8 @@ import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.events.JServerEvents;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.network.c2s.ConfigUpdatePacket;
+import net.arna.jcraft.common.spec.JSpec;
+import net.arna.jcraft.common.tickable.Revivables;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
@@ -82,8 +84,19 @@ public interface JEventsRegistry {
         ServerEntityEvents.ENTITY_LOAD.register(JServerEvents::entityLoad);
 
         ServerLivingEntityEvents.AFTER_DEATH.register((living, source) -> {
-            if (living instanceof ServerPlayerEntity && source.getAttacker() instanceof LivingEntity killer)
+            if (living instanceof ServerPlayerEntity && source.getAttacker() instanceof LivingEntity killer) {
                 JComponents.getCooldowns(killer).clear(CooldownType.COMBO_BREAKER);
+
+                boolean killVampirism = JServerConfig.KILL_VAMPIRISM.getValue();
+                if (killer instanceof ServerPlayerEntity serverPlayer) {
+                    if (killVampirism)
+                        serverPlayer.getHungerManager().add(20, 20f);
+                }
+                if (killVampirism)
+                    killer.setHealth(killer.getMaxHealth());
+            }
+
+            Revivables.addRevivable(living.getType(), living.getPos(), living.getWorld().getRegistryKey());
         });
 
         ServerTickEvents.END_SERVER_TICK.register(JServerEvents::serverTick);

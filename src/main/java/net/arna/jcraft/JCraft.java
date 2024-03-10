@@ -13,6 +13,7 @@ import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.StandType;
 import net.arna.jcraft.common.gravity.config.GravityChangerConfig;
 import net.arna.jcraft.common.gravity.util.GravityChannel;
+import net.arna.jcraft.common.item.BloodBottleItem;
 import net.arna.jcraft.common.item.StandDiscItem;
 import net.arna.jcraft.common.loot.JLootTableHelper;
 import net.arna.jcraft.common.network.RemoteStandInteractPacket;
@@ -214,6 +215,8 @@ public class JCraft implements ModInitializer {
         stacks.add(new ItemStack(JObjectRegistry.CINDERELLA_MASK));
 
         StandDiscItem.appendStacks(JCRAFT_GROUP, stacks);
+
+        BloodBottleItem.appendStacks(JCRAFT_GROUP, stacks);
     }
 
     // Dashes

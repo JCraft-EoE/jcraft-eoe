@@ -36,6 +36,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.tag.EntityTypeTags;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -454,5 +455,37 @@ public final class JUtils {
         newMob.setEquipmentDropChance(EquipmentSlot.FEET, 0);
 
         return newMob;
+    }
+
+    private static final Map<EntityType<?>, Float> uniqueBloodMults = Map.ofEntries(
+            Map.entry(EntityType.ZOMBIE, 1.0f),
+            Map.entry(EntityType.ZOMBIE_VILLAGER, 1.0f),
+            Map.entry(EntityType.ZOMBIE_HORSE, 1.0f),
+
+            Map.entry(EntityType.ZOGLIN, 0.5f),
+            Map.entry(EntityType.ZOMBIFIED_PIGLIN, 0.5f),
+
+            Map.entry(EntityType.HUSK, 0.1f),
+
+            Map.entry(EntityType.VILLAGER, 1.5f),
+            Map.entry(EntityType.PLAYER, 1.5f)
+    );
+
+    public static float getBloodMult(LivingEntity entity) {
+        EntityType<?> type = entity.getType();
+
+        if (type.isIn(EntityTypeTags.RAIDERS))
+            return 1.5f;
+
+        if (type.isIn(EntityTypeTags.SKELETONS))
+            return 0;
+
+        if (type.isIn(EntityTypeTags.AXOLOTL_HUNT_TARGETS)) // Fishes
+            return 0.25f;
+
+        if (uniqueBloodMults.containsKey(type))
+            return uniqueBloodMults.get(type);
+
+        return 0;
     }
 }

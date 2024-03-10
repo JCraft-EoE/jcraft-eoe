@@ -2445,13 +2445,29 @@ Golden Experience (and Requiem)
     >Renamed to Gold Experience
 
 ● 09/03/2024
+>Added VAMPIRISM
 >Fixed being able to use /stand skin while not op-ed
+
+Brawler
+    >Combo cooldown reduced (20->18s)
+    >Uppercut
+        >Cooldown reduced (17->14s)
+        >Hyper armor reduced to 3 armor points
+    >Gut Punch cooldown reduced (12->6s)
+    >Sweep cooldown reduced (10->4s)
 
 Cream
     >Removed ability to fly with Elytra while in Half-Ball mode
 
 The Fool
     >Fixed Sand Clones being able to drop items
+
+The World: Over Heaven
+    >Singularity renamed to True Strike
+        >Cooldown reduced (13->10s)
+        >Removed block bypassing effect
+        >Significantly increased blockstun (-8->+8t)
+        >Added slower crouching variant that bypasses block
 
 The reason the easings dont work is because kosmx is fucking stupid,
 see: dev.kosmx.playerAnim.core.util.Easing

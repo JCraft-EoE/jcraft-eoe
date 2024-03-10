@@ -767,6 +767,12 @@
     ]
   },
 
+  "twohsingularity": {
+    "sounds": [
+      "jcraft:stands/theworldoverheaven/singularity"
+    ]
+  },
+
   "twohsmite": {
     "sounds": [
       "jcraft:stands/theworldoverheaven/smite"

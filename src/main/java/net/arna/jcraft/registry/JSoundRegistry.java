@@ -200,6 +200,7 @@ public interface JSoundRegistry {
     SoundEvent TWOH_TIMESKIP = registerSound("twohtimeskip");
     SoundEvent TWOH_TS = registerSound("twohtimestop");
     SoundEvent TWOH_HEAVY = registerSound("twohheavy");
+    SoundEvent TWOH_SINGULARITY = registerSound("twohsingularity");
     SoundEvent TWOH_SMITE = registerSound("twohsmite");
     SoundEvent TWOH_CHARGE_OVERWRITE = registerSound("twohchargeoverwrite");
     SoundEvent TWOH_CHARGE = registerSound("twohcharge");

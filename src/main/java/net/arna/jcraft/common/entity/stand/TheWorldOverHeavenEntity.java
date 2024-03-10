@@ -10,7 +10,6 @@ import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.attack.moves.theworld.overheaven.*;
 import net.arna.jcraft.common.component.living.HitPropertyComponent;
-import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -22,7 +21,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.text.Text;
@@ -35,7 +33,6 @@ import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.util.Color;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Consumer;
 
 public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEntity, TheWorldOverHeavenEntity.State> {
@@ -67,13 +64,24 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withSound(JSoundRegistry.TWOH_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
-    public static final SingularityAttack SINGULARITY = new SingularityAttack(260, 10, 22,
-            1f, 0f, 20, 2f, 0.3f, 0f)
+    public static final SingularityAttack SINGULARITY = new SingularityAttack(260, 11, 23,
+            1f, 0f, 25, 2f, 0.4f, 0.2f, true)
+            .withSound(JSoundRegistry.TWOH_SINGULARITY)
+            .withImpactSound(JSoundRegistry.IMPACT_12)
+            .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
+            .withHitSpark(JParticleType.HIT_SPARK_3)
+            .withInfo(Text.literal("Singularity"), Text.literal("block bypass (stun will always hit, but the opponent can stay blocking)"));
+    public static final SingularityAttack TRUE_STRIKE = new SingularityAttack(200, 10, 22,
+            1f, 0f, 20, 2f, 0.3f, 0f, false)
+            .withBlockStun(20)
+            .withCrouchingVariant(SINGULARITY)
             .withSound(JSoundRegistry.TWOH_HEAVY)
             .withImpactSound(JSoundRegistry.IMPACT_12)
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
-            .withInfo(Text.literal("Singularity"), Text.literal("block bypass, low stun, medium windup"));
+            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withInfo(Text.literal("True Strike"), Text.literal("damage ignores potions and enchantments, low stun, high blockstun, medium windup"));
     public static final SmiteAttack AIR_SMITE = new SmiteAttack(300, 10, 20, 1f,
             6f, 21, 3f, 0f, 0f, true)
             .withSound(JSoundRegistry.TWOH_SMITE)
@@ -104,7 +112,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withInfo(Text.literal("Reality Overwrite"), Text.literal("""
                             charges (for a minimum of 1s) an unblockable punch that changes the reality of the hit victims
                             While charging, (de)activate overwrite by pressing:
-                            SPECIAL 1 - makes victims unable to look at you
+                            SPECIAL 1 - makes victims unable to look at you (stops if TW:OH is desummoned)
                             SPECIAL 2 - applies every damage over time effect to victims
                             SPECIAL 3 - heals and enslaves mobs"""));
 
@@ -195,7 +203,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
     protected void registerMoves(MoveMap<TheWorldOverHeavenEntity, State> moves) {
         moves.registerImmediate(MoveType.LIGHT, PUNCH, State.LIGHT);
 
-        moves.register(MoveType.HEAVY, SINGULARITY, State.HEAVY);
+        moves.register(MoveType.HEAVY, TRUE_STRIKE, State.HEAVY).withCrouchingVariant(State.SINGULARITY);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 
         moves.register(MoveType.SPECIAL1, SMITE, State.SMITE);
@@ -257,20 +265,6 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         List<LivingEntity> overwriteTargets = moveContext.get(OverwriteAttack.OVERWRITE_TARGETS);
         LivingEntity user = getUserOrThrow();
 
-        if (age == 1) {
-            List<LivingEntity> hit = world.getEntitiesByClass(LivingEntity.class, new Box(
-                            getPos().add(-64, -64, -64), getPos().add(64, 64, 64)),
-                    EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e -> e != this && e != user));
-
-            for (LivingEntity ent : hit) {
-                UUID slavedTo = JComponents.getMiscData(ent).getSlavedTo();
-
-                if (slavedTo == null || !slavedTo.equals(user.getUuid())) continue;
-                overwriteTargets.add(ent);
-                overwriteTimes.add(1048576); // 2 to the whatever
-            }
-        }
-
         if (world.isClient) return;
 
         int moveStun = getMoveStun();
@@ -285,20 +279,9 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
                 overwriteTargets.remove(i);
                 i--;
             } else {
+                // Inability to look at master
                 LivingEntity entity = overwriteTargets.get(i);
 
-                if (entity instanceof MobEntity mob && time > 200) { // Targeting and movement for mobs
-                    LivingEntity victim = user.getAttacking();
-                    if (victim == null) {
-                        LivingEntity adv = user.getPrimeAdversary();
-                        if (adv != null && adv.isAlive()) mob.setTarget(adv);
-                    } else if (victim.isAlive()) mob.setTarget(victim);
-
-                    if (mob.squaredDistanceTo(this) > 256)
-                        mob.getNavigation().startMovingTo(this, 1);
-                }
-
-                // Inability to look at master
                 double range = 1024.0;
 
                 Box box = entity
@@ -350,7 +333,8 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         AIR_KNIVES(builder -> builder.playAndHold("animation.twoh.airknives")),
         TIME_SKIP(builder -> builder.loop("animation.twoh.idle")),
         LUNGE(builder -> builder.loop("animation.twoh.lunge")),
-        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.twoh.light_followup"));
+        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.twoh.light_followup")),
+        SINGULARITY(builder -> builder.playAndHold("animation.twoh.singularity"));
 
         private final Consumer<AnimationBuilder> animator;
 

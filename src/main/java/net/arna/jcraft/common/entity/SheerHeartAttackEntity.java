@@ -156,8 +156,9 @@ public class SheerHeartAttackEntity extends MobEntity implements IAnimatable, IA
                 }
             }
 
-            if (canTarget(getAttacking()))
-                setTarget(getAttacking());
+            LivingEntity attacking = getAttacking();
+            if (attacking != null && canTarget(attacking))
+                setTarget(attacking);
         } else {
             if (age % 19 == 0 && isOnGround() && getVelocity().lengthSquared() > 0.005)
                 playSound(JSoundRegistry.SHA_TREAD, 0.5f, 1.0f);
