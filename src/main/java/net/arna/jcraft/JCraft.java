@@ -214,6 +214,10 @@ public class JCraft implements ModInitializer {
 
         stacks.add(new ItemStack(JObjectRegistry.CINDERELLA_MASK));
 
+        stacks.add(new ItemStack(JObjectRegistry.KARSHEADWRAP));
+
+        stacks.add(new ItemStack(JObjectRegistry.STONE_MASK));
+
         StandDiscItem.appendStacks(JCRAFT_GROUP, stacks);
 
         BloodBottleItem.appendStacks(JCRAFT_GROUP, stacks);

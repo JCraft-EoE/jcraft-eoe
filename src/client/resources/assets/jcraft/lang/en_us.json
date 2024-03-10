@@ -30,6 +30,10 @@
   "item.jcraft.jotaro_jacket": "Jotaro's Jacket",
   "item.jcraft.jotaro_pants": "Jotaro's Pants",
   "item.jcraft.jotaro_boots": "Jotaro's Boots",
+
+  "item.jcraft.kars_headwrap": "Kars' Head Wrap",
+  "item.jcraft.stone_mask": "Stone Mask",
+
   "item.jcraft.debug_wand": "Debug Wand",
 
   "item.jcraft.bullet": "Bullet",
@@ -158,6 +162,10 @@
   "jcraft.bullet.caliber": "§9Caliber:",
 
   "jcraft.boxinggloves.desc": "§eBrawler §9spec obtainment item",
+
+  "jcraft.stonemask.desc": "§eVampirism §9spec obtainment item",
+
+  "jcraft.sunprotection.desc": "Protects from the Sun.",
 
   "jcraft.commands.error.nospec": "No spec found!",
   "jcraft.commands.error.nostand": "No stand found!",

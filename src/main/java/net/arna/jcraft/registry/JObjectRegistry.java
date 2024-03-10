@@ -71,19 +71,19 @@ public interface JObjectRegistry {
     Item LIVINGARROW = register("living_arrow", new LivingArrowItem(settings().rarity(Rarity.RARE).fireproof()));
 
     Item DIOHEADBAND = register("dio_headband", new DIOArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.HEAD, settings()));
-
     Item DIOJACKET = register("dio_jacket", new DIOArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.CHEST, settings()));
-
     Item DIOPANTS = register("dio_pants", new DIOArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.LEGS, settings()));
-
     Item DIOBOOTS = register("dio_boots", new DIOArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.FEET, settings()));
 
+    Item KARSHEADWRAP = register("kars_headwrap", new SunProtectionItem(ArmorMaterials.IRON, EquipmentSlot.HEAD, settings()));
+
+    Item RED_HAT = register("red_hat", new SunProtectionItem(ArmorMaterials.IRON, EquipmentSlot.HEAD, settings()));
+
+    Item STONE_MASK = register("stone_mask", new StoneMaskItem(ArmorMaterials.CHAIN, EquipmentSlot.HEAD, settings()));
+
     Item JOTAROCAP = register("jotaro_cap", new JotaroArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.HEAD, settings()));
-
     Item JOTAROJACKET = register("jotaro_jacket", new JotaroArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.CHEST, settings()));
-
     Item JOTAROPANTS = register("jotaro_pants", new JotaroArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.LEGS, settings()));
-
     Item JOTAROBOOTS = register("jotaro_boots", new JotaroArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.FEET, settings()));
 
     Item CINDERELLA_MASK = register("cinderella_mask", new CinderellaMaskItem());

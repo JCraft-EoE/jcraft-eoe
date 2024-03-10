@@ -1,0 +1,53 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.diooutfit",
+				"texture_width": 64,
+				"texture_height": 64,
+				"visible_bounds_width": 3,
+				"visible_bounds_height": 3.5,
+				"visible_bounds_offset": [0, 1.25, 0]
+			},
+			"bones": [
+				{
+					"name": "helmet",
+					"pivot": [0, 24, 0],
+					"cubes": [
+						{"origin": [-4, 24, -4], "size": [8, 8, 8], "inflate": 0.6, "pivot": [0, 0, 0], "rotation": [1, 0, 0], "uv": [0, 0]},
+						{"origin": [-10, 29.1, -10], "size": [20, 0, 20], "inflate": 0.01, "pivot": [0, 30, 0], "rotation": [0, -45, 0], "uv": [-20, 44]}
+					]
+				},
+				{
+					"name": "chestplate",
+					"pivot": [0, 24, 0]
+				},
+				{
+					"name": "rightBoot",
+					"pivot": [-1.9, 12, 0]
+				},
+				{
+					"name": "leftBoot",
+					"pivot": [1.9, 12, 0]
+				},
+				{
+					"name": "rightLeg",
+					"pivot": [-1.9, 12, 0]
+				},
+				{
+					"name": "leftLeg",
+					"pivot": [1.9, 12, 0]
+				},
+				{
+					"name": "leftArm",
+					"pivot": [5, 22, 0]
+				},
+				{
+					"name": "rightArm",
+					"pivot": [-5, 22, 0]
+				}
+			]
+		}
+	]
+}

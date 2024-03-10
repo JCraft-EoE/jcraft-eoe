@@ -124,7 +124,10 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
         MoveMap.Entry<A, S> entry = moveMap.getFirstValidEntry(type, getThis());
         if (entry == null) return false;
 
-        if (player.isSneaking() && entry.getCrouchingVariant() != null) entry = entry.getCrouchingVariant();
+        if (player.isSneaking()) {
+            if (entry.getCrouchingVariant() != null)
+                entry = entry.getCrouchingVariant();
+        } else if (!player.isOnGround() && entry.getAerialVariant() != null) entry = entry.getAerialVariant();
         return handleMove(entry.getMove(), entry.getCooldownType(), entry.getAnimState(), animationSpeed);
     }
 

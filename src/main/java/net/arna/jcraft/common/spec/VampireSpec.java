@@ -11,6 +11,7 @@ import net.arna.jcraft.common.attack.moves.vampire.BloodSuckAttack;
 import net.arna.jcraft.common.attack.moves.vampire.ReviveMove;
 import net.arna.jcraft.common.attack.moves.vampire.SpaceRipperAttack;
 import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.component.living.VampireComponent;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
@@ -23,15 +24,25 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 
 public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
-    public static final UppercutAttack<VampireSpec> SWEEP = new UppercutAttack<VampireSpec>(30, 6,
-            12, 1f, 5f, 12, 1.5f, 0.5f, 0.5f, 0.5f)
+    public static final UppercutAttack<VampireSpec> AIR_KICK = new UppercutAttack<VampireSpec>(30, 6,
+            12, 1f, 5f, 15, 1.5f, 0.2f, 0.5f, -0.5f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withStaticY()
+            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
+            .withInfo(Text.literal("Axe Kick"), Text.literal("jab"));
+
+    public static final UppercutAttack<VampireSpec> SWEEP = new UppercutAttack<VampireSpec>(30, 6,
+            12, 1f, 5f, 12, 1.5f, 0.2f, 0.5f, 0.5f)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withStaticY()
+            .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
             .withInfo(Text.literal("Sweep Kick"), Text.literal("fast launcher"));
 
     public static final SimpleAttack<VampireSpec> ROUNDHOUSE = new SimpleAttack<VampireSpec>(30, 8,
             15, 1f, 6f, 15, 1.5f, 1.5f, 0f)
             .withCrouchingVariant(SWEEP)
+            .withAerialVariant(AIR_KICK)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withLaunch()
@@ -74,7 +85,10 @@ public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
 
     @Override
     protected void registerMoves(MoveMap<VampireSpec, State> moves) {
-        moves.register(MoveType.HEAVY, ROUNDHOUSE, CooldownType.HEAVY, State.ROUNDHOUSE).withCrouchingVariant(State.SWEEP);
+        MoveMap.Entry<VampireSpec, State> hvy = moves.register(MoveType.HEAVY, ROUNDHOUSE, CooldownType.HEAVY, State.ROUNDHOUSE);
+        hvy.withCrouchingVariant(State.SWEEP);
+        hvy.withAerialVariant(State.AXE_KICK);
+
         moves.register(MoveType.BARRAGE, COMBO, CooldownType.BARRAGE, State.COMBO);
 
         moves.register(MoveType.SPECIAL1, SPACE_RIPPER_ATTACK, CooldownType.SPECIAL1, State.SPACE_RIPPERS);
@@ -88,15 +102,16 @@ public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
     }
 
     public enum State implements SpecAnimationState<VampireSpec> {
+        SWEEP("vm.swp"),
         ROUNDHOUSE("vm.rnd"),
+        AXE_KICK("vm.axe"),
+
         COMBO("vm.5hit"),
 
         SPACE_RIPPERS("vm.srse"),
 
         BLOODSUCK("vm.bsk"),
         BLOODSUCK_HIT("vm.bsh"),
-
-        SWEEP("vm.swp"),
 
         RESURRECT("vm.rsr");
 

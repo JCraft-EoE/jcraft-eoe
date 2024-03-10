@@ -120,6 +120,9 @@ public class MiscComponentImpl implements MiscComponent {
                 }
             } else {
                 if (entity instanceof MobEntity mob) { // Targeting and movement for mobs
+                    if (mob.getTarget() == master)
+                        mob.setTarget(null);
+
                     LivingEntity victim = master.getAttacking();
                     if (victim == null) {
                         LivingEntity adv = master.getPrimeAdversary();
@@ -138,6 +141,10 @@ public class MiscComponentImpl implements MiscComponent {
                 updateKnifeTimer();
             }
         }
+    }
+
+    public LivingEntity getMaster() {
+        return master;
     }
 
     private void updateKnifeTimer() {

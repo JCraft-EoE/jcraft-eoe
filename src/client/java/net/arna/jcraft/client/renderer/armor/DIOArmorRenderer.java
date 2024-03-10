@@ -1,12 +1,12 @@
 package net.arna.jcraft.client.renderer.armor;
 
-import net.arna.jcraft.client.model.armor.DIOArmorModel;
+import net.arna.jcraft.client.model.armor.JArmorModel;
 import net.arna.jcraft.common.item.DIOArmorItem;
 import software.bernie.geckolib3.renderers.geo.GeoArmorRenderer;
 
 public class DIOArmorRenderer extends GeoArmorRenderer<DIOArmorItem> {
     public DIOArmorRenderer() {
-        super(new DIOArmorModel());
+        super(new JArmorModel<>("diooutfit"));
         this.headBone = "helmet";
         this.bodyBone = "chestplate";
         this.rightArmBone = "rightArm";

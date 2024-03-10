@@ -1,9 +1,13 @@
 package net.arna.jcraft.common.item;
 
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterial;
-import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
+import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.controller.AnimationController;
@@ -12,11 +16,19 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
-public class DIOArmorItem extends ArmorItem implements IAnimatable {
+import java.util.List;
+
+public class SunProtectionItem extends ArmorItem implements IAnimatable {
     private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
-    public DIOArmorItem(ArmorMaterial materialIn, EquipmentSlot slot, Item.Settings builder) {
+    public SunProtectionItem(ArmorMaterial materialIn, EquipmentSlot slot, Settings builder) {
         super(materialIn, slot, builder);
+    }
+
+    @Override
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        tooltip.add(Text.translatable("jcraft.sunprotection.desc"));
+        super.appendTooltip(stack, world, tooltip, context);
     }
 
     @SuppressWarnings("SameReturnValue")

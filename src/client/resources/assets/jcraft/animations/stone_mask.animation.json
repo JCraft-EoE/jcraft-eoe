@@ -1,0 +1,67 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.stone_mask.clench": {
+			"loop": true,
+			"animation_length": 1,
+			"bones": {
+				"prongs_Left": {
+					"rotation": {
+						"0.0833": {
+							"vector": [0, 45, 0]
+						},
+						"0.3333": {
+							"vector": [0, -22.5, 0],
+							"easing": "easeOutBack"
+						}
+					},
+					"scale": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.3333": {
+							"vector": [1, 1, 1],
+							"easing": "easeOutBack"
+						}
+					}
+				},
+				"prongs_Right": {
+					"rotation": {
+						"0.0833": {
+							"vector": [0, -45, 0]
+						},
+						"0.3333": {
+							"vector": [0, 22.5, 0],
+							"easing": "easeOutBack"
+						}
+					},
+					"scale": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.3333": {
+							"vector": [1, 1, 1],
+							"easing": "easeOutBack"
+						}
+					}
+				}
+			}
+		},
+		"animation.stone_mask.dormant": {
+			"loop": true,
+			"animation_length": 1,
+			"bones": {
+				"prongs_Left": {
+					"scale": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"prongs_Right": {
+					"scale": {
+						"vector": [0, 0, 0]
+					}
+				}
+			}
+		}
+	}
+}

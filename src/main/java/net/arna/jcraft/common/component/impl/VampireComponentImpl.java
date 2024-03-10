@@ -3,9 +3,12 @@ package net.arna.jcraft.common.component.impl;
 import lombok.Getter;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.living.VampireComponent;
+import net.arna.jcraft.common.item.SunProtectionItem;
 import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.spec.SpecType;
 import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.registry.JObjectRegistry;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.HungerManager;
@@ -47,7 +50,7 @@ public class VampireComponentImpl implements VampireComponent {
 
         if (!isVampire) return;
 
-        if (world.isDay() && world.isSkyVisible(entity.getBlockPos()))
+        if (world.isDay() && !(entity.getEquippedStack(EquipmentSlot.HEAD).getItem() instanceof SunProtectionItem) && world.isSkyVisible(entity.getBlockPos()))
             entity.setOnFireFor(1);
 
         if (blood < 1 && --starveTick < 1) {

@@ -135,8 +135,7 @@ public abstract class LivingEntityMixin implements IDamageScaler {
         if (entity.getFirstPassenger() instanceof KingCrimsonEntity kingCrimson && kingCrimson.getTETime() > 0)
             cir.setReturnValue(false);
 
-        MiscComponent miscData = JComponents.getMiscData(livingEntity);
-        if (miscData.getSlavedTo() != null && miscData.getSlavedTo().equals(livingEntity.getUuid()))
+        if (JComponents.getMiscData(livingEntity).getMaster() == entity)
             cir.setReturnValue(false);
     }
 }

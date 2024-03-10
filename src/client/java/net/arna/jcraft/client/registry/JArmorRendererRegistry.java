@@ -1,7 +1,6 @@
 package net.arna.jcraft.client.registry;
 
-import net.arna.jcraft.client.renderer.armor.DIOArmorRenderer;
-import net.arna.jcraft.client.renderer.armor.JotaroArmorRenderer;
+import net.arna.jcraft.client.renderer.armor.*;
 import net.arna.jcraft.registry.JObjectRegistry;
 import software.bernie.geckolib3.renderers.geo.GeoArmorRenderer;
 
@@ -12,5 +11,11 @@ public interface JArmorRendererRegistry {
                 JObjectRegistry.DIOJACKET, JObjectRegistry.DIOPANTS, JObjectRegistry.DIOBOOTS);
         GeoArmorRenderer.registerArmorRenderer(new JotaroArmorRenderer(), JObjectRegistry.JOTAROCAP,
                 JObjectRegistry.JOTAROJACKET, JObjectRegistry.JOTAROPANTS, JObjectRegistry.JOTAROBOOTS);
+        GeoArmorRenderer.registerArmorRenderer(new KarsArmorRenderer(), JObjectRegistry.KARSHEADWRAP,
+                null, null, null);
+        GeoArmorRenderer.registerArmorRenderer(new StoneMaskRenderer(), JObjectRegistry.STONE_MASK,
+                null, null, null);
+        GeoArmorRenderer.registerArmorRenderer(new RedHatRenderer(), JObjectRegistry.RED_HAT,
+                null, null, null);
     }
 }
