@@ -52,19 +52,22 @@ public abstract class AbstractSpecGrabAttack<
     public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user, MoveContext ctx) {
         Set<LivingEntity> targets = super.perform(attacker, user, ctx);
         if (targets.isEmpty()) return targets;
-
-        attacker.setMove(hitMove, hitState);
-        attacker.setMoveStun(grabDuration);
-        attacker.setPlayerAnimation(hitState.getKey(attacker), grabDuration, 1f);
+        boolean anyHit = false;
 
         for (LivingEntity target : targets) {
             StandEntity<?, ?> stand = JUtils.getStand(target);
-            if (stand != null) stand.blocking = false;
+            if (stand != null && stand.blocking) continue;
+
+            anyHit = true;
             JUtils.cancelMoves(target);
-
             JComponents.getGrab(target).startGrab(attacker.getBaseEntity(), grabDuration, grabOffset);
-
             JUtils.setVelocity(target, 0, 0, 0);
+        }
+
+        if (anyHit) {
+            attacker.setMove(hitMove, hitState);
+            attacker.setMoveStun(grabDuration);
+            attacker.setPlayerAnimation(hitState.getKey(attacker), grabDuration, 1f);
         }
 
         return targets;

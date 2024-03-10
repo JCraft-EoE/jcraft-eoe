@@ -49,7 +49,7 @@ public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
             .withInfo(Text.literal("Wheel Kick"), Text.literal("fast launcher"));
 
     public static final SimpleMultiHitAttack<VampireSpec> COMBO = new SimpleMultiHitAttack<VampireSpec>(180,
-            21, 1f, 2.5f, 12, 1.5f, 0.2f, -0.1f, IntSet.of(5, 8, 11, 14, 18))
+            23, 1f, 2.5f, 12, 1.5f, 0.2f, -0.1f, IntSet.of(5, 8, 12, 16, 20))
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withBlockStun(5)
             .withInfo(Text.literal("Beatdown"), Text.literal("hits 5 times, combo starter/extender"));
