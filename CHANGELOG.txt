@@ -2469,6 +2469,33 @@ The World: Over Heaven
         >Significantly increased blockstun (-8->+8t)
         >Added slower crouching variant that bypasses block
 
+● 11/03/2024
+>Removed bends from player animations in order to let them function with Geckolib armor
+
+Brawler
+    >Reanimated everything
+    >Gut Punch is now Special 2
+    >Sweep is now Special 1
+        >cooldown reduced (4->1.5s)
+        >is now the crouching variant of Right Low Kick
+
+Anubis
+    >Reanimated everything
+    >No longer gains Bloodlust from blocked hits
+    >Sweep
+        >cooldown reduced (11->2s)
+        >no longer knocks down, instead launches up
+        >stun increased (+1->+7t on hit)
+
+Made in Heaven
+    >Updated animations
+    >(Original) Leg Crusher is now Low Kick
+        >Stun reduced (+20->+16t on hit)
+        >Damage reduced (7->6)
+        >Added crouching variant, (New) Leg Crusher that inflicts slowness on hit
+
+todo: vamp zombies dont remove from revivables
+
 The reason the easings dont work is because kosmx is fucking stupid,
 see: dev.kosmx.playerAnim.core.util.Easing
 

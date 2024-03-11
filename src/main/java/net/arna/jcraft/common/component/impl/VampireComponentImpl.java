@@ -44,7 +44,7 @@ public class VampireComponentImpl implements VampireComponent {
 
         if (player != null) {
             JSpec<?, ?> spec = JUtils.getSpec(player);
-            if (!spec.getType().equals(SpecType.VAMPIRE))
+            if (spec == null || !spec.getType().equals(SpecType.VAMPIRE))
                 setVampire(false);
         }
 
@@ -60,7 +60,7 @@ public class VampireComponentImpl implements VampireComponent {
         } else {
             // Regenerate
             float health = entity.getHealth();
-            if (health < entity.getMaxHealth() && blood >= 15 && --regenTick < 1) {
+            if (health < entity.getMaxHealth() && blood >= 17 && --regenTick < 1) {
                 player.heal(1);
 
                 // Every third heal takes away a blood unit

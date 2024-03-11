@@ -8,10 +8,7 @@ import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.anubis.Rekka3Attack;
-import net.arna.jcraft.common.attack.moves.shared.KnockdownAttack;
-import net.arna.jcraft.common.attack.moves.shared.KnockdownMultiHitAttack;
-import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
-import net.arna.jcraft.common.attack.moves.shared.SimpleMultiHitAttack;
+import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
@@ -49,7 +46,7 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
             .withAction(AnubisSpec::tryIncrementBloodlust)
             .withSound(JSoundRegistry.ANUBIS_REKKA2)
             .withImpactSound(JSoundRegistry.IMPACT_4)
-            .withInfo(Text.literal("Cleaving Strikes"), Text.literal("2 hits"));
+            .withInfo(Text.literal("Cleaving Strikes"), Text.literal("hits twice"));
     public static final KnockdownMultiHitAttack<AnubisSpec> REKKA_FINISHER = new KnockdownMultiHitAttack<AnubisSpec>(
             0, 40, 1f, 7f, 15, 2f, 0.9f, 0f,
             IntSet.of(32), 35)
@@ -60,9 +57,11 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
             .withAction(AnubisSpec::tryIncrementBloodlust)
             .withSound(JSoundRegistry.ANUBIS_REKKA3)
             .withImpactSound(JSoundRegistry.IMPACT_4)
-            .withInfo(Text.literal("Cleaving Strikes/Sweep"), Text.literal("3 hits, if 0 Bloodlust, last hit knocks down/sweeps while sheathed"));
-    public static final KnockdownAttack<AnubisSpec> SWEEP = new KnockdownAttack<AnubisSpec>(220, 10, 17,
-            1.5f, 7f, 9, 1.33f, 0.3f, 0f, 35)
+            .withInfo(Text.literal("Cleaving Strikes/Sweep"), Text.literal("""
+                    hits 3 times, last hit knocks down if on 0 Bloodlust
+                    if used while Sheathed, sweeps the opponent"""));
+    public static final UppercutAttack<AnubisSpec> SWEEP = new UppercutAttack<AnubisSpec>(40, 10, 17,
+            1.5f, 7f, 15, 1.33f, 0.3f, 0f, 0.4f)
             .withAction(AnubisSpec::resetLastHitTime)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withStaticY()
@@ -75,7 +74,16 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
 
     private static void tryIncrementBloodlust(IAttacker<?, ?> attacker, LivingEntity living, MoveContext moveContext, Set<LivingEntity> targets) {
         if (targets.isEmpty()) return;
-        if (living instanceof PlayerEntity playerEntity) {
+        boolean hit = true;
+
+        for (LivingEntity target : targets) {
+            if (JUtils.isBlocking(target)) {
+                hit = false;
+                break;
+            }
+        }
+
+        if (hit && living instanceof PlayerEntity playerEntity) {
             AnubisSpec anubisSpec = (AnubisSpec) JUtils.getSpec(playerEntity);
             anubisSpec.setTicksSinceLastHit(0);
             if (anubisSpec.attackSpeedMult < 2.0f) {

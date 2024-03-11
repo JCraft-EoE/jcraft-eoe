@@ -87,15 +87,26 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
             .withSound(JSoundRegistry.MIH_SPEEDSLICE)
             .withInfo(Text.literal("Speed Slice"), Text.literal("short windup, harming teleport with hitstun and light knockback"));
-    public static final SimpleAttack<MadeInHeavenEntity> LEG_CRUSHER = new SimpleAttack<MadeInHeavenEntity>(80,
-            8, 17, 0.85f, 7f, 30, 1.5f, 0.25f, 0.2f)
+    public static final EffectInflictingAttack<MadeInHeavenEntity> LEG_CRUSHER = new EffectInflictingAttack<MadeInHeavenEntity>(
+            80, 9, 19, 0.85f, 7f, 22, 1.5f, 0.35f, 0.2f,
+            List.of(new StatusEffectInstance(StatusEffects.SLOWNESS, 40, 0, true, false)) )
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
             .withSound(JSoundRegistry.MIH_LEGCRUSHER)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withExtraHitBox(0, -0.5, 1)
             .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withInfo(Text.literal("Leg Crusher"), Text.literal("combo starter/extender, mih hoofs the enemies legs in a quick, stunning attack"));
+            .withInfo(Text.literal("Leg Crusher"), Text.literal("inflicts Slowness I (2s)"));
+    public static final SimpleAttack<MadeInHeavenEntity> LOW_KICK = new SimpleAttack<MadeInHeavenEntity>(80,
+            8, 17, 0.85f, 6f, 26, 1.5f, 0.25f, 0.2f)
+            .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
+            .withCrouchingVariant(LEG_CRUSHER)
+            .withSound(JSoundRegistry.MIH_LEGCRUSHER)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withExtraHitBox(0, -0.5, 1)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withInfo(Text.literal("Low Kick"), Text.literal("combo starter/extender, mih hoofs the enemies legs in a quick, stunning attack"));
     public static final FuryChopAttack FURY_CHOP = new FuryChopAttack(200, 15, 24, 0.85f,
             7f, 20, 1.6f, 0.25f, 0.2f)
             .withSound(JSoundRegistry.MIH_FURYCHOP)
@@ -190,7 +201,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
         moves.register(MoveType.HEAVY, DONUT, State.DONUT);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 
-        moves.register(MoveType.SPECIAL1, LEG_CRUSHER, State.LEG_CRUSHER);
+        moves.register(MoveType.SPECIAL1, LOW_KICK, State.LOW_KICK).withCrouchingVariant(State.LEG_CRUSHER);
         moves.register(MoveType.SPECIAL2, FURY_CHOP, State.FURY_CHOP);
         moves.register(MoveType.SPECIAL3, JUDGEMENT, State.JUDGEMENT).withCrouchingVariant(State.CIRCLE_STARTUP);
         moves.register(MoveType.ULTIMATE, TIME_ACCELERATION, State.TIME_ACCELERATION);
@@ -370,7 +381,8 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
         TIME_ACCELERATION(builder -> builder.playAndHold("animation.mih.taccel")),
         CIRCLE_STARTUP(builder -> builder.playAndHold("animation.mih.circlestartup")),
         SPEED_CHOP(builder -> builder.playAndHold("animation.mih.speedchop")),
-        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.mih.light_followup"));
+        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.mih.light_followup")),
+        LOW_KICK(builder -> builder.playAndHold("animation.mih.lowkick"));
 
         private final Consumer<AnimationBuilder> animator;
 

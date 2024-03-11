@@ -1,20 +1,14 @@
 package net.arna.jcraft.common.entity.projectile;
 
 import net.arna.jcraft.common.component.living.HitPropertyComponent;
-import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -26,11 +20,10 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.arna.jcraft.common.entity.stand.StandEntity.damageLogic;
-
 public class LaserProjectile extends PersistentProjectileEntity implements IAnimatable {
     private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
-    private List<Entity> hit = new ArrayList<>();
+    private int lifetime = 60;
+    private final List<Entity> hit = new ArrayList<>();
 
     public LaserProjectile(EntityType<? extends LaserProjectile> entityType, World world) {
         super(entityType, world);
@@ -81,7 +74,8 @@ public class LaserProjectile extends PersistentProjectileEntity implements IAnim
                         vel.x / 2, vel.y / 2, vel.z / 2
                 );
             }
-        }
+        } else if (--lifetime < 1)
+            discard();
     }
 
     @Override

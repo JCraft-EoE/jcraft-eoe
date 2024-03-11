@@ -6,6 +6,8 @@ import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.moves.shared.KnockdownAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleMultiHitAttack;
+import net.arna.jcraft.common.attack.moves.shared.UppercutAttack;
+import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.SpecAnimationState;
@@ -14,9 +16,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 
 public class BrawlerSpec extends JSpec<BrawlerSpec, BrawlerSpec.State> {
-    public static final SimpleAttack<BrawlerSpec> HEAVY = new SimpleAttack<BrawlerSpec>(280, 10,
-            21, 1f, 6f, 15, 1.5f, 0.3f, 0f)
-            .withImpactSound(JSoundRegistry.IMPACT_2)
+    public static final UppercutAttack<BrawlerSpec> HEAVY = new UppercutAttack<BrawlerSpec>(280, 10,
+            21, 1f, 6f, 15, 1.5f, 0.3f, 0f, 0.3f)
+            .withImpactSound(JSoundRegistry.IMPACT_3)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withArmor(3)
             .withInfo(Text.literal("Uppercut"), Text.literal("uninterruptible, medium speed"));
@@ -27,14 +29,23 @@ public class BrawlerSpec extends JSpec<BrawlerSpec, BrawlerSpec.State> {
             .withInfo(Text.literal("Combo"), Text.literal("hits 3 times, combo starter/extender"));
     public static final SimpleAttack<BrawlerSpec> GUT = new SimpleAttack<BrawlerSpec>(120, 11, 18,
             1f, 6f, 16, 1.5f, 0.4f, 0f)
-            .withImpactSound(JSoundRegistry.IMPACT_2)
+            .withImpactSound(JSoundRegistry.IMPACT_3)
             .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
             .withInfo(Text.literal("Gut Punch"), Text.literal("good stun"));
-    public static final KnockdownAttack<BrawlerSpec> SWEEP = new KnockdownAttack<BrawlerSpec>(80, 11, 18,
-            1f, 5f, 16, 1.5f, 0.6f, 0.65f, 25)
+    public static final KnockdownAttack<BrawlerSpec> SWEEP = new KnockdownAttack<BrawlerSpec>(30, 11, 18,
+            1f, 5f, 16, 1.5f, 0.6f, 0.85f, 25)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withStaticY()
             .withInfo(Text.literal("SWEEP"), Text.literal("knocks down"));
+    public static final SimpleAttack<BrawlerSpec> LOW_KICK = new SimpleAttack<BrawlerSpec>(30, 6, 11,
+            1f, 4f, 10, 1.25f, 0.15f, 0.35f)
+            .withCrouchingVariant(SWEEP)
+            .withImpactSound(JSoundRegistry.IMPACT_6)
+            .withExtraHitBox(1)
+            .withStaticY()
+            .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
+            .withInfo(Text.literal("Right Low Kick"), Text.literal("fast jab"));
 
     public BrawlerSpec(PlayerEntity player) {
         super(SpecType.BRAWLER, player);
@@ -44,8 +55,8 @@ public class BrawlerSpec extends JSpec<BrawlerSpec, BrawlerSpec.State> {
     protected void registerMoves(MoveMap<BrawlerSpec, State> moves) {
         moves.register(MoveType.HEAVY, HEAVY, CooldownType.HEAVY, State.HEAVY);
         moves.register(MoveType.BARRAGE, COMBO, CooldownType.BARRAGE, State.COMBO);
-        moves.register(MoveType.SPECIAL1, GUT, CooldownType.SPECIAL1, State.GUT);
-        moves.register(MoveType.SPECIAL2, SWEEP, CooldownType.SPECIAL2, State.SWEEP);
+        moves.register(MoveType.SPECIAL1, LOW_KICK, CooldownType.SPECIAL1, State.LOW_KICK).withCrouchingVariant(State.SWEEP);
+        moves.register(MoveType.SPECIAL2, GUT, CooldownType.SPECIAL2, State.GUT);
     }
 
     @Override
@@ -57,7 +68,8 @@ public class BrawlerSpec extends JSpec<BrawlerSpec, BrawlerSpec.State> {
         HEAVY("br.upct"),
         COMBO("br.3hit"),
         GUT("br.gut"),
-        SWEEP("br.low");
+        SWEEP("br.low"),
+        LOW_KICK("br.lkk");
 
         private final String key;
 

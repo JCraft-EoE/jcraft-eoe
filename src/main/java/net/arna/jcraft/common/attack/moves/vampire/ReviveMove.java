@@ -47,6 +47,7 @@ public class ReviveMove<A extends IAttacker<? extends A, ?>> extends AbstractMov
                     if (user instanceof ServerPlayerEntity serverPlayer)
                         JComponents.getMiscData(living).setSlavedTo(serverPlayer.getUuid());
                     serverWorld.spawnEntity(entity);
+                    Revivables.removeRevivable(revivable);
                 }
         }
         return Set.of();

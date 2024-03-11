@@ -70,6 +70,7 @@ public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
             .withInfo(Text.literal("Blood Suck"), Text.literal("blockable grab"));
 
     public static final SpaceRipperAttack SPACE_RIPPER_ATTACK = new SpaceRipperAttack(300, 16, 25,1f)
+            .withSound(JSoundRegistry.VAMPIRE_LASER)
             .withInfo(Text.literal("Space Ripper Stingy Eyes"), Text.literal("unblockable laser beam"));
 
     public static final ReviveMove<VampireSpec> REVIVE_MOVE = new ReviveMove<VampireSpec>(300, 16, 20, 5)

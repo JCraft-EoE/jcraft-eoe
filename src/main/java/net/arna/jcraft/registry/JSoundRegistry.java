@@ -226,6 +226,9 @@ public interface JSoundRegistry {
     SoundEvent ANUBIS_REKKA2 = registerSound("anubisrekka2");
     SoundEvent ANUBIS_REKKA3 = registerSound("anubisrekka3"); //todo: 3 hit rekka sound for anubis
 
+    // Vampire
+    SoundEvent VAMPIRE_LASER = registerSound("vampirelaser");
+
     //// OTHER
     SoundEvent BULLET_RICOCHET = registerSound("bulletricochet");
     SoundEvent BULLET_PENETRATE = registerSound("bulletpenetrate");

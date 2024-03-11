@@ -27,7 +27,7 @@ import net.minecraft.world.event.GameEvent;
 import java.util.List;
 
 public class BloodBottleItem extends Item {
-    private static final int MAX_USE_TIME = 16;
+    private static final int MAX_USE_TIME = 24;
 
     public BloodBottleItem(Settings settings) {
         super(settings);
@@ -47,16 +47,16 @@ public class BloodBottleItem extends Item {
             VampireComponent vampireComponent = JComponents.getVampirism(playerEntity);
 
             if (vampireComponent.isVampire()) {
-                if (!world.isClient) {
-                    if (playerEntity instanceof ServerPlayerEntity)
-                        Criteria.CONSUME_ITEM.trigger((ServerPlayerEntity) playerEntity, stack);
-                    vampireComponent.setBlood(vampireComponent.getBlood() + 2);
-                }
-
                 if (playerEntity != null) {
                     playerEntity.incrementStat(Stats.USED.getOrCreateStat(this));
                     if (!playerEntity.getAbilities().creativeMode && vampireComponent.getBlood() < 20)
                         nbt.putFloat("Blood", --blood);
+                }
+
+                if (!world.isClient) {
+                    if (playerEntity instanceof ServerPlayerEntity)
+                        Criteria.CONSUME_ITEM.trigger((ServerPlayerEntity) playerEntity, stack);
+                    vampireComponent.setBlood(vampireComponent.getBlood() + 2);
                 }
 
                 user.emitGameEvent(GameEvent.DRINK);
@@ -81,19 +81,22 @@ public class BloodBottleItem extends Item {
 
     @Override
     public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
-        if (user.getItemCooldownManager().isCoolingDown(this))
+        if (user.getItemCooldownManager().isCoolingDown(this) || !JUtils.canAct(user))
             return ActionResult.PASS;
 
         float bloodMult = JUtils.getBloodMult(entity);
         if (bloodMult <= 0)
             return ActionResult.PASS;
 
-        user.getItemCooldownManager().set(this, 10);
+        user.getItemCooldownManager().set(this, 15);
 
         if (!user.getWorld().isClient()) {
             entity.damage(DamageSource.player(user), 2);
             NbtCompound nbtCompound = stack.getOrCreateNbt();
-            nbtCompound.putFloat("Blood", nbtCompound.getFloat("Blood") + bloodMult);
+            float newBlood = nbtCompound.getFloat("Blood") + bloodMult;
+            if (newBlood > 20f)
+                newBlood = 20f;
+            nbtCompound.putFloat("Blood", newBlood);
             user.setStackInHand(hand, stack);
         }
 

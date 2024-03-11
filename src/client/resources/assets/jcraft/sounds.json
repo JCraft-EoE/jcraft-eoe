@@ -1026,6 +1026,12 @@
     ]
   },
 
+  "vampirelaser": {
+    "sounds": [
+      "jcraft:specs/vampire/laser"
+    ]
+  },
+
   "bulletricochet": {
     "sounds": [
       "jcraft:projectiles/bullet/ricochet"
