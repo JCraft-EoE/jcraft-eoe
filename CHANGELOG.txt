@@ -2494,7 +2494,10 @@ Made in Heaven
         >Damage reduced (7->6)
         >Added crouching variant, (New) Leg Crusher that inflicts slowness on hit
 
-todo: vamp zombies dont remove from revivables
+todo: make the two sun protection items craftable
+      and add some item descriptions
+      then ill have to add stone masks to the loot tables
+      and make coffins
 
 The reason the easings dont work is because kosmx is fucking stupid,
 see: dev.kosmx.playerAnim.core.util.Easing
