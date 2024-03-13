@@ -10,7 +10,7 @@ import net.minecraft.entity.Entity;
 public interface IClientEntityHandler {
     void bombTrackerParticleTick(Entity entity, BombTrackerComponent.BombData bombData);
     void standEntityClientTick(StandEntity<?,?> stand);
-    void playerCloneEntityClientTick(PlayerCloneEntity entity);
+
     void whiteSnakeRemoteClientTick(WhiteSnakeEntity whiteSnakeEntity);
     void sheerHeartAttackEntityTick(SheerHeartAttackEntity sHAEntity);
 }

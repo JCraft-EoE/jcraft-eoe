@@ -203,6 +203,9 @@
 							"vector": [0, 0, 20],
 							"easing": "easeInOutSine"
 						}
+					},
+					"position": {
+						"vector": [0, 0, 0]
 					}
 				},
 				"leftLeg": {
@@ -222,6 +225,9 @@
 							"vector": [0, 0, -17.5],
 							"easing": "easeInOutSine"
 						}
+					},
+					"position": {
+						"vector": [0, 0, 0]
 					}
 				}
 			}

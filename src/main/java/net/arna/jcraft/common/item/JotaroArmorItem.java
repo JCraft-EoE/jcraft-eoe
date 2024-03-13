@@ -20,19 +20,17 @@ public class JotaroArmorItem extends ArmorItem implements IAnimatable {
         super(materialIn, slot, builder);
     }
 
-    // Predicate runs every frame
     private <P extends IAnimatable> PlayState predicate(AnimationEvent<P> event) {
         LivingEntity livingEntity = event.getExtraDataOfType(LivingEntity.class).get(0);
-        event.getController().setAnimation(new AnimationBuilder().loop("animation.jotarooutfit.moving"));
-        return livingEntity.getVelocity().horizontalLengthSquared() > 0.01 ? PlayState.CONTINUE : PlayState.STOP;
+        event.getController().setAnimation(new AnimationBuilder().loop(
+                livingEntity.getVelocity().horizontalLengthSquared() > 0.01 ? "animation.jotarooutfit.moving" : "animation.jotarooutfit.idle"));
+        return PlayState.CONTINUE;
     }
 
-    // All you need to do here is add your animation controllers to the
-    // AnimationData
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     public void registerControllers(AnimationData data) {
-        data.addAnimationController(new AnimationController(this, "controller", 20, this::predicate));
+        data.addAnimationController(new AnimationController(this, "controller", 10, this::predicate));
     }
 
     @Override

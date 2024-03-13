@@ -42,7 +42,7 @@ public class BrawlerSpec extends JSpec<BrawlerSpec, BrawlerSpec.State> {
             1f, 4f, 10, 1.25f, 0.15f, 0.35f)
             .withCrouchingVariant(SWEEP)
             .withImpactSound(JSoundRegistry.IMPACT_6)
-            .withExtraHitBox(1)
+            .withExtraHitBox(0.25, 0, 1)
             .withStaticY()
             .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
             .withInfo(Text.literal("Right Low Kick"), Text.literal("fast jab"));

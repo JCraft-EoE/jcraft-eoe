@@ -31,6 +31,7 @@
     "ServerWorldMixin",
     "TimestopBlockEntityMixin",
     "TimestopBlockMixin",
+    "VillagerEntityMixin",
     "WorldMixin"
   ],
   "injectors": {

@@ -2494,9 +2494,15 @@ Made in Heaven
         >Damage reduced (7->6)
         >Added crouching variant, (New) Leg Crusher that inflicts slowness on hit
 
-todo: make the two sun protection items craftable
-      and add some item descriptions
-      then ill have to add stone masks to the loot tables
+● 13/03/2024
+>Added crafting recipes for Vampire items
+>Added tooltips to Blood Bottle and Cinderella's Mask
+>Blood Bottle can now be used even with 0.5 blood units inside
+>Removed ability to hit enemies without a weapon while your stand is out
+>Added Coffins
+>Updated Jotaro Armor
+
+todo: then ill have to add stone masks to the loot tables
       and make coffins
 
 The reason the easings dont work is because kosmx is fucking stupid,

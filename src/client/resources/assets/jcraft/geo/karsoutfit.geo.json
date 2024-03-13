@@ -3,7 +3,7 @@
 	"minecraft:geometry": [
 		{
 			"description": {
-				"identifier": "geometry.diooutfit",
+				"identifier": "geometry.karsoutfit",
 				"texture_width": 64,
 				"texture_height": 64,
 				"visible_bounds_width": 3,
@@ -15,7 +15,7 @@
 					"name": "helmet",
 					"pivot": [0, 24, 0],
 					"cubes": [
-						{"origin": [-4, 24, -4], "size": [8, 8, 8], "inflate": 0.251, "uv": [0, 0]},
+						{"origin": [-4, 24, -4], "size": [8, 8, 8], "inflate": 0.501, "uv": [0, 0]},
 						{"origin": [1, 30, -5], "size": [2, 2, 1], "uv": [1, 1]}
 					]
 				},

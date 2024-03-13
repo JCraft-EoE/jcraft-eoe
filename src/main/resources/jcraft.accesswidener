@@ -19,3 +19,5 @@ accessible class net/minecraft/client/render/WorldRenderer$ChunkInfo
 accessible class net/minecraft/client/render/WorldRenderer$ChunkInfoList
 
 accessible field net/minecraft/block/entity/AbstractFurnaceBlockEntity burnTime I
+
+accessible field net/minecraft/server/world/ServerWorld sleepManager Lnet/minecraft/server/world/SleepManager;

@@ -41,6 +41,7 @@
 
   "itemGroup.jcraft.main": "JCraft Items",
 
+  "block.jcraft.coffin": "Coffin",
   "block.jcraft.soul_block": "Block of Suffering",
   "block.jcraft.meteorite_block": "Meteorite Block",
   "block.jcraft.foolish_sand_block": "Foolish Sand",
@@ -165,6 +166,11 @@
   "jcraft.boxinggloves.desc": "§eBrawler §9spec obtainment item",
 
   "jcraft.stonemask.desc": "§eVampirism §9spec obtainment item",
+
+  "jcraft.blood_bottle.units": "Blood units: ",
+
+  "jcraft.cinderella_mask.enchdesc": "Needs an §9enchantment§r.",
+  "jcraft.cinderella_mask.usedesc": "Use with a full Stand Disc in a Smithing table to get a skin.",
 
   "jcraft.sunprotection.desc": "Protects from the Sun.",
 

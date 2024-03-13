@@ -29,6 +29,8 @@ public class VampireComponentImpl implements VampireComponent {
     private byte healCount = 0;
     private int regenTick = 0, starveTick = 0;
 
+    public static final int MIN_REGEN_BLOOD = 16; // 75%
+
     public VampireComponentImpl(LivingEntity entity) {
         this.entity = entity;
         if (entity instanceof PlayerEntity playerEntity) {
@@ -60,7 +62,7 @@ public class VampireComponentImpl implements VampireComponent {
         } else {
             // Regenerate
             float health = entity.getHealth();
-            if (health < entity.getMaxHealth() && blood >= 17 && --regenTick < 1) {
+            if (health < entity.getMaxHealth() && blood >= MIN_REGEN_BLOOD && --regenTick < 1) {
                 player.heal(1);
 
                 // Every third heal takes away a blood unit

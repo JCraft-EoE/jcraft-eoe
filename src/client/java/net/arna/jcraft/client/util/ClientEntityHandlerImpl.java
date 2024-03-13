@@ -147,9 +147,6 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
     }
 
     @Override
-    public void playerCloneEntityClientTick(PlayerCloneEntity entity) { }
-
-    @Override
     public void whiteSnakeRemoteClientTick(@NotNull WhiteSnakeEntity whiteSnakeEntity) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (JUtils.getStand(client.player) != whiteSnakeEntity) return;

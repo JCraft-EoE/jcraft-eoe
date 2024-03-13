@@ -51,7 +51,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             List.of(new StatusEffectInstance(StatusEffects.SLOWNESS, 40, 1)))
             .withAnim(State.BITE)
             .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
-            .withImpactSound(SoundEvents.ENTITY_EVOKER_FANGS_ATTACK)
+            .withSound(SoundEvents.ENTITY_EVOKER_FANGS_ATTACK)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Bite"), Text.literal("applies Slowness II (2s) on hit"));
     public static final SimpleAttack<CreamEntity> LIGHT_FOLLOWUP = new SimpleAttack<CreamEntity>(

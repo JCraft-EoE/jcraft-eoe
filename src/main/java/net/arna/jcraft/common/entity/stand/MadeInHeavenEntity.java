@@ -291,8 +291,8 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
 
     @Override
     public void desummon() {
-        if (getAccelTime() > 0)
-            TimeAccelStatePacket.sendStop(Objects.requireNonNull(getServer()).getPlayerManager(), this);
+        if (!world.isClient() && getAccelTime() > 0)
+            TimeAccelStatePacket.sendStop(getServer().getPlayerManager(), this);
         super.desummon();
     }
 

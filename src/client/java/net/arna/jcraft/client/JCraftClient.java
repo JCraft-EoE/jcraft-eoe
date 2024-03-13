@@ -13,6 +13,7 @@ import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
 import net.arna.jcraft.client.net.ClientPacketHandler;
 import net.arna.jcraft.client.particle.*;
 import net.arna.jcraft.client.registry.*;
+import net.arna.jcraft.client.renderer.block.CoffinTileRenderer;
 import net.arna.jcraft.client.renderer.block.ShaderTestBlockEntityRenderer;
 import net.arna.jcraft.client.renderer.effects.*;
 import net.arna.jcraft.client.renderer.item.BigItemRenderer;
@@ -28,10 +29,7 @@ import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.network.c2s.PlayerInputPacket;
 import net.arna.jcraft.common.network.c2s.StandBlockPacket;
 import net.arna.jcraft.common.util.*;
-import net.arna.jcraft.registry.JBlockEntityTypeRegistry;
-import net.arna.jcraft.registry.JObjectRegistry;
-import net.arna.jcraft.registry.JPacketRegistry;
-import net.arna.jcraft.registry.JParticleTypeRegistry;
+import net.arna.jcraft.registry.*;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
@@ -145,11 +143,11 @@ public class JCraftClient implements ClientModInitializer {
         particleFactoryRegistry.register(JParticleTypeRegistry.AURA_BLOB, AuraBlobParticle.Factory::new);
         particleFactoryRegistry.register(JParticleTypeRegistry.INVERSION, InversionParticle.Factory::new);
 
-
         // Renderer registration
         JEntityRendererRegister.registerEntityRenderers();
         JArmorRendererRegistry.registerArmorRenderers();
         BlockEntityRendererFactories.register(JBlockEntityTypeRegistry.SHADER_TEST_BLOCK_ENTITY, ShaderTestBlockEntityRenderer::new);
+        BlockEntityRendererFactories.register(JBlockEntityTypeRegistry.COFFIN_TILE, CoffinTileRenderer::new);
 
         // This HAS to be registered before TrackingKeyBinding is initialized.
         ClientTickEvents.END_CLIENT_TICK.register(this::tickClient);

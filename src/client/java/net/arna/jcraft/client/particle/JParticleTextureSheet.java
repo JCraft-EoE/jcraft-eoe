@@ -17,7 +17,7 @@ import java.util.List;
 @SuppressWarnings("deprecation") // Minecraft uses it too
 @Environment(EnvType.CLIENT)
 public class JParticleTextureSheet {
-    public static ParticleTextureSheet PARTICLE_SHEET_AURA = new ParticleTextureSheet() {
+    public static final ParticleTextureSheet PARTICLE_SHEET_AURA = new ParticleTextureSheet() {
         public void begin(BufferBuilder builder, TextureManager textureManager) {
             RenderSystem.setShaderTexture(0, SpriteAtlasTexture.PARTICLE_ATLAS_TEXTURE);
 
@@ -37,7 +37,7 @@ public class JParticleTextureSheet {
         }
     };
 
-    public static ParticleTextureSheet INVERSION_SHEET = new ParticleTextureSheet() {
+    public static final ParticleTextureSheet INVERSION_SHEET = new ParticleTextureSheet() {
         public void begin(BufferBuilder builder, TextureManager textureManager) {
             // Doesn't seem to work by using a blend function, so we'll use a shader instead.
             // Think that is because of the render order, but I'm not sure.

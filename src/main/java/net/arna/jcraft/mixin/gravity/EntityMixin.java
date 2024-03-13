@@ -402,6 +402,7 @@ public abstract class EntityMixin {
         cir.setReturnValue(RotationUtil.vecWorldToPlayer(cir.getReturnValue(), gravityDirection));
     }
 
+    @SuppressWarnings("ParameterCanBeLocal")
     @Inject(
             method = "adjustMovementForCollisions(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Lnet/minecraft/world/World;Ljava/util/List;)Lnet/minecraft/util/math/Vec3d;",
             at = @At("RETURN"),
@@ -692,6 +693,7 @@ public abstract class EntityMixin {
     }
 
 
+    @SuppressWarnings("ParameterCanBeLocal")
     @ModifyVariable(
             method = "updateSubmergedInWaterState",
             at = @At(
@@ -704,6 +706,7 @@ public abstract class EntityMixin {
         return d;
     }
 
+    @SuppressWarnings("ParameterCanBeLocal")
     @ModifyVariable(
             method = "updateSubmergedInWaterState",
             at = @At(

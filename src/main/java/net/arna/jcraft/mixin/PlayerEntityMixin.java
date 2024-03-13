@@ -10,6 +10,7 @@ import net.arna.jcraft.common.util.IComboCounter;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
@@ -17,6 +18,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stat;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -28,7 +30,9 @@ public abstract class PlayerEntityMixin implements IComboCounter {
     public abstract void increaseStat(Stat<?> stat, int amount);
 
     // Combo tracking
+    @Unique
     private int comboCount = 1;
+    @Unique
     private LivingEntity lastAttacked;
 
     @Override
@@ -89,9 +93,13 @@ public abstract class PlayerEntityMixin implements IComboCounter {
     // Can't M1 in TS or during spec moves, LivingEntity does not override this
     @Inject(cancellable = true, method = "attack", at = @At("HEAD"))
     public void jcraft$attack(Entity target, CallbackInfo info) {
-        if (JUtils.isAffectedByTimeStop((PlayerEntity) (Object) this)) info.cancel();
+        PlayerEntity player = (PlayerEntity) (Object) this;
+        if (JUtils.isAffectedByTimeStop(player)) info.cancel();
 
-        JSpec<?, ?> spec = JComponents.getSpecData((PlayerEntity) (Object) this).getSpec();
+        // Can't M1 without a weapon while stand ON
+        if (JUtils.getStand(player) != null && player.getMainHandStack().getAttributeModifiers(EquipmentSlot.MAINHAND).isEmpty()) info.cancel();
+
+        JSpec<?, ?> spec = JComponents.getSpecData(player).getSpec();
         if (spec != null && spec.moveStun > 0) info.cancel();
     }
 
@@ -107,7 +115,7 @@ public abstract class PlayerEntityMixin implements IComboCounter {
 
             //noinspection unchecked,rawtypes // Generic types can be annoying sometimes. This is fine.
             ((AbstractCounterAttack) attack).counter(stand, source.getAttacker(), source);
-//            stand.counter(source.getAttacker(), source); // Initiate counter
+            //stand.counter(source.getAttacker(), source); // Initiate counter
             player.removeStatusEffect(JStatusRegistry.DAZED);
             info.cancel();
         }

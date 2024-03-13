@@ -1,17 +1,20 @@
 package net.arna.jcraft.registry;
 
+import net.arna.jcraft.common.block.CoffinBlock;
 import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.component.living.VampireComponent;
 import net.arna.jcraft.common.config.ConfigOption;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.events.JServerEvents;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.network.c2s.ConfigUpdatePacket;
-import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.tickable.Revivables;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
+import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -19,16 +22,21 @@ import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.GameRules;
+
+import static net.arna.jcraft.registry.JObjectRegistry.COFFIN_BLOCK;
 
 public interface JEventsRegistry {
     static void registerEvents() {
@@ -49,8 +57,6 @@ public interface JEventsRegistry {
 
                         if (source.isExplosive()) {
                             toLaunch = true;
-                            if (amount > 6.0f)
-                                amount = 6.0f;
                         }
 
                         if (toLaunch) {
@@ -89,8 +95,12 @@ public interface JEventsRegistry {
 
                 boolean killVampirism = JServerConfig.KILL_VAMPIRISM.getValue();
                 if (killer instanceof ServerPlayerEntity serverPlayer) {
-                    if (killVampirism)
+                    if (killVampirism) {
                         serverPlayer.getHungerManager().add(20, 20f);
+                        VampireComponent vampireComponent = JComponents.getVampirism(serverPlayer);
+                        if (vampireComponent.isVampire())
+                            vampireComponent.setBlood(20.0f);
+                    }
                 }
                 if (killVampirism)
                     killer.setHealth(killer.getMaxHealth());
@@ -100,6 +110,50 @@ public interface JEventsRegistry {
         });
 
         ServerTickEvents.END_SERVER_TICK.register(JServerEvents::serverTick);
+
+        
+
+        EntitySleepEvents.ALLOW_SLEEP_TIME.register(
+                (player, sleepingPos, vanillaResult) -> {
+                    if (player.getWorld() instanceof ServerWorld serverWorld)
+                        if (serverWorld.getBlockState(sleepingPos).isOf(COFFIN_BLOCK))
+                            return serverWorld.isDay() ? ActionResult.SUCCESS : ActionResult.FAIL;
+                    return ActionResult.PASS;
+                }
+        );
+
+        EntitySleepEvents.ALLOW_BED.register(
+                (entity, sleepingPos, state, vanillaResult) -> {
+                    if (state.isOf(COFFIN_BLOCK))
+                        if (entity instanceof ServerPlayerEntity serverPlayer)
+                            return serverPlayer.canResetTimeBySleeping() ? ActionResult.FAIL : ActionResult.SUCCESS;
+                    return ActionResult.PASS;
+                }
+        );
+
+        EntitySleepEvents.MODIFY_SLEEPING_DIRECTION.register(
+                (entity, sleepingPos, sleepingDirection) -> {
+                    BlockState state = entity.getWorld().getBlockState(sleepingPos);
+                    if (state.isOf(COFFIN_BLOCK))
+                        return state.get(CoffinBlock.FACING);
+                    return sleepingDirection;
+                }
+        );
+
+        EntitySleepEvents.STOP_SLEEPING.register(
+                (entity, sleepingPos) -> {
+                    if (entity instanceof ServerPlayerEntity serverPlayer && serverPlayer.canResetTimeBySleeping()) {
+                        ServerWorld serverWorld = serverPlayer.getWorld();
+                        BlockState state = serverWorld.getBlockState(sleepingPos);
+                        if (state.isOf(COFFIN_BLOCK)) {
+                            if (serverWorld.sleepManager.canSkipNight(serverWorld.getGameRules().getInt(GameRules.PLAYERS_SLEEPING_PERCENTAGE))
+                                    && serverWorld.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE))
+                                serverWorld.setTimeOfDay(13000);
+                            serverWorld.setBlockState(sleepingPos, state.with(CoffinBlock.OCCUPIED, false));
+                        }
+                    }
+                }
+        );
 
         // Disable item/block usage while stunned
         UseItemCallback.EVENT.register((player, world, hand) -> {

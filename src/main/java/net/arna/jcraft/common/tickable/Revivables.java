@@ -38,7 +38,7 @@ public class Revivables {
     }
 
     public static void removeRevivable(ReviveData reviveData) {
-        revivables.add(reviveData);
+        revivables.remove(reviveData);
     }
 
     public static void revive(@NonNull MinecraftServer server, @NonNull ReviveData revivable) {

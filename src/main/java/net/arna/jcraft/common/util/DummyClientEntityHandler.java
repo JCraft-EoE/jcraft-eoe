@@ -14,9 +14,6 @@ public class DummyClientEntityHandler implements IClientEntityHandler {
     private DummyClientEntityHandler() {}
 
     @Override
-    public void playerCloneEntityClientTick(PlayerCloneEntity entity) {}
-
-    @Override
     public void whiteSnakeRemoteClientTick(WhiteSnakeEntity whiteSnakeEntity) {}
 
     @Override

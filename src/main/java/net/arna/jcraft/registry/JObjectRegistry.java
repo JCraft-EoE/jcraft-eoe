@@ -1,6 +1,7 @@
 package net.arna.jcraft.registry;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.block.CoffinBlock;
 import net.arna.jcraft.common.block.FoolishSandBlock;
 import net.arna.jcraft.common.block.ShaderTestBlock;
 import net.arna.jcraft.common.block.SoulBlock;
@@ -107,6 +108,7 @@ public interface JObjectRegistry {
             .strength(6.0f, 1200f)
             .sounds(BlockSoundGroup.ANCIENT_DEBRIS)
     ), settings(), true);
+    Block COFFIN_BLOCK = register("coffin", new CoffinBlock(FabricBlockSettings.of(Material.WOOD, MapColor.RED).sounds(BlockSoundGroup.WOOD).nonOpaque()), settings(), true);
     Block SHADER_TEST_BLOCK = register("shader_test_block", new ShaderTestBlock(FabricBlockSettings.of(Material.METAL)), settings(), true);
 
     static Item.Settings settings() {
