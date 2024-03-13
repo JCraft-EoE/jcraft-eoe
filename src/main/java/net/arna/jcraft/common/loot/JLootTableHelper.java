@@ -61,5 +61,9 @@ public class JLootTableHelper {
                                 // P(0) = 56.25%; P(1) = 37.5%; P(2) = 6.25%
                                 .enchantment(CinderellasKissEnchantment.INSTANCE, BinomialLootNumberProvider.create(2, 0.25f))))
                 .conditionally(RandomChanceLootCondition.builder(0.08f)));
+
+        builder.pool(LootPool.builder()
+                .with(ItemEntry.builder(JObjectRegistry.STONE_MASK))
+                .conditionally(RandomChanceLootCondition.builder(0.04f)));
     }
 }
