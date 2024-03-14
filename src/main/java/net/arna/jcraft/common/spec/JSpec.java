@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.spec;
 
+import com.google.common.base.MoreObjects;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.Getter;
 import lombok.Setter;
@@ -110,6 +111,13 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
 
     public boolean initMove(MoveType type) {
         return handleMove(type);
+    }
+
+    public boolean canHoldMove(MoveInputType type) {
+        if (type.getMoveType() == null) return false;
+
+        MoveMap.Entry<A, S> entry = moveMap.getFirstValidEntry(type.getMoveType(), getThis());
+        return entry == null ? type.isHoldable() : MoreObjects.firstNonNull(entry.getMove().getIsHoldable(), type.isHoldable());
     }
 
     public boolean canAttack() {

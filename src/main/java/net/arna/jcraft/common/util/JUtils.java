@@ -2,6 +2,7 @@ package net.arna.jcraft.common.util;
 
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.attack.core.MoveInputType;
 import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.StandEntity;
@@ -491,5 +492,13 @@ public final class JUtils {
             return uniqueBloodMults.get(type);
 
         return 0;
+    }
+
+    public static boolean canHoldMove(ServerPlayerEntity player, MoveInputType type) {
+        StandEntity<?, ?> stand = JUtils.getStand(player);
+        JSpec<?, ?> spec;
+        return stand != null && stand.canHoldMove(type) ||
+                (spec = JUtils.getSpec(player)) != null && spec.canHoldMove(type) ||
+                type.isHoldable();
     }
 }

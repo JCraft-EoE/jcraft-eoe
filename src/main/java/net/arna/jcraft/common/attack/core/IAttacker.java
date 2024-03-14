@@ -36,6 +36,10 @@ public interface IAttacker<A extends IAttacker<? extends A, S>, S> {
 
     DamageSource getDamageSource();
 
+    boolean initMove(MoveType type);
+
+    boolean canHoldMove(MoveInputType type);
+
     boolean canAttack();
 
     void cancelMove();

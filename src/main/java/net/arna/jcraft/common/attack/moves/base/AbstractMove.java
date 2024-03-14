@@ -50,6 +50,8 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     private int armor;
     private IntObjectPair<AbstractMove<?, ? super A>> finisher;
     protected MobilityType mobilityType;
+    @Getter
+    private Boolean isHoldable;
     // Used to help AI know how and when to use this attack.
     protected boolean ranged, barrage, multiHit, charge, counter, dash, grab;
     private boolean copiedExtras; // See #testCopy()
@@ -257,6 +259,25 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      */
     public T withMobilityType(MobilityType mobilityType) {
         this.mobilityType = mobilityType;
+        return getThis();
+    }
+
+    /**
+     * Sets this move to be holdable.
+     * @see #withHoldable(Boolean)
+     * @return This move
+     */
+    public T withHoldable() {
+        return withHoldable(true);
+    }
+
+    /**
+     * Sets whether this move can be held.
+     * @param holdable Whether this move can be held. {@code null} for default behavior (dependent on the move-type).
+     * @return This move
+     */
+    public T withHoldable(Boolean holdable) {
+        this.isHoldable = holdable;
         return getThis();
     }
 
@@ -474,6 +495,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         cast.isAerialVariant = isAerialVariant;
         cast.isFollowup = isFollowup;
         cast.armor = armor;
+        cast.isHoldable = isHoldable;
         cast.finisher = finisher == null ? null : IntObjectPair.of(finisher.leftInt(), finisher.right().copy());
         cast.mobilityType = mobilityType;
         cast.originalMove = originalMove; // Set the original move to this move

@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.entity.stand;
 
+import com.google.common.base.MoreObjects;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -689,6 +690,13 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      */
     public boolean initMove(MoveType type) {
         return handleMove(type);
+    }
+
+    public boolean canHoldMove(MoveInputType type) {
+        if (type.getMoveType() == null) return false;
+
+        MoveMap.Entry<E, S> entry = moveMap.getFirstValidEntry(type.getMoveType(), getThis());
+        return entry == null ? type.isHoldable() : MoreObjects.firstNonNull(entry.getMove().getIsHoldable(), type.isHoldable());
     }
 
     /**

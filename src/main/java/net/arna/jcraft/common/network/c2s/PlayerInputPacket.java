@@ -25,6 +25,7 @@ import net.minecraft.server.world.ServerWorld;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import static net.arna.jcraft.JCraft.*;
 
@@ -37,7 +38,10 @@ public class PlayerInputPacket {
                 InputStateManager sm = getInputStateManager(player);
 
                 // Handle held inputs
-                sm.heldInputs.forEach(type -> handleMoveInput(server, player, type));
+                sm.heldInputs = sm.heldInputs.stream()
+                        .filter(type -> JUtils.canHoldMove(player, type))
+                        .peek(type -> handleMoveInput(server, player, type))
+                        .collect(Collectors.toCollection(HashSet::new)); // To ensure it is a mutable set.
 
                 int forward = sm.calcForward();
                 int side = sm.calcSide();
@@ -112,7 +116,7 @@ public class PlayerInputPacket {
             MoveInputType type = buf.readEnumConstant(MoveInputType.class);
             boolean pressed = buf.readBoolean();
 
-            if (type.isHoldable()) {
+            if (JUtils.canHoldMove(player, type)) {
                 if (pressed) sm.heldInputs.add(type);
                 else sm.heldInputs.remove(type);
             }
