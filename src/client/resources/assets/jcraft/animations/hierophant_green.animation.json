@@ -2598,7 +2598,7 @@
 		},
 		"animation.hg.net_place": {
 			"loop": "hold_on_last_frame",
-			"animation_length": 0.75,
+			"animation_length": 1,
 			"bones": {
 				"torso": {
 					"rotation": {

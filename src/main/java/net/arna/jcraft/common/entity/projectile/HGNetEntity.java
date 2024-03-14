@@ -1,5 +1,9 @@
 package net.arna.jcraft.common.entity.projectile;
 
+import net.arna.jcraft.common.component.living.HitPropertyComponent;
+import net.arna.jcraft.common.entity.stand.StandEntity;
+import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -9,11 +13,13 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.particle.ParticleTypes;
+import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.IAnimatable;
@@ -28,7 +34,16 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 
 public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimationTickable {
     public static final TrackedData<Integer> STATE;
-    private int animTimer = 5;
+    public static final TrackedData<Boolean> CHARGED;
+
+    private int animTimer = 0;
+    private Vec3d target;
+
+    private int lifeTime = 30 * 20;
+
+    private static final int FIRE_COOLDOWN = 10 * 20;
+    private static final int CONSTRICT_COOLDOWN = 10 * 20;
+    private int fireCooldown = 0, constrictCooldown = 0;
 
     public HGNetEntity(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);
@@ -36,32 +51,98 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
 
     static {
         STATE = DataTracker.registerData(HGNetEntity.class, TrackedDataHandlerRegistry.INTEGER);
+        CHARGED = DataTracker.registerData(HGNetEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     }
 
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
         dataTracker.startTracking(STATE, 0);
+        dataTracker.startTracking(CHARGED, true);
+    }
+
+    public boolean isCharged() {
+        return dataTracker.get(CHARGED);
+    }
+
+    public void setCharged(boolean charged) {
+        if (isCharged() != charged)
+            dataTracker.set(CHARGED, charged);
     }
 
     public int getState() {
         return dataTracker.get(STATE);
     }
 
+    public void setState(int state) {
+        if (getState() != state)
+            dataTracker.set(STATE, state);
+    }
+
+    public void tryFireAt(Vec3d target) {
+        if (isCharged()) {
+            animTimer = 25;
+            this.target = target;
+            fireCooldown = FIRE_COOLDOWN;
+            setCharged(false);
+        }
+    }
+
     @Override
     public void tick() {
         super.tick();
-        if (master == null) kill();
 
-        if (world.isClient) {
-            world.addParticle(
-                    ParticleTypes.FLAME,
-                    this.getX() + random.nextFloat() - 0.5f,
-                    this.getY() + random.nextFloat() - 0.5f,
-                    this.getZ() + random.nextFloat() - 0.5f,
-                    0.0, 0.0, 0.0);
-        } else {
+        if (!world.isClient) {
+            if (--lifeTime <= 0 || master == null)
+                discard();
 
+            Vec3d upVec = GravityChangerAPI.getEyeOffset(this);
+
+            if (age == 1) {
+                JUtils.displayHitbox(world, getBoundingBox());
+                world.getEntitiesByClass(LivingEntity.class, getBoundingBox(),
+                        EntityPredicates.VALID_LIVING_ENTITY.and(EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR)).forEach(
+                        living -> {
+                            if (!living.isConnectedThroughVehicle(master))
+                                StandEntity.damageLogic(
+                                        world, living, upVec, 15, 3, false, 5f, true, 10,
+                                        DamageSource.mob(this), this, HitPropertyComponent.HitAnimation.HIGH
+                                );
+                        }
+                );
+            }
+
+            if (getState() == 2) {
+                if (animTimer == 0) {
+                    JUtils.displayHitbox(world, getBoundingBox());
+                    world.getEntitiesByClass(LivingEntity.class, getBoundingBox(),
+                            EntityPredicates.VALID_LIVING_ENTITY.and(EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR)).forEach(
+                            living -> {
+                                if (!JUtils.isBlocking(living) && !living.isConnectedThroughVehicle(master))
+                                    StandEntity.stun(living, 17, 0);
+                            }
+                    );
+                } else if (animTimer <= -16)
+                    setState(0);
+            } else {
+                if (animTimer > 0 && animTimer % 8 == 0)
+                    for (int i = 0; i < 3; i++) {
+                        EmeraldProjectile emerald = new EmeraldProjectile(world, getMaster());
+
+                        Vec3d heightOffset = upVec.multiply(0.8);
+                        Vec3d emeraldPos = getPos().add(heightOffset).add(JUtils.randUnitVec(getRandom()));
+                        emerald.setPosition(emeraldPos);
+
+                        emerald.setVelocity(target.subtract(emeraldPos).normalize().multiply(1.5));
+
+                        world.spawnEntity(emerald);
+                    }
+            }
+
+            if (--fireCooldown < 0)
+                setCharged(true);
+            constrictCooldown--;
+            animTimer--;
         }
     }
 
@@ -73,25 +154,63 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
         return true;
     }
 
+    @Override
+    public boolean damage(DamageSource source, float amount) {
+        if (source == DamageSource.IN_WALL)
+            return false;
+        return super.damage(source, amount);
+    }
+
+    @Override
+    public void pushAwayFrom(Entity entity) {
+        // Constriction check
+        if (entity == null || master == null || entity.isConnectedThroughVehicle(master)) return;
+        if (entity instanceof JAttackEntity attackEntity && attackEntity.getMaster() == master) return;
+
+        if (getState() != 2 && constrictCooldown <= 0) {
+            setState(2);
+            constrictCooldown = CONSTRICT_COOLDOWN;
+            animTimer = 6;
+        }
+    }
+
+    @Override
+    public void pushAway(Entity entity) {
+        // Constriction check
+        if (entity == null || master == null || entity.isConnectedThroughVehicle(master)) return;
+        if (entity instanceof JAttackEntity attackEntity && attackEntity.getMaster() == master) return;
+
+        if (getState() != 2 && constrictCooldown <= 0) {
+            setState(2);
+            constrictCooldown = CONSTRICT_COOLDOWN;
+            animTimer = 6;
+        }
+    }
+
     @Nullable
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
-        return SoundEvents.BLOCK_LAVA_EXTINGUISH;
+        return SoundEvents.ENTITY_SLIME_HURT;
     }
 
     @Nullable
     @Override
     protected SoundEvent getDeathSound() {
-        return SoundEvents.BLOCK_LAVA_EXTINGUISH;
+        return SoundEvents.BLOCK_CHORUS_FLOWER_DEATH;
     }
 
     @Override
     public boolean hasNoGravity() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean startRiding(Entity entity, boolean force) {
+        return false;
+    }
+
+    @Override
+    public boolean addStatusEffect(StatusEffectInstance effect, @Nullable Entity source) {
         return false;
     }
 
@@ -107,6 +226,8 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
     @Override
     public void writeCustomDataToNbt(NbtCompound tag) {
         super.writeCustomDataToNbt(tag);
+        tag.putInt("lifeTime", lifeTime);
+
         if (master == null) return;
         boolean ownerIsPlayer = master instanceof PlayerEntity;
         tag.putBoolean("playerOwner", ownerIsPlayer);
@@ -117,6 +238,8 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
     @Override
     public void readCustomDataFromNbt(NbtCompound tag) {
         super.readCustomDataFromNbt(tag);
+        lifeTime = tag.getInt("lifeTime");
+
         boolean ownerIsPlayer = tag.getBoolean("playerOwner");
         if (ownerIsPlayer) master = world.getPlayerByUuid(tag.getUuid("ownerUUID"));
         else master = (LivingEntity) world.getEntityById(tag.getInt("ownerID")); // Always is living
@@ -137,10 +260,8 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
             anim.setAnimation(new AnimationBuilder().playOnce("animation.hg_nets.spawn"));
         else {
             switch (getState()) {
-                case 0 -> anim.setAnimation(new AnimationBuilder().loop("animation.hg_nets.idle"));
-                default -> {
-
-                }
+                case 2 -> anim.setAnimation(new AnimationBuilder().playOnce("animation.hg_nets.constrict"));
+                default -> anim.setAnimation(new AnimationBuilder().loop("animation.hg_nets.idle"));
             }
         }
         return PlayState.CONTINUE;

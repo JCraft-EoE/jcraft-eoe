@@ -77,7 +77,7 @@ public class EmeraldProjectile extends PersistentProjectileEntity implements IAn
             }
         }
 
-        if (world.isClient && random.nextGaussian() < 0.1) {
+        if (world.isClient && random.nextGaussian() < -0.1) {
             double x = getX();
             double y = getY();
             double z = getZ();
@@ -97,6 +97,7 @@ public class EmeraldProjectile extends PersistentProjectileEntity implements IAn
         Entity owner = this.getOwner();
 
         if (owner != null && owner.hasPassenger(entity) || entity == owner) return;
+        if (entity instanceof JAttackEntity attackEntity && attackEntity.getMaster() == owner) return;
 
         if (isOnFire()) entity.setOnFireFor(5);
 

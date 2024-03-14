@@ -3,25 +3,26 @@ package net.arna.jcraft.common.entity.stand;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.attack.core.BlockableType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.hierophantgreen.EmeraldSplashAttack;
+import net.arna.jcraft.common.attack.moves.hierophantgreen.NetSetMove;
 import net.arna.jcraft.common.attack.moves.shared.*;
-import net.arna.jcraft.common.attack.moves.whitesnake.*;
 import net.arna.jcraft.common.component.living.HitPropertyComponent;
+import net.arna.jcraft.common.entity.projectile.HGNetEntity;
+import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.JParticleType;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
-import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.tag.BlockTags;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -71,33 +72,13 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
             .withSound(JSoundRegistry.WS_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, medium stun"));
-    public static final SimpleAttack<HGEntity> LEG_CRUSHER = new SimpleAttack<HGEntity>(
-            240, 16, 22, 0.75f, 7, 32, 1.75f, 0.35f, 0.2f)
-            .withSound(JSoundRegistry.WS_LEGCRUSH)
-            .withImpactSound(JSoundRegistry.TW_KICK_HIT)
-            .withHitSpark(JParticleType.HIT_SPARK_3)
-            .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
-            .withInfo(Text.literal("Leg Crusher"), Text.literal("high stun, medium windup"));
     public static final EmeraldSplashAttack EMERALD_SPLASH = new EmeraldSplashAttack(100, 20, 1, 0, 0, 0, 0,
             IntSet.of(8, 10, 12))
             .withInfo(Text.literal("Emerald Splash"), Text.literal("fires 9 emeralds at the opponent"));
-    public static final ChargedSpewAttack CHARGED_SPEW = new ChargedSpewAttack(
-            200, 20, 26, 0.75f, 0f, 0, 2f, 0f, 0f)
-            .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
-            .withInfo(Text.literal("Poison Spew"), Text.literal("fires a spread of 5 acid projectiles that slow enemies and persist on the surface they hits for 5s"));
-    public static final PoisonSpewAttack POISON_SPEW = new PoisonSpewAttack(
-            200, 10, 14, 0.75f, 0f, 0, 2f, 0f, 0f)
-            .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
-            .withCrouchingVariant(CHARGED_SPEW)
-            .withInfo(Text.literal("Poison Spew"), Text.literal("fires an acid projectile that slows enemies and persists on the surface it hits for 5s"));
-    public static final MeltYourHeartAttack MELT_YOUR_HEART = new MeltYourHeartAttack(
-            800, 40, 50, 1f, 3f, 20, 2f, 1f, 0f)
-            .withSound(JSoundRegistry.WS_MYH)
-            .withImpactSound(JSoundRegistry.IMPACT_2)
-            .withHyperArmor()
-            .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
-            .withLaunch()
-            .withInfo(Text.literal("Melt your Heart"), Text.literal("remote-only and armored, expels a sphere of poison"));
+    public static final NetSetMove NET_SET = new NetSetMove(200, 9, 15, 1f)
+            .withInfo(Text.literal("Net Place"), Text.literal("todo lol"));
+
+
     public static final PilotModeMove<HGEntity> PILOT_MODE = new PilotModeMove<HGEntity>(20)
             .withInfo(Text.literal("Pilot Mode"), Text.empty());
 
@@ -139,16 +120,32 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 
         moves.register(MoveType.SPECIAL1, EMERALD_SPLASH, State.EMERALD_SPLASH);
-        moves.register(MoveType.SPECIAL2, LEG_CRUSHER, State.LEG_CRUSHER);
+        moves.register(MoveType.SPECIAL3, NET_SET, State.NET_SET);
 
         moves.register(MoveType.UTILITY, PILOT_MODE);
     }
 
     @Override
     public void initMove(MoveType type) {
+        LivingEntity user = getUserOrThrow();
         if (type == MoveType.LIGHT && curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
             AbstractMove<?, ? super HGEntity> followup = curMove.getFollowup();
             if (followup != null) setMove(followup, (State) followup.getAnimation());
+        } else if (type == MoveType.SPECIAL1 && user.isSneaking()) {
+            List<HGNetEntity> nets = world.getEntitiesByClass(HGNetEntity.class,
+                    getBoundingBox().expand(64), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+
+            Vec3d upVec = GravityChangerAPI.getEyeOffset(user);
+            Vec3d heightOffset = upVec.multiply(0.5);
+            Vec3d eyePos = user.getPos().add(heightOffset);
+
+            if (!nets.isEmpty()) {
+                Vec3d pos = JUtils.raycastAll(user, eyePos, eyePos.add(user.getRotationVector().multiply(24)), RaycastContext.FluidHandling.NONE);
+                for (HGNetEntity net : nets) {
+                    if (net.getMaster() != user) continue;
+                    net.tryFireAt(pos);
+                }
+            }
         } else super.initMove(type);
     }
 
@@ -231,7 +228,8 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
         BLOCK(builder -> builder.loop("animation.hg.block")),
         SENDOFF(builder -> builder.playAndHold("animation.hg.sendoff")),
         BARRAGE(builder -> builder.loop("animation.hg.barrage")),
-        LEG_CRUSHER(builder -> builder.playAndHold("animation.hg.legcrusher")),
+        NET_SET(builder -> builder.playAndHold("animation.hg.net_place")),
+
         ACID_SPEW(builder -> builder.playAndHold("animation.hg.acidspew")),
         ACID_SPEW_CHARGED(builder -> builder.playAndHold("animation.hg.acidspew_charged")),
         EMERALD_SPLASH(builder -> builder.playAndHold("animation.hg.emerald_splash")),
