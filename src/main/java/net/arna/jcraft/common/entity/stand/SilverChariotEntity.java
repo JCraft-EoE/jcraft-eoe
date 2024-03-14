@@ -7,12 +7,13 @@ import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.StunType;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
+import net.arna.jcraft.common.attack.moves.shared.HoldableMove;
 import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleMultiHitAttack;
 import net.arna.jcraft.common.attack.moves.silverchariot.*;
-import net.arna.jcraft.common.component.living.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.component.living.CooldownsComponent;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -118,8 +119,8 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withLaunch()
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Circle Slash (Hit)"), Text.empty());
-    public static final SimpleAttack<SilverChariotEntity> CIRCLE_CHARGE = new SimpleAttack<SilverChariotEntity>(
-            260, 101, 100, 0.65f, 0f, 0, 0f, 0f, 0f)
+    public static final HoldableMove<SilverChariotEntity, State> CIRCLE_CHARGE = new HoldableMove<>(
+            260, 101, 100, 0.65f, CIRCLE_SLASH, State.CIRCLE_SLASH, 15, 100)
             .withFollowup(CIRCLE_SLASH)
             .withArmor(2)
             .withInfo(Text.literal("Circle Slash"), Text.literal("charges for a minimum of 0.75s, tap again to release, 2 armor points"));

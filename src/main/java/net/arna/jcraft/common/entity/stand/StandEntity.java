@@ -10,10 +10,7 @@ import net.arna.jcraft.common.attack.core.MoveInputType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
-import net.arna.jcraft.common.attack.moves.base.AbstractBarrageAttack;
-import net.arna.jcraft.common.attack.moves.base.AbstractCounterAttack;
-import net.arna.jcraft.common.attack.moves.base.AbstractMove;
-import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
+import net.arna.jcraft.common.attack.moves.base.*;
 import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.living.CooldownsComponent;
@@ -593,10 +590,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     public void onUserMoveInput(MoveInputType type, boolean pressed, boolean moveInitiated) {
         // Ensure the current move is still the one corresponding to the input.
-//        if (type.getMoveType() != null && moveMap.getEntries(type.getMoveType()).stream().anyMatch(e -> e.getMove() == curMove) &&
-//                curMove instanceof AbstractHoldableMove<?, ?> holdableMove && !pressed && moveInitiated) {
-//            holdableMove.onRelease();
-//        }
+        if (type.getMoveType() != null && moveMap.getEntries(type.getMoveType()).stream().anyMatch(e -> e.getMove() == curMove) &&
+                curMove instanceof AbstractHoldableMove<?, ?, ?> holdableMove && !pressed && moveInitiated) {
+            holdableMove.onRelease();
+        }
     }
 
     /**

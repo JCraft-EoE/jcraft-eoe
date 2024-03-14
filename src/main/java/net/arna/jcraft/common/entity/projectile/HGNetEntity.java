@@ -32,6 +32,8 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
+import java.util.List;
+
 public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimationTickable {
     public static final TrackedData<Integer> STATE;
     public static final TrackedData<Boolean> CHARGED;
@@ -90,22 +92,28 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
 
     @Override
     public void tick() {
+        if (getBlockStateAtPos().isOpaque())
+            setVelocity(0, 0, 0);
+
         super.tick();
 
         if (!world.isClient) {
-            if (--lifeTime <= 0 || master == null)
+            if (--lifeTime <= 0 || master == null) {
                 discard();
+                return;
+            }
 
             Vec3d upVec = GravityChangerAPI.getEyeOffset(this);
 
             if (age == 1) {
+                Vec3d launchVec = upVec.multiply(0.2);
+
                 JUtils.displayHitbox(world, getBoundingBox());
-                world.getEntitiesByClass(LivingEntity.class, getBoundingBox(),
-                        EntityPredicates.VALID_LIVING_ENTITY.and(EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR)).forEach(
+                getInsideEntities().forEach(
                         living -> {
                             if (!living.isConnectedThroughVehicle(master))
                                 StandEntity.damageLogic(
-                                        world, living, upVec, 15, 3, false, 5f, true, 10,
+                                        world, living, launchVec, 15, 3, false, 5f, false, 10,
                                         DamageSource.mob(this), this, HitPropertyComponent.HitAnimation.HIGH
                                 );
                         }
@@ -115,8 +123,7 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
             if (getState() == 2) {
                 if (animTimer == 0) {
                     JUtils.displayHitbox(world, getBoundingBox());
-                    world.getEntitiesByClass(LivingEntity.class, getBoundingBox(),
-                            EntityPredicates.VALID_LIVING_ENTITY.and(EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR)).forEach(
+                    getInsideEntities().forEach(
                             living -> {
                                 if (!JUtils.isBlocking(living) && !living.isConnectedThroughVehicle(master))
                                     StandEntity.stun(living, 17, 0);
@@ -146,6 +153,11 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
         }
     }
 
+    private List<LivingEntity> getInsideEntities() {
+        return world.getEntitiesByClass(LivingEntity.class, getBoundingBox(),
+                EntityPredicates.VALID_LIVING_ENTITY.and(EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR).and(entity -> !entity.equals(this)));
+    }
+
     @Override
     public int tickTimer() { return age; }
 
@@ -163,20 +175,15 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
 
     @Override
     public void pushAwayFrom(Entity entity) {
-        // Constriction check
-        if (entity == null || master == null || entity.isConnectedThroughVehicle(master)) return;
-        if (entity instanceof JAttackEntity attackEntity && attackEntity.getMaster() == master) return;
-
-        if (getState() != 2 && constrictCooldown <= 0) {
-            setState(2);
-            constrictCooldown = CONSTRICT_COOLDOWN;
-            animTimer = 6;
-        }
+        tryConstrict(entity);
     }
 
     @Override
     public void pushAway(Entity entity) {
-        // Constriction check
+        tryConstrict(entity);
+    }
+
+    private void tryConstrict(Entity entity) {
         if (entity == null || master == null || entity.isConnectedThroughVehicle(master)) return;
         if (entity instanceof JAttackEntity attackEntity && attackEntity.getMaster() == master) return;
 

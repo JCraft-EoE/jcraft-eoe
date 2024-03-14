@@ -46,16 +46,6 @@ public class EmeraldProjectile extends PersistentProjectileEntity implements IAn
 
     @Override
     protected void age() {
-        if (world.isClient) {
-            double x = getX();
-            double y = getY();
-            double z = getZ();
-
-            for (int i = 0; i < 8; i++)
-                world.addParticle(EMERALD_PARTICLE, x, y, z,
-                        random.nextGaussian(), random.nextGaussian(), random.nextGaussian());
-        }
-
         discard();
     }
 
