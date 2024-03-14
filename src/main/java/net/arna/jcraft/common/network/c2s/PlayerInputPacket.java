@@ -1,9 +1,11 @@
 package net.arna.jcraft.common.network.c2s;
 
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
+import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.MoveInputType;
 import net.arna.jcraft.common.attack.core.MoveType;
+import net.arna.jcraft.common.callbacks.JServerPlayerInputCallback;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.living.StandComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
@@ -22,10 +24,13 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 import static net.arna.jcraft.JCraft.*;
 
 public class PlayerInputPacket {
+    private static final Map<ServerPlayerEntity, Object2BooleanMap<MoveInputType>> successMap = new WeakHashMap<>();
+
     static {
         ServerTickEvents.START_SERVER_TICK.register(server -> {
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
@@ -101,6 +106,7 @@ public class PlayerInputPacket {
 
 
     private static void handleMoveInput(ServerPlayerEntity player, PacketByteBuf buf, InputStateManager sm) {
+        MinecraftServer server = Objects.requireNonNull(player.getServer());
         int count = buf.readVarInt();
         for (int i = 0; i < count; i++) {
             MoveInputType type = buf.readEnumConstant(MoveInputType.class);
@@ -111,11 +117,20 @@ public class PlayerInputPacket {
                 else sm.heldInputs.remove(type);
             }
 
-            if (pressed) handleMoveInput(Objects.requireNonNull(player.getServer()), player, type);
+            if (pressed) handleMoveInput(server, player, type).thenAccept(b -> {
+                successMap.computeIfAbsent(player, p -> new Object2BooleanOpenHashMap<>()).put(type, b.booleanValue());
+
+                server.execute(() -> JServerPlayerInputCallback.EVENT.invoker().onPlayerInput(player, type, true, b));
+            });
+            else {
+                boolean success = successMap.computeIfAbsent(player, p -> new Object2BooleanOpenHashMap<>()).getOrDefault(type, false);
+                server.execute(() -> JServerPlayerInputCallback.EVENT.invoker().onPlayerInput(player, type, false, success));
+            }
         }
     }
 
-    private static void handleMoveInput(MinecraftServer server, ServerPlayerEntity player, MoveInputType type) {
+    private static CompletableFuture<Boolean> handleMoveInput(MinecraftServer server, ServerPlayerEntity player, MoveInputType type) {
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
         ServerWorld world = player.getWorld();
         server.execute(() -> {
             switch (type) {
@@ -129,49 +144,66 @@ public class PlayerInputPacket {
                     StandEntity<?, ?> stand = standData.getStand();
                     if (stand != null) {
                         int moveStun = stand.getMoveStun();
-                        if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT)
+                        if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT) {
                             stand.queueMove(MoveInputType.STAND_SUMMON);
-                        else stand.desummon();
-                    } else if (world != null) JCraft.summon(world, player);
+                            future.complete(false);
+                        } else {
+                            stand.desummon();
+                            future.complete(true);
+                        }
+                    } else if (world != null) {
+                        JCraft.summon(world, player);
+                        future.complete(true);
+                    }
                 }
                 case LIGHT -> {
                     StandEntity<?, ?> stand = JUtils.getStand(player);
                     if (stand == null) return;
 
-                    initStandMove(stand, MoveInputType.LIGHT);
+                    future.complete(initStandMove(stand, MoveInputType.LIGHT));
                 }
                 case UTILITY -> {
+                    boolean s;
                     StandEntity<?, ?> stand = JUtils.getStand(player);
-                    if (stand != null) initStandMove(stand, MoveInputType.UTILITY);
+                    if (stand != null) s = initStandMove(stand, MoveInputType.UTILITY);
                     else {
                         StandEntity<?, ?> stand2 = JCraft.summon(world, player);
-                        if (stand2 != null) stand2.initMove(MoveType.UTILITY);
+                        if (stand2 != null) s = stand2.initMove(MoveType.UTILITY);
+                        else s = false;
                     }
+
+                    future.complete(s);
                 }
-                default -> initStandOrSpecMove(player, type);
+                default -> future.complete(initStandOrSpecMove(player, type));
             }
         });
+
+        return future;
     }
 
-    private static void initStandOrSpecMove(ServerPlayerEntity player, MoveInputType type) {
+    private static boolean initStandOrSpecMove(ServerPlayerEntity player, MoveInputType type) {
         StandEntity<?, ?> stand = JUtils.getStand(player);
-        if (stand != null) initStandMove(stand, type);
+        if (stand != null) return initStandMove(stand, type);
         else {
             JSpec<?, ?> spec = JUtils.getSpec(player);
-            if (spec == null) return;
+            if (spec == null) return false;
 
-            spec.initMove(type.getMoveType());
+            if (spec.initMove(type.getMoveType())) return true;
             if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT)
                 spec.queuedMove = type;
+
+            return false;
         }
     }
 
-    private static void initStandMove(StandEntity<?, ?> stand, MoveInputType type) {
+    private static boolean initStandMove(StandEntity<?, ?> stand, MoveInputType type) {
         int moveStun = stand.getMoveStun();
 
-        stand.initMove(type.getMoveType());
+        if (stand.initMove(type.getMoveType())) return true;
         if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking())
             stand.queueMove(type);
+
+        return false;
     }
 
     private static void checkComboBreak(ServerPlayerEntity player) {

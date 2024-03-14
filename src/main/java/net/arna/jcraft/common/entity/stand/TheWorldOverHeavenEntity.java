@@ -215,7 +215,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
     }
 
     @Override
-    public void initMove(MoveType type) {
+    public boolean initMove(MoveType type) {
         switch (type) {
             case SPECIAL1, SPECIAL2, SPECIAL3 -> {
                 if (curMove != null && curMove.getOriginalMove() == CHARGE_OVERWRITE && getMoveStun() < 50)
@@ -224,10 +224,10 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
                         case SPECIAL2 -> 2;
                         case SPECIAL3 -> 3;
                     });
-                else super.initMove(type);
+                else return super.initMove(type);
             }
             case ULTIMATE -> {
-                if (tsTime <= 0) super.initMove(type);
+                if (tsTime <= 0) return super.initMove(type);
                 else if (hasUser()) {
                     JCraft.stopTimestop(getUserOrThrow());
                     tsTime = 0;
@@ -237,10 +237,14 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
                 if (curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
                     AbstractMove<?, ? super TheWorldOverHeavenEntity> followup = curMove.getFollowup();
                     if (followup != null) setMove(followup, (State) followup.getAnimation());
-                } else super.initMove(type);
+                } else return super.initMove(type);
             }
-            default -> super.initMove(type);
+            default -> {
+                return super.initMove(type);
+            }
         }
+
+        return true;
     }
 
     private void initOverwrite(int type) {

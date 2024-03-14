@@ -253,16 +253,16 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     }
 
     @Override
-    public void initMove(MoveType type) {
+    public boolean initMove(MoveType type) {
         if (type == MoveType.LIGHT && curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
             AbstractMove<?, ? super CreamEntity> followup = curMove.getFollowup();
             if (followup != null) {
                 setMove(followup, (State) followup.getAnimation());
-                return;
+                return true;
             }
         }
 
-        super.initMove(type);
+        return super.initMove(type);
     }
 
     @Override

@@ -681,8 +681,14 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     }
 
     // Stock attacks to define
-    public void initMove(MoveType type) {
-        handleMove(type);
+
+    /**
+     * Initiates a move of the specified type.
+     * @param type The type of move to initiate.
+     * @return Whether the move was initiated.
+     */
+    public boolean initMove(MoveType type) {
+        return handleMove(type);
     }
 
     /**

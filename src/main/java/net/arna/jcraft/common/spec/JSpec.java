@@ -108,8 +108,8 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
 
     protected abstract void registerMoves(MoveMap<A, S> moves);
 
-    public void initMove(MoveType type) {
-        handleMove(type);
+    public boolean initMove(MoveType type) {
+        return handleMove(type);
     }
 
     public boolean canAttack() {

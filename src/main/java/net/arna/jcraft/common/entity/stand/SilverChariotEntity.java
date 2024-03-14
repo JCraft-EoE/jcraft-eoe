@@ -229,18 +229,20 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
     }
 
     @Override
-    public void initMove(MoveType type) {
+    public boolean initMove(MoveType type) {
         if (type == MoveType.UTILITY) {
             if (curMove != null && curMove.getMoveType() == MoveType.UTILITY && getMoveStun() <= 85)
                 setMove(CIRCLE_SLASH.copy(), State.CIRCLE_SLASH);
             else { // Reset charge time, and begin charging again
                 getMoveContext().setInt(CHARGE_TIME, 0);
-                handleMove(MoveType.UTILITY);
+                return handleMove(MoveType.UTILITY);
             }
         } else if (type == MoveType.LIGHT && curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
             AbstractMove<?, ? super SilverChariotEntity> followup = curMove.getFollowup();
             if (followup != null) setMove(followup, (State) followup.getAnimation());
-        } else super.initMove(type);
+        } else return super.initMove(type);
+
+        return true;
     }
 
     @Override

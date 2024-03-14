@@ -104,11 +104,11 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
 
     // Moveset
     @Override
-    public void initMove(MoveType type) {
-        if (!hasUser()) return;
+    public boolean initMove(MoveType type) {
+        if (!hasUser()) return false;
 
         LivingEntity user = getUserOrThrow();
-        if (user.hasStatusEffect(JStatusRegistry.DAZED)) return;
+        if (user.hasStatusEffect(JStatusRegistry.DAZED)) return false;
 
         switch (type) {
             case LIGHT -> {
@@ -116,7 +116,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
                 if (curMove == null || curMove.getFollowup() == null) {
                     if (idling) {
                         if (user.isSneaking()) detonate();
-                        else super.initMove(MoveType.LIGHT);
+                        else return super.initMove(MoveType.LIGHT);
                     }
                 } else if (getMoveStun() < curMove.getWindupPoint()) {
                     if (user.isSneaking()) detonate();
@@ -125,6 +125,8 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
                         setMove(followup, (S) followup.getAnimation());
                     }
                 }
+
+                return true;
             }
 
             case SPECIAL1 -> {
@@ -136,10 +138,14 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
                         JComponents.getBombTracker(user).getMainBomb().setBomb(standingOn);
                         cooldowns.setCooldown(CooldownType.STAND_SP1, BOMB_PLANT.getCooldown());
                     }
-                } else handleMove(MoveType.SPECIAL1);
+
+                    return true;
+                } else return handleMove(MoveType.SPECIAL1);
             }
 
-            default -> super.initMove(type);
+            default -> {
+                return super.initMove(type);
+            }
         }
     }
 

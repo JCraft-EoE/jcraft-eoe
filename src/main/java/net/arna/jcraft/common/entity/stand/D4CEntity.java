@@ -172,7 +172,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
     }
 
     @Override
-    public void initMove(MoveType type) {
+    public boolean initMove(MoveType type) {
         switch (type) {
             case SPECIAL1 -> getMoveContext().set(CloneSpawnMove.CLONE_TYPE, CloneSpawnMove.CloneType.AXE);
             case SPECIAL2 -> getMoveContext().set(CloneSpawnMove.CLONE_TYPE, CloneSpawnMove.CloneType.BOW);
@@ -186,7 +186,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                 if (getWorld().getRegistryKey().equals(JDimensionRegistry.AU_DIMENSION_KEY)) {
                     setMove(DIM_HOP, State.DIM_HOP);
                     playSound(JSoundRegistry.D4C_DIMHOP, 1, 1);
-                    return;
+                    return true;
                 }
             }
             case LIGHT -> {
@@ -194,13 +194,13 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                     AbstractMove<?, ? super D4CEntity> followup = curMove.getFollowup();
                     if (followup != null) {
                         setMove(followup, (State) followup.getAnimation());
-                        return;
+                        return true;
                     }
                 }
             }
         }
 
-        super.initMove(type);
+        return super.initMove(type);
     }
 
     @Override

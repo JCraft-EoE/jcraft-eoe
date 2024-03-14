@@ -115,12 +115,12 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
     }
 
     @Override
-    public void initMove(MoveType type) {
+    public boolean initMove(MoveType type) {
         if (type == MoveType.ULTIMATE) {
             if (moveContext.get(BTDPlantAttack.BTD_ENTITY) != null)
-                handleMove(BTD_DETONATE, CooldownType.ULTIMATE, State.DETONATE);
-            else handleMove(MoveType.ULTIMATE);
-        } else super.initMove(type);
+                return handleMove(BTD_DETONATE, CooldownType.ULTIMATE, State.DETONATE);
+            else return handleMove(MoveType.ULTIMATE);
+        } else return super.initMove(type);
     }
 
     @Override

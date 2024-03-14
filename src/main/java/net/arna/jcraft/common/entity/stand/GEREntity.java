@@ -176,13 +176,15 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
     }
 
     @Override
-    public void initMove(MoveType type) {
+    public boolean initMove(MoveType type) {
         if (type == MoveType.ULTIMATE && !moveContext.get(ReturnToZeroMove.ENTITY_DATA).isEmpty())
             RETURN_TO_ZERO.returnToZero(this);
         else if (type == MoveType.LIGHT && curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
             AbstractMove<?, ? super GEREntity> followup = curMove.getFollowup();
             if (followup != null) setMove(followup, (State) followup.getAnimation());
-        } else super.initMove(type);
+        } else return super.initMove(type);
+
+        return true;
     }
 
     public int getFlightTime() {

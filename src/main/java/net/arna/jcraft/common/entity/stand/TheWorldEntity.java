@@ -159,11 +159,13 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
     }
 
     @Override
-    public void initMove(MoveType type) {
+    public boolean initMove(MoveType type) {
         if (type == MoveType.LIGHT && curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
             AbstractMove<?, ? super TheWorldEntity> followup = curMove.getFollowup();
             if (followup != null) setMove(followup, (State) followup.getAnimation());
-        } else super.initMove(type);
+
+            return true;
+        } else return super.initMove(type);
     }
 
     @Override

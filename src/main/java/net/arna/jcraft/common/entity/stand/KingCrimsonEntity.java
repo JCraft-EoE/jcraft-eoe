@@ -203,13 +203,13 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     }
 
     @Override
-    public void initMove(MoveType type) {
+    public boolean initMove(MoveType type) {
         switch (type) {
             case HEAVY -> {
                 boolean idling = getMoveStun() <= 0;
 
                 if (curMove == null || curMove.getOriginalMove() != VERTICAL_CHOP) {
-                    if (idling) super.initMove(type);
+                    if (idling) return super.initMove(type);
                 } else if (getMoveStun() < 7) setMove(OVERHEAD_HOOK, State.OVERHEAD);
             }
             case ULTIMATE -> {
@@ -224,23 +224,20 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
 
                 // If not predicting, do other Time Erase logic
                 if (!canAttack())
-                    return;
+                    return false;
 
                 if (getTETime() > 0) {
                     cancelTE();
-                    return;
+                    return true;
                 }
 
-                super.initMove(type);
+                return super.initMove(type);
             }
             case SPECIAL3 -> {
                 LivingEntity user = getUserOrThrow();
                 boolean start = getMoveStun() <= 0;
 
-                if (start) {
-                    super.initMove(type);
-                    return;
-                }
+                if (start) return super.initMove(type);
 
                 // When used during a move, cancels it and puts time erase on cooldown
                 moveCancel();
@@ -271,10 +268,14 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             }
             case UTILITY -> {
                 if (getTETime() > 0) cancelTE();
-                super.initMove(type);
+                return super.initMove(type);
             }
-            default -> super.initMove(type);
+            default -> {
+                return super.initMove(type);
+            }
         }
+
+        return true;
     }
 
     private void spawnTimeSkipParticles() {

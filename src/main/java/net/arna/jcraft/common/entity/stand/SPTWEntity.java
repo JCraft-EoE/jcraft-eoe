@@ -162,14 +162,17 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
     }
 
     @Override
-    public void initMove(MoveType type) {
+    public boolean initMove(MoveType type) {
         if (type == MoveType.LIGHT && curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
             AbstractMove<?, ? super SPTWEntity> followup = curMove.getFollowup();
             if (followup != null) setMove(followup, (State) followup.getAnimation());
         } else {
-            super.initMove(type);
+            boolean s = super.initMove(type);
             if (type == MoveType.SPECIAL1) turnAround = getUserOrThrow().isSneaking();
+            return s;
         }
+
+        return true;
     }
 
     @Override

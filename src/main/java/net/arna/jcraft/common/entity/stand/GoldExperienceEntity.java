@@ -162,20 +162,20 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
 
     // Moveset
     @Override
-    public void initMove(MoveType type) {
+    public boolean initMove(MoveType type) {
         switch (type) {
             case SPECIAL2 -> {
-                if (!hasUser()) return;
+                if (!hasUser()) return false;
                 LivingEntity user = getUserOrThrow();
-                if (user.hasStatusEffect(JStatusRegistry.DAZED)) return;
+                if (user.hasStatusEffect(JStatusRegistry.DAZED)) return false;
                 boolean idling = this.getMoveStun() <= 0;
                 if (!(curMove instanceof RekkaAttack rekka)) {
-                    if (idling) handleMove(MoveType.SPECIAL2);
+                    if (idling) return handleMove(MoveType.SPECIAL2);
                 } else if (rekka.getNext() != null && rekka.mayAdvance(this))
                     setMove(rekka.getNext(), rekka.getNextState());
             }
             case SPECIAL3 -> {
-                if (!canAttack() || !hasUser()) return;
+                if (!canAttack() || !hasUser()) return false;
                 LivingEntity user = getUserOrThrow();
 
                 LifeGiverAttack.LifeGiverType toSummon = LifeGiverAttack.LifeGiverType.SNAKE;
@@ -184,16 +184,20 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
                 } else toSummon = LifeGiverAttack.LifeGiverType.BUTTERFLY;
                 moveContext.set(LifeGiverAttack.TYPE_TO_SUMMON, toSummon);
 
-                handleMove(MoveType.SPECIAL3);
+                return handleMove(MoveType.SPECIAL3);
             }
             case LIGHT -> {
                 if (curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
                     AbstractMove<?, ? super GoldExperienceEntity> followup = curMove.getFollowup();
                     if (followup != null) setMove(followup, (State) followup.getAnimation());
-                } else super.initMove(type);
+                } else return super.initMove(type);
             }
-            default -> super.initMove(type);
+            default -> {
+                return super.initMove(type);
+            }
         }
+
+        return true;
     }
 
     /*

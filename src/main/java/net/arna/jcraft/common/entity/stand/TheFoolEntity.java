@@ -2,7 +2,6 @@ package net.arna.jcraft.common.entity.stand;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.NonNull;
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.BlockableType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
@@ -216,7 +215,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     }
 
     @Override
-    public void initMove(MoveType type) {
+    public boolean initMove(MoveType type) {
         switch (type) {
             case SPECIAL1, SPECIAL2, SPECIAL3 -> {
                 if (curMove != null && curMove.getOriginalMove() == POUND && getMoveStun() <= 11) {
@@ -226,21 +225,27 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
                         case SPECIAL3 -> 3;
                     });
 
-                    return;
+                    return true;
                 }
 
-                super.initMove(type);
+                boolean s = super.initMove(type);
                 if (type == MoveType.SPECIAL2 && !getUserOrThrow().isOnGround() || type == MoveType.SPECIAL3)
                     setSand(true);
+
+                return s;
             }
             case LIGHT -> {
                 if (curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
                     AbstractMove<?, ? super TheFoolEntity> followup = curMove.getFollowup();
                     if (followup != null) setMove(followup, (State) followup.getAnimation());
-                } else super.initMove(type);
+                } else return super.initMove(type);
             }
-            default -> super.initMove(type);
+            default -> {
+                return super.initMove(type);
+            }
         }
+
+        return true;
     }
 
     private void initSlam(int type) {

@@ -126,7 +126,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
     }
 
     @Override
-    public void initMove(MoveType type) {
+    public boolean initMove(MoveType type) {
         LivingEntity user = getUserOrThrow();
         if (type == MoveType.LIGHT && curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
             AbstractMove<?, ? super HGEntity> followup = curMove.getFollowup();
@@ -146,7 +146,9 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
                     net.tryFireAt(pos);
                 }
             }
-        } else super.initMove(type);
+        } else return super.initMove(type);
+
+        return true;
     }
 
     public void togglePilotMode() {

@@ -71,11 +71,11 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
 
     // Move-set
     @Override
-    public void initMove(MoveType type) {
+    public boolean initMove(MoveType type) {
         if (type == MoveType.SPECIAL1)
             if (coin != null) coin.discard();
 
-        super.initMove(type);
+       return super.initMove(type);
     }
 
     @Override

@@ -128,18 +128,18 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
     }
 
     @Override
-    public void initMove(MoveType type) {
+    public boolean initMove(MoveType type) {
         if (type == MoveType.LIGHT && curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
             AbstractMove<?, ? super StarPlatinumEntity> followup = curMove.getFollowup();
             if (followup != null) {
                 setMove(followup, (State) followup.getAnimation());
-                return;
+                return true;
             }
         }
 
         if (type == MoveType.SPECIAL3)
-            handleMove(getUserOrThrow().isSneaking() ? SHORT_CHARGE_BARRAGE.copy() : CHARGE_BARRAGE.copy(), CooldownType.STAND_SP3, State.BARRAGE);
-        else super.initMove(type);
+            return handleMove(getUserOrThrow().isSneaking() ? SHORT_CHARGE_BARRAGE.copy() : CHARGE_BARRAGE.copy(), CooldownType.STAND_SP3, State.BARRAGE);
+        else return super.initMove(type);
     }
 
     @Override

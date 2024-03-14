@@ -125,18 +125,25 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
 
     // Attacks
     @Override
-    public void initMove(MoveType type) {
+    public boolean initMove(MoveType type) {
         switch (type) {
-            case HEAVY -> handleMove(POMMEL, CooldownType.HEAVY, isHoldingAnubis(this) ? State.POMMEL : State.POMMEL_IN, attackSpeedMult);
+            case HEAVY -> {
+                return handleMove(POMMEL, CooldownType.HEAVY, isHoldingAnubis(this) ? State.POMMEL : State.POMMEL_IN, attackSpeedMult);
+            }
             case SPECIAL3 -> {
+                boolean s;
                 if (isHoldingAnubis(this)) {
-                    handleMove(REKKA3, CooldownType.SPECIAL2, State.REKKA3, attackSpeedMult);
+                    s = handleMove(REKKA3, CooldownType.SPECIAL2, State.REKKA3, attackSpeedMult);
                 } else {
-                    handleMove(SWEEP, CooldownType.SPECIAL3, State.SWEEP, attackSpeedMult);
+                    s = handleMove(SWEEP, CooldownType.SPECIAL3, State.SWEEP, attackSpeedMult);
                     player.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, SWEEP.getDuration(), 2, true, false));
                 }
+
+                return s;
             }
-            default -> handleMove(type, attackSpeedMult);
+            default -> {
+                return handleMove(type, attackSpeedMult);
+            }
         }
     }
 

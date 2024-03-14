@@ -154,11 +154,13 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
     }
 
     @Override
-    public void initMove(MoveType type) {
+    public boolean initMove(MoveType type) {
         if (type == MoveType.LIGHT && curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
             AbstractMove<?, ? super MagiciansRedEntity> followup = curMove.getFollowup();
             if (followup != null) setMove(followup, (State) followup.getAnimation());
-        } else super.initMove(type);
+        } else return super.initMove(type);
+
+        return true;
     }
 
     public static void ignite(World world, BlockPos blockPos) {

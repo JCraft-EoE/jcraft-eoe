@@ -188,27 +188,32 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
     }
 
     @Override
-    public void initMove(MoveType type) {
+    public boolean initMove(MoveType type) {
         switch (type) {
             case SPECIAL2 -> {
                 if (hasUser() && getUserOrThrow().isSneaking()) world.getEntitiesByClass(BlockProjectile.class,
                                 getBoundingBox().expand(16), p -> p.isAlive() && p.getMaster() == getUser())
                         .forEach(BlockProjectile::markRefresh);
-                else super.initMove(type);
+                else return super.initMove(type);
+                return true;
             }
             case ULTIMATE -> {
                 GravityShiftComponent shiftComponent = JComponents.getGravityShift(getUserOrThrow());
                 if (shiftComponent.isActive())
                     shiftComponent.swapRadialType();
-                else super.initMove(type);
+                else return super.initMove(type);
+                return true;
             }
             case LIGHT -> {
                 if (curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
                     AbstractMove<?, ? super CMoonEntity> followup = curMove.getFollowup();
                     if (followup != null) setMove(followup, (State) followup.getAnimation());
-                } else super.initMove(type);
+                } else return super.initMove(type);
+                return true;
             }
-            default -> super.initMove(type);
+            default -> {
+                return super.initMove(type);
+            }
         }
     }
 
