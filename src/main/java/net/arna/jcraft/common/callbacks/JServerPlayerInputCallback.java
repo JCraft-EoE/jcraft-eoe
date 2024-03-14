@@ -13,9 +13,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 public interface JServerPlayerInputCallback {
     Event<JServerPlayerInputCallback> EVENT = EventFactory.createArrayBacked(JServerPlayerInputCallback.class,
             listeners -> (player, moveInput, pressed, moveSuccess) -> {
-                StandEntity<?, ?> stand = JUtils.getStand(player);
-                if (stand != null) stand.onUserMoveInput(moveInput, pressed, moveSuccess);
-
                 for (JServerPlayerInputCallback listener : listeners)
                     listener.onPlayerInput(player, moveInput, pressed, moveSuccess);
             });

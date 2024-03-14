@@ -124,11 +124,21 @@ public class PlayerInputPacket {
             if (pressed) handleMoveInput(server, player, type).thenAccept(b -> {
                 successMap.computeIfAbsent(player, p -> new Object2BooleanOpenHashMap<>()).put(type, b.booleanValue());
 
-                server.execute(() -> JServerPlayerInputCallback.EVENT.invoker().onPlayerInput(player, type, true, b));
+                server.execute(() -> {
+                    JServerPlayerInputCallback.EVENT.invoker().onPlayerInput(player, type, true, b);
+
+                    StandEntity<?, ?> stand = JUtils.getStand(player);
+                    if (stand != null) stand.onUserMoveInput(type, true, b);
+                });
             });
             else {
                 boolean success = successMap.computeIfAbsent(player, p -> new Object2BooleanOpenHashMap<>()).getOrDefault(type, false);
-                server.execute(() -> JServerPlayerInputCallback.EVENT.invoker().onPlayerInput(player, type, false, success));
+                server.execute(() -> {
+                    JServerPlayerInputCallback.EVENT.invoker().onPlayerInput(player, type, false, success);
+
+                    StandEntity<?, ?> stand = JUtils.getStand(player);
+                    if (stand != null) stand.onUserMoveInput(type, true, success);
+                });
             }
         }
     }
