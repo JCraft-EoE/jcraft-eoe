@@ -1,6 +1,8 @@
 package net.arna.jcraft.common.callbacks;
 
 import net.arna.jcraft.common.attack.core.MoveInputType;
+import net.arna.jcraft.common.entity.stand.StandEntity;
+import net.arna.jcraft.common.util.JUtils;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -10,9 +12,12 @@ import net.minecraft.server.network.ServerPlayerEntity;
  */
 public interface JServerPlayerInputCallback {
     Event<JServerPlayerInputCallback> EVENT = EventFactory.createArrayBacked(JServerPlayerInputCallback.class,
-            listeners -> (movementInput, moveInput, pressed, moveSuccess) -> {
+            listeners -> (player, moveInput, pressed, moveSuccess) -> {
+                StandEntity<?, ?> stand = JUtils.getStand(player);
+                if (stand != null) stand.onUserMoveInput(moveInput, pressed, moveSuccess);
+
                 for (JServerPlayerInputCallback listener : listeners)
-                    listener.onPlayerInput(movementInput, moveInput, pressed, moveSuccess);
+                    listener.onPlayerInput(player, moveInput, pressed, moveSuccess);
             });
 
     /**
