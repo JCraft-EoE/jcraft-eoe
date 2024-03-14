@@ -144,6 +144,12 @@ public interface JEntityTypeRegistry {
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, GEButterflyEntity::new).dimensions(EntityDimensions.fixed(0.3f, 0.3f)).build()
     );
 
+    EntityType<HGEntity> HIEROPHANT_GREEN = Registry.register(
+            Registry.ENTITY_TYPE,
+            JCraft.id("hierophant_green"),
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(HGEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
+    );
+
     EntityType<GEREntity> GER = Registry.register(
             Registry.ENTITY_TYPE,
             JCraft.id("ger"),
@@ -167,6 +173,13 @@ public interface JEntityTypeRegistry {
             Registry.ENTITY_TYPE,
             JCraft.id("knife"),
             FabricEntityTypeBuilder.<KnifeProjectile>create(SpawnGroup.MISC, KnifeProjectile::new)
+                    .dimensions(EntityDimensions.fixed(0.5f, 0.5f)).trackRangeChunks(6).trackedUpdateRate(10).build()
+    );
+
+    EntityType<EmeraldProjectile> EMERALD = Registry.register(
+            Registry.ENTITY_TYPE,
+            JCraft.id("emerald"),
+            FabricEntityTypeBuilder.<EmeraldProjectile>create(SpawnGroup.MISC, EmeraldProjectile::new)
                     .dimensions(EntityDimensions.fixed(0.5f, 0.5f)).trackRangeChunks(6).trackedUpdateRate(10).build()
     );
 
@@ -217,6 +230,13 @@ public interface JEntityTypeRegistry {
             JCraft.id("lifedetector"),
                 FabricEntityTypeBuilder.create(SpawnGroup.MISC, LifeDetectorEntity::new)
                         .dimensions(EntityDimensions.fixed(1f, 1f)).build()
+    );
+
+    EntityType<HGNetEntity> HG_NET = Registry.register(
+            Registry.ENTITY_TYPE,
+            JCraft.id("hg_net"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MISC, HGNetEntity::new)
+                    .dimensions(EntityDimensions.fixed(2f, 4f)).build()
     );
 
     EntityType<RedBindEntity> RED_BIND = Registry.register(
@@ -272,6 +292,7 @@ public interface JEntityTypeRegistry {
         FabricDefaultAttributeRegistry.register(SILVER_CHARIOT, SilverChariotEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(MAGICIANS_RED, MagiciansRedEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(THE_FOOL, TheFoolEntity.createMobAttributes());
+        FabricDefaultAttributeRegistry.register(HIEROPHANT_GREEN, HGEntity.createMobAttributes());
 
         FabricDefaultAttributeRegistry.register(GOLD_EXPERIENCE, GoldExperienceEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(GER, GEREntity.createMobAttributes());
@@ -294,6 +315,8 @@ public interface JEntityTypeRegistry {
 
         FabricDefaultAttributeRegistry.register(D4C, D4CEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(PLAYER_CLONE, PlayerCloneEntity.createCloneAttributes());
+
+        FabricDefaultAttributeRegistry.register(HG_NET, HGNetEntity.createNetAttributes());
 
         FabricDefaultAttributeRegistry.register(LIFE_DETECTOR, LifeDetectorEntity.createDetectorAttributes());
         FabricDefaultAttributeRegistry.register(RED_BIND, LifeDetectorEntity.createDetectorAttributes()); // This will also do fine.

@@ -6,10 +6,7 @@ import net.arna.jcraft.common.attack.core.BlockableType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
-import net.arna.jcraft.common.attack.moves.shared.EffectInflictingAttack;
-import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
-import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
-import net.arna.jcraft.common.attack.moves.shared.UppercutAttack;
+import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.attack.moves.whitesnake.*;
 import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.util.JParticleType;
@@ -119,7 +116,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withLaunch()
             .withInfo(Text.literal("Melt your Heart"), Text.literal("remote-only and armored, expels a sphere of poison"));
-    public static final PilotModeMove PILOT_MODE = new PilotModeMove(20)
+    public static final PilotModeMove<WhiteSnakeEntity> PILOT_MODE = new PilotModeMove<WhiteSnakeEntity>(20)
             .withInfo(Text.literal("Pilot Mode"), Text.empty());
 
     public WhiteSnakeEntity(World worldIn) {
@@ -187,11 +184,6 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             AbstractMove<?, ? super WhiteSnakeEntity> followup = curMove.getFollowup();
             if (followup != null) setMove(followup, (State) followup.getAnimation());
         } else super.initMove(type);
-    }
-
-    public void togglePilotMode() {
-        setRemote(!isRemote());
-        registerMoves(); // To switch the ultimate with the proper one.
     }
 
     @Override

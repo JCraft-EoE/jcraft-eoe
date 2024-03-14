@@ -6,6 +6,7 @@ import net.arna.jcraft.client.particle.AuraBlobParticle;
 import net.arna.jcraft.common.component.living.BombTrackerComponent;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.entity.SheerHeartAttackEntity;
+import net.arna.jcraft.common.entity.stand.HGEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.WhiteSnakeEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
@@ -165,6 +166,26 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
 
         //JCraft.LOGGER.info("Handling remote movement for: " + whiteSnakeEntity + " with " + f + " " + s + " " + jump);
         whiteSnakeEntity.tickRemoteMovement(f, s, jump);
+    }
+
+    @Override
+    public void hierophantGreenRemoteClientTick(@NotNull HGEntity hgEntity) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (JUtils.getStand(client.player) != hgEntity) return;
+
+        GameOptions options = client.options;
+        float f = 0, s = 0;
+        boolean jump = options.jumpKey.isPressed();
+        if (options.forwardKey.isPressed())
+            f += 1.0f;
+        if (options.backKey.isPressed())
+            f += 1.0f;
+        if (options.leftKey.isPressed())
+            s -= 1.0f;
+        if (options.rightKey.isPressed())
+            s += 1.0f;
+
+        hgEntity.tickRemoteMovement(f, s, jump);
     }
 
     @Override

@@ -1,0 +1,134 @@
+package net.arna.jcraft.common.entity.projectile;
+
+import net.arna.jcraft.common.component.living.HitPropertyComponent;
+import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.registry.JEntityTypeRegistry;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.projectile.PersistentProjectileEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.particle.BlockStateParticleEffect;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import software.bernie.geckolib3.core.IAnimatable;
+import software.bernie.geckolib3.core.manager.AnimationData;
+import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
+
+public class EmeraldProjectile extends PersistentProjectileEntity implements IAnimatable {
+    private int ticksInAir;
+
+    public EmeraldProjectile(EntityType<? extends EmeraldProjectile> entityType, World world) {
+        super(entityType, world);
+    }
+
+    public EmeraldProjectile(World world) {
+        super(JEntityTypeRegistry.EMERALD, world);
+    }
+
+    public EmeraldProjectile(World world, LivingEntity owner) {
+        super(JEntityTypeRegistry.EMERALD, owner, world);
+        this.setOwner(owner);
+    }
+
+    @Override
+    public ItemStack asItemStack() {
+        return ItemStack.EMPTY;
+    }
+
+    private static final BlockStateParticleEffect EMERALD_PARTICLE = new BlockStateParticleEffect(ParticleTypes.BLOCK, Blocks.EMERALD_BLOCK.getDefaultState());
+
+    @Override
+    protected void age() {
+        if (world.isClient) {
+            double x = getX();
+            double y = getY();
+            double z = getZ();
+
+            for (int i = 0; i < 8; i++)
+                world.addParticle(EMERALD_PARTICLE, x, y, z,
+                        random.nextGaussian(), random.nextGaussian(), random.nextGaussian());
+        }
+
+        discard();
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        if (!inGround) {
+            ++ticksInAir;
+        } else {
+            if (world.isClient) {
+                double x = getX();
+                double y = getY();
+                double z = getZ();
+
+                for (int i = 0; i < 8; i++)
+                    world.addParticle(EMERALD_PARTICLE, x, y, z,
+                            random.nextGaussian(), random.nextGaussian(), random.nextGaussian());
+            }
+        }
+
+        if (world.isClient && random.nextGaussian() < 0.1) {
+            double x = getX();
+            double y = getY();
+            double z = getZ();
+            world.addParticle(ParticleTypes.HAPPY_VILLAGER, x, y, z,
+                    random.nextGaussian(), random.nextGaussian(), random.nextGaussian());
+            return;
+        }
+
+        if (ticksInAir > 200)
+            discard();
+    }
+
+    @Override
+    protected void onEntityHit(EntityHitResult entityHitResult) {
+        if (world.isClient) return;
+        Entity entity = entityHitResult.getEntity();
+        Entity owner = this.getOwner();
+
+        if (owner != null && owner.hasPassenger(entity) || entity == owner) return;
+
+        if (isOnFire()) entity.setOnFireFor(5);
+
+        int blockstun = 4;
+        int stunT = 10;
+
+        JUtils.projectileDamageLogic(this, world, entity, Vec3d.ZERO, stunT, 1, false, 2, blockstun, HitPropertyComponent.HitAnimation.MID);
+        playSound(SoundEvents.ITEM_TRIDENT_HIT, 1, 1);
+        discard();
+    }
+
+    @Override
+    public void writeCustomDataToNbt(NbtCompound tag) {
+        super.writeCustomDataToNbt(tag);
+        tag.putShort("life", (short) this.ticksInAir);
+    }
+
+    @Override
+    public void readCustomDataFromNbt(NbtCompound tag) {
+        super.readCustomDataFromNbt(tag);
+        this.ticksInAir = tag.getShort("life");
+    }
+
+    // Animations
+    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+
+    @Override
+    public void registerControllers(AnimationData data) {
+    }
+
+    @Override
+    public AnimationFactory getFactory() {
+        return this.factory;
+    }
+}

@@ -3,6 +3,7 @@ package net.arna.jcraft.client.registry;
 import net.arna.jcraft.client.renderer.entity.*;
 import net.arna.jcraft.client.renderer.entity.projectiles.*;
 import net.arna.jcraft.client.renderer.entity.stands.*;
+import net.arna.jcraft.common.entity.projectile.EmeraldProjectile;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 
@@ -37,6 +38,8 @@ public interface JEntityRendererRegister {
         EntityRendererRegistry.register(JEntityTypeRegistry.GE_SNAKE, GESnakeRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegistry.GE_BUTTERFLY, GEButterflyRenderer::new);
 
+        EntityRendererRegistry.register(JEntityTypeRegistry.HIEROPHANT_GREEN, HGRenderer::new);
+
         EntityRendererRegistry.register(JEntityTypeRegistry.GER, GERRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegistry.GER_SCORPION, GERScorpionRenderer::new);
 
@@ -52,5 +55,6 @@ public interface JEntityRendererRegister {
         EntityRendererRegistry.register(JEntityTypeRegistry.WS_ACID_PROJECTILE, WSAcidRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegistry.BULLET, BulletRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegistry.RAPIER, RapierRenderer::new);
+        EntityRendererRegistry.register(JEntityTypeRegistry.EMERALD, EmeraldRenderer::new);
     }
 }
