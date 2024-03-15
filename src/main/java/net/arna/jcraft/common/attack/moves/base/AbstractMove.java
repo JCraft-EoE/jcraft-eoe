@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.ints.IntObjectPair;
 import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.IAttacker;
+import net.arna.jcraft.common.attack.core.MoveInputType;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
@@ -457,6 +458,14 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         Vec3d heightOffset = upVec.multiply(0.5);
         return attacker.getBaseEntity().getPos().add(heightOffset);
     }
+
+    /**
+     * Called when a user inputs this move.
+     * @param attacker The attacker that input this move.
+     * @param pressed Whether the move was pressed or released.
+     * @param moveInitiated Whether the move was initiated (or rejected because of e.g., a cooldown).
+     */
+    public void onUserMoveInput(A attacker, boolean pressed, boolean moveInitiated) {}
 
     /**
      * Simply returns {@code this}. Can only be implemented by final moves.

@@ -364,7 +364,8 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     }
 
     @Override
-    protected @NonNull MadeInHeavenEntity getThis() {
+    @NonNull
+    public MadeInHeavenEntity getThis() {
         return this;
     }
 

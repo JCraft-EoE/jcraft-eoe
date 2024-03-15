@@ -193,7 +193,8 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
     }
 
     @Override
-    protected @NonNull TheWorldEntity getThis() {
+    @NonNull
+    public TheWorldEntity getThis() {
         return this;
     }
 

@@ -195,7 +195,8 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
     }
 
     @Override
-    protected @NonNull SPTWEntity getThis() {
+    @NonNull
+    public SPTWEntity getThis() {
         return this;
     }
 

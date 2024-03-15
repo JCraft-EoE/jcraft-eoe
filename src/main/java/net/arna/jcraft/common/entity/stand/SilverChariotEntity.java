@@ -321,7 +321,8 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
     }
 
     @Override
-    protected @NonNull SilverChariotEntity getThis() {
+    @NonNull
+    public SilverChariotEntity getThis() {
         return this;
     }
 

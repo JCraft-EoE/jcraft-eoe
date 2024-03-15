@@ -119,7 +119,7 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
     }
 
     @Override
-    protected AnubisSpec getThis() {
+    public AnubisSpec getThis() {
         return this;
     }
 

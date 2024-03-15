@@ -41,9 +41,8 @@ public interface IAttacker<A extends IAttacker<? extends A, S>, S> {
 
     boolean canHoldMove(MoveInputType type);
 
-    default void onUserMoveInput(AbstractMove<?, ?> currentMove, MoveInputType type, boolean pressed, boolean moveInitiated) {
-        if (type.getMoveType() != null && currentMove instanceof AbstractHoldableMove<?, ?, ?> holdableMove && !pressed && moveInitiated)
-            holdableMove.onRelease(this);
+    default void onUserMoveInput(AbstractMove<?, ? super A> currentMove, boolean pressed, boolean moveInitiated) {
+        currentMove.onUserMoveInput(getThis(), pressed, moveInitiated);
     }
 
     boolean canAttack();
@@ -66,4 +65,6 @@ public interface IAttacker<A extends IAttacker<? extends A, S>, S> {
     default void playAttackerSound(SoundEvent sound, float volume, float pitch)  {
         getBaseEntity().playSound(sound, volume, pitch);
     }
+
+    A getThis();
 }

@@ -225,7 +225,8 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
     }
 
     @Override
-    protected @NonNull GEREntity getThis() {
+    @NonNull
+    public GEREntity getThis() {
         return this;
     }
 

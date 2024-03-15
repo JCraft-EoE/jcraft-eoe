@@ -149,7 +149,8 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
     }
 
     @Override
-    protected @NonNull KQBTDEntity getThis() {
+    @NonNull
+    public KQBTDEntity getThis() {
         return this;
     }
 

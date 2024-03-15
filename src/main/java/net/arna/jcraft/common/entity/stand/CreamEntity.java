@@ -526,7 +526,8 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     }
 
     @Override
-    protected @NonNull CreamEntity getThis() {
+    @NonNull
+    public CreamEntity getThis() {
         return this;
     }
 

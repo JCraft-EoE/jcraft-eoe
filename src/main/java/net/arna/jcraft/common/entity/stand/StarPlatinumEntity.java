@@ -150,7 +150,8 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
     }
 
     @Override
-    protected @NonNull StarPlatinumEntity getThis() {
+    @NonNull
+    public StarPlatinumEntity getThis() {
         return this;
     }
 

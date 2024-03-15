@@ -318,7 +318,8 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
     }
 
     @Override
-    protected @NonNull TheWorldOverHeavenEntity getThis() {
+    @NonNull
+    public TheWorldOverHeavenEntity getThis() {
         return this;
     }
 

@@ -360,7 +360,8 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     }
 
     @Override
-    protected @NonNull KingCrimsonEntity getThis() {
+    @NonNull
+    public KingCrimsonEntity getThis() {
         return this;
     }
 

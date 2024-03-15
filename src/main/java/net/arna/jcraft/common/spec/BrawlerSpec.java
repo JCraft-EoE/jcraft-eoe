@@ -60,7 +60,7 @@ public class BrawlerSpec extends JSpec<BrawlerSpec, BrawlerSpec.State> {
     }
 
     @Override
-    protected BrawlerSpec getThis() {
+    public BrawlerSpec getThis() {
         return this;
     }
 

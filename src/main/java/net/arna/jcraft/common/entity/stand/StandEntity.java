@@ -588,6 +588,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         armorPoints = move.getArmor();
     }
 
+    public final void onUserMoveInput(boolean pressed, boolean moveInitiated) {
+        onUserMoveInput(curMove, pressed, moveInitiated);
+    }
+
     /**
      * Stuns specified {@link LivingEntity}
      *
@@ -1182,7 +1186,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         return user.damage(source, amount);
     }
 
-    protected abstract @NonNull E getThis();
+    public abstract @NonNull E getThis();
 
     // Physical properties
     @Override

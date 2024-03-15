@@ -120,6 +120,10 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
         return entry == null ? type.isHoldable() : MoreObjects.firstNonNull(entry.getMove().getIsHoldable(), type.isHoldable());
     }
 
+    public final void onUserMoveInput(boolean pressed, boolean moveInitiated) {
+        onUserMoveInput(curMove, pressed, moveInitiated);
+    }
+
     public boolean canAttack() {
         return moveStun <= 0 && !JUtils.isAffectedByTimeStop(player) && !player.hasStatusEffect(JStatusRegistry.DAZED);
     }
@@ -243,5 +247,5 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
         if (attack != null) attack.tick(getThis());
     }
 
-    protected abstract A getThis();
+    public abstract A getThis();
 }

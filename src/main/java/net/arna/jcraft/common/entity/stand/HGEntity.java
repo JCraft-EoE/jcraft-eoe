@@ -216,7 +216,8 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
 
 
     @Override
-    protected @NonNull HGEntity getThis() {
+    @NonNull
+    public HGEntity getThis() {
         return this;
     }
 

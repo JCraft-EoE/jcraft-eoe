@@ -395,7 +395,8 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
     }
 
     @Override
-    protected @NonNull TheFoolEntity getThis() {
+    @NonNull
+    public TheFoolEntity getThis() {
         return this;
     }
 

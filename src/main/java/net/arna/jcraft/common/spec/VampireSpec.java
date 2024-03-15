@@ -98,7 +98,7 @@ public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
     }
 
     @Override
-    protected VampireSpec getThis() {
+    public VampireSpec getThis() {
         return this;
     }
 

@@ -215,7 +215,8 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
     }
 
     @Override
-    protected @NonNull MagiciansRedEntity getThis() {
+    @NonNull
+    public MagiciansRedEntity getThis() {
         return this;
     }
 

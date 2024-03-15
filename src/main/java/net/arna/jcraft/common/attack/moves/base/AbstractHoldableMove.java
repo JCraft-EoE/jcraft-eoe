@@ -31,8 +31,13 @@ public abstract class AbstractHoldableMove<T extends AbstractHoldableMove<T, A, 
             attacker.setMove(followupMove, followupState);
     }
 
-    public <A extends IAttacker<? extends A, S>, S> void onRelease(IAttacker<A,S> attacker) {
+    @Override
+    public void onUserMoveInput(A attacker, boolean pressed, boolean moveInitiated) {
+        if (!pressed && moveInitiated) onRelease(attacker);
+    }
+
+    public void onRelease(A attacker) {
         if (attacker.getMoveStun() <= getDuration() - minimumCharge)
-            attacker.setMove((AbstractMove<?, ? super A>) followupMove, (S) followupState);
+            attacker.setMove(followupMove, followupState);
     }
 }

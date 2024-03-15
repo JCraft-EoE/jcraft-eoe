@@ -242,7 +242,8 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
     */
 
     @Override
-    protected @NonNull D4CEntity getThis() {
+    @NonNull
+    public D4CEntity getThis() {
         return this;
     }
 

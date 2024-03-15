@@ -241,7 +241,8 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
     }
 
     @Override
-    protected @NonNull GoldExperienceEntity getThis() {
+    @NonNull
+    public GoldExperienceEntity getThis() {
         return this;
     }
 

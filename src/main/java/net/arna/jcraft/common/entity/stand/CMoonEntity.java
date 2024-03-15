@@ -261,7 +261,8 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
     }
 
     @Override
-    protected @NonNull CMoonEntity getThis() {
+    @NonNull
+    public CMoonEntity getThis() {
         return this;
     }
 

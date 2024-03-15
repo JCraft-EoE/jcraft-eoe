@@ -260,7 +260,8 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
 
 
     @Override
-    protected @NonNull WhiteSnakeEntity getThis() {
+    @NonNull
+    public WhiteSnakeEntity getThis() {
         return this;
     }
 
