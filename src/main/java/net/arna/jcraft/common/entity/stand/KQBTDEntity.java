@@ -35,8 +35,8 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Elbow"), Text.literal("fast, short-range knockback"));
-    public static final BarrageAttack<KQBTDEntity> BARRAGE = new BarrageAttack<KQBTDEntity>(240, 0, 50,
-            0.75f, 1f, 20, 1.5f, 0.1f, 0, 3)
+    public static final BarrageAttack<KQBTDEntity> BARRAGE = new BarrageAttack<KQBTDEntity>(240, 0,
+            40, 0.75f, 1f, 20, 1.5f, 0.1f, 0, 3)
             .withSound(JSoundRegistry.KQ_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, medium stun"));

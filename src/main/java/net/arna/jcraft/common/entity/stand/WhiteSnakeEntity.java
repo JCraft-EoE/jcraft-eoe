@@ -57,7 +57,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
             .withInfo(Text.literal("Gut Punch"), Text.literal("combo starter/extender"));
     public static final MainBarrageAttack<WhiteSnakeEntity> BARRAGE = new MainBarrageAttack<WhiteSnakeEntity>(
-            240, 0, 60, 0.75f, 1, 20, 2, 0.25f, 0, 3, Blocks.OAK_PLANKS.getHardness())
+            240, 0, 40, 0.75f, 1, 20, 2, 0.25f, 0, 3, Blocks.OAK_PLANKS.getHardness())
             .withSound(JSoundRegistry.WS_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, medium stun"));

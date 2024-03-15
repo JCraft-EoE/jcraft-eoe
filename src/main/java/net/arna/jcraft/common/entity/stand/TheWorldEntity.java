@@ -50,7 +50,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
             .withCrouchingVariant(LOW_KICK)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
     public static final MainBarrageAttack<TheWorldEntity> BARRAGE = new MainBarrageAttack<TheWorldEntity>(280,
-            0, 50, 0.75f, 1f, 30, 2, 0.25f, 0, 3, Blocks.OBSIDIAN.getHardness())
+            0, 40, 0.75f, 1f, 30, 2, 0.25f, 0, 3, Blocks.OBSIDIAN.getHardness())
             .withSound(JSoundRegistry.TW_BARRAGE)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
     public static final UppercutAttack<TheWorldEntity> ROUNDHOUSE = new UppercutAttack<TheWorldEntity>(40, 7, 13, 0.75f, 5f,

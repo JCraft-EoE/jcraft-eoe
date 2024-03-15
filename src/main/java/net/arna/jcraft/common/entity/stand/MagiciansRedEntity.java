@@ -74,8 +74,8 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
             .withInfo(Text.literal("Hammerfist"), Text.literal("two-hit launcher"));
-    public static final FlamethrowerAttack FLAMETHROWER = new FlamethrowerAttack(300, 0, 60,
-            0.75f, 0.4f, 0, 2, 0.25f, 0, 3)
+    public static final FlamethrowerAttack FLAMETHROWER = new FlamethrowerAttack(300, 0,
+            40, 0.75f, 0.4f, 0, 2, 0.25f, 0, 3)
             .withArmor(1)
             .withSound(JSoundRegistry.MR_BARRAGE)
             .withInfo(Text.literal("Flamethrower"), Text.literal("fast reliable damage cash-out tool, no stun, burns for 3 seconds"));

@@ -66,7 +66,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             .withLaunch()
             .withInfo(Text.literal("Barrage (Final Hit)"), Text.empty());
     public static final MainBarrageAttack<KingCrimsonEntity> BARRAGE = new MainBarrageAttack<KingCrimsonEntity>(280,
-            0, 50, 0.85f, 1f, 20, 1.5f, 0.1f, 0f, 3, Blocks.OBSIDIAN.getHardness())
+            0, 40, 0.85f, 1f, 20, 1.5f, 0.1f, 0f, 3, Blocks.OBSIDIAN.getHardness())
             .withFinisher(46, BARRAGE_FINISHER)
             .withSound(JSoundRegistry.KC_BARRAGE)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender/finisher, medium stun, knocks back"));

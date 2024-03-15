@@ -53,8 +53,8 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
             .withInfo(Text.literal("Chop"), Text.literal("relatively quick combo starter"));
-    public static final MainBarrageAttack<D4CEntity> BARRAGE = new MainBarrageAttack<D4CEntity>(240, 0, 70,
-            0.75f, 0.8f, 30, 2f, 0.25f, 0f, 3, Blocks.DEEPSLATE.getHardness())
+    public static final MainBarrageAttack<D4CEntity> BARRAGE = new MainBarrageAttack<D4CEntity>(240, 0,
+            40, 0.75f, 0.8f, 30, 2f, 0.25f, 0f, 3, Blocks.DEEPSLATE.getHardness())
             .withSound(JSoundRegistry.D4C_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));

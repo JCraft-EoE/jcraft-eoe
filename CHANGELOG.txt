@@ -2505,6 +2505,19 @@ Blood Bottles
     >can now be used even with 0.5 blood units inside
     >can be used on Villagers
 
+● 15/03/2024
+>Added BETA Hierophant Green
+
+Barrages
+    >Mining barrages must be held (last up to 10s)
+    >Standardized regular barrage length to a maximum of 2s
+
+Silver Chariot
+    >Circle slash is now holdable
+
+Gold Experience: Requiem
+    >Life Beam is now holdable
+
 todo: combo counter is LYING
 
 The reason the easings dont work is because kosmx is fucking stupid,

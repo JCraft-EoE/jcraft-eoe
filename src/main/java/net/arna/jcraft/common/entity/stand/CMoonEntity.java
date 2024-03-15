@@ -59,8 +59,8 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withTargetProcessor(CMoonEntity::addInversion)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
-    public static final MainBarrageAttack<CMoonEntity> BARRAGE = new MainBarrageAttack<CMoonEntity>(280, 0, 50,
-            0.75f, 0.75f, 20, 2f, 0.25f, 0f, 4, Blocks.OBSIDIAN.getHardness())
+    public static final MainBarrageAttack<CMoonEntity> BARRAGE = new MainBarrageAttack<CMoonEntity>(280, 0,
+            40, 0.75f, 0.75f, 20, 2f, 0.25f, 0f, 4, Blocks.OBSIDIAN.getHardness())
             .withSound(JSoundRegistry.CMOON_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withTargetProcessor(CMoonEntity::addBarrageInversion)

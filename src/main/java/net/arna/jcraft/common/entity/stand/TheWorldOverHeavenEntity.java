@@ -60,7 +60,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
     public static final MainBarrageAttack<TheWorldOverHeavenEntity> BARRAGE = new MainBarrageAttack<TheWorldOverHeavenEntity>(
-            280, 0, 50, 0.75f, 1f, 30, 2f, 0.1f, 0f, 3, Blocks.OBSIDIAN.getHardness())
+            280, 0, 40, 0.75f, 1f, 30, 2f, 0.1f, 0f, 3, Blocks.OBSIDIAN.getHardness())
             .withSound(JSoundRegistry.TWOH_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));

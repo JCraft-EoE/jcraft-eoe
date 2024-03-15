@@ -58,7 +58,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withSound(JSoundRegistry.SC_POKE)
             .withInfo(Text.literal("Stab"), Text.literal("quick combo starter, links into Spinning Blade while armor is off"));
     public static final MainBarrageAttack<SilverChariotEntity> BARRAGE = new MainBarrageAttack<SilverChariotEntity>(
-            240, 0, 60, 0.65f, 0.9f, 25, 2.25f, 0.1f, 0f, 3, 1.25F)
+            240, 0, 40, 0.65f, 0.9f, 25, 2.25f, 0.1f, 0f, 3, 1.25F)
             .withSound(JSoundRegistry.SC_BARRAGE)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
     public static final SimpleAttack<SilverChariotEntity> HEAVY = new SimpleAttack<SilverChariotEntity>(

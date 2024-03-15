@@ -51,7 +51,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
             // implemented in class: .withFollowup(LIGHT_FOLLOWUP)
             .withInfo(Text.literal("Punch"), Text.literal("combo starter, decent speed, has two followups"));
     public static final MainBarrageAttack<AbstractKillerQueenEntity<?, ?>> BARRAGE = new MainBarrageAttack<AbstractKillerQueenEntity<?, ?>>(
-            240, 0, 50, 0.75f, 1f, 20, 2f, 0.1f, 0, 3, Blocks.DEEPSLATE.getHardness())
+            240, 0, 40, 0.75f, 1f, 20, 2f, 0.1f, 0, 3, Blocks.DEEPSLATE.getHardness())
             .withSound(JSoundRegistry.KQ_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, medium stun"));
