@@ -27,15 +27,14 @@ public abstract class AbstractHoldableMove<T extends AbstractHoldableMove<T, A, 
     @Override
     public void tick(A attacker) {
         super.tick(attacker);
-        //todo: add a marker for "already released", so holdable moves that arent held dont last till max
-        //        finish sc spin
-        if (attacker.getMoveStun() == 1)
+        int moveStun = attacker.getMoveStun();
+        if (moveStun == 1 || (!attacker.isHolding() && moveStun <= getDuration() - minimumCharge))
             attacker.setMove(followupMove, followupState);
     }
 
     @Override
     public void onUserMoveInput(A attacker, MoveInputType type, boolean pressed, boolean moveInitiated) {
-        if (!pressed && moveInitiated) onRelease(attacker);
+        if (!pressed && moveInitiated && type.getMoveType() == getMoveType()) onRelease(attacker);
     }
 
     public void onRelease(A attacker) {

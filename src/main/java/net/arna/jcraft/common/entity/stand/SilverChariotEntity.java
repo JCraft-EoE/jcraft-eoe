@@ -121,7 +121,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withInfo(Text.literal("Circle Slash (Hit)"), Text.empty());
     public static final HoldableMove<SilverChariotEntity, State> CIRCLE_CHARGE = new HoldableMove<>(
             260, 101, 100, 0.65f, CIRCLE_SLASH, State.CIRCLE_SLASH, 15)
-            .withFollowup(CIRCLE_SLASH)
+            .withInitAction((attacker, user, ctx) -> ctx.setInt(CHARGE_TIME, 0))
             .withArmor(2)
             .withInfo(Text.literal("Circle Slash"), Text.literal("charges for a minimum of 0.75s, tap again to release, 2 armor points"));
     private static final TrackedData<Boolean> HAS_RAPIER;

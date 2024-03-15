@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.attack.core;
 
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractHoldableMove;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
@@ -7,6 +8,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Anything that can use moves must implement this interface.
@@ -39,15 +41,18 @@ public interface IAttacker<A extends IAttacker<? extends A, S>, S> {
 
     boolean initMove(MoveType type);
 
-    boolean canHoldMove(MoveInputType type);
+    boolean canHoldMove(@Nullable MoveInputType type);
 
     default void onUserMoveInput(AbstractMove<?, ? super A> currentMove, MoveInputType type, boolean pressed, boolean moveInitiated) {
-        if (currentMove != null)
-            currentMove.onUserMoveInput(getThis(), type, pressed, moveInitiated);
-        // This is kind of hacky, because type.isHoldable() will fuck up the holding value if you have two holdable types, and you press the other one mid-holdable move.
-        // That's why I added get/setHoldingType(), but it's yet unused.
-        if (moveInitiated || type.isHoldable())
+        if ((moveInitiated && pressed && canHoldMove(type)) ){
+            setHoldingType(type);
+        }
+        if (getHoldingType() == type) {
             setHolding(pressed);
+        }
+        if (currentMove != null) {
+            currentMove.onUserMoveInput(getThis(), type, pressed, moveInitiated);
+        }
     }
 
     boolean isHolding();

@@ -30,6 +30,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -120,8 +121,8 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
         return handleMove(type);
     }
 
-    public boolean canHoldMove(MoveInputType type) {
-        if (type.getMoveType() == null) return false;
+    public boolean canHoldMove(@Nullable MoveInputType type) {
+        if (type == null || type.getMoveType() == null) return false;
 
         MoveMap.Entry<A, S> entry = moveMap.getFirstValidEntry(type.getMoveType(), getThis());
         return entry == null ? type.isHoldable() : MoreObjects.firstNonNull(entry.getMove().getIsHoldable(), type.isHoldable());
@@ -249,9 +250,18 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
         //JCraft.LOGGER.info("SERVER: Movestun is " + moveStun);
 
         // Process attack
-        AbstractMove<?, ? super A> attack = this.curMove;
+        AbstractMove<?, ? super A> move = this.curMove;
         moveStun--;
-        if (attack != null) attack.tick(getThis());
+        if (move != null) {
+            // Make sure the correct holding type is set
+            MoveInputType curMoveInputType = MoveInputType.fromMoveType(move.getMoveType());
+            if (canHoldMove(curMoveInputType) && getHoldingType() != curMoveInputType) {
+                setHoldingType(curMoveInputType);
+                setHolding(true);
+            }
+
+            move.tick(getThis());
+        }
     }
 
     @Override

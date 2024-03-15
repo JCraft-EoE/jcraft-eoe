@@ -697,8 +697,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         return handleMove(type);
     }
 
-    public boolean canHoldMove(MoveInputType type) {
-        if (type.getMoveType() == null) return false;
+    public boolean canHoldMove(@Nullable MoveInputType type) {
+        if (type == null || type.getMoveType() == null) return false;
 
         MoveMap.Entry<E, S> entry = moveMap.getFirstValidEntry(type.getMoveType(), getThis());
         return entry == null ? type.isHoldable() : MoreObjects.firstNonNull(entry.getMove().getIsHoldable(), type.isHoldable());
@@ -862,6 +862,13 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             // Attack logic
             if (move != null) {
                 move.tick(getThis());
+
+                // Make sure the correct holding type is set
+                MoveInputType curMoveInputType = MoveInputType.fromMoveType(move.getMoveType());
+                if (canHoldMove(curMoveInputType) && getHoldingType() != curMoveInputType) {
+                    setHoldingType(curMoveInputType);
+                    setHolding(true);
+                }
 
                 if (moveStun >= 0 && !blocking) {
                     float attackDist = move.getMoveDistance();

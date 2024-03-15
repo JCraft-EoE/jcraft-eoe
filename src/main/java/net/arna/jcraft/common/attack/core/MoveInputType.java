@@ -40,8 +40,8 @@ public enum MoveInputType {
         this.holdable = holdable;
     }
 
-    public static MoveInputType fromMoveType(MoveType moveType) {
-        return Objects.requireNonNull(getFromMoveType().get(moveType), "No MoveQueue has been " +
-                "associated with the given MoveType.");
+    public static @Nullable MoveInputType fromMoveType(MoveType moveType) {
+        //return Objects.requireNonNull(getFromMoveType().get(moveType), "No MoveQueue has been associated with the given MoveType.");
+        return getFromMoveType().get(moveType);
     }
 }

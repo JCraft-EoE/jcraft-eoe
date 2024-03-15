@@ -13,17 +13,25 @@ import java.util.Set;
 
 public class CircleSlashAttack extends AbstractSimpleAttack<CircleSlashAttack, SilverChariotEntity> {
     public static final IntMoveVariable CHARGE_TIME = new IntMoveVariable(); // in half seconds
+    private final float originalDamage;
 
     public CircleSlashAttack(int cooldown, int windup, int duration, float moveDistance, float damage, int stun,
                              float hitboxSize, float knockback, float offset) {
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset);
+        originalDamage = damage;
+    }
+
+    @Override
+    public void onInitiate(SilverChariotEntity attacker) {
+        super.onInitiate(attacker);
+        withDamage(originalDamage);
     }
 
     @Override
     public @NonNull Set<LivingEntity> perform(SilverChariotEntity attacker, LivingEntity user, MoveContext ctx) {
         Set<LivingEntity> targets = super.perform(attacker, user, ctx);
 
-        withDamage(getDamage() + attacker.getMoveContext().getInt(CHARGE_TIME) * 0.75f);
+        withDamage(originalDamage + attacker.getMoveContext().getInt(CHARGE_TIME) * 0.75f);
         double launchMultiplier = getDamage() / 5; // damage [6.5 to 11]
 
         for (LivingEntity living : targets) {

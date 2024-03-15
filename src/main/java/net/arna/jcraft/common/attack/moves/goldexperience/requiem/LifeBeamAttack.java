@@ -2,6 +2,7 @@ package net.arna.jcraft.common.attack.moves.goldexperience.requiem;
 
 import lombok.Getter;
 import lombok.NonNull;
+import net.arna.jcraft.common.attack.core.ctx.IntMoveVariable;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.entity.GERScorpionEntity;
@@ -14,18 +15,17 @@ import java.util.Set;
 
 @Getter
 public class LifeBeamAttack extends AbstractMove<LifeBeamAttack, GEREntity> {
-    private final boolean charged;
+    public static final IntMoveVariable CHARGE_TIME = new IntMoveVariable(); // 9t interval
 
-    public LifeBeamAttack(int cooldown, int windup, int duration, float moveDistance, boolean charged) {
+    public LifeBeamAttack(int cooldown, int windup, int duration, float moveDistance) {
         super(cooldown, windup, duration, moveDistance);
-        this.charged = charged;
         ranged = true;
     }
 
     @Override
     public @NonNull Set<LivingEntity> perform(GEREntity attacker, LivingEntity user, MoveContext ctx) {
         GERScorpionEntity scorpion = new GERScorpionEntity(JEntityTypeRegistry.GER_SCORPION, attacker.getWorld());
-        if (charged) scorpion.charge();
+        if (ctx.getInt(CHARGE_TIME) >= 18) scorpion.charge();
         scorpion.setInitialVel(user.getRotationVector().multiply(2));
         Vec3d ePos = attacker.getEyePos();
         scorpion.refreshPositionAndAngles(ePos.x, ePos.y, ePos.z, -user.getYaw() - 90f, attacker.getPitch());
@@ -36,12 +36,17 @@ public class LifeBeamAttack extends AbstractMove<LifeBeamAttack, GEREntity> {
     }
 
     @Override
+    public void registerContextEntries(MoveContext ctx) {
+        ctx.register(CHARGE_TIME);
+    }
+
+    @Override
     protected @NonNull LifeBeamAttack getThis() {
         return this;
     }
 
     @Override
     public @NonNull LifeBeamAttack copy() {
-        return copyExtras(new LifeBeamAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), isCharged()));
+        return copyExtras(new LifeBeamAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
     }
 }

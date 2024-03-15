@@ -14,6 +14,7 @@ import java.util.Set;
 public class HoldableMove <A extends IAttacker<A, S> & IAnimatable, S extends Enum<S> & StandAnimationState<A>> extends AbstractHoldableMove<HoldableMove<A, S>, A, S> {
     public HoldableMove(int cooldown, int windup, int duration, float attackDistance, AbstractMove<?, ? super A> followupMove, S followupState, int minimumCharge) {
         super(cooldown, windup, duration, attackDistance, followupMove, followupState, minimumCharge);
+        withFollowup(followupMove);
     }
 
     @Override

@@ -7,6 +7,7 @@ import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.goldexperience.requiem.*;
 import net.arna.jcraft.common.attack.moves.shared.*;
+import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
@@ -17,7 +18,9 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.Angerable;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -26,6 +29,7 @@ import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static net.arna.jcraft.common.attack.moves.goldexperience.requiem.LifeBeamAttack.CHARGE_TIME;
 import static net.arna.jcraft.common.component.living.HitPropertyComponent.HitAnimation.*;
 
 public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
@@ -94,15 +98,16 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             .withCrouchingVariant(HEAL)
             .withSound(JSoundRegistry.GE_HEAL)
             .withInfo(Text.literal("Healing Hand"), Text.literal("standing: heals user for 2 hearts, crouching: heals others for 3 hearts, pacifies angered mobs"));
-    public static final LifeBeamAttack CHARGED_LIFE_BEAM = new LifeBeamAttack(280, 18, 28,
-            1.1f, true)
-            .withSound(JSoundRegistry.GER_SLOW_LASER)
-            .withInfo(Text.literal("Life Beam (Charged)"), Text.literal("slower, poisoning variant"));
-    public static final LifeBeamAttack LIFE_BEAM = new LifeBeamAttack(280, 10, 20, 1f, false)
-            .withCrouchingVariant(CHARGED_LIFE_BEAM)
+    public static final LifeBeamAttack LIFE_BEAM = new LifeBeamAttack(0, 1, 10, 1.1f)
+            .withSound(JSoundRegistry.GER_LASER_FIRE)
+            .withInfo(Text.literal("Life Beam"), Text.literal(""));
+    public static final HoldableMove<GEREntity, State> LIFE_BEAM_CHARGE = new HoldableMove<>(280,
+            0, 40, 1.1f, LIFE_BEAM, State.LASER_FIRE, 9)
+            .withInitAction((attacker, user, ctx) -> ctx.setInt(CHARGE_TIME, 0))
             .withSound(JSoundRegistry.GER_LASER)
-            .withInfo(Text.literal("Life Beam"), Text.literal("summons a quick, stunning rock projectile " +
-                    "that turns into a scorpion a small time after landing"));
+            .withInfo(Text.literal("Life Beam"), Text.literal("""
+                    Summons a fast rock projectile that turns into a homing scorpion a small time after landing.
+                    If charged for a minimum of 0.9 seconds, the scorpion inflicts poison and deals more stun."""));
     public static final NullificationAttack NULLIFICATION = new NullificationAttack(480, 5, 35, 1f)
             .withSound(JSoundRegistry.GE_HEAL)
             .withInfo(Text.literal("Nullification"), Text.literal("0.25s windup, 1.5s counter, stuns on hit"));
@@ -162,7 +167,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE).withAerialVariant(State.AIR_BARRAGE);
 
         moves.register(MoveType.SPECIAL1, HEAL_SELF, State.HEAL_SELF).withCrouchingVariant(State.HEAL);
-        moves.register(MoveType.SPECIAL2, LIFE_BEAM, State.LASER).withCrouchingVariant(State.SLOW_LASER);
+        moves.register(MoveType.SPECIAL2, LIFE_BEAM_CHARGE, State.LASER);
         moves.register(MoveType.SPECIAL3, NULLIFICATION, State.COUNTER);
         moves.register(MoveType.ULTIMATE, RETURN_TO_ZERO, State.SETUP);
 
@@ -220,6 +225,17 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         if (age == 1) playSound(JSoundRegistry.GER_SUMMON, 1f, 1f);
         super.tick();
 
+        if (world.isClient) {
+            if (getState() == State.LASER && getMoveStun() == (LIFE_BEAM_CHARGE.getDuration() - 18))  {
+                Vec3d offset = GravityChangerAPI.getEyeOffset(this);
+                double x = getX() + offset.x, y = getY() + offset.y, z = getZ() + offset.z;
+                for (int i = 0; i < 12; i++)
+                    world.addParticle(ParticleTypes.WITCH, x, y, z, random.nextGaussian(), random.nextGaussian(), random.nextGaussian());
+            }
+        } else {
+            if (curMove != null && curMove.getOriginalMove() == LIFE_BEAM_CHARGE)
+                getMoveContext().incrementInt(CHARGE_TIME, 1);
+        }
         FLIGHT.tickFlight(this);
         RETURN_TO_ZERO.tickReturnInfo(this);
     }
@@ -240,7 +256,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         HEAL_SELF(builder -> builder.playAndHold("animation.ger.healself")),
         HEAL(builder -> builder.playAndHold("animation.ger.heal")),
         LASER(builder -> builder.playAndHold("animation.ger.laser")),
-        SLOW_LASER(builder -> builder.playAndHold("animation.ger.slowlaser")),
+        LASER_FIRE(builder -> builder.playAndHold("animation.ger.laser_fire")),
         COUNTER(builder -> builder.playAndHold("animation.ger.counter")),
         COUNTER_MISS(builder -> builder.playAndHold("animation.ger.counter_miss")),
         AIR_HEAVY(builder -> builder.playAndHold("animation.ger.airheavy")),

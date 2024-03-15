@@ -899,9 +899,9 @@
     ]
   },
 
-  "gerslowlaser": {
+  "gerlaserfire": {
     "sounds": [
-      "jcraft:stands/goldexperiencerequiem/slowlaser"
+      "jcraft:stands/goldexperiencerequiem/laser_fire"
     ]
   },
 

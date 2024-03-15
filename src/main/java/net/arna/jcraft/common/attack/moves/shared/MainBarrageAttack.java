@@ -2,6 +2,7 @@ package net.arna.jcraft.common.attack.moves.shared;
 
 import lombok.NonNull;
 import net.arna.jcraft.common.attack.core.IAttacker;
+import net.arna.jcraft.common.attack.core.MoveInputType;
 import net.arna.jcraft.common.attack.core.ctx.BooleanMoveVariable;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractBarrageAttack;
@@ -35,6 +36,13 @@ public class MainBarrageAttack<A extends IAttacker<? extends A, ?>> extends Abst
     public void onInitiate(A attacker) {
         super.onInitiate(attacker);
         attacker.getMoveContext().setBoolean(BREAK_BLOCKS, attacker.getUserOrThrow().isSneaking());
+    }
+
+    @Override
+    public void onUserMoveInput(A attacker, MoveInputType type, boolean pressed, boolean moveInitiated) {
+        super.onUserMoveInput(attacker, type, pressed, moveInitiated);
+        if (type.getMoveType() == getMoveType() && !pressed)
+            attacker.cancelMove();
     }
 
     @Override
