@@ -41,9 +41,22 @@ public interface IAttacker<A extends IAttacker<? extends A, S>, S> {
 
     boolean canHoldMove(MoveInputType type);
 
-    default void onUserMoveInput(AbstractMove<?, ? super A> currentMove, boolean pressed, boolean moveInitiated) {
-        currentMove.onUserMoveInput(getThis(), pressed, moveInitiated);
+    default void onUserMoveInput(AbstractMove<?, ? super A> currentMove, MoveInputType type, boolean pressed, boolean moveInitiated) {
+        if (currentMove != null)
+            currentMove.onUserMoveInput(getThis(), type, pressed, moveInitiated);
+        // This is kind of hacky, because type.isHoldable() will fuck up the holding value if you have two holdable types, and you press the other one mid-holdable move.
+        // That's why I added get/setHoldingType(), but it's yet unused.
+        if (moveInitiated || type.isHoldable())
+            setHolding(pressed);
     }
+
+    boolean isHolding();
+
+    void setHolding(boolean holding);
+
+    MoveInputType getHoldingType();
+
+    void setHoldingType(MoveInputType holdingType);
 
     boolean canAttack();
 

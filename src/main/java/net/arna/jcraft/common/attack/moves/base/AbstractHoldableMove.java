@@ -2,6 +2,8 @@ package net.arna.jcraft.common.attack.moves.base;
 
 import lombok.Getter;
 import net.arna.jcraft.common.attack.core.IAttacker;
+import net.arna.jcraft.common.attack.core.MoveInputType;
+import net.arna.jcraft.common.attack.core.MoveType;
 
 @Getter
 public abstract class AbstractHoldableMove<T extends AbstractHoldableMove<T, A, S>, A extends IAttacker<A, S>, S>
@@ -32,7 +34,7 @@ public abstract class AbstractHoldableMove<T extends AbstractHoldableMove<T, A, 
     }
 
     @Override
-    public void onUserMoveInput(A attacker, boolean pressed, boolean moveInitiated) {
+    public void onUserMoveInput(A attacker, MoveInputType type, boolean pressed, boolean moveInitiated) {
         if (!pressed && moveInitiated) onRelease(attacker);
     }
 

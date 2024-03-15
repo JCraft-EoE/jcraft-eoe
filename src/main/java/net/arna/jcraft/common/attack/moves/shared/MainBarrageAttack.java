@@ -28,6 +28,7 @@ public class MainBarrageAttack<A extends IAttacker<? extends A, ?>> extends Abst
         super(cooldown, windup, duration, attackDistance, damage, stun, hitboxSize, knockback, offset, interval);
         this.mineableHardness = mineableHardness;
         withBarrageShockwaves();
+        withHoldable();
     }
 
     @Override

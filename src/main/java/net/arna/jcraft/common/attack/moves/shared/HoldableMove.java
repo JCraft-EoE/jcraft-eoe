@@ -28,6 +28,6 @@ public class HoldableMove <A extends IAttacker<A, S> & IAnimatable, S extends En
 
     @Override
     public @NonNull HoldableMove<A, S> copy() {
-        return copyExtras(new HoldableMove<>(getCooldown(), getWindup(), getDuration(), getArmor(), getFollowupMove(), getFollowupState(), getMinimumCharge()));
+        return copyExtras(new HoldableMove<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getFollowupMove(), getFollowupState(), getMinimumCharge()));
     }
 }

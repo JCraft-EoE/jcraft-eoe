@@ -54,7 +54,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     @Getter
     private Boolean isHoldable;
     // Used to help AI know how and when to use this attack.
-    protected boolean ranged, barrage, multiHit, charge, counter, dash, grab;
+    protected boolean ranged, barrage, multiHit, charge, counter, dash, grab, copyOnUse;
     private boolean copiedExtras; // See #testCopy()
 
     protected AbstractMove(int cooldown, int windup, int duration, float moveDistance) {
@@ -273,6 +273,18 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     }
 
     /**
+     * Forces move handling to copy this move when initiated.
+     */
+    public T withCopyOnUse() {
+        this.copyOnUse = true;
+        return getThis();
+    }
+
+    public boolean shouldCopyOnUse() {
+        return copyOnUse;
+    }
+
+    /**
      * Sets whether this move can be held.
      * @param holdable Whether this move can be held. {@code null} for default behavior (dependent on the move-type).
      * @return This move
@@ -462,10 +474,11 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     /**
      * Called when a user inputs this move.
      * @param attacker The attacker that input this move.
+     * @param type The {@link MoveInputType} of the move.
      * @param pressed Whether the move was pressed or released.
      * @param moveInitiated Whether the move was initiated (or rejected because of e.g., a cooldown).
      */
-    public void onUserMoveInput(A attacker, boolean pressed, boolean moveInitiated) {}
+    public void onUserMoveInput(A attacker, MoveInputType type, boolean pressed, boolean moveInitiated) {}
 
     /**
      * Simply returns {@code this}. Can only be implemented by final moves.
@@ -505,6 +518,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         cast.isFollowup = isFollowup;
         cast.armor = armor;
         cast.isHoldable = isHoldable;
+        cast.copyOnUse = copyOnUse;
         cast.finisher = finisher == null ? null : IntObjectPair.of(finisher.leftInt(), finisher.right().copy());
         cast.mobilityType = mobilityType;
         cast.originalMove = originalMove; // Set the original move to this move

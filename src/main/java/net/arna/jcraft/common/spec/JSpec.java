@@ -45,11 +45,18 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
     public final PlayerEntity player;
     @Setter
     public int moveStun = 0;
+
     private S state;
+
     public AbstractMove<?, ? super A> curMove;
     public AbstractMove<?, ? super A> previousAttack;
+
     public MoveInputType queuedMove;
+
     public int armorPoints = 0;
+
+    private boolean holding = false;
+    private MoveInputType holdingType = null;
 
     protected JSpec(SpecType type, PlayerEntity player) {
         this.type = type;
@@ -120,8 +127,8 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
         return entry == null ? type.isHoldable() : MoreObjects.firstNonNull(entry.getMove().getIsHoldable(), type.isHoldable());
     }
 
-    public final void onUserMoveInput(boolean pressed, boolean moveInitiated) {
-        onUserMoveInput(curMove, pressed, moveInitiated);
+    public final void onUserMoveInput(MoveInputType type, boolean pressed, boolean moveInitiated) {
+        onUserMoveInput(curMove, type, pressed, moveInitiated);
     }
 
     public boolean canAttack() {
@@ -245,6 +252,26 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
         AbstractMove<?, ? super A> attack = this.curMove;
         moveStun--;
         if (attack != null) attack.tick(getThis());
+    }
+
+    @Override
+    public boolean isHolding() {
+        return holding;
+    }
+
+    @Override
+    public void setHolding(boolean holding) {
+        this.holding = holding;
+    }
+
+    @Override
+    public MoveInputType getHoldingType() {
+        return holdingType;
+    }
+
+    @Override
+    public void setHoldingType(MoveInputType holdingType) {
+        this.holdingType = holdingType;
     }
 
     public abstract A getThis();

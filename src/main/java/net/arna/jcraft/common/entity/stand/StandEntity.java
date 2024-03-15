@@ -115,6 +115,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     public boolean wantToBlock = false;
     public boolean blocking = false;
+
+    private boolean holding = false;
     protected boolean idleOverride = false;
 
     // In meters and degrees
@@ -126,6 +128,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     protected float maxStandGauge = 90f;
 
     protected MoveInputType queuedMove;
+    private MoveInputType holdingType;
     public AbstractMove<?, ? super E> curMove;
     public AbstractMove<?, ? super E> prevMove;
     public int armorPoints;
@@ -539,7 +542,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if (hasUser() && !getUserOrThrow().isOnGround() && entry.getAerialVariant() != null)
             entry = entry.getAerialVariant();
 
-        return handleMove(entry.getMove(), entry.getCooldownType(), entry.getAnimState());
+        AbstractMove<?, ? super E> move = entry.getMove();
+        return handleMove(move.shouldCopyOnUse() ? move.copy() : move, entry.getCooldownType(), entry.getAnimState());
     }
 
     /**
@@ -588,8 +592,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         armorPoints = move.getArmor();
     }
 
-    public final void onUserMoveInput(boolean pressed, boolean moveInitiated) {
-        onUserMoveInput(curMove, pressed, moveInitiated);
+    public final void onUserMoveInput(MoveInputType type, boolean pressed, boolean moveInitiated) {
+        onUserMoveInput(curMove, type, pressed, moveInitiated);
     }
 
     /**
@@ -1184,6 +1188,26 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if (getStandGauge() <= 0.0F || source.isOutOfWorld())
             return super.damage(source, amount);
         return user.damage(source, amount);
+    }
+
+    @Override
+    public boolean isHolding() {
+        return holding;
+    }
+
+    @Override
+    public void setHolding(boolean holding) {
+        this.holding = holding;
+    }
+
+    @Override
+    public MoveInputType getHoldingType() {
+        return holdingType;
+    }
+
+    @Override
+    public void setHoldingType(MoveInputType holdingType) {
+        this.holdingType = holdingType;
     }
 
     public abstract @NonNull E getThis();

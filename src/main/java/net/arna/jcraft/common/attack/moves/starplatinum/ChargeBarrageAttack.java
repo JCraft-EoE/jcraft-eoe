@@ -25,7 +25,8 @@ public class ChargeBarrageAttack extends AbstractBarrageAttack<ChargeBarrageAtta
         this.originalMoveDistance = moveDistance;
         this.quadraticMovement = quadraticMovement;
 
-        this.withStunType(StunType.BURSTABLE);
+        withCopyOnUse();
+        withStunType(StunType.BURSTABLE);
         charge = true;
         ranged = true;
         inflictsSlowness = false;

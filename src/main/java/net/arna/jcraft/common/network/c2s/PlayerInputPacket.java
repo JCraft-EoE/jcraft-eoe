@@ -130,9 +130,9 @@ public class PlayerInputPacket {
                     StandEntity<?, ?> stand = JUtils.getStand(player);
                     if (stand == null) {
                         JSpec<?, ?> spec = JUtils.getSpec(player);
-                        spec.onUserMoveInput(true, b);
+                        spec.onUserMoveInput(type, true, b);
                     } else {
-                        stand.onUserMoveInput(true, b);
+                        stand.onUserMoveInput(type, true, b);
                     }
                 });
             });
@@ -144,9 +144,9 @@ public class PlayerInputPacket {
                     StandEntity<?, ?> stand = JUtils.getStand(player);
                     if (stand == null) {
                         JSpec<?, ?> spec = JUtils.getSpec(player);
-                        spec.onUserMoveInput(false, success);
+                        spec.onUserMoveInput(type, false, success);
                     } else {
-                        stand.onUserMoveInput(false, success);
+                        stand.onUserMoveInput(type, false, success);
                     }
                 });
             }
