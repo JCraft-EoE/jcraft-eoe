@@ -12,8 +12,8 @@ import software.bernie.geckolib3.core.IAnimatable;
 import java.util.Set;
 
 public class HoldableMove <A extends IAttacker<A, S> & IAnimatable, S extends Enum<S> & StandAnimationState<A>> extends AbstractHoldableMove<HoldableMove<A, S>, A, S> {
-    public HoldableMove(int cooldown, int windup, int duration, float attackDistance, AbstractMove<?, ? super A> followupMove, S followupState, int minimumCharge, int maximumCharge) {
-        super(cooldown, windup, duration, attackDistance, followupMove, followupState, minimumCharge, maximumCharge);
+    public HoldableMove(int cooldown, int windup, int duration, float attackDistance, AbstractMove<?, ? super A> followupMove, S followupState, int minimumCharge) {
+        super(cooldown, windup, duration, attackDistance, followupMove, followupState, minimumCharge);
     }
 
     @Override
@@ -28,6 +28,6 @@ public class HoldableMove <A extends IAttacker<A, S> & IAnimatable, S extends En
 
     @Override
     public @NonNull HoldableMove<A, S> copy() {
-        return copyExtras(new HoldableMove<>(getCooldown(), getWindup(), getDuration(), getArmor(), getFollowupMove(), getFollowupState(), getMinimumCharge(), getMaximumCharge()));
+        return copyExtras(new HoldableMove<>(getCooldown(), getWindup(), getDuration(), getArmor(), getFollowupMove(), getFollowupState(), getMinimumCharge()));
     }
 }

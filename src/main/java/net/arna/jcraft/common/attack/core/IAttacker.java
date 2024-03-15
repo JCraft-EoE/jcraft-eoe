@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.attack.core;
 
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
+import net.arna.jcraft.common.attack.moves.base.AbstractHoldableMove;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -39,6 +40,11 @@ public interface IAttacker<A extends IAttacker<? extends A, S>, S> {
     boolean initMove(MoveType type);
 
     boolean canHoldMove(MoveInputType type);
+
+    default void onUserMoveInput(AbstractMove<?, ?> currentMove, MoveInputType type, boolean pressed, boolean moveInitiated) {
+        if (type.getMoveType() != null && currentMove instanceof AbstractHoldableMove<?, ?, ?> holdableMove && !pressed && moveInitiated)
+            holdableMove.onRelease(this);
+    }
 
     boolean canAttack();
 

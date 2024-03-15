@@ -120,7 +120,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Circle Slash (Hit)"), Text.empty());
     public static final HoldableMove<SilverChariotEntity, State> CIRCLE_CHARGE = new HoldableMove<>(
-            260, 101, 100, 0.65f, CIRCLE_SLASH, State.CIRCLE_SLASH, 15, 100)
+            260, 101, 100, 0.65f, CIRCLE_SLASH, State.CIRCLE_SLASH, 15)
             .withFollowup(CIRCLE_SLASH)
             .withArmor(2)
             .withInfo(Text.literal("Circle Slash"), Text.literal("charges for a minimum of 0.75s, tap again to release, 2 armor points"));
@@ -231,18 +231,10 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
 
     @Override
     public boolean initMove(MoveType type) {
-        if (type == MoveType.UTILITY) {
-            if (curMove != null && curMove.getMoveType() == MoveType.UTILITY && getMoveStun() <= 85)
-                setMove(CIRCLE_SLASH.copy(), State.CIRCLE_SLASH);
-            else { // Reset charge time, and begin charging again
-                getMoveContext().setInt(CHARGE_TIME, 0);
-                return handleMove(MoveType.UTILITY);
-            }
-        } else if (type == MoveType.LIGHT && curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
+        if (type == MoveType.LIGHT && curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
             AbstractMove<?, ? super SilverChariotEntity> followup = curMove.getFollowup();
             if (followup != null) setMove(followup, (State) followup.getAnimation());
         } else return super.initMove(type);
-
         return true;
     }
 

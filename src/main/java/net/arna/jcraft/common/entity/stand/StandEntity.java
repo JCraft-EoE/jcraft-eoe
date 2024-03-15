@@ -588,14 +588,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         armorPoints = move.getArmor();
     }
 
-    public void onUserMoveInput(MoveInputType type, boolean pressed, boolean moveInitiated) {
-        // Ensure the current move is still the one corresponding to the input.
-        if (type.getMoveType() != null && moveMap.getEntries(type.getMoveType()).stream().anyMatch(e -> e.getMove() == curMove) &&
-                curMove instanceof AbstractHoldableMove<?, ?, ?> holdableMove && !pressed && moveInitiated) {
-            holdableMove.onRelease();
-        }
-    }
-
     /**
      * Stuns specified {@link LivingEntity}
      *
