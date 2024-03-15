@@ -38,10 +38,10 @@ public class PlayerInputPacket {
                 InputStateManager sm = getInputStateManager(player);
 
                 // Handle held inputs
-                sm.heldInputs = sm.heldInputs.stream()
+                sm.heldInputs = EnumSet.copyOf(sm.heldInputs).stream()
                         .filter(type -> JUtils.canHoldMove(player, type))
                         .peek(type -> handleMoveInput(server, player, type))
-                        .collect(Collectors.toCollection(HashSet::new)); // To ensure it is a mutable set.
+                        .collect(Collectors.toCollection(() -> EnumSet.noneOf(MoveInputType.class)));
 
                 int forward = sm.calcForward();
                 int side = sm.calcSide();
