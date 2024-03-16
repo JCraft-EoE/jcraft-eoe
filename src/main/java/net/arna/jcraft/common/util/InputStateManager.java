@@ -12,7 +12,7 @@ import java.util.Set;
 public class InputStateManager {
     public Set<MoveInputType> heldInputs = EnumSet.noneOf(MoveInputType.class);
     public boolean forward, backward, left, right;
-    public boolean dashing, jumping;
+    public boolean dashing, jumping, sneaking;
 
     public int calcForward() {
         int forward = 0;
@@ -36,5 +36,6 @@ public class InputStateManager {
         this.right = other.right;
         this.dashing = other.dashing;
         this.jumping = other.jumping;
+        this.sneaking = other.sneaking;
     }
 }

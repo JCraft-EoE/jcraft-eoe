@@ -170,9 +170,8 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
         } else {
             double f = getRemoteForwardInput();
             double s = getRemoteSideInput();
-            boolean jump = getRemoteJumpInput();
 
-            tickRemoteMovement(f, s, jump);
+            tickRemoteMovement(f, s, getRemoteJumpInput(), getRemoteSneakInput());
 
             if (getState() == State.IDLE) { // Replace idle anim
                 if (s > 0) setStateNoReset(onGround ? State.RIGHT : State.RIGHT_DASH);
@@ -183,21 +182,24 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
         }
     }
 
-    public void tickRemoteMovement(double f, double s, boolean jump) {
+    public void tickRemoteMovement(double f, double s, boolean jump, boolean sneak) {
         Vec3d pos = getPos();
+        onLanding();
 
         // 1 tick of inertia, helping movement be fluid as well as dealing with packet drops
-        if (lastRemoteInputTime - age > 2) updateRemoteInputs(0, 0, false);
+        if (lastRemoteInputTime - age > 2) updateRemoteInputs(0, 0, false, false);
         Vec3d rotVec = new Vec3d(getRotationVector().x, 0, getRotationVector().z).normalize();
 
-        double dragMult = getMoveStun() > 0 ? 0.2 : 0.4;
+        double dragMult = getMoveStun() > 0 ? 0.1 : 0.2;
         double moveSpeed = 0.24;
-        boolean swimming = !world.getFluidState(getBlockPos()).isEmpty();
 
-        if (swimming) dragMult *= 0.5;
+        Vec3d upVec = GravityChangerAPI.getEyeOffset(this);
 
         if (jump)
-            addVelocity(0, 0.1, 0);
+            remoteSpeed = remoteSpeed.add(upVec.multiply(moveSpeed));
+
+        if (sneak)
+            remoteSpeed = remoteSpeed.subtract(upVec.multiply(moveSpeed));
 
         remoteSpeed = remoteSpeed
                 .add(rotVec.multiply(f * moveSpeed)) // Forward movement
@@ -209,6 +211,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
         if (pos.add(remoteSpeed).squaredDistanceTo(userPos) > 400)
             remoteSpeed = userPos.subtract(pos).multiply(0.025); // 1/40th so it scales with distance
 
+        addVelocity(-getVelocity().x * 0.1, -getVelocity().y * 0.1, -getVelocity().z * 0.1);
         addVelocity(remoteSpeed.x, remoteSpeed.y, remoteSpeed.z);
         velocityDirty = true;
         velocityModified = true;

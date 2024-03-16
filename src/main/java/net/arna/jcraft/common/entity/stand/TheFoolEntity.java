@@ -381,7 +381,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
         }
 
         AbstractMove<?, ? super TheFoolEntity> move = curMove;
-        if (lastRemoteInputTime - age > 4) updateRemoteInputs(0, 0, false);
+        if (lastRemoteInputTime - age > 4) updateRemoteInputs(0, 0, false, false);
         if (move != null) {
             int slamType = moveContext.getInt(SlamAttack.VARIANT);
             if (move.getOriginalMove() == SLAM && slamType != 1) queuedMove = null;

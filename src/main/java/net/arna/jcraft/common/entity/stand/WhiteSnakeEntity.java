@@ -217,7 +217,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         Vec3d pos = getPos();
 
         // 1 tick of inertia, helping movement be fluid as well as dealing with packet drops
-        if (lastRemoteInputTime - age > 2) updateRemoteInputs(0, 0, false);
+        if (lastRemoteInputTime - age > 2) updateRemoteInputs(0, 0, false, false);
         Vec3d rotVec = new Vec3d(getRotationVector().x, 0, getRotationVector().z).normalize();
 
         double dragMult = getMoveStun() > 0 ? 0.2 : 0.4;

@@ -48,7 +48,7 @@ public class PlayerInputPacket {
                 JComponents.getMiscData(player).updateRemoteInputs(forward, side, sm.jumping);
 
                 StandEntity<?, ?> stand = JUtils.getStand(player);
-                if (stand != null) stand.updateRemoteInputs(forward, side, sm.jumping);
+                if (stand != null) stand.updateRemoteInputs(forward, side, sm.jumping, sm.sneaking);
 
                 if (sm.dashing) JCraft.tryDash(forward, side, player);
 
@@ -99,6 +99,9 @@ public class PlayerInputPacket {
             }
 
             if (type == MovementInputType.JUMP) sm.jumping = pressed;
+
+            if (type == MovementInputType.CROUCH) sm.sneaking = pressed;
+
             if (type == MovementInputType.DASH) {
                 sm.dashing = pressed;
                 if (pressed) server.execute(() -> JCraft.tryDash(sm.calcForward(), sm.calcSide(), player));

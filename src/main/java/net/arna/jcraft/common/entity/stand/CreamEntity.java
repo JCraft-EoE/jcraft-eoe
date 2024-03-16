@@ -459,7 +459,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                 if (serverPlayer.isFallFlying())
                     serverPlayer.stopFallFlying();
 
-                if (lastRemoteInputTime - age > 4) updateRemoteInputs(0, 0, false);
+                if (lastRemoteInputTime - age > 4) updateRemoteInputs(0, 0, false, false);
 
                 Vec3d finalSpeed = Vec3d.ZERO;
                 if (!blocking && !user.hasStatusEffect(JStatusRegistry.DAZED)) {

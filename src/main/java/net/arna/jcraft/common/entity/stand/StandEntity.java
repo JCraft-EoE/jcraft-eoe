@@ -10,12 +10,14 @@ import net.arna.jcraft.common.attack.core.MoveInputType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
-import net.arna.jcraft.common.attack.moves.base.*;
+import net.arna.jcraft.common.attack.moves.base.AbstractBarrageAttack;
+import net.arna.jcraft.common.attack.moves.base.AbstractCounterAttack;
+import net.arna.jcraft.common.attack.moves.base.AbstractMove;
+import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.living.CooldownsComponent;
 import net.arna.jcraft.common.component.living.HitPropertyComponent;
-import net.arna.jcraft.common.entity.GEFrogEntity;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.network.s2c.ComboCounterPacket;
@@ -146,7 +148,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     private double remoteForwardInput = 0;
     @Getter
     private double remoteSideInput = 0;
-    private boolean remoteJumpInput = false;
+    @Setter
+    private boolean remoteJumpInput = false, remoteSneakInput = false;
 
     // Summoning
     @Getter
@@ -349,14 +352,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         this.dataTracker.set(FREE, free);
     }
 
-    public void setRemoteJumpInput(boolean b) {
-        remoteJumpInput = b;
-    }
-
-    public boolean getRemoteJumpInput() {
-        return remoteJumpInput;
-    }
-
     /**
      * Called in the constructor of this class. Registers all moves by calling {@link #registerMoves(MoveMap)}.
      * Call this if you wish to re-register the moves for some reason. Doing so will reset the {@link MoveMap}.
@@ -372,13 +367,22 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     /**
      * Synchronises the user inputs serverside
      */
-    public void updateRemoteInputs(int f, int s, boolean j) {
+    public void updateRemoteInputs(int f, int s, boolean j, boolean c) {
         // These persist, so implementation for cleaning should be done in the stand code
         Vec3d v = new Vec3d(f, 0, s).normalize();
         remoteForwardInput = v.x;
         remoteSideInput = v.z;
         remoteJumpInput = j;
+        remoteSneakInput = c;
         lastRemoteInputTime = age;
+    }
+
+    public boolean getRemoteJumpInput() {
+        return remoteJumpInput;
+    }
+
+    public boolean getRemoteSneakInput() {
+        return remoteSneakInput;
     }
 
     public boolean isRemote() {

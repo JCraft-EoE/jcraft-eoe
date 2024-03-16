@@ -6,5 +6,6 @@ public enum MovementInputType {
     LEFT,
     RIGHT,
     JUMP,
+    CROUCH,
     DASH
 }

@@ -323,6 +323,7 @@ public class JCraftClient implements ClientModInitializer {
                 .put(TrackedKeyBinding.wrap(options.leftKey), MovementInputType.LEFT)
                 .put(TrackedKeyBinding.wrap(options.rightKey), MovementInputType.RIGHT)
                 .put(TrackedKeyBinding.wrap(options.jumpKey), MovementInputType.JUMP)
+                .put(TrackedKeyBinding.wrap(options.sneakKey), MovementInputType.CROUCH)
                 .put(dash, MovementInputType.DASH)
                 .build();
     }

@@ -176,6 +176,7 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
         GameOptions options = client.options;
         float f = 0, s = 0;
         boolean jump = options.jumpKey.isPressed();
+        boolean sneak = options.sneakKey.isPressed();
         if (options.forwardKey.isPressed())
             f += 1.0f;
         if (options.backKey.isPressed())
@@ -185,7 +186,7 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
         if (options.rightKey.isPressed())
             s += 1.0f;
 
-        hgEntity.tickRemoteMovement(f, s, jump);
+        hgEntity.tickRemoteMovement(f, s, jump, sneak);
     }
 
     @Override
