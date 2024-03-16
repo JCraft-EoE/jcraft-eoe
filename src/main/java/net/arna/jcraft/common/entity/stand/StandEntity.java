@@ -1036,11 +1036,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     private static void baseDamageLogic(LivingEntity ent, Vec3d kbVec, int stunTicks, int stunLevel, boolean overrideStun,
                                         float damage, boolean lift, int blockstun, DamageSource source, Entity attacker,
                                         HitPropertyComponent.HitAnimation hitAnimation, boolean canBackstab, boolean unblockable) {
-        // If we need more damage reflection later, use an interface.
-        if (ent instanceof GEFrogEntity && attacker instanceof LivingEntity living) {
-            baseDamageLogic(living, kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, hitAnimation, canBackstab, unblockable);
-            return;
-        }
+        if (ent instanceof ICustomDamageHandler customDamageHandler)
+            if (!customDamageHandler.handleDamage(kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, hitAnimation, canBackstab, unblockable))
+                return;
 
         boolean hit = true;
         boolean tsHit = JUtils.isAffectedByTimeStop(ent);

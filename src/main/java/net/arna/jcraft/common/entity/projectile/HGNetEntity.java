@@ -3,6 +3,8 @@ package net.arna.jcraft.common.entity.projectile;
 import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.util.ICustomDamageHandler;
+import net.arna.jcraft.common.util.IOwnable;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -34,7 +36,7 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
 
-public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimationTickable {
+public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimationTickable, ICustomDamageHandler {
     public static final TrackedData<Integer> STATE;
     public static final TrackedData<Boolean> CHARGED;
 
@@ -114,7 +116,7 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
                             if (!living.isConnectedThroughVehicle(master))
                                 StandEntity.damageLogic(
                                         world, living, launchVec, 15, 3, false, 5f, false, 10,
-                                        DamageSource.mob(this), this, HitPropertyComponent.HitAnimation.HIGH
+                                        DamageSource.mob(this), master, HitPropertyComponent.HitAnimation.HIGH
                                 );
                         }
                 );
@@ -228,6 +230,18 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0)
                 .add(EntityAttributes.GENERIC_ARMOR, 10)
                 .add(EntityAttributes.GENERIC_ARMOR_TOUGHNESS, 10);
+    }
+
+    @Override
+    public boolean reflectsDamage() {
+        return false;
+    }
+
+    @Override
+    public boolean handleDamage(Vec3d kbVec, int stunTicks, int stunLevel, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, HitPropertyComponent.HitAnimation hitAnimation, boolean canBackstab, boolean unblockable) {
+        if (attacker == master || (attacker instanceof IOwnable ownable && ownable.getMaster() == master))
+            return false;
+        return true;
     }
 
     @Override
