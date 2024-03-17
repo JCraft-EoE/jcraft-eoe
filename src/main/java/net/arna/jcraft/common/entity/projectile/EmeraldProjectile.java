@@ -34,7 +34,9 @@ public class EmeraldProjectile extends PersistentProjectileEntity implements IAn
 
     public EmeraldProjectile(World world, LivingEntity owner) {
         super(JEntityTypeRegistry.EMERALD, owner, world);
-        this.setOwner(owner);
+        setNoGravity(true);
+        setOwner(owner);
+        setSound(SoundEvents.BLOCK_AMETHYST_BLOCK_BREAK);
     }
 
     @Override
@@ -67,12 +69,14 @@ public class EmeraldProjectile extends PersistentProjectileEntity implements IAn
             }
         }
 
-        if (world.isClient && random.nextGaussian() < -0.1) {
-            double x = getX();
-            double y = getY();
-            double z = getZ();
-            world.addParticle(ParticleTypes.HAPPY_VILLAGER, x, y, z,
-                    random.nextGaussian(), random.nextGaussian(), random.nextGaussian());
+        if (world.isClient) {
+            if (random.nextGaussian() < -0.005) {
+                double x = getX();
+                double y = getY();
+                double z = getZ();
+                world.addParticle(ParticleTypes.HAPPY_VILLAGER, x, y, z,
+                        random.nextGaussian(), random.nextGaussian(), random.nextGaussian());
+            }
             return;
         }
 
@@ -94,8 +98,8 @@ public class EmeraldProjectile extends PersistentProjectileEntity implements IAn
         int blockstun = 4;
         int stunT = 10;
 
-        JUtils.projectileDamageLogic(this, world, entity, Vec3d.ZERO, stunT, 1, false, 2, blockstun, HitPropertyComponent.HitAnimation.MID);
-        playSound(SoundEvents.ITEM_TRIDENT_HIT, 1, 1);
+        JUtils.projectileDamageLogic(this, world, entity, Vec3d.ZERO, stunT, 1, false, 1, blockstun, HitPropertyComponent.HitAnimation.MID);
+        playSound(SoundEvents.BLOCK_AMETHYST_BLOCK_BREAK, 1, 1);
         discard();
     }
 

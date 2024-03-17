@@ -46,7 +46,7 @@ public enum StandType {
             Text.literal("Chilled"), Text.literal("OVA"), Text.literal("Neon")),
     GOLD_EXPERIENCE(JEntityTypeRegistry.GOLD_EXPERIENCE, GoldExperienceEntity::new, "goldexperience",       // 11
             Text.literal("Anime"), Text.literal("Spectre"), Text.literal("Burning Passion")),
-    HIEROPHANT_GREEN(JEntityTypeRegistry.HIEROPHANT_GREEN, HGEntity::new, "hierophant_green",       // 12
+    HIEROPHANT_GREEN(JEntityTypeRegistry.HIEROPHANT_GREEN, HGEntity::new, "hierophantgreen",       // 12
             Text.literal("Cold"), Text.literal("Burning"), Text.literal("Seaside")),
 
     // Evolutions

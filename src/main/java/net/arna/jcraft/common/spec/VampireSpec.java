@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.StunType;
+import net.arna.jcraft.common.attack.moves.shared.HoldableMove;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleMultiHitAttack;
 import net.arna.jcraft.common.attack.moves.shared.UppercutAttack;
@@ -69,9 +70,19 @@ public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
             .withHitSpark(JParticleType.BACK_STAB) // todo: bloodsuck particles
             .withInfo(Text.literal("Blood Suck"), Text.literal("blockable grab"));
 
-    public static final SpaceRipperAttack SPACE_RIPPER_ATTACK = new SpaceRipperAttack(300, 16, 25,1f)
+    public static final SpaceRipperAttack SPACE_RIPPER_ATTACK = new SpaceRipperAttack(300, 1, 10,1f)
+            .withAction((attacker, user, ctx, targets) -> JUtils.serverPlaySound(JSoundRegistry.VAMPIRE_LASER_FIRE, (ServerWorld) user.getWorld(), user.getPos(), 96))
+            .withInfo(Text.literal("Space Ripper Stingy Eyes (Fire)"), Text.empty());
+    public static final HoldableMove<VampireSpec, State> SPACE_RIPPER_CHARGE = new HoldableMove<>(
+            300, 0, 32, 1f, SPACE_RIPPER_ATTACK, State.SPACE_RIPPERS, 14)
+            .withInitAction(((attacker, user, ctx) -> ctx.setInt(SpaceRipperAttack.CHARGE_TIME, 0)))
             .withSound(JSoundRegistry.VAMPIRE_LASER)
-            .withInfo(Text.literal("Space Ripper Stingy Eyes"), Text.literal("unblockable laser beam"));
+            .shouldSetMoveStun()
+            .withInfo(Text.literal("Space Ripper Stingy Eyes"), Text.literal("""
+                    Chargable laser beam attack.
+                    Laser velocity depends on charge time.
+                    After charging for 1.2s, becomes unblockable.
+                    """));
 
     public static final ReviveMove<VampireSpec> REVIVE_MOVE = new ReviveMove<VampireSpec>(300, 16, 20, 5)
             .withInfo(Text.literal("Resurrection"), Text.literal("revives humanoid/undead enemies within 5 meters, that died within the last 1 minute"));
@@ -92,9 +103,16 @@ public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
 
         moves.register(MoveType.BARRAGE, COMBO, CooldownType.BARRAGE, State.COMBO);
 
-        moves.register(MoveType.SPECIAL1, SPACE_RIPPER_ATTACK, CooldownType.SPECIAL1, State.SPACE_RIPPERS);
+        moves.register(MoveType.SPECIAL1, SPACE_RIPPER_CHARGE, CooldownType.SPECIAL1, State.SPACE_RIPPER_CHARGE);
         moves.register(MoveType.SPECIAL2, BLOODSUCK, CooldownType.SPECIAL2, State.BLOODSUCK);
         moves.register(MoveType.SPECIAL3, REVIVE_MOVE, CooldownType.SPECIAL3, State.RESURRECT);
+    }
+
+    @Override
+    public void tickSpec() {
+        super.tickSpec();
+        if (curMove != null && curMove.getOriginalMove() == SPACE_RIPPER_CHARGE)
+            getMoveContext().incrementInt(SpaceRipperAttack.CHARGE_TIME, 1);
     }
 
     @Override
@@ -109,6 +127,7 @@ public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
 
         COMBO("vm.5hit"),
 
+        SPACE_RIPPER_CHARGE("vm.srsc"),
         SPACE_RIPPERS("vm.srse"),
 
         BLOODSUCK("vm.bsk"),

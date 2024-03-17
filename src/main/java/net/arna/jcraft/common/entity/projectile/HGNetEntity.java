@@ -6,6 +6,7 @@ import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.ICustomDamageHandler;
 import net.arna.jcraft.common.util.IOwnable;
 import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -43,7 +44,7 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
     private int animTimer = 0;
     private Vec3d target;
 
-    private int lifeTime = 30 * 20;
+    private int lifeTime = 30 * 20 + 5;
 
     private static final int FIRE_COOLDOWN = 10 * 20;
     private static final int CONSTRICT_COOLDOWN = 10 * 20;
@@ -84,7 +85,8 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
     }
 
     public void tryFireAt(Vec3d target) {
-        if (isCharged()) {
+        if (isCharged() && getState() != 2) {
+            playSound(JSoundRegistry.HG_SPLASH, 1, 1);
             animTimer = 25;
             this.target = target;
             fireCooldown = FIRE_COOLDOWN;
@@ -120,6 +122,9 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
                                 );
                         }
                 );
+            } else if (lifeTime <= 5) {
+                setState(3);
+                return;
             }
 
             if (getState() == 2) {
@@ -131,10 +136,10 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
                                     StandEntity.stun(living, 17, 0);
                             }
                     );
-                } else if (animTimer <= -16)
+                } else if (animTimer <= -20)
                     setState(0);
             } else {
-                if (animTimer > 0 && animTimer % 8 == 0)
+                if (animTimer > 0 && animTimer % 8 == 0) {
                     for (int i = 0; i < 3; i++) {
                         EmeraldProjectile emerald = new EmeraldProjectile(world, getMaster());
 
@@ -146,6 +151,7 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
 
                         world.spawnEntity(emerald);
                     }
+                }
             }
 
             if (--fireCooldown < 0)
@@ -186,10 +192,13 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
     }
 
     private void tryConstrict(Entity entity) {
-        if (entity == null || master == null || entity.isConnectedThroughVehicle(master)) return;
+        if (entity == null) return;
+        if (master == null || entity.isConnectedThroughVehicle(master)) return;
         if (entity instanceof JAttackEntity attackEntity && attackEntity.getMaster() == master) return;
+        if (entity instanceof StandEntity<?,?> stand && stand.getUser() == master) return;
 
-        if (getState() != 2 && constrictCooldown <= 0) {
+        // Not constricting or dying
+        if (getState() < 2 && constrictCooldown <= 0) {
             setState(2);
             constrictCooldown = CONSTRICT_COOLDOWN;
             animTimer = 6;
@@ -271,7 +280,7 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
 
     @Override
     public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
+        animationData.addAnimationController(new AnimationController<>(this, "controller", 6, this::predicate));
     }
 
     @SuppressWarnings("SameReturnValue")
@@ -280,9 +289,12 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
         if (age < 5)
             anim.setAnimation(new AnimationBuilder().playOnce("animation.hg_nets.spawn"));
         else {
-            switch (getState()) {
-                case 2 -> anim.setAnimation(new AnimationBuilder().playOnce("animation.hg_nets.constrict"));
-                default -> anim.setAnimation(new AnimationBuilder().loop("animation.hg_nets.idle"));
+            if (getState() == 3) {
+                anim.setAnimation(new AnimationBuilder().playOnce("animation.hg_nets.wilt"));
+            } else if (getState() == 2) {
+                anim.setAnimation(new AnimationBuilder().playOnce("animation.hg_nets.constrict"));
+            } else {
+                anim.setAnimation(new AnimationBuilder().loop("animation.hg_nets.idle"));
             }
         }
         return PlayState.CONTINUE;

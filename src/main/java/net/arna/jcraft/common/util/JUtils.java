@@ -3,8 +3,8 @@ package net.arna.jcraft.common.util;
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.MoveInputType;
-import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
@@ -195,12 +195,20 @@ public final class JUtils {
     }
 
     public static Vec3d raycastAll(Entity entity, Vec3d start, Vec3d end, RaycastContext.FluidHandling fluidHandling) {
+        return raycastAll(entity, start, end, fluidHandling, null);
+    }
+
+    public static Vec3d raycastAll(Entity entity, Vec3d start, Vec3d end, RaycastContext.FluidHandling fluidHandling, Predicate<Entity> entityPredicate) {
         World world = entity.getWorld();
         double rangeSquared = start.squaredDistanceTo(end);
 
+        Predicate<Entity> combined = EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR;
+        if (entityPredicate != null)
+            combined = combined.and(entityPredicate);
+
         EntityHitResult eHit = ProjectileUtil.raycast(entity, start, end,
                 entity.getBoundingBox().expand(rangeSquared), // Not technically necessary but doesn't matter
-                EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR,
+                combined,
                 rangeSquared
         );
         boolean entityHit = eHit != null && eHit.getType() == HitResult.Type.ENTITY;

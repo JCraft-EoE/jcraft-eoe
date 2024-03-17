@@ -151,6 +151,11 @@ public interface JSoundRegistry {
     SoundEvent GE_REKKA2 = registerSound("gerekka2");
     SoundEvent GE_REKKA3 = registerSound("gerekka3");
 
+    //Hierophant Green
+    SoundEvent HG_SPLASH = registerSound("hgsplash");
+    SoundEvent HG_EXTEND = registerSound("hgextend");
+    SoundEvent HG_NET_SET = registerSound("hgnetset");
+
     //Golden Experience: Requiem
     SoundEvent GER_SUMMON = registerSound("gersummon");
     SoundEvent GER_HEAVY = registerSound("gerheavy");
@@ -228,6 +233,7 @@ public interface JSoundRegistry {
 
     // Vampire
     SoundEvent VAMPIRE_LASER = registerSound("vampirelaser");
+    SoundEvent VAMPIRE_LASER_FIRE = registerSound("vampirelaserfire");
 
     //// OTHER
     SoundEvent BULLET_RICOCHET = registerSound("bulletricochet");

@@ -15,7 +15,7 @@ import java.util.Set;
 
 @Getter
 public class LifeBeamAttack extends AbstractMove<LifeBeamAttack, GEREntity> {
-    public static final IntMoveVariable CHARGE_TIME = new IntMoveVariable(); // 9t interval
+    public static final IntMoveVariable CHARGE_TIME = new IntMoveVariable();
 
     public LifeBeamAttack(int cooldown, int windup, int duration, float moveDistance) {
         super(cooldown, windup, duration, moveDistance);

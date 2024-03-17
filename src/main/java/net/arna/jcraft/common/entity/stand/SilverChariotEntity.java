@@ -123,7 +123,13 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             260, 101, 100, 0.65f, CIRCLE_SLASH, State.CIRCLE_SLASH, 15)
             .withInitAction((attacker, user, ctx) -> ctx.setInt(CHARGE_TIME, 0))
             .withArmor(2)
-            .withInfo(Text.literal("Circle Slash"), Text.literal("charges for a minimum of 0.75s, tap again to release, 2 armor points"));
+            .withInfo(Text.literal("Circle Slash"), Text.literal(
+                    """
+                            2 armor points
+                            Can be held, and released 0.75s in.
+                            Depending on how much you hold, the damage and launch height increase.
+                            """
+            ));
     private static final TrackedData<Boolean> HAS_RAPIER;
     private static final TrackedData<Integer> MODE;
 

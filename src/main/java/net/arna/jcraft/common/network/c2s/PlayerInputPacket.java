@@ -131,12 +131,12 @@ public class PlayerInputPacket {
                     JServerPlayerInputCallback.EVENT.invoker().onPlayerInput(player, type, true, b);
 
                     StandEntity<?, ?> stand = JUtils.getStand(player);
-                    if (stand == null) {
-                        JSpec<?, ?> spec = JUtils.getSpec(player);
-                        spec.onUserMoveInput(type, true, b);
-                    } else {
+                    if (stand != null)
                         stand.onUserMoveInput(type, true, b);
-                    }
+
+                    JSpec<?, ?> spec = JUtils.getSpec(player);
+                    if (spec != null)
+                        spec.onUserMoveInput(type, true, b);
                 });
             });
             else {
@@ -145,12 +145,12 @@ public class PlayerInputPacket {
                     JServerPlayerInputCallback.EVENT.invoker().onPlayerInput(player, type, false, success);
 
                     StandEntity<?, ?> stand = JUtils.getStand(player);
-                    if (stand == null) {
-                        JSpec<?, ?> spec = JUtils.getSpec(player);
-                        spec.onUserMoveInput(type, false, success);
-                    } else {
+                    if (stand != null)
                         stand.onUserMoveInput(type, false, success);
-                    }
+
+                    JSpec<?, ?> spec = JUtils.getSpec(player);
+                    if (spec != null)
+                        spec.onUserMoveInput(type, false, success);
                 });
             }
         }

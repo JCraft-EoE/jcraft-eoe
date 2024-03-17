@@ -153,7 +153,7 @@ public class MoveDataCommand {
                 frames.append("§41§r");
             }
 
-            if (attack.getHitboxSize() > 0) {
+            if (attack.getHitboxSize() > 0 || !attack.getExtraHitBoxes().isEmpty()) {
                 advOnHit = "Advantage on hit: §c" + (attack.getStun() - recovery - 1) + "§r ticks of " + attack.getStunType() + " Stun\n";
                 advOnBlock = (attack.getBlockableType() == BlockableType.NON_BLOCKABLE) ? "§5Unblockable§r\n" : "Advantage on block: §5" + (attack.getBlockStun() - recovery) + "§r ticks";
 

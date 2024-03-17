@@ -16,12 +16,19 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 
 public class BrawlerSpec extends JSpec<BrawlerSpec, BrawlerSpec.State> {
-    public static final UppercutAttack<BrawlerSpec> HEAVY = new UppercutAttack<BrawlerSpec>(280, 10,
+    public static final UppercutAttack<BrawlerSpec> HEAVY = new UppercutAttack<BrawlerSpec>(30, 10,
             21, 1f, 6f, 15, 1.5f, 0.3f, 0f, 0.3f)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withInfo(Text.literal("Uppercut"), Text.literal("medium speed"));
+    public static final SimpleAttack<BrawlerSpec> TORNADO = new SimpleAttack<BrawlerSpec>(280, 12,
+            20, 1f, 7f, 20, 1.6f, 0.4f, -0.1f)
+            .withCrouchingVariant(HEAVY)
+            .withImpactSound(JSoundRegistry.IMPACT_3)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
             .withArmor(3)
-            .withInfo(Text.literal("Uppercut"), Text.literal("uninterruptible, medium speed"));
+            .withInfo(Text.literal("Tornado Kick"), Text.literal("3 points of armor, high stun"));
     public static final SimpleMultiHitAttack<BrawlerSpec> COMBO = new SimpleMultiHitAttack<BrawlerSpec>(360,
             26, 1f, 4, 15, 1.5f, 0.2f, -0.1f, IntSet.of(5, 10, 19))
             .withImpactSound(JSoundRegistry.IMPACT_2)
@@ -53,7 +60,7 @@ public class BrawlerSpec extends JSpec<BrawlerSpec, BrawlerSpec.State> {
 
     @Override
     protected void registerMoves(MoveMap<BrawlerSpec, State> moves) {
-        moves.register(MoveType.HEAVY, HEAVY, CooldownType.HEAVY, State.HEAVY);
+        moves.register(MoveType.HEAVY, TORNADO, CooldownType.HEAVY, State.TORNADO).withCrouchingVariant(State.HEAVY);
         moves.register(MoveType.BARRAGE, COMBO, CooldownType.BARRAGE, State.COMBO);
         moves.register(MoveType.SPECIAL1, LOW_KICK, CooldownType.SPECIAL1, State.LOW_KICK).withCrouchingVariant(State.SWEEP);
         moves.register(MoveType.SPECIAL2, GUT, CooldownType.SPECIAL2, State.GUT);
@@ -66,6 +73,7 @@ public class BrawlerSpec extends JSpec<BrawlerSpec, BrawlerSpec.State> {
 
     public enum State implements SpecAnimationState<BrawlerSpec> {
         HEAVY("br.upct"),
+        TORNADO("br.kck"),
         COMBO("br.3hit"),
         GUT("br.gut"),
         SWEEP("br.low"),

@@ -984,6 +984,24 @@
     ]
   },
 
+  "hgsplash": {
+    "sounds": [
+      "jcraft:stands/hierophantgreen/splash"
+    ]
+  },
+
+  "hgextend": {
+    "sounds": [
+      "jcraft:stands/hierophantgreen/extend"
+    ]
+  },
+
+  "hgnetset": {
+    "sounds": [
+      "jcraft:stands/hierophantgreen/netset"
+    ]
+  },
+
   "anubisslash": {
     "sounds": [
       "jcraft:specs/anubis/slash"
@@ -1029,6 +1047,12 @@
   "vampirelaser": {
     "sounds": [
       "jcraft:specs/vampire/laser"
+    ]
+  },
+
+  "vampirelaserfire": {
+    "sounds": [
+      "jcraft:specs/vampire/laser_fire"
     ]
   },
 

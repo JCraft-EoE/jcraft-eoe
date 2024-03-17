@@ -10,6 +10,6 @@ public class HGNetRenderer extends GeoEntityRenderer<HGNetEntity> {
     public HGNetRenderer(EntityRendererFactory.Context renderManagerIn) {
         super(renderManagerIn, new HGNetModel());
         addLayer(new HGNetGlowLayer(this));
-        shadowRadius = 1.5f;
+        shadowRadius = 1.25f;
     }
 }

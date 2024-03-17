@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.entity.projectile;
 
+import lombok.Setter;
 import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
@@ -24,6 +25,8 @@ public class LaserProjectile extends PersistentProjectileEntity implements IAnim
     private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
     private int lifetime = 60;
     private final List<Entity> hit = new ArrayList<>();
+    @Setter
+    private boolean unblockable = false;
 
     public LaserProjectile(EntityType<? extends LaserProjectile> entityType, World world) {
         super(entityType, world);
@@ -87,7 +90,7 @@ public class LaserProjectile extends PersistentProjectileEntity implements IAnim
         if (owner.hasPassenger(entity) || entity == owner || hit.contains(entity)) return;
 
         JUtils.projectileDamageLogic(this, world, entity, getVelocity(), 20, 1, false,
-                5f, 0, HitPropertyComponent.HitAnimation.CRUSH, true, false);
+                5f, 0, HitPropertyComponent.HitAnimation.CRUSH, unblockable, false);
         hit.add(entity);
     }
 

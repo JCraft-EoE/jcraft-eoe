@@ -2518,6 +2518,22 @@ Silver Chariot
 Gold Experience: Requiem
     >Life Beam is now holdable
 
+● 17/03/2024
+
+Brawler
+    >Uppercut is now the crouching heavy
+        >Armor transferred onto the standing heavy
+        >The new heavy is a Tornado Kick
+
+Vampire
+    >Space Ripper Stingy Eyes is now holdable
+
+Silver Chariot
+    >Added blur effects to slashing attacks
+
+    >second hitbox to grab (sptw)
+    >tune down emerald damage
+
 todo: combo counter is LYING
 
 The reason the easings dont work is because kosmx is fucking stupid,

@@ -257,7 +257,7 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
             MoveInputType curMoveInputType = MoveInputType.fromMoveType(move.getMoveType());
             if (canHoldMove(curMoveInputType) && getHoldingType() != curMoveInputType) {
                 setHoldingType(curMoveInputType);
-                setHolding(true);
+                //setHolding(true);
             }
 
             move.tick(getThis());

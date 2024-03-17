@@ -871,7 +871,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 MoveInputType curMoveInputType = MoveInputType.fromMoveType(move.getMoveType());
                 if (canHoldMove(curMoveInputType) && getHoldingType() != curMoveInputType) {
                     setHoldingType(curMoveInputType);
-                    setHolding(true);
+                    //setHolding(true);
                 }
 
                 if (moveStun >= 0 && !blocking) {
@@ -1010,6 +1010,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * @param playerEntity attacker
      */
     private static void comboCounterLogic(ServerPlayerEntity playerEntity, LivingEntity victim) {
+        if (victim instanceof IOwnable ownable && ownable.getMaster() == playerEntity)
+            return;
+
         IComboCounter comboCounter = (IComboCounter) playerEntity;
 
         if (comboCounter.getLastAttacked() != victim)
