@@ -44,7 +44,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
                     7, 11, 0.75f, 5f, 12, 0.15f, 0.3f)
             .withAnim(State.CROUCHING_LIGHT)
             .withFollowup(CROUCHING_LIGHT_FOLLOWUP)
-            .withImpactSound(JSoundRegistry.IMPACT_2)
+            .withImpactSound(JSoundRegistry.IMPACT_4)
             .withInfo(Text.literal("Low Punch"), Text.literal("quick combo starter"));
 
     public static final UppercutAttack<HGEntity> LIGHT_FOLLOWUP = new UppercutAttack<HGEntity>(
@@ -55,10 +55,10 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Uppercut"), Text.literal("combo extender"));
     public static final SimpleAttack<HGEntity> LIGHT = SimpleAttack.<HGEntity>lightAttack(
-            6, 8, 0.75f, 5f, 10, 0.15f, 0.2f)
+            7, 9, 0.75f, 5f, 10, 0.15f, 0.2f)
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(CROUCHING_LIGHT)
-            .withImpactSound(JSoundRegistry.IMPACT_2)
+            .withImpactSound(JSoundRegistry.IMPACT_4)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
     public static final SimpleAttack<HGEntity> SENDOFF = new SimpleAttack<HGEntity>(
             180, 11, 20, 1, 8f, 16, 2f, 1.5f, 0)
@@ -77,7 +77,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, medium stun"));
 
     public static final SimpleAttack<HGEntity> EXTEND_FORWARD_SECOND = new SimpleAttack<HGEntity>(
-            0, 13, 21, 1f, 5, 15, 0, 0.4f, 0)
+            0, 13, 21, 1f, 5, 16, 0, 0.4f, 0)
             .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
             .withExtraHitBox(2.5, -0.5, 1.5)
             .withExtraHitBox(3.5    , -0.6, 1.5)
@@ -91,7 +91,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
             .withInfo(Text.literal("Extend (Forward)"), Text.literal("Hierophant extends its arm forward in a far-reaching attack"));
 
     public static final SimpleAttack<HGEntity> EXTEND_UP_SECOND = new SimpleAttack<HGEntity>(
-            0, 13, 21, 1f, 5, 15, 0, 0.4f, 0)
+            0, 13, 21, 1f, 5, 16, 0, 0.4f, 0)
             .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
             .withExtraHitBox(2, 0.5, 1.5)
             .withExtraHitBox(3, 0.75, 1.5)
@@ -131,7 +131,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
             .withInfo(Text.literal("Pilot Mode"), Text.empty());
 
     public HGEntity(World worldIn) {
-        super(StandType.HIEROPHANT_GREEN, worldIn, JSoundRegistry.WS_SUMMON);
+        super(StandType.HIEROPHANT_GREEN, worldIn, JSoundRegistry.HG_SUMMON);
         idleRotation = 220f;
 
         description = "Long-range ZONER";
@@ -155,7 +155,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
                 new Vec3f(0.2f, 0.9f, 0.2f),
                 new Vec3f(0.2f, 0.2f, 0.9f),
                 new Vec3f(0.4f, 0.4f, 0.5f),
-                new Vec3f(1.0f, 1.0f, 0.0f)
+                new Vec3f(1.0f, 0.65f, 0.44f)
         };
     }
 
@@ -183,6 +183,8 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
             AbstractMove<?, ? super HGEntity> followup = curMove.getFollowup();
             if (followup != null) setMove(followup, (State) followup.getAnimation());
         } else if (type == MoveType.SPECIAL1 && user.isSneaking()) {
+            if (!JUtils.canAct(user)) return false;
+
             List<HGNetEntity> nets = world.getEntitiesByClass(HGNetEntity.class,
                     getBoundingBox().expand(64), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
 

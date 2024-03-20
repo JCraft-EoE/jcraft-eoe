@@ -20,7 +20,9 @@ public class NetSetMove extends AbstractMove<NetSetMove, HGEntity> {
     @Override
     public @NonNull Set<LivingEntity> perform(HGEntity attacker, LivingEntity user, MoveContext ctx) {
         HGNetEntity net = new HGNetEntity(JEntityTypeRegistry.HG_NET, attacker.world);
-        net.copyPositionAndRotation(attacker);
+        net.setSkin(attacker.getSkin());
+        net.refreshPositionAndAngles(attacker.getX(), attacker.getY(), attacker.getZ()
+                , attacker.getRandom().nextFloat() * 360f, attacker.getRandom().nextFloat() * 360f);
         net.setMaster(user);
 
         attacker.world.spawnEntity(net);

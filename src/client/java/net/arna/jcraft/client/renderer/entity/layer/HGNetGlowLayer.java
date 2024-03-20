@@ -10,9 +10,13 @@ import net.minecraft.util.Identifier;
 import software.bernie.geckolib3.renderers.geo.GeoLayerRenderer;
 import software.bernie.geckolib3.renderers.geo.IGeoRenderer;
 
+import java.util.List;
+import java.util.stream.IntStream;
+
 public class HGNetGlowLayer extends GeoLayerRenderer<HGNetEntity> {
-    private static final Identifier LAYER = new Identifier(JCraft.MOD_ID, "textures/entity/hg_nets_glow.png");
     private static final Identifier MODEL = new Identifier(JCraft.MOD_ID, "geo/hg_nets.geo.json");
+    private static final List<Identifier> skins = IntStream.range(0, 4).mapToObj(
+            i -> JCraft.id("textures/entity/hg_nets/glow_" + i + ".png")).toList();
 
     public HGNetGlowLayer(IGeoRenderer<HGNetEntity> entityRendererIn) {
         super(entityRendererIn);
@@ -21,7 +25,7 @@ public class HGNetGlowLayer extends GeoLayerRenderer<HGNetEntity> {
     @Override
     public void render(MatrixStack matrixStackIn, VertexConsumerProvider bufferIn, int packedLightIn, HGNetEntity entityLivingBaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         if (entityLivingBaseIn.isCharged()) {
-            RenderLayer cameo = RenderLayer.getEyes(LAYER);
+            RenderLayer cameo = RenderLayer.getEyes(skins.get(entityLivingBaseIn.getSkin()));
 
             matrixStackIn.push();
             getRenderer().render(getEntityModel().getModel(MODEL), entityLivingBaseIn, partialTicks, cameo, matrixStackIn, bufferIn,

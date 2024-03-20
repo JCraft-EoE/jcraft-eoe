@@ -984,6 +984,12 @@
     ]
   },
 
+  "hgsummon": {
+    "sounds": [
+      "jcraft:stands/hierophantgreen/summon"
+    ]
+  },
+
   "hgsplash": {
     "sounds": [
       "jcraft:stands/hierophantgreen/splash"

@@ -152,6 +152,7 @@ public interface JSoundRegistry {
     SoundEvent GE_REKKA3 = registerSound("gerekka3");
 
     //Hierophant Green
+    SoundEvent HG_SUMMON = registerSound("hgsummon");
     SoundEvent HG_SPLASH = registerSound("hgsplash");
     SoundEvent HG_EXTEND = registerSound("hgextend");
     SoundEvent HG_NET_SET = registerSound("hgnetset");

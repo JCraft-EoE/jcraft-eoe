@@ -7,6 +7,7 @@ import net.arna.jcraft.common.util.ICustomDamageHandler;
 import net.arna.jcraft.common.util.IOwnable;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JSoundRegistry;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -38,6 +39,7 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 import java.util.List;
 
 public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimationTickable, ICustomDamageHandler {
+    public static final TrackedData<Integer> SKIN;
     public static final TrackedData<Integer> STATE;
     public static final TrackedData<Boolean> CHARGED;
 
@@ -56,12 +58,14 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
 
     static {
         STATE = DataTracker.registerData(HGNetEntity.class, TrackedDataHandlerRegistry.INTEGER);
+        SKIN = DataTracker.registerData(HGNetEntity.class, TrackedDataHandlerRegistry.INTEGER);
         CHARGED = DataTracker.registerData(HGNetEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     }
 
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
+        dataTracker.startTracking(SKIN, 0);
         dataTracker.startTracking(STATE, 0);
         dataTracker.startTracking(CHARGED, true);
     }
@@ -79,13 +83,21 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
         return dataTracker.get(STATE);
     }
 
+    public int getSkin() {
+        return dataTracker.get(SKIN);
+    }
+
     public void setState(int state) {
         if (getState() != state)
             dataTracker.set(STATE, state);
     }
 
+    public void setSkin(int skin) {
+        dataTracker.set(SKIN, skin);
+    }
+
     public void tryFireAt(Vec3d target) {
-        if (isCharged() && getState() != 2) {
+        if (isCharged() && JUtils.canAct(this) && getState() != 2) {
             playSound(JSoundRegistry.HG_SPLASH, 1, 1);
             animTimer = 25;
             this.target = target;
@@ -107,50 +119,59 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
                 return;
             }
 
-            Vec3d upVec = GravityChangerAPI.getEyeOffset(this);
+            if (JUtils.canAct(this)) {
+                Vec3d upVec = GravityChangerAPI.getEyeOffset(this);
 
-            if (age == 1) {
-                Vec3d launchVec = upVec.multiply(0.2);
+                if (age == 1) {
+                    Vec3d launchVec = upVec.multiply(0.2);
 
-                JUtils.displayHitbox(world, getBoundingBox());
-                getInsideEntities().forEach(
-                        living -> {
-                            if (!living.isConnectedThroughVehicle(master))
-                                StandEntity.damageLogic(
-                                        world, living, launchVec, 15, 3, false, 5f, false, 10,
-                                        DamageSource.mob(this), master, HitPropertyComponent.HitAnimation.HIGH
-                                );
-                        }
-                );
-            } else if (lifeTime <= 5) {
-                setState(3);
-                return;
-            }
-
-            if (getState() == 2) {
-                if (animTimer == 0) {
                     JUtils.displayHitbox(world, getBoundingBox());
                     getInsideEntities().forEach(
                             living -> {
-                                if (!JUtils.isBlocking(living) && !living.isConnectedThroughVehicle(master))
-                                    StandEntity.stun(living, 17, 0);
+                                if (!living.isConnectedThroughVehicle(master))
+                                    StandEntity.damageLogic(
+                                            world, living, launchVec, 15, 3, false, 5f, false, 10,
+                                            DamageSource.mob(this), master, HitPropertyComponent.HitAnimation.HIGH
+                                    );
                             }
                     );
-                } else if (animTimer <= -20)
-                    setState(0);
-            } else {
-                if (animTimer > 0 && animTimer % 8 == 0) {
-                    for (int i = 0; i < 3; i++) {
-                        EmeraldProjectile emerald = new EmeraldProjectile(world, getMaster());
+                } else if (lifeTime <= 5) {
+                    setState(3);
+                    return;
+                }
 
-                        Vec3d heightOffset = upVec.multiply(0.8);
-                        Vec3d emeraldPos = getPos().add(heightOffset).add(JUtils.randUnitVec(getRandom()));
-                        emerald.setPosition(emeraldPos);
+                if (getState() == 2) {
+                    if (animTimer == 0) {
+                        JUtils.displayHitbox(world, getBoundingBox());
+                        getInsideEntities().forEach(
+                                living -> {
+                                    if (!JUtils.isBlocking(living) && !living.isConnectedThroughVehicle(master))
+                                        StandEntity.stun(living, 17, 0);
+                                }
+                        );
+                    } else if (animTimer <= -20)
+                        setState(0);
+                } else {
+                    if (animTimer > 0) {
+                        if (animTimer % 8 == 0) {
+                            for (int i = 0; i < 3; i++) {
+                                EmeraldProjectile emerald = new EmeraldProjectile(world, getMaster());
 
-                        emerald.setVelocity(target.subtract(emeraldPos).normalize().multiply(1.5));
+                                Vec3d heightOffset = upVec.multiply(0.8);
+                                Vec3d emeraldPos = getPos().add(heightOffset).add(JUtils.randUnitVec(getRandom()));
+                                emerald.setPosition(emeraldPos);
 
-                        world.spawnEntity(emerald);
+                                emerald.setVelocity(target.subtract(emeraldPos).normalize().multiply(1.5));
+
+                                world.spawnEntity(emerald);
+                            }
+                        }
                     }
+                }
+            } else {
+                if (animTimer > 0) {
+                    setState(0);
+                    animTimer = 0;
                 }
             }
 
@@ -192,6 +213,7 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
     }
 
     private void tryConstrict(Entity entity) {
+        if (!JUtils.canAct(this)) return;
         if (entity == null) return;
         if (master == null || entity.isConnectedThroughVehicle(master)) return;
         if (entity instanceof JAttackEntity attackEntity && attackEntity.getMaster() == master) return;
@@ -229,6 +251,8 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
 
     @Override
     public boolean addStatusEffect(StatusEffectInstance effect, @Nullable Entity source) {
+        if (effect.getEffectType() == JStatusRegistry.DAZED)
+            return super.addStatusEffect(effect, source);
         return false;
     }
 

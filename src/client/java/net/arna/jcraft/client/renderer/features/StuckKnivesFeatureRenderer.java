@@ -56,20 +56,22 @@ public class StuckKnivesFeatureRenderer<T extends LivingEntity, M extends Animal
             AnimalModelAccessor accessor = (AnimalModelAccessor) getContextModel();
             List<ModelPart> parts = Stream.concat(Streams.stream(accessor.callGetHeadParts()), Streams.stream(accessor.callGetBodyParts())).toList();
             ModelPart part = parts.get(random.nextInt(parts.size()));
-            ModelPart.Cuboid cuboid = part.getRandomCuboid(random);
-            part.rotate(matrixStack);
+            if (!part.isEmpty()) {
+                ModelPart.Cuboid cuboid = part.getRandomCuboid(random);
+                part.rotate(matrixStack);
 
-            float o = random.nextFloat();
-            float p = random.nextFloat();
-            float q = random.nextFloat();
-            float r = MathHelper.lerp(o, cuboid.minX, cuboid.maxX) / 16.0f;
-            float s = MathHelper.lerp(p, cuboid.minY, cuboid.maxY) / 16.0f;
-            float t = MathHelper.lerp(q, cuboid.minZ, cuboid.maxZ) / 16.0f;
-            matrixStack.translate(r, s, t);
-            o = -1.0f * (o * 2.0f - 1.0f);
-            p = -1.0f * (p * 2.0f - 1.0f);
-            q = -1.0f * (q * 2.0f - 1.0f);
-            this.renderObject(matrixStack, vertexConsumerProvider, i, livingEntity, o, p, q, h);
+                float o = random.nextFloat();
+                float p = random.nextFloat();
+                float q = random.nextFloat();
+                float r = MathHelper.lerp(o, cuboid.minX, cuboid.maxX) / 16.0f;
+                float s = MathHelper.lerp(p, cuboid.minY, cuboid.maxY) / 16.0f;
+                float t = MathHelper.lerp(q, cuboid.minZ, cuboid.maxZ) / 16.0f;
+                matrixStack.translate(r, s, t);
+                o = -1.0f * (o * 2.0f - 1.0f);
+                p = -1.0f * (p * 2.0f - 1.0f);
+                q = -1.0f * (q * 2.0f - 1.0f);
+                this.renderObject(matrixStack, vertexConsumerProvider, i, livingEntity, o, p, q, h);
+            }
             matrixStack.pop();
         }
     }

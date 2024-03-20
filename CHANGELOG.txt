@@ -2519,7 +2519,6 @@ Gold Experience: Requiem
     >Life Beam is now holdable
 
 ● 17/03/2024
-
 Brawler
     >Uppercut is now the crouching heavy
         >Armor transferred onto the standing heavy
@@ -2531,10 +2530,18 @@ Vampire
 Silver Chariot
     >Added blur effects to slashing attacks
 
+Hierophant Green
+    >Added Special 2
+
     >second hitbox to grab (sptw)
     >tune down emerald damage
 
 todo: combo counter is LYING
+    fully charged esplash breaks blocks
+    keepStand gamerule
+    cool leggy sweep for tw
+    big slash for sc
+    and anubis charges for sc
 
 The reason the easings dont work is because kosmx is fucking stupid,
 see: dev.kosmx.playerAnim.core.util.Easing
