@@ -34,8 +34,14 @@ import java.util.function.Consumer;
 import static net.arna.jcraft.common.attack.moves.hierophantgreen.EmeraldSplashAttack.CHARGE_TIME;
 
 public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
+    public static final UppercutAttack<HGEntity> AIR_LIGHT = new UppercutAttack<HGEntity>(
+            JCraft.LIGHT_COOLDOWN, 7, 14, 0.75f, 5f, 15, 1.5f, 0.4f, -0.3f, 0.4f)
+            .withAnim(State.AIR_LIGHT)
+            .withImpactSound(JSoundRegistry.IMPACT_3)
+            .withInfo(Text.literal("Backward Flip Kick"), Text.literal("launches up"));
     public static final KnockdownAttack<HGEntity> CROUCHING_LIGHT_FOLLOWUP = new KnockdownAttack<HGEntity>(
             0, 9, 16, 0.75f, 6f, 13, 1.75f, 0.75f, 0.4f, 35)
+            .withSound(JSoundRegistry.HG_CROUCH_LIGHT)
             .withAnim(State.CROUCHING_LIGHT_FOLLOWUP)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
@@ -49,15 +55,17 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
 
     public static final UppercutAttack<HGEntity> LIGHT_FOLLOWUP = new UppercutAttack<HGEntity>(
             0, 10, 15, 0.75f, 6f, 13, 1.75f, 0.5f, -0.2f, 0.4f)
+            .withSound(JSoundRegistry.HG_LIGHT_FOLLOWUP)
             .withAnim(State.LIGHT_FOLLOWUP)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withBlockStun(4)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withInfo(Text.literal("Uppercut"), Text.literal("combo extender"));
+            .withInfo(Text.literal("Uppercut"), Text.literal("reset tool, combos back into light"));
     public static final SimpleAttack<HGEntity> LIGHT = SimpleAttack.<HGEntity>lightAttack(
             7, 9, 0.75f, 5f, 10, 0.15f, 0.2f)
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(CROUCHING_LIGHT)
+            .withAerialVariant(AIR_LIGHT)
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
     public static final SimpleAttack<HGEntity> SENDOFF = new SimpleAttack<HGEntity>(
@@ -72,7 +80,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
     public static final SimpleMultiHitAttack<HGEntity> BARRAGE = new SimpleMultiHitAttack<HGEntity>(
             200, 28, 1, 2f, 20, 2f, 0.3f, 0.25f,
             IntSet.of(3, 9, 15, 17, 25))
-            //.withSound(JSoundRegistry.WS_BARRAGE)
+            .withSound(JSoundRegistry.HG_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, medium stun"));
 
@@ -149,7 +157,10 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
         freespace =
                 """
                         BNBs:
-                            -a""";
+                            -the calamari
+                            M1>Barrage>Net Set>delay.Emarald Splash>crouch.Emerald Splash>
+                            ...Extend>crouch.M1~M1
+                            ...Sendoff""";
 
         auraColors = new Vec3f[]{
                 new Vec3f(0.2f, 0.9f, 0.2f),
@@ -165,6 +176,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
         light.withFollowUp(State.LIGHT_FOLLOWUP);
         MoveMap.Entry<HGEntity, State> crouchingLight = light.withCrouchingVariant(State.CROUCHING_LIGHT);
         crouchingLight.withFollowUp(State.CROUCHING_LIGHT_FOLLOWUP);
+        light.withAerialVariant(State.AIR_LIGHT);
 
         moves.register(MoveType.HEAVY, SENDOFF, State.SENDOFF);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
@@ -297,6 +309,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
         LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.hg.light_followup")),
         CROUCHING_LIGHT(builder -> builder.playAndHold("animation.hg.crouching_light")),
         CROUCHING_LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.hg.crouching_light_followup")),
+        AIR_LIGHT(builder -> builder.playAndHold("animation.hg.air_light")),
         BLOCK(builder -> builder.loop("animation.hg.block")),
         SENDOFF(builder -> builder.playAndHold("animation.hg.sendoff")),
         BARRAGE(builder -> builder.loop("animation.hg.barrage")),

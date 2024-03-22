@@ -105,21 +105,6 @@ public class CoffinBlock extends BedBlock {
         };
     }
 
-    /*
-     * Tests for air 1 block out from the facing pos to ensure it's air so the block
-     * doesn't place into another block
-     */
-    @SuppressWarnings("deprecation")
-    @Override
-    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
-        for (BlockPos testPos : BlockPos.iterate(pos,
-                pos.offset(state.get(FACING), 2))) {
-            if (!testPos.equals(pos) && !world.getBlockState(testPos).isAir())
-                return false;
-        }
-        return true;
-    }
-
     // Simplified from Block#onBreak
     @Override
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {

@@ -990,6 +990,24 @@
     ]
   },
 
+  "hgbarrage": {
+    "sounds": [
+      "jcraft:stands/hierophantgreen/barrage"
+    ]
+  },
+
+  "hgcrouchlight": {
+    "sounds": [
+      "jcraft:stands/hierophantgreen/crouch_light"
+    ]
+  },
+
+  "hglightfollowup": {
+    "sounds": [
+      "jcraft:stands/hierophantgreen/lightfollowup"
+    ]
+  },
+
   "hgsplash": {
     "sounds": [
       "jcraft:stands/hierophantgreen/splash"

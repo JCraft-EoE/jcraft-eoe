@@ -458,23 +458,24 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
 
         // Particles
         Random random = Random.create();
-
-        JCraft.createParticle(serverWorld,
-                center.x + random.nextGaussian() * 0.1,
-                center.y + random.nextGaussian() * 0.1,
-                center.z + random.nextGaussian() * 0.1,
-                hitSpark);
-
         boolean anyHit = false;
 
         // Process targets
-        Vec3d kbVec = getRotVec(attacker).multiply(knockback).add(new Vec3d(0.0, Math.abs(knockback) / 4, 0.0));
+        Vec3d rotVec = getRotVec(attacker);
+        Vec3d kbVec = rotVec.multiply(knockback).add(new Vec3d(0.0, Math.abs(knockback) / 4, 0.0));
         for (LivingEntity target : validateTargets(attacker, targets)) {
-            Vec3d pos = RotationUtil.vecPlayerToWorld(target.getEyePos(), GravityChangerAPI.getGravityDirection(target));
+            Vec3d pos = target.getPos().add(GravityChangerAPI.getEyeOffset(target).multiply(0.65)).subtract(rotVec);
             if (JUtils.isBlocking(target))
                 JCraft.createHitsparks(serverWorld, pos.getX(), pos.getY(), pos.getZ(), JParticleType.BLOCK_SPARK, 3, 0);
             else {
                 JCraft.createHitsparks(serverWorld, pos.getX(), pos.getY(), pos.getZ(), JParticleType.PIXEL, 2 + (int) damage * 2, 0.5);
+
+                JCraft.createParticle(serverWorld,
+                        pos.x + random.nextGaussian() * 0.25,
+                        pos.y + random.nextGaussian() * 0.25,
+                        pos.z + random.nextGaussian() * 0.25,
+                        hitSpark);
+
                 anyHit = true;
             }
 

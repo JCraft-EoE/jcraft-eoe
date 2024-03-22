@@ -153,6 +153,9 @@ public interface JSoundRegistry {
 
     //Hierophant Green
     SoundEvent HG_SUMMON = registerSound("hgsummon");
+    SoundEvent HG_BARRAGE = registerSound("hgbarrage");
+    SoundEvent HG_CROUCH_LIGHT = registerSound("hgcrouchlight");
+    SoundEvent HG_LIGHT_FOLLOWUP = registerSound("hglightfollowup");
     SoundEvent HG_SPLASH = registerSound("hgsplash");
     SoundEvent HG_EXTEND = registerSound("hgextend");
     SoundEvent HG_NET_SET = registerSound("hgnetset");
