@@ -2208,7 +2208,7 @@
 							"easing": "easeOutSine"
 						},
 						"0.84": {
-							"vector": [-359.04642, -0.45386, 1.14239],
+							"vector": [-359.03306, 9.54474, 1.31029],
 							"easing": "easeOutSine"
 						}
 					},
@@ -2353,7 +2353,7 @@
 							"easing": "easeOutSine"
 						},
 						"0.44": {
-							"vector": [-10.02662, 12.16897, 2.8349],
+							"vector": [-10.83304, -1.02055, 0.19182],
 							"easing": "easeOutQuad"
 						}
 					}

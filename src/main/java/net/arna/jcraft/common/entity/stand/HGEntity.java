@@ -207,7 +207,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
             Vec3d eyePos = shooter.getPos().add(heightOffset);
 
             if (!nets.isEmpty()) {
-                Vec3d pos = JUtils.raycastAll(shooter, eyePos, eyePos.add(shooter.getRotationVector().multiply(96)), RaycastContext.FluidHandling.NONE,
+                Vec3d pos = JUtils.raycastAll(shooter, eyePos, eyePos.add(user.getRotationVector().multiply(96)), RaycastContext.FluidHandling.NONE,
                         (entity -> {
                             if (entity instanceof IOwnable ownable && ownable.getMaster() == user)
                                 return false;

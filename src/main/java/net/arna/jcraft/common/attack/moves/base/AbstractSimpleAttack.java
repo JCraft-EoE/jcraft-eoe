@@ -464,7 +464,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
         Vec3d rotVec = getRotVec(attacker);
         Vec3d kbVec = rotVec.multiply(knockback).add(new Vec3d(0.0, Math.abs(knockback) / 4, 0.0));
         for (LivingEntity target : validateTargets(attacker, targets)) {
-            Vec3d pos = target.getPos().add(GravityChangerAPI.getEyeOffset(target).multiply(0.65)).subtract(rotVec);
+            Vec3d pos = target.getPos().add(GravityChangerAPI.getEyeOffset(target).multiply(0.65)).subtract(rotVec.multiply(0.65));
             if (JUtils.isBlocking(target))
                 JCraft.createHitsparks(serverWorld, pos.getX(), pos.getY(), pos.getZ(), JParticleType.BLOCK_SPARK, 3, 0);
             else {
