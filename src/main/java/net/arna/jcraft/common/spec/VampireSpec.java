@@ -4,10 +4,8 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.StunType;
-import net.arna.jcraft.common.attack.moves.shared.HoldableMove;
-import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
-import net.arna.jcraft.common.attack.moves.shared.SimpleMultiHitAttack;
-import net.arna.jcraft.common.attack.moves.shared.UppercutAttack;
+import net.arna.jcraft.common.attack.core.ctx.MoveContext;
+import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.attack.moves.vampire.BloodSuckAttack;
 import net.arna.jcraft.common.attack.moves.vampire.ReviveMove;
 import net.arna.jcraft.common.attack.moves.vampire.SpaceRipperAttack;
@@ -19,6 +17,9 @@ import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.SpecAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
@@ -59,7 +60,9 @@ public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
             25, 1f, 4, 5, 1.5f, 0.6f, -0.1f, IntSet.of(8, 16, 24))
             .withAction((attacker, user, ctx, targets) -> {
                 user.heal(1);
-                attacker.vampireComponent.setBlood(attacker.vampireComponent.getBlood() + 2 * JUtils.getBloodMult(ctx.get(BloodSuckAttack.TARGET)));
+                float bloodMult = JUtils.getBloodMult(ctx.get(BloodSuckAttack.TARGET));
+                if (bloodMult <= 0) return;
+                attacker.vampireComponent.setBlood(attacker.vampireComponent.getBlood() + 2 * bloodMult);
                 JUtils.serverPlaySound(SoundEvents.ENTITY_GENERIC_DRINK, (ServerWorld) user.getWorld(), user.getPos(), 32);
             })
             .withStunType(StunType.LAUNCH)
@@ -84,10 +87,22 @@ public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
                     After charging for 1.2s, becomes unblockable.
                     """));
 
+    public static final NoOpMove<VampireSpec> TOGGLE_NV = new NoOpMove<VampireSpec>(20, 0, 0)
+            .withInitAction(VampireSpec::toggleNightVision)
+            .withInfo(Text.literal("Toggle Night Vision"), Text.empty());
+
     public static final ReviveMove<VampireSpec> REVIVE_MOVE = new ReviveMove<VampireSpec>(300, 16, 20, 5)
+            .withCrouchingVariant(TOGGLE_NV)
             .withInfo(Text.literal("Resurrection"), Text.literal("revives humanoid/undead enemies within 5 meters, that died within the last 1 minute"));
 
     private final VampireComponent vampireComponent;
+    private boolean nightVision = true;
+
+    private static void toggleNightVision(VampireSpec attacker, LivingEntity living, MoveContext moveContext) {
+        attacker.nightVision = !attacker.nightVision;
+        if (!attacker.nightVision)
+            living.removeStatusEffect(StatusEffects.NIGHT_VISION);
+    }
 
     public VampireSpec(PlayerEntity player) {
         super(SpecType.VAMPIRE, player);
@@ -105,12 +120,15 @@ public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
 
         moves.register(MoveType.SPECIAL1, SPACE_RIPPER_CHARGE, CooldownType.SPECIAL1, State.SPACE_RIPPER_CHARGE);
         moves.register(MoveType.SPECIAL2, BLOODSUCK, CooldownType.SPECIAL2, State.BLOODSUCK);
-        moves.register(MoveType.SPECIAL3, REVIVE_MOVE, CooldownType.SPECIAL3, State.RESURRECT);
+        moves.register(MoveType.SPECIAL3, REVIVE_MOVE, CooldownType.SPECIAL3, State.RESURRECT).withCrouchingVariant(null);
     }
 
     @Override
     public void tickSpec() {
         super.tickSpec();
+        if (!hasUser() || getUserOrThrow().getWorld().isClient) return;
+        if (nightVision)
+            getUserOrThrow().addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, 400, 0, true, false));
         if (curMove != null && curMove.getOriginalMove() == SPACE_RIPPER_CHARGE)
             getMoveContext().incrementInt(SpaceRipperAttack.CHARGE_TIME, 1);
     }

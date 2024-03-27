@@ -44,7 +44,9 @@ public class SheathedAnubisItem extends SpecObtainmentItem {
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack itemStack = user.getStackInHand(hand);
 
-        if (user.isSneaking()) { // Unsheathe
+        if (user.isSneaking()) { // Block
+            user.setCurrentHand(hand);
+        } else { // Unsheathe
             if (world.isClient) return TypedActionResult.fail(itemStack);
             ServerWorld serverWorld = (ServerWorld)world;
 
@@ -57,8 +59,8 @@ public class SheathedAnubisItem extends SpecObtainmentItem {
                 JUtils.serverPlaySound(JSoundRegistry.ANUBIS_UNSHEATHE, serverWorld, user.getPos());
                 user.setStackInHand(hand, new ItemStack(JObjectRegistry.ANUBIS));
             }
-        } else // Block
-            user.setCurrentHand(hand);
+        }
+
         return TypedActionResult.consume(itemStack);
     }
 

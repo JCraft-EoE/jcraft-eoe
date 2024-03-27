@@ -66,7 +66,7 @@ public class AnubisItem extends Item {
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack item = user.getStackInHand(hand);
 
-        if (!user.isSneaking() || world.isClient) return TypedActionResult.fail(item);
+        if (user.isSneaking() || world.isClient) return TypedActionResult.fail(item);
 
         JUtils.serverPlaySound(JSoundRegistry.ANUBIS_SHEATHE, (ServerWorld) world, user.getPos());
         user.setStackInHand(hand, new ItemStack(JObjectRegistry.ANUBISSHEATHED));

@@ -1,8 +1,6 @@
 package net.arna.jcraft.common.callbacks;
 
 import net.arna.jcraft.common.attack.core.MoveInputType;
-import net.arna.jcraft.common.entity.stand.StandEntity;
-import net.arna.jcraft.common.util.JUtils;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.server.network.ServerPlayerEntity;

@@ -155,7 +155,7 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
         return handleMove(move, cooldownType, state, 1f);
     }
 
-    public boolean handleMove(AbstractMove<?, ? super A> move, CooldownType cooldownType, S state, float animationSpeed) {
+    public boolean handleMove(AbstractMove<?, ? super A> move, CooldownType cooldownType, @Nullable S state, float animationSpeed) {
         move = moveMap.getRegisteredMoveFor(move);
 
         if (!move.canBeInitiated(getThis())) return false;
@@ -181,7 +181,8 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
 
         armorPoints = move.getArmor();
 
-        setPlayerAnimation((this.state = state).getKey(getThis()), moveStun, animationSpeed);
+        if (state != null)
+            setPlayerAnimation((this.state = state).getKey(getThis()), moveStun, animationSpeed);
 
         return true;
     }

@@ -26,6 +26,7 @@ import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
@@ -481,7 +482,9 @@ public final class JUtils {
             Map.entry(EntityType.HUSK, 0.1f),
 
             Map.entry(EntityType.VILLAGER, 1.5f),
-            Map.entry(EntityType.PLAYER, 1.5f)
+            Map.entry(EntityType.PLAYER, 1.5f),
+
+            Map.entry(EntityType.IRON_GOLEM, 0.0f)
     );
 
     public static float getBloodMult(LivingEntity entity) {
@@ -496,8 +499,14 @@ public final class JUtils {
         if (type.isIn(EntityTypeTags.AXOLOTL_HUNT_TARGETS)) // Fishes
             return 0.25f;
 
+        if (entity instanceof AnimalEntity)
+            return 0.5f;
+
         if (uniqueBloodMults.containsKey(type))
             return uniqueBloodMults.get(type);
+
+        if (!entity.isUndead())
+            return entity.getMaxHealth() / 20.0f;
 
         return 0;
     }

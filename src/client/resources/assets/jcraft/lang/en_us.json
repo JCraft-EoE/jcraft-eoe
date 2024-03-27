@@ -140,9 +140,9 @@
   "jcraft.anubis.namedesc": "§9The sword/stand named after the Egyptian god of death",
   "jcraft.anubis.bloodthirstdesc": "§eBloodthirsty. §9Fuels itself on any and all violence.",
   "jcraft.anubis.removaldesc": "§eHard to get rid of.",
-  "jcraft.anubis.desc": "§9Can §esheathed §9with §eCrouch + RMB.",
-  "jcraft.sheathedanubis.blockdesc": "§9Can used to §eblock.",
-  "jcraft.sheathedanubis.desc" : "§9Can §eunsheathed §9with §eCrouch + RMB.",
+  "jcraft.anubis.desc": "§9Can §esheathed §9with §eRMB.",
+  "jcraft.sheathedanubis.blockdesc": "§9Can used to §eblock §9with §eCrouch + RMB.",
+  "jcraft.sheathedanubis.desc" : "§9Can be §eunsheathed",
 
   "jcraft.requiemarrow.desc": "§eAble to grant immense power to those worthy.",
 

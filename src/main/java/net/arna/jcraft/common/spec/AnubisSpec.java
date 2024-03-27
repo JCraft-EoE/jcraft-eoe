@@ -20,13 +20,16 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.Hand;
 
 import java.util.Set;
 
 public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
-    public static final SimpleAttack<AnubisSpec> SLASH = new SimpleAttack<AnubisSpec>(340, 9, 20, 1f, 6f,
+    public static final SimpleAttack<AnubisSpec> SLASH = new SimpleAttack<AnubisSpec>(220, 9, 20, 1f, 6f,
             15, 1.75f, 0.9f, 0f)
             .withCondition(AnubisSpec::isHoldingAnubis)
             .withAction(AnubisSpec::tryIncrementBloodlust)
@@ -40,7 +43,7 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
             .withSound(JSoundRegistry.ANUBIS_POMMEL)
             .withAction(AnubisSpec::tryIncrementBloodlust)
             .withImpactSound(JSoundRegistry.IMPACT_3);
-    public static final SimpleMultiHitAttack<AnubisSpec> REKKA2 = new SimpleMultiHitAttack<AnubisSpec>(280,
+    public static final SimpleMultiHitAttack<AnubisSpec> REKKA2 = new SimpleMultiHitAttack<AnubisSpec>(180,
             26, 1f, 4f, 15, 1.75f, 0.2f, -0.1f, IntSet.of(8, 20))
             .withCondition(AnubisSpec::isHoldingAnubis)
             .withAction(AnubisSpec::tryIncrementBloodlust)
@@ -51,7 +54,7 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
             0, 40, 1f, 7f, 15, 2f, 0.9f, 0f,
             IntSet.of(32), 35)
             .withHitSpark(JParticleType.SWEEP_ATTACK);
-    public static final Rekka3Attack REKKA3 = new Rekka3Attack(280, 40, 1f, 4f,
+    public static final Rekka3Attack REKKA3 = new Rekka3Attack(180, 40, 1f, 4f,
             15, 1.75f, 0.6f, -0.1f, IntSet.of(8, 20, 32))
             .withFollowup(REKKA_FINISHER)
             .withAction(AnubisSpec::tryIncrementBloodlust)
@@ -66,6 +69,25 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withStaticY()
             .withInfo(Text.literal("Sweep"), Text.literal("sheathed-only, knocks down"));
+    public static final SimpleAttack<AnubisSpec> UNSHEATHING_ATTACK = new SimpleAttack<AnubisSpec>(340, 6, 12, 1f, 6f,
+            13, 1.75f, 0.5f, 0f)
+            .withCondition(AnubisSpec::isHoldingSheathedAnubis)
+            .withAction(AnubisSpec::tryIncrementBloodlust)
+            .withAction((attacker, user, ctx, targets) -> {
+                if (user.getWorld() instanceof ServerWorld serverWorld) {
+                    if (user.getMainHandStack().isOf(JObjectRegistry.ANUBISSHEATHED)) {
+                        JUtils.serverPlaySound(JSoundRegistry.ANUBIS_UNSHEATHE, serverWorld, user.getPos());
+                        user.setStackInHand(Hand.MAIN_HAND, new ItemStack(JObjectRegistry.ANUBIS));
+                    }
+                    if (user.getOffHandStack().isOf(JObjectRegistry.ANUBISSHEATHED)) {
+                        JUtils.serverPlaySound(JSoundRegistry.ANUBIS_UNSHEATHE, serverWorld, user.getPos());
+                        user.setStackInHand(Hand.OFF_HAND, new ItemStack(JObjectRegistry.ANUBIS));
+                    }
+                }
+            })
+            .withImpactSound(SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP)
+            .withHitSpark(JParticleType.SWEEP_ATTACK)
+            .withInfo(Text.literal("Unsheathing Attack"), Text.literal("unsheathes Anubis"));
 
     @Setter
     private int ticksSinceLastHit = 0;
@@ -114,6 +136,9 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
         moves.register(MoveType.SPECIAL3, SWEEP, CooldownType.SPECIAL3, State.SWEEP);
     }
 
+    private static boolean isHoldingSheathedAnubis(AnubisSpec spec) {
+        return spec.player.isHolding(JObjectRegistry.ANUBISSHEATHED);
+    }
     private static boolean isHoldingAnubis(AnubisSpec spec) {
         return spec.player.isHolding(JObjectRegistry.ANUBIS);
     }
@@ -129,6 +154,16 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
         switch (type) {
             case HEAVY -> {
                 return handleMove(POMMEL, CooldownType.HEAVY, isHoldingAnubis(this) ? State.POMMEL : State.POMMEL_IN, attackSpeedMult);
+            }
+            case SPECIAL1 -> {
+                boolean s;
+                if (isHoldingAnubis(this)) {
+                    s = handleMove(SLASH, CooldownType.SPECIAL1, State.SLASH, attackSpeedMult);
+                } else if (isHoldingSheathedAnubis(this)) {
+                    s = handleMove(UNSHEATHING_ATTACK, CooldownType.SPECIAL1, State.UNSHEATHING_ATTACK, attackSpeedMult);
+                } else return false;
+
+                return s;
             }
             case SPECIAL3 -> {
                 boolean s;
@@ -163,7 +198,8 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
         POMMEL_IN("an.pmi"),
         REKKA2("an.2hit"),
         REKKA3("an.3hit"),
-        SWEEP("an.swp");
+        SWEEP("an.swp"),
+        UNSHEATHING_ATTACK("an.usa"),;
 
         private final String key;
 

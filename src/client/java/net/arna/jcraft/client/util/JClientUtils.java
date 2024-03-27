@@ -143,6 +143,8 @@ public class JClientUtils {
 
         switch (hitAnimation) {
             case HIGH -> {
+                angDegrees *= 1.5F;
+
                 head.pitch += angDegrees;
 
                 body.pitch -= angDegrees;
@@ -154,6 +156,8 @@ public class JClientUtils {
                 leftArm.roll -= angDegrees;
             }
             case MID -> {
+                angDegrees *= 1.5F;
+
                 head.pitch += angDegrees;
 
                 body.pitch += angDegrees;
@@ -167,6 +171,8 @@ public class JClientUtils {
                 leftLeg.pitch -= angDegrees;
             }
             case LOW -> {
+                angDegrees *= 1.5F;
+
                 head.pitch += angDegrees;
 
                 body.pitch += angDegrees;

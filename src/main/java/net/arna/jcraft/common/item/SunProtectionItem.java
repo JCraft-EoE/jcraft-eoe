@@ -5,6 +5,7 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -23,6 +24,12 @@ public class SunProtectionItem extends ArmorItem implements IAnimatable {
 
     public SunProtectionItem(ArmorMaterial materialIn, EquipmentSlot slot, Settings builder) {
         super(materialIn, slot, builder);
+    }
+
+    @Override
+    public boolean canRepair(ItemStack stack, ItemStack ingredient) {
+        if (ingredient.isOf(Items.LEATHER)) return true;
+        return super.canRepair(stack, ingredient);
     }
 
     @Override

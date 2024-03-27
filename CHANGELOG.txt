@@ -2533,10 +2533,34 @@ Silver Chariot
 Hierophant Green
     >Added Special 2
 
+● 24/03/2024
+>Hit animations are more pronounced
+
+Vampire
+    >Bloodsuck works on more mobs
+    >Added toggleable night vision
+
+Sun Protection Items
+    >May now be repaired with Leather
+
+● 27/03/2024
+
+Anubis
+(Sheathed)
+    >Unsheathing is now standing use key
+    >Blocking is now crouching + use key
+    >Added new Special 1 - Unsheathing Attack
+(Unsheathed)
+    >Slash cooldown reduced (17->11s)
+    >Cleaving Strikes cooldown reduced (14->9s)
+
     >second hitbox to grab (sptw)
-    >tune down emerald damage
+
 
 todo: combo counter is LYING
+    chaka 236s for anubis (PLEASE)
+    esplash color :)
+    jot hat clips slightly (WHERE IS THE PIVOT)
     fully charged esplash breaks blocks
     keepStand gamerule
     cool leggy sweep for tw

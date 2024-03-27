@@ -27,10 +27,7 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -504,6 +501,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
     }
 
     protected Set<LivingEntity> validateTargets(A attacker, Set<LivingEntity> targets) {
+        targets.removeIf(target -> !target.isAlive());
         return targets;
     }
 
