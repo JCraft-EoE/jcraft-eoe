@@ -46,11 +46,13 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
     private int animTimer = 0;
     private Vec3d target;
 
-    private int lifeTime = 30 * 20 + 5;
+    private int lifeTime = 30 * 20 + 20;
 
     private static final int FIRE_COOLDOWN = 10 * 20;
     private static final int CONSTRICT_COOLDOWN = 10 * 20;
     private int fireCooldown = 0, constrictCooldown = 0;
+
+    private boolean finalAttack = false;
 
     public HGNetEntity(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);
@@ -96,13 +98,19 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
         dataTracker.set(SKIN, skin);
     }
 
-    public void tryFireAt(Vec3d target) {
+    public void tryFireAt(Vec3d target, boolean finalAttack) {
         if (isCharged() && JUtils.canAct(this) && getState() != 2) {
             playSound(JSoundRegistry.HG_SPLASH, 1, 1);
-            animTimer = 25;
             this.target = target;
             fireCooldown = FIRE_COOLDOWN;
             setCharged(false);
+
+            if (finalAttack) {
+                this.finalAttack = true;
+                animTimer = 50;
+            } else {
+                animTimer = 25;
+            }
         }
     }
 
@@ -116,6 +124,11 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
         if (!world.isClient) {
             if (--lifeTime <= 0 || master == null) {
                 discard();
+                return;
+            }
+
+            if (lifeTime <= 20) {
+                setState(3);
                 return;
             }
 
@@ -135,9 +148,6 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
                                     );
                             }
                     );
-                } else if (lifeTime <= 5) {
-                    setState(3);
-                    return;
                 }
 
                 if (getState() == 2) {
@@ -160,13 +170,15 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
                                 Vec3d heightOffset = upVec.multiply(0.8);
                                 Vec3d emeraldPos = getPos().add(heightOffset).add(JUtils.randUnitVec(getRandom()));
                                 emerald.setPosition(emeraldPos);
-
                                 emerald.setVelocity(target.subtract(emeraldPos).normalize().multiply(1.5));
+                                if (finalAttack)
+                                    emerald.withReflect();
 
                                 world.spawnEntity(emerald);
                             }
                         }
-                    }
+                    } else if (finalAttack)
+                        lifeTime = 20;
                 }
             } else {
                 if (animTimer > 0) {
@@ -180,6 +192,8 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
             constrictCooldown--;
             animTimer--;
         }
+
+        //JCraft.LOGGER.info("STATE: " + getState() + " ltime: " + lifeTime);
     }
 
     private List<LivingEntity> getInsideEntities() {

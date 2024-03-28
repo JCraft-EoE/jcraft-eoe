@@ -19,13 +19,14 @@ public enum SpecType {
     ANUBIS(AnubisSpec::new, Text.literal("Counterpoking tool"), Text.literal(
             """
                     PASSIVE: Bloodlust
-                    landing blows on opponents speeds up Anubis' attacks up to 2x, with +0.2x per hit
-                    not hitting opponents reduces Bloodlust by one stack every 4 seconds""")),
+                    Landing blows on opponents speeds up Anubis' attacks up to 2x, with +0.2x per hit.
+                    Not hitting opponents reduces Bloodlust by one stack every 4 seconds.""")),
 
     VAMPIRE(VampireSpec::new, Text.literal("Supernatural all-ranger"), Text.literal(
             """
-                    PASSIVES: ???
-                    comand grab :D"""));
+                    PASSIVES: Burns in sunlight, Blood replaces hunger, Night vision
+                    Excellent frametraps with Sweep or Axe Kick.
+                    Bloodsuck is extremely rewarding and allows linking into almost any move."""));
 
     @Getter(lazy = true)
     private static final List<SpecType> allSpecTypes = ImmutableList.copyOf(values());

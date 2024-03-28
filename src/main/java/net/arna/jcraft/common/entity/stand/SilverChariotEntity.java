@@ -25,6 +25,7 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
@@ -73,14 +74,23 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             0.65f, 1f, 10, 2f, 0.1f, 0f, 2)
             .withSound(JSoundRegistry.SC_SPIN)
             .withInfo(Text.literal("Spinning Blade"), Text.literal("fast reliable combo starter/extender, low stun"));
-    public static final RayDartAttack RAY_DART = new RayDartAttack(100, 13, 21,
-            0.65f, 5f, 15, 1.75f, 0.25f, -0.2f)
+    public static final RayDartAttack RAY_DART_LOW = new RayDartAttack(100, 10, 18,
+            0.65f, 6f, 20, 1.75f, 0.25f, 0.2f)
             .withSound(JSoundRegistry.SC_CHARGE)
-            .withBlockStun(17)
-            .withInfo(Text.literal("Ray Dart"), Text.literal("Silver Chariot and the user charge forward, combo finisher"));
+            .withSound(SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP)
+            .withBlockStun(9)
+            .withInfo(Text.literal("Lacerate"), Text.literal("Anubis Chariot and the user charge forward, high stun, low blockstun."));
+    public static final RayDartAttack RAY_DART_HIGH = new RayDartAttack(100, 12, 20,
+            0.65f, 6f, 15, 1.75f, 0.25f, 0.2f)
+            .withCrouchingVariant(RAY_DART_LOW)
+            .withSound(JSoundRegistry.SC_CHARGE)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withBlockStun(16)
+            .withInfo(Text.literal("Split"), Text.literal("Anubis Chariot and the user charge forward, low stun, high blockstun."));
     public static final CleaveAttack CLEAVE = new CleaveAttack(260, 12, 21, 0.75f, 9f,
             20, 2.5f, 0.8f, 0f)
             .withSound(JSoundRegistry.SC_CLEAVE)
+            .withImpactSound(SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP)
             .withHyperArmor()
             .withInfo(Text.literal("Cleave"), Text.literal("Silver Chariot detaches from the user, delivering an uninterruptible, combo-starting slice"));
     public static final SCChargeAttack CHARGE = new SCChargeAttack(280, 5, 19, 8f,
@@ -206,9 +216,21 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         moves.register(MoveType.HEAVY, HEAVY, State.HEAVY);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
         moves.register(MoveType.SPECIAL1, SPIN_BARRAGE, State.SPIN);
-        moves.register(MoveType.SPECIAL2, isPossessed() ? RAY_DART : CHARGE, isPossessed() ? State.CHARGE : State.P_CHARGE);
-        moves.register(MoveType.SPECIAL3, isPossessed() ? COUNTER : CLEAVE, isPossessed() ? State.COUNTER : State.CLEAVE);
-        moves.register(MoveType.ULTIMATE, isPossessed() ? GOD_OF_DEATH : ARMOR_OFF, isPossessed() ? State.BEAT_DOWN_START : State.ARMOR_OFF);
+        if (isPossessed()) {
+            moves.register(MoveType.SPECIAL2,
+                    RAY_DART_HIGH, State.CHARGE_HIGH).withCrouchingVariant(State.CHARGE_LOW);
+            moves.register(MoveType.SPECIAL3,
+                    COUNTER, State.COUNTER);
+            moves.register(MoveType.ULTIMATE,
+                    GOD_OF_DEATH, State.BEAT_DOWN_START);
+        } else {
+            moves.register(MoveType.SPECIAL2,
+                    CHARGE, State.P_CHARGE);
+            moves.register(MoveType.SPECIAL3,
+                    CLEAVE, State.CLEAVE);
+            moves.register(MoveType.ULTIMATE,
+                    ARMOR_OFF, State.ARMOR_OFF);
+        }
         moves.register(MoveType.UTILITY, CIRCLE_CHARGE, State.CIRCLE_CHARGE);
     }
 
@@ -350,7 +372,10 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         HEAVY(builder -> builder.playAndHold("animation.silverchariot.heavy")),
         BARRAGE(builder -> builder.loop("animation.silverchariot.barrage")),
         SPIN(builder -> builder.loop("animation.silverchariot.spin")),
-        CHARGE(builder -> builder.loop("animation.silverchariot.charge")),
+
+        CHARGE_LOW(builder -> builder.loop("animation.silverchariot.charge_low")),
+        CHARGE_HIGH(builder -> builder.loop("animation.silverchariot.charge_high")),
+
         P_CHARGE(builder -> builder.loop("animation.silverchariot.pcharge")),
         P_CHARGE_HIT(builder -> builder.playAndHold("animation.silverchariot.pchargehit")),
         COUNTER(builder -> builder.loop("animation.silverchariot.counter")),

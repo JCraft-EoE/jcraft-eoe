@@ -2544,21 +2544,27 @@ Sun Protection Items
     >May now be repaired with Leather
 
 ● 27/03/2024
-
 Anubis
-(Sheathed)
-    >Unsheathing is now standing use key
-    >Blocking is now crouching + use key
-    >Added new Special 1 - Unsheathing Attack
-(Unsheathed)
-    >Slash cooldown reduced (17->11s)
-    >Cleaving Strikes cooldown reduced (14->9s)
+    (Sheathed)
+        >Unsheathing is now standing use key
+        >Blocking is now crouching + use key
+        >Added new Special 1 - Unsheathing Attack
+    (Unsheathed)
+        >Slash cooldown reduced (17->11s)
+        >Cleaving Strikes cooldown reduced (14->9s)
 
-    >second hitbox to grab (sptw)
+● 28/03/2024
+>Added keepStand and keepSpec gamerules
+
+Anubis Chariot
+    >Reworked Ray Dart
+        >Split into 2 moves - Split and Lacerate
+
+>second hitbox to grab (sptw)
+
 
 
 todo: combo counter is LYING
-    chaka 236s for anubis (PLEASE)
     esplash color :)
     jot hat clips slightly (WHERE IS THE PIVOT)
     fully charged esplash breaks blocks

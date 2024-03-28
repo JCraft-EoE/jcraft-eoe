@@ -138,7 +138,7 @@ public enum StandType {
 
     // Can't access static fields in enum constructor, blah blah blah.
     private static class StaticFields {
-        private static final Int2ObjectMap<StandType> fromId = new Int2ObjectOpenHashMap<>(17); // Increase this number when adding more stands.
+        private static final Int2ObjectMap<StandType> fromId = new Int2ObjectOpenHashMap<>(19); // Increase this number when adding more stands.
         private static int nextId, nextEvoId;
     }
 }

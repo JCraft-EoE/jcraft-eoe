@@ -15,10 +15,18 @@ import java.util.Set;
 
 public class EmeraldSplashAttack extends AbstractMultiHitAttack<EmeraldSplashAttack, HGEntity> {
     public static final IntMoveVariable CHARGE_TIME = new IntMoveVariable();
+    private final float speed;
+    private boolean reflect = false;
 
-    public EmeraldSplashAttack(int cooldown, int duration, float moveDistance, float damage, int stun, float knockback, float offset, IntSet hitMoments) {
+    public EmeraldSplashAttack(int cooldown, int duration, float moveDistance, float damage, int stun, float knockback, float offset, IntSet hitMoments, float speed) {
         super(cooldown, duration, moveDistance, damage, stun, 0, knockback, offset, hitMoments);
+        this.speed = speed;
         ranged = true;
+    }
+
+    public EmeraldSplashAttack withReflect() {
+        this.reflect = true;
+        return this;
     }
 
     @Override
@@ -27,11 +35,14 @@ public class EmeraldSplashAttack extends AbstractMultiHitAttack<EmeraldSplashAtt
 
         for (int i = 0; i < emeraldCount; i++) {
             EmeraldProjectile emerald = new EmeraldProjectile(attacker.world, user);
-            emerald.setVelocity(user, user.getPitch(), user.getYaw(), 0.0F, 1.5F, 5F);
+            emerald.setVelocity(user, user.getPitch(), user.getYaw(), 0.0F, speed, 5F);
 
             Vec3d upVec = GravityChangerAPI.getEyeOffset(attacker.getUserOrThrow());
             Vec3d heightOffset = upVec.multiply(0.75);
             emerald.setPosition(attacker.getBaseEntity().getPos().add(heightOffset));
+
+            if (reflect)
+                emerald.withReflect();
 
             attacker.world.spawnEntity(emerald);
         }
@@ -51,6 +62,9 @@ public class EmeraldSplashAttack extends AbstractMultiHitAttack<EmeraldSplashAtt
 
     @Override
     public @NonNull EmeraldSplashAttack copy() {
-        return copyExtras(new EmeraldSplashAttack(getCooldown(), getDuration(), getMoveDistance(), getDamage(), getStun(), getKnockback(), getOffset(), getHitMoments()));
+        EmeraldSplashAttack emeraldSplashAttack = copyExtras(new EmeraldSplashAttack(getCooldown(), getDuration(), getMoveDistance(), getDamage(), getStun(), getKnockback(), getOffset(), getHitMoments(), speed));
+        if (reflect)
+            emeraldSplashAttack.withReflect();
+        return emeraldSplashAttack;
     }
 }

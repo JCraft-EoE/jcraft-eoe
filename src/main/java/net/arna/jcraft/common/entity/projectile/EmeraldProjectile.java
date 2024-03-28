@@ -13,9 +13,14 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import net.minecraft.world.event.GameEvent;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
@@ -23,6 +28,8 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 
 public class EmeraldProjectile extends PersistentProjectileEntity implements IAnimatable {
     private int ticksInAir;
+    private int bouncesLeft = 5;
+    private boolean reflect = false;
 
     public EmeraldProjectile(EntityType<? extends EmeraldProjectile> entityType, World world) {
         super(entityType, world);
@@ -39,6 +46,10 @@ public class EmeraldProjectile extends PersistentProjectileEntity implements IAn
         setSound(SoundEvents.BLOCK_AMETHYST_BLOCK_BREAK);
     }
 
+    public void withReflect() {
+        reflect = true;
+    }
+
     @Override
     public ItemStack asItemStack() {
         return ItemStack.EMPTY;
@@ -50,6 +61,8 @@ public class EmeraldProjectile extends PersistentProjectileEntity implements IAn
     protected void age() {
         discard();
     }
+
+
 
     @Override
     public void tick() {
@@ -70,7 +83,7 @@ public class EmeraldProjectile extends PersistentProjectileEntity implements IAn
         }
 
         if (world.isClient) {
-            if (random.nextGaussian() < -0.005) {
+            if (random.nextGaussian() < -0.002) {
                 double x = getX();
                 double y = getY();
                 double z = getZ();
@@ -82,6 +95,27 @@ public class EmeraldProjectile extends PersistentProjectileEntity implements IAn
 
         if (ticksInAir > 200)
             discard();
+    }
+
+    @Override
+    protected void onCollision(HitResult hitResult) {
+        if (reflect) {
+            HitResult.Type type = hitResult.getType();
+            if (type == HitResult.Type.ENTITY) {
+                this.onEntityHit((EntityHitResult) hitResult);
+                this.world.emitGameEvent(GameEvent.PROJECTILE_LAND, hitResult.getPos(), GameEvent.Emitter.of(this, null));
+            } else if (type == HitResult.Type.BLOCK) {
+                BlockHitResult blockHitResult = (BlockHitResult) hitResult;
+                if (bouncesLeft-- > 0) {
+                    Vec3i normal = blockHitResult.getSide().getVector();
+                    setVelocity(getVelocity().add(Vec3d.of(normal)).normalize());
+                } else {
+                    this.onBlockHit(blockHitResult);
+                    BlockPos blockPos = blockHitResult.getBlockPos();
+                    this.world.emitGameEvent(GameEvent.PROJECTILE_LAND, blockPos, GameEvent.Emitter.of(this, this.world.getBlockState(blockPos)));
+                }
+            }
+        } else super.onCollision(hitResult);
     }
 
     @Override

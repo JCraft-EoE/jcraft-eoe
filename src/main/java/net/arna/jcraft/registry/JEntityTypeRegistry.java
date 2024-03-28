@@ -180,7 +180,7 @@ public interface JEntityTypeRegistry {
             Registry.ENTITY_TYPE,
             JCraft.id("emerald"),
             FabricEntityTypeBuilder.<EmeraldProjectile>create(SpawnGroup.MISC, EmeraldProjectile::new)
-                    .dimensions(EntityDimensions.fixed(0.5f, 0.5f)).trackRangeChunks(6).trackedUpdateRate(10).build()
+                    .dimensions(EntityDimensions.fixed(0.5f, 0.5f)).trackRangeChunks(6).trackedUpdateRate(15).build()
     );
 
     EntityType<BulletProjectile> BULLET = Registry.register(
@@ -194,7 +194,7 @@ public interface JEntityTypeRegistry {
             Registry.ENTITY_TYPE,
             JCraft.id("rapier"),
             FabricEntityTypeBuilder.<RapierProjectile>create(SpawnGroup.MISC, RapierProjectile::new)
-                    .dimensions(EntityDimensions.fixed(0.5f, 0.5f)).trackRangeChunks(6).trackedUpdateRate(10).build()
+                    .dimensions(EntityDimensions.fixed(0.5f, 0.5f)).trackRangeChunks(6).trackedUpdateRate(15).build()
     );
 
     EntityType<AnkhProjectile> ANKH = Registry.register(

@@ -9,6 +9,7 @@ import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.Gravity;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.math.Direction;
 
 import java.util.Set;
 
@@ -19,16 +20,22 @@ public class NetSetMove extends AbstractMove<NetSetMove, HGEntity> {
 
     @Override
     public @NonNull Set<LivingEntity> perform(HGEntity attacker, LivingEntity user, MoveContext ctx) {
+        Direction gravity = GravityChangerAPI.getGravityDirection(attacker);
+
         HGNetEntity net = new HGNetEntity(JEntityTypeRegistry.HG_NET, attacker.world);
         net.setSkin(attacker.getSkin());
-        net.refreshPositionAndAngles(attacker.getX(), attacker.getY(), attacker.getZ()
-                , attacker.getRandom().nextFloat() * 360f, attacker.getRandom().nextFloat() * 360f);
+        net.refreshPositionAndAngles(
+                attacker.getX() + gravity.getOffsetX(),
+                attacker.getY() + gravity.getOffsetY(),
+                attacker.getZ() + gravity.getOffsetZ(),
+                attacker.getRandom().nextFloat() * 360f,
+                attacker.getRandom().nextFloat() * 360f);
         net.setMaster(user);
 
         attacker.world.spawnEntity(net);
 
         GravityChangerAPI.addGravity(net,
-                new Gravity(GravityChangerAPI.getGravityDirection(attacker), 0, 32767, "_spawn")
+                new Gravity(gravity, 0, 32767, "_spawn")
         );
 
         return Set.of();

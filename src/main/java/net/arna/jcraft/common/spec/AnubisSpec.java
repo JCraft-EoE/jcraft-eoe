@@ -69,7 +69,7 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withStaticY()
             .withInfo(Text.literal("Sweep"), Text.literal("sheathed-only, knocks down"));
-    public static final SimpleAttack<AnubisSpec> UNSHEATHING_ATTACK = new SimpleAttack<AnubisSpec>(340, 6, 12, 1f, 6f,
+    public static final SimpleAttack<AnubisSpec> UNSHEATHING_ATTACK = new SimpleAttack<AnubisSpec>(220, 6, 12, 1f, 6f,
             13, 1.75f, 0.5f, 0f)
             .withCondition(AnubisSpec::isHoldingSheathedAnubis)
             .withAction(AnubisSpec::tryIncrementBloodlust)

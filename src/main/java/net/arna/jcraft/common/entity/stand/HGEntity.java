@@ -115,7 +115,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
             .withInfo(Text.literal("Extend (Upward)"), Text.literal("Hierophant extends its arm upward in a far-reaching attack"));
 
     public static final EmeraldSplashAttack EMERALD_SPLASH = new EmeraldSplashAttack(0, 12, 1, 0, 0, 0, 0,
-            IntSet.of(1, 3, 5))
+            IntSet.of(1, 3, 5), 1.5f)
             .withSound(JSoundRegistry.HG_SPLASH)
             .withInfo(Text.literal("Emerald Splash (Fire)"), Text.empty());
     public static final HoldableMove<HGEntity, State> EMERALD_CHARGE = new HoldableMove<>(100, 0, 40, 1,
@@ -138,6 +138,35 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
     public static final PilotModeMove<HGEntity> PILOT_MODE = new PilotModeMove<HGEntity>(20)
             .withInfo(Text.literal("Pilot Mode"), Text.empty());
 
+    public static final EmeraldSplashAttack EMERALD_SUPER = new EmeraldSplashAttack(500, 40, 1, 0, 0, 0, 0,
+            IntSet.of(12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32), 2f)
+            .withInitAction(
+                    (attacker, user, ctx) -> ctx.setInt(CHARGE_TIME, 0)
+            )
+            .withInitAction(
+                    (attacker, user, ctx) -> {
+                        LivingEntity shooter = attacker.isRemote() ? attacker : user;
+
+                        Vec3d upVec = GravityChangerAPI.getEyeOffset(shooter);
+                        Vec3d heightOffset = upVec.multiply(0.5);
+                        Vec3d eyePos = shooter.getPos().add(heightOffset);
+                        Vec3d pos = JUtils.raycastAll(shooter, eyePos, eyePos.add(user.getRotationVector().multiply(96)), RaycastContext.FluidHandling.NONE,
+                                (entity -> !(entity instanceof IOwnable ownable) || ownable.getMaster() != user));
+
+                        user.getWorld().getEntitiesByClass(HGNetEntity.class, user.getBoundingBox().expand(96), EntityPredicates.VALID_LIVING_ENTITY)
+                                .stream()
+                                .filter(hgNetEntity -> hgNetEntity.getMaster() == user)
+                                .forEach(hgNetEntity -> hgNetEntity.tryFireAt(pos, true));
+                    }
+            )
+            .withReflect()
+            .withSound(JSoundRegistry.HG_SPLASH)
+            .withInfo(Text.literal("All-Consuming Emerald Splash"), Text.literal("""
+                    Fires a long, oppressive stream of emeralds at the opponent.
+                    These emeralds may bounce off walls up to 5 times.
+                    Nearby Tentacles will do the same, but immediately start wilting after use.
+                    """));
+
     public HGEntity(World worldIn) {
         super(StandType.HIEROPHANT_GREEN, worldIn, JSoundRegistry.HG_SUMMON);
         idleRotation = 220f;
@@ -151,7 +180,8 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
         );
 
         cons = List.of(
-                "mediocre combos without tentacles"
+                "mediocre combos without tentacles",
+                "mediocre close-range coverage"
         );
 
         freespace =
@@ -185,6 +215,8 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
         moves.register(MoveType.SPECIAL2, EXTEND_UP, State.EXTEND_UP).withCrouchingVariant(State.EXTEND_FORWARD);
         moves.register(MoveType.SPECIAL3, NET_SET, State.NET_SET);
 
+        moves.register(MoveType.ULTIMATE, EMERALD_SUPER, State.EMERALD_SUPER);
+
         moves.register(MoveType.UTILITY, PILOT_MODE);
     }
 
@@ -216,7 +248,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
 
                 for (HGNetEntity net : nets) {
                     if (net.getMaster() != user) continue;
-                    net.tryFireAt(pos);
+                    net.tryFireAt(pos, false);
                 }
             }
         } else return super.initMove(type);
@@ -317,6 +349,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
 
         EMERALD_CHARGE(builder -> builder.playAndHold("animation.hg.emerald_charge")),
         EMERALD_SPLASH(builder -> builder.playAndHold("animation.hg.emerald_splash")),
+        EMERALD_SUPER(builder -> builder.playAndHold("animation.hg.emerald_super")),
         EXTEND_UP(builder -> builder.playAndHold("animation.hg.extend_up")),
         EXTEND_FORWARD(builder -> builder.playAndHold("animation.hg.extend_forward")),
 

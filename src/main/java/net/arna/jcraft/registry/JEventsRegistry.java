@@ -1,20 +1,22 @@
 package net.arna.jcraft.registry;
 
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.block.CoffinBlock;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.living.VampireComponent;
 import net.arna.jcraft.common.config.ConfigOption;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.entity.stand.StandEntity;
+import net.arna.jcraft.common.entity.stand.StandType;
 import net.arna.jcraft.common.events.JServerEvents;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.network.c2s.ConfigUpdatePacket;
+import net.arna.jcraft.common.spec.SpecType;
 import net.arna.jcraft.common.tickable.Revivables;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
 import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -90,20 +92,28 @@ public interface JEventsRegistry {
         ServerEntityEvents.ENTITY_LOAD.register(JServerEvents::entityLoad);
 
         ServerLivingEntityEvents.AFTER_DEATH.register((living, source) -> {
-            if (living instanceof ServerPlayerEntity && source.getAttacker() instanceof LivingEntity killer) {
-                JComponents.getCooldowns(killer).clear(CooldownType.COMBO_BREAKER);
+            if (living instanceof ServerPlayerEntity serverPlayer) {
+                GameRules gameRules = living.getWorld().getGameRules();
+                if (!gameRules.getBoolean(JCraft.KEEP_STAND))
+                    JComponents.getStandData(living).setTypeAndSkin(StandType.NONE, 0);
+                if (!gameRules.getBoolean(JCraft.KEEP_SPEC))
+                    JComponents.getSpecData(serverPlayer).setType(SpecType.NONE);
 
-                boolean killVampirism = JServerConfig.KILL_VAMPIRISM.getValue();
-                if (killer instanceof ServerPlayerEntity serverPlayer) {
-                    if (killVampirism) {
-                        serverPlayer.getHungerManager().add(20, 20f);
-                        VampireComponent vampireComponent = JComponents.getVampirism(serverPlayer);
-                        if (vampireComponent.isVampire())
-                            vampireComponent.setBlood(20.0f);
+                if (source.getAttacker() instanceof LivingEntity killer) {
+                    JComponents.getCooldowns(killer).clear(CooldownType.COMBO_BREAKER);
+
+                    boolean killVampirism = JServerConfig.KILL_VAMPIRISM.getValue();
+                    if (killer instanceof ServerPlayerEntity killerPlayer) {
+                        if (killVampirism) {
+                            killerPlayer.getHungerManager().add(20, 20f);
+                            VampireComponent vampireComponent = JComponents.getVampirism(killerPlayer);
+                            if (vampireComponent.isVampire())
+                                vampireComponent.setBlood(20.0f);
+                        }
                     }
+                    if (killVampirism)
+                        killer.setHealth(killer.getMaxHealth());
                 }
-                if (killVampirism)
-                    killer.setHealth(killer.getMaxHealth());
             }
 
             Revivables.addRevivable(living.getType(), living.getPos(), living.getWorld().getRegistryKey());

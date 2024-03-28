@@ -20,7 +20,7 @@ public class RayDartAttack extends AbstractSimpleAttack<RayDartAttack, SilverCha
 
         LivingEntity user = attacker.getUser();
         if (user != null && user.isOnGround()) {
-            user.setVelocity(user.getVelocity().add(getRotVec(attacker).multiply(0.85)).add(0.0, 0.15, 0.0));
+            user.setVelocity(user.getVelocity().add(getRotVec(attacker).multiply(1)));
             user.velocityModified = true;
         }
     }

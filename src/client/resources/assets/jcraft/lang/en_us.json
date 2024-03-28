@@ -69,6 +69,8 @@
   "entity.jcraft.cream": "Cream",
   "entity.jcraft.silverchariot": "Silver Chariot",
   "entity.jcraft.thefool": "The Fool",
+  "entity.jcraft.hierophant_green": "Hierophant Green",
+  "entity.jcraft.hg_net": "Hierophant Tentacles",
 
   "entity.jcraft.killerqueen": "Killer Queen",
   "entity.jcraft.kqbtd": "Killer Queen: Bites the Dust",
@@ -97,6 +99,7 @@
   "entity.jcraft.knife": "Knife",
   "entity.jcraft.ankh": "Ankh",
   "entity.jcraft.bullet": "Bullet",
+  "entity.jcraft.emerald": "Emerald ",
 
   "effect.jcraft.dazed_effect": "Dazed",
   "effect.jcraft.ws_poison": "Melting",
