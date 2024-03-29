@@ -7,10 +7,7 @@ import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.StunType;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
-import net.arna.jcraft.common.attack.moves.shared.HoldableMove;
-import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
-import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
-import net.arna.jcraft.common.attack.moves.shared.SimpleMultiHitAttack;
+import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.attack.moves.silverchariot.*;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.living.CooldownsComponent;
@@ -69,11 +66,18 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withHyperArmor()
             .withLaunch()
             .withInfo(Text.literal("Impaling Thrust"), Text.literal("slow, uninterruptible launcher"));
-    //todo: spin barrage deflecting projectiles
-    public static final SpinBarrageAttack SPIN_BARRAGE = new SpinBarrageAttack(240, 7, 24,
-            0.65f, 1f, 10, 2f, 0.1f, 0f, 2)
+
+    public static final SpinBarrageAttack ANUBIS_SPIN_BARRAGE = new SpinBarrageAttack(0, 7, 24,
+            0.65f, 1f, 10, 2f, 0.1f, -0.2f, 2)
+            .withAnim(State.SPIN_2)
+            .withSound(JSoundRegistry.SC_SPIN)
+            .withInfo(Text.literal("Divine Blade"), Text.literal("fast reliable combo starter/extender, low stun"));
+    public static final BarrageAttack<SilverChariotEntity> SPIN_BARRAGE = new BarrageAttack<SilverChariotEntity>(240, 7, 24,
+            0.65f, 1f, 10, 2f, 0.1f, -0.2f, 2)
+            .withFollowup(ANUBIS_SPIN_BARRAGE)
             .withSound(JSoundRegistry.SC_SPIN)
             .withInfo(Text.literal("Spinning Blade"), Text.literal("fast reliable combo starter/extender, low stun"));
+
     public static final RayDartAttack RAY_DART_LOW = new RayDartAttack(100, 10, 18,
             0.65f, 6f, 20, 1.75f, 0.25f, 0.2f)
             .withSound(JSoundRegistry.SC_CHARGE)
@@ -81,11 +85,12 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withBlockStun(9)
             .withInfo(Text.literal("Lacerate"), Text.literal("Anubis Chariot and the user charge forward, high stun, low blockstun."));
     public static final RayDartAttack RAY_DART_HIGH = new RayDartAttack(100, 12, 20,
-            0.65f, 6f, 15, 1.75f, 0.25f, 0.2f)
+            0.65f, 6f, 15, 2.0f, 0.25f, 0.2f)
             .withCrouchingVariant(RAY_DART_LOW)
             .withSound(JSoundRegistry.SC_CHARGE)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withBlockStun(16)
+            .withExtraHitBox(1, 1, 1)
             .withInfo(Text.literal("Split"), Text.literal("Anubis Chariot and the user charge forward, low stun, high blockstun."));
     public static final CleaveAttack CLEAVE = new CleaveAttack(260, 12, 21, 0.75f, 9f,
             20, 2.5f, 0.8f, 0f)
@@ -215,8 +220,9 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
 
         moves.register(MoveType.HEAVY, HEAVY, State.HEAVY);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
-        moves.register(MoveType.SPECIAL1, SPIN_BARRAGE, State.SPIN);
+        MoveMap.Entry<SilverChariotEntity, State> spin = moves.register(MoveType.SPECIAL1, SPIN_BARRAGE, State.SPIN);
         if (isPossessed()) {
+            spin.withFollowUp(State.SPIN_2);
             moves.register(MoveType.SPECIAL2,
                     RAY_DART_HIGH, State.CHARGE_HIGH).withCrouchingVariant(State.CHARGE_LOW);
             moves.register(MoveType.SPECIAL3,
@@ -262,6 +268,8 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         if (type == MoveType.LIGHT && curMove != null && curMove.getMoveType() == MoveType.LIGHT && getMoveStun() < curMove.getWindupPoint()) {
             AbstractMove<?, ? super SilverChariotEntity> followup = curMove.getFollowup();
             if (followup != null) setMove(followup, (State) followup.getAnimation());
+        } else if (type == MoveType.SPECIAL1 && getUserOrThrow().isHolding(JObjectRegistry.ANUBIS) && curMove != null && curMove.getOriginalMove() == SPIN_BARRAGE && getMoveStun() < 7) {
+            setMove(ANUBIS_SPIN_BARRAGE, (State) ANUBIS_SPIN_BARRAGE.getAnimation());
         } else return super.initMove(type);
         return true;
     }
@@ -316,35 +324,30 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             return;
         }
 
-        boolean hasAnubis = user instanceof PlayerEntity player ? player.getInventory().contains(JObjectRegistry.ANUBIS.getDefaultStack()) :
-                user.getMainHandStack().getItem() == JObjectRegistry.ANUBIS;
+        // getOffHandStack() must be an AnubisItem
+        boolean hasAnubis = getOffHandStack().isOf(JObjectRegistry.ANUBIS) || user.getMainHandStack().getItem() == JObjectRegistry.ANUBIS;
+
+        if (user instanceof PlayerEntity player) {
+            hasAnubis |= player.getInventory().contains(JObjectRegistry.ANUBIS.getDefaultStack());
+
+            if (curMove == null && getOffHandStack() != null) {
+                player.giveItemStack(getOffHandStack());
+                getOffHandStack().decrement(1);
+            }
+        }
 
         if (hasAnubis && mode != Mode.POSSESSED) {
-            for (int i = 0; i < 128; i++)
-                world.addParticle(
-                        ParticleTypes.ASH,
-                        getX() + random.nextDouble() - 0.5, getY() + random.nextDouble() * 2, getZ() + random.nextDouble() - 0.5,
-                        0.0, 0.1, 0.0
-                );
-
             // Set possession state
             setMode(Mode.POSSESSED);
             setPossessedDesc();
         } else if (!hasAnubis && mode == Mode.POSSESSED) {
-            for (int i = 0; i < 128; i++)
-                world.addParticle(
-                        ParticleTypes.ELECTRIC_SPARK,
-                        getX() + random.nextDouble() - 0.5, getY() + random.nextDouble() * 2, getZ() + random.nextDouble() - 0.5,
-                        0.0, 0.1, 0.0
-                );
-
             // Reset
             setMode(Mode.REGULAR);
             setNormalDesc();
         }
 
         ARMOR_OFF.tickArmor(this);
-        if (getMoveStun() % 10 == 0 && curMove != null && curMove.getOriginalMove() == CIRCLE_CHARGE)
+        if (curMove != null && getMoveStun() % 10 == 0 && curMove.getOriginalMove() == CIRCLE_CHARGE)
             getMoveContext().incrementInt(CHARGE_TIME, 1);
     }
 
@@ -372,6 +375,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         HEAVY(builder -> builder.playAndHold("animation.silverchariot.heavy")),
         BARRAGE(builder -> builder.loop("animation.silverchariot.barrage")),
         SPIN(builder -> builder.loop("animation.silverchariot.spin")),
+        SPIN_2(builder -> builder.loop("animation.silverchariot.spin_2")),
 
         CHARGE_LOW(builder -> builder.loop("animation.silverchariot.charge_low")),
         CHARGE_HIGH(builder -> builder.loop("animation.silverchariot.charge_high")),

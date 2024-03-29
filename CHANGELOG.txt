@@ -2562,16 +2562,21 @@ Anubis Chariot
 
 >second hitbox to grab (sptw)
 
+● 29/03/2024
+Anubis
+    >Blocking with your stand is now possible while Anubis is held
 
+Silver Chariot
+    >Updated Barrage animation
+
+Anubis Chariot
+    >Added followup to Spinning Blade
 
 todo: combo counter is LYING
     esplash color :)
-    jot hat clips slightly (WHERE IS THE PIVOT)
+    anubis pommel IMPACT sound
     fully charged esplash breaks blocks
-    keepStand gamerule
     cool leggy sweep for tw
-    big slash for sc
-    and anubis charges for sc
 
 The reason the easings dont work is because kosmx is fucking stupid,
 see: dev.kosmx.playerAnim.core.util.Easing

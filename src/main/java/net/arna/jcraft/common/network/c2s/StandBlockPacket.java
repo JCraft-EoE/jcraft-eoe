@@ -3,8 +3,10 @@ package net.arna.jcraft.common.network.c2s;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.registry.JObjectRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -35,12 +37,18 @@ public class StandBlockPacket {
 
             boolean blocking = stand.wantToBlock;
             if (!blocking && blockDown) {
-                if (player.getMainHandStack().getUseAction() == UseAction.NONE && player.getOffHandStack().getUseAction() == UseAction.NONE) {
+                if (allowBlockingWith(player.getMainHandStack()) && allowBlockingWith(player.getOffHandStack())) {
                     stand.wantToBlock = true;
                     if (stand.canAttack() && !JCraft.isDashing(player)) stand.blocking = true;
                 }
             } else if (blocking && !blockDown) stand.wantToBlock = false;
         });
+    }
+
+    private static boolean allowBlockingWith(ItemStack itemStack) {
+        if (itemStack.isOf(JObjectRegistry.ANUBIS) || itemStack.isOf(JObjectRegistry.ANUBISSHEATHED))
+            return true;
+        return itemStack.getUseAction() == UseAction.NONE;
     }
 
     public static boolean isBlocking(ServerPlayerEntity player) {

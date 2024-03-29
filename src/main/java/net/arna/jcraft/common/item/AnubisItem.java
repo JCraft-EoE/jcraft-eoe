@@ -2,6 +2,7 @@ package net.arna.jcraft.common.item;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegistry;
@@ -65,8 +66,9 @@ public class AnubisItem extends Item {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack item = user.getStackInHand(hand);
+        StandEntity<?, ?> stand = JUtils.getStand(user);
 
-        if (user.isSneaking() || world.isClient) return TypedActionResult.fail(item);
+        if (user.isSneaking() || world.isClient || (stand != null && stand.blocking)) return TypedActionResult.fail(item);
 
         JUtils.serverPlaySound(JSoundRegistry.ANUBIS_SHEATHE, (ServerWorld) world, user.getPos());
         user.setStackInHand(hand, new ItemStack(JObjectRegistry.ANUBISSHEATHED));

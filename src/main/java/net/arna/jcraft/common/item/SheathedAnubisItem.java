@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.item;
 
+import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.spec.SpecType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JObjectRegistry;
@@ -48,6 +49,8 @@ public class SheathedAnubisItem extends SpecObtainmentItem {
             user.setCurrentHand(hand);
         } else { // Unsheathe
             if (world.isClient) return TypedActionResult.fail(itemStack);
+            StandEntity<?, ?> stand = JUtils.getStand(user);
+            if (stand != null && stand.blocking) return TypedActionResult.fail(itemStack);
             ServerWorld serverWorld = (ServerWorld)world;
 
             boolean specChanged = tryGetSpec(user);
