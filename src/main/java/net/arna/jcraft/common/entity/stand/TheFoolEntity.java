@@ -51,6 +51,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withAnim(State.DRILL)
             .withBlockStun(4)
             .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
+            .withExtraHitBox(1.75, -0.1, 0.75)
             .withInfo(Text.literal("Drill"), Text.literal("fast, multi-hitting combo starter, low stun and blockstun"));
     public static final SimpleAttack<TheFoolEntity> LIGHT_FOLLOWUP = new SimpleAttack<TheFoolEntity>(
             0, 9, 16, 1.5f, 6f, 9, 2f, 1.5f, 0)

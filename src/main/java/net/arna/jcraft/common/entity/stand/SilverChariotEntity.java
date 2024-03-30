@@ -61,6 +61,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
     public static final SimpleAttack<SilverChariotEntity> HEAVY = new SimpleAttack<SilverChariotEntity>(
             200, 20, 28, 0.65f, 8f, 10, 2f, 1.5f, 0f)
+            .withExtraHitBox(2, 0.1, 1)
             .withSound(JSoundRegistry.SC_HEAVY)
             .withHitSpark(JParticleType.HIT_SPARK_3)
             .withHyperArmor()

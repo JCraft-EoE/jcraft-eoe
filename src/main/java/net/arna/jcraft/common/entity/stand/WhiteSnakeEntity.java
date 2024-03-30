@@ -30,7 +30,7 @@ import java.util.function.Consumer;
 
 public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEntity.State> {
     public static final UppercutAttack<WhiteSnakeEntity> UPPERCUT = new UppercutAttack<WhiteSnakeEntity>(
-            20, 8, 14, 1, 6f, 16, 1.25f, 0.5f, -0.4f, 0.5f)
+            20, 8, 14, 1, 6f, 16, 1.25f, 0.5f, -0.5f, 0.5f)
             .withAnim(State.UPPERCUT)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withExtraHitBox(1)
@@ -80,7 +80,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withCrouchingVariant(GIVE_STAND)
             .withInfo(Text.literal("Take Stand Disk"), Text.literal("uninterruptible & unblockable, removes enemy stand for 8s"));
     public static final SimpleAttack<WhiteSnakeEntity> LEG_CRUSHER = new SimpleAttack<WhiteSnakeEntity>(
-            240, 16, 22, 0.75f, 7, 32, 1.75f, 0.35f, 0.2f)
+            240, 16, 22, 0.75f, 7, 32, 1.75f, 0.35f, 0.4f)
             .withSound(JSoundRegistry.WS_LEGCRUSH)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withHitSpark(JParticleType.HIT_SPARK_3)

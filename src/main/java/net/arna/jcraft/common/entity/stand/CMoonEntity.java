@@ -98,6 +98,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             .withTargetProcessor(CMoonEntity::addInversion)
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withStaticY()
             .withInfo(Text.literal("Ground Slam"), Text.literal("launches downwards, combo starter/extender, knocks down if it hits while user is crouching"));
     public static final GravityShiftMove GRAV_SHIFT = new GravityShiftMove(1400, 20, 32, 1f)
             .withSound(JSoundRegistry.CMOON_GRAVSHIFT)
