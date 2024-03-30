@@ -5,10 +5,9 @@ import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.shared.*;
-import net.arna.jcraft.common.attack.moves.starplatinum.ChargeBarrageAttack;
+import net.arna.jcraft.common.attack.moves.shared.ChargeBarrageAttack;
 import net.arna.jcraft.common.attack.moves.starplatinum.InhaleAttack;
 import net.arna.jcraft.common.component.living.HitPropertyComponent;
-import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
@@ -64,13 +63,13 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
             .withImpactSound(JSoundRegistry.IMPACT_6)
             .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
             .withInfo(Text.literal("Knee"), Text.literal("fast poke, low stun"));
-    public static final ChargeBarrageAttack SHORT_CHARGE_BARRAGE = new ChargeBarrageAttack(280, 5, 25,
+    public static final ChargeBarrageAttack<StarPlatinumEntity> SHORT_CHARGE_BARRAGE = new ChargeBarrageAttack<StarPlatinumEntity>(280, 5, 25,
             6f, 0.6f, 15, 1.5f, 0.1f, 0f, 3, true)
             .withSound(JSoundRegistry.STAR_PLATINUM_LUNGING_BARRAGE)
             .withBarrageShockwaves()
             .withBackstab(false)
             .withInfo(Text.literal("Lunging Barrage"), Text.literal("fast combo starter/extender, medium stun"));
-    public static final ChargeBarrageAttack CHARGE_BARRAGE = new ChargeBarrageAttack(280, 5, 55,
+    public static final ChargeBarrageAttack<StarPlatinumEntity> CHARGE_BARRAGE = new ChargeBarrageAttack<StarPlatinumEntity>(280, 5, 55,
             7f, 0.6f, 15, 1.5f, 0.1f, 0f, 3, false)
             .withSound(JSoundRegistry.STAR_PLATINUM_ADVANCING_BARRAGE)
             .withBarrageShockwaves()

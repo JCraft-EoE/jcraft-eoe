@@ -2563,14 +2563,31 @@ Anubis Chariot
 >second hitbox to grab (sptw)
 
 ● 29/03/2024
+>Updated textures for: Stand Arrow, Living Arrow, Requiem Arrow, Requiem Ruby, Boxing Gloves
+
 Anubis
     >Blocking with your stand is now possible while Anubis is held
+
+Cream
+    >Bite sped up
+    >Surprise can now be forced to come out near the user (via crouching)
+    >Added Half-Ball Special 2 - Detaching Void Charge
 
 Silver Chariot
     >Updated Barrage animation
 
 Anubis Chariot
     >Added followup to Spinning Blade
+
+Killer Queen: Bites The Dust
+    >Bubble cooldown reduced (16->11s)
+    >Takedown cooldown reduced (15->11s)
+    >Bites the Dust Plant cooldown reduced (50->40s)
+
+Gold Experience Requiem
+    >Added floating animation to user
+
+    //TODO: FIX FUCKING INPUT BUGS :)
 
 todo: combo counter is LYING
     esplash color :)

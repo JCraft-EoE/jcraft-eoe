@@ -98,7 +98,6 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends GeoEntityR
         float netHeadYaw = lerpHeadRot - lerpBodyRot;
 
         if (shouldSit && !animatable.isFree() && animatable.getVehicle() instanceof LivingEntity livingentity) {
-            //lerpBodyRot = MathHelper.lerpAngleDegrees(partialTick, livingentity.prevBodyYaw, livingentity.bodyYaw);
             lerpBodyRot = MathHelper.lerpAngleDegrees(partialTick, livingentity.prevHeadYaw, livingentity.headYaw);
             netHeadYaw = lerpHeadRot - lerpBodyRot;
             float clampedHeadYaw = MathHelper.clamp(MathHelper.wrapDegrees(netHeadYaw), -85, 85);
@@ -178,8 +177,6 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends GeoEntityR
             PatchouliCompat.patchouliLoaded(poseStack);
 
         poseStack.pop();
-
-        //super.render(animatable, entityYaw, partialTick, poseStack, bufferSource, packedLight);
     }
 
     @Override

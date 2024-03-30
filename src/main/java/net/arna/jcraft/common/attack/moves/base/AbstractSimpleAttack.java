@@ -385,12 +385,16 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
     // Logic methods
     @Override
     public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user, MoveContext ctx) {
-        Vec3d upVec = GravityChangerAPI.getEyeOffset(user);
+        Vec3d userRotVec = user.getRotationVector();
+        Direction gravDir = GravityChangerAPI.getGravityDirection(user);
+        if (gravDir == Direction.UP)
+            userRotVec = new Vec3d(userRotVec.x, -userRotVec.y, userRotVec.z);
+
         Vec3d hPos = getOffsetHeightPos(attacker);
-        Vec3d rotVec = getRotVec(attacker);
+        Vec3d rotVec = staticY ? getRotVec(attacker) : userRotVec;
+        Vec3d upVec = new Vec3d(gravDir.getUnitVector()).multiply(-1.0);
 
         if (staticY) {
-            Direction gravDir = GravityChangerAPI.getGravityDirection(attacker.getBaseEntity());
             rotVec = rotVec.withAxis(gravDir.getAxis(), 0);
         }
 

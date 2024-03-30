@@ -27,6 +27,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.IAnimationTickable;
 import software.bernie.geckolib3.core.PlayState;
@@ -61,7 +62,7 @@ public class SheerHeartAttackEntity extends MobEntity implements IAnimatable, IA
         setOwnerId(owner.getUuid());
     }
 
-    public UUID getOwnerId() {
+    public @Nullable UUID getOwnerId() {
         return this.dataTracker.get(OWNER_ID).orElse(null);
     }
 

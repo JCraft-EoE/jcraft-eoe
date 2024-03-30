@@ -1,12 +1,14 @@
-package net.arna.jcraft.common.attack.moves.starplatinum;
+package net.arna.jcraft.common.attack.moves.shared;
 
 import lombok.NonNull;
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.StunType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractBarrageAttack;
 import net.arna.jcraft.common.entity.stand.StandEntity;
-import net.arna.jcraft.common.entity.stand.StarPlatinumEntity;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
@@ -15,7 +17,7 @@ import java.util.Set;
 
 import static net.arna.jcraft.common.attack.moves.base.AbstractChargeAttack.prepDetachmentMove;
 
-public class ChargeBarrageAttack extends AbstractBarrageAttack<ChargeBarrageAttack, StarPlatinumEntity> {
+public class ChargeBarrageAttack<A extends IAttacker<? extends A, ?>> extends AbstractBarrageAttack<ChargeBarrageAttack<A>, A> {
     private final float originalMoveDistance;
     private final boolean quadraticMovement;
 
@@ -33,15 +35,19 @@ public class ChargeBarrageAttack extends AbstractBarrageAttack<ChargeBarrageAtta
     }
 
     @Override
-    public void onInitiate(StarPlatinumEntity attacker) {
+    public void onInitiate(A attacker) {
         super.onInitiate(attacker);
         withMoveDistance(originalMoveDistance);
     }
 
     @Override
-    public void tick(StarPlatinumEntity attacker) {
+    public void tick(A attacker) {
         super.tick(attacker);
-        tickChargeBarrageAttack(attacker, attacker.getMoveStun() < getWindupPoint(), getMoveDistance(), getWindupPoint());
+        Entity attackerEntity = attacker.getBaseEntity();
+        if (attackerEntity instanceof StandEntity<?,?> stand)
+            tickChargeBarrageAttack(stand, attacker.getMoveStun() < getWindupPoint(), getMoveDistance(), getWindupPoint());
+        else
+            JCraft.LOGGER.error("Trying to tick ChargeBarrageAttack non non-stand entity; " + attackerEntity);
     }
 
     protected Vec3d advanceChargePos(StandEntity<?, ?> attacker, float moveDistance, int windupPoint) {
@@ -61,9 +67,10 @@ public class ChargeBarrageAttack extends AbstractBarrageAttack<ChargeBarrageAtta
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(StarPlatinumEntity attacker, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user, MoveContext ctx) {
         Set<LivingEntity> targets = super.perform(attacker, user, ctx);
-        if (targets.isEmpty()) return targets;
+        Entity attackerEntity = attacker.getBaseEntity();
+        if (targets.isEmpty() || attackerEntity == null) return targets;
 
         Vec3d avgPos = Vec3d.ZERO;
         float c = 0;
@@ -73,25 +80,25 @@ public class ChargeBarrageAttack extends AbstractBarrageAttack<ChargeBarrageAtta
             c += 1f;
         }
         avgPos = avgPos.multiply(1f / c);
-        attacker.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, avgPos);
-        withMoveDistance((float) avgPos.squaredDistanceTo(attacker.getPos()) + 0.1f);
+        attackerEntity.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, avgPos);
+        withMoveDistance((float) avgPos.squaredDistanceTo(attackerEntity.getPos()) + 0.1f);
 
         return targets;
     }
 
     @Override
-    protected Vec3d getOffsetForwardPos(StarPlatinumEntity attacker, Vec3d offsetHeightPos, Vec3d upVec, Vec3d rotVec) {
+    protected Vec3d getOffsetForwardPos(A attacker, Vec3d offsetHeightPos, Vec3d upVec, Vec3d rotVec) {
         return offsetHeightPos.add(rotVec);
     }
 
     @Override
-    protected @NonNull ChargeBarrageAttack getThis() {
+    protected @NonNull ChargeBarrageAttack<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull ChargeBarrageAttack copy() {
-        return copyExtras(new ChargeBarrageAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
+    public @NonNull ChargeBarrageAttack<A> copy() {
+        return copyExtras(new ChargeBarrageAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
                 getStun(), getHitboxSize(), getKnockback(), getOffset(), getInterval(), quadraticMovement));
     }
 }

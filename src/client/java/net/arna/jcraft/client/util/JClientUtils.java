@@ -15,6 +15,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import software.bernie.geckolib3.core.processor.AnimationProcessor;
 import software.bernie.geckolib3.core.processor.IBone;
 
 import java.util.ArrayList;
@@ -74,6 +75,8 @@ public class JClientUtils {
     public static void animateGenericHumanoid(StandEntityModel<?> model, StandEntity<?, ?> entity, LivingEntity player, float partialTick, boolean flipBody, boolean flipHead, float tPO, float hPO, float velInfluence) {
         float overVel = 0;
 
+        AnimationProcessor<?> animationProcessor = model.getAnimationProcessor();
+
         if (entity.getMoveStun() < 1) {
             Vec3d playerVel = deltaPos(player);
             overVel = MathHelper.clamp((float) playerVel.horizontalLength() - 0.05f, -1f, 1f);
@@ -82,7 +85,7 @@ public class JClientUtils {
             if (playerVel.normalize().add(entity.getRotationVector()).horizontalLengthSquared() < playerVel.normalize().horizontalLengthSquared())
                 velInfluence *= -1;
 
-            IBone torso = model.getAnimationProcessor().getBone("torso");
+            IBone torso = animationProcessor.getBone("torso");
             if (torso != null) {
                 float pitch = (180f + overVel * velInfluence) * 3.1415f / 180f;
                 if (flipBody) {
@@ -94,11 +97,18 @@ public class JClientUtils {
         }
 
         if (entity.isBlocking() || entity.isIdle()) { // if in/going to idle, or blocking
-            IBone head = model.getAnimationProcessor().getBone("head");
+            IBone head = animationProcessor.getBone("head");
             if (head != null) {
                 float headPitch = (player.getPitch() - overVel * velInfluence) * 3.1415f / 180f;
                 if (flipHead) headPitch = -headPitch;
                 head.setRotationX(headPitch + hPO);
+            }
+        } else if (entity.getMoveStun() > 0) {
+            //TODO: I NEED A NEW FUCKIN BONE :DDDDDD
+            IBone torso = animationProcessor.getBone("torso");
+            if (torso != null) {
+                float torsoPitch = (player.getPitch() * 0.9f) * 3.1415f / 180f;
+                torso.setRotationX(torso.getRotationX() - torsoPitch);
             }
         }
     }

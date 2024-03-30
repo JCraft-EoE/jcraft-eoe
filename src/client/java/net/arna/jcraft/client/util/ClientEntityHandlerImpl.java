@@ -28,6 +28,7 @@ import net.minecraft.util.math.random.Random;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.UUID;
 
 public class ClientEntityHandlerImpl implements IClientEntityHandler {
     public static final ClientEntityHandlerImpl INSTANCE = new ClientEntityHandlerImpl();
@@ -192,8 +193,9 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
     @Override
     public void sheerHeartAttackEntityTick(SheerHeartAttackEntity sHAEntity) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (sHAEntity.getOwnerId().equals(client.player.getUuid()) && sHAEntity.age <= 300) {
+        UUID ownerId = sHAEntity.getOwnerId();
+        if (ownerId == null) return;
+        if (ownerId.equals(client.player.getUuid()) && sHAEntity.age <= 300)
             sHAEntity.setCustomName( Text.literal(15 - sHAEntity.age / 20 + "s") );
-        }
     }
 }

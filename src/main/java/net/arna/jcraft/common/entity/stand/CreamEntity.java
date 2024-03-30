@@ -36,6 +36,7 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
@@ -45,9 +46,12 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import static net.arna.jcraft.common.attack.moves.cream.SurpriseMove.OUT_DIR;
+import static net.arna.jcraft.common.attack.moves.cream.SurpriseMove.OUT_POS;
+
 public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public static final EffectInflictingAttack<CreamEntity> BITE = new EffectInflictingAttack<CreamEntity>(20,
-            9, 15, 0.75f, 5f, 20, 1.75f, 0.75f, 0.3f,
+            7, 13, 0.75f, 6f, 20, 1.75f, 0.75f, 0.3f,
             List.of(new StatusEffectInstance(StatusEffects.SLOWNESS, 40, 1)))
             .withAnim(State.BITE)
             .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
@@ -55,7 +59,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Bite"), Text.literal("applies Slowness II (2s) on hit"));
     public static final SimpleAttack<CreamEntity> LIGHT_FOLLOWUP = new SimpleAttack<CreamEntity>(
-            0, 7, 14, 0.75f, 6, 8, 1.75f, 1.1f, -0.1f)
+            0, 7, 14, 0.75f, 6f, 8, 1.75f, 1.1f, -0.1f)
             .withAnim(State.LIGHT_FOLLOWUP)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withLaunch()
@@ -95,9 +99,43 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             .withInfo(Text.literal("Grab"), Text.literal("unblockable, knocks back"));
     public static final SurpriseMove SURPRISE = new SurpriseMove(300, 14, 24, 1f)
             .withSound(JSoundRegistry.CREAM_SUMMON)
-            .withInfo(Text.literal("Surprise"), Text.literal("Cream disappears into the ground, then pops out in a nearby looked location"));
+            .withInitAction((attacker, user, ctx) -> {
+                Vec3d rotVec = user.getRotationVector();
+                if (user.isSneaking()) {
+                    attacker.getMoveContext().set(OUT_POS, new Vec3f(user.getPos().add(rotVec)));
+                } else {
+                    Vec3d eyePos = user.getEyePos();
+                    HitResult hitResult = attacker.getWorld().raycast(new RaycastContext(eyePos, eyePos.add(rotVec.multiply(16)),
+                            RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user));
+                    attacker.getMoveContext().set(OUT_POS, new Vec3f(hitResult.getPos()));
+                }
+            })
+            .withAction((attacker, user, ctx, targets) -> {
+                Vec3f outDir = GravityChangerAPI.getGravityDirection(attacker).getUnitVector();
+                outDir.scale(-1f);
+                ctx.set(OUT_DIR, outDir);
+            })
+            .withInfo(Text.literal("Surprise"), Text.literal("""
+                    Cream disappears into the ground, then pops out in a nearby looked location.
+                    If used while crouching, Cream appears in front of the user.
+                    """));
+    public static final ChargeBarrageAttack<CreamEntity> CHARGE = new ChargeBarrageAttack<CreamEntity>(200, 15, 30,
+            4f, 2f, 10, 1.5f, 0.5f, 0f, 3, false)
+            .withAction(
+                    ((attacker, user, ctx, targets) ->
+                            targets.forEach(target -> target.addStatusEffect(
+                                            new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 25, 0, true, false)
+                                    )
+                            )
+                    )
+            )
+            .withLaunchNoShockwave()
+            .withImpactSound(JSoundRegistry.IMPACT_5)
+            .withBlockableType(BlockableType.NON_BLOCKABLE)
+            .withInfo(Text.literal("Charge"), Text.literal("4 block range, unblockable knockdown"));
     public static final DestroyAttack DESTROY = new DestroyAttack(320, 21, 30, 1f,
             8f, 5, 2f, 1.25f, 0f)
+            .withCrouchingVariant(CHARGE)
             .withSound(JSoundRegistry.CREAM_OVERHEAD)
             .withImpactSound(JSoundRegistry.IMPACT_5)
             .withLaunch()
@@ -136,7 +174,16 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public static final BallChargeAttack BALL_CHARGE = new BallChargeAttack(300, 13, 28, 1f)
             .withSound(JSoundRegistry.CREAM_BALLDASH)
             .withInfo(Text.literal("Void Charge"), Text.literal("Cream quickly transforms into a black hole and charges in the pointed direction"));
-
+    public static final SurpriseMove DETACH_CHARGE = new SurpriseMove(300, 13, 28, 1f)
+            .withSound(JSoundRegistry.CREAM_BALLDASH)
+            .withInitAction((attacker, user, ctx) -> {
+                attacker.endHalfBall();
+                attacker.getMoveContext().set(OUT_POS, new Vec3f(user.getPos()));
+                ctx.set(OUT_DIR, new Vec3f(user.getRotationVector().multiply(0.75)));
+            })
+            .withInfo(Text.literal("Detaching Void Charge"), Text.literal("""
+                    Cream quickly transforms into a black hole and charges in the pointed direction.
+                    The user exits cream upon performing this move."""));
     public static final BallChargeAttack BALL_DESTROY = new BallChargeAttack(300, 13, 28, 1f)
             .withSound(JSoundRegistry.CREAM_BALLDASH)
             .withInfo(Text.literal("Destroy"), Text.literal("Cream quickly transforms into a black hole and charges in a downward curve"));
@@ -229,10 +276,12 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     protected void registerMoves(MoveMap<CreamEntity, State> moves) {
         if (isHalfBall()) {
             moves.register(MoveType.LIGHT, SWIPE, State.BALL_LIGHT);
+
             moves.register(MoveType.HEAVY, OVERHEAD_SMASH, State.BALL_HEAVY);
             moves.register(MoveType.BARRAGE, BALL_COMBO, State.BALL_COMBO);
 
             moves.register(MoveType.SPECIAL1, BALL_CHARGE, State.BALL_CONSUME);
+            moves.register(MoveType.SPECIAL2, DETACH_CHARGE, State.BALL_CONSUME);
             moves.register(MoveType.SPECIAL3, BALL_DESTROY, State.BALL_CONSUME);
 
             moves.register(MoveType.UTILITY, EXIT, State.EXIT);
@@ -243,12 +292,12 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             moves.register(MoveType.BARRAGE, COMBO, State.COMBO);
 
             moves.register(MoveType.SPECIAL1, GRAB, State.GRAB);
-            moves.register(MoveType.SPECIAL3, DESTROY, State.DESTROY);
+            moves.register(MoveType.SPECIAL2, SURPRISE, State.SURPRISE);
+            moves.register(MoveType.SPECIAL3, DESTROY, State.DESTROY).withCrouchingVariant(State.CHARGE);
 
             moves.register(MoveType.UTILITY, ENTER, State.ENTER);
         }
 
-        moves.register(MoveType.SPECIAL2, SURPRISE, State.SURPRISE);
         moves.register(MoveType.ULTIMATE, CONSUME, State.CONSUME);
     }
 
@@ -373,7 +422,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                 if (charging) {
                     if (isFree()) { // Surprise move
                         Vec3f newPos = getFreePos().copy();
-                        newPos.add(getMoveContext().get(SurpriseMove.OUT_DIR));
+                        newPos.add(getMoveContext().get(OUT_DIR));
                         setFreePos(newPos);
                         if (getMoveStun() == 1) setFree(false);
                     } else if (chargeDir != null) { // Void Charge move
@@ -546,7 +595,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         CONSUME(builder -> builder.playAndHold("animation.cream.consume")),
         BALL_CONSUME(builder -> builder.playAndHold("animation.cream.ballconsume")),
         SURPRISE(builder -> builder.playAndHold("animation.cream.surprise")),
-        CHARGE_HIT(builder -> builder.playAndHold("animation.cream.charge_hit")),
+        CHARGE(builder -> builder.playAndHold("animation.cream.charge")),
         GRAB(builder -> builder.playAndHold("animation.cream.grab")),
         GRAB_HIT(builder -> builder.playAndHold("animation.cream.grab_hit")),
         ENTER(builder -> builder.playAndHold("animation.cream.enter")),
