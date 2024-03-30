@@ -104,8 +104,7 @@ public class JClientUtils {
                 head.setRotationX(headPitch + hPO);
             }
         } else if (entity.getMoveStun() > 0) {
-            //TODO: I NEED A NEW FUCKIN BONE :DDDDDD
-            IBone torso = animationProcessor.getBone("torso");
+            IBone torso = animationProcessor.getBone("base");
             if (torso != null) {
                 float torsoPitch = (player.getPitch() * 0.9f) * 3.1415f / 180f;
                 torso.setRotationX(torso.getRotationX() - torsoPitch);

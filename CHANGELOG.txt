@@ -2574,6 +2574,7 @@ Cream
     >Added Half-Ball Special 2 - Detaching Void Charge
 
 Silver Chariot
+    >Updated Impaling Thrust animation
     >Updated Barrage animation
 
 Anubis Chariot
@@ -2586,6 +2587,8 @@ Killer Queen: Bites The Dust
 
 Gold Experience Requiem
     >Added floating animation to user
+
+● 30/03/2024
 
     //TODO: FIX FUCKING INPUT BUGS :)
 

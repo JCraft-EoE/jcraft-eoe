@@ -12,7 +12,12 @@
 			},
 			"bones": [
 				{
+					"name": "base",
+					"pivot": [0, 19.25, 0]
+				},
+				{
 					"name": "KingCrimson",
+					"parent": "base",
 					"pivot": [0, 0.5, 0]
 				},
 				{

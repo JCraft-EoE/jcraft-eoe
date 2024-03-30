@@ -130,13 +130,15 @@ public class PlayerInputPacket {
                 server.execute(() -> {
                     JServerPlayerInputCallback.EVENT.invoker().onPlayerInput(player, type, true, b);
 
-                    StandEntity<?, ?> stand = JUtils.getStand(player);
-                    if (stand != null)
-                        stand.onUserMoveInput(type, true, b);
+                    if (type != MoveInputType.STAND_SUMMON) {
+                        StandEntity<?, ?> stand = JUtils.getStand(player);
+                        if (stand != null)
+                            stand.onUserMoveInput(type, true, b);
 
-                    JSpec<?, ?> spec = JUtils.getSpec(player);
-                    if (spec != null)
-                        spec.onUserMoveInput(type, true, b);
+                        JSpec<?, ?> spec = JUtils.getSpec(player);
+                        if (spec != null)
+                            spec.onUserMoveInput(type, true, b);
+                    }
                 });
             });
             else {
@@ -144,13 +146,15 @@ public class PlayerInputPacket {
                 server.execute(() -> {
                     JServerPlayerInputCallback.EVENT.invoker().onPlayerInput(player, type, false, success);
 
-                    StandEntity<?, ?> stand = JUtils.getStand(player);
-                    if (stand != null)
-                        stand.onUserMoveInput(type, false, success);
+                    if (type != MoveInputType.STAND_SUMMON) {
+                        StandEntity<?, ?> stand = JUtils.getStand(player);
+                        if (stand != null)
+                            stand.onUserMoveInput(type, false, success);
 
-                    JSpec<?, ?> spec = JUtils.getSpec(player);
-                    if (spec != null)
-                        spec.onUserMoveInput(type, false, success);
+                        JSpec<?, ?> spec = JUtils.getSpec(player);
+                        if (spec != null)
+                            spec.onUserMoveInput(type, false, success);
+                    }
                 });
             }
         }

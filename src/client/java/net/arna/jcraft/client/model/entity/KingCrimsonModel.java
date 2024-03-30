@@ -41,7 +41,7 @@ public class KingCrimsonModel extends StandEntityModel<KingCrimsonEntity> {
                 head.setRotationX(-(user.getPitch() + overVel * velInfluence) * 3.1415f / 180f);
             }
         } else if (entity.getMoveStun() > 0) {
-            IBone torso = this.getAnimationProcessor().getBone("torso");
+            IBone torso = this.getAnimationProcessor().getBone("base");
             if (torso != null) {
                 float torsoPitch = (user.getPitch() * 0.9f) * 3.1415f / 180f;
                 torso.setRotationX(torso.getRotationX() - torsoPitch);

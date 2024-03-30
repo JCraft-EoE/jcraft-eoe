@@ -23,7 +23,7 @@ public enum StandType {
      * NONE marks an entity as processed.
      * For players, this is functionally identical to null, for entities this disables obtaining a stand.
      */
-    NONE(),
+    NONE(), // 255
     STAR_PLATINUM(JEntityTypeRegistry.STAR_PLATINUM, StarPlatinumEntity::new, "starplatinum",                   // 1
             Text.literal("Manga"), Text.literal("Arcade"), Text.literal("OVA")),
     THE_WORLD(JEntityTypeRegistry.THE_WORLD, TheWorldEntity::new, "theworld",                                   // 2
