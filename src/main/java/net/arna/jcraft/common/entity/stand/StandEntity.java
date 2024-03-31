@@ -1041,7 +1041,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * @param hitAnimation animation the opponent will do when they are hit
      */
     private static void baseDamageLogic(LivingEntity ent, Vec3d kbVec, int stunTicks, int stunLevel, boolean overrideStun,
-                                        float damage, boolean lift, int blockstun, DamageSource source, Entity attacker,
+                                        float damage, boolean lift, int blockstun, DamageSource source, @Nullable Entity attacker,
                                         HitPropertyComponent.HitAnimation hitAnimation, boolean canBackstab, boolean unblockable) {
         if (ent instanceof ICustomDamageHandler customDamageHandler)
             if (!customDamageHandler.handleDamage(kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, hitAnimation, canBackstab, unblockable))
@@ -1069,13 +1069,19 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             }
 
             if (stand.blocking && !stand.isRemote()) {
-                double delta = Math.abs((ent.headYaw + 90.0f) % 360.0f - (attacker.getHeadYaw() + 90.0f) % 360.0f);
-                if (canBackstab && (360.0 - delta % 360.0 < 90 || delta % 360.0 < 90) && ent.squaredDistanceTo(attacker.getPos()) >= 1.5625) { // Backstab logic
-                    JCraft.createParticle((ServerWorld) attacker.getWorld(), ent.getX(), attacker.getEyeY(), ent.getZ(), JParticleType.BACK_STAB);
-                    stand.playSound(JSoundRegistry.BACKSTAB, 1, 1);
-                    stand.blocking = false;
-                    overrideStun = true;
-                } else if (!unblockable) { // Didn't backstab, not unblockable
+                boolean backstabbed = false;
+                if (attacker != null) {
+                    double delta = Math.abs((ent.headYaw + 90.0f) % 360.0f - (attacker.getHeadYaw() + 90.0f) % 360.0f);
+                    if (canBackstab && (360.0 - delta % 360.0 < 90 || delta % 360.0 < 90) && ent.squaredDistanceTo(attacker.getPos()) >= 1.5625) { // Backstab logic
+                        JCraft.createParticle((ServerWorld) attacker.getWorld(), ent.getX(), attacker.getEyeY(), ent.getZ(), JParticleType.BACK_STAB);
+                        stand.playSound(JSoundRegistry.BACKSTAB, 1, 1);
+                        stand.blocking = false;
+                        overrideStun = true;
+                        backstabbed = true;
+                    }
+                }
+
+                if (!backstabbed && !unblockable) { // Didn't backstab, not unblockable
                     //JCraft.LOGGER.info("Enemy blocked attack, setting blockstun to: " + blockstun);
                     stand.setMoveStun(blockstun);
                     stand.setStandGauge(stand.getStandGauge() - 2 * damage);

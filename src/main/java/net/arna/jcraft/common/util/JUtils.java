@@ -5,6 +5,7 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.MoveInputType;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.living.HitPropertyComponent;
+import net.arna.jcraft.common.entity.projectile.JAttackEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
@@ -12,6 +13,7 @@ import net.arna.jcraft.common.network.s2c.JExplosionPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.splatter.JSplatterManager;
+import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
@@ -484,7 +486,10 @@ public final class JUtils {
             Map.entry(EntityType.VILLAGER, 1.5f),
             Map.entry(EntityType.PLAYER, 1.5f),
 
-            Map.entry(EntityType.IRON_GOLEM, 0.0f)
+            Map.entry(EntityType.IRON_GOLEM, 0.0f),
+            Map.entry(EntityType.SNOW_GOLEM, 0.0f),
+
+            Map.entry(JEntityTypeRegistry.SHEER_HEART_ATTACK, 0.0f)
     );
 
     public static float getBloodMult(LivingEntity entity) {
@@ -493,7 +498,7 @@ public final class JUtils {
         if (type.isIn(EntityTypeTags.RAIDERS))
             return 1.5f;
 
-        if (type.isIn(EntityTypeTags.SKELETONS))
+        if (type.isIn(EntityTypeTags.SKELETONS) || entity instanceof JAttackEntity)
             return 0;
 
         if (type.isIn(EntityTypeTags.AXOLOTL_HUNT_TARGETS)) // Fishes
