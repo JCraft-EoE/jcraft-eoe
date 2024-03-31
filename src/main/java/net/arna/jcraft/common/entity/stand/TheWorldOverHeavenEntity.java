@@ -67,14 +67,26 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
     public static final SingularityAttack SINGULARITY = new SingularityAttack(260, 11, 23,
             1f, 0f, 25, 2f, 0.4f, 0.2f, true)
             .withSound(JSoundRegistry.TWOH_SINGULARITY)
+            .withAnim(State.SINGULARITY)
             .withImpactSound(JSoundRegistry.IMPACT_12)
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
             .withHitSpark(JParticleType.HIT_SPARK_3)
             .withInfo(Text.literal("Singularity"), Text.literal("block bypass (stun will always hit, but the opponent can stay blocking)"));
+    public static final UppercutAttack<TheWorldOverHeavenEntity> OVERHEAD_KICK = new UppercutAttack<TheWorldOverHeavenEntity>(
+            200, 10, 20, 1.25f, 8f, 20, 1.5f, 0.3f, 0f, -1)
+            //.withSound(JSoundRegistry.TWOH_HEAVY)
+            .withAnim(State.AIR_HEAVY)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
+            .withHitSpark(JParticleType.HIT_SPARK_3)
+            .withExtraHitBox(1, 0.75, 1)
+            .withExtraHitBox(1, -0.5, 1)
+            .withInfo(Text.literal("Overhead Kick"), Text.literal("damage ignores potions and enchantments, low stun, high blockstun, medium windup"));
     public static final SingularityAttack TRUE_STRIKE = new SingularityAttack(200, 10, 22,
             1f, 0f, 20, 2f, 0.3f, 0f, false)
             .withBlockStun(20)
+            .withAerialVariant(OVERHEAD_KICK)
             .withCrouchingVariant(SINGULARITY)
             .withSound(JSoundRegistry.TWOH_HEAVY)
             .withImpactSound(JSoundRegistry.IMPACT_12)
@@ -203,7 +215,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
     protected void registerMoves(MoveMap<TheWorldOverHeavenEntity, State> moves) {
         moves.registerImmediate(MoveType.LIGHT, PUNCH, State.LIGHT);
 
-        moves.register(MoveType.HEAVY, TRUE_STRIKE, State.HEAVY).withCrouchingVariant(State.SINGULARITY);
+        moves.registerImmediate(MoveType.HEAVY, TRUE_STRIKE, State.HEAVY);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 
         moves.register(MoveType.SPECIAL1, SMITE, State.SMITE);
@@ -339,7 +351,8 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         TIME_SKIP(builder -> builder.loop("animation.twoh.idle")),
         LUNGE(builder -> builder.loop("animation.twoh.lunge")),
         LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.twoh.light_followup")),
-        SINGULARITY(builder -> builder.playAndHold("animation.twoh.singularity"));
+        SINGULARITY(builder -> builder.playAndHold("animation.twoh.singularity")),
+        AIR_HEAVY(builder -> builder.playAndHold("animation.twoh.air_heavy")),;
 
         private final Consumer<AnimationBuilder> animator;
 

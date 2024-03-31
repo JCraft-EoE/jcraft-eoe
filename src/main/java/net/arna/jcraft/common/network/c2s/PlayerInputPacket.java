@@ -129,32 +129,35 @@ public class PlayerInputPacket {
 
                 server.execute(() -> {
                     JServerPlayerInputCallback.EVENT.invoker().onPlayerInput(player, type, true, b);
+                    boolean success = b;
 
-                    if (type != MoveInputType.STAND_SUMMON) {
-                        StandEntity<?, ?> stand = JUtils.getStand(player);
-                        if (stand != null)
-                            stand.onUserMoveInput(type, true, b);
-
-                        JSpec<?, ?> spec = JUtils.getSpec(player);
-                        if (spec != null)
-                            spec.onUserMoveInput(type, true, b);
+                    StandEntity<?, ?> stand = JUtils.getStand(player);
+                    if (stand != null) {
+                        stand.onUserMoveInput(type, true, success);
+                        success = false; // If a stand is out, the move input success belongs to it.
                     }
+
+                    JSpec<?, ?> spec = JUtils.getSpec(player);
+                    if (spec != null)
+                        spec.onUserMoveInput(type, true, success);
                 });
             });
             else {
-                boolean success = successMap.computeIfAbsent(player, p -> new Object2BooleanOpenHashMap<>()).getOrDefault(type, false);
+                boolean b = successMap.computeIfAbsent(player, p -> new Object2BooleanOpenHashMap<>()).getOrDefault(type, false);
+
                 server.execute(() -> {
-                    JServerPlayerInputCallback.EVENT.invoker().onPlayerInput(player, type, false, success);
+                    JServerPlayerInputCallback.EVENT.invoker().onPlayerInput(player, type, false, b);
+                    boolean success = b;
 
-                    if (type != MoveInputType.STAND_SUMMON) {
-                        StandEntity<?, ?> stand = JUtils.getStand(player);
-                        if (stand != null)
-                            stand.onUserMoveInput(type, false, success);
-
-                        JSpec<?, ?> spec = JUtils.getSpec(player);
-                        if (spec != null)
-                            spec.onUserMoveInput(type, false, success);
+                    StandEntity<?, ?> stand = JUtils.getStand(player);
+                    if (stand != null) {
+                        stand.onUserMoveInput(type, false, success);
+                        success = false; // If a stand is out, the move input success belongs to it.
                     }
+
+                    JSpec<?, ?> spec = JUtils.getSpec(player);
+                    if (spec != null)
+                        spec.onUserMoveInput(type, false, success);
                 });
             }
         }

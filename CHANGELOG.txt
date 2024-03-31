@@ -2562,7 +2562,8 @@ Anubis Chariot
 
 >second hitbox to grab (sptw)
 
-● 29/03/2024
+● 30/03/2024
+>STANDS CAN NOW AIM IN 3D (mostly)
 >Updated textures for: Stand Arrow, Living Arrow, Requiem Arrow, Requiem Ruby, Boxing Gloves
 
 Anubis
@@ -2588,7 +2589,10 @@ Killer Queen: Bites The Dust
 Gold Experience Requiem
     >Added floating animation to user
 
-● 30/03/2024
+● 31/03/2024
+The World: Over Heaven
+    >Updated animations
+    >Added aerial variant to Heavy
 
     //TODO: FIX FUCKING INPUT BUGS :)
 

@@ -340,6 +340,8 @@ public class JCraftClient implements ClientModInitializer {
         return StringUtils.capitalize(secondLast) + StringUtils.capitalize(last);
     }
 
+    //todo: if holdable move is still there, but we arent holding the right input, keep sending the release input
+
     private void tickClient(MinecraftClient client) {
         ClientPlayerEntity player = client.player;
         if (player == null) return;
