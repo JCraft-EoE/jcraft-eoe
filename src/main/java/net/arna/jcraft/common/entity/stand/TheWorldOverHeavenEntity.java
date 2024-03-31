@@ -82,7 +82,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withHitSpark(JParticleType.HIT_SPARK_3)
             .withExtraHitBox(1, 0.75, 1)
             .withExtraHitBox(1, -0.5, 1)
-            .withInfo(Text.literal("Overhead Kick"), Text.literal("damage ignores potions and enchantments, low stun, high blockstun, medium windup"));
+            .withInfo(Text.literal("Overhead Kick"), Text.literal("high damage, good reach, launches down"));
     public static final SingularityAttack TRUE_STRIKE = new SingularityAttack(200, 10, 22,
             1f, 0f, 20, 2f, 0.3f, 0f, false)
             .withBlockStun(20)
@@ -179,7 +179,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
                 """
                         BNBs:
                             -the ultrakill
-                            M1>Barrage>M1>Knives>Overwrite~S2/S3>dash>Smite>Heavy>M1""";
+                            M1>Barrage>M1>Knives>Overwrite~S1/S2>dash>Singularity>Smite>M1~M1""";
 
         auraColors = new Vec3f[]{
                 new Vec3f(0.1f, 0.1f, 0.1f),

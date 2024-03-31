@@ -128,7 +128,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
     public GEREntity(World worldIn) {
         super(StandType.GOLD_EXPERIENCE_REQUIEM, worldIn);
 
-        idleRotation = 0f;
+        idleRotation = -30f;
 
         description = "Impossible Ascended DEFENSE";
 

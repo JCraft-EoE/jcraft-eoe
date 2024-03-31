@@ -112,7 +112,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
     public GoldExperienceEntity(World worldIn) {
         super(StandType.GOLD_EXPERIENCE, worldIn, JSoundRegistry.GE_SUMMON);
 
-        idleRotation = 0f;
+        idleRotation = -30f;
 
         description = "Impenetrable Regenerative DEFENSE";
 

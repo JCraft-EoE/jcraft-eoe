@@ -2590,6 +2590,9 @@ Gold Experience Requiem
     >Added floating animation to user
 
 ● 31/03/2024
+Gold Experience
+    >Snake model updated
+
 The World: Over Heaven
     >Updated animations
     >Added aerial variant to Heavy
