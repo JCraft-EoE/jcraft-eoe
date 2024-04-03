@@ -3,9 +3,9 @@ package net.arna.jcraft.client.model.entity;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.projectile.RedBindEntity;
 import net.minecraft.util.Identifier;
-import software.bernie.geckolib3.model.AnimatedGeoModel;
+import software.bernie.geckolib.model.GeoModel;
 
-public class RedBindModel extends AnimatedGeoModel<RedBindEntity> {
+public class RedBindModel extends GeoModel<RedBindEntity> {
     @Override
     public Identifier getModelResource(RedBindEntity object) {
         return JCraft.id("geo/red_bind.geo.json");

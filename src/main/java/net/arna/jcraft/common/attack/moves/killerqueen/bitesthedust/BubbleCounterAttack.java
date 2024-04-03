@@ -10,6 +10,7 @@ import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageTypes;
 
 public class BubbleCounterAttack extends AbstractCounterAttack<BubbleCounterAttack, KQBTDEntity> {
     private static final CounterMissMove<KQBTDEntity> missAttack = new CounterMissMove<>(15);
@@ -27,7 +28,7 @@ public class BubbleCounterAttack extends AbstractCounterAttack<BubbleCounterAtta
     @Override
     public void counter(@NonNull KQBTDEntity attacker, Entity countered, DamageSource counteredDamageSource) {
         super.counter(attacker, countered, counteredDamageSource);
-        if (countered == null || !attacker.hasUser() || counteredDamageSource.isMagic()) return;
+        if (countered == null || !attacker.hasUser() || counteredDamageSource.isOf(DamageTypes.MAGIC)) return;
 
         if (countered instanceof LivingEntity livingEntity) {
             StandEntity.stun(livingEntity, 10, 3);

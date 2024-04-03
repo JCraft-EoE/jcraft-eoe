@@ -23,7 +23,7 @@ public class AbstractClientPlayerEntityMixin implements IJCraftAnimatedPlayer {
     private final PlayerModifierLayer<IAnimation> modAnimationContainer = new PlayerModifierLayer<>();
 
     @Inject(method = "<init>", at = @At(value = "RETURN"))
-    private void jcraft$init(ClientWorld world, GameProfile profile, @Nullable PlayerPublicKey publicKey, CallbackInfo ci) {
+    private void jcraft$init(ClientWorld world, GameProfile profile, CallbackInfo ci) {
         PlayerAnimationAccess.getPlayerAnimLayer((AbstractClientPlayerEntity) (Object) this).addAnimLayer(1001, modAnimationContainer);
     }
 

@@ -121,7 +121,7 @@ public class CircleAttack extends AbstractMove<CircleAttack, MadeInHeavenEntity>
         Random random = attacker.getRandom();
         Box box = entity.getBoundingBox();
         for (int i = 0; i < box.getAverageSideLength(); i++)
-            entity.world.addParticle(JParticleTypeRegistry.SPEED_PARTICLE,
+            entity.getWorld().addParticle(JParticleTypeRegistry.SPEED_PARTICLE,
                     random.nextDouble() * box.getXLength() + box.minX,
                     random.nextDouble() * box.getYLength() + box.minY,
                     random.nextDouble() * box.getZLength() + box.minZ,

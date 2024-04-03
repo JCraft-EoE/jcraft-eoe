@@ -18,10 +18,10 @@ public class CrossfireAttack extends AbstractMove<CrossfireAttack, MagiciansRedE
     @Override
     public @NonNull Set<LivingEntity> perform(MagiciansRedEntity attacker, LivingEntity user, MoveContext ctx) {
         for (int i = 0; i < 3; i++) {
-            AnkhProjectile ankh = new AnkhProjectile(attacker.world, user);
+            AnkhProjectile ankh = new AnkhProjectile(attacker.getWorld(), user);
             ankh.setVelocity(user, user.getPitch(), user.getYaw(), 0.0F, 1F, 5F);
             ankh.setPosition(getOffsetHeightPos(attacker));
-            attacker.world.spawnEntity(ankh);
+            attacker.getWorld().spawnEntity(ankh);
         }
 
         return Set.of();

@@ -7,7 +7,7 @@ import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
+import org.joml.Vector3f;
 
 import java.util.Set;
 
@@ -63,7 +63,7 @@ public abstract class AbstractChargeAttack<T extends AbstractChargeAttack<T, A, 
             //float t = 1f - (float) curMoveStun / (float) realInitTime;
             Vec3d newPos = advanceChargePos(attacker, moveDistance, windupPoint);
             //stand.setDistanceOffset(1 + attackDist * t * t);
-            attacker.setFreePos(new Vec3f((float) newPos.x, (float) newPos.y, (float) newPos.z));
+            attacker.setFreePos(new Vector3f((float) newPos.x, (float) newPos.y, (float) newPos.z));
             attacker.setFree(true);
         } else prepDetachmentMove(attacker, attacker.getUserOrThrow());
     }

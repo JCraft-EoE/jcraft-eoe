@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.2-SNAPSHOT'
+	id 'fabric-loom' version '1.5-SNAPSHOT'
 	id 'maven-publish'
 	id 'io.freefair.lombok' version '8.4'
 }
@@ -72,7 +72,7 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	// Geckolib
-	modImplementation "software.bernie.geckolib:geckolib-fabric-1.19:${project.geckolib}"
+	modImplementation "software.bernie.geckolib:geckolib-fabric-${project.minecraft_version}:${project.geckolib}"
 
 	//Player Anim
 	modImplementation("dev.kosmx.player-anim:player-animation-lib-fabric:${project.player_anim}")
@@ -87,7 +87,7 @@ dependencies {
 	runtimeOnly "org.joml:joml:1.10.4"
 	modImplementation "maven.modrinth:sodium:${project.sodium}"
 	modImplementation "com.ptsmods:devlogin:3.3.2" // To login into your Minecraft account
-	modRuntimeOnly "com.sk89q.worldedit:worldedit-fabric-mc1.19.2:7.2.12"
+	modRuntimeOnly "com.sk89q.worldedit:worldedit-fabric-mc1.20:${project.world_edit_version}"
 
 	// Bendylib
 	include modImplementation("io.github.kosmx.bendy-lib:bendy-lib-fabric:${project.bendylib_version}")

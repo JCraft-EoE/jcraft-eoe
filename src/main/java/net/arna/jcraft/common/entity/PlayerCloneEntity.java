@@ -21,6 +21,7 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.mob.SkeletonEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
@@ -237,7 +238,7 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
         if (!itemStack.isOf(Items.NAME_TAG)) {
             if (player.isSpectator()) {
                 return ActionResult.SUCCESS;
-            } else if (player.world.isClient) {
+            } else if (player.getWorld().isClient) {
                 return ActionResult.CONSUME;
             } else {
                 EquipmentSlot equipmentSlot = MobEntity.getPreferredEquipmentSlot(itemStack);
@@ -315,9 +316,9 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
     public void tick() {
         super.tick();
 
-        if (world.isClient()) {
+        if (getWorld().isClient()) {
             if (isSand() && age % 4 == 0)
-                world.addParticle(
+                getWorld().addParticle(
                         new BlockStateParticleEffect(ParticleTypes.BLOCK, Blocks.SAND.getDefaultState()),
                         getX() + getRandom().nextTriangular(0, 0.5),
                         getRandomBodyY(),
@@ -332,7 +333,7 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
                 // If the master id is set, but the master isn't (when loaded via NBT data), find master
                 UUID master = this.getMasterId();
                 if (master != null)
-                    for (ServerPlayerEntity serverPlayerEntity : PlayerLookup.world((ServerWorld) world))
+                    for (ServerPlayerEntity serverPlayerEntity : PlayerLookup.world((ServerWorld) getWorld()))
                         if (serverPlayerEntity.getUuid().equals(master))
                             this.master = serverPlayerEntity;
             }
@@ -373,7 +374,7 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
     }
 
     public void updateAttackType() {
-        if (world == null || world.isClient) return;
+        if (getWorld() == null || getWorld().isClient) return;
         goalSelector.remove(this.cloneAttackGoal);
         goalSelector.remove(this.bowAttackGoal);
         ItemStack itemStack = this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW));
@@ -389,7 +390,7 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
 
     // Ranged attack handling
     public void attack(LivingEntity target, float pullProgress) {
-        ItemStack itemStack = this.getArrowType(this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW)));
+        ItemStack itemStack = this.getProjectileType(this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW)));
         PersistentProjectileEntity persistentProjectileEntity = this.createArrowProjectile(itemStack, pullProgress);
         double d = target.getX() - this.getX();
         double e = target.getBodyY(0.33) - persistentProjectileEntity.getY();
@@ -397,7 +398,7 @@ public class PlayerCloneEntity extends HostileEntity implements RangedAttackMob,
         double g = Math.sqrt(d * d + f * f);
         persistentProjectileEntity.setVelocity(d, e + g * 0.2, f, 1.6F, 2f);
         this.playSound(SoundEvents.ENTITY_ARROW_SHOOT, 1.0F, 1.0F / (this.getRandom().nextFloat() * 0.4F + 0.8F));
-        this.world.spawnEntity(persistentProjectileEntity);
+        this.getWorld().spawnEntity(persistentProjectileEntity);
     }
 
     protected PersistentProjectileEntity createArrowProjectile(ItemStack arrow, float damageModifier) {

@@ -1,8 +1,8 @@
 package net.arna.jcraft.client.rendering.shader;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.render.RenderPhase;
-import net.minecraft.client.render.Shader;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ public class ShaderHolder {
     public JShader instance;
     public ArrayList<String> uniforms;
     public ArrayList<UniformData> defaultUniformData = new ArrayList<>();
-    public final RenderPhase.Shader phase = new RenderPhase.Shader(getInstance());
+    public final RenderPhase.ShaderProgram phase = new RenderPhase.ShaderProgram(getInstance());
 
     public ShaderHolder(String... uniforms) {
         this.uniforms = new ArrayList<>(List.of(uniforms));
@@ -31,7 +31,7 @@ public class ShaderHolder {
         this.instance = instance;
     }
 
-    public Supplier<Shader> getInstance() {
+    public Supplier<ShaderProgram> getInstance() {
         return () -> instance;
     }
 }

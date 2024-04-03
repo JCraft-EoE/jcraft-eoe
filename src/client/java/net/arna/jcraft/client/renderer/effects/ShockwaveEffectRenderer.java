@@ -11,7 +11,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.math.Vector3f;
 import net.minecraft.world.LightType;
 
 import java.util.List;
@@ -42,8 +42,8 @@ public class ShockwaveEffectRenderer {
 
             // Calculate matrix
             stack.translate(shockwave.getX() - camPos.x, shockwave.getY() - camPos.y, shockwave.getZ() - camPos.z);
-            stack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(-shockwave.getYaw()));
-            stack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(shockwave.getPitch()));
+            stack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(-shockwave.getYaw()));
+            stack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(shockwave.getPitch()));
             Matrix4f mat = stack.peek().getPositionMatrix();
 
             // Calculate light

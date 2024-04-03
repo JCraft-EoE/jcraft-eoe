@@ -49,7 +49,7 @@ public class CrossfireHurricaneAttack extends AbstractMove<CrossfireHurricaneAtt
         Vec3d hurricanePos = ctx.get(HURRICANE_POS);
         LivingEntity user = stand.getUserOrThrow();
         Entity vehicle = user.getVehicle();
-        World world = stand.world;
+        World world = stand.getWorld();
 
         // Run every four ticks because the hurricane's meant to be slow, and it's convenient for CPU usage
         if (stand.age % 4 != 0 || hurricaneTime <= 0) return;

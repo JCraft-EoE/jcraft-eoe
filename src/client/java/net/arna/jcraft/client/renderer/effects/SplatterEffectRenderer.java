@@ -11,6 +11,8 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.*;
 import net.minecraft.world.LightType;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 public class SplatterEffectRenderer {
 
@@ -26,7 +28,7 @@ public class SplatterEffectRenderer {
         RenderSystem.disableCull();
         RenderSystem.enableDepthTest();
         RenderSystem.depthMask(false);
-        RenderSystem.setShader(GameRenderer::getPositionColorTexLightmapShader);
+        RenderSystem.setShader(GameRenderer::getPositionColorTexLightmapProgram);
 
         MatrixStack matrices = ctx.matrixStack();
         Vec3d camPos = ctx.camera().getPos();
@@ -60,26 +62,26 @@ public class SplatterEffectRenderer {
     @SuppressWarnings("DuplicatedCode") // I do not care how similar the different directions' code are.
     private static void renderSection(SplatterSection section, BufferBuilder buf, MatrixStack matrices, float alpha, float offset) {
         matrices.push();
-        Vec3f offsetVec = section.getDirection().getUnitVector();
+        Vector3f offsetVec = section.getDirection().getUnitVector();
         offsetVec.multiplyComponentwise(offset, offset, offset); // Prevent z-fighting with anchor block and other splatters.
-        matrices.translate(offsetVec.getX(), offsetVec.getY(), offsetVec.getZ());
+        matrices.translate(offsetVec.x(), offsetVec.y(), offsetVec.z());
         Matrix4f m = matrices.peek().getPositionMatrix();
 
         int blockLight = section.getWorld().getLightLevel(LightType.BLOCK, section.getBlockPos());
         int skyLight = section.getWorld().getLightLevel(LightType.SKY, section.getBlockPos());
         int light = LightmapTextureManager.pack(blockLight, skyLight);
 
-        Vec3f min = section.getMinPos();
-        Vec3f max = section.getMaxPos();
+        Vector3f min = section.getMinPos();
+        Vector3f max = section.getMaxPos();
         Vec2f minUv = section.getMinUv();
         Vec2f maxUv = section.getMaxUv();
 
-        float minX = min.getX();
-        float minY = min.getY();
-        float minZ = min.getZ();
-        float maxX = max.getX();
-        float maxY = max.getY();
-        float maxZ = max.getZ();
+        float minX = min.x();
+        float minY = min.y();
+        float minZ = min.z();
+        float maxX = max.x();
+        float maxY = max.y();
+        float maxZ = max.z();
 
         switch (section.getDirection()) {
             case UP -> {

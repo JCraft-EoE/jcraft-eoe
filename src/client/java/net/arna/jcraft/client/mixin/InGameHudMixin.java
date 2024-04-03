@@ -7,7 +7,7 @@ import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
 import net.arna.jcraft.client.gui.hud.JCraftHudOverlay;
 import net.arna.jcraft.common.component.JComponents;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
@@ -22,8 +22,10 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static net.arna.jcraft.client.gui.hud.JCraftAbilityHud.GUI_ICONS_TEXTURE;
+
 @Mixin(InGameHud.class)
-public abstract class InGameHudMixin extends DrawableHelper {
+public abstract class InGameHudMixin  {
     @Shadow
     @Final
     private MinecraftClient client;
@@ -49,16 +51,16 @@ public abstract class InGameHudMixin extends DrawableHelper {
             ),
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/hud/InGameHud;drawTexture(Lnet/minecraft/client/util/math/MatrixStack;IIIIII)V"
+                    target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Lnet/minecraft/util/Identifier;IIIIII)V"
             )
     )
-    void showVampireBloodIcons(InGameHud inGameHud, MatrixStack matrices, int x, int y, int u, int v, int width, int height) {
+    void showVampireBloodIcons(DrawContext instance, Identifier texture, int x, int y, int u, int v, int width, int height) {
         PlayerEntity player = client.player;
         if (JComponents.getVampirism(player).isVampire()) {
-            drawTexture(matrices, x, y, 0, 0, width, height, 9, 9);
+            instance.drawTexture(texture, x, y, 0, 0, width, height, 9, 9);
             RenderSystem.setShaderTexture(0, GUI_ICONS_TEXTURE);
         } else {
-            inGameHud.drawTexture(matrices, x, y, u, v, width, height);
+            instance.drawTexture(texture, x, y, u, v, width, height);
         }
     }
 
@@ -76,11 +78,11 @@ public abstract class InGameHudMixin extends DrawableHelper {
             ),
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/hud/InGameHud;drawTexture(Lnet/minecraft/client/util/math/MatrixStack;IIIIII)V",
+                    target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Lnet/minecraft/util/Identifier;IIIIII)V",
                     ordinal = 0
             )
     )
-    void switchToEmptyBloodIcon(MatrixStack matrixStack, CallbackInfo ci) {
+    void switchToEmptyBloodIcon(DrawContext context, CallbackInfo ci) {
         PlayerEntity player = client.player;
         if (JComponents.getVampirism(player).isVampire()) {
             RenderSystem.setShaderTexture(0, EMPTY_BLOOD_ICON);
@@ -100,11 +102,11 @@ public abstract class InGameHudMixin extends DrawableHelper {
             ),
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/hud/InGameHud;drawTexture(Lnet/minecraft/client/util/math/MatrixStack;IIIIII)V",
+                    target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Lnet/minecraft/util/Identifier;IIIIII)V",
                     ordinal = 2
             )
     )
-    void switchToHalfBloodIcon(MatrixStack matrixStack, CallbackInfo ci) {
+    void switchToHalfBloodIcon(DrawContext context, CallbackInfo ci) {
         PlayerEntity player = client.player;
         if (JComponents.getVampirism(player).isVampire()) {
             RenderSystem.setShaderTexture(0, HALF_BLOOD_ICON);
@@ -125,11 +127,11 @@ public abstract class InGameHudMixin extends DrawableHelper {
             ),
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/hud/InGameHud;drawTexture(Lnet/minecraft/client/util/math/MatrixStack;IIIIII)V",
+                    target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Lnet/minecraft/util/Identifier;IIIIII)V",
                     ordinal = 1
             )
     )
-    void switchToFullBloodIcon(MatrixStack matrixStack, CallbackInfo ci) {
+    void switchToFullBloodIcon(DrawContext context, CallbackInfo ci) {
         PlayerEntity player = client.player;
         if (JComponents.getVampirism(player).isVampire()) {
             RenderSystem.setShaderTexture(0, FULL_BLOOD_ICON);
@@ -137,7 +139,7 @@ public abstract class InGameHudMixin extends DrawableHelper {
     }
     
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;getFrozenTicks()I"))
-    private void renderEpitaph(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
+    private void renderEpitaph(DrawContext context, float tickDelta, CallbackInfo ci) {
         if (JClientConfig.getInstance().isEpitaphOverlay())
             EpitaphOverlay.render();
     }
@@ -145,7 +147,7 @@ public abstract class InGameHudMixin extends DrawableHelper {
     // Rendered using this mixin rather than HudRenderCallback, so it's behind chat.
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;enableBlend()V"),
             slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/scoreboard/Scoreboard;getPlayerTeam(Ljava/lang/String;)Lnet/minecraft/scoreboard/Team;")))
-    private void renderHud(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
-        JCraftHudOverlay.render(matrices);
+    private void renderHud(DrawContext context, float tickDelta, CallbackInfo ci) {
+        JCraftHudOverlay.render(context);
     }
 }

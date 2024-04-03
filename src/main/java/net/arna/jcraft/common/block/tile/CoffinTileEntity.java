@@ -7,41 +7,39 @@ import net.arna.jcraft.registry.JObjectRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.PlayState;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.builder.ILoopType;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.animatable.GeoBlockEntity;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class CoffinTileEntity extends BlockEntity implements IAnimatable {
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+public class CoffinTileEntity extends BlockEntity implements GeoBlockEntity {
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public CoffinTileEntity(BlockPos pos, BlockState state) {
         super(JBlockEntityTypeRegistry.COFFIN_TILE, pos, state);
     }
 
-    private <E extends BlockEntity & IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController(this, "controller", 30, this::predicate));
+    }
+
+    private PlayState predicate(AnimationState animationState) {
         if (!world.getBlockState(getPos()).isOf(JObjectRegistry.COFFIN_BLOCK))
             return PlayState.STOP;
 
         boolean occupied = getCachedState().get(CoffinBlock.OCCUPIED);
-        event.getController().setAnimation(new AnimationBuilder().addAnimation(
-                occupied ? "animation.coffin.closed" : "animation.coffin.open"
-                , ILoopType.EDefaultLoopTypes.LOOP));
-        return PlayState.CONTINUE;
+
+        return animationState.setAndContinue(RawAnimation.begin().thenLoop(occupied ? "animation.coffin.closed" : "animation.coffin.open"));
     }
 
     @Override
-    public void registerControllers(AnimationData data) {
-        data.addAnimationController(new AnimationController<>(this, "controller", 30, this::predicate));
-    }
-
-    @Override
-    public AnimationFactory getFactory() {
-        return factory;
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 }

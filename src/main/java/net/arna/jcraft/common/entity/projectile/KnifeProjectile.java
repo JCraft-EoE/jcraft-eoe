@@ -26,12 +26,12 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class KnifeProjectile extends PersistentProjectileEntity implements IAnimatable {
+public class KnifeProjectile extends PersistentProjectileEntity implements GeoEntity {
     private static final TrackedData<Boolean> LIGHTNING;
     private int ticksInAir;
     private boolean delayed = false;
@@ -87,15 +87,15 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
         if (!this.inGround) ++this.ticksInAir;
 
         if (!getLightning()) {
-            if (ticksInAir > 640 && !world.isClient) discard();
+            if (ticksInAir > 640 && !getWorld().isClient) discard();
             return;
         }
-        if (world.isClient) {
+        if (getWorld().isClient) {
             double x = getX();
             double y = getY();
             double z = getZ();
-            world.addParticle(ParticleTypes.ELECTRIC_SPARK, x, y, z, 0, 0, 0);
-            world.addParticle(ParticleTypes.ELECTRIC_SPARK, (x + prevX) / 2, (y + prevY) / 2, (z + prevZ) / 2, 0, 0, 0);
+            getWorld().addParticle(ParticleTypes.ELECTRIC_SPARK, x, y, z, 0, 0, 0);
+            getWorld().addParticle(ParticleTypes.ELECTRIC_SPARK, (x + prevX) / 2, (y + prevY) / 2, (z + prevZ) / 2, 0, 0, 0);
             return;
         }
 
@@ -122,7 +122,7 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
                 576 // Squared
         );
 
-        HitResult hitResult = world.raycast(new RaycastContext(eP, eP.add(rangeMod), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, owner));
+        HitResult hitResult = getWorld().raycast(new RaycastContext(eP, eP.add(rangeMod), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, owner));
 
         playSound(JSoundRegistry.TWOH_SHOOT, 1, 1);
 
@@ -141,7 +141,7 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
-        if (world.isClient) return;
+        if (getWorld().isClient) return;
         if (delayed && delayTime > 1) return;
         Entity entity = entityHitResult.getEntity();
         Entity owner = this.getOwner();
@@ -157,7 +157,7 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
             blockstun = 6;
         } else dropStack(asItemStack(), 0.1F);
 
-        JUtils.projectileDamageLogic(this, world, entity, Vec3d.ZERO, stunT, 1, false, 2, blockstun, HitPropertyComponent.HitAnimation.MID);
+        JUtils.projectileDamageLogic(this, getWorld(), entity, Vec3d.ZERO, stunT, 1, false, 2, blockstun, HitPropertyComponent.HitAnimation.MID);
         playSound(SoundEvents.ITEM_TRIDENT_HIT, 1, 1);
         if (entity instanceof LivingEntity living) JComponents.getMiscData(living).stab();
         discard();
@@ -178,14 +178,16 @@ public class KnifeProjectile extends PersistentProjectileEntity implements IAnim
     }
 
     // Animations
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+
 
     @Override
-    public void registerControllers(AnimationData data) {
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+
     }
 
     @Override
-    public AnimationFactory getFactory() {
-        return this.factory;
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 }

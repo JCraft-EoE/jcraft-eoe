@@ -11,8 +11,8 @@ import net.minecraft.client.gl.*;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3f;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ public abstract class PostProcessor {
     protected static final MinecraftClient MC = MinecraftClient.getInstance();
 
     public static final Collection<Pair<String, Consumer<GlUniform>>> COMMON_UNIFORMS = Lists.newArrayList(
-            Pair.of("cameraPos", u -> u.set(new Vec3f((float) MC.gameRenderer.getCamera().getPos().x, (float) MC.gameRenderer.getCamera().getPos().y, (float) MC.gameRenderer.getCamera().getPos().z))),
+            Pair.of("cameraPos", u -> u.set(new Vector3f((float) MC.gameRenderer.getCamera().getPos().x, (float) MC.gameRenderer.getCamera().getPos().y, (float) MC.gameRenderer.getCamera().getPos().z))),
             Pair.of("lookVector", u -> u.set(MC.gameRenderer.getCamera().getHorizontalPlane())),
             Pair.of("upVector", u -> u.set(MC.gameRenderer.getCamera().getVerticalPlane())),
             Pair.of("leftVector", u -> u.set(MC.gameRenderer.getCamera().getDiagonalPlane())),
@@ -41,7 +41,7 @@ public abstract class PostProcessor {
                 u.set(invertedProjectionMatrix);
             }),
             Pair.of("nearPlaneDistance", u -> u.set(GameRenderer.CAMERA_DEPTH)),
-            Pair.of("farPlaneDistance", u -> u.set(MC.gameRenderer.method_32796())),
+            Pair.of("farPlaneDistance", u -> u.set(MC.gameRenderer.getFarPlaneDistance())),
             Pair.of("fov", u -> u.set((float) Math.toRadians(MC.gameRenderer.getFov(MC.gameRenderer.getCamera(), MC.getTickDelta(), true)))),
             Pair.of("aspectRatio", u -> u.set((float) MC.getWindow().getWidth() / (float) MC.getWindow().getHeight()))
     );
@@ -52,8 +52,8 @@ public abstract class PostProcessor {
     public static MatrixStack viewModelStack;
 
     private boolean initialized = false;
-    protected ShaderEffect shaderEffect;
-    protected JsonEffectGlShader[] effects;
+    protected PostEffectProcessor shaderEffect;
+    protected JsonEffectShaderProgram[] effects;
     private Framebuffer tempDepthBuffer;
     private Collection<Pair<GlUniform, Consumer<GlUniform>>> defaultUniforms;
 
@@ -73,7 +73,7 @@ public abstract class PostProcessor {
             tempDepthBuffer = shaderEffect.getSecondaryTarget("depthMain");
 
             defaultUniforms = new ArrayList<>();
-            for (JsonEffectGlShader e : effects) {
+            for (JsonEffectShaderProgram e : effects) {
                 for (Pair<String, Consumer<GlUniform>> pair : COMMON_UNIFORMS) {
                     GlUniform u = e.getUniformByName(pair.getFirst());
                     if (u != null) {
@@ -98,14 +98,14 @@ public abstract class PostProcessor {
         try {
             Identifier file = getShaderEffectId();
             file = new Identifier(file.getNamespace(), "shaders/post/" + file.getPath() + ".json");
-            shaderEffect = new ShaderEffect(
+            shaderEffect = new PostEffectProcessor(
                     MC.getTextureManager(),
                     MC.getResourceManager(),
                     MC.getFramebuffer(),
                     file
             );
             shaderEffect.setupDimensions(MC.getWindow().getWidth(), MC.getWindow().getHeight());
-            effects = shaderEffect.passes.stream().map(PostProcessShader::getProgram).toArray(JsonEffectGlShader[]::new);
+            effects = shaderEffect.passes.stream().map(PostEffectPass::getProgram).toArray(JsonEffectShaderProgram[]::new);
         } catch (IOException | JsonParseException e) {
             JCraft.LOGGER.error("Failed to load post-processing shader: ", e);
         }

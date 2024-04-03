@@ -38,7 +38,7 @@ public class KQGrabHitAttack extends AbstractMove<KQGrabHitAttack, KillerQueenEn
         BombTrackerComponent.BombData bombData = JComponents.getBombTracker(user).getMainBomb();
 
         if (bombData.bombEntity instanceof LivingEntity livingEntity) {
-            ServerWorld world = (ServerWorld) attacker.world;
+            ServerWorld world = (ServerWorld) attacker.getWorld();
 
             Vec3d pos = livingEntity.getPos();
             JCraft.createParticle(world, pos.x, pos.y, pos.z, JParticleType.BOOM);

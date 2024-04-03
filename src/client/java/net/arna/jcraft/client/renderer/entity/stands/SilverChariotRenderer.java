@@ -11,8 +11,6 @@ import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
-import software.bernie.geckolib3.geo.render.built.GeoModel;
 
 public class SilverChariotRenderer extends StandEntityRenderer<SilverChariotEntity> {
 
@@ -40,14 +38,14 @@ public class SilverChariotRenderer extends StandEntityRenderer<SilverChariotEnti
                              VertexConsumer vertexBuilder, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
         matrixStack.push();
 
-        matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(user.bodyYaw));
+        matrixStack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(user.bodyYaw));
 
         double y = velocity.y;
         if (-0.2 < -y && y < 0.2)
             y = 0;
 
         matrixStack.translate(velocity.x, y, velocity.z);
-        matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(-user.bodyYaw));
+        matrixStack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(-user.bodyYaw));
         super.render(model, animatable, partialTicks, type, matrixStack, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, a);
         matrixStack.pop();
     }

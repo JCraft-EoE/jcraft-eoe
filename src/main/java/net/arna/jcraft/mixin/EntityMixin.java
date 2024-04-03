@@ -10,7 +10,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
+import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -28,8 +28,8 @@ public abstract class EntityMixin {
     private void jcraft$updatePassengerPosition(Entity passenger, Entity.PositionUpdater positionUpdater, CallbackInfo info) {
         if (passenger instanceof StandEntity<?, ?> stand) {
             if (stand.isFree() && !stand.isRemote()) {
-                Vec3f freePos = stand.getFreePos();
-                positionUpdater.accept(passenger, freePos.getX(), freePos.getY(), freePos.getZ());
+                Vector3f freePos = stand.getFreePos();
+                positionUpdater.accept(passenger, freePos.x(), freePos.y(), freePos.z());
                 info.cancel();
                 return;
             }

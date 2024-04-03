@@ -73,7 +73,7 @@ public class JSplatterManager {
     }
 
     private Pair<Vec3d, Direction> anchorPos(Vec3d position) {
-        BlockPos bPos = new BlockPos(position);
+        BlockPos bPos = BlockPos.ofFloored(position);
         // Find the direction with the closest anchor
         Direction direction = Direction.stream()
                 .filter(d -> SplatterSplitter.isValidAnchor(world, bPos.offset(d)))

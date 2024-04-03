@@ -12,6 +12,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -27,21 +28,22 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.PlayState;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.GeoAnimatable;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
 import java.util.Set;
 
-public class SandTornadoEntity extends LivingEntity implements IAnimatable, IOwnable {
+public class SandTornadoEntity extends LivingEntity implements GeoEntity, IOwnable {
     private static final TrackedData<Boolean> DISAPPEARED;
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private LivingEntity master;
     private int hitsLeft = 5;
 
@@ -84,9 +86,9 @@ public class SandTornadoEntity extends LivingEntity implements IAnimatable, IOwn
 
         Vec3d circulation = new Vec3d(MathHelper.sin(age * 0.25f) * 0.3f, 0.0, MathHelper.cos(age * 0.25f) * 0.3f);
 
-        if (world.isClient) {
+        if (getWorld().isClient) {
             for (int i = 0; i < 3; i++)
-                world.addParticle(
+                getWorld().addParticle(
                         new BlockStateParticleEffect(ParticleTypes.BLOCK, Blocks.SAND.getDefaultState()),
                         getX() + random.nextFloat() - 0.5f,
                         getY() + random.nextFloat() * 2f,
@@ -99,7 +101,7 @@ public class SandTornadoEntity extends LivingEntity implements IAnimatable, IOwn
                 return;
             }
 
-            Set<LivingEntity> toHurt = JUtils.generateHitbox(world, getEyePos(), 1.8, Set.of(this, master));
+            Set<LivingEntity> toHurt = JUtils.generateHitbox(getWorld(), getEyePos(), 1.8, Set.of(this, master));
 
             if (toHurt.isEmpty()) {
                 setVelocity(getVelocity().add(getRotationVector().multiply(0.5)).multiply(0.4));
@@ -108,8 +110,8 @@ public class SandTornadoEntity extends LivingEntity implements IAnimatable, IOwn
                 for (LivingEntity living : toHurt) {
                     LivingEntity target = JUtils.getUserIfStand(living);
                     if (target.isConnectedThroughVehicle(master)) return;
-                    StandEntity.damageLogic(world, target, circulation, 10, 1, false, 2f, true, 6,
-                            DamageSource.mob(master), master, HitPropertyComponent.HitAnimation.MID, false);
+                    StandEntity.damageLogic(getWorld(), target, circulation, 10, 1, false, 2f, true, 6,
+                            getWorld().getDamageSources().mobAttack(master), master, HitPropertyComponent.HitAnimation.MID, false);
                 }
                 hitsLeft--;
             }
@@ -124,7 +126,7 @@ public class SandTornadoEntity extends LivingEntity implements IAnimatable, IOwn
     // Physical properties
     @Override
     public boolean isInvulnerableTo(DamageSource damageSource) {
-        return !damageSource.isOutOfWorld();
+        return !damageSource.isOf(DamageTypes.OUT_OF_WORLD);
     }
 
     @Override
@@ -193,9 +195,9 @@ public class SandTornadoEntity extends LivingEntity implements IAnimatable, IOwn
         super.readCustomDataFromNbt(tag);
         boolean ownerIsPlayer = tag.getBoolean("playerOwner");
         if (ownerIsPlayer)
-            master = world.getPlayerByUuid(tag.getUuid("ownerUUID"));
+            master = getWorld().getPlayerByUuid(tag.getUuid("ownerUUID"));
         else
-            master = (LivingEntity) world.getEntityById(tag.getInt("ownerID")); // Always is living
+            master = (LivingEntity) getWorld().getEntityById(tag.getInt("ownerID")); // Always is living
     }
 
     @Override
@@ -218,19 +220,18 @@ public class SandTornadoEntity extends LivingEntity implements IAnimatable, IOwn
     }
 
     // Animations
-    @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
-    }
-
-    @SuppressWarnings("SameReturnValue")
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        event.getController().setAnimation(new AnimationBuilder().loop(hasDisappeared() ? "animation.sandtornado.disappear" : "animation.sandtornado.idle"));
-        return PlayState.CONTINUE;
-    }
 
     @Override
-    public AnimationFactory getFactory() {
-        return this.factory;
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<GeoAnimatable>(this, "controller", 0, this::predicate));
+    }
+
+    private PlayState predicate(AnimationState<GeoAnimatable> state) {
+        return state.setAndContinue(RawAnimation.begin().thenLoop(hasDisappeared() ? "animation.sandtornado.disappear" : "animation.sandtornado.idle"));
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 }

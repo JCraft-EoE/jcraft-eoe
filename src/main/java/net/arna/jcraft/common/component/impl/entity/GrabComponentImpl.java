@@ -53,7 +53,7 @@ public class GrabComponentImpl implements GrabComponent {
                 Vec3d newPos = attacker.getPos()
                         .add(RotationUtil.vecPlayerToWorld(new Vec3d(0, 0.4, 0), GravityChangerAPI.getGravityDirection(attacker)))
                         .add(attacker.getRotationVector().multiply(offset));
-                if (!attacker.getWorld().isTopSolid(new BlockPos(newPos), grabbed))
+                if (!attacker.getWorld().isTopSolid(BlockPos.ofFloored(newPos), grabbed))
                     grabbed.setPosition(newPos);
             } else endGrab();
     }

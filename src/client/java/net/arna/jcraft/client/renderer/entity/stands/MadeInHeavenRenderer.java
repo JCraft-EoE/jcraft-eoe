@@ -9,8 +9,6 @@ import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
-import software.bernie.geckolib3.geo.render.built.GeoModel;
 
 public class MadeInHeavenRenderer extends StandEntityRenderer<MadeInHeavenEntity> {
 
@@ -47,9 +45,9 @@ public class MadeInHeavenRenderer extends StandEntityRenderer<MadeInHeavenEntity
                              int packedOverlayIn, float red, float green, float blue, float alpha) {
         matrixStack.push();
 
-        matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(bodyYaw));
+        matrixStack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(bodyYaw));
         matrixStack.translate(velocity.x, -velocity.y, velocity.z);
-        matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(-bodyYaw));
+        matrixStack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(-bodyYaw));
         super.render(model, animatable, partialTicks, type, matrixStack, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, aa);
         matrixStack.pop();
     }

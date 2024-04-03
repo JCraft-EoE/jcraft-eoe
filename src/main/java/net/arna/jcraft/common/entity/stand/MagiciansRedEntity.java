@@ -26,10 +26,11 @@ import net.minecraft.state.property.Property;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import org.joml.Vector3f;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
 
 import java.util.Collection;
 import java.util.List;
@@ -129,11 +130,11 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
                         ...Life Detector/Variation>any physical hit
                         ...Hurricane""";
 
-        auraColors = new Vec3f[]{
-                new Vec3f(0.9f, 0.6f, 0.3f),
-                new Vec3f(0.8f, 0.3f, 1.0f),
-                new Vec3f(1.0f, 0.0f, 0.0f),
-                new Vec3f(1.0f, 0.2f, 0.4f)
+        auraColors = new Vector3f[]{
+                new Vector3f(0.9f, 0.6f, 0.3f),
+                new Vector3f(0.8f, 0.3f, 1.0f),
+                new Vector3f(1.0f, 0.0f, 0.0f),
+                new Vector3f(1.0f, 0.2f, 0.4f)
         };
     }
 
@@ -191,7 +192,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
 
         if (!hasUser()) return;
 
-        if (world.isClient && getState() == State.BARRAGE && FLAMETHROWER.hasWindupPassed(this)) {
+        if (getWorld().isClient && getState() == State.BARRAGE && FLAMETHROWER.hasWindupPassed(this)) {
             Vec3d rotVec = getRotationVector();
             Vec3d mouthPos = getEyePos().add(rotVec);
             for (int i = 0; i < 16; i++) {
@@ -202,7 +203,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
                                 .rotateZ(random.nextFloat() - 0.5f)
                                 .multiply(0.2)
                 );
-                world.addParticle(
+                getWorld().addParticle(
                         random.nextInt(6) == 5 ? ParticleTypes.LAVA : ParticleTypes.FLAME,
                         mouthPos.x, mouthPos.y, mouthPos.z,
                         vel.x, vel.y, vel.z
@@ -222,28 +223,28 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
 
     // Animation code
     public enum State implements StandAnimationState<MagiciansRedEntity> {
-        IDLE(builder -> builder.loop("animation.mr.idle")),
-        LIGHT(builder -> builder.playAndHold("animation.mr.light")),
-        BLOCK(builder -> builder.loop("animation.mr.block")),
-        HEAVY(builder -> builder.playAndHold("animation.mr.heavy")),
-        BARRAGE(builder -> builder.playAndHold("animation.mr.barrage")),
-        CROSSFIRE(builder -> builder.playAndHold("animation.mr.crossfire")),
-        CROSSFIRE_HURRICANE(builder -> builder.playAndHold("animation.mr.crossfirehurricane")),
-        CROSSFIRE_VARIATION(builder -> builder.playAndHold("animation.mr.crossfirevariation")),
-        REDIRECT(builder -> builder.playAndHold("animation.mr.redirect")),
-        RED_BIND(builder -> builder.playAndHold("animation.mr.redbind")),
-        DETECTOR(builder -> builder.playAndHold("animation.mr.detector")),
-        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.mr.light_followup")),
-        HAMMER(builder -> builder.playAndHold("animation.mr.hammer"));
+        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.mr.idle"))),
+        LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mr.light"))),
+        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.mr.block"))),
+        HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mr.heavy"))),
+        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mr.barrage"))),
+        CROSSFIRE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mr.crossfire"))),
+        CROSSFIRE_HURRICANE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mr.crossfirehurricane"))),
+        CROSSFIRE_VARIATION(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mr.crossfirevariation"))),
+        REDIRECT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mr.redirect"))),
+        RED_BIND(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mr.redbind"))),
+        DETECTOR(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mr.detector"))),
+        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mr.light_followup"))),
+        HAMMER(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mr.hammer")));
 
-        private final Consumer<AnimationBuilder> animator;
+        private final Consumer<AnimationState> animator;
 
-        State(Consumer<AnimationBuilder> animator) {
+        State(Consumer<AnimationState> animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(MagiciansRedEntity attacker, AnimationBuilder builder) {
+        public void playAnimation(MagiciansRedEntity attacker, AnimationState builder) {
             animator.accept(builder);
         }
     }

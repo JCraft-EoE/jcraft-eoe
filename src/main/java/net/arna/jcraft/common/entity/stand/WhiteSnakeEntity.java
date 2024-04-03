@@ -14,15 +14,17 @@ import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.tag.BlockTags;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import org.joml.Vector3f;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
 
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -152,11 +154,11 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
                             -the protein shake (sets up mixups)
                             M1>Barrage>Leg Crusher>Charged Spew""";
 
-        auraColors = new Vec3f[]{
-                new Vec3f(1f, 1f, 1f),
-                new Vec3f(1f, 1f, 1f),
-                new Vec3f(0.4f, 0.4f, 0.5f),
-                new Vec3f(1.0f, 0.0f, 0.0f)
+        auraColors = new Vector3f[]{
+                new Vector3f(1f, 1f, 1f),
+                new Vector3f(1f, 1f, 1f),
+                new Vector3f(0.4f, 0.4f, 0.5f),
+                new Vector3f(1.0f, 0.0f, 0.0f)
         };
     }
 
@@ -194,7 +196,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
 
         if (!isRemote()) return;
 
-        if (world.isClient) {
+        if (getWorld().isClient) {
             // Called for EVERYONE
             JCraft.getClientEntityHandler().whiteSnakeRemoteClientTick(this);
         } else {
@@ -205,10 +207,10 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             tickRemoteMovement(f, s, jump);
 
             if (getState() == State.IDLE) { // Replace idle anim
-                if (s > 0) setStateNoReset(onGround ? State.RIGHT : State.RIGHT_DASH);
-                if (s < 0) setStateNoReset(onGround ? State.LEFT : State.LEFT_DASH);
-                if (f < 0) setStateNoReset(onGround ? State.BACKWARD : State.BACKWARD_DASH);
-                if (f > 0) setStateNoReset(onGround ? State.FORWARD : State.FORWARD_DASH);
+                if (s > 0) setStateNoReset(isOnGround() ? State.RIGHT : State.RIGHT_DASH);
+                if (s < 0) setStateNoReset(isOnGround() ? State.LEFT : State.LEFT_DASH);
+                if (f < 0) setStateNoReset(isOnGround() ? State.BACKWARD : State.BACKWARD_DASH);
+                if (f > 0) setStateNoReset(isOnGround() ? State.FORWARD : State.FORWARD_DASH);
             }
         }
     }
@@ -224,7 +226,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         double moveSpeed = 0.24;
         boolean onGround = isOnGround();
         boolean climbing = getBlockStateAtPos().streamTags().anyMatch(tag -> tag == BlockTags.CLIMBABLE);
-        boolean swimming = !world.getFluidState(getBlockPos()).isEmpty();
+        boolean swimming = !getWorld().getFluidState(getBlockPos()).isEmpty();
 
         if (climbing || swimming) dragMult *= 0.5;
 
@@ -267,42 +269,42 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
 
     // Animation code
     public enum State implements StandAnimationState<WhiteSnakeEntity> {
-        IDLE((whitesnake, builder) -> builder.loop(whitesnake.isRemote() ? "animation.whitesnake.remote_idle" : "animation.whitesnake.idle")),
-        LIGHT(builder -> builder.playAndHold("animation.whitesnake.light")),
-        BLOCK(builder -> builder.loop("animation.whitesnake.block")),
-        MEDIUM(builder -> builder.playAndHold("animation.whitesnake.medium")),
-        BARRAGE(builder -> builder.loop("animation.whitesnake.barrage")),
-        LEG_CRUSHER(builder -> builder.playAndHold("animation.whitesnake.legcrusher")),
-        ACID_SPEW(builder -> builder.playAndHold("animation.whitesnake.acidspew")),
-        ACID_SPEW_CHARGED(builder -> builder.playAndHold("animation.whitesnake.acidspew_charged")),
-        DISC_TAKE(builder -> builder.playAndHold("animation.whitesnake.disc_take")),
-        DISC_GIVE(builder -> builder.playAndHold("animation.whitesnake.disc_give")),
-        UPPERCUT(builder -> builder.playAndHold("animation.whitesnake.uppercut")),
+        IDLE((whitesnake, builder) -> builder.setAnimation(RawAnimation.begin().thenLoop(whitesnake.isRemote() ? "animation.whitesnake.remote_idle" : "animation.whitesnake.idle"))),
+        LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.whitesnake.light"))),
+        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.whitesnake.block"))),
+        MEDIUM(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.whitesnake.medium"))),
+        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.whitesnake.barrage"))),
+        LEG_CRUSHER(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.whitesnake.legcrusher"))),
+        ACID_SPEW(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.whitesnake.acidspew"))),
+        ACID_SPEW_CHARGED(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.whitesnake.acidspew_charged"))),
+        DISC_TAKE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.whitesnake.disc_take"))),
+        DISC_GIVE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.whitesnake.disc_give"))),
+        UPPERCUT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.whitesnake.uppercut"))),
 
-        FORWARD(builder -> builder.loop("animation.whitesnake.forw")),
-        BACKWARD(builder -> builder.loop("animation.whitesnake.back")),
-        LEFT(builder -> builder.loop("animation.whitesnake.left")),
-        RIGHT(builder -> builder.loop("animation.whitesnake.right")),
-        FORWARD_DASH(builder -> builder.loop("animation.whitesnake.fdash")),
-        BACKWARD_DASH(builder -> builder.loop("animation.whitesnake.bdash")),
-        LEFT_DASH(builder -> builder.loop("animation.whitesnake.ldash")),
-        RIGHT_DASH(builder -> builder.loop("animation.whitesnake.rdash")),
+        FORWARD(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.whitesnake.forw"))),
+        BACKWARD(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.whitesnake.back"))),
+        LEFT(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.whitesnake.left"))),
+        RIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.whitesnake.right"))),
+        FORWARD_DASH(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.whitesnake.fdash"))),
+        BACKWARD_DASH(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.whitesnake.bdash"))),
+        LEFT_DASH(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.whitesnake.ldash"))),
+        RIGHT_DASH(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.whitesnake.rdash"))),
 
-        MELT_YOUR_HEART(builder -> builder.playAndHold("animation.whitesnake.meltyourheart")),
-        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.whitesnake.light_followup"));
+        MELT_YOUR_HEART(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.whitesnake.meltyourheart"))),
+        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.whitesnake.light_followup")));
 
-        private final BiConsumer<WhiteSnakeEntity, AnimationBuilder> animator;
+        private final BiConsumer<WhiteSnakeEntity, AnimationState> animator;
 
-        State(Consumer<AnimationBuilder> animator) {
+        State(Consumer<AnimationState> animator) {
             this((whiteSnake, builder) -> animator.accept(builder));
         }
 
-        State(BiConsumer<WhiteSnakeEntity, AnimationBuilder> animator) {
+        State(BiConsumer<WhiteSnakeEntity, AnimationState> animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(WhiteSnakeEntity attacker, AnimationBuilder builder) {
+        public void playAnimation(WhiteSnakeEntity attacker, AnimationState builder) {
             animator.accept(attacker, builder);
         }
     }

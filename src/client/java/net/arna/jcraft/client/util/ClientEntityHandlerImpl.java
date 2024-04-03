@@ -104,7 +104,7 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
 
             Direction gravity = GravityChangerAPI.getGravityDirection(stand);
 
-            Vec3f auraColor = stand.getAuraColor();
+            Vector3f auraColor = stand.getAuraColor();
 
             if ( (!isOwnerAndFP || stand.isFree())
                     && !(stand.isRemote() && isFP)
@@ -116,7 +116,7 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
     }
 
     private static final double metersPerTickSquared = 9.81 / 400;
-    private void displayAuraParticles(ClientWorld clientWorld, Random random, Entity entity, Vec3f maxBox, Direction gravity, Vec3f color) {
+    private void displayAuraParticles(ClientWorld clientWorld, Random random, Entity entity, Vector3f maxBox, Direction gravity, Vector3f color) {
         if (JClientUtils.shouldNotRender(entity)) return;
 
         Vec3d pos = entity.getPos();

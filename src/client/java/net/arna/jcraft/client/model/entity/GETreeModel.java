@@ -3,9 +3,9 @@ package net.arna.jcraft.client.model.entity;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.projectile.GETreeEntity;
 import net.minecraft.util.Identifier;
-import software.bernie.geckolib3.model.AnimatedGeoModel;
+import software.bernie.geckolib.model.GeoModel;
 
-public class GETreeModel extends AnimatedGeoModel<GETreeEntity> {
+public class GETreeModel extends GeoModel<GETreeEntity> {
     @Override
     public Identifier getModelResource(GETreeEntity object) {
         return JCraft.id("geo/getree.geo.json");

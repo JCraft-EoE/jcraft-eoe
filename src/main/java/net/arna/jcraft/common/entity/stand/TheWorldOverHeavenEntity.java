@@ -26,11 +26,12 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.text.Text;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.util.Color;
+import org.joml.Vector3f;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.Color;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -169,20 +170,20 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
                             -the ultrakill
                             M1>Barrage>M1>Knives>Overwrite~S2/S3>dash>Smite>Heavy>M1""";
 
-        auraColors = new Vec3f[]{
-                new Vec3f(0.1f, 0.1f, 0.1f),
-                new Vec3f(1f, 0.6f, 0.8f),
-                new Vec3f(0.9f, 0.9f, 1.0f),
-                new Vec3f(1.0f, 0.0f, 0.2f)
+        auraColors = new Vector3f[]{
+                new Vector3f(0.1f, 0.1f, 0.1f),
+                new Vector3f(1f, 0.6f, 0.8f),
+                new Vector3f(0.9f, 0.9f, 1.0f),
+                new Vector3f(1.0f, 0.0f, 0.2f)
         };
     }
 
     @Override
-    public Vec3f getAuraColor() {
+    public Vector3f getAuraColor() {
         if (getSkin() > 0)
             return super.getAuraColor();
         Color auraColor = Color.ofHSB(age % 360f / 360f, 0.5f, 0.5f);
-        return new Vec3f(auraColor.getRed(), auraColor.getGreen(), auraColor.getBlue());
+        return new Vector3f(auraColor.getRed(), auraColor.getGreen(), auraColor.getBlue());
     }
 
     public int getOverwriteType() {
@@ -269,7 +270,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         List<LivingEntity> overwriteTargets = moveContext.get(OverwriteAttack.OVERWRITE_TARGETS);
         LivingEntity user = getUserOrThrow();
 
-        if (world.isClient) return;
+        if (getWorld().isClient) return;
 
         int moveStun = getMoveStun();
         if (moveStun <= 0 && getOverwriteType() != 0) setOverwriteType(0);
@@ -325,30 +326,30 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
 
     // Animation code
     public enum State implements StandAnimationState<TheWorldOverHeavenEntity> {
-        IDLE(builder -> builder.loop("animation.twoh.idle")),
-        LIGHT(builder -> builder.playAndHold("animation.twoh.light")),
-        BLOCK(builder -> builder.loop("animation.twoh.block")),
-        HEAVY(builder -> builder.playAndHold("animation.twoh.heavy")),
-        BARRAGE(builder -> builder.loop("animation.twoh.barrage")),
-        SMITE(builder -> builder.playAndHold("animation.twoh.smite")),
-        TIME_STOP(builder -> builder.playAndHold("animation.twoh.timestop")),
-        CHARGE_OVERWRITE(builder -> builder.loop("animation.twoh.chargeoverwrite")),
-        OVERWRITE(builder -> builder.playAndHold("animation.twoh.overwrite")),
-        THROW(builder -> builder.playAndHold("animation.twoh.throw")),
-        AIR_KNIVES(builder -> builder.playAndHold("animation.twoh.airknives")),
-        TIME_SKIP(builder -> builder.loop("animation.twoh.idle")),
-        LUNGE(builder -> builder.loop("animation.twoh.lunge")),
-        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.twoh.light_followup")),
-        SINGULARITY(builder -> builder.playAndHold("animation.twoh.singularity"));
+        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.twoh.idle"))),
+        LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.twoh.light"))),
+        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.twoh.block"))),
+        HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.twoh.heavy"))),
+        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.twoh.barrage"))),
+        SMITE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.twoh.smite"))),
+        TIME_STOP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.twoh.timestop"))),
+        CHARGE_OVERWRITE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.twoh.chargeoverwrite"))),
+        OVERWRITE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.twoh.overwrite"))),
+        THROW(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.twoh.throw"))),
+        AIR_KNIVES(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.twoh.airknives"))),
+        TIME_SKIP(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.twoh.idle"))),
+        LUNGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.twoh.lunge"))),
+        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.twoh.light_followup"))),
+        SINGULARITY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.twoh.singularity")));
 
-        private final Consumer<AnimationBuilder> animator;
+        private final Consumer<AnimationState> animator;
 
-        State(Consumer<AnimationBuilder> animator) {
+        State(Consumer<AnimationState> animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(TheWorldOverHeavenEntity attacker, AnimationBuilder builder) {
+        public void playAnimation(TheWorldOverHeavenEntity attacker, AnimationState builder) {
             animator.accept(builder);
         }
     }

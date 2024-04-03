@@ -85,7 +85,7 @@ public class RotationAnimation {
                 Vec3d.of(newGravity.getVector())
         );
 
-        Vec3f lookingDirection = new Vec3f(oldLookingDirection);
+        Vector3f lookingDirection = new Vector3f(oldLookingDirection);
         lookingDirection.rotate(deltaRotation);
         return new Vec3d(lookingDirection);
     }

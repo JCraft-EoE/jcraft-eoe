@@ -7,6 +7,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.FrogEntity;
 import net.minecraft.util.math.Vec3d;
@@ -21,7 +22,7 @@ public class GEFrogEntity extends FrogEntity implements IOwnable, ICustomDamageH
 
     @Override
     public boolean damage(DamageSource source, float amount) {
-        if (source.isOutOfWorld()) {
+        if (source.isOf(DamageTypes.OUT_OF_WORLD)) {
             dropStack(getMainHandStack());
             discard();
             return true;
@@ -48,7 +49,7 @@ public class GEFrogEntity extends FrogEntity implements IOwnable, ICustomDamageH
 
     @Override
     public void tick() {
-        boolean server = !world.isClient;
+        boolean server = !getWorld().isClient;
 
         if (server) {
             if (master == null) kill();

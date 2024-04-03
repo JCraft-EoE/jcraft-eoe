@@ -10,12 +10,12 @@ import net.arna.jcraft.common.spec.AnubisSpec;
 import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3f;
+import org.joml.Vector3f;
 
 public class JCraftHudOverlay {
     private static final Identifier EMPTY_GAUGE = JCraft.id("textures/gui/empty_gauge.png");
@@ -27,7 +27,7 @@ public class JCraftHudOverlay {
     private static final Gauge TIME_ACCEL_GAUGE = new Gauge(1.0f, 0.8f, 0.0f, MadeInHeavenEntity.MAXIMUM_SPEEDOMETER);
     private static final Gauge BLOODLUST_GAUGE = new Gauge(0.8f, 0.1f, 0.2f, 5);
 
-    public static void render(MatrixStack matrixStack) {
+    public static void render(DrawContext ctx) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client == null) return;
 
@@ -36,36 +36,34 @@ public class JCraftHudOverlay {
         int x = width / 2;
 
         ClientPlayerEntity player = client.player;
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
 
         gaugeHeightOffset = gaugeHeightOffsetMax;
         int gaugeX = x - gaugeWidth / 2;
 
         if (player.getFirstPassenger() instanceof StandEntity<?, ?> stand) {
-            BLOCK_GAUGE.render(matrixStack, gaugeX, height + gaugeHeightOffset, (int) stand.getStandGauge());
+            BLOCK_GAUGE.render(ctx, gaugeX, height + gaugeHeightOffset, (int) stand.getStandGauge());
             if (stand instanceof MadeInHeavenEntity madeInHeaven && madeInHeaven.getAccelTime() > 0)
-                TIME_ACCEL_GAUGE.render(matrixStack, gaugeX, height + gaugeHeightOffset, madeInHeaven.getSpeedometer());
+                TIME_ACCEL_GAUGE.render(ctx, gaugeX, height + gaugeHeightOffset, madeInHeaven.getSpeedometer());
         }
 
         JSpec<?, ?> spec = JUtils.getSpec(player);
         if (spec instanceof AnubisSpec) {
             int displayBloodlust = (int) ((JComponents.getMiscData(player).getAttackSpeedMult() - 1.0f) * 5);
             if (displayBloodlust > 0)
-                BLOODLUST_GAUGE.render(matrixStack, gaugeX, height + gaugeHeightOffset, displayBloodlust);
+                BLOODLUST_GAUGE.render(ctx, gaugeX, height + gaugeHeightOffset, displayBloodlust);
         }
     }
 
     protected record Gauge(float red, float green, float blue, @Setter int max) {
-        public Gauge(Vec3f color, int max) {
-            this(color.getX(), color.getY(), color.getZ(), max);
+        public Gauge(Vector3f color, int max) {
+            this(color.x(), color.y(), color.z(), max);
         }
 
-        public void render(MatrixStack matrixStack, int x, int y, int value) {
+        public void render(DrawContext ctx, int x, int y, int value) {
             RenderSystem.setShaderColor(red, green, blue, 1);
-            RenderSystem.setShaderTexture(0, EMPTY_GAUGE);
-            DrawableHelper.drawTexture(matrixStack, x, y, 0, 0, gaugeWidth, 5, gaugeWidth, 5);
-            RenderSystem.setShaderTexture(0, FULL_GAUGE);
-            DrawableHelper.drawTexture(matrixStack, x, y, 0, 0, value * gaugeWidth / max, 5, gaugeWidth, 5);
+            ctx.drawTexture(EMPTY_GAUGE, x, y, 0, 0, gaugeWidth, 5, gaugeWidth, 5);
+            ctx.drawTexture(FULL_GAUGE, x, y, 0, 0, value * gaugeWidth / max, 5, gaugeWidth, 5);
             gaugeHeightOffset -= 6;
         }
     }

@@ -27,7 +27,7 @@ public class AboutStandCommand {
         StandEntity<?, ?> stand = JUtils.getStand(player);
 
         if (stand == null) {
-            context.getSource().sendFeedback(Text.translatable("jcraft.commands.error.nostand"), true);
+            context.getSource().sendFeedback(() -> Text.translatable("jcraft.commands.error.nostand"), true);
             return 0;
         }
 
@@ -88,7 +88,7 @@ public class AboutStandCommand {
         // Free Space
         resp.append(Text.literal(stand.freespace));
 
-        context.getSource().sendFeedback(resp, false);
+        context.getSource().sendFeedback(() -> resp, false);
         return 1;
     }
 

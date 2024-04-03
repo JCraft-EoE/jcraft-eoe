@@ -8,7 +8,6 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class MockItem extends Item {
     private static final ItemStack FALLBACK = new ItemStack(Items.DIRT);

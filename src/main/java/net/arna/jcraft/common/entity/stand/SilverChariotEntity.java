@@ -24,11 +24,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
+import org.joml.Vector3f;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
 
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -172,17 +173,17 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
 
         setNormalDesc();
 
-        auraColors = new Vec3f[]{
-                new Vec3f(0.4f, 0.5f, 1f),
-                new Vec3f(0.9f, 0.6f, 0.3f),
-                new Vec3f(0.6f, 0.7f, 1f),
-                new Vec3f(0.8f, 0.8f, 0.8f)
+        auraColors = new Vector3f[]{
+                new Vector3f(0.4f, 0.5f, 1f),
+                new Vector3f(0.9f, 0.6f, 0.3f),
+                new Vector3f(0.6f, 0.7f, 1f),
+                new Vector3f(0.8f, 0.8f, 0.8f)
         };
     }
 
     @Override
-    public Vec3f getAuraColor() {
-        if (isPossessed()) return Vec3f.POSITIVE_X;
+    public Vector3f getAuraColor() {
+        if (isPossessed()) return new Vector3f(1.0f, 0f, 0f);
         return super.getAuraColor();
     }
 
@@ -311,11 +312,11 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         LivingEntity user = getUserOrThrow();
         Mode mode = getMode();
 
-        if (world.isClient) {
+        if (getWorld().isClient) {
             // Possession particles
             if (mode == Mode.POSSESSED)
                 for (int i = 0; i < 16; i++)
-                    world.addParticle(
+                    getWorld().addParticle(
                             ParticleTypes.ASH,
                             getX() + random.nextDouble() - 0.5, getY() + random.nextDouble() * 0.25 + 0.5, getZ() + random.nextDouble() - 0.5,
                             0.0, 0.0, 0.0
@@ -365,46 +366,46 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
 
     // Animation code
     public enum State implements StandAnimationState<SilverChariotEntity> {
-        IDLE((silverChariot, builder) -> builder.loop("animation.silverchariot.idle" + switch (silverChariot.getMode()) {
+        IDLE((silverChariot, builder) -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.silverchariot.idle" + switch (silverChariot.getMode()) {
             case REGULAR -> "";
             case ARMORLESS -> "_armorless";
             case POSSESSED -> "_possessed";
-        })),
-        STAB(builder -> builder.playAndHold("animation.silverchariot.stab")),
-        BLOCK(builder -> builder.loop("animation.silverchariot.block")),
-        HEAVY(builder -> builder.playAndHold("animation.silverchariot.heavy")),
-        BARRAGE(builder -> builder.loop("animation.silverchariot.barrage")),
-        SPIN(builder -> builder.loop("animation.silverchariot.spin")),
-        SPIN_2(builder -> builder.loop("animation.silverchariot.spin_2")),
+        }))),
+        STAB(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.silverchariot.stab"))),
+        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.silverchariot.block"))),
+        HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.silverchariot.heavy"))),
+        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.silverchariot.barrage"))),
+        SPIN(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.silverchariot.spin"))),
+        SPIN_2(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.silverchariot.spin_2"))),
 
-        CHARGE_LOW(builder -> builder.loop("animation.silverchariot.charge_low")),
-        CHARGE_HIGH(builder -> builder.loop("animation.silverchariot.charge_high")),
+        CHARGE_LOW(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.silverchariot.charge_low"))),
+        CHARGE_HIGH(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.silverchariot.charge_high"))),
 
-        P_CHARGE(builder -> builder.loop("animation.silverchariot.pcharge")),
-        P_CHARGE_HIT(builder -> builder.playAndHold("animation.silverchariot.pchargehit")),
-        COUNTER(builder -> builder.loop("animation.silverchariot.counter")),
-        BEAT_DOWN_START(builder -> builder.playAndHold("animation.silverchariot.beatdownstart")),
-        BEAT_DOWN(builder -> builder.playAndHold("animation.silverchariot.beatdown")),
-        CLEAVE(builder -> builder.playAndHold("animation.silverchariot.cleave")),
-        ARMOR_OFF(builder -> builder.playAndHold("animation.silverchariot.armor_off")),
-        COUNTER_MISS(builder -> builder.playAndHold("animation.silverchariot.counter_miss")),
-        LAST_SHOT(builder -> builder.playAndHold("animation.silverchariot.lastshot")),
-        CIRCLE_CHARGE(builder -> builder.playAndHold("animation.silverchariot.circle_charge")),
-        CIRCLE_SLASH(builder -> builder.playAndHold("animation.silverchariot.circle_slash")),
-        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.silverchariot.light_followup"));
+        P_CHARGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.silverchariot.pcharge"))),
+        P_CHARGE_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.silverchariot.pchargehit"))),
+        COUNTER(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.silverchariot.counter"))),
+        BEAT_DOWN_START(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.silverchariot.beatdownstart"))),
+        BEAT_DOWN(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.silverchariot.beatdown"))),
+        CLEAVE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.silverchariot.cleave"))),
+        ARMOR_OFF(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.silverchariot.armor_off"))),
+        COUNTER_MISS(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.silverchariot.counter_miss"))),
+        LAST_SHOT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.silverchariot.lastshot"))),
+        CIRCLE_CHARGE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.silverchariot.circle_charge"))),
+        CIRCLE_SLASH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.silverchariot.circle_slash"))),
+        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.silverchariot.light_followup")));
 
-        private final BiConsumer<SilverChariotEntity, AnimationBuilder> animator;
+        private final BiConsumer<SilverChariotEntity, AnimationState> animator;
 
-        State(Consumer<AnimationBuilder> animator) {
+        State(Consumer<AnimationState> animator) {
             this((silverChariot, builder) -> animator.accept(builder));
         }
 
-        State(BiConsumer<SilverChariotEntity, AnimationBuilder> animator) {
+        State(BiConsumer<SilverChariotEntity, AnimationState> animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(SilverChariotEntity attacker, AnimationBuilder builder) {
+        public void playAnimation(SilverChariotEntity attacker, AnimationState builder) {
             animator.accept(attacker, builder);
         }
 

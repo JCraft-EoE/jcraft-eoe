@@ -9,18 +9,15 @@ import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.PlayState;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.core.animation.AnimatableManager;
 
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
-public class SunProtectionItem extends ArmorItem implements IAnimatable {
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+public class SunProtectionItem extends ArmorItem implements GeoItem {
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public SunProtectionItem(ArmorMaterial materialIn, EquipmentSlot slot, Settings builder) {
         super(materialIn, slot, builder);
@@ -43,8 +40,24 @@ public class SunProtectionItem extends ArmorItem implements IAnimatable {
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     public void registerControllers(AnimationData data) { data.addAnimationController(new AnimationController(this, "controller", 20, this::predicate)); }
+
     @Override
-    public AnimationFactory getFactory() {
-        return this.factory;
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
+    }
+
+    @Override
+    public void createRenderer(Consumer<Object> consumer) {
+
+    }
+
+    @Override
+    public Supplier<Object> getRenderProvider() {
+        return null;
     }
 }

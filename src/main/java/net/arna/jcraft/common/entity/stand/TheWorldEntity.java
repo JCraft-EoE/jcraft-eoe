@@ -17,10 +17,11 @@ import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import org.joml.Vector3f;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -135,11 +136,11 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
                             -the afternoon coffee
                             Donut>Roundhouse>Charge>M1>Barrage>Roundhouse>M1~M1""";
 
-        auraColors = new Vec3f[]{
-                new Vec3f(1.0f, 0.7f, 0.3f),
-                Vec3f.POSITIVE_X,
-                new Vec3f(1.0f, 0.6f, 0.0f),
-                new Vec3f(0.7f, 0.3f, 1.0f)
+        auraColors = new Vector3f[]{
+                new Vector3f(1.0f, 0.7f, 0.3f),
+                new Vector3f(1.0f, 0f, 0f),
+                new Vector3f(1.0f, 0.6f, 0.0f),
+                new Vector3f(0.7f, 0.3f, 1.0f)
         };
     }
 
@@ -200,30 +201,30 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
 
     // Animation code
     public enum State implements StandAnimationState<TheWorldEntity> {
-        IDLE(builder -> builder.loop("animation.theworld.idle")),
-        LIGHT(builder -> builder.playAndHold("animation.theworld.light")),
-        BLOCK(builder -> builder.loop("animation.theworld.block")),
-        DONUT(builder -> builder.playAndHold("animation.theworld.donut")),
-        BARRAGE(builder -> builder.loop("animation.theworld.barrage")),
-        TIME_STOP(builder -> builder.playAndHold("animation.theworld.timestop")),
-        CHARGE(builder -> builder.loop("animation.theworld.charge")),
-        CHARGE_HIT(builder -> builder.playAndHold("animation.theworld.charge_hit")),
-        ROUNDHOUSE(builder -> builder.playAndHold("animation.theworld.roundhouse")),
-        COUNTER_HIT(builder -> builder.playAndHold("animation.theworld.counter_hit")),
-        COUNTER_MISS(builder -> builder.playAndHold("animation.theworld.counter_miss")),
-        LOW(builder -> builder.playAndHold("animation.theworld.low")),
-        TIMESKIP(builder -> builder.loop("animation.theworld.idle")),
-        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.theworld.light_followup")),
-        LUNGE(builder -> builder.playAndHold("animation.theworld.lunge"));
+        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.theworld.idle"))),
+        LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.theworld.light"))),
+        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.theworld.block"))),
+        DONUT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.theworld.donut"))),
+        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.theworld.barrage"))),
+        TIME_STOP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.theworld.timestop"))),
+        CHARGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.theworld.charge"))),
+        CHARGE_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.theworld.charge_hit"))),
+        ROUNDHOUSE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.theworld.roundhouse"))),
+        COUNTER_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.theworld.counter_hit"))),
+        COUNTER_MISS(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.theworld.counter_miss"))),
+        LOW(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.theworld.low"))),
+        TIMESKIP(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.theworld.idle"))),
+        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.theworld.light_followup"))),
+        LUNGE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.theworld.lunge")));
 
-        private final Consumer<AnimationBuilder> animator;
+        private final Consumer<AnimationState> animator;
 
-        State(Consumer<AnimationBuilder> animator) {
+        State(Consumer<AnimationState> animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(TheWorldEntity attacker, AnimationBuilder builder) {
+        public void playAnimation(TheWorldEntity attacker, AnimationState builder) {
             animator.accept(builder);
         }
     }

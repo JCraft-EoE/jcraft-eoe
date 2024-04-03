@@ -39,7 +39,9 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import org.joml.Vector3f;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
 
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -180,17 +182,17 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                     Chop>Destroy>Surprise
                     Chop>Void""";
 
-        auraColors = new Vec3f[]{
-                new Vec3f(0.5f, 0.1f, 0.3f),
-                new Vec3f(0.5f, 0.6f, 0.8f),
-                new Vec3f(1.0f, 0.5f, 0.7f),
-                new Vec3f(1.0f, 0.5f, 0.5f)
+        auraColors = new Vector3f[]{
+                new Vector3f(0.5f, 0.1f, 0.3f),
+                new Vector3f(0.5f, 0.6f, 0.8f),
+                new Vector3f(1.0f, 0.5f, 0.7f),
+                new Vector3f(1.0f, 0.5f, 0.5f)
         };
     }
 
     @Override
-    public Vec3f getAuraColor() {
-        if (getVoidTime() > 0) return Vec3f.ZERO;
+    public Vector3f getAuraColor() {
+        if (getVoidTime() > 0) return new Vector3f();
         return super.getAuraColor();
     }
 
@@ -319,7 +321,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     @Override
     public void tick() {
         super.tick();
-        boolean server = !world.isClient();
+        boolean server = !getWorld().isClient();
 
         if (!hasUser()) return;
         LivingEntity user = getUserOrThrow();
@@ -353,15 +355,15 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
 
         if (voiding) {
             if (server) {
-                if (world.getGameRules().getBoolean(JCraft.STAND_GRIEFING)) {
+                if (getWorld().getGameRules().getBoolean(JCraft.STAND_GRIEFING)) {
                     // Unfun 3x4x3 void code
                     for (int x = -1; x < 2; x++) {
                         for (int y = -1; y < 3; y++) {
                             for (int z = -1; z < 2; z++) {
                                 BlockPos curPos = this.getBlockPos().add(x, y, z);
-                                if (world.getBlockState(curPos).getBlock().getBlastResistance() > 100.1f)
+                                if (getWorld().getBlockState(curPos).getBlock().getBlastResistance() > 100.1f)
                                     continue;
-                                world.setBlockState(curPos, Block.getStateFromRawId(0));
+                                getWorld().setBlockState(curPos, Block.getStateFromRawId(0));
                             }
                         }
                     }
@@ -372,7 +374,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
 
                 if (charging) {
                     if (isFree()) { // Surprise move
-                        Vec3f newPos = getFreePos().copy();
+                        Vector3f newPos = new Vector3f(getFreePos());
                         newPos.add(getMoveContext().get(SurpriseMove.OUT_DIR));
                         setFreePos(newPos);
                         if (getMoveStun() == 1) setFree(false);
@@ -395,9 +397,9 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                 }
 
                 Box damageBox = new Box(pos.add(1.5, 1.5, 1.5), pos.subtract(1.5, 1.5, 1.5));
-                List<Entity> toDamage = world.getEntitiesByClass(Entity.class,
+                List<Entity> toDamage = getWorld().getEntitiesByClass(Entity.class,
                         damageBox, EntityPredicates.VALID_ENTITY);
-                JUtils.displayHitbox(world, damageBox);
+                JUtils.displayHitbox(getWorld(), damageBox);
 
                 toDamage.remove(user);
                 toDamage.remove(this);
@@ -426,7 +428,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                             JUtils.cancelMoves(livingEntity);
                         }
 
-                        livingEntity.damage(DamageSource.OUT_OF_WORLD, damage);
+                        livingEntity.damage(getWorld().getDamageSources().outOfWorld(), damage);
                     }
                 }
 
@@ -437,7 +439,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                 setDistanceOffset(0);
             } else {
                 for (int i = 0; i < 16; i++)
-                    world.addParticle(ParticleTypes.MYCELIUM,
+                    getWorld().addParticle(ParticleTypes.MYCELIUM,
                             pos.x + (random.nextFloat() - 0.5f) * 2f,
                             pos.y + (random.nextFloat() - 0.5f) * 2f,
                             pos.z + (random.nextFloat() - 0.5f) * 2f,
@@ -468,7 +470,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
 
                     Vec3d userVel = JUtils.deltaPos(user);
                     Vec3d userPos = user.getPos();
-                    Vec3d groundPos = world.raycast(
+                    Vec3d groundPos = getWorld().raycast(
                             new RaycastContext(
                                     userPos, userPos.add(gravityVec.multiply(24)),
                                     RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, user) ).getPos();
@@ -504,7 +506,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         Vec3d vel = new Vec3d(user.getVelocity().x, 0.0, user.getVelocity().z);
 
         // Targeting priority
-        LivingEntity targetEntity = user.getDamageTracker().getBiggestAttacker();
+        LivingEntity targetEntity = user.getDamageTracker().getBiggestFall();
         if (targetEntity == null && user instanceof MobEntity mob)
             targetEntity = mob.getTarget();
         if (targetEntity == null)
@@ -533,40 +535,40 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
 
     // Animation code
     public enum State implements StandAnimationState<CreamEntity> {
-        IDLE((cream, builder) -> builder.loop("animation.cream." + ( cream.getVoidTime() > 0 ? "void" : cream.isHalfBall() ? "ball" : "" ) + "idle")),
-        LIGHT(builder -> builder.playAndHold("animation.cream.light")),
-        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.cream.light_followup")),
-        BALL_LIGHT(builder -> builder.playAndHold("animation.cream.balllight")),
-        BLOCK(builder -> builder.loop("animation.cream.block")),
-        BALL_BLOCK(builder -> builder.loop("animation.cream.ballblock")),
-        HEAVY(builder -> builder.playAndHold("animation.cream.heavy")),
-        BALL_HEAVY(builder -> builder.playAndHold("animation.cream.ballheavy")),
-        COMBO(builder -> builder.playAndHold("animation.cream.combo")),
-        BALL_COMBO(builder -> builder.playAndHold("animation.cream.ballcombo")),
-        CONSUME(builder -> builder.playAndHold("animation.cream.consume")),
-        BALL_CONSUME(builder -> builder.playAndHold("animation.cream.ballconsume")),
-        SURPRISE(builder -> builder.playAndHold("animation.cream.surprise")),
-        CHARGE_HIT(builder -> builder.playAndHold("animation.cream.charge_hit")),
-        GRAB(builder -> builder.playAndHold("animation.cream.grab")),
-        GRAB_HIT(builder -> builder.playAndHold("animation.cream.grab_hit")),
-        ENTER(builder -> builder.playAndHold("animation.cream.enter")),
-        EXIT(builder -> builder.playAndHold("animation.cream.exit")),
-        DESTROY(builder -> builder.playAndHold("animation.cream.destroy")),
-        BITE(builder -> builder.playAndHold("animation.cream.bite"));
+        IDLE((cream, builder) -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.cream." + ( cream.getVoidTime() > 0 ? "void" : cream.isHalfBall() ? "ball" : "" ) + "idle"))),
+        LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cream.light"))),
+        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cream.light_followup"))),
+        BALL_LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cream.balllight"))),
+        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.cream.block"))),
+        BALL_BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.cream.ballblock"))),
+        HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cream.heavy"))),
+        BALL_HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cream.ballheavy"))),
+        COMBO(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cream.combo"))),
+        BALL_COMBO(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cream.ballcombo"))),
+        CONSUME(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cream.consume"))),
+        BALL_CONSUME(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cream.ballconsume"))),
+        SURPRISE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cream.surprise"))),
+        CHARGE_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cream.charge_hit"))),
+        GRAB(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cream.grab"))),
+        GRAB_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cream.grab_hit"))),
+        ENTER(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cream.enter"))),
+        EXIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cream.exit"))),
+        DESTROY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cream.destroy"))),
+        BITE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cream.bite")));
 
-        private final BiConsumer<CreamEntity, AnimationBuilder> animator;
+        private final BiConsumer<CreamEntity, AnimationState> animator;
 
-        State(Consumer<AnimationBuilder> animator) {
+        State(Consumer<AnimationState> animator) {
             this((creamEntity, builder) -> animator.accept(builder));
         }
 
-        State(BiConsumer<CreamEntity, AnimationBuilder> animator) {
+        State(BiConsumer<CreamEntity, AnimationState> animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(CreamEntity attacker, AnimationBuilder builder) {
-            animator.accept(attacker, builder);
+        public void playAnimation(CreamEntity attacker, AnimationState state) {
+            animator.accept(attacker, state);
         }
     }
 

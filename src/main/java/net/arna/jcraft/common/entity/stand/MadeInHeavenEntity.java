@@ -34,10 +34,11 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import org.joml.Vector3f;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
 
 import java.util.List;
 import java.util.Set;
@@ -185,11 +186,11 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                     -the flashbang
                     (Donut>M1>)Speed Slice>Leg Crusher>Fury Chop>M1>Barrage""";
 
-        auraColors = new Vec3f[]{
-                new Vec3f(0.9f, 0.8f, 0.8f),
-                new Vec3f(1.0f, 0.0f, 0.0f),
-                new Vec3f(0.0f, 0.0f, 0.0f),
-                new Vec3f(0.5f, 0.0f, 1.0f)
+        auraColors = new Vector3f[]{
+                new Vector3f(0.9f, 0.8f, 0.8f),
+                new Vector3f(1.0f, 0.0f, 0.0f),
+                new Vector3f(0.0f, 0.0f, 0.0f),
+                new Vector3f(0.5f, 0.0f, 1.0f)
         };
     }
 
@@ -253,7 +254,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     }
 
     public LivingEntity getCircleTarget() {
-        return world.getEntityById(dataTracker.get(CIRCLING_TARGET)) instanceof LivingEntity entity ? entity : null;
+        return getWorld().getEntityById(dataTracker.get(CIRCLING_TARGET)) instanceof LivingEntity entity ? entity : null;
     }
 
     public void setCirclingTarget(LivingEntity target) {
@@ -292,7 +293,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
 
     @Override
     public void desummon() {
-        if (!world.isClient() && getAccelTime() > 0)
+        if (!getWorld().isClient() && getAccelTime() > 0)
             TimeAccelStatePacket.sendStop(getServer().getPlayerManager(), this);
         super.desummon();
     }
@@ -320,7 +321,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                 user.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 40, 0, true, false));
         }
 
-        if (world.isClient) {
+        if (getWorld().isClient) {
             Entity clientCircleTarget = getCircleTarget();
             if (clientCircleTarget != null)
                 lookAtWithoutReset(user, EntityAnchorArgumentType.EntityAnchor.EYES, clientCircleTarget.getEyePos());
@@ -371,29 +372,29 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
 
     // Animation code
     public enum State implements StandAnimationState<MadeInHeavenEntity> {
-        IDLE(builder -> builder.loop("animation.mih.idle")),
-        SLICE(builder -> builder.playAndHold("animation.mih.slice")),
-        BLOCK(builder -> builder.loop("animation.mih.block")),
-        DONUT(builder -> builder.playAndHold("animation.mih.donut")),
-        BARRAGE(builder -> builder.loop("animation.mih.barrage")),
-        SPEED_SLICE(builder -> builder.playAndHold("animation.mih.speedslice")),
-        JUDGEMENT(builder -> builder.playAndHold("animation.mih.judgement")),
-        LEG_CRUSHER(builder -> builder.playAndHold("animation.mih.legcrusher")),
-        FURY_CHOP(builder -> builder.playAndHold("animation.mih.furychop")),
-        TIME_ACCELERATION(builder -> builder.playAndHold("animation.mih.taccel")),
-        CIRCLE_STARTUP(builder -> builder.playAndHold("animation.mih.circlestartup")),
-        SPEED_CHOP(builder -> builder.playAndHold("animation.mih.speedchop")),
-        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.mih.light_followup")),
-        LOW_KICK(builder -> builder.playAndHold("animation.mih.lowkick"));
+        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.mih.idle"))),
+        SLICE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mih.slice"))),
+        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.mih.block"))),
+        DONUT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mih.donut"))),
+        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.mih.barrage"))),
+        SPEED_SLICE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mih.speedslice"))),
+        JUDGEMENT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mih.judgement"))),
+        LEG_CRUSHER(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mih.legcrusher"))),
+        FURY_CHOP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mih.furychop"))),
+        TIME_ACCELERATION(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mih.taccel"))),
+        CIRCLE_STARTUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mih.circlestartup"))),
+        SPEED_CHOP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mih.speedchop"))),
+        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mih.light_followup"))),
+        LOW_KICK(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mih.lowkick")));
 
-        private final Consumer<AnimationBuilder> animator;
+        private final Consumer<AnimationState> animator;
 
-        State(Consumer<AnimationBuilder> animator) {
+        State(Consumer<AnimationState> animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(MadeInHeavenEntity attacker, AnimationBuilder builder) {
+        public void playAnimation(MadeInHeavenEntity attacker, AnimationState builder) {
             animator.accept(builder);
         }
     }

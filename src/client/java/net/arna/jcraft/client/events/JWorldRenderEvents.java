@@ -5,8 +5,8 @@ import net.arna.jcraft.client.rendering.RenderHandler;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
+import org.joml.Matrix4f;
 
 public class JWorldRenderEvents {
 
@@ -15,17 +15,17 @@ public class JWorldRenderEvents {
         Vec3d cameraPos = context.camera().getPos();
         matrixStack.push();
         matrixStack.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
-        if (context.worldRenderer().transparencyShader != null) {
+        if (context.worldRenderer().getTranslucentFramebuffer() != null) {
             MinecraftClient.getInstance().getFramebuffer().beginWrite(false);
         }
         RenderHandler.beginBufferedRendering(matrixStack);
 
         if (RenderHandler.MATRIX4F != null) {
-            RenderSystem.getModelViewMatrix().load(RenderHandler.MATRIX4F);
+            RenderSystem.getModelViewMatrix().get(RenderHandler.MATRIX4F);
         }
         RenderHandler.renderBufferedBatches(matrixStack);
         RenderHandler.endBufferedRendering(matrixStack);
-        if (context.worldRenderer().transparencyShader != null) {
+        if (context.worldRenderer().getTranslucentFramebuffer() != null) {
             context.worldRenderer().getCloudsFramebuffer().beginWrite(false);
         }
         matrixStack.pop();

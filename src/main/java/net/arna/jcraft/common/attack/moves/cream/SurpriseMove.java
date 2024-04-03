@@ -10,14 +10,14 @@ import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.RaycastContext;
+import org.joml.Vector3f;
 
 import java.util.Set;
 
 public class SurpriseMove extends AbstractMove<SurpriseMove, CreamEntity> {
-    public static final MoveVariable<Vec3f> OUT_POS = new MoveVariable<>(Vec3f.class);
-    public static final MoveVariable<Vec3f> OUT_DIR = new MoveVariable<>(Vec3f.class);
+    public static final MoveVariable<Vector3f> OUT_POS = new MoveVariable<>(Vector3f.class);
+    public static final MoveVariable<Vector3f> OUT_DIR = new MoveVariable<>(Vector3f.class);
 
     public SurpriseMove(int cooldown, int windup, int duration, float moveDistance) {
         super(cooldown, windup, duration, moveDistance);
@@ -39,21 +39,21 @@ public class SurpriseMove extends AbstractMove<SurpriseMove, CreamEntity> {
                 RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user));
 
         attacker.setFree(true);
-        attacker.setFreePos(new Vec3f(user.getPos()));
-        attacker.getMoveContext().set(OUT_POS, new Vec3f(hitResult.getPos()));
+        attacker.setFreePos((user.getPos().toVector3f()));
+        attacker.getMoveContext().set(OUT_POS, (hitResult.getPos().toVector3f()));
     }
 
     @Override
     public @NonNull Set<LivingEntity> perform(CreamEntity attacker, LivingEntity user, MoveContext ctx) {
         attacker.setCharging(true);
 
-        Vec3f outDir = GravityChangerAPI.getGravityDirection(attacker).getUnitVector();
-        outDir.scale(-1f);
+        Vector3f outDir = GravityChangerAPI.getGravityDirection(attacker).getUnitVector();
+        outDir.mul(-1f);
         ctx.set(OUT_DIR, outDir);
-        ctx.get(OUT_POS).subtract(outDir);
+        ctx.get(OUT_POS).sub(outDir);
 
-        Vec3f outPos = ctx.get(OUT_POS);
-        attacker.setPosition(new Vec3d(outPos.getX(), outPos.getY(), outPos.getZ()));
+        Vector3f outPos = ctx.get(OUT_POS);
+        attacker.setPosition(new Vec3d(outPos.x(), outPos.y(), outPos.z()));
         attacker.setFreePos(outPos);
 
         attacker.setVoidTime(getWindupPoint());
@@ -65,8 +65,8 @@ public class SurpriseMove extends AbstractMove<SurpriseMove, CreamEntity> {
 
     @Override
     public void registerContextEntries(MoveContext ctx) {
-        ctx.register(OUT_POS, new Vec3f());
-        ctx.register(OUT_DIR, new Vec3f());
+        ctx.register(OUT_POS, new Vector3f());
+        ctx.register(OUT_DIR, new Vector3f());
     }
 
     @Override

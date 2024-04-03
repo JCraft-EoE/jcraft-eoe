@@ -25,13 +25,13 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class BulletProjectile extends PersistentProjectileEntity implements IAnimatable {
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+public class BulletProjectile extends PersistentProjectileEntity implements GeoEntity {
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private int stunTicks = 0;
     private int damage = 0;
     private float mass = 1f; // Used for penetration calculation
@@ -78,11 +78,11 @@ public class BulletProjectile extends PersistentProjectileEntity implements IAni
 
         if (type == HitResult.Type.ENTITY) {
             this.onEntityHit((EntityHitResult) hitResult);
-            world.emitGameEvent(GameEvent.PROJECTILE_LAND, hitResult.getPos(), GameEvent.Emitter.of(this, null));
+            getWorld().emitGameEvent(GameEvent.PROJECTILE_LAND, hitResult.getPos(), GameEvent.Emitter.of(this, null));
         } else if (type == HitResult.Type.BLOCK) {
             BlockHitResult blockHitResult = (BlockHitResult) hitResult;
             BlockPos blockPos = blockHitResult.getBlockPos();
-            BlockState blockState = world.getBlockState(blockPos);
+            BlockState blockState = getWorld().getBlockState(blockPos);
             if (blockState.isAir()) return;
 
             // Calculate penetrative value and decide if it should land
@@ -110,14 +110,14 @@ public class BulletProjectile extends PersistentProjectileEntity implements IAni
                 boolean through = hardness <= 1.0; // Go straight through?
                 if (lowEnergy || !through) { // Lodged inside block
                     this.onBlockHit(blockHitResult);
-                    this.world.emitGameEvent(GameEvent.PROJECTILE_LAND, blockPos, GameEvent.Emitter.of(this, blockState));
+                    this.getWorld().emitGameEvent(GameEvent.PROJECTILE_LAND, blockPos, GameEvent.Emitter.of(this, blockState));
                     discard();
-                } else if (!world.isClient) {
-                    JUtils.serverPlaySound(JSoundRegistry.BULLET_PENETRATE, (ServerWorld) world, getPos(), 32);
+                } else if (!getWorld().isClient) {
+                    JUtils.serverPlaySound(JSoundRegistry.BULLET_PENETRATE, (ServerWorld) getWorld(), getPos(), 32);
                 }
             } else { // Ricochet
                 setVelocity(impactVec.add(normal).multiply(0.5 / hardness));
-                if (!world.isClient) JUtils.serverPlaySound(JSoundRegistry.BULLET_RICOCHET, (ServerWorld) world, getPos(), 32);
+                if (!getWorld().isClient) JUtils.serverPlaySound(JSoundRegistry.BULLET_RICOCHET, (ServerWorld) getWorld(), getPos(), 32);
             }
         }
     }
@@ -132,12 +132,12 @@ public class BulletProjectile extends PersistentProjectileEntity implements IAni
     protected void onEntityHit(EntityHitResult entityHitResult) {
         Entity entity = entityHitResult.getEntity();
         if (entity instanceof LivingEntity living) {
-            if (!world.isClient) {
+            if (!getWorld().isClient) {
                 Entity owner = getOwner();
                 LivingEntity target = JUtils.getUserIfStand(living);
                 StandEntity.damageLogic(getWorld(), target, getVelocity().normalize(), stunTicks, 1,
-                        false, damage, true, 4 + damage, DamageSource.thrownProjectile(this, owner), owner, HitPropertyComponent.HitAnimation.MID);
-                JUtils.serverPlaySound(JSoundRegistry.BULLET_PENETRATE, (ServerWorld) world, getPos(), 32);
+                        false, damage, true, 4 + damage, getWorld().getDamageSources().thrown(this, owner), owner, HitPropertyComponent.HitAnimation.MID);
+                JUtils.serverPlaySound(JSoundRegistry.BULLET_PENETRATE, (ServerWorld) getWorld(), getPos(), 32);
                 discard();
             }
         } else
@@ -196,12 +196,14 @@ public class BulletProjectile extends PersistentProjectileEntity implements IAni
     }
 
     // Animations
+
     @Override
-    public void registerControllers(AnimationData data) {
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+
     }
 
     @Override
-    public AnimationFactory getFactory() {
-        return this.factory;
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 }

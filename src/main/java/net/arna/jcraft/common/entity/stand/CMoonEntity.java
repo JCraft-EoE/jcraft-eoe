@@ -25,9 +25,10 @@ import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import org.joml.Vector3f;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -144,11 +145,11 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
                         ...Grav. Hop>Ground Slam
                         ...Gut Punch""";
 
-        auraColors = new Vec3f[]{
-                new Vec3f(0.4f, 1.0f, 0.6f),
-                new Vec3f(1.0f, 0.4f, 0.6f),
-                new Vec3f(0.4f, 0.8f, 1.0f),
-                new Vec3f(1.0f, 0.2f, 0.6f)
+        auraColors = new Vector3f[]{
+                new Vector3f(0.4f, 1.0f, 0.6f),
+                new Vector3f(1.0f, 0.4f, 0.6f),
+                new Vector3f(0.4f, 0.8f, 1.0f),
+                new Vector3f(1.0f, 0.2f, 0.6f)
         };
     }
 
@@ -191,7 +192,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
     public boolean initMove(MoveType type) {
         switch (type) {
             case SPECIAL2 -> {
-                if (hasUser() && getUserOrThrow().isSneaking()) world.getEntitiesByClass(BlockProjectile.class,
+                if (hasUser() && getUserOrThrow().isSneaking()) getWorld().getEntitiesByClass(BlockProjectile.class,
                                 getBoundingBox().expand(16), p -> p.isAlive() && p.getMaster() == getUser())
                         .forEach(BlockProjectile::markRefresh);
                 else return super.initMove(type);
@@ -222,7 +223,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
         LivingEntity user = getUser();
         if (user == null) return;
         // Projectile deflection
-        List<ProjectileEntity> toDeflect = world.getEntitiesByClass(ProjectileEntity.class, getBoundingBox().expand(0.75f), EntityPredicates.VALID_ENTITY);
+        List<ProjectileEntity> toDeflect = getWorld().getEntitiesByClass(ProjectileEntity.class, getBoundingBox().expand(0.75f), EntityPredicates.VALID_ENTITY);
 
         for (ProjectileEntity projectile : toDeflect) {
             if (projectile.getOwner() == user) continue;
@@ -241,7 +242,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
         if (!hasUser()) return;
         LivingEntity user = getUserOrThrow();
 
-        if (world.isClient) return;
+        if (getWorld().isClient) return;
 
         for (int i = 0; i < inversions.size(); i++) {
             Inversion inversion = inversions.get(i);
@@ -250,7 +251,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
 
             if (time < 1) {
                 LivingEntity entity = inversion.getEntity();
-                damage(inversion.getDamage(), DamageSource.mob(user), entity);
+                damage(inversion.getDamage(), getWorld().getDamageSources().mobAttack(user), entity);
                 inversions.remove(i);
 
                 if (inversion.doSlow)
@@ -289,28 +290,28 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
 
     // Animation code
     public enum State implements StandAnimationState<CMoonEntity> {
-        IDLE(builder -> builder.loop("animation.cmoon.idle")),
-        LIGHT(builder -> builder.playAndHold("animation.cmoon.light")),
-        BLOCK(builder -> builder.loop("animation.cmoon.block")),
-        DONUT(builder -> builder.playAndHold("animation.cmoon.donut")),
-        BARRAGE(builder -> builder.loop("animation.cmoon.barrage")),
-        GRAV_PUNCH(builder -> builder.playAndHold("animation.cmoon.gravpunch")),
-        GROUND_SLAM(builder -> builder.playAndHold("animation.cmoon.groundslam")),
-        GROUND_SHOOT(builder -> builder.playAndHold("animation.cmoon.groundshoot")),
-        GRAV_SHIFT(builder -> builder.playAndHold("animation.cmoon.gravshift")),
-        DIRECTIONAL_SHIFT(builder -> builder.playAndHold("animation.cmoon.directionalshift")),
-        INVERSION_PUNCH(builder -> builder.playAndHold("animation.cmoon.inversionpunch")),
-        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.cmoon.light_followup"));
+        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.cmoon.idle"))),
+        LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cmoon.light"))),
+        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.cmoon.block"))),
+        DONUT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cmoon.donut"))),
+        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.cmoon.barrage"))),
+        GRAV_PUNCH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cmoon.gravpunch"))),
+        GROUND_SLAM(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cmoon.groundslam"))),
+        GROUND_SHOOT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cmoon.groundshoot"))),
+        GRAV_SHIFT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cmoon.gravshift"))),
+        DIRECTIONAL_SHIFT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cmoon.directionalshift"))),
+        INVERSION_PUNCH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cmoon.inversionpunch"))),
+        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cmoon.light_followup")));
 
-        private final Consumer<AnimationBuilder> animator;
+        private final Consumer<AnimationState> animator;
 
-        State(Consumer<AnimationBuilder> animator) {
+        State(Consumer<AnimationState> animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(CMoonEntity attacker, AnimationBuilder builder) {
-            animator.accept(builder);
+        public void playAnimation(CMoonEntity attacker, AnimationState state) {
+            animator.accept(state);
         }
     }
 

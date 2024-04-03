@@ -6,19 +6,20 @@ import lombok.NonNull;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3f;
 
 @Data
 public class SplatterSection {
     private final World world;
     private final Direction direction;
-    private final @NonNull Vec3f minPos, maxPos;
-    private final Vec3f center;
+    private final @NonNull Vector3f minPos, maxPos;
+    private final Vector3f center;
     private final BlockPos blockPos;
     private final Vec2f minUv, maxUv;
     private final Box hitBox;
     private boolean removed;
 
-    public SplatterSection(World world, Direction direction, @NotNull Vec3f minPos, @NotNull Vec3f maxPos, Vec2f minUv, Vec2f maxUv) {
+    public SplatterSection(World world, Direction direction, @NotNull Vector3f minPos, @NotNull Vector3f maxPos, Vec2f minUv, Vec2f maxUv) {
         this.world = world;
         this.direction = direction;
         this.minPos = minPos;
@@ -31,14 +32,14 @@ public class SplatterSection {
                 .stretch(new Vec3d(direction.getUnitVector()).multiply(0.1));
     }
 
-    public static BlockPos getAnchor(Vec3f center, Direction facing) {
-        return new BlockPos(new Vec3d(center).add(new Vec3d(facing.getUnitVector()).multiply(0.05)));
+    public static BlockPos getAnchor(Vector3f center, Direction facing) {
+        return BlockPos.ofFloored(new Vec3d(center).add(new Vec3d(facing.getUnitVector()).multiply(0.05)));
     }
 
-    public static Vec3f calcCenter(Vec3f min, Vec3f max) {
-        Vec3f center = min.copy();
-        Vec3f delta = max.copy(); // Delta = (max - min) / 2
-        delta.subtract(min);
+    public static Vector3f calcCenter(Vector3f min, Vector3f max) {
+        Vector3f center = new Vector3f(min);
+        Vector3f delta =  new Vector3f(max); // Delta = (max - min) / 2
+        delta.sub(min);
         delta.modify(x -> x / 2f);
         center.add(delta); // (max - min) / 2 + min = center
 
@@ -54,7 +55,7 @@ public class SplatterSection {
      * @param max       The maximum coordinates
      * @return A wrapped version of this section
      */
-    public SplatterSection wrapped(Direction direction, Vec3f min, Vec3f max) {
+    public SplatterSection wrapped(Direction direction, Vector3f min, Vector3f max) {
         return wrapped(direction, min, max, UvModification.NONE);
     }
 
@@ -69,7 +70,7 @@ public class SplatterSection {
      * @return A wrapped version of this section
      */
     @SuppressWarnings("SuspiciousNameCombination") // Yes, that's the idea.
-    public SplatterSection wrapped(Direction direction, Vec3f min, Vec3f max, UvModification uvModification) {
+    public SplatterSection wrapped(Direction direction, Vector3f min, Vector3f max, UvModification uvModification) {
         Vec2f minUv = this.minUv;
         Vec2f maxUv = this.maxUv;
 
@@ -96,7 +97,7 @@ public class SplatterSection {
             maxUv = new Vec2f(maxUv.x, intermediary);
         }
 
-        return new SplatterSection(world, direction, min.copy(), max.copy(), minUv, maxUv);
+        return new SplatterSection(world, direction, new Vector3f(min), new Vector3f(max), minUv, maxUv);
     }
 
     public boolean hasValidAnchor() {

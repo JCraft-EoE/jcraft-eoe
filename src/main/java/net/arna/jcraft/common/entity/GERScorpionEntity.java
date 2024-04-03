@@ -25,22 +25,21 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.IAnimationTickable;
-import software.bernie.geckolib3.core.PlayState;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.*;
 
 import static net.arna.jcraft.common.util.JUtils.canDamage;
 import static net.arna.jcraft.common.entity.stand.StandEntity.damageLogic;
 
-public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimationTickable, IOwnable {
+public class GERScorpionEntity extends MobEntity implements GeoEntity, IOwnable {
     private static final TrackedData<Optional<UUID>> OWNERUUID;
     private static final TrackedData<Boolean> ISROCK;
     private static final TrackedData<Boolean> CHARGED;
@@ -154,7 +153,7 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
 
         Vec3d curPos = getPos();
 
-        if (world.isClient) {
+        if (getWorld().isClient) {
             if (!isRock()) landedTimer += 1;
             double x = getX();
             double y = getY();
@@ -163,14 +162,14 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                 Vec3d towardsVec = JUtils.deltaPos(this);
                 for (double i = 0; i < 6; i++) {
                     double lerp = i / 6;
-                    world.addParticle(
+                    getWorld().addParticle(
                             isCharged() ? ParticleTypes.WITCH : ParticleTypes.COMPOSTER,
                             x + towardsVec.x * lerp, y + towardsVec.y * lerp, z + towardsVec.z * lerp,
                             towardsVec.x, towardsVec.y, towardsVec.z);
                 }
             } else if (landedTimer == 1) { // Landing burst
                 for (int i = 0; i < 8; i++) {
-                    world.addParticle(new BlockStateParticleEffect(ParticleTypes.BLOCK, Blocks.DIRT.getDefaultState()),
+                    getWorld().addParticle(new BlockStateParticleEffect(ParticleTypes.BLOCK, Blocks.DIRT.getDefaultState()),
                             x + random.nextFloat() - 0.5f,
                             y + random.nextFloat() - 0.5f,
                             z + random.nextFloat() - 0.5f,
@@ -184,7 +183,7 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                 filter.add(owner);
                 filter.add(this);
                 if (owner.hasPassengers()) filter.addAll(owner.getPassengerList());
-                DamageSource damageSource = DamageSource.mob(owner);
+                DamageSource damageSource = getWorld().getDamageSources().mobAttack(owner);
                 if (isRock()) {
                     if (!getVelocity().equals(initialVel)) // Ghetto collision check
                         Transform();
@@ -193,7 +192,7 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                     Vec3d towardsVec = curPos.subtract(new Vec3d(prevX, prevY, prevZ));
                     List<LivingEntity> hurtAll = new ArrayList<>();
                     for (double i = 0; i < 3; i++)
-                        hurtAll.addAll(JUtils.generateHitbox(world, curPos.add(towardsVec.multiply(i / 3)), 0.5, filter));
+                        hurtAll.addAll(JUtils.generateHitbox(getWorld(), curPos.add(towardsVec.multiply(i / 3)), 0.5, filter));
 
                     hurtAll.removeIf(e -> !canDamage(damageSource, e));
 
@@ -201,11 +200,11 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                         jumpTarget = hurtAll.get(0);
                         for (LivingEntity l : hurtAll) {
                             LivingEntity target = JUtils.getUserIfStand(l);
-                            damageLogic(world, target, getVelocity(), rockStun, 1, false, 6f,
+                            damageLogic(getWorld(), target, getVelocity(), rockStun, 1, false, 6f,
                                     true, 10, damageSource, owner, HitPropertyComponent.HitAnimation.MID);
                         }
                         Transform();
-                        JCraft.createParticle((ServerWorld) this.world,
+                        JCraft.createParticle((ServerWorld) this.getWorld(),
                                 curPos.x + random.nextGaussian() * 0.25,
                                 curPos.y + random.nextGaussian() * 0.25,
                                 curPos.z + random.nextGaussian() * 0.25,
@@ -223,15 +222,15 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                     }
 
                     if (landedTimer == 20) { // Sting followup, 5t gap
-                        Set<LivingEntity> hurt = JUtils.generateHitbox(world, getPos(), 1.5, filter);
+                        Set<LivingEntity> hurt = JUtils.generateHitbox(getWorld(), getPos(), 1.5, filter);
                         if (isCharged()) for (LivingEntity l : hurt) {
                             LivingEntity target = JUtils.getUserIfStand(l);
                             target.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 60, 0, false, true));
-                            damageLogic(world, target, Vec3d.ZERO, 15, 1, false, 3f, true, 7, damageSource, owner, HitPropertyComponent.HitAnimation.MID);
+                            damageLogic(getWorld(), target, Vec3d.ZERO, 15, 1, false, 3f, true, 7, damageSource, owner, HitPropertyComponent.HitAnimation.MID);
                         }
                         else for (LivingEntity l : hurt) {
                             LivingEntity target = JUtils.getUserIfStand(l);
-                            damageLogic(world, target, Vec3d.ZERO, 15, 1, false, 3f, true, 7, damageSource, owner, HitPropertyComponent.HitAnimation.MID);
+                            damageLogic(getWorld(), target, Vec3d.ZERO, 15, 1, false, 3f, true, 7, damageSource, owner, HitPropertyComponent.HitAnimation.MID);
                         }
                     }
                 }
@@ -243,7 +242,7 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
                 boolean found = false;
 
                 for (LivingEntity e :
-                        world.getEntitiesByClass(LivingEntity.class, box, EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR)) {
+                        getWorld().getEntitiesByClass(LivingEntity.class, box, EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR)) {
                     if (e.getUuid().equals(searchID)) {
                         setMaster(e);
                         found = true;
@@ -258,29 +257,23 @@ public class GERScorpionEntity extends MobEntity implements IAnimatable, IAnimat
     }
 
     // Animations
-    private final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "controller", 0, this::predicate));
     }
 
-    @Override
-    public AnimationFactory getFactory() {
-        return this.animationFactory;
-    }
-
-    @Override
-    public int tickTimer() {
-        return age;
-    }
-
-    @SuppressWarnings("SameReturnValue")
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+    private PlayState predicate(AnimationState<GERScorpionEntity> state) {
         if (this.isRock())
-            event.getController().setAnimation(new AnimationBuilder().loop("animation.gerscorpion.rock"));
+            state.setAnimation(RawAnimation.begin().thenLoop("animation.gerscorpion.rock"));
         else
-            event.getController().setAnimation(new AnimationBuilder().playOnce("animation.gerscorpion.transform").playAndHold("animation.gerscorpion.attack"));
+            state.setAnimation(RawAnimation.begin().thenPlay("animation.gerscorpion.transform").thenPlayAndHold("animation.gerscorpion.attack"));
         return PlayState.CONTINUE;
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 }

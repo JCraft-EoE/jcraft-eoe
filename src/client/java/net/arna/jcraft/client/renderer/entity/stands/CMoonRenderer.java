@@ -9,18 +9,18 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector3d;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.random.Random;
-import software.bernie.geckolib3.geo.render.built.GeoModel;
+import org.joml.Vector3d;
+import org.joml.Vector3f;
+import software.bernie.geckolib.model.GeoModel;
 
 public class CMoonRenderer extends StandEntityRenderer<CMoonEntity> {
     private int currentTick = -1;
     private static final int gravWindup = CMoonEntity.GRAV_PUNCH.getWindupPoint();
-    private static final ParticleEffect chargeParticle = new DustParticleEffect(new Vec3f(0.8f, 0.2f, 1.0f), 2.0f);
+    private static final ParticleEffect chargeParticle = new DustParticleEffect(new Vector3f(0.8f, 0.2f, 1.0f), 2.0f);
     public CMoonRenderer(EntityRendererFactory.Context context) {
         super(context, new StandEntityModel<>(StandType.C_MOON));
     }

@@ -1,8 +1,8 @@
 package net.arna.jcraft.common.util;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 

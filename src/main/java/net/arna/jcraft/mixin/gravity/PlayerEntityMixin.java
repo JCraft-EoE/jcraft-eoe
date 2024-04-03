@@ -141,7 +141,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
             double e = playerMovement.z;
             double var7 = 0.05D;
 
-            while (d != 0.0D && this.world.isSpaceEmpty(this, this.getBoundingBox().offset(RotationUtil.vecPlayerToWorld(d, (double) (-this.stepHeight), 0.0D, gravityDirection)))) {
+            while (d != 0.0D && this.getWorld().isSpaceEmpty(this, this.getBoundingBox().offset(RotationUtil.vecPlayerToWorld(d, (double) (-this.stepHeight), 0.0D, gravityDirection)))) {
                 if (d < 0.05D && d >= -0.05D) {
                     d = 0.0D;
                 } else if (d > 0.0D) {
@@ -151,7 +151,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
                 }
             }
 
-            while (e != 0.0D && this.world.isSpaceEmpty(this, this.getBoundingBox().offset(RotationUtil.vecPlayerToWorld(0.0D, (double) (-this.stepHeight), e, gravityDirection)))) {
+            while (e != 0.0D && this.getWorld().isSpaceEmpty(this, this.getBoundingBox().offset(RotationUtil.vecPlayerToWorld(0.0D, (double) (-this.stepHeight), e, gravityDirection)))) {
                 if (e < 0.05D && e >= -0.05D) {
                     e = 0.0D;
                 } else if (e > 0.0D) {
@@ -161,7 +161,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
                 }
             }
 
-            while (d != 0.0D && e != 0.0D && this.world.isSpaceEmpty(this, this.getBoundingBox().offset(RotationUtil.vecPlayerToWorld(d, (double) (-this.stepHeight), e, gravityDirection)))) {
+            while (d != 0.0D && e != 0.0D && this.getWorld().isSpaceEmpty(this, this.getBoundingBox().offset(RotationUtil.vecPlayerToWorld(d, (double) (-this.stepHeight), e, gravityDirection)))) {
                 if (d < 0.05D && d >= -0.05D) {
                     d = 0.0D;
                 } else if (d > 0.0D) {

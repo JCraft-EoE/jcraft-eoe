@@ -12,10 +12,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3f;
-import software.bernie.geckolib3.core.processor.IBone;
-import software.bernie.geckolib3.geo.render.built.GeoBone;
-import software.bernie.geckolib3.renderers.geo.ExtendedGeoEntityRenderer;
 
 import java.util.Objects;
 
@@ -52,7 +48,7 @@ public class GEButterflyRenderer extends ExtendedGeoEntityRenderer<GEButterflyEn
         if (item != this.mainHandItem) return;
 
         stack.scale(0.33f, 0.33f, 0.33f);
-        stack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(-90f));
+        stack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(-90f));
     }
 
     @Override

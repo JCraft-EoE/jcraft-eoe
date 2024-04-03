@@ -28,6 +28,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -51,13 +52,13 @@ public interface JEventsRegistry {
                     if (stun != null && stun.getAmplifier() != 2) {
                         // Only apply stun nerfs if hit with a weapon or a projectile
                         if (attacker instanceof LivingEntity living) {
-                            boolean hasWeapon = source.isProjectile();
+                            boolean hasWeapon = source.isOf(DamageTypes.MOB_PROJECTILE);
                             if (!hasWeapon)
                                 hasWeapon = !living.getMainHandStack().getAttributeModifiers(EquipmentSlot.MAINHAND).isEmpty();
                             toLaunch = hasWeapon;
                         }
 
-                        if (source.isExplosive()) {
+                        if (source.isOf(DamageTypes.EXPLOSION)) {
                             toLaunch = true;
                         }
 
@@ -152,8 +153,7 @@ public interface JEventsRegistry {
 
         EntitySleepEvents.STOP_SLEEPING.register(
                 (entity, sleepingPos) -> {
-                    if (entity instanceof ServerPlayerEntity serverPlayer && serverPlayer.canResetTimeBySleeping()) {
-                        ServerWorld serverWorld = serverPlayer.getWorld();
+                    if (entity instanceof ServerPlayerEntity serverPlayer && serverPlayer.canResetTimeBySleeping() && serverPlayer.getWorld() instanceof ServerWorld serverWorld) {
                         BlockState state = serverWorld.getBlockState(sleepingPos);
                         if (state.isOf(COFFIN_BLOCK)) {
                             if (serverWorld.sleepManager.canSkipNight(serverWorld.getGameRules().getInt(GameRules.PLAYERS_SLEEPING_PERCENTAGE))

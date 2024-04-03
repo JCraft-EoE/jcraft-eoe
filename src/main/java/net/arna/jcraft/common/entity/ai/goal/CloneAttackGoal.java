@@ -27,7 +27,7 @@ public class CloneAttackGoal extends Goal {
     }
 
     public boolean canStart() {
-        long l = clone.world.getTime();
+        long l = clone.getWorld().getTime();
         if (l - this.lastUpdateTime < 10L) {
             return false;
         } else {

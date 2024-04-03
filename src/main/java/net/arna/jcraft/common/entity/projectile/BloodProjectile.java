@@ -16,15 +16,15 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import static net.arna.jcraft.common.entity.stand.StandEntity.damageLogic;
 
-public class BloodProjectile extends PersistentProjectileEntity implements IAnimatable {
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+public class BloodProjectile extends PersistentProjectileEntity implements GeoEntity {
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public BloodProjectile(EntityType<? extends BloodProjectile> entityType, World world) {
         super(entityType, world);
@@ -44,7 +44,7 @@ public class BloodProjectile extends PersistentProjectileEntity implements IAnim
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
-        if (world.isClient) return;
+        if (getWorld().isClient) return;
         Entity owner = getOwner();
         if (owner == null) return;
         Entity entity = entityHitResult.getEntity();
@@ -54,14 +54,14 @@ public class BloodProjectile extends PersistentProjectileEntity implements IAnim
             LivingEntity target = living;
             if (entity instanceof StandEntity<?, ?> stand && stand.hasUser())
                 target = stand.getUserOrThrow();
-            damageLogic(world, target, Vec3d.ZERO, 10, 1, false, 2f,
-                    false, 6, DamageSource.thrownProjectile(this, owner), owner, HitPropertyComponent.HitAnimation.MID);
+            damageLogic(getWorld(), target, Vec3d.ZERO, 10, 1, false, 2f,
+                    false, 6, getWorld().getDamageSources().thrown(this, owner), owner, HitPropertyComponent.HitAnimation.MID);
             target.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 60, 0, false, true));
             discard();
         }
 
         if (entity instanceof EndCrystalEntity endCrystal)
-            endCrystal.damage(DamageSource.thrownProjectile(this, owner), 2f);
+            endCrystal.damage(getWorld().getDamageSources().thrown(this, owner), 2f);
 
         playSound(SoundEvents.BLOCK_SLIME_BLOCK_FALL, 1, 0.5f);
     }
@@ -77,12 +77,14 @@ public class BloodProjectile extends PersistentProjectileEntity implements IAnim
     }
 
     // Animations
+
     @Override
-    public void registerControllers(AnimationData data) {
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+
     }
 
     @Override
-    public AnimationFactory getFactory() {
-        return this.factory;
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 }

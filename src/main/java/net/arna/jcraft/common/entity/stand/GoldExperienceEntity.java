@@ -16,10 +16,11 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import org.joml.Vector3f;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -137,11 +138,11 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
                     -the superprince of gaming
                     Rekka 1~2>M1>Barrage>M1>Tree>Heavy""";
 
-        auraColors = new Vec3f[]{
-                new Vec3f(1.0f, 0.7f, 0.2f),
-                new Vec3f(0.3f, 0.6f, 1.0f),
-                new Vec3f(1.0f, 0.3f, 0.7f),
-                new Vec3f(1.0f, 0.0f, 0.0f)
+        auraColors = new Vector3f[]{
+                new Vector3f(1.0f, 0.7f, 0.2f),
+                new Vector3f(0.3f, 0.6f, 1.0f),
+                new Vector3f(1.0f, 0.3f, 0.7f),
+                new Vector3f(1.0f, 0.0f, 0.0f)
         };
     }
 
@@ -236,7 +237,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
         super.tick();
         if (!hasUser()) return;
 
-        if (!world.isClient && curMove != null && (curMove.getOriginalMove() == REKKA2 || curMove.getOriginalMove() == REKKA3) && queuedMove == MoveInputType.SPECIAL2)
+        if (!getWorld().isClient && curMove != null && (curMove.getOriginalMove() == REKKA2 || curMove.getOriginalMove() == REKKA3) && queuedMove == MoveInputType.SPECIAL2)
             queuedMove = null;
     }
 
@@ -248,29 +249,29 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
 
     // Animation code
     public enum State implements StandAnimationState<GoldExperienceEntity> {
-        IDLE(builder -> builder.loop("animation.ge.idle")),
-        LIGHT(builder -> builder.playAndHold("animation.ge.light")),
-        BLOCK(builder -> builder.loop("animation.ge.block")),
-        HEAVY(builder -> builder.playAndHold("animation.ge.heavy")),
-        BARRAGE(builder -> builder.loop("animation.ge.barrage")),
-        HEAL_SELF(builder -> builder.playAndHold("animation.ge.healself")),
-        HEAL(builder -> builder.playAndHold("animation.ge.heal")),
-        TREE(builder -> builder.playAndHold("animation.ge.tree")),
-        LIFE_GIVER(builder -> builder.playAndHold("animation.ge.lifegiver")),
-        REKKA1(builder -> builder.playAndHold("animation.ge.rekka1")),
-        REKKA2(builder -> builder.playAndHold("animation.ge.rekka2")),
-        REKKA3(builder -> builder.playAndHold("animation.ge.rekka3")),
-        OVERCLOCK(builder -> builder.playAndHold("animation.ge.overclock")),
-        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.ge.light_followup"));
+        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.ge.idle"))),
+        LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ge.light"))),
+        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.ge.block"))),
+        HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ge.heavy"))),
+        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.ge.barrage"))),
+        HEAL_SELF(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ge.healself"))),
+        HEAL(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ge.heal"))),
+        TREE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ge.tree"))),
+        LIFE_GIVER(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ge.lifegiver"))),
+        REKKA1(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ge.rekka1"))),
+        REKKA2(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ge.rekka2"))),
+        REKKA3(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ge.rekka3"))),
+        OVERCLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ge.overclock"))),
+        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ge.light_followup")));
 
-        private final Consumer<AnimationBuilder> animator;
+        private final Consumer<AnimationState> animator;
 
-        State(Consumer<AnimationBuilder> animator) {
+        State(Consumer<AnimationState> animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(GoldExperienceEntity attacker, AnimationBuilder builder) {
+        public void playAnimation(GoldExperienceEntity attacker, AnimationState builder) {
             animator.accept(builder);
         }
     }

@@ -4,12 +4,12 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.projectile.RapierProjectile;
 import net.arna.jcraft.common.entity.stand.StandType;
 import net.minecraft.util.Identifier;
-import software.bernie.geckolib3.model.AnimatedGeoModel;
+import software.bernie.geckolib.model.GeoModel;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class RapierModel extends AnimatedGeoModel<RapierProjectile> {
+public class RapierModel extends GeoModel<RapierProjectile> {
 
     public static final Map<Integer, Identifier> skins = new HashMap<>(
             Map.ofEntries(

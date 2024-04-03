@@ -23,6 +23,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.math.Box;
@@ -44,7 +45,7 @@ public class TimeEraseMove extends AbstractMove<TimeEraseMove, KingCrimsonEntity
         super.onInitiate(attacker);
 
         if (attacker.getUser() instanceof ServerPlayerEntity player)
-            player.networkHandler.sendPacket(new PlaySoundS2CPacket(JSoundRegistry.TIME_ERASE, SoundCategory.PLAYERS,
+            player.networkHandler.sendPacket(new PlaySoundS2CPacket(Registries.SOUND_EVENT.getEntry(JSoundRegistry.TIME_ERASE), SoundCategory.PLAYERS,
                     attacker.getX(), attacker.getY(), attacker.getZ(), 1, 1, 0));
     }
 

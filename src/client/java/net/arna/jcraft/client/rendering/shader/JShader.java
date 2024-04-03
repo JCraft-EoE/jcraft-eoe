@@ -4,11 +4,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.client.gl.GlUniform;
-import net.minecraft.client.gl.ShaderParseException;
-import net.minecraft.client.render.Shader;
+import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.resource.ResourceFactory;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.InvalidHierarchicalFileException;
 import net.minecraft.util.JsonHelper;
 
 import java.io.IOException;
@@ -17,7 +17,7 @@ import java.util.Arrays;
 /**
  * This class is for adding CORE shaders, not post processed
  */
-public class JShader extends Shader {
+public class JShader extends ShaderProgram {
     public JShader(ResourceFactory factory, String name, VertexFormat format) throws IOException {
         super(factory, name, format);
     }
@@ -46,7 +46,7 @@ public class JShader extends Shader {
     }
 
     @Override
-    public void addUniform(JsonElement pJson) throws ShaderParseException {
+    public void addUniform(JsonElement pJson) throws InvalidHierarchicalFileException {
         if (getHolder().uniforms.isEmpty()) {
             super.addUniform(pJson);
             return;
@@ -58,7 +58,7 @@ public class JShader extends Shader {
         float[] afloat = new float[Math.max(j, 16)];
         JsonArray jsonarray = JsonHelper.getArray(jsonobject, "values");
         if (jsonarray.size() != j && jsonarray.size() > 1) {
-            throw new ShaderParseException("Invalid amount of values specified (expected " + j + ", found " + jsonarray.size() + ")");
+            throw new InvalidHierarchicalFileException("Invalid amount of values specified (expected " + j + ", found " + jsonarray.size() + ")");
         } else {
             int k = 0;
 
@@ -66,8 +66,8 @@ public class JShader extends Shader {
                 try {
                     afloat[k] = JsonHelper.asFloat(jsonelement, "value");
                 } catch (Exception exception) {
-                    ShaderParseException chainedjsonexception = ShaderParseException.wrap(exception);
-                    chainedjsonexception.addFaultyElement("values[" + k + "]");
+                    InvalidHierarchicalFileException chainedjsonexception = InvalidHierarchicalFileException.wrap(exception);
+                    chainedjsonexception.addInvalidKey("values[" + k + "]");
                     throw chainedjsonexception;
                 }
 

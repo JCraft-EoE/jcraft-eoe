@@ -14,17 +14,17 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.PlayState;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class BubbleProjectile extends PersistentProjectileEntity implements IAnimatable {
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+public class BubbleProjectile extends PersistentProjectileEntity implements GeoEntity {
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public BubbleProjectile(EntityType<? extends BubbleProjectile> entityType, World world) {
         super(entityType, world);
@@ -59,7 +59,7 @@ public class BubbleProjectile extends PersistentProjectileEntity implements IAni
     @Override
     public void tick() {
         super.tick();
-        if (!world.isClient())
+        if (!getWorld().isClient())
             if (getOwner() == null || age > 1600)
                 discard();
     }
@@ -81,19 +81,18 @@ public class BubbleProjectile extends PersistentProjectileEntity implements IAni
     }
 
     // Animations
+
     @Override
-    public void registerControllers(AnimationData data) {
-        data.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "controller", 0, this::predicate));
+    }
+
+    private PlayState predicate(AnimationState<BubbleProjectile> state) {
+        return state.setAndContinue(RawAnimation.begin().thenLoop("animation.bubble.idle"));
     }
 
     @Override
-    public AnimationFactory getFactory() {
-        return this.factory;
-    }
-
-    @SuppressWarnings("SameReturnValue")
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        event.getController().setAnimation(new AnimationBuilder().loop("animation.bubble.idle"));
-        return PlayState.CONTINUE;
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 }

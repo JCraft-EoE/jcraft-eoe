@@ -90,7 +90,7 @@ public class BTDPlantAttack extends AbstractSimpleAttack<BTDPlantAttack, KQBTDEn
         Vec3d pos = bombEntity.getPos();
         Vec3d v1 = pos.add(3, 3, 3);
         Vec3d v2 = pos.add(-3, -3, -3);
-        List<LivingEntity> list = stand.world.getEntitiesByClass(LivingEntity.class, new Box(v1, v2),
+        List<LivingEntity> list = stand.getWorld().getEntitiesByClass(LivingEntity.class, new Box(v1, v2),
                 EntityPredicates.VALID_LIVING_ENTITY.and(e -> e != bombEntity));
         for (LivingEntity l : list)
             if (l.squaredDistanceTo(pos) < 9) {

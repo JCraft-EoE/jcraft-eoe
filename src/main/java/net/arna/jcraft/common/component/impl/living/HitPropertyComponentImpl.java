@@ -23,13 +23,13 @@ public class HitPropertyComponentImpl implements HitPropertyComponent {
 
     @Override
     public long endHitAnimTime() {
-        return endHitAnimTime - entity.world.getTime();
+        return endHitAnimTime - entity.getWorld().getTime();
     }
 
     @Override
     public void setHitAnimation(HitPropertyComponent.HitAnimation hitAnimation, int duration) {
         this.hitAnimation = hitAnimation;
-        this.endHitAnimTime = entity.world.getTime() + duration;
+        this.endHitAnimTime = entity.getWorld().getTime() + duration;
         sync();
     }
 

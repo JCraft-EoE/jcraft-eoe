@@ -79,7 +79,7 @@ public class StandComponentImpl implements StandComponent {
     public void applySyncPacket(PacketByteBuf buf) {
         StandComponent.super.applySyncPacket(buf);
 
-        Entity entity = buf.readBoolean() ? this.entity.world.getEntityById(buf.readVarInt()) : null;
+        Entity entity = buf.readBoolean() ? this.entity.getWorld().getEntityById(buf.readVarInt()) : null;
         if (entity == null || entity instanceof StandEntity<?,?>) stand = (StandEntity<?, ?>) entity;
     }
 

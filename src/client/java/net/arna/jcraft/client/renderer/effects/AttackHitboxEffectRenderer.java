@@ -14,8 +14,8 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
+import org.joml.Matrix4f;
 
 import java.util.*;
 
@@ -75,7 +75,7 @@ public class AttackHitboxEffectRenderer {
         Tessellator tess = Tessellator.getInstance();
         BufferBuilder quadsVc = tess.getBuffer();
         quadsVc.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         RenderSystem.enableBlend();
         RenderSystem.enableCull();
         RenderSystem.enableDepthTest();

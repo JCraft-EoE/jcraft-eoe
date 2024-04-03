@@ -32,7 +32,7 @@ public class BombTrackerComponentImpl implements BombTrackerComponent {
 
     @Override
     public void tick() {
-        World world = entity.world;
+        World world = entity.getWorld();
 
         if (world.isClient) {
             JCraft.getClientEntityHandler().bombTrackerParticleTick(entity, main);

@@ -62,7 +62,7 @@ public class InduceAttackCommand {
                     StandEntity<?, ?> standEntity = standData.getStand();
 
                     if (standEntity != null) {
-                        source.sendFeedback(Text.literal("Initiating stand attack " + typeName + " for " + living.getName().getString()), true);
+                        source.sendFeedback(() -> Text.literal("Initiating stand attack " + typeName + " for " + living.getName().getString()), true);
                         standEntity.initMove(type);
                         flag = 1;
                     }
@@ -76,7 +76,7 @@ public class InduceAttackCommand {
 
                 JSpec<?, ?> spec = JUtils.getSpec(player);
                 if (spec != null) {
-                    source.sendFeedback(Text.literal("Initiating spec attack " + typeName + " for " + entity.getName().getString()), true);
+                    source.sendFeedback(() -> Text.literal("Initiating spec attack " + typeName + " for " + entity.getName().getString()), true);
                     spec.initMove(type);
                     flag = 1;
                 }

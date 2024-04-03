@@ -36,10 +36,11 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import org.joml.Vector3f;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -162,11 +163,11 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                     Donut>Move Cancel>Timeskip>Barrage>Move Cancel>M1>Heavy>Move Cancel>Eye Chop>Sweep
                     """;
 
-        auraColors = new Vec3f[]{
-                Vec3f.POSITIVE_X,
-                new Vec3f(0.9f, 0.5f, 0.7f),
-                new Vec3f(1.0f, 0.4f, 0.4f),
-                new Vec3f(0.3f, 0.0f, 0.5f)
+        auraColors = new Vector3f[]{
+                new Vector3f(1.0F, 0.0F, 0.0F),
+                new Vector3f(0.9f, 0.5f, 0.7f),
+                new Vector3f(1.0f, 0.4f, 0.4f),
+                new Vector3f(0.3f, 0.0f, 0.5f)
         };
     }
 
@@ -250,7 +251,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                 // Particle effects
                 Vec3d oPos = user.getPos();
                 Box bBox = user.getBoundingBox();
-                for (ServerPlayerEntity serverPlayer : ((ServerWorld) world).getPlayers()) {
+                for (ServerPlayerEntity serverPlayer : ((ServerWorld) getWorld()).getPlayers()) {
                     PacketByteBuf buf = PacketByteBufs.create();
                     buf.writeVarInt(2);
                     buf.writeDouble(oPos.x);
@@ -293,7 +294,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
         buf.writeDouble(bBox.getYLength());
         buf.writeDouble(bBox.getZLength());
 
-        PlayerLookup.world((ServerWorld) world).forEach(serverPlayer -> ServerChannelFeedbackPacket.send(serverPlayer, buf));
+        PlayerLookup.world((ServerWorld) getWorld()).forEach(serverPlayer -> ServerChannelFeedbackPacket.send(serverPlayer, buf));
     }
 
     public void moveCancel() {
@@ -346,7 +347,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
         LivingEntity user = this.getUser();
         if (user == null) return;
 
-        if (world.isClient) return;
+        if (getWorld().isClient) return;
         if (curMove != null && curMove.getOriginalMove() == OVERHEAD_HOOK)
             queuedMove = null;
 
@@ -367,30 +368,30 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
 
     // Animations
     public enum State implements StandAnimationState<KingCrimsonEntity> {
-        IDLE(builder -> builder.loop("animation.kingcrimson.idle")),
-        DUAL_CHOP(builder -> builder.playAndHold("animation.kingcrimson.dual_chop")),
-        BLOCK(builder -> builder.loop("animation.kingcrimson.block")),
-        OVERHEAD(builder -> builder.playAndHold("animation.kingcrimson.overhead")),
-        DONUT(builder -> builder.playAndHold("animation.kingcrimson.donut")),
-        BARRAGE(builder -> builder.loop("animation.kingcrimson.barrage")),
-        EYE_CHOP(builder -> builder.playAndHold("animation.kingcrimson.eye_chop")),
-        TIME_ERASE(builder -> builder.playAndHold("animation.kingcrimson.time_erase")),
-        EPITAPH(builder -> builder.playAndHold("animation.kingcrimson.epitaph")),
-        HEAVY(builder -> builder.playAndHold("animation.kingcrimson.heavy")),
-        BLOOD_THROW(builder -> builder.playAndHold("animation.kingcrimson.bloodthrow")),
-        PREDICT(builder -> builder.playAndHold("animation.kingcrimson.predict")),
-        COUNTER_MISS(builder -> builder.playAndHold("animation.kingcrimson.counter_miss")),
-        SWEEP(builder -> builder.playAndHold("animation.kingcrimson.sweep")),
-        TIME_SKIP(builder -> builder.loop("animation.kingcrimson.idle"));
+        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.kingcrimson.idle"))),
+        DUAL_CHOP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kingcrimson.dual_chop"))),
+        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.kingcrimson.block"))),
+        OVERHEAD(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kingcrimson.overhead"))),
+        DONUT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kingcrimson.donut"))),
+        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.kingcrimson.barrage"))),
+        EYE_CHOP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kingcrimson.eye_chop"))),
+        TIME_ERASE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kingcrimson.time_erase"))),
+        EPITAPH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kingcrimson.epitaph"))),
+        HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kingcrimson.heavy"))),
+        BLOOD_THROW(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kingcrimson.bloodthrow"))),
+        PREDICT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kingcrimson.predict"))),
+        COUNTER_MISS(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kingcrimson.counter_miss"))),
+        SWEEP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kingcrimson.sweep"))),
+        TIME_SKIP(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.kingcrimson.idle")));
 
-        private final Consumer<AnimationBuilder> animator;
+        private final Consumer<AnimationState> animator;
 
-        State(Consumer<AnimationBuilder> animator) {
+        State(Consumer<AnimationState> animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(KingCrimsonEntity attacker, AnimationBuilder builder) {
+        public void playAnimation(KingCrimsonEntity attacker, AnimationState builder) {
             animator.accept(builder);
         }
     }

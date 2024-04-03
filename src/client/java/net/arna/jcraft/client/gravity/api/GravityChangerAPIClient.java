@@ -61,7 +61,7 @@ public class GravityChangerAPIClient {
     }
 
     private static boolean onWrongSide(Entity entity) {
-        if (!entity.world.isClient) {
+        if (!entity.getWorld().isClient) {
             JCraft.LOGGER.error("GravityChangerAPI function cannot be called from the server, use dedicated server class. ", new Exception());
             return true;
         }

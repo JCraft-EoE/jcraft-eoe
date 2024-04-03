@@ -50,7 +50,7 @@ public interface ShockwaveHandlerComponent extends Component, AutoSyncedComponen
             this.x = x;
             this.y = y;
             this.z = z;
-            this.blockPos = new BlockPos(x, y, z);
+            this.blockPos = BlockPos.ofFloored(x, y, z);
             this.pitch = pitch;
             this.yaw = yaw;
             this.scale = scale;

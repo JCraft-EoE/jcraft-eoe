@@ -25,7 +25,7 @@ public class IntegratedServerLoaderMixin {
     }
 
     @Inject(method = "tryLoad", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;setScreen(Lnet/minecraft/client/gui/screen/Screen;)V", ordinal = 0), cancellable = true)
-    private static void jcraft$removeAdviceOnCreation(MinecraftClient client, CreateWorldScreen parent, Lifecycle lifecycle, Runnable loader, CallbackInfo ci) {
+    private static void jcraft$removeAdviceOnCreation(MinecraftClient client, CreateWorldScreen parent, Lifecycle lifecycle, Runnable loader, boolean bypassWarnings, CallbackInfo ci) {
         loader.run();
         ci.cancel();
     }

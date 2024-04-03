@@ -35,6 +35,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -43,8 +44,8 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.GameRules;
+import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.Nullable;
 
@@ -111,9 +112,9 @@ public class JServerEvents {
             Vec3d pPos = player.getEyePos();
 
             Box burstHitbox = AbstractSimpleAttack.createBox(pPos, 4);
-            List<? extends Entity> toPush = player.world.getEntitiesByClass(Entity.class, burstHitbox,
+            List<? extends Entity> toPush = player.getWorld().getEntitiesByClass(Entity.class, burstHitbox,
                     EntityPredicates.VALID_LIVING_ENTITY.and(e -> !filter.contains(e)));
-            JUtils.displayHitbox(player.world, burstHitbox);
+            JUtils.displayHitbox(player.getWorld(), burstHitbox);
 
             for (Entity ent : toPush) {
                 Vec3d awayVector = ent.getPos().subtract(pPos).normalize();
@@ -169,7 +170,7 @@ public class JServerEvents {
                         JCraft.summon(serverWorld, mob);
                     } else {
                         // Target priority
-                        LivingEntity biggestAttacker = mob.getDamageTracker().getBiggestAttacker();
+                        LivingEntity biggestAttacker = mob.getDamageTracker().getBiggestFall();
                         LivingEntity primeAdversary = mob.getPrimeAdversary();
                         LivingEntity target = mob.getTarget();
                         if (primeAdversary != null && primeAdversary.isAlive() && stand.canTarget(primeAdversary))
@@ -257,7 +258,7 @@ public class JServerEvents {
         one.discard();
 
         Explosion explosion = serverWorld.createExplosion(null, midPos.x, midPos.y, midPos.z, 1f,
-                griefing ? Explosion.DestructionType.BREAK : Explosion.DestructionType.NONE);
+                griefing ? World.ExplosionSourceType.BLOCK : World.ExplosionSourceType.NONE);
 
         List<LivingEntity> toDamage = serverWorld.getEntitiesByClass(LivingEntity.class,
                 new Box(midPos.add(1.5, 1.5, 1.5), midPos.subtract(1.5, 1.5, 1.5)),
@@ -287,7 +288,7 @@ public class JServerEvents {
 
             // ... in the AU
             if (world.getRegistryKey().equals(JDimensionRegistry.AU_DIMENSION_KEY)) {
-                if (item.getThrower() != null || MockItem.isMockItem(stack)) return;
+                if (item.getOwner() != null || MockItem.isMockItem(stack)) return;
 
                 ItemStack mockStack = MockItem.createMockStack(stack); // Convert it to a mock item (incompatible and useless)
                 if (stack.getItem() instanceof BlockItem) // ... and mark down all relevant data
@@ -302,7 +303,7 @@ public class JServerEvents {
                         int[] attractPos = stackData.getIntArray("AttractPos");
                         BlockPos attractBlockPos = new BlockPos(attractPos[0], attractPos[1], attractPos[2]);
                         if ( // ... if the world has the specified block item
-                                Registry.ITEM.getId(
+                                Registries.ITEM.getId(
                                         world.getBlockState(attractBlockPos).getBlock().asItem()
                                 ).toString().equals(itemId)
                         )

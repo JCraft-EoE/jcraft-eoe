@@ -11,10 +11,7 @@ import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Vec3f;
-import software.bernie.example.client.DefaultBipedBoneIdents;
-import software.bernie.geckolib3.core.processor.IBone;
-import software.bernie.geckolib3.geo.render.built.GeoModel;
+import software.bernie.geckolib.model.GeoModel;
 
 public class D4CRenderer extends ExtendedStandEntityRenderer<D4CEntity> {
     public D4CRenderer(EntityRendererFactory.Context context) {
@@ -68,6 +65,6 @@ public class D4CRenderer extends ExtendedStandEntityRenderer<D4CEntity> {
         D4CEntity.State state = currentEntity.getState();
         if (state == D4CEntity.State.THROW || state == D4CEntity.State.GIVE_GUN)
             ang += (currentEntity.getMoveStun() + 1f - this.partialTick) * 65f;
-        stack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(ang));
+        stack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(ang));
     }
 }

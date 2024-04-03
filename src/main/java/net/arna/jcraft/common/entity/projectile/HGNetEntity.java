@@ -14,6 +14,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -26,19 +27,19 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.IAnimationTickable;
-import software.bernie.geckolib3.core.PlayState;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.GeoAnimatable;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
 
-public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimationTickable, ICustomDamageHandler {
+public class HGNetEntity extends JAttackEntity implements GeoEntity, ICustomDamageHandler {
     public static final TrackedData<Integer> SKIN;
     public static final TrackedData<Integer> STATE;
     public static final TrackedData<Boolean> CHARGED;
@@ -121,7 +122,7 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
 
         super.tick();
 
-        if (!world.isClient) {
+        if (!getWorld().isClient) {
             if (--lifeTime <= 0 || master == null) {
                 discard();
                 return;
@@ -138,13 +139,13 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
                 if (age == 1) {
                     Vec3d launchVec = upVec.multiply(0.2);
 
-                    JUtils.displayHitbox(world, getBoundingBox());
+                    JUtils.displayHitbox(getWorld(), getBoundingBox());
                     getInsideEntities().forEach(
                             living -> {
                                 if (!living.isConnectedThroughVehicle(master))
                                     StandEntity.damageLogic(
-                                            world, living, launchVec, 15, 3, false, 5f, false, 10,
-                                            DamageSource.mob(this), master, HitPropertyComponent.HitAnimation.HIGH
+                                            getWorld(), living, launchVec, 15, 3, false, 5f, false, 10,
+                                            getWorld().getDamageSources().mobAttack(this), master, HitPropertyComponent.HitAnimation.HIGH
                                     );
                             }
                     );
@@ -152,7 +153,7 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
 
                 if (getState() == 2) {
                     if (animTimer == 0) {
-                        JUtils.displayHitbox(world, getBoundingBox());
+                        JUtils.displayHitbox(getWorld(), getBoundingBox());
                         getInsideEntities().forEach(
                                 living -> {
                                     if (!JUtils.isBlocking(living) && !living.isConnectedThroughVehicle(master))
@@ -165,7 +166,7 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
                     if (animTimer > 0) {
                         if (animTimer % 8 == 0) {
                             for (int i = 0; i < 3; i++) {
-                                EmeraldProjectile emerald = new EmeraldProjectile(world, getMaster());
+                                EmeraldProjectile emerald = new EmeraldProjectile(getWorld(), getMaster());
 
                                 Vec3d heightOffset = upVec.multiply(0.8);
                                 Vec3d emeraldPos = getPos().add(heightOffset).add(JUtils.randUnitVec(getRandom()));
@@ -174,7 +175,7 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
                                 if (finalAttack)
                                     emerald.withReflect();
 
-                                world.spawnEntity(emerald);
+                                getWorld().spawnEntity(emerald);
                             }
                         }
                     } else if (finalAttack)
@@ -197,12 +198,9 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
     }
 
     private List<LivingEntity> getInsideEntities() {
-        return world.getEntitiesByClass(LivingEntity.class, getBoundingBox(),
+        return getWorld().getEntitiesByClass(LivingEntity.class, getBoundingBox(),
                 EntityPredicates.VALID_LIVING_ENTITY.and(EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR).and(entity -> !entity.equals(this)));
     }
-
-    @Override
-    public int tickTimer() { return age; }
 
     @Override
     public boolean isFireImmune() {
@@ -211,7 +209,7 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
 
     @Override
     public boolean damage(DamageSource source, float amount) {
-        if (source == DamageSource.IN_WALL)
+        if (source.isOf(DamageTypes.IN_WALL))
             return false;
         return super.damage(source, amount);
     }
@@ -309,37 +307,35 @@ public class HGNetEntity extends JAttackEntity implements IAnimatable, IAnimatio
         lifeTime = tag.getInt("lifeTime");
 
         boolean ownerIsPlayer = tag.getBoolean("playerOwner");
-        if (ownerIsPlayer) master = world.getPlayerByUuid(tag.getUuid("ownerUUID"));
-        else master = (LivingEntity) world.getEntityById(tag.getInt("ownerID")); // Always is living
+        if (ownerIsPlayer) master = getWorld().getPlayerByUuid(tag.getUuid("ownerUUID"));
+        else master = (LivingEntity) getWorld().getEntityById(tag.getInt("ownerID")); // Always is living
     }
 
     // Animations
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 6, this::predicate));
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<GeoAnimatable>(this, "controller", 6, this::predicate));
     }
 
-    @SuppressWarnings("SameReturnValue")
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        AnimationController<E> anim = event.getController();
+    private PlayState predicate(AnimationState<GeoAnimatable> state) {
         if (age < 5)
-            anim.setAnimation(new AnimationBuilder().playOnce("animation.hg_nets.spawn"));
+            state.setAnimation(RawAnimation.begin().thenPlay("animation.hg_nets.spawn"));
         else {
             if (getState() == 3) {
-                anim.setAnimation(new AnimationBuilder().playOnce("animation.hg_nets.wilt"));
+                state.setAnimation(RawAnimation.begin().thenPlay("animation.hg_nets.wilt"));
             } else if (getState() == 2) {
-                anim.setAnimation(new AnimationBuilder().playOnce("animation.hg_nets.constrict"));
+                state.setAnimation(RawAnimation.begin().thenPlay("animation.hg_nets.constrict"));
             } else {
-                anim.setAnimation(new AnimationBuilder().loop("animation.hg_nets.idle"));
+                state.setAnimation(RawAnimation.begin().thenLoop("animation.hg_nets.idle"));
             }
         }
         return PlayState.CONTINUE;
     }
 
     @Override
-    public AnimationFactory getFactory() {
-        return this.factory;
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 }

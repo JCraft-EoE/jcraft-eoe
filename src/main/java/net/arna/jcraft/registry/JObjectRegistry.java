@@ -13,7 +13,6 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.MapColor;
-import net.minecraft.block.Material;
 import net.minecraft.block.dispenser.ProjectileDispenserBehavior;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.projectile.ProjectileEntity;
@@ -21,11 +20,12 @@ import net.minecraft.item.ArmorMaterials;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.math.Position;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 import java.util.LinkedHashMap;
@@ -94,25 +94,25 @@ public interface JObjectRegistry {
     Item MOCK_ITEM = register("mock_item", new MockItem());
 
     //Block
-    Block FOOLISH_SAND_BLOCK = register("foolish_sand_block", new FoolishSandBlock(FabricBlockSettings.of(Material.AGGREGATE, MapColor.PALE_YELLOW)
+    Block FOOLISH_SAND_BLOCK = register("foolish_sand_block", new FoolishSandBlock(FabricBlockSettings.create()
             .strength(0.5f)
             .sounds(BlockSoundGroup.SAND)
     ), settings(), true);
-    Block SOUL_BLOCK = register("soul_block", new SoulBlock(FabricBlockSettings.of(Material.DENSE_ICE, MapColor.LIGHT_BLUE_GRAY)
+    Block SOUL_BLOCK = register("soul_block", new SoulBlock(FabricBlockSettings.create()
             .strength(4.0f)
             .sounds(BlockSoundGroup.SOUL_SOIL)
     ), settings(), true);
     //todo: make the meteorite mineable and drop the item
-    Block METEORITE_BLOCK = register("meteorite_block", new Block(FabricBlockSettings.of(Material.STONE, MapColor.SPRUCE_BROWN)
+    Block METEORITE_BLOCK = register("meteorite_block", new Block(FabricBlockSettings.create()
             .requiresTool()
             .strength(6.0f, 1200f)
             .sounds(BlockSoundGroup.ANCIENT_DEBRIS)
     ), settings(), true);
-    Block COFFIN_BLOCK = register("coffin", new CoffinBlock(FabricBlockSettings.of(Material.WOOD, MapColor.RED).sounds(BlockSoundGroup.WOOD).nonOpaque()), settings(), true);
-    Block SHADER_TEST_BLOCK = register("shader_test_block", new ShaderTestBlock(FabricBlockSettings.of(Material.METAL)), settings(), true);
+    Block COFFIN_BLOCK = register("coffin", new CoffinBlock(FabricBlockSettings.create().sounds(BlockSoundGroup.WOOD).nonOpaque()), settings(), true);
+    Block SHADER_TEST_BLOCK = register("shader_test_block", new ShaderTestBlock(FabricBlockSettings.create()), settings(), true);
 
     static Item.Settings settings() {
-        return new Item.Settings().group(JCraft.JCRAFT_GROUP);
+        return new Item.Settings();
     }
 
     static <T extends Item> T register(String name, T item) {
@@ -129,8 +129,8 @@ public interface JObjectRegistry {
     }
 
     static void init() {
-        BLOCKS.keySet().forEach(block -> Registry.register(Registry.BLOCK, BLOCKS.get(block), block));
-        ITEMS.keySet().forEach(item -> Registry.register(Registry.ITEM, ITEMS.get(item), item));
+        BLOCKS.keySet().forEach(block -> Registry.register(Registries.BLOCK, BLOCKS.get(block), block));
+        ITEMS.keySet().forEach(item -> Registry.register(Registries.ITEM, ITEMS.get(item), item));
 
         DispenserBlock.registerBehavior(KNIFE, new ProjectileDispenserBehavior() {
             @Override

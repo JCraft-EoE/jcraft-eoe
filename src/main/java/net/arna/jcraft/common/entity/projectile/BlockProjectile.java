@@ -33,20 +33,21 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.PlayState;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.GeoAnimatable;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
 import java.util.Set;
 
-public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatable {
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+public class BlockProjectile extends LivingEntity implements IOwnable, GeoEntity {
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private final int maxTimeToLaunch = 15;
     private int timeToLaunch = maxTimeToLaunch;
     private int timeLaunched = 0;
@@ -97,12 +98,12 @@ public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatab
     @Override
     public void tick() {
         super.tick();
-        if (world.isClient) {
+        if (getWorld().isClient) {
             Vec3d vel = getVelocity();
             int effect = dataTracker.get(EFFECT);
             if (effect != 0) {
                 for (int i = 0; i < 32; i++) {
-                    world.addParticle(
+                    getWorld().addParticle(
                             effect == 1 ? new BlockStateParticleEffect(ParticleTypes.BLOCK, Blocks.STONE.getDefaultState()) : ParticleTypes.REVERSE_PORTAL,
                             getX() + vel.x + random.nextDouble() - 0.5,
                             getY() + vel.y + random.nextDouble() - 0.5,
@@ -113,7 +114,7 @@ public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatab
                     );
                 }
             }
-            world.addParticle(ParticleTypes.REVERSE_PORTAL,
+            getWorld().addParticle(ParticleTypes.REVERSE_PORTAL,
                     getX() + random.nextDouble() - 0.5,
                     getY() + random.nextDouble() - 0.5,
                     getZ() + random.nextDouble() - 0.5,
@@ -154,7 +155,7 @@ public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatab
                     if (eHit != null) {
                         targetPos = eHit.getPos();
                     } else {
-                        targetPos = world.raycast(
+                        targetPos = getWorld().raycast(
                                 new RaycastContext(eP, eP.add(rangeMod), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, master)
                         ).getPos();
                     }
@@ -169,13 +170,13 @@ public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatab
 
             if (launched && timeLaunched < 20 && !hit) {
                 timeLaunched++;
-                Set<LivingEntity> toHurt = JUtils.generateHitbox(world, getPos(), 1, Set.of(master));
-                DamageSource damageSource = DamageSource.mob(master);
+                Set<LivingEntity> toHurt = JUtils.generateHitbox(getWorld(), getPos(), 1, Set.of(master));
+                DamageSource damageSource = getWorld().getDamageSources().mobAttack(master);
                 for (LivingEntity living : toHurt) {
                     LivingEntity target = JUtils.getUserIfStand(living);
                     if (target == master || target == this || !JUtils.canDamage(damageSource, target)) continue;
                     hit = true;
-                    StandEntity.damageLogic(world, target, getVelocity(), 15, 1, true,
+                    StandEntity.damageLogic(getWorld(), target, getVelocity(), 15, 1, true,
                             6, false, 11, damageSource, master, HitPropertyComponent.HitAnimation.MID, false);
                 }
             }
@@ -246,9 +247,9 @@ public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatab
         super.readCustomDataFromNbt(tag);
         boolean ownerIsPlayer = tag.getBoolean("playerOwner");
         if (ownerIsPlayer)
-            master = world.getPlayerByUuid(tag.getUuid("ownerUUID"));
+            master = getWorld().getPlayerByUuid(tag.getUuid("ownerUUID"));
         else
-            master = (LivingEntity) world.getEntityById(tag.getInt("ownerID")); // Always is living
+            master = (LivingEntity) getWorld().getEntityById(tag.getInt("ownerID")); // Always is living
     }
 
     @Override
@@ -282,19 +283,18 @@ public class BlockProjectile extends LivingEntity implements IOwnable, IAnimatab
     }
 
     // Animations
-    @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
-    }
-
-    @SuppressWarnings("SameReturnValue")
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        event.getController().setAnimation(new AnimationBuilder().loop("animation.block.idle"));
-        return PlayState.CONTINUE;
-    }
 
     @Override
-    public AnimationFactory getFactory() {
-        return this.factory;
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<GeoAnimatable>(this, "controller", 0, this::predicate));
+    }
+
+    private PlayState predicate(AnimationState<GeoAnimatable> state) {
+        return state.setAndContinue(RawAnimation.begin().thenLoop("animation.block.idle"));
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 }

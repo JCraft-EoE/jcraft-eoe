@@ -3,9 +3,9 @@ package net.arna.jcraft.client.model.entity;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.projectile.LifeDetectorEntity;
 import net.minecraft.util.Identifier;
-import software.bernie.geckolib3.model.AnimatedGeoModel;
+import software.bernie.geckolib.model.GeoModel;
 
-public class LifeDetectorModel extends AnimatedGeoModel<LifeDetectorEntity> {
+public class LifeDetectorModel extends GeoModel<LifeDetectorEntity> {
     @Override
     public Identifier getModelResource(LifeDetectorEntity object) {
         return JCraft.id("geo/detector.geo.json");

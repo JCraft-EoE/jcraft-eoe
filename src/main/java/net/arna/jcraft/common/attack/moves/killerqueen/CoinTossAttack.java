@@ -28,11 +28,11 @@ public class CoinTossAttack extends AbstractMove<CoinTossAttack, KillerQueenEnti
         ItemEntity coin = ctx.get(COIN);
         Vec3d lookVec = user.getRotationVector().multiply(0.75);
         if (coin != null) coin.discard();
-        coin = new ItemEntity(attacker.world, user.getX(), user.getY() + user.getHeight() * 2 / 3, user.getZ(),
+        coin = new ItemEntity(attacker.getWorld(), user.getX(), user.getY() + user.getHeight() * 2 / 3, user.getZ(),
                 new ItemStack(JObjectRegistry.KQ_COIN, 1), lookVec.x, lookVec.y, lookVec.z);
         coin.setPickupDelayInfinite();
 
-        attacker.world.spawnEntity(coin);
+        attacker.getWorld().spawnEntity(coin);
 
         JComponents.getBombTracker(user).getMainBomb().setBomb(coin);
 

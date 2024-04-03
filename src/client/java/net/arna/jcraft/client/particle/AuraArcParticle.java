@@ -6,16 +6,16 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
+import org.joml.Vector3f;
 
 public class AuraArcParticle extends AbstractSlowingParticle {
     protected final SpriteProvider spriteProvider;
     private final Entity parent;
 
-    AuraArcParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, SpriteProvider spriteProvider, Vec3f color, Entity parent) {
+    AuraArcParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, SpriteProvider spriteProvider, Vector3f color, Entity parent) {
         super(world, x, y, z, velocityX, velocityY, velocityZ);
         this.spriteProvider = spriteProvider;
-        this.setColor(color.getX(), color.getY(), color.getZ());
+        this.setColor(color.x(), color.y(), color.z());
         this.alpha = 0.4f;
         this.scale = 0.5f;
         this.maxAge = 7;
@@ -47,7 +47,7 @@ public class AuraArcParticle extends AbstractSlowingParticle {
 
     public static class Factory implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
-        public static Vec3f color = Vec3f.POSITIVE_X;
+        public static Vector3f color = new Vector3f(1f ,0f,0f);
         public static Entity parent = null;
 
         public Factory(SpriteProvider spriteProvider) {

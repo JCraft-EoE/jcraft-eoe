@@ -53,7 +53,8 @@ public class CoffinBlock extends BedBlock {
                 if (world.getBlockState(blockPos).isOf(this))
                     world.removeBlock(blockPos, false);
 
-                world.createExplosion(null, DamageSource.badRespawnPoint(), null, (double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5, 5.0F, true, Explosion.DestructionType.DESTROY);
+                Vec3d vec3d = pos.toCenterPos();
+                world.createExplosion(null, world.getDamageSources().badRespawnPoint(vec3d), null, (double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5, 5.0F, true, World.ExplosionSourceType.BLOCK);
             } else if (state.get(OCCUPIED)) {
                 if (!wakeVillager(world, pos))
                     player.sendMessage(Text.translatable("block.minecraft.bed.occupied"), true);
@@ -81,7 +82,7 @@ public class CoffinBlock extends BedBlock {
     @Override
     public BlockState getPlacementState(ItemPlacementContext context) {
         return this.getDefaultState()
-                .with(FACING, context.getPlayerFacing())
+                .with(FACING, context.getPlayerLookDirection())
                 .with(OCCUPIED, false);
     }
 

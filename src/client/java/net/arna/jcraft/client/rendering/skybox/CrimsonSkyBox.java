@@ -4,10 +4,11 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.arna.jcraft.client.registry.JShaderRegistry;
 import net.arna.jcraft.client.rendering.shader.JShader;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.math.RotationAxis;
+import org.joml.Matrix4f;
 
 import java.util.function.Supplier;
 
@@ -29,12 +30,12 @@ public class CrimsonSkyBox implements JSkyBox {
         RenderSystem.defaultBlendFunc();
         RenderSystem.depthMask(false);
         Matrix4f mat = matrices.peek().getPositionMatrix();
-        Matrix4f invMat = mat.copy();
+        Matrix4f invMat = new Matrix4f(mat);
         invMat.invert();
         JShader jShader = (JShader) JShaderRegistry.TEST.getInstance().get();
         jShader.getUniformOrDefault("InverseTransformMatrix").set(invMat);
         jShader.getUniformOrDefault("Time").set((client.world.getTime() + tickDelta) / 20);
-        Supplier<Shader> shaderInstanceSupplier = () -> jShader;
+        Supplier<ShaderProgram> shaderInstanceSupplier = () -> jShader;
         RenderSystem.setShader(shaderInstanceSupplier);
 
         Tessellator tessellator = Tessellator.getInstance();
@@ -43,23 +44,23 @@ public class CrimsonSkyBox implements JSkyBox {
         for(int i = 0; i < 6; ++i) {
             matrices.push();
             if (i == 1) {
-                matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(90.0F));
+                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90.0F));
             }
 
             if (i == 2) {
-                matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(-90.0F));
+                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-90.0F));
             }
 
             if (i == 3) {
-                matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(180.0F));
+                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180.0F));
             }
 
             if (i == 4) {
-                matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(90.0F));
+                matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(90.0F));
             }
 
             if (i == 5) {
-                matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(-90.0F));
+                matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-90.0F));
             }
 
             projectionMatrix = matrices.peek().getPositionMatrix();
@@ -73,7 +74,7 @@ public class CrimsonSkyBox implements JSkyBox {
         }
 
         RenderSystem.depthMask(true);
-        RenderSystem.enableTexture();
+        //RenderSystem.enableTexture();
         RenderSystem.disableBlend();
     }
 }

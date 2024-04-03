@@ -7,8 +7,9 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.math.RotationAxis;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import java.util.Objects;
 
@@ -43,24 +44,24 @@ public class CrimsonSkyBoxCool implements JSkyBox {
         RenderSystem.depthMask(false);
         RenderSystem.enableBlend();
 
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.enableBlend();
         RenderSystem.depthMask(false);
 
         ClientWorld world = Objects.requireNonNull(MinecraftClient.getInstance().world);
 
-        Vec3f rotationStatic = this.rotation.getStatic();
+        Vector3f rotationStatic = this.rotation.getStatic();
 
         matrices.push();
         double timeRotation = isShouldRotate() ? 360.0D * MathHelper.floorMod(world.getLunarTime() / (24000.D / this.rotation.getRotationSpeed()) + 0.75D, 1) : 0D;
         this.applyTimeRotation(matrices, (float) timeRotation);
-        matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(rotationStatic.getX()));
-        matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(rotationStatic.getY()));
-        matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(rotationStatic.getZ()));
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(rotationStatic.x()));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotationStatic.y()));
+        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotationStatic.z()));
         this.renderSkybox(matrices, tickDelta);
-        matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(rotationStatic.getZ()));
-        matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(rotationStatic.getY()));
-        matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(rotationStatic.getX()));
+        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotationStatic.z()));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotationStatic.y()));
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(rotationStatic.x()));
         matrices.pop();
 
         RenderSystem.depthMask(true);
@@ -79,18 +80,18 @@ public class CrimsonSkyBoxCool implements JSkyBox {
             RenderSystem.setShaderTexture(0, tex.getTextureId());
 
             if (i == 1) {
-                matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(90.0F));
+                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90.0F));
             } else if (i == 2) {
-                matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(-90.0F));
-                matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180.0F));
+                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-90.0F));
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0F));
             } else if (i == 3) {
-                matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(180.0F));
+                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180.0F));
             } else if (i == 4) {
-                matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(90.0F));
-                matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(-90.0F));
+                matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(90.0F));
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-90.0F));
             } else if (i == 5) {
-                matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(-90.0F));
-                matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(90.0F));
+                matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-90.0F));
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(90.0F));
             }
 
             Matrix4f matrix4f = matrices.peek().getPositionMatrix();
@@ -105,13 +106,13 @@ public class CrimsonSkyBoxCool implements JSkyBox {
     }
 
     private void applyTimeRotation(MatrixStack matrices, float timeRotation) {
-        Vec3f timeRotationAxis = this.rotation.getAxis();
-        matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(timeRotationAxis.getX()));
-        matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(timeRotationAxis.getY()));
-        matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(timeRotationAxis.getZ()));
-        matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(timeRotation));
-        matrices.multiply(Vec3f.NEGATIVE_Z.getDegreesQuaternion(timeRotationAxis.getZ()));
-        matrices.multiply(Vec3f.NEGATIVE_Y.getDegreesQuaternion(timeRotationAxis.getY()));
-        matrices.multiply(Vec3f.NEGATIVE_X.getDegreesQuaternion(timeRotationAxis.getX()));
+        Vector3f timeRotationAxis = this.rotation.getAxis();
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(timeRotationAxis.x()));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(timeRotationAxis.y()));
+        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(timeRotationAxis.z()));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(timeRotation));
+        matrices.multiply(RotationAxis.NEGATIVE_Z.rotationDegrees(timeRotationAxis.z()));
+        matrices.multiply(RotationAxis.NEGATIVE_Y.rotationDegrees(timeRotationAxis.y()));
+        matrices.multiply(RotationAxis.NEGATIVE_X.rotationDegrees(timeRotationAxis.x()));
     }
 }

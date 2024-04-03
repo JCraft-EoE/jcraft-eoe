@@ -15,6 +15,7 @@ import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.ai.goal.PounceAtTargetGoal;
 import net.minecraft.entity.ai.goal.SwimGoal;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -27,23 +28,22 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.IAnimationTickable;
-import software.bernie.geckolib3.core.PlayState;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class SheerHeartAttackEntity extends MobEntity implements IAnimatable, IAnimationTickable, IOwnable {
+public class SheerHeartAttackEntity extends MobEntity implements GeoEntity, IOwnable {
     private static final TrackedData<Optional<UUID>> OWNER_ID = DataTracker.registerData(SheerHeartAttackEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
-    private final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private LivingEntity master;
 
     public SheerHeartAttackEntity(EntityType<? extends MobEntity> entityType, World world) {
@@ -85,31 +85,8 @@ public class SheerHeartAttackEntity extends MobEntity implements IAnimatable, IA
     }
 
     @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
-    }
-
-    @Override
-    public AnimationFactory getFactory() {
-        return this.animationFactory;
-    }
-
-    @Override
-    public int tickTimer() {
-        return age;
-    }
-
-    @SuppressWarnings("SameReturnValue")
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        event.getController().setAnimation(
-                event.isMoving() ? new AnimationBuilder().loop("animation.sha.walk") : new AnimationBuilder().loop("animation.sha.idle")
-        );
-        return PlayState.CONTINUE;
-    }
-
-    @Override
     protected void applyDamage(DamageSource source, float amount) {
-        if (source.isExplosive()) return;
+        if (source.isOf(DamageTypes.EXPLOSION)) return;
         super.applyDamage(source, amount);
     }
 
@@ -137,7 +114,7 @@ public class SheerHeartAttackEntity extends MobEntity implements IAnimatable, IA
     public void tick() {
         super.tick();
 
-        if (world.isClient()) {
+        if (getWorld().isClient()) {
             JCraft.getClientEntityHandler().sheerHeartAttackEntityTick(this);
             return;
         }
@@ -148,7 +125,7 @@ public class SheerHeartAttackEntity extends MobEntity implements IAnimatable, IA
                 // If the owner name is set, but the owner isn't (when loaded via NBT data), find owner
                 UUID ownerId = getOwnerId();
                 if (ownerId != null) {
-                    ServerWorld serverWorld = (ServerWorld) world;
+                    ServerWorld serverWorld = (ServerWorld) getWorld();
                     for (ServerPlayerEntity serverPlayerEntity : PlayerLookup.world(serverWorld)) {
                         if (serverPlayerEntity.getUuid().equals(ownerId))
                             master = serverPlayerEntity;
@@ -172,7 +149,7 @@ public class SheerHeartAttackEntity extends MobEntity implements IAnimatable, IA
 
             if (target == null) {
                 if (this.age % 10 == 0) { // Entity lists are still expensive
-                    List<LivingEntity> toTrack = world.getEntitiesByClass(
+                    List<LivingEntity> toTrack = getWorld().getEntitiesByClass(
                             LivingEntity.class,
                             new Box(pos.add(16, 16, 16), pos.add(-16, -16, -16)),
                             EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e -> e != this && e != master)
@@ -211,8 +188,25 @@ public class SheerHeartAttackEntity extends MobEntity implements IAnimatable, IA
         JUtils.explode(getWorld(), this, getX(), getY(), getZ(), 1.8f,
                 JExplosionModifier.builder().particle(JParticleTypeRegistry.BOOM_1)
                         .destructionType(
-                        getWorld().getGameRules().getBoolean(JCraft.STAND_GRIEFING) ? Explosion.DestructionType.BREAK : Explosion.DestructionType.NONE)
+                        getWorld().getGameRules().getBoolean(JCraft.STAND_GRIEFING) ? Explosion.DestructionType.DESTROY : Explosion.DestructionType.KEEP)
                         .particleVelocity(Vec3d.ZERO)
                         .build());
+    }
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "controller", 0, this::predicate));
+    }
+
+    private PlayState predicate(AnimationState<SheerHeartAttackEntity> state) {
+        state.setAnimation(
+                state.isMoving() ? RawAnimation.begin().thenLoop("animation.sha.walk") : RawAnimation.begin().thenLoop("animation.sha.idle")
+        );
+        return PlayState.CONTINUE;
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 }

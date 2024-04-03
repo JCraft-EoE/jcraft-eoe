@@ -24,19 +24,20 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.PlayState;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.GeoAnimatable;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
 import java.util.Set;
 
-public class LifeDetectorEntity extends JAttackEntity implements IAnimatable {
+public class LifeDetectorEntity extends JAttackEntity implements GeoEntity {
     private static final TrackedData<Boolean> EXPLODED;
     public LivingEntity target;
 
@@ -64,7 +65,7 @@ public class LifeDetectorEntity extends JAttackEntity implements IAnimatable {
         if (target == this || target == master) return false;
         if (target.isConnectedThroughVehicle(master)) return false;
         if (target instanceof IOwnable ownable && ownable.getMaster() == master) return false;
-        return target.canTakeDamage() && target.isAlive() && JUtils.canDamage(DamageSource.mob(master), target);
+        return target.canTakeDamage() && target.isAlive() && JUtils.canDamage(getWorld().getDamageSources().mobAttack(master), target);
     }
 
     private void Explode() {
@@ -72,13 +73,13 @@ public class LifeDetectorEntity extends JAttackEntity implements IAnimatable {
         velocityModified = true;
 
         Vec3d pos = getPos();
-        Set<LivingEntity> hurt = JUtils.generateHitbox(world, pos, 2.25, e -> true);
+        Set<LivingEntity> hurt = JUtils.generateHitbox(getWorld(), pos, 2.25, e -> true);
         for (LivingEntity living : hurt) {
             if (!canTarget(living)) continue;
             LivingEntity target = JUtils.getUserIfStand(living);
             Vec3d kbVec = target.getPos().subtract(pos).normalize();
-            StandEntity.damageLogic(world, target, kbVec, 10, 1, false, 5f, true, 9,
-                    DamageSource.mob(master), master, HitPropertyComponent.HitAnimation.MID, false);
+            StandEntity.damageLogic(getWorld(), target, kbVec, 10, 1, false, 5f, true, 9,
+                    getWorld().getDamageSources().mobAttack(master), master, HitPropertyComponent.HitAnimation.MID, false);
         }
 
         dataTracker.set(EXPLODED, true);
@@ -94,7 +95,7 @@ public class LifeDetectorEntity extends JAttackEntity implements IAnimatable {
         if (master == null) kill();
         if (hasExploded()) return;
 
-        if (world.isClient) world.addParticle(
+        if (getWorld().isClient) getWorld().addParticle(
                 ParticleTypes.FLAME,
                 this.getX() + random.nextFloat() - 0.5f,
                 this.getY() + random.nextFloat() - 0.5f,
@@ -104,7 +105,7 @@ public class LifeDetectorEntity extends JAttackEntity implements IAnimatable {
             if (target == null) {
                 if (this.age % 2 == 0) {
                     LivingEntity finalTarget = null;
-                    List<LivingEntity> targets = world.getEntitiesByClass(LivingEntity.class, this.getBoundingBox().expand(32f), EntityPredicates.VALID_ENTITY);
+                    List<LivingEntity> targets = getWorld().getEntitiesByClass(LivingEntity.class, this.getBoundingBox().expand(32f), EntityPredicates.VALID_ENTITY);
 
                     for (LivingEntity t :
                             targets) {
@@ -195,26 +196,24 @@ public class LifeDetectorEntity extends JAttackEntity implements IAnimatable {
     public void readCustomDataFromNbt(NbtCompound tag) {
         super.readCustomDataFromNbt(tag);
         boolean ownerIsPlayer = tag.getBoolean("playerOwner");
-        if (ownerIsPlayer) master = world.getPlayerByUuid(tag.getUuid("ownerUUID"));
-        else master = (LivingEntity) world.getEntityById(tag.getInt("ownerID")); // Always is living
+        if (ownerIsPlayer) master = getWorld().getPlayerByUuid(tag.getUuid("ownerUUID"));
+        else master = (LivingEntity) getWorld().getEntityById(tag.getInt("ownerID")); // Always is living
     }
 
     // Animations
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<GeoAnimatable>(this, "controller", 0, this::predicate));
     }
 
-    @SuppressWarnings("SameReturnValue")
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        event.getController().setAnimation(new AnimationBuilder().loop(hasExploded() ? "animation.detector.explode" : "animation.detector.idle"));
-        return PlayState.CONTINUE;
+    private PlayState predicate(AnimationState<GeoAnimatable> state) {
+        return state.setAndContinue(RawAnimation.begin().thenLoop(hasExploded() ? "animation.detector.explode" : "animation.detector.idle"));
     }
 
     @Override
-    public AnimationFactory getFactory() {
-        return this.factory;
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 }

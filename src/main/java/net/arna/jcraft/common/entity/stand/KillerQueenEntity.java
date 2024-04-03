@@ -12,10 +12,11 @@ import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import org.joml.Vector3f;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
 
 import java.util.function.Consumer;
 
@@ -47,11 +48,11 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
     public KillerQueenEntity(World worldIn) {
         super(StandType.KILLER_QUEEN, worldIn, null);
 
-        auraColors = new Vec3f[]{
-                new Vec3f(0.9f, 0.7f, 0.8f),
-                new Vec3f(1f, 1f, 1f),
-                new Vec3f(0.5f, 0.2f, 0.6f),
-                new Vec3f(0.4f, 0.7f, 1.0f)
+        auraColors = new Vector3f[]{
+                new Vector3f(0.9f, 0.7f, 0.8f),
+                new Vector3f(1f, 1f, 1f),
+                new Vector3f(0.5f, 0.2f, 0.6f),
+                new Vector3f(0.4f, 0.7f, 1.0f)
         };
     }
 
@@ -86,28 +87,28 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
 
     // Animations
     public enum State implements StandAnimationState<KillerQueenEntity> {
-        IDLE(builder -> builder.loop("animation.killerqueen.idle")),
-        LIGHT(builder -> builder.playAndHold("animation.killerqueen.light")),
-        BLOCK(builder -> builder.loop("animation.killerqueen.block")),
-        HEAVY(builder -> builder.playAndHold("animation.killerqueen.heavy")),
-        BARRAGE(builder -> builder.loop("animation.killerqueen.barrage")),
-        DETONATE(builder -> builder.playAndHold("animation.killerqueen.detonate")),
-        BOMB_PLANT(builder -> builder.playAndHold("animation.killerqueen.bombplant")),
-        SHA(builder -> builder.playAndHold("animation.killerqueen.sha")),
-        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.killerqueen.light_followup")),
-        LOW(builder -> builder.playAndHold("animation.killerqueen.low")),
-        GRAB(builder -> builder.playAndHold("animation.killerqueen.grab")),
-        GRAB_HIT(builder -> builder.playAndHold("animation.killerqueen.grab_hit"));
+        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.killerqueen.idle"))),
+        LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.killerqueen.light"))),
+        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.killerqueen.block"))),
+        HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.killerqueen.heavy"))),
+        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.killerqueen.barrage"))),
+        DETONATE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.killerqueen.detonate"))),
+        BOMB_PLANT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.killerqueen.bombplant"))),
+        SHA(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.killerqueen.sha"))),
+        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.killerqueen.light_followup"))),
+        LOW(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.killerqueen.low"))),
+        GRAB(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.killerqueen.grab"))),
+        GRAB_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.killerqueen.grab_hit")));
 
 
-        private final Consumer<AnimationBuilder> animator;
+        private final Consumer<AnimationState> animator;
 
-        State(Consumer<AnimationBuilder> animator) {
+        State(Consumer<AnimationState> animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(KillerQueenEntity attacker, AnimationBuilder builder) {
+        public void playAnimation(KillerQueenEntity attacker, AnimationState builder) {
             animator.accept(builder);
         }
     }

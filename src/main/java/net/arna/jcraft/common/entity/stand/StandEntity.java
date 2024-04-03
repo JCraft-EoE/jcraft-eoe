@@ -36,6 +36,7 @@ import net.minecraft.entity.ai.control.JumpControl;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -56,19 +57,19 @@ import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.IAnimationTickable;
-import software.bernie.geckolib3.core.PlayState;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import org.joml.Vector3f;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
 
@@ -76,7 +77,7 @@ import static net.arna.jcraft.JCraft.comboBreak;
 import static net.minecraft.command.argument.EntityAnchorArgumentType.EntityAnchor;
 
 public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S> & StandAnimationState<E>>
-        extends MobEntity implements IAnimatable, IAnimationTickable, IAttacker<E, S> {
+        extends MobEntity implements GeoEntity, IAttacker<E, S> {
 
     // TODO: finish custom player idle poses for all stands
 
@@ -166,8 +167,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     // Data
     @Getter
     private final StandType standType;
-    private final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
-    protected Vec3f[] auraColors = {Vec3f.ZERO, Vec3f.POSITIVE_X, Vec3f.POSITIVE_Y, Vec3f.POSITIVE_Z};
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    protected Vector3f[] auraColors = {Vector3f.ZERO, Vector3f.POSITIVE_X, Vector3f.POSITIVE_Y, Vector3f.POSITIVE_Z};
 
     protected StandEntity(StandType type, World world) {
         this(type, world, null, true);
@@ -445,8 +446,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     /**
      * Gets the stands position while detached
      */
-    public Vec3f getFreePos() {
-        return new Vec3f(this.dataTracker.get(FREEX), this.dataTracker.get(FREEY), this.dataTracker.get(FREEZ));
+    public Vector3f getFreePos() {
+        return new Vector3f(this.dataTracker.get(FREEX), this.dataTracker.get(FREEY), this.dataTracker.get(FREEZ));
     }
 
     /**
@@ -454,10 +455,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      *
      * @param freePos new position
      */
-    public void setFreePos(Vec3f freePos) {
-        this.dataTracker.set(FREEX, freePos.getX());
-        this.dataTracker.set(FREEY, freePos.getY());
-        this.dataTracker.set(FREEZ, freePos.getZ());
+    public void setFreePos(Vector3f freePos) {
+        this.dataTracker.set(FREEX, freePos.x());
+        this.dataTracker.set(FREEY, freePos.y());
+        this.dataTracker.set(FREEZ, freePos.z());
     }
 
     @Override
@@ -664,7 +665,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         ent.maxHurtTime = ent.hurtTime = 10;
 
         ent.setHealth(h - damage);
-        ent.getDamageTracker().onDamage(damageSource, h, damage);
+        ent.getDamageTracker().onDamage(damageSource, damage);
         ent.emitGameEvent(GameEvent.ENTITY_DAMAGE);
         if (ent.isDead()) ent.onDeath(damageSource);
     }
@@ -714,7 +715,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     public void standBlock() {
         if (!hasUser()) return;
         // Projectile deflection
-        List<ProjectileEntity> toDeflect = this.world.getEntitiesByClass(ProjectileEntity.class, this.getBoundingBox().expand(0.75f), EntityPredicates.VALID_ENTITY);
+        List<ProjectileEntity> toDeflect = this.getWorld().getEntitiesByClass(ProjectileEntity.class, this.getBoundingBox().expand(0.75f), EntityPredicates.VALID_ENTITY);
 
         for (ProjectileEntity projectile : toDeflect) {
             if (projectile.getOwner() == user) continue;
@@ -786,7 +787,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if (isDead()) return;
 
         if (age == 1) playSummonSound();
-        boolean client = world.isClient;
+        boolean client = getWorld().isClient;
         prevAlpha = getAlphaOverride();
 
         int moveStun = getMoveStun();
@@ -1163,7 +1164,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if (getVehicle() == null) return;
 
         super.stopRiding();
-        if (isRemote() || world.isClient) return;
+        if (isRemote() || getWorld().isClient) return;
 
         if (playDesummonSound) playSound(JSoundRegistry.STAND_DESUMMON, 1, 1);
         discard();
@@ -1188,16 +1189,16 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if (user == null ||
                 source.getAttacker() == user ||
                 user.isInvulnerableTo(source) ||
-                source.isFallingBlock() ||
-                source == DamageSource.DROWN ) return false;
+                source.isOf(DamageTypes.FALLING_BLOCK) ||
+                source.isOf(DamageTypes.DROWN) ) return false;
 
-        if (blocking && source.isProjectile())
+        if (blocking && source.isOf(DamageTypes.MOB_PROJECTILE))
             return false;
 
-        if (source.isMagic() || source.isExplosive()) // AoE effects have damage nerfed
+        if (source.isOf(DamageTypes.MAGIC) || source.isOf(DamageTypes.EXPLOSION)) // AoE effects have damage nerfed
             amount /= 2.0F;
 
-        if (getStandGauge() <= 0.0F || source.isOutOfWorld())
+        if (getStandGauge() <= 0.0F || source.isOf(DamageTypes.OUT_OF_WORLD))
             return super.damage(source, amount);
         return user.damage(source, amount);
     }
@@ -1235,13 +1236,13 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     @Override
     public boolean addStatusEffect(StatusEffectInstance effect, @Nullable Entity source) {
-        if (world.isClient || user == null) return false;
+        if (getWorld().isClient || user == null) return false;
         return user.addStatusEffect(effect, source);
     }
 
     @Override
     public boolean isInvulnerableTo(DamageSource damageSource) {
-        return !damageSource.isOutOfWorld() || damageSource.getAttacker() == this;
+        return !damageSource.isOf(DamageTypes.OUT_OF_WORLD) || damageSource.getAttacker() == this;
     }
 
     @Override
@@ -1318,7 +1319,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         // Block if falling or there are projectiles nearby
         // 2 tick check interval is efficient because block doesn't run out by then, and finding entities is expensive
         if (stand.age % 2 == 0) {
-            List<ProjectileEntity> nearbyProjectiles = stand.world.getEntitiesByClass(ProjectileEntity.class, mob.getBoundingBox().expand(3), EntityPredicates.VALID_ENTITY);
+            List<ProjectileEntity> nearbyProjectiles = stand.getWorld().getEntitiesByClass(ProjectileEntity.class, mob.getBoundingBox().expand(3), EntityPredicates.VALID_ENTITY);
             boolean anyInAir = false;
             Vec3d pos = stand.getPos();
             for (ProjectileEntity projectile : nearbyProjectiles) {
@@ -1348,7 +1349,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         // If stunned, and about to get hit by another move, combo break sometimes
         if (mobStun != null)
             if (!stand.blocking && enemyAttack != null && enemyMoveStun > enemyAttack.getWindup() && stand.random.nextFloat() < 0.1f)
-                comboBreak((ServerWorld) stand.world, mob, mobStun);
+                comboBreak((ServerWorld) stand.getWorld(), mob, mobStun);
 
 
         EntityNavigation entityNavigation = mob.getNavigation();
@@ -1437,7 +1438,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             queuedMove = type;
     }
 
-    public Vec3f getAuraColor() {
+    public Vector3f getAuraColor() {
         return auraColors[getSkin()];
     }
 
@@ -1594,37 +1595,32 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     }
 
     // Animation code
+
     @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(getThis(), "controller", 0, event -> {
-            AnimationController<E> controller = event.getController();
-            AnimationBuilder builder = new AnimationBuilder();
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController(getThis(), "controller", 0 , this::predicate));
+    }
 
-            String summonAnimation = getSummonAnimation();
-            if (playSummonAnim && summonAnimation != null) {
-                controller.setAnimation(builder.playOnce(summonAnimation));
-                return PlayState.CONTINUE;
-            }
+    private PlayState predicate(AnimationState state) {
+        AnimationController<E> controller = state.getController();
 
-            if (isSameState()) controller.markNeedsReload();
+        String summonAnimation = getSummonAnimation();
+        if (playSummonAnim && summonAnimation != null) {
+            return state.setAndContinue(RawAnimation.begin().thenPlay(summonAnimation));
+        }
 
-            S state = getState();
-            state.playAnimation(getThis(), builder);
-            controller.setAnimation(builder);
-            state.configureController(getThis(), controller);
+        if (isSameState()) controller.forceAnimationReset();
 
-            return PlayState.CONTINUE;
-        }));
+        S superState = getState();
+        superState.playAnimation(getThis(), state);
+        superState.configureController(getThis(), controller);
+
+        return PlayState.CONTINUE;
     }
 
     @Override
-    public AnimationFactory getFactory() {
-        return animationFactory;
-    }
-
-    @Override
-    public int tickTimer() {
-        return age;
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 
     @Override

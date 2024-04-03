@@ -19,10 +19,10 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.shape.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 import java.util.*;
 
@@ -68,7 +68,7 @@ public class GravityComponentImpl implements GravityComponent {
         Vec3d realWorldVelocity = getRealWorldVelocity(entity, prevGravityDirection);
         if (rotationParameters.rotateVelocity()) {
             //Rotate velocity with gravity, this will cause things to appear to take a sharp turn
-            Vec3f worldSpaceVec = new Vec3f(realWorldVelocity);
+            Vector3f worldSpaceVec = realWorldVelocity.toVector3f();
             worldSpaceVec.rotate(RotationUtil.getRotationBetween(prevGravityDirection, gravityDirection));
             entity.setVelocity(RotationUtil.vecWorldToPlayer(new Vec3d(worldSpaceVec), gravityDirection));
         } else {
@@ -129,7 +129,7 @@ public class GravityComponentImpl implements GravityComponent {
         // if gravity changed from down to up, also move up
         Direction movingDirection = oldGravity.getOpposite();
 
-        Iterable<VoxelShape> collisions = entity.world.getCollisions(entity, entityBoundingBox);
+        Iterable<VoxelShape> collisions = entity.getWorld().getCollisions(entity, entityBoundingBox);
         Box totalCollisionBox = null;
         for (VoxelShape collision : collisions) {
             if (!collision.isEmpty()) {
@@ -205,8 +205,8 @@ public class GravityComponentImpl implements GravityComponent {
             Direction newGravity = getActualGravityDirection();
             Direction oldGravity = gravityDirection;
             if (oldGravity != newGravity) {
-                long timeMs = entity.world.getTime() * 50;
-                if (entity.world.isClient) {
+                long timeMs = entity.getWorld().getTime() * 50;
+                if (entity.getWorld().isClient) {
                     animation.applyRotationAnimation(
                             newGravity, oldGravity,
                             initialGravity ? 0 : rotationParameters.rotationTime(),
@@ -367,7 +367,7 @@ public class GravityComponentImpl implements GravityComponent {
                 temp.decrementDuration();
             }
         }
-        if (!entity.world.isClient && needsInitialSync) {
+        if (!entity.getWorld().isClient && needsInitialSync) {
             needsInitialSync = false;
             RotationParameters rotationParameters = new RotationParameters(false, false, false, 0);
             GravityChannel.sendFullStatePacket(entity, NetworkUtil.PacketMode.EVERYONE, rotationParameters, true);

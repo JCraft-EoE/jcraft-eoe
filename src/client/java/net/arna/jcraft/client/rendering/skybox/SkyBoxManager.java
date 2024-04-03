@@ -4,7 +4,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.math.Matrix4f;
+import org.joml.Matrix4f;
 
 public class SkyBoxManager implements ClientTickEvents.EndWorldTick {
     private static final SkyBoxManager INSTANCE = new SkyBoxManager();

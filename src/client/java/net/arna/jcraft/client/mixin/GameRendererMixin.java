@@ -6,10 +6,11 @@ import net.arna.jcraft.client.rendering.PostProcessHandler;
 import net.arna.jcraft.common.entity.stand.CreamEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Shader;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.resource.ResourceFactory;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
@@ -26,7 +27,7 @@ import java.util.function.Consumer;
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
 
-    @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WorldRenderer;render(Lnet/minecraft/client/util/math/MatrixStack;FJZLnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/GameRenderer;Lnet/minecraft/client/render/LightmapTextureManager;Lnet/minecraft/util/math/Matrix4f;)V", shift = At.Shift.AFTER))
+    @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WorldRenderer;render(Lnet/minecraft/client/util/math/MatrixStack;FJZLnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/GameRenderer;Lnet/minecraft/client/render/LightmapTextureManager;Lorg/joml/Matrix4f;)V", shift = At.Shift.AFTER))
     private void jcraft$renderWorldLast(float tickDelta, long limitTime, MatrixStack matrix, CallbackInfo ci) {
         Vec3d cameraPos = MinecraftClient.getInstance().gameRenderer.getCamera().getPos();
         matrix.push();
@@ -35,8 +36,8 @@ public class GameRendererMixin {
         matrix.pop();
     }
 
-    @Inject(method = "loadShaders", at = @At(value = "INVOKE_ASSIGN", target = "Ljava/util/List;add(Ljava/lang/Object;)Z", ordinal = 0), locals = LocalCapture.CAPTURE_FAILHARD)
-    private void jcraft$registerShaders(ResourceManager manager, CallbackInfo ci, List<Pair<Shader, Consumer<Shader>>> list, List<Pair<Shader, Consumer<Shader>>> list2) throws IOException {
+    @Inject(method = "loadPrograms", at = @At(value = "INVOKE_ASSIGN", target = "Ljava/util/List;add(Ljava/lang/Object;)Z", ordinal = 0), locals = LocalCapture.CAPTURE_FAILHARD)
+    private void jcraft$registerShaders(ResourceFactory manager, CallbackInfo ci, List<Pair<ShaderProgram, Consumer<ShaderProgram>>> list, List<Pair<ShaderProgram, Consumer<ShaderProgram>>> list2) throws IOException {
         JShaderRegistry.init(manager);
         list2.addAll(JShaderRegistry.shaderList);
     }

@@ -3,9 +3,9 @@ package net.arna.jcraft.client.model.entity;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.SheerHeartAttackEntity;
 import net.minecraft.util.Identifier;
-import software.bernie.geckolib3.model.AnimatedTickingGeoModel;
+import software.bernie.geckolib.model.GeoModel;
 
-public class SheerHeartAttackModel extends AnimatedTickingGeoModel<SheerHeartAttackEntity> {
+public class SheerHeartAttackModel extends GeoModel<SheerHeartAttackEntity> {
 
     @Override
     public Identifier getModelResource(SheerHeartAttackEntity object) {

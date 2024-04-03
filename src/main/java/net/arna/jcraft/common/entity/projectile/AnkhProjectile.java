@@ -18,12 +18,12 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class AnkhProjectile extends PersistentProjectileEntity implements IAnimatable {
+public class AnkhProjectile extends PersistentProjectileEntity implements GeoEntity {
     private int ticksInAir;
     private boolean variation = false;
     private double orbitRange = 3;
@@ -78,14 +78,14 @@ public class AnkhProjectile extends PersistentProjectileEntity implements IAnima
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
-        if (world.isClient) return;
+        if (getWorld().isClient) return;
         Entity owner = getOwner();
         if (owner == null) return;
         Entity entity = entityHitResult.getEntity();
         if (owner.hasPassenger(entity) || entity == owner) return;
 
         entity.setOnFireFor(3);
-        JUtils.projectileDamageLogic(this, world, entity, Vec3d.ZERO, 5, 1, false, 3.5f, 8, HitPropertyComponent.HitAnimation.MID);
+        JUtils.projectileDamageLogic(this, getWorld(), entity, Vec3d.ZERO, 5, 1, false, 3.5f, 8, HitPropertyComponent.HitAnimation.MID);
         discard();
     }
 
@@ -113,9 +113,9 @@ public class AnkhProjectile extends PersistentProjectileEntity implements IAnima
     public void tick() {
         super.tick();
 
-        if (world.isClient()) {
+        if (getWorld().isClient()) {
             Vec3d vel = getVelocity();
-            this.world.addParticle(
+            this.getWorld().addParticle(
                     ParticleTypes.FLAME,
                     getX() + random.nextFloat() * 0.5f - 0.25f,
                     getY() + random.nextFloat() * 0.5f - 0.25f,
@@ -168,14 +168,16 @@ public class AnkhProjectile extends PersistentProjectileEntity implements IAnima
     }
 
     // Animations
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+
 
     @Override
-    public void registerControllers(AnimationData data) {
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+
     }
 
     @Override
-    public AnimationFactory getFactory() {
-        return this.factory;
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return this.cache;
     }
 }

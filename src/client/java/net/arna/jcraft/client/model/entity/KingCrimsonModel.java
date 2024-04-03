@@ -1,11 +1,13 @@
 package net.arna.jcraft.client.model.entity;
 
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
+import net.arna.jcraft.common.entity.stand.SilverChariotEntity;
 import net.arna.jcraft.common.entity.stand.StandType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Vec3d;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.processor.IBone;
+import software.bernie.geckolib.core.animatable.model.CoreGeoBone;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.model.GeoModel;
 
 public class KingCrimsonModel extends StandEntityModel<KingCrimsonEntity> {
 
@@ -13,32 +15,34 @@ public class KingCrimsonModel extends StandEntityModel<KingCrimsonEntity> {
         super(StandType.KING_CRIMSON);
     }
 
-    @Override
-    public void setCustomAnimations(KingCrimsonEntity entity, int uniqueID, AnimationEvent animationEvent) {
-        super.setCustomAnimations(entity, uniqueID, animationEvent);
-        if (!entity.hasUser()) return;
 
-        LivingEntity user = entity.getUserOrThrow();
+
+    @Override
+    public void setCustomAnimations(KingCrimsonEntity animatable, long instanceId, AnimationState<KingCrimsonEntity> animationState) {
+        super.setCustomAnimations(animatable, instanceId, animationState);
+        if (!animatable.hasUser()) return;
+
+        LivingEntity user = animatable.getUserOrThrow();
         float overVel = 0;
         float velInfluence = 90f;
 
-        if (entity.getMoveStun() < 1) {
-            IBone torso = this.getAnimationProcessor().getBone("torso");
+        if (animatable.getMoveStun() < 1) {
+            CoreGeoBone torso = this.getAnimationProcessor().getBone("torso");
 
             Vec3d userVel = user.getVelocity();
             overVel = (float) userVel.horizontalLength() - 0.05f;
-            if (userVel.normalize().add(entity.getRotationVector()).horizontalLengthSquared() < userVel.normalize().horizontalLengthSquared()) {
+            if (userVel.normalize().add(animatable.getRotationVector()).horizontalLengthSquared() < userVel.normalize().horizontalLengthSquared()) {
                 velInfluence *= -1;
             }
             if (torso != null) {
-                torso.setRotationX((overVel * velInfluence) * 3.1415f / 180f);
+                torso.setRotX((overVel * velInfluence) * 3.1415f / 180f);
             }
         }
 
-        IBone head = this.getAnimationProcessor().getBone("head");
+        CoreGeoBone head = this.getAnimationProcessor().getBone("head");
 
-        if ((entity.isBlocking() || entity.isIdle()) && head != null) {
-            head.setRotationX(-(user.getPitch() + overVel * velInfluence) * 3.1415f / 180f);
+        if ((animatable.isBlocking() || animatable.isIdle()) && head != null) {
+            head.setRotX(-(user.getPitch() + overVel * velInfluence) * 3.1415f / 180f);
         }
     }
 

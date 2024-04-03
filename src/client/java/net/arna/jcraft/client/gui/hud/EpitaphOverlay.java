@@ -6,7 +6,6 @@ import net.arna.jcraft.client.rendering.FrameCounter;
 import net.arna.jcraft.client.rendering.HUDAnimation;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.util.math.MathHelper;
@@ -17,7 +16,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class EpitaphOverlay extends DrawableHelper {
+public class EpitaphOverlay {
     public static final long FRAME_TIME = 1000000000 / 60; // Time of one frame in nanoseconds.
     private static final float VIGNETTE_INTENSITY = 5f;
     private static final float VIGNETTE_EXTEND = 0.5f;

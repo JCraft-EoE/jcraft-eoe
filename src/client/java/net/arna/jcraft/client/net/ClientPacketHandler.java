@@ -37,12 +37,12 @@ import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.NotNull;
@@ -85,7 +85,7 @@ public class ClientPacketHandler {
 
         if (isStart) {
             Vec3d position = new Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
-            RegistryKey<World> registryKey = buf.readRegistryKey(Registry.WORLD_KEY);
+            RegistryKey<World> registryKey = buf.readRegistryKey(RegistryKeys.WORLD);
             int time = buf.readInt();
 
             client.execute(() -> {
@@ -491,10 +491,10 @@ public class ClientPacketHandler {
             if (!(entity instanceof LivingEntity living)) return;
 
             // LivingEntity#handleStatus(byte) case 2, but without the sound
-            living.limbDistance = 1.5f;
+            //living.limbDistance = 1.5f; TODO check this
             living.timeUntilRegen = 20;
             living.hurtTime = living.maxHurtTime = 10;
-            living.knockbackVelocity = 0f;
+            //living.knockbackVelocity = 0f;
         });
     }
 }

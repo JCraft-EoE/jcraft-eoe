@@ -29,7 +29,7 @@ public class Splatter {
     private final float xRange, zRange;
     private final List<SplatterSection> sections;
     @Getter(lazy = true)
-    private final BlockPos anchor = new BlockPos(pos).down();
+    private final BlockPos anchor = BlockPos.ofFloored(pos).down();
     private final float offset = (float) (Math.random() * 0.0019 + 0.0001); // To prevent z-fighting with anchor block and other splatters
     private final Box mainBox;
     private int age;
@@ -45,18 +45,18 @@ public class Splatter {
         this.creator = creator;
         sections = SplatterSplitter.splitAndWrap(this);
 
-        Vec3f min = findEdge(sections, false);
-        Vec3f max = findEdge(sections, true);
+        Vector3f min = findEdge(sections, false);
+        Vector3f max = findEdge(sections, true);
         mainBox = new Box(new Vec3d(min), new Vec3d(max)).expand(.1);
     }
 
-    private static Vec3f findEdge(List<SplatterSection> sections, boolean max) {
+    private static Vector3f findEdge(List<SplatterSection> sections, boolean max) {
         float f = max ? Float.NEGATIVE_INFINITY : Float.POSITIVE_INFINITY;
         BiFunction<Float, Float, Float> function = max ? Math::max : Math::min;
 
         return sections.stream()
                 .map(max ? SplatterSection::getMaxPos : SplatterSection::getMinPos)
-                .reduce(new Vec3f(f, f, f), (current, vec) -> {
+                .reduce(new Vector3f(f, f, f), (current, vec) -> {
                     float x = function.apply(current.getX(), vec.getX());
                     float y = function.apply(current.getY(), vec.getY());
                     float z = function.apply(current.getZ(), vec.getZ());

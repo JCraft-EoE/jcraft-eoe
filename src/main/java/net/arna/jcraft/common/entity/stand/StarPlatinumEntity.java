@@ -17,10 +17,11 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import org.joml.Vector3f;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -90,11 +91,11 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
 
     public StarPlatinumEntity(World worldIn) {
         super(StandType.STAR_PLATINUM, worldIn);
-        auraColors = new Vec3f[]{
-                new Vec3f(0.8f, 0.5f, 1.0f),
-                new Vec3f(0.6f, 0.2f, 1.0f),
-                new Vec3f(0.2f, 0.8f, 0.6f),
-                new Vec3f(0.1f, 0.3f, 1.0f)
+        auraColors = new Vector3f[]{
+                new Vector3f(0.8f, 0.5f, 1.0f),
+                new Vector3f(0.6f, 0.2f, 1.0f),
+                new Vector3f(0.2f, 0.8f, 0.6f),
+                new Vector3f(0.1f, 0.3f, 1.0f)
         };
     }
 
@@ -155,32 +156,32 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
 
     // Animation code
     public enum State implements StandAnimationState<StarPlatinumEntity> {
-        IDLE((starPlatinum, builder) -> builder.loop("animation.starplatinum." +
-                (starPlatinum.getInhaleTime() > 0 ? "inhaleidle" : "idle"))),
-        PUNCH(builder -> builder.playAndHold("animation.starplatinum.light")),
-        BLOCK(builder -> builder.loop("animation.starplatinum.block")),
-        HEAVY(builder -> builder.playAndHold("animation.starplatinum.heavy")),
-        GROUND_BREAKER(builder -> builder.playAndHold("animation.starplatinum.ground_slam")),
-        BARRAGE(builder -> builder.loop("animation.starplatinum.barrage")),
-        STAR_FINGER(builder -> builder.playAndHold("animation.starplatinum.star_finger")),
-        INHALE(builder -> builder.playAndHold("animation.starplatinum.inhale")),
-        KNEE(builder -> builder.playAndHold("animation.starplatinum.knee")),
-        JUMP(builder -> builder.playAndHold("animation.starplatinum.jump")),
-        UPPERCUT(builder -> builder.playAndHold("animation.starplatinum.uppercut")),
-        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.starplatinum.light_followup"));
+        IDLE((starPlatinum, builder) -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.starplatinum." +
+                (starPlatinum.getInhaleTime() > 0 ? "inhaleidle" : "idle")))),
+        PUNCH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.light"))),
+        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.starplatinum.block"))),
+        HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.heavy"))),
+        GROUND_BREAKER(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.ground_slam"))),
+        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.starplatinum.barrage"))),
+        STAR_FINGER(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.star_finger"))),
+        INHALE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.inhale"))),
+        KNEE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.knee"))),
+        JUMP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.jump"))),
+        UPPERCUT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.uppercut"))),
+        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.light_followup")));
 
-        private final BiConsumer<StarPlatinumEntity, AnimationBuilder> animator;
+        private final BiConsumer<StarPlatinumEntity, AnimationState> animator;
 
-        State(Consumer<AnimationBuilder> animator) {
+        State(Consumer<AnimationState> animator) {
             this((silverChariot, builder) -> animator.accept(builder));
         }
 
-        State(BiConsumer<StarPlatinumEntity, AnimationBuilder> animator) {
+        State(BiConsumer<StarPlatinumEntity, AnimationState> animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(StarPlatinumEntity attacker, AnimationBuilder builder) {
+        public void playAnimation(StarPlatinumEntity attacker, AnimationState builder) {
             animator.accept(attacker, builder);
         }
     }

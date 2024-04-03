@@ -1,15 +1,16 @@
 package net.arna.jcraft.registry;
 
 import net.arna.jcraft.JCraft;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.registry.Registry;
 
 public interface JSoundRegistry {
 
     static SoundEvent registerSound(String id) {
         //JCraft.LOGGER.info("Registering sound: " + id); // Probably unnecessary
-        SoundEvent event = new SoundEvent(JCraft.id(id));
-        Registry.register(Registry.SOUND_EVENT, event.getId(), event);
+        SoundEvent event = SoundEvent.of(JCraft.id(id));
+        Registry.register(Registries.SOUND_EVENT, event.getId(), event);
         return event;
     }
 

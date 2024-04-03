@@ -25,9 +25,11 @@ import net.arna.jcraft.common.tickable.Timestops;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.*;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -40,15 +42,17 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
@@ -74,9 +78,9 @@ public class JCraft implements ModInitializer {
     public static final int SPEC_QUEUE_MOVESTUN_LIMIT = 11; // exclusive, 10 -> 0.5s window for queueing moves
     public static final int QUEUE_MOVESTUN_LIMIT = 7; // exclusive, 6 -> 0.3s window for queueing moves
 
-    public static final ItemGroup JCRAFT_GROUP = FabricItemGroupBuilder.create(new Identifier(MOD_ID, "main"))
-            .icon(() -> new ItemStack(JObjectRegistry.STANDARROW))
-            .appendItems(JCraft::appendJcraftGroupStacks)
+    public static final ItemGroup JCRAFT_GROUP = FabricItemGroup.builder()
+            .displayName(Text.translatable("itemGroup.create.base"))
+            .icon(JObjectRegistry.STANDARROW::getDefaultStack)
             .build();
 
     public static final GravityChangerConfig gravityConfig = new GravityChangerConfig(); // TODO incorporate this into our own config
@@ -178,54 +182,6 @@ public class JCraft implements ModInitializer {
         }
 
         Timestops.remove(timestop);
-    }
-
-    private static void appendJcraftGroupStacks(List<ItemStack> stacks) {
-        stacks.add(new ItemStack(JObjectRegistry.STANDARROW));
-        stacks.add(new ItemStack(JObjectRegistry.LIVINGARROW));
-        stacks.add(new ItemStack(JObjectRegistry.REQUIEMARROW));
-        stacks.add(new ItemStack(JObjectRegistry.REQUIEMRUBY));
-
-        stacks.add(new ItemStack(JObjectRegistry.ANUBIS));
-        stacks.add(new ItemStack(JObjectRegistry.ANUBISSHEATHED));
-        stacks.add(new ItemStack(JObjectRegistry.KNIFE));
-        stacks.add(new ItemStack(JObjectRegistry.KNIFEBUNDLE));
-        stacks.add(JObjectRegistry.FV_REVOLVER.getDefaultStack());
-        stacks.add(JObjectRegistry.BULLET.getDefaultStack());
-
-        stacks.add(new ItemStack(JObjectRegistry.SINNERSSOUL));
-        stacks.add(new ItemStack(JObjectRegistry.SOUL_BLOCK.asItem()));
-        stacks.add(new ItemStack(JObjectRegistry.METEORITE_BLOCK.asItem()));
-        stacks.add(new ItemStack(JObjectRegistry.GREENBABY));
-        stacks.add(new ItemStack(JObjectRegistry.DIOSDIARY));
-
-        stacks.add(new ItemStack(JObjectRegistry.BOXINGGLOVES));
-
-        stacks.add(new ItemStack(JObjectRegistry.DIOHEADBAND));
-        stacks.add(new ItemStack(JObjectRegistry.DIOJACKET));
-        stacks.add(new ItemStack(JObjectRegistry.DIOPANTS));
-        stacks.add(new ItemStack(JObjectRegistry.DIOBOOTS));
-
-        stacks.add(new ItemStack(JObjectRegistry.JOTAROCAP));
-        stacks.add(new ItemStack(JObjectRegistry.JOTAROJACKET));
-        stacks.add(new ItemStack(JObjectRegistry.JOTAROPANTS));
-        stacks.add(new ItemStack(JObjectRegistry.JOTAROBOOTS));
-
-        stacks.add(new ItemStack(JObjectRegistry.KQ_COIN));
-        stacks.add(new ItemStack(JObjectRegistry.FOOLISH_SAND_BLOCK.asItem()));
-
-        stacks.add(new ItemStack(JObjectRegistry.CINDERELLA_MASK));
-
-        stacks.add(new ItemStack(JObjectRegistry.KARSHEADWRAP));
-        stacks.add(new ItemStack(JObjectRegistry.RED_HAT));
-
-        stacks.add(new ItemStack(JObjectRegistry.COFFIN_BLOCK.asItem()));
-
-        stacks.add(new ItemStack(JObjectRegistry.STONE_MASK));
-
-        StandDiscItem.appendStacks(JCRAFT_GROUP, stacks);
-
-        BloodBottleItem.appendStacks(JCRAFT_GROUP, stacks);
     }
 
     // Dashes
@@ -356,9 +312,6 @@ public class JCraft implements ModInitializer {
         // Particle registration (serverside)
         JParticleTypeRegistry.initParticleTypes();
 
-        // Geckolib
-        GeckoLibMod.DISABLE_IN_DEV = true;
-
         // Registration
         JObjectRegistry.init();
         JBlockEntityTypeRegistry.init();
@@ -379,6 +332,8 @@ public class JCraft implements ModInitializer {
         ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_STAND_BLOCK, StandBlockPacket::handle);
         ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_COOLDOWN_CANCEL, CooldownCancelPacket::handle);
         ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_REMOTE_STAND_INTERACT, RemoteStandInteractPacket::handle);
+
+        ItemGroupEvents.MODIFY_ENTRIES_ALL.register(JCraft::make);
     }
 
     public static void createParticle(ServerWorld world, double x, double y, double z, JParticleType type) {
@@ -468,7 +423,7 @@ public class JCraft implements ModInitializer {
         if (entity instanceof ServerPlayerEntity player) {
             player.teleport(au, pos.x, pos.y - heightOffset, pos.z, entity.getYaw(), entity.getPitch());
             player.networkHandler.sendPacket(
-                    new PlaySoundS2CPacket(JSoundRegistry.D4C_ALT_UNIVERSE_AMBIENCE, SoundCategory.MUSIC, pos.x, pos.y - heightOffset, pos.z, 1.0F, 1.0F, 0)
+                    new PlaySoundS2CPacket(Registries.SOUND_EVENT.getEntry(JSoundRegistry.D4C_ALT_UNIVERSE_AMBIENCE), SoundCategory.MUSIC, pos.x, pos.y - heightOffset, pos.z, 1.0F, 1.0F, 0)
             );
         } else finalEnt = teleportToWorld(entity, au, entity.getX(), entity.getY() - heightOffset, entity.getZ());
 
@@ -479,5 +434,56 @@ public class JCraft implements ModInitializer {
 
         finalEnt.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 100, 9, true, false, true));
         PastDimensions.enqueue(new DimensionData(finalEnt, pos, original.getRegistryKey()));
+    }
+
+    private static void make(ItemGroup creativeModeTab, FabricItemGroupEntries entries) {
+        if (creativeModeTab == JCRAFT_GROUP) {
+
+            entries.add(new ItemStack(JObjectRegistry.STANDARROW));
+            entries.add(new ItemStack(JObjectRegistry.LIVINGARROW));
+            entries.add(new ItemStack(JObjectRegistry.REQUIEMARROW));
+            entries.add(new ItemStack(JObjectRegistry.REQUIEMRUBY));
+
+            entries.add(new ItemStack(JObjectRegistry.ANUBIS));
+            entries.add(new ItemStack(JObjectRegistry.ANUBISSHEATHED));
+            entries.add(new ItemStack(JObjectRegistry.KNIFE));
+            entries.add(new ItemStack(JObjectRegistry.KNIFEBUNDLE));
+            entries.add(JObjectRegistry.FV_REVOLVER.getDefaultStack());
+            entries.add(JObjectRegistry.BULLET.getDefaultStack());
+
+            entries.add(new ItemStack(JObjectRegistry.SINNERSSOUL));
+            entries.add(new ItemStack(JObjectRegistry.SOUL_BLOCK.asItem()));
+            entries.add(new ItemStack(JObjectRegistry.METEORITE_BLOCK.asItem()));
+            entries.add(new ItemStack(JObjectRegistry.GREENBABY));
+            entries.add(new ItemStack(JObjectRegistry.DIOSDIARY));
+
+            entries.add(new ItemStack(JObjectRegistry.BOXINGGLOVES));
+
+            entries.add(new ItemStack(JObjectRegistry.DIOHEADBAND));
+            entries.add(new ItemStack(JObjectRegistry.DIOJACKET));
+            entries.add(new ItemStack(JObjectRegistry.DIOPANTS));
+            entries.add(new ItemStack(JObjectRegistry.DIOBOOTS));
+
+            entries.add(new ItemStack(JObjectRegistry.JOTAROCAP));
+            entries.add(new ItemStack(JObjectRegistry.JOTAROJACKET));
+            entries.add(new ItemStack(JObjectRegistry.JOTAROPANTS));
+            entries.add(new ItemStack(JObjectRegistry.JOTAROBOOTS));
+
+            entries.add(new ItemStack(JObjectRegistry.KQ_COIN));
+            entries.add(new ItemStack(JObjectRegistry.FOOLISH_SAND_BLOCK.asItem()));
+
+            entries.add(new ItemStack(JObjectRegistry.CINDERELLA_MASK));
+
+            entries.add(new ItemStack(JObjectRegistry.KARSHEADWRAP));
+            entries.add(new ItemStack(JObjectRegistry.RED_HAT));
+
+            entries.add(new ItemStack(JObjectRegistry.COFFIN_BLOCK.asItem()));
+
+            entries.add(new ItemStack(JObjectRegistry.STONE_MASK));
+
+            StandDiscItem.appendStacks(JCRAFT_GROUP, entries.getDisplayStacks());
+
+            BloodBottleItem.appendStacks(JCRAFT_GROUP, entries.getDisplayStacks());
+        }
     }
 }

@@ -6,13 +6,13 @@ import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.StandType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.model.AnimatedTickingGeoModel;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.model.GeoModel;
 
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class StandEntityModel<E extends StandEntity<?, ?>> extends AnimatedTickingGeoModel<E> {
+public class StandEntityModel<E extends StandEntity<?, ?>> extends GeoModel<E> {
     private final StandType type;
     private final Identifier model;
     private final List<Identifier> skins;
@@ -57,11 +57,11 @@ public class StandEntityModel<E extends StandEntity<?, ?>> extends AnimatedTicki
     }
 
     @Override
-    public void setCustomAnimations(E entity, int instanceId, AnimationEvent animationEvent) {
-        super.setCustomAnimations(entity, instanceId, animationEvent);
-        if (skipCustomAnimations() || !entity.hasUser()) return;
+    public void setCustomAnimations(E animatable, long instanceId, AnimationState<E> animationState) {
+        super.setCustomAnimations(animatable, instanceId, animationState);
+        if (skipCustomAnimations() || !animatable.hasUser()) return;
 
-        JClientUtils.animateGenericHumanoid(this, entity, entity.getUser(), animationEvent.getPartialTick(),
+        JClientUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), animationState.getPartialTick(),
                 true, true, torsoPitchOffset, headPitchOffset, velInfluence);
     }
 

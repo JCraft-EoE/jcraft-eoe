@@ -7,14 +7,14 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
-public class ScreenFreezeRenderer extends DrawableHelper implements ClientTickEvents.EndTick, HudRenderCallback {
+public class ScreenFreezeRenderer implements ClientTickEvents.EndTick, HudRenderCallback {
     public NativeImage screenImage;
     private boolean shouldScreenGrab = true;
 
@@ -53,17 +53,16 @@ public class ScreenFreezeRenderer extends DrawableHelper implements ClientTickEv
     }
 
     @Override
-    public void onHudRender(MatrixStack matrixStack, float tickDelta) {
+    public void onHudRender(DrawContext drawContext, float tickDelta) {
         MinecraftClient client = MinecraftClient.getInstance();
-
+        var matrixStack = drawContext.getMatrices();
         if (screenImage != null && client.player != null) {
             matrixStack.push();
             NativeImageBackedTexture backedTexture = new NativeImageBackedTexture(screenImage);
             Identifier id = JCraft.id("screen/screenfreeze/" + client.player.getName());
             MinecraftClient.getInstance().getTextureManager().registerTexture(id, backedTexture);
 
-            RenderSystem.setShaderTexture(0, id);
-            drawTexture(matrixStack, 0,0, 0 ,0 ,screenImage.getWidth(), screenImage.getHeight(), screenImage.getWidth(), screenImage.getHeight());
+            drawContext.drawTexture(id, 0,0, 0 ,0 ,screenImage.getWidth(), screenImage.getHeight(), screenImage.getWidth(), screenImage.getHeight());
             matrixStack.pop();
         }
     }

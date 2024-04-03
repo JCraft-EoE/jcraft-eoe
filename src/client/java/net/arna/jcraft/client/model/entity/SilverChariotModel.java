@@ -5,7 +5,7 @@ import net.arna.jcraft.client.util.JClientUtils;
 import net.arna.jcraft.common.entity.stand.SilverChariotEntity;
 import net.arna.jcraft.common.entity.stand.StandType;
 import net.minecraft.util.Identifier;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
+import software.bernie.geckolib.core.animation.AnimationState;
 
 public class SilverChariotModel extends StandEntityModel<SilverChariotEntity> {
     private static final Identifier NO_ARMOR_TEXTURE = JCraft.id("textures/entity/stands/silver_chariot/no_armor.png");
@@ -25,9 +25,9 @@ public class SilverChariotModel extends StandEntityModel<SilverChariotEntity> {
     }
 
     @Override
-    public void setCustomAnimations(SilverChariotEntity animatable, int instanceId, AnimationEvent animationEvent) {
-        super.setCustomAnimations(animatable, instanceId, animationEvent);
+    public void setCustomAnimations(SilverChariotEntity animatable, long instanceId, AnimationState<SilverChariotEntity> animationState) {
+        super.setCustomAnimations(animatable, instanceId, animationState);
         if (animatable.hasUser())
-            JClientUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), animationEvent.getPartialTick(), true, true, 0, -0.2f);
+            JClientUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), animationState.getPartialTick(), true, true, 0, -0.2f);
     }
 }

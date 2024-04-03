@@ -23,7 +23,7 @@ public class JRenderLayerRegistry extends RenderPhase {
                     "transparent_block",
                     VertexFormats.POSITION,
                     VertexFormat.DrawMode.QUADS,
-                    new Shader(() -> JShaderRegistry.TEST.getInstance().get()),
+                    new ShaderProgram(() -> JShaderRegistry.TEST.getInstance().get()),
                     Phases.NORMAL_TRANSPARENCY,
                     SpriteAtlasTexture.PARTICLE_ATLAS_TEXTURE);
 
@@ -33,7 +33,7 @@ public class JRenderLayerRegistry extends RenderPhase {
                     "rrre",
                     VertexFormats.POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL,
                     VertexFormat.DrawMode.QUADS,
-                    new Shader(() -> JShaderRegistry.RREDE.getInstance().get()),
+                    new ShaderProgram(() -> JShaderRegistry.RREDE.getInstance().get()),
                     RenderPhase.TRANSLUCENT_TRANSPARENCY
             );
 
@@ -44,28 +44,28 @@ public class JRenderLayerRegistry extends RenderPhase {
     /**
      * Creates a custom render layer with a texture.
      */
-    public static RenderLayer createGenericRenderLayer(String modId, String name, VertexFormat format, VertexFormat.DrawMode mode, RenderPhase.Shader shader, RenderPhase.Transparency transparency, Identifier texture) {
+    public static RenderLayer createGenericRenderLayer(String modId, String name, VertexFormat format, VertexFormat.DrawMode mode, RenderPhase.ShaderProgram shader, RenderPhase.Transparency transparency, Identifier texture) {
         return createGenericRenderLayer(modId + ":" + name, format, mode, shader, transparency, new RenderPhase.Texture(texture, false, false));
     }
 
     /**
      * Creates a custom render layer with an empty texture state.
      */
-    public static RenderLayer createGenericRenderLayer(String modId, String name, VertexFormat format, VertexFormat.DrawMode mode, RenderPhase.Shader shader, RenderPhase.Transparency transparency, RenderPhase.TextureBase texture) {
+    public static RenderLayer createGenericRenderLayer(String modId, String name, VertexFormat format, VertexFormat.DrawMode mode, RenderPhase.ShaderProgram shader, RenderPhase.Transparency transparency, RenderPhase.TextureBase texture) {
         return createGenericRenderLayer(modId + ":" + name, format, mode, shader, transparency, texture);
     }
 
     /**
      * Creates a custom render layer with an empty texture.
      */
-    public static RenderLayer createGenericRenderLayer(String modId, String name, VertexFormat format, VertexFormat.DrawMode mode, RenderPhase.Shader shader, RenderPhase.Transparency transparency) {
+    public static RenderLayer createGenericRenderLayer(String modId, String name, VertexFormat format, VertexFormat.DrawMode mode, RenderPhase.ShaderProgram shader, RenderPhase.Transparency transparency) {
         return createGenericRenderLayer(modId + ":" + name, format, mode, shader, transparency, NO_TEXTURE);
     }
 
     /**
      * Creates a custom render layer and creates a buffer builder for it.
      */
-    public static RenderLayer createGenericRenderLayer(String name, VertexFormat format, VertexFormat.DrawMode mode, RenderPhase.Shader shader, RenderPhase.Transparency transparency, RenderPhase.TextureBase texture) {
+    public static RenderLayer createGenericRenderLayer(String name, VertexFormat format, VertexFormat.DrawMode mode, RenderPhase.ShaderProgram shader, RenderPhase.Transparency transparency, RenderPhase.TextureBase texture) {
         RenderLayer type = RenderLayer.of(
                 name, format, mode, FabricLoader.getInstance().isModLoaded("sodium") ? 262144 : 256, false, false, RenderLayer.MultiPhaseParameters.builder()
                         .shader(shader)

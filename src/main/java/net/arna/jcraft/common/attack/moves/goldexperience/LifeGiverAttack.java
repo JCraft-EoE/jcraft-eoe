@@ -38,7 +38,7 @@ public class LifeGiverAttack extends AbstractMove<LifeGiverAttack, GoldExperienc
             case SNAKE -> {
                 if (item.getMaxCount() <= 1) return Set.of();
 
-                GESnakeEntity snake = new GESnakeEntity(JEntityTypeRegistry.GE_SNAKE, attacker.world);
+                GESnakeEntity snake = new GESnakeEntity(JEntityTypeRegistry.GE_SNAKE, attacker.getWorld());
                 //todo: fix snake not working for mobs
                 if (user instanceof PlayerEntity playerEntity) snake.setOwner(playerEntity);
                 animal = snake;
@@ -46,12 +46,12 @@ public class LifeGiverAttack extends AbstractMove<LifeGiverAttack, GoldExperienc
             case FROG -> {
                 if (item.getMaxCount() <= 1) return Set.of();
 
-                GEFrogEntity frog = new GEFrogEntity(JEntityTypeRegistry.GE_FROG, attacker.world);
+                GEFrogEntity frog = new GEFrogEntity(JEntityTypeRegistry.GE_FROG, attacker.getWorld());
                 frog.setMaster(user);
                 animal = frog;
             }
             case BUTTERFLY -> {
-                GEButterflyEntity butterfly = new GEButterflyEntity(JEntityTypeRegistry.GE_BUTTERFLY, attacker.world);
+                GEButterflyEntity butterfly = new GEButterflyEntity(JEntityTypeRegistry.GE_BUTTERFLY, attacker.getWorld());
                 butterfly.setMaster(user);
                 animal = butterfly;
             }
@@ -65,7 +65,7 @@ public class LifeGiverAttack extends AbstractMove<LifeGiverAttack, GoldExperienc
         item.decrement(1);
         animal.refreshPositionAndAngles(attacker.getX(), attacker.getY() + 0.5f, attacker.getZ(), attacker.getYaw(), attacker.getPitch());
         animal.setStackInHand(Hand.MAIN_HAND, animalItem);
-        attacker.world.spawnEntity(animal);
+        attacker.getWorld().spawnEntity(animal);
 
         return Set.of();
     }

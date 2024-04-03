@@ -2,7 +2,7 @@ package net.arna.jcraft.client.rendering.shader;
 
 import net.arna.jcraft.JCraft;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.GLImportProcessor;
+import net.minecraft.client.gl.GlImportProcessor;
 import net.minecraft.resource.Resource;
 import net.minecraft.util.Identifier;
 import org.apache.commons.io.IOUtils;
@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * Make sure we can have the CORE shaders in our own namespace
  */
-public class JGLImportProcessor extends GLImportProcessor {
+public class JGLImportProcessor extends GlImportProcessor {
     @Nullable
     @Override
     public String loadImport(boolean inline, String name) {

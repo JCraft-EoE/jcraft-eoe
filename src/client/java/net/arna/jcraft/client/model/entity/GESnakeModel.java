@@ -3,9 +3,9 @@ package net.arna.jcraft.client.model.entity;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.GESnakeEntity;
 import net.minecraft.util.Identifier;
-import software.bernie.geckolib3.model.AnimatedGeoModel;
+import software.bernie.geckolib.model.GeoModel;
 
-public class GESnakeModel extends AnimatedGeoModel<GESnakeEntity> {
+public class GESnakeModel extends GeoModel<GESnakeEntity> {
     @Override
     public Identifier getModelResource(GESnakeEntity object) {
         return JCraft.id("geo/gesnake.geo.json");

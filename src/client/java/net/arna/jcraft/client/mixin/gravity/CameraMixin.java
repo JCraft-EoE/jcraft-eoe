@@ -7,7 +7,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Quaternion;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.math.Vector3f;
 import net.minecraft.world.BlockView;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -68,7 +68,7 @@ public abstract class CameraMixin {
 
         double currentCameraY = MathHelper.lerp(tickDelta, this.lastCameraY, this.cameraY);
 
-        Vec3f eyeOffset = new Vec3f(0, (float) currentCameraY, 0);
+        Vector3f eyeOffset = new Vector3f(0, (float) currentCameraY, 0);
         eyeOffset.rotate(gravityRotation);
 
         this.setPos(

@@ -3,9 +3,9 @@ package net.arna.jcraft.client.model.entity;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.projectile.BulletProjectile;
 import net.minecraft.util.Identifier;
-import software.bernie.geckolib3.model.AnimatedGeoModel;
+import software.bernie.geckolib.model.GeoModel;
 
-public class BulletModel extends AnimatedGeoModel<BulletProjectile> {
+public class BulletModel extends GeoModel<BulletProjectile> {
     @Override
     public Identifier getModelResource(BulletProjectile object) {
         return JCraft.id("geo/bullet.geo.json");

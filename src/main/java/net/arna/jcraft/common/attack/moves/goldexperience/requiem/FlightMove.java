@@ -6,6 +6,7 @@ import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.entity.stand.GEREntity;
 import net.arna.jcraft.common.util.MobilityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageTracker;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
@@ -41,7 +42,7 @@ public class FlightMove extends AbstractMove<FlightMove, GEREntity> {
             double y = user.getY();
             Vec3d vel = new Vec3d(user.getVelocity().x, 0.0, user.getVelocity().z);
             // Targetting priority
-            LivingEntity targetEntity = user.getDamageTracker().getBiggestAttacker();
+            LivingEntity targetEntity = user.getDamageTracker().getBiggestFall();
             if (targetEntity == null && user instanceof MobEntity mob)
                 targetEntity = mob.getTarget();
             if (targetEntity == null)

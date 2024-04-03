@@ -9,9 +9,7 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector3d;
 import net.minecraft.particle.ParticleTypes;
-import software.bernie.geckolib3.geo.render.built.GeoModel;
 
 public class MagiciansRedRenderer extends StandEntityRenderer<MagiciansRedEntity> {
     public MagiciansRedRenderer(EntityRendererFactory.Context context) {

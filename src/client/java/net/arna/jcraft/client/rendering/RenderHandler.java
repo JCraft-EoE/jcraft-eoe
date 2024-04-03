@@ -6,9 +6,10 @@ import net.arna.jcraft.client.rendering.shader.ShaderUniformHandler;
 import net.arna.jcraft.client.util.RenderUtils;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Matrix4f;
+import org.joml.Matrix4f;
 
 import java.util.HashMap;
 
@@ -93,7 +94,7 @@ public class RenderHandler {
 
     public static void draw(VertexConsumerProvider.Immediate source, HashMap<RenderLayer, BufferBuilder> buffers) {
         for (RenderLayer type : buffers.keySet()) {
-            Shader instance = RenderUtils.getShader(type);
+            ShaderProgram instance = RenderUtils.getShader(type);
             if (UNIFORM_HANDLERS.containsKey(type)) {
                 ShaderUniformHandler handler = UNIFORM_HANDLERS.get(type);
                 handler.updateShaderData(instance);

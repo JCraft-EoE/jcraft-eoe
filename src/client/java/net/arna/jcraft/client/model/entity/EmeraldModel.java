@@ -3,9 +3,9 @@ package net.arna.jcraft.client.model.entity;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.projectile.EmeraldProjectile;
 import net.minecraft.util.Identifier;
-import software.bernie.geckolib3.model.AnimatedGeoModel;
+import software.bernie.geckolib.model.GeoModel;
 
-public class EmeraldModel extends AnimatedGeoModel<EmeraldProjectile> {
+public class EmeraldModel extends GeoModel<EmeraldProjectile> {
     @Override
     public Identifier getModelResource(EmeraldProjectile object) {
         return JCraft.id("geo/emerald.geo.json");

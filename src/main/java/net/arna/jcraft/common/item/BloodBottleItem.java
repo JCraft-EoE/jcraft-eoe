@@ -104,7 +104,7 @@ public class BloodBottleItem extends Item {
         user.getItemCooldownManager().set(this, 15);
 
         if (!user.getWorld().isClient()) {
-            entity.damage(DamageSource.player(user), 2);
+            entity.damage(user.getWorld().getDamageSources().playerAttack(user), 2);
             NbtCompound nbtCompound = stack.getOrCreateNbt();
             float newBlood = nbtCompound.getFloat("Blood") + bloodMult;
             if (newBlood > MAX_BLOOD)
@@ -121,13 +121,13 @@ public class BloodBottleItem extends Item {
         return MAX_USE_TIME;
     }
 
-    @Override
-    public void appendStacks(ItemGroup group, DefaultedList<ItemStack> stacks) {
-        appendStacks(group, (List<ItemStack>) stacks);
-    }
+    //@Override
+    //public void appendStacks(ItemGroup group, DefaultedList<ItemStack> stacks) {
+    //    appendStacks(group, (List<ItemStack>) stacks);
+    //}
 
     public static void appendStacks(ItemGroup group, List<ItemStack> stacks) {
-        boolean full = group == ItemGroup.SEARCH;
+        boolean full = group.getType() == ItemGroup.Type.SEARCH;
         if (!full && group != JCraft.JCRAFT_GROUP) return;
 
         int step = 1;

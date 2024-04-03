@@ -7,21 +7,21 @@ import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.world.EntityView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.IAnimationTickable;
-import software.bernie.geckolib3.core.PlayState;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.Arrays;
 
-public class GESnakeEntity extends TameableEntity implements IAnimatable, IAnimationTickable {
+public class GESnakeEntity extends TameableEntity implements GeoEntity {
     public GESnakeEntity(EntityType<? extends TameableEntity> entityType, World world) {
         super(entityType, world);
         Arrays.fill(this.handDropChances, 1F);
@@ -51,7 +51,7 @@ public class GESnakeEntity extends TameableEntity implements IAnimatable, IAnima
     public void tick() {
         super.tick();
 
-        if (world.isClient()) {
+        if (getWorld().isClient()) {
             if (this.handSwinging) {
                 this.handSwingTicks += 1;
 
@@ -69,41 +69,34 @@ public class GESnakeEntity extends TameableEntity implements IAnimatable, IAnima
     }
 
     // Animations
-    private final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "movement", 10, this::predicate));
-        animationData.addAnimationController(new AnimationController<>(this, "attack", 0, this::attackPredicate));
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "movement", 10, this::predicate));
+        controllers.add(new AnimationController<>(this, "attack", 0, this::attackPredicate));
     }
 
-    @Override
-    public AnimationFactory getFactory() {
-        return this.animationFactory;
+    private PlayState attackPredicate(AnimationState<GESnakeEntity> state) {
+        if (!handSwinging) return PlayState.STOP;
+
+        state.setAnimation(RawAnimation.begin().thenLoop("animation.gesnake.attack"));
+        return PlayState.CONTINUE;
     }
 
-    @Override
-    public int tickTimer() {
-        return age;
-    }
-
-    @SuppressWarnings("SameReturnValue")
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        AnimationController<E> controller = event.getController();
-        if (event.isMoving()) {
-            controller.setAnimation(new AnimationBuilder().loop("animation.gesnake.move"));
-            controller.setAnimationSpeed(1 + this.getVelocity().length());
+    private PlayState predicate(AnimationState<GESnakeEntity> state) {
+        if (state.isMoving()) {
+            state.setAnimation(RawAnimation.begin().thenLoop("animation.gesnake.move"));
+            state.getController().setAnimationSpeed(1 + this.getVelocity().length());
         } else {
-            controller.setAnimation(new AnimationBuilder().loop("animation.gesnake.idle"));
+            state.setAnimation(RawAnimation.begin().thenLoop("animation.gesnake.idle"));
         }
 
         return PlayState.CONTINUE;
     }
 
-    private <E extends IAnimatable> PlayState attackPredicate(AnimationEvent<E> event) {
-        if (!handSwinging) return PlayState.STOP;
-
-        event.getController().setAnimation(new AnimationBuilder().loop("animation.gesnake.attack"));
-        return PlayState.CONTINUE;
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 }

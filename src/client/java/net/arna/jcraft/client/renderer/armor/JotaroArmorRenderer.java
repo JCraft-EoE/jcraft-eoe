@@ -2,11 +2,12 @@ package net.arna.jcraft.client.renderer.armor;
 
 import net.arna.jcraft.client.model.armor.JArmorModel;
 import net.arna.jcraft.common.item.JotaroArmorItem;
-import software.bernie.geckolib3.renderers.geo.GeoArmorRenderer;
+import software.bernie.geckolib.renderer.GeoArmorRenderer;
 
 public class JotaroArmorRenderer extends GeoArmorRenderer<JotaroArmorItem> {
     public JotaroArmorRenderer() {
         super(new JArmorModel<>("jotarooutfit"));
+        /*
         this.headBone = "helmet";
         this.bodyBone = "chestplate";
         this.rightArmBone = "rightArm";
@@ -15,5 +16,7 @@ public class JotaroArmorRenderer extends GeoArmorRenderer<JotaroArmorItem> {
         this.leftLegBone = "leftLeg";
         this.rightBootBone = "rightBoot";
         this.leftBootBone = "leftBoot";
+
+         */
     }
 }

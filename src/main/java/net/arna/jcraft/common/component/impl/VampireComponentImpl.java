@@ -57,7 +57,7 @@ public class VampireComponentImpl implements VampireComponent {
 
         if (blood < 1 && --starveTick < 1) {
             // Starve
-            player.damage(DamageSource.STARVE, 1.0F);
+            player.damage(world.getDamageSources().starve(), 1.0F);
             starveTick = 80;
         } else {
             // Regenerate

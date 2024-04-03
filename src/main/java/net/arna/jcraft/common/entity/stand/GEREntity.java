@@ -21,10 +21,11 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import org.joml.Vector3f;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -152,11 +153,11 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
                 -knockdown experience
                 M1>Barrage>Life Beam>M1~Overhead Smash>Life Beam (second hit)""";
 
-        auraColors = new Vec3f[]{
-                new Vec3f(0.7f, 0.8f, 1.0f),
-                new Vec3f(0.8f, 0.7f, 1.0f),
-                new Vec3f(1.0f, 0.3f, 0.7f),
-                new Vec3f(1.0f, 0.0f, 1.0f)
+        auraColors = new Vector3f[]{
+                new Vector3f(0.7f, 0.8f, 1.0f),
+                new Vector3f(0.8f, 0.7f, 1.0f),
+                new Vector3f(1.0f, 0.3f, 0.7f),
+                new Vector3f(1.0f, 0.0f, 1.0f)
         };
     }
 
@@ -225,12 +226,12 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         if (age == 1) playSound(JSoundRegistry.GER_SUMMON, 1f, 1f);
         super.tick();
 
-        if (world.isClient) {
+        if (getWorld().isClient) {
             if (getState() == State.LASER && getMoveStun() == (LIFE_BEAM_CHARGE.getDuration() - 18))  {
                 Vec3d offset = GravityChangerAPI.getEyeOffset(this);
                 double x = getX() + offset.x, y = getY() + offset.y, z = getZ() + offset.z;
                 for (int i = 0; i < 12; i++)
-                    world.addParticle(ParticleTypes.WITCH, x, y, z, random.nextGaussian(), random.nextGaussian(), random.nextGaussian());
+                    getWorld().addParticle(ParticleTypes.WITCH, x, y, z, random.nextGaussian(), random.nextGaussian(), random.nextGaussian());
             }
         } else {
             if (curMove != null && curMove.getOriginalMove() == LIFE_BEAM_CHARGE)
@@ -248,32 +249,32 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
 
     // Animation code
     public enum State implements StandAnimationState<GEREntity> {
-        IDLE(builder -> builder.loop("animation.ger.idle")),
-        LIGHT(builder -> builder.playAndHold("animation.ger.light")),
-        BLOCK(builder -> builder.loop("animation.ger.block")),
-        HEAVY(builder -> builder.playAndHold("animation.ger.heavy")),
-        BARRAGE(builder -> builder.loop("animation.ger.barrage")),
-        HEAL_SELF(builder -> builder.playAndHold("animation.ger.healself")),
-        HEAL(builder -> builder.playAndHold("animation.ger.heal")),
-        LASER(builder -> builder.playAndHold("animation.ger.laser")),
-        LASER_FIRE(builder -> builder.playAndHold("animation.ger.laser_fire")),
-        COUNTER(builder -> builder.playAndHold("animation.ger.counter")),
-        COUNTER_MISS(builder -> builder.playAndHold("animation.ger.counter_miss")),
-        AIR_HEAVY(builder -> builder.playAndHold("animation.ger.airheavy")),
-        AIR_LIGHT(builder -> builder.playAndHold("animation.ger.airlight")),
-        AIR_BARRAGE(builder -> builder.playAndHold("animation.ger.airbarrage")),
-        SETUP(builder -> builder.playAndHold("animation.ger.setup")),
-        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.ger.light_followup"));
+        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.ger.idle"))),
+        LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ger.light"))),
+        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.ger.block"))),
+        HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ger.heavy"))),
+        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.ger.barrage"))),
+        HEAL_SELF(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ger.healself"))),
+        HEAL(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ger.heal"))),
+        LASER(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ger.laser"))),
+        LASER_FIRE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ger.laser_fire"))),
+        COUNTER(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ger.counter"))),
+        COUNTER_MISS(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ger.counter_miss"))),
+        AIR_HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ger.airheavy"))),
+        AIR_LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ger.airlight"))),
+        AIR_BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ger.airbarrage"))),
+        SETUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ger.setup"))),
+        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ger.light_followup")));
 
-        private final Consumer<AnimationBuilder> animator;
+        private final Consumer<AnimationState> animator;
 
-        State(Consumer<AnimationBuilder> animator) {
+        State(Consumer<AnimationState> animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(GEREntity attacker, AnimationBuilder builder) {
-            animator.accept(builder);
+        public void playAnimation(GEREntity attacker, AnimationState state) {
+            animator.accept(state);
         }
     }
 

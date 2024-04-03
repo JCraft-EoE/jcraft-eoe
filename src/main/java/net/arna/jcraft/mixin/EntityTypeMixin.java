@@ -5,8 +5,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -27,7 +27,7 @@ public class EntityTypeMixin {
     private static void doNotLoadStandEntities(NbtCompound nbt, World world, CallbackInfoReturnable<Optional<Entity>> cir) {
         if (shouldLoadStands > 0) return;
 
-        EntityType<?> entityType = Registry.ENTITY_TYPE.get(new Identifier(nbt.getString("id")));
+        EntityType<?> entityType = Registries.ENTITY_TYPE.get(new Identifier(nbt.getString("id")));
         if (StandType.getEntityTypes().contains(entityType)) cir.setReturnValue(Optional.empty());
     }
 

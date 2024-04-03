@@ -17,19 +17,18 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.IAnimationTickable;
-import software.bernie.geckolib3.core.PlayState;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.Arrays;
 
-public class GEButterflyEntity extends FlyingEntity implements IAnimatable, IAnimationTickable, IOwnable {
+public class GEButterflyEntity extends FlyingEntity implements GeoEntity, IOwnable {
     public GEButterflyEntity(EntityType<? extends FlyingEntity> entityType, World world) {
         super(entityType, world);
         this.moveControl = new FlightMoveControl(this, 10, false);
@@ -73,7 +72,7 @@ public class GEButterflyEntity extends FlyingEntity implements IAnimatable, IAni
     public void tick() {
         super.tick();
 
-        if (world.isClient || !hasMaster) return;
+        if (getWorld().isClient || !hasMaster) return;
         if (master == null) {
             kill();
             return;
@@ -104,31 +103,26 @@ public class GEButterflyEntity extends FlyingEntity implements IAnimatable, IAni
         super.readCustomDataFromNbt(nbt);
         hasMaster = nbt.getBoolean("HasMaster");
         if (nbt.containsUuid("MasterUUID"))
-            setMaster(world.getPlayerByUuid(nbt.getUuid("MasterUUID")));
+            setMaster(getWorld().getPlayerByUuid(nbt.getUuid("MasterUUID")));
     }
 
     // Animations
-    private final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "controller", 0, this::predicate));
     }
 
-    @Override
-    public AnimationFactory getFactory() {
-        return this.animationFactory;
-    }
-
-    @Override
-    public int tickTimer() {
-        return age;
-    }
-
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+    private PlayState predicate(AnimationState<GEButterflyEntity> state) {
         if (isAlive()) {
-            event.getController().setAnimation(new AnimationBuilder().loop("animation.gebutterfly.idle"));
+            state.setAnimation(RawAnimation.begin().thenLoop("animation.gebutterfly.idle"));
             return PlayState.CONTINUE;
         } else return PlayState.STOP;
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 }

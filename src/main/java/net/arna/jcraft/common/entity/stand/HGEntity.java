@@ -21,11 +21,12 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import org.joml.Vector3f;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
 
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -192,11 +193,11 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
                             ...Extend>crouch.M1~M1
                             ...Sendoff""";
 
-        auraColors = new Vec3f[]{
-                new Vec3f(0.2f, 0.9f, 0.2f),
-                new Vec3f(0.2f, 0.2f, 0.9f),
-                new Vec3f(0.4f, 0.4f, 0.5f),
-                new Vec3f(1.0f, 0.65f, 0.44f)
+        auraColors = new Vector3f[]{
+                new Vector3f(0.2f, 0.9f, 0.2f),
+                new Vector3f(0.2f, 0.2f, 0.9f),
+                new Vector3f(0.4f, 0.4f, 0.5f),
+                new Vector3f(1.0f, 0.65f, 0.44f)
         };
     }
 
@@ -229,7 +230,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
         } else if (type == MoveType.SPECIAL1 && user.isSneaking()) {
             if (!JUtils.canAct(user)) return false;
 
-            List<HGNetEntity> nets = world.getEntitiesByClass(HGNetEntity.class,
+            List<HGNetEntity> nets = getWorld().getEntitiesByClass(HGNetEntity.class,
                     getBoundingBox().expand(64), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
 
             LivingEntity shooter = isRemote() ? this : user;
@@ -265,7 +266,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
     public void tick() {
         super.tick();
 
-        if (!world.isClient) {
+        if (!getWorld().isClient) {
             if (curMove != null && curMove.getOriginalMove() == EMERALD_CHARGE)
                 getMoveContext().incrementInt(CHARGE_TIME, 1);
         }
@@ -274,7 +275,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
         setNoGravity(isRemote);
         if (!isRemote) return;
 
-        if (world.isClient) {
+        if (getWorld().isClient) {
             // Called for EVERYONE
             JCraft.getClientEntityHandler().hierophantGreenRemoteClientTick(this);
         } else {
@@ -336,42 +337,42 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
 
     // Animation code
     public enum State implements StandAnimationState<HGEntity> {
-        IDLE((hg, builder) -> builder.loop("animation.hg.idle")),
-        LIGHT(builder -> builder.playAndHold("animation.hg.light")),
-        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.hg.light_followup")),
-        CROUCHING_LIGHT(builder -> builder.playAndHold("animation.hg.crouching_light")),
-        CROUCHING_LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.hg.crouching_light_followup")),
-        AIR_LIGHT(builder -> builder.playAndHold("animation.hg.air_light")),
-        BLOCK(builder -> builder.loop("animation.hg.block")),
-        SENDOFF(builder -> builder.playAndHold("animation.hg.sendoff")),
-        BARRAGE(builder -> builder.loop("animation.hg.barrage")),
-        NET_SET(builder -> builder.playAndHold("animation.hg.net_place")),
+        IDLE((hg, builder) -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.hg.idle"))),
+        LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.hg.light"))),
+        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.hg.light_followup"))),
+        CROUCHING_LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.hg.crouching_light"))),
+        CROUCHING_LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.hg.crouching_light_followup"))),
+        AIR_LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.hg.air_light"))),
+        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.hg.block"))),
+        SENDOFF(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.hg.sendoff"))),
+        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.hg.barrage"))),
+        NET_SET(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.hg.net_place"))),
 
-        EMERALD_CHARGE(builder -> builder.playAndHold("animation.hg.emerald_charge")),
-        EMERALD_SPLASH(builder -> builder.playAndHold("animation.hg.emerald_splash")),
-        EMERALD_SUPER(builder -> builder.playAndHold("animation.hg.emerald_super")),
-        EXTEND_UP(builder -> builder.playAndHold("animation.hg.extend_up")),
-        EXTEND_FORWARD(builder -> builder.playAndHold("animation.hg.extend_forward")),
+        EMERALD_CHARGE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.hg.emerald_charge"))),
+        EMERALD_SPLASH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.hg.emerald_splash"))),
+        EMERALD_SUPER(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.hg.emerald_super"))),
+        EXTEND_UP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.hg.extend_up"))),
+        EXTEND_FORWARD(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.hg.extend_forward"))),
 
-        UPPERCUT(builder -> builder.playAndHold("animation.hg.uppercut")),
+        UPPERCUT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.hg.uppercut"))),
 
-        FORWARD(builder -> builder.loop("animation.hg.forw")),
-        BACKWARD(builder -> builder.loop("animation.hg.back")),
-        LEFT(builder -> builder.loop("animation.hg.left")),
-        RIGHT(builder -> builder.loop("animation.hg.right")),;
+        FORWARD(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.hg.forw"))),
+        BACKWARD(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.hg.back"))),
+        LEFT(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.hg.left"))),
+        RIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.hg.right")));
 
-        private final BiConsumer<HGEntity, AnimationBuilder> animator;
+        private final BiConsumer<HGEntity, AnimationState> animator;
 
-        State(Consumer<AnimationBuilder> animator) {
+        State(Consumer<AnimationState> animator) {
             this((whiteSnake, builder) -> animator.accept(builder));
         }
 
-        State(BiConsumer<HGEntity, AnimationBuilder> animator) {
+        State(BiConsumer<HGEntity, AnimationState> animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(HGEntity attacker, AnimationBuilder builder) {
+        public void playAnimation(HGEntity attacker, AnimationState builder) {
             animator.accept(attacker, builder);
         }
     }

@@ -21,20 +21,21 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.PlayState;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.GeoAnimatable;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import static net.arna.jcraft.common.entity.stand.StandEntity.damageLogic;
 
-public class WSAcidProjectile extends PersistentProjectileEntity implements IAnimatable {
+public class WSAcidProjectile extends PersistentProjectileEntity implements GeoEntity {
     private static final TrackedData<Boolean> MYH; // Melt your Heart variant
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     static {
         MYH = DataTracker.registerData(WSAcidProjectile.class, TrackedDataHandlerRegistry.BOOLEAN);
@@ -57,7 +58,7 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
     }
 
     private void splat() {
-        JUtils.getSplatterManager(world).addSplatter(getPos(), SplatterType.ACID, 1, getOwner());
+        JUtils.getSplatterManager(getWorld()).addSplatter(getPos(), SplatterType.ACID, 1, getOwner());
         discard();
     }
 
@@ -69,7 +70,7 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
-        if (world.isClient) return;
+        if (getWorld().isClient) return;
 
         Entity owner = getOwner();
         if (owner == null) return;
@@ -83,14 +84,14 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
             LivingEntity target = living;
             if (entity instanceof StandEntity<?, ?> stand && stand.hasUser())
                 target = stand.getUserOrThrow();
-            damageLogic(world, target, Vec3d.ZERO, 10, 1, false, 5f, false, 6,
-                    DamageSource.thrownProjectile(this, owner), owner, HitPropertyComponent.HitAnimation.MID);
+            damageLogic(getWorld(), target, Vec3d.ZERO, 10, 1, false, 5f, false, 6,
+                    getWorld().getDamageSources().thrown(this, owner), owner, HitPropertyComponent.HitAnimation.MID);
             target.addStatusEffect(new StatusEffectInstance(JStatusRegistry.WSPOISON, 60, 0, false, true));
             discard();
         }
 
         if (entity instanceof EndCrystalEntity endCrystal)
-            endCrystal.damage(DamageSource.thrownProjectile(this, owner), 2f);
+            endCrystal.damage(getWorld().getDamageSources().thrown(this, owner), 2f);
 
         playSound(SoundEvents.ITEM_BUCKET_EMPTY, 1, 0.5f);
     }
@@ -100,7 +101,7 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
     @Override
     protected void age() {
         super.age();
-        if (world.isClient) return;
+        if (getWorld().isClient) return;
         if (timeOnSurface++ >= 100) discard();
         splat();
     }
@@ -109,7 +110,7 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
     public void tick() {
         Entity owner = getOwner();
         if (owner == null) {
-            if (!world.isClient) discard();
+            if (!getWorld().isClient) discard();
             return;
         }
 
@@ -124,7 +125,7 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
                 double pZ = z + random.nextDouble() * 2 - 1;
                 Vec3d awayVector = getRotationVecClient().multiply(0.3);
 
-                world.addParticle(
+                getWorld().addParticle(
                         ParticleTypes.SPIT,
                         pX, pY, pZ,
                         -awayVector.x, -awayVector.y, awayVector.z);
@@ -135,7 +136,7 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
 
         if (!inGround) {
             Vec3d vel = getVelocity();
-            world.addParticle(
+            getWorld().addParticle(
                     ParticleTypes.SPIT,
                     getX(), getY(), getZ(),
                     vel.x, vel.y, vel.z);
@@ -153,19 +154,18 @@ public class WSAcidProjectile extends PersistentProjectileEntity implements IAni
     }
 
     // Animations
-    @Override
-    public void registerControllers(AnimationData data) {
-        data.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
-    }
-
-    @SuppressWarnings("SameReturnValue")
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        event.getController().setAnimation( new AnimationBuilder().loop(dataTracker.get(MYH) ? "animation.wsacid.meltidle" : "animation.wsacid.idle") );
-        return PlayState.CONTINUE;
-    }
 
     @Override
-    public AnimationFactory getFactory() {
-        return this.factory;
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<GeoAnimatable>(this, "controller", 0, this::predicate));
+    }
+
+    private PlayState predicate(AnimationState<GeoAnimatable> state) {
+        return state.setAndContinue(RawAnimation.begin().thenLoop(dataTracker.get(MYH) ? "animation.wsacid.meltidle" : "animation.wsacid.idle"));
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 }

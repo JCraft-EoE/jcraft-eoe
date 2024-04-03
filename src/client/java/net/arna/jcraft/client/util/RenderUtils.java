@@ -3,14 +3,15 @@ package net.arna.jcraft.client.util;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
+import org.joml.Matrix4f;
 
 import java.awt.*;
 import java.util.Optional;
@@ -20,9 +21,9 @@ public class RenderUtils {
 
     public static final int FULL_BRIGHT = 15728880;
 
-    public static Shader getShader(RenderLayer type) {
+    public static ShaderProgram getShader(RenderLayer type) {
         if (type instanceof RenderLayer.MultiPhase compositeRenderType) {
-            Optional<Supplier<Shader>> shader = compositeRenderType.phases.shader.supplier;
+            Optional<Supplier<ShaderProgram>> shader = compositeRenderType.phases.shader.supplier;
             if (shader.isPresent()) {
                 return shader.get().get();
             }
@@ -31,13 +32,13 @@ public class RenderUtils {
     }
 
     public static void renderGuiQuad(BufferBuilder buffer, int x, int y, int width, int height, int red, int green, int blue, int alpha) {
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
         buffer.vertex(x, y, 0.0).color(red, green, blue, alpha).next();
         buffer.vertex(x, (y + height), 0.0).color(red, green, blue, alpha).next();
         buffer.vertex((x + width), (y + height), 0.0).color(red, green, blue, alpha).next();
         buffer.vertex((x + width), y, 0.0).color(red, green, blue, alpha).next();
-        BufferRenderer.drawWithShader(buffer.end());
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
     }
 
     public static void vertexPos(VertexConsumer vertexConsumer, Matrix4f last, float x, float y, float z) {
@@ -77,11 +78,11 @@ public class RenderUtils {
     }
 
     public static void renderBlockAtPosition(WorldRenderContext context, Vec3d pos, Identifier texture, float alpha) {
-        renderBlockAtPosition(context.matrixStack(), context.camera(), pos, texture, alpha, GameRenderer::getPositionColorTexShader);
+        renderBlockAtPosition(context.matrixStack(), context.camera(), pos, texture, alpha, GameRenderer::getPositionColorTexProgram);
     }
 
     public static void renderBlockAtPosition(MatrixStack matrixStack, Camera camera, Vec3d pos, Identifier texture, float alpha) {
-        renderBlockAtPosition(matrixStack, camera, pos, texture, alpha, GameRenderer::getPositionColorTexShader);
+        renderBlockAtPosition(matrixStack, camera, pos, texture, alpha, GameRenderer::getPositionColorTexProgram);
     }
 
     public static void renderBlock(MatrixStack matrixStack, VertexConsumer vertexConsumer){
@@ -104,7 +105,7 @@ public class RenderUtils {
     /**
      * Renders a Block at a pos
      */
-    public static void renderBlockAtPosition(MatrixStack matrixStack, Camera camera, Vec3d pos, Identifier texture, float alpha, Supplier<Shader> shader) {
+    public static void renderBlockAtPosition(MatrixStack matrixStack, Camera camera, Vec3d pos, Identifier texture, float alpha, Supplier<ShaderProgram> shader) {
         matrixStack.push();
         Vec3d transformedPos = pos.subtract(camera.getPos());
         matrixStack.translate(transformedPos.x, transformedPos.y, transformedPos.z);

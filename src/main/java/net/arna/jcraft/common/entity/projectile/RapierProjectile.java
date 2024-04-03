@@ -29,16 +29,16 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class RapierProjectile extends PersistentProjectileEntity implements IAnimatable {
+public class RapierProjectile extends PersistentProjectileEntity implements GeoEntity {
     public static final Identifier POSSESSED_TEXTURE = JCraft.id("textures/entity/stands/silver_chariot/rapier_possessed.png");
     public static final Identifier ARMOR_OFF_TEXTURE = JCraft.id("textures/entity/stands/silver_chariot/rapier_no_armor.png");
     private static final TrackedData<Integer> SKIN;
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private StandEntity<?, ?> origin;
     private int ticksInAir, bouncesLeft = 5;
 
@@ -78,11 +78,11 @@ public class RapierProjectile extends PersistentProjectileEntity implements IAni
     @Override
     public void tick() {
         super.tick();
-        if (world.isClient) {
+        if (getWorld().isClient) {
             if (!inGround) {
                 Vec3d vel = getVelocity();
                 for (double i = 0; i < 3.0; i++)
-                    world.addParticle(
+                    getWorld().addParticle(
                             ParticleTypes.ELECTRIC_SPARK,
                             MathHelper.lerp(i / 3.0, getX(), prevX), MathHelper.lerp(i / 3.0, getY(), prevY), MathHelper.lerp(i / 3.0, getZ(), prevZ),
                             vel.x, vel.y, vel.z
@@ -97,7 +97,7 @@ public class RapierProjectile extends PersistentProjectileEntity implements IAni
         HitResult.Type type = hitResult.getType();
         if (type == HitResult.Type.ENTITY) {
             this.onEntityHit((EntityHitResult) hitResult);
-            this.world.emitGameEvent(GameEvent.PROJECTILE_LAND, hitResult.getPos(), GameEvent.Emitter.of(this, null));
+            this.getWorld().emitGameEvent(GameEvent.PROJECTILE_LAND, hitResult.getPos(), GameEvent.Emitter.of(this, null));
         } else if (type == HitResult.Type.BLOCK) {
             BlockHitResult blockHitResult = (BlockHitResult) hitResult;
             if (bouncesLeft-- > 0) {
@@ -106,21 +106,21 @@ public class RapierProjectile extends PersistentProjectileEntity implements IAni
             } else {
                 this.onBlockHit(blockHitResult);
                 BlockPos blockPos = blockHitResult.getBlockPos();
-                this.world.emitGameEvent(GameEvent.PROJECTILE_LAND, blockPos, GameEvent.Emitter.of(this, this.world.getBlockState(blockPos)));
+                this.getWorld().emitGameEvent(GameEvent.PROJECTILE_LAND, blockPos, GameEvent.Emitter.of(this, this.getWorld().getBlockState(blockPos)));
             }
         }
     }
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
-        if (world.isClient) return;
+        if (getWorld().isClient) return;
         Entity owner = this.getOwner();
         if (owner == null) return;
         Entity entity = entityHitResult.getEntity();
         if (owner.hasPassenger(entity) || entity == owner) return;
         if (this.isOnFire()) entity.setOnFireFor(5);
 
-        JUtils.projectileDamageLogic(this, world, entity, Vec3d.ZERO, 20, 1, false, 2, 6, HitPropertyComponent.HitAnimation.MID);
+        JUtils.projectileDamageLogic(this, getWorld(), entity, Vec3d.ZERO, 20, 1, false, 2, 6, HitPropertyComponent.HitAnimation.MID);
         playSound(SoundEvents.ITEM_TRIDENT_HIT, 1, 1);
         discard();
     }
@@ -147,12 +147,14 @@ public class RapierProjectile extends PersistentProjectileEntity implements IAni
     }
 
     // Animations
+
     @Override
-    public void registerControllers(AnimationData data) {
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+
     }
 
     @Override
-    public AnimationFactory getFactory() {
-        return this.factory;
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 }

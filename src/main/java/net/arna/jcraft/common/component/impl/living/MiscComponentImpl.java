@@ -110,13 +110,13 @@ public class MiscComponentImpl implements MiscComponent {
         if (damageTimer > 0) damageTimer--;
         if (armoredHitTicks > 0) armoredHitTicks--;
 
-        if (entity.world.isClient()) return;
+        if (entity.getWorld().isClient()) return;
 
         if (slavedTo != null) {
             if (master == null) {
                 if (entity.age % 20 == 0) {
                     //TODO: make SlavedTo properly load from NBT for non-players
-                    master = entity.world.getPlayerByUuid(slavedTo);
+                    master = entity.getWorld().getPlayerByUuid(slavedTo);
                 }
             } else {
                 if (entity instanceof MobEntity mob) { // Targeting and movement for mobs

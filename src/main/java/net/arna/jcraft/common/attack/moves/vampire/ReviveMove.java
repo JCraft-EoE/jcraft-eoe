@@ -9,10 +9,10 @@ import net.arna.jcraft.common.tickable.Revivables;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.registry.tag.EntityTypeTags;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.tag.EntityTypeTags;
 
 import java.util.Set;
 

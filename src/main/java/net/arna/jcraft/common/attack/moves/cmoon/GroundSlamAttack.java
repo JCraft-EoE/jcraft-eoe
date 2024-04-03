@@ -37,7 +37,7 @@ public class GroundSlamAttack extends AbstractSimpleAttack<GroundSlamAttack, CMo
 
     @Override
     public void performHook(CMoonEntity attacker, Set<LivingEntity> targets, Set<Box> boxes, DamageSource damageSource, Vec3d forwardPos, Vec3d rotationVector, MoveContext ctx) {
-        World world = attacker.world;
+        World world = attacker.getWorld();
         Vec3i gravityVector = GravityChangerAPI.getGravityDirection(attacker).getVector();
 
         if (world.getGameRules().getBoolean(JCraft.STAND_GRIEFING)) {
@@ -67,7 +67,7 @@ public class GroundSlamAttack extends AbstractSimpleAttack<GroundSlamAttack, CMo
             }
         }
 
-        JComponents.getShockwaveHandler(attacker.world).addShockwave(attacker.getPos().add(rotationVector), new Vec3d(GravityChangerAPI.getGravityDirection(attacker).getUnitVector()), 4.0f);
+        JComponents.getShockwaveHandler(attacker.getWorld()).addShockwave(attacker.getPos().add(rotationVector), new Vec3d(GravityChangerAPI.getGravityDirection(attacker).getUnitVector()), 4.0f);
     }
 
     @Override

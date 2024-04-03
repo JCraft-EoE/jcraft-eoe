@@ -47,7 +47,7 @@ public class JParticleTextureSheet {
             RenderSystem.disableBlend();
             RenderSystem.enableDepthTest();
             RenderSystem.depthMask(true);
-            RenderSystem.setShader(GameRenderer::getParticleShader);
+            RenderSystem.setShader(GameRenderer::getParticleProgram);
             RenderSystem.setShaderTexture(0, SpriteAtlasTexture.PARTICLE_ATLAS_TEXTURE);
 
             builder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);

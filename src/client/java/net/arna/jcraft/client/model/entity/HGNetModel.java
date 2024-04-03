@@ -3,12 +3,12 @@ package net.arna.jcraft.client.model.entity;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.projectile.HGNetEntity;
 import net.minecraft.util.Identifier;
-import software.bernie.geckolib3.model.AnimatedGeoModel;
+import software.bernie.geckolib.model.GeoModel;
 
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class HGNetModel extends AnimatedGeoModel<HGNetEntity> {
+public class HGNetModel extends GeoModel<HGNetEntity> {
     private static final List<Identifier> skins = IntStream.range(0, 4).mapToObj(
             i -> JCraft.id("textures/entity/hg_nets/" + i + ".png")).toList();
 

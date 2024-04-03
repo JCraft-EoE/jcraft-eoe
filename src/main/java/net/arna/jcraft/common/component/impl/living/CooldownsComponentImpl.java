@@ -71,8 +71,8 @@ public class CooldownsComponentImpl implements CooldownsComponent {
         startCooldown(CooldownType.COOLDOWN_CANCEL);
 
         Vec3d pPos = entity.getEyePos();
-        entity.world.playSoundFromEntity(null, entity, JSoundRegistry.COOLDOWN_CANCEL, SoundCategory.PLAYERS, 1, 1);
-        if (!entity.world.isClient) JCraft.createParticle((ServerWorld) entity.world, pPos.x, pPos.y, pPos.z, JParticleType.COOLDOWN_CANCEL);
+        entity.getWorld().playSoundFromEntity(null, entity, JSoundRegistry.COOLDOWN_CANCEL, SoundCategory.PLAYERS, 1, 1);
+        if (!entity.getWorld().isClient) JCraft.createParticle((ServerWorld) entity.getWorld(), pPos.x, pPos.y, pPos.z, JParticleType.COOLDOWN_CANCEL);
 
         sync();
     }
@@ -101,7 +101,7 @@ public class CooldownsComponentImpl implements CooldownsComponent {
 
     @Override
     public void tick() {
-        boolean isClient = entity.world.isClient;
+        boolean isClient = entity.getWorld().isClient;
 
         // Decrement all cooldowns.
         boolean shouldSync = false;

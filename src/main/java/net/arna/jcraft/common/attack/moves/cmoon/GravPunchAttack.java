@@ -43,7 +43,7 @@ public class GravPunchAttack extends AbstractSimpleAttack<GravPunchAttack, CMoon
     @Override
     public void performHook(CMoonEntity attacker, Set<LivingEntity> targets, Set<Box> boxes, DamageSource damageSource, Vec3d forwardPos, Vec3d rotationVector, MoveContext ctx) {
         if (targets.isEmpty()) return;
-        JComponents.getShockwaveHandler(attacker.world).addShockwave(forwardPos, new Vec3d(GravityChangerAPI.getGravityDirection(attacker).getUnitVector()), 3.0f);
+        JComponents.getShockwaveHandler(attacker.getWorld()).addShockwave(forwardPos, new Vec3d(GravityChangerAPI.getGravityDirection(attacker).getUnitVector()), 3.0f);
     }
 
     @Override

@@ -23,7 +23,7 @@ public class RedirectAttack extends AbstractMove<RedirectAttack, MagiciansRedEnt
 
     @Override
     public @NonNull Set<LivingEntity> perform(MagiciansRedEntity attacker, LivingEntity user, MoveContext ctx) {
-        List<AnkhProjectile> ankhs = attacker.world.getEntitiesByClass(AnkhProjectile.class,
+        List<AnkhProjectile> ankhs = attacker.getWorld().getEntitiesByClass(AnkhProjectile.class,
                 attacker.getBoundingBox().expand(32), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
 
         Vec3d eyePos = getOffsetHeightPos(attacker);

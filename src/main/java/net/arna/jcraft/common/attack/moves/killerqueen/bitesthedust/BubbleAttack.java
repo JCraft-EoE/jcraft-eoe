@@ -22,11 +22,11 @@ public class BubbleAttack extends AbstractMove<BubbleAttack, KQBTDEntity> {
 
     @Override
     public @NonNull Set<LivingEntity> perform(KQBTDEntity attacker, LivingEntity user, MoveContext ctx) {
-        BubbleProjectile bubbleProjectile = new BubbleProjectile(attacker.world, user);
+        BubbleProjectile bubbleProjectile = new BubbleProjectile(attacker.getWorld(), user);
         bubbleProjectile.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
         bubbleProjectile.setVelocity(user, user.getPitch(), user.getYaw(), 0, 0.5f, 0f);
         bubbleProjectile.setPosition(attacker.getPos().add(0, 1.25, 0));
-        attacker.world.spawnEntity(bubbleProjectile);
+        attacker.getWorld().spawnEntity(bubbleProjectile);
         ctx.set(BUBBLE_PROJECTILE, bubbleProjectile);
 
         JComponents.getBombTracker(user).getMainBomb().setBomb(bubbleProjectile);

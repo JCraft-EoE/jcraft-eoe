@@ -18,9 +18,10 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import org.joml.Vector3f;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -132,11 +133,11 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
                         -the superman
                         M1>cr.Time Strike>Backhand>What an Ugly Watch>delay M1>Timestop~Star Breaker>dash/Timeskip>Barrage>M1""";
 
-        auraColors = new Vec3f[]{
-                new Vec3f(0.8f, 0.6f, 1.0f),
-                new Vec3f(1.0f, 0.4f, 0.8f),
-                new Vec3f(0.7f, 0.7f, 1.0f),
-                new Vec3f(0.8f, 1.0f, 1.0f)
+        auraColors = new Vector3f[]{
+                new Vector3f(0.8f, 0.6f, 1.0f),
+                new Vector3f(1.0f, 0.4f, 0.8f),
+                new Vector3f(0.7f, 0.7f, 1.0f),
+                new Vector3f(0.8f, 1.0f, 1.0f)
         };
     }
 
@@ -178,7 +179,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
     @Override
     public void tick() {
         super.tick();
-        if (!hasUser() || world.isClient || curMove == null || curMove.getOriginalMove() != TIME_STRIKE || getMoveStun() != 7)
+        if (!hasUser() || getWorld().isClient || curMove == null || curMove.getOriginalMove() != TIME_STRIKE || getMoveStun() != 7)
             return;
 
         /*
@@ -202,30 +203,30 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
 
     // Animation code
     public enum State implements StandAnimationState<SPTWEntity> {
-        IDLE(builder -> builder.loop("animation.sptw.idle")),
-        PUNCH(builder -> builder.playAndHold("animation.sptw.punch")),
-        BLOCK(builder -> builder.loop("animation.sptw.block")),
-        HEAVY(builder -> builder.playAndHold("animation.sptw.heavy")),
-        GROUND_BREAKER(builder -> builder.playAndHold("animation.sptw.ground_break")),
-        BARRAGE(builder -> builder.loop("animation.sptw.barrage")),
-        TIME_STRIKE(builder -> builder.playAndHold("animation.sptw.timestrike")),
-        TIME_STOP(builder -> builder.playAndHold("animation.sptw.timestop")),
-        BACKHAND(builder -> builder.playAndHold("animation.sptw.backhand")),
-        GRAB(builder -> builder.playAndHold("animation.sptw.grab")),
-        GRAB_HIT(builder -> builder.playAndHold("animation.sptw.grabhit")),
-        GRAB_HIT2(builder -> builder.playAndHold("animation.sptw.grabhit2")),
-        TIME_SKIP(builder -> builder.loop("animation.sptw.idle")),
-        GROUND_SLAM(builder -> builder.playAndHold("animation.sptw.ground_slam")),
-        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.sptw.light_followup"));
+        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.sptw.idle"))),
+        PUNCH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.sptw.punch"))),
+        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.sptw.block"))),
+        HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.sptw.heavy"))),
+        GROUND_BREAKER(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.sptw.ground_break"))),
+        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.sptw.barrage"))),
+        TIME_STRIKE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.sptw.timestrike"))),
+        TIME_STOP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.sptw.timestop"))),
+        BACKHAND(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.sptw.backhand"))),
+        GRAB(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.sptw.grab"))),
+        GRAB_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.sptw.grabhit"))),
+        GRAB_HIT2(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.sptw.grabhit2"))),
+        TIME_SKIP(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.sptw.idle"))),
+        GROUND_SLAM(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.sptw.ground_slam"))),
+        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.sptw.light_followup")));
 
-        private final Consumer<AnimationBuilder> animator;
+        private final Consumer<AnimationState> animator;
 
-        State(Consumer<AnimationBuilder> animator) {
+        State(Consumer<AnimationState> animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(SPTWEntity attacker, AnimationBuilder builder) {
+        public void playAnimation(SPTWEntity attacker, AnimationState builder) {
             animator.accept(builder);
         }
     }

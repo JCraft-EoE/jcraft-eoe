@@ -7,6 +7,7 @@ import net.arna.jcraft.common.entity.stand.AbstractKillerQueenEntity;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 
 import java.util.Set;
@@ -20,11 +21,11 @@ public class ExplosiveDashAttack extends AbstractMove<ExplosiveDashAttack, Abstr
     @Override
     public @NonNull Set<LivingEntity> perform(AbstractKillerQueenEntity<?, ?> attacker, LivingEntity user, MoveContext ctx) {
         Vec3d lookVec = user.getRotationVector().multiply(0.9);
-        attacker.world.createExplosion(user,
+        attacker.getWorld().createExplosion(user,
                 user.getX() - lookVec.x,
                 user.getY() + user.getHeight() / 2 - lookVec.y,
                 user.getZ() - lookVec.z,
-                1f, Explosion.DestructionType.NONE);
+                1f, World.ExplosionSourceType.NONE);
 
         user.setVelocity(user.getVelocity().add(lookVec));
         user.velocityModified = true;

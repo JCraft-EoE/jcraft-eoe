@@ -34,7 +34,7 @@ public class EmeraldSplashAttack extends AbstractMultiHitAttack<EmeraldSplashAtt
         int emeraldCount = 3 + ctx.getInt(CHARGE_TIME) / 10;
 
         for (int i = 0; i < emeraldCount; i++) {
-            EmeraldProjectile emerald = new EmeraldProjectile(attacker.world, user);
+            EmeraldProjectile emerald = new EmeraldProjectile(attacker.getWorld(), user);
             emerald.setVelocity(user, user.getPitch(), user.getYaw(), 0.0F, speed, 5F);
 
             Vec3d upVec = GravityChangerAPI.getEyeOffset(attacker.getUserOrThrow());
@@ -44,7 +44,7 @@ public class EmeraldSplashAttack extends AbstractMultiHitAttack<EmeraldSplashAtt
             if (reflect)
                 emerald.withReflect();
 
-            attacker.world.spawnEntity(emerald);
+            attacker.getWorld().spawnEntity(emerald);
         }
 
         return Set.of();

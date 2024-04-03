@@ -21,12 +21,12 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class EmeraldProjectile extends PersistentProjectileEntity implements IAnimatable {
+public class EmeraldProjectile extends PersistentProjectileEntity implements GeoEntity {
     private int ticksInAir;
     private int bouncesLeft = 5;
     private boolean reflect = false;
@@ -71,23 +71,23 @@ public class EmeraldProjectile extends PersistentProjectileEntity implements IAn
         if (!inGround) {
             ++ticksInAir;
         } else {
-            if (world.isClient) {
+            if (getWorld().isClient) {
                 double x = getX();
                 double y = getY();
                 double z = getZ();
 
                 for (int i = 0; i < 8; i++)
-                    world.addParticle(EMERALD_PARTICLE, x, y, z,
+                    getWorld().addParticle(EMERALD_PARTICLE, x, y, z,
                             random.nextGaussian(), random.nextGaussian(), random.nextGaussian());
             }
         }
 
-        if (world.isClient) {
+        if (getWorld().isClient) {
             if (random.nextGaussian() < -0.002) {
                 double x = getX();
                 double y = getY();
                 double z = getZ();
-                world.addParticle(ParticleTypes.HAPPY_VILLAGER, x, y, z,
+                getWorld().addParticle(ParticleTypes.HAPPY_VILLAGER, x, y, z,
                         random.nextGaussian(), random.nextGaussian(), random.nextGaussian());
             }
             return;
@@ -103,7 +103,7 @@ public class EmeraldProjectile extends PersistentProjectileEntity implements IAn
             HitResult.Type type = hitResult.getType();
             if (type == HitResult.Type.ENTITY) {
                 this.onEntityHit((EntityHitResult) hitResult);
-                this.world.emitGameEvent(GameEvent.PROJECTILE_LAND, hitResult.getPos(), GameEvent.Emitter.of(this, null));
+                this.getWorld().emitGameEvent(GameEvent.PROJECTILE_LAND, hitResult.getPos(), GameEvent.Emitter.of(this, null));
             } else if (type == HitResult.Type.BLOCK) {
                 BlockHitResult blockHitResult = (BlockHitResult) hitResult;
                 if (bouncesLeft-- > 0) {
@@ -112,7 +112,7 @@ public class EmeraldProjectile extends PersistentProjectileEntity implements IAn
                 } else {
                     this.onBlockHit(blockHitResult);
                     BlockPos blockPos = blockHitResult.getBlockPos();
-                    this.world.emitGameEvent(GameEvent.PROJECTILE_LAND, blockPos, GameEvent.Emitter.of(this, this.world.getBlockState(blockPos)));
+                    this.getWorld().emitGameEvent(GameEvent.PROJECTILE_LAND, blockPos, GameEvent.Emitter.of(this, this.getWorld().getBlockState(blockPos)));
                 }
             }
         } else super.onCollision(hitResult);
@@ -120,7 +120,7 @@ public class EmeraldProjectile extends PersistentProjectileEntity implements IAn
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
-        if (world.isClient) return;
+        if (getWorld().isClient) return;
         Entity entity = entityHitResult.getEntity();
         Entity owner = this.getOwner();
 
@@ -132,7 +132,7 @@ public class EmeraldProjectile extends PersistentProjectileEntity implements IAn
         int blockstun = 4;
         int stunT = 10;
 
-        JUtils.projectileDamageLogic(this, world, entity, Vec3d.ZERO, stunT, 1, false, 1, blockstun, HitPropertyComponent.HitAnimation.MID);
+        JUtils.projectileDamageLogic(this, getWorld(), entity, Vec3d.ZERO, stunT, 1, false, 1, blockstun, HitPropertyComponent.HitAnimation.MID);
         playSound(SoundEvents.BLOCK_AMETHYST_BLOCK_BREAK, 1, 1);
         discard();
     }
@@ -150,14 +150,16 @@ public class EmeraldProjectile extends PersistentProjectileEntity implements IAn
     }
 
     // Animations
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+
 
     @Override
-    public void registerControllers(AnimationData data) {
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+
     }
 
     @Override
-    public AnimationFactory getFactory() {
-        return this.factory;
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 }

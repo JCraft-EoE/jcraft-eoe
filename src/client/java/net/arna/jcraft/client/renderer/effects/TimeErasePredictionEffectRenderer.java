@@ -95,10 +95,10 @@ public class TimeErasePredictionEffectRenderer {
             if (entity == null || !entity.isAlive()) continue;
 
             Vec3d pos = prediction.getValue().subtract(camPos);
-            BlockPos bPos = new BlockPos(prediction.getValue());
+            BlockPos bPos = BlockPos.ofFloored(prediction.getValue());
 
-            int blockLight = Math.max(entity.isOnFire() ? 15 : entity.world.getLightLevel(LightType.BLOCK, bPos), 7);
-            int skyLight = Math.max(entity.world.getLightLevel(LightType.SKY, bPos), 7);
+            int blockLight = Math.max(entity.isOnFire() ? 15 : entity.getWorld().getLightLevel(LightType.BLOCK, bPos), 7);
+            int skyLight = Math.max(entity.getWorld().getLightLevel(LightType.SKY, bPos), 7);
             entityRenderDispatcher.render(entity, pos.x, pos.y - 0.1, pos.z, entity.getYaw(), ctx.tickDelta(), ctx.matrixStack(),
                     consumers, LightmapTextureManager.pack(blockLight, skyLight));
         }
@@ -120,7 +120,7 @@ public class TimeErasePredictionEffectRenderer {
         RenderSystem.enableBlend();
         RenderSystem.disableCull();
         RenderSystem.disableDepthTest();
-        RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
         RenderSystem.setShaderTexture(0, predictionsBuffer.getColorAttachment());
         RenderUtils.startOverlayRender();
 
@@ -133,7 +133,7 @@ public class TimeErasePredictionEffectRenderer {
         buffer.vertex(window.getScaledWidth(), 0, 0).color(r, g, b, a).texture(1, 1).next();
         buffer.vertex(window.getScaledWidth(), window.getScaledHeight(), 0).color(r, g, b, a).texture(1, 0).next();
         buffer.vertex(0, window.getScaledHeight(), 0).color(r, g, b, a).texture(0, 0).next();
-        BufferRenderer.drawWithShader(buffer.end());
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
 
         RenderSystem.disableBlend();
         RenderSystem.enableDepthTest();

@@ -11,7 +11,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.passive.FrogEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Vec3f;
 
 @Environment(EnvType.CLIENT)
 public class GEFrogRenderer extends FrogEntityRenderer {
@@ -25,7 +24,7 @@ public class GEFrogRenderer extends FrogEntityRenderer {
     public void render(FrogEntity frogEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
         matrixStack.push();
         matrixStack.translate(0.0, 0.4, 0);
-        matrixStack.multiply(Vec3f.NEGATIVE_Y.getDegreesQuaternion(frogEntity.getYaw()));
+        matrixStack.multiply(Vector3f.NEGATIVE_Y.getDegreesQuaternion(frogEntity.getYaw()));
         ItemStack itemStack = frogEntity.getEquippedStack(EquipmentSlot.MAINHAND);
         this.heldItemRenderer.renderItem(frogEntity, itemStack, ModelTransformation.Mode.GROUND, false, matrixStack, vertexConsumerProvider, i);
         matrixStack.pop();

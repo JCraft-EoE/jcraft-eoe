@@ -20,10 +20,11 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import org.joml.Vector3f;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -92,11 +93,11 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                     -the ol razzle dazzle
                     (Already bomb planted) M1~Low>Barrage>M1>Elbow>Detonate""";
 
-        auraColors = new Vec3f[]{
-                new Vec3f(0.9f, 0.7f, 0.8f),
-                new Vec3f(0f, 0f, 0f),
-                new Vec3f(0.8f, 0.2f, 0.2f),
-                new Vec3f(0.8f, 0.6f, 0.2f)
+        auraColors = new Vector3f[]{
+                new Vector3f(0.9f, 0.7f, 0.8f),
+                new Vector3f(0f, 0f, 0f),
+                new Vector3f(0.8f, 0.2f, 0.2f),
+                new Vector3f(0.8f, 0.6f, 0.2f)
         };
     }
 
@@ -142,7 +143,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
     public void tick() {
         super.tick();
 
-        if (!hasUser() || world.isClient) return;
+        if (!hasUser() || getWorld().isClient) return;
 
         BUBBLE.tickBubble(this);
         BTD_PLANT.tickBomb(this);
@@ -156,30 +157,30 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
 
     // Animations
     public enum State implements StandAnimationState<KQBTDEntity> {
-        IDLE(builder -> builder.loop("animation.kqbtd.idle")),
-        LIGHT(builder -> builder.playAndHold("animation.kqbtd.light")),
-        BLOCK(builder -> builder.loop("animation.kqbtd.block")),
-        HEAVY(builder -> builder.playAndHold("animation.kqbtd.heavy")),
-        BARRAGE(builder -> builder.loop("animation.kqbtd.barrage")),
-        DETONATE(builder -> builder.playAndHold("animation.kqbtd.detonate")),
-        BOMB_PLANT(builder -> builder.playAndHold("animation.kqbtd.bombplant")),
-        BUBBLE(builder -> builder.playAndHold("animation.kqbtd.bubble")),
-        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.kqbtd.light_followup")),
-        LOW(builder -> builder.playAndHold("animation.kqbtd.low")),
-        BUBBLE_COUNTER(builder -> builder.playAndHold("animation.kqbtd.bubblecounter")),
-        COUNTER_MISS(builder -> builder.playAndHold("animation.kqbtd.counter_miss")),
-        BTD_PLANT(builder -> builder.playAndHold("animation.kqbtd.btdplant")),
-        GRAB(builder -> builder.playAndHold("animation.kqbtd.grab")),
-        GRAB_HIT(builder -> builder.playAndHold("animation.kqbtd.grab_hit"));
+        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.kqbtd.idle"))),
+        LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kqbtd.light"))),
+        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.kqbtd.block"))),
+        HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kqbtd.heavy"))),
+        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.kqbtd.barrage"))),
+        DETONATE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kqbtd.detonate"))),
+        BOMB_PLANT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kqbtd.bombplant"))),
+        BUBBLE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kqbtd.bubble"))),
+        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kqbtd.light_followup"))),
+        LOW(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kqbtd.low"))),
+        BUBBLE_COUNTER(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kqbtd.bubblecounter"))),
+        COUNTER_MISS(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kqbtd.counter_miss"))),
+        BTD_PLANT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kqbtd.btdplant"))),
+        GRAB(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kqbtd.grab"))),
+        GRAB_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kqbtd.grab_hit")));
 
-        private final Consumer<AnimationBuilder> animator;
+        private final Consumer<AnimationState> animator;
 
-        State(Consumer<AnimationBuilder> animator) {
+        State(Consumer<AnimationState> animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(KQBTDEntity attacker, AnimationBuilder builder) {
+        public void playAnimation(KQBTDEntity attacker, AnimationState builder) {
             animator.accept(builder);
         }
     }

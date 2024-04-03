@@ -18,7 +18,7 @@ public class JExplosionPacket {
         if (modifier == null) buf.writeBoolean(false);
         else {
             buf.writeBoolean(true);
-            modifier.write(buf, player.world.random);
+            modifier.write(buf, player.getWorld().random);
         }
 
         ServerPlayNetworking.send(player, JPacketRegistry.S2C_J_EXPLOSION, buf);

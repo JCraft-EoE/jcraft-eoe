@@ -16,16 +16,16 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.PlayState;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class RedBindEntity extends JAttackEntity implements IAnimatable {
+public class RedBindEntity extends JAttackEntity implements GeoEntity {
     private LivingEntity boundEntity;
     private float boundHealth;
     public static final int ticksToLive = 60;
@@ -72,7 +72,7 @@ public class RedBindEntity extends JAttackEntity implements IAnimatable {
 
     @Override
     public void tick() {
-        if (!world.isClient) {
+        if (!getWorld().isClient) {
             if (boundEntity == null) { // If boundEntity data was wiped, attempt to recover
                 if (getVehicle() instanceof LivingEntity living) setBoundEntity(living);
             } else if (!hasVehicle() && !hasExploded()) { // If detached
@@ -98,7 +98,7 @@ public class RedBindEntity extends JAttackEntity implements IAnimatable {
             Vec3d vel = boundEntity.getPos().add(0, 0.5, 0).subtract(master.getPos());
             Vec3d launch = vel.normalize().multiply(1.25);
             StandEntity.damageLogic(boundEntity.getWorld(), boundEntity, launch, 20, 3, true,
-                    6, false, 4, DamageSource.mob(master), master, HitPropertyComponent.HitAnimation.MID, false, true);
+                    6, false, 4, getWorld().getDamageSources().mobAttack(master), master, HitPropertyComponent.HitAnimation.MID, false, true);
         }
 
         dataTracker.set(EXPLODED, true);
@@ -128,25 +128,19 @@ public class RedBindEntity extends JAttackEntity implements IAnimatable {
     }
 
     // Animations
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
-    }
-
-    @SuppressWarnings("SameReturnValue")
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        event.getController().setAnimation(
-                new AnimationBuilder().loop(
-                        hasExploded() ? "animation.red_bind.explode" : "animation.red_bind.idle"
-                )
-        );
-        return PlayState.CONTINUE;
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 
     @Override
-    public AnimationFactory getFactory() {
-        return this.factory;
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "controller", 0, this::predicate));
+    }
+
+    private PlayState predicate(AnimationState<RedBindEntity> state) {
+        return state.setAndContinue(RawAnimation.begin().thenLoop(hasExploded() ? "animation.red_bind.explode" : "animation.red_bind.idle"));
     }
 }

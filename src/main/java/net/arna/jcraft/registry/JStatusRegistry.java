@@ -5,7 +5,8 @@ import net.arna.jcraft.common.effects.*;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 
 public interface JStatusRegistry {
     StatusEffect DAZED = new DazedStatusEffect();
@@ -18,7 +19,7 @@ public interface JStatusRegistry {
 
     static void registerStatuses() {
         Registry.register(
-                Registry.STATUS_EFFECT, JCraft.id("dazed_effect"),
+                Registries.STATUS_EFFECT, JCraft.id("dazed_effect"),
                 DAZED.addAttributeModifier(
                         EntityAttributes.GENERIC_ATTACK_DAMAGE,
                         "FE04CA6A-A3D1-E22B-CB00-EDA6A853F90E",
@@ -42,7 +43,7 @@ public interface JStatusRegistry {
         );
 
         Registry.register(
-                Registry.STATUS_EFFECT, JCraft.id("knockdown"),
+                Registries.STATUS_EFFECT, JCraft.id("knockdown"),
                 KNOCKDOWN.addAttributeModifier(
                         EntityAttributes.GENERIC_ARMOR,
                         "BB2CA307-EEA6-B54C-B324-F7EB036289BF",
@@ -60,10 +61,10 @@ public interface JStatusRegistry {
                         EntityAttributeModifier.Operation.MULTIPLY_TOTAL)
         );
 
-        Registry.register(Registry.STATUS_EFFECT, JCraft.id("ws_poison"), WSPOISON);
-        Registry.register(Registry.STATUS_EFFECT, JCraft.id("standless"), STANDLESS);
-        Registry.register(Registry.STATUS_EFFECT, JCraft.id("outofbody"), OUTOFBODY);
-        Registry.register(Registry.STATUS_EFFECT, JCraft.id("weightless"), WEIGHTLESS);
-        Registry.register(Registry.STATUS_EFFECT, JCraft.id("bleeding"), BLEEDING);
+        Registry.register(Registries.STATUS_EFFECT, JCraft.id("ws_poison"), WSPOISON);
+        Registry.register(Registries.STATUS_EFFECT, JCraft.id("standless"), STANDLESS);
+        Registry.register(Registries.STATUS_EFFECT, JCraft.id("outofbody"), OUTOFBODY);
+        Registry.register(Registries.STATUS_EFFECT, JCraft.id("weightless"), WEIGHTLESS);
+        Registry.register(Registries.STATUS_EFFECT, JCraft.id("bleeding"), BLEEDING);
     }
 }

@@ -54,7 +54,7 @@ public class SpeedSliceAttack extends AbstractMove<SpeedSliceAttack, MadeInHeave
 
         Vec3d kbVec = towardsVec.normalize();
 
-        DamageSource playerSource = DamageSource.mob(user);
+        DamageSource playerSource = world.getDamageSources().mobAttack(user);
 
         user.teleport(pos2.x, pos2.y, pos2.z);
 

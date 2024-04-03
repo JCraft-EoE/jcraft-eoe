@@ -7,8 +7,6 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import software.bernie.geckolib3.renderers.geo.GeoLayerRenderer;
-import software.bernie.geckolib3.renderers.geo.IGeoRenderer;
 
 public class MRGlowLayer extends GeoLayerRenderer<MagiciansRedEntity> {
     private static final Identifier LAYER = new Identifier(JCraft.MOD_ID, "textures/entity/stands/magicians_red/glow.png");

@@ -111,7 +111,7 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
 
     @Override
     public void playAttackerSound(SoundEvent sound, float volume, float pitch) {
-        player.world.playSound(null, player.getX(), player.getY(), player.getZ(), sound, SoundCategory.PLAYERS,
+        player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), sound, SoundCategory.PLAYERS,
                 volume, pitch);
     }
 

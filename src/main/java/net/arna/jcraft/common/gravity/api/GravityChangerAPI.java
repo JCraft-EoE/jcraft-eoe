@@ -15,8 +15,8 @@ import net.arna.jcraft.common.gravity.util.packet.UpdateGravityPacket;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -198,7 +198,7 @@ public abstract class GravityChangerAPI {
         entity.setVelocity(RotationUtil.vecWorldToPlayer(worldVelocity, getGravityDirection(entity)));
     }
 
-    public static void setWorldVelocity(Entity entity, Vec3f worldVelocity) {
+    public static void setWorldVelocity(Entity entity, Vector3f worldVelocity) {
         entity.setVelocity(RotationUtil.vecWorldToPlayer(new Vec3d(worldVelocity), getGravityDirection(entity)));
     }
 
@@ -224,7 +224,7 @@ public abstract class GravityChangerAPI {
     }
 
     private static boolean onWrongSide(Entity entity) {
-        if (entity.world.isClient) {
+        if (entity.getWorld().isClient) {
             JCraft.LOGGER.error("GravityChangerAPI function cannot be called from the client, use dedicated client class. ", new Exception());
             return true;
         }

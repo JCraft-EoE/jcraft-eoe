@@ -51,7 +51,7 @@ class SplatterSplitter {
         Vec3d min = add(add(center, a1, -xRange), a2, -zRange);
         Vec3d max = add(add(center, a1, xRange), a2, zRange);
 
-        return Streams.stream(BlockPos.iterate(new BlockPos(min), new BlockPos(max))).map(pos -> {
+        return Streams.stream(BlockPos.iterate(BlockPos.ofFloored(min), BlockPos.ofFloored(max))).map(pos -> {
             double c1 = center.getComponentAlongAxis(a1);
             double c2 = center.getComponentAlongAxis(a2);
             int p1 = pos.getComponentAlongAxis(a1);
@@ -86,12 +86,12 @@ class SplatterSplitter {
         return vec.add(axis == Direction.Axis.X ? value : 0, axis == Direction.Axis.Y ? value : 0, axis == Direction.Axis.Z ? value : 0);
     }
 
-    private static void add(Vec3f vec, Direction.Axis axis, float value) {
+    private static void add(Vector3f vec, Direction.Axis axis, float value) {
         vec.add(axis == Direction.Axis.X ? value : 0, axis == Direction.Axis.Y ? value : 0, axis == Direction.Axis.Z ? value : 0);
     }
 
-    private static Vec3f pack(float v1, float v2, Direction.Axis a1, Direction.Axis a2, Vec3d fallback) {
-        Vec3f res = new Vec3f();
+    private static Vector3f pack(float v1, float v2, Direction.Axis a1, Direction.Axis a2, Vec3d fallback) {
+        Vector3f res = new Vector3f();
         for (Direction.Axis axis : Direction.Axis.values()) {
             if (axis == a1) add(res, axis, v1);
             else if (axis == a2) add(res, axis, v2);
@@ -120,8 +120,8 @@ class SplatterSplitter {
             if (anchors == null) return Stream.of(section); // No anchors, no special handling.
 
             Stream.Builder<SplatterSection> res = Stream.builder();
-            Vec3f minP = section.getMinPos().copy();
-            Vec3f maxP = section.getMaxPos().copy();
+            Vector3f minP = section.getMinPos().copy();
+            Vector3f maxP = section.getMaxPos().copy();
 
             for (ObjectBooleanPair<Direction> anchor : anchors) {
                 boolean inside = anchor.rightBoolean();
@@ -148,173 +148,173 @@ class SplatterSplitter {
         .toList();
     }
 
-    private static SplatterSection wrapUp(SplatterSection section, Vec3f min, Vec3f max, boolean inside) {
+    private static SplatterSection wrapUp(SplatterSection section, Vector3f min, Vector3f max, boolean inside) {
         FloatFloatPair dims = getDims(section.getDirection(), min, max);
         float width = dims.leftFloat(), height = dims.rightFloat();
 
         return switch (section.getDirection()) {
             case NORTH -> inside ?
-                    section.wrapped(UP, new Vec3f(min.getX(), max.getY(), min.getZ() - height), max) :
-                    section.wrapped(UP, min, new Vec3f(max.getX(), min.getY(), max.getZ() + height));
+                    section.wrapped(UP, new Vector3f(min.getX(), max.getY(), min.getZ() - height), max) :
+                    section.wrapped(UP, min, new Vector3f(max.getX(), min.getY(), max.getZ() + height));
             case SOUTH -> inside ?
-                    section.wrapped(UP, new Vec3f(min.getX(), max.getY(), min.getZ()),
-                            new Vec3f(max.getX(), max.getY(), max.getZ() + height)) :
-                    section.wrapped(UP, new Vec3f(min.getX(), min.getY(), min.getZ() - height),
-                            new Vec3f(max.getX(), min.getY(), max.getZ()));
+                    section.wrapped(UP, new Vector3f(min.getX(), max.getY(), min.getZ()),
+                            new Vector3f(max.getX(), max.getY(), max.getZ() + height)) :
+                    section.wrapped(UP, new Vector3f(min.getX(), min.getY(), min.getZ() - height),
+                            new Vector3f(max.getX(), min.getY(), max.getZ()));
             case WEST -> inside ?
-                    section.wrapped(UP, new Vec3f(min.getX() - width, max.getY(), min.getZ()), max) :
-                    section.wrapped(UP, min, new Vec3f(max.getX() + width, min.getY(), max.getZ()));
+                    section.wrapped(UP, new Vector3f(min.getX() - width, max.getY(), min.getZ()), max) :
+                    section.wrapped(UP, min, new Vector3f(max.getX() + width, min.getY(), max.getZ()));
             case EAST -> inside ?
-                    section.wrapped(UP, new Vec3f(min.getX(), max.getY(), min.getZ()),
-                            new Vec3f(max.getX() + width, max.getY(), max.getZ())) :
-                    section.wrapped(UP, new Vec3f(min.getX() - width, min.getY(), min.getZ()),
-                            new Vec3f(max.getX(), min.getY(), max.getZ()));
+                    section.wrapped(UP, new Vector3f(min.getX(), max.getY(), min.getZ()),
+                            new Vector3f(max.getX() + width, max.getY(), max.getZ())) :
+                    section.wrapped(UP, new Vector3f(min.getX() - width, min.getY(), min.getZ()),
+                            new Vector3f(max.getX(), min.getY(), max.getZ()));
             // Up and down should be impossible
             default -> throw new IllegalStateException("Unexpected value: " + section.getDirection());
         };
     }
 
-    private static SplatterSection wrapDown(SplatterSection section, Vec3f min, Vec3f max, boolean inside) {
+    private static SplatterSection wrapDown(SplatterSection section, Vector3f min, Vector3f max, boolean inside) {
         FloatFloatPair dims = getDims(section.getDirection(), min, max);
         float width = dims.leftFloat(), height = dims.rightFloat();
 
         return switch (section.getDirection()) {
             case NORTH -> inside ?
-                    section.wrapped(DOWN, new Vec3f(min.getX(), min.getY(), min.getZ() - height),
-                            new Vec3f(max.getX(), min.getY(), max.getZ()), SplatterSection.UvModification.V_FLIP) :
-                    section.wrapped(DOWN, new Vec3f(min.getX(), max.getY(), min.getZ()),
-                            new Vec3f(max.getX(), max.getY(), max.getZ() + height), SplatterSection.UvModification.V_FLIP);
+                    section.wrapped(DOWN, new Vector3f(min.getX(), min.getY(), min.getZ() - height),
+                            new Vector3f(max.getX(), min.getY(), max.getZ()), SplatterSection.UvModification.V_FLIP) :
+                    section.wrapped(DOWN, new Vector3f(min.getX(), max.getY(), min.getZ()),
+                            new Vector3f(max.getX(), max.getY(), max.getZ() + height), SplatterSection.UvModification.V_FLIP);
             case SOUTH -> inside ?
-                    section.wrapped(DOWN, min, new Vec3f(max.getX(), min.getY(), max.getZ() + height),
+                    section.wrapped(DOWN, min, new Vector3f(max.getX(), min.getY(), max.getZ() + height),
                             SplatterSection.UvModification.V_FLIP) :
-                    section.wrapped(DOWN, new Vec3f(min.getX(), max.getY(), min.getZ() - height), max,
+                    section.wrapped(DOWN, new Vector3f(min.getX(), max.getY(), min.getZ() - height), max,
                             SplatterSection.UvModification.V_FLIP);
             case WEST -> inside ?
-                    section.wrapped(DOWN, new Vec3f(min.getX() - width, min.getY(), min.getZ()),
-                            new Vec3f(max.getX(), min.getY(), max.getZ()), SplatterSection.UvModification.U_FLIP) :
-                    section.wrapped(DOWN, new Vec3f(min.getX(), max.getY(), min.getZ()),
-                            new Vec3f(max.getX() + width, max.getY(), max.getZ()), SplatterSection.UvModification.U_FLIP);
+                    section.wrapped(DOWN, new Vector3f(min.getX() - width, min.getY(), min.getZ()),
+                            new Vector3f(max.getX(), min.getY(), max.getZ()), SplatterSection.UvModification.U_FLIP) :
+                    section.wrapped(DOWN, new Vector3f(min.getX(), max.getY(), min.getZ()),
+                            new Vector3f(max.getX() + width, max.getY(), max.getZ()), SplatterSection.UvModification.U_FLIP);
             case EAST -> inside ?
-                    section.wrapped(DOWN, min, new Vec3f(max.getX() + width, min.getY(), max.getZ()),
+                    section.wrapped(DOWN, min, new Vector3f(max.getX() + width, min.getY(), max.getZ()),
                             SplatterSection.UvModification.U_FLIP) :
-                    section.wrapped(DOWN, new Vec3f(min.getX() - width, max.getY(), min.getZ()), max,
+                    section.wrapped(DOWN, new Vector3f(min.getX() - width, max.getY(), min.getZ()), max,
                             SplatterSection.UvModification.U_FLIP);
             // North and south should be impossible
             default -> throw new IllegalStateException("Unexpected value: " + section.getDirection());
         };
     }
 
-    private static SplatterSection wrapNorth(SplatterSection section, Vec3f min, Vec3f max, boolean inside) {
+    private static SplatterSection wrapNorth(SplatterSection section, Vector3f min, Vector3f max, boolean inside) {
         FloatFloatPair dims = getDims(section.getDirection(), min, max);
         float height = dims.rightFloat();
 
         return switch (section.getDirection()) {
             case UP -> inside ?
-                    section.wrapped(NORTH, min, new Vec3f(max.getX(), max.getY() + height, min.getZ())) :
-                    section.wrapped(NORTH, new Vec3f(min.getX(), min.getY() - height, max.getZ()), max);
+                    section.wrapped(NORTH, min, new Vector3f(max.getX(), max.getY() + height, min.getZ())) :
+                    section.wrapped(NORTH, new Vector3f(min.getX(), min.getY() - height, max.getZ()), max);
             case DOWN -> inside ?
-                    section.wrapped(NORTH, new Vec3f(min.getX(), min.getY() - height, min.getZ()),
-                            new Vec3f(max.getX(), max.getY(), max.getZ() - height), SplatterSection.UvModification.V_FLIP) :
-                    section.wrapped(NORTH, new Vec3f(min.getX(), min.getY(), max.getZ()),
-                            new Vec3f(max.getX(), max.getY() + height, min.getZ()), SplatterSection.UvModification.V_FLIP);
+                    section.wrapped(NORTH, new Vector3f(min.getX(), min.getY() - height, min.getZ()),
+                            new Vector3f(max.getX(), max.getY(), max.getZ() - height), SplatterSection.UvModification.V_FLIP) :
+                    section.wrapped(NORTH, new Vector3f(min.getX(), min.getY(), max.getZ()),
+                            new Vector3f(max.getX(), max.getY() + height, min.getZ()), SplatterSection.UvModification.V_FLIP);
             case WEST -> inside ?
-                    section.wrapped(NORTH, new Vec3f(min.getX() - height, min.getY(), min.getZ()),
-                            new Vec3f(max.getX(), max.getY(), min.getZ()), SplatterSection.UvModification.FLIP_U_FLIP) :
-                    section.wrapped(NORTH, new Vec3f(min.getX() + height, min.getY(), max.getZ()), max,
+                    section.wrapped(NORTH, new Vector3f(min.getX() - height, min.getY(), min.getZ()),
+                            new Vector3f(max.getX(), max.getY(), min.getZ()), SplatterSection.UvModification.FLIP_U_FLIP) :
+                    section.wrapped(NORTH, new Vector3f(min.getX() + height, min.getY(), max.getZ()), max,
                             SplatterSection.UvModification.FLIP);
             case EAST -> inside ?
-                    section.wrapped(NORTH, min, new Vec3f(max.getX() + height, max.getY(), min.getZ()),
+                    section.wrapped(NORTH, min, new Vector3f(max.getX() + height, max.getY(), min.getZ()),
                             SplatterSection.UvModification.SWAP_U_FLIP) :
-                    section.wrapped(NORTH, new Vec3f(min.getX() - height, min.getY(), max.getZ()),
-                            new Vec3f(max.getX(), max.getY(), max.getZ()), SplatterSection.UvModification.SWAP_U_FLIP);
+                    section.wrapped(NORTH, new Vector3f(min.getX() - height, min.getY(), max.getZ()),
+                            new Vector3f(max.getX(), max.getY(), max.getZ()), SplatterSection.UvModification.SWAP_U_FLIP);
             // North and south should be impossible
             default -> throw new IllegalStateException("Unexpected value: " + section.getDirection());
         };
     }
 
-    private static SplatterSection wrapWest(SplatterSection section, Vec3f min, Vec3f max, boolean inside) {
+    private static SplatterSection wrapWest(SplatterSection section, Vector3f min, Vector3f max, boolean inside) {
         FloatFloatPair dims = getDims(section.getDirection(), min, max);
         float width = dims.leftFloat();
 
         return switch (section.getDirection()) {
             case UP -> inside ?
-                    section.wrapped(WEST, min, new Vec3f(max.getX(), max.getY() + width, max.getZ())) :
-                    section.wrapped(WEST, new Vec3f(min.getX() + width, min.getY() - width, min.getZ()), max);
+                    section.wrapped(WEST, min, new Vector3f(max.getX(), max.getY() + width, max.getZ())) :
+                    section.wrapped(WEST, new Vector3f(min.getX() + width, min.getY() - width, min.getZ()), max);
             case DOWN -> inside ?
-                    section.wrapped(WEST, new Vec3f(min.getX(), min.getY() - width, min.getZ()),
+                    section.wrapped(WEST, new Vector3f(min.getX(), min.getY() - width, min.getZ()),
                             max, SplatterSection.UvModification.U_FLIP) :
-                    section.wrapped(WEST, new Vec3f(min.getX() + width, min.getY(), min.getZ()),
-                            new Vec3f(max.getX(), max.getY() + width, max.getZ()), SplatterSection.UvModification.U_FLIP);
+                    section.wrapped(WEST, new Vector3f(min.getX() + width, min.getY(), min.getZ()),
+                            new Vector3f(max.getX(), max.getY() + width, max.getZ()), SplatterSection.UvModification.U_FLIP);
             case NORTH -> inside ?
-                    section.wrapped(WEST, new Vec3f(min.getX(), min.getY(), min.getZ() - width),
-                            new Vec3f(min.getX(), max.getY(), max.getZ()), SplatterSection.UvModification.SWAP_U_FLIP) :
-                    section.wrapped(WEST, new Vec3f(max.getX(), min.getY(), min.getZ()),
-                            new Vec3f(max.getX(), max.getY(), max.getZ() + width), SplatterSection.UvModification.SWAP_U_FLIP);
+                    section.wrapped(WEST, new Vector3f(min.getX(), min.getY(), min.getZ() - width),
+                            new Vector3f(min.getX(), max.getY(), max.getZ()), SplatterSection.UvModification.SWAP_U_FLIP) :
+                    section.wrapped(WEST, new Vector3f(max.getX(), min.getY(), min.getZ()),
+                            new Vector3f(max.getX(), max.getY(), max.getZ() + width), SplatterSection.UvModification.SWAP_U_FLIP);
             case SOUTH -> inside ?
-                    section.wrapped(WEST, min, new Vec3f(min.getX(), max.getY(), max.getZ() + width),
+                    section.wrapped(WEST, min, new Vector3f(min.getX(), max.getY(), max.getZ() + width),
                             SplatterSection.UvModification.SWAP_V_FLIP) :
-                    section.wrapped(WEST, new Vec3f(max.getX(), min.getY(), min.getZ()),
-                            new Vec3f(max.getX(), max.getY(), max.getZ() - width), SplatterSection.UvModification.SWAP);
+                    section.wrapped(WEST, new Vector3f(max.getX(), min.getY(), min.getZ()),
+                            new Vector3f(max.getX(), max.getY(), max.getZ() - width), SplatterSection.UvModification.SWAP);
             // West and East should be impossible
             default -> throw new IllegalStateException("Unexpected value: " + section.getDirection());
         };
     }
 
-    private static SplatterSection wrapSouth(SplatterSection section, Vec3f min, Vec3f max, boolean inside) {
+    private static SplatterSection wrapSouth(SplatterSection section, Vector3f min, Vector3f max, boolean inside) {
         FloatFloatPair dims = getDims(section.getDirection(), min, max);
         float height = dims.rightFloat();
 
         return switch (section.getDirection()) {
             case UP -> inside ?
-                    section.wrapped(SOUTH, new Vec3f(min.getX(), min.getY(), max.getZ()),
-                            new Vec3f(max.getX(), max.getY() + height, max.getZ())) :
-                    section.wrapped(SOUTH, new Vec3f(min.getX(), min.getY() - height, min.getZ()),
-                            new Vec3f(max.getX(), max.getY(), min.getZ()));
+                    section.wrapped(SOUTH, new Vector3f(min.getX(), min.getY(), max.getZ()),
+                            new Vector3f(max.getX(), max.getY() + height, max.getZ())) :
+                    section.wrapped(SOUTH, new Vector3f(min.getX(), min.getY() - height, min.getZ()),
+                            new Vector3f(max.getX(), max.getY(), min.getZ()));
             case DOWN -> inside ?
-                    section.wrapped(SOUTH, new Vec3f(min.getX(), min.getY() - height, max.getZ()), max,
+                    section.wrapped(SOUTH, new Vector3f(min.getX(), min.getY() - height, max.getZ()), max,
                             SplatterSection.UvModification.V_FLIP) :
-                    section.wrapped(SOUTH, min, new Vec3f(max.getX(), max.getY() + height, min.getZ()),
+                    section.wrapped(SOUTH, min, new Vector3f(max.getX(), max.getY() + height, min.getZ()),
                             SplatterSection.UvModification.V_FLIP);
             case WEST -> inside ?
-                    section.wrapped(SOUTH, new Vec3f(min.getX() - height, min.getY(), max.getZ()), max,
+                    section.wrapped(SOUTH, new Vector3f(min.getX() - height, min.getY(), max.getZ()), max,
                             SplatterSection.UvModification.SWAP_U_FLIP) :
-                    section.wrapped(SOUTH, min, new Vec3f(max.getX() + height, max.getY(), min.getZ()),
+                    section.wrapped(SOUTH, min, new Vector3f(max.getX() + height, max.getY(), min.getZ()),
                             SplatterSection.UvModification.SWAP_U_FLIP);
             case EAST -> inside ?
-                    section.wrapped(SOUTH, new Vec3f(min.getX(), min.getY(), max.getZ()),
-                            new Vec3f(max.getX() + height, max.getY(), max.getZ()), SplatterSection.UvModification.SWAP_V_FLIP) :
-                    section.wrapped(SOUTH, new Vec3f(min.getX() - height, min.getY(), min.getZ()),
-                            new Vec3f(max.getX(), max.getY(), min.getZ()), SplatterSection.UvModification.SWAP_V_FLIP);
+                    section.wrapped(SOUTH, new Vector3f(min.getX(), min.getY(), max.getZ()),
+                            new Vector3f(max.getX() + height, max.getY(), max.getZ()), SplatterSection.UvModification.SWAP_V_FLIP) :
+                    section.wrapped(SOUTH, new Vector3f(min.getX() - height, min.getY(), min.getZ()),
+                            new Vector3f(max.getX(), max.getY(), min.getZ()), SplatterSection.UvModification.SWAP_V_FLIP);
             // South and north should be impossible
             default -> throw new IllegalStateException("Unexpected value: " + section.getDirection());
         };
     }
 
-    private static SplatterSection wrapEast(SplatterSection section, Vec3f min, Vec3f max, boolean inside) {
+    private static SplatterSection wrapEast(SplatterSection section, Vector3f min, Vector3f max, boolean inside) {
         FloatFloatPair dims = getDims(section.getDirection(), min, max);
         float width = dims.leftFloat();
 
         return switch (section.getDirection()) {
             case UP -> inside ?
-                    section.wrapped(EAST, new Vec3f(max.getX(), min.getY(), min.getZ()),
-                            new Vec3f(max.getX(), max.getY() + width, max.getZ())) :
-                    section.wrapped(EAST, new Vec3f(min.getX(), min.getY() - width, min.getZ()),
-                            new Vec3f(min.getX(), max.getY(), max.getZ()));
+                    section.wrapped(EAST, new Vector3f(max.getX(), min.getY(), min.getZ()),
+                            new Vector3f(max.getX(), max.getY() + width, max.getZ())) :
+                    section.wrapped(EAST, new Vector3f(min.getX(), min.getY() - width, min.getZ()),
+                            new Vector3f(min.getX(), max.getY(), max.getZ()));
             case DOWN -> inside ?
-                    section.wrapped(EAST, new Vec3f(max.getX(), min.getY() - width, min.getZ()), max,
+                    section.wrapped(EAST, new Vector3f(max.getX(), min.getY() - width, min.getZ()), max,
                             SplatterSection.UvModification.U_FLIP) :
-                    section.wrapped(EAST, min, new Vec3f(min.getX(), max.getY() + width, max.getZ()),
+                    section.wrapped(EAST, min, new Vector3f(min.getX(), max.getY() + width, max.getZ()),
                             SplatterSection.UvModification.U_FLIP);
             case NORTH -> inside ?
-                    section.wrapped(EAST, new Vec3f(max.getX(), min.getY(), min.getZ() - width),
+                    section.wrapped(EAST, new Vector3f(max.getX(), min.getY(), min.getZ() - width),
                             max, SplatterSection.UvModification.SWAP_V_FLIP) :
-                    section.wrapped(EAST, min, new Vec3f(min.getX(), max.getY(), max.getZ() + width),
+                    section.wrapped(EAST, min, new Vector3f(min.getX(), max.getY(), max.getZ() + width),
                             SplatterSection.UvModification.SWAP_V_FLIP);
             case SOUTH -> inside ?
-                    section.wrapped(EAST, new Vec3f(max.getX(), min.getY(), min.getZ()),
-                            new Vec3f(max.getX(), max.getY(), max.getZ() + width), SplatterSection.UvModification.SWAP_U_FLIP) :
-                    section.wrapped(EAST, new Vec3f(min.getX(), min.getY(), min.getZ() - width),
-                            new Vec3f(min.getX(), max.getY(), max.getZ()), SplatterSection.UvModification.SWAP_U_FLIP);
+                    section.wrapped(EAST, new Vector3f(max.getX(), min.getY(), min.getZ()),
+                            new Vector3f(max.getX(), max.getY(), max.getZ() + width), SplatterSection.UvModification.SWAP_U_FLIP) :
+                    section.wrapped(EAST, new Vector3f(min.getX(), min.getY(), min.getZ() - width),
+                            new Vector3f(min.getX(), max.getY(), max.getZ()), SplatterSection.UvModification.SWAP_U_FLIP);
             // East and west should be impossible
             default -> throw new IllegalStateException("Unexpected value: " + section.getDirection());
         };
@@ -331,7 +331,7 @@ class SplatterSplitter {
 
         // These directions are the directions the section will be facing when wrapped downwards.
         // They are in turn also the directions in which an anchor should be were this section wrapped upwards.
-        Vec3f sectionCenter = section.getCenter();
+        Vector3f sectionCenter = section.getCenter();
         double dx = sectionCenter.getComponentAlongAxis(a1) - splatter.getPos().getComponentAlongAxis(a1);
         double dz = sectionCenter.getComponentAlongAxis(a2) - splatter.getPos().getComponentAlongAxis(a2);
         Direction horizontal = Direction.from(a1, dx >= 0 ? Direction.AxisDirection.POSITIVE : Direction.AxisDirection.NEGATIVE);
@@ -368,7 +368,7 @@ class SplatterSplitter {
         return Pair.of(a1, a2);
     }
 
-    private FloatFloatPair getDims(Direction facing, Vec3f min, Vec3f max) {
+    private FloatFloatPair getDims(Direction facing, Vector3f min, Vector3f max) {
         Pair<Axis, Axis> axes = getAxesForDirection(facing);
         Axis a1 = axes.first(), a2 = axes.second();
 

@@ -11,11 +11,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3f;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.example.client.DefaultBipedBoneIdents;
-import software.bernie.geckolib3.core.processor.IBone;
-import software.bernie.geckolib3.geo.render.built.GeoModel;
 
 public class WhiteSnakeRenderer extends ExtendedStandEntityRenderer<WhiteSnakeEntity> {
     public WhiteSnakeRenderer(EntityRendererFactory.Context context) {
@@ -65,8 +61,8 @@ public class WhiteSnakeRenderer extends ExtendedStandEntityRenderer<WhiteSnakeEn
 
     @Override
     protected void preRenderItem(MatrixStack stack, ItemStack item, String boneName, WhiteSnakeEntity currentEntity, IBone bone) {
-        stack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(bone.getRotationX() - 90f));
-        stack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(bone.getRotationY() - 90f));
-        stack.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(bone.getRotationZ()));
+        stack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(bone.getRotationX() - 90f));
+        stack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(bone.getRotationY() - 90f));
+        stack.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(bone.getRotationZ()));
     }
 }

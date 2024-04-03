@@ -25,9 +25,10 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import org.joml.Vector3f;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -139,11 +140,11 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                             -the western
                             M1>Summon Gun>Barrage>M1~stand.OFF>M2>M2>M2>~s.ON+M1>Charge""";
 
-        auraColors = new Vec3f[]{
-                new Vec3f(0.9f, 0.5f, 0.7f),
-                new Vec3f(0.5f, 0.8f, 0.9f),
-                new Vec3f(0.4f, 0.4f, 1.0f),
-                new Vec3f(1.0f, 0.5f, 0.2f)
+        auraColors = new Vector3f[]{
+                new Vector3f(0.9f, 0.5f, 0.7f),
+                new Vector3f(0.5f, 0.8f, 0.9f),
+                new Vector3f(0.4f, 0.4f, 1.0f),
+                new Vector3f(1.0f, 0.5f, 0.2f)
         };
     }
 
@@ -249,30 +250,30 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
 
     // Animation code
     public enum State implements StandAnimationState<D4CEntity> {
-        IDLE(builder -> builder.loop("animation.d4c.idle")),
-        LIGHT(builder -> builder.playAndHold("animation.d4c.light")),
-        BLOCK(builder -> builder.loop("animation.d4c.block")),
-        HEAVY(builder -> builder.playAndHold("animation.d4c.heavy")),
-        BARRAGE(builder -> builder.loop("animation.d4c.barrage")),
-        DIM_HOP(builder -> builder.playAndHold("animation.d4c.dimhop")),
-        THROW(builder -> builder.playAndHold("animation.d4c.throw")),
-        THROW_HIT(builder -> builder.playAndHold("animation.d4c.throwhit")),
-        COUNTER(builder -> builder.loop("animation.d4c.counter")),
-        COUNTER_MISS(builder -> builder.playAndHold("animation.d4c.counter_miss")),
-        GIVE_GUN(builder -> builder.playAndHold("animation.d4c.givegun")),
-        FLAG(builder -> builder.playAndHold("animation.d4c.flag")),
-        ITEM_PLACE(builder -> builder.playAndHold("animation.d4c.itemplace")),
-        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.d4c.light_followup"));
+        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.d4c.idle"))),
+        LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.d4c.light"))),
+        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.d4c.block"))),
+        HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.d4c.heavy"))),
+        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.d4c.barrage"))),
+        DIM_HOP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.d4c.dimhop"))),
+        THROW(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.d4c.throw"))),
+        THROW_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.d4c.throwhit"))),
+        COUNTER(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.d4c.counter"))),
+        COUNTER_MISS(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.d4c.counter_miss"))),
+        GIVE_GUN(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.d4c.givegun"))),
+        FLAG(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.d4c.flag"))),
+        ITEM_PLACE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.d4c.itemplace"))),
+        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.d4c.light_followup")));
 
-        private final Consumer<AnimationBuilder> animator;
+        private final Consumer<AnimationState> animator;
 
-        State(Consumer<AnimationBuilder> animator) {
+        State(Consumer<AnimationState> animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(D4CEntity attacker, AnimationBuilder builder) {
-            animator.accept(builder);
+        public void playAnimation(D4CEntity attacker, AnimationState state) {
+            animator.accept(state);
         }
     }
 

@@ -91,7 +91,7 @@ public class SandCloneMove extends AbstractMove<SandCloneMove, TheFoolEntity> {
             setSandClone(ctx, newMob);
         }
 
-        attacker.world.spawnEntity(ctx.get(SAND_CLONE));
+        attacker.getWorld().spawnEntity(ctx.get(SAND_CLONE));
         return Set.of();
     }
 

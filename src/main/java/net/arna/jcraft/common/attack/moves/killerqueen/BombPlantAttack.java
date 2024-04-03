@@ -43,18 +43,18 @@ public class BombPlantAttack extends AbstractSimpleAttack<BombPlantAttack, Abstr
                 .<Entity>map(JUtils::getUserIfStand)
                 .or(() -> {
                     // If none are found, re-do an optimized hitbox check for any entity type
-                    List<Entity> hit = attacker.world.getEntitiesByClass(Entity.class,
+                    List<Entity> hit = attacker.getWorld().getEntitiesByClass(Entity.class,
                             new Box(boxCenter.subtract(halfBox), boxCenter.add(halfBox)),
                             EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e -> e != attacker && e != user));
                     return hit.isEmpty() ? Optional.empty() : Optional.of(hit.get(0));
                 })
                 .ifPresentOrElse(mainBomb::setBomb, () -> {
                     // If none are found again, try to place the bomb on the wall
-                    BlockPos closePos = new BlockPos(boxCenter.subtract(rotVec));
-                    BlockPos farPos = new BlockPos(boxCenter);
-                    BlockState blockState = attacker.world.getBlockState(closePos);
+                    BlockPos closePos = BlockPos.ofFloored(boxCenter.subtract(rotVec));
+                    BlockPos farPos = BlockPos.ofFloored(boxCenter);
+                    BlockState blockState = attacker.getWorld().getBlockState(closePos);
                     if (blockState.isAir()) {
-                        blockState = attacker.world.getBlockState(farPos);
+                        blockState = attacker.getWorld().getBlockState(farPos);
                         if (!blockState.isAir())
                             mainBomb.setBomb(farPos);
                     } else

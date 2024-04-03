@@ -13,11 +13,12 @@ import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.player.ItemCooldownManager;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -25,9 +26,9 @@ import net.minecraft.util.math.MathHelper;
 import java.util.Map;
 
 @UtilityClass
-public class JCraftAbilityHud extends DrawableHelper {
+public class JCraftAbilityHud {
     /// ICON HUD
-    private static final Identifier GUI_ICONS_TEXTURE = new Identifier("textures/gui/icons.png");
+    public static final Identifier GUI_ICONS_TEXTURE = new Identifier("textures/gui/icons.png");
 
     final IconPos ICON = new IconPos("icon", 10, 18 * 3 + 18);
 
@@ -104,7 +105,7 @@ public class JCraftAbilityHud extends DrawableHelper {
         };
     }
 
-    public static void render(MatrixStack matrices, boolean renderCooldownOverlay) {
+    public static void render(DrawContext ctx, boolean renderCooldownOverlay) {
         MinecraftClient client = MinecraftClient.getInstance();
         ClientPlayerEntity player = client.player;
         if (player == null) return;
@@ -122,13 +123,13 @@ public class JCraftAbilityHud extends DrawableHelper {
             if (stand == null) {
                 // Render cooldown HUD for specs
                 if (spec != null)
-                    renderIcons(matrices, SPEC_ICONS, selectedX, selectedY, spec.getType().getInternalName().toLowerCase(), renderCooldownOverlay);
+                    renderIcons(ctx, SPEC_ICONS, selectedX, selectedY, spec.getType().getInternalName().toLowerCase(), renderCooldownOverlay);
             } else {
                 // Render cooldown HUD for stands
-                renderIcons(matrices, isMid ? STAND_ICONS_MID : STAND_ICONS, selectedX, selectedY, stand.getType().getUntranslatedName(), renderCooldownOverlay);
+                renderIcons(ctx, isMid ? STAND_ICONS_MID : STAND_ICONS, selectedX, selectedY, stand.getType().getUntranslatedName(), renderCooldownOverlay);
             }
 
-            renderIcons(matrices, UNIVERSAL_ICONS, selectedX, selectedY, "universal", renderCooldownOverlay);
+            renderIcons(ctx, UNIVERSAL_ICONS, selectedX, selectedY, "universal", renderCooldownOverlay);
         }
     }
 
@@ -139,7 +140,7 @@ public class JCraftAbilityHud extends DrawableHelper {
      * @param selectedY y offset (in pixels) accounting for player's config choice
      * @param type decides which resource folder is loaded when rendering icons
      */
-    private static void renderIcons(MatrixStack matrices, Map<CooldownType, IconPos> icons, int selectedX, int selectedY,
+    private static void renderIcons(DrawContext ctx, Map<CooldownType, IconPos> icons, int selectedX, int selectedY,
                                     String type, boolean renderCooldownOverlay) {
         icons.forEach((cooldownType, iconPos) -> {
             int iconX = iconPos.x() + selectedX;
@@ -148,17 +149,18 @@ public class JCraftAbilityHud extends DrawableHelper {
             double cd = getCooldownProgress(cooldownType);
             if (cd < 0) return;
 
-            if (!renderCooldownOverlay) renderBorder(matrices, iconX, iconY);
-            renderIcon(matrices, iconX, iconY, type, iconPos.name(), cd, renderCooldownOverlay);
+            if (!renderCooldownOverlay) renderBorder(ctx, iconX, iconY);
+            renderIcon(ctx, iconX, iconY, type, iconPos.name(), cd, renderCooldownOverlay);
         });
     }
 
-    public static void renderIcon(MatrixStack matrices, int x, int y, String type, String icon, double cd, boolean renderCooldownOverlay) {
+    public static void renderIcon(DrawContext ctx, int x, int y, String type, String icon, double cd, boolean renderCooldownOverlay) {
         Identifier texture = JCraft.id("textures/gui/ability_icons/" + type + "/"+ icon + ".png");
-        renderIcon(matrices,  x, y, texture, icon, cd, renderCooldownOverlay);
+        renderIcon(ctx,  x, y, texture, icon, cd, renderCooldownOverlay);
     }
 
-    public static void renderIcon(MatrixStack matrices, int x, int y, Identifier texture, String fallback, double cd, boolean renderCooldownOverlay) {
+    public static void renderIcon(DrawContext ctx, int x, int y, Identifier texture, String fallback, double cd, boolean renderCooldownOverlay) {
+        var matrices = ctx.getMatrices();
         matrices.push();
 
         if (isTextureAvailable(texture)) {
@@ -169,7 +171,7 @@ public class JCraftAbilityHud extends DrawableHelper {
         }
 
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-        if (!renderCooldownOverlay) drawTexture(matrices, x + 2 , y + 2,0,0,18,18, 18 ,18);
+        if (!renderCooldownOverlay) ctx.drawTexture(texture, x + 2 , y + 2,0,0,18,18, 18 ,18);
         else renderCooldown(cd, x, y);
         RenderSystem.setShaderTexture(0, GUI_ICONS_TEXTURE);
         RenderSystem.depthMask(true);
@@ -177,11 +179,11 @@ public class JCraftAbilityHud extends DrawableHelper {
         matrices.pop();
     }
 
-    public static void renderBorder(MatrixStack matrices, int x, int y){
+    public static void renderBorder(DrawContext ctx, int x, int y){
+        var matrices = ctx.getMatrices();
         matrices.push();
-        RenderSystem.setShaderTexture(0, JCraft.id("textures/gui/ability_icons/border.png"));
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-        drawTexture(matrices, x , y,0,0,22,22, 22 ,22);
+        ctx.drawTexture(JCraft.id("textures/gui/ability_icons/border.png"), x , y,0,0,22,22, 22 ,22);
         RenderSystem.setShaderTexture(0, GUI_ICONS_TEXTURE);
         RenderSystem.depthMask(true);
         RenderSystem.disableBlend();
@@ -211,13 +213,13 @@ public class JCraftAbilityHud extends DrawableHelper {
 
     public static void renderCooldown(double cd, int x, int y) {
         RenderSystem.disableDepthTest();
-        RenderSystem.disableTexture();
+        //TODO? RenderSystem.disableTexture();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         Tessellator tess = Tessellator.getInstance();
         BufferBuilder buf = tess.getBuffer();
         RenderUtils.renderGuiQuad(buf, x, y + MathHelper.floor(22.0 * (1.0 - cd)), 22, MathHelper.ceil(22.0 * cd), 255, 255, 255, 127);
-        RenderSystem.enableTexture();
+        // TODO? RenderSystem.enableTexture();
         RenderSystem.enableDepthTest();
     }
 

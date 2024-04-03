@@ -3,9 +3,9 @@ package net.arna.jcraft.client.model.entity;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.projectile.LaserProjectile;
 import net.minecraft.util.Identifier;
-import software.bernie.geckolib3.model.AnimatedGeoModel;
+import software.bernie.geckolib.model.GeoModel;
 
-public class LaserProjectileModel extends AnimatedGeoModel<LaserProjectile> {
+public class LaserProjectileModel extends GeoModel<LaserProjectile> {
     @Override
     public Identifier getModelResource(LaserProjectile object) {
         return JCraft.id("geo/laser.geo.json");

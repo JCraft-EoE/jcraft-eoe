@@ -14,18 +14,20 @@ import net.arna.jcraft.registry.JDimensionRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.chunk.ChunkNibbleArray;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.ChunkToNibbleArrayMap;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.light.LightingProvider;
+import org.joml.Vector3f;
 
 import java.util.*;
 import java.util.stream.IntStream;
@@ -152,12 +154,10 @@ public class DimensionalHopMove extends AbstractSimpleAttack<DimensionalHopMove,
                 ChunkSection[] sections = ogChunk.getSectionArray();
                 ChunkSection[] copies = IntStream.range(0, sections.length)
                         .mapToObj(i -> {
-                            ChunkSection copy = new ChunkSection(world.sectionIndexToCoord(i),
-                                    world.getRegistryManager().get(Registry.BIOME_KEY));
-
+                            ChunkSection copy = new ChunkSection(world.getRegistryManager().get(RegistryKeys.BIOME));
                             PacketByteBuf serialized = PacketByteBufs.create();
                             sections[i].toPacket(serialized);
-                            copy.fromPacket(serialized);
+                            copy.readDataPacket(serialized);
                             return copy;
                         })
                         .toArray(ChunkSection[]::new);

@@ -9,9 +9,9 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.RaycastContext;
+import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -27,7 +27,7 @@ public abstract class CameraMixin {
     private Vec3d pos;
     @Final
     @Shadow
-    private Vec3f verticalPlane;
+    private Vector3f verticalPlane;
     @Shadow
     private Entity focusedEntity;
     @Shadow
@@ -46,7 +46,7 @@ public abstract class CameraMixin {
             g *= 0.1F;
             h *= 0.1F;
             Vec3d vec3d = pos.add(f, g, h);
-            Vec3d vec3d2 = new Vec3d(pos.x - (double) verticalPlane.getX() * desiredCameraDistance + (double) f + (double) h, pos.y - (double) verticalPlane.getY() * desiredCameraDistance + (double) g, pos.z - (double) verticalPlane.getZ() * desiredCameraDistance + (double) h);
+            Vec3d vec3d2 = new Vec3d(pos.x - (double) verticalPlane.x() * desiredCameraDistance + (double) f + (double) h, pos.y - (double) verticalPlane.y() * desiredCameraDistance + (double) g, pos.z - (double) verticalPlane.z() * desiredCameraDistance + (double) h);
             HitResult hitResult = area.raycast(new RaycastContext(vec3d, vec3d2, RaycastContext.ShapeType.VISUAL, RaycastContext.FluidHandling.NONE, this.focusedEntity));
             if (hitResult.getType() != HitResult.Type.MISS) {
                 double d = hitResult.getPos().distanceTo(this.pos);

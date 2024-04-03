@@ -3,9 +3,9 @@ package net.arna.jcraft.client.model.entity;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.projectile.WSAcidProjectile;
 import net.minecraft.util.Identifier;
-import software.bernie.geckolib3.model.AnimatedGeoModel;
+import software.bernie.geckolib.model.GeoModel;
 
-public class WSAcidModel extends AnimatedGeoModel<WSAcidProjectile> {
+public class WSAcidModel extends GeoModel<WSAcidProjectile> {
     @Override
     public Identifier getModelResource(WSAcidProjectile object) {
         return JCraft.id("geo/wsacid.geo.json");

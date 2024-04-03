@@ -134,7 +134,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
 
                 if (user.isInSneakingPose() && cooldowns.getCooldown(CooldownType.STAND_SP1) <= 0) {
                     BlockPos standingOn = user.getBlockPos().offset(GravityChangerAPI.getGravityDirection(user));
-                    if (!world.getBlockState(standingOn).isAir()) {
+                    if (!getWorld().getBlockState(standingOn).isAir()) {
                         JComponents.getBombTracker(user).getMainBomb().setBomb(standingOn);
                         cooldowns.setCooldown(CooldownType.STAND_SP1, BOMB_PLANT.getCooldown());
                     }

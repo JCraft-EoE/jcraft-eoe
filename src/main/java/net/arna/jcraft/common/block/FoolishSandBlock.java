@@ -11,8 +11,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.TickPriority;
 import net.minecraft.world.World;
+import net.minecraft.world.tick.TickPriority;
 
 public class FoolishSandBlock extends FallingBlock {
     public static final int MAX_AGE = 250;
@@ -26,7 +26,7 @@ public class FoolishSandBlock extends FallingBlock {
     @Override
     public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
         if (!increaseAge(state, world, pos)) {
-            world.createAndScheduleBlockTick(pos, this, 20, TickPriority.NORMAL);
+            world.scheduleBlockTick(pos, this, 20, TickPriority.NORMAL);
             return;
         }
 
@@ -36,7 +36,7 @@ public class FoolishSandBlock extends FallingBlock {
             blockPos.set(pos, direction);
             BlockState blockState = world.getBlockState(blockPos);
             if (blockState.isOf(this) && !increaseAge(blockState, world, blockPos))
-                world.createAndScheduleBlockTick(blockPos, this, 20);
+                world.scheduleBlockTick(blockPos, this, 20);
         }
     }
 

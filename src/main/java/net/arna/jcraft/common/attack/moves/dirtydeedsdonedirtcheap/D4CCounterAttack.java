@@ -10,6 +10,8 @@ import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageSources;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Vec3d;
@@ -30,8 +32,10 @@ public class D4CCounterAttack extends AbstractCounterAttack<D4CCounterAttack, D4
     @Override
     public void counter(@NonNull D4CEntity attacker, Entity countered, DamageSource counteredDamageSource) {
         super.counter(attacker, countered, counteredDamageSource);
+        var bl = counteredDamageSource.isOf(DamageTypes.MOB_PROJECTILE);
+        var bl2 = counteredDamageSource.isOf(DamageTypes.MAGIC);
 
-        if (countered == null || !attacker.hasUser() || counteredDamageSource.isProjectile() || counteredDamageSource.isMagic())
+        if (countered == null || !attacker.hasUser() || bl || bl2)
             return;
 
         LivingEntity user = attacker.getUserOrThrow();
@@ -40,7 +44,7 @@ public class D4CCounterAttack extends AbstractCounterAttack<D4CCounterAttack, D4
         countered.velocityModified = true;
 
         if (countered instanceof LivingEntity livingEntity) {
-            livingEntity.damage(DamageSource.mob(user), 10);
+            livingEntity.damage(livingEntity.getWorld().getDamageSources().mobAttack(user), 10);
             StandEntity.stun(livingEntity, 20, 3);
             JUtils.cancelMoves(livingEntity);
         }

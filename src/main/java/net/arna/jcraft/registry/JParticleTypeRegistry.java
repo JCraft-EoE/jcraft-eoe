@@ -4,7 +4,8 @@ import net.arna.jcraft.JCraft;
 import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes;
 import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.particle.ParticleType;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 
 public interface JParticleTypeRegistry {
     DefaultParticleType AURA_ARC = FabricParticleTypes.simple();
@@ -25,7 +26,7 @@ public interface JParticleTypeRegistry {
     DefaultParticleType INVERSION = FabricParticleTypes.simple();
 
     private static void registerParticle(String identifier, ParticleType<?> type) {
-        Registry.register(Registry.PARTICLE_TYPE, JCraft.id(identifier), type);
+        Registry.register(Registries.PARTICLE_TYPE, JCraft.id(identifier), type);
     }
 
     static void initParticleTypes() {

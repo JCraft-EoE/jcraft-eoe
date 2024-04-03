@@ -13,16 +13,16 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class LaserProjectile extends PersistentProjectileEntity implements IAnimatable {
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+public class LaserProjectile extends PersistentProjectileEntity implements GeoEntity {
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private int lifetime = 60;
     private final List<Entity> hit = new ArrayList<>();
     @Setter
@@ -46,13 +46,13 @@ public class LaserProjectile extends PersistentProjectileEntity implements IAnim
     @Override
     public void tick() {
         super.tick();
-        if (world.isClient()) {
+        if (getWorld().isClient()) {
             double x = getX(), y = getY(), z = getZ();
             Vec3d vel = getVelocity();
 
             if (age == 1) {
                 for (int i = 0; i < 20; i++) {
-                    world.addParticle(
+                    getWorld().addParticle(
                             ParticleTypes.FIREWORK,
                             x, y, z
                             , (vel.x + random.nextGaussian() * 0.5) * 0.2
@@ -62,7 +62,7 @@ public class LaserProjectile extends PersistentProjectileEntity implements IAnim
                 }
                 for (int i = 0; i < 10; i++) {
                     Vec3d frontVel = vel.multiply(random.nextDouble());
-                    world.addParticle(
+                    getWorld().addParticle(
                             ParticleTypes.FIREWORK,
                             x, y, z
                             , frontVel.x
@@ -71,7 +71,7 @@ public class LaserProjectile extends PersistentProjectileEntity implements IAnim
                     );
                 }
             } else {
-                world.addParticle(
+                getWorld().addParticle(
                         ParticleTypes.WITCH,
                         x, y, z,
                         vel.x / 2, vel.y / 2, vel.z / 2
@@ -83,13 +83,13 @@ public class LaserProjectile extends PersistentProjectileEntity implements IAnim
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
-        if (world.isClient) return;
+        if (getWorld().isClient) return;
         Entity owner = getOwner();
         if (owner == null) return;
         Entity entity = entityHitResult.getEntity();
         if (owner.hasPassenger(entity) || entity == owner || hit.contains(entity)) return;
 
-        JUtils.projectileDamageLogic(this, world, entity, getVelocity(), 20, 1, false,
+        JUtils.projectileDamageLogic(this, getWorld(), entity, getVelocity(), 20, 1, false,
                 5f, 0, HitPropertyComponent.HitAnimation.CRUSH, unblockable, false);
         hit.add(entity);
     }
@@ -105,10 +105,14 @@ public class LaserProjectile extends PersistentProjectileEntity implements IAnim
     }
 
     // Animations
+
     @Override
-    public void registerControllers(AnimationData data) { }
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+
+    }
+
     @Override
-    public AnimationFactory getFactory() {
-        return this.factory;
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 }

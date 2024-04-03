@@ -5,11 +5,12 @@ import lombok.Data;
 import lombok.With;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.particle.DefaultParticleType;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.explosion.Explosion;
 
 import java.util.function.BiConsumer;
@@ -30,13 +31,13 @@ public class JExplosionModifier {
     public void write(PacketByteBuf buf, Random random) {
         write(createFire, buf, PacketByteBuf::writeBoolean);
         write(destructionType, buf, (b, dt) -> b.writeVarInt(dt.ordinal()));
-        write(particle, buf, (b, p) -> b.writeRegistryKey(Registry.PARTICLE_TYPE.getKey(p).orElseThrow()));
+        write(particle, buf, (b, p) -> b.writeRegistryKey(Registries.PARTICLE_TYPE.getKey(p).orElseThrow()));
         write(particleVelocity, buf, (b, v) -> {
             b.writeDouble(v.x);
             b.writeDouble(v.y);
             b.writeDouble(v.z);
         });
-        write(sound, buf, (b, s) -> b.writeRegistryKey(Registry.SOUND_EVENT.getKey(sound).orElseThrow()));
+        write(sound, buf, (b, s) -> b.writeRegistryKey(Registries.SOUND_EVENT.getKey(sound).orElseThrow()));
         write(soundCategory, buf, (b, c) -> b.writeVarInt(c.ordinal()));
         write(volumeGetter, buf, (b, v) -> b.writeFloat(v.apply(random)));
         write(pitchGetter, buf, (b, p) -> b.writeFloat(p.apply(random)));
@@ -52,9 +53,9 @@ public class JExplosionModifier {
         Builder builder = JExplosionModifier.builder()
                 .createFire(read(buf, PacketByteBuf::readBoolean))
                 .destructionType(read(buf, b -> Explosion.DestructionType.values()[b.readVarInt()]))
-                .particle(read(buf, b -> (DefaultParticleType) Registry.PARTICLE_TYPE.get(b.readRegistryKey(Registry.PARTICLE_TYPE_KEY))))
+                .particle(read(buf, b -> (DefaultParticleType) Registries.PARTICLE_TYPE.get(b.readRegistryKey(RegistryKeys.PARTICLE_TYPE))))
                 .particleVelocity(read(buf, b -> new Vec3d(b.readDouble(), b.readDouble(), b.readDouble())))
-                .sound(read(buf, b -> Registry.SOUND_EVENT.get(b.readRegistryKey(Registry.SOUND_EVENT_KEY))))
+                .sound(read(buf, b -> Registries.SOUND_EVENT.get(b.readRegistryKey(RegistryKeys.SOUND_EVENT))))
                 .soundCategory(read(buf, b -> SoundCategory.values()[b.readVarInt()]));
         if (buf.readBoolean()) builder.volume(buf.readFloat());
         if (buf.readBoolean()) builder.pitch(buf.readFloat());

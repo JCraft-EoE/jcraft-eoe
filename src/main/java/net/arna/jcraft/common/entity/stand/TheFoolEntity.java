@@ -36,10 +36,11 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import org.joml.Vector3f;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
 
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -191,11 +192,11 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
                                        Charge/Tornado>...
                                        Sand Clone/Sandwave""";
 
-        auraColors = new Vec3f[]{
-                new Vec3f(1.0f, 0.8f, 0.4f),
-                new Vec3f(0.8f, 0.3f, 1.0f),
-                new Vec3f(1.0f, 0.6f, 0.2f),
-                new Vec3f(0.4f, 0.5f, 1.0f)
+        auraColors = new Vector3f[]{
+                new Vector3f(1.0f, 0.8f, 0.4f),
+                new Vector3f(0.8f, 0.3f, 1.0f),
+                new Vector3f(1.0f, 0.6f, 0.2f),
+                new Vector3f(0.4f, 0.5f, 1.0f)
         };
     }
 
@@ -293,7 +294,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
         if (sand) this.setDistanceOffset(0);
 
         // Projectile deflection
-        List<ProjectileEntity> toDeflect = world.getEntitiesByClass(ProjectileEntity.class, getBoundingBox().expand(0.75f), EntityPredicates.VALID_ENTITY);
+        List<ProjectileEntity> toDeflect = getWorld().getEntitiesByClass(ProjectileEntity.class, getBoundingBox().expand(0.75f), EntityPredicates.VALID_ENTITY);
 
         for (ProjectileEntity projectile : toDeflect) {
             if (projectile.getOwner() == user) continue;
@@ -358,7 +359,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
 
         if (!hasUser()) return;
 
-        if (world.isClient) {
+        if (getWorld().isClient) {
             if (age % 2 != 0) return;
             Vec3d pos = getPos();
             // If the fool is using any morphing attack, the amount of sand multiplies, and the stand itself changes color
@@ -369,7 +370,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
                 ParticleEffect effect = (isWave() && random.nextFloat() * 0.5f > 0) ?
                         new BlockStateParticleEffect(ParticleTypes.BLOCK, sandState) :
                         new BlockStateParticleEffect(ParticleTypes.FALLING_DUST, sandState);
-                world.addParticle(
+                getWorld().addParticle(
                         effect,
                         pos.x + random.nextTriangular(0, 1),
                         pos.y + random.nextTriangular(height / 2f, height / 2f),
@@ -402,37 +403,37 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
 
     // Animation code
     public enum State implements StandAnimationState<TheFoolEntity> {
-        IDLE(builder -> builder.loop("animation.thefool.idle")),
-        SWIPE(builder -> builder.playAndHold("animation.thefool.light")),
-        BLOCK((theFool, builder) -> builder.loop("animation.thefool." +
-                (theFool.isSand() ? "crouchblock" : "block"))),
-        COMBO(builder -> builder.playAndHold("animation.thefool.combo")),
-        AIR_BARRAGE(builder -> builder.loop("animation.thefool.airbarrage")),
-        LAUNCH(builder -> builder.playAndHold("animation.thefool.launch")),
-        POUND_UP(builder -> builder.playAndHold("animation.thefool.poundup")),
-        POUND_DOWN(builder -> builder.playAndHold("animation.thefool.pounddown")),
-        CHARGE(builder -> builder.loop("animation.thefool.charge")),
-        CHARGE_HIT(builder -> builder.playAndHold("animation.thefool.charge_hit")),
-        CREATE(builder -> builder.playAndHold("animation.thefool.create")),
-        SAND_WAVE(builder -> builder.loop("animation.thefool.sandwave")),
-        SANDSTORM(builder -> builder.playAndHold("animation.thefool.sandstorm")),
-        GLIDE(builder -> builder.loop("animation.thefool.glide")),
-        TORNADO(builder -> builder.loop("animation.thefool.tornado")),
-        DRILL(builder -> builder.loop("animation.thefool.drill")),
-        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.thefool.light_followup"));
+        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.thefool.idle"))),
+        SWIPE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.thefool.light"))),
+        BLOCK((theFool, builder) -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.thefool." +
+                (theFool.isSand() ? "crouchblock" : "block")))),
+        COMBO(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.thefool.combo"))),
+        AIR_BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.thefool.airbarrage"))),
+        LAUNCH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.thefool.launch"))),
+        POUND_UP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.thefool.poundup"))),
+        POUND_DOWN(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.thefool.pounddown"))),
+        CHARGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.thefool.charge"))),
+        CHARGE_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.thefool.charge_hit"))),
+        CREATE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.thefool.create"))),
+        SAND_WAVE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.thefool.sandwave"))),
+        SANDSTORM(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.thefool.sandstorm"))),
+        GLIDE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.thefool.glide"))),
+        TORNADO(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.thefool.tornado"))),
+        DRILL(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.thefool.drill"))),
+        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.thefool.light_followup")));
 
-        private final BiConsumer<TheFoolEntity, AnimationBuilder> animator;
+        private final BiConsumer<TheFoolEntity, AnimationState> animator;
 
-        State(Consumer<AnimationBuilder> animator) {
+        State(Consumer<AnimationState> animator) {
             this((fool, builder) -> animator.accept(builder));
         }
 
-        State(BiConsumer<TheFoolEntity, AnimationBuilder> animator) {
+        State(BiConsumer<TheFoolEntity, AnimationState> animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(TheFoolEntity attacker, AnimationBuilder builder) {
+        public void playAnimation(TheFoolEntity attacker, AnimationState builder) {
             animator.accept(attacker, builder);
         }
     }
