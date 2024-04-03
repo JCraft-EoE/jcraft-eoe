@@ -29,11 +29,13 @@ public class JClientUtils {
     // Timestop tracking
     public static List<DimensionData> activeTimestops = new ArrayList<>();
 
+    // Mustn't directly remove the DimensionData due to the possibility of a ConcurrentModificationException
+    // Setting the timer to 0 will make the next tick remove it
     public static void removeTimestop(int timestopperId) {
         for (DimensionData timestop : activeTimestops) {
             Entity timestopper = timestop.user;
             if (timestopper.getId() != timestopperId) continue;
-            activeTimestops.remove(timestop);
+            timestop.timer = 0;
             return;
         }
     }

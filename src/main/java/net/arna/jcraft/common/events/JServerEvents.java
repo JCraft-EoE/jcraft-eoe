@@ -10,10 +10,8 @@ import net.arna.jcraft.common.component.living.StandComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.StandType;
 import net.arna.jcraft.common.item.MockItem;
-import net.arna.jcraft.common.tickable.PastDimensions;
-import net.arna.jcraft.common.tickable.Revivables;
-import net.arna.jcraft.common.tickable.RevolverFire;
-import net.arna.jcraft.common.tickable.Timestops;
+import net.arna.jcraft.common.network.c2s.PredictionTriggerPacket;
+import net.arna.jcraft.common.tickable.*;
 import net.arna.jcraft.common.util.EntityInterest;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JDimensionRegistry;
@@ -38,7 +36,6 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.TypeFilter;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -52,7 +49,6 @@ import java.util.*;
 
 import static net.arna.jcraft.JCraft.ALLOW_MOB_EVOLVED_STANDS;
 import static net.arna.jcraft.JCraft.CHANCE_MOB_SPAWNS_WITH_STAND;
-import static net.arna.jcraft.common.entity.stand.StandEntity.standUserAI;
 import static net.arna.jcraft.common.entity.stand.StandEntity.stun;
 import static net.arna.jcraft.common.util.EntityInterest.blockAttractionInterest;
 import static net.arna.jcraft.common.util.EntityInterest.itemAttractionInterest;
@@ -80,12 +76,23 @@ public class JServerEvents {
         PastDimensions.tick(server);
         Timestops.tick(server);
         Revivables.tick(server);
+        JEnemies.tick(server);
 
         // Player logic (cooldown handling and DamageTimer counting)
         for (ServerPlayerEntity player : PlayerLookup.all(server)) {
             if (player == null || !player.isAlive()) continue;
 
             if (player.getAttacker() != null) JComponents.getMiscData(player).startDamageTimer();
+
+            if (PredictionTriggerPacket.isSubscribed(player)) {
+                PlayerLookup.around(player.getWorld(), player.getPos(), 128).forEach(
+                        tracked -> {
+                            Vec3d predictedPos = tracked.getPos().add(JUtils.deltaPos(tracked).multiply(tracked.pingMilliseconds * 50.0));
+                            //todo: prediction tracking packet
+                            //player.networkHandler.sendPacket(new EntityPositionS2CPacket(tracked, predictedPos));
+                        }
+                );
+            }
         }
 
         // Burst handling
@@ -148,39 +155,6 @@ public class JServerEvents {
             dash.tickDash();
 
             if (dash.finished) JCraft.dashes.remove(entry.getKey());
-        }
-
-
-        for (ServerWorld serverWorld : server.getWorlds()) {
-            List<? extends MobEntity> mobEntities = serverWorld.getEntitiesByType(TypeFilter.instanceOf(MobEntity.class), EntityPredicates.VALID_ENTITY);
-
-            for (MobEntity mob : mobEntities) {
-                if (!mob.isAlive()) continue;
-
-                // Damage timer
-                if (mob.getAttacker() != null) JComponents.getMiscData(mob).startDamageTimer();
-
-                // Stand User AIs
-                if (mob.isAiDisabled()) continue;
-                StandComponent standComponent = JComponents.getStandData(mob);
-                if (standComponent.getType() != null) {
-                    StandEntity<?, ?> stand = standComponent.getStand();
-                    if (stand == null) {
-                        JCraft.summon(serverWorld, mob);
-                    } else {
-                        // Target priority
-                        LivingEntity biggestAttacker = mob.getDamageTracker().getBiggestAttacker();
-                        LivingEntity primeAdversary = mob.getPrimeAdversary();
-                        LivingEntity target = mob.getTarget();
-                        if (primeAdversary != null && primeAdversary.isAlive() && stand.canTarget(primeAdversary))
-                            standUserAI(mob, primeAdversary, stand);
-                        else if (target != null && target.isAlive() && stand.canTarget(target))
-                            standUserAI(mob, target, stand);
-                        else if (biggestAttacker != null && biggestAttacker.isAlive() && stand.canTarget(biggestAttacker))
-                            mob.setTarget(biggestAttacker);
-                    }
-                }
-            }
         }
 
         // Handle items of interest
@@ -314,11 +288,16 @@ public class JServerEvents {
             }
         }
 
-        // If a mob was spawned
         if (entity instanceof MobEntity mob) {
-            if (mob.age > 0) return;
-
+            // Mark stand user mobs
             StandComponent standData = JComponents.getStandData(mob);
+            if (standData.getType() != null && standData.getType() != StandType.NONE) {
+                JEnemies.add(mob);
+                return;
+            }
+
+            // Create new stand user mobs
+            if (mob.age > 0) return;
             if (standData.getType() != null) return;
             EntityGroup group = mob.getGroup();
 
@@ -361,6 +340,8 @@ public class JServerEvents {
                 itemStack.addEnchantment(enchantment, enchantment.getMaxLevel());
                 armorItems.set(i, itemStack);
             }
+
+            JEnemies.add(mob);
         }
     }
 }

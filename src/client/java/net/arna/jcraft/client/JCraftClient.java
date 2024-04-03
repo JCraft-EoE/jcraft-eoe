@@ -372,27 +372,26 @@ public class JCraftClient implements ClientModInitializer {
         if (client.isPaused() && client.isInSingleplayer()) return;
 
         // Timestop handling (nearly identical to serverside, but toStop is obtained in user.world instead of server world)
-        ArrayList<DimensionData> newActiveTimestops = new ArrayList<>();
+        Iterator<DimensionData> iter = activeTimestops.iterator();
 
-        for (DimensionData timestop : activeTimestops) {
+        while (iter.hasNext()) {
+            DimensionData timestop = iter.next();
             LivingEntity user = timestop.user;
-            //JCraft.LOGGER.info("CLIENT: Ticking timestop " + timestop + " with user " + user + " and duration " + timestop.timer);
 
-            if (user != null && user.isAlive() && timestop.timer-- > 0) {
-                Vec3d pos = timestop.pos;
-
-                List<? extends Entity> toStop = user.world.getEntitiesByClass(Entity.class,
-                        new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
-
-                for (Entity entity : toStop)
-                    if (!entity.hasVehicle() && entity != user && entity != JUtils.getStand(user) && entity != user.getVehicle())
-                        JComponents.getTimeStopData(entity).setTicks(2);
-
-                newActiveTimestops.add(timestop);
+            if (user == null || !user.isAlive() || --timestop.timer <= 0) {
+                iter.remove();
+                continue;
             }
-        }
 
-        activeTimestops = newActiveTimestops;
+            Vec3d pos = timestop.pos;
+
+            List<? extends Entity> toStop = user.world.getEntitiesByClass(Entity.class,
+                    new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+
+            for (Entity entity : toStop)
+                if (!entity.hasVehicle() && entity != user && entity != JUtils.getStand(user) && entity != user.getVehicle())
+                    JComponents.getTimeStopData(entity).setTicks(2);
+        }
     }
 
     private static <E extends Enum<E>> Object2BooleanMap<E> getChangedInputs(Map<TrackedKeyBinding, E> bindings) {
