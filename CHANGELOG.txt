@@ -2597,6 +2597,11 @@ The World: Over Heaven
     >Updated animations
     >Added aerial variant to Heavy
 
+● 04/04/2024
+    Added JConfig options for:
+        enabling move cooldowns
+        a multiplier for cooldown length
+
     //TODO: FIX FUCKING INPUT BUGS :)
 
 todo: combo counter is LYING

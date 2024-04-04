@@ -18,6 +18,7 @@ import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.living.CooldownsComponent;
 import net.arna.jcraft.common.component.living.HitPropertyComponent;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.network.s2c.ComboCounterPacket;
@@ -1100,6 +1101,11 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         // Stun application & overriding
         IDamageScaler damageScaler = (IDamageScaler) ent;
+
+        if (JServerConfig.ENABLE_IPS.getValue()) {
+            float scaling = damageScaler.jcraft$getDamageScaling();
+            stunTicks *= scaling * 0.2 + 0.8;
+        }
 
         if (hit) {
             damageScaler.jcraft$increaseHitCount();

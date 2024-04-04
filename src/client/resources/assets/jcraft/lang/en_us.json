@@ -233,6 +233,9 @@
   "jcraft.serverconfig.option.damageScalingMinimum": "Damage Scaling Minimum",
   "jcraft.serverconfig.option.scalingPenaltyPerHit": "Scaling Penalty per Hit",
   "jcraft.serverconfig.option.killVampirism": "Kill Vampirism",
+  "jcraft.serverconfig.option.enableMoveCooldowns": "Enable Move Cooldowns",
+  "jcraft.serverconfig.option.cooldownMultiplier": "Cooldown Duration Multiplier",
+  "jcraft.serverconfig.option.enableIPS": "Enable Infinite Protection System (Reduces stun proportional to damage scaling - use with low/no cooldowns)",
 
   "jcraft.serverconfig.category.minecraft_rebalance": "Minecraft Balance",
   "jcraft.serverconfig.option.reduceDeadlyExplosions": "Reduce Deadly Explosion Power (End Crystals, Beds, Respawn Anchors)",

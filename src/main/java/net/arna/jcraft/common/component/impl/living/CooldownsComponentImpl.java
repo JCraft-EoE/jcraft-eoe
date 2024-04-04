@@ -6,6 +6,7 @@ import lombok.NonNull;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.component.living.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.registry.JSoundRegistry;
@@ -45,9 +46,12 @@ public class CooldownsComponentImpl implements CooldownsComponent {
             return;
         }
 
-        cooldowns.put(type, duration);
-        initialDurations.put(type, duration);
-        sync();
+        if (type.isOverrideNoCooldowns() || JServerConfig.ENABLE_MOVE_COOLDOWNS.getValue()) {
+            duration *= JServerConfig.COOLDOWN_MULTIPLIER.getValue();
+            cooldowns.put(type, duration);
+            initialDurations.put(type, duration);
+            sync();
+        }
     }
 
     @Override
@@ -61,6 +65,9 @@ public class CooldownsComponentImpl implements CooldownsComponent {
         }
 
         if (getCooldown(CooldownType.COOLDOWN_CANCEL) > 0) return;
+
+        if (!JServerConfig.ENABLE_MOVE_COOLDOWNS.getValue())
+            return;
 
         skipSync = true;
         for (CooldownType type : CooldownType.values())
