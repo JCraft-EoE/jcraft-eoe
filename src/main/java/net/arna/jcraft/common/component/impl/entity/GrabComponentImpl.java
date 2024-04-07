@@ -2,8 +2,8 @@ package net.arna.jcraft.common.component.impl.entity;
 
 import lombok.Getter;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.component.entity.GrabComponent;
 import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.component.entity.GrabComponent;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.minecraft.entity.Entity;
@@ -11,23 +11,34 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.NotNull;
 
 public class GrabComponentImpl implements GrabComponent {
+    /**
+     * The grabbed entity.
+     * Grab logic is ran from the side of the victim, which prevents multiple attackers from attempting to grab it.
+     */
     @Getter
     private final Entity grabbed;
     @Getter
     public Entity attacker = null;
     @Getter
     public int duration = 0;
-    private double offset;
+    private double distance, verticalOffset = 0.4;
 
     public GrabComponentImpl(Entity grabbed) {
         this.grabbed = grabbed;
     }
 
     @Override
-    public void startGrab(Entity attacker, int duration, double offset) {
+    public void startGrab(Entity attacker, int duration, double distance) {
+        startGrab(attacker, duration, distance, 0.4);
+    }
+
+    @Override
+    public void startGrab(Entity attacker, int duration, double distance, double verticalOffset) {
         if (attacker == null) {
             JCraft.LOGGER.warn("Null attacker tried to grab: " + grabbed);
             return;
@@ -35,7 +46,8 @@ public class GrabComponentImpl implements GrabComponent {
 
         this.attacker = attacker;
         this.duration = duration;
-        this.offset = offset;
+        this.distance = distance;
+        this.verticalOffset = verticalOffset;
         sync();
     }
 
@@ -50,9 +62,10 @@ public class GrabComponentImpl implements GrabComponent {
     public void tick() {
         if (attacker != null)
             if (attacker.isAlive() && duration-- > 0) {
+                Direction gravity = GravityChangerAPI.getGravityDirection(attacker);
                 Vec3d newPos = attacker.getPos()
-                        .add(RotationUtil.vecPlayerToWorld(new Vec3d(0, 0.4, 0), GravityChangerAPI.getGravityDirection(attacker)))
-                        .add(attacker.getRotationVector().multiply(offset));
+                        .add(RotationUtil.vecPlayerToWorld(new Vec3d(0, verticalOffset, 0), gravity))
+                        .add(attacker.getRotationVector().multiply(distance));
                 if (!attacker.getWorld().isTopSolid(new BlockPos(newPos), grabbed))
                     grabbed.setPosition(newPos);
             } else endGrab();
@@ -73,7 +86,8 @@ public class GrabComponentImpl implements GrabComponent {
         if (notGrabbing) return;
         buf.writeVarInt(attacker.getId());
         buf.writeVarInt(duration);
-        buf.writeDouble(offset);
+        buf.writeDouble(distance);
+        buf.writeDouble(verticalOffset);
     }
 
     @Override
@@ -81,11 +95,12 @@ public class GrabComponentImpl implements GrabComponent {
         if (buf.readBoolean()) return;
         attacker = grabbed.getWorld().getEntityById(buf.readVarInt());
         duration = buf.readVarInt();
-        offset = buf.readDouble();
+        distance = buf.readDouble();
+        verticalOffset = buf.readDouble();
     }
 
     @Override
-    public void readFromNbt(NbtCompound tag) { }
+    public void readFromNbt(@NotNull NbtCompound tag) { }
     @Override
-    public void writeToNbt(NbtCompound tag) { }
+    public void writeToNbt(@NotNull NbtCompound tag) { }
 }

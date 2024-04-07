@@ -402,7 +402,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     }
 
     /**
-     * Puts the stand into remote mode
+     * Puts the stand into remote mode.
+     * USE {@link #setRemote(boolean)} FOR PRACTICAL APPLICATION
      */
     protected void beginRemote() {
         if (user == null) return;
@@ -890,7 +891,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             if (wantToBlock && !blocking && (user == null || !JCraft.isDashing(user)) && canAttack()) {
                 if (isFree() && !isRemote())
                     setFree(false);
-                blocking = true;
+                tryBlock();
             }
 
             if (moveStun <= 0 && !blocking) {
@@ -937,6 +938,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if (curMove != prevMove && curMove != null)
             //JCraft.LOGGER.info("Logged previous attack change: " + this.curAttack + " " + this.previousAttack);
             prevMove = curMove;
+    }
+
+    public void tryBlock() {
+        this.blocking = true;
     }
 
     /**

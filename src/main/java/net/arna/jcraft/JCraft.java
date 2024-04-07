@@ -271,7 +271,6 @@ public class JCraft implements ModInitializer {
 
     public static void tryDash(int forward, int side, LivingEntity entity) {
         CooldownsComponent cooldowns = JComponents.COOLDOWNS.get(entity);
-        //todo: make a JCraftUtils method for checking if the player should be effectively disabled? like when stunned or knocked down as shown here:
         if (cooldowns.getCooldown(CooldownType.DASH) > 0 || !entity.isOnGround() || entity.hasStatusEffect(JStatusRegistry.DAZED) || entity.hasStatusEffect(JStatusRegistry.KNOCKDOWN))
             return;
         cooldowns.setCooldown(CooldownType.DASH, dashCooldown);
@@ -297,7 +296,7 @@ public class JCraft implements ModInitializer {
             JSpec<?, ?> spec = JUtils.getSpec(player);
 
             if (spec == null || spec.moveStun < 1)
-                PlayerLookup.around((ServerWorld) entity.getWorld(), entity.getPos(), 96).forEach( //todo: find a less arbitrary number for radius here
+                PlayerLookup.around((ServerWorld) entity.getWorld(), entity.getPos(), 96).forEach(
                         serverPlayer -> PlayerAnimPacket.send(player, serverPlayer, "dash"));
         }
     }
@@ -338,7 +337,7 @@ public class JCraft implements ModInitializer {
 
         if (user instanceof ServerPlayerEntity player && JUtils.canAct(user) && StandBlockPacket.isBlocking(player)) {
             stand.wantToBlock = true;
-            stand.blocking = true;
+            stand.tryBlock();
         }
 
         world.spawnEntity(stand);

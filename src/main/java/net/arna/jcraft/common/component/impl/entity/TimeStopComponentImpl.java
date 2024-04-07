@@ -45,7 +45,7 @@ public class TimeStopComponentImpl implements TimeStopComponent {
         for (Entity passenger : entity.getPassengerList()) stopTick(passenger);
         ticks--;
 
-        if (ticks == 0) {
+        if (ticks == 0 && totalVelocity.lengthSquared() > 0.01) {
             // Lift off ground to stop friction from cutting the launch short
             Vec3i localUp = GravityChangerAPI.getGravityDirection(entity).getOpposite().getVector();
             double upX = entity.getX() + localUp.getX() * 0.1;

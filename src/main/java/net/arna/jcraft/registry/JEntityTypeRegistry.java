@@ -150,6 +150,12 @@ public interface JEntityTypeRegistry {
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(HGEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
+    EntityType<TheSunEntity> THE_SUN = Registry.register(
+            Registry.ENTITY_TYPE,
+            JCraft.id("the_sun"),
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(TheSunEntity::new)).dimensions(EntityDimensions.fixed(12f, 12f)).build()
+    );
+
     EntityType<GEREntity> GER = Registry.register(
             Registry.ENTITY_TYPE,
             JCraft.id("ger"),
@@ -293,6 +299,7 @@ public interface JEntityTypeRegistry {
         FabricDefaultAttributeRegistry.register(MAGICIANS_RED, MagiciansRedEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(THE_FOOL, TheFoolEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(HIEROPHANT_GREEN, HGEntity.createMobAttributes());
+        FabricDefaultAttributeRegistry.register(THE_SUN, TheSunEntity.createMobAttributes());
 
         FabricDefaultAttributeRegistry.register(GOLD_EXPERIENCE, GoldExperienceEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(GER, GEREntity.createMobAttributes());

@@ -48,6 +48,9 @@ public enum StandType {
             Text.literal("Anime"), Text.literal("Spectre"), Text.literal("Burning Passion")),
     HIEROPHANT_GREEN(JEntityTypeRegistry.HIEROPHANT_GREEN, HGEntity::new, "hierophantgreen",       // 12
             Text.literal("Cold"), Text.literal("Burning"), Text.literal("Seaside")),
+    THE_SUN(JEntityTypeRegistry.THE_SUN, TheSunEntity::new, "the_sun",       // 13
+            Text.literal(":)"), Text.literal("Neutron Star"), Text.literal("Dark")),
+
 
     // Evolutions
     C_MOON(JEntityTypeRegistry.C_MOON, CMoonEntity::new, "cmoon", true,                                             // -1

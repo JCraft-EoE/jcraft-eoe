@@ -41,6 +41,8 @@ public interface JEntityRendererRegister {
         EntityRendererRegistry.register(JEntityTypeRegistry.EMERALD, EmeraldRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegistry.HG_NET, HGNetRenderer::new);
 
+        EntityRendererRegistry.register(JEntityTypeRegistry.THE_SUN, SunRenderer::new);
+
         EntityRendererRegistry.register(JEntityTypeRegistry.GER, GERRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegistry.GER_SCORPION, GERScorpionRenderer::new);
 
