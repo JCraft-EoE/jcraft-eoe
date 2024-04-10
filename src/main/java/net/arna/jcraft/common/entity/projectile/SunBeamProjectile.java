@@ -94,8 +94,8 @@ public class SunBeamProjectile extends PersistentProjectileEntity implements IAn
 
         Vec3d curPos = getPos();
 
-        if (age <= 10)
-            length += maxLength / 10;
+        if (age > 5 && age <= 10)
+            length += maxLength / 5;
 
         if (world.isClient()) {
             if (age <= 20) {
@@ -126,7 +126,9 @@ public class SunBeamProjectile extends PersistentProjectileEntity implements IAn
                     List<LivingEntity> hurtAll = new ArrayList<>();
                     for (double i = 0; i < length; i++) {
                         Vec3d laserPos = curPos.add(towardsVec.multiply(i));
-                        hurtAll.addAll(JUtils.generateHitbox(world, laserPos, 1, filter));
+                        Set<LivingEntity> targets = JUtils.generateHitbox(world, laserPos, 1, filter);
+                        targets.removeIf(hurtAll::contains);
+                        hurtAll.addAll(targets);
                         TheSunEntity.dryOut((ServerWorld) world, new BlockPos(laserPos));
                     }
                     hurtAll.removeIf(e -> !canDamage(damageSource, e));

@@ -15,6 +15,7 @@ import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.IceBlock;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -183,6 +184,8 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
         }
         if (world.getBlockEntity(blockPos) instanceof AbstractFurnaceBlockEntity furnaceBlock)
             furnaceBlock.burnTime = 220;
+        if (block instanceof IceBlock iceBlock)
+            iceBlock.melt(state, world, blockPos);
     }
 
     @Override

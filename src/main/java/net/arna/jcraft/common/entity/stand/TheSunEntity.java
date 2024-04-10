@@ -17,13 +17,17 @@ import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FluidDrainable;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -33,26 +37,47 @@ import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.function.Consumer;
 
 public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.State> {
     private static final TrackedData<Boolean> PASSIVE;
     private static final TrackedData<Float> SCALE;
+    public float prevScale = MIN_SCALE;
     public static final float MAX_SCALE = 3.0F, MIN_SCALE = 1.0F;
-    private final int desiredHeight = 32;
+    public static final double MAX_DISTANCE = 64.0, AIMING_DISTANCE = 128.0;
+    private int overextensionTime = 0;
     private Vec3d desiredPosition, targetPosition;
 
+    private static final SimpleAttack<TheSunEntity> FIRE_SUNBEAM = new SimpleAttack<TheSunEntity>(20, 5, 10, 0, 0, 0, 0, 0, 0)
+            .withInitAction((attacker, user, ctx) -> attacker.setTargetPosition(user))
+            .withAction((attacker, user, ctx, targets) -> fireSunBeam(attacker, user, 0.0f))
+            .withInfo(
+                    Text.of("Fire Sunbeam"),
+                    Text.of("""
+                            Fires a sunbeam with perfect precision.""")
+            );
+
     private static final SimpleAttack<TheSunEntity> FIRE_METEOR = new SimpleAttack<TheSunEntity>(20, 5, 10, 0, 0, 0, 0, 0, 0)
+            .withCrouchingVariant(FIRE_SUNBEAM)
             .withInitAction((attacker, user, ctx) -> attacker.setTargetPosition(user))
             .withAction((attacker, user, ctx, targets) -> {
                 Vec3d pos = attacker.randomPos();
-                fireMeteor(attacker, user, pos, getLookVector(pos, attacker.targetPosition), 2.5f, 0f).setNoGravity(true);
+                MeteorProjectile meteor = fireMeteor(attacker, user, pos, getLookVector(pos, attacker.targetPosition), 2.5f, 0f);
+                meteor.setNoGravity(true);
+
+                if (attacker.getScale() == MAX_SCALE)
+                    meteor.setExplosive(true);
             })
             .withInfo(
                     Text.of("Fire Meteor"),
-                    Text.of("Fires a high-velocity meteor with perfect precision")
+                    Text.of("""
+                            Fires a high-velocity meteor with perfect precision.
+                            At max size, the meteor is explosive.""")
             );
 
     private static final SimpleMultiHitAttack<TheSunEntity> FIRE_METEORS_1 = new SimpleMultiHitAttack<TheSunEntity>(
@@ -61,28 +86,34 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
             .withInitAction((attacker, user, ctx) -> attacker.setTargetPosition(user))
             .withAction((attacker, user, ctx, targets) -> fireMeteors1(attacker, user))
             .withInfo(
-                    Text.of("Fire Meteors (Pattern A)"),
-                    Text.of("Fires 3 bursts of 3 meteors with high spread")
+                    Text.of("Starburst"),
+                    Text.of("""
+                            Fires 3 bursts of 3 meteors with high spread.""")
             );
 
     private static final BarrageAttack<TheSunEntity> FIRE_METEORS_2 = new BarrageAttack<TheSunEntity>(
             100, 10, 110, 0, 0, 0, 0, 0, 0, 2
     )
-            .withAction((attacker, user, ctx, targets) -> fireMeteor(attacker, user, attacker.randomPos(), JUtils.randUnitVec(attacker.random), 1.25f, 0f))
+            .withAction((attacker, user, ctx, targets) -> {
+                for (int i = 0; i < attacker.getScale(); i++)
+                    fireMeteor(attacker, user, attacker.randomPos(), JUtils.randUnitVec(attacker.random), 1.25f, 0f);
+            })
             .withoutSlowness()
             .withInfo(
-                    Text.of("Fire Meteors (Pattern B)"),
-                    Text.of("Fires a hail of meteors in all directions for 5 seconds")
+                    Text.of("Meteor Shower"),
+                    Text.of("""
+                            Fires a hail of meteors in all directions for 5 seconds.
+                            Amount of meteors changes proportional to the size of The Sun.""")
             );
 
     private static final SimpleMultiHitAttack<TheSunEntity> FIRE_BEAM = new SimpleMultiHitAttack<TheSunEntity>(
             200, 24, 0, 0, 0, 0, 0, 0, IntSet.of(8, 12, 16)
     )
             .withInitAction((attacker, user, ctx) -> attacker.setTargetPosition(user))
-            .withAction((attacker, user, ctx, targets) -> fireSunBeam(attacker, user))
+            .withAction((attacker, user, ctx, targets) -> fireSunBeam(attacker, user, 2.5f))
             .withInfo(
-                    Text.of("Fire Beams"),
-                    Text.of("RANGE: 64m")
+                    Text.of("Incinerating Sunshine"),
+                    Text.of("Fires 3 sunbeams.")
             );
 
     private static final NoOpMove<TheSunEntity> CHANGE_SIZE = new NoOpMove<TheSunEntity>(0, 0, 0)
@@ -91,18 +122,15 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
                     Text.of("""
                             Use while standing to expand size.
                             Crouch to shrink.
-                            
-                            Size decreases movement speed and increases heat field.
-                            """)
-                    //TODO: Size decreases movement speed and increases heat field.
+                            Size decreases movement speed and increases heat field.""")
             );
 
     private static final NoOpMove<TheSunEntity> MOVE = new NoOpMove<TheSunEntity>(0, 0, 0)
+            .withHoldable()
             .withInfo(
                     Text.of("Move"),
                     Text.of("""
-                            Moves The Sun above the looked location.
-                            """)
+                            Moves The Sun to the looked location.""")
             );
 
     private static final NoOpMove<TheSunEntity> TOGGLE_PASSIVE = new NoOpMove<TheSunEntity>(0, 0, 0)
@@ -112,15 +140,18 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
                     Text.of("""
                             Toggles The Sun between an Active and Passive mode.
                             Active mode - the one it's in when summoned, allows usage of stand moves.
-                            Passive mode - allows usage of spec moves while keeping the Sun summoned.
-                            """)
+                            Passive mode - allows usage of spec moves while keeping the Sun summoned.""")
             );
 
     private Vec3d randomPos() {
+        return randomPos(getScale());
+    }
+
+    private Vec3d randomPos(double scale) {
         return new Vec3d(
-                getX() + random.nextGaussian() * getScale(),
-                getY() + random.nextGaussian() * getScale(),
-                getZ() + random.nextGaussian() * getScale()
+                getX() + random.nextGaussian() * scale,
+                getY() + random.nextGaussian() * scale,
+                getZ() + random.nextGaussian() * scale
 
         );
     }
@@ -148,6 +179,7 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
     private static MeteorProjectile fireMeteor(TheSunEntity attacker, @NonNull LivingEntity user, Vec3d pos, Vec3d velocity, float speed, float divergence) {
         MeteorProjectile meteor = new MeteorProjectile(attacker.getWorld(), user);
         meteor.setSkin(attacker.getSkin());
+        meteor.assignSun(attacker);
         meteor.setPosition(pos);
         meteor.setVelocity(velocity.x, velocity.y, velocity.z, speed, divergence);
 
@@ -156,7 +188,7 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
         return meteor;
     }
 
-    private static void fireSunBeam(TheSunEntity attacker, @NonNull LivingEntity user) {
+    private static void fireSunBeam(TheSunEntity attacker, @NonNull LivingEntity user, float divergence) {
         Vec3d pos = attacker.randomPos();
 
         SunBeamProjectile sunBeam = new SunBeamProjectile(attacker.getWorld());
@@ -166,7 +198,7 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
         sunBeam.setPosition(pos);
 
         Vec3d lookVec = getLookVector(pos, attacker.targetPosition);
-        sunBeam.setVelocity(lookVec.x, lookVec.y, lookVec.z, 0.01f, 2.5f);
+        sunBeam.setVelocity(lookVec.x, lookVec.y, lookVec.z, 0.01f, divergence);
 
         attacker.getWorld().spawnEntity(sunBeam);
     }
@@ -186,9 +218,20 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
     public TheSunEntity(World worldIn) {
         super(StandType.THE_SUN, worldIn);
 
-        freespace = """
-                Cannot buffer moves.
-                """;
+        idleRotation = 0;
+
+        pros = List.of(
+                "longest range coverage in the game",
+                "powerful area control"
+        );
+        cons = List.of(
+                "cannot block",
+                "heat field affects user"
+        );
+
+        description = "Long-range Projectile ZONER";
+
+        freespace = "Cannot buffer moves.\n Must stay within "+ MAX_DISTANCE + " of the user, otherwise it loses size and disappears.\nGrace period of 1 second before heat field activates after summoning.\nHeat field applies Nausea > Weakness > Slowness > Burning as entities get closer.\n";
 
         auraColors = new Vec3f[]{
                 new Vec3f(1.0f, 0.8f, 4.0f),
@@ -205,8 +248,13 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
     }
 
     @Override
+    public boolean canHoldMove(@Nullable MoveInputType type) {
+        return type == MoveInputType.ULTIMATE;
+    }
+
+    @Override
     protected void registerMoves(MoveMap<TheSunEntity, State> moves) {
-        moves.register(MoveType.HEAVY, FIRE_METEOR, null);
+        moves.register(MoveType.HEAVY, FIRE_METEOR, null).withCrouchingVariant(null);
 
         moves.register(MoveType.SPECIAL1, FIRE_METEORS_1, null);
         moves.register(MoveType.SPECIAL2, FIRE_METEORS_2, null);
@@ -231,17 +279,16 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
 
         switch (type) {
             case ULTIMATE -> {
-                float newScale = getScale() + (sneaking ? -1.0F : 1.0F);
+                float newScale = getScale() + (user.isSneaking() ? -0.05F : 0.05F);
                 dataTracker.set(SCALE, MathHelper.clamp(newScale, MIN_SCALE, MAX_SCALE));
             }
             case UTILITY -> {
                 if (sneaking) {
                     Vec3d eP = user.getEyePos();
-                    Vec3d rangeMod = user.getRotationVector().multiply(96);
+                    Vec3d rangeMod = user.getRotationVector().multiply(MAX_DISTANCE);
                     desiredPosition = getWorld().raycast(new RaycastContext(eP, eP.add(rangeMod),
                             RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user)).getPos();
-                }
-                togglePassive();
+                } else togglePassive();
             }
             default -> {
                 return super.handleMove(type);
@@ -254,11 +301,11 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
         if (user == null) return;
 
         Vec3d eP = user.getEyePos();
-        Vec3d rangeMod = user.getRotationVector().multiply(96);
+        Vec3d rangeMod = user.getRotationVector().multiply(AIMING_DISTANCE);
         EntityHitResult eHit = ProjectileUtil.raycast(user, eP, eP.add(rangeMod),
-                user.getBoundingBox().expand(96),
+                user.getBoundingBox().expand(AIMING_DISTANCE),
                 EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR,
-                9216 // Squared
+                AIMING_DISTANCE * AIMING_DISTANCE
         );
 
         if (eHit != null) targetPosition = eHit.getPos();
@@ -299,33 +346,90 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
     public void tick() {
         super.tick();
 
-        if (!world.isClient()) {
-            LivingEntity user = getUser();
-            if (user == null) return;
+        LivingEntity user = getUser();
+        if (user == null) return;
 
-            // Ensure remote state
-            //if (hasVehicle()) dismountVehicle();
+        float scale = getScale();
+        float heatFieldSize = scale * 20.0F;
+
+        if (world.isClient()) {
+            Vec3d pos = randomPos();
+            Vec3d vel = JUtils.randUnitVec(random).multiply(0.2 * scale);
+            for (int i = 0; i < (int)(heatFieldSize); i++)
+                world.addParticle( getSkin() == 2 ? ParticleTypes.SOUL_FIRE_FLAME : ParticleTypes.FLAME,
+                        false, pos.x, pos.y, pos.z,
+                        vel.x, vel.y, vel.z
+                );
+
+        } else {
+            speed = 0.5F / scale;
 
             Vec3d pos = getPos();
+            Vec3d userPos = user.getPos();
 
             if (!isFree()) {
                 setFree(true);
                 setFreePos(new Vec3f(pos));
             }
 
-            // Move where needed
+            // Fly away when summoned
             if (desiredPosition == null) {
                 Direction gravity = GravityChangerAPI.getGravityDirection(user);
-                desiredPosition = user.getPos().add(Vec3d.of(gravity.getVector().multiply(-desiredHeight)));
-            } else if (desiredPosition.squaredDistanceTo(pos) > getScale() * getScale()) {
-                Vec3d towards = desiredPosition.subtract(pos).normalize().multiply(speed);
-                Vec3d newPos = new Vec3d(getX() + towards.x, getY() + towards.y, getZ() + towards.z);
-                if (!world.isTopSolid(new BlockPos(newPos), this)) {
-                    setPosition(newPos);
-                    setFreePos(new Vec3f(getPos()));
+                int desiredHeight = 32;
+                desiredPosition = userPos.add(Vec3d.of(gravity.getVector().multiply(-desiredHeight)));
+            } else {
+                // Prioritize getting closer
+                double distance = pos.squaredDistanceTo(userPos);
+                if (distance > MAX_DISTANCE * MAX_DISTANCE) {
+                    desiredPosition = desiredPosition.add(userPos.subtract(pos).normalize());
+                    if (++overextensionTime > 20)
+                        dataTracker.set(SCALE, MathHelper.clamp(getScale() - 0.1f, MIN_SCALE, MAX_SCALE));
+                } else {
+                    overextensionTime = 0;
+                }
+
+                // Go where directed
+                if (desiredPosition.squaredDistanceTo(pos) > (scale * scale * 3)) {
+                    Vec3d towards = desiredPosition.subtract(pos).normalize().multiply(speed);
+                    Vec3d newPos = new Vec3d(getX() + towards.x, getY() + towards.y, getZ() + towards.z);
+                    if (!world.isTopSolid(new BlockPos(newPos), this)) {
+                        setPosition(newPos);
+                        setFreePos(new Vec3f(getPos()));
+                    }
+                }
+            }
+
+            if (age > 20 & heatFieldSize > 0) {
+                Collection<Entity> entities = world.getOtherEntities(this, getBoundingBox().expand(heatFieldSize), EntityPredicates.VALID_ENTITY);
+                for (Entity entity : entities) {
+                    double distance = entity.squaredDistanceTo(this);
+                    double exposure = 125.0 * scale;
+                    if (distance == 0)
+                        exposure *= 10;
+                    else
+                        exposure *= 1 / distance;
+
+                    if (exposure > 2) {
+                        entity.setOnFireFor(2);
+                        if (exposure > 4) entity.damage(DamageSource.ON_FIRE, 1.0f);
+                    }
+
+                    if (entity instanceof LivingEntity living && living.isAlive()) {
+                        if (exposure > 0.25) {
+                            living.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 10, 0, true, false));
+                            if (exposure > 0.5) {
+                                living.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 10, 0, true, false));
+                                if (exposure > 1) {
+                                    living.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 10, 0, true, false));
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
+
+        prevScale = getScale();
     }
 
     public static void dryOut(ServerWorld serverWorld, BlockPos pos) {

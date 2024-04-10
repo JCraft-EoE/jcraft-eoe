@@ -6,14 +6,14 @@
 				"identifier": "geometry.meteor",
 				"texture_width": 32,
 				"texture_height": 32,
-				"visible_bounds_width": 2,
+				"visible_bounds_width": 4,
 				"visible_bounds_height": 2.5,
 				"visible_bounds_offset": [0, 0.75, 0]
 			},
 			"bones": [
 				{
 					"name": "base",
-					"pivot": [0, 0, 0]
+					"pivot": [0, 8, 0]
 				},
 				{
 					"name": "head",

@@ -249,7 +249,7 @@ public class PlayerInputPacket {
         if (stun != null) JCraft.comboBreak(player.getWorld(), player, stun);
     }
 
-    private static InputStateManager getInputStateManager(ServerPlayerEntity player) {
+    public static InputStateManager getInputStateManager(ServerPlayerEntity player) {
         return ((IJInputStateManagerHolder) player).jcraft$getJInputStateManager();
     }
 }

@@ -2602,6 +2602,9 @@ The World: Over Heaven
         enabling move cooldowns
         a multiplier for cooldown length
 
+● 10/04/2024
+    Added The Sun
+
     //TODO: FIX FUCKING INPUT BUGS :)
 
 todo: combo counter is LYING

@@ -54,7 +54,7 @@ public class SunRenderer extends GeoEntityRenderer<TheSunEntity> {
         setCurrentModelRenderCycle(EModelRenderCycle.INITIAL);
         poseStack.push();
 
-        float scale = animatable.getScale();
+        float scale = MathHelper.lerp(partialTick, animatable.prevScale, animatable.getScale());
         poseStack.scale(scale, scale, scale);
 
         this.dispatchedMat = poseStack.peek().getPositionMatrix().copy();

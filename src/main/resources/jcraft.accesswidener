@@ -21,3 +21,5 @@ accessible class net/minecraft/client/render/WorldRenderer$ChunkInfoList
 accessible field net/minecraft/block/entity/AbstractFurnaceBlockEntity burnTime I
 
 accessible field net/minecraft/server/world/ServerWorld sleepManager Lnet/minecraft/server/world/SleepManager;
+
+accessible method net/minecraft/block/IceBlock melt (Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V
