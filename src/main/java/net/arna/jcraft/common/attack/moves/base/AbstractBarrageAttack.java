@@ -42,6 +42,11 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A
         withHitSpark(null);
     }
 
+    public @NonNull T withoutSlowness() {
+        this.inflictsSlowness = false;
+        return getThis();
+    }
+
     @Override
     protected boolean shouldPerform(A attacker) {
         // If move stun is 22 ticks, windup is 6 and interval is 4, the first hit will occur at tick 6 (when move stun is 22 - 6 = 16),
@@ -121,7 +126,7 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A
                     random.nextGaussian() / 3.0,
                     random.nextGaussian() / 3.0
             );
-            Vec3d rotVec = attackerEntity.getRotationVector();
+            Vec3d rotVec = user.getRotationVector();
             shockwavePos = shockwavePos.add(rotVec);
             shockwavePos = shockwavePos.add(RotationUtil.vecPlayerToWorld(new Vec3d(0, attackerEntity.getHeight() / 1.8 - getOffset(), 0), GravityChangerAPI.getGravityDirection(user)));
             JComponents.getShockwaveHandler(attacker.getEntityWorld())

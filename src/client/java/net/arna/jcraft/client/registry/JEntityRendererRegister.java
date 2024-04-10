@@ -56,7 +56,9 @@ public interface JEntityRendererRegister {
         EntityRendererRegistry.register(JEntityTypeRegistry.RED_BIND, RedBindRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegistry.SAND_TORNADO, SandTornadoRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegistry.WS_ACID_PROJECTILE, WSAcidRenderer::new);
+        EntityRendererRegistry.register(JEntityTypeRegistry.SUN_BEAM, SunBeamRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegistry.BULLET, BulletRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegistry.RAPIER, RapierRenderer::new);
+        EntityRendererRegistry.register(JEntityTypeRegistry.METEOR, MeteorRenderer::new);
     }
 }

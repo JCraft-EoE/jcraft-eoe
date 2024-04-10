@@ -23,6 +23,7 @@ public interface JParticleTypeRegistry {
     DefaultParticleType BLOCKSPARK = FabricParticleTypes.simple();
     DefaultParticleType GO = FabricParticleTypes.simple();
     DefaultParticleType INVERSION = FabricParticleTypes.simple();
+    DefaultParticleType SUN_LOCK_ON = FabricParticleTypes.simple();
 
     private static void registerParticle(String identifier, ParticleType<?> type) {
         Registry.register(Registry.PARTICLE_TYPE, JCraft.id(identifier), type);
@@ -45,5 +46,6 @@ public interface JParticleTypeRegistry {
         registerParticle("aura_arc", AURA_ARC);
         registerParticle("aura_blob", AURA_BLOB);
         registerParticle("inversion", INVERSION);
+        registerParticle("sun_lock_on", SUN_LOCK_ON);
     }
 }

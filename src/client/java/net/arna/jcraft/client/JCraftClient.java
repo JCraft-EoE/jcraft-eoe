@@ -23,13 +23,16 @@ import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
 import net.arna.jcraft.client.util.TrackedKeyBinding;
 import net.arna.jcraft.common.attack.core.MoveInputType;
-import net.arna.jcraft.common.component.living.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.component.living.CooldownsComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.network.c2s.PlayerInputPacket;
 import net.arna.jcraft.common.network.c2s.StandBlockPacket;
 import net.arna.jcraft.common.util.*;
-import net.arna.jcraft.registry.*;
+import net.arna.jcraft.registry.JBlockEntityTypeRegistry;
+import net.arna.jcraft.registry.JObjectRegistry;
+import net.arna.jcraft.registry.JPacketRegistry;
+import net.arna.jcraft.registry.JParticleTypeRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
@@ -68,7 +71,10 @@ import org.lwjgl.glfw.GLFW;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Supplier;
@@ -142,6 +148,7 @@ public class JCraftClient implements ClientModInitializer {
         particleFactoryRegistry.register(JParticleTypeRegistry.AURA_ARC, AuraArcParticle.Factory::new);
         particleFactoryRegistry.register(JParticleTypeRegistry.AURA_BLOB, AuraBlobParticle.Factory::new);
         particleFactoryRegistry.register(JParticleTypeRegistry.INVERSION, InversionParticle.Factory::new);
+        particleFactoryRegistry.register(JParticleTypeRegistry.SUN_LOCK_ON, BackstabParticle.Factory::new); // 9 frames, reusing
 
         // Renderer registration
         JEntityRendererRegister.registerEntityRenderers();

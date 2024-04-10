@@ -153,7 +153,7 @@ public interface JEntityTypeRegistry {
     EntityType<TheSunEntity> THE_SUN = Registry.register(
             Registry.ENTITY_TYPE,
             JCraft.id("the_sun"),
-            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(TheSunEntity::new)).dimensions(EntityDimensions.fixed(12f, 12f)).build()
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(TheSunEntity::new)).dimensions(EntityDimensions.fixed(2f, 2f)).build()
     );
 
     EntityType<GEREntity> GER = Registry.register(
@@ -208,6 +208,13 @@ public interface JEntityTypeRegistry {
             JCraft.id("ankh"),
             FabricEntityTypeBuilder.<AnkhProjectile>create(SpawnGroup.MISC, AnkhProjectile::new)
                     .dimensions(EntityDimensions.fixed(0.75f, 0.75f)).trackRangeChunks(6).trackedUpdateRate(20).build()
+    );
+
+    EntityType<MeteorProjectile> METEOR = Registry.register(
+            Registry.ENTITY_TYPE,
+            JCraft.id("meteor"),
+            FabricEntityTypeBuilder.<MeteorProjectile>create(SpawnGroup.MISC, MeteorProjectile::new)
+                    .dimensions(EntityDimensions.fixed(1.0f, 1.0f)).trackRangeChunks(6).trackedUpdateRate(20).build()
     );
 
     EntityType<BubbleProjectile> BUBBLE = Registry.register(
@@ -270,6 +277,13 @@ public interface JEntityTypeRegistry {
             Registry.ENTITY_TYPE,
             JCraft.id("wsacidprojectile"),
             FabricEntityTypeBuilder.create(SpawnGroup.MISC, WorldOnlyEntityFactory.from(WSAcidProjectile::new))
+                    .dimensions(EntityDimensions.fixed(0.5f, 0.5f)).trackRangeChunks(4).trackedUpdateRate(10).build()
+    );
+
+    EntityType<SunBeamProjectile> SUN_BEAM = Registry.register(
+            Registry.ENTITY_TYPE,
+            JCraft.id("sunbeam"),
+            FabricEntityTypeBuilder.<SunBeamProjectile>create(SpawnGroup.MISC, (type, world) -> new SunBeamProjectile(world))
                     .dimensions(EntityDimensions.fixed(0.5f, 0.5f)).trackRangeChunks(4).trackedUpdateRate(10).build()
     );
 

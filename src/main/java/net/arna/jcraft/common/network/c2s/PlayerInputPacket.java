@@ -132,7 +132,7 @@ public class PlayerInputPacket {
                     boolean success = b;
 
                     StandEntity<?, ?> stand = JUtils.getStand(player);
-                    if (stand != null) {
+                    if (stand != null && stand.allowMoveHandling()) {
                         stand.onUserMoveInput(type, true, success);
                         success = false; // If a stand is out, the move input success belongs to it.
                     }
@@ -150,7 +150,7 @@ public class PlayerInputPacket {
                     boolean success = b;
 
                     StandEntity<?, ?> stand = JUtils.getStand(player);
-                    if (stand != null) {
+                    if (stand != null && stand.allowMoveHandling()) {
                         stand.onUserMoveInput(type, false, success);
                         success = false; // If a stand is out, the move input success belongs to it.
                     }
@@ -192,7 +192,7 @@ public class PlayerInputPacket {
                 }
                 case LIGHT -> {
                     StandEntity<?, ?> stand = JUtils.getStand(player);
-                    if (stand == null) return;
+                    if (stand == null || !stand.allowMoveHandling()) return;
 
                     future.complete(initStandMove(stand, MoveInputType.LIGHT));
                 }
@@ -217,7 +217,7 @@ public class PlayerInputPacket {
 
     private static boolean initStandOrSpecMove(ServerPlayerEntity player, MoveInputType type) {
         StandEntity<?, ?> stand = JUtils.getStand(player);
-        if (stand != null) return initStandMove(stand, type);
+        if (stand != null && stand.allowMoveHandling()) return initStandMove(stand, type);
         else {
             JSpec<?, ?> spec = JUtils.getSpec(player);
             if (spec == null) return false;

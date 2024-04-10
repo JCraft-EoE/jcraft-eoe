@@ -215,6 +215,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         FREEZ = DataTracker.registerData(StandEntity.class, TrackedDataHandlerRegistry.FLOAT);
     }
 
+    public boolean allowMoveHandling() {
+        return true;
+    }
+
     @NotNull
     public LivingEntity getUserOrThrow() {
         if (user == null) throw new NullPointerException("No user set");
