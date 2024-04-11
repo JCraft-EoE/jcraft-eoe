@@ -53,10 +53,19 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
             0, 40, 0.75f, 1f, 30, 2, 0.25f, 0, 3, Blocks.OBSIDIAN.getHardness())
             .withSound(JSoundRegistry.TW_BARRAGE)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
-    public static final UppercutAttack<TheWorldEntity> ROUNDHOUSE = new UppercutAttack<TheWorldEntity>(40, 7, 13, 0.75f, 5f,
-            10, 1.75f, 0.25f, -0.2f, 0.4f)
+    public static final SimpleAttack<TheWorldEntity> SWEEP = new SimpleAttack<TheWorldEntity>(30, 6, 16, 0.75f, 5f,
+            16, 1.85f, 0.25f, 0.4f)
             .withSound(JSoundRegistry.TW_KICK)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withInfo(Text.literal("Sweep"), Text.literal("fast, decent stun, mediocre when blocked"));
+    public static final UppercutAttack<TheWorldEntity> ROUNDHOUSE = new UppercutAttack<TheWorldEntity>(20, 7, 13, 0.75f, 5f,
+            10, 1.75f, 0.25f, -0.2f, 0.4f)
+            .withCrouchingVariant(SWEEP)
+            .withSound(JSoundRegistry.TW_KICK)
+            .withImpactSound(JSoundRegistry.TW_KICK_HIT)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Text.literal("Roundhouse"), Text.literal("low stun"));
     public static final KnockdownAttack<TheWorldEntity> COUNTER_FOLLOWUP = new KnockdownAttack<TheWorldEntity>(0, 5, 9, 0.75f, 9f, 16, 1.75f, 0.7f, 0.1f, 35)
@@ -101,6 +110,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
             .withSound(JSoundRegistry.TW_CHARGE)
             .withImpactSound(JSoundRegistry.TW_CHARGE_HIT)
             .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
             .withBlockStun(11)
             .withInfo(Text.literal("Forward Charge"), Text.literal("The World detaches from the user and lunges forward, combo starter"));
     public static final TimeStopMove<TheWorldEntity> TIME_STOP = new TimeStopMove<TheWorldEntity>(1400,
@@ -150,7 +160,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
         moves.register(MoveType.HEAVY, DONUT, State.DONUT);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 
-        moves.register(MoveType.SPECIAL1, ROUNDHOUSE, State.ROUNDHOUSE);
+        moves.register(MoveType.SPECIAL1, ROUNDHOUSE, State.ROUNDHOUSE).withCrouchingVariant(State.SWEEP);
         moves.register(MoveType.SPECIAL2, CHARGE, State.CHARGE).withCrouchingVariant(State.LUNGE);
         moves.register(MoveType.SPECIAL3, FEIGN_BARRAGE, State.BARRAGE);
         moves.register(MoveType.ULTIMATE, TIME_STOP, State.TIME_STOP);
@@ -209,6 +219,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
         CHARGE(builder -> builder.loop("animation.theworld.charge")),
         CHARGE_HIT(builder -> builder.playAndHold("animation.theworld.charge_hit")),
         ROUNDHOUSE(builder -> builder.playAndHold("animation.theworld.roundhouse")),
+        SWEEP(builder -> builder.playAndHold("animation.theworld.sweep")),
         COUNTER_HIT(builder -> builder.playAndHold("animation.theworld.counter_hit")),
         COUNTER_MISS(builder -> builder.playAndHold("animation.theworld.counter_miss")),
         LOW(builder -> builder.playAndHold("animation.theworld.low")),

@@ -2605,6 +2605,12 @@ The World: Over Heaven
 ● 10/04/2024
     Added The Sun
 
+● 11/04/2024
+
+The World
+    >Roundhouse cooldown reduced (2->1s)
+    >Added crouching variant to Roundhouse
+
     //TODO: FIX FUCKING INPUT BUGS :)
 
 todo: combo counter is LYING

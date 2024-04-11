@@ -130,7 +130,7 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A
             shockwavePos = shockwavePos.add(rotVec);
             shockwavePos = shockwavePos.add(RotationUtil.vecPlayerToWorld(new Vec3d(0, attackerEntity.getHeight() / 1.8 - getOffset(), 0), GravityChangerAPI.getGravityDirection(user)));
             JComponents.getShockwaveHandler(attacker.getEntityWorld())
-                    .addShockwave(shockwavePos, attackerEntity.getRotationVector(), getDamage() / 1.5f);
+                    .addShockwave(shockwavePos, user.getRotationVector(), getDamage() / 1.5f);
         }));
     }
 

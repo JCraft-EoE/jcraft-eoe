@@ -23,11 +23,11 @@
 							"easing": "easeOutCirc"
 						},
 						"0.48": {
-							"vector": [64, 2, 2],
+							"vector": [64, 4, 4],
 							"easing": "easeInBack"
 						},
 						"1.0": {
-							"vector": [64, 2, 2],
+							"vector": [64, 4, 4],
 							"easing": "linear"
 						},
 						"1.2": {

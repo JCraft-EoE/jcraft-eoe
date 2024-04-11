@@ -131,14 +131,16 @@ public class MeteorProjectile extends PersistentProjectileEntity implements IAni
 
     @Override
     protected void onBlockHit(BlockHitResult blockHitResult) {
-        Direction movementDirection = getMovementDirection();
-        BlockPos blockPos2 = getBlockPos(); //.offset(movementDirection);
-        if (AbstractFireBlock.canPlaceAt(world, blockPos2, movementDirection)) {
-            //world.playSound(null, blockPos2, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1.0F, world.getRandom().nextFloat() * 0.4F + 0.8F);
-            BlockState blockState2 = AbstractFireBlock.getState(world, blockPos2);
-            world.setBlockState(blockPos2, blockState2, 11);
+        if (!world.isClient()) {
+            Direction movementDirection = getMovementDirection();
+            BlockPos blockPos2 = getBlockPos(); //.offset(movementDirection);
+            if (AbstractFireBlock.canPlaceAt(world, blockPos2, movementDirection)) {
+                //world.playSound(null, blockPos2, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1.0F, world.getRandom().nextFloat() * 0.4F + 0.8F);
+                BlockState blockState2 = AbstractFireBlock.getState(world, blockPos2);
+                world.setBlockState(blockPos2, blockState2, 11);
+            }
+            MagiciansRedEntity.ignite(getWorld(), blockHitResult.getBlockPos());
         }
-        MagiciansRedEntity.ignite(getWorld(), blockHitResult.getBlockPos());
         super.onBlockHit(blockHitResult);
     }
 

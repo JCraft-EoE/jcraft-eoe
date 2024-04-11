@@ -124,9 +124,10 @@ public class SunBeamProjectile extends PersistentProjectileEntity implements IAn
                     // Recursive hitbox check between current and previous position
                     Vec3d towardsVec = getVelocity().normalize();
                     List<LivingEntity> hurtAll = new ArrayList<>();
-                    for (double i = 0; i < length; i++) {
-                        Vec3d laserPos = curPos.add(towardsVec.multiply(i));
-                        Set<LivingEntity> targets = JUtils.generateHitbox(world, laserPos, 1, filter);
+                    double hitboxSize = 2.0;
+                    for (double i = 0.0; i < length / hitboxSize; i++) {
+                        Vec3d laserPos = curPos.add(towardsVec.multiply(i * hitboxSize));
+                        Set<LivingEntity> targets = JUtils.generateHitbox(world, laserPos, hitboxSize, filter);
                         targets.removeIf(hurtAll::contains);
                         hurtAll.addAll(targets);
                         TheSunEntity.dryOut((ServerWorld) world, new BlockPos(laserPos));

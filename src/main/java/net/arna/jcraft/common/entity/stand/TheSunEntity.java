@@ -206,7 +206,7 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
     private static void fireMeteors1(TheSunEntity attacker, LivingEntity user) {
         for (int i = 0; i < 3; i++) {
             Vec3d pos = attacker.randomPos();
-            fireMeteor(attacker, user, pos, getLookVector(pos, attacker.targetPosition)).setNoGravity(true);
+            fireMeteor(attacker, user, pos, getLookVector(pos, attacker.targetPosition).multiply(1.75)).setNoGravity(true);
         }
     }
 
