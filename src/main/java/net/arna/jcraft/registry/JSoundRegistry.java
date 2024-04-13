@@ -238,6 +238,9 @@ public interface JSoundRegistry {
     // Vampire
     SoundEvent VAMPIRE_LASER = registerSound("vampirelaser");
     SoundEvent VAMPIRE_LASER_FIRE = registerSound("vampirelaserfire");
+    SoundEvent VAMPIRE_GRAB_HIT = registerSound("vampiregrabhit");
+    SoundEvent VAMPIRE_SUCK = registerSound("vampiresuck");
+    SoundEvent VAMPIRE_REANIMATE = registerSound("vampirereanimate");
 
     //// OTHER
     SoundEvent BULLET_RICOCHET = registerSound("bulletricochet");

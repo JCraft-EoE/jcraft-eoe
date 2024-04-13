@@ -153,15 +153,15 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
         };
     }
 
-    private static void addInversion(CMoonEntity attacker, LivingEntity target, Vec3d kbVec, DamageSource damageSource) {
+    private static void addInversion(CMoonEntity attacker, LivingEntity target, Vec3d kbVec, DamageSource damageSource, boolean blocking) {
         attacker.inversions.add(new Inversion(40, 0.5f, target));
     }
 
-    private static void addBarrageInversion(CMoonEntity attacker, LivingEntity target, Vec3d kbVec, DamageSource damageSource) {
+    private static void addBarrageInversion(CMoonEntity attacker, LivingEntity target, Vec3d kbVec, DamageSource damageSource, boolean blocking) {
         attacker.inversions.add(new Inversion(40, 0.25f, target));
     }
 
-    private static void addInversionPunchInversion(CMoonEntity attacker, LivingEntity target, Vec3d kbVec, DamageSource damageSource) {
+    private static void addInversionPunchInversion(CMoonEntity attacker, LivingEntity target, Vec3d kbVec, DamageSource damageSource, boolean blocking) {
         attacker.inversions.add(new Inversion(70, 0.5f, target, true));
     }
 

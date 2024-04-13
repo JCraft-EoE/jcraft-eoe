@@ -43,6 +43,7 @@ import java.util.stream.Stream;
 @Getter
 public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>, A extends IAttacker<? extends A, ?>> extends AbstractMove<T, A> {
     private final List<TargetProcessor<? super A>> targetProcessors = new ArrayList<>();
+    private final List<TargetProcessor<? super A>> targetPostProcessors = new ArrayList<>();
     private final Set<HitBoxData> extraHitBoxes = new HashSet<>();
     private float damage;
     private StunType stunType = StunType.BURSTABLE;
@@ -302,6 +303,16 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
         return getThis();
     }
 
+    /**
+     * Adds a new target post-processor to this attack.
+     * @param targetProcessor The target processor to add
+     * @return This attack
+     */
+    public T withTargetPostProcessor(TargetProcessor<? super A> targetProcessor) {
+        targetPostProcessors.add(targetProcessor);
+        return getThis();
+    }
+
     public int getBlockStun() {
         return blockStun < 0 ? (int) (damage + 4) : blockStun;
     }
@@ -466,7 +477,8 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
         Vec3d kbVec = rotVec.multiply(knockback).add(new Vec3d(0.0, Math.abs(knockback) / 4, 0.0));
         for (LivingEntity target : validateTargets(attacker, targets)) {
             Vec3d pos = target.getPos().add(GravityChangerAPI.getEyeOffset(target).multiply(0.65)).subtract(rotVec.multiply(0.65));
-            if (JUtils.isBlocking(target))
+            boolean blocking = JUtils.isBlocking(target);
+            if (blocking)
                 JCraft.createHitsparks(serverWorld, pos.getX(), pos.getY(), pos.getZ(), JParticleType.BLOCK_SPARK, 3, 0);
             else {
                 JCraft.createHitsparks(serverWorld, pos.getX(), pos.getY(), pos.getZ(), JParticleType.PIXEL, 2 + (int) damage * 2, 0.5);
@@ -480,8 +492,10 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
                 anyHit = true;
             }
 
-            targetProcessors.forEach(processor -> processor.processTarget(attacker, target, kbVec, damageSource));
+            targetProcessors.forEach(processor -> processor.processTarget(attacker, target, kbVec, damageSource, blocking));
             processTarget(attacker, target, kbVec, damageSource);
+            boolean blockingAfter = JUtils.isBlocking(target);
+            targetPostProcessors.forEach(processor -> processor.processTarget(attacker, target, kbVec, damageSource, blockingAfter));
         }
 
         // Sounds
@@ -517,6 +531,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
     protected @NonNull T copyExtras(@NonNull T base) {
         AbstractSimpleAttack<T, A> cast = super.copyExtras(base);
         cast.targetProcessors.addAll(targetProcessors);
+        cast.targetPostProcessors.addAll(targetPostProcessors);
         cast.extraHitBoxes.addAll(extraHitBoxes);
         cast.stunType = stunType;
         cast.overrideStun = overrideStun;
@@ -532,6 +547,6 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
 
     @FunctionalInterface
     public interface TargetProcessor<A extends IAttacker<? extends A, ?>> {
-        void processTarget(A attacker, LivingEntity target, Vec3d kbVec, DamageSource damageSource);
+        void processTarget(A attacker, LivingEntity target, Vec3d kbVec, DamageSource damageSource, boolean blocking);
     }
 }

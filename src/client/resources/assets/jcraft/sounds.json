@@ -1080,6 +1080,24 @@
     ]
   },
 
+  "vampiregrabhit": {
+    "sounds": [
+      "jcraft:specs/vampire/grab_hit"
+    ]
+  },
+
+  "vampiresuck": {
+    "sounds": [
+      "jcraft:specs/vampire/suck"
+    ]
+  },
+
+  "vampirereanimate": {
+    "sounds": [
+      "jcraft:specs/vampire/reanimate"
+    ]
+  },
+
   "bulletricochet": {
     "sounds": [
       "jcraft:projectiles/bullet/ricochet"

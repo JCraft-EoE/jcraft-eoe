@@ -156,6 +156,12 @@ public interface JEntityTypeRegistry {
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(TheSunEntity::new)).dimensions(EntityDimensions.fixed(2f, 2f)).build()
     );
 
+    EntityType<PurpleHazeDistortionEntity> PURPLE_HAZE_DISTORTION = Registry.register(
+            Registry.ENTITY_TYPE,
+            JCraft.id("purple_haze"),
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(PurpleHazeDistortionEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
+    );
+
     EntityType<GEREntity> GER = Registry.register(
             Registry.ENTITY_TYPE,
             JCraft.id("ger"),
@@ -287,6 +293,13 @@ public interface JEntityTypeRegistry {
                     .dimensions(EntityDimensions.fixed(0.5f, 0.5f)).trackRangeChunks(4).trackedUpdateRate(10).build()
     );
 
+    EntityType<PurpleHazeCloudEntity> PURPLE_HAZE_COUD = Registry.register(
+            Registry.ENTITY_TYPE,
+            JCraft.id("purple_haze_cloud"),
+            FabricEntityTypeBuilder.<PurpleHazeCloudEntity>create(SpawnGroup.MISC, (type, world) -> new PurpleHazeCloudEntity(world))
+                    .dimensions(EntityDimensions.changing(1.0f, 1.0f)).build()
+    );
+
     static void registerEntities() {
         FabricDefaultAttributeRegistry.register(STAR_PLATINUM, StarPlatinumEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(SPTW, SPTWEntity.createMobAttributes());
@@ -314,6 +327,7 @@ public interface JEntityTypeRegistry {
         FabricDefaultAttributeRegistry.register(THE_FOOL, TheFoolEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(HIEROPHANT_GREEN, HGEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(THE_SUN, TheSunEntity.createMobAttributes());
+        FabricDefaultAttributeRegistry.register(PURPLE_HAZE_DISTORTION, AbstractPurpleHazeEntity.createMobAttributes());
 
         FabricDefaultAttributeRegistry.register(GOLD_EXPERIENCE, GoldExperienceEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(GER, GEREntity.createMobAttributes());

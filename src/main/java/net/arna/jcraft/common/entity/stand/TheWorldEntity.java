@@ -53,13 +53,13 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
             0, 40, 0.75f, 1f, 30, 2, 0.25f, 0, 3, Blocks.OBSIDIAN.getHardness())
             .withSound(JSoundRegistry.TW_BARRAGE)
             .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
-    public static final SimpleAttack<TheWorldEntity> SWEEP = new SimpleAttack<TheWorldEntity>(30, 6, 16, 0.75f, 5f,
+    public static final SimpleAttack<TheWorldEntity> SWEEP = new SimpleAttack<TheWorldEntity>(40, 6, 16, 0.75f, 5f,
             16, 1.85f, 0.25f, 0.4f)
             .withSound(JSoundRegistry.TW_KICK)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withInfo(Text.literal("Sweep"), Text.literal("fast, decent stun, mediocre when blocked"));
+            .withInfo(Text.literal("Sweep"), Text.literal("fast, decent stun"));
     public static final UppercutAttack<TheWorldEntity> ROUNDHOUSE = new UppercutAttack<TheWorldEntity>(20, 7, 13, 0.75f, 5f,
             10, 1.75f, 0.25f, -0.2f, 0.4f)
             .withCrouchingVariant(SWEEP)

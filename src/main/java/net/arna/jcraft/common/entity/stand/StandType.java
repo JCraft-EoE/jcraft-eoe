@@ -64,7 +64,10 @@ public enum StandType {
     GOLD_EXPERIENCE_REQUIEM(JEntityTypeRegistry.GER, GEREntity::new, "ger", true,                                   // -5
             Text.literal("Silver"), Text.literal("Manga"), Text.literal("Cherry Blossom")),
     STAR_PLATINUM_THE_WORLD(JEntityTypeRegistry.SPTW, SPTWEntity::new, "sptw", true,                                // -6
-            Text.literal("Judge, Jury, Executioner"), Text.literal("Diamond"), Text.literal("Over Heaven"));
+            Text.literal("Judge, Jury, Executioner"), Text.literal("Diamond"), Text.literal("Over Heaven")),
+
+    PURPLE_HAZE_DISTORTION(JEntityTypeRegistry.PURPLE_HAZE_DISTORTION, PurpleHazeDistortionEntity::new, "purple_haze_distortion", true,       // -7
+            Text.literal("Amber"), Text.literal("Vintage"), Text.literal("Reversal")),;
 
 
     @Getter(lazy = true)

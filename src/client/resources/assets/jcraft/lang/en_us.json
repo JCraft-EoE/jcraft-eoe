@@ -202,9 +202,14 @@
   "death.attack.wsacid.player.item": "%1$s was melted by %2$s while wielding %3$s",
 
   "death.attack.jbleeding": "%1$s bled out",
-  "death.attack.jbleeding.item": "%1$s bled out while fighting %2$s",
+  "death.attack.jbleeding.item": "%1$s bled out while fighting %2$s while wielding %3$s",
   "death.attack.jbleeding.player": "%1$s bled out while fighting %2$s",
-  "death.attack.jbleeding.player.item": "%1$s bled out while fighting %2$s",
+  "death.attack.jbleeding.player.item": "%1$s bled out while fighting %2$s while wielding %3$s",
+
+  "death.attack.phpoison": "%1$s was eradicated by the Purple Haze",
+  "death.attack.phpoison.item": "%1$s was eradicated by the Purple Haze while fighting %2$s while wielding %3$s",
+  "death.attack.phpoison.player": "%1$s was eradicated by the Purple Haze while fighting %2$s",
+  "death.attack.phpoison.player.item": "%1$s was eradicated by the Purple Haze while fighting %2$s while wielding %3$s",
 
   "commands.gravity.get.self": "Your gravity is %s",
   "commands.gravity.get.other": "%s's gravity is %s",

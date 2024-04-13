@@ -63,13 +63,13 @@ public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
                 float bloodMult = JUtils.getBloodMult(ctx.get(BloodSuckAttack.TARGET));
                 if (bloodMult <= 0) return;
                 attacker.vampireComponent.setBlood(attacker.vampireComponent.getBlood() + 2 * bloodMult);
-                JUtils.serverPlaySound(SoundEvents.ENTITY_GENERIC_DRINK, (ServerWorld) user.getWorld(), user.getPos(), 32);
+                JUtils.serverPlaySound(JSoundRegistry.VAMPIRE_SUCK, (ServerWorld) user.getWorld(), user.getPos(), 32);
             })
             .withStunType(StunType.LAUNCH)
             .withInfo(Text.literal("Blood Suck (Hit)"), Text.empty());
     public static final BloodSuckAttack<VampireSpec, State> BLOODSUCK = new BloodSuckAttack<>(240, 10, 18,
             1f, 1f, BLOODSUCK_HITS.getDuration(), 1.5f, 0f, 0f, BLOODSUCK_HITS, State.BLOODSUCK_HIT, BLOODSUCK_HITS.getDuration(), 2f)
-            .withImpactSound(JSoundRegistry.IMPACT_9)
+            .withImpactSound(JSoundRegistry.VAMPIRE_GRAB_HIT)
             .withHitSpark(JParticleType.BACK_STAB) // todo: bloodsuck particles
             .withInfo(Text.literal("Blood Suck"), Text.literal("blockable grab"));
 
@@ -93,6 +93,7 @@ public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
 
     public static final ReviveMove<VampireSpec> REVIVE_MOVE = new ReviveMove<VampireSpec>(300, 16, 20, 5)
             .withCrouchingVariant(TOGGLE_NV)
+            .withSound(JSoundRegistry.VAMPIRE_REANIMATE)
             .withInfo(Text.literal("Resurrection"), Text.literal("revives humanoid/undead enemies within 5 meters, that died within the last 1 minute"));
 
     private final VampireComponent vampireComponent;

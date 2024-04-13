@@ -20,4 +20,8 @@ public class JDamageSources {
     public static @NotNull DamageSource bleeding() {
         return new DamageSource("jbleeding");
     }
+
+    public static @NotNull DamageSource phpoison() {
+        return new DamageSource("phpoison").setBypassesArmor().setUnblockable();
+    }
 }

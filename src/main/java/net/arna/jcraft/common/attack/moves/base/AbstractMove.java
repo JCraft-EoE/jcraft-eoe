@@ -54,7 +54,8 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     @Getter
     private Boolean isHoldable;
     // Used to help AI know how and when to use this attack.
-    protected boolean ranged, barrage, multiHit, charge, counter, dash, grab, copyOnUse;
+    protected boolean ranged, barrage, multiHit, charge, counter, dash, grab;
+    protected boolean copyOnUse;
     private boolean copiedExtras; // See #testCopy()
 
     protected AbstractMove(int cooldown, int windup, int duration, float moveDistance) {
