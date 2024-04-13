@@ -658,7 +658,7 @@
 				},
 				"leftArm": {
 					"rotation": {
-						"vector": ["easeInOutSine", "easeInOutSine", "easeInOutSine"]
+						"vector": [-82.2384, 14.8687, 2.0031]
 					},
 					"position": {
 						"vector": [-1, 0, -2]
@@ -666,7 +666,7 @@
 				},
 				"leftLower": {
 					"rotation": {
-						"vector": [-75.68787, 7.80384, 86.63256]
+						"vector": [-75.30744, 15.06556, 88.54746]
 					}
 				},
 				"eye": {

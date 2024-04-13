@@ -2,6 +2,7 @@ package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.common.entity.stand.AbstractPurpleHazeEntity;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
+import net.arna.jcraft.registry.JParticleTypeRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
@@ -60,15 +61,21 @@ public class PurpleHazeCloudEntity extends Entity {
     public void tick() {
         super.tick();
 
+        float radius = getRadius();
+
         if (world.isClient()) {
-            world.addParticle(
-                    ParticleTypes.WITCH, false,
-                    getParticleX(0.5), getRandomBodyY(), getParticleZ(0.5),
-                    0, 0, 0
-            );
+            for (int i = 0; i < radius; i++) {
+                world.addParticle(
+                        JParticleTypeRegistry.PURPLE_HAZE_CLOUD, false,
+                        getX() + random.nextGaussian() * radius / 2,
+                        getY() + random.nextGaussian() * radius / 2,
+                        getZ() + random.nextGaussian() * radius / 2,
+                        0, 0, 0
+                );
+            }
         } else {
             // -1 radius per second
-            setRadius(getRadius() - 0.05f);
+            setRadius(radius - 0.05f);
 
             if (getRadius() <= 0 || age >= MAX_AGE) {
                 discard();

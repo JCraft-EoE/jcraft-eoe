@@ -33,7 +33,7 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
             6, 14, 0.75f, 6f, 20, 1.5f, 0.25f, -0.6f, 0.75f)
             .withTargetPostProcessor((attacker, target, kbVec, damageSource, blocking) -> {
                 if (!blocking)
-                    attacker.infect(target, 5 * 20);
+                    infect(target, 5 * 20);
             })
             .withFollowup(BACKHAND_FOLLOWUP)
             .withImpactSound(JSoundRegistry.IMPACT_4)
@@ -50,7 +50,7 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
             .withInfo(Text.literal("Kick"), Text.literal("fast combo finisher"));
 
     public static final SimpleAttack<AbstractPurpleHazeEntity<?, ?>> LIGHT = new SimpleAttack<AbstractPurpleHazeEntity<?, ?>>(
-            30, 6, 9, 0.75f, 5f, 10, 1.5f, 0.25f, 0.1f)
+            30, 6, 9, 0.75f, 5f, 11, 1.5f, 0.25f, 0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(BACKHAND)

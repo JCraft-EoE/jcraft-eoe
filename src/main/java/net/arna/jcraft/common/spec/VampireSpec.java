@@ -69,7 +69,8 @@ public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
             .withInfo(Text.literal("Blood Suck (Hit)"), Text.empty());
     public static final BloodSuckAttack<VampireSpec, State> BLOODSUCK = new BloodSuckAttack<>(240, 10, 18,
             1f, 1f, BLOODSUCK_HITS.getDuration(), 1.5f, 0f, 0f, BLOODSUCK_HITS, State.BLOODSUCK_HIT, BLOODSUCK_HITS.getDuration(), 2f)
-            .withImpactSound(JSoundRegistry.VAMPIRE_GRAB_HIT)
+            .withSound(JSoundRegistry.VAMPIRE_GRAB_HIT)
+            .withImpactSound(JSoundRegistry.IMPACT_9)
             .withHitSpark(JParticleType.BACK_STAB) // todo: bloodsuck particles
             .withInfo(Text.literal("Blood Suck"), Text.literal("blockable grab"));
 
