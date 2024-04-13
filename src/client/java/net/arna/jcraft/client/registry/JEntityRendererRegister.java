@@ -65,6 +65,7 @@ public interface JEntityRendererRegister {
         EntityRendererRegistry.register(JEntityTypeRegistry.BULLET, BulletRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegistry.RAPIER, RapierRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegistry.METEOR, MeteorRenderer::new);
+        EntityRendererRegistry.register(JEntityTypeRegistry.PH_CAPSULE, PHCapsuleRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegistry.PURPLE_HAZE_COUD, ctx -> new EntityRenderer<>(ctx) {
             @Override
             public Identifier getTexture(PurpleHazeCloudEntity entity) {

@@ -1,27 +1,31 @@
-package net.arna.jcraft.common.attack.moves.goldexperience;
+package net.arna.jcraft.common.attack.moves.shared;
 
 import lombok.Getter;
 import lombok.NonNull;
+import net.arna.jcraft.common.attack.core.IAttacker;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.entity.stand.GoldExperienceEntity;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import software.bernie.geckolib3.core.IAnimatable;
 
 import java.util.Set;
 
 @Getter
-public class RekkaAttack extends AbstractSimpleAttack<RekkaAttack, GoldExperienceEntity> {
+public class RekkaAttack<A extends IAttacker<A, S> & IAnimatable, S extends Enum<S> & StandAnimationState<A>>
+        extends AbstractSimpleAttack<RekkaAttack<A, S>, A> {
     private final int rekkaLevel;
-    private final RekkaAttack next;
+    private final RekkaAttack<A, S> next;
     private final int switchStart;
-    private final GoldExperienceEntity.State nextState;
+    private final StandAnimationState<A> nextState;
 
     public RekkaAttack(int cooldown, int windup, int duration, float attackDistance, float damage, int stun, float hitboxSize,
-                       float knockback, float offset, int rekkaLevel, int switchStart, RekkaAttack next, GoldExperienceEntity.State nextState) {
+                       float knockback, float offset, int rekkaLevel, int switchStart, RekkaAttack<A, S> next, StandAnimationState<A> nextState) {
         super(cooldown, windup, duration, attackDistance, damage, stun, hitboxSize, knockback, offset);
         if (rekkaLevel > 1) hitSpark = JParticleType.HIT_SPARK_2;
         this.rekkaLevel = rekkaLevel;
@@ -31,7 +35,7 @@ public class RekkaAttack extends AbstractSimpleAttack<RekkaAttack, GoldExperienc
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(GoldExperienceEntity attacker, LivingEntity user, MoveContext ctx) {
+    public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user, MoveContext ctx) {
         Set<LivingEntity> targets = super.perform(attacker, user, ctx);
 
         if (rekkaLevel == 3)
@@ -47,13 +51,13 @@ public class RekkaAttack extends AbstractSimpleAttack<RekkaAttack, GoldExperienc
     }
 
     @Override
-    protected @NonNull RekkaAttack getThis() {
+    protected @NonNull RekkaAttack<A, S> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull RekkaAttack copy() {
-        return copyExtras(new RekkaAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
+    public @NonNull RekkaAttack<A, S> copy() {
+        return copyExtras(new RekkaAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
                 getHitboxSize(), getKnockback(), getOffset(), getRekkaLevel(), getSwitchStart(), getNext(), getNextState()));
     }
 }

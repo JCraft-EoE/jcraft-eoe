@@ -11,7 +11,7 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
-import net.minecraft.particle.ParticleTypes;
+import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 
@@ -72,6 +72,14 @@ public class PurpleHazeCloudEntity extends Entity {
                         getZ() + random.nextGaussian() * radius / 2,
                         0, 0, 0
                 );
+
+                world.addParticle(
+                        JParticleTypeRegistry.PURPLE_HAZE_PARTICLE, false,
+                        getX() + random.nextGaussian() * radius / 2,
+                        getY() + random.nextGaussian() * radius / 2,
+                        getZ() + random.nextGaussian() * radius / 2,
+                        0, 0, 0
+                );
             }
         } else {
             // -1 radius per second
@@ -82,10 +90,11 @@ public class PurpleHazeCloudEntity extends Entity {
                 return;
             }
 
-            world.getOtherEntities(this, getBoundingBox()).forEach(
+            world.getOtherEntities(this, getBoundingBox(),
+                    EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(EntityPredicates.VALID_ENTITY)).forEach(
                     entity -> {
                         if (entity instanceof LivingEntity living)
-                            AbstractPurpleHazeEntity.infect(living, 3);
+                            AbstractPurpleHazeEntity.infect(living, 4);
                     }
             );
         }

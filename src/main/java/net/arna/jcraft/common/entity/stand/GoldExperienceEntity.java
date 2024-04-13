@@ -6,6 +6,7 @@ import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.goldexperience.*;
 import net.arna.jcraft.common.attack.moves.shared.HealMove;
 import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
+import net.arna.jcraft.common.attack.moves.shared.RekkaAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.util.JParticleType;
@@ -87,20 +88,23 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .withImpactSound(JSoundRegistry.IMPACT_10)
             .withBlockableType(BlockableType.NON_BLOCKABLE)
             .withInfo(Text.literal("Overclock"), Text.literal("slow, unblockable, devastating stun"));
-    public static final RekkaAttack REKKA3 = new RekkaAttack(0, 12, 24, 1f, 6f,
+    public static final RekkaAttack<GoldExperienceEntity, GoldExperienceEntity.State> REKKA3 = new RekkaAttack<GoldExperienceEntity, GoldExperienceEntity.State>
+            (0, 12, 24, 1f, 6f,
             15, 2f, 0.75f, 0f, 3, 0, null, null)
             .withSound(JSoundRegistry.GE_REKKA3)
             .withLaunch()
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withInfo(Text.literal("Rekka (Final Hit)"), Text.literal("knockdown"));
-    public static final RekkaAttack REKKA2 = new RekkaAttack(0, 9, 18, 1f, 5f,
+    public static final RekkaAttack<GoldExperienceEntity, GoldExperienceEntity.State> REKKA2 = new RekkaAttack<GoldExperienceEntity, GoldExperienceEntity.State>
+            (0, 9, 18, 1f, 5f,
             16, 1.75f, 0.5f, 0f, 2, 9, REKKA3, State.REKKA3)
             .withSound(JSoundRegistry.GE_REKKA2)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withFollowup(REKKA3)
             .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
             .withInfo(Text.literal("Rekka (2nd Hit)"), Text.literal("links into Light"));
-    public static final RekkaAttack REKKA1 = new RekkaAttack(160, 8, 20, 1f, 5f,
+    public static final RekkaAttack<GoldExperienceEntity, GoldExperienceEntity.State> REKKA1 = new RekkaAttack<GoldExperienceEntity, GoldExperienceEntity.State>
+            (160, 8, 20, 1f, 5f,
             15, 1.5f, 0.5f, 0f, 1, 12, REKKA2, State.REKKA2)
             .withSound(JSoundRegistry.GE_REKKA1)
             .withImpactSound(JSoundRegistry.IMPACT_2)
@@ -169,10 +173,10 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
                 LivingEntity user = getUserOrThrow();
                 if (user.hasStatusEffect(JStatusRegistry.DAZED)) return false;
                 boolean idling = this.getMoveStun() <= 0;
-                if (!(curMove instanceof RekkaAttack rekka)) {
+                if (!(curMove instanceof RekkaAttack<GoldExperienceEntity, State> rekka)) {
                     if (idling) return handleMove(MoveType.SPECIAL2);
                 } else if (rekka.getNext() != null && rekka.mayAdvance(this))
-                    setMove(rekka.getNext(), rekka.getNextState());
+                    setMove(rekka.getNext(), (State) rekka.getNextState());
             }
             case SPECIAL3 -> {
                 if (!canAttack() || !hasUser()) return false;

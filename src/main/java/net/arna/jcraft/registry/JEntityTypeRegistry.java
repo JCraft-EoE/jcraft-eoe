@@ -244,6 +244,13 @@ public interface JEntityTypeRegistry {
                     .dimensions(EntityDimensions.fixed(0.5f, 0.5f)).trackRangeChunks(4).trackedUpdateRate(10).build()
     );
 
+    EntityType<PHCapsuleProjectile> PH_CAPSULE = Registry.register(
+            Registry.ENTITY_TYPE,
+            JCraft.id("ph_capsule"),
+            FabricEntityTypeBuilder.<PHCapsuleProjectile>create(SpawnGroup.MISC, (type, world) -> new PHCapsuleProjectile(world))
+                    .dimensions(EntityDimensions.fixed(0.75f, 0.75f)).trackRangeChunks(6).trackedUpdateRate(20).build()
+    );
+
     EntityType<LifeDetectorEntity> LIFE_DETECTOR = Registry.register(
             Registry.ENTITY_TYPE,
             JCraft.id("lifedetector"),

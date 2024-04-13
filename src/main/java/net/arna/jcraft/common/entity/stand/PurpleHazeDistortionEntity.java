@@ -25,10 +25,10 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
     public PurpleHazeDistortionEntity(World worldIn) {
         super(StandType.PURPLE_HAZE_DISTORTION, worldIn);
         auraColors = new Vec3f[]{
-                new Vec3f(0.8f, 0.5f, 1.0f),
-                new Vec3f(0.6f, 0.2f, 1.0f),
+                new Vec3f(0.8f, 0.2f, 1.0f),
+                new Vec3f(1.0f, 0.2f, 0.6f),
                 new Vec3f(0.2f, 0.8f, 0.6f),
-                new Vec3f(0.1f, 0.3f, 1.0f)
+                new Vec3f(1.0f, 0.3f, 0.5f)
         };
     }
 
@@ -40,6 +40,9 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
 
         //moves.register(MoveType.HEAVY, STAR_BREAKER, State.HEAVY).withCrouchingVariant(State.GROUND_BREAKER);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
+
+        moves.register(MoveType.SPECIAL1, LAUNCH_CAPSULE, State.LAUNCH).withCrouchingVariant(State.LAUNCH2);
+        moves.register(MoveType.SPECIAL3, GROUND_SLAM, State.GROUND_SLAM);
     }
 
     @Override
@@ -67,9 +70,10 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
         PUNCH(builder -> builder.playAndHold("animation.purple_haze.light")),
         BLOCK(builder -> builder.loop("animation.purple_haze.block")),
         HEAVY(builder -> builder.playAndHold("animation.purple_haze.heavy")),
-        GROUND_BREAKER(builder -> builder.playAndHold("animation.purple_haze.ground_slam")),
+        GROUND_SLAM(builder -> builder.playAndHold("animation.purple_haze.ground_slam")),
         BARRAGE(builder -> builder.loop("animation.purple_haze.barrage")),
-        STAR_FINGER(builder -> builder.playAndHold("animation.purple_haze.star_finger")),
+        LAUNCH(builder -> builder.playAndHold("animation.purple_haze.launch")),
+        LAUNCH2(builder -> builder.playAndHold("animation.purple_haze.launch2")),
         INHALE(builder -> builder.playAndHold("animation.purple_haze.inhale")),
         KNEE(builder -> builder.playAndHold("animation.purple_haze.knee")),
         JUMP(builder -> builder.playAndHold("animation.purple_haze.jump")),

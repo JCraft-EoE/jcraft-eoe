@@ -25,6 +25,7 @@ public interface JParticleTypeRegistry {
     DefaultParticleType INVERSION = FabricParticleTypes.simple();
     DefaultParticleType SUN_LOCK_ON = FabricParticleTypes.simple();
     DefaultParticleType PURPLE_HAZE_CLOUD = FabricParticleTypes.simple();
+    DefaultParticleType PURPLE_HAZE_PARTICLE = FabricParticleTypes.simple();
 
     private static void registerParticle(String identifier, ParticleType<?> type) {
         Registry.register(Registry.PARTICLE_TYPE, JCraft.id(identifier), type);
@@ -49,5 +50,6 @@ public interface JParticleTypeRegistry {
         registerParticle("inversion", INVERSION);
         registerParticle("sun_lock_on", SUN_LOCK_ON);
         registerParticle("purple_haze_cloud", PURPLE_HAZE_CLOUD);
+        registerParticle("purple_haze_particle", PURPLE_HAZE_PARTICLE);
     }
 }

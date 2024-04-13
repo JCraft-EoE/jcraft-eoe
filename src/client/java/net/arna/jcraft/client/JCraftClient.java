@@ -150,6 +150,7 @@ public class JCraftClient implements ClientModInitializer {
         particleFactoryRegistry.register(JParticleTypeRegistry.INVERSION, InversionParticle.Factory::new);
         particleFactoryRegistry.register(JParticleTypeRegistry.SUN_LOCK_ON, BackstabParticle.Factory::new); // 9 frames, reusing
         particleFactoryRegistry.register(JParticleTypeRegistry.PURPLE_HAZE_CLOUD, PurpleHazeCloudParticle.Factory::new);
+        particleFactoryRegistry.register(JParticleTypeRegistry.PURPLE_HAZE_PARTICLE, PurpleHazeErraticParticle.Factory::new);
 
         // Renderer registration
         JEntityRendererRegister.registerEntityRenderers();
