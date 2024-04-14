@@ -1,6 +1,8 @@
 package net.arna.jcraft.common.entity.projectile;
 
+import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.entity.PurpleHazeCloudEntity;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
@@ -34,8 +36,12 @@ public class PHCapsuleProjectile extends PersistentProjectileEntity implements I
             return;
         if (hitResult.getType() == HitResult.Type.MISS)
             return;
-        if (hitResult instanceof EntityHitResult entityHitResult && entityHitResult.getEntity().isConnectedThroughVehicle(getOwner()))
-            return;
+        if (hitResult instanceof EntityHitResult entityHitResult) {
+            if (entityHitResult.getEntity().isConnectedThroughVehicle(getOwner())) return;
+
+            JUtils.projectileDamageLogic(this, world, entityHitResult.getEntity(), getVelocity().multiply(0.1),
+                    2, 1, false, 2f, 2, HitPropertyComponent.HitAnimation.MID);
+        }
 
         discard();
         PurpleHazeCloudEntity cloud = new PurpleHazeCloudEntity(world, 2.0f);

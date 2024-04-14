@@ -322,7 +322,9 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
     }
 
     private void togglePassive() {
-        dataTracker.set(PASSIVE, !dataTracker.get(PASSIVE));
+        boolean newPassive = !dataTracker.get(PASSIVE);
+        dataTracker.set(PASSIVE, newPassive);
+        getUserOrThrow().sendMessage(Text.of(newPassive ? "PASSIVE" : "ACTIVE"));
     }
 
     public boolean isPassive() {

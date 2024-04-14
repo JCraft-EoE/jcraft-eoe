@@ -11,7 +11,7 @@ public class PurpleHazeErraticParticle extends AbstractSlowingParticle {
         super(clientWorld, d, e, f, g, h, i);
         this.maxAge = 16;
         this.scale = 0.05f;
-        this.setColor(0.6f, 0.3f, 1.0f);
+        this.setColor(0.6f, 0.3f, 0.8f);
         this.setSpriteForAge(spriteProvider);
     }
 
