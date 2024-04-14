@@ -15,6 +15,7 @@ import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
+import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FluidDrainable;
 import net.minecraft.entity.Entity;
@@ -98,6 +99,7 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
                 for (int i = 0; i < attacker.getScale(); i++)
                     fireMeteor(attacker, user, attacker.randomPos(), JUtils.randUnitVec(attacker.random), 1.25f, 0f);
             })
+            .withSound(JSoundRegistry.SUN_SHOWER)
             .withoutSlowness()
             .withInfo(
                     Text.of("Meteor Shower"),
@@ -184,6 +186,8 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
         meteor.setVelocity(velocity.x, velocity.y, velocity.z, speed, divergence);
 
         attacker.getWorld().spawnEntity(meteor);
+        if (!attacker.getCurrentMove().isBarrage())
+            attacker.playSound(JSoundRegistry.SUN_METEOR_FIRE, 1f, 1f);
 
         return meteor;
     }
@@ -201,6 +205,7 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
         sunBeam.setVelocity(lookVec.x, lookVec.y, lookVec.z, 0.01f, divergence);
 
         attacker.getWorld().spawnEntity(sunBeam);
+        attacker.playSound(JSoundRegistry.SUN_BEAM_RAY, 1f, 1f);
     }
 
     private static void fireMeteors1(TheSunEntity attacker, LivingEntity user) {
@@ -216,7 +221,7 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
     }
 
     public TheSunEntity(World worldIn) {
-        super(StandType.THE_SUN, worldIn);
+        super(StandType.THE_SUN, worldIn, JSoundRegistry.SUN_SUMMON);
 
         idleRotation = 0;
 
@@ -355,6 +360,9 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
         float heatFieldSize = scale * 20.0F;
 
         if (world.isClient()) {
+            if (random.nextGaussian() <= -0.95)
+                playSound(JSoundRegistry.SUN_IDLE, 1f, 1f);
+
             Vec3d pos = randomPos();
             Vec3d vel = JUtils.randUnitVec(random).multiply(0.2 * scale);
             for (int i = 0; i < (int)(heatFieldSize); i++)

@@ -1026,6 +1026,96 @@
     ]
   },
 
+  "phsummon": {
+    "sounds": [
+      "jcraft:stands/purple_haze/summon"
+    ]
+  },
+
+  "phbarrage": {
+    "sounds": [
+      "jcraft:stands/purple_haze/barrage"
+    ]
+  },
+
+  "phgrabhit": {
+    "sounds": [
+      "jcraft:stands/purple_haze/grab_hit"
+    ]
+  },
+
+  "phgroundslam": {
+    "sounds": [
+      "jcraft:stands/purple_haze/ground_slam"
+    ]
+  },
+
+  "phrekka1": {
+    "sounds": [
+      "jcraft:stands/purple_haze/rekka1"
+    ]
+  },
+
+  "phrekka2": {
+    "sounds": [
+      "jcraft:stands/purple_haze/rekka2"
+    ]
+  },
+
+  "phrekka3": {
+    "sounds": [
+      "jcraft:stands/purple_haze/rekka3"
+    ]
+  },
+
+  "phcapsule1": {
+    "sounds": [
+      "jcraft:stands/purple_haze/capsule1"
+    ]
+  },
+
+  "phcapsule2": {
+    "sounds": [
+      "jcraft:stands/purple_haze/capsule2"
+    ]
+  },
+
+  "phultimate": {
+    "sounds": [
+      "jcraft:stands/purple_haze/ultimate"
+    ]
+  },
+
+  "sunsummon": {
+    "sounds": [
+      "jcraft:stands/the_sun/summon"
+    ]
+  },
+
+  "sunshower": {
+    "sounds": [
+      "jcraft:stands/the_sun/shower"
+    ]
+  },
+
+  "sunbeamray": {
+    "sounds": [
+      "jcraft:stands/the_sun/beam_ray"
+    ]
+  },
+
+  "sunmeteorfire": {
+    "sounds": [
+      "jcraft:stands/the_sun/meteorfire"
+    ]
+  },
+
+  "sunidle": {
+    "sounds": [
+      "jcraft:stands/the_sun/idle"
+    ]
+  },
+
   "anubisslash": {
     "sounds": [
       "jcraft:specs/anubis/slash"

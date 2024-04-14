@@ -45,6 +45,7 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
             GRAB_HIT, State.GRAB_HIT, 25, 1)
             .withCrouchingVariant(GROUND_SLAM)
             .withSound(JSoundRegistry.D4C_THROW)
+            .withImpactSound(JSoundRegistry.PH_GRAB_HIT)
             .withInfo(Text.literal("Grab"), Text.literal("unblockable, combo finisher"));
 
     public PurpleHazeDistortionEntity(World worldIn) {

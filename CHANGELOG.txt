@@ -2620,7 +2620,6 @@ Gold Experience
     >Rekka 1 sped up tremendously
 
 ● 14/04/2024
-
 The Sun
     >Replaced block gauge with size gauge
     >Added text for swapping between active/passive mode

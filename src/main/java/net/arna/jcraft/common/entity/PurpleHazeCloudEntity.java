@@ -82,8 +82,8 @@ public class PurpleHazeCloudEntity extends Entity {
                 );
             }
         } else {
-            // -1 radius per second
-            setRadius(radius - 0.05f);
+            // -0.5 radius per second
+            setRadius(radius - 0.025f);
 
             if (getRadius() <= 0 || age >= MAX_AGE) {
                 discard();
