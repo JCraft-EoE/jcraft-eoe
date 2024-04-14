@@ -21,6 +21,9 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
     private static final @NonNull UppercutAttack<AbstractPurpleHazeEntity<?, ?>> CROUCHING_LIGHT_ATTACK = BACKHAND.copy().withFollowup(CROUCHING_LIGHT_FOLLOWUP_ATTACK);
     private static final @NonNull SimpleAttack<AbstractPurpleHazeEntity<?, ?>> LIGHT_FOLLOWUP_ATTACK = LIGHT_FOLLOWUP.copy().withAnim(State.LIGHT_FOLLOWUP);
     private static final @NonNull SimpleAttack<AbstractPurpleHazeEntity<?, ?>> LIGHT_ATTACK = LIGHT.copy().withFollowup(LIGHT_FOLLOWUP_ATTACK).withCrouchingVariant(CROUCHING_LIGHT_ATTACK);
+    private static final @NonNull KnockdownAttack<AbstractPurpleHazeEntity<?, ?>> REKKA_3 = REKKA3.copy().withAnim(State.REKKA3);
+    private static final @NonNull SimpleAttack<AbstractPurpleHazeEntity<?, ?>> REKKA_2 = REKKA2.copy().withAnim(State.REKKA2).withFollowup(REKKA_3);
+    private static final @NonNull SimpleAttack<AbstractPurpleHazeEntity<?, ?>> REKKA_1 = REKKA1.copy().withAnim(State.REKKA1).withFollowup(REKKA_2);
 
     public PurpleHazeDistortionEntity(World worldIn) {
         super(StandType.PURPLE_HAZE_DISTORTION, worldIn);
@@ -42,6 +45,7 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 
         moves.register(MoveType.SPECIAL1, LAUNCH_CAPSULE, State.LAUNCH).withCrouchingVariant(State.LAUNCH2);
+        moves.register(MoveType.SPECIAL2, REKKA_1, State.REKKA1);
         moves.register(MoveType.SPECIAL3, GROUND_SLAM, State.GROUND_SLAM);
     }
 
@@ -74,9 +78,11 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
         BARRAGE(builder -> builder.loop("animation.purple_haze.barrage")),
         LAUNCH(builder -> builder.playAndHold("animation.purple_haze.launch")),
         LAUNCH2(builder -> builder.playAndHold("animation.purple_haze.launch2")),
-        INHALE(builder -> builder.playAndHold("animation.purple_haze.inhale")),
-        KNEE(builder -> builder.playAndHold("animation.purple_haze.knee")),
-        JUMP(builder -> builder.playAndHold("animation.purple_haze.jump")),
+
+        REKKA1(builder -> builder.playAndHold("animation.purple_haze.rekka1")),
+        REKKA2(builder -> builder.playAndHold("animation.purple_haze.rekka2")),
+        REKKA3(builder -> builder.playAndHold("animation.purple_haze.rekka3")),
+
         BACKHAND(builder -> builder.playAndHold("animation.purple_haze.backhand")),
         BACKHAND_FOLLOWUP(builder -> builder.playAndHold("animation.purple_haze.backhand_followup")),
         LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.purple_haze.light_followup"));

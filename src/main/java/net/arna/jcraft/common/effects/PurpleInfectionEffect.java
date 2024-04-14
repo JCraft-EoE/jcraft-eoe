@@ -25,9 +25,9 @@ public class PurpleInfectionEffect extends StatusEffect {
     @Override
     public void applyUpdateEffect(LivingEntity entity, int amplifier) {
         StandType standType = JComponents.getStandData(entity).getType();
-        float damage = 1.0f;
+        float damage = 0.6666f; // 1/3rd of a heart
         if (standType == StandType.PURPLE_HAZE_DISTORTION)
-            damage /= 10.0f;
+            damage /= 3.0f;
         entity.damage(JDamageSources.phpoison(), damage);
     }
 }

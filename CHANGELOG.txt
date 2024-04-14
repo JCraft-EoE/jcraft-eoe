@@ -2616,6 +2616,9 @@ The World
 Vampire
     >Added more sounds
 
+Gold Experience
+    >Rekka 1 sped up tremendously
+
     //TODO: FIX FUCKING INPUT BUGS :)
 
 todo: combo counter is LYING
