@@ -2624,6 +2624,10 @@ The Sun
     >Replaced block gauge with size gauge
     >Added text for swapping between active/passive mode
 
+● 16/04/2024
+Stone Mask
+    >Updated model
+
     //TODO: FIX FUCKING INPUT BUGS :)
 
 todo: combo counter is LYING

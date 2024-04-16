@@ -66,6 +66,7 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
 
         //moves.register(MoveType.HEAVY, STAR_BREAKER, State.HEAVY).withCrouchingVariant(State.GROUND_BREAKER);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
+        moves.register(MoveType.HEAVY, HEAVY, State.HEAVY);
 
         moves.register(MoveType.SPECIAL1, LAUNCH_CAPSULE, State.LAUNCH).withCrouchingVariant(State.LAUNCH2);
         moves.register(MoveType.SPECIAL2, REKKA_1, State.REKKA1);

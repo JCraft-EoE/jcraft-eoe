@@ -17,5 +17,7 @@ public interface JArmorRendererRegistry {
                 null, null, null);
         GeoArmorRenderer.registerArmorRenderer(new RedHatRenderer(), JObjectRegistry.RED_HAT,
                 null, null, null);
+        GeoArmorRenderer.registerArmorRenderer(new DIOCapeRenderer(), null,
+                JObjectRegistry.DIOCAPE, null, null);
     }
 }

@@ -23,7 +23,7 @@ public class JotaroArmorItem extends ArmorItem implements IAnimatable {
     private <P extends IAnimatable> PlayState predicate(AnimationEvent<P> event) {
         LivingEntity livingEntity = event.getExtraDataOfType(LivingEntity.class).get(0);
         event.getController().setAnimation(new AnimationBuilder().loop(
-                livingEntity.getVelocity().horizontalLengthSquared() > 0.01 ? "animation.jotarooutfit.moving" : "animation.jotarooutfit.idle"));
+                livingEntity.getVelocity().horizontalLengthSquared() > 0.01 ? "animation.moving" : "animation.idle"));
         return PlayState.CONTINUE;
     }
 

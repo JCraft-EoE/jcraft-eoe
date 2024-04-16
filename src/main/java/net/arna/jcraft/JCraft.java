@@ -207,6 +207,7 @@ public class JCraft implements ModInitializer {
         stacks.add(new ItemStack(JObjectRegistry.DIOJACKET));
         stacks.add(new ItemStack(JObjectRegistry.DIOPANTS));
         stacks.add(new ItemStack(JObjectRegistry.DIOBOOTS));
+        stacks.add(new ItemStack(JObjectRegistry.DIOCAPE));
 
         stacks.add(new ItemStack(JObjectRegistry.JOTAROCAP));
         stacks.add(new ItemStack(JObjectRegistry.JOTAROJACKET));

@@ -28,10 +28,10 @@ import static net.arna.jcraft.registry.JStatusRegistry.PHPOISON;
 public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHazeEntity<E, S>, S extends Enum<S> & StandAnimationState<E>> extends StandEntity<E, S>
         permits PurpleHazeDistortionEntity {
     public static final KnockdownAttack<AbstractPurpleHazeEntity<?, ?>> BACKHAND_FOLLOWUP = new KnockdownAttack<AbstractPurpleHazeEntity<?, ?>>(
-            0, 13, 20, 0.75f, 6f, 13, 1.75f, 0.5f, 0.35f, 35)
+            0, 13, 20, 0.75f, 6f, 13, 1.75f, 0.5f, 0.35f, 25)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withInfo(Text.literal("Hammerfist"), Text.literal("knockdown"));
+            .withInfo(Text.literal("Hammerfist"), Text.literal("1s knockdown"));
     public static final UppercutAttack<AbstractPurpleHazeEntity<?, ?>> BACKHAND = new UppercutAttack<AbstractPurpleHazeEntity<?, ?>>(20,
             6, 14, 0.75f, 6f, 20, 1.5f, 0.25f, -0.6f, 0.75f)
             .withTargetPostProcessor((attacker, target, kbVec, damageSource, blocking) -> {
@@ -58,6 +58,12 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(BACKHAND)
             .withInfo(Text.literal("Punch"), Text.literal("fast combo starter"));
+
+    public static final SimpleAttack<AbstractPurpleHazeEntity<?, ?>> HEAVY = new SimpleAttack<AbstractPurpleHazeEntity<?, ?>>(
+            20 * 5, 10, 20, 0.75f, 7f, 14, 2.0f, 1.25f, -0.1f)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withLaunch()
+            .withInfo(Text.literal("Uppercut"), Text.literal("launcher"));
 
     public static final MainBarrageAttack<AbstractPurpleHazeEntity<?, ?>> BARRAGE = new MainBarrageAttack<AbstractPurpleHazeEntity<?, ?>>(280,
             0, 40, 0.75f, 1f, 30, 2f, 0.25f, 0f, 3, Blocks.DEEPSLATE.getHardness())
@@ -96,7 +102,7 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
 
     // .withFollowup() and .withAnim() must be implemented inside inheritors
     public static final KnockdownAttack<AbstractPurpleHazeEntity<?, ?>> REKKA3 = new KnockdownAttack<AbstractPurpleHazeEntity<?, ?>>
-            (0, 10, 20, 1f, 5f, 15, 2f, 0.75f, 0.3f, 50)
+            (0, 10, 20, 1f, 5f, 15, 2f, 0.75f, 0.3f, 55)
             .withSound(JSoundRegistry.PH_REKKA3)
             .withLaunch()
             .withImpactSound(JSoundRegistry.IMPACT_1)
@@ -114,10 +120,12 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
             .withSound(JSoundRegistry.PH_REKKA1)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             // .withFollowup(REKKA2)
-            .withExtraHitBox(1.75)
+            .withExtraHitBox(1.5)
             .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
             .withInitAction(AbstractPurpleHazeEntity::lunge)
-            .withInfo(Text.literal("Rekka Series"), Text.literal("a set of three attacks, which cancel into each other during recovery"));
+            .withInfo(Text.literal("Rekka Series"), Text.literal("""
+                    A set of three attacks, which cancel into each other during recovery.
+                    Last hit knocks down for 2.5s"""));
     public static final SimpleAttack<AbstractPurpleHazeEntity<?, ?>> GROUND_SLAM = new SimpleAttack<AbstractPurpleHazeEntity<?, ?>>(
             7 * 20, 10, 18, 0.75f, 6f, 10, 1.75f, 0.3f, 0.3f)
             .withSound(JSoundRegistry.PH_GROUNDSLAM)

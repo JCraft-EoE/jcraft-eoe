@@ -76,6 +76,8 @@ public interface JObjectRegistry {
     Item DIOPANTS = register("dio_pants", new DIOArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.LEGS, settings()));
     Item DIOBOOTS = register("dio_boots", new DIOArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.FEET, settings()));
 
+    Item DIOCAPE = register("dio_cape", new JotaroArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.CHEST, settings()));
+
     Item KARSHEADWRAP = register("kars_headwrap", new SunProtectionItem(ArmorMaterials.IRON, EquipmentSlot.HEAD, settings()));
 
     Item RED_HAT = register("red_hat", new SunProtectionItem(ArmorMaterials.IRON, EquipmentSlot.HEAD, settings()));
