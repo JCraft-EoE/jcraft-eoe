@@ -14,12 +14,12 @@ public class PredictionUpdatePacket {
     public static void send(ServerPlayerEntity serverPlayerEntity, Set<Pair<Integer, Vec3d>> idPosPairs) {
         PacketByteBuf buf = PacketByteBufs.create();
 
-        buf.writeVarInt(idPosPairs.size());
+        buf.writeInt(idPosPairs.size());
 
         idPosPairs.forEach(
                 idPosPair -> {
                     // Entity ID
-                    buf.writeVarInt(idPosPair.getLeft());
+                    buf.writeInt(idPosPair.getLeft());
                     // Position
                     Vec3d pos = idPosPair.getRight();
                     buf.writeDouble(pos.x);

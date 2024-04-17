@@ -248,7 +248,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     /**
      * Sets the stands state directly
      */
-    public void setStateNoReset(S state) {
+    public void setStateNoReset(@Nullable S state) {
+        if (state == null) return;
         setRawStateNoReset(state.ordinal());
     }
 

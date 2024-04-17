@@ -79,13 +79,16 @@ public class ClientPacketHandler {
     }
 
     private static void handlePrediction(@NotNull MinecraftClient client, PacketByteBuf buf) {
-        for (int i = 0; i < buf.readVarInt(); i++) {
-            int entID = buf.readVarInt();
+        int size = buf.readInt();
+        if (size == 0) return;
+        for (int i = 0; i < size; i++) {
+            int entID = buf.readInt();
             Vec3d predictedPos = new Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
 
             client.execute(() -> {
                 Entity ent = client.world.getEntityById(entID);
                 if (ent == null) return;
+                // ent.setPos() is awful in tandem with getTrackedPosition().setPos();
                 ent.getTrackedPosition().setPos(predictedPos);
             });
         }
