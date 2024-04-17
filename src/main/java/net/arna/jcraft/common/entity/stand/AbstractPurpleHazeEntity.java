@@ -31,9 +31,12 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
             0, 13, 20, 0.75f, 6f, 13, 1.75f, 0.5f, 0.35f, 25)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withInfo(Text.literal("Hammerfist"), Text.literal("1s knockdown"));
+            .withInfo(
+                    Text.literal("Hammerfist"),
+                    Text.literal("1s knockdown")
+            );
     public static final UppercutAttack<AbstractPurpleHazeEntity<?, ?>> BACKHAND = new UppercutAttack<AbstractPurpleHazeEntity<?, ?>>(20,
-            6, 14, 0.75f, 6f, 20, 1.5f, 0.25f, -0.6f, 0.75f)
+            6, 14, 0.75f, 6f, 20, 1.5f, 0.25f, -0.6f, 0.5f)
             .withTargetPostProcessor((attacker, target, kbVec, damageSource, blocking) -> {
                 if (!blocking)
                     infect(target, 3 * 20);
@@ -43,32 +46,47 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
             .withExtraHitBox(0, 0.35, 1.25)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
-            .withInfo(Text.literal("Backhand"), Text.literal("launches vertically, infects (3s) on hit"));
+            .withInfo(
+                    Text.literal("Backhand"),
+                    Text.literal("launches vertically, infects (3s) on hit")
+            );
 
     public static final SimpleAttack<AbstractPurpleHazeEntity<?, ?>> LIGHT_FOLLOWUP = new SimpleAttack<AbstractPurpleHazeEntity<?, ?>>(
             0, 9, 20, 0.75f, 6f, 13, 1.6f, 1.25f, -0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withLaunch()
-            .withInfo(Text.literal("Kick"), Text.literal("fast combo finisher"));
+            .withInfo(
+                    Text.literal("Kick"),
+                    Text.literal("fast combo finisher")
+            );
 
     public static final SimpleAttack<AbstractPurpleHazeEntity<?, ?>> LIGHT = new SimpleAttack<AbstractPurpleHazeEntity<?, ?>>(
             30, 6, 9, 0.75f, 5f, 11, 1.5f, 0.25f, 0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(BACKHAND)
-            .withInfo(Text.literal("Punch"), Text.literal("fast combo starter"));
+            .withInfo(
+                    Text.literal("Punch"),
+                    Text.literal("fast combo starter")
+            );
 
     public static final SimpleAttack<AbstractPurpleHazeEntity<?, ?>> HEAVY = new SimpleAttack<AbstractPurpleHazeEntity<?, ?>>(
             20 * 5, 10, 20, 0.75f, 7f, 14, 2.0f, 1.25f, -0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withLaunch()
-            .withInfo(Text.literal("Uppercut"), Text.literal("launcher"));
+            .withInfo(
+                    Text.literal("Uppercut"),
+                    Text.literal("launcher")
+            );
 
     public static final MainBarrageAttack<AbstractPurpleHazeEntity<?, ?>> BARRAGE = new MainBarrageAttack<AbstractPurpleHazeEntity<?, ?>>(280,
             0, 40, 0.75f, 1f, 30, 2f, 0.25f, 0f, 3, Blocks.DEEPSLATE.getHardness())
             .withSound(JSoundRegistry.PH_BARRAGE)
-            .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
+            .withInfo(
+                    Text.literal("Barrage"),
+                    Text.literal("fast reliable combo starter/extender, high stun")
+            );
 
     public static final SimpleAttack<AbstractPurpleHazeEntity<?, ?>> LAUNCH_CAPSULES = new SimpleAttack<AbstractPurpleHazeEntity<?, ?>>(
             8 * 20, 9, 18, 0.75f, 0, 0, 0, 0, 0)
@@ -79,7 +97,10 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
                             launchCapsule(attacker, user, ctx, targets, 0.4F, user.getYaw() - 45F + i * 45F);
                     }
             )
-            .withInfo(Text.literal("Triple Capsule Launch"), Text.literal("launches 3 capsules close by"));
+            .withInfo(
+                    Text.literal("Triple Capsule Launch"),
+                    Text.literal("launches 3 capsules close by")
+            );
 
     public static final SimpleAttack<AbstractPurpleHazeEntity<?, ?>> LAUNCH_CAPSULE = new SimpleAttack<AbstractPurpleHazeEntity<?, ?>>(
             8 * 20, 7, 14, 0.75f, 0, 0, 0, 0, 0)
@@ -88,7 +109,10 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
             .withAction(
                     (attacker, user, ctx, targets) -> launchCapsule(attacker, user, ctx, targets, 0.8F, user.getYaw())
             )
-            .withInfo(Text.literal("Capsule Launch"), Text.literal("launches a single, fast capsule at the aimed location"));
+            .withInfo(
+                    Text.literal("Capsule Launch"),
+                    Text.literal("launches a single, fast capsule at the aimed location")
+            );
 
     public static final SimpleMultiHitAttack<AbstractPurpleHazeEntity<?, ?>> FULL_RELEASE = new SimpleMultiHitAttack<AbstractPurpleHazeEntity<?, ?>>(
             30 * 20, 30, 0.75f, 3f, 11, 1.75f, 0.45f, 0.2f, IntSet.of(14, 24))
@@ -97,7 +121,10 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
             .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
             .withAction(AbstractPurpleHazeEntity::performUlt)
             .withHyperArmor()
-            .withInfo(Text.literal("Full Release"), Text.literal("launches 2 sets of 3 capsules in a hexagonal pattern, uninterruptable"));
+            .withInfo(
+                    Text.literal("Full Release"),
+                    Text.literal("launches 2 sets of 3 capsules in a hexagonal pattern, uninterruptable")
+            );
 
 
     // .withFollowup() and .withAnim() must be implemented inside inheritors
@@ -107,14 +134,20 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
             .withLaunch()
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withBlockStun(8)
-            .withInfo(Text.literal("Rekka (Final Hit)"), Text.literal("knockdown, low blockstun"));
+            .withInfo(
+                    Text.literal("Rekka (Final Hit)"),
+                    Text.literal("knockdown, low blockstun")
+            );
     public static final SimpleAttack<AbstractPurpleHazeEntity<?, ?>> REKKA2 = new SimpleAttack<AbstractPurpleHazeEntity<?, ?>>
             (0, 9, 18, 1f, 4f, 16, 1.75f, 0.5f, 0f)
             .withSound(JSoundRegistry.PH_REKKA2)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             // .withFollowup(REKKA3)
             .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
-            .withInfo(Text.literal("Rekka (2nd Hit)"), Text.literal("links into Light"));
+            .withInfo(
+                    Text.literal("Rekka (2nd Hit)"),
+                    Text.literal("links into Light")
+            );
     public static final SimpleAttack<AbstractPurpleHazeEntity<?, ?>> REKKA1 = new SimpleAttack<AbstractPurpleHazeEntity<?, ?>>
             (160, 7, 14, 1f, 4f, 15, 1.5f, 0.5f, 0f)
             .withSound(JSoundRegistry.PH_REKKA1)
@@ -123,9 +156,12 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
             .withExtraHitBox(1.5)
             .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
             .withInitAction(AbstractPurpleHazeEntity::lunge)
-            .withInfo(Text.literal("Rekka Series"), Text.literal("""
+            .withInfo(
+                    Text.literal("Rekka Series"),
+                    Text.literal("""
                     A set of three attacks, which cancel into each other during recovery.
-                    Last hit knocks down for 2.5s"""));
+                    Last hit knocks down for 2.5s""")
+            );
     public static final SimpleAttack<AbstractPurpleHazeEntity<?, ?>> GROUND_SLAM = new SimpleAttack<AbstractPurpleHazeEntity<?, ?>>(
             7 * 20, 10, 18, 0.75f, 6f, 10, 1.75f, 0.3f, 0.3f)
             .withSound(JSoundRegistry.PH_GROUNDSLAM)
@@ -133,7 +169,10 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
             .withAction(AbstractPurpleHazeEntity::groundSlam)
-            .withInfo(Text.literal("Ground Slam"), Text.literal("places down a Purple Haze cloud"));
+            .withInfo(
+                    Text.literal("Ground Slam"),
+                    Text.literal("places down a Purple Haze cloud")
+            );
 
     protected AbstractPurpleHazeEntity(StandType type, World worldIn) {
         super(type, worldIn, JSoundRegistry.PH_SUMMON);

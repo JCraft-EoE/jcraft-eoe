@@ -36,34 +36,55 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEntity, TheWorldOverHeavenEntity.State> {
-    public static final LungeAttack LUNGE = new LungeAttack(JCraft.LIGHT_COOLDOWN, 10, 16, 0.75f,
-            8f, 16, 1.75f, 1f, 0f)
+    public static final LungeAttack LUNGE = new LungeAttack(0, 10, 16, 0.75f,
+            8f, 10, 1.75f, 1f, 0f)
             .withAnim(State.LUNGE)
             .withSound(JSoundRegistry.MUDA_DA)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withLaunch()
-            .withInfo(Text.literal("Lunge"), Text.literal("medium speed launcher"));
+            .withInfo(
+                    Text.literal("Lunge"),
+                    Text.literal("medium speed launcher")
+            );
+    public static final SimpleAttack<TheWorldOverHeavenEntity> LOW_KICK = SimpleAttack.<TheWorldOverHeavenEntity>lightAttack(
+                    6, 12, 0.75f, 6f, 14, 0.25f, 0.25f)
+            .withAnim(State.LOW_KICK)
+            .withFollowup(LUNGE)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withInfo(
+                    Text.literal("Low Kick"),
+                    Text.literal("quick combo starter")
+            );
     public static final SimpleAttack<TheWorldOverHeavenEntity> LIGHT_FOLLOWUP = new SimpleAttack<TheWorldOverHeavenEntity>(
-            0, 9, 13, 0.75f, 6, 8, 1.75f, 1.25f, -0.1f)
+            0, 9, 13, 0.75f, 6f, 8, 1.75f, 1.25f, -0.1f)
             .withAnim(State.LIGHT_FOLLOWUP)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withLaunch()
             .withBlockStun(4)
             .withExtraHitBox(0, 0.25, 1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withInfo(Text.literal("Roundhouse"), Text.literal("quick combo finisher"));
+            .withInfo(
+                    Text.literal("Roundhouse"),
+                    Text.literal("quick combo finisher")
+            );
     public static final SimpleAttack<TheWorldOverHeavenEntity> PUNCH = SimpleAttack.<TheWorldOverHeavenEntity>lightAttack(
-            4, 7, 0.75f, 6f, 11, 0.2f, -0.1f)
+            4, 7, 0.75f, 5f, 11, 0.2f, -0.1f)
             .withFollowup(LIGHT_FOLLOWUP)
-            .withCrouchingVariant(LUNGE)
+            .withCrouchingVariant(LOW_KICK)
             .withImpactSound(JSoundRegistry.IMPACT_1)
-            .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
+            .withInfo(
+                    Text.literal("Punch"),
+                    Text.literal("quick combo starter")
+            );
     public static final MainBarrageAttack<TheWorldOverHeavenEntity> BARRAGE = new MainBarrageAttack<TheWorldOverHeavenEntity>(
             280, 0, 40, 0.75f, 1f, 30, 2f, 0.1f, 0f, 3, Blocks.OBSIDIAN.getHardness())
             .withSound(JSoundRegistry.TWOH_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_1)
-            .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
+            .withInfo(
+                    Text.literal("Barrage"),
+                    Text.literal("fast reliable combo starter/extender, high stun")
+            );
     public static final SingularityAttack SINGULARITY = new SingularityAttack(260, 11, 23,
             1f, 0f, 25, 2f, 0.4f, 0.2f, true)
             .withSound(JSoundRegistry.TWOH_SINGULARITY)
@@ -72,7 +93,10 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
             .withHitSpark(JParticleType.HIT_SPARK_3)
-            .withInfo(Text.literal("Singularity"), Text.literal("block bypass (stun will always hit, but the opponent can stay blocking)"));
+            .withInfo(
+                    Text.literal("Singularity"),
+                    Text.literal("block bypass (stun will always hit, but the opponent can stay blocking)")
+            );
     public static final UppercutAttack<TheWorldOverHeavenEntity> OVERHEAD_KICK = new UppercutAttack<TheWorldOverHeavenEntity>(
             200, 10, 20, 1.25f, 8f, 20, 1.5f, 0.3f, 0f, -1)
             //.withSound(JSoundRegistry.TWOH_HEAVY)
@@ -82,7 +106,10 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withHitSpark(JParticleType.HIT_SPARK_3)
             .withExtraHitBox(1, 0.75, 1)
             .withExtraHitBox(1, -0.5, 1)
-            .withInfo(Text.literal("Overhead Kick"), Text.literal("high damage, good reach, launches down"));
+            .withInfo(
+                    Text.literal("Overhead Kick"),
+                    Text.literal("high damage, good reach, launches down")
+            );
     public static final SingularityAttack TRUE_STRIKE = new SingularityAttack(200, 10, 22,
             1f, 0f, 20, 2f, 0.3f, 0f, false)
             .withBlockStun(20)
@@ -93,20 +120,29 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withInfo(Text.literal("True Strike"), Text.literal("damage ignores potions and enchantments, low stun, high blockstun, medium windup"));
+            .withInfo(
+                    Text.literal("True Strike"),
+                    Text.literal("damage ignores potions and enchantments, low stun, high blockstun, medium windup")
+            );
     public static final SmiteAttack AIR_SMITE = new SmiteAttack(300, 10, 20, 1f,
             6f, 21, 3f, 0f, 0f, true)
             .withSound(JSoundRegistry.TWOH_SMITE)
             .withBlockStun(13)
             .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
-            .withInfo(Text.literal("You won't run away!"), Text.literal("summons a weaker lightning bolt at the aimed position"));
+            .withInfo(
+                    Text.literal("You won't run away!"),
+                    Text.literal("summons a weaker lightning bolt at the aimed position")
+            );
     public static final SmiteAttack SMITE = new SmiteAttack(300, 10, 20, 1f,
             8f, 21, 3f, 0f, 0f, false)
             .withAerialVariant(AIR_SMITE)
             .withSound(JSoundRegistry.TWOH_SMITE)
             .withBlockStun(13)
             .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
-            .withInfo(Text.literal("Evaporate"), Text.literal("summons a powerful lightning bolt that deals high damage and stun"));
+            .withInfo(
+                    Text.literal("Evaporate"),
+                    Text.literal("summons a powerful lightning bolt that deals high damage and stun")
+            );
     public static final OverwriteAttack OVERWRITE = new OverwriteAttack(0, 7, 23, 1f,
             0f, 40, 2f, 1f, 0f)
             .withSound(JSoundRegistry.TWOH_OVERWRITE)
@@ -115,7 +151,10 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withHyperArmor()
             .withBlockableType(BlockableType.NON_BLOCKABLE)
             .withHitSpark(JParticleType.HIT_SPARK_3)
-            .withInfo(Text.literal("Overwrite (Hit)"), Text.empty());
+            .withInfo(
+                    Text.literal("Overwrite (Hit)"),
+                    Text.empty()
+            );
     // Does absolutely nothing on its own.
     public static final NoOpMove<TheWorldOverHeavenEntity> CHARGE_OVERWRITE = new NoOpMove<TheWorldOverHeavenEntity>(
             360, 70, 1f)
@@ -132,22 +171,34 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             16, 22, 0.75f, 0f, 20, 1.5f, 0f, 0f)
             .withSound(JSoundRegistry.TWOH_KNIFETHROW)
             .withBlockStun(6)
-            .withInfo(Text.literal("Aerial Divine Finisher"), Text.empty());
+            .withInfo(
+                    Text.literal("Aerial Divine Finisher"),
+                    Text.empty()
+            );
     public static final DivineFinisherAttack DIVINE_FINISHER = new DivineFinisherAttack(280, 16, 22,
             0.75f, 0f, 20, 1.5f, 0f, 0f)
             .withAerialVariant(AERIAL_DIVINE_FINISHER)
             .withSound(JSoundRegistry.TWOH_AIRKNIVES)
             .withBlockStun(6)
-            .withInfo(Text.literal("Divine Finisher"), Text.literal("fires 4 stunning knives that launch at a delay/in air summons and launches 8 knives"));
+            .withInfo(
+                    Text.literal("Divine Finisher"),
+                    Text.literal("fires 4 stunning knives that launch at a delay/in air summons and launches 8 knives")
+            );
     public static final TimeStopMove<TheWorldOverHeavenEntity> TIME_STOP = new TimeStopMove<TheWorldOverHeavenEntity>(
             1400, 45, 50, JServerConfig.TWOH_TIME_STOP_DURATION::getValue)
             .withSound(JSoundRegistry.TWOH_TS)
-            .withInfo(Text.literal("Timestop"), Text.literal("5 seconds"));
+            .withInfo(
+                    Text.literal("Timestop"),
+                    Text.literal("5 seconds")
+            );
 
     public static final TimeSkipMove<TheWorldOverHeavenEntity> TIME_SKIP = new TimeSkipMove<TheWorldOverHeavenEntity>(
             300, 14)
             .withSound(JSoundRegistry.TWOH_TIMESKIP)
-            .withInfo(Text.literal("Timeskip"), Text.literal("14m range"));
+            .withInfo(
+                    Text.literal("Timeskip"),
+                    Text.literal("14m range")
+            );
     private static final TrackedData<Integer> OVERWRITE_TYPE;
 
     static {
@@ -162,8 +213,8 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         description = "All Range DOMINATOR";
 
         pros = List.of(
-                "fast m1",
-                "unblockables",
+                "very fast m1",
+                "powerful unblockable options",
                 "good ranged coverage",
                 "longest timestop"
         );
@@ -179,7 +230,10 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
                 """
                         BNBs:
                             -the ultrakill
-                            M1>Barrage>M1>Knives>Overwrite~S1/S2>dash>Singularity>Smite>M1~M1""";
+                            M1>Barrage>M1>Knives>Overwrite~S1/S2>dash>Singularity>Smite>M1~M1
+                            
+                            -JUDGE MENT
+                            crouching M1~M1>dash>Barrage>...""";
 
         auraColors = new Vec3f[]{
                 new Vec3f(0.1f, 0.1f, 0.1f),
@@ -350,6 +404,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         AIR_KNIVES(builder -> builder.playAndHold("animation.twoh.airknives")),
         TIME_SKIP(builder -> builder.loop("animation.twoh.idle")),
         LUNGE(builder -> builder.loop("animation.twoh.lunge")),
+        LOW_KICK(builder -> builder.loop("animation.twoh.low_kick")),
         LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.twoh.light_followup")),
         SINGULARITY(builder -> builder.playAndHold("animation.twoh.singularity")),
         AIR_HEAVY(builder -> builder.playAndHold("animation.twoh.air_heavy")),;

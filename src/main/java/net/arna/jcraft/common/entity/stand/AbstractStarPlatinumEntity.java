@@ -21,7 +21,10 @@ public abstract sealed class AbstractStarPlatinumEntity<E extends AbstractStarPl
             .withBlockStun(9)
             .withHyperArmor()
             .withLaunch()
-            .withInfo(Text.literal("Ground Breaker"), Text.literal("slow, uninterruptible launcher, breaks the ground"));
+            .withInfo(
+                    Text.literal("Ground Breaker"),
+                    Text.literal("slow, uninterruptible launcher, breaks the ground")
+            );
     public static final SimpleAttack<AbstractStarPlatinumEntity<?, ?>> STAR_BREAKER = new SimpleAttack<AbstractStarPlatinumEntity<?, ?>>(
             200, 20, 30, 1f, 10f, 14, 2f, 1.5f, 0f)
             .withSound(JSoundRegistry.STAR_BREAKER)
@@ -32,7 +35,10 @@ public abstract sealed class AbstractStarPlatinumEntity<E extends AbstractStarPl
             .withHyperArmor()
             .withLaunch()
             .withCrouchingVariant(GROUND_BREAKER)
-            .withInfo(Text.literal("Star Breaker"), Text.literal("slow, uninterruptible launcher"));
+            .withInfo(
+                    Text.literal("Star Breaker"),
+                    Text.literal("slow, uninterruptible launcher")
+            );
 
     protected AbstractStarPlatinumEntity(StandType type, World worldIn) {
         super(type, worldIn, JSoundRegistry.STAR_PLATINUM_SUMMON);

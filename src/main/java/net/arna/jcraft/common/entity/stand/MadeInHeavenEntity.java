@@ -51,7 +51,10 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .withImpactSound(SoundEvents.ITEM_TRIDENT_HIT)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
             .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
-            .withInfo(Text.literal("Speed Chop"), Text.literal("tiny stun, procs bleed"));
+            .withInfo(
+                    Text.literal("Speed Chop"),
+                    Text.literal("tiny stun, procs bleed")
+            );
     public static final SimpleAttack<MadeInHeavenEntity> LIGHT_FOLLOWUP = new SimpleAttack<MadeInHeavenEntity>(
             0, 6, 12, 0.75f, 5, 8, 1.5f, 1f, -0.1f)
             .withAnim(State.LIGHT_FOLLOWUP)
@@ -60,32 +63,47 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .withBlockStun(4)
             .withExtraHitBox(0, 0.25, 1)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
-            .withInfo(Text.literal("Kick"), Text.literal("quick combo finisher"));
+            .withInfo(
+                    Text.literal("Kick"),
+                    Text.literal("quick combo finisher")
+            );
     public static final SimpleAttack<MadeInHeavenEntity> SLICE = new SimpleAttack<MadeInHeavenEntity>(JCraft.LIGHT_COOLDOWN,
             5, 8, 0.75f, 4f, 10, 1.5f, 0.15f, -0.1f)
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(SPEED_CHOP)
             .withImpactSound(SoundEvents.ITEM_TRIDENT_HIT)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
-            .withInfo(Text.literal("Slice"), Text.literal("quick combo starter"));
+            .withInfo(
+                    Text.literal("Slice"),
+                    Text.literal("quick combo starter")
+            );
     public static final SimpleAttack<MadeInHeavenEntity> BARRAGE_FINISHER = new SimpleAttack<MadeInHeavenEntity>(0,
             6, 9, 0.85f, 1f, 10, 1.5f, 1.1f, 0f)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withLaunch()
-            .withInfo(Text.literal("Barrage (Final Hit)"), Text.empty());
+            .withInfo(
+                    Text.literal("Barrage (Final Hit)"),
+                    Text.empty()
+            );
     public static final MainBarrageAttack<MadeInHeavenEntity> BARRAGE = new MainBarrageAttack<MadeInHeavenEntity>(200,
             0, 32, 0.85f, 1.5f, 10, 2f, 0.1f, 0f, 3, Blocks.OAK_PLANKS.getHardness())
             .withFinisher(23, BARRAGE_FINISHER)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
             .withSound(JSoundRegistry.MIH_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_1)
-            .withInfo(Text.literal("Barrage"), Text.literal("short, knocks back"));
+            .withInfo(
+                    Text.literal("Barrage"),
+                    Text.literal("short, knocks back")
+            );
     public static final SpeedSliceAttack SPEED_SLICE = new SpeedSliceAttack(300, 10, 11,
             1.25f, 6f, 1.5f, 1f)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
             .withSound(JSoundRegistry.MIH_SPEEDSLICE)
-            .withInfo(Text.literal("Speed Slice"), Text.literal("short windup, harming teleport with hitstun and light knockback"));
+            .withInfo(
+                    Text.literal("Speed Slice"),
+                    Text.literal("short windup, harming teleport with hitstun and light knockback")
+            );
     public static final EffectInflictingAttack<MadeInHeavenEntity> LEG_CRUSHER = new EffectInflictingAttack<MadeInHeavenEntity>(
             80, 9, 19, 0.85f, 7f, 22, 1.5f, 0.35f, 0.2f,
             List.of(new StatusEffectInstance(StatusEffects.SLOWNESS, 40, 0, true, false)) )
@@ -95,7 +113,10 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .withExtraHitBox(0, -0.5, 1)
             .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withInfo(Text.literal("Leg Crusher"), Text.literal("inflicts Slowness I (2s)"));
+            .withInfo(
+                    Text.literal("Leg Crusher"),
+                    Text.literal("inflicts Slowness I (2s)")
+            );
     public static final SimpleAttack<MadeInHeavenEntity> LOW_KICK = new SimpleAttack<MadeInHeavenEntity>(80,
             8, 17, 0.85f, 6f, 26, 1.5f, 0.25f, 0.2f)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
@@ -105,7 +126,10 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .withExtraHitBox(0, -0.5, 1)
             .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withInfo(Text.literal("Low Kick"), Text.literal("combo starter/extender, mih hoofs the enemies legs in a quick, stunning attack"));
+            .withInfo(
+                    Text.literal("Low Kick"),
+                    Text.literal("combo starter/extender, mih hoofs the enemies legs in a quick, stunning attack")
+            );
     public static final FuryChopAttack FURY_CHOP = new FuryChopAttack(200, 15, 24, 0.85f,
             7f, 20, 1.6f, 0.25f, 0.2f)
             .withSound(JSoundRegistry.MIH_FURYCHOP)
@@ -113,7 +137,10 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
             .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withInfo(Text.literal("Fury Chop"), Text.literal("combo extender, on hit gives haste(8s) to user and mining fatigue(8s) to victim, on whiff the fatigue goes to user"));
+            .withInfo(
+                    Text.literal("Fury Chop"),
+                    Text.literal("combo extender, on hit gives haste(8s) to user and mining fatigue(8s) to victim, on whiff the fatigue goes to user")
+            );
     public static final SimpleAttack<MadeInHeavenEntity> DONUT = new SimpleAttack<MadeInHeavenEntity>(200,
             26, 32, 0.75f, 8.5f, 40, 2f, -0.2f, 0.2f)
             .withSound(JSoundRegistry.STAND_DESUMMON)
@@ -123,12 +150,17 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .withBlockStun(4)
             .withHitSpark(JParticleType.HIT_SPARK_3)
             .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
-            .withInfo(Text.literal("Roundabout Donut"), Text.literal("feigns stand desummon, uninterruptible combo starter"));
+            .withInfo(
+                    Text.literal("Roundabout Donut"),
+                    Text.literal("feigns stand desummon, uninterruptible combo starter")
+            );
     public static final TimeAccelerationMove TIME_ACCELERATION = new TimeAccelerationMove(1400, 20,
             40, 1f, JServerConfig.MIH_TIME_ACCELERATION_DURATION::getValue)
             .withSound(JSoundRegistry.MIH_TACCEL)
             .withAction((attacker, user, ctx, targets) -> attacker.speedometer = 0) // Clear speedometer
-            .withInfo(Text.literal("Time Acceleration"), Text.literal("""
+            .withInfo(
+                    Text.literal("Time Acceleration"),
+                    Text.literal("""
                             allows charging the speedometer for 30s
                             it is charged by landing hits
                             the speedometer impacts the level of speed and haste granted by Time Acceleration
@@ -136,13 +168,19 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     public static final CircleAttack CIRCLE = new CircleAttack(400, 13, 14, 1.25f)
             .withSound(JSoundRegistry.MIH_CIRCLE)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
-            .withInfo(Text.literal("Heaven's Judgement"), Text.literal("rapidly circles a looked-at target within 4m at a radius of 7m"));
+            .withInfo(
+                    Text.literal("Heaven's Judgement"),
+                    Text.literal("rapidly circles a looked-at target within 4m at a radius of 7m")
+            );
 
     public static final JudgementAttack JUDGEMENT = new JudgementAttack(300, 20, 60, 1.25f, 2)
             .withCrouchingVariant(CIRCLE)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
             .withSound(JSoundRegistry.MIH_JUDGEMENT)
-            .withInfo(Text.literal("Divine Severance"), Text.literal("Made in Heaven rapidly speed slices an area, then finishes with a large, launching slice"));
+            .withInfo(
+                    Text.literal("Divine Severance"),
+                    Text.literal("Made in Heaven rapidly speed slices an area, then finishes with a large, launching slice")
+            );
     private static final TrackedData<Integer> ACCEL_TIME;
     private static final TrackedData<Integer> SPEEDOMETER;
     private static final TrackedData<Boolean> AFTER_IMAGE;

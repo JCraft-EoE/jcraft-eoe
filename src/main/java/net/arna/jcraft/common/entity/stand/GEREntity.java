@@ -41,7 +41,10 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             .withBlockStun(4)
             .withExtraHitBox(0, 0.25, 1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withInfo(Text.literal("Punch"), Text.literal("quick combo finisher"));
+            .withInfo(
+                    Text.literal("Punch"),
+                    Text.literal("quick combo finisher")
+            );
     public static final SimpleAttack<GEREntity> DOWNWARD_KICK = new SimpleAttack<GEREntity>(JCraft.LIGHT_COOLDOWN,
             5, 12, 0.75f, 4f, 20, 1.25f, 0.4f, 0.33f)
             .withAnim(State.AIR_LIGHT)
@@ -49,31 +52,46 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(0, -1, 1)
             .withHitAnimation(HIGH)
-            .withInfo(Text.literal("Downward Kick"), Text.literal("medium stun combo starter, low hitbox, low blockstun"));
+            .withInfo(
+                    Text.literal("Downward Kick"),
+                    Text.literal("medium stun combo starter, low hitbox, low blockstun")
+            );
     public static final OverheadKickAttack OVERHEAD_KICK = new OverheadKickAttack(140, 14, 24,
             1f, 9f, 40, 1.5f, 0.8f, 0.25f)
             .withSound(JSoundRegistry.GER_HEAVY)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(0, -1, 1)
             .withHitAnimation(CRUSH)
-            .withInfo(Text.literal("Overhead Kick"), Text.literal("slow, high stun combo starter"));
+            .withInfo(
+                    Text.literal("Overhead Kick"),
+                    Text.literal("slow, high stun combo starter")
+            );
     public static final SimpleAttack<GEREntity> KICK_BARRAGE_FINISHER = new SimpleAttack<GEREntity>(0,
             6, 9, 1f, 1f, 10, 1.75f, 1.1f, 0f)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withLaunchNoShockwave()
-            .withInfo(Text.literal("Kick Barrage (Final Hit)"), Text.empty());
+            .withInfo(
+                    Text.literal("Kick Barrage (Final Hit)"),
+                    Text.empty()
+            );
     public static final BarrageAttack<GEREntity> KICK_BARRAGE = new BarrageAttack<GEREntity>(280, 0, 48,
             1f, 1f, 20, 1.5f, 0.3f, 0f, 3)
             .withFinisher(37, KICK_BARRAGE_FINISHER)
             .withSound(JSoundRegistry.GER_KICKBARRAGE)
-            .withInfo(Text.literal("Kick Barrage"), Text.literal("fast combo finisher, knocks back"));
+            .withInfo(
+                    Text.literal("Kick Barrage"),
+                    Text.literal("fast combo finisher, knocks back")
+            );
     // JCraft.lightCooldown -> 0 | 0.55f -> 0.4f
     public static final SimpleAttack<GEREntity> PUNCH = new SimpleAttack<GEREntity>(JCraft.LIGHT_COOLDOWN / 2,
             5, 9, 0.75f, 5f, 8, 1.5f, 0.2f, -0.1f)
             .withAerialVariant(DOWNWARD_KICK)
             .withImpactSound(JSoundRegistry.IMPACT_1)
-            .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
+            .withInfo(
+                    Text.literal("Punch"),
+                    Text.literal("quick combo starter")
+            );
     public static final KnockdownAttack<GEREntity> OVERHEAD_SMASH = new KnockdownAttack<GEREntity>(220, 10, 19,
             1f, 9f, 10, 1.5f, 1.1f, 0f, 30)
             .withAerialVariant(OVERHEAD_KICK)
@@ -83,41 +101,68 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             .withHyperArmor()
             .withLaunch()
             .withExtraHitBox(1.5)
-            .withInfo(Text.literal("Overhead Smash"), Text.literal("slow, uninterruptible knockdown"));
+            .withInfo(
+                    Text.literal("Overhead Smash"),
+                    Text.literal("slow, uninterruptible knockdown")
+            );
     public static final MainBarrageAttack<GEREntity> BARRAGE = new MainBarrageAttack<GEREntity>(280, 0, 30,
             0.75f, 1f, 20, 2f, 0.25f, 0f, 3, Blocks.DEEPSLATE.getHardness())
             .withAerialVariant(KICK_BARRAGE)
             .withSound(JSoundRegistry.GE_BARRAGE)
-            .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
+            .withInfo(
+                    Text.literal("Barrage"),
+                    Text.literal("fast reliable combo starter/extender, high stun")
+            );
     public static final HealMove<GEREntity> HEAL = new HealMove<GEREntity>(520, 10, 16,
             1f, 1.25f, 0f, 6f, HealMove.HealTarget.TARGETS, GEREntity::pacifyMobs)
             .withSound(JSoundRegistry.GE_HEAL)
-            .withInfo(Text.literal("Healing Hand (Others)"), Text.empty());
+            .withInfo(
+                    Text.literal("Healing Hand (Others)"),
+                    Text.empty()
+            );
     public static final HealMove<GEREntity> HEAL_SELF = new HealMove<GEREntity>(520, 10, 14,
             1f, 0f, 0f, 4f, HealMove.HealTarget.USER)
             .withCrouchingVariant(HEAL)
             .withSound(JSoundRegistry.GE_HEAL)
-            .withInfo(Text.literal("Healing Hand"), Text.literal("standing: heals user for 2 hearts, crouching: heals others for 3 hearts, pacifies angered mobs"));
+            .withInfo(
+                    Text.literal("Healing Hand"),
+                    Text.literal("standing: heals user for 2 hearts, crouching: heals others for 3 hearts, pacifies angered mobs")
+            );
     public static final LifeBeamAttack LIFE_BEAM = new LifeBeamAttack(0, 1, 10, 1.1f)
             .withSound(JSoundRegistry.GER_LASER_FIRE)
-            .withInfo(Text.literal("Life Beam"), Text.literal(""));
+            .withInfo(
+                    Text.literal("Life Beam"),
+                    Text.literal("")
+            );
     public static final HoldableMove<GEREntity, State> LIFE_BEAM_CHARGE = new HoldableMove<>(280,
             0, 40, 1.1f, LIFE_BEAM, State.LASER_FIRE, 9)
             .withInitAction((attacker, user, ctx) -> ctx.setInt(CHARGE_TIME, 0))
             .withSound(JSoundRegistry.GER_LASER)
-            .withInfo(Text.literal("Life Beam"), Text.literal("""
+            .withInfo(
+                    Text.literal("Life Beam"),
+                    Text.literal("""
                     Summons a fast rock projectile that turns into a homing scorpion a small time after landing.
-                    If charged for a minimum of 0.9 seconds, the scorpion inflicts poison and deals more stun."""));
+                    If charged for a minimum of 0.9 seconds, the scorpion inflicts poison and deals more stun.""")
+            );
     public static final NullificationAttack NULLIFICATION = new NullificationAttack(480, 5, 35, 1f)
             .withSound(JSoundRegistry.GE_HEAL)
-            .withInfo(Text.literal("Nullification"), Text.literal("0.25s windup, 1.5s counter, stuns on hit"));
+            .withInfo(
+                    Text.literal("Nullification"),
+                    Text.literal("0.25s windup, 1.5s counter, stuns on hit")
+            );
     public static final ReturnToZeroMove RETURN_TO_ZERO = new ReturnToZeroMove(1200, 30, 32, 1f)
             .withSound(JSoundRegistry.GER_SETUP)
-            .withInfo(Text.literal("Return to Zero"), Text.literal("initial press: saves the state of " +
-                    "every entity in a 4 chunk radius, second press: reverts all states except users\nDoesn't affect player inventories"));
+            .withInfo(
+                    Text.literal("Return to Zero"),
+                    Text.literal("initial press: saves the state of " +
+                    "every entity in a 4 chunk radius, second press: reverts all states except users\nDoesn't affect player inventories")
+            );
     public static final FlightMove FLIGHT = new FlightMove(320, 1, 0, 0f)
             .withSound(JSoundRegistry.GER_FLY)
-            .withInfo(Text.literal("Flight"), Text.literal("1 second of flight"));
+            .withInfo(
+                    Text.literal("Flight"),
+                    Text.literal("1 second of flight")
+            );
 
     private static final TrackedData<Integer> FLIGHT_TIME;
 

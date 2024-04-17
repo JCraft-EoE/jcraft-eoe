@@ -315,6 +315,9 @@ public final class JUtils {
         entity.prevHorizontalSpeed = entity.horizontalSpeed;
     }
 
+    /**
+     * @return the change in position for an entity between the current and last tick.
+     */
     public static Vec3d deltaPos(@NotNull Entity ent) {
         return new Vec3d(
                 ent.getX() - ent.prevX,

@@ -11,6 +11,7 @@ import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.StandType;
 import net.arna.jcraft.common.item.MockItem;
 import net.arna.jcraft.common.network.c2s.PredictionTriggerPacket;
+import net.arna.jcraft.common.network.s2c.PredictionUpdatePacket;
 import net.arna.jcraft.common.tickable.*;
 import net.arna.jcraft.common.util.EntityInterest;
 import net.arna.jcraft.common.util.JUtils;
@@ -36,6 +37,7 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Pair;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -46,6 +48,7 @@ import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static net.arna.jcraft.JCraft.ALLOW_MOB_EVOLVED_STANDS;
 import static net.arna.jcraft.JCraft.CHANCE_MOB_SPAWNS_WITH_STAND;
@@ -68,6 +71,9 @@ public class JServerEvents {
         JCraft.auWorld = server.getWorld(JDimensionRegistry.AU_DIMENSION_KEY);
     }
 
+    private static final int PREDICTION_RADIUS = 6 * 16;
+    private static final int MAX_COMPENSATION_MS = 250; // Game is barely playable at this point
+    private static final double MS_TO_TICKS = 1000.0 / 20.0; // 1000ms = 1s, 1s = 20t
     public static void serverTick(MinecraftServer server) {
         if (JCraft.preloadLockTicks > 0)
             JCraft.preloadLockTicks--;
@@ -77,22 +83,34 @@ public class JServerEvents {
         Timestops.tick(server);
         Revivables.tick(server);
         JEnemies.tick(server);
+        // Positional prediction logic for players that want a more current look at where their enemies are, at the cost of smoothness
+        PredictionTriggerPacket.getSubscribers().forEach(
+                subscriber -> {
+                    int adjustedPing = subscriber.pingMilliseconds;
+                    if (adjustedPing > MAX_COMPENSATION_MS)
+                        adjustedPing = MAX_COMPENSATION_MS;
+                    double pingTicks = adjustedPing * MS_TO_TICKS;
+
+                    Set<Pair<Integer, Vec3d>> idPosPairs = PlayerLookup.around(subscriber.getWorld(), subscriber.getPos(), PREDICTION_RADIUS)
+                            .stream()
+                            .filter(serverPlayer -> serverPlayer != subscriber)
+                            .map(
+                                    serverPlayer -> {
+                                        // This will likely need extension
+                                        Vec3d predictedDeltaPos = JUtils.deltaPos(serverPlayer).multiply(pingTicks);
+                                        return new Pair<>(serverPlayer.getId(), serverPlayer.getPos().add(predictedDeltaPos));
+                                    }
+                            ).collect(Collectors.toSet());
+
+                    PredictionUpdatePacket.send(subscriber, idPosPairs);
+                }
+        );
 
         // Player logic (cooldown handling and DamageTimer counting)
         for (ServerPlayerEntity player : PlayerLookup.all(server)) {
             if (player == null || !player.isAlive()) continue;
 
             if (player.getAttacker() != null) JComponents.getMiscData(player).startDamageTimer();
-
-            if (PredictionTriggerPacket.isSubscribed(player)) {
-                PlayerLookup.around(player.getWorld(), player.getPos(), 128).forEach(
-                        tracked -> {
-                            Vec3d predictedPos = tracked.getPos().add(JUtils.deltaPos(tracked).multiply(tracked.pingMilliseconds * 50.0));
-                            //todo: prediction tracking packet
-                            //player.networkHandler.sendPacket(new EntityPositionS2CPacket(tracked, predictedPos));
-                        }
-                );
-            }
         }
 
         // Burst handling

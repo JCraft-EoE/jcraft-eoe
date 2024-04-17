@@ -34,33 +34,57 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
             .withSound(JSoundRegistry.KQBTD_ELBOW)
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withInfo(Text.literal("Elbow"), Text.literal("fast, short-range knockback"));
+            .withInfo(
+                    Text.literal("Elbow"),
+                    Text.literal("fast, short-range knockback")
+            );
     public static final BarrageAttack<KQBTDEntity> BARRAGE = new BarrageAttack<KQBTDEntity>(240, 0,
             40, 0.75f, 1f, 20, 1.5f, 0.1f, 0, 3)
             .withSound(JSoundRegistry.KQ_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_4)
-            .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, medium stun"));
+            .withInfo(
+                    Text.literal("Barrage"),
+                    Text.literal("fast reliable combo starter/extender, medium stun")
+            );
     public static final BubbleCounterAttack BUBBLE_COUNTER = new BubbleCounterAttack(480, 5, 20, 1f)
-            .withInfo(Text.literal("Stray Cat Counter"), Text.literal("0.25s windup counter, turns opponent into your primary bomb"));
+            .withInfo(
+                    Text.literal("Stray Cat Counter"),
+                    Text.literal("0.25s windup counter, turns opponent into your primary bomb")
+            );
     public static final BubbleAttack BUBBLE = new BubbleAttack(220, 15, 18, 0.75f)
             .withCrouchingVariant(BUBBLE_COUNTER)
             .withSound(JSoundRegistry.KQ_UPPERCUT)
-            .withInfo(Text.literal("Stray Cat Bubble"), Text.literal("launches an explosive bubble guided by your view rotation"));
+            .withInfo(
+                    Text.literal("Stray Cat Bubble"),
+                    Text.literal("launches an explosive bubble guided by your view rotation")
+            );
     public static final BTDDetonateAttack BTD_DETONATE = new BTDDetonateAttack(20, 5, 6, 0.75f)
             .withSound(JSoundRegistry.KQ_DETONATE)
-            .withInfo(Text.literal("Detonate"), Text.empty());
+            .withInfo(
+                    Text.literal("Detonate"),
+                    Text.empty()
+            );
     public static final BTDPlantAttack BTD_PLANT = new BTDPlantAttack(800, 14, 24, 1f, 10, 1.5f, 0f)
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withBlockStun(8)
-            .withInfo(Text.literal("Bites the Dust Plant"), Text.literal("press the same button to detonate, sending the affected enemy back to their previous location"));
+            .withInfo(
+                    Text.literal("Bites the Dust Plant"),
+                    Text.literal("press the same button to detonate, sending the affected enemy back to their previous location")
+            );
     public static final BTDGrabHitAttack GRAB_HIT = new BTDGrabHitAttack(0, 42, 0.75f,
             5f, 15, 2f, 0f, 0.5f, IntSet.of(8, 22, 32))
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withStunType(StunType.UNBURSTABLE)
-            .withInfo(Text.literal("Takedown (hit)"), Text.empty());
+            .withInfo(
+                    Text.literal("Takedown (hit)"),
+                    Text.empty()
+            );
     public static final GrabAttack<KQBTDEntity, State> GRAB = new GrabAttack<>(220, 12, 28,
             0.75f, 0f, 20, 1.75f, 0.1f, 0f, GRAB_HIT, State.GRAB_HIT, 31, 1)
-            .withInfo(Text.literal("Takedown"), Text.literal("high damage grab"));
+            .withInfo(
+                    Text.literal("Takedown"),
+                    Text.literal("high damage grab")
+            );
 
     // Light chain implementation
     public static final SimpleAttack<AbstractKillerQueenEntity<?, ?>> LOW = AbstractKillerQueenEntity.LOW.copy().withAnim(KQBTDEntity.State.LOW);
