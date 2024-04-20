@@ -2628,6 +2628,11 @@ The Sun
 Stone Mask
     >Updated model
 
+● 19/04/2024
+
+Cream
+    >Updated skin 3
+
     //TODO: FIX FUCKING INPUT BUGS :)
 
 todo: combo counter is LYING
