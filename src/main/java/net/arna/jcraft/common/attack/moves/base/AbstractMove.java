@@ -56,6 +56,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     // Used to help AI know how and when to use this attack.
     protected boolean ranged, barrage, multiHit, charge, counter, dash, grab;
     protected boolean copyOnUse;
+    protected boolean mayHitUser;
     private boolean copiedExtras; // See #testCopy()
 
     protected AbstractMove(int cooldown, int windup, int duration, float moveDistance) {
@@ -165,6 +166,24 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
 
         this.aerialVariant = aerialVariant.copy();
         this.aerialVariant.isAerialVariant = true;
+        return getThis();
+    }
+
+    /**
+     * Marks the move as a ranged move.
+     * @return This move
+     */
+    public T markRanged() {
+        this.ranged = true;
+        return getThis();
+    }
+
+    /**
+     * Allows the stand to hit its own user
+     * @return This move
+     */
+    public T allowHitUser() {
+        this.mayHitUser = true;
         return getThis();
     }
 
@@ -338,6 +357,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         if (finisher != null) finisher.right().onRegister(type);
 
         // TODO convert these to actual tests
+        // THATS TOO BAD!
         if (!FabricLoader.getInstance().isDevelopmentEnvironment()) return;
         testCopy();
         assert getThis() == this;
@@ -514,6 +534,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         cast.followup = followup == null ? null : followup.copy();
         cast.crouchingVariant = crouchingVariant == null ? null : crouchingVariant.copy();
         cast.aerialVariant = aerialVariant == null ? null : aerialVariant.copy();
+        cast.ranged = ranged;
         cast.isCrouchingVariant = isCrouchingVariant;
         cast.isAerialVariant = isAerialVariant;
         cast.isFollowup = isFollowup;
@@ -524,6 +545,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         cast.mobilityType = mobilityType;
         cast.originalMove = originalMove; // Set the original move to this move
         cast.animation = animation;
+        cast.mayHitUser = mayHitUser;
         copiedExtras = true;
         return base;
     }

@@ -28,6 +28,12 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
     private static final @NonNull SimpleAttack<AbstractPurpleHazeEntity<?, ?>> REKKA_2 = REKKA2.copy().withAnim(State.REKKA2).withFollowup(REKKA_3);
     private static final @NonNull SimpleAttack<AbstractPurpleHazeEntity<?, ?>> REKKA_1 = REKKA1.copy().withAnim(State.REKKA1).withFollowup(REKKA_2);
 
+    public static final PilotModeMove<PurpleHazeDistortionEntity> PILOT_MODE = new PilotModeMove<PurpleHazeDistortionEntity>(20)
+            .withInfo(
+                    Text.literal("Pilot Mode"),
+                    Text.empty()
+            );
+
     public static final SimpleAttack<AbstractPurpleHazeEntity<?, ?>> GRAB_HIT_FINAL = new SimpleAttack<AbstractPurpleHazeEntity<?, ?>>(0, 27,
             34, 0.75f, 4f, 8, 2f, 1.25f, 0f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
@@ -73,7 +79,6 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
         light.withFollowUp(State.LIGHT_FOLLOWUP);
         light.withCrouchingVariant(State.BACKHAND).withFollowUp(State.BACKHAND_FOLLOWUP);
 
-        //moves.register(MoveType.HEAVY, STAR_BREAKER, State.HEAVY).withCrouchingVariant(State.GROUND_BREAKER);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
         moves.register(MoveType.HEAVY, HEAVY, State.HEAVY);
 
@@ -82,6 +87,8 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
         moves.register(MoveType.SPECIAL3, GRAB, State.GRAB).withCrouchingVariant(State.GROUND_SLAM);
 
         moves.register(MoveType.ULTIMATE, FULL_RELEASE, State.FULL_RELEASE);
+
+        moves.register(MoveType.UTILITY, PILOT_MODE);
     }
 
     @Override
@@ -95,6 +102,16 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
         }
 
         return super.initMove(type);
+    }
+
+    @Override
+    protected void tickRemoteState(double f, double s, boolean dashing) {
+        if (getState() == State.IDLE) { // Replace idle anim
+            if (s > 0) setStateNoReset(dashing ? State.RIGHT : State.RIGHT_DASH);
+            if (s < 0) setStateNoReset(dashing ? State.LEFT : State.LEFT_DASH);
+            if (f < 0) setStateNoReset(dashing ? State.BACKWARD : State.BACKWARD_DASH);
+            if (f > 0) setStateNoReset(dashing ? State.FORWARD : State.FORWARD_DASH);
+        }
     }
 
     @Override
@@ -126,7 +143,16 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
 
         BACKHAND(builder -> builder.playAndHold("animation.purple_haze.backhand")),
         BACKHAND_FOLLOWUP(builder -> builder.playAndHold("animation.purple_haze.backhand_followup")),
-        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.purple_haze.light_followup"));
+        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.purple_haze.light_followup")),
+
+        FORWARD(builder -> builder.loop("animation.purple_haze.forw")),
+        BACKWARD(builder -> builder.loop("animation.purple_haze.back")),
+        LEFT(builder -> builder.loop("animation.purple_haze.left")),
+        RIGHT(builder -> builder.loop("animation.purple_haze.right")),
+        FORWARD_DASH(builder -> builder.loop("animation.purple_haze.fdash")),
+        BACKWARD_DASH(builder -> builder.loop("animation.purple_haze.bdash")),
+        LEFT_DASH(builder -> builder.loop("animation.purple_haze.ldash")),
+        RIGHT_DASH(builder -> builder.loop("animation.purple_haze.rdash")),;
 
         private final BiConsumer<PurpleHazeDistortionEntity, AnimationBuilder> animator;
 

@@ -81,7 +81,7 @@ public class JClientUtils {
         AnimationProcessor<?> animationProcessor = model.getAnimationProcessor();
 
         if (entity.getMoveStun() < 1) {
-            Vec3d playerVel = deltaPos(player);
+            Vec3d playerVel = entity.isRemote() ? entity.getVelocity() : deltaPos(player);
             overVel = MathHelper.clamp((float) playerVel.horizontalLength() - 0.05f, -1f, 1f);
 
             // If going backwards

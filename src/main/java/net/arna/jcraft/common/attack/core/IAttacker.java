@@ -1,8 +1,6 @@
 package net.arna.jcraft.common.attack.core;
 
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
-import net.arna.jcraft.common.attack.moves.base.AbstractHoldableMove;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -66,6 +64,8 @@ public interface IAttacker<A extends IAttacker<? extends A, S>, S> {
     boolean canAttack();
 
     void cancelMove();
+
+    boolean isRemote();
 
     AbstractMove<?, ? super A> getCurrentMove();
 

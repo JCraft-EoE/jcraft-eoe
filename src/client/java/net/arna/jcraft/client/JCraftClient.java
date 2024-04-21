@@ -370,7 +370,7 @@ public class JCraftClient implements ClientModInitializer {
         if (getTrackedUseKey().isChangedThisTick()) {
             boolean pressed = getTrackedUseKey().isPressedThisTick();
                 ClientPlayNetworking.send(JPacketRegistry.C2S_STAND_BLOCK, StandBlockPacket.write(pressed));
-            if (stand != null && stand.isRemote() && pressed)
+            if (stand != null && stand.isRemoteAndControllable() && pressed)
                 ClientPlayNetworking.send(JPacketRegistry.C2S_REMOTE_STAND_INTERACT, PacketByteBufs.create());
         }
 

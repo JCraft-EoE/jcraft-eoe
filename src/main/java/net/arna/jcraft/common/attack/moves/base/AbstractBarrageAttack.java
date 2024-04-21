@@ -69,8 +69,10 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A
     public void tick(A attacker) {
         super.tick(attacker);
 
-        if (attacker.hasUser() && inflictsSlowness)
+        // Consider replacing the isRemote() with isFree()?
+        if (attacker.hasUser() && inflictsSlowness && !attacker.isRemote()) {
             attacker.getUserOrThrow().addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 10, 2, true, false));
+        }
     }
 
     @Override

@@ -17,7 +17,6 @@ import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
@@ -148,7 +147,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
     }
 
     @Override
-    public MoveSelectionResult specificMoveSelectionCriterion(AbstractMove<?, ? super KQBTDEntity> attack, MobEntity mob,
+    public MoveSelectionResult specificMoveSelectionCriterion(AbstractMove<?, ? super KQBTDEntity> attack, LivingEntity mob,
                                                               LivingEntity target, int stunTicks, int enemyMoveStun,
                                                               double distance, StandEntity<?, ?> enemyStand, AbstractMove<?, ?> enemyAttack) {
         if (enemyStand != null && enemyStand.blocking) return MoveSelectionResult.STOP;

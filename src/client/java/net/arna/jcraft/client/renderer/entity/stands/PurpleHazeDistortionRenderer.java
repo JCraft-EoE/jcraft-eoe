@@ -5,7 +5,6 @@ import net.arna.jcraft.common.entity.stand.AbstractPurpleHazeEntity;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 
 public class PurpleHazeDistortionRenderer extends StandEntityRenderer<AbstractPurpleHazeEntity<?, ?>> {
-
     public PurpleHazeDistortionRenderer(EntityRendererFactory.Context context) {
         super(context, new PurpleHazeModel(true));
     }

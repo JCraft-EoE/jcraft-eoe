@@ -383,10 +383,15 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
      */
     public static <T extends Entity> @NonNull Set<T> findHits(IAttacker<?, ?> attacker, @NonNull Set<Box> boxes,
                                                      @Nullable DamageSource damageSource, Class<T> type) {
+        LivingEntity user = attacker.getUser();
         return boxes.stream()
                 .flatMap(box -> attacker.getEntityWorld().getEntitiesByClass(type, box, EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e ->
-                        e != attacker && e != attacker.getUser() && e != attacker.getUserOrThrow().getVehicle() &&
-                                e != JUtils.getStand(attacker.getUser()))).stream())
+                        e != attacker
+                            && e != user
+                            && e != user.getVehicle()
+                            && e != JUtils.getStand(user)
+                        )
+                ).stream())
                 .flatMap(e -> e instanceof StandEntity<?,?> hitStand && hitStand.hasUser() &&
                         type.isInstance(hitStand.getUserOrThrow()) ? Stream.of(e, type.cast(hitStand.getUserOrThrow())) : Stream.of(e))
                 .filter(damageSource == null ? e -> true : e -> JUtils.canDamage(damageSource, e)) // This must be done after the previous flatmap call as it excludes stands.

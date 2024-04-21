@@ -395,6 +395,20 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         return this.dataTracker.get(REMOTE);
     }
 
+    /**
+     * @return Whether this stand should be controllable in remote mode. Certain stands should not (i.e. {@link PurpleHazeEntity}).
+     */
+    public boolean remoteControllable() {
+        return true;
+    }
+
+    /**
+     * @return Whether this stand is in remote mode and should be controllable.
+     */
+    public boolean isRemoteAndControllable() {
+        return isRemote() && remoteControllable();
+    }
+
     public void setRemote(boolean r) {
         this.dataTracker.set(REMOTE, r);
         if (r) beginRemote();
@@ -814,11 +828,13 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if (isRemote) {
             if (hasVehicle()) detach();
             if (user.isAlive()) {
-                // Clientside rotational sync for remote mode
-                user.setBodyYaw(user.getHeadYaw());
+                // Clientside rotational sync for controllable remote mode
+                if (remoteControllable()) {
+                    user.setBodyYaw(user.getHeadYaw());
 
-                setHeadYaw(user.getHeadYaw());
-                setRotation(user.getYaw(), user.getPitch());
+                    setHeadYaw(user.getHeadYaw());
+                    setRotation(user.getYaw(), user.getPitch());
+                }
             } else discard();
         } else if (!hasVehicle() && !isFree())
             startRiding(user, true);
@@ -861,14 +877,17 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 }
             }
 
-            // Rotate with user
-            if (!isFree || isRemote) {
+            boolean isRemoteAndControllable = isRemote && remoteControllable();
+
+            // Rotate with user (provided user controls the stand)
+            if (!isFree || isRemoteAndControllable) {
                 setHeadYaw(user.getHeadYaw());
                 setRotation(user.getYaw(), user.getPitch());
             }
 
-            // Remote mode
-            if (isRemote) user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 5, 9, true, false));
+            // Remote mode users cannot move while controlling
+            if (isRemoteAndControllable)
+                user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 5, 9, true, false));
 
             // Attack logic
             if (move != null) {
@@ -1083,7 +1102,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 boolean backstabbed = false;
                 if (attacker != null) {
                     double delta = Math.abs((ent.headYaw + 90.0f) % 360.0f - (attacker.getHeadYaw() + 90.0f) % 360.0f);
-                    if (canBackstab && (360.0 - delta % 360.0 < 90 || delta % 360.0 < 90) && ent.squaredDistanceTo(attacker.getPos()) >= 1.5625) { // Backstab logic
+                    if (canBackstab && (360.0 - delta % 360.0 < 45 || delta % 360.0 < 45) && ent.squaredDistanceTo(attacker.getPos()) >= 1.5625) { // Backstab logic
                         JCraft.createParticle((ServerWorld) attacker.getWorld(), ent.getX(), attacker.getEyeY(), ent.getZ(), JParticleType.BACK_STAB);
                         stand.playSound(JSoundRegistry.BACKSTAB, 1, 1);
                         stand.blocking = false;
@@ -1285,6 +1304,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         JSpec<?, ?> enemySpec;
         StandEntity<?, ?> enemyStand = JUtils.getStand(target);
+        if (enemyStand == stand) // Stands that attack their users would tweak tf out otherwise
+            enemyStand = null;
         AbstractMove<?, ?> enemyAttack = null;
         boolean enemyHasStand = enemyStand != null;
 
@@ -1387,7 +1408,16 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             stunTicks += blockPlusTicks;
             stunTicks += JComponents.getTimeStopData(target).getTicks();
 
-            Pair<AbstractMove<?, ?>, Boolean> selectedAttackData = stand.selectAttack(mob, target, stunTicks, enemyMoveStun, distance, enemyStand, enemyAttack);
+            // Ensures the cooldowns are read/written to the correct entity.
+            Pair<AbstractMove<?, ?>, Boolean> selectedAttackData;
+            if (mob instanceof StandEntity<?,?> standEntity && standEntity.hasUser())
+                selectedAttackData = stand.selectAttack(
+                        JComponents.getCooldowns(standEntity.getUser()),
+                        mob, target, stunTicks, enemyMoveStun, distance, enemyStand, enemyAttack);
+            else
+                selectedAttackData = stand.selectAttack(
+                        JComponents.getCooldowns(mob),
+                        mob, target, stunTicks, enemyMoveStun, distance, enemyStand, enemyAttack);
 
             if (selectedAttackData != null) {
                 AbstractMove<?, ?> selectedAttack = selectedAttackData.getLeft();
@@ -1478,17 +1508,16 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     /**
      * Used to help AIs that use stands with unique moves
      */
-    public MoveSelectionResult specificMoveSelectionCriterion(AbstractMove<?, ? super E> attack, MobEntity mob, LivingEntity target, int stunTicks,
+    public MoveSelectionResult specificMoveSelectionCriterion(AbstractMove<?, ? super E> attack, LivingEntity mob, LivingEntity target, int stunTicks,
                                                               int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand, AbstractMove<?, ?> enemyAttack) {
         return MoveSelectionResult.PASS;
     }
 
-    private @Nullable Pair<AbstractMove<?, ?>, Boolean> selectAttack(MobEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand, AbstractMove<?, ?> enemyAttack) {
+    private @Nullable Pair<AbstractMove<?, ?>, Boolean> selectAttack(CooldownsComponent cooldowns, LivingEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand, AbstractMove<?, ?> enemyAttack) {
         AbstractMove<?, ? super E> selectedAttack;
         boolean needsCrouch = false;
         boolean doFinalChecks = true; // Refuses to run the move if certain conditions are met
         boolean enemyIsAttacking = enemyAttack != null;
-        CooldownsComponent cooldowns = JComponents.getCooldowns(mob);
 
         // If the opponent is countering, don't attack
         if (enemyIsAttacking && enemyAttack.isCounter()) return null;

@@ -231,9 +231,9 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
     public void tick() {
         super.tick();
 
-        if (!isRemote()) return;
+        if (!isRemoteAndControllable()) return;
 
-        if (world.isClient) {
+        if (world.isClient()) {
             // Called for EVERYONE
             JCraft.getClientEntityHandler().whiteSnakeRemoteClientTick(this);
         } else {
@@ -252,6 +252,12 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         }
     }
 
+    /**
+     * Movement control for a grounded remote stand.
+     * @param f Forward input
+     * @param s +Right/-Left input
+     * @param jump Jump input
+     */
     public void tickRemoteMovement(double f, double s, boolean jump) {
         Vec3d pos = getPos();
 

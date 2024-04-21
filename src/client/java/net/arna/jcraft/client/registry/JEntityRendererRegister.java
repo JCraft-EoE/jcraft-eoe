@@ -3,10 +3,11 @@ package net.arna.jcraft.client.registry;
 import net.arna.jcraft.client.renderer.entity.*;
 import net.arna.jcraft.client.renderer.entity.projectiles.*;
 import net.arna.jcraft.client.renderer.entity.stands.*;
-import net.arna.jcraft.common.entity.PurpleHazeCloudEntity;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 
 public interface JEntityRendererRegister {
@@ -50,6 +51,7 @@ public interface JEntityRendererRegister {
         EntityRendererRegistry.register(JEntityTypeRegistry.GER_SCORPION, GERScorpionRenderer::new);
 
         EntityRendererRegistry.register(JEntityTypeRegistry.PURPLE_HAZE_DISTORTION, PurpleHazeDistortionRenderer::new);
+        EntityRendererRegistry.register(JEntityTypeRegistry.PURPLE_HAZE, PurpleHazeRenderer::new);
 
         EntityRendererRegistry.register(JEntityTypeRegistry.LASER_PROJECTILE, LaserProjectileRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegistry.BLOOD_PROJECTILE, BloodProjectileRenderer::new);
@@ -66,11 +68,15 @@ public interface JEntityRendererRegister {
         EntityRendererRegistry.register(JEntityTypeRegistry.RAPIER, RapierRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegistry.METEOR, MeteorRenderer::new);
         EntityRendererRegistry.register(JEntityTypeRegistry.PH_CAPSULE, PHCapsuleRenderer::new);
-        EntityRendererRegistry.register(JEntityTypeRegistry.PURPLE_HAZE_COUD, ctx -> new EntityRenderer<>(ctx) {
+        EntityRendererRegistry.register(JEntityTypeRegistry.PURPLE_HAZE_COUD, JEntityRendererRegister::createEmpty);
+    }
+
+    private static <T extends Entity> EntityRenderer<T> createEmpty(EntityRendererFactory.Context ctx) {
+        return new EntityRenderer<>(ctx) {
             @Override
-            public Identifier getTexture(PurpleHazeCloudEntity entity) {
+            public Identifier getTexture(T entity) {
                 return null;
             }
-        });
+        };
     }
 }

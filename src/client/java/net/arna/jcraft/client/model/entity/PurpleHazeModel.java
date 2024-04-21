@@ -9,8 +9,7 @@ public class PurpleHazeModel extends StandEntityModel<AbstractPurpleHazeEntity<?
     private static final Identifier MODEL = JCraft.id("geo/purple_haze.geo.json");
 
     public PurpleHazeModel(boolean distortion) {
-        //todo: not this
-        super(distortion ? StandType.PURPLE_HAZE_DISTORTION : StandType.PURPLE_HAZE_DISTORTION);
+        super(distortion ? StandType.PURPLE_HAZE_DISTORTION : StandType.PURPLE_HAZE);
     }
 
     @Override

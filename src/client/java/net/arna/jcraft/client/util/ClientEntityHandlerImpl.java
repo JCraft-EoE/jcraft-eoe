@@ -4,11 +4,8 @@ import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.particle.AuraArcParticle;
 import net.arna.jcraft.client.particle.AuraBlobParticle;
 import net.arna.jcraft.common.component.living.BombTrackerComponent;
-import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.entity.SheerHeartAttackEntity;
-import net.arna.jcraft.common.entity.stand.HGEntity;
-import net.arna.jcraft.common.entity.stand.StandEntity;
-import net.arna.jcraft.common.entity.stand.WhiteSnakeEntity;
+import net.arna.jcraft.common.entity.stand.*;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.util.IClientEntityHandler;
@@ -23,7 +20,10 @@ import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.random.Random;
 import org.jetbrains.annotations.NotNull;
 
@@ -108,7 +108,7 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
             Vec3f auraColor = stand.getAuraColor();
 
             if ( (!isOwnerAndFP || stand.isFree())
-                    && !(stand.isRemote() && isFP)
+                    && !(stand.isRemoteAndControllable() && isFP)
                             && random.nextBoolean() )
                 displayAuraParticles(clientWorld, random, stand, RotationUtil.vecPlayerToWorld(stand.getWidth(), stand.getHeight(), stand.getWidth(), gravity), gravity, auraColor);
             if ( !isOwnerAndFP && random.nextBoolean() && !JClientUtils.shouldNotRender(user) )
@@ -167,6 +167,27 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
 
         //JCraft.LOGGER.info("Handling remote movement for: " + whiteSnakeEntity + " with " + f + " " + s + " " + jump);
         whiteSnakeEntity.tickRemoteMovement(f, s, jump);
+    }
+
+    @Override
+    public void purpleHazeRemoteClientTick(@NotNull AbstractPurpleHazeEntity<?, ?> purpleHazeEntity) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (JUtils.getStand(client.player) != purpleHazeEntity) return;
+
+        GameOptions options = client.options;
+        float f = 0, s = 0;
+        boolean jump = options.jumpKey.isPressed();
+        if (options.forwardKey.isPressed())
+            f += 1.0f;
+        if (options.backKey.isPressed())
+            f += 1.0f;
+        if (options.leftKey.isPressed())
+            s -= 1.0f;
+        if (options.rightKey.isPressed())
+            s += 1.0f;
+
+        //JCraft.LOGGER.info("Handling remote movement for: " + purpleHazeEntity + " with " + f + " " + s + " " + jump);
+        purpleHazeEntity.tickRemoteMovement(f, s, jump);
     }
 
     @Override

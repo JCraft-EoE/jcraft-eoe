@@ -50,6 +50,8 @@ public enum StandType {
             Text.literal("Cold"), Text.literal("Burning"), Text.literal("Seaside")),
     THE_SUN(JEntityTypeRegistry.THE_SUN, TheSunEntity::new, "the_sun",       // 13
             Text.literal(":)"), Text.literal("Neutron Star"), Text.literal("Dark")),
+    PURPLE_HAZE(JEntityTypeRegistry.PURPLE_HAZE, PurpleHazeEntity::new, "purple_haze",       // 14
+            Text.literal("Amber"), Text.literal("Vintage"), Text.literal("Reversal")),
 
 
     // Evolutions
@@ -65,7 +67,6 @@ public enum StandType {
             Text.literal("Silver"), Text.literal("Manga"), Text.literal("Cherry Blossom")),
     STAR_PLATINUM_THE_WORLD(JEntityTypeRegistry.SPTW, SPTWEntity::new, "sptw", true,                                // -6
             Text.literal("Judge, Jury, Executioner"), Text.literal("Diamond"), Text.literal("Over Heaven")),
-
     PURPLE_HAZE_DISTORTION(JEntityTypeRegistry.PURPLE_HAZE_DISTORTION, PurpleHazeDistortionEntity::new, "purple_haze_distortion", true,       // -7
             Text.literal("Amber"), Text.literal("Vintage"), Text.literal("Reversal")),;
 

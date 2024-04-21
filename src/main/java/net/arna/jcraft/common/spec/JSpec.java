@@ -266,6 +266,11 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
     }
 
     @Override
+    public boolean isRemote() {
+        return false;
+    }
+
+    @Override
     public boolean isHolding() {
         return holding;
     }

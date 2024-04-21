@@ -23,3 +23,6 @@ accessible field net/minecraft/block/entity/AbstractFurnaceBlockEntity burnTime 
 accessible field net/minecraft/server/world/ServerWorld sleepManager Lnet/minecraft/server/world/SleepManager;
 
 accessible method net/minecraft/block/IceBlock melt (Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V
+
+accessible field net/minecraft/entity/ai/control/MoveControl forwardMovement F
+accessible field net/minecraft/entity/ai/control/MoveControl sidewaysMovement F

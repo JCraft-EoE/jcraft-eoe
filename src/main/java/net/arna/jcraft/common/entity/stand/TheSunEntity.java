@@ -57,6 +57,7 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
     private static final SimpleAttack<TheSunEntity> FIRE_SUNBEAM = new SimpleAttack<TheSunEntity>(20, 5, 10, 0, 0, 0, 0, 0, 0)
             .withInitAction((attacker, user, ctx) -> attacker.setTargetPosition(user))
             .withAction((attacker, user, ctx, targets) -> fireSunBeam(attacker, user, 0.0f))
+            .markRanged()
             .withInfo(
                     Text.of("Fire Sunbeam"),
                     Text.of("""
@@ -74,6 +75,7 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
                 if (attacker.getScale() == MAX_SCALE)
                     meteor.setExplosive(true);
             })
+            .markRanged()
             .withInfo(
                     Text.of("Fire Meteor"),
                     Text.of("""
@@ -86,6 +88,7 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
     )
             .withInitAction((attacker, user, ctx) -> attacker.setTargetPosition(user))
             .withAction((attacker, user, ctx, targets) -> fireMeteors1(attacker, user))
+            .markRanged()
             .withInfo(
                     Text.of("Starburst"),
                     Text.of("""
@@ -101,6 +104,7 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
             })
             .withSound(JSoundRegistry.SUN_SHOWER)
             .withoutSlowness()
+            .markRanged()
             .withInfo(
                     Text.of("Meteor Shower"),
                     Text.of("""
@@ -113,6 +117,7 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
     )
             .withInitAction((attacker, user, ctx) -> attacker.setTargetPosition(user))
             .withAction((attacker, user, ctx, targets) -> fireSunBeam(attacker, user, 2.5f))
+            .markRanged()
             .withInfo(
                     Text.of("Incinerating Sunshine"),
                     Text.of("Fires 3 sunbeams.")
@@ -343,7 +348,7 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
 
     @Override
     public boolean isInvulnerableTo(DamageSource damageSource) {
-        return damageSource.isOutOfWorld();
+        return !damageSource.isOutOfWorld();
     }
 
     @Override

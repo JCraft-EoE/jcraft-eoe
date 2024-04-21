@@ -1,7 +1,10 @@
 package net.arna.jcraft.common.entity.stand;
 
 import lombok.NonNull;
-import net.arna.jcraft.common.attack.core.*;
+import net.arna.jcraft.common.attack.core.BlockableType;
+import net.arna.jcraft.common.attack.core.HitBoxData;
+import net.arna.jcraft.common.attack.core.MoveMap;
+import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.goldexperience.BerryBushAttack;
 import net.arna.jcraft.common.attack.moves.goldexperience.LifeGiverAttack;
@@ -18,7 +21,6 @@ import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
@@ -263,7 +265,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
 
     @Override
     public MoveSelectionResult specificMoveSelectionCriterion(AbstractMove<?, ? super GoldExperienceEntity> attack,
-                                                              MobEntity mob, LivingEntity target, int stunTicks,
+                                                              LivingEntity mob, LivingEntity target, int stunTicks,
                                                               int enemyMoveStun, double distance,
                                                               StandEntity<?, ?> enemyStand, AbstractMove<?, ?> enemyAttack) {
         return attack == LIFE_GIVER ?

@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.entity.stand;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.shared.*;
@@ -10,12 +11,14 @@ import net.arna.jcraft.common.entity.projectile.PHCapsuleProjectile;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.common.util.MobilityType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -26,7 +29,7 @@ import java.util.Set;
 import static net.arna.jcraft.registry.JStatusRegistry.PHPOISON;
 
 public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHazeEntity<E, S>, S extends Enum<S> & StandAnimationState<E>> extends StandEntity<E, S>
-        permits PurpleHazeDistortionEntity {
+        permits PurpleHazeDistortionEntity, PurpleHazeEntity {
     public static final KnockdownAttack<AbstractPurpleHazeEntity<?, ?>> BACKHAND_FOLLOWUP = new KnockdownAttack<AbstractPurpleHazeEntity<?, ?>>(
             0, 13, 20, 0.75f, 6f, 13, 1.75f, 0.5f, 0.35f, 25)
             .withImpactSound(JSoundRegistry.IMPACT_2)
@@ -91,10 +94,12 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
     public static final SimpleAttack<AbstractPurpleHazeEntity<?, ?>> LAUNCH_CAPSULES = new SimpleAttack<AbstractPurpleHazeEntity<?, ?>>(
             8 * 20, 9, 18, 0.75f, 0, 0, 0, 0, 0)
             .withSound(JSoundRegistry.PH_CAPSULE2)
+            .markRanged()
             .withAction(
                     (attacker, user, ctx, targets) -> {
+                        LivingEntity shooter = (attacker.isRemote() && !attacker.remoteControllable()) ? attacker : user;
                         for (int i = 0; i < 3; i++)
-                            launchCapsule(attacker, user, ctx, targets, 0.4F, user.getYaw() - 45F + i * 45F);
+                            launchCapsule(attacker, shooter, ctx, targets, 0.4F, shooter.getYaw() - 45F + i * 45F);
                     }
             )
             .withInfo(
@@ -106,8 +111,12 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
             8 * 20, 7, 14, 0.75f, 0, 0, 0, 0, 0)
             .withSound(JSoundRegistry.PH_CAPSULE1)
             .withCrouchingVariant(LAUNCH_CAPSULES)
+            .markRanged()
             .withAction(
-                    (attacker, user, ctx, targets) -> launchCapsule(attacker, user, ctx, targets, 0.8F, user.getYaw())
+                    (attacker, user, ctx, targets) -> {
+                        LivingEntity shooter = (attacker.isRemote() && !attacker.remoteControllable()) ? attacker : user;
+                        launchCapsule(attacker, shooter, ctx, targets, 0.8F, shooter.getYaw());
+                    }
             )
             .withInfo(
                     Text.literal("Capsule Launch"),
@@ -156,6 +165,7 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
             .withExtraHitBox(1.5)
             .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
             .withInitAction(AbstractPurpleHazeEntity::lunge)
+            .withMobilityType(MobilityType.DASH)
             .withInfo(
                     Text.literal("Rekka Series"),
                     Text.literal("""
@@ -218,6 +228,76 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
         return super.handleMove(type);
     }
 
+    @Override
+    public void tick() {
+        super.tick();
+
+        if (!isRemoteAndControllable()) return;
+
+        if (world.isClient()) {
+            JCraft.getClientEntityHandler().purpleHazeRemoteClientTick(this);
+        } else {
+            double f = getRemoteForwardInput();
+            double s = getRemoteSideInput();
+            boolean jump = getRemoteJumpInput();
+
+            tickRemoteMovement(f, s, jump);
+            tickRemoteState(f, s, onGround);
+        }
+    }
+
+    protected abstract void tickRemoteState(double f, double s, boolean dashing);
+
+    /**
+     * Code lifted from {@link WhiteSnakeEntity#tickRemoteMovement(double, double, boolean)}
+     * @param f Forward input
+     * @param s +Right/-Left input
+     * @param jump Jump input
+     */
+    public void tickRemoteMovement(double f, double s, boolean jump) {
+        Vec3d pos = getPos();
+
+        // 1 tick of inertia, helping movement be fluid as well as dealing with packet drops
+        if (lastRemoteInputTime - age > 2) updateRemoteInputs(0, 0, false, false);
+        Vec3d rotVec = new Vec3d(getRotationVector().x, 0, getRotationVector().z).normalize();
+
+        double dragMult = getMoveStun() > 0 ? 0.2 : 0.4;
+        double moveSpeed = 0.24;
+        boolean onGround = isOnGround();
+        boolean climbing = getBlockStateAtPos().streamTags().anyMatch(tag -> tag == BlockTags.CLIMBABLE);
+        boolean swimming = !world.getFluidState(getBlockPos()).isEmpty();
+
+        if (climbing || swimming) dragMult *= 0.5;
+
+        if ( (climbing || swimming ) && jump) { // Climb or Swim
+            addVelocity(0, 0.1, 0);
+        } else { // Jump
+            if (onGround) {
+                if (jump) {
+                    addVelocity(0, 0.75, 0);
+                    setRemoteJumpInput(false);
+                }
+            } else {
+                moveSpeed = 0.024;
+                dragMult = 0.4;
+            }
+        }
+
+        remoteSpeed = remoteSpeed
+                .add(rotVec.multiply(f * moveSpeed)) // Forward movement
+                .add(rotVec.rotateY(1.5707963f).multiply(s * moveSpeed)); // Side movement
+
+        remoteSpeed = remoteSpeed.multiply(dragMult);
+
+        Vec3d userPos = getUserOrThrow().getPos();
+        if (pos.add(remoteSpeed).squaredDistanceTo(userPos) > 400)
+            remoteSpeed = userPos.subtract(pos).multiply(0.025); // 1/40th so it scales with distance
+
+        addVelocity(remoteSpeed.x, remoteSpeed.y, remoteSpeed.z);
+        velocityDirty = true;
+        velocityModified = true;
+    }
+
     public static void infect(LivingEntity target, int ticks) {
         StatusEffectInstance instance = target.getStatusEffect(PHPOISON);
         if (instance != null)
@@ -228,6 +308,7 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
 
     // Attack methods
     private static void lunge(AbstractPurpleHazeEntity<?, ?> attacker, LivingEntity user, MoveContext moveContext) {
+        if (attacker.isRemote()) return;
         JUtils.addVelocity(user, attacker.getRotationVector().multiply(0.6));
     }
 
