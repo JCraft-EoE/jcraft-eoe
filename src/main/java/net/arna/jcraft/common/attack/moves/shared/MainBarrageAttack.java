@@ -42,7 +42,14 @@ public class MainBarrageAttack<A extends IAttacker<? extends A, ?>> extends Abst
         withDuration(breakBlocks ? MINING_BARRAGE_TIME : baseDuration);
         super.onInitiate(attacker);
         attacker.getMoveContext().setBoolean(BREAK_BLOCKS, breakBlocks);
-        withStun(baseStun);
+        withStun(breakBlocks ? 1 : baseStun);
+    }
+
+    @Override
+    public boolean canFinish(A attacker) {
+        if (attacker.getMoveContext().getBoolean(BREAK_BLOCKS))
+            return false;
+        return super.canFinish(attacker);
     }
 
     @Override
@@ -68,8 +75,6 @@ public class MainBarrageAttack<A extends IAttacker<? extends A, ?>> extends Abst
         Set<LivingEntity> targets = super.perform(attacker, user, ctx);
 
         if (ctx.getBoolean(BREAK_BLOCKS)) {
-            withStun(1);
-
             ServerWorld serverWorld = (ServerWorld) user.getWorld();
             LivingEntity attackerEntity = attacker.getBaseEntity();
             Vec3i lookDirection = JUtils.getLookDirection(user).getVector();

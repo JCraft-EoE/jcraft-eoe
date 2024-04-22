@@ -2611,7 +2611,7 @@ The World
     >Added crouching variant to Roundhouse
 
 ● 13/04/2024
->Added Purple Haze
+>Added Purple Haze: Distortion
 
 Vampire
     >Added more sounds
@@ -2629,17 +2629,22 @@ Stone Mask
     >Updated model
 
 ● 19/04/2024
-
 Cream
     >Updated skin 3
 
-    //TODO: FIX FUCKING INPUT BUGS :)
+● 22/04/2024
+>Added base Purple Haze
+>Added heartbeat packet to held inputs (which will automatically release moves that accidentally register as always held)
+>Fixed King Crimson's and Made in Heaven's barrages not being able to mine properly
+>Fixed buffered holdable moves not being holdable for stands
+
+Made in Heaven
+    >Leg Crusher now knocks down
 
 todo: combo counter is LYING
     esplash color :)
     anubis pommel IMPACT sound
     fully charged esplash breaks blocks
-    cool leggy sweep for tw
 
 The reason the easings dont work is because kosmx is fucking stupid,
 see: dev.kosmx.playerAnim.core.util.Easing

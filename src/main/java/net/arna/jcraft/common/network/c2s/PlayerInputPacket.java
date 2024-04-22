@@ -22,6 +22,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -35,8 +36,11 @@ import static net.arna.jcraft.JCraft.SPEC_QUEUE_MOVESTUN_LIMIT;
 public class PlayerInputPacket {
     private static final int HOLD_TIMEOUT_TICKS = 3; // 0.15s
     private static final Map<ServerPlayerEntity, Object2BooleanMap<MoveInputType>> successMap = new WeakHashMap<>();
+    private static final int MOVEMENT_INPUT_TYPES;
 
     static {
+        MOVEMENT_INPUT_TYPES = MovementInputType.values().length;
+
         ServerTickEvents.START_SERVER_TICK.register(server -> {
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
                 InputStateManager sm = getInputStateManager(player);
@@ -44,6 +48,8 @@ public class PlayerInputPacket {
                 // Handle held inputs
                 sm.heldInputs.forEach(
                         (type, integer) -> {
+                            //JCraft.LOGGER.info("Holding: " + type + ", with remaining heartbeat time: " + integer);
+
                             if (!JUtils.canHoldMove(player, type))
                                 sm.heldInputs.remove(type);
 
@@ -103,21 +109,25 @@ public class PlayerInputPacket {
     }
 
     public static void handleHold(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler network, PacketByteBuf buf, PacketSender sender) {
-        InputStateManager sm = getInputStateManager(player);
-
+        buf.readVarInt(); // Throwaway Movement input data
         int count = buf.readVarInt();
+        if (count > MoveInputType.types) {
+            player.networkHandler.disconnect(Text.of("Illegal input packet!"));
+        }
+
+        InputStateManager sm = getInputStateManager(player);
         for (int i = 0; i < count; i++) {
             MoveInputType type = buf.readEnumConstant(MoveInputType.class);
-            for (MoveInputType moveInputType : sm.heldInputs.keySet()) {
-                if (moveInputType != type || !JUtils.canHoldMove(player, moveInputType))
-                    continue;
+            if (JUtils.canHoldMove(player, type))
                 sm.heldInputs.put(type, HOLD_TIMEOUT_TICKS);
-            }
         }
     }
 
     private static void handleMovementInput(MinecraftServer server, ServerPlayerEntity player, PacketByteBuf buf, InputStateManager sm) {
         int count = buf.readVarInt();
+        if (count > MOVEMENT_INPUT_TYPES) {
+            player.networkHandler.disconnect(Text.of("Illegal input packet!"));
+        }
 
         for (int i = 0; i < count; i++) {
             MovementInputType type = buf.readEnumConstant(MovementInputType.class);
@@ -145,8 +155,12 @@ public class PlayerInputPacket {
 
 
     private static void handleMoveInput(ServerPlayerEntity player, PacketByteBuf buf, InputStateManager sm) {
-        MinecraftServer server = Objects.requireNonNull(player.getServer());
         int count = buf.readVarInt();
+        if (count > MoveInputType.types) {
+            player.networkHandler.disconnect(Text.of("Illegal input packet!"));
+        }
+
+        MinecraftServer server = Objects.requireNonNull(player.getServer());
         for (int i = 0; i < count; i++) {
             MoveInputType type = buf.readEnumConstant(MoveInputType.class);
             boolean pressed = buf.readBoolean();

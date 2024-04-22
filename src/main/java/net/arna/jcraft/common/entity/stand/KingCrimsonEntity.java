@@ -248,7 +248,10 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                 boolean idling = getMoveStun() <= 0;
 
                 if (curMove == null || curMove.getOriginalMove() != VERTICAL_CHOP) {
-                    if (idling) return super.initMove(type);
+                    if (idling)
+                        return super.initMove(type);
+                    else
+                        return false;
                 } else if (getMoveStun() < 7) setMove(OVERHEAD_HOOK, State.OVERHEAD);
             }
             case ULTIMATE -> {
@@ -384,11 +387,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
 
         LivingEntity user = this.getUser();
         if (user == null) return;
-
         if (world.isClient) return;
-        if (curMove != null && curMove.getOriginalMove() == OVERHEAD_HOOK)
-            queuedMove = null;
-
         TIME_ERASE.tickTimeErase(this);
     }
 

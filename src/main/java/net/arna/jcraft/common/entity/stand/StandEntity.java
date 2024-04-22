@@ -21,6 +21,7 @@ import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.network.c2s.PlayerInputPacket;
 import net.arna.jcraft.common.network.s2c.ComboCounterPacket;
 import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.util.*;
@@ -852,6 +853,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if (client) {
             JCraft.getClientEntityHandler().standEntityClientTick(this);
         } else {
+            ServerPlayerEntity userPlayer = null;
+            if (user instanceof ServerPlayerEntity serverPlayerEntity)
+                userPlayer = serverPlayerEntity;
+
             // Reset samestate
             if (isSameState()) setSameState(false);
 
@@ -924,7 +929,14 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                     if (queuedMove == MoveInputType.STAND_SUMMON) {
                         curMove = null;
                         desummon();
-                    } else initMove(queuedMove.getMoveType());
+                    } else {
+                        if (userPlayer != null && canHoldMove(queuedMove)) {
+                            setHolding(PlayerInputPacket.getInputStateManager(userPlayer).heldInputs.containsKey(queuedMove));
+                            if (isHolding())
+                                setHoldingType(queuedMove);
+                        }
+                        initMove(queuedMove.getMoveType());
+                    }
 
                     queuedMove = null;
                 } else if (!idleOverride) {

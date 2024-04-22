@@ -78,11 +78,11 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
         auraColors = new Vec3f[]{
                 new Vec3f(0.8f, 0.2f, 1.0f),
                 new Vec3f(1.0f, 0.2f, 0.6f),
-                new Vec3f(0.2f, 0.8f, 0.6f),
-                new Vec3f(1.0f, 0.3f, 0.5f)
+                new Vec3f(1.0f, 1.0f, 1.0f),
+                new Vec3f(0.5f, 0.3f, 1.0f)
         };
 
-        setAlphaOverride(255.0f);
+        setAlphaOverride(1.0f);
     }
 
     @Override

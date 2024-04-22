@@ -45,12 +45,18 @@ public class ReviveMove<A extends IAttacker<? extends A, ?>> extends AbstractMov
                     entity.age = 1;
                     if (user instanceof ServerPlayerEntity serverPlayer)
                         JComponents.getMiscData(living).setSlavedTo(serverPlayer.getUuid());
-                    //todo: SPAWNING BOSSES SHOULD PROBABLY NOT BE ALLOWED
-                    serverWorld.spawnEntity(entity);
-                    Revivables.removeRevivable(revivable);
+                    if (!isBoss(living)) {
+                        serverWorld.spawnEntity(entity);
+                        Revivables.removeRevivable(revivable);
+                    }
                 }
         }
         return Set.of();
+    }
+
+    public static boolean isBoss(LivingEntity living) {
+        //todo: find a better way to check if smth is a boss
+        return living.getMaxHealth() >= 80.0f;
     }
 
     @Override

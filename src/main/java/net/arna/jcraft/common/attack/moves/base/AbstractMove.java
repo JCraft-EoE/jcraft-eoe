@@ -390,6 +390,14 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     public void onCancel(A attacker) {}
 
     /**
+     * Whether this attack should be allowed to move onto its finisher.
+     * Certain attacks shouldn't always be able to, see: {@link net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack#canFinish(IAttacker)}
+     */
+    public boolean canFinish(A attacker) {
+        return true;
+    }
+
+    /**
      * Called every tick so long as this move is active.
      * Called separately for each attacker.
      * Invokes the {@link #perform(IAttacker, LivingEntity, MoveContext)} method if {@link #shouldPerform(IAttacker)}
@@ -397,7 +405,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * @param attacker The attacker to tick for.
      */
     public void tick(A attacker) {
-        if (finisher != null && finisher.leftInt() == getDuration() - attacker.getMoveStun())
+        if (finisher != null && canFinish(attacker) && finisher.leftInt() == getDuration() - attacker.getMoveStun())
             attacker.setCurrentMove(finisher.right());
         if (shouldPerform(attacker)) doPerform(attacker);
     }

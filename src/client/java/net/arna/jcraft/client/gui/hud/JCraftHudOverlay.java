@@ -43,7 +43,8 @@ public class JCraftHudOverlay {
         gaugeHeightOffset = gaugeHeightOffsetMax;
         int gaugeX = x - gaugeWidth / 2;
 
-        if (player.getFirstPassenger() instanceof StandEntity<?, ?> stand) {
+        StandEntity<?, ?> stand = JUtils.getStand(player);
+        if (stand != null) {
             if (stand instanceof TheSunEntity theSun)
                 SUN_SIZE_GAUGE.render(matrixStack, gaugeX, height + gaugeHeightOffset, (int) (theSun.getScale() * 10.0F));
             else

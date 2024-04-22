@@ -8,6 +8,7 @@ import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.madeinheaven.*;
 import net.arna.jcraft.common.attack.moves.shared.EffectInflictingAttack;
+import net.arna.jcraft.common.attack.moves.shared.KnockdownAttack;
 import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.component.living.CooldownsComponent;
@@ -104,9 +105,8 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                     Text.literal("Speed Slice"),
                     Text.literal("short windup, harming teleport with hitstun and light knockback")
             );
-    public static final EffectInflictingAttack<MadeInHeavenEntity> LEG_CRUSHER = new EffectInflictingAttack<MadeInHeavenEntity>(
-            80, 9, 19, 0.85f, 7f, 22, 1.5f, 0.35f, 0.2f,
-            List.of(new StatusEffectInstance(StatusEffects.SLOWNESS, 40, 0, true, false)) )
+    public static final KnockdownAttack<MadeInHeavenEntity> LEG_CRUSHER = new KnockdownAttack<MadeInHeavenEntity>(
+            80, 9, 19, 0.85f, 7f, 22, 1.5f, 0.35f, 0.2f, 45)
             .withAction(MadeInHeavenEntity::tryIncrementSpeedometer)
             .withSound(JSoundRegistry.MIH_LEGCRUSHER)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
@@ -115,7 +115,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(
                     Text.literal("Leg Crusher"),
-                    Text.literal("inflicts Slowness I (2s)")
+                    Text.literal("knocks down (2s)")
             );
     public static final SimpleAttack<MadeInHeavenEntity> LOW_KICK = new SimpleAttack<MadeInHeavenEntity>(80,
             8, 17, 0.85f, 6f, 26, 1.5f, 0.25f, 0.2f)
