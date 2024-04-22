@@ -364,6 +364,15 @@ public class JCraftClient implements ClientModInitializer {
 
             if (!movementInput.isEmpty() || !moveInput.isEmpty())
                 ClientPlayNetworking.send(JPacketRegistry.C2S_PLAYER_INPUT, PlayerInputPacket.write(movementInput, moveInput));
+
+            Object2BooleanMap<MoveInputType> heldMoves = new Object2BooleanOpenHashMap<>();
+            getBindings().forEach((key, value) -> {
+                if (key.isDown())
+                    heldMoves.put(value, true);
+            });
+
+            if (!heldMoves.isEmpty())
+                ClientPlayNetworking.send(JPacketRegistry.C2S_PLAYER_INPUT_HOLD, PlayerInputPacket.write(null, heldMoves));
         }
 
         // Block

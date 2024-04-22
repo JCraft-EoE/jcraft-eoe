@@ -51,7 +51,7 @@ public enum StandType {
     THE_SUN(JEntityTypeRegistry.THE_SUN, TheSunEntity::new, "the_sun",       // 13
             Text.literal(":)"), Text.literal("Neutron Star"), Text.literal("Dark")),
     PURPLE_HAZE(JEntityTypeRegistry.PURPLE_HAZE, PurpleHazeEntity::new, "purple_haze",       // 14
-            Text.literal("Amber"), Text.literal("Vintage"), Text.literal("Reversal")),
+            Text.literal("Red"), Text.literal("Stopping Force"), Text.literal("Reversal")),
 
 
     // Evolutions

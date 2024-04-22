@@ -23,6 +23,7 @@ public interface JPacketRegistry {
     Identifier C2S_STAND_BLOCK = JCraft.id("stand_block");
     Identifier C2S_COOLDOWN_CANCEL = JCraft.id("cooldown_cancel");
     Identifier C2S_PLAYER_INPUT = JCraft.id("player_input");
+    Identifier C2S_PLAYER_INPUT_HOLD = JCraft.id("player_input_hold");
     Identifier C2S_REMOTE_STAND_INTERACT = JCraft.id("remote_stand_interact");
     Identifier C2S_PREDICTION_TRIGGER = JCraft.id("prediction_trigger");
 }

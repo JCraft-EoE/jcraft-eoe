@@ -86,6 +86,10 @@
   "entity.jcraft.gesnake": "Snake",
   "entity.jcraft.gerscorpion": "Scorpion",
 
+  "entity.jcraft.the_sun": "The Sun",
+  "entity.jcraft.purple_haze": "Purple Haze",
+  "entity.jcraft.purple_haze_distortion": "Purple Haze: Distortion",
+
   "entity.jcraft.whitesnake": "Whitesnake",
   "entity.jcraft.cmoon": "C-Moon",
   "entity.jcraft.block": "Block",

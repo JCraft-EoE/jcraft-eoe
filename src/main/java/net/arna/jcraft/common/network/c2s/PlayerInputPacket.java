@@ -22,14 +22,18 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
+import java.util.WeakHashMap;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
-import static net.arna.jcraft.JCraft.*;
+import static net.arna.jcraft.JCraft.QUEUE_MOVESTUN_LIMIT;
+import static net.arna.jcraft.JCraft.SPEC_QUEUE_MOVESTUN_LIMIT;
 
 public class PlayerInputPacket {
+    private static final int HOLD_TIMEOUT_TICKS = 3; // 0.15s
     private static final Map<ServerPlayerEntity, Object2BooleanMap<MoveInputType>> successMap = new WeakHashMap<>();
 
     static {
@@ -38,10 +42,20 @@ public class PlayerInputPacket {
                 InputStateManager sm = getInputStateManager(player);
 
                 // Handle held inputs
-                sm.heldInputs = EnumSet.copyOf(sm.heldInputs).stream()
-                        .filter(type -> JUtils.canHoldMove(player, type))
-                        .peek(type -> handleMoveInput(server, player, type))
-                        .collect(Collectors.toCollection(() -> EnumSet.noneOf(MoveInputType.class)));
+                sm.heldInputs.forEach(
+                        (type, integer) -> {
+                            if (!JUtils.canHoldMove(player, type))
+                                sm.heldInputs.remove(type);
+
+                            Integer newValue = integer - 1;
+                            if (newValue <= 0)
+                                sm.heldInputs.remove(type);
+                            else
+                                sm.heldInputs.put(type, newValue);
+                        }
+                );
+
+                sm.heldInputs.keySet().forEach(type -> handleMoveInput(server, player, type));
 
                 int forward = sm.calcForward();
                 int side = sm.calcSide();
@@ -70,7 +84,11 @@ public class PlayerInputPacket {
         return buf;
     }
 
-    private static void writeInput(PacketByteBuf buf, Object2BooleanMap<? extends Enum<?>> input) {
+    private static void writeInput(PacketByteBuf buf, @Nullable Object2BooleanMap<? extends Enum<?>> input) {
+        if (input == null) {
+            buf.writeVarInt(0);
+            return;
+        }
         buf.writeVarInt(input.size());
         for (Object2BooleanMap.Entry<? extends Enum<?>> entry : input.object2BooleanEntrySet()) {
             buf.writeEnumConstant(entry.getKey());
@@ -82,6 +100,20 @@ public class PlayerInputPacket {
         InputStateManager sm = getInputStateManager(player);
         handleMovementInput(server, player, buf, sm);
         handleMoveInput(player, buf, sm);
+    }
+
+    public static void handleHold(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler network, PacketByteBuf buf, PacketSender sender) {
+        InputStateManager sm = getInputStateManager(player);
+
+        int count = buf.readVarInt();
+        for (int i = 0; i < count; i++) {
+            MoveInputType type = buf.readEnumConstant(MoveInputType.class);
+            for (MoveInputType moveInputType : sm.heldInputs.keySet()) {
+                if (moveInputType != type || !JUtils.canHoldMove(player, moveInputType))
+                    continue;
+                sm.heldInputs.put(type, HOLD_TIMEOUT_TICKS);
+            }
+        }
     }
 
     private static void handleMovementInput(MinecraftServer server, ServerPlayerEntity player, PacketByteBuf buf, InputStateManager sm) {
@@ -120,7 +152,7 @@ public class PlayerInputPacket {
             boolean pressed = buf.readBoolean();
 
             if (JUtils.canHoldMove(player, type)) {
-                if (pressed) sm.heldInputs.add(type);
+                if (pressed) sm.heldInputs.put(type, HOLD_TIMEOUT_TICKS);
                 else sm.heldInputs.remove(type);
             }
 
