@@ -2628,6 +2628,13 @@ The Sun
 Stone Mask
     >Updated model
 
+● 18/04/2024
+>Attempted to add prediction as a config option
+
+The World: Over Heaven
+    >Crouching Light replaced with Low Kick
+    >Previous crouching Light is now the followup to Low Kick
+
 ● 19/04/2024
 Cream
     >Updated skin 3

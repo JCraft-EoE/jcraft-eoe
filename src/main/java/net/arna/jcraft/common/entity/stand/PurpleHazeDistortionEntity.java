@@ -65,6 +65,10 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
 
     public PurpleHazeDistortionEntity(World worldIn) {
         super(StandType.PURPLE_HAZE_DISTORTION, worldIn);
+
+        freespace = """
+                PASSIVE: 66% resistance to Purple Haze effect""";
+
         auraColors = new Vec3f[]{
                 new Vec3f(0.8f, 0.2f, 1.0f),
                 new Vec3f(1.0f, 0.2f, 0.6f),

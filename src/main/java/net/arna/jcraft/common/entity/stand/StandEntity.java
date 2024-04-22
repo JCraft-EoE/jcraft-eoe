@@ -1453,7 +1453,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                         else
                             stand.initMove(selectedAttack.getMoveType());
                     } else
-                        stand.queuedMove = MoveInputType.fromMoveType(selectedAttack.getMoveType());
+                        stand.queueMove(MoveInputType.fromMoveType(selectedAttack.getMoveType()));
 
                     if ( // in range (to attack)
                             (selectedAttack instanceof AbstractSimpleAttack<?, ?> simpleAttack &&

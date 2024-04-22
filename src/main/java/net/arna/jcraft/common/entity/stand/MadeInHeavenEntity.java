@@ -221,7 +221,9 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                 
                 BNBs:
                     -the flashbang
-                    (Donut>M1>)Speed Slice>Leg Crusher>Fury Chop>M1>Barrage""";
+                    (Donut>M1>)Speed Slice>Low Kick>Fury Chop>M1>Barrage>dash>M1~M1
+                    
+                    -""";
 
         auraColors = new Vec3f[]{
                 new Vec3f(0.9f, 0.8f, 0.8f),

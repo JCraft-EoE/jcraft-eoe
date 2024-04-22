@@ -2,6 +2,7 @@ package net.arna.jcraft.common.entity.stand;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.NonNull;
+import net.arna.jcraft.common.attack.core.MoveInputType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.StunType;
@@ -75,6 +76,12 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
     public PurpleHazeEntity(World worldIn) {
         super(StandType.PURPLE_HAZE, worldIn);
 
+        freespace = """
+                PASSIVE: Rage
+                Builds up while the stand is summoned.
+                Maxes out after 1 minute. When maxed, aura turns red.
+                Purple Haze has a chance to target it's own user which increases with rage.""";
+
         auraColors = new Vec3f[]{
                 new Vec3f(0.8f, 0.2f, 1.0f),
                 new Vec3f(1.0f, 0.2f, 0.6f),
@@ -106,6 +113,13 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
         moves.register(MoveType.SPECIAL3, GRAB, State.GRAB).withCrouchingVariant(State.GROUND_SLAM);
 
         moves.register(MoveType.ULTIMATE, FULL_RELEASE, State.FULL_RELEASE);
+    }
+
+    @Override
+    public void queueMove(MoveInputType type) {
+        if (!remoteControllable() && queuedMove == MoveInputType.STAND_SUMMON)
+            return;
+        super.queueMove(type);
     }
 
     @Override
@@ -198,7 +212,7 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                             break;
                         }
                         if (potentialTarget == user) {
-                            if (random.nextDouble() * MAX_RAGE <= rage) {
+                            if (age % 20 == 0 && random.nextDouble() * MAX_RAGE <= rage) {
                                 setTarget(user);
                                 break;
                             }
