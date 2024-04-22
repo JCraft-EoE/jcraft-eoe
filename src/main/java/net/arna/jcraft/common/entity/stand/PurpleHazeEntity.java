@@ -88,8 +88,6 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                 new Vec3f(1.0f, 1.0f, 1.0f),
                 new Vec3f(0.5f, 0.3f, 1.0f)
         };
-
-        setAlphaOverride(1.0f);
     }
 
     @Override
@@ -189,11 +187,13 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
         if (!hasUser()) return;
         LivingEntity user = getUser();
 
-
         if (!world.isClient()) {
             boolean isRemote = isRemote();
 
             if (!remoteControllable()) {
+                if (getAlphaOverride() != 1.0f)
+                    setAlphaOverride(1.0f);
+
                 LivingEntity target = getTarget();
                 if (target != null && !target.isAlive())
                     target = null;
