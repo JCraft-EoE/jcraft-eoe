@@ -54,9 +54,23 @@ public class PlayerInputPacket {
                                 sm.heldInputs.remove(type);
 
                             Integer newValue = integer - 1;
-                            if (newValue <= 0)
+                            if (newValue <= 0) {
+                                server.execute(() -> {
+                                    boolean success = true;
+                                    JServerPlayerInputCallback.EVENT.invoker().onPlayerInput(player, type, false, success);
+
+                                    StandEntity<?, ?> stand = JUtils.getStand(player);
+                                    if (stand != null && stand.allowMoveHandling()) {
+                                        stand.onUserMoveInput(type, false, success);
+                                        success = false; // If a stand is out, the move input success belongs to it.
+                                    }
+
+                                    JSpec<?, ?> spec = JUtils.getSpec(player);
+                                    if (spec != null)
+                                        spec.onUserMoveInput(type, false, success);
+                                });
                                 sm.heldInputs.remove(type);
-                            else
+                            } else
                                 sm.heldInputs.put(type, newValue);
                         }
                 );
