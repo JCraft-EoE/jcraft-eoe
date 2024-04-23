@@ -11,6 +11,7 @@ import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -22,6 +23,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -202,8 +204,15 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                     List<LivingEntity> potentialTargets = world.getEntitiesByClass(
                             LivingEntity.class,
                             getBoundingBox().expand(64.0),
-                            EntityPredicates.VALID_LIVING_ENTITY);
+                            EntityPredicates.VALID_LIVING_ENTITY.and(EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR));
                     potentialTargets.remove(this);
+
+                    Comparator<Entity> distanceComparator = (entity1, entity2) -> {
+                        double distance1 = this.distanceTo(entity1);
+                        double distance2 = this.distanceTo(entity2);
+                        return Double.compare(distance1, distance2);
+                    };
+                    potentialTargets.sort(distanceComparator);
 
                     for (LivingEntity potentialTarget : potentialTargets) {
                         if (!canSee(potentialTarget)) continue;
