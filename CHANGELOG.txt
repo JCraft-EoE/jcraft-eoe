@@ -2648,6 +2648,17 @@ Cream
 Made in Heaven
     >Leg Crusher now knocks down
 
+● 26/04/2024
+Vampire
+    >Updated all Heavy animations
+
+Anubis
+    >Unsheathing Attack
+        >Cooldown reduced (11->5s)
+        >Damage reduced (6->5)
+        >Added crouching variant
+    >Low Kick damage reduced (7->6)
+
 todo: combo counter is LYING
     esplash color :)
     anubis pommel IMPACT sound

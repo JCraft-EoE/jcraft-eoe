@@ -47,6 +47,12 @@ public class SunRenderer extends GeoEntityRenderer<TheSunEntity> {
         return RenderLayer.getEntityAlpha(texture);
     }
 
+    // Not inlined for sake of debugging
+    private static float lerpScale(TheSunEntity animatable, float partialTick) {
+        float scale = MathHelper.lerp(partialTick, animatable.prevScale, animatable.getScale());
+        return scale;
+    }
+
     @Override
     public void render(TheSunEntity animatable, float entityYaw, float partialTick, MatrixStack poseStack, VertexConsumerProvider bufferSource, int packedLight) {
         packedLight = 255;
@@ -54,7 +60,7 @@ public class SunRenderer extends GeoEntityRenderer<TheSunEntity> {
         setCurrentModelRenderCycle(EModelRenderCycle.INITIAL);
         poseStack.push();
 
-        float scale = MathHelper.lerp(partialTick, animatable.prevScale, animatable.getScale());
+        float scale = lerpScale(animatable, partialTick);
         poseStack.scale(scale, scale, scale);
 
         this.dispatchedMat = poseStack.peek().getPositionMatrix().copy();

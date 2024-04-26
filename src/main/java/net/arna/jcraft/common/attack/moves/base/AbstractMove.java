@@ -329,6 +329,15 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         return getThis();
     }
 
+    public T modifyFinisherTime(int tick) {
+        if (finisher == null) {
+            throw new IllegalStateException("modifyFinisherTime(" + tick + ") called without a pre-set finisher!");
+        } else {
+            finisher = IntObjectPair.of(tick, finisher.right());
+        }
+        return getThis();
+    }
+
     // Lombok does not understand these variable names already start with 'is'.
     public boolean isCrouchingVariant() {
         return isCrouchingVariant;
@@ -405,13 +414,14 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * @param attacker The attacker to tick for.
      */
     public void tick(A attacker) {
-        if (finisher != null && canFinish(attacker) && finisher.leftInt() == getDuration() - attacker.getMoveStun())
+        if (finisher != null && canFinish(attacker) && finisher.leftInt() <= getDuration() - attacker.getMoveStun())
             attacker.setCurrentMove(finisher.right());
         if (shouldPerform(attacker)) doPerform(attacker);
     }
 
     /**
      * Returns whether {@link #perform(IAttacker, LivingEntity, MoveContext)} should be called this tick.
+     * Ensures the attacker has a valid user.
      * @param attacker The attacker to check for.
      * @return Whether this move should be performed this tick.
      */

@@ -76,7 +76,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             );
     public static final MainBarrageAttack<KingCrimsonEntity> BARRAGE = new MainBarrageAttack<KingCrimsonEntity>(280,
             0, 40, 0.85f, 1f, 20, 1.5f, 0.1f, 0f, 3, Blocks.OBSIDIAN.getHardness())
-            .withFinisher(46, BARRAGE_FINISHER)
+            .withFinisher(36, BARRAGE_FINISHER)
             .withSound(JSoundRegistry.KC_BARRAGE)
             .withInfo(
                     Text.literal("Barrage"),

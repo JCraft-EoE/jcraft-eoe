@@ -5,14 +5,14 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.Getter;
 import lombok.Setter;
 import net.arna.jcraft.common.attack.core.IAttacker;
+import net.arna.jcraft.common.attack.core.MoveInputType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
-import net.arna.jcraft.common.attack.core.MoveInputType;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.base.AbstractMultiHitAttack;
-import net.arna.jcraft.common.component.living.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.component.living.CooldownsComponent;
 import net.arna.jcraft.common.network.s2c.PlayerAnimPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.CooldownType;
@@ -178,6 +178,16 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
             multiHitAttack.withHitMoments(IntSet.of(multiHitAttack.getHitMoments().intStream()
                     .map(i -> (int) (i / animationSpeed))
                     .toArray()));
+
+        var finisher = curMove.getFinisher();
+        if (finisher != null) {
+            int finisherSwapTick = (int) (finisher.leftInt() / animationSpeed);
+            curMove.modifyFinisherTime(finisherSwapTick);
+            // Ensure the finisher will happen
+            int finisherWindupTime = finisher.right().getWindup() + 1;
+            if (moveStun < finisherWindupTime)
+                moveStun = finisherWindupTime;
+        }
 
         armorPoints = move.getArmor();
 

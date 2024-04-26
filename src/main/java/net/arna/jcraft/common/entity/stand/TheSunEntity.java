@@ -244,7 +244,7 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
         freespace = "Cannot buffer moves.\n Must stay within "+ MAX_DISTANCE + " of the user, otherwise it loses size and disappears.\nGrace period of 1 second before heat field activates after summoning.\nHeat field applies Nausea > Weakness > Slowness > Burning as entities get closer.\n";
 
         auraColors = new Vec3f[]{
-                new Vec3f(1.0f, 0.8f, 4.0f),
+                new Vec3f(1.0f, 0.8f, 0.4f),
                 new Vec3f(1.0f, 1.0f, 0.0f),
                 new Vec3f(0.4f, 0.8f, 1.0f),
                 new Vec3f(0.6f, 0.1f, 0.8f)
@@ -292,17 +292,13 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
         switch (type) {
             case ULTIMATE -> {
                 boolean shrink = user.isSneaking();
-                float newScale = getScale() + (shrink ? -0.05F : 0.05F);
+                float newScale = getScale() + (shrink ? -0.05f : 0.05f);
 
-                if (!shrink) {
+                if (!shrink && newScale <= MAX_SCALE) {
                     // Distributes world collision check to minimize lag
-                    int roundScale;
-                    if (newScale <= 2)
-                        roundScale = 2;
-                    else
-                        roundScale = Math.round(newScale);
+                    int roundScale = Math.round(newScale * 1.2f);
 
-                    Box newBox = newBoundingBox(getX() + 1, getY() + 1, getZ() + 1, newScale * 1.5f);
+                    Box newBox = newBoundingBox(getX() + 1, getY() + 1, getZ() + 1, newScale * 2.0f);
                     BlockPos start = new BlockPos(newBox.minX, newBox.minY, newBox.minZ);
                     BlockPos end = new BlockPos(newBox.maxX, newBox.maxY, newBox.maxZ);
 
@@ -378,8 +374,9 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
     }
 
     @Override
-    public boolean isInvulnerableTo(DamageSource damageSource) {
-        return !damageSource.isOutOfWorld();
+    public boolean damage(DamageSource source, float amount) {
+        if (source.isFire() || source == DamageSource.IN_WALL) return false;
+        return super.damage(source, amount);
     }
 
     @Override
@@ -393,7 +390,52 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
     }
 
     @Override
+    public boolean isPushedByFluids() {
+        return false;
+    }
+
+    @Override
+    public boolean isPushable() {
+        return false;
+    }
+
+    @Override
     public void tryBlock() {}
+
+    /**
+     * Modified from {@link Entity#pushAwayFrom(Entity)}.
+     * @param entity The entity to push away.
+     */
+    @Override
+    public void pushAwayFrom(Entity entity) {
+        if (!isConnectedThroughVehicle(entity)) {
+            if (!entity.noClip && !this.noClip) {
+                double d = entity.getX() - this.getX();
+                double e = entity.getZ() - this.getZ();
+                double f = MathHelper.absMax(d, e);
+                if (f >= 0.001) {
+                    f = Math.sqrt(f);
+                    d /= f;
+                    e /= f;
+                    double g = 1.0 / f;
+                    if (g > 1.0) g = 1.0;
+
+                    d *= g;
+                    e *= g;
+                    d *= 0.1;
+                    e *= 0.1;
+
+                    if (entity.isPushable())
+                        entity.addVelocity(d, 0.0, e);
+                }
+            }
+        }
+    }
+
+    public boolean collidesWith(Entity other) {
+        return other.isCollidable() && !this.isConnectedThroughVehicle(other);
+    }
+
 
     @Override
     public void tick() {
@@ -406,11 +448,8 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
         float heatFieldSize = scale * 20.0F;
 
         if (world.isClient()) {
-            if (random.nextGaussian() <= -0.95)
-                playSound(JSoundRegistry.SUN_IDLE, 1f, 1f);
-
             Vec3d pos = randomPos();
-            Vec3d vel = JUtils.randUnitVec(random).multiply(0.2 * scale);
+            Vec3d vel = JUtils.randUnitVec(random).multiply(0.2 * scale).add(getVelocity());
             for (int i = 0; i < (int)(heatFieldSize); i++)
                 world.addParticle( getSkin() == 2 ? ParticleTypes.SOUL_FIRE_FLAME : ParticleTypes.FLAME,
                         false, pos.x, pos.y, pos.z,
@@ -451,34 +490,41 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
                 }
             }
 
-            if (age > 20 & heatFieldSize > 0) {
-                Collection<Entity> entities = world.getOtherEntities(this, getBoundingBox().expand(heatFieldSize), EntityPredicates.VALID_ENTITY);
-                for (Entity entity : entities) {
-                    double distance = entity.squaredDistanceTo(this);
-                    double exposure = 125.0 * scale;
-                    if (distance == 0)
-                        exposure *= 10;
-                    else
-                        exposure *= 1 / distance;
+            if (age > 20) {
+                if (age % 40 == 0 && random.nextDouble() >= 0.5)
+                    playSound(JSoundRegistry.SUN_IDLE, 1f, random.nextFloat());
 
-                    if (exposure > 2) {
-                        entity.setOnFireFor(2);
-                        if (exposure > 4) entity.damage(DamageSource.ON_FIRE, 1.0f);
-                    }
+                if (heatFieldSize > 0) {
+                    Collection<Entity> entities = world.getOtherEntities(this, getBoundingBox().expand(heatFieldSize), EntityPredicates.VALID_ENTITY.and(this::canSee));
+                    for (Entity entity : entities) {
+                        double distance = entity.squaredDistanceTo(this);
+                        double exposure = 125.0 * scale;
+                        if (distance == 0)
+                            exposure *= 10;
+                        else
+                            exposure *= 1 / distance;
 
-                    if (entity instanceof LivingEntity living && living.isAlive()) {
-                        if (exposure > 0.25) {
-                            living.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 10, 0, true, false));
-                            if (exposure > 0.5) {
-                                living.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 10, 0, true, false));
-                                if (exposure > 1) {
-                                    living.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 10, 0, true, false));
+                        if (exposure > 2) {
+                            if (exposure > 8)
+                                entity.damage(DamageSource.ON_FIRE, 1.5f);
+                            entity.setOnFireFor(2);
+                        }
+
+                        if (entity instanceof LivingEntity living && living.isAlive()) {
+                            if (exposure > 0.25) {
+                                living.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 10, 0, true, false));
+                                if (exposure > 0.5) {
+                                    living.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 10, 0, true, false));
+                                    if (exposure > 1) {
+                                        living.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 10, 0, true, false));
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
+
         }
 
         prevScale = getScale();
