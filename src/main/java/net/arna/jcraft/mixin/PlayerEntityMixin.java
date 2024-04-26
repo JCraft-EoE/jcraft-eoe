@@ -13,6 +13,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stat;
@@ -34,14 +35,23 @@ public abstract class PlayerEntityMixin implements IComboCounter {
     private int comboCount = 1;
     @Unique
     private LivingEntity lastAttacked;
+    @Unique
+    private boolean stunned = false;
+    @Unique
+    private int ticksSinceStun = 0;
 
     @Override
-    public LivingEntity getLastAttacked() {
+    public boolean jcraft$wasStunned() {
+        return stunned;
+    }
+
+    @Override
+    public LivingEntity jcraft$getLastAttacked() {
         return lastAttacked;
     }
 
     @Override
-    public void setLastAttacked(LivingEntity l) {
+    public void jcraft$setLastAttacked(LivingEntity l) {
         lastAttacked = l;
     }
 
@@ -60,8 +70,21 @@ public abstract class PlayerEntityMixin implements IComboCounter {
         comboCount++;
     }
 
+    @Inject(at = @At("HEAD"), method = "tick")
+    public void jcraft$playerTickHead(CallbackInfo info) {
+        if (lastAttacked == null) return;
+        StatusEffectInstance stun = lastAttacked.getStatusEffect(JStatusRegistry.DAZED);
+        boolean shouldBeStunned = stun != null && stun.getAmplifier() != 2;
+        if (shouldBeStunned) {
+            stunned = true;
+            ticksSinceStun = 0;
+        } else if (ticksSinceStun++ > 1) { // Intentional delay of 1 tick
+            stunned = false;
+        }
+    }
+
     @Inject(at = @At("TAIL"), method = "tick")
-    public void jcraft$playerTick(CallbackInfo info) {
+    public void jcraft$playerTickTail(CallbackInfo info) {
         PlayerEntity player = (PlayerEntity) (Object) this;
         if (JUtils.isAffectedByTimeStop(player)) return;
 

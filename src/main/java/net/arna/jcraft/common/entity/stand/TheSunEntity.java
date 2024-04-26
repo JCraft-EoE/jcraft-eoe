@@ -231,7 +231,7 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
         idleRotation = 0;
 
         pros = List.of(
-                "longest range coverage in the game",
+                "longest ranged coverage in the game",
                 "powerful area control"
         );
         cons = List.of(
@@ -253,6 +253,8 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
         speed = 0.5f;
 
         summonAnimDuration = 40;
+
+        setNoGravity(true);
 
         setAlphaOverride(1.0f);
     }
@@ -289,7 +291,36 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
 
         switch (type) {
             case ULTIMATE -> {
-                float newScale = getScale() + (user.isSneaking() ? -0.05F : 0.05F);
+                boolean shrink = user.isSneaking();
+                float newScale = getScale() + (shrink ? -0.05F : 0.05F);
+
+                if (!shrink) {
+                    // Distributes world collision check to minimize lag
+                    int roundScale;
+                    if (newScale <= 2)
+                        roundScale = 2;
+                    else
+                        roundScale = Math.round(newScale);
+
+                    Box newBox = newBoundingBox(getX() + 1, getY() + 1, getZ() + 1, newScale * 1.5f);
+                    BlockPos start = new BlockPos(newBox.minX, newBox.minY, newBox.minZ);
+                    BlockPos end = new BlockPos(newBox.maxX, newBox.maxY, newBox.maxZ);
+
+                    // Detect if world prevents resize
+                    for (int x = start.getX(); x < end.getX(); x += roundScale) {
+                        for (int y = start.getY(); y < end.getY(); y += roundScale) {
+                            for (int z = start.getZ(); z < end.getZ(); z += roundScale) {
+                                BlockPos blockPos = new BlockPos(x, y, z);
+                                //JCraft.createParticle((ServerWorld) world, x, y, z, JParticleType.BACK_STAB);
+                                if (world.isTopSolid(blockPos, this)) {
+                                    //JCraft.createParticle((ServerWorld) world, x, y, z, JParticleType.HIT_SPARK_3);
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+
                 dataTracker.set(SCALE, MathHelper.clamp(newScale, MIN_SCALE, MAX_SCALE));
             }
             case UTILITY -> {
@@ -352,6 +383,16 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
     }
 
     @Override
+    public boolean remoteControllable() {
+        return false;
+    }
+
+    @Override
+    public boolean handleFallDamage(float fallDistance, float damageMultiplier, DamageSource damageSource) {
+        return false;
+    }
+
+    @Override
     public void tryBlock() {}
 
     @Override
@@ -382,10 +423,8 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
             Vec3d pos = getPos();
             Vec3d userPos = user.getPos();
 
-            if (!isFree()) {
-                setFree(true);
-                setFreePos(new Vec3f(pos));
-            }
+            if (!isRemote())
+                setRemote(true);
 
             // Fly away when summoned
             if (desiredPosition == null) {
@@ -406,11 +445,9 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
                 // Go where directed
                 if (desiredPosition.squaredDistanceTo(pos) > (scale * scale * 3)) {
                     Vec3d towards = desiredPosition.subtract(pos).normalize().multiply(speed);
-                    Vec3d newPos = new Vec3d(getX() + towards.x, getY() + towards.y, getZ() + towards.z);
-                    if (!world.isTopSolid(new BlockPos(newPos), this)) {
-                        setPosition(newPos);
-                        setFreePos(new Vec3f(getPos()));
-                    }
+                    setVelocity(towards);
+                } else {
+                    setVelocity(getVelocity().multiply(0.5f));
                 }
             }
 
@@ -460,6 +497,10 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
     protected Box calculateBoundingBox() {
         double x = getX(), y = getY(), z = getZ();
         float scale = getScale() * 1.5f;
+        return newBoundingBox(x, y, z, scale);
+    }
+
+    private static Box newBoundingBox(double x, double y, double z, float scale) {
         return new Box(
                 x - scale,
                 y - scale,

@@ -112,7 +112,7 @@
   "effect.jcraft.outofbody": "Out of Body",
   "effect.jcraft.weightless": "Weightless",
   "effect.jcraft.bleeding": "Bleeding",
-  "effect.jcraft.ph_poison": "Purple Haze",
+  "effect.jcraft.phpoison": "Purple Haze",
 
   "gamerule.showHitboxes": "Show JCraft hitboxes",
   "gamerule.kingCrimsonTeleportEffect": "King Crimson's teleport displacement",

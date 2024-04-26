@@ -86,8 +86,8 @@ public class CooldownsComponentImpl implements CooldownsComponent {
 
     @Override
     public void clear(CooldownType type) {
-        cooldowns.removeInt(type);
-        initialDurations.removeInt(type);
+        cooldowns.put(type, 0);
+        initialDurations.put(type, 0);
         sync();
     }
 

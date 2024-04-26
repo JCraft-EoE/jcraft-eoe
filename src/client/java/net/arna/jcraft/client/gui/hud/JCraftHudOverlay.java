@@ -25,7 +25,7 @@ public class JCraftHudOverlay {
     private static int gaugeHeightOffset;
     private static final int gaugeHeightOffsetMax = -65;
     private static final Gauge BLOCK_GAUGE = new Gauge(0.5f, 0.5f, 1.0f, 90);
-    private static final Gauge SUN_SIZE_GAUGE = new Gauge(1.0f, 0.8f, 0.3f, 30);
+    private static final Gauge SUN_SIZE_GAUGE = new Gauge(1.0f, 0.7f, 0.4f, 30);
     private static final Gauge TIME_ACCEL_GAUGE = new Gauge(1.0f, 0.8f, 0.0f, MadeInHeavenEntity.MAXIMUM_SPEEDOMETER);
     private static final Gauge BLOODLUST_GAUGE = new Gauge(0.8f, 0.1f, 0.2f, 5);
 
@@ -45,9 +45,16 @@ public class JCraftHudOverlay {
 
         StandEntity<?, ?> stand = JUtils.getStand(player);
         if (stand != null) {
-            if (stand instanceof TheSunEntity theSun)
-                SUN_SIZE_GAUGE.render(matrixStack, gaugeX, height + gaugeHeightOffset, (int) (theSun.getScale() * 10.0F));
-            else
+            if (stand instanceof TheSunEntity theSun) {
+                float darken = (theSun.isPassive() ? 0.4f : 0.0f);
+                SUN_SIZE_GAUGE.render(matrixStack,
+                        SUN_SIZE_GAUGE.red() - darken,
+                        SUN_SIZE_GAUGE.green() - darken,
+                        SUN_SIZE_GAUGE.blue() - darken,
+                        gaugeX,
+                        height + gaugeHeightOffset,
+                        (int) (theSun.getScale() * 10.0F));
+            } else
                 BLOCK_GAUGE.render(matrixStack, gaugeX, height + gaugeHeightOffset, (int) stand.getStandGauge());
             if (stand instanceof MadeInHeavenEntity madeInHeaven && madeInHeaven.getAccelTime() > 0)
                 TIME_ACCEL_GAUGE.render(matrixStack, gaugeX, height + gaugeHeightOffset, madeInHeaven.getSpeedometer());
@@ -67,7 +74,11 @@ public class JCraftHudOverlay {
         }
 
         public void render(MatrixStack matrixStack, int x, int y, int value) {
-            RenderSystem.setShaderColor(red, green, blue, 1);
+            render(matrixStack, red, green, blue, x, y, value);
+        }
+
+        public void render(MatrixStack matrixStack, float r, float g, float b, int x, int y, int value) {
+            RenderSystem.setShaderColor(r, g, b, 1);
             RenderSystem.setShaderTexture(0, EMPTY_GAUGE);
             DrawableHelper.drawTexture(matrixStack, x, y, 0, 0, gaugeWidth, 5, gaugeWidth, 5);
             RenderSystem.setShaderTexture(0, FULL_GAUGE);

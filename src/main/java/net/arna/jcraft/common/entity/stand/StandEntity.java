@@ -909,7 +909,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                     float attackDist = move.getMoveDistance();
 
                     if (!move.isCharge()) {
-                        user.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 5, 4, true, false));
+                        if (!isRemote)
+                            user.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 5, 4, true, false));
 
                         setAttackRotationOffset();
                         setDistanceOffset(attackDist);
@@ -1057,18 +1058,17 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         IComboCounter comboCounter = (IComboCounter) playerEntity;
 
-        if (comboCounter.getLastAttacked() != victim)
+        if (comboCounter.jcraft$getLastAttacked() != victim)
             comboCounter.jcraft$setComboCount(1);
         else {
-            StatusEffectInstance stun = victim.getStatusEffect(JStatusRegistry.DAZED);
-            if (stun != null && stun.getAmplifier() != 2) //LOGGER.info("Target stun: " + stun.getDuration());
+            if (comboCounter.jcraft$wasStunned())
                 comboCounter.jcraft$incrementComboCount();
             else comboCounter.jcraft$setComboCount(1);
 
             ComboCounterPacket.send(playerEntity, comboCounter.jcraft$getComboCount(), ((IDamageScaler) victim).jcraft$getDamageScaling());
         }
 
-        comboCounter.setLastAttacked(victim);
+        comboCounter.jcraft$setLastAttacked(victim);
     }
 
     /**
@@ -1393,8 +1393,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         //JCraft.LOGGER.info("Want to block: " + wantToBlock);
         stand.wantToBlock = wantToBlock;
         if (wantToBlock) {
-            if (!stand.blocking)
-                stand.blocking = stand.canAttack() && !JCraft.isDashing(mob);
+            if (!stand.blocking && stand.canAttack() && !JCraft.isDashing(mob))
+                stand.tryBlock();
         } else {
             stand.blocking = false;
         }
@@ -1420,45 +1420,48 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             stunTicks += blockPlusTicks;
             stunTicks += JComponents.getTimeStopData(target).getTicks();
 
-            // Ensures the cooldowns are read/written to the correct entity.
-            Pair<AbstractMove<?, ?>, Boolean> selectedAttackData;
-            if (mob instanceof StandEntity<?,?> standEntity && standEntity.hasUser())
-                selectedAttackData = stand.selectAttack(
-                        JComponents.getCooldowns(standEntity.getUser()),
-                        mob, target, stunTicks, enemyMoveStun, distance, enemyStand, enemyAttack);
-            else
-                selectedAttackData = stand.selectAttack(
-                        JComponents.getCooldowns(mob),
-                        mob, target, stunTicks, enemyMoveStun, distance, enemyStand, enemyAttack);
+            // Only select or buffer attacks when necessary
+            if (stand.getMoveStun() <= 1) {
+                // Ensures the cooldowns are read/written to the correct entity.
+                Pair<AbstractMove<?, ?>, Boolean> selectedAttackData;
+                if (mob instanceof StandEntity<?, ?> standEntity && standEntity.hasUser())
+                    selectedAttackData = stand.selectAttack(
+                            JComponents.getCooldowns(standEntity.getUser()),
+                            mob, target, stunTicks, enemyMoveStun, distance, enemyStand, enemyAttack);
+                else
+                    selectedAttackData = stand.selectAttack(
+                            JComponents.getCooldowns(mob),
+                            mob, target, stunTicks, enemyMoveStun, distance, enemyStand, enemyAttack);
 
-            if (selectedAttackData != null) {
-                AbstractMove<?, ?> selectedAttack = selectedAttackData.getLeft();
+                if (selectedAttackData != null) {
+                    AbstractMove<?, ?> selectedAttack = selectedAttackData.getLeft();
 
-                if (selectedAttack != null) {
-                    boolean shouldPerformMove = stand.getMoveStun() < 1;
+                    if (selectedAttack != null) {
+                        boolean shouldPerformMove = stand.getMoveStun() < 1;
 
-                    if (stand.curMove != null && stand.curMove.getFollowup() != null)
-                        shouldPerformMove = true;
+                        if (stand.curMove != null && stand.curMove.getFollowup() != null)
+                            shouldPerformMove = true;
 
-                    mob.setSneaking(selectedAttackData.getRight());
-                    if (selectedAttack.isAerialVariant()) {
-                        mobJumpControl.setActive();
-                        mob.setOnGround(false);
+                        mob.setSneaking(selectedAttackData.getRight());
+                        if (selectedAttack.isAerialVariant()) {
+                            mobJumpControl.setActive();
+                            mob.setOnGround(false);
+                        }
+
+                        if (shouldPerformMove) {
+                            //JCraft.LOGGER.info("Stand User AI: Performing attack " + selectedAttack);
+                            if (selectedAttack.getMoveType() == null)
+                                JCraft.LOGGER.error("Attempting to use attack with unset MoveType: " + selectedAttack.getName().getString() + ", stand: " + stand);
+                            else
+                                stand.initMove(selectedAttack.getMoveType());
+                        } else
+                            stand.queueMove(MoveInputType.fromMoveType(selectedAttack.getMoveType()));
+
+                        if ( // in range (to attack)
+                                (selectedAttack instanceof AbstractSimpleAttack<?, ?> simpleAttack &&
+                                        distance < selectedAttack.getMoveDistance() + simpleAttack.getHitboxSize() * 0.75)
+                        ) entityNavigation.setSpeed(0.25);
                     }
-
-                    if (shouldPerformMove) {
-                        //JCraft.LOGGER.info("Stand User AI: Performing attack " + selectedAttack);
-                        if (selectedAttack.getMoveType() == null)
-                            JCraft.LOGGER.error("Attempting to use attack with unset MoveType: " + selectedAttack.getName().getString() + ", stand: " + stand);
-                        else
-                            stand.initMove(selectedAttack.getMoveType());
-                    } else
-                        stand.queueMove(MoveInputType.fromMoveType(selectedAttack.getMoveType()));
-
-                    if ( // in range (to attack)
-                            (selectedAttack instanceof AbstractSimpleAttack<?, ?> simpleAttack &&
-                                    distance < selectedAttack.getMoveDistance() + simpleAttack.getHitboxSize() * 0.75)
-                    ) entityNavigation.setSpeed(0.25);
                 }
             }
 
@@ -1487,7 +1490,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 mob.getMoveControl().strafeTo(fStrafe, sStrafe);
             }
 
-        } else if (stand.getMoveStun() > 4) { // if blocking & movestun > 4 means the enemy made you block
+        } else if (stand.getMoveStun() > 4) { // blocking & movestun > 4 likely means the enemy made you block
             // Don't buffer any attacks as you are minus and will DIE
             stand.queuedMove = null;
         }
@@ -1536,9 +1539,18 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         int movesOnCooldown = 0;
 
         MoveMap.Entry<E, S> lightEntry = getMoveMap().getFirstValidEntry(MoveType.LIGHT, getThis());
-        if (lightEntry == null) return null;
+        if (lightEntry == null) {
+            MoveMap.Entry<E, S> heavyEntry = getMoveMap().getFirstValidEntry(MoveType.HEAVY, getThis());
+            if (heavyEntry == null) {
+                JCraft.LOGGER.warn("Couldn't find light or heavy attack entry while running selectAttack on stand: " + this);
+                return null;
+            } else {
+                selectedAttack = heavyEntry.getMove();
+            }
+        } else {
+            selectedAttack = lightEntry.getMove();
+        }
 
-        selectedAttack = lightEntry.getMove();
         int selectedAttackInitTime = selectedAttack.getDuration() - selectedAttack.getWindup();
 
         for (AbstractMove<?, ? super E> attack : getMoveMap().asMovesList()) {

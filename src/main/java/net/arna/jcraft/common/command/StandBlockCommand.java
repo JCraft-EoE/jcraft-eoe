@@ -36,7 +36,12 @@ public class StandBlockCommand {
                 StandEntity<?, ?> stand = JComponents.getStandData(livingEntity).getStand();
 
                 if (stand == null) continue;
-                stand.blocking = block;
+                if (block) {
+                    if (stand.getMoveStun() < 1)
+                        stand.tryBlock();
+                } else {
+                    stand.tryUnblock();
+                }
                 stand.wantToBlock = block;
             }
         }

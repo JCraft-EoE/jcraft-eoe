@@ -7,6 +7,7 @@ import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.StunType;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.shared.*;
+import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
@@ -31,7 +32,19 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
     public static final PilotModeMove<PurpleHazeDistortionEntity> PILOT_MODE = new PilotModeMove<PurpleHazeDistortionEntity>(20)
             .withInfo(
                     Text.literal("Pilot Mode"),
-                    Text.empty()
+                    Text.literal("5m range")
+            );
+
+    public static final NoOpMove<PurpleHazeDistortionEntity> DISTORTION = new NoOpMove<PurpleHazeDistortionEntity>(20, 0, 0)
+            .withInitAction((attacker, user, ctx) -> attacker.nextPoisonType())
+            .withCrouchingVariant(PILOT_MODE)
+            .withInfo(
+                    Text.literal("Distortion"),
+                    Text.literal("""
+                            Toggles virus effects between:
+                            Harming - standard effect, deals damage over time
+                            Nullifying - removes status effects
+                            Debilitating - gives blindness and slowness""")
             );
 
     public static final SimpleAttack<AbstractPurpleHazeEntity<?, ?>> GRAB_HIT_FINAL = new SimpleAttack<AbstractPurpleHazeEntity<?, ?>>(0, 27,
@@ -66,7 +79,7 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
     public PurpleHazeDistortionEntity(World worldIn) {
         super(StandType.PURPLE_HAZE_DISTORTION, worldIn);
 
-        freespace = """
+        freespace += """
                 PASSIVE: 66% resistance to Purple Haze effect""";
 
         auraColors = new Vec3f[]{
@@ -92,7 +105,7 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
 
         moves.register(MoveType.ULTIMATE, FULL_RELEASE, State.FULL_RELEASE);
 
-        moves.register(MoveType.UTILITY, PILOT_MODE);
+        moves.register(MoveType.UTILITY, DISTORTION).withCrouchingVariant(CooldownType.UTILITY, null);
     }
 
     @Override

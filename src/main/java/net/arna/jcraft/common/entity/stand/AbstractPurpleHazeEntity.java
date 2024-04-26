@@ -17,6 +17,7 @@ import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.text.Text;
@@ -30,6 +31,18 @@ import static net.arna.jcraft.registry.JStatusRegistry.PHPOISON;
 
 public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHazeEntity<E, S>, S extends Enum<S> & StandAnimationState<E>> extends StandEntity<E, S>
         permits PurpleHazeDistortionEntity, PurpleHazeEntity {
+    public enum PoisonType {
+        HARMING,
+        NULLIFYING,
+        DEBILITATING;
+        static final int count = values().length;
+    }
+    protected PoisonType poisonType = PoisonType.HARMING;
+    protected void nextPoisonType() {
+        int next = this.poisonType.ordinal() + 1;
+        this.poisonType = PoisonType.values()[next % PoisonType.count];
+    }
+
     public static final KnockdownAttack<AbstractPurpleHazeEntity<?, ?>> BACKHAND_FOLLOWUP = new KnockdownAttack<AbstractPurpleHazeEntity<?, ?>>(
             0, 13, 20, 0.75f, 6f, 13, 1.75f, 0.5f, 0.35f, 25)
             .withImpactSound(JSoundRegistry.IMPACT_2)
@@ -290,8 +303,8 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
         remoteSpeed = remoteSpeed.multiply(dragMult);
 
         Vec3d userPos = getUserOrThrow().getPos();
-        if (pos.add(remoteSpeed).squaredDistanceTo(userPos) > 400)
-            remoteSpeed = userPos.subtract(pos).multiply(0.025); // 1/40th so it scales with distance
+        if (pos.add(remoteSpeed).squaredDistanceTo(userPos) > 25)
+            remoteSpeed = userPos.subtract(pos).multiply(0.05); // 1/20th so it scales with distance
 
         addVelocity(remoteSpeed.x, remoteSpeed.y, remoteSpeed.z);
         velocityDirty = true;
@@ -299,11 +312,15 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
     }
 
     public static void infect(LivingEntity target, int ticks) {
-        StatusEffectInstance instance = target.getStatusEffect(PHPOISON);
+        infect(target, ticks, PHPOISON);
+    }
+
+    public static void infect(LivingEntity target, int ticks, StatusEffect effect) {
+        StatusEffectInstance instance = target.getStatusEffect(effect);
         if (instance != null)
-            target.addStatusEffect(new StatusEffectInstance(PHPOISON, instance.getDuration() + ticks, 2));
+            target.addStatusEffect(new StatusEffectInstance(effect, instance.getDuration() + ticks, 2));
         else
-            target.addStatusEffect(new StatusEffectInstance(PHPOISON, ticks, 2));
+            target.addStatusEffect(new StatusEffectInstance(effect, ticks, 2));
     }
 
     // Attack methods
@@ -324,7 +341,7 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
     }
 
     private static void launchCapsule(AbstractPurpleHazeEntity<?, ?> attacker, LivingEntity user, MoveContext ctx, Set<LivingEntity> targets, float speed, float yaw) {
-        PHCapsuleProjectile capsule = new PHCapsuleProjectile(user, attacker.getWorld());
+        PHCapsuleProjectile capsule = new PHCapsuleProjectile(user, attacker.getWorld(), attacker.poisonType);
 
         capsule.setVelocity(user, user.getPitch(), yaw, 0.0F, speed, 0.1F);
 
@@ -336,7 +353,7 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
     }
 
     private static void groundSlam(AbstractPurpleHazeEntity<?, ?> attacker, LivingEntity user, MoveContext ctx, Set<LivingEntity> targets) {
-        PurpleHazeCloudEntity cloud = new PurpleHazeCloudEntity(attacker.getWorld(), 3.0f);
+        PurpleHazeCloudEntity cloud = new PurpleHazeCloudEntity(attacker.getWorld(), 3.0f, attacker.poisonType);
         cloud.copyPositionAndRotation(attacker);
         attacker.getWorld().spawnEntity(cloud);
     }
