@@ -35,6 +35,8 @@ public abstract class PlayerEntityMixin implements IComboCounter {
     private int comboCount = 1;
     @Unique
     private LivingEntity lastAttacked;
+
+    /*
     @Unique
     private boolean stunned = false;
     @Unique
@@ -44,6 +46,7 @@ public abstract class PlayerEntityMixin implements IComboCounter {
     public boolean jcraft$wasStunned() {
         return stunned;
     }
+     */
 
     @Override
     public LivingEntity jcraft$getLastAttacked() {
@@ -70,11 +73,13 @@ public abstract class PlayerEntityMixin implements IComboCounter {
         comboCount++;
     }
 
+    /*
     @Inject(at = @At("HEAD"), method = "tick")
     public void jcraft$playerTickHead(CallbackInfo info) {
         if (lastAttacked == null) return;
         StatusEffectInstance stun = lastAttacked.getStatusEffect(JStatusRegistry.DAZED);
         boolean shouldBeStunned = stun != null && stun.getAmplifier() != 2;
+
         if (shouldBeStunned) {
             stunned = true;
             ticksSinceStun = 0;
@@ -82,6 +87,7 @@ public abstract class PlayerEntityMixin implements IComboCounter {
             stunned = false;
         }
     }
+     */
 
     @Inject(at = @At("TAIL"), method = "tick")
     public void jcraft$playerTickTail(CallbackInfo info) {

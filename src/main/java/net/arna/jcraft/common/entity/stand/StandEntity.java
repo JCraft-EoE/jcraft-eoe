@@ -1061,7 +1061,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if (comboCounter.jcraft$getLastAttacked() != victim)
             comboCounter.jcraft$setComboCount(1);
         else {
-            if (comboCounter.jcraft$wasStunned())
+            StatusEffectInstance stun = comboCounter.jcraft$getLastAttacked().getStatusEffect(JStatusRegistry.DAZED);
+            if (stun != null && stun.getAmplifier() != 2)
                 comboCounter.jcraft$incrementComboCount();
             else comboCounter.jcraft$setComboCount(1);
 

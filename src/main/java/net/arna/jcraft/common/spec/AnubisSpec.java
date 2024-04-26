@@ -8,7 +8,6 @@ import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.anubis.Rekka3Attack;
-import net.arna.jcraft.common.attack.moves.anubis.SweepFollowupAttack;
 import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.util.CooldownType;
@@ -17,6 +16,7 @@ import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.SpecAnimationState;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JSoundRegistry;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -26,6 +26,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
@@ -78,23 +79,13 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withStaticY()
             .withInfo(Text.literal("Low Kick"), Text.literal("sheathed-only, launches slightly up"));
-
-    // Reminder that finishers don't reassign moveStun.
-    public static final SweepFollowupAttack SWEEP = new SweepFollowupAttack(0, 0, 6,
-            1f, 4f, 10, 1.25f, 0.35f, 0.3f, 35)
-            .withAction(AnubisSpec::unsheatheAttack)
-            .withImpactSound(SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP)
-            .withHitSpark(JParticleType.SWEEP_ATTACK)
-            .withInfo(Text.literal("Unsheathing Sweep (Second Hit)"), Text.literal("unsheathes Anubis"));
-
-    public static final SimpleAttack<AnubisSpec> UNSHEATHING_SWEEP = new SimpleAttack<AnubisSpec>(100, 6, 16,
-            1f, 3f, 7, 1.25f, 0.2f, 0.3f)
+    public static final SimpleMultiHitAttack<AnubisSpec> UNSHEATHING_SWEEP = new SimpleMultiHitAttack<AnubisSpec>(100, 16, 1f,
+            3f, 10, 1.25f, 0.3f, 0.3f, IntSet.of(6, 10))
             .withCondition(AnubisSpec::isHoldingSheathedAnubis)
             .withAction(AnubisSpec::tryIncrementBloodlust)
+            .withAction(AnubisSpec::unsheatheSweep)
             .withImpactSound(JSoundRegistry.IMPACT_3)
-            .withFinisher(9, SWEEP)
             .withInfo(Text.literal("Unsheating Sweep"), Text.literal("2 hits, knocks down"));
-
     public static final SimpleAttack<AnubisSpec> UNSHEATHING_ATTACK = new SimpleAttack<AnubisSpec>(100, 6, 12, 1f, 5f,
             13, 1.75f, 0.5f, 0f)
             .withCrouchingVariant(UNSHEATHING_SWEEP)
@@ -131,7 +122,7 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
         }
     }
 
-    private static void unsheatheAttack(AnubisSpec attacker, LivingEntity user, MoveContext ctx, Set<LivingEntity> targets) {
+    private static void unsheatheAttack(AnubisSpec attacker, LivingEntity user, MoveContext ctx, @Nullable Set<LivingEntity> targets) {
         if (user.getWorld() instanceof ServerWorld serverWorld) {
             if (user.getMainHandStack().isOf(JObjectRegistry.ANUBISSHEATHED)) {
                 JUtils.serverPlaySound(JSoundRegistry.ANUBIS_UNSHEATHE, serverWorld, user.getPos());
@@ -141,6 +132,19 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
                 JUtils.serverPlaySound(JSoundRegistry.ANUBIS_UNSHEATHE, serverWorld, user.getPos());
                 user.setStackInHand(Hand.OFF_HAND, new ItemStack(JObjectRegistry.ANUBIS));
             }
+        }
+    }
+
+    private static void unsheatheSweep(AnubisSpec attacker, LivingEntity user, MoveContext ctx, Set<LivingEntity> targets) {
+        int blow = UNSHEATHING_SWEEP.getBlow(attacker);
+        if (blow == 1) {
+            unsheatheAttack(attacker, user, ctx, targets);
+            targets.forEach(
+                    target -> {
+                        if (!JUtils.isBlocking(target))
+                            target.addStatusEffect(new StatusEffectInstance(JStatusRegistry.KNOCKDOWN, 35, 0));
+                    }
+            );
         }
     }
 
@@ -160,9 +164,10 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
     protected void registerMoves(MoveMap<AnubisSpec, State> moves) {
         moves.register(MoveType.HEAVY, POMMEL, CooldownType.HEAVY, State.POMMEL);
         moves.register(MoveType.SPECIAL1, SLASH, CooldownType.SPECIAL1, State.SLASH).withAerialVariant(State.AERIAL_CLEAVE);
-        moves.register(MoveType.SPECIAL1, UNSHEATHING_ATTACK, CooldownType.SPECIAL1, State.UNSHEATHING_ATTACK).withCrouchingVariant(State.UNSHEATHING_SWEEP);
+        moves.register(MoveType.SPECIAL1, UNSHEATHING_ATTACK, CooldownType.SPECIAL1, State.UNSHEATHING_ATTACK)
+                .withCrouchingVariant(State.UNSHEATHING_SWEEP);
         moves.register(MoveType.SPECIAL2, REKKA2, CooldownType.SPECIAL2, State.REKKA2);
-        moves.register(MoveType.SPECIAL3, REKKA3, CooldownType.SPECIAL3, State.REKKA3);
+        moves.register(MoveType.SPECIAL3, REKKA3, CooldownType.SPECIAL2, State.REKKA3);
         moves.register(MoveType.SPECIAL3, LOW_KICK, CooldownType.SPECIAL3, State.SWEEP);
     }
 

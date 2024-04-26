@@ -11,9 +11,8 @@ public interface IComboCounter {
 
     /**
      * @return whether the victim was stunned at the start of the tick.
-     * This is important because one cannot act during the tick stun is finishing, meaning combos and such should keep counting.
      */
-    boolean jcraft$wasStunned();
+    //boolean jcraft$wasStunned();
 
     void jcraft$setComboCount(int i);
 
