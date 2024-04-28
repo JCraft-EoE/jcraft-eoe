@@ -2652,12 +2652,32 @@ Made in Heaven
 Vampire
     >Updated all Heavy animations
 
+The Sun
+    >Collides with the world better (both for movement and scaling)
+    >Stand gauge is now darker when passive
+
 Anubis
     >Unsheathing Attack
         >Cooldown reduced (11->5s)
         >Damage reduced (6->5)
         >Added crouching variant
     >Low Kick damage reduced (7->6)
+
+● 28/04/2024
+>Purple Haze no longer cooldown cancels for you
+>Fixed certain projectile moves not working in different gravities
+
+Star Platinum
+    >Fixed Jump not working in different gravities
+    >Knee
+        >Stand distance increased (0.75->0.9m)
+        >Cooldown reduced (2->1s)
+        >Added aerial variant - Upward Knee Strike
+    >Star Finger
+        >Added crouching variant - Takedown
+
+D4C
+    >Item place windup reduced (10->7t)
 
 todo: combo counter is LYING
     esplash color :)

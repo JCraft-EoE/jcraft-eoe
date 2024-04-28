@@ -3,17 +3,13 @@ package net.arna.jcraft.common.item;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.player.SpecComponent;
 import net.arna.jcraft.common.spec.SpecType;
-import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterial;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.world.World;
@@ -28,7 +24,6 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class StoneMaskItem extends ArmorItem implements IAnimatable {
@@ -64,10 +59,9 @@ public class StoneMaskItem extends ArmorItem implements IAnimatable {
                 livingEntity.getDamageTracker().wasRecentlyAttacked() ? "animation.stone_mask.clench" : "animation.stone_mask.dormant", ILoopType.EDefaultLoopTypes.LOOP));
         return PlayState.CONTINUE;
     }
-    @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     public void registerControllers(AnimationData data) {
-        data.addAnimationController(new AnimationController(this, "controller", 5, this::predicate));
+        data.addAnimationController(new AnimationController<>(this, "controller", 5, this::predicate));
     }
     @Override
     public AnimationFactory getFactory() {

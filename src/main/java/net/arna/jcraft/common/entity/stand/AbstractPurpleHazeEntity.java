@@ -9,6 +9,7 @@ import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.entity.PurpleHazeCloudEntity;
 import net.arna.jcraft.common.entity.projectile.PHCapsuleProjectile;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.MobilityType;
@@ -21,6 +22,8 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -111,8 +114,9 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
             .withAction(
                     (attacker, user, ctx, targets) -> {
                         LivingEntity shooter = (attacker.isRemote() && !attacker.remoteControllable()) ? attacker : user;
+                        Direction gravity = GravityChangerAPI.getGravityDirection(shooter);
                         for (int i = 0; i < 3; i++)
-                            launchCapsule(attacker, shooter, ctx, targets, 0.4F, shooter.getYaw() - 45F + i * 45F);
+                            launchCapsule(attacker, shooter, gravity, 0.4F, shooter.getYaw() - 45F + i * 45F);
                     }
             )
             .withInfo(
@@ -128,7 +132,7 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
             .withAction(
                     (attacker, user, ctx, targets) -> {
                         LivingEntity shooter = (attacker.isRemote() && !attacker.remoteControllable()) ? attacker : user;
-                        launchCapsule(attacker, shooter, ctx, targets, 0.8F, shooter.getYaw());
+                        launchCapsule(attacker, shooter, GravityChangerAPI.getGravityDirection(shooter), 0.8F, shooter.getYaw());
                     }
             )
             .withInfo(
@@ -331,19 +335,22 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
 
     private static void performUlt(AbstractPurpleHazeEntity<?, ?> attacker, LivingEntity user, MoveContext ctx, Set<LivingEntity> targets) {
         float baseYaw = user.getYaw();
+        Direction gravity = GravityChangerAPI.getGravityDirection(attacker);
 
         if (attacker.getMoveStun() == 6)
             baseYaw += 60.0F;
 
         for (int i = 0; i < 3; i++) {
-            launchCapsule(attacker, user, ctx, targets, 0.6F, baseYaw + i * 120.0F);
+            launchCapsule(attacker, user, gravity, 0.6F, baseYaw + i * 120.0F);
         }
     }
 
-    private static void launchCapsule(AbstractPurpleHazeEntity<?, ?> attacker, LivingEntity user, MoveContext ctx, Set<LivingEntity> targets, float speed, float yaw) {
+    private static void launchCapsule(AbstractPurpleHazeEntity<?, ?> attacker, LivingEntity user, Direction gravity, float speed, float yaw) {
         PHCapsuleProjectile capsule = new PHCapsuleProjectile(user, attacker.getWorld(), attacker.poisonType);
 
-        capsule.setVelocity(user, user.getPitch(), yaw, 0.0F, speed, 0.1F);
+        Vec2f corrected = RotationUtil.rotPlayerToWorld(yaw, user.getPitch(), gravity);
+        // Y,P to P,Y,R
+        JUtils.shoot(capsule, user, corrected.y, corrected.x, 0.0F, speed, 0.1F);
 
         Vec3d upVec = GravityChangerAPI.getEyeOffset(attacker.getUserOrThrow());
         Vec3d heightOffset = upVec.multiply(0.5);

@@ -5,7 +5,12 @@ import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.moves.base.AbstractSimpleAttack;
 import net.arna.jcraft.common.entity.projectile.WSAcidProjectile;
 import net.arna.jcraft.common.entity.stand.WhiteSnakeEntity;
+import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.gravity.util.RotationUtil;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec2f;
 
 import java.util.Set;
 
@@ -20,9 +25,13 @@ public class ChargedSpewAttack extends AbstractSimpleAttack<ChargedSpewAttack, W
     public @NonNull Set<LivingEntity> perform(WhiteSnakeEntity attacker, LivingEntity user, MoveContext ctx) {
         Set<LivingEntity> targets = super.perform(attacker, user, ctx);
 
+        Direction gravity = GravityChangerAPI.getGravityDirection(user);
         for (int i = 0; i < 5; i++) {
             WSAcidProjectile acidProjectile = new WSAcidProjectile(attacker.getWorld(), user);
-            acidProjectile.setVelocity(user, user.getPitch(), user.getYaw() - 75F + i * 37.5F, 0, 0.66F, 0);
+
+            Vec2f corrected = RotationUtil.rotPlayerToWorld(user.getYaw() - 75F + i * 37.5F, user.getPitch(), gravity);
+            JUtils.shoot(acidProjectile, user, corrected.y, corrected.x, 0, 0.66F, 0);
+
             acidProjectile.setPosition(attacker.getEyePos());
             attacker.getWorld().spawnEntity(acidProjectile);
         }

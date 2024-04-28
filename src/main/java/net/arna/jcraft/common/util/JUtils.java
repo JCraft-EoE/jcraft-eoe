@@ -526,4 +526,25 @@ public final class JUtils {
                 (spec = JUtils.getSpec(player)) != null && spec.canHoldMove(type) ||
                 type.isHoldable();
     }
+
+    /**
+     * Shoots a projectile without interference from GravityAPI.
+     * @param projectile
+     * @param shooter Entity this projectile inherits velocity from
+     * @param pitch in degrees
+     * @param yaw in degrees
+     * @param roll in degrees
+     * @param speed in meters per tick
+     * @param divergence Spread, done via a {@link Vec3d} of {@link net.minecraft.util.math.random.Random#nextTriangular(double, double)} calls
+     */
+    public static void shoot(@NotNull ProjectileEntity projectile, @Nullable Entity shooter, float pitch, float yaw, float roll, float speed, float divergence) {
+        float f = -MathHelper.sin(yaw * RAD_TO_DEG) * MathHelper.cos(pitch * RAD_TO_DEG);
+        float g = -MathHelper.sin((pitch + roll) * RAD_TO_DEG);
+        float h = MathHelper.cos(yaw * RAD_TO_DEG) * MathHelper.cos(pitch * RAD_TO_DEG);
+        projectile.setVelocity(f, g, h, speed, divergence);
+        if (shooter != null) {
+            Vec3d vec3d = shooter.getVelocity();
+            projectile.setVelocity(projectile.getVelocity().add(vec3d.x, shooter.isOnGround() ? 0.0 : vec3d.y, vec3d.z));
+        }
+    }
 }

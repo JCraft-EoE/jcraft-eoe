@@ -21,9 +21,10 @@ public class DIOArmorItem extends ArmorItem implements IAnimatable {
 
     @SuppressWarnings("SameReturnValue")
     private <P extends IAnimatable> PlayState predicate(AnimationEvent<P> event) { return PlayState.STOP; }
-    @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
-    public void registerControllers(AnimationData data) { data.addAnimationController(new AnimationController(this, "controller", 20, this::predicate)); }
+    public void registerControllers(AnimationData data) {
+        data.addAnimationController(new AnimationController<>(this, "controller", 20, this::predicate));
+    }
     @Override
     public AnimationFactory getFactory() {
         return this.factory;

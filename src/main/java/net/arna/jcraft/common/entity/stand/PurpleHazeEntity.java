@@ -9,10 +9,13 @@ import net.arna.jcraft.common.attack.core.StunType;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.util.JParticleType;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
+import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.projectile.ProjectileEntity;
@@ -85,7 +88,7 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                 Purple Haze has a chance to target it's own user which increases with rage.""";
 
         auraColors = new Vec3f[]{
-                new Vec3f(0.8f, 0.2f, 1.0f),
+                new Vec3f(0.3f, 1.0f, 0.6f),
                 new Vec3f(1.0f, 0.2f, 0.6f),
                 new Vec3f(1.0f, 1.0f, 1.0f),
                 new Vec3f(0.5f, 0.3f, 1.0f)
@@ -231,8 +234,13 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                         break;
                     }
                 } else {
+                    double speed = getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED);
+                    // user is not null (see above)
+                    if (user.hasStatusEffect(JStatusRegistry.DAZED))
+                        speed = user.getMovementSpeed();
                     if (age % 4 == 0) // Pathfinding is expensive
-                        navigation.startMovingTo(target, 0.5);
+                        navigation.startMovingTo(target, speed);
+
                     standUserAI(this, target, this);
                 }
 
@@ -247,11 +255,16 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
 
     @Override
     protected void tickRemoteState(double f, double s, boolean dashing) {
-        if (getState() == State.IDLE) { // Replace idle anim
-            if (s > 0) setStateNoReset(dashing ? State.RIGHT : State.RIGHT_DASH);
-            if (s < 0) setStateNoReset(dashing ? State.LEFT : State.LEFT_DASH);
-            if (f < 0) setStateNoReset(dashing ? State.BACKWARD : State.BACKWARD_DASH);
-            if (f > 0) setStateNoReset(dashing ? State.FORWARD : State.FORWARD_DASH);
+        LivingEntity user = getUserOrThrow();
+        if (getState() == State.IDLE) {
+            if (JUtils.canAct(user)) {
+                if (s > 0) setStateNoReset(dashing ? State.RIGHT : State.RIGHT_DASH);
+                if (s < 0) setStateNoReset(dashing ? State.LEFT : State.LEFT_DASH);
+                if (f < 0) setStateNoReset(dashing ? State.BACKWARD : State.BACKWARD_DASH);
+                if (f > 0) setStateNoReset(dashing ? State.FORWARD : State.FORWARD_DASH);
+            } else {
+                setStateNoReset(State.HURT);
+            }
         }
     }
 
@@ -285,6 +298,7 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
         BACKHAND(builder -> builder.playAndHold("animation.purple_haze.backhand")),
         BACKHAND_FOLLOWUP(builder -> builder.playAndHold("animation.purple_haze.backhand_followup")),
         LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.purple_haze.light_followup")),
+        HURT(builder -> builder.playAndHold("animation.purple_haze.hurt")),
 
         FORWARD(builder -> builder.loop("animation.purple_haze.forw")),
         BACKWARD(builder -> builder.loop("animation.purple_haze.back")),

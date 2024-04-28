@@ -340,7 +340,10 @@ public interface JEntityTypeRegistry {
         FabricDefaultAttributeRegistry.register(THE_FOOL, TheFoolEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(HIEROPHANT_GREEN, HGEntity.createMobAttributes());
         FabricDefaultAttributeRegistry.register(THE_SUN, TheSunEntity.createMobAttributes());
-        FabricDefaultAttributeRegistry.register(PURPLE_HAZE, AbstractPurpleHazeEntity.createMobAttributes());
+        FabricDefaultAttributeRegistry.register(PURPLE_HAZE, AbstractPurpleHazeEntity
+                .createMobAttributes()
+                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.5)
+        );
         FabricDefaultAttributeRegistry.register(PURPLE_HAZE_DISTORTION, AbstractPurpleHazeEntity.createMobAttributes());
 
         FabricDefaultAttributeRegistry.register(GOLD_EXPERIENCE, GoldExperienceEntity.createMobAttributes());

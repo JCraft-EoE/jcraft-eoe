@@ -1650,7 +1650,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             }
         }
 
-        if (movesOnCooldown > 5) cooldowns.cooldownCancel(); // >5 = 80+%
+        if (movesOnCooldown > 5 && !(mob instanceof StandEntity<?,?>)) cooldowns.cooldownCancel(); // >5 = 80+%
 
         if (doFinalChecks) {
             if (selectedAttack.isCounter()) {

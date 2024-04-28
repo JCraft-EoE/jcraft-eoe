@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
-    public static final ItemPlaceMove ITEM_PLACE = new ItemPlaceMove(JCraft.LIGHT_COOLDOWN, 11, 15, 0.75f)
+    public static final ItemPlaceMove ITEM_PLACE = new ItemPlaceMove(JCraft.LIGHT_COOLDOWN, 8, 12, 0.75f)
             .withAnim(State.ITEM_PLACE)
             .withInfo(
                     Text.literal("Item Place"),

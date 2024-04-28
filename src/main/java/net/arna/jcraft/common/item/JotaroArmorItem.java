@@ -27,10 +27,9 @@ public class JotaroArmorItem extends ArmorItem implements IAnimatable {
         return PlayState.CONTINUE;
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     public void registerControllers(AnimationData data) {
-        data.addAnimationController(new AnimationController(this, "controller", 10, this::predicate));
+        data.addAnimationController(new AnimationController<>(this, "controller", 10, this::predicate));
     }
 
     @Override

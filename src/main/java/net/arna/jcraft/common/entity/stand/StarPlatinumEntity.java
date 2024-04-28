@@ -1,11 +1,11 @@
 package net.arna.jcraft.common.entity.stand;
 
 import lombok.NonNull;
+import net.arna.jcraft.common.attack.core.BlockableType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.shared.*;
-import net.arna.jcraft.common.attack.moves.shared.ChargeBarrageAttack;
 import net.arna.jcraft.common.attack.moves.starplatinum.InhaleAttack;
 import net.arna.jcraft.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.common.util.JParticleType;
@@ -63,8 +63,29 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
                     Text.literal("Barrage"),
                     Text.literal("fast reliable combo starter/extender, high stun")
             );
+    public static final KnockdownAttack<StarPlatinumEntity> GRAB_HIT = new KnockdownAttack<StarPlatinumEntity>(0,
+            10, 20, 1f, 6f, 15, 1.75f, 0.4f, 0f, 35)
+            .withSound(JSoundRegistry.SPTW_UPPERCUT)
+            .withImpactSound(JSoundRegistry.IMPACT_6)
+            .withHyperArmor()
+            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withInfo(
+                    Text.literal("Takedown (hit)"),
+                    Text.empty()
+            );
+    public static final GrabAttack<StarPlatinumEntity, StarPlatinumEntity.State> GRAB = new GrabAttack<>(280, 8, 20,
+            1f, 2f, 20, 1.5f, 0.1f, 0f, GRAB_HIT, State.GRAB_HIT, 11, 0.3)
+            .withSound(JSoundRegistry.SPTW_GRAB)
+            .withImpactSound(JSoundRegistry.SPTW_GRABHIT)
+            .withHitAnimation(null)
+            .withBlockableType(BlockableType.BLOCKABLE)
+            .withInfo(
+                    Text.literal("Takedown"),
+                    Text.literal("blockable grab, knocks down")
+            );
     public static final SimpleAttack<StarPlatinumEntity> STAR_FINGER = new SimpleAttack<StarPlatinumEntity>(200,
             12, 20, 0.75f, 5f, 30, 1.75f, -0.4f, -0.25f)
+            .withCrouchingVariant(GRAB)
             .withSound(JSoundRegistry.STAR_FINGER)
             .withBlockStun(5)
             .withExtraHitBox(2, 0.1, 1)
@@ -72,8 +93,18 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
                     Text.literal("Star Finger"),
                     Text.literal("medium windup, combo starter/extender")
             );
-    public static final SimpleAttack<StarPlatinumEntity> KNEE = new SimpleAttack<StarPlatinumEntity>(40,
-            7, 12, 0.75f, 6f, 9, 1.5f, 0.3f, 0f)
+    public static final UppercutAttack<StarPlatinumEntity> KNEE_UP = new UppercutAttack<StarPlatinumEntity>(30,
+            8, 14, 0.75f, 4f, 13, 1.6f, 0.2f, -0.4f, 0.5f)
+            .withSound(JSoundRegistry.STAR_PLATINUM_KNEE)
+            .withImpactSound(JSoundRegistry.IMPACT_6)
+            .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
+            .withInfo(
+                    Text.literal("Upward Knee"),
+                    Text.literal("launches upward, larger and higher hitbox, higher stun")
+            );
+    public static final SimpleAttack<StarPlatinumEntity> KNEE = new SimpleAttack<StarPlatinumEntity>(20,
+            7, 12, 0.9f, 6f, 9, 1.5f, 0.3f, 0f)
+            .withAerialVariant(KNEE_UP)
             .withSound(JSoundRegistry.STAR_PLATINUM_KNEE)
             .withImpactSound(JSoundRegistry.IMPACT_6)
             .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
@@ -134,8 +165,8 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
         moves.register(MoveType.HEAVY, STAR_BREAKER, State.HEAVY).withCrouchingVariant(State.GROUND_BREAKER);
         moves.register(MoveType.BARRAGE, BARRAGE, State.BARRAGE);
 
-        moves.register(MoveType.SPECIAL1, STAR_FINGER, State.STAR_FINGER);
-        moves.register(MoveType.SPECIAL2, KNEE, State.KNEE);
+        moves.register(MoveType.SPECIAL1, STAR_FINGER, State.STAR_FINGER).withCrouchingVariant(State.GRAB);
+        moves.register(MoveType.SPECIAL2, KNEE, State.KNEE).withAerialVariant(State.KNEE_UP);
         moves.register(MoveType.SPECIAL3, CHARGE_BARRAGE, State.BARRAGE).withCrouchingVariant(State.BARRAGE);
         moves.register(MoveType.ULTIMATE, INHALE, State.INHALE);
 
@@ -194,7 +225,11 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
         STAR_FINGER(builder -> builder.playAndHold("animation.starplatinum.star_finger")),
         INHALE(builder -> builder.playAndHold("animation.starplatinum.inhale")),
         KNEE(builder -> builder.playAndHold("animation.starplatinum.knee")),
+        KNEE_UP(builder -> builder.playAndHold("animation.starplatinum.knee_up")),
         JUMP(builder -> builder.playAndHold("animation.starplatinum.jump")),
+        GRAB(builder -> builder.playAndHold("animation.starplatinum.grab")),
+        GRAB_HIT(builder -> builder.playAndHold("animation.starplatinum.grabhit")),
+
         UPPERCUT(builder -> builder.playAndHold("animation.starplatinum.uppercut")),
         LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.starplatinum.light_followup"));
 
