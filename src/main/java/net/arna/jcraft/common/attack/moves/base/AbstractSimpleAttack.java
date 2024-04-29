@@ -361,7 +361,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
     /**
      * Finds all valid targets that can be damaged with the given damage source
      * by the given attacker, contained in the given boxes.
-     * Also maps all attackers found to their user. I.e. redirecting damage done to attackers to their users.
+     * Also maps all attackers found to their user. I.e., redirecting damage done to attackers to their users.
      * @param attacker The attacker that will be doing the damage
      * @param boxes The boxes to check in
      * @param damageSource The damage source to check for
@@ -374,7 +374,23 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
     /**
      * Finds all valid targets that can be damaged with the given damage source
      * by the given attacker, contained in the given boxes.
-     * Also maps all attackers found to their user. I.e., redirecting damage done to stands to their users.
+     * Also maps all attackers found to their user. I.e., redirecting damage done to attackers to their users.
+     * @param attacker The attacker that will be doing the damage
+     * @param boxes The boxes to check in
+     * @param damageSource The damage source to check for
+     * @param mayHitUser Whether the user of the attacker can be hit
+     * @return All found valid targets
+     */
+    public static Set<LivingEntity> findHits(IAttacker<?, ?> attacker, Set<Box> boxes, @Nullable DamageSource damageSource,
+                                             boolean mayHitUser) {
+        return findHits(attacker, boxes, damageSource, LivingEntity.class, mayHitUser);
+    }
+
+    /**
+     * Finds all valid targets that can be damaged with the given damage source
+     * by the given attacker, contained in the given boxes.
+     * Also maps all attackers found to their user.
+     * I.e., redirecting damage done to stands to their users.
      * @param attacker The attacker that will be doing the damage
      * @param boxes The boxes to check in
      * @param damageSource The damage source to check for
@@ -382,14 +398,30 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
      * @return All found valid targets
      */
     public static <T extends Entity> @NonNull Set<T> findHits(IAttacker<?, ?> attacker, @NonNull Set<Box> boxes,
-                                                     @Nullable DamageSource damageSource, Class<T> type) {
+                                                              @Nullable DamageSource damageSource, Class<T> type) {
+        return findHits(attacker, boxes, damageSource, type, false);
+    }
+
+    /**
+     * Finds all valid targets that can be damaged with the given damage source
+     * by the given attacker, contained in the given boxes.
+     * Also maps all attackers found to their user. I.e., redirecting damage done to stands to their users.
+     * @param attacker The attacker that will be doing the damage
+     * @param boxes The boxes to check in
+     * @param damageSource The damage source to check for
+     * @param type The type of entities to look for
+     * @param mayHitUser Whether the user of the attacker can be hit
+     * @return All found valid targets
+     */
+    public static <T extends Entity> @NonNull Set<T> findHits(IAttacker<?, ?> attacker, @NonNull Set<Box> boxes,
+                                                     @Nullable DamageSource damageSource, Class<T> type, boolean mayHitUser) {
         LivingEntity user = attacker.getUser();
         return boxes.stream()
                 .flatMap(box -> attacker.getEntityWorld().getEntitiesByClass(type, box, EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(e ->
                         e != attacker
-                            && e != user
+                            && (mayHitUser || e != user
                             && e != user.getVehicle()
-                            && e != JUtils.getStand(user)
+                            && e != JUtils.getStand(user))
                         )
                 ).stream())
                 .flatMap(e -> e instanceof StandEntity<?,?> hitStand && hitStand.hasUser() &&
@@ -468,7 +500,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
     protected final Set<LivingEntity> attackBoxes(A attacker, Set<Box> boxes, DamageSource damageSource, Vec3d center) {
         JUtils.displayHitboxes(attacker.getEntityWorld(), boxes);
 
-        Set<LivingEntity> targets = findHits(attacker, boxes, damageSource);
+        Set<LivingEntity> targets = findHits(attacker, boxes, damageSource, mayHitUser);
         if (targets.isEmpty()) return Set.of();
 
         ServerWorld serverWorld = (ServerWorld) attacker.getEntityWorld();
