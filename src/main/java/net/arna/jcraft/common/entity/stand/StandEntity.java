@@ -78,7 +78,7 @@ import static net.arna.jcraft.JCraft.comboBreak;
 import static net.minecraft.command.argument.EntityAnchorArgumentType.EntityAnchor;
 
 public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S> & StandAnimationState<E>>
-        extends MobEntity implements IAnimatable, IAnimationTickable, IAttacker<E, S> {
+        extends MobEntity implements IAnimatable, IAnimationTickable, IAttacker<E, S>, ICustomDamageHandler {
 
     // TODO: finish custom player idle poses for all stands
 
@@ -544,6 +544,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * @return whether the stand should be able to attack
      */
     public boolean canAttack() {
+        if (isRemote() && hasStatusEffect(JStatusRegistry.DAZED))
+            return false;
         return hasUser() && getMoveStun() <= 0 && !JUtils.isAffectedByTimeStop(user) && !getUserOrThrow().hasStatusEffect(JStatusRegistry.DAZED);
     }
 
@@ -1295,7 +1297,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     @Override
     public boolean isInvulnerableTo(DamageSource damageSource) {
-        return !damageSource.isOutOfWorld() || damageSource.getAttacker() == this;
+        if (damageSource.getAttacker() == this) return true;
+        // Non-remote stands redirect damage within the AbstractSimpleAttack targetting filters.
+        // Remote stands take normal damage, then redirect it within this classes damage() method.
+        return !isRemote() && !damageSource.isOutOfWorld();
     }
 
     @Override
@@ -1707,6 +1712,54 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     public boolean isSilent() {
         // Make stands silent if their users are.
         return super.isSilent() || (user != null && user.isSilent());
+    }
+
+    @Override
+    public boolean reflectsDamage() {
+        return false;
+    }
+
+    /**
+     * Redirects damage from the stand to its user.
+     * @return whether the damage logic should proceed in harming the stand itself
+     */
+    @Override
+    public boolean handleDamage(Vec3d kbVec, int stunTicks, int stunLevel, boolean overrideStun, float damage, boolean lift, int blockstun, DamageSource source, Entity attacker, HitPropertyComponent.HitAnimation hitAnimation, boolean canBackstab, boolean unblockable) {
+        if (hasUser()) {
+            boolean hit = true;
+
+            // Remote stands can only block for themselves
+            if (isRemote()) {
+                if (blocking) {
+                    boolean backstabbed = false;
+                    if (attacker != null) {
+                        double delta = Math.abs((headYaw + 90.0f) % 360.0f - (attacker.getHeadYaw() + 90.0f) % 360.0f);
+                        if (canBackstab && (360.0 - delta % 360.0 < 45 || delta % 360.0 < 45) && squaredDistanceTo(attacker.getPos()) >= 1.5625) { // Backstab logic
+                            JCraft.createParticle((ServerWorld) attacker.getWorld(), getX(), attacker.getEyeY(), getZ(), JParticleType.BACK_STAB);
+                            playSound(JSoundRegistry.BACKSTAB, 1, 1);
+                            blocking = false;
+                            overrideStun = true;
+                            backstabbed = true;
+                        }
+                    }
+
+                    if (!backstabbed && !unblockable) { // Didn't backstab, not unblockable
+                        setMoveStun(blockstun);
+                        setStandGauge(getStandGauge() - 2 * damage);
+                        playSound(JSoundRegistry.STAND_BLOCK, 1, 1);
+                        hit = false;
+                        overrideStun = false;
+                    } else blocking = false;
+
+                    if (!backstabbed) hit = false;
+                } else {
+                    setStandGauge(getStandGauge() - damage * 2);
+                }
+            }
+
+            if (hit) damageLogic(world, user, kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, hitAnimation, canBackstab, unblockable);
+        }
+        return false;
     }
 
     /**

@@ -424,7 +424,9 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
                             && e != JUtils.getStand(user))
                         )
                 ).stream())
-                .flatMap(e -> e instanceof StandEntity<?,?> hitStand && hitStand.hasUser() &&
+                .flatMap(e -> e instanceof StandEntity<?,?> hitStand &&
+                        !hitStand.isRemote() &&
+                        hitStand.hasUser() &&
                         type.isInstance(hitStand.getUserOrThrow()) ? Stream.of(e, type.cast(hitStand.getUserOrThrow())) : Stream.of(e))
                 .filter(damageSource == null ? e -> true : e -> JUtils.canDamage(damageSource, e)) // This must be done after the previous flatmap call as it excludes stands.
                 .collect(Collectors.toSet());

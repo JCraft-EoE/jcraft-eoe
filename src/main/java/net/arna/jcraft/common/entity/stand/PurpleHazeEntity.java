@@ -88,8 +88,8 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                 Purple Haze has a chance to target it's own user which increases with rage.""";
 
         auraColors = new Vec3f[]{
-                new Vec3f(0.3f, 1.0f, 0.6f),
                 new Vec3f(1.0f, 0.2f, 0.6f),
+                new Vec3f(0.3f, 1.0f, 0.6f),
                 new Vec3f(1.0f, 1.0f, 1.0f),
                 new Vec3f(0.5f, 0.3f, 1.0f)
         };
@@ -207,7 +207,7 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                     List<LivingEntity> potentialTargets = world.getEntitiesByClass(
                             LivingEntity.class,
                             getBoundingBox().expand(64.0),
-                            EntityPredicates.VALID_LIVING_ENTITY.and(EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR));
+                            EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(EntityPredicates.VALID_LIVING_ENTITY));
                     potentialTargets.remove(this);
 
                     Comparator<Entity> distanceComparator = (entity1, entity2) -> {

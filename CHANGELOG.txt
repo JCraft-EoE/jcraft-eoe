@@ -2664,7 +2664,6 @@ Anubis
     >Low Kick damage reduced (7->6)
 
 ● 28/04/2024
->Purple Haze no longer cooldown cancels for you
 >Fixed certain projectile moves not working in different gravities
 
 Star Platinum
@@ -2678,6 +2677,13 @@ Star Platinum
 
 D4C
     >Item place windup reduced (10->7t)
+
+Purple Haze
+    >no longer cooldown cancels for you
+    >is stopped by stun
+
+● 29/04/2024
+>Fixed remote stand blocking bugs
 
 todo: combo counter is LYING
     esplash color :)
