@@ -23,6 +23,7 @@ public class JLootTableProviders {
         @Override
         protected void generateBlockLootTables() {
             addDrop(JObjectRegistry.METEORITE_BLOCK);
+            addDrop(JObjectRegistry.METEORITE_IRON_ORE_BLOCK);
         }
     }
 

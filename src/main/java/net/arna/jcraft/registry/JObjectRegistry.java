@@ -109,6 +109,11 @@ public interface JObjectRegistry {
             .strength(6.0f, 1200f)
             .sounds(BlockSoundGroup.ANCIENT_DEBRIS)
     ), settings(), true);
+    Block METEORITE_IRON_ORE_BLOCK = register("meteorite_iron_ore_block", new Block(FabricBlockSettings.of(Material.STONE, MapColor.SPRUCE_BROWN)
+            .requiresTool()
+            .strength(9.0f, 1200f)
+            .sounds(BlockSoundGroup.ANCIENT_DEBRIS)
+    ), settings(), true);
     Block COFFIN_BLOCK = register("coffin", new CoffinBlock(FabricBlockSettings.of(Material.WOOD, MapColor.RED).sounds(BlockSoundGroup.WOOD).nonOpaque()), settings(), true);
     Block SHADER_TEST_BLOCK = register("shader_test_block", new ShaderTestBlock(FabricBlockSettings.of(Material.METAL)), settings(), true);
 

@@ -198,6 +198,7 @@ public class JCraft implements ModInitializer {
         stacks.add(new ItemStack(JObjectRegistry.SINNERSSOUL));
         stacks.add(new ItemStack(JObjectRegistry.SOUL_BLOCK.asItem()));
         stacks.add(new ItemStack(JObjectRegistry.METEORITE_BLOCK.asItem()));
+        stacks.add(new ItemStack(JObjectRegistry.METEORITE_IRON_ORE_BLOCK.asItem()));
         stacks.add(new ItemStack(JObjectRegistry.GREENBABY));
         stacks.add(new ItemStack(JObjectRegistry.DIOSDIARY));
 
