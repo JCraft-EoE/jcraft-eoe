@@ -74,7 +74,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
                     Text.empty()
             );
     public static final GrabAttack<StarPlatinumEntity, StarPlatinumEntity.State> GRAB = new GrabAttack<>(280, 8, 20,
-            1f, 2f, 20, 1.5f, 0.1f, 0f, GRAB_HIT, State.GRAB_HIT, 11, 0.3)
+            1f, 2f, 20, 1.5f, 0.1f, 0f, GRAB_HIT, State.GRAB_HIT, 11, 0.8)
             .withSound(JSoundRegistry.SPTW_GRAB)
             .withImpactSound(JSoundRegistry.SPTW_GRABHIT)
             .withHitAnimation(null)

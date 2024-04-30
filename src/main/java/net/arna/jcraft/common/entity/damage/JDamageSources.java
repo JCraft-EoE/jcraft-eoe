@@ -8,8 +8,20 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 public class JDamageSources {
-    public static @NotNull DamageSource stand(StandEntity<?, ?> stand) {
-        return new EntityDamageSource("stand", stand.getUser()).setBypassesArmor();
+    public static class StandDamageSource extends EntityDamageSource {
+        final StandEntity<?, ?> stand;
+        public StandDamageSource(@NotNull StandEntity<?, ?> stand) {
+            super("stand", stand.getUser());
+            this.stand = stand;
+        }
+
+        @Override
+        public boolean bypassesArmor() {
+            return true;
+        }
+    }
+    public static @NotNull StandDamageSource stand(StandEntity<?, ?> stand) {
+        return new StandDamageSource(stand);
     }
 
     @Contract(value = "_ -> new", pure = true)

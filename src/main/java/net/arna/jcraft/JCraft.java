@@ -20,6 +20,7 @@ import net.arna.jcraft.common.network.RemoteStandInteractPacket;
 import net.arna.jcraft.common.network.c2s.*;
 import net.arna.jcraft.common.network.s2c.*;
 import net.arna.jcraft.common.spec.JSpec;
+import net.arna.jcraft.common.tickable.JEnemies;
 import net.arna.jcraft.common.tickable.PastDimensions;
 import net.arna.jcraft.common.tickable.Timestops;
 import net.arna.jcraft.common.util.*;
@@ -35,6 +36,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
@@ -336,9 +338,13 @@ public class JCraft implements ModInitializer {
         stand.startRiding(user);
         stand.setUser(user);
 
-        if (user instanceof ServerPlayerEntity player && JUtils.canAct(user) && StandBlockPacket.isBlocking(player)) {
-            stand.wantToBlock = true;
-            stand.tryBlock();
+        if (user instanceof ServerPlayerEntity player) {
+            if (JUtils.canAct(user) && StandBlockPacket.isBlocking(player)) {
+                stand.wantToBlock = true;
+                stand.tryBlock();
+            }
+        } else if (user instanceof MobEntity mob) {
+            JEnemies.add(mob);
         }
 
         world.spawnEntity(stand);
