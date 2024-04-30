@@ -1,9 +1,9 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "GGI",
+    "NGI",
     "GIG",
-    " GG"
+    " GN"
   ],
   "key": {
     "G": {
@@ -11,10 +11,13 @@
     },
     "I": {
       "item": "jcraft:stellar_iron_ingot"
+    },
+    "N": {
+      "item": "minecraft:gold_nugget"
     }
   },
   "result": {
     "item": "jcraft:stand_arrowhead",
-    "count": 4
+    "count": 3
   }
 }
