@@ -104,7 +104,6 @@ public interface JObjectRegistry {
             .strength(4.0f)
             .sounds(BlockSoundGroup.SOUL_SOIL)
     ), settings(), true);
-    //todo: make the meteorite mineable and drop the item
     Block METEORITE_BLOCK = register("meteorite_block", new Block(FabricBlockSettings.of(Material.STONE, MapColor.SPRUCE_BROWN)
             .requiresTool()
             .strength(6.0f, 1200f)
