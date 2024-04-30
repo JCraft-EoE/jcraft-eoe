@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "jcraft:stand_arrow"
+    ]
+  },
+  "criteria": {
+    "has_arrowhead": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["jcraft:stand_arrowhead"]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "jcraft:stand_arrow"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_arrowhead",
+      "has_the_recipe"
+    ]
+  ]
+}
