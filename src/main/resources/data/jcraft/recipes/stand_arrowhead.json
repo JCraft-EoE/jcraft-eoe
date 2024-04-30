@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GGI",
+    "GIG",
+    " GG"
+  ],
+  "key": {
+    "G": {
+      "item": "minecraft:gold_ingot"
+    },
+    "I": {
+      "item": "jcraft:stellar_iron_ingot"
+    }
+  },
+  "result": {
+    "item": "jcraft:stand_arrowhead",
+    "count": 4
+  }
+}

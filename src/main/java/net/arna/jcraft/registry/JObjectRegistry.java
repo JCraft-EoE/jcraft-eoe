@@ -93,6 +93,9 @@ public interface JObjectRegistry {
 
     Item BLOOD_BOTTLE = register("blood_bottle", new BloodBottleItem(settings().maxCount(1)));
 
+    Item STELLAR_IRON_INGOT = register("stellar_iron_ingot", new Item(settings()));
+    Item STAND_ARROWHEAD = register("stand_arrowhead", new Item(settings()));
+
     Item MOCK_ITEM = register("mock_item", new MockItem());
 
     //Block

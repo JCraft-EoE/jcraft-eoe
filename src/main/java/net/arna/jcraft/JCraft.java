@@ -183,6 +183,7 @@ public class JCraft implements ModInitializer {
     }
 
     private static void appendJcraftGroupStacks(List<ItemStack> stacks) {
+        stacks.add(new ItemStack(JObjectRegistry.STAND_ARROWHEAD));
         stacks.add(new ItemStack(JObjectRegistry.STANDARROW));
         stacks.add(new ItemStack(JObjectRegistry.LIVINGARROW));
         stacks.add(new ItemStack(JObjectRegistry.REQUIEMARROW));
@@ -199,6 +200,7 @@ public class JCraft implements ModInitializer {
         stacks.add(new ItemStack(JObjectRegistry.SOUL_BLOCK.asItem()));
         stacks.add(new ItemStack(JObjectRegistry.METEORITE_BLOCK.asItem()));
         stacks.add(new ItemStack(JObjectRegistry.METEORITE_IRON_ORE_BLOCK.asItem()));
+        stacks.add(new ItemStack(JObjectRegistry.STELLAR_IRON_INGOT));
         stacks.add(new ItemStack(JObjectRegistry.GREENBABY));
         stacks.add(new ItemStack(JObjectRegistry.DIOSDIARY));
 
