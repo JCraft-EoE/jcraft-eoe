@@ -1793,4 +1793,11 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     @Nullable
     protected abstract String getSummonAnimation();
+
+    /**
+     * Gets called after damage calculation if the damaged entity was slain.
+     */
+    protected void freshKill() {
+        // nothing to add here
+    }
 }

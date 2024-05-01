@@ -2,6 +2,7 @@ package net.arna.jcraft.common.entity.stand;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.NonNull;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.MoveInputType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
@@ -18,9 +19,15 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.tag.ItemTags;
 import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
@@ -45,6 +52,7 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
 
     public static final int MAX_RAGE = 20 * 60;
     private int rage = 0;
+    private boolean flowerable = false;
 
     public static final SimpleAttack<AbstractPurpleHazeEntity<?, ?>> GRAB_HIT_FINAL = new SimpleAttack<AbstractPurpleHazeEntity<?, ?>>(0, 27,
             34, 0.75f, 4f, 8, 2f, 1.25f, 0f)
@@ -280,6 +288,30 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
     @NonNull
     public PurpleHazeEntity getThis() {
         return this;
+    }
+
+    @Override
+    public boolean onKilledOther(ServerWorld world, LivingEntity other) {
+        final boolean result = super.onKilledOther(world, other);
+        flowerable = true;
+        return result;
+    }
+
+    @Override
+    protected ActionResult interactMob(PlayerEntity player, Hand hand) {
+        JCraft.LOGGER.info("Interacting with PH");
+        final ItemStack stack = player.getStackInHand(hand);
+        if (player == getUser() && stack.isIn(ItemTags.FLOWERS)) {
+            JCraft.LOGGER.info("Recognized user! flowerable="+flowerable);
+            if (!flowerable) {
+                return ActionResult.FAIL;
+            }
+            stack.setCount(stack.getCount()-1);
+            desummon();
+            // TODO increase the phLevel of the player
+            return ActionResult.SUCCESS;
+        }
+        return ActionResult.PASS;
     }
 
     // Animation code
