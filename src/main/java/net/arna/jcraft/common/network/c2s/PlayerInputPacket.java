@@ -293,11 +293,13 @@ public class PlayerInputPacket {
     }
 
     private static boolean initStandMove(StandEntity<?, ?> stand, MoveInputType type) {
-        int moveStun = stand.getMoveStun();
+        if (!stand.blocking) {
+            int moveStun = stand.getMoveStun();
 
-        if (stand.initMove(type.getMoveType())) return true;
-        if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking())
-            stand.queueMove(type);
+            if (stand.initMove(type.getMoveType())) return true;
+            if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT)
+                stand.queueMove(type);
+        }
 
         return false;
     }
