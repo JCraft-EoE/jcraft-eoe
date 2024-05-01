@@ -75,6 +75,7 @@
       "jcraft:gravity_direction",
       "jcraft:stand",
       "jcraft:spec",
+      "jcraft:ph",
       "jcraft:cooldowns",
       "jcraft:time_stop",
       "jcraft:misc",

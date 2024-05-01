@@ -1057,6 +1057,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     private static void comboCounterLogic(ServerPlayerEntity playerEntity, LivingEntity victim) {
         if (victim instanceof IOwnable ownable && ownable.getMaster() == playerEntity)
             return;
+        if (victim != null && !JServerConfig.ENABLE_FRIENDLY_FIRE.getValue() && victim.isTeammate(playerEntity))
+            return;
 
         IComboCounter comboCounter = (IComboCounter) playerEntity;
 
@@ -1091,6 +1093,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if (ent instanceof ICustomDamageHandler customDamageHandler)
             if (!customDamageHandler.handleDamage(kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, hitAnimation, canBackstab, unblockable))
                 return;
+
+        if (ent != null && !JServerConfig.ENABLE_FRIENDLY_FIRE.getValue() && ent.isTeammate(attacker))
+            return;
 
         boolean hit = true;
         boolean tsHit = JUtils.isAffectedByTimeStop(ent);
@@ -1195,6 +1200,12 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         }
 
         damage(damage, source, ent);
+        if ((ent.isDead() || ent.getHealth() <= 0f) && attacker instanceof final LivingEntity livingAttacker) {
+            final StandEntity<?, ?> standAttacker = JUtils.getStand(livingAttacker);
+            if (standAttacker != null) {
+                standAttacker.freshKill();
+            }
+        }
 
         if (tsHit)
             JComponents.getTimeStopData(ent).addTotalVelocity(kbVec);
@@ -1793,4 +1804,11 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     @Nullable
     protected abstract String getSummonAnimation();
+
+    /**
+     * Gets called after damage calculation if the damaged entity was slain.
+     */
+    protected void freshKill() {
+        // nothing to add here
+    }
 }
