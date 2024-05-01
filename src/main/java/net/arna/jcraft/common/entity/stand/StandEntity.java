@@ -1057,6 +1057,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     private static void comboCounterLogic(ServerPlayerEntity playerEntity, LivingEntity victim) {
         if (victim instanceof IOwnable ownable && ownable.getMaster() == playerEntity)
             return;
+        if (victim != null && !JServerConfig.ENABLE_FRIENDLY_FIRE.getValue() && victim.isTeammate(playerEntity))
+            return;
 
         IComboCounter comboCounter = (IComboCounter) playerEntity;
 
@@ -1091,6 +1093,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if (ent instanceof ICustomDamageHandler customDamageHandler)
             if (!customDamageHandler.handleDamage(kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, hitAnimation, canBackstab, unblockable))
                 return;
+
+        if (ent != null && !JServerConfig.ENABLE_FRIENDLY_FIRE.getValue() && ent.isTeammate(attacker))
+            return;
 
         boolean hit = true;
         boolean tsHit = JUtils.isAffectedByTimeStop(ent);

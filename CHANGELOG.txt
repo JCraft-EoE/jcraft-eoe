@@ -2694,6 +2694,9 @@ Purple Haze
     >Stand Arrowheads are made by smelting Stellar Iron Ore and combining it with Gold Ingots/Nuggets
 
 >Added DIO's Cape
+>Added Enable Friendly Fire config option, which works alongside Minecrafts /team system
+
+
 
 todo: combo counter is LYING
     esplash color :)
