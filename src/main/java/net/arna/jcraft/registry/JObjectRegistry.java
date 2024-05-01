@@ -76,7 +76,7 @@ public interface JObjectRegistry {
     Item DIOPANTS = register("dio_pants", new DIOArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.LEGS, settings()));
     Item DIOBOOTS = register("dio_boots", new DIOArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.FEET, settings()));
 
-    Item DIOCAPE = register("dio_cape", new JotaroArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.CHEST, settings()));
+    Item DIOCAPE = register("dio_cape", new FlutteringArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.CHEST, settings()));
 
     Item KARSHEADWRAP = register("kars_headwrap", new SunProtectionItem(ArmorMaterials.IRON, EquipmentSlot.HEAD, settings()));
 
@@ -84,10 +84,10 @@ public interface JObjectRegistry {
 
     Item STONE_MASK = register("stone_mask", new StoneMaskItem(ArmorMaterials.CHAIN, EquipmentSlot.HEAD, settings()));
 
-    Item JOTAROCAP = register("jotaro_cap", new JotaroArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.HEAD, settings()));
-    Item JOTAROJACKET = register("jotaro_jacket", new JotaroArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.CHEST, settings()));
-    Item JOTAROPANTS = register("jotaro_pants", new JotaroArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.LEGS, settings()));
-    Item JOTAROBOOTS = register("jotaro_boots", new JotaroArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.FEET, settings()));
+    Item JOTAROCAP = register("jotaro_cap", new FlutteringArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.HEAD, settings()));
+    Item JOTAROJACKET = register("jotaro_jacket", new FlutteringArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.CHEST, settings()));
+    Item JOTAROPANTS = register("jotaro_pants", new FlutteringArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.LEGS, settings()));
+    Item JOTAROBOOTS = register("jotaro_boots", new FlutteringArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.FEET, settings()));
 
     Item CINDERELLA_MASK = register("cinderella_mask", new CinderellaMaskItem());
 

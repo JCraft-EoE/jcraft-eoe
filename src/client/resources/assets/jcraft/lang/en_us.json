@@ -28,6 +28,7 @@
   "item.jcraft.dio_jacket": "DIO's Jacket",
   "item.jcraft.dio_pants": "DIO's Pants",
   "item.jcraft.dio_boots": "DIO's Boots",
+  "item.jcraft.dio_cape": "DIO's Cape",
 
   "item.jcraft.jotaro_cap": "Jotaro's Cap",
   "item.jcraft.jotaro_jacket": "Jotaro's Jacket",
@@ -73,7 +74,7 @@
   "entity.jcraft.cream": "Cream",
   "entity.jcraft.silverchariot": "Silver Chariot",
   "entity.jcraft.thefool": "The Fool",
-  "entity.jcraft.hierophant_green": "Hierophant Green",
+  "entity.jcraft.hierophantgreen": "Hierophant Green",
   "entity.jcraft.hg_net": "Hierophant Tentacles",
 
   "entity.jcraft.killerqueen": "Killer Queen",

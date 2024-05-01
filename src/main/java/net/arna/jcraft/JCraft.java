@@ -377,7 +377,7 @@ public class JCraft implements ModInitializer {
         JEnchantmentRegistry.init();
         JLootTableHelper.init();
         JServerConfig.init();
-
+        JStatRegistry.init();
 
         ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_PLAYER_INPUT, PlayerInputPacket::handle);
         ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_PLAYER_INPUT_HOLD, PlayerInputPacket::handleHold);

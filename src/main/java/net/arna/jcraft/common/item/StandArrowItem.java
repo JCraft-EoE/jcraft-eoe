@@ -7,6 +7,7 @@ import net.arna.jcraft.common.entity.stand.StandType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.stat.Stats;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.UseAction;
@@ -47,6 +48,8 @@ public class StandArrowItem extends Item {
             standData.setType(newType);
             user.detach();
             JCraft.summon(world, user);
+
+            user.incrementStat(Stats.USED.getOrCreateStat(this));
         }
 
         return TypedActionResult.consume(itemStack);
