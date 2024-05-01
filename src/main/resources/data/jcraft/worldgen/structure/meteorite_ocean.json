@@ -1,6 +1,6 @@
 {
   "type": "minecraft:jigsaw",
-  "biomes": "#c:deep_ocean",
+  "biomes": "#jcraft:has_structure/meteorite_ocean",
   "step": "surface_structures",
   "spawn_overrides": {},
   "terrain_adaptation": "none",

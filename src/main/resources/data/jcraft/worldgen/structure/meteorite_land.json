@@ -1,6 +1,6 @@
 {
   "type": "minecraft:jigsaw",
-  "biomes": "#c:desert",
+  "biomes": "#jcraft:has_structure/meteorite_land",
   "step": "surface_structures",
   "spawn_overrides": {},
   "terrain_adaptation": "none",
