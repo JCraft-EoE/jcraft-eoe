@@ -307,13 +307,13 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                 return ActionResult.FAIL;
             }
             stack.setCount(stack.getCount()-1);
+            player.detach();
             desummon();
             final PhComponent ph = JComponents.getPhData(player);
             ph.increaseLevel();
             if (ph.getLevel() >= 5) {
                 ph.resetLevel();
                 JComponents.getStandData(player).setType(StandType.PURPLE_HAZE_DISTORTION);
-                player.detach();
                 JCraft.summon(world, player);
             }
             return ActionResult.SUCCESS;
