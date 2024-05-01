@@ -1195,8 +1195,11 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         }
 
         damage(damage, source, ent);
-        if ((ent.isDead() || ent.getHealth() <= 0f) && stand != null) {
-            stand.freshKill();
+        if ((ent.isDead() || ent.getHealth() <= 0f) && attacker instanceof final LivingEntity livingAttacker) {
+            final StandEntity<?, ?> standAttacker = JUtils.getStand(livingAttacker);
+            if (standAttacker != null) {
+                standAttacker.freshKill();
+            }
         }
 
         if (tsHit)

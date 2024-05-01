@@ -300,7 +300,6 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
 
     @Override
     protected ActionResult interactMob(PlayerEntity player, Hand hand) {
-        JCraft.LOGGER.info("Interacting with PH");
         final ItemStack stack = player.getStackInHand(hand);
         if (player == getUser() && stack.isIn(ItemTags.FLOWERS)) {
             JCraft.LOGGER.info("Recognized user! flowerable="+flowerable);
@@ -311,8 +310,11 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
             desummon();
             final PhComponent ph = JComponents.getPhData(player);
             ph.increaseLevel();
-            if (ph.getLevel() == 5) {
-                // TODO upgrade ph
+            if (ph.getLevel() >= 5) {
+                ph.resetLevel();
+                JComponents.getStandData(player).setType(StandType.PURPLE_HAZE_DISTORTION);
+                player.detach();
+                JCraft.summon(world, player);
             }
             return ActionResult.SUCCESS;
         }

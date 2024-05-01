@@ -10,4 +10,5 @@ import org.jetbrains.annotations.Nullable;
 public interface PhComponent extends Component, AutoSyncedComponent {
     int getLevel();
     void increaseLevel();
+    void resetLevel();
 }

@@ -29,6 +29,11 @@ public class PhComponentImpl implements PhComponent {
         level++;
     }
 
+    @Override
+    public void resetLevel() {
+        level = 0;
+    }
+
     private void sync() {
         JComponents.PH.sync(player);
     }
