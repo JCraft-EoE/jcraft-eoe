@@ -293,10 +293,9 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
     }
 
     @Override
-    public boolean onKilledOther(ServerWorld world, LivingEntity other) {
-        final boolean result = super.onKilledOther(world, other);
+    public void freshKill() {
+        super.freshKill();
         flowerable = true;
-        return result;
     }
 
     @Override

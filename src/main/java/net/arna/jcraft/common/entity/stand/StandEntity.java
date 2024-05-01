@@ -1195,6 +1195,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         }
 
         damage(damage, source, ent);
+        if ((ent.isDead() || ent.getHealth() <= 0f) && stand != null) {
+            stand.freshKill();
+        }
 
         if (tsHit)
             JComponents.getTimeStopData(ent).addTotalVelocity(kbVec);
