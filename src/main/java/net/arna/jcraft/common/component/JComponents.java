@@ -17,9 +17,11 @@ import net.arna.jcraft.common.component.impl.entity.GrabComponentImpl;
 import net.arna.jcraft.common.component.impl.entity.GravityComponentImpl;
 import net.arna.jcraft.common.component.impl.entity.TimeStopComponentImpl;
 import net.arna.jcraft.common.component.impl.living.*;
+import net.arna.jcraft.common.component.impl.player.PhComponentImpl;
 import net.arna.jcraft.common.component.impl.player.SpecComponentImpl;
 import net.arna.jcraft.common.component.impl.world.ShockwaveHandlerComponentImpl;
 import net.arna.jcraft.common.component.living.*;
+import net.arna.jcraft.common.component.player.PhComponent;
 import net.arna.jcraft.common.component.player.SpecComponent;
 import net.arna.jcraft.common.component.world.ShockwaveHandlerComponent;
 import net.minecraft.entity.Entity;
@@ -35,6 +37,8 @@ public class JComponents implements EntityComponentInitializer, WorldComponentIn
             ComponentRegistry.getOrCreate(JCraft.id("stand"), StandComponent.class);
     public static final ComponentKey<SpecComponent> SPEC =
             ComponentRegistry.getOrCreate(JCraft.id("spec"), SpecComponent.class);
+    public static final ComponentKey<PhComponent> PH =
+            ComponentRegistry.getOrCreate(JCraft.id("ph"), PhComponent.class);
     public static final ComponentKey<CooldownsComponent> COOLDOWNS =
             ComponentRegistry.getOrCreate(JCraft.id("cooldowns"), CooldownsComponent.class);
     public static final ComponentKey<TimeStopComponent> TIME_STOP =
@@ -62,6 +66,7 @@ public class JComponents implements EntityComponentInitializer, WorldComponentIn
                 .impl(StandComponentImpl.class)
                 .end(StandComponentImpl::new);
         registry.registerForPlayers(SPEC, SpecComponentImpl::new, RespawnCopyStrategy.ALWAYS_COPY);
+        registry.registerForPlayers(PH, PhComponentImpl::new, RespawnCopyStrategy.ALWAYS_COPY);
         registry.beginRegistration(LivingEntity.class, COOLDOWNS)
                 .respawnStrategy(RespawnCopyStrategy.LOSSLESS_ONLY)
                 .impl(CooldownsComponentImpl.class)
@@ -104,6 +109,10 @@ public class JComponents implements EntityComponentInitializer, WorldComponentIn
 
     public static SpecComponent getSpecData(PlayerEntity player) {
         return SPEC.get(player);
+    }
+
+    public static PhComponent getPhData(PlayerEntity player) {
+        return PH.get(player);
     }
 
     public static CooldownsComponent getCooldowns(LivingEntity entity) {
