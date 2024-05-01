@@ -215,8 +215,8 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
 
         cons = List.of(
                 "only one, rarely accessible armored move",
-                "low damage without virus",
-                ""
+                "mediocre damage without virus",
+                "no movement utility"
         );
 
         freespace =

@@ -1783,6 +1783,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         return getRawState() == 0;
     }
 
+    /**
+     * Should be used on the CLIENT only, due to the sub-tick delay between setting {@link StandEntity#blocking} and {@link StandEntity#STATE}
+     * @return whether the stands state indicates it is blocking.
+     */
     public boolean isBlocking() {
         return getState() == getBlockState();
     }

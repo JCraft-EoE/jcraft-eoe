@@ -20,6 +20,7 @@ import net.arna.jcraft.common.network.RemoteStandInteractPacket;
 import net.arna.jcraft.common.network.c2s.*;
 import net.arna.jcraft.common.network.s2c.*;
 import net.arna.jcraft.common.spec.JSpec;
+import net.arna.jcraft.common.tickable.JEnemies;
 import net.arna.jcraft.common.tickable.PastDimensions;
 import net.arna.jcraft.common.tickable.Timestops;
 import net.arna.jcraft.common.util.*;
@@ -35,6 +36,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
@@ -89,8 +91,6 @@ public class JCraft implements ModInitializer {
     public static final GameRules.Key<GameRules.BooleanRule> STAND_GRIEFING = GameRuleRegistry.register("standGriefing", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
     public static final GameRules.Key<GameRules.BooleanRule> KEEP_STAND = GameRuleRegistry.register("keepStand", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
     public static final GameRules.Key<GameRules.BooleanRule> KEEP_SPEC = GameRuleRegistry.register("keepSpec", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
-    public static final GameRules.Key<GameRules.IntRule> DEFAULT_SPEC = GameRuleRegistry.register("defaultSpec", GameRules.Category.PLAYER, GameRuleFactory.createIntRule(0, 0, 2));
-    public static final GameRules.Key<GameRules.BooleanRule> ENABLE_COOLDOWNS = GameRuleRegistry.register("enableMoveCooldowns", GameRules.Category.PLAYER, GameRuleFactory.createBooleanRule(true));
     //public static GameRules.Key<GameRules.IntRule> DAMAGE_MULT = GameRuleRegistry.register("jcraftDamageMult", GameRules.Category.MISC, GameRuleFactory.createIntRule(0, 0, 100));
 
     // Dimensional travel bullshit
@@ -339,9 +339,13 @@ public class JCraft implements ModInitializer {
         stand.startRiding(user);
         stand.setUser(user);
 
-        if (user instanceof ServerPlayerEntity player && JUtils.canAct(user) && StandBlockPacket.isBlocking(player)) {
-            stand.wantToBlock = true;
-            stand.tryBlock();
+        if (user instanceof ServerPlayerEntity player) {
+            if (JUtils.canAct(user) && StandBlockPacket.isBlocking(player)) {
+                stand.wantToBlock = true;
+                stand.tryBlock();
+            }
+        } else if (user instanceof MobEntity mob) {
+            JEnemies.add(mob);
         }
 
         world.spawnEntity(stand);

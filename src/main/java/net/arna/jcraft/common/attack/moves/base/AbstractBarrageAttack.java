@@ -84,7 +84,13 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A
             StandEntity<?, ?> targetStand = JUtils.getStand(target);
             Vec3d forwardPos = stand.getRotationVector();
             forwardPos = new Vec3d(stand.getX() + forwardPos.x, stand.getY() + forwardPos.y, stand.getZ() + forwardPos.z);
-            if (targetStand == null || targetStand.curMove == null || !targetStand.curMove.isBarrage() || targetStand.squaredDistanceTo(forwardPos) > 4) continue;
+            if (targetStand == null ||
+                    targetStand == attacker ||
+                    targetStand.curMove == null ||
+                    !targetStand.curMove.isBarrage() ||
+                    targetStand.squaredDistanceTo(forwardPos) > 4) {
+                continue;
+            }
             onClash(attacker.getUserOrThrow());
             onClash(target);
 

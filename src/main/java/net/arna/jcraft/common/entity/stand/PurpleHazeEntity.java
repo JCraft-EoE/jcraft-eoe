@@ -81,10 +81,18 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
     public PurpleHazeEntity(World worldIn) {
         super(StandType.PURPLE_HAZE, worldIn);
 
+        description = "Automatic Walking BIOWEAPON";
+
+        cons = List.of(
+                "uncontrollable",
+                "can and will hurt the user"
+        );
+
         freespace = """
                 PASSIVE: Rage
                 Builds up while the stand is summoned.
                 Maxes out after 1 minute. When maxed, aura turns red.
+                Rage decreases by half with each living thing Purple Haze kills.
                 Purple Haze has a chance to target it's own user which increases with rage.""";
 
         auraColors = new Vec3f[]{
