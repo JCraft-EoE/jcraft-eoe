@@ -91,8 +91,6 @@ public class JCraft implements ModInitializer {
     public static final GameRules.Key<GameRules.BooleanRule> STAND_GRIEFING = GameRuleRegistry.register("standGriefing", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
     public static final GameRules.Key<GameRules.BooleanRule> KEEP_STAND = GameRuleRegistry.register("keepStand", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
     public static final GameRules.Key<GameRules.BooleanRule> KEEP_SPEC = GameRuleRegistry.register("keepSpec", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
-    public static final GameRules.Key<GameRules.IntRule> DEFAULT_SPEC = GameRuleRegistry.register("defaultSpec", GameRules.Category.PLAYER, GameRuleFactory.createIntRule(0, 0, 2));
-    public static final GameRules.Key<GameRules.BooleanRule> ENABLE_COOLDOWNS = GameRuleRegistry.register("enableMoveCooldowns", GameRules.Category.PLAYER, GameRuleFactory.createBooleanRule(true));
     //public static GameRules.Key<GameRules.IntRule> DAMAGE_MULT = GameRuleRegistry.register("jcraftDamageMult", GameRules.Category.MISC, GameRuleFactory.createIntRule(0, 0, 100));
 
     // Dimensional travel bullshit
