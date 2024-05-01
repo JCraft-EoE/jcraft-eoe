@@ -2686,6 +2686,15 @@ Purple Haze
 >Fixed remote stand blocking bugs
 >Fixed being able to cancel the start of a stand on move with blocking
 
+● 01/05/2024
+>ADDED METEORITES
+    >Required mining level: Diamond
+    >Found in: Deserts and Oceans
+    >Stand Arrows are now made from Stand Arrowheads, Sticks and Feathers
+    >Stand Arrowheads are made by smelting Stellar Iron Ore and combining it with Gold Ingots/Nuggets
+
+>Added DIO's Cape
+
 todo: combo counter is LYING
     esplash color :)
     anubis pommel IMPACT sound

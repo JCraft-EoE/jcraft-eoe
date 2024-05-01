@@ -1,9 +1,21 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "ingredients": [
-    { "item": "minecraft:netherite_ingot" },
-    { "item": "minecraft:spectral_arrow" }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  A",
+    " S ",
+    "F  "
   ],
+  "key": {
+    "A": {
+      "item": "jcraft:stand_arrowhead"
+    },
+    "F": {
+      "item": "minecraft:feather"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
   "result": {
     "item": "jcraft:stand_arrow"
   }

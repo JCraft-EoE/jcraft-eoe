@@ -1,15 +1,15 @@
 {
   "display": {
     "icon": {
-      "item": "jcraft:stand_arrow"
+      "item": "jcraft:meteorite_iron_ore_block"
     },
-    "title": "Stand Proud",
-    "description": "Obtain a Stand Arrow",
+    "title": "On the Precipice of Greatness",
+    "description": "Obtain Meteorite Iron Ore",
+    "background": "jcraft:textures/block/foolish_sand_block.png",
     "frame": "task",
     "show_toast": true,
     "announce_to_chat": false
   },
-  "parent": "jcraft:obtain_meteorite_iron_ore",
   "criteria": {
     "requirement": {
       "trigger": "minecraft:inventory_changed",
@@ -17,7 +17,7 @@
         "items": [
           {
             "items": [
-              "jcraft:stand_arrow"
+              "jcraft:meteorite_iron_ore_block"
             ]
           }
         ]

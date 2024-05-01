@@ -76,7 +76,7 @@ public interface JObjectRegistry {
     Item DIOPANTS = register("dio_pants", new DIOArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.LEGS, settings()));
     Item DIOBOOTS = register("dio_boots", new DIOArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.FEET, settings()));
 
-    Item DIOCAPE = register("dio_cape", new JotaroArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.CHEST, settings()));
+    Item DIOCAPE = register("dio_cape", new FlutteringArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.CHEST, settings()));
 
     Item KARSHEADWRAP = register("kars_headwrap", new SunProtectionItem(ArmorMaterials.IRON, EquipmentSlot.HEAD, settings()));
 
@@ -84,14 +84,17 @@ public interface JObjectRegistry {
 
     Item STONE_MASK = register("stone_mask", new StoneMaskItem(ArmorMaterials.CHAIN, EquipmentSlot.HEAD, settings()));
 
-    Item JOTAROCAP = register("jotaro_cap", new JotaroArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.HEAD, settings()));
-    Item JOTAROJACKET = register("jotaro_jacket", new JotaroArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.CHEST, settings()));
-    Item JOTAROPANTS = register("jotaro_pants", new JotaroArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.LEGS, settings()));
-    Item JOTAROBOOTS = register("jotaro_boots", new JotaroArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.FEET, settings()));
+    Item JOTAROCAP = register("jotaro_cap", new FlutteringArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.HEAD, settings()));
+    Item JOTAROJACKET = register("jotaro_jacket", new FlutteringArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.CHEST, settings()));
+    Item JOTAROPANTS = register("jotaro_pants", new FlutteringArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.LEGS, settings()));
+    Item JOTAROBOOTS = register("jotaro_boots", new FlutteringArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.FEET, settings()));
 
     Item CINDERELLA_MASK = register("cinderella_mask", new CinderellaMaskItem());
 
     Item BLOOD_BOTTLE = register("blood_bottle", new BloodBottleItem(settings().maxCount(1)));
+
+    Item STELLAR_IRON_INGOT = register("stellar_iron_ingot", new Item(settings()));
+    Item STAND_ARROWHEAD = register("stand_arrowhead", new Item(settings()));
 
     Item MOCK_ITEM = register("mock_item", new MockItem());
 
@@ -104,10 +107,14 @@ public interface JObjectRegistry {
             .strength(4.0f)
             .sounds(BlockSoundGroup.SOUL_SOIL)
     ), settings(), true);
-    //todo: make the meteorite mineable and drop the item
     Block METEORITE_BLOCK = register("meteorite_block", new Block(FabricBlockSettings.of(Material.STONE, MapColor.SPRUCE_BROWN)
             .requiresTool()
             .strength(6.0f, 1200f)
+            .sounds(BlockSoundGroup.ANCIENT_DEBRIS)
+    ), settings(), true);
+    Block METEORITE_IRON_ORE_BLOCK = register("meteorite_iron_ore_block", new Block(FabricBlockSettings.of(Material.STONE, MapColor.SPRUCE_BROWN)
+            .requiresTool()
+            .strength(9.0f, 1200f)
             .sounds(BlockSoundGroup.ANCIENT_DEBRIS)
     ), settings(), true);
     Block COFFIN_BLOCK = register("coffin", new CoffinBlock(FabricBlockSettings.of(Material.WOOD, MapColor.RED).sounds(BlockSoundGroup.WOOD).nonOpaque()), settings(), true);

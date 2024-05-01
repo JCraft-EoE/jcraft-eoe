@@ -1,6 +1,7 @@
 package net.arna.jcraft.datagen;
 
 import com.google.common.collect.Maps;
+import net.arna.jcraft.registry.JObjectRegistry;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.SimpleFabricLootTableProvider;
@@ -21,7 +22,8 @@ public class JLootTableProviders {
 
         @Override
         protected void generateBlockLootTables() {
-
+            addDrop(JObjectRegistry.METEORITE_BLOCK);
+            addDrop(JObjectRegistry.METEORITE_IRON_ORE_BLOCK);
         }
     }
 

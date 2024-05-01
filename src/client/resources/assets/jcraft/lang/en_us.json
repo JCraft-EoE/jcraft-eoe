@@ -1,5 +1,6 @@
 {
   "item.jcraft.stand_disc": "Stand Disc",
+  "item.jcraft.stand_arrowhead": "Stand Arrowhead",
   "item.jcraft.stand_arrow": "Stand Arrow",
   "item.jcraft.living_arrow": "Living Arrow",
   "item.jcraft.requiem_arrow": "Requiem Arrow",
@@ -12,6 +13,8 @@
   "item.jcraft.sinners_soul": "Sinner's Soul",
   "item.jcraft.soul_block": "Block of Suffering",
   "item.jcraft.meteorite_block": "Meteorite Block",
+  "item.jcraft.meteorite_iron_ore_block": "Meteorite Iron Ore",
+  "item.jcraft.stellar_iron_ingot": "Stellar Iron Ingot",
   "item.jcraft.green_baby": "Green Baby",
   "item.jcraft.knife": "Knife",
   "item.jcraft.knife_bundle": "Knife Bundle",
@@ -25,6 +28,7 @@
   "item.jcraft.dio_jacket": "DIO's Jacket",
   "item.jcraft.dio_pants": "DIO's Pants",
   "item.jcraft.dio_boots": "DIO's Boots",
+  "item.jcraft.dio_cape": "DIO's Cape",
 
   "item.jcraft.jotaro_cap": "Jotaro's Cap",
   "item.jcraft.jotaro_jacket": "Jotaro's Jacket",
@@ -44,6 +48,7 @@
   "block.jcraft.coffin": "Coffin",
   "block.jcraft.soul_block": "Block of Suffering",
   "block.jcraft.meteorite_block": "Meteorite Block",
+  "block.jcraft.meteorite_iron_ore_block": "Meteorite Iron Ore",
   "block.jcraft.foolish_sand_block": "Foolish Sand",
 
   "enchantment.jcraft.cinderellas_kiss": "Cinderella's Kiss",
@@ -69,7 +74,7 @@
   "entity.jcraft.cream": "Cream",
   "entity.jcraft.silverchariot": "Silver Chariot",
   "entity.jcraft.thefool": "The Fool",
-  "entity.jcraft.hierophant_green": "Hierophant Green",
+  "entity.jcraft.hierophantgreen": "Hierophant Green",
   "entity.jcraft.hg_net": "Hierophant Tentacles",
 
   "entity.jcraft.killerqueen": "Killer Queen",

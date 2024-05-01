@@ -441,7 +441,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
             userRotVec = new Vec3d(userRotVec.x, -userRotVec.y, userRotVec.z);
 
         Vec3d hPos = getOffsetHeightPos(attacker);
-        Vec3d rotVec = staticY ? getRotVec(attacker) : userRotVec;
+        Vec3d rotVec = (staticY || attacker.isRemote()) ? getRotVec(attacker) : userRotVec;
         Vec3d upVec = new Vec3d(gravDir.getUnitVector()).multiply(-1.0);
 
         if (staticY) {

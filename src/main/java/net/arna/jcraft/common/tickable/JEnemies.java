@@ -11,24 +11,45 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 import static net.arna.jcraft.common.entity.stand.StandEntity.standUserAI;
 
+/**
+ * Stores and updates all MobEntities that use Stands.
+ */
 public class JEnemies {
     private static final HashMap<MobEntity, RegistryKey<World>> enemies = new HashMap<>();
+    /**
+     * A queue designed to prevent any ConcurrentModificationException.
+     * Stores to-be JEnemies temporarily if they were attempted to be registered while {@link JEnemies#ticking} is true.
+     */
+    private static final PriorityQueue<MobEntity> queuedEnemies = new PriorityQueue<>();
+    private static boolean ticking = false;
+
     public static void add(MobEntity entity) {
-        add(entity, entity.getWorld().getRegistryKey());
-    }
-    public static void add(MobEntity entity, RegistryKey<World> registryKey) {
         if (enemies.containsKey(entity))
             return;
+
+        if (ticking) {
+            queuedEnemies.add(entity);
+        } else {
+            add(entity, entity.getWorld().getRegistryKey());
+        }
+    }
+    public static void add(MobEntity entity, RegistryKey<World> registryKey) {
         enemies.put(entity, registryKey);
     }
 
     public static void tick(MinecraftServer server) {
+        ticking = true;
+
+        while (!queuedEnemies.isEmpty()) {
+            MobEntity queued = queuedEnemies.peek();
+            add(queued, queued.getWorld().getRegistryKey());
+            queuedEnemies.remove();
+        }
+
         Iterator<Map.Entry<MobEntity, RegistryKey<World>>> iter = enemies.entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry<MobEntity, RegistryKey<World>> enemyData = iter.next();
@@ -61,5 +82,7 @@ public class JEnemies {
                 }
             }
         }
+
+        ticking = false;
     }
 }
