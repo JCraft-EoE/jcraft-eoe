@@ -168,5 +168,86 @@ public class JRecipeProvider extends FabricRecipeProvider {
                 .input('G', Items.GLASS)
                 .criterion("has_glass", InventoryChangedCriterion.Conditions.items(Items.GLASS))
                 .offerTo(exporter);
+        // Jotaro's cap
+        ShapedRecipeJsonBuilder.create(JObjectRegistry.JOTAROCAP)
+                .pattern("BYB")
+                .pattern("BHB")
+                .input('B', Items.BLACK_DYE)
+                .input('H', Items.NETHERITE_HELMET)
+                .input('Y', Items.YELLOW_DYE)
+                .criterion("has_netherite_helmet", InventoryChangedCriterion.Conditions.items(Items.NETHERITE_HELMET))
+                .offerTo(exporter);
+        // Jotaro's jacket
+        ShapedRecipeJsonBuilder.create(JObjectRegistry.JOTAROJACKET)
+                .pattern("B B")
+                .pattern("BCB")
+                .pattern("BBB")
+                .input('B', Items.BLACK_DYE)
+                .input('C', Items.NETHERITE_CHESTPLATE)
+                .criterion("has_netherite_chestplate", InventoryChangedCriterion.Conditions.items(Items.NETHERITE_CHESTPLATE))
+                .offerTo(exporter);
+        // Jotaro's pants
+        ShapedRecipeJsonBuilder.create(JObjectRegistry.JOTAROPANTS)
+                .pattern("YYY")
+                .pattern("BLB")
+                .pattern("B B")
+                .input('B', Items.BLACK_DYE)
+                .input('L', Items.NETHERITE_LEGGINGS)
+                .input('Y', Items.YELLOW_DYE)
+                .criterion("has_netherite_leggings", InventoryChangedCriterion.Conditions.items(Items.NETHERITE_LEGGINGS))
+                .offerTo(exporter);
+        // Jotaro's boots
+        ShapedRecipeJsonBuilder.create(JObjectRegistry.JOTAROBOOTS)
+                .pattern("BNB")
+                .pattern("B B")
+                .input('B', Items.BLACK_DYE)
+                .input('N', Items.NETHERITE_BOOTS)
+                .criterion("has_netherite_boots", InventoryChangedCriterion.Conditions.items(Items.NETHERITE_BOOTS))
+                .offerTo(exporter);
+        // Dio's headband
+        ShapedRecipeJsonBuilder.create(JObjectRegistry.DIOHEADBAND)
+                .pattern("GHG")
+                .input('G', Items.GREEN_DYE)
+                .input('H', Items.NETHERITE_HELMET)
+                .criterion("has_netherite_helmet", InventoryChangedCriterion.Conditions.items(Items.NETHERITE_HELMET))
+                .offerTo(exporter);
+        // Dio's jacket
+        ShapedRecipeJsonBuilder.create(JObjectRegistry.DIOJACKET)
+                .pattern("Y Y")
+                .pattern("YCY")
+                .pattern("YBY")
+                .input('B', Items.BLACK_DYE)
+                .input('C', Items.NETHERITE_CHESTPLATE)
+                .input('Y', Items.YELLOW_DYE)
+                .criterion("has_netherite_chestplate", InventoryChangedCriterion.Conditions.items(Items.NETHERITE_CHESTPLATE))
+                .offerTo(exporter);
+        // Dio's cape
+        ShapedRecipeJsonBuilder.create(JObjectRegistry.DIOCAPE)
+                .pattern("RLR")
+                .pattern("LCL")
+                .pattern("LLL")
+                .input('C', Items.NETHERITE_CHESTPLATE)
+                .input('L', Items.LEATHER)
+                .input('R', Items.RED_DYE)
+                .criterion("has_netherite_chestplate", InventoryChangedCriterion.Conditions.items(Items.NETHERITE_CHESTPLATE))
+                .offerTo(exporter);
+        // Dio's pants
+        ShapedRecipeJsonBuilder.create(JObjectRegistry.DIOPANTS)
+                .pattern("GGG")
+                .pattern("YLY")
+                .pattern("Y Y")
+                .input('G', Items.GREEN_DYE)
+                .input('L', Items.NETHERITE_LEGGINGS)
+                .input('Y', Items.YELLOW_DYE)
+                .criterion("has_netherite_leggings", InventoryChangedCriterion.Conditions.items(Items.NETHERITE_LEGGINGS))
+                .offerTo(exporter);
+        // Dio's boots
+        ShapedRecipeJsonBuilder.create(JObjectRegistry.DIOBOOTS)
+                .pattern("YBY")
+                .pattern("Y Y")
+                .input('B', Items.NETHERITE_BOOTS)
+                .input('Y', Items.YELLOW_DYE)
+                .criterion("has_netherite_boots", InventoryChangedCriterion.Conditions.items(Items.NETHERITE_BOOTS))
+                .offerTo(exporter);
     }
 }
