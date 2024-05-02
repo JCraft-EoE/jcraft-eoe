@@ -1,9 +1,0 @@
-{
-  "type": "minecraft:blasting",
-  "cookingtime": 100,
-  "experience": 2,
-  "ingredient": {
-    "item": "jcraft:meteorite_iron_ore_block"
-  },
-  "result": "jcraft:stellar_iron_ingot"
-}
