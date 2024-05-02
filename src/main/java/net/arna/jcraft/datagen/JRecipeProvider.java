@@ -8,6 +8,7 @@ import net.minecraft.advancement.criterion.InventoryChangedCriterion;
 import net.minecraft.data.server.recipe.CookingRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.RecipeJsonProvider;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
+import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
 
@@ -65,6 +66,55 @@ public class JRecipeProvider extends FabricRecipeProvider {
                 .input('A', JObjectRegistry.STANDARROW)
                 .input('F', Items.DISC_FRAGMENT_5)
                 .criterion("has_arrow", InventoryChangedCriterion.Conditions.items(JObjectRegistry.STANDARROW))
+                .offerTo(exporter);
+        // sinner's soul
+        ShapedRecipeJsonBuilder.create(JObjectRegistry.SINNERSSOUL)
+                .pattern("SSS")
+                .pattern("SFS")
+                .pattern("SSS")
+                .input('F', Items.FERMENTED_SPIDER_EYE)
+                .input('S', Items.SOUL_SAND)
+                .criterion("has_soul_sand", InventoryChangedCriterion.Conditions.items(Items.SOUL_SAND))
+                .offerTo(exporter);
+        // living arrow
+        ShapelessRecipeJsonBuilder.create(JObjectRegistry.LIVINGARROW)
+                .input(JObjectRegistry.STANDARROW)
+                .input(JObjectRegistry.SINNERSSOUL)
+                .criterion("has_arrow", InventoryChangedCriterion.Conditions.items(JObjectRegistry.STANDARROW))
+                .criterion("has_sinners_soul", InventoryChangedCriterion.Conditions.items(JObjectRegistry.SINNERSSOUL))
+                .offerTo(exporter);
+        // soul block
+        ShapelessRecipeJsonBuilder.create(JObjectRegistry.SOUL_BLOCK)
+                .input(JObjectRegistry.SINNERSSOUL)
+                .input(JObjectRegistry.SINNERSSOUL)
+                .input(JObjectRegistry.SINNERSSOUL)
+                .input(JObjectRegistry.SINNERSSOUL)
+                .input(JObjectRegistry.SINNERSSOUL)
+                .input(JObjectRegistry.SINNERSSOUL)
+                .input(JObjectRegistry.SINNERSSOUL)
+                .input(JObjectRegistry.SINNERSSOUL)
+                .input(JObjectRegistry.SINNERSSOUL)
+                .criterion("has_sinners_soul", InventoryChangedCriterion.Conditions.items(JObjectRegistry.SINNERSSOUL))
+                .offerTo(exporter);
+        // requiem ruby
+        ShapedRecipeJsonBuilder.create(JObjectRegistry.REQUIEMRUBY)
+                .pattern("RDR")
+                .pattern("ENE")
+                .pattern("RDR")
+                .input('D', Items.DIAMOND_BLOCK)
+                .input('E', Items.EMERALD_BLOCK)
+                .input('N', Items.NETHER_STAR)
+                .input('R', Items.REDSTONE_BLOCK)
+                .criterion("has_nether_star", InventoryChangedCriterion.Conditions.items(Items.NETHER_STAR))
+                .criterion("has_redstone_block", InventoryChangedCriterion.Conditions.items(Items.REDSTONE_BLOCK))
+                .offerTo(exporter);
+        // requiem arrow
+        ShapelessRecipeJsonBuilder.create(JObjectRegistry.REQUIEMARROW)
+                .input(JObjectRegistry.STANDARROW)
+                .input(JObjectRegistry.REQUIEMRUBY)
+                .input(Items.TIPPED_ARROW)
+                .criterion("has_arrow", InventoryChangedCriterion.Conditions.items(JObjectRegistry.STANDARROW))
+                .criterion("has_ruby", InventoryChangedCriterion.Conditions.items(JObjectRegistry.REQUIEMRUBY))
                 .offerTo(exporter);
     }
 }
