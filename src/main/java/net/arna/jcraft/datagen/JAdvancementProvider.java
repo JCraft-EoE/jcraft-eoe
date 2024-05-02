@@ -163,7 +163,7 @@ public class JAdvancementProvider extends FabricAdvancementProvider {
                 .rewards(AdvancementRewards.Builder.experience(200))
                 .build(JCraft.id("obtain_jotaro_outfit"));
         consumer.accept(obtainJotaroOutfit);
-        // obtain Jotaro outfit
+        // obtain Dio outfit
         final Advancement obtainDioOutfit = Advancement.Builder.create()
                 .display(JObjectRegistry.DIOHEADBAND,
                         Text.literal("MUDA MUDA"),
@@ -180,7 +180,23 @@ public class JAdvancementProvider extends FabricAdvancementProvider {
                 .criterion("has_dio_pants", InventoryChangedCriterion.Conditions.items(JObjectRegistry.DIOPANTS))
                 .criterion("has_dio_boots", InventoryChangedCriterion.Conditions.items(JObjectRegistry.DIOBOOTS))
                 .rewards(AdvancementRewards.Builder.experience(200))
+                .rewards(AdvancementRewards.Builder.recipe(JCraft.id("dios_diary")))
                 .build(JCraft.id("obtain_dio_outfit"));
         consumer.accept(obtainDioOutfit);
+        // obtain Dio's diary
+        final Advancement obtainDiosDiary = Advancement.Builder.create()
+                .display(JObjectRegistry.DIOSDIARY,
+                        Text.literal("It was me, DIO!"),
+                        Text.literal("Obtain Dio's diary"),
+                        null,
+                        AdvancementFrame.CHALLENGE,
+                        true,
+                        false,
+                        true)
+                .parent(obtainDioOutfit)
+                .criterion("has_diary", InventoryChangedCriterion.Conditions.items(JObjectRegistry.DIOSDIARY))
+                .rewards(AdvancementRewards.Builder.experience(500))
+                .build(JCraft.id("obtain_dios_diary"));
+        consumer.accept(obtainDiosDiary);
     }
 }

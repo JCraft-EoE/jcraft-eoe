@@ -249,5 +249,19 @@ public class JRecipeProvider extends FabricRecipeProvider {
                 .input('Y', Items.YELLOW_DYE)
                 .criterion("has_netherite_boots", InventoryChangedCriterion.Conditions.items(Items.NETHERITE_BOOTS))
                 .offerTo(exporter);
+        // Dio's diary
+        ShapelessRecipeJsonBuilder.create(JObjectRegistry.DIOSDIARY)
+                .input(Items.WAXED_OXIDIZED_COPPER)
+                .input(Items.GOLD_BLOCK)
+                .input(Items.NETHERITE_BLOCK)
+                .input(Items.EXPERIENCE_BOTTLE)
+                .input(Items.NETHER_STAR)
+                .input(Items.ELYTRA)
+                .input(Items.LINGERING_POTION)
+                .input(Items.WRITABLE_BOOK)
+                .input(Items.EMERALD_BLOCK)
+                .criterion("has_nether_star", InventoryChangedCriterion.Conditions.items(Items.NETHER_STAR))
+                .criterion("has_book", InventoryChangedCriterion.Conditions.items(Items.WRITABLE_BOOK))
+                .offerTo(exporter);
     }
 }
