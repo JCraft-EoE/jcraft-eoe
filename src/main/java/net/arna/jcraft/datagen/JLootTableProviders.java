@@ -24,6 +24,7 @@ public class JLootTableProviders {
         protected void generateBlockLootTables() {
             addDrop(JObjectRegistry.METEORITE_BLOCK);
             addDrop(JObjectRegistry.METEORITE_IRON_ORE_BLOCK);
+            addDrop(JObjectRegistry.SOUL_BLOCK);
         }
     }
 
