@@ -57,5 +57,14 @@ public class JRecipeProvider extends FabricRecipeProvider {
                 .input('S', Items.STICK)
                 .criterion("has_arrowhead", InventoryChangedCriterion.Conditions.items(JObjectRegistry.STAND_ARROWHEAD))
                 .offerTo(exporter);
+        // stand disk
+        ShapedRecipeJsonBuilder.create(JObjectRegistry.STAND_DISC)
+                .pattern("FFF")
+                .pattern("FAF")
+                .pattern("FFF")
+                .input('A', JObjectRegistry.STANDARROW)
+                .input('F', Items.DISC_FRAGMENT_5)
+                .criterion("has_arrow", InventoryChangedCriterion.Conditions.items(JObjectRegistry.STANDARROW))
+                .offerTo(exporter);
     }
 }
