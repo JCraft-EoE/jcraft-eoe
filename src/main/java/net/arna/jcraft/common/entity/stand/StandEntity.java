@@ -690,7 +690,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         ent.setHealth(h - damage);
         ent.getDamageTracker().onDamage(damageSource, h, damage);
         ent.emitGameEvent(GameEvent.ENTITY_DAMAGE);
-        if (ent.isDead()) ent.onDeath(damageSource);
+        if (damageSource.getAttacker() instanceof LivingEntity livingAttacker)
+            ent.setAttacker(livingAttacker);
+        if (ent.isDead())
+            ent.onDeath(damageSource);
     }
 
     /**
@@ -1203,7 +1206,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if ((ent.isDead() || ent.getHealth() <= 0f) && attacker instanceof final LivingEntity livingAttacker) {
             final StandEntity<?, ?> standAttacker = JUtils.getStand(livingAttacker);
             if (standAttacker != null) {
-                standAttacker.freshKill();
+                standAttacker.freshKill(ent);
             }
         }
 
@@ -1808,7 +1811,5 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     /**
      * Gets called after damage calculation if the damaged entity was slain.
      */
-    protected void freshKill() {
-        // nothing to add here
-    }
+    protected void freshKill(@Nullable LivingEntity entity) { }
 }

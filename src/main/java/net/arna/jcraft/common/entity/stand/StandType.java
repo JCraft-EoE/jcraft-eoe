@@ -121,6 +121,10 @@ public enum StandType {
         StaticFields.fromId.put(0xff, this);
     }
 
+    public static boolean isNone(StandType standType) {
+        return standType == null || standType == NONE;
+    }
+
     @Nullable
     public static StandType fromId(int internalId) {
         return StaticFields.fromId.get(internalId);

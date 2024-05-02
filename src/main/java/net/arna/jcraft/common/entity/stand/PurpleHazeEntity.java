@@ -25,7 +25,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.predicate.entity.EntityPredicates;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
@@ -33,6 +32,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 
 import java.util.Comparator;
@@ -51,10 +51,6 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
     private static final @NonNull SimpleAttack<AbstractPurpleHazeEntity<?, ?>> REKKA_2 = REKKA2.copy().withAnim(State.REKKA2).withFollowup(REKKA_3).allowHitUser();
     private static final @NonNull SimpleAttack<AbstractPurpleHazeEntity<?, ?>> REKKA_1 = REKKA1.copy().withAnim(State.REKKA1).withFollowup(REKKA_2).allowHitUser();
     private static final @NonNull SimpleAttack<AbstractPurpleHazeEntity<?, ?>> GROUND_SLAM = AbstractPurpleHazeEntity.GROUND_SLAM.copy().allowHitUser();
-
-    public static final int MAX_RAGE = 20 * 60;
-    private int rage = 0;
-    private boolean flowerable = false;
 
     public static final SimpleAttack<AbstractPurpleHazeEntity<?, ?>> GRAB_HIT_FINAL = new SimpleAttack<AbstractPurpleHazeEntity<?, ?>>(0, 27,
             34, 0.75f, 4f, 8, 2f, 1.25f, 0f)
@@ -88,6 +84,19 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                     Text.literal("unblockable, combo finisher")
             );
 
+    private static final SimpleAttack<AbstractPurpleHazeEntity<?, ?>> PLAY = new SimpleAttack<AbstractPurpleHazeEntity<?, ?>>(
+            0, 30, 31, 0, 0, 0, 0, 0, 0)
+            .withAction((attacker, user, ctx, targets) -> {
+                attacker.setCurrentMove(null);
+                attacker.setMoveStun(0);
+                attacker.desummon();
+            })
+            .withInfo(Text.literal("Playing with flower"), Text.empty());
+
+    public static final int MAX_RAGE = 20 * 60;
+    private int rage = 0;
+    private boolean flowerable = false, hasFlower = false, toEvolve = false;
+
     public PurpleHazeEntity(World worldIn) {
         super(StandType.PURPLE_HAZE, worldIn);
 
@@ -103,7 +112,10 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                 Builds up while the stand is summoned.
                 Maxes out after 1 minute. When maxed, aura turns red.
                 Rage decreases by half with each living thing Purple Haze kills.
-                Purple Haze has a chance to target it's own user which increases with rage.""";
+                Purple Haze has a chance to target it's own user which increases with rage.
+                
+                EVOLUTION: Give Purple Haze any flower after it has killed a stand user.
+                Doing this 5 times will evolve it into Purple Haze: Distortion.""";
 
         auraColors = new Vec3f[]{
                 new Vec3f(1.0f, 0.2f, 0.6f),
@@ -118,6 +130,16 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
         if (rage == MAX_RAGE)
             return Vec3f.POSITIVE_X;
         return super.getAuraColor();
+    }
+
+    @Override
+    public void desummon() {
+        if (toEvolve && hasUser()) {
+            JComponents.getStandData(getUserOrThrow()).setType(StandType.PURPLE_HAZE_DISTORTION);
+            JCraft.summon(world, getUserOrThrow());
+        }
+
+        super.desummon();
     }
 
     @Override
@@ -204,70 +226,80 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
     public void tick() {
         super.tick();
 
-        if (++rage >= MAX_RAGE)
-            rage = MAX_RAGE;
+        if (hasFlower) {
+            if (getMoveStun() > 0) {
+                rage = 0;
+                if (navigation.isFollowingPath())
+                    navigation.stop();
+            } else {
+                desummon();
+            }
+        } else {
+            if (++rage >= MAX_RAGE)
+                rage = MAX_RAGE;
 
-        if (!hasUser()) return;
-        LivingEntity user = getUser();
+            if (!hasUser()) return;
+            LivingEntity user = getUser();
 
-        if (!world.isClient()) {
-            boolean isRemote = isRemote();
+            if (!world.isClient()) {
+                boolean isRemote = isRemote();
 
-            if (!remoteControllable()) {
-                if (getAlphaOverride() != 1.0f)
-                    setAlphaOverride(1.0f);
+                if (!remoteControllable()) {
+                    if (getAlphaOverride() != 1.0f)
+                        setAlphaOverride(1.0f);
 
-                LivingEntity target = getTarget();
-                if (target != null && !target.isAlive())
-                    target = null;
+                    LivingEntity target = getTarget();
+                    if (target != null && !target.isAlive())
+                        target = null;
 
-                if (target == null) {
-                    List<LivingEntity> potentialTargets = world.getEntitiesByClass(
-                            LivingEntity.class,
-                            getBoundingBox().expand(64.0),
-                            EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(EntityPredicates.VALID_LIVING_ENTITY));
-                    potentialTargets.remove(this);
+                    if (target == null) {
+                        List<LivingEntity> potentialTargets = world.getEntitiesByClass(
+                                LivingEntity.class,
+                                getBoundingBox().expand(64.0),
+                                EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(EntityPredicates.VALID_LIVING_ENTITY));
+                        potentialTargets.remove(this);
 
-                    Comparator<Entity> distanceComparator = (entity1, entity2) -> {
-                        double distance1 = this.distanceTo(entity1);
-                        double distance2 = this.distanceTo(entity2);
-                        return Double.compare(distance1, distance2);
-                    };
-                    potentialTargets.sort(distanceComparator);
+                        Comparator<Entity> distanceComparator = (entity1, entity2) -> {
+                            double distance1 = this.distanceTo(entity1);
+                            double distance2 = this.distanceTo(entity2);
+                            return Double.compare(distance1, distance2);
+                        };
+                        potentialTargets.sort(distanceComparator);
 
-                    for (LivingEntity potentialTarget : potentialTargets) {
-                        if (!canSee(potentialTarget)) continue;
-                        if (potentialTarget instanceof StandEntity<?,?> standEntity && standEntity.hasUser()) {
-                            setTarget(standEntity.getUserOrThrow());
-                            break;
-                        }
-                        if (potentialTarget == user) {
-                            if (age % 20 == 0 && random.nextDouble() * MAX_RAGE <= rage) {
-                                setTarget(user);
+                        for (LivingEntity potentialTarget : potentialTargets) {
+                            if (!canSee(potentialTarget)) continue;
+                            if (potentialTarget instanceof StandEntity<?, ?> standEntity && standEntity.hasUser()) {
+                                setTarget(standEntity.getUserOrThrow());
                                 break;
                             }
-                            continue;
+                            if (potentialTarget == user) {
+                                if (age % 20 == 0 && random.nextDouble() * MAX_RAGE <= rage) {
+                                    setTarget(user);
+                                    break;
+                                }
+                                continue;
+                            }
+                            setTarget(potentialTarget);
+                            break;
                         }
-                        setTarget(potentialTarget);
-                        break;
-                    }
-                } else {
-                    double speed = getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED);
-                    // user is not null (see above)
-                    if (user.hasStatusEffect(JStatusRegistry.DAZED))
-                        speed = user.getMovementSpeed();
-                    if (age % 4 == 0) // Pathfinding is expensive
-                        navigation.startMovingTo(target, speed);
+                    } else {
+                        double speed = getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED);
+                        // user is not null (see above)
+                        if (user.hasStatusEffect(JStatusRegistry.DAZED))
+                            speed = user.getMovementSpeed();
+                        if (age % 4 == 0) // Pathfinding is expensive
+                            navigation.startMovingTo(target, speed);
 
-                    standUserAI(this, target, this);
+                        standUserAI(this, target, this);
+                    }
+
+                    if (!isRemote)
+                        setRemote(true);
                 }
 
-                if (!isRemote)
-                    setRemote(true);
+                if (isRemote)
+                    tickRemoteState(getMoveControl().getSpeed(), getMoveControl().sidewaysMovement, onGround);
             }
-
-            if (isRemote)
-                tickRemoteState(getMoveControl().getSpeed(), getMoveControl().sidewaysMovement, onGround);
         }
     }
 
@@ -293,28 +325,33 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
     }
 
     @Override
-    public void freshKill() {
-        super.freshKill();
-        flowerable = true;
+    public void freshKill(@Nullable LivingEntity entity) {
+        super.freshKill(entity);
+        if (!StandType.isNone(JComponents.getStandData(entity).getType()))
+            flowerable = true;
     }
 
     @Override
     protected ActionResult interactMob(PlayerEntity player, Hand hand) {
         final ItemStack stack = player.getStackInHand(hand);
         if (player == getUser() && stack.isIn(ItemTags.FLOWERS)) {
-            JCraft.LOGGER.info("Recognized user! flowerable="+flowerable);
-            if (!flowerable) {
+            if (!flowerable)
                 return ActionResult.FAIL;
-            }
-            stack.setCount(stack.getCount()-1);
-            player.detach();
-            desummon();
-            final PhComponent ph = JComponents.getPhData(player);
-            ph.increaseLevel();
-            if (ph.getLevel() >= 5) {
-                ph.resetLevel();
-                JComponents.getStandData(player).setType(StandType.PURPLE_HAZE_DISTORTION);
-                JCraft.summon(world, player);
+
+            setStackInHand(Hand.MAIN_HAND, stack.copy());
+            stack.decrement(1);
+            flowerable = false;
+            hasFlower = true;
+
+            if (!world.isClient()) {
+                setMove(PLAY, State.PLAY);
+
+                final PhComponent ph = JComponents.getPhData(player);
+                ph.increaseLevel();
+                if (ph.getLevel() >= 5) {
+                    ph.resetLevel();
+                    toEvolve = true;
+                }
             }
             return ActionResult.SUCCESS;
         }
@@ -346,6 +383,7 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
         BACKHAND_FOLLOWUP(builder -> builder.playAndHold("animation.purple_haze.backhand_followup")),
         LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.purple_haze.light_followup")),
         HURT(builder -> builder.playAndHold("animation.purple_haze.hurt")),
+        PLAY(builder -> builder.playAndHold("animation.purple_haze.play")),
 
         FORWARD(builder -> builder.loop("animation.purple_haze.forw")),
         BACKWARD(builder -> builder.loop("animation.purple_haze.back")),

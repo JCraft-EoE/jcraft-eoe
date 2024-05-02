@@ -11,10 +11,11 @@ public class JDamageSources {
     public static class StandDamageSource extends EntityDamageSource {
         final StandEntity<?, ?> stand;
         public StandDamageSource(@NotNull StandEntity<?, ?> stand) {
-            super("stand", stand.getUser());
+            super("stand", stand.isRemote() ? stand : stand.getUser());
             this.stand = stand;
         }
 
+        // Partially, but not incorrect.
         @Override
         public boolean bypassesArmor() {
             return true;

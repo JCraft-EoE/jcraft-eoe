@@ -2696,6 +2696,72 @@ Purple Haze
 >Added DIO's Cape
 >Added Enable Friendly Fire config option, which works alongside Minecrafts /team system
 
+RELEASE 1.19.2-0.13.7
+//todo: fix enummap jank
+● 01/05/2024
+>NEW STANDS: The Sun, Purple Haze, Purple Haze: Distortion
+
+>ADDED METEORITES
+    >Required mining level: Diamond
+    >Found in: Deserts and Oceans
+    >Stand Arrows are now made from Stand Arrowheads, Sticks and Feathers
+    >Stand Arrowheads are made by smelting Stellar Iron Ore and combining it with Gold Ingots/Nuggets
+
+>New JConfig options:
+    >Enable/Disable move cooldowns
+    >Multiplier for cooldown length - which changes SOME cooldown lengths (others must stay to best preserve balance)
+    >Enable/Disable Stun Falloff - which reduces stun proportionally to damage scaling
+    NOTE: infinite combos are still possible if cooldowns are turned completely off (mostly from barrages), unless you also crank up damage scaling by a lot
+    >Enable/Disable friendly fire - which uses the /team system from base Minecraft
+
+>Updated Sprites
+
+>Added heartbeat packet to held inputs (which will automatically release moves that accidentally register as always held)
+>Fixed King Crimson's and Made in Heaven's barrages not being able to mine properly
+>Fixed buffered holdable moves not being holdable for stands
+>Fixed certain projectile moves not working in different gravities
+>Fixed remote stand blocking bugs
+>Fixed being able to cancel the start of a stand on move with blocking
+
+Star Platinum
+    >Fixed Jump not working in different gravities
+    >Knee
+        >Stand distance increased (0.75->0.9m)
+        >Cooldown reduced (2->1s)
+        >Added aerial variant - Upward Knee Strike
+    >Star Finger
+        >Added crouching variant - Takedown
+
+The World
+    >Roundhouse cooldown reduced (2->1s)
+    >Added crouching variant to Roundhouse
+
+D4C
+    >Item place windup reduced (10->7t)
+
+Cream
+    >Updated skin 3
+
+Made in Heaven
+    >Leg Crusher now knocks down
+
+The World: Over Heaven
+    >Crouching Light replaced with Low Kick
+    >Previous crouching Light is now the followup to Low Kick
+
+Gold Experience
+    >Rekka 1 sped up tremendously
+
+Anubis
+    >Unsheathing Attack
+        >Cooldown reduced (11->5s)
+        >Damage reduced (6->5)
+        >Added crouching variant
+    >Low Kick damage reduced (7->6)
+
+Vampire
+    >Added more sounds
+    >Updated all Heavy animations
 
 
 todo: combo counter is LYING

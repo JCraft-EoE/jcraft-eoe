@@ -69,16 +69,29 @@ public class JEnemies {
                 if (stand == null) {
                     JCraft.summon(world, enemy);
                 } else {
-                    // Target priority
-                    LivingEntity biggestAttacker = enemy.getDamageTracker().getBiggestAttacker();
-                    LivingEntity primeAdversary = enemy.getPrimeAdversary();
                     LivingEntity target = enemy.getTarget();
-                    if (primeAdversary != null && primeAdversary.isAlive() && stand.canTarget(primeAdversary))
-                        standUserAI(enemy, primeAdversary, stand);
-                    else if (target != null && target.isAlive() && stand.canTarget(target))
+                    if (target != null && target.isAlive()) {
                         standUserAI(enemy, target, stand);
-                    else if (biggestAttacker != null && biggestAttacker.isAlive() && stand.canTarget(biggestAttacker))
-                        enemy.setTarget(biggestAttacker);
+                    } else {
+                        // Targeting priority: top to bottom
+                        LinkedList<LivingEntity> targets = new LinkedList<>();
+                        targets.add(enemy.getPrimeAdversary());
+                        targets.add(enemy.getDamageTracker().getBiggestAttacker());
+                        targets.add(enemy.getAttacker());
+                        // Shouldn't use canTarget because that applies a PlayerEntity only filter.
+                        targets.stream()
+                                .filter(potentialTarget -> potentialTarget != null &&
+                                        potentialTarget.isAlive() &&
+                                        enemy.canSee(potentialTarget) &&
+                                        potentialTarget.canTakeDamage())
+                                .findFirst()
+                                .ifPresent(
+                                        selectedTarget -> {
+                                            enemy.setTarget(selectedTarget);
+                                            standUserAI(enemy, selectedTarget, stand);
+                                        }
+                                );
+                    }
                 }
             }
         }
