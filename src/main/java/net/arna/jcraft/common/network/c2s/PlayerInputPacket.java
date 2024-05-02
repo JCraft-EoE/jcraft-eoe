@@ -48,14 +48,15 @@ public class PlayerInputPacket {
                 // Handle held inputs
                 if (!sm.heldInputs.isEmpty()) {
                     sm.heldInputs.forEach(
-                            (type, integer) -> {
-                                //JCraft.LOGGER.info("Holding: " + type + ", with remaining heartbeat time: " + integer);
+                        (type, integer) -> {
+                            //JCraft.LOGGER.info("Holding: " + type + ", with remaining heartbeat time: " + integer);
 
-                                if (!JUtils.canHoldMove(player, type))
-                                    sm.heldInputs.remove(type);
-
+                            if (integer == 0) { // Marked for unprocessed removal by handleMoveInput(), which shouldn't mutate heldInputs.keySet()
+                                sm.heldInputs.remove(type);
+                            } else {
                                 Integer newValue = integer - 1;
-                                if (newValue <= 0) {
+                                // JUtils.canHoldMove() may change after a holdable button was pressed if the player swaps their abilities
+                                if (newValue <= 0 || !JUtils.canHoldMove(player, type)) {
                                     server.execute(() -> {
                                         boolean success = true;
                                         JServerPlayerInputCallback.EVENT.invoker().onPlayerInput(player, type, false, success);
@@ -74,6 +75,7 @@ public class PlayerInputPacket {
                                 } else
                                     sm.heldInputs.put(type, newValue);
                             }
+                        }
                     );
 
                     sm.heldInputs.keySet().forEach(type -> handleMoveInput(server, player, type));
@@ -134,6 +136,7 @@ public class PlayerInputPacket {
         InputStateManager sm = getInputStateManager(player);
         for (int i = 0; i < count; i++) {
             MoveInputType type = buf.readEnumConstant(MoveInputType.class);
+            buf.readBoolean(); // Throwaway hold input data
             if (JUtils.canHoldMove(player, type))
                 sm.heldInputs.put(type, HOLD_TIMEOUT_TICKS);
         }
@@ -225,6 +228,11 @@ public class PlayerInputPacket {
         }
     }
 
+    /**
+     * javadoc pliz :>
+     * @param player that sent the input
+     * @return
+     */
     private static CompletableFuture<Boolean> handleMoveInput(MinecraftServer server, ServerPlayerEntity player, MoveInputType type) {
         CompletableFuture<Boolean> future = new CompletableFuture<>();
         ServerWorld world = player.getWorld();
