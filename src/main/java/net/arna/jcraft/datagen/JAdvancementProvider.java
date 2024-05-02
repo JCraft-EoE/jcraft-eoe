@@ -87,5 +87,62 @@ public class JAdvancementProvider extends FabricAdvancementProvider {
                 .criterion("has_arrow", InventoryChangedCriterion.Conditions.items(JObjectRegistry.REQUIEMARROW))
                 .build(JCraft.id("obtain_requiem_arrow"));
         consumer.accept(obtainRequiemArrow);
+        // find stone mask
+        final Advancement findStoneMask = Advancement.Builder.create()
+                .display(JObjectRegistry.STONE_MASK,
+                        Text.literal("This is gonna hurt…"),
+                        Text.literal("Find a Stone Mask"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        false,
+                        false)
+                .parent(obtainMeteoriteIronOre)
+                .criterion("has_mask", InventoryChangedCriterion.Conditions.items(JObjectRegistry.STONE_MASK))
+                .build(JCraft.id("find_stone_mask"));
+        consumer.accept(findStoneMask);
+        // obtain coffin block
+        final Advancement obtainCoffin = Advancement.Builder.create()
+                .display(JObjectRegistry.COFFIN_BLOCK,
+                        Text.literal("Sleepy Vampire"),
+                        Text.literal("Obtain a Coffin"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        false,
+                        false)
+                .parent(findStoneMask)
+                .criterion("has_coffin", InventoryChangedCriterion.Conditions.items(JObjectRegistry.COFFIN_BLOCK))
+                .build(JCraft.id("obtain_coffin"));
+        consumer.accept(obtainCoffin);
+        // obtain sun protections
+        final Advancement obtainSunProtection = Advancement.Builder.create()
+                .display(JObjectRegistry.KARSHEADWRAP,
+                        Text.literal("Rise and Shine"),
+                        Text.literal("Obtain all sun protection items"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        false,
+                        false)
+                .parent(findStoneMask)
+                .criterion("has_kars_headwrap", InventoryChangedCriterion.Conditions.items(JObjectRegistry.KARSHEADWRAP))
+                .criterion("has_red_hat", InventoryChangedCriterion.Conditions.items(JObjectRegistry.RED_HAT))
+                .build(JCraft.id("obtain_sun_protection"));
+        consumer.accept(obtainSunProtection);
+        // obtain blood bottle
+        final Advancement obtainBloodBottle = Advancement.Builder.create()
+                .display(JObjectRegistry.BLOOD_BOTTLE,
+                        Text.literal("Not Kool-Aid"),
+                        Text.literal("Obtain a blood bottle"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        false,
+                        false)
+                .parent(findStoneMask)
+                .criterion("has_bottle", InventoryChangedCriterion.Conditions.items(JObjectRegistry.BLOOD_BOTTLE))
+                .build(JCraft.id("obtain_blood_bottle"));
+        consumer.accept(obtainBloodBottle);
     }
 }

@@ -11,6 +11,7 @@ import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.tag.ItemTags;
 
 import java.util.function.Consumer;
 
@@ -115,6 +116,57 @@ public class JRecipeProvider extends FabricRecipeProvider {
                 .input(Items.TIPPED_ARROW)
                 .criterion("has_arrow", InventoryChangedCriterion.Conditions.items(JObjectRegistry.STANDARROW))
                 .criterion("has_ruby", InventoryChangedCriterion.Conditions.items(JObjectRegistry.REQUIEMRUBY))
+                .offerTo(exporter);
+        // coffin
+        ShapedRecipeJsonBuilder.create(JObjectRegistry.COFFIN_BLOCK)
+                .pattern("SSS")
+                .pattern("SBS")
+                .input('B', ItemTags.BEDS)
+                .input('S', ItemTags.WOODEN_SLABS)
+                .criterion("has_black_bed", InventoryChangedCriterion.Conditions.items(Items.BLACK_BED))
+                .criterion("has_blue_bed", InventoryChangedCriterion.Conditions.items(Items.BLUE_BED))
+                .criterion("has_brown_bed", InventoryChangedCriterion.Conditions.items(Items.BROWN_BED))
+                .criterion("has_cyan_bed", InventoryChangedCriterion.Conditions.items(Items.CYAN_BED))
+                .criterion("has_gray_bed", InventoryChangedCriterion.Conditions.items(Items.GRAY_BED))
+                .criterion("has_green_bed", InventoryChangedCriterion.Conditions.items(Items.GREEN_BED))
+                .criterion("has_light_blue_bed", InventoryChangedCriterion.Conditions.items(Items.LIGHT_BLUE_BED))
+                .criterion("has_light_grey_bed", InventoryChangedCriterion.Conditions.items(Items.LIGHT_GRAY_BED))
+                .criterion("has_lime_bed", InventoryChangedCriterion.Conditions.items(Items.LIME_BED))
+                .criterion("has_magenta_bed", InventoryChangedCriterion.Conditions.items(Items.MAGENTA_BED))
+                .criterion("has_orange_bed", InventoryChangedCriterion.Conditions.items(Items.ORANGE_BED))
+                .criterion("has_pink_bed", InventoryChangedCriterion.Conditions.items(Items.PINK_BED))
+                .criterion("has_purple_bed", InventoryChangedCriterion.Conditions.items(Items.PURPLE_BED))
+                .criterion("has_red_bed", InventoryChangedCriterion.Conditions.items(Items.RED_BED))
+                .criterion("has_white_bed", InventoryChangedCriterion.Conditions.items(Items.WHITE_BED))
+                .criterion("has_yellow_bed", InventoryChangedCriterion.Conditions.items(Items.YELLOW_BED))
+                .offerTo(exporter);
+        // Kars' headwrap
+        ShapedRecipeJsonBuilder.create(JObjectRegistry.KARSHEADWRAP)
+                .pattern(" C ")
+                .pattern("L L")
+                .pattern(" B ")
+                .input('B', Items.BLACK_DYE)
+                .input('C', Items.LEATHER_HELMET)
+                .input('L', Items.LEATHER)
+                .criterion("has_leather_helmet", InventoryChangedCriterion.Conditions.items(Items.LEATHER_HELMET))
+                .offerTo(exporter);
+        // red hat
+        ShapedRecipeJsonBuilder.create(JObjectRegistry.RED_HAT)
+                .pattern(" R ")
+                .pattern("LCL")
+                .input('C', Items.LEATHER_HELMET)
+                .input('L', Items.LEATHER)
+                .input('R', Items.RED_DYE)
+                .criterion("has_leather_helmet", InventoryChangedCriterion.Conditions.items(Items.LEATHER_HELMET))
+                .offerTo(exporter);
+        // blood bottle
+        ShapedRecipeJsonBuilder.create(JObjectRegistry.BLOOD_BOTTLE)
+                .pattern(" B ")
+                .pattern(" G ")
+                .pattern("GGG")
+                .input('B', ItemTags.BUTTONS)
+                .input('G', Items.GLASS)
+                .criterion("has_glass", InventoryChangedCriterion.Conditions.items(Items.GLASS))
                 .offerTo(exporter);
     }
 }
