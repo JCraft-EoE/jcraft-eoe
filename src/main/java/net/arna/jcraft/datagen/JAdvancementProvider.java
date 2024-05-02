@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricAdvancementProvider;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementFrame;
+import net.minecraft.advancement.AdvancementRewards;
 import net.minecraft.advancement.criterion.InventoryChangedCriterion;
 import net.minecraft.text.Text;
 
@@ -121,7 +122,7 @@ public class JAdvancementProvider extends FabricAdvancementProvider {
                         Text.literal("Rise and Shine"),
                         Text.literal("Obtain all sun protection items"),
                         null,
-                        AdvancementFrame.TASK,
+                        AdvancementFrame.GOAL,
                         true,
                         false,
                         false)
@@ -144,5 +145,42 @@ public class JAdvancementProvider extends FabricAdvancementProvider {
                 .criterion("has_bottle", InventoryChangedCriterion.Conditions.items(JObjectRegistry.BLOOD_BOTTLE))
                 .build(JCraft.id("obtain_blood_bottle"));
         consumer.accept(obtainBloodBottle);
+        // obtain Jotaro outfit
+        final Advancement obtainJotaroOutfit = Advancement.Builder.create()
+                .display(JObjectRegistry.JOTAROCAP,
+                        Text.literal("ORA ORA"),
+                        Text.literal("Obtain all of Jotaro's clothes"),
+                        null,
+                        AdvancementFrame.CHALLENGE,
+                        true,
+                        false,
+                        false)
+                .parent(obtainMeteoriteIronOre)
+                .criterion("has_jotaro_cap", InventoryChangedCriterion.Conditions.items(JObjectRegistry.JOTAROCAP))
+                .criterion("has_jotaro_jacket", InventoryChangedCriterion.Conditions.items(JObjectRegistry.JOTAROJACKET))
+                .criterion("has_jotaro_pants", InventoryChangedCriterion.Conditions.items(JObjectRegistry.JOTAROPANTS))
+                .criterion("has_jotaro_boots", InventoryChangedCriterion.Conditions.items(JObjectRegistry.JOTAROBOOTS))
+                .rewards(AdvancementRewards.Builder.experience(200))
+                .build(JCraft.id("obtain_jotaro_outfit"));
+        consumer.accept(obtainJotaroOutfit);
+        // obtain Jotaro outfit
+        final Advancement obtainDioOutfit = Advancement.Builder.create()
+                .display(JObjectRegistry.DIOHEADBAND,
+                        Text.literal("MUDA MUDA"),
+                        Text.literal("Obtain all of Dio's clothes"),
+                        null,
+                        AdvancementFrame.CHALLENGE,
+                        true,
+                        false,
+                        false)
+                .parent(obtainMeteoriteIronOre)
+                .criterion("has_dio_headband", InventoryChangedCriterion.Conditions.items(JObjectRegistry.DIOHEADBAND))
+                .criterion("has_dio_jacket", InventoryChangedCriterion.Conditions.items(JObjectRegistry.DIOJACKET))
+                .criterion("has_dio_cape", InventoryChangedCriterion.Conditions.items(JObjectRegistry.DIOCAPE))
+                .criterion("has_dio_pants", InventoryChangedCriterion.Conditions.items(JObjectRegistry.DIOPANTS))
+                .criterion("has_dio_boots", InventoryChangedCriterion.Conditions.items(JObjectRegistry.DIOBOOTS))
+                .rewards(AdvancementRewards.Builder.experience(200))
+                .build(JCraft.id("obtain_dio_outfit"));
+        consumer.accept(obtainDioOutfit);
     }
 }
