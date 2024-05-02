@@ -183,7 +183,7 @@ public class PlayerInputPacket {
 
             if (JUtils.canHoldMove(player, type)) {
                 if (pressed) sm.heldInputs.put(type, HOLD_TIMEOUT_TICKS);
-                else sm.heldInputs.remove(type);
+                else sm.heldInputs.put(type, 0);
             }
 
             if (pressed) handleMoveInput(server, player, type).thenAccept(b -> {
