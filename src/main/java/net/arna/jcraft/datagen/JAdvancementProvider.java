@@ -192,7 +192,7 @@ public class JAdvancementProvider extends FabricAdvancementProvider {
                         AdvancementFrame.CHALLENGE,
                         true,
                         false,
-                        true)
+                        false)
                 .parent(obtainDioOutfit)
                 .criterion("has_diary", InventoryChangedCriterion.Conditions.items(JObjectRegistry.DIOSDIARY))
                 .rewards(AdvancementRewards.Builder.experience(500))
