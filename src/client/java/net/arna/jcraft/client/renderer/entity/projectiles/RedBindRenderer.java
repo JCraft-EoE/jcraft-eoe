@@ -8,9 +8,10 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import software.bernie.geckolib.renderer.GeoEntityRenderer;
 import software.bernie.geckolib3.renderers.geo.GeoProjectilesRenderer;
 
-public class RedBindRenderer extends GeoProjectilesRenderer<RedBindEntity> {
+public class RedBindRenderer extends GeoEntityRenderer<RedBindEntity> {
     public RedBindRenderer(EntityRendererFactory.Context renderManagerIn) {
         super(renderManagerIn, new RedBindModel());
     }

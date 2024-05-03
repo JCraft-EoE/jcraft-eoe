@@ -18,21 +18,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib3.compat.PatchouliCompat;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.util.Color;
-import software.bernie.geckolib3.geo.render.built.GeoModel;
-import software.bernie.geckolib3.model.provider.data.EntityModelData;
-import software.bernie.geckolib3.renderers.geo.GeoEntityRenderer;
-import software.bernie.geckolib3.renderers.geo.GeoLayerRenderer;
-import software.bernie.geckolib3.util.EModelRenderCycle;
+import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
 import java.util.Collections;
 
 public class SunRenderer extends GeoEntityRenderer<TheSunEntity> {
     public SunRenderer(EntityRendererFactory.Context renderManager) {
         super(renderManager, new TheSunModel());
-        addLayer(new SunGlowLayer(this));
+        addRenderLayer(new SunGlowLayer(this));
     }
 
     @Override

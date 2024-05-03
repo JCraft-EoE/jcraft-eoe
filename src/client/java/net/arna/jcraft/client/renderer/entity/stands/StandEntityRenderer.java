@@ -20,6 +20,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.LightType;
 import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib.cache.object.BakedGeoModel;
+import software.bernie.geckolib.core.object.Color;
 import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
@@ -49,25 +51,21 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends GeoEntityR
     }
 
     @Override
-    public RenderLayer getRenderType(T stand, float partialTicks, MatrixStack stack,
-                                     @Nullable VertexConsumerProvider renderTypeBuffer, @Nullable VertexConsumer vertexBuilder,
-                                     int packedLightIn, Identifier textureLocation) {
+    public RenderLayer getRenderType(T animatable, Identifier texture, @Nullable VertexConsumerProvider bufferSource, float partialTick) {
         MinecraftClient mcClient = MinecraftClient.getInstance();
-        return mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null && JUtils.getStand(mcClient.player) == stand ?
-                RenderLayer.getEntityNoOutline(textureLocation) : RenderLayer.getEntityTranslucent(textureLocation);
-
+        return mcClient.options.getPerspective().isFirstPerson() && mcClient.player != null && JUtils.getStand(mcClient.player) == animatable ?
+                RenderLayer.getEntityNoOutline(texture) : RenderLayer.getEntityTranslucent(texture);
     }
 
     // Adds the ability to change render alpha
     @Override
-    public void render(GeoModel model, T stand, float tickDelta, RenderLayer type, MatrixStack matrixStackIn,
-                       VertexConsumerProvider vertexConsumerProvider, VertexConsumer vertexConsumer, int packedLightIn,
-                       int packedOverlayIn, float red, float green, float blue, float alpha) {
-        float a = getAlpha(stand, tickDelta);
+    public void preRender(MatrixStack poseStack, T stand, BakedGeoModel model, VertexConsumerProvider bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+
+        float a = getAlpha(stand, partialTick);
         a *= alpha;
         if (a <= 0.01f) return;
-        super.render(model, stand, tickDelta, type, matrixStackIn, vertexConsumerProvider, vertexConsumer, packedLightIn,
-                packedOverlayIn, getRed(stand, red, a), getGreen(stand, green, a), getBlue(stand, blue, a), a);
+
+        super.preRender(poseStack, stand, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, getRed(stand, red, a), getGreen(stand, green, a), getBlue(stand, blue, a), alpha);
     }
 
     // Better than a mixin, makes stands look towards the users HEAD rotation as opposed to body
@@ -177,12 +175,12 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends GeoEntityR
         if (!stand.hasUser()) return super.getBlockLight(stand, pos);
 
         if (stand.isOnFire() || stand.getUserOrThrow().isOnFire()) return 15;
-        return stand.world.getLightLevel(LightType.BLOCK, stand.getUserOrThrow().getBlockPos());
+        return stand.getWorld().getLightLevel(LightType.BLOCK, stand.getUserOrThrow().getBlockPos());
     }
 
     @Override
     protected int getSkyLight(T stand, BlockPos pos) {
-        return stand.hasUser() ? stand.world.getLightLevel(LightType.SKY, stand.getUserOrThrow().getBlockPos()) :
+        return stand.hasUser() ? stand.getWorld().getLightLevel(LightType.SKY, stand.getUserOrThrow().getBlockPos()) :
                 super.getSkyLight(stand, pos);
     }
 

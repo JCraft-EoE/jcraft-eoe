@@ -12,10 +12,11 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
+import software.bernie.geckolib.renderer.DynamicGeoEntityRenderer;
 
 import java.util.Objects;
 
-public class GEButterflyRenderer extends ExtendedGeoEntityRenderer<GEButterflyEntity> {
+public class GEButterflyRenderer extends DynamicGeoEntityRenderer<GEButterflyEntity> {
     protected ItemStack mainHandItem;
 
     @Override

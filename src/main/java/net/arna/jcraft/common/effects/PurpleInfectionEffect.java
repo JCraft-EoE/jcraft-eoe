@@ -28,6 +28,6 @@ public class PurpleInfectionEffect extends StatusEffect {
         float damage = 0.6666f; // 1/3rd of a heart
         if (standType == StandType.PURPLE_HAZE_DISTORTION)
             damage /= 3.0f;
-        entity.damage(JDamageSources.phpoison(), damage);
+        entity.damage(JDamageSources.phpoison(entity.getWorld()), damage);
     }
 }

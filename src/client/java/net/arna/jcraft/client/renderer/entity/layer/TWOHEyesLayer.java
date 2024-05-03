@@ -4,14 +4,18 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.stand.TheWorldOverHeavenEntity;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import org.joml.Vector3f;
+import software.bernie.geckolib.cache.object.BakedGeoModel;
+import software.bernie.geckolib.renderer.GeoRenderer;
+import software.bernie.geckolib.renderer.layer.GeoRenderLayer;
 
 import java.util.Map;
 
-public class TWOHEyesLayer extends GeoLayerRenderer<TheWorldOverHeavenEntity> {
+public class TWOHEyesLayer extends GeoRenderLayer<TheWorldOverHeavenEntity> {
     private static final Identifier LAYER = new Identifier(JCraft.MOD_ID, "textures/entity/stands/the_world_over_heaven/eyes.png");
     private static final Identifier MODEL = new Identifier(JCraft.MOD_ID, "geo/the_world_over_heaven.geo.json");
     private static final Map<Integer, Vector3f> overwriteColors =
@@ -25,18 +29,19 @@ public class TWOHEyesLayer extends GeoLayerRenderer<TheWorldOverHeavenEntity> {
               Map.entry(4, new Vector3f(1f, 0.8f, 0)) // Heavy, YELLOW
             );
 
-    public TWOHEyesLayer(IGeoRenderer<TheWorldOverHeavenEntity> entityRendererIn) {
+    public TWOHEyesLayer(GeoRenderer<TheWorldOverHeavenEntity> entityRendererIn) {
         super(entityRendererIn);
     }
 
     @Override
-    public void render(MatrixStack matrixStackIn, VertexConsumerProvider bufferIn, int packedLightIn, TheWorldOverHeavenEntity twoh, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void render(MatrixStack matrixStackIn, TheWorldOverHeavenEntity twoh, BakedGeoModel bakedModel, RenderLayer renderType, VertexConsumerProvider bufferSource, VertexConsumer bufferIn, float partialTick, int packedLightIn, int packedOverlay) {
+
         Vector3f color = overwriteColors.get(twoh.getOverwriteType());
         RenderLayer cameo = RenderLayer.getEyes(LAYER);
 
         matrixStackIn.push();
-        getRenderer().render(getEntityModel().getModel(MODEL), twoh, partialTicks, cameo, matrixStackIn, bufferIn,
-                bufferIn.getBuffer(cameo), packedLightIn, OverlayTexture.DEFAULT_UV, color.getX(), color.getY(), color.getZ(), 1f);
+        getRenderer().reRender(getDefaultBakedModel(twoh), matrixStackIn, bufferSource, twoh, cameo,
+                bufferSource.getBuffer(cameo), partialTick, packedLightIn, OverlayTexture.DEFAULT_UV, color.x(), color.y(), color.z(), 1f);
         matrixStackIn.pop();
     }
 }

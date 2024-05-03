@@ -8,9 +8,10 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import software.bernie.geckolib.renderer.GeoEntityRenderer;
 import software.bernie.geckolib3.renderers.geo.GeoProjectilesRenderer;
 
-public class BulletRenderer extends GeoProjectilesRenderer<BulletProjectile> {
+public class BulletRenderer extends GeoEntityRenderer<BulletProjectile> {
     public BulletRenderer(EntityRendererFactory.Context renderManagerIn) {
         super(renderManagerIn, new BulletModel()); // 3x1x1 px cuboid model
     }

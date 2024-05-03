@@ -9,9 +9,10 @@ import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import software.bernie.geckolib.renderer.GeoEntityRenderer;
 import software.bernie.geckolib3.renderers.geo.GeoProjectilesRenderer;
 
-public class SunBeamRenderer extends GeoProjectilesRenderer<SunBeamProjectile> {
+public class SunBeamRenderer extends GeoEntityRenderer<SunBeamProjectile> {
 
     public SunBeamRenderer(EntityRendererFactory.Context renderManagerIn) {
         super(renderManagerIn, new SunBeamModel());

@@ -6,13 +6,15 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 public class JDataGen implements DataGeneratorEntrypoint {
     @Override
     public void onInitializeDataGenerator(FabricDataGenerator generator) {
-        generator.addProvider(JModelProvider::new);
+        var pack = generator.createPack();
+
+        pack.addProvider(JModelProvider::new);
         //generator.addProvider(JLanguageProvider::new);
-        generator.addProvider(JLootTableProviders.BlockLoot::new);
-        generator.addProvider(JLootTableProviders.EntityLoot::new);
-        generator.addProvider(JTagProviders.JBlockTags::new);
-        generator.addProvider(JTagProviders.JItemTags::new);
-        generator.addProvider(JAdvancementProvider::new);
-        generator.addProvider(JRecipeProvider::new);
+        pack.addProvider(JLootTableProviders.BlockLoot::new);
+        pack.addProvider(JLootTableProviders.EntityLoot::new);
+        //pack.addProvider(JTagProviders.JBlockTags::new);
+        //pack.addProvider(JTagProviders.JItemTags::new);
+        pack.addProvider(JAdvancementProvider::new);
+        pack.addProvider(JRecipeProvider::new);
     }
 }

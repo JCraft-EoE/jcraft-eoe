@@ -10,9 +10,10 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.LightType;
+import software.bernie.geckolib.renderer.GeoEntityRenderer;
 import software.bernie.geckolib3.renderers.geo.GeoProjectilesRenderer;
 
-public class KnifeRenderer extends GeoProjectilesRenderer<KnifeProjectile> {
+public class KnifeRenderer extends GeoEntityRenderer<KnifeProjectile> {
 
     public KnifeRenderer(EntityRendererFactory.Context renderManagerIn) {
         super(renderManagerIn, new KnifeModel());

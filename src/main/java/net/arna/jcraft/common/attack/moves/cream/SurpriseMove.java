@@ -31,7 +31,7 @@ public class SurpriseMove extends AbstractMove<SurpriseMove, CreamEntity> {
         // OUT_POS are set in .withInitAction() in CreamEntity.java
 
         attacker.setFree(true);
-        attacker.setFreePos(new Vec3f(attacker.getUserOrThrow().getPos()));
+        attacker.setFreePos(attacker.getUserOrThrow().getPos().toVector3f());
     }
 
     @Override
@@ -40,9 +40,9 @@ public class SurpriseMove extends AbstractMove<SurpriseMove, CreamEntity> {
 
         // OUT_DIR is set in .withAction() in CreamEntity.java
 
-        ctx.get(OUT_POS).subtract(ctx.get(OUT_DIR));
-        Vec3f outPos = ctx.get(OUT_POS);
-        attacker.setPosition(new Vec3d(outPos.getX(), outPos.getY(), outPos.getZ()));
+        ctx.get(OUT_POS).sub(ctx.get(OUT_DIR));
+        var outPos = ctx.get(OUT_POS);
+        attacker.setPosition(new Vec3d(outPos.x(), outPos.y(), outPos.z()));
         attacker.setFreePos(outPos);
 
         attacker.setVoidTime(getWindupPoint());

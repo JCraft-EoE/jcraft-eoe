@@ -9,6 +9,6 @@ public class TheWorldOverHeavenRenderer extends StandEntityRenderer<TheWorldOver
 
     public TheWorldOverHeavenRenderer(EntityRendererFactory.Context context) {
         super(context, new TheWorldOverHeavenModel());
-        this.addLayer(new TWOHEyesLayer(this));
+        this.addRenderLayer(new TWOHEyesLayer(this));
     }
 }

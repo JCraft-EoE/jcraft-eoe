@@ -216,23 +216,6 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
 
     // Animation code
     public enum State implements StandAnimationState<StarPlatinumEntity> {
-        IDLE((starPlatinum, builder) -> builder.loop("animation.starplatinum." +
-                (starPlatinum.getInhaleTime() > 0 ? "inhaleidle" : "idle"))),
-        PUNCH(builder -> builder.playAndHold("animation.starplatinum.light")),
-        BLOCK(builder -> builder.loop("animation.starplatinum.block")),
-        HEAVY(builder -> builder.playAndHold("animation.starplatinum.heavy")),
-        GROUND_BREAKER(builder -> builder.playAndHold("animation.starplatinum.ground_slam")),
-        BARRAGE(builder -> builder.loop("animation.starplatinum.barrage")),
-        STAR_FINGER(builder -> builder.playAndHold("animation.starplatinum.star_finger")),
-        INHALE(builder -> builder.playAndHold("animation.starplatinum.inhale")),
-        KNEE(builder -> builder.playAndHold("animation.starplatinum.knee")),
-        KNEE_UP(builder -> builder.playAndHold("animation.starplatinum.knee_up")),
-        JUMP(builder -> builder.playAndHold("animation.starplatinum.jump")),
-        GRAB(builder -> builder.playAndHold("animation.starplatinum.grab")),
-        GRAB_HIT(builder -> builder.playAndHold("animation.starplatinum.grabhit")),
-
-        UPPERCUT(builder -> builder.playAndHold("animation.starplatinum.uppercut")),
-        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.starplatinum.light_followup"));
         IDLE((starPlatinum, builder) -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.starplatinum." +
                 (starPlatinum.getInhaleTime() > 0 ? "inhaleidle" : "idle")))),
         PUNCH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.light"))),
@@ -243,7 +226,10 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
         STAR_FINGER(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.star_finger"))),
         INHALE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.inhale"))),
         KNEE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.knee"))),
+        KNEE_UP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.knee_up"))),
         JUMP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.jump"))),
+        GRAB(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.grab"))),
+        GRAB_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.grabhit"))),
         UPPERCUT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.uppercut"))),
         LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.light_followup")));
 

@@ -388,7 +388,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
 
         LivingEntity user = this.getUser();
         if (user == null) return;
-        if (world.isClient) return;
+        if (getWorld().isClient) return;
         TIME_ERASE.tickTimeErase(this);
     }
 

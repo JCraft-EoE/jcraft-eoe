@@ -9,10 +9,10 @@ import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Matrix4f;
+import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vector3f;
 import net.minecraft.world.LightType;
+import org.joml.Matrix4f;
 
 import java.util.List;
 import java.util.stream.IntStream;
@@ -35,15 +35,15 @@ public class ShockwaveEffectRenderer {
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
         RenderSystem.disableCull();
-        RenderSystem.setShader(GameRenderer::getPositionColorTexLightmapShader);
+        RenderSystem.setShader(GameRenderer::getPositionColorTexLightmapProgram);
 
         for (ShockwaveHandlerComponent.Shockwave shockwave : shockwaveHandler.getShockwaves()) {
             stack.push();
 
             // Calculate matrix
             stack.translate(shockwave.getX() - camPos.x, shockwave.getY() - camPos.y, shockwave.getZ() - camPos.z);
-            stack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(-shockwave.getYaw()));
-            stack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(shockwave.getPitch()));
+            stack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-shockwave.getYaw()));
+            stack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(shockwave.getPitch()));
             Matrix4f mat = stack.peek().getPositionMatrix();
 
             // Calculate light

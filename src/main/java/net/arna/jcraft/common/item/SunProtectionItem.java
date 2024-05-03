@@ -10,7 +10,9 @@ import net.minecraft.text.Text;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -19,7 +21,7 @@ import java.util.function.Supplier;
 public class SunProtectionItem extends ArmorItem implements GeoItem {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
-    public SunProtectionItem(ArmorMaterial materialIn, EquipmentSlot slot, Settings builder) {
+    public SunProtectionItem(ArmorMaterial materialIn, ArmorItem.Type slot, Settings builder) {
         super(materialIn, slot, builder);
     }
 
@@ -37,6 +39,7 @@ public class SunProtectionItem extends ArmorItem implements GeoItem {
 
     @SuppressWarnings("SameReturnValue")
     private <P extends IAnimatable> PlayState predicate(AnimationEvent<P> event) { return PlayState.STOP; }
+
     @Override
     public void registerControllers(AnimationData data) { data.addAnimationController(new AnimationController(this, "controller", 20, this::predicate)); }
 

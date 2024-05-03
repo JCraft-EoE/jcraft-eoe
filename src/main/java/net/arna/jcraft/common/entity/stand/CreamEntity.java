@@ -118,17 +118,17 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             .withInitAction((attacker, user, ctx) -> {
                 Vec3d rotVec = user.getRotationVector();
                 if (user.isSneaking()) {
-                    attacker.getMoveContext().set(OUT_POS, new Vec3f(user.getPos().add(rotVec)));
+                    attacker.getMoveContext().set(OUT_POS, user.getPos().add(rotVec).toVector3f());
                 } else {
                     Vec3d eyePos = user.getEyePos();
                     HitResult hitResult = attacker.getWorld().raycast(new RaycastContext(eyePos, eyePos.add(rotVec.multiply(16)),
                             RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user));
-                    attacker.getMoveContext().set(OUT_POS, new Vec3f(hitResult.getPos()));
+                    attacker.getMoveContext().set(OUT_POS, hitResult.getPos().toVector3f());
                 }
             })
             .withAction((attacker, user, ctx, targets) -> {
-                Vec3f outDir = GravityChangerAPI.getGravityDirection(attacker).getUnitVector();
-                outDir.scale(-1f);
+                var outDir = GravityChangerAPI.getGravityDirection(attacker).getUnitVector();
+                outDir.mul(-1f);
                 ctx.set(OUT_DIR, outDir);
             })
             .withInfo(
@@ -214,8 +214,8 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             .withSound(JSoundRegistry.CREAM_BALLDASH)
             .withInitAction((attacker, user, ctx) -> {
                 attacker.endHalfBall();
-                attacker.getMoveContext().set(OUT_POS, new Vec3f(user.getPos()));
-                ctx.set(OUT_DIR, new Vec3f(user.getRotationVector().multiply(0.75)));
+                attacker.getMoveContext().set(OUT_POS, user.getPos().toVector3f());
+                ctx.set(OUT_DIR, user.getRotationVector().multiply(0.75).toVector3f());
             })
             .withInfo(
                     Text.literal("Detaching Void Charge"),
@@ -593,7 +593,11 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         Vec3d vel = new Vec3d(user.getVelocity().x, 0.0, user.getVelocity().z);
 
         // Targeting priority
-        LivingEntity targetEntity = user.getDamageTracker().getBiggestFall();
+        var damageRecord = user.getDamageTracker().getBiggestFall();
+        Entity targetEntity = null;
+        if (damageRecord != null) {
+            targetEntity = damageRecord.damageSource().getAttacker();
+        }
         if (targetEntity == null && user instanceof MobEntity mob)
             targetEntity = mob.getTarget();
         if (targetEntity == null)
@@ -635,7 +639,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         CONSUME(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cream.consume"))),
         BALL_CONSUME(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cream.ballconsume"))),
         SURPRISE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cream.surprise"))),
-        CHARGE_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cream.charge_hit"))),
+        CHARGE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cream.charge"))),
         GRAB(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cream.grab"))),
         GRAB_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cream.grab_hit"))),
         ENTER(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cream.enter"))),

@@ -22,12 +22,18 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.LightType;
 import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib.model.GeoModel;
+import software.bernie.geckolib.renderer.DynamicGeoEntityRenderer;
+import software.bernie.geckolib.renderer.GeoArmorRenderer;
+import software.bernie.geckolib.renderer.GeoEntityRenderer;
+import software.bernie.geckolib.renderer.layer.GeoRenderLayer;
 
 import java.util.Collections;
+import java.util.List;
 
-public class ExtendedStandEntityRenderer<T extends StandEntity<?,?>> extends ExtendedGeoEntityRenderer<T> {
+public class ExtendedStandEntityRenderer<T extends StandEntity<?,?>> extends DynamicGeoEntityRenderer<T> {
     protected ItemStack mainHandItem, offHandItem;
-    protected ExtendedStandEntityRenderer(EntityRendererFactory.Context renderManager, AnimatedGeoModel<T> modelProvider) {
+    protected ExtendedStandEntityRenderer(EntityRendererFactory.Context renderManager, GeoModel<T> modelProvider) {
         super(renderManager, modelProvider);
     }
 

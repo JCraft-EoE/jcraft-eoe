@@ -20,7 +20,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.tag.BlockTags;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec2f;
@@ -251,7 +251,7 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
 
         if (!isRemoteAndControllable()) return;
 
-        if (world.isClient()) {
+        if (getWorld().isClient()) {
             JCraft.getClientEntityHandler().purpleHazeRemoteClientTick(this);
         } else {
             double f = getRemoteForwardInput();
@@ -259,7 +259,7 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
             boolean jump = getRemoteJumpInput();
 
             tickRemoteMovement(f, s, jump);
-            tickRemoteState(f, s, onGround);
+            tickRemoteState(f, s, isOnGround());
         }
     }
 
@@ -282,7 +282,7 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
         double moveSpeed = 0.24;
         boolean onGround = isOnGround();
         boolean climbing = getBlockStateAtPos().streamTags().anyMatch(tag -> tag == BlockTags.CLIMBABLE);
-        boolean swimming = !world.getFluidState(getBlockPos()).isEmpty();
+        boolean swimming = !getWorld().getFluidState(getBlockPos()).isEmpty();
 
         if (climbing || swimming) dragMult *= 0.5;
 

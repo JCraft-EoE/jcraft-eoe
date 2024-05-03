@@ -5,6 +5,7 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.MoveInputType;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.living.HitPropertyComponent;
+import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.projectile.JAttackEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
@@ -14,6 +15,7 @@ import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.splatter.JSplatterManager;
 import net.arna.jcraft.registry.JEntityTypeRegistry;
+import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
@@ -24,9 +26,11 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -36,6 +40,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.EntityTypeTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -179,7 +184,7 @@ public final class JUtils {
     public static void serverPlaySound(SoundEvent sound, ServerWorld serverWorld, Vec3d pos, double radius) {
         PlayerLookup.around(serverWorld, pos, radius).forEach(
                 serverPlayer -> serverPlayer.networkHandler.sendPacket(
-                        new PlaySoundS2CPacket(sound, SoundCategory.PLAYERS, pos.x, pos.y, pos.z, 1, 1, 0)
+                        new PlaySoundS2CPacket(Registries.SOUND_EVENT.getEntry(sound), SoundCategory.PLAYERS, pos.x, pos.y, pos.z, 1, 1, 0)
                 )
         );
     }
@@ -271,9 +276,11 @@ public final class JUtils {
         Objects.requireNonNull(proj, "Attempted to run ProjectileDamageLogic with invalid projectile in world " + world);
         Entity owner = proj.getOwner();
         DamageSource source;
-        if (owner == null)
-            source = DamageSource.GENERIC;
-        else source = DamageSource.thrownProjectile(proj, owner);
+        if (owner == null) {
+            source = JDamageSources.create(world, DamageTypes.GENERIC);
+        } else {
+            source = JDamageSources.create(world, DamageTypes.MOB_PROJECTILE, proj, owner);
+        }
 
         if (ent instanceof LivingEntity living) {
             LivingEntity target = living;
@@ -298,7 +305,7 @@ public final class JUtils {
             livingEntity.prevBodyYaw = livingEntity.bodyYaw;
             livingEntity.prevHeadYaw = livingEntity.headYaw;
             livingEntity.lastHandSwingProgress = livingEntity.handSwingProgress;
-            livingEntity.lastLimbDistance = livingEntity.limbDistance;
+            //TODO check if this moved or changed livingEntity.lastLimbDistance = livingEntity.limbDistance;
         }
 
         entity.prevX = entity.getX();
@@ -368,11 +375,11 @@ public final class JUtils {
 
     public static void explode(World world, @Nullable Entity entity, double x, double y, double z, float power, JExplosionModifier modifier) {
         if (modifier == null) {
-            world.createExplosion(entity, x, y, z, power, Explosion.DestructionType.DESTROY);
+            world.createExplosion(entity, x, y, z, power, World.ExplosionSourceType.MOB);
             return;
         }
 
-        Explosion explosion = new Explosion(world, entity, x, y, z, power);
+        Explosion explosion = new Explosion(world, entity, x, y, z, power, false, Explosion.DestructionType.KEEP);
         ((IJExplosion) explosion).jcraft$setModifier(modifier);
         explosion.collectBlocksAndDamageEntities();
         explosion.affectWorld(true);

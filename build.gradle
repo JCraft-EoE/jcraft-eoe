@@ -87,7 +87,7 @@ dependencies {
 	runtimeOnly "org.joml:joml:1.10.4"
 	modImplementation "maven.modrinth:sodium:${project.sodium}"
 	modImplementation "com.ptsmods:devlogin:3.3.2" // To login into your Minecraft account
-	modRuntimeOnly "com.sk89q.worldedit:worldedit-fabric-mc1.20:${project.world_edit_version}"
+//	modRuntimeOnly "com.sk89q.worldedit:worldedit-fabric-mc1.20:${project.world_edit_version}"
 
 	// Bendylib
 	include modImplementation("io.github.kosmx.bendy-lib:bendy-lib-fabric:${project.bendylib_version}")

@@ -16,3 +16,6 @@ accessible field net/minecraft/client/render/BackgroundRenderer$FogData fogEnd F
 accessible field net/minecraft/client/render/BackgroundRenderer$FogData fogShape Lnet/minecraft/client/render/FogShape;
 accessible class net/minecraft/client/render/RenderLayer$MultiPhaseParameters
 accessible class net/minecraft/client/render/RenderLayer$MultiPhase
+
+accessible method net/minecraft/block/IceBlock melt (Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V
+accessible field net/minecraft/entity/ai/control/MoveControl sidewaysMovement F

@@ -170,7 +170,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     @Getter
     private final StandType standType;
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
-    protected Vector3f[] auraColors = {Vector3f.ZERO, Vector3f.POSITIVE_X, Vector3f.POSITIVE_Y, Vector3f.POSITIVE_Z};
+    protected Vector3f[] auraColors = {new Vector3f(), new Vector3f(1f, 0f ,0f), new Vector3f(0f, 1f ,0f), new Vector3f(0f, 0f ,1f)};
 
     protected StandEntity(StandType type, World world) {
         this(type, world, null, true);
@@ -1767,7 +1767,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 }
             }
 
-            if (hit) damageLogic(world, user, kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, hitAnimation, canBackstab, unblockable);
+            if (hit) damageLogic(getWorld(), user, kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, hitAnimation, canBackstab, unblockable);
         }
         return false;
     }

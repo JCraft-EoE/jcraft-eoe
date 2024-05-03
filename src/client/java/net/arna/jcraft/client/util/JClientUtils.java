@@ -16,8 +16,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib3.core.processor.AnimationProcessor;
-import software.bernie.geckolib3.core.processor.IBone;
+import software.bernie.geckolib.core.animatable.model.CoreGeoBone;
+import software.bernie.geckolib.core.animation.AnimationProcessor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,29 +88,29 @@ public class JClientUtils {
             if (playerVel.normalize().add(entity.getRotationVector()).horizontalLengthSquared() < playerVel.normalize().horizontalLengthSquared())
                 velInfluence *= -1;
 
-            IBone torso = animationProcessor.getBone("torso");
+            CoreGeoBone torso = animationProcessor.getBone("torso");
             if (torso != null) {
                 float pitch = (180f + overVel * velInfluence) * 3.1415f / 180f;
                 if (flipBody) {
                     pitch += 3.1415f;
                     pitch = -pitch;
                 }
-                torso.setRotationX(pitch + tPO);
+                torso.setRotX(pitch + tPO);
             }
         }
 
         if (entity.isBlocking() || entity.isIdle()) { // if in/going to idle, or blocking
-            IBone head = animationProcessor.getBone("head");
+            CoreGeoBone head = animationProcessor.getBone("head");
             if (head != null) {
                 float headPitch = (player.getPitch() - overVel * velInfluence) * 3.1415f / 180f;
                 if (flipHead) headPitch = -headPitch;
-                head.setRotationX(headPitch + hPO);
+                head.setRotX(headPitch + hPO);
             }
         } else if (entity.getMoveStun() > 0) {
-            IBone torso = animationProcessor.getBone("base");
+            CoreGeoBone torso = animationProcessor.getBone("base");
             if (torso != null) {
                 float torsoPitch = (player.getPitch() * 0.9f) * 3.1415f / 180f;
-                torso.setRotationX(torso.getRotationX() - torsoPitch);
+                torso.setRotX(torso.getRotX() - torsoPitch);
             }
         }
     }

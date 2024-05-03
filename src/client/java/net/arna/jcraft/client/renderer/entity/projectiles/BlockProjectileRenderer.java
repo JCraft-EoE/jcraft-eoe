@@ -9,11 +9,13 @@ import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import software.bernie.geckolib.renderer.GeoEntityRenderer;
 import software.bernie.geckolib3.renderers.geo.GeoProjectilesRenderer;
 
-public class BlockProjectileRenderer extends GeoProjectilesRenderer<BlockProjectile> {
+public class BlockProjectileRenderer extends GeoEntityRenderer<BlockProjectile> {
     private final ItemRenderer itemRenderer;
 
     public BlockProjectileRenderer(EntityRendererFactory.Context ctx) {
@@ -35,7 +37,7 @@ public class BlockProjectileRenderer extends GeoProjectilesRenderer<BlockProject
         itemRenderer.renderItem(
                 animatable,
                 animatable.getMainHandStack(),
-                ModelTransformation.Mode.HEAD,
+                ModelTransformationMode.HEAD,
                 false, poseStack, bufferSource, null, packedLight,
                 LivingEntityRenderer.getOverlay(animatable, 0),
                 animatable.getId());

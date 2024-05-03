@@ -259,7 +259,7 @@ public class TheWorldEntity extends StandEntity<TheWorldEntity, TheWorldEntity.S
         CHARGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.theworld.charge"))),
         CHARGE_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.theworld.charge_hit"))),
         ROUNDHOUSE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.theworld.roundhouse"))),
-        SWEEP(builder -> builder.playAndHold("animation.theworld.sweep")),
+        SWEEP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.theworld.sweep"))),
         COUNTER_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.theworld.counter_hit"))),
         COUNTER_MISS(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.theworld.counter_miss"))),
         LOW(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.theworld.low"))),

@@ -25,15 +25,16 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.predicate.entity.EntityPredicates;
-import net.minecraft.tag.ItemTags;
+import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import org.joml.Vector3f;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
 
 import java.util.Comparator;
 import java.util.List;
@@ -117,18 +118,18 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                 EVOLUTION: Give Purple Haze any flower after it has killed a stand user.
                 Doing this 5 times will evolve it into Purple Haze: Distortion.""";
 
-        auraColors = new Vec3f[]{
-                new Vec3f(1.0f, 0.2f, 0.6f),
-                new Vec3f(0.3f, 1.0f, 0.6f),
-                new Vec3f(1.0f, 1.0f, 1.0f),
-                new Vec3f(0.5f, 0.3f, 1.0f)
+        auraColors = new Vector3f[]{
+                new Vector3f(1.0f, 0.2f, 0.6f),
+                new Vector3f(0.3f, 1.0f, 0.6f),
+                new Vector3f(1.0f, 1.0f, 1.0f),
+                new Vector3f(0.5f, 0.3f, 1.0f)
         };
     }
 
     @Override
-    public Vec3f getAuraColor() {
+    public Vector3f getAuraColor() {
         if (rage == MAX_RAGE)
-            return Vec3f.POSITIVE_X;
+            return new Vector3f(1f, 0f, 0f);
         return super.getAuraColor();
     }
 
@@ -136,7 +137,7 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
     public void desummon() {
         if (toEvolve && hasUser()) {
             JComponents.getStandData(getUserOrThrow()).setType(StandType.PURPLE_HAZE_DISTORTION);
-            JCraft.summon(world, getUserOrThrow());
+            JCraft.summon(getWorld(), getUserOrThrow());
         }
 
         super.desummon();
@@ -209,7 +210,7 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
     public void standBlock() {
         if (!hasUser()) return;
         // Projectile deflection
-        List<ProjectileEntity> toDeflect = this.world.getEntitiesByClass(ProjectileEntity.class, this.getBoundingBox().expand(0.75f), EntityPredicates.VALID_ENTITY);
+        List<ProjectileEntity> toDeflect = this.getWorld().getEntitiesByClass(ProjectileEntity.class, this.getBoundingBox().expand(0.75f), EntityPredicates.VALID_ENTITY);
 
         for (ProjectileEntity projectile : toDeflect) {
             if (projectile.getOwner() == getUserOrThrow()) continue;
@@ -241,7 +242,7 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
             if (!hasUser()) return;
             LivingEntity user = getUser();
 
-            if (!world.isClient()) {
+            if (!getWorld().isClient()) {
                 boolean isRemote = isRemote();
 
                 if (!remoteControllable()) {
@@ -253,7 +254,7 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                         target = null;
 
                     if (target == null) {
-                        List<LivingEntity> potentialTargets = world.getEntitiesByClass(
+                        List<LivingEntity> potentialTargets = getWorld().getEntitiesByClass(
                                 LivingEntity.class,
                                 getBoundingBox().expand(64.0),
                                 EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(EntityPredicates.VALID_LIVING_ENTITY));
@@ -298,7 +299,7 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                 }
 
                 if (isRemote)
-                    tickRemoteState(getMoveControl().getSpeed(), getMoveControl().sidewaysMovement, onGround);
+                    tickRemoteState(getMoveControl().getSpeed(), getMoveControl().sidewaysMovement, isOnGround());
             }
         }
     }
@@ -343,7 +344,7 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
             flowerable = false;
             hasFlower = true;
 
-            if (!world.isClient()) {
+            if (!getWorld().isClient()) {
                 setMove(PLAY, State.PLAY);
 
                 final PhComponent ph = JComponents.getPhData(player);
@@ -360,53 +361,53 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
 
     // Animation code
     public enum State implements StandAnimationState<PurpleHazeEntity> {
-        IDLE((PurpleHaze, builder) -> builder.loop("animation.purple_haze.idle")),
-        PUNCH(builder -> builder.playAndHold("animation.purple_haze.light")),
-        BLOCK(builder -> builder.loop("animation.purple_haze.block")),
-        HEAVY(builder -> builder.playAndHold("animation.purple_haze.heavy")),
+        IDLE((PurpleHaze, builder) -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.idle"))),
+        PUNCH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.light"))),
+        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.block"))),
+        HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.heavy"))),
 
-        FULL_RELEASE(builder -> builder.playAndHold("animation.purple_haze.full_release")),
-        GROUND_SLAM(builder -> builder.playAndHold("animation.purple_haze.ground_slam")),
+        FULL_RELEASE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.full_release"))),
+        GROUND_SLAM(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.ground_slam"))),
 
-        BARRAGE(builder -> builder.loop("animation.purple_haze.barrage")),
-        LAUNCH(builder -> builder.playAndHold("animation.purple_haze.launch")),
-        LAUNCH2(builder -> builder.playAndHold("animation.purple_haze.launch2")),
+        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.barrage"))),
+        LAUNCH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.launch"))),
+        LAUNCH2(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.launch2"))),
 
-        REKKA1(builder -> builder.playAndHold("animation.purple_haze.rekka1")),
-        REKKA2(builder -> builder.playAndHold("animation.purple_haze.rekka2")),
-        REKKA3(builder -> builder.playAndHold("animation.purple_haze.rekka3")),
+        REKKA1(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.rekka1"))),
+        REKKA2(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.rekka2"))),
+        REKKA3(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.rekka3"))),
 
-        GRAB(builder -> builder.playAndHold("animation.purple_haze.grab")),
-        GRAB_HIT(builder -> builder.playAndHold("animation.purple_haze.grab_hit")),
+        GRAB(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.grab"))),
+        GRAB_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.grab_hit"))),
 
-        BACKHAND(builder -> builder.playAndHold("animation.purple_haze.backhand")),
-        BACKHAND_FOLLOWUP(builder -> builder.playAndHold("animation.purple_haze.backhand_followup")),
-        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.purple_haze.light_followup")),
-        HURT(builder -> builder.playAndHold("animation.purple_haze.hurt")),
-        PLAY(builder -> builder.playAndHold("animation.purple_haze.play")),
+        BACKHAND(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.backhand"))),
+        BACKHAND_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.backhand_followup"))),
+        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.light_followup"))),
+        HURT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.hurt"))),
+        PLAY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.play"))),
 
-        FORWARD(builder -> builder.loop("animation.purple_haze.forw")),
-        BACKWARD(builder -> builder.loop("animation.purple_haze.back")),
-        LEFT(builder -> builder.loop("animation.purple_haze.left")),
-        RIGHT(builder -> builder.loop("animation.purple_haze.right")),
-        FORWARD_DASH(builder -> builder.loop("animation.purple_haze.fdash")),
-        BACKWARD_DASH(builder -> builder.loop("animation.purple_haze.bdash")),
-        LEFT_DASH(builder -> builder.loop("animation.purple_haze.ldash")),
-        RIGHT_DASH(builder -> builder.loop("animation.purple_haze.rdash")),;
+        FORWARD(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.forw"))),
+        BACKWARD(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.back"))),
+        LEFT(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.left"))),
+        RIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.right"))),
+        FORWARD_DASH(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.fdash"))),
+        BACKWARD_DASH(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.bdash"))),
+        LEFT_DASH(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.ldash"))),
+        RIGHT_DASH(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.rdash"))),;
 
-        private final BiConsumer<PurpleHazeEntity, AnimationBuilder> animator;
+        private final BiConsumer<PurpleHazeEntity, AnimationState> animator;
 
-        State(Consumer<AnimationBuilder> animator) {
+        State(Consumer<AnimationState> animator) {
             this((silverChariot, builder) -> animator.accept(builder));
         }
 
-        State(BiConsumer<PurpleHazeEntity, AnimationBuilder> animator) {
+        State(BiConsumer<PurpleHazeEntity, AnimationState> animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(PurpleHazeEntity attacker, AnimationBuilder builder) {
-            animator.accept(attacker, builder);
+        public void playAnimation(PurpleHazeEntity attacker, AnimationState state) {
+            animator.accept(attacker, state);
         }
     }
 

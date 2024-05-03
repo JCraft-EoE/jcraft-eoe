@@ -18,6 +18,7 @@ public class JDamageSources {
     public static final RegistryKey<DamageType> STAND = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, JCraft.id("stand"));
     public static final RegistryKey<DamageType> WHITE_SNAKE_POISON = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, JCraft.id("wspoison"));
     public static final RegistryKey<DamageType> BLEEDING = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, JCraft.id("jbleeding"));
+    public static final RegistryKey<DamageType> PHPOISON = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, JCraft.id("phpoison"));
 
     public static DamageSource create(World world, RegistryKey<DamageType> key, @Nullable Entity source, @Nullable Entity attacker) {
         return new DamageSource(world.getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(key), source, attacker);
@@ -44,7 +45,7 @@ public class JDamageSources {
         return create(world, BLEEDING);
     }
 
-    public static @NotNull DamageSource phpoison() {
-        return new DamageSource("phpoison").setBypassesArmor().setUnblockable();
+    public static @NotNull DamageSource phpoison(World world) {
+        return create(world, PHPOISON);
     }
 }

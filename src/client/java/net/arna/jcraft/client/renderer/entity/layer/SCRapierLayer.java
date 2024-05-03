@@ -5,9 +5,13 @@ import net.arna.jcraft.common.entity.stand.SilverChariotEntity;
 import net.arna.jcraft.common.entity.stand.StandType;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import software.bernie.geckolib.cache.object.BakedGeoModel;
+import software.bernie.geckolib.renderer.GeoRenderer;
+import software.bernie.geckolib.renderer.layer.GeoRenderLayer;
 
 import java.util.List;
 import java.util.stream.IntStream;
@@ -15,10 +19,10 @@ import java.util.stream.IntStream;
 import static net.arna.jcraft.common.entity.projectile.RapierProjectile.ARMOR_OFF_TEXTURE;
 import static net.arna.jcraft.common.entity.projectile.RapierProjectile.POSSESSED_TEXTURE;
 
-public class SCRapierLayer extends GeoLayerRenderer<SilverChariotEntity> {
+public class SCRapierLayer extends GeoRenderLayer<SilverChariotEntity> {
     private static final Identifier MODEL = JCraft.id("geo/silver_chariot.geo.json");
     private static List<Identifier> skins;
-    public SCRapierLayer(IGeoRenderer<SilverChariotEntity> entityRendererIn) {
+    public SCRapierLayer(GeoRenderer<SilverChariotEntity> entityRendererIn) {
         super(entityRendererIn);
 
         skins = IntStream.rangeClosed(0, StandType.SILVER_CHARIOT.getSkinCount())
@@ -27,19 +31,19 @@ public class SCRapierLayer extends GeoLayerRenderer<SilverChariotEntity> {
     }
 
     @Override
-    public void render(MatrixStack matrixStackIn, VertexConsumerProvider bufferIn, int packedLightIn, SilverChariotEntity entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
-        if (entitylivingbaseIn.hasRapier()) {
-            SilverChariotEntity.Mode mode = entitylivingbaseIn.getMode();
+    public void render(MatrixStack matrixStackIn, SilverChariotEntity animatable, BakedGeoModel bakedModel, RenderLayer renderType, VertexConsumerProvider bufferIn, VertexConsumer buffer, float partialTicks, int packedLightIn, int packedOverlay) {
+        if (animatable.hasRapier()) {
+            SilverChariotEntity.Mode mode = animatable.getMode();
 
             RenderLayer cameo = RenderLayer.getArmorCutoutNoCull(
                     mode == SilverChariotEntity.Mode.POSSESSED ? POSSESSED_TEXTURE :
                             mode == SilverChariotEntity.Mode.ARMORLESS ? ARMOR_OFF_TEXTURE :
-                                    skins.get(entitylivingbaseIn.getSkin())
+                                    skins.get(animatable.getSkin())
             );
 
             matrixStackIn.push();
-            getRenderer().render(getEntityModel().getModel(MODEL), entitylivingbaseIn, partialTicks, cameo, matrixStackIn, bufferIn,
-                    bufferIn.getBuffer(cameo), packedLightIn, OverlayTexture.DEFAULT_UV, 1f, 1f, 1f, 1f);
+            getRenderer().reRender(getDefaultBakedModel(animatable), matrixStackIn, bufferIn, animatable, cameo,
+                    bufferIn.getBuffer(cameo), partialTicks, packedLightIn, OverlayTexture.DEFAULT_UV, 1, 1, 1, 1f);
             matrixStackIn.pop();
         }
     }

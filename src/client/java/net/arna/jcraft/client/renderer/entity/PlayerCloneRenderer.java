@@ -1,5 +1,6 @@
 package net.arna.jcraft.client.renderer.entity;
 
+import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import net.arna.jcraft.client.rendering.CloneSkinTracker;
 import net.arna.jcraft.client.util.PlayerCloneClientPlayerEntity;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
@@ -14,6 +15,7 @@ import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
 
 import java.util.UUID;
 
@@ -45,6 +47,11 @@ public class PlayerCloneRenderer extends BipedEntityRenderer<PlayerCloneEntity, 
         PlayerCloneClientPlayerEntity clonePlayer = CloneSkinTracker.toPlayer(clone);
         if (clonePlayer == null) return;
         parent.render(clonePlayer, f, g, matrixStack, vertexConsumerProvider, i);
+    }
+
+    @Override
+    public Identifier getTexture(PlayerCloneEntity entity) {
+        return CloneSkinTracker.getSkinFor(entity, MinecraftProfileTexture.Type.SKIN);
     }
 }
 

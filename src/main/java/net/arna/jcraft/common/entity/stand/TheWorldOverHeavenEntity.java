@@ -405,10 +405,10 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         AIR_KNIVES(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.twoh.airknives"))),
         TIME_SKIP(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.twoh.idle"))),
         LUNGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.twoh.lunge"))),
-        LOW_KICK(builder -> builder.loop("animation.twoh.low_kick")),
+        LOW_KICK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.twoh.low_kick"))),
         LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.twoh.light_followup"))),
         SINGULARITY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.twoh.singularity"))),
-        AIR_HEAVY(builder -> builder.playAndHold("animation.twoh.air_heavy")),;
+        AIR_HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.twoh.air_heavy"))),;
 
         private final Consumer<AnimationState> animator;
 

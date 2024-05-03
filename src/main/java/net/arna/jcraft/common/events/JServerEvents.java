@@ -92,7 +92,7 @@ public class JServerEvents {
                         adjustedPing = MAX_COMPENSATION_MS;
                     double pingTicks = adjustedPing * MS_TO_TICKS;
 
-                    Set<Pair<Integer, Vec3d>> idPosPairs = PlayerLookup.around(subscriber.getWorld(), subscriber.getPos(), PREDICTION_RADIUS)
+                    Set<Pair<Integer, Vec3d>> idPosPairs = PlayerLookup.around((ServerWorld) subscriber.getWorld(), subscriber.getPos(), PREDICTION_RADIUS)
                             .stream()
                             .filter(serverPlayer -> serverPlayer != subscriber)
                             .map(

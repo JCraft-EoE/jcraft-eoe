@@ -3,6 +3,7 @@ package net.arna.jcraft.datagen;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricAdvancementProvider;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementFrame;
@@ -13,8 +14,8 @@ import net.minecraft.text.Text;
 import java.util.function.Consumer;
 
 public class JAdvancementProvider extends FabricAdvancementProvider {
-    public JAdvancementProvider(FabricDataGenerator dataGenerator) {
-        super(dataGenerator);
+    public JAdvancementProvider(FabricDataOutput output) {
+        super(output);
     }
 
     @Override

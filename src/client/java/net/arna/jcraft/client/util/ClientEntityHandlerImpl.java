@@ -23,9 +23,9 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.random.Random;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3f;
 
 import java.util.List;
 import java.util.UUID;
@@ -136,15 +136,15 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
         AuraBlobParticle.Factory.color = color;
 
         clientWorld.addParticle(JParticleTypeRegistry.AURA_ARC, false,
-                pos.x + maxBox.getX() * random.nextTriangular(0, 1),
-                pos.y + maxBox.getY() * random.nextTriangular(0.5, 0.5),
-                pos.z + maxBox.getZ() * random.nextTriangular(0, 1),
+                pos.x + maxBox.x() * random.nextTriangular(0, 1),
+                pos.y + maxBox.y() * random.nextTriangular(0.5, 0.5),
+                pos.z + maxBox.z() * random.nextTriangular(0, 1),
                 vel.x, vel.y, vel.z);
 
         clientWorld.addParticle(JParticleTypeRegistry.AURA_BLOB, false,
-                pos.x + maxBox.getX() * random.nextTriangular(0, 1),
-                pos.y + maxBox.getY() * random.nextTriangular(0.5, 0.5),
-                pos.z + maxBox.getZ() * random.nextTriangular(0, 1),
+                pos.x + maxBox.x() * random.nextTriangular(0, 1),
+                pos.y + maxBox.y() * random.nextTriangular(0.5, 0.5),
+                pos.z + maxBox.z() * random.nextTriangular(0, 1),
                 vel.x, vel.y, vel.z);
     }
 

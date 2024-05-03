@@ -12,13 +12,15 @@ import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import org.joml.Vector3f;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+
 
 public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<PurpleHazeDistortionEntity, PurpleHazeDistortionEntity.State> {
     private static final @NonNull KnockdownAttack<AbstractPurpleHazeEntity<?, ?>> CROUCHING_LIGHT_FOLLOWUP_ATTACK = BACKHAND_FOLLOWUP.copy().withAnim(State.BACKHAND_FOLLOWUP);
@@ -82,11 +84,11 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
         freespace += """
                 PASSIVE: 66% resistance to Purple Haze effect""";
 
-        auraColors = new Vec3f[]{
-                new Vec3f(0.8f, 0.2f, 1.0f),
-                new Vec3f(1.0f, 0.2f, 0.6f),
-                new Vec3f(0.2f, 0.8f, 0.6f),
-                new Vec3f(1.0f, 0.3f, 0.5f)
+        auraColors = new Vector3f[]{
+                new Vector3f(0.8f, 0.2f, 1.0f),
+                new Vector3f(1.0f, 0.2f, 0.6f),
+                new Vector3f(0.2f, 0.8f, 0.6f),
+                new Vector3f(1.0f, 0.3f, 0.5f)
         };
     }
 
@@ -139,51 +141,51 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
 
     // Animation code
     public enum State implements StandAnimationState<PurpleHazeDistortionEntity> {
-        IDLE((PurpleHaze, builder) -> builder.loop("animation.purple_haze.idle")),
-        PUNCH(builder -> builder.playAndHold("animation.purple_haze.light")),
-        BLOCK(builder -> builder.loop("animation.purple_haze.block")),
-        HEAVY(builder -> builder.playAndHold("animation.purple_haze.heavy")),
+        IDLE((PurpleHaze, builder) -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.idle"))),
+        PUNCH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.light"))),
+        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.block"))),
+        HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.heavy"))),
 
-        FULL_RELEASE(builder -> builder.playAndHold("animation.purple_haze.full_release")),
-        GROUND_SLAM(builder -> builder.playAndHold("animation.purple_haze.ground_slam")),
+        FULL_RELEASE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.full_release"))),
+        GROUND_SLAM(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.ground_slam"))),
 
-        BARRAGE(builder -> builder.loop("animation.purple_haze.barrage")),
-        LAUNCH(builder -> builder.playAndHold("animation.purple_haze.launch")),
-        LAUNCH2(builder -> builder.playAndHold("animation.purple_haze.launch2")),
+        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.barrage"))),
+        LAUNCH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.launch"))),
+        LAUNCH2(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.launch2"))),
 
-        REKKA1(builder -> builder.playAndHold("animation.purple_haze.rekka1")),
-        REKKA2(builder -> builder.playAndHold("animation.purple_haze.rekka2")),
-        REKKA3(builder -> builder.playAndHold("animation.purple_haze.rekka3")),
+        REKKA1(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.rekka1"))),
+        REKKA2(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.rekka2"))),
+        REKKA3(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.rekka3"))),
 
-        GRAB(builder -> builder.playAndHold("animation.purple_haze.grab")),
-        GRAB_HIT(builder -> builder.playAndHold("animation.purple_haze.grab_hit")),
+        GRAB(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.grab"))),
+        GRAB_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.grab_hit"))),
 
-        BACKHAND(builder -> builder.playAndHold("animation.purple_haze.backhand")),
-        BACKHAND_FOLLOWUP(builder -> builder.playAndHold("animation.purple_haze.backhand_followup")),
-        LIGHT_FOLLOWUP(builder -> builder.playAndHold("animation.purple_haze.light_followup")),
+        BACKHAND(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.backhand"))),
+        BACKHAND_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.backhand_followup"))),
+        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.light_followup"))),
 
-        FORWARD(builder -> builder.loop("animation.purple_haze.forw")),
-        BACKWARD(builder -> builder.loop("animation.purple_haze.back")),
-        LEFT(builder -> builder.loop("animation.purple_haze.left")),
-        RIGHT(builder -> builder.loop("animation.purple_haze.right")),
-        FORWARD_DASH(builder -> builder.loop("animation.purple_haze.fdash")),
-        BACKWARD_DASH(builder -> builder.loop("animation.purple_haze.bdash")),
-        LEFT_DASH(builder -> builder.loop("animation.purple_haze.ldash")),
-        RIGHT_DASH(builder -> builder.loop("animation.purple_haze.rdash")),;
+        FORWARD(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.forw"))),
+        BACKWARD(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.back"))),
+        LEFT(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.left"))),
+        RIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.right"))),
+        FORWARD_DASH(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.fdash"))),
+        BACKWARD_DASH(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.bdash"))),
+        LEFT_DASH(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.ldash"))),
+        RIGHT_DASH(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.rdash"))),;
 
-        private final BiConsumer<PurpleHazeDistortionEntity, AnimationBuilder> animator;
+        private final BiConsumer<PurpleHazeDistortionEntity, AnimationState> animator;
 
-        State(Consumer<AnimationBuilder> animator) {
+        State(Consumer<AnimationState> animator) {
             this((silverChariot, builder) -> animator.accept(builder));
         }
 
-        State(BiConsumer<PurpleHazeDistortionEntity, AnimationBuilder> animator) {
+        State(BiConsumer<PurpleHazeDistortionEntity, AnimationState> animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(PurpleHazeDistortionEntity attacker, AnimationBuilder builder) {
-            animator.accept(attacker, builder);
+        public void playAnimation(PurpleHazeDistortionEntity attacker, AnimationState state) {
+            animator.accept(attacker, state);
         }
     }
 

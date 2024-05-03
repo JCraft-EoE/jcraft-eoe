@@ -11,10 +11,11 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
+import software.bernie.geckolib.renderer.DynamicGeoEntityRenderer;
 
 import java.util.Objects;
 
-public class GESnakeRenderer extends ExtendedGeoEntityRenderer<GESnakeEntity> {
+public class GESnakeRenderer extends DynamicGeoEntityRenderer<GESnakeEntity> {
     protected ItemStack mainHandItem;
 
     public GESnakeRenderer(EntityRendererFactory.Context renderManager) {

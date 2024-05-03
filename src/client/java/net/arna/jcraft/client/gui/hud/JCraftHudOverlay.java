@@ -47,7 +47,7 @@ public class JCraftHudOverlay {
         if (stand != null) {
             if (stand instanceof TheSunEntity theSun) {
                 float darken = (theSun.isPassive() ? 0.4f : 0.0f);
-                SUN_SIZE_GAUGE.render(matrixStack,
+                SUN_SIZE_GAUGE.render(ctx,
                         SUN_SIZE_GAUGE.red() - darken,
                         SUN_SIZE_GAUGE.green() - darken,
                         SUN_SIZE_GAUGE.blue() - darken,
@@ -55,7 +55,7 @@ public class JCraftHudOverlay {
                         height + gaugeHeightOffset,
                         (int) (theSun.getScale() * 10.0F));
             } else
-                BLOCK_GAUGE.render(matrixStack, gaugeX, height + gaugeHeightOffset, (int) stand.getStandGauge());
+                BLOCK_GAUGE.render(ctx, gaugeX, height + gaugeHeightOffset, (int) stand.getStandGauge());
             if (stand instanceof MadeInHeavenEntity madeInHeaven && madeInHeaven.getAccelTime() > 0)
                 TIME_ACCEL_GAUGE.render(ctx, gaugeX, height + gaugeHeightOffset, madeInHeaven.getSpeedometer());
         }
@@ -73,16 +73,16 @@ public class JCraftHudOverlay {
             this(color.x(), color.y(), color.z(), max);
         }
 
-        public void render(MatrixStack matrixStack, int x, int y, int value) {
-            render(matrixStack, red, green, blue, x, y, value);
+        public void render(DrawContext ctx, int x, int y, int value) {
+            render(ctx, red, green, blue, x, y, value);
         }
 
-        public void render(MatrixStack matrixStack, float r, float g, float b, int x, int y, int value) {
+        public void render(DrawContext ctx, float r, float g, float b, int x, int y, int value) {
             RenderSystem.setShaderColor(r, g, b, 1);
-            RenderSystem.setShaderTexture(0, EMPTY_GAUGE);
-            DrawableHelper.drawTexture(matrixStack, x, y, 0, 0, gaugeWidth, 5, gaugeWidth, 5);
-            RenderSystem.setShaderTexture(0, FULL_GAUGE);
-            DrawableHelper.drawTexture(matrixStack, x, y, 0, 0, value * gaugeWidth / max, 5, gaugeWidth, 5);
+            //RenderSystem.setShaderTexture(0, EMPTY_GAUGE);
+            ctx.drawTexture(EMPTY_GAUGE, x, y, 0, 0, gaugeWidth, 5, gaugeWidth, 5);
+            //RenderSystem.setShaderTexture(0, FULL_GAUGE);
+            ctx.drawTexture(FULL_GAUGE, x, y, 0, 0, value * gaugeWidth / max, 5, gaugeWidth, 5);
             gaugeHeightOffset -= 6;
         }
     }

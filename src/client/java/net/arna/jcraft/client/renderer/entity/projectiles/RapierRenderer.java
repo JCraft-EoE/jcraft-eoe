@@ -8,9 +8,10 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import software.bernie.geckolib.renderer.GeoEntityRenderer;
 import software.bernie.geckolib3.renderers.geo.GeoProjectilesRenderer;
 
-public class RapierRenderer extends GeoProjectilesRenderer<RapierProjectile> {
+public class RapierRenderer extends GeoEntityRenderer<RapierProjectile> {
 
     public RapierRenderer(EntityRendererFactory.Context renderManagerIn) {
         super(renderManagerIn, new RapierModel());

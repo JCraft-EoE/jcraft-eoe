@@ -46,6 +46,7 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
@@ -196,8 +197,8 @@ public class JCraftClient implements ClientModInitializer {
         BuiltinItemRendererRegistry.INSTANCE.register(JObjectRegistry.DEBUG_WAND, itemRenderer);
 
         ModelLoadingRegistry.INSTANCE.registerModelProvider((manager, out) -> {
-            out.accept(new ModelIdentifier(itemId + "_gui", "inventory"));
-            out.accept(new ModelIdentifier(itemId + "_handheld", "inventory"));
+            out.accept(new ModelIdentifier(new Identifier(itemId + "_gui"), "inventory"));
+            out.accept(new ModelIdentifier(new Identifier(itemId + "_handheld"), "inventory"));
         });
     }
 
@@ -207,7 +208,7 @@ public class JCraftClient implements ClientModInitializer {
     public static float damageScaling = 1.00f;
     public static int framesSinceCounted = 0;
 
-    private void renderHud(MatrixStack matrices, float tickDelta) {
+    private void renderHud(DrawContext ctx, float tickDelta) {
         MinecraftClient client = MinecraftClient.getInstance();
         ClientPlayerEntity player = client.player;
         if (player == null) {
@@ -285,19 +286,19 @@ public class JCraftClient implements ClientModInitializer {
                     offsetIndex -= 6;
                 float offsetY = selectedY * 1.25f + 9f * offsetIndex;
 
-                textRenderer.drawWithShadow(
-                        matrices,
+                ctx.drawTextWithShadow(
+                        textRenderer,
                         finalText,
                         selectedX + xOffset,
-                        offsetY,
-                        ColorUtils.HSBAtoRGBA(0.3f - (float) cooldown * 10f / 720f, (cooldown < 1.6) ? 0.0f : 1.0f, 1.0f, (cooldown < 1.6) ? 1.0f : defaultAlpha),
-                        true
+                        (int) offsetY,
+                        ColorUtils.HSBAtoRGBA(0.3f - (float) cooldown * 10f / 720f, (cooldown < 1.6) ? 0.0f : 1.0f, 1.0f, (cooldown < 1.6) ? 1.0f : defaultAlpha)
                 );
+
             }
         }
 
         // Draw Combo Counter
-        if (comboCounter > 0 && player.world.getGameRules().getBoolean(JCraft.COMBO_COUNTER) && framesSinceCounted <= 180) {
+        if (comboCounter > 0 && player.getWorld().getGameRules().getBoolean(JCraft.COMBO_COUNTER) && framesSinceCounted <= 180) {
             String remark = "epic tod free download";
             if (comboCounter < comboRemarks.size() * 7)
                 remark = comboRemarks.get(Math.floorDiv(comboCounter, 7));
@@ -308,13 +309,12 @@ public class JCraftClient implements ClientModInitializer {
 
             if (comboStarted && ++framesSinceComboStarted > 59) comboStarted = false;
 
-            textRenderer.drawWithShadow(
-                    matrices,
+            ctx.drawTextWithShadow(
+                    textRenderer,
                     comboCounter + " - (" + Math.round(damageScaling * 100f) + "%) - " + remark,
-                    selectedX + (isMid && useIcons ? 54f : 0) + (recentHit ? tickDelta * random.nextFloat() * 5f : 0),
-                    selectedY * (1.15f) + (recentHit ? tickDelta * random.nextFloat() * 5f : 0),
-                    ColorUtils.HSBAtoRGBA(comboCounter / 360f - 1f, comboStarted ? framesSinceComboStarted / 60f : 1f, 1f, 0.8f),
-                    true
+                    (int) (selectedX + (isMid && useIcons ? 54f : 0) + (recentHit ? tickDelta * random.nextFloat() * 5f : 0)),
+                    (int) (selectedY * (1.15f) + (recentHit ? tickDelta * random.nextFloat() * 5f : 0)),
+                    ColorUtils.HSBAtoRGBA(comboCounter / 360f - 1f, comboStarted ? framesSinceComboStarted / 60f : 1f, 1f, 0.8f)
             );
         }
     }
@@ -401,7 +401,7 @@ public class JCraftClient implements ClientModInitializer {
 
             Vec3d pos = timestop.pos;
 
-            List<? extends Entity> toStop = user.world.getEntitiesByClass(Entity.class,
+            List<? extends Entity> toStop = user.getWorld().getEntitiesByClass(Entity.class,
                     new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
 
             for (Entity entity : toStop)

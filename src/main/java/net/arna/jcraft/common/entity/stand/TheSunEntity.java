@@ -2,6 +2,7 @@ package net.arna.jcraft.common.entity.stand;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.NonNull;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.MoveInputType;
 import net.arna.jcraft.common.attack.core.MoveMap;
 import net.arna.jcraft.common.attack.core.MoveType;
@@ -9,6 +10,7 @@ import net.arna.jcraft.common.attack.moves.shared.BarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.NoOpMove;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleMultiHitAttack;
+import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.projectile.MeteorProjectile;
 import net.arna.jcraft.common.entity.projectile.SunBeamProjectile;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
@@ -21,6 +23,8 @@ import net.minecraft.block.FluidDrainable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageSources;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -30,6 +34,7 @@ import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
@@ -39,10 +44,13 @@ import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import org.joml.Vector3f;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.State> {
@@ -243,11 +251,11 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
 
         freespace = "Cannot buffer moves.\n Must stay within "+ MAX_DISTANCE + " of the user, otherwise it loses size and disappears.\nGrace period of 1 second before heat field activates after summoning.\nHeat field applies Nausea > Weakness > Slowness > Burning as entities get closer.\n";
 
-        auraColors = new Vec3f[]{
-                new Vec3f(1.0f, 0.8f, 0.4f),
-                new Vec3f(1.0f, 1.0f, 0.0f),
-                new Vec3f(0.4f, 0.8f, 1.0f),
-                new Vec3f(0.6f, 0.1f, 0.8f)
+        auraColors = new Vector3f[]{
+                new Vector3f(1.0f, 0.8f, 0.4f),
+                new Vector3f(1.0f, 1.0f, 0.0f),
+                new Vector3f(0.4f, 0.8f, 1.0f),
+                new Vector3f(0.6f, 0.1f, 0.8f)
         };
 
         speed = 0.5f;
@@ -299,8 +307,8 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
                     int roundScale = Math.round(newScale * 1.2f);
 
                     Box newBox = newBoundingBox(getX() + 1, getY() + 1, getZ() + 1, newScale * 2.0f);
-                    BlockPos start = new BlockPos(newBox.minX, newBox.minY, newBox.minZ);
-                    BlockPos end = new BlockPos(newBox.maxX, newBox.maxY, newBox.maxZ);
+                    BlockPos start = BlockPos.ofFloored(newBox.minX, newBox.minY, newBox.minZ);
+                    BlockPos end = BlockPos.ofFloored(newBox.maxX, newBox.maxY, newBox.maxZ);
 
                     // Detect if world prevents resize
                     for (int x = start.getX(); x < end.getX(); x += roundScale) {
@@ -308,7 +316,7 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
                             for (int z = start.getZ(); z < end.getZ(); z += roundScale) {
                                 BlockPos blockPos = new BlockPos(x, y, z);
                                 //JCraft.createParticle((ServerWorld) world, x, y, z, JParticleType.BACK_STAB);
-                                if (world.isTopSolid(blockPos, this)) {
+                                if (getWorld().isTopSolid(blockPos, this)) {
                                     //JCraft.createParticle((ServerWorld) world, x, y, z, JParticleType.HIT_SPARK_3);
                                     return false;
                                 }
@@ -375,7 +383,7 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
 
     @Override
     public boolean damage(DamageSource source, float amount) {
-        if (source.isFire() || source == DamageSource.IN_WALL) return false;
+        if (source.isIn(DamageTypeTags.IS_FIRE) || source.isOf(DamageTypes.IN_WALL)) return false;
         return super.damage(source, amount);
     }
 
@@ -447,11 +455,11 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
         float scale = getScale();
         float heatFieldSize = scale * 20.0F;
 
-        if (world.isClient()) {
+        if (getWorld().isClient()) {
             Vec3d pos = randomPos();
             Vec3d vel = JUtils.randUnitVec(random).multiply(0.2 * scale).add(getVelocity());
             for (int i = 0; i < (int)(heatFieldSize); i++)
-                world.addParticle( getSkin() == 2 ? ParticleTypes.SOUL_FIRE_FLAME : ParticleTypes.FLAME,
+                getWorld().addParticle( getSkin() == 2 ? ParticleTypes.SOUL_FIRE_FLAME : ParticleTypes.FLAME,
                         false, pos.x, pos.y, pos.z,
                         vel.x, vel.y, vel.z
                 );
@@ -495,7 +503,7 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
                     playSound(JSoundRegistry.SUN_IDLE, 1f, random.nextFloat());
 
                 if (heatFieldSize > 0) {
-                    Collection<Entity> entities = world.getOtherEntities(this, getBoundingBox().expand(heatFieldSize), EntityPredicates.VALID_ENTITY.and(this::canSee));
+                    Collection<Entity> entities = getWorld().getOtherEntities(this, getBoundingBox().expand(heatFieldSize), EntityPredicates.VALID_ENTITY.and(this::canSee));
                     for (Entity entity : entities) {
                         double distance = entity.squaredDistanceTo(this);
                         double exposure = 125.0 * scale;
@@ -506,7 +514,7 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
 
                         if (exposure > 2) {
                             if (exposure > 8)
-                                entity.damage(DamageSource.ON_FIRE, 1.5f);
+                                entity.damage(JDamageSources.create( getWorld(), DamageTypes.ON_FIRE), 1.5f);
                             entity.setOnFireFor(2);
                         }
 
@@ -579,17 +587,22 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
 
     // Animation code
     public enum State implements StandAnimationState<TheSunEntity> {
-        IDLE(builder -> builder.loop("animation.sun.idle")),
+        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.sun.idle"))),
         ;
-        private final Consumer<AnimationBuilder> animator;
 
-        State(Consumer<AnimationBuilder> animator) {
+        private final BiConsumer<TheSunEntity, AnimationState> animator;
+
+        State(Consumer<AnimationState> animator) {
+            this((silverChariot, builder) -> animator.accept(builder));
+        }
+
+        State(BiConsumer<TheSunEntity, AnimationState> animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(TheSunEntity attacker, AnimationBuilder builder) {
-            animator.accept(builder);
+        public void playAnimation(TheSunEntity attacker, AnimationState builder) {
+            animator.accept(attacker, builder);
         }
     }
 

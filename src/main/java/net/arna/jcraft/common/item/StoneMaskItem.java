@@ -23,7 +23,7 @@ import java.util.List;
 public class StoneMaskItem extends ArmorItem implements GeoItem {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
-    public StoneMaskItem(ArmorMaterial materialIn, EquipmentSlot slot, Settings builder) {
+    public StoneMaskItem(ArmorMaterial materialIn, ArmorItem.Type slot, Settings builder) {
         super(materialIn, slot, builder);
     }
 

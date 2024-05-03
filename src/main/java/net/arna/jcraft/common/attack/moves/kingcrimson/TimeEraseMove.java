@@ -140,7 +140,7 @@ public class TimeEraseMove extends AbstractMove<TimeEraseMove, KingCrimsonEntity
             if (teTime <= 0) {
                 // Play exit noise
                 if (user instanceof ServerPlayerEntity player)
-                    player.networkHandler.sendPacket(new PlaySoundS2CPacket(JSoundRegistry.TIME_ERASE_EXIT,
+                    player.networkHandler.sendPacket(new PlaySoundS2CPacket(Registries.SOUND_EVENT.getEntry(JSoundRegistry.TIME_ERASE_EXIT),
                             SoundCategory.PLAYERS, attacker.getX(), attacker.getY(), attacker.getZ(), 1, 1, 0));
 
                 /* Return targets to position

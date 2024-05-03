@@ -5,9 +5,10 @@ import net.arna.jcraft.common.entity.projectile.PHCapsuleProjectile;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
+import software.bernie.geckolib.renderer.GeoEntityRenderer;
 import software.bernie.geckolib3.renderers.geo.GeoProjectilesRenderer;
 
-public class PHCapsuleRenderer extends GeoProjectilesRenderer<PHCapsuleProjectile> {
+public class PHCapsuleRenderer extends GeoEntityRenderer<PHCapsuleProjectile> {
 
     public PHCapsuleRenderer(EntityRendererFactory.Context renderManagerIn) {
         super(renderManagerIn, new PHCapsuleModel());

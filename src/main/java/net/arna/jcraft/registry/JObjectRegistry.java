@@ -11,15 +11,13 @@ import net.arna.jcraft.common.spec.SpecType;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.MapColor;
 import net.minecraft.block.dispenser.ProjectileDispenserBehavior;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.item.ArmorMaterials;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.sound.BlockSoundGroup;
@@ -71,23 +69,23 @@ public interface JObjectRegistry {
 
     Item LIVINGARROW = register("living_arrow", new LivingArrowItem(settings().rarity(Rarity.RARE).fireproof()));
 
-    Item DIOHEADBAND = register("dio_headband", new DIOArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.HEAD, settings()));
-    Item DIOJACKET = register("dio_jacket", new DIOArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.CHEST, settings()));
-    Item DIOPANTS = register("dio_pants", new DIOArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.LEGS, settings()));
-    Item DIOBOOTS = register("dio_boots", new DIOArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.FEET, settings()));
+    Item DIOHEADBAND = register("dio_headband", new DIOArmorItem(ArmorMaterials.NETHERITE, ArmorItem.Type.HELMET, settings()));
+    Item DIOJACKET = register("dio_jacket", new DIOArmorItem(ArmorMaterials.NETHERITE, ArmorItem.Type.CHESTPLATE, settings()));
+    Item DIOPANTS = register("dio_pants", new DIOArmorItem(ArmorMaterials.NETHERITE, ArmorItem.Type.LEGGINGS, settings()));
+    Item DIOBOOTS = register("dio_boots", new DIOArmorItem(ArmorMaterials.NETHERITE, ArmorItem.Type.BOOTS, settings()));
 
-    Item DIOCAPE = register("dio_cape", new FlutteringArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.CHEST, settings()));
+    Item DIOCAPE = register("dio_cape", new FlutteringArmorItem(ArmorMaterials.NETHERITE, ArmorItem.Type.CHESTPLATE, settings()));
 
-    Item KARSHEADWRAP = register("kars_headwrap", new SunProtectionItem(ArmorMaterials.IRON, EquipmentSlot.HEAD, settings()));
+    Item KARSHEADWRAP = register("kars_headwrap", new SunProtectionItem(ArmorMaterials.IRON, ArmorItem.Type.HELMET, settings()));
 
-    Item RED_HAT = register("red_hat", new SunProtectionItem(ArmorMaterials.IRON, EquipmentSlot.HEAD, settings()));
+    Item RED_HAT = register("red_hat", new SunProtectionItem(ArmorMaterials.IRON, ArmorItem.Type.HELMET, settings()));
 
-    Item STONE_MASK = register("stone_mask", new StoneMaskItem(ArmorMaterials.CHAIN, EquipmentSlot.HEAD, settings()));
+    Item STONE_MASK = register("stone_mask", new StoneMaskItem(ArmorMaterials.CHAIN, ArmorItem.Type.HELMET, settings()));
 
-    Item JOTAROCAP = register("jotaro_cap", new FlutteringArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.HEAD, settings()));
-    Item JOTAROJACKET = register("jotaro_jacket", new FlutteringArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.CHEST, settings()));
-    Item JOTAROPANTS = register("jotaro_pants", new FlutteringArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.LEGS, settings()));
-    Item JOTAROBOOTS = register("jotaro_boots", new FlutteringArmorItem(ArmorMaterials.NETHERITE, EquipmentSlot.FEET, settings()));
+    Item JOTAROCAP = register("jotaro_cap", new FlutteringArmorItem(ArmorMaterials.NETHERITE, ArmorItem.Type.HELMET, settings()));
+    Item JOTAROJACKET = register("jotaro_jacket", new FlutteringArmorItem(ArmorMaterials.NETHERITE, ArmorItem.Type.CHESTPLATE, settings()));
+    Item JOTAROPANTS = register("jotaro_pants", new FlutteringArmorItem(ArmorMaterials.NETHERITE, ArmorItem.Type.LEGGINGS, settings()));
+    Item JOTAROBOOTS = register("jotaro_boots", new FlutteringArmorItem(ArmorMaterials.NETHERITE, ArmorItem.Type.BOOTS, settings()));
 
     Item CINDERELLA_MASK = register("cinderella_mask", new CinderellaMaskItem());
 
@@ -107,12 +105,12 @@ public interface JObjectRegistry {
             .strength(4.0f)
             .sounds(BlockSoundGroup.SOUL_SOIL)
     ), settings(), true);
-    Block METEORITE_BLOCK = register("meteorite_block", new Block(FabricBlockSettings.of(Material.STONE, MapColor.SPRUCE_BROWN)
+    Block METEORITE_BLOCK = register("meteorite_block", new Block(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK)
             .requiresTool()
             .strength(6.0f, 1200f)
             .sounds(BlockSoundGroup.ANCIENT_DEBRIS)
     ), settings(), true);
-    Block METEORITE_IRON_ORE_BLOCK = register("meteorite_iron_ore_block", new Block(FabricBlockSettings.of(Material.STONE, MapColor.SPRUCE_BROWN)
+    Block METEORITE_IRON_ORE_BLOCK = register("meteorite_iron_ore_block", new Block(FabricBlockSettings.copyOf(Blocks.IRON_ORE)
             .requiresTool()
             .strength(9.0f, 1200f)
             .sounds(BlockSoundGroup.ANCIENT_DEBRIS)

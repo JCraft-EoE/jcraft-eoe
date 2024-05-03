@@ -152,19 +152,19 @@ public interface JEntityTypeRegistry {
     );
 
     EntityType<TheSunEntity> THE_SUN = Registry.register(
-            Registry.ENTITY_TYPE,
+            Registries.ENTITY_TYPE,
             JCraft.id("the_sun"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(TheSunEntity::new)).dimensions(EntityDimensions.fixed(2f, 2f)).build()
     );
 
     EntityType<PurpleHazeEntity> PURPLE_HAZE = Registry.register(
-            Registry.ENTITY_TYPE,
+            Registries.ENTITY_TYPE,
             JCraft.id("purple_haze"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(PurpleHazeEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
 
     EntityType<PurpleHazeDistortionEntity> PURPLE_HAZE_DISTORTION = Registry.register(
-            Registry.ENTITY_TYPE,
+            Registries.ENTITY_TYPE,
             JCraft.id("purple_haze_distortion"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WorldOnlyEntityFactory.from(PurpleHazeDistortionEntity::new)).dimensions(EntityDimensions.fixed(0.6f, 1.8f)).build()
     );
@@ -224,7 +224,7 @@ public interface JEntityTypeRegistry {
     );
 
     EntityType<MeteorProjectile> METEOR = Registry.register(
-            Registry.ENTITY_TYPE,
+            Registries.ENTITY_TYPE,
             JCraft.id("meteor"),
             FabricEntityTypeBuilder.<MeteorProjectile>create(SpawnGroup.MISC, MeteorProjectile::new)
                     .dimensions(EntityDimensions.fixed(1.0f, 1.0f)).trackRangeChunks(6).trackedUpdateRate(20).build()
@@ -252,7 +252,7 @@ public interface JEntityTypeRegistry {
     );
 
     EntityType<PHCapsuleProjectile> PH_CAPSULE = Registry.register(
-            Registry.ENTITY_TYPE,
+            Registries.ENTITY_TYPE,
             JCraft.id("ph_capsule"),
             FabricEntityTypeBuilder.<PHCapsuleProjectile>create(SpawnGroup.MISC, (type, world) -> new PHCapsuleProjectile(world))
                     .dimensions(EntityDimensions.fixed(0.75f, 0.75f)).trackRangeChunks(6).trackedUpdateRate(20).build()
@@ -301,14 +301,14 @@ public interface JEntityTypeRegistry {
     );
 
     EntityType<SunBeamProjectile> SUN_BEAM = Registry.register(
-            Registry.ENTITY_TYPE,
+            Registries.ENTITY_TYPE,
             JCraft.id("sunbeam"),
             FabricEntityTypeBuilder.<SunBeamProjectile>create(SpawnGroup.MISC, (type, world) -> new SunBeamProjectile(world))
                     .dimensions(EntityDimensions.fixed(0.5f, 0.5f)).trackRangeChunks(4).trackedUpdateRate(10).build()
     );
 
     EntityType<PurpleHazeCloudEntity> PURPLE_HAZE_COUD = Registry.register(
-            Registry.ENTITY_TYPE,
+            Registries.ENTITY_TYPE,
             JCraft.id("purple_haze_cloud"),
             FabricEntityTypeBuilder.<PurpleHazeCloudEntity>create(SpawnGroup.MISC, (type, world) -> new PurpleHazeCloudEntity(world))
                     .dimensions(EntityDimensions.changing(1.0f, 1.0f)).build()

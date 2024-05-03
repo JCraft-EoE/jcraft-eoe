@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 
 public class JArmorRendererRegistry {
 
-    static void registerArmorRenderers() {
+    public static void registerArmorRenderers() {
         GeoArmorRenderer.registerArmorRenderer(new DIOArmorRenderer(), JObjectRegistry.DIOHEADBAND,
                 JObjectRegistry.DIOJACKET, JObjectRegistry.DIOPANTS, JObjectRegistry.DIOBOOTS);
         GeoArmorRenderer.registerArmorRenderer(new JotaroArmorRenderer(), JObjectRegistry.JOTAROCAP,

@@ -63,7 +63,7 @@ public class SplatterEffectRenderer {
     private static void renderSection(SplatterSection section, BufferBuilder buf, MatrixStack matrices, float alpha, float offset) {
         matrices.push();
         Vector3f offsetVec = section.getDirection().getUnitVector();
-        offsetVec.multiplyComponentwise(offset, offset, offset); // Prevent z-fighting with anchor block and other splatters.
+        offsetVec.mul(offset, offset, offset); // Prevent z-fighting with anchor block and other splatters.
         matrices.translate(offsetVec.x(), offsetVec.y(), offsetVec.z());
         Matrix4f m = matrices.peek().getPositionMatrix();
 

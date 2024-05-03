@@ -12,12 +12,12 @@ import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import software.bernie.geckolib3.core.IAnimatable;
+import software.bernie.geckolib.animatable.GeoEntity;
 
 import java.util.Set;
 
 @Getter
-public class RekkaAttack<A extends IAttacker<A, S> & IAnimatable, S extends Enum<S> & StandAnimationState<A>>
+public class RekkaAttack<A extends IAttacker<A, S> & GeoEntity, S extends Enum<S> & StandAnimationState<A>>
         extends AbstractSimpleAttack<RekkaAttack<A, S>, A> {
     private final int rekkaLevel;
     private final RekkaAttack<A, S> next;
