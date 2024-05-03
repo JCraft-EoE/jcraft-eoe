@@ -12,8 +12,8 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.item.LingeringPotionItem;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
@@ -82,9 +82,9 @@ public class PurpleHazeCloudEntity extends Entity {
         float radius = getRadius();
         PoisonType poisonType = getPoisonType();
 
-        if (world.isClient()) {
+        if (getWorld().isClient()) {
             for (int i = 0; i < radius; i++) {
-                world.addParticle(
+                getWorld().addParticle(
                         JParticleTypeRegistry.PURPLE_HAZE_CLOUD, false,
                         getX() + random.nextGaussian() * radius / 2,
                         getY() + random.nextGaussian() * radius / 2,
@@ -92,7 +92,7 @@ public class PurpleHazeCloudEntity extends Entity {
                         0, 0, 0
                 );
 
-                world.addParticle(
+                getWorld().addParticle(
                         switch (poisonType) {
                             case HARMING -> JParticleTypeRegistry.PURPLE_HAZE_PARTICLE;
                             case NULLIFYING -> ParticleTypes.POOF;
@@ -114,7 +114,7 @@ public class PurpleHazeCloudEntity extends Entity {
                 return;
             }
 
-            world.getOtherEntities(this, getBoundingBox(),
+            getWorld().getOtherEntities(this, getBoundingBox(),
                     EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(EntityPredicates.VALID_ENTITY)).forEach(
                     entity -> {
                         if (entity instanceof LivingEntity living) {
@@ -162,10 +162,5 @@ public class PurpleHazeCloudEntity extends Entity {
                 x - radius, y - radius, z - radius,
                 x + radius, y + radius, z + radius
         );
-    }
-
-    @Override
-    public Packet<?> createSpawnPacket() {
-        return new EntitySpawnS2CPacket(this);
     }
 }

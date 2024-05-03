@@ -11,12 +11,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.core.animatable.GeoAnimatable;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class PHCapsuleProjectile extends PersistentProjectileEntity implements IAnimatable {
+public class PHCapsuleProjectile extends PersistentProjectileEntity implements GeoAnimatable {
     private AbstractPurpleHazeEntity.PoisonType poisonType;
 
     public PHCapsuleProjectile(World world) {
@@ -35,32 +35,38 @@ public class PHCapsuleProjectile extends PersistentProjectileEntity implements I
 
     @Override
     protected void onCollision(HitResult hitResult) {
-        if (world.isClient())
+        if (getWorld().isClient())
             return;
         if (hitResult.getType() == HitResult.Type.MISS)
             return;
         if (hitResult instanceof EntityHitResult entityHitResult) {
             if (getOwner() != null && entityHitResult.getEntity().isConnectedThroughVehicle(getOwner())) return;
 
-            JUtils.projectileDamageLogic(this, world, entityHitResult.getEntity(), getVelocity().multiply(0.1),
+            JUtils.projectileDamageLogic(this, getWorld(), entityHitResult.getEntity(), getVelocity().multiply(0.1),
                     2, 1, false, 2f, 2, HitPropertyComponent.HitAnimation.MID);
         }
 
         discard();
-        PurpleHazeCloudEntity cloud = new PurpleHazeCloudEntity(world, 2.0f, poisonType);
+        PurpleHazeCloudEntity cloud = new PurpleHazeCloudEntity(getWorld(), 2.0f, poisonType);
         cloud.copyPositionAndRotation(this);
-        world.spawnEntity(cloud);
+        getWorld().spawnEntity(cloud);
     }
 
     // Animations
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     @Override
-    public void registerControllers(AnimationData data) {
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+
     }
 
     @Override
-    public AnimationFactory getFactory() {
-        return this.factory;
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
+    }
+
+    @Override
+    public double getTick(Object object) {
+        return 0;
     }
 }

@@ -8,12 +8,14 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.*;
 import org.apache.commons.lang3.Validate;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 public class RotationAnimation {
     @Getter
     private boolean inAnimation = false;
-    private Quaternion startGravityRotation;
-    private Quaternion endGravityRotation;
+    private Quaternionf startGravityRotation;
+    private Quaternionf endGravityRotation;
     private long startTimeMs;
     private long endTimeMs;
 
@@ -27,14 +29,14 @@ public class RotationAnimation {
 
         Vec3d newLookingDirection = getNewLookingDirection(newGravity, prevGravity, entity);
 
-        Quaternion oldViewRotation = QuaternionUtil.getViewRotation(entity.getPitch(), entity.getYaw());
+        Quaternionf oldViewRotation = QuaternionUtil.getViewRotation(entity.getPitch(), entity.getYaw());
 
-        Quaternion currentAnimatedGravityRotation = getCurrentGravityRotation(prevGravity, timeMs);
+        Quaternionf currentAnimatedGravityRotation = getCurrentGravityRotation(prevGravity, timeMs);
 
         // camera rotation = view rotation(pitch and yaw) * gravity rotation(animated)
-        Quaternion currentAnimatedCameraRotation = QuaternionUtil.mult(oldViewRotation, currentAnimatedGravityRotation);
+        Quaternionf currentAnimatedCameraRotation = QuaternionUtil.mult(oldViewRotation, currentAnimatedGravityRotation);
 
-        Quaternion newEndGravityRotation = RotationUtil.getWorldRotationQuaternion(newGravity);
+        Quaternionf newEndGravityRotation = RotationUtil.getWorldRotationQuaternion(newGravity);
 
         Vec2f newYawAndPitch = RotationUtil.vecToRot(
                 RotationUtil.vecWorldToPlayer(newLookingDirection, newGravity)
@@ -54,10 +56,10 @@ public class RotationAnimation {
             livingEntity.prevHeadYaw += deltaYaw;
         }
 
-        Quaternion newViewRotation = QuaternionUtil.getViewRotation(entity.getPitch(), entity.getYaw());
+        Quaternionf newViewRotation = QuaternionUtil.getViewRotation(entity.getPitch(), entity.getYaw());
 
         // gravity rotation = (view rotation^-1) * camera rotation
-        Quaternion animationStartGravityRotation = QuaternionUtil.mult(
+        Quaternionf animationStartGravityRotation = QuaternionUtil.mult(
                 QuaternionUtil.inversed(newViewRotation), currentAnimatedCameraRotation
         );
 
@@ -80,17 +82,17 @@ public class RotationAnimation {
             return oldLookingDirection.multiply(-1);
         }
 
-        Quaternion deltaRotation = QuaternionUtil.getRotationBetween(
+        Quaternionf deltaRotation = QuaternionUtil.getRotationBetween(
                 Vec3d.of(prevGravity.getVector()),
                 Vec3d.of(newGravity.getVector())
         );
 
-        Vector3f lookingDirection = new Vector3f(oldLookingDirection);
+        Vector3f lookingDirection = oldLookingDirection.toVector3f();
         lookingDirection.rotate(deltaRotation);
         return new Vec3d(lookingDirection);
     }
 
-    public Quaternion getCurrentGravityRotation(Direction currentGravity, long timeMs) {
+    public Quaternionf getCurrentGravityRotation(Direction currentGravity, long timeMs) {
 
         if (timeMs > endTimeMs) {
             inAnimation = false;
@@ -120,14 +122,14 @@ public class RotationAnimation {
         nbt.putBoolean("InAnimation", inAnimation);
         if (!inAnimation) return;
 
-        nbt.putFloat("Q0X", startGravityRotation.getX());
-        nbt.putFloat("Q0Y", startGravityRotation.getY());
-        nbt.putFloat("Q0Z", startGravityRotation.getZ());
-        nbt.putFloat("Q0W", startGravityRotation.getW());
-        nbt.putFloat("Q1X", endGravityRotation.getX());
-        nbt.putFloat("Q1Y", endGravityRotation.getY());
-        nbt.putFloat("Q1Z", endGravityRotation.getZ());
-        nbt.putFloat("Q1W", endGravityRotation.getW());
+        nbt.putFloat("Q0X", startGravityRotation.x());
+        nbt.putFloat("Q0Y", startGravityRotation.y());
+        nbt.putFloat("Q0Z", startGravityRotation.z());
+        nbt.putFloat("Q0W", startGravityRotation.w());
+        nbt.putFloat("Q1X", endGravityRotation.x());
+        nbt.putFloat("Q1Y", endGravityRotation.y());
+        nbt.putFloat("Q1Z", endGravityRotation.z());
+        nbt.putFloat("Q1W", endGravityRotation.w());
         nbt.putLong("StartTime", startTimeMs);
         nbt.putLong("EndTime", endTimeMs);
     }
@@ -136,13 +138,13 @@ public class RotationAnimation {
         inAnimation = nbt.getBoolean("InAnimation");//Will return false if no such element exists
         if (!inAnimation) return;
 
-        startGravityRotation = new Quaternion(
+        startGravityRotation = new Quaternionf(
                 nbt.getFloat("Q0X"),
                 nbt.getFloat("Q0Y"),
                 nbt.getFloat("Q0Z"),
                 nbt.getFloat("Q0W")
         );
-        endGravityRotation = new Quaternion(
+        endGravityRotation = new Quaternionf(
                 nbt.getFloat("Q1X"),
                 nbt.getFloat("Q1Y"),
                 nbt.getFloat("Q1Z"),

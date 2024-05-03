@@ -68,7 +68,7 @@ public class JRenderLayerRegistry extends RenderPhase {
     public static RenderLayer createGenericRenderLayer(String name, VertexFormat format, VertexFormat.DrawMode mode, RenderPhase.ShaderProgram shader, RenderPhase.Transparency transparency, RenderPhase.TextureBase texture) {
         RenderLayer type = RenderLayer.of(
                 name, format, mode, FabricLoader.getInstance().isModLoaded("sodium") ? 262144 : 256, false, false, RenderLayer.MultiPhaseParameters.builder()
-                        .shader(shader)
+                        .program(shader)
                         .transparency(transparency)
                         .texture(texture)
                         .cull(new RenderPhase.Cull(true))

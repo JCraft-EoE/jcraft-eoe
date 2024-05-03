@@ -6,9 +6,9 @@ import net.arna.jcraft.common.component.living.StandComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 
 import java.util.*;
@@ -76,7 +76,14 @@ public class JEnemies {
                         // Targeting priority: top to bottom
                         LinkedList<LivingEntity> targets = new LinkedList<>();
                         targets.add(enemy.getPrimeAdversary());
-                        targets.add(enemy.getDamageTracker().getBiggestAttacker());
+                        var damageRec = enemy.getDamageTracker().getBiggestFall();
+                        if (damageRec != null) {
+                            var targetEntity = damageRec.damageSource().getAttacker();
+                            if (targetEntity instanceof LivingEntity living) {
+                                targets.add(living);
+                            }
+                        }
+
                         targets.add(enemy.getAttacker());
                         // Shouldn't use canTarget because that applies a PlayerEntity only filter.
                         targets.stream()

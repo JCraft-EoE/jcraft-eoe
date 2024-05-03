@@ -12,6 +12,7 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 import java.util.List;
 import java.util.function.BiFunction;
@@ -57,9 +58,9 @@ public class Splatter {
         return sections.stream()
                 .map(max ? SplatterSection::getMaxPos : SplatterSection::getMinPos)
                 .reduce(new Vector3f(f, f, f), (current, vec) -> {
-                    float x = function.apply(current.getX(), vec.getX());
-                    float y = function.apply(current.getY(), vec.getY());
-                    float z = function.apply(current.getZ(), vec.getZ());
+                    float x = function.apply(current.x(), vec.x());
+                    float y = function.apply(current.y(), vec.y());
+                    float z = function.apply(current.z(), vec.z());
                     current.set(x, y, z);
                     return current;
                 });

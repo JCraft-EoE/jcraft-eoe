@@ -1,10 +1,13 @@
 package net.arna.jcraft.common.item;
 
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterial;
+import net.minecraft.util.math.Vec3d;
 import software.bernie.example.item.WolfArmorItem;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.constant.DataTickets;
@@ -28,17 +31,6 @@ public class FlutteringArmorItem extends ArmorItem implements GeoItem {
         super(materialIn, slot, builder);
     }
 
-    private <P extends IAnimatable> PlayState predicate(AnimationEvent<P> event) {
-        LivingEntity livingEntity = event.getExtraDataOfType(LivingEntity.class).get(0);
-        boolean moving = (livingEntity instanceof PlayerEntity player) ?
-                !JUtils.deltaPos(player).equals(Vec3d.ZERO) :
-                livingEntity.getVelocity().horizontalLengthSquared() > 0.01;
-        event.getController().setAnimation(new AnimationBuilder().loop(
-                moving ? "animation.moving" : "animation.idle"));
-        return PlayState.CONTINUE;
-    }
-
-    @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController(this, "controller", 10, this::predicate));
@@ -46,8 +38,9 @@ public class FlutteringArmorItem extends ArmorItem implements GeoItem {
 
     private PlayState predicate(AnimationState state) {
         Entity entity = (Entity) state.getData(DataTickets.ENTITY);
-        state.getController().setAnimation(RawAnimation.begin().thenLoop(
-                entity.getVelocity().horizontalLengthSquared() > 0.01 ? "animation.jotarooutfit.moving" : "animation.jotarooutfit.idle"));
+
+        boolean moving = (entity instanceof PlayerEntity player) ? !JUtils.deltaPos(player).equals(Vec3d.ZERO) : entity.getVelocity().horizontalLengthSquared() > 0.01;
+        state.getController().setAnimation(RawAnimation.begin().thenLoop(moving ? "animation.moving" : "animation.idle"));
         return PlayState.CONTINUE;
     }
 

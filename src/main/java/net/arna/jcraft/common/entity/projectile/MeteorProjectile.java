@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.entity.projectile;
 
 import net.arna.jcraft.common.component.living.HitPropertyComponent;
+import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.stand.MagiciansRedEntity;
 import net.arna.jcraft.common.entity.stand.TheSunEntity;
 import net.arna.jcraft.common.util.JUtils;
@@ -11,6 +12,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -28,14 +30,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.PlayState;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.core.animatable.GeoAnimatable;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -45,9 +47,8 @@ import java.util.Set;
 import static net.arna.jcraft.common.entity.stand.StandEntity.damageLogic;
 import static net.arna.jcraft.common.util.JUtils.canDamage;
 
-public class MeteorProjectile extends PersistentProjectileEntity implements IAnimatable {
+public class MeteorProjectile extends PersistentProjectileEntity implements GeoAnimatable {
     public static final TrackedData<Integer> SKIN;
-    private static final DamageSource damageSource = DamageSource.ON_FIRE;
     private int ticksInAir = 0;
     private int ticksInGround = 0;
     private TheSunEntity sun;
@@ -111,14 +112,14 @@ public class MeteorProjectile extends PersistentProjectileEntity implements IAni
         Entity entity = entityHitResult.getEntity();
         if (owner.hasPassenger(entity) || entity == owner || entity == sun) return;
 
-        if (world.isClient) {
+        if (getWorld().isClient) {
             // Hack that displays explosion without needing sync
             inGround = true;
             return;
         }
 
         entity.setOnFireFor(3);
-        JUtils.projectileDamageLogic(this, world, entity, getVelocity(), 20, 1, false,
+        JUtils.projectileDamageLogic(this, getWorld(), entity, getVelocity(), 20, 1, false,
                 6f, 10, HitPropertyComponent.HitAnimation.HIGH);
         if (explosive && ticksInGround < 1) {
             explode();
@@ -131,13 +132,13 @@ public class MeteorProjectile extends PersistentProjectileEntity implements IAni
 
     @Override
     protected void onBlockHit(BlockHitResult blockHitResult) {
-        if (!world.isClient()) {
+        if (!getWorld().isClient()) {
             Direction movementDirection = getMovementDirection();
             BlockPos blockPos2 = getBlockPos(); //.offset(movementDirection);
-            if (AbstractFireBlock.canPlaceAt(world, blockPos2, movementDirection)) {
+            if (AbstractFireBlock.canPlaceAt(getWorld(), blockPos2, movementDirection)) {
                 //world.playSound(null, blockPos2, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1.0F, world.getRandom().nextFloat() * 0.4F + 0.8F);
-                BlockState blockState2 = AbstractFireBlock.getState(world, blockPos2);
-                world.setBlockState(blockPos2, blockState2, 11);
+                BlockState blockState2 = AbstractFireBlock.getState(getWorld(), blockPos2);
+                getWorld().setBlockState(blockPos2, blockState2, 11);
             }
             MagiciansRedEntity.ignite(getWorld(), blockHitResult.getBlockPos());
         }
@@ -160,9 +161,9 @@ public class MeteorProjectile extends PersistentProjectileEntity implements IAni
     public void tick() {
         super.tick();
 
-        if (world.isClient()) {
+        if (getWorld().isClient()) {
             Vec3d vel = getVelocity();
-            this.world.addParticle(
+            this.getWorld().addParticle(
                     getSkin() == 2 ? ParticleTypes.SOUL_FIRE_FLAME : ParticleTypes.FLAME,
                     getX() + random.nextFloat() * 0.5f - 0.25f,
                     getY() + random.nextFloat() * 0.5f - 0.25f,
@@ -191,7 +192,7 @@ public class MeteorProjectile extends PersistentProjectileEntity implements IAni
                 return;
             }
 
-            TheSunEntity.dryOut((ServerWorld) world, getBlockPos());
+            TheSunEntity.dryOut((ServerWorld) getWorld(), getBlockPos());
         }
     }
 
@@ -201,14 +202,14 @@ public class MeteorProjectile extends PersistentProjectileEntity implements IAni
         filter.add(owner);
         filter.add(this);
 
-        List<LivingEntity> hurtAll = new ArrayList<>(JUtils.generateHitbox(world, getPos(), 2, filter));
-        hurtAll.removeIf(e -> !canDamage(damageSource, e));
+        List<LivingEntity> hurtAll = new ArrayList<>(JUtils.generateHitbox(getWorld(), getPos(), 2, filter));
+        hurtAll.removeIf(e -> !canDamage(JDamageSources.create(getWorld(), DamageTypes.ON_FIRE), e));
 
         if (!hurtAll.isEmpty()) {
             for (LivingEntity l : hurtAll) {
                 LivingEntity target = JUtils.getUserIfStand(l);
-                damageLogic(world, target, l.getPos().subtract(getPos()).normalize(), 20, 3, false, 5f,
-                        false, 10, damageSource, owner, HitPropertyComponent.HitAnimation.LAUNCH);
+                damageLogic(getWorld(), target, l.getPos().subtract(getPos()).normalize(), 20, 3, false, 5f,
+                        false, 10, JDamageSources.create(getWorld(), DamageTypes.ON_FIRE), owner, HitPropertyComponent.HitAnimation.LAUNCH);
             }
         }
     }
@@ -219,25 +220,29 @@ public class MeteorProjectile extends PersistentProjectileEntity implements IAni
     }
 
     // Animations
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     @Override
-    public void registerControllers(AnimationData data) {
-        data.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<GeoAnimatable>(this, "controller", 0, this::predicate));
     }
 
-    @Override
-    public AnimationFactory getFactory() {
-        return this.factory;
-    }
-
-    @SuppressWarnings("SameReturnValue")
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+    private PlayState predicate(AnimationState<GeoAnimatable> state) {
         if (inGround)
-            event.getController().setAnimation(new AnimationBuilder().playOnce("animation.meteor.explode"));
+            state.getController().setAnimation(RawAnimation.begin().thenPlay("animation.meteor.explode"));
         else
-            event.getController().setAnimation(new AnimationBuilder().playOnce("animation.meteor.spawn")
-                    .loop("animation.meteor.idle"));
+            state.getController().setAnimation(RawAnimation.begin().thenPlay("animation.meteor.spawn")
+                    .thenLoop("animation.meteor.idle"));
         return PlayState.CONTINUE;
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
+    }
+
+    @Override
+    public double getTick(Object object) {
+        return 0;
     }
 }
