@@ -2,6 +2,7 @@ package net.arna.jcraft.common.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import net.arna.jcraft.common.argumenttype.AttackArgumentType;
+import net.arna.jcraft.common.attack.core.MoveInputType;
 import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.component.living.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
@@ -55,15 +56,17 @@ public class InduceAttackCommand {
         if (stand) {
             for (Entity entity : targets) {
                 if (entity instanceof LivingEntity living) {
-                    CooldownsComponent cooldowns = JComponents.COOLDOWNS.get(living);
-                    cooldowns.clear();
-
-                    StandComponent standData = JComponents.STAND.get(living);
-                    StandEntity<?, ?> standEntity = standData.getStand();
+                    JComponents.getCooldowns(living).clear();
+                    StandEntity<?, ?> standEntity = JComponents.getStandData(living).getStand();
 
                     if (standEntity != null) {
-                        source.sendFeedback(() -> Text.literal("Initiating stand attack " + typeName + " for " + living.getName().getString()), true);
-                        standEntity.initMove(type);
+                            if (standEntity.initMove(type)) {
+                                source.sendFeedback(Text.literal("Initiating stand attack " + typeName + " for " + living.getName().getString()), true);
+                            } else {
+                                source.sendFeedback(Text.literal("Queueing stand attack " + typeName + " for " + living.getName().getString()), true);
+                                standEntity.queueMove(MoveInputType.fromMoveType(type));
+                            }
+
                         flag = 1;
                     }
                 }
@@ -71,13 +74,17 @@ public class InduceAttackCommand {
         } else {
             for (Entity entity : targets) {
                 if (!(entity instanceof PlayerEntity player)) continue;
-
                 JComponents.getCooldowns(player).clear();
-
                 JSpec<?, ?> spec = JUtils.getSpec(player);
+
                 if (spec != null) {
-                    source.sendFeedback(() -> Text.literal("Initiating spec attack " + typeName + " for " + entity.getName().getString()), true);
-                    spec.initMove(type);
+                    if (spec.initMove(type)) {
+                        source.sendFeedback(Text.literal("Initiating spec attack " + typeName + " for " + entity.getName().getString()), true);
+                    } else {
+                        source.sendFeedback(Text.literal("Queueing spec attack " + typeName + " for " + entity.getName().getString()), true);
+                        spec.queuedMove = MoveInputType.fromMoveType(type);
+                    }
+
                     flag = 1;
                 }
             }

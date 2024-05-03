@@ -12,7 +12,7 @@ public class SilverChariotModel extends StandEntityModel<SilverChariotEntity> {
     private static final Identifier POSSESSED_TEXTURE = JCraft.id("textures/entity/stands/silver_chariot/possessed.png");
 
     public SilverChariotModel() {
-        super(StandType.SILVER_CHARIOT);
+        super(StandType.SILVER_CHARIOT, 0, -0.2f);
     }
 
     @Override
@@ -22,12 +22,5 @@ public class SilverChariotModel extends StandEntityModel<SilverChariotEntity> {
             case POSSESSED -> POSSESSED_TEXTURE;
             default -> super.getTextureResource(entity);
         };
-    }
-
-    @Override
-    public void setCustomAnimations(SilverChariotEntity animatable, long instanceId, AnimationState<SilverChariotEntity> animationState) {
-        super.setCustomAnimations(animatable, instanceId, animationState);
-        if (animatable.hasUser())
-            JClientUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), animationState.getPartialTick(), true, true, 0, -0.2f);
     }
 }

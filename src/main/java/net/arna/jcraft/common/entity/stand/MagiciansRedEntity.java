@@ -15,6 +15,7 @@ import net.arna.jcraft.registry.JSoundRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.IceBlock;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -40,7 +41,10 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
     public static final RedirectAttack REDIRECT = new RedirectAttack(0, 7, 10, 0.75f)
             .withAnim(State.REDIRECT)
             .withSound(JSoundRegistry.MR_REDIRECT)
-            .withInfo(Text.literal("Redirect"), Text.literal("redirects all the users ankhs to where they're looking"));
+            .withInfo(
+                    Text.literal("Redirect"),
+                    Text.literal("redirects all the users ankhs to where they're looking")
+            );
     public static final SimpleAttack<MagiciansRedEntity> LIGHT_FOLLOWUP = new SimpleAttack<MagiciansRedEntity>(
             0, 6, 14, 0.65f, 6f, 12, 1.5f, 1.2f, -0.1f)
             .withAnim(State.LIGHT_FOLLOWUP)
@@ -48,25 +52,37 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             .withLaunch()
             .withBlockStun(4)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withInfo(Text.literal("Punch"), Text.literal("quick combo finisher"));
+            .withInfo(
+                    Text.literal("Punch"),
+                    Text.literal("quick combo finisher")
+            );
     public static final SimpleAttack<MagiciansRedEntity> LIGHT = new SimpleAttack<MagiciansRedEntity>(JCraft.LIGHT_COOLDOWN,
             5, 8, 0.75f, 5f, 16, 1.5f, 0.2f, -0.1f)
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(REDIRECT)
             .withImpactSound(JSoundRegistry.IMPACT_1)
-            .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
+            .withInfo(
+                    Text.literal("Punch"),
+                    Text.literal("quick combo starter")
+            );
     public static final KnockdownAttack<MagiciansRedEntity> HEAVY = new KnockdownAttack<MagiciansRedEntity>(100,
             12, 22, 1f, 7f, 10, 1.75f, 0.5f, 0.6f, 40)
             .withAnim(State.HEAVY)
             .withSound(JSoundRegistry.MR_HEAVY)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
-            .withInfo(Text.literal("Low Kick"), Text.literal("medium windup knockdown"));
+            .withInfo(
+                    Text.literal("Low Kick"),
+                    Text.literal("medium windup knockdown")
+            );
     public static final SimpleAttack<MagiciansRedEntity> HAMMERFIST_FLARE = new SimpleAttack<MagiciansRedEntity>(0,
             1, 5, 1f, 6f, 10, 1.75f, 1.5f, -0.2f)
             .withLaunch()
             .withAction((attacker, user, ctx, targets) -> attacker.playSound(SoundEvents.ITEM_FIRECHARGE_USE, 1.0f, 1.0f))
             .withHitSpark(JParticleType.HIT_SPARK_3)
-            .withInfo(Text.literal("Hammerfist Flare"), Text.literal("launcher"));
+            .withInfo(
+                    Text.literal("Hammerfist Flare"),
+                    Text.literal("launcher")
+            );
     public static final SimpleAttack<MagiciansRedEntity> HAMMERFIST = new SimpleAttack<MagiciansRedEntity>(100,
             10, 20, 1f, 3f, 13, 1.75f, 0.2f, 0)
             .withSound(JSoundRegistry.MR_CROSSFIRE)
@@ -74,28 +90,49 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             .withCrouchingVariant(HEAVY)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
-            .withInfo(Text.literal("Hammerfist"), Text.literal("two-hit launcher"));
+            .withInfo(
+                    Text.literal("Hammerfist"),
+                    Text.literal("two-hit launcher")
+            );
     public static final FlamethrowerAttack FLAMETHROWER = new FlamethrowerAttack(300, 0,
             40, 0.75f, 0.4f, 0, 2, 0.25f, 0, 3)
             .withArmor(1)
             .withSound(JSoundRegistry.MR_BARRAGE)
-            .withInfo(Text.literal("Flamethrower"), Text.literal("fast reliable damage cash-out tool, no stun, burns for 3 seconds"));
+            .withInfo(
+                    Text.literal("Flamethrower"),
+                    Text.literal("fast reliable damage cash-out tool, no stun, burns for 3 seconds")
+            );
     public static final CrossfireAttack CROSSFIRE = new CrossfireAttack(240, 8, 10, 0.75f)
             .withSound(JSoundRegistry.MR_CROSSFIRE)
-            .withInfo(Text.literal("Crossfire"), Text.literal("fires 3 stunning ankhs"));
+            .withInfo(
+                    Text.literal("Crossfire"),
+                    Text.literal("fires 3 stunning ankhs")
+            );
     public static final CrossfireVariationAttack CROSSFIRE_VARIATION = new CrossfireVariationAttack(600, 12, 17, 0.75f)
             .withSound(JSoundRegistry.MR_CROSSFIRE)
-            .withInfo(Text.literal("Crossfire Variation"), Text.literal("summons 6 ankhs that orbit around the user, crouch as they come out to increase orbit distance"));
+            .withInfo(
+                    Text.literal("Crossfire Variation"),
+                    Text.literal("summons 6 ankhs that orbit around the user, crouch as they come out to increase orbit distance")
+            );
     public static final CrossfireHurricaneAttack CROSSFIRE_HURRICANE = new CrossfireHurricaneAttack(800, 18, 22, 0.75f)
             .withSound(JSoundRegistry.MR_ULT)
-            .withInfo(Text.literal("Crossfire Hurricane"), Text.literal("summons slow, homing fire hurricane that knocks down, lasts for 3 seconds after hitting anything"));
+            .withInfo(
+                    Text.literal("Crossfire Hurricane"),
+                    Text.literal("summons slow, homing fire hurricane that knocks down, lasts for 3 seconds after hitting anything")
+            );
     public static final RedBindAttack RED_BIND = new RedBindAttack(300, 12, 22, 0.75f, 3, 15, 1.5f, 0, 0)
             .withSound(JSoundRegistry.MR_REDBIND)
             .withImpactSound(JSoundRegistry.IMPACT_3)
-            .withInfo(Text.literal("Red Bind"), Text.literal("on hit, wraps opponent in fiery rings that launch them in the direction they are hit"));
+            .withInfo(
+                    Text.literal("Red Bind"),
+                    Text.literal("on hit, wraps opponent in fiery rings that launch them in the direction they are hit")
+            );
     public static final LifeDetectorAttack LIFE_DETECTOR = new LifeDetectorAttack(280, 13, 20, 0.75f)
             .withSound(JSoundRegistry.MR_DETECTOR)
-            .withInfo(Text.literal("Life Detector"), Text.literal("tracks down nearby life, lasts 15s"));
+            .withInfo(
+                    Text.literal("Life Detector"),
+                    Text.literal("tracks down nearby life, lasts 15s")
+            );
 
     public MagiciansRedEntity(World worldIn) {
         super(StandType.MAGICIANS_RED, worldIn, JSoundRegistry.MR_SUMMON);
@@ -184,6 +221,8 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
         }
         if (world.getBlockEntity(blockPos) instanceof AbstractFurnaceBlockEntity furnaceBlock)
             furnaceBlock.burnTime = 220;
+        if (block instanceof IceBlock iceBlock)
+            iceBlock.melt(state, world, blockPos);
     }
 
     @Override

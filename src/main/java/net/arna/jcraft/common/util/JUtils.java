@@ -5,6 +5,7 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.MoveInputType;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.living.HitPropertyComponent;
+import net.arna.jcraft.common.entity.projectile.JAttackEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
@@ -12,6 +13,7 @@ import net.arna.jcraft.common.network.s2c.JExplosionPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.splatter.JSplatterManager;
+import net.arna.jcraft.registry.JEntityTypeRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
@@ -313,6 +315,9 @@ public final class JUtils {
         entity.prevHorizontalSpeed = entity.horizontalSpeed;
     }
 
+    /**
+     * @return the change in position for an entity between the current and last tick.
+     */
     public static Vec3d deltaPos(@NotNull Entity ent) {
         return new Vec3d(
                 ent.getX() - ent.prevX,
@@ -484,7 +489,10 @@ public final class JUtils {
             Map.entry(EntityType.VILLAGER, 1.5f),
             Map.entry(EntityType.PLAYER, 1.5f),
 
-            Map.entry(EntityType.IRON_GOLEM, 0.0f)
+            Map.entry(EntityType.IRON_GOLEM, 0.0f),
+            Map.entry(EntityType.SNOW_GOLEM, 0.0f),
+
+            Map.entry(JEntityTypeRegistry.SHEER_HEART_ATTACK, 0.0f)
     );
 
     public static float getBloodMult(LivingEntity entity) {
@@ -493,7 +501,7 @@ public final class JUtils {
         if (type.isIn(EntityTypeTags.RAIDERS))
             return 1.5f;
 
-        if (type.isIn(EntityTypeTags.SKELETONS))
+        if (type.isIn(EntityTypeTags.SKELETONS) || entity instanceof JAttackEntity)
             return 0;
 
         if (type.isIn(EntityTypeTags.AXOLOTL_HUNT_TARGETS)) // Fishes
@@ -517,5 +525,26 @@ public final class JUtils {
         return stand != null && stand.canHoldMove(type) ||
                 (spec = JUtils.getSpec(player)) != null && spec.canHoldMove(type) ||
                 type.isHoldable();
+    }
+
+    /**
+     * Shoots a projectile without interference from GravityAPI.
+     * @param projectile
+     * @param shooter Entity this projectile inherits velocity from
+     * @param pitch in degrees
+     * @param yaw in degrees
+     * @param roll in degrees
+     * @param speed in meters per tick
+     * @param divergence Spread, done via a {@link Vec3d} of {@link net.minecraft.util.math.random.Random#nextTriangular(double, double)} calls
+     */
+    public static void shoot(@NotNull ProjectileEntity projectile, @Nullable Entity shooter, float pitch, float yaw, float roll, float speed, float divergence) {
+        float f = -MathHelper.sin(yaw * RAD_TO_DEG) * MathHelper.cos(pitch * RAD_TO_DEG);
+        float g = -MathHelper.sin((pitch + roll) * RAD_TO_DEG);
+        float h = MathHelper.cos(yaw * RAD_TO_DEG) * MathHelper.cos(pitch * RAD_TO_DEG);
+        projectile.setVelocity(f, g, h, speed, divergence);
+        if (shooter != null) {
+            Vec3d vec3d = shooter.getVelocity();
+            projectile.setVelocity(projectile.getVelocity().add(vec3d.x, shooter.isOnGround() ? 0.0 : vec3d.y, vec3d.z));
+        }
     }
 }

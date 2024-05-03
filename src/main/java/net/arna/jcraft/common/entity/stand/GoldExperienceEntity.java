@@ -1,10 +1,17 @@
 package net.arna.jcraft.common.entity.stand;
 
 import lombok.NonNull;
-import net.arna.jcraft.common.attack.core.*;
+import net.arna.jcraft.common.attack.core.BlockableType;
+import net.arna.jcraft.common.attack.core.HitBoxData;
+import net.arna.jcraft.common.attack.core.MoveMap;
+import net.arna.jcraft.common.attack.core.MoveType;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
-import net.arna.jcraft.common.attack.moves.goldexperience.*;
+import net.arna.jcraft.common.attack.moves.goldexperience.BerryBushAttack;
+import net.arna.jcraft.common.attack.moves.goldexperience.LifeGiverAttack;
+import net.arna.jcraft.common.attack.moves.goldexperience.OverclockAttack;
+import net.arna.jcraft.common.attack.moves.goldexperience.TreeAttack;
 import net.arna.jcraft.common.attack.moves.shared.HealMove;
+import net.arna.jcraft.common.attack.moves.shared.KnockdownAttack;
 import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.component.living.HitPropertyComponent;
@@ -14,7 +21,6 @@ import net.arna.jcraft.registry.JSoundRegistry;
 import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.text.Text;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +37,10 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             1.25f, 4f, 5, 1.5f, 0.75f, 0.2f)
             .withAnim(State.LIFE_GIVER)
             .withImpactSound(JSoundRegistry.IMPACT_4)
-            .withInfo(Text.literal("Place Berry Bush"), Text.literal("places an almost-ripe berry bush on the ground, this move cannot be aimed up or down"));
+            .withInfo(
+                    Text.literal("Place Berry Bush"),
+                    Text.literal("places an almost-ripe berry bush on the ground, this move cannot be aimed up or down")
+            );
     public static final SimpleAttack<GoldExperienceEntity> LIGHT_FOLLOWUP = new SimpleAttack<GoldExperienceEntity>(
             0, 7, 12, 0.75f, 6, 7, 1.5f, 1f, -0.1f)
             .withAnim(State.LIGHT_FOLLOWUP)
@@ -40,13 +49,19 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .withBlockStun(4)
             .withExtraHitBox(0, 0.25, 1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withInfo(Text.literal("Punch"), Text.literal("quick combo finisher"));
+            .withInfo(
+                    Text.literal("Punch"),
+                    Text.literal("quick combo finisher")
+            );
     public static final SimpleAttack<GoldExperienceEntity> LIGHT = new SimpleAttack<GoldExperienceEntity>(
             15, 6, 9, 0.75f, 5f, 7, 1.5f, 0.2f, -0.1f)
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(BERRY_BUSH)
             .withImpactSound(JSoundRegistry.IMPACT_1)
-            .withInfo(Text.literal("Punch"), Text.literal("quick combo starter, low stun"));
+            .withInfo(
+                    Text.literal("Punch"),
+                    Text.literal("quick combo starter, low stun")
+            );
     public static final SimpleAttack<GoldExperienceEntity> HEAVY = new SimpleAttack<GoldExperienceEntity>(
             200, 13, 22, 1f, 9f, 10, 1.5f, 1.5f, 0f)
             .withExtraHitBox(new HitBoxData(0, 0, 1.25))
@@ -55,65 +70,99 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .withHitSpark(JParticleType.HIT_SPARK_3)
             .withHyperArmor()
             .withLaunch()
-            .withInfo(Text.literal("Shoulder Smash"), Text.literal("slow, uninterruptible combo finisher"));
+            .withInfo(
+                    Text.literal("Shoulder Smash"),
+                    Text.literal("slow, uninterruptible combo finisher")
+            );
     public static final MainBarrageAttack<GoldExperienceEntity> BARRAGE = new MainBarrageAttack<GoldExperienceEntity>(
             280, 0, 30, 0.75f, 1f, 20, 2f, 0.25f, 0f, 3, Blocks.OAK_PLANKS.getHardness())
             .withSound(JSoundRegistry.GE_BARRAGE)
-            .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
+            .withInfo(
+                    Text.literal("Barrage"),
+                    Text.literal("fast reliable combo starter/extender, high stun")
+            );
     public static final HealMove<GoldExperienceEntity> HEAL_OTHERS = new HealMove<GoldExperienceEntity>(520, 10,
             16, 1f, 1.25f,
             0f, 4f, HealMove.HealTarget.TARGETS)
             .withSound(JSoundRegistry.GE_HEAL)
-            .withInfo(Text.literal("Healing Hand (others)"), Text.empty());
+            .withInfo(
+                    Text.literal("Healing Hand (others)"),
+                    Text.empty()
+            );
     public static final HealMove<GoldExperienceEntity> HEAL_SELF = new HealMove<GoldExperienceEntity>(520, 10,
             14, 1f, 0,
             0, 4f, HealMove.HealTarget.USER)
             .withCrouchingVariant(HEAL_OTHERS)
             .withSound(JSoundRegistry.GE_HEAL)
-            .withInfo(Text.literal("Healing Hand"), Text.literal("standing: heals user for 2 hearts, crouching: heals others for 2 hearts, pacifies angered mobs"));
+            .withInfo(
+                    Text.literal("Healing Hand"),
+                    Text.literal("standing: heals user for 2 hearts, crouching: heals others for 2 hearts, pacifies angered mobs")
+            );
     public static final TreeAttack TREE = new TreeAttack(280, 10, 24, 1f, 5f,
             15, 1.75f, 0.2f, -0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_8)
             .withSound(JSoundRegistry.GE_TREE)
-            .withInfo(Text.literal("Tree Summon"), Text.literal("two-hitting launch"));
+            .withInfo(
+                    Text.literal("Tree Summon"),
+                    Text.literal("two-hitting launch")
+            );
     public static final LifeGiverAttack LIFE_GIVER = new LifeGiverAttack(400, 16, 25, 1f)
             .withSound(JSoundRegistry.GE_HEAL)
-            .withInfo(Text.literal("Life Giver"), Text.literal("""
+            .withInfo(
+                    Text.literal("Life Giver"),
+                    Text.literal("""
                             STANDING: turns any stackable item into a snake, lasts for 25s and stuns for 0.5s on hit
                             CROUCHING: turns any stackable item into a frog, lasts for 15s and reflects damage, follows user
-                            AERIAL: turns any item into a butterfly, lasts forever"""));
+                            AERIAL: turns any item into a butterfly, lasts forever""")
+            );
     public static final OverclockAttack OVERCLOCK = new OverclockAttack(920, 22, 31, 1f,
             9f, 60, 2f, 0.9f, 0f)
 //            .withSound(JSoundRegistry.GE_ULT)
             .withImpactSound(JSoundRegistry.IMPACT_10)
             .withBlockableType(BlockableType.NON_BLOCKABLE)
-            .withInfo(Text.literal("Overclock"), Text.literal("slow, unblockable, devastating stun"));
-    public static final RekkaAttack REKKA3 = new RekkaAttack(0, 12, 24, 1f, 6f,
-            15, 2f, 0.75f, 0f, 3, 0, null, null)
+            .withInfo(
+                    Text.literal("Overclock"),
+                    Text.literal("slow, unblockable, devastating stun")
+            );
+    public static final KnockdownAttack<GoldExperienceEntity> REKKA3 = new KnockdownAttack<GoldExperienceEntity>
+            (0, 12, 24, 1f, 6f, 15, 2f, 0.75f, 0f, 50)
+            .withAnim(State.REKKA3)
             .withSound(JSoundRegistry.GE_REKKA3)
             .withLaunch()
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
-            .withInfo(Text.literal("Rekka (Final Hit)"), Text.literal("knockdown"));
-    public static final RekkaAttack REKKA2 = new RekkaAttack(0, 9, 18, 1f, 5f,
-            16, 1.75f, 0.5f, 0f, 2, 9, REKKA3, State.REKKA3)
+            .withBlockStun(8)
+            .withInfo(
+                    Text.literal("Rekka (Final Hit)"),
+                    Text.literal("knockdown, low blockstun")
+            );
+    public static final SimpleAttack<GoldExperienceEntity> REKKA2 = new SimpleAttack<GoldExperienceEntity>
+            (0, 9, 18, 1f, 5f, 16, 1.75f, 0.5f, 0f)
+            .withAnim(State.REKKA2)
             .withSound(JSoundRegistry.GE_REKKA2)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withFollowup(REKKA3)
             .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
-            .withInfo(Text.literal("Rekka (2nd Hit)"), Text.literal("links into Light"));
-    public static final RekkaAttack REKKA1 = new RekkaAttack(160, 8, 20, 1f, 5f,
-            15, 1.5f, 0.5f, 0f, 1, 12, REKKA2, State.REKKA2)
+            .withInfo(
+                    Text.literal("Rekka (2nd Hit)"),
+                    Text.literal("links into Light")
+            );
+    public static final SimpleAttack<GoldExperienceEntity> REKKA1 = new SimpleAttack<GoldExperienceEntity>
+            (160, 7, 14, 1f, 5f, 15, 1.5f, 0.5f, 0f)
+            .withAnim(State.REKKA1)
             .withSound(JSoundRegistry.GE_REKKA1)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withFollowup(REKKA2)
             .withExtraHitBox(1.25)
             .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
-            .withInfo(Text.literal("Rekka Series"), Text.literal("a set of three attacks, which cancel into each other during recovery"));
+            .withInfo(
+                    Text.literal("Rekka Series"),
+                    Text.literal("a set of three attacks, which cancel into each other during recovery")
+            );
 
     public GoldExperienceEntity(World worldIn) {
         super(StandType.GOLD_EXPERIENCE, worldIn, JSoundRegistry.GE_SUMMON);
 
-        idleRotation = 0f;
+        idleRotation = -30f;
 
         description = "Impenetrable Regenerative DEFENSE";
 
@@ -166,14 +215,14 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
     public boolean initMove(MoveType type) {
         switch (type) {
             case SPECIAL2 -> {
-                if (!hasUser()) return false;
                 LivingEntity user = getUserOrThrow();
                 if (user.hasStatusEffect(JStatusRegistry.DAZED)) return false;
                 boolean idling = this.getMoveStun() <= 0;
-                if (!(curMove instanceof RekkaAttack rekka)) {
+                if (curMove == null || curMove.getMoveType() != MoveType.SPECIAL2) {
                     if (idling) return handleMove(MoveType.SPECIAL2);
-                } else if (rekka.getNext() != null && rekka.mayAdvance(this))
-                    setMove(rekka.getNext(), rekka.getNextState());
+                    else return false;
+                } else if (curMove.getFollowup() != null && curMove.hasWindupPassed(this))
+                    setMove(curMove.getFollowup(), (State) curMove.getFollowup().getAnimation());
             }
             case SPECIAL3 -> {
                 if (!canAttack() || !hasUser()) return false;
@@ -217,7 +266,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
 
     @Override
     public MoveSelectionResult specificMoveSelectionCriterion(AbstractMove<?, ? super GoldExperienceEntity> attack,
-                                                              MobEntity mob, LivingEntity target, int stunTicks,
+                                                              LivingEntity mob, LivingEntity target, int stunTicks,
                                                               int enemyMoveStun, double distance,
                                                               StandEntity<?, ?> enemyStand, AbstractMove<?, ?> enemyAttack) {
         return attack == LIFE_GIVER ?
@@ -235,10 +284,6 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
     @Override
     public void tick() {
         super.tick();
-        if (!hasUser()) return;
-
-        if (!getWorld().isClient && curMove != null && (curMove.getOriginalMove() == REKKA2 || curMove.getOriginalMove() == REKKA3) && queuedMove == MoveInputType.SPECIAL2)
-            queuedMove = null;
     }
 
     @Override

@@ -138,6 +138,12 @@ public class EmeraldProjectile extends PersistentProjectileEntity implements Geo
     }
 
     @Override
+    protected float getDragInWater() {
+        // Not actually drag, just a multiplier
+        return 0.8F;
+    }
+
+    @Override
     public void writeCustomDataToNbt(NbtCompound tag) {
         super.writeCustomDataToNbt(tag);
         tag.putShort("life", (short) this.ticksInAir);

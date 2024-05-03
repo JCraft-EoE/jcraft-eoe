@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.attack.moves.cream;
 
 import lombok.NonNull;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.attack.core.ctx.MoveContext;
 import net.arna.jcraft.common.attack.core.ctx.MoveVariable;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
@@ -24,36 +25,24 @@ public class SurpriseMove extends AbstractMove<SurpriseMove, CreamEntity> {
     }
 
     @Override
-    public boolean canBeInitiated(CreamEntity attacker) {
-        return !attacker.isHalfBall() && super.canBeInitiated(attacker);
-    }
-
-    @Override
     public void onInitiate(CreamEntity attacker) {
         super.onInitiate(attacker);
 
-        LivingEntity user = attacker.getUserOrThrow();
-        Vec3d eyePos = user.getEyePos();
-        Vec3d rotVec = user.getRotationVector();
-        HitResult hitResult = attacker.getWorld().raycast(new RaycastContext(eyePos, eyePos.add(rotVec.multiply(16)),
-                RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user));
+        // OUT_POS are set in .withInitAction() in CreamEntity.java
 
         attacker.setFree(true);
-        attacker.setFreePos((user.getPos().toVector3f()));
-        attacker.getMoveContext().set(OUT_POS, (hitResult.getPos().toVector3f()));
+        attacker.setFreePos(new Vec3f(attacker.getUserOrThrow().getPos()));
     }
 
     @Override
     public @NonNull Set<LivingEntity> perform(CreamEntity attacker, LivingEntity user, MoveContext ctx) {
         attacker.setCharging(true);
 
-        Vector3f outDir = GravityChangerAPI.getGravityDirection(attacker).getUnitVector();
-        outDir.mul(-1f);
-        ctx.set(OUT_DIR, outDir);
-        ctx.get(OUT_POS).sub(outDir);
+        // OUT_DIR is set in .withAction() in CreamEntity.java
 
-        Vector3f outPos = ctx.get(OUT_POS);
-        attacker.setPosition(new Vec3d(outPos.x(), outPos.y(), outPos.z()));
+        ctx.get(OUT_POS).subtract(ctx.get(OUT_DIR));
+        Vec3f outPos = ctx.get(OUT_POS);
+        attacker.setPosition(new Vec3d(outPos.getX(), outPos.getY(), outPos.getZ()));
         attacker.setFreePos(outPos);
 
         attacker.setVoidTime(getWindupPoint());

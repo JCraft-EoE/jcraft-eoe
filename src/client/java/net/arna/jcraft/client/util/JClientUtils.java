@@ -15,6 +15,8 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib3.core.processor.AnimationProcessor;
 import software.bernie.geckolib3.core.processor.IBone;
 
 import java.util.ArrayList;
@@ -28,11 +30,13 @@ public class JClientUtils {
     // Timestop tracking
     public static List<DimensionData> activeTimestops = new ArrayList<>();
 
+    // Mustn't directly remove the DimensionData due to the possibility of a ConcurrentModificationException
+    // Setting the timer to 0 will make the next tick remove it
     public static void removeTimestop(int timestopperId) {
         for (DimensionData timestop : activeTimestops) {
             Entity timestopper = timestop.user;
             if (timestopper.getId() != timestopperId) continue;
-            activeTimestops.remove(timestop);
+            timestop.timer = 0;
             return;
         }
     }
@@ -74,15 +78,17 @@ public class JClientUtils {
     public static void animateGenericHumanoid(StandEntityModel<?> model, StandEntity<?, ?> entity, LivingEntity player, float partialTick, boolean flipBody, boolean flipHead, float tPO, float hPO, float velInfluence) {
         float overVel = 0;
 
+        AnimationProcessor<?> animationProcessor = model.getAnimationProcessor();
+
         if (entity.getMoveStun() < 1) {
-            Vec3d playerVel = deltaPos(player);
+            Vec3d playerVel = (entity.isRemote() && !entity.remoteControllable()) ? entity.getVelocity() : deltaPos(player);
             overVel = MathHelper.clamp((float) playerVel.horizontalLength() - 0.05f, -1f, 1f);
 
             // If going backwards
             if (playerVel.normalize().add(entity.getRotationVector()).horizontalLengthSquared() < playerVel.normalize().horizontalLengthSquared())
                 velInfluence *= -1;
 
-            IBone torso = model.getAnimationProcessor().getBone("torso");
+            IBone torso = animationProcessor.getBone("torso");
             if (torso != null) {
                 float pitch = (180f + overVel * velInfluence) * 3.1415f / 180f;
                 if (flipBody) {
@@ -94,11 +100,17 @@ public class JClientUtils {
         }
 
         if (entity.isBlocking() || entity.isIdle()) { // if in/going to idle, or blocking
-            IBone head = model.getAnimationProcessor().getBone("head");
+            IBone head = animationProcessor.getBone("head");
             if (head != null) {
                 float headPitch = (player.getPitch() - overVel * velInfluence) * 3.1415f / 180f;
                 if (flipHead) headPitch = -headPitch;
                 head.setRotationX(headPitch + hPO);
+            }
+        } else if (entity.getMoveStun() > 0) {
+            IBone torso = animationProcessor.getBone("base");
+            if (torso != null) {
+                float torsoPitch = (player.getPitch() * 0.9f) * 3.1415f / 180f;
+                torso.setRotationX(torso.getRotationX() - torsoPitch);
             }
         }
     }
@@ -124,7 +136,7 @@ public class JClientUtils {
         part.roll = defaultTransform.roll;
     }
 
-    public static void animateHit(HitPropertyComponent.HitAnimation hitAnimation, long endHitAnimTime, Vec3d randomRotation, ModelPart head, ModelPart hat, ModelPart body, ModelPart rightArm, ModelPart leftArm, ModelPart rightLeg, ModelPart leftLeg) {
+    public static void animateHit(HitPropertyComponent.HitAnimation hitAnimation, long endHitAnimTime, Vec3d randomRotation, ModelPart head, @Nullable ModelPart hat, ModelPart body, ModelPart rightArm, ModelPart leftArm, ModelPart rightLeg, ModelPart leftLeg) {
         if (endHitAnimTime > 20L)
             endHitAnimTime = 20L;
         float angDegrees = endHitAnimTime * RAD_TO_DEG;

@@ -26,6 +26,6 @@ public class PilotModeMove<A extends StandEntity<? extends A, ?>> extends Abstra
 
     @Override
     public @NonNull PilotModeMove<A> copy() {
-        return copyExtras(new PilotModeMove<A>(getCooldown()));
+        return copyExtras(new PilotModeMove<>(getCooldown()));
     }
 }

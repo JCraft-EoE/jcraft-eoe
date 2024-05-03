@@ -49,6 +49,9 @@
 							"vector": [0, -37.5, 0],
 							"easing": "easeInOutSine"
 						}
+					},
+					"position": {
+						"vector": [0, 0, 0]
 					}
 				},
 				"leftArm": {
@@ -245,6 +248,21 @@
 							"vector": [1, 0, -3],
 							"easing": "easeInOutSine"
 						}
+					}
+				},
+				"head": {
+					"position": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"rightLeg": {
+					"position": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"leftLeg": {
+					"position": {
+						"vector": [0, 0, 0]
 					}
 				}
 			}

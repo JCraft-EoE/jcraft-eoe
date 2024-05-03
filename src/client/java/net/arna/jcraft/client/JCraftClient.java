@@ -23,13 +23,16 @@ import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
 import net.arna.jcraft.client.util.TrackedKeyBinding;
 import net.arna.jcraft.common.attack.core.MoveInputType;
-import net.arna.jcraft.common.component.living.CooldownsComponent;
 import net.arna.jcraft.common.component.JComponents;
+import net.arna.jcraft.common.component.living.CooldownsComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.network.c2s.PlayerInputPacket;
 import net.arna.jcraft.common.network.c2s.StandBlockPacket;
 import net.arna.jcraft.common.util.*;
-import net.arna.jcraft.registry.*;
+import net.arna.jcraft.registry.JBlockEntityTypeRegistry;
+import net.arna.jcraft.registry.JObjectRegistry;
+import net.arna.jcraft.registry.JPacketRegistry;
+import net.arna.jcraft.registry.JParticleTypeRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
@@ -68,7 +71,10 @@ import org.lwjgl.glfw.GLFW;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Supplier;
@@ -142,6 +148,9 @@ public class JCraftClient implements ClientModInitializer {
         particleFactoryRegistry.register(JParticleTypeRegistry.AURA_ARC, AuraArcParticle.Factory::new);
         particleFactoryRegistry.register(JParticleTypeRegistry.AURA_BLOB, AuraBlobParticle.Factory::new);
         particleFactoryRegistry.register(JParticleTypeRegistry.INVERSION, InversionParticle.Factory::new);
+        particleFactoryRegistry.register(JParticleTypeRegistry.SUN_LOCK_ON, BackstabParticle.Factory::new); // 9 frames, reusing
+        particleFactoryRegistry.register(JParticleTypeRegistry.PURPLE_HAZE_CLOUD, PurpleHazeCloudParticle.Factory::new);
+        particleFactoryRegistry.register(JParticleTypeRegistry.PURPLE_HAZE_PARTICLE, PurpleHazeErraticParticle.Factory::new);
 
         // Renderer registration
         JEntityRendererRegister.registerEntityRenderers();
@@ -353,13 +362,22 @@ public class JCraftClient implements ClientModInitializer {
 
             if (!movementInput.isEmpty() || !moveInput.isEmpty())
                 ClientPlayNetworking.send(JPacketRegistry.C2S_PLAYER_INPUT, PlayerInputPacket.write(movementInput, moveInput));
+
+            Object2BooleanMap<MoveInputType> heldMoves = new Object2BooleanOpenHashMap<>();
+            getBindings().forEach((key, value) -> {
+                if (key.isDown())
+                    heldMoves.put(value, true);
+            });
+
+            if (!heldMoves.isEmpty())
+                ClientPlayNetworking.send(JPacketRegistry.C2S_PLAYER_INPUT_HOLD, PlayerInputPacket.write(null, heldMoves));
         }
 
         // Block
         if (getTrackedUseKey().isChangedThisTick()) {
             boolean pressed = getTrackedUseKey().isPressedThisTick();
                 ClientPlayNetworking.send(JPacketRegistry.C2S_STAND_BLOCK, StandBlockPacket.write(pressed));
-            if (stand != null && stand.isRemote() && pressed)
+            if (stand != null && stand.isRemoteAndControllable() && pressed)
                 ClientPlayNetworking.send(JPacketRegistry.C2S_REMOTE_STAND_INTERACT, PacketByteBufs.create());
         }
 
@@ -370,27 +388,26 @@ public class JCraftClient implements ClientModInitializer {
         if (client.isPaused() && client.isInSingleplayer()) return;
 
         // Timestop handling (nearly identical to serverside, but toStop is obtained in user.world instead of server world)
-        ArrayList<DimensionData> newActiveTimestops = new ArrayList<>();
+        Iterator<DimensionData> iter = activeTimestops.iterator();
 
-        for (DimensionData timestop : activeTimestops) {
+        while (iter.hasNext()) {
+            DimensionData timestop = iter.next();
             LivingEntity user = timestop.user;
-            //JCraft.LOGGER.info("CLIENT: Ticking timestop " + timestop + " with user " + user + " and duration " + timestop.timer);
 
-            if (user != null && user.isAlive() && timestop.timer-- > 0) {
-                Vec3d pos = timestop.pos;
-
-                List<? extends Entity> toStop = user.world.getEntitiesByClass(Entity.class,
-                        new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
-
-                for (Entity entity : toStop)
-                    if (!entity.hasVehicle() && entity != user && entity != JUtils.getStand(user) && entity != user.getVehicle())
-                        JComponents.getTimeStopData(entity).setTicks(2);
-
-                newActiveTimestops.add(timestop);
+            if (user == null || !user.isAlive() || --timestop.timer <= 0) {
+                iter.remove();
+                continue;
             }
-        }
 
-        activeTimestops = newActiveTimestops;
+            Vec3d pos = timestop.pos;
+
+            List<? extends Entity> toStop = user.world.getEntitiesByClass(Entity.class,
+                    new Box(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR);
+
+            for (Entity entity : toStop)
+                if (!entity.hasVehicle() && entity != user && entity != JUtils.getStand(user) && entity != user.getVehicle())
+                    JComponents.getTimeStopData(entity).setTicks(2);
+        }
     }
 
     private static <E extends Enum<E>> Object2BooleanMap<E> getChangedInputs(Map<TrackedKeyBinding, E> bindings) {

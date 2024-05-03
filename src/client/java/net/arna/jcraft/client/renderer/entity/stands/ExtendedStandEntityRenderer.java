@@ -57,7 +57,6 @@ public class ExtendedStandEntityRenderer<T extends StandEntity<?,?>> extends Ext
         float netHeadYaw = lerpHeadRot - lerpBodyRot;
 
         if (shouldSit && !animatable.isFree() && animatable.getVehicle() instanceof LivingEntity livingentity) {
-            //lerpBodyRot = MathHelper.lerpAngleDegrees(partialTick, livingentity.prevBodyYaw, livingentity.bodyYaw);
             lerpBodyRot = MathHelper.lerpAngleDegrees(partialTick, livingentity.prevHeadYaw, livingentity.headYaw);
             netHeadYaw = lerpHeadRot - lerpBodyRot;
             float clampedHeadYaw = MathHelper.clamp(MathHelper.wrapDegrees(netHeadYaw), -85, 85);
@@ -104,7 +103,7 @@ public class ExtendedStandEntityRenderer<T extends StandEntity<?,?>> extends Ext
                 (limbSwingAmount <= -getSwingMotionAnimThreshold() || limbSwingAmount > getSwingMotionAnimThreshold()), Collections.singletonList(entityModelData));
         GeoModel model = this.modelProvider.getModel(this.modelProvider.getModelResource(animatable));
 
-        this.modelProvider.setCustomAnimations(animatable, getInstanceId(animatable), predicate); // TODO change to setCustomAnimations in 1.20+
+        this.modelProvider.setCustomAnimations(animatable, getInstanceId(animatable), predicate);
 
         poseStack.translate(0, 0.01f, 0);
         RenderSystem.setShaderTexture(0, getTextureLocation(animatable));

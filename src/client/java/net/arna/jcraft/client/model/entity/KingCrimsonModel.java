@@ -39,6 +39,19 @@ public class KingCrimsonModel extends StandEntityModel<KingCrimsonEntity> {
             }
         }
 
+        //TODO git 1.19
+        if (entity.isBlocking() || entity.isIdle()) { // if in/going to idle, or blocking
+            IBone head = this.getAnimationProcessor().getBone("head");
+            if (head != null) {
+                head.setRotationX(-(user.getPitch() + overVel * velInfluence) * 3.1415f / 180f);
+            }
+        } else if (entity.getMoveStun() > 0) {
+            IBone torso = this.getAnimationProcessor().getBone("base");
+            if (torso != null) {
+                float torsoPitch = (user.getPitch() * 0.9f) * 3.1415f / 180f;
+                torso.setRotationX(torso.getRotationX() - torsoPitch);
+            }
+            //TODO git 1.20
         CoreGeoBone head = this.getAnimationProcessor().getBone("head");
 
         if ((animatable.isBlocking() || animatable.isIdle()) && head != null) {

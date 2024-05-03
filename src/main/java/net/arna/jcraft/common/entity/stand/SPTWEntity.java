@@ -33,7 +33,10 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .withImpactSound(JSoundRegistry.IMPACT_8)
             .withLaunchNoShockwave()
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withInfo(Text.literal("Ground Slam"), Text.literal("low hitbox, decent damage, launches"));
+            .withInfo(
+                    Text.literal("Ground Slam"),
+                    Text.literal("low hitbox, decent damage, launches")
+            );
     public static final SimpleAttack<SPTWEntity> LIGHT_FOLLOWUP = new SimpleAttack<SPTWEntity>(
             0, 5, 14, 0.75f, 6, 12, 1.5f, 1f, -0.1f)
             .withAnim(State.LIGHT_FOLLOWUP)
@@ -42,17 +45,26 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .withBlockStun(4)
             .withExtraHitBox(0, 0.25, 1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withInfo(Text.literal("Punch"), Text.literal("quick combo finisher"));
+            .withInfo(
+                    Text.literal("Punch"),
+                    Text.literal("quick combo finisher")
+            );
     public static final SimpleAttack<SPTWEntity> PUNCH = SimpleAttack.<SPTWEntity>lightAttack(5, 7,
                     0.75f, 5f, 10, 0.2f, -0.1f)
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(GROUND_SLAM)
             .withImpactSound(JSoundRegistry.IMPACT_1)
-            .withInfo(Text.literal("Punch"), Text.literal("quick combo starter, low knockback"));
+            .withInfo(
+                    Text.literal("Punch"),
+                    Text.literal("quick combo starter, low knockback")
+            );
     public static final MainBarrageAttack<SPTWEntity> BARRAGE = new MainBarrageAttack<SPTWEntity>(280, 0,
             40, 0.75f, 1f, 30, 2f, 0.25f, 0f, 3, Blocks.OBSIDIAN.getHardness())
             .withSound(JSoundRegistry.STAR_PLATINUM_BARRAGE)
-            .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, high stun"));
+            .withInfo(
+                    Text.literal("Barrage"),
+                    Text.literal("fast reliable combo starter/extender, high stun")
+            );
     public static final SimpleAttack<SPTWEntity> TIME_STRIKE = new SimpleAttack<SPTWEntity>(300, 7,
             11, 0.75f, 5f, 12, 1.5f, 0.6f, -0.25f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
@@ -67,7 +79,10 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .withExtraHitBox(1f)
             .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withInfo(Text.literal("Backhand"), Text.literal("fast poke, great stun"));
+            .withInfo(
+                    Text.literal("Backhand"),
+                    Text.literal("fast poke, great stun")
+            );
     public static final KnockdownAttack<SPTWEntity> GRAB_SLAM = new KnockdownAttack<SPTWEntity>(0,
             16, 24, 1f, 9f, 10, 1.75f, 0.4f, 0f, 25)
             .withSound(JSoundRegistry.SPTW_UPPERCUT)
@@ -75,13 +90,19 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .withHyperArmor()
             .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
             .withHitSpark(JParticleType.HIT_SPARK_3)
-            .withInfo(Text.literal("What an ugly watch (Slam)"), Text.empty());
+            .withInfo(
+                    Text.literal("What an ugly watch (Slam)"),
+                    Text.empty()
+            );
     public static final GrabAttack<SPTWEntity, State> GRAB2 = new GrabAttack<>(280, 8, 20,
             1f, 2f, 20, 1.5f, 0.1f, 0f, GRAB_SLAM, State.GRAB_HIT2)
             .withSound(JSoundRegistry.SPTW_GRAB)
             .withImpactSound(JSoundRegistry.SPTW_GRABHIT)
             .withHitAnimation(null)
-            .withInfo(Text.literal("What an ugly watch"), Text.literal("grab, high damage combo-finishing knockdown"));
+            .withInfo(
+                    Text.literal("What an ugly watch"),
+                    Text.literal("grab, high damage combo-finishing knockdown")
+            );
     public static final EffectInflictingAttack<SPTWEntity> GRAB_HIT = new EffectInflictingAttack<SPTWEntity>(0,
             16, 24, 1f, 6f, 20, 1.75f, 0.4f, 0f,
             List.of(new StatusEffectInstance(StatusEffects.LEVITATION, 5, 10, true, false)))
@@ -91,21 +112,33 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .withHyperArmor()
             .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withInfo(Text.literal("What an ugly watch (Uppercut)"), Text.empty());
+            .withInfo(
+                    Text.literal("What an ugly watch (Uppercut)"),
+                    Text.empty()
+            );
     public static final GrabAttack<SPTWEntity, State> GRAB = new GrabAttack<>(280, 8, 20,
             1f, 2f, 20, 1.5f, 0.1f, 0f, GRAB_HIT, State.GRAB_HIT)
             .withCrouchingVariant(GRAB2)
             .withSound(JSoundRegistry.SPTW_GRAB)
             .withImpactSound(JSoundRegistry.SPTW_GRABHIT)
             .withHitAnimation(null)
-            .withInfo(Text.literal("What an ugly watch"), Text.literal("grab, combo-starting uppercut"));
+            .withInfo(
+                    Text.literal("What an ugly watch"),
+                    Text.literal("grab, combo-starting uppercut")
+            );
     public static final TimeStopMove<SPTWEntity> TIME_STOP = new TimeStopMove<SPTWEntity>(600, 5, 10,
             JServerConfig.SPTW_TIME_STOP_DURATION::getValue)
             .withSound(JSoundRegistry.STAR_PLATINUM_THE_WORLD)
-            .withInfo(Text.literal("Timestop"), Text.literal("1.75 seconds, extremely low windup"));
+            .withInfo(
+                    Text.literal("Timestop"),
+                    Text.literal("1.75 seconds, extremely low windup")
+            );
     public static final TimeSkipMove<SPTWEntity> TIME_SKIP = new TimeSkipMove<SPTWEntity>(300, 14)
             .withSound(JSoundRegistry.STAR_PLATINUM_TIMESKIP)
-            .withInfo(Text.literal("Timeskip"), Text.empty());
+            .withInfo(
+                    Text.literal("Timeskip"),
+                    Text.empty()
+            );
     private boolean turnAround;
 
     public SPTWEntity(World worldIn) {

@@ -151,7 +151,7 @@ public abstract class BipedEntityModelMixin<T extends LivingEntity> {
                         rightLeg.pivotZ -= 1F;
                     }
 
-                    case THE_WORLD_OVER_HEAVEN -> {
+                    case THE_WORLD_OVER_HEAVEN, GOLD_EXPERIENCE_REQUIEM -> {
                         // Floating
                         float heightOffset = 1.0f + MathHelper.sin(h / 10);
                         head.pivotY -= heightOffset;

@@ -224,6 +224,25 @@ public interface JSoundRegistry {
     SoundEvent SPTW_UPPERCUT = registerSound("sptwuppercut");
     SoundEvent SPTW_BACKHAND = registerSound("sptwbackhand");
 
+    // Purple Haze
+    SoundEvent PH_SUMMON = registerSound("phsummon");
+    SoundEvent PH_BARRAGE = registerSound("phbarrage");
+    SoundEvent PH_GRAB_HIT = registerSound("phgrabhit");
+    SoundEvent PH_REKKA1 = registerSound("phrekka1");
+    SoundEvent PH_REKKA2 = registerSound("phrekka2");
+    SoundEvent PH_REKKA3 = registerSound("phrekka3");
+    SoundEvent PH_CAPSULE1 = registerSound("phcapsule1");
+    SoundEvent PH_CAPSULE2 = registerSound("phcapsule2");
+    SoundEvent PH_GROUNDSLAM = registerSound("phgroundslam");
+    SoundEvent PH_ULTIMATE = registerSound("phultimate");
+
+    // The Sun
+    SoundEvent SUN_SUMMON = registerSound("sunsummon");
+    SoundEvent SUN_SHOWER = registerSound("sunshower");
+    SoundEvent SUN_BEAM_RAY = registerSound("sunbeamray");
+    SoundEvent SUN_METEOR_FIRE = registerSound("sunmeteorfire");
+    SoundEvent SUN_IDLE = registerSound("sunidle");
+
     //// SPECS
     // Brawler
 
@@ -239,6 +258,9 @@ public interface JSoundRegistry {
     // Vampire
     SoundEvent VAMPIRE_LASER = registerSound("vampirelaser");
     SoundEvent VAMPIRE_LASER_FIRE = registerSound("vampirelaserfire");
+    SoundEvent VAMPIRE_GRAB_HIT = registerSound("vampiregrabhit");
+    SoundEvent VAMPIRE_SUCK = registerSound("vampiresuck");
+    SoundEvent VAMPIRE_REANIMATE = registerSound("vampirereanimate");
 
     //// OTHER
     SoundEvent BULLET_RICOCHET = registerSound("bulletricochet");

@@ -42,6 +42,11 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A
         withHitSpark(null);
     }
 
+    public @NonNull T withoutSlowness() {
+        this.inflictsSlowness = false;
+        return getThis();
+    }
+
     @Override
     protected boolean shouldPerform(A attacker) {
         // If move stun is 22 ticks, windup is 6 and interval is 4, the first hit will occur at tick 6 (when move stun is 22 - 6 = 16),
@@ -64,8 +69,10 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A
     public void tick(A attacker) {
         super.tick(attacker);
 
-        if (attacker.hasUser() && inflictsSlowness)
+        // Consider replacing the isRemote() with isFree()?
+        if (attacker.hasUser() && inflictsSlowness && !attacker.isRemote()) {
             attacker.getUserOrThrow().addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 10, 2, true, false));
+        }
     }
 
     @Override
@@ -77,7 +84,13 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A
             StandEntity<?, ?> targetStand = JUtils.getStand(target);
             Vec3d forwardPos = stand.getRotationVector();
             forwardPos = new Vec3d(stand.getX() + forwardPos.x, stand.getY() + forwardPos.y, stand.getZ() + forwardPos.z);
-            if (targetStand == null || targetStand.curMove == null || !targetStand.curMove.isBarrage() || targetStand.squaredDistanceTo(forwardPos) > 4) continue;
+            if (targetStand == null ||
+                    targetStand == attacker ||
+                    targetStand.curMove == null ||
+                    !targetStand.curMove.isBarrage() ||
+                    targetStand.squaredDistanceTo(forwardPos) > 4) {
+                continue;
+            }
             onClash(attacker.getUserOrThrow());
             onClash(target);
 
@@ -121,11 +134,11 @@ public abstract class AbstractBarrageAttack<T extends AbstractBarrageAttack<T, A
                     random.nextGaussian() / 3.0,
                     random.nextGaussian() / 3.0
             );
-            Vec3d rotVec = attackerEntity.getRotationVector();
+            Vec3d rotVec = user.getRotationVector();
             shockwavePos = shockwavePos.add(rotVec);
             shockwavePos = shockwavePos.add(RotationUtil.vecPlayerToWorld(new Vec3d(0, attackerEntity.getHeight() / 1.8 - getOffset(), 0), GravityChangerAPI.getGravityDirection(user)));
             JComponents.getShockwaveHandler(attacker.getEntityWorld())
-                    .addShockwave(shockwavePos, attackerEntity.getRotationVector(), getDamage() / 1.5f);
+                    .addShockwave(shockwavePos, user.getRotationVector(), getDamage() / 1.5f);
         }));
     }
 

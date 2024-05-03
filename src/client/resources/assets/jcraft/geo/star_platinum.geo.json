@@ -12,7 +12,12 @@
 			},
 			"bones": [
 				{
+					"name": "base",
+					"pivot": [0, 19.25, 0]
+				},
+				{
 					"name": "StarPlatinum",
+					"parent": "base",
 					"pivot": [0, 0.25, 0]
 				},
 				{
@@ -1271,6 +1276,7 @@
 				},
 				{
 					"name": "BAM",
+					"parent": "base",
 					"pivot": [0, 19, 1]
 				},
 				{

@@ -49,9 +49,12 @@ public abstract class AbstractGrabAttack<T extends AbstractGrabAttack<T, A, S>, 
         Set<LivingEntity> targets = super.perform(attacker, user, ctx);
         if (targets.isEmpty()) return targets;
 
-        attacker.setMove(hitMove, hitState);
+        boolean unblockable = getBlockableType() == BlockableType.NON_BLOCKABLE;
 
+        boolean anyHit = false;
         for (LivingEntity target : targets) {
+            if (JUtils.isBlocking(target) && !unblockable) continue;
+
             StandEntity<?, ?> stand = JUtils.getStand(target);
             if (stand != null) stand.blocking = false;
             JUtils.cancelMoves(target);
@@ -59,7 +62,12 @@ public abstract class AbstractGrabAttack<T extends AbstractGrabAttack<T, A, S>, 
             JComponents.getGrab(target).startGrab(attacker.getBaseEntity(), grabDuration, grabOffset);
 
             JUtils.setVelocity(target, 0, 0, 0);
+
+            anyHit = true;
         }
+
+        if (anyHit)
+            attacker.setMove(hitMove, hitState);
 
         return targets;
     }

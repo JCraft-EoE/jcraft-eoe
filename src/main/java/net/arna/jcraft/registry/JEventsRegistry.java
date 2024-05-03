@@ -178,7 +178,7 @@ public interface JEventsRegistry {
 
             // Remote players do stuff with their stand, not themselves
             StandEntity<?, ?> stand = JUtils.getStand(player);
-            if (stand != null && stand.isRemote())
+            if (stand != null && stand.isRemoteAndControllable())
                 return ActionResult.FAIL;
 
             return ActionResult.PASS;
@@ -189,7 +189,7 @@ public interface JEventsRegistry {
 
             // Remote players do stuff with their stand, not themselves
             StandEntity<?, ?> stand = JUtils.getStand(player);
-            if (stand != null && stand.isRemote())
+            if (stand != null && stand.isRemoteAndControllable())
                 return ActionResult.FAIL;
 
             return ActionResult.PASS;

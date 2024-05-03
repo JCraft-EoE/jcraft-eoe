@@ -75,6 +75,23 @@ public class ClientPacketHandler {
         register(S2C_TIME_STOP, ClientPacketHandler::handleTimeStop);
         register(S2C_SPLATTER, ClientPacketHandler::handleSplatter);
         register(S2C_STAND_HURT, ClientPacketHandler::handleStandHurt);
+        register(S2C_PREDICTION_UPDATE, ClientPacketHandler::handlePrediction);
+    }
+
+    private static void handlePrediction(@NotNull MinecraftClient client, PacketByteBuf buf) {
+        int size = buf.readInt();
+        if (size == 0) return;
+        for (int i = 0; i < size; i++) {
+            int entID = buf.readInt();
+            Vec3d predictedPos = new Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
+
+            client.execute(() -> {
+                Entity ent = client.world.getEntityById(entID);
+                if (ent == null) return;
+                // ent.setPos() is awful in tandem with getTrackedPosition().setPos();
+                ent.getTrackedPosition().setPos(predictedPos);
+            });
+        }
     }
 
     private static void handleTimeStop(@NotNull MinecraftClient client, PacketByteBuf buf) {

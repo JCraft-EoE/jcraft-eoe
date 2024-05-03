@@ -1,5 +1,6 @@
 {
   "item.jcraft.stand_disc": "Stand Disc",
+  "item.jcraft.stand_arrowhead": "Stand Arrowhead",
   "item.jcraft.stand_arrow": "Stand Arrow",
   "item.jcraft.living_arrow": "Living Arrow",
   "item.jcraft.requiem_arrow": "Requiem Arrow",
@@ -12,6 +13,8 @@
   "item.jcraft.sinners_soul": "Sinner's Soul",
   "item.jcraft.soul_block": "Block of Suffering",
   "item.jcraft.meteorite_block": "Meteorite Block",
+  "item.jcraft.meteorite_iron_ore_block": "Meteorite Iron Ore",
+  "item.jcraft.stellar_iron_ingot": "Stellar Iron Ingot",
   "item.jcraft.green_baby": "Green Baby",
   "item.jcraft.knife": "Knife",
   "item.jcraft.knife_bundle": "Knife Bundle",
@@ -25,6 +28,7 @@
   "item.jcraft.dio_jacket": "DIO's Jacket",
   "item.jcraft.dio_pants": "DIO's Pants",
   "item.jcraft.dio_boots": "DIO's Boots",
+  "item.jcraft.dio_cape": "DIO's Cape",
 
   "item.jcraft.jotaro_cap": "Jotaro's Cap",
   "item.jcraft.jotaro_jacket": "Jotaro's Jacket",
@@ -44,6 +48,7 @@
   "block.jcraft.coffin": "Coffin",
   "block.jcraft.soul_block": "Block of Suffering",
   "block.jcraft.meteorite_block": "Meteorite Block",
+  "block.jcraft.meteorite_iron_ore_block": "Meteorite Iron Ore",
   "block.jcraft.foolish_sand_block": "Foolish Sand",
 
   "enchantment.jcraft.cinderellas_kiss": "Cinderella's Kiss",
@@ -69,7 +74,7 @@
   "entity.jcraft.cream": "Cream",
   "entity.jcraft.silverchariot": "Silver Chariot",
   "entity.jcraft.thefool": "The Fool",
-  "entity.jcraft.hierophant_green": "Hierophant Green",
+  "entity.jcraft.hierophantgreen": "Hierophant Green",
   "entity.jcraft.hg_net": "Hierophant Tentacles",
 
   "entity.jcraft.killerqueen": "Killer Queen",
@@ -85,6 +90,10 @@
   "entity.jcraft.getree": "Tree",
   "entity.jcraft.gesnake": "Snake",
   "entity.jcraft.gerscorpion": "Scorpion",
+
+  "entity.jcraft.the_sun": "The Sun",
+  "entity.jcraft.purple_haze": "Purple Haze",
+  "entity.jcraft.purple_haze_distortion": "Purple Haze: Distortion",
 
   "entity.jcraft.whitesnake": "Whitesnake",
   "entity.jcraft.cmoon": "C-Moon",
@@ -108,6 +117,7 @@
   "effect.jcraft.outofbody": "Out of Body",
   "effect.jcraft.weightless": "Weightless",
   "effect.jcraft.bleeding": "Bleeding",
+  "effect.jcraft.phpoison": "Purple Haze",
 
   "gamerule.showHitboxes": "Show JCraft hitboxes",
   "gamerule.kingCrimsonTeleportEffect": "King Crimson's teleport displacement",
@@ -202,9 +212,14 @@
   "death.attack.wsacid.player.item": "%1$s was melted by %2$s while wielding %3$s",
 
   "death.attack.jbleeding": "%1$s bled out",
-  "death.attack.jbleeding.item": "%1$s bled out while fighting %2$s",
+  "death.attack.jbleeding.item": "%1$s bled out while fighting %2$s while wielding %3$s",
   "death.attack.jbleeding.player": "%1$s bled out while fighting %2$s",
-  "death.attack.jbleeding.player.item": "%1$s bled out while fighting %2$s",
+  "death.attack.jbleeding.player.item": "%1$s bled out while fighting %2$s while wielding %3$s",
+
+  "death.attack.phpoison": "%1$s was eradicated by the Purple Haze",
+  "death.attack.phpoison.item": "%1$s was eradicated by the Purple Haze while fighting %2$s while wielding %3$s",
+  "death.attack.phpoison.player": "%1$s was eradicated by the Purple Haze while fighting %2$s",
+  "death.attack.phpoison.player.item": "%1$s was eradicated by the Purple Haze while fighting %2$s while wielding %3$s",
 
   "commands.gravity.get.self": "Your gravity is %s",
   "commands.gravity.get.other": "%s's gravity is %s",
@@ -233,6 +248,10 @@
   "jcraft.serverconfig.option.damageScalingMinimum": "Damage Scaling Minimum",
   "jcraft.serverconfig.option.scalingPenaltyPerHit": "Scaling Penalty per Hit",
   "jcraft.serverconfig.option.killVampirism": "Kill Vampirism",
+  "jcraft.serverconfig.option.enableMoveCooldowns": "Enable Move Cooldowns",
+  "jcraft.serverconfig.option.cooldownMultiplier": "Cooldown Duration Multiplier",
+  "jcraft.serverconfig.option.enableIPS": "Enable Stun Falloff (Stun reduction is proportional to damage scaling; use with low cooldowns)",
+  "jcraft.serverconfig.option.enableFriendlyFire": "Enable Friendly Fire (Uses scoreboard teams)",
 
   "jcraft.serverconfig.category.minecraft_rebalance": "Minecraft Balance",
   "jcraft.serverconfig.option.reduceDeadlyExplosions": "Reduce Deadly Explosion Power (End Crystals, Beds, Respawn Anchors)",

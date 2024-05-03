@@ -34,4 +34,4 @@ bin/
 run/
 
 # Datagen
-src/main/generated/.cache
+src/main/generated/

@@ -6,7 +6,8 @@ import dev.onyxstudios.cca.api.v3.component.tick.CommonTickingComponent;
 import net.minecraft.entity.Entity;
 
 public interface GrabComponent extends Component, AutoSyncedComponent, CommonTickingComponent {
-    void startGrab(Entity e, int duration, double offset);
+    void startGrab(Entity e, int duration, double distance, double verticalOffset);
+    void startGrab(Entity e, int duration, double distance);
     void endGrab();
     int getDuration();
     Entity getAttacker();

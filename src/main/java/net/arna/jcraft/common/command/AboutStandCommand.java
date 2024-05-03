@@ -86,6 +86,7 @@ public class AboutStandCommand {
         resp.append(moves);
 
         // Free Space
+        resp.append(Text.literal("\n"));
         resp.append(Text.literal(stand.freespace));
 
         context.getSource().sendFeedback(() -> resp, false);

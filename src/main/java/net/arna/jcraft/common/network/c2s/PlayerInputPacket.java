@@ -22,26 +22,64 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
+import java.util.WeakHashMap;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
-import static net.arna.jcraft.JCraft.*;
+import static net.arna.jcraft.JCraft.QUEUE_MOVESTUN_LIMIT;
+import static net.arna.jcraft.JCraft.SPEC_QUEUE_MOVESTUN_LIMIT;
 
 public class PlayerInputPacket {
+    private static final int HOLD_TIMEOUT_TICKS = 3; // 0.15s
     private static final Map<ServerPlayerEntity, Object2BooleanMap<MoveInputType>> successMap = new WeakHashMap<>();
+    private static final int MOVEMENT_INPUT_TYPES;
 
     static {
+        MOVEMENT_INPUT_TYPES = MovementInputType.values().length;
+
         ServerTickEvents.START_SERVER_TICK.register(server -> {
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
                 InputStateManager sm = getInputStateManager(player);
 
                 // Handle held inputs
-                sm.heldInputs = EnumSet.copyOf(sm.heldInputs).stream()
-                        .filter(type -> JUtils.canHoldMove(player, type))
-                        .peek(type -> handleMoveInput(server, player, type))
-                        .collect(Collectors.toCollection(() -> EnumSet.noneOf(MoveInputType.class)));
+                if (!sm.heldInputs.isEmpty()) {
+                    sm.heldInputs.forEach(
+                        (type, integer) -> {
+                            //JCraft.LOGGER.info("Holding: " + type + ", with remaining heartbeat time: " + integer);
+
+                            if (integer == 0) { // Marked for unprocessed removal by handleMoveInput(), which shouldn't mutate heldInputs.keySet()
+                                sm.heldInputs.remove(type);
+                            } else {
+                                Integer newValue = integer - 1;
+                                // JUtils.canHoldMove() may change after a holdable button was pressed if the player swaps their abilities
+                                if (newValue <= 0 || !JUtils.canHoldMove(player, type)) {
+                                    server.execute(() -> {
+                                        boolean success = true;
+                                        JServerPlayerInputCallback.EVENT.invoker().onPlayerInput(player, type, false, success);
+
+                                        StandEntity<?, ?> stand = JUtils.getStand(player);
+                                        if (stand != null && stand.allowMoveHandling()) {
+                                            stand.onUserMoveInput(type, false, success);
+                                            success = false; // If a stand is out, the move input success belongs to it.
+                                        }
+
+                                        JSpec<?, ?> spec = JUtils.getSpec(player);
+                                        if (spec != null)
+                                            spec.onUserMoveInput(type, false, success);
+                                    });
+                                    sm.heldInputs.remove(type);
+                                } else
+                                    sm.heldInputs.put(type, newValue);
+                            }
+                        }
+                    );
+
+                    sm.heldInputs.keySet().forEach(type -> handleMoveInput(server, player, type));
+                }
 
                 int forward = sm.calcForward();
                 int side = sm.calcSide();
@@ -70,7 +108,11 @@ public class PlayerInputPacket {
         return buf;
     }
 
-    private static void writeInput(PacketByteBuf buf, Object2BooleanMap<? extends Enum<?>> input) {
+    private static void writeInput(PacketByteBuf buf, @Nullable Object2BooleanMap<? extends Enum<?>> input) {
+        if (input == null) {
+            buf.writeVarInt(0);
+            return;
+        }
         buf.writeVarInt(input.size());
         for (Object2BooleanMap.Entry<? extends Enum<?>> entry : input.object2BooleanEntrySet()) {
             buf.writeEnumConstant(entry.getKey());
@@ -84,8 +126,27 @@ public class PlayerInputPacket {
         handleMoveInput(player, buf, sm);
     }
 
+    public static void handleHold(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler network, PacketByteBuf buf, PacketSender sender) {
+        buf.readVarInt(); // Throwaway Movement input data
+        int count = buf.readVarInt();
+        if (count > MoveInputType.types) {
+            player.networkHandler.disconnect(Text.of("Illegal input packet!"));
+        }
+
+        InputStateManager sm = getInputStateManager(player);
+        for (int i = 0; i < count; i++) {
+            MoveInputType type = buf.readEnumConstant(MoveInputType.class);
+            buf.readBoolean(); // Throwaway hold input data
+            if (JUtils.canHoldMove(player, type))
+                sm.heldInputs.put(type, HOLD_TIMEOUT_TICKS);
+        }
+    }
+
     private static void handleMovementInput(MinecraftServer server, ServerPlayerEntity player, PacketByteBuf buf, InputStateManager sm) {
         int count = buf.readVarInt();
+        if (count > MOVEMENT_INPUT_TYPES) {
+            player.networkHandler.disconnect(Text.of("Illegal input packet!"));
+        }
 
         for (int i = 0; i < count; i++) {
             MovementInputType type = buf.readEnumConstant(MovementInputType.class);
@@ -113,15 +174,19 @@ public class PlayerInputPacket {
 
 
     private static void handleMoveInput(ServerPlayerEntity player, PacketByteBuf buf, InputStateManager sm) {
-        MinecraftServer server = Objects.requireNonNull(player.getServer());
         int count = buf.readVarInt();
+        if (count > MoveInputType.types) {
+            player.networkHandler.disconnect(Text.of("Illegal input packet!"));
+        }
+
+        MinecraftServer server = Objects.requireNonNull(player.getServer());
         for (int i = 0; i < count; i++) {
             MoveInputType type = buf.readEnumConstant(MoveInputType.class);
             boolean pressed = buf.readBoolean();
 
             if (JUtils.canHoldMove(player, type)) {
-                if (pressed) sm.heldInputs.add(type);
-                else sm.heldInputs.remove(type);
+                if (pressed) sm.heldInputs.put(type, HOLD_TIMEOUT_TICKS);
+                else sm.heldInputs.put(type, 0);
             }
 
             if (pressed) handleMoveInput(server, player, type).thenAccept(b -> {
@@ -129,24 +194,31 @@ public class PlayerInputPacket {
 
                 server.execute(() -> {
                     JServerPlayerInputCallback.EVENT.invoker().onPlayerInput(player, type, true, b);
+                    boolean success = b;
 
                     StandEntity<?, ?> stand = JUtils.getStand(player);
-                    if (stand != null)
-                        stand.onUserMoveInput(type, true, b);
+                    if (stand != null && stand.allowMoveHandling()) {
+                        stand.onUserMoveInput(type, true, success);
+                        success = false; // If a stand is out, the move input success belongs to it.
+                    }
 
                     JSpec<?, ?> spec = JUtils.getSpec(player);
                     if (spec != null)
-                        spec.onUserMoveInput(type, true, b);
+                        spec.onUserMoveInput(type, true, success);
                 });
             });
             else {
-                boolean success = successMap.computeIfAbsent(player, p -> new Object2BooleanOpenHashMap<>()).getOrDefault(type, false);
+                boolean b = successMap.computeIfAbsent(player, p -> new Object2BooleanOpenHashMap<>()).getOrDefault(type, false);
+
                 server.execute(() -> {
-                    JServerPlayerInputCallback.EVENT.invoker().onPlayerInput(player, type, false, success);
+                    JServerPlayerInputCallback.EVENT.invoker().onPlayerInput(player, type, false, b);
+                    boolean success = b;
 
                     StandEntity<?, ?> stand = JUtils.getStand(player);
-                    if (stand != null)
+                    if (stand != null && stand.allowMoveHandling()) {
                         stand.onUserMoveInput(type, false, success);
+                        success = false; // If a stand is out, the move input success belongs to it.
+                    }
 
                     JSpec<?, ?> spec = JUtils.getSpec(player);
                     if (spec != null)
@@ -156,6 +228,11 @@ public class PlayerInputPacket {
         }
     }
 
+    /**
+     * javadoc pliz :>
+     * @param player that sent the input
+     * @return
+     */
     private static CompletableFuture<Boolean> handleMoveInput(MinecraftServer server, ServerPlayerEntity player, MoveInputType type) {
         CompletableFuture<Boolean> future = new CompletableFuture<>();
         ServerWorld world = player.getWorld();
@@ -185,7 +262,7 @@ public class PlayerInputPacket {
                 }
                 case LIGHT -> {
                     StandEntity<?, ?> stand = JUtils.getStand(player);
-                    if (stand == null) return;
+                    if (stand == null || !stand.allowMoveHandling()) return;
 
                     future.complete(initStandMove(stand, MoveInputType.LIGHT));
                 }
@@ -210,7 +287,7 @@ public class PlayerInputPacket {
 
     private static boolean initStandOrSpecMove(ServerPlayerEntity player, MoveInputType type) {
         StandEntity<?, ?> stand = JUtils.getStand(player);
-        if (stand != null) return initStandMove(stand, type);
+        if (stand != null && stand.allowMoveHandling()) return initStandMove(stand, type);
         else {
             JSpec<?, ?> spec = JUtils.getSpec(player);
             if (spec == null) return false;
@@ -224,11 +301,13 @@ public class PlayerInputPacket {
     }
 
     private static boolean initStandMove(StandEntity<?, ?> stand, MoveInputType type) {
-        int moveStun = stand.getMoveStun();
+        if (!stand.blocking) {
+            int moveStun = stand.getMoveStun();
 
-        if (stand.initMove(type.getMoveType())) return true;
-        if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT && !stand.isBlocking())
-            stand.queueMove(type);
+            if (stand.initMove(type.getMoveType())) return true;
+            if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT)
+                stand.queueMove(type);
+        }
 
         return false;
     }
@@ -242,7 +321,7 @@ public class PlayerInputPacket {
         if (stun != null) JCraft.comboBreak(player.getWorld(), player, stun);
     }
 
-    private static InputStateManager getInputStateManager(ServerPlayerEntity player) {
+    public static InputStateManager getInputStateManager(ServerPlayerEntity player) {
         return ((IJInputStateManagerHolder) player).jcraft$getJInputStateManager();
     }
 }

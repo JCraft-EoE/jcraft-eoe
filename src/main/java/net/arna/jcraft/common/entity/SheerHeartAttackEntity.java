@@ -28,6 +28,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
@@ -61,7 +62,7 @@ public class SheerHeartAttackEntity extends MobEntity implements GeoEntity, IOwn
         setOwnerId(owner.getUuid());
     }
 
-    public UUID getOwnerId() {
+    public @Nullable UUID getOwnerId() {
         return this.dataTracker.get(OWNER_ID).orElse(null);
     }
 

@@ -12,7 +12,12 @@
 			},
 			"bones": [
 				{
+					"name": "base",
+					"pivot": [0, 19.25, 0]
+				},
+				{
 					"name": "TheWorldOverHeaven",
+					"parent": "base",
 					"pivot": [0, 0.25, -3]
 				},
 				{

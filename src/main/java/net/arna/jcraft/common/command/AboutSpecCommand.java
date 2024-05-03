@@ -70,6 +70,7 @@ public class AboutSpecCommand {
         text.append(moves);
 
         // Details
+        text.append(Text.literal("\n"));
         text.append(specType.getDetails());
 
         player.sendMessage(text);

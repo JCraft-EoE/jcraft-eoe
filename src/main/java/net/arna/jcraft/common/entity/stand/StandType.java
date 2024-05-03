@@ -23,7 +23,7 @@ public enum StandType {
      * NONE marks an entity as processed.
      * For players, this is functionally identical to null, for entities this disables obtaining a stand.
      */
-    NONE(),
+    NONE(), // 255
     STAR_PLATINUM(JEntityTypeRegistry.STAR_PLATINUM, StarPlatinumEntity::new, "starplatinum",                   // 1
             Text.literal("Manga"), Text.literal("Arcade"), Text.literal("OVA")),
     THE_WORLD(JEntityTypeRegistry.THE_WORLD, TheWorldEntity::new, "theworld",                                   // 2
@@ -48,6 +48,11 @@ public enum StandType {
             Text.literal("Anime"), Text.literal("Spectre"), Text.literal("Burning Passion")),
     HIEROPHANT_GREEN(JEntityTypeRegistry.HIEROPHANT_GREEN, HGEntity::new, "hierophantgreen",       // 12
             Text.literal("Cold"), Text.literal("Burning"), Text.literal("Seaside")),
+    THE_SUN(JEntityTypeRegistry.THE_SUN, TheSunEntity::new, "the_sun",       // 13
+            Text.literal(":D"), Text.literal("Neutron Star"), Text.literal("Dark")),
+    PURPLE_HAZE(JEntityTypeRegistry.PURPLE_HAZE, PurpleHazeEntity::new, "purple_haze",       // 14
+            Text.literal("Toxin"), Text.literal("Stopping Force"), Text.literal("Reversal")),
+
 
     // Evolutions
     C_MOON(JEntityTypeRegistry.C_MOON, CMoonEntity::new, "cmoon", true,                                             // -1
@@ -61,7 +66,9 @@ public enum StandType {
     GOLD_EXPERIENCE_REQUIEM(JEntityTypeRegistry.GER, GEREntity::new, "ger", true,                                   // -5
             Text.literal("Silver"), Text.literal("Manga"), Text.literal("Cherry Blossom")),
     STAR_PLATINUM_THE_WORLD(JEntityTypeRegistry.SPTW, SPTWEntity::new, "sptw", true,                                // -6
-            Text.literal("Judge, Jury, Executioner"), Text.literal("Diamond"), Text.literal("Over Heaven"));
+            Text.literal("Judge, Jury, Executioner"), Text.literal("Diamond"), Text.literal("Over Heaven")),
+    PURPLE_HAZE_DISTORTION(JEntityTypeRegistry.PURPLE_HAZE_DISTORTION, PurpleHazeDistortionEntity::new, "purple_haze_distortion", true,       // -7
+            Text.literal("Black Knight"), Text.literal("Vintage"), Text.literal("Reversal")),;
 
 
     @Getter(lazy = true)
@@ -112,6 +119,10 @@ public enum StandType {
         this.skinNames = List.of();
 
         StaticFields.fromId.put(0xff, this);
+    }
+
+    public static boolean isNone(StandType standType) {
+        return standType == null || standType == NONE;
     }
 
     @Nullable

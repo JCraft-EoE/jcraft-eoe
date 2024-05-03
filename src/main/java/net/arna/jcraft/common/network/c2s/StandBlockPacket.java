@@ -39,7 +39,7 @@ public class StandBlockPacket {
             if (!blocking && blockDown) {
                 if (allowBlockingWith(player.getMainHandStack()) && allowBlockingWith(player.getOffHandStack())) {
                     stand.wantToBlock = true;
-                    if (stand.canAttack() && !JCraft.isDashing(player)) stand.blocking = true;
+                    if (stand.canAttack() && !JCraft.isDashing(player)) stand.tryBlock();
                 }
             } else if (blocking && !blockDown) stand.wantToBlock = false;
         });

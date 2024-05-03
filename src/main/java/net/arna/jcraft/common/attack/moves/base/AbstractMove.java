@@ -54,7 +54,9 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     @Getter
     private Boolean isHoldable;
     // Used to help AI know how and when to use this attack.
-    protected boolean ranged, barrage, multiHit, charge, counter, dash, grab, copyOnUse;
+    protected boolean ranged, barrage, multiHit, charge, counter, dash, grab;
+    protected boolean copyOnUse;
+    protected boolean mayHitUser;
     private boolean copiedExtras; // See #testCopy()
 
     protected AbstractMove(int cooldown, int windup, int duration, float moveDistance) {
@@ -164,6 +166,24 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
 
         this.aerialVariant = aerialVariant.copy();
         this.aerialVariant.isAerialVariant = true;
+        return getThis();
+    }
+
+    /**
+     * Marks the move as a ranged move.
+     * @return This move
+     */
+    public T markRanged() {
+        this.ranged = true;
+        return getThis();
+    }
+
+    /**
+     * Allows the stand to hit its own user
+     * @return This move
+     */
+    public T allowHitUser() {
+        this.mayHitUser = true;
         return getThis();
     }
 
@@ -309,6 +329,15 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         return getThis();
     }
 
+    public T modifyFinisherTime(int tick) {
+        if (finisher == null) {
+            throw new IllegalStateException("modifyFinisherTime(" + tick + ") called without a pre-set finisher!");
+        } else {
+            finisher = IntObjectPair.of(tick, finisher.right());
+        }
+        return getThis();
+    }
+
     // Lombok does not understand these variable names already start with 'is'.
     public boolean isCrouchingVariant() {
         return isCrouchingVariant;
@@ -337,6 +366,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         if (finisher != null) finisher.right().onRegister(type);
 
         // TODO convert these to actual tests
+        // THATS TOO BAD!
         if (!FabricLoader.getInstance().isDevelopmentEnvironment()) return;
         testCopy();
         assert getThis() == this;
@@ -369,6 +399,14 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     public void onCancel(A attacker) {}
 
     /**
+     * Whether this attack should be allowed to move onto its finisher.
+     * Certain attacks shouldn't always be able to, see: {@link net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack#canFinish(IAttacker)}
+     */
+    public boolean canFinish(A attacker) {
+        return true;
+    }
+
+    /**
      * Called every tick so long as this move is active.
      * Called separately for each attacker.
      * Invokes the {@link #perform(IAttacker, LivingEntity, MoveContext)} method if {@link #shouldPerform(IAttacker)}
@@ -376,13 +414,14 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * @param attacker The attacker to tick for.
      */
     public void tick(A attacker) {
-        if (finisher != null && finisher.leftInt() == getDuration() - attacker.getMoveStun())
+        if (finisher != null && canFinish(attacker) && finisher.leftInt() <= getDuration() - attacker.getMoveStun())
             attacker.setCurrentMove(finisher.right());
         if (shouldPerform(attacker)) doPerform(attacker);
     }
 
     /**
      * Returns whether {@link #perform(IAttacker, LivingEntity, MoveContext)} should be called this tick.
+     * Ensures the attacker has a valid user.
      * @param attacker The attacker to check for.
      * @return Whether this move should be performed this tick.
      */
@@ -513,6 +552,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         cast.followup = followup == null ? null : followup.copy();
         cast.crouchingVariant = crouchingVariant == null ? null : crouchingVariant.copy();
         cast.aerialVariant = aerialVariant == null ? null : aerialVariant.copy();
+        cast.ranged = ranged;
         cast.isCrouchingVariant = isCrouchingVariant;
         cast.isAerialVariant = isAerialVariant;
         cast.isFollowup = isFollowup;
@@ -523,6 +563,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         cast.mobilityType = mobilityType;
         cast.originalMove = originalMove; // Set the original move to this move
         cast.animation = animation;
+        cast.mayHitUser = mayHitUser;
         copiedExtras = true;
         return base;
     }

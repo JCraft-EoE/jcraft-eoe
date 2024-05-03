@@ -283,5 +283,10 @@ public class MoveMap<A extends IAttacker<A, S>, S> implements Iterable<MoveMap.E
             followUp = new Entry<>(this, type, move.getFollowup(), cooldownType, animState);
             return followUp;
         }
+
+        @Override
+        public String toString() {
+            return "Type: " + type + ", Move name: " + move.getName() + ", Move desc: " + move.getDescription();
+        }
     }
 }

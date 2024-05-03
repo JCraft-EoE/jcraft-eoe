@@ -20,7 +20,6 @@ import net.arna.jcraft.registry.JStatusRegistry;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
@@ -35,32 +34,53 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
     public static final SimpleAttack<AbstractKillerQueenEntity<?, ?>> LOW = new SimpleAttack<AbstractKillerQueenEntity<?, ?>>(
             0, 8, 13, 0.85f, 4f, 10, 1.5f, 0.25f, 0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
-            .withInfo(Text.literal("Low Punch"), Text.literal("frametrap tool, low stun"));
+            .withInfo(
+                    Text.literal("Low Punch"),
+                    Text.literal("frametrap tool, low stun")
+            );
     public static final SimpleAttack<AbstractKillerQueenEntity<?, ?>> LIGHT_FOLLOWUP = new SimpleAttack<AbstractKillerQueenEntity<?, ?>>(
             0, 6, 13, 0.8f, 3f, 20, 1.5f, 0.5f, 0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             // implemented in class: .withFollowup(LOW)
-            .withInfo(Text.literal("Second Punch"), Text.literal("frametrap tool"));
+            .withInfo(
+                    Text.literal("Second Punch"),
+                    Text.literal("frametrap tool")
+            );
     public static final DetonateAttack DETONATE = new DetonateAttack(20, 5, 6, 1f)
-            .withInfo(Text.literal("Detonate"), Text.literal("tiny windup, move queueing is disabled while Detonate is active"));
+            .withInfo(
+                    Text.literal("Detonate"),
+                    Text.literal("tiny windup, move queueing is disabled while Detonate is active")
+            );
     public static final SimpleAttack<AbstractKillerQueenEntity<?, ?>> LIGHT = new SimpleAttack<AbstractKillerQueenEntity<?, ?>>(
             30, 6, 10, 0.75f, 3f, 10, 1.5f, 0.25f, 0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_6)
             .withCrouchingVariant(DETONATE)
             // implemented in class: .withFollowup(LIGHT_FOLLOWUP)
-            .withInfo(Text.literal("Punch"), Text.literal("combo starter, decent speed, has two followups"));
+            .withInfo(
+                    Text.literal("Punch"),
+                    Text.literal("combo starter, decent speed, has two followups")
+            );
     public static final MainBarrageAttack<AbstractKillerQueenEntity<?, ?>> BARRAGE = new MainBarrageAttack<AbstractKillerQueenEntity<?, ?>>(
             240, 0, 40, 0.75f, 1f, 20, 2f, 0.1f, 0, 3, Blocks.DEEPSLATE.getHardness())
             .withSound(JSoundRegistry.KQ_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_4)
-            .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, medium stun"));
+            .withInfo(
+                    Text.literal("Barrage"),
+                    Text.literal("fast reliable combo starter/extender, medium stun")
+            );
     public static final BombPlantAttack BOMB_PLANT = new BombPlantAttack(280, 12, 20, 1f, 9, 1.5f, 0f)
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withBlockStun(8)
-            .withInfo(Text.literal("Bomb Plant"), Text.literal("crouch to plant on the ground below you, stealthily"));
+            .withInfo(
+                    Text.literal("Bomb Plant"),
+                    Text.literal("crouch to plant on the ground below you, stealthily")
+            );
     public static final ExplosiveDashAttack EXPLOSIVE_DASH = new ExplosiveDashAttack(240)
-            .withInfo(Text.literal("Explosive Dash"), Text.literal("instantly boosts the user in the aimed direction"));
+            .withInfo(
+                    Text.literal("Explosive Dash"),
+                    Text.literal("instantly boosts the user in the aimed direction")
+            );
     protected ItemEntity coin;
 
     protected AbstractKillerQueenEntity(StandType type, World worldIn, @Nullable SoundEvent summonSound) {
@@ -156,7 +176,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
     }
 
     @Override
-    public MoveSelectionResult specificMoveSelectionCriterion(AbstractMove<?, ? super E> attack, MobEntity mob, LivingEntity target, int stunTicks,
+    public MoveSelectionResult specificMoveSelectionCriterion(AbstractMove<?, ? super E> attack, LivingEntity mob, LivingEntity target, int stunTicks,
                                                               int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand, AbstractMove<?, ?> enemyAttack) {
         if (enemyStand != null && enemyStand.blocking) return MoveSelectionResult.STOP;
         Vec3d bombPos = JComponents.getBombTracker(mob).getMainBomb().getBombPos();

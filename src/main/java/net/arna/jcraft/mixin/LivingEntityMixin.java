@@ -3,7 +3,6 @@ package net.arna.jcraft.mixin;
 import net.arna.jcraft.common.attack.moves.base.AbstractCounterAttack;
 import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.component.JComponents;
-import net.arna.jcraft.common.component.living.MiscComponent;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
@@ -81,7 +80,7 @@ public abstract class LivingEntityMixin implements IDamageScaler {
         if (
                 entity.hasStatusEffect(JStatusRegistry.KNOCKDOWN) || // Knocked down
                         (stun != null && stun.getAmplifier() != 2) || // Stunned (not blocking)
-                        (stand != null && stand.isRemote()) // Stand ON in remote mode
+                        (stand != null && stand.isRemoteAndControllable()) // Stand ON in controllable remote mode
         ) cir.setReturnValue(-1.0D); // Nullify jump
         /*
         else if (stand != null && (stand.curAttack != null && stand.curAttack.attackType == AttackType.BARRAGE)) { // Stand ON and barraging

@@ -2562,21 +2562,212 @@ Anubis Chariot
 
 >second hitbox to grab (sptw)
 
-● 29/03/2024
+● 30/03/2024
+>STANDS CAN NOW AIM IN 3D (mostly)
+>Updated textures for: Stand Arrow, Living Arrow, Requiem Arrow, Requiem Ruby, Boxing Gloves
+
 Anubis
     >Blocking with your stand is now possible while Anubis is held
 
+Cream
+    >Bite sped up
+    >Surprise can now be forced to come out near the user (via crouching)
+    >Added Half-Ball Special 2 - Detaching Void Charge
+
 Silver Chariot
+    >Updated Impaling Thrust animation
     >Updated Barrage animation
 
 Anubis Chariot
     >Added followup to Spinning Blade
 
+Killer Queen: Bites The Dust
+    >Bubble cooldown reduced (16->11s)
+    >Takedown cooldown reduced (15->11s)
+    >Bites the Dust Plant cooldown reduced (50->40s)
+
+Gold Experience Requiem
+    >Added floating animation to user
+
+● 31/03/2024
+Gold Experience
+    >Snake model updated
+
+The World: Over Heaven
+    >Updated animations
+    >Added aerial variant to Heavy
+
+● 04/04/2024
+    Added JConfig options for:
+        enabling move cooldowns
+        a multiplier for cooldown length
+
+● 10/04/2024
+>Added The Sun
+
+● 11/04/2024
+The World
+    >Roundhouse cooldown reduced (2->1s)
+    >Added crouching variant to Roundhouse
+
+● 13/04/2024
+>Added Purple Haze: Distortion
+
+Vampire
+    >Added more sounds
+
+Gold Experience
+    >Rekka 1 sped up tremendously
+
+● 14/04/2024
+The Sun
+    >Replaced block gauge with size gauge
+    >Added text for swapping between active/passive mode
+
+● 16/04/2024
+Stone Mask
+    >Updated model
+
+● 18/04/2024
+>Attempted to add prediction as a config option
+
+The World: Over Heaven
+    >Crouching Light replaced with Low Kick
+    >Previous crouching Light is now the followup to Low Kick
+
+● 19/04/2024
+Cream
+    >Updated skin 3
+
+● 22/04/2024
+>Added base Purple Haze
+>Added heartbeat packet to held inputs (which will automatically release moves that accidentally register as always held)
+>Fixed King Crimson's and Made in Heaven's barrages not being able to mine properly
+>Fixed buffered holdable moves not being holdable for stands
+
+Made in Heaven
+    >Leg Crusher now knocks down
+
+● 26/04/2024
+Vampire
+    >Updated all Heavy animations
+
+The Sun
+    >Collides with the world better (both for movement and scaling)
+    >Stand gauge is now darker when passive
+
+Anubis
+    >Unsheathing Attack
+        >Cooldown reduced (11->5s)
+        >Damage reduced (6->5)
+        >Added crouching variant
+    >Low Kick damage reduced (7->6)
+
+● 28/04/2024
+>Fixed certain projectile moves not working in different gravities
+
+Star Platinum
+    >Fixed Jump not working in different gravities
+    >Knee
+        >Stand distance increased (0.75->0.9m)
+        >Cooldown reduced (2->1s)
+        >Added aerial variant - Upward Knee Strike
+    >Star Finger
+        >Added crouching variant - Takedown
+
+D4C
+    >Item place windup reduced (10->7t)
+
+Purple Haze
+    >no longer cooldown cancels for you
+    >is stopped by stun
+
+● 29/04/2024
+>Fixed remote stand blocking bugs
+>Fixed being able to cancel the start of a stand on move with blocking
+
+● 01/05/2024
+>ADDED METEORITES
+    >Required mining level: Diamond
+    >Found in: Deserts and Oceans
+    >Stand Arrows are now made from Stand Arrowheads, Sticks and Feathers
+    >Stand Arrowheads are made by smelting Stellar Iron Ore and combining it with Gold Ingots/Nuggets
+
+>Added DIO's Cape
+>Added Enable Friendly Fire config option, which works alongside Minecrafts /team system
+
+RELEASE 1.19.2-0.13.7
+//todo: fix enummap jank
+● 01/05/2024
+>NEW STANDS: The Sun, Purple Haze, Purple Haze: Distortion
+
+>ADDED METEORITES
+    >Required mining level: Diamond
+    >Found in: Deserts and Oceans
+    >Stand Arrows are now made from Stand Arrowheads, Sticks and Feathers
+    >Stand Arrowheads are made by smelting Stellar Iron Ore and combining it with Gold Ingots/Nuggets
+
+>New JConfig options:
+    >Enable/Disable move cooldowns
+    >Multiplier for cooldown length - which changes SOME cooldown lengths (others must stay to best preserve balance)
+    >Enable/Disable Stun Falloff - which reduces stun proportionally to damage scaling
+    NOTE: infinite combos are still possible if cooldowns are turned completely off (mostly from barrages), unless you also crank up damage scaling by a lot
+    >Enable/Disable friendly fire - which uses the /team system from base Minecraft
+
+>Updated Sprites
+
+>Added heartbeat packet to held inputs (which will automatically release moves that accidentally register as always held)
+>Fixed King Crimson's and Made in Heaven's barrages not being able to mine properly
+>Fixed buffered holdable moves not being holdable for stands
+>Fixed certain projectile moves not working in different gravities
+>Fixed remote stand blocking bugs
+>Fixed being able to cancel the start of a stand on move with blocking
+
+Star Platinum
+    >Fixed Jump not working in different gravities
+    >Knee
+        >Stand distance increased (0.75->0.9m)
+        >Cooldown reduced (2->1s)
+        >Added aerial variant - Upward Knee Strike
+    >Star Finger
+        >Added crouching variant - Takedown
+
+The World
+    >Roundhouse cooldown reduced (2->1s)
+    >Added crouching variant to Roundhouse
+
+D4C
+    >Item place windup reduced (10->7t)
+
+Cream
+    >Updated skin 3
+
+Made in Heaven
+    >Leg Crusher now knocks down
+
+The World: Over Heaven
+    >Crouching Light replaced with Low Kick
+    >Previous crouching Light is now the followup to Low Kick
+
+Gold Experience
+    >Rekka 1 sped up tremendously
+
+Anubis
+    >Unsheathing Attack
+        >Cooldown reduced (11->5s)
+        >Damage reduced (6->5)
+        >Added crouching variant
+    >Low Kick damage reduced (7->6)
+
+Vampire
+    >Added more sounds
+    >Updated all Heavy animations
+
+
 todo: combo counter is LYING
     esplash color :)
     anubis pommel IMPACT sound
     fully charged esplash breaks blocks
-    cool leggy sweep for tw
 
 The reason the easings dont work is because kosmx is fucking stupid,
 see: dev.kosmx.playerAnim.core.util.Easing

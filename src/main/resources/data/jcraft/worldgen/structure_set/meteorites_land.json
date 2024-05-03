@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "jcraft:meteorite_land",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 17,
+    "separation": 6,
+    "salt": 765389024
+  }
+}

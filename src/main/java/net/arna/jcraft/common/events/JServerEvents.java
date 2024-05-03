@@ -10,10 +10,9 @@ import net.arna.jcraft.common.component.living.StandComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.StandType;
 import net.arna.jcraft.common.item.MockItem;
-import net.arna.jcraft.common.tickable.PastDimensions;
-import net.arna.jcraft.common.tickable.Revivables;
-import net.arna.jcraft.common.tickable.RevolverFire;
-import net.arna.jcraft.common.tickable.Timestops;
+import net.arna.jcraft.common.network.c2s.PredictionTriggerPacket;
+import net.arna.jcraft.common.network.s2c.PredictionUpdatePacket;
+import net.arna.jcraft.common.tickable.*;
 import net.arna.jcraft.common.util.EntityInterest;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.registry.JDimensionRegistry;
@@ -39,7 +38,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.TypeFilter;
+import net.minecraft.util.Pair;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -50,10 +49,10 @@ import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static net.arna.jcraft.JCraft.ALLOW_MOB_EVOLVED_STANDS;
 import static net.arna.jcraft.JCraft.CHANCE_MOB_SPAWNS_WITH_STAND;
-import static net.arna.jcraft.common.entity.stand.StandEntity.standUserAI;
 import static net.arna.jcraft.common.entity.stand.StandEntity.stun;
 import static net.arna.jcraft.common.util.EntityInterest.blockAttractionInterest;
 import static net.arna.jcraft.common.util.EntityInterest.itemAttractionInterest;
@@ -73,6 +72,9 @@ public class JServerEvents {
         JCraft.auWorld = server.getWorld(JDimensionRegistry.AU_DIMENSION_KEY);
     }
 
+    private static final int PREDICTION_RADIUS = 6 * 16;
+    private static final int MAX_COMPENSATION_MS = 250; // Game is barely playable at this point
+    private static final double MS_TO_TICKS = 1000.0 / 20.0; // 1000ms = 1s, 1s = 20t
     public static void serverTick(MinecraftServer server) {
         if (JCraft.preloadLockTicks > 0)
             JCraft.preloadLockTicks--;
@@ -81,6 +83,29 @@ public class JServerEvents {
         PastDimensions.tick(server);
         Timestops.tick(server);
         Revivables.tick(server);
+        JEnemies.tick(server);
+        // Positional prediction logic for players that want a more current look at where their enemies are, at the cost of smoothness
+        PredictionTriggerPacket.getSubscribers().forEach(
+                subscriber -> {
+                    int adjustedPing = subscriber.pingMilliseconds;
+                    if (adjustedPing > MAX_COMPENSATION_MS)
+                        adjustedPing = MAX_COMPENSATION_MS;
+                    double pingTicks = adjustedPing * MS_TO_TICKS;
+
+                    Set<Pair<Integer, Vec3d>> idPosPairs = PlayerLookup.around(subscriber.getWorld(), subscriber.getPos(), PREDICTION_RADIUS)
+                            .stream()
+                            .filter(serverPlayer -> serverPlayer != subscriber)
+                            .map(
+                                    serverPlayer -> {
+                                        // This will likely need extension
+                                        Vec3d predictedDeltaPos = JUtils.deltaPos(serverPlayer).multiply(pingTicks);
+                                        return new Pair<>(serverPlayer.getId(), serverPlayer.getPos().add(predictedDeltaPos));
+                                    }
+                            ).collect(Collectors.toSet());
+
+                    PredictionUpdatePacket.send(subscriber, idPosPairs);
+                }
+        );
 
         // Player logic (cooldown handling and DamageTimer counting)
         for (ServerPlayerEntity player : PlayerLookup.all(server)) {
@@ -149,39 +174,6 @@ public class JServerEvents {
             dash.tickDash();
 
             if (dash.finished) JCraft.dashes.remove(entry.getKey());
-        }
-
-
-        for (ServerWorld serverWorld : server.getWorlds()) {
-            List<? extends MobEntity> mobEntities = serverWorld.getEntitiesByType(TypeFilter.instanceOf(MobEntity.class), EntityPredicates.VALID_ENTITY);
-
-            for (MobEntity mob : mobEntities) {
-                if (!mob.isAlive()) continue;
-
-                // Damage timer
-                if (mob.getAttacker() != null) JComponents.getMiscData(mob).startDamageTimer();
-
-                // Stand User AIs
-                if (mob.isAiDisabled()) continue;
-                StandComponent standComponent = JComponents.getStandData(mob);
-                if (standComponent.getType() != null) {
-                    StandEntity<?, ?> stand = standComponent.getStand();
-                    if (stand == null) {
-                        JCraft.summon(serverWorld, mob);
-                    } else {
-                        // Target priority
-                        LivingEntity biggestAttacker = mob.getDamageTracker().getBiggestFall();
-                        LivingEntity primeAdversary = mob.getPrimeAdversary();
-                        LivingEntity target = mob.getTarget();
-                        if (primeAdversary != null && primeAdversary.isAlive() && stand.canTarget(primeAdversary))
-                            standUserAI(mob, primeAdversary, stand);
-                        else if (target != null && target.isAlive() && stand.canTarget(target))
-                            standUserAI(mob, target, stand);
-                        else if (biggestAttacker != null && biggestAttacker.isAlive() && stand.canTarget(biggestAttacker))
-                            mob.setTarget(biggestAttacker);
-                    }
-                }
-            }
         }
 
         // Handle items of interest
@@ -315,11 +307,16 @@ public class JServerEvents {
             }
         }
 
-        // If a mob was spawned
         if (entity instanceof MobEntity mob) {
-            if (mob.age > 0) return;
-
+            // Mark stand user mobs
             StandComponent standData = JComponents.getStandData(mob);
+            if (standData.getType() != null && standData.getType() != StandType.NONE) {
+                JEnemies.add(mob);
+                return;
+            }
+
+            // Create new stand user mobs
+            if (mob.age > 0) return;
             if (standData.getType() != null) return;
             EntityGroup group = mob.getGroup();
 
@@ -362,6 +359,8 @@ public class JServerEvents {
                 itemStack.addEnchantment(enchantment, enchantment.getMaxLevel());
                 armorItems.set(i, itemStack);
             }
+
+            JEnemies.add(mob);
         }
     }
 }

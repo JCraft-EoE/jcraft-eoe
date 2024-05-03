@@ -15,8 +15,9 @@ import java.util.function.Function;
 public enum SpecType {
     NONE(player -> null, Text.empty(), Text.empty()),
     BRAWLER(BrawlerSpec::new, Text.literal("Close-range pressure and combo extension tool"), Text.literal(
-            "Important hitconfirm: (any stand move)~stand.OFF>Combo>stand.ON+(any stand move)")),
-    ANUBIS(AnubisSpec::new, Text.literal("Counterpoking tool"), Text.literal(
+            """
+                    Important hitconfirm: (any stand move)~stand.OFF>Combo>stand.ON+(any stand move)""")),
+    ANUBIS(AnubisSpec::new, Text.literal("Accelerating offense"), Text.literal(
             """
                     PASSIVE: Bloodlust
                     Landing blows on opponents speeds up Anubis' attacks up to 2x, with +0.2x per hit.

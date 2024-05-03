@@ -39,20 +39,29 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
             JCraft.LIGHT_COOLDOWN, 7, 14, 0.75f, 5f, 15, 1.5f, 0.4f, -0.3f, 0.4f)
             .withAnim(State.AIR_LIGHT)
             .withImpactSound(JSoundRegistry.IMPACT_3)
-            .withInfo(Text.literal("Backward Flip Kick"), Text.literal("launches up"));
+            .withInfo(
+                    Text.literal("Backward Flip Kick"),
+                    Text.literal("launches up")
+            );
     public static final KnockdownAttack<HGEntity> CROUCHING_LIGHT_FOLLOWUP = new KnockdownAttack<HGEntity>(
             0, 9, 16, 0.75f, 6f, 13, 1.75f, 0.75f, 0.4f, 35)
             .withSound(JSoundRegistry.HG_CROUCH_LIGHT)
             .withAnim(State.CROUCHING_LIGHT_FOLLOWUP)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withInfo(Text.literal("Sweep"), Text.literal("1.5s knockdown"));
+            .withInfo(
+                    Text.literal("Sweep"),
+                    Text.literal("1.5s knockdown")
+            );
     public static final SimpleAttack<HGEntity> CROUCHING_LIGHT = SimpleAttack.<HGEntity>lightAttack(
                     7, 11, 0.75f, 5f, 12, 0.15f, 0.3f)
             .withAnim(State.CROUCHING_LIGHT)
             .withFollowup(CROUCHING_LIGHT_FOLLOWUP)
             .withImpactSound(JSoundRegistry.IMPACT_4)
-            .withInfo(Text.literal("Low Punch"), Text.literal("quick combo starter"));
+            .withInfo(
+                    Text.literal("Low Punch"),
+                    Text.literal("quick combo starter")
+            );
 
     public static final UppercutAttack<HGEntity> LIGHT_FOLLOWUP = new UppercutAttack<HGEntity>(
             0, 10, 15, 0.75f, 6f, 13, 1.75f, 0.5f, -0.2f, 0.4f)
@@ -61,14 +70,20 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withBlockStun(4)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withInfo(Text.literal("Uppercut"), Text.literal("reset tool, combos back into light"));
+            .withInfo(
+                    Text.literal("Uppercut"),
+                    Text.literal("reset tool, combos back into light")
+            );
     public static final SimpleAttack<HGEntity> LIGHT = SimpleAttack.<HGEntity>lightAttack(
             7, 9, 0.75f, 5f, 10, 0.15f, 0.2f)
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(CROUCHING_LIGHT)
             .withAerialVariant(AIR_LIGHT)
             .withImpactSound(JSoundRegistry.IMPACT_4)
-            .withInfo(Text.literal("Punch"), Text.literal("quick combo starter"));
+            .withInfo(
+                    Text.literal("Punch"),
+                    Text.literal("quick combo starter")
+            );
     public static final SimpleAttack<HGEntity> SENDOFF = new SimpleAttack<HGEntity>(
             180, 11, 20, 1, 8f, 16, 2f, 1.5f, 0)
             .withSound(JSoundRegistry.WS_DONUT)
@@ -77,34 +92,49 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
             .withLaunch()
             .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
             .withHyperArmor()
-            .withInfo(Text.literal("Sendoff"), Text.literal("uninterruptible launcher"));
+            .withInfo(
+                    Text.literal("Sendoff"),
+                    Text.literal("uninterruptible launcher")
+            );
     public static final SimpleMultiHitAttack<HGEntity> BARRAGE = new SimpleMultiHitAttack<HGEntity>(
             200, 28, 1, 2f, 20, 2f, 0.3f, 0.25f,
             IntSet.of(3, 9, 15, 17, 25))
             .withSound(JSoundRegistry.HG_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_3)
-            .withInfo(Text.literal("Barrage"), Text.literal("fast reliable combo starter/extender, medium stun"));
+            .withInfo(
+                    Text.literal("Barrage"),
+                    Text.literal("fast reliable combo starter/extender, medium stun")
+            );
 
     public static final SimpleAttack<HGEntity> EXTEND_FORWARD_SECOND = new SimpleAttack<HGEntity>(
             0, 13, 21, 1f, 5, 16, 0, 0.4f, 0)
             .withHitAnimation(HitPropertyComponent.HitAnimation.LOW)
             .withExtraHitBox(2.5, -0.5, 1.5)
             .withExtraHitBox(3.5    , -0.6, 1.5)
-            .withInfo(Text.literal("Extend (Forward, Second Hit)"), Text.empty());
+            .withInfo(
+                    Text.literal("Extend (Forward, Second Hit)"),
+                    Text.empty()
+            );
     public static final SimpleAttack<HGEntity> EXTEND_FORWARD = new SimpleAttack<HGEntity>(
             100, 10, 21, 1f, 5, 15, 1.5f, 0.7f, 0.2f)
             .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
             .withSound(JSoundRegistry.HG_EXTEND)
             .withExtraHitBox(2, -0.1, 1.5)
             .withFinisher(12, EXTEND_FORWARD_SECOND)
-            .withInfo(Text.literal("Extend (Forward)"), Text.literal("Hierophant extends its arm forward in a far-reaching attack"));
+            .withInfo(
+                    Text.literal("Extend (Forward)"),
+                    Text.literal("Hierophant extends its arm forward in a far-reaching attack")
+            );
 
     public static final SimpleAttack<HGEntity> EXTEND_UP_SECOND = new SimpleAttack<HGEntity>(
             0, 13, 21, 1f, 5, 16, 0, 0.4f, 0)
             .withHitAnimation(HitPropertyComponent.HitAnimation.HIGH)
             .withExtraHitBox(2, 0.5, 1.5)
             .withExtraHitBox(3, 0.75, 1.5)
-            .withInfo(Text.literal("Extend (Upward, Second Hit)"), Text.empty());
+            .withInfo(
+                    Text.literal("Extend (Upward, Second Hit)"),
+                    Text.empty()
+            );
     public static final SimpleAttack<HGEntity> EXTEND_UP = new SimpleAttack<HGEntity>(
             100, 10, 21, 1f, 5, 15, 1.5f, 0.7f, -0.2f)
             .withCrouchingVariant(EXTEND_FORWARD)
@@ -113,31 +143,44 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
             .withHitAnimation(HitPropertyComponent.HitAnimation.CRUSH)
             .withExtraHitBox(2, 0.1, 1.5)
             .withFinisher(12, EXTEND_UP_SECOND)
-            .withInfo(Text.literal("Extend (Upward)"), Text.literal("Hierophant extends its arm upward in a far-reaching attack"));
+            .withInfo(
+                    Text.literal("Extend (Upward)"),
+                    Text.literal("Hierophant extends its arm upward in a far-reaching attack")
+            );
 
     public static final EmeraldSplashAttack EMERALD_SPLASH = new EmeraldSplashAttack(0, 12, 1, 0, 0, 0, 0,
             IntSet.of(1, 3, 5), 1.5f)
             .withSound(JSoundRegistry.HG_SPLASH)
-            .withInfo(Text.literal("Emerald Splash (Fire)"), Text.empty());
+            .withInfo(
+                    Text.literal("Emerald Splash (Fire)"),
+                    Text.empty()
+            );
     public static final HoldableMove<HGEntity, State> EMERALD_CHARGE = new HoldableMove<>(100, 0, 40, 1,
             EMERALD_SPLASH, State.EMERALD_SPLASH, 7)
             .withInitAction(
                     (attacker, user, ctx) -> ctx.setInt(CHARGE_TIME, 0)
             )
-            .withInfo(Text.literal("Emerald Splash"), Text.literal("""
+            .withInfo(
+                    Text.literal("Emerald Splash"),
+                    Text.literal("""
                     Fires 3 bursts of emeralds at the opponent.
                     Bursts contain 3-6 emeralds depending on how long you hold."""));
 
     public static final NetSetMove NET_SET = new NetSetMove(200, 9, 15, 1f)
             .withSound(JSoundRegistry.HG_NET_SET)
-            .withInfo(Text.literal("Tentacle Place"), Text.literal("""
+            .withInfo(
+                    Text.literal("Tentacle Place"),
+                    Text.literal("""
                     Places a Hierophant Tentacle at Hierophant's feet.
                     Tentacles automatically grasp anything that touches them that isn't the user (10s cooldown).
                     Use crouching Emerald Splash to fire from the Tentacles remotely.
                     Tentacles cannot fire if grabbing.
                     """));
     public static final PilotModeMove<HGEntity> PILOT_MODE = new PilotModeMove<HGEntity>(20)
-            .withInfo(Text.literal("Pilot Mode"), Text.empty());
+            .withInfo(
+                    Text.literal("Pilot Mode"),
+                    Text.empty()
+            );
 
     public static final EmeraldSplashAttack EMERALD_SUPER = new EmeraldSplashAttack(500, 40, 1, 0, 0, 0, 0,
             IntSet.of(12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32), 2f)
@@ -162,7 +205,9 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
             )
             .withReflect()
             .withSound(JSoundRegistry.HG_SPLASH)
-            .withInfo(Text.literal("All-Consuming Emerald Splash"), Text.literal("""
+            .withInfo(
+                    Text.literal("All-Consuming Emerald Splash"),
+                    Text.literal("""
                     Fires a long, oppressive stream of emeralds at the opponent.
                     These emeralds may bounce off walls up to 5 times.
                     Nearby Tentacles will do the same, but immediately start wilting after use.

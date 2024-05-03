@@ -6,6 +6,7 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.stand.MadeInHeavenEntity;
 import net.arna.jcraft.common.entity.stand.StandEntity;
+import net.arna.jcraft.common.entity.stand.TheSunEntity;
 import net.arna.jcraft.common.spec.AnubisSpec;
 import net.arna.jcraft.common.spec.JSpec;
 import net.arna.jcraft.common.util.JUtils;
@@ -24,6 +25,7 @@ public class JCraftHudOverlay {
     private static int gaugeHeightOffset;
     private static final int gaugeHeightOffsetMax = -65;
     private static final Gauge BLOCK_GAUGE = new Gauge(0.5f, 0.5f, 1.0f, 90);
+    private static final Gauge SUN_SIZE_GAUGE = new Gauge(1.0f, 0.7f, 0.4f, 30);
     private static final Gauge TIME_ACCEL_GAUGE = new Gauge(1.0f, 0.8f, 0.0f, MadeInHeavenEntity.MAXIMUM_SPEEDOMETER);
     private static final Gauge BLOODLUST_GAUGE = new Gauge(0.8f, 0.1f, 0.2f, 5);
 
@@ -41,8 +43,19 @@ public class JCraftHudOverlay {
         gaugeHeightOffset = gaugeHeightOffsetMax;
         int gaugeX = x - gaugeWidth / 2;
 
-        if (player.getFirstPassenger() instanceof StandEntity<?, ?> stand) {
-            BLOCK_GAUGE.render(ctx, gaugeX, height + gaugeHeightOffset, (int) stand.getStandGauge());
+        StandEntity<?, ?> stand = JUtils.getStand(player);
+        if (stand != null) {
+            if (stand instanceof TheSunEntity theSun) {
+                float darken = (theSun.isPassive() ? 0.4f : 0.0f);
+                SUN_SIZE_GAUGE.render(matrixStack,
+                        SUN_SIZE_GAUGE.red() - darken,
+                        SUN_SIZE_GAUGE.green() - darken,
+                        SUN_SIZE_GAUGE.blue() - darken,
+                        gaugeX,
+                        height + gaugeHeightOffset,
+                        (int) (theSun.getScale() * 10.0F));
+            } else
+                BLOCK_GAUGE.render(matrixStack, gaugeX, height + gaugeHeightOffset, (int) stand.getStandGauge());
             if (stand instanceof MadeInHeavenEntity madeInHeaven && madeInHeaven.getAccelTime() > 0)
                 TIME_ACCEL_GAUGE.render(ctx, gaugeX, height + gaugeHeightOffset, madeInHeaven.getSpeedometer());
         }
@@ -60,10 +73,16 @@ public class JCraftHudOverlay {
             this(color.x(), color.y(), color.z(), max);
         }
 
-        public void render(DrawContext ctx, int x, int y, int value) {
-            RenderSystem.setShaderColor(red, green, blue, 1);
-            ctx.drawTexture(EMPTY_GAUGE, x, y, 0, 0, gaugeWidth, 5, gaugeWidth, 5);
-            ctx.drawTexture(FULL_GAUGE, x, y, 0, 0, value * gaugeWidth / max, 5, gaugeWidth, 5);
+        public void render(MatrixStack matrixStack, int x, int y, int value) {
+            render(matrixStack, red, green, blue, x, y, value);
+        }
+
+        public void render(MatrixStack matrixStack, float r, float g, float b, int x, int y, int value) {
+            RenderSystem.setShaderColor(r, g, b, 1);
+            RenderSystem.setShaderTexture(0, EMPTY_GAUGE);
+            DrawableHelper.drawTexture(matrixStack, x, y, 0, 0, gaugeWidth, 5, gaugeWidth, 5);
+            RenderSystem.setShaderTexture(0, FULL_GAUGE);
+            DrawableHelper.drawTexture(matrixStack, x, y, 0, 0, value * gaugeWidth / max, 5, gaugeWidth, 5);
             gaugeHeightOffset -= 6;
         }
     }

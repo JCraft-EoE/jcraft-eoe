@@ -95,6 +95,12 @@ public class LaserProjectile extends PersistentProjectileEntity implements GeoEn
     }
 
     @Override
+    protected float getDragInWater() {
+        // Not actually drag, just a multiplier
+        return 1.0F;
+    }
+
+    @Override
     public ItemStack asItemStack() {
         return ItemStack.EMPTY;
     }

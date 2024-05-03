@@ -1,0 +1,41 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.sunbeam.fire": {
+			"animation_length": 1.2,
+			"bones": {
+				"beam": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"1.0": {
+							"vector": [360, 0, 0]
+						}
+					},
+					"scale": {
+						"0.0": {
+							"vector": [1, 1, 1],
+							"easing": "easeInSine"
+						},
+						"0.28": {
+							"vector": [64, 0.1, 0.1],
+							"easing": "easeOutCirc"
+						},
+						"0.48": {
+							"vector": [64, 4, 4],
+							"easing": "easeInBack"
+						},
+						"1.0": {
+							"vector": [64, 4, 4],
+							"easing": "linear"
+						},
+						"1.2": {
+							"vector": [1, 1, 1]
+						}
+					}
+				}
+			}
+		}
+	}
+}

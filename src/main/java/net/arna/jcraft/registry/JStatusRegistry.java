@@ -16,6 +16,7 @@ public interface JStatusRegistry {
     StatusEffect OUTOFBODY = new OutOfBodyEffect();
     StatusEffect WEIGHTLESS = new WeightlessStatusEffect();
     StatusEffect BLEEDING = new BleedingEffect();
+    StatusEffect PHPOISON = new PurpleInfectionEffect();
 
     static void registerStatuses() {
         Registry.register(
@@ -66,5 +67,6 @@ public interface JStatusRegistry {
         Registry.register(Registries.STATUS_EFFECT, JCraft.id("outofbody"), OUTOFBODY);
         Registry.register(Registries.STATUS_EFFECT, JCraft.id("weightless"), WEIGHTLESS);
         Registry.register(Registries.STATUS_EFFECT, JCraft.id("bleeding"), BLEEDING);
+        Registry.register(Registries.STATUS_EFFECT, JCraft.id("phpoison"), PHPOISON);
     }
 }

@@ -43,4 +43,8 @@ public class JDamageSources {
     public static @NotNull DamageSource bleeding(World world) {
         return create(world, BLEEDING);
     }
+
+    public static @NotNull DamageSource phpoison() {
+        return new DamageSource("phpoison").setBypassesArmor().setUnblockable();
+    }
 }

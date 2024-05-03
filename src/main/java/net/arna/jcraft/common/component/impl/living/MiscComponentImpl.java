@@ -88,7 +88,8 @@ public class MiscComponentImpl implements MiscComponent {
 
     @Override
     public void stab() {
-        stuckKnifeCount++;
+        if (++stuckKnifeCount > 16)
+            stuckKnifeCount = 16;
         updateKnifeTimer();
     }
 

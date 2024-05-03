@@ -37,7 +37,6 @@ public class SunProtectionItem extends ArmorItem implements GeoItem {
 
     @SuppressWarnings("SameReturnValue")
     private <P extends IAnimatable> PlayState predicate(AnimationEvent<P> event) { return PlayState.STOP; }
-    @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     public void registerControllers(AnimationData data) { data.addAnimationController(new AnimationController(this, "controller", 20, this::predicate)); }
 
@@ -46,6 +45,9 @@ public class SunProtectionItem extends ArmorItem implements GeoItem {
 
     }
 
+    public void registerControllers(AnimationData data) {
+        data.addAnimationController(new AnimationController<>(this, "controller", 20, this::predicate));
+    }
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return cache;

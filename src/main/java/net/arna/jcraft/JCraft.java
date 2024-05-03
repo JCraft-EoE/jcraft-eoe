@@ -20,6 +20,7 @@ import net.arna.jcraft.common.network.RemoteStandInteractPacket;
 import net.arna.jcraft.common.network.c2s.*;
 import net.arna.jcraft.common.network.s2c.*;
 import net.arna.jcraft.common.spec.JSpec;
+import net.arna.jcraft.common.tickable.JEnemies;
 import net.arna.jcraft.common.tickable.PastDimensions;
 import net.arna.jcraft.common.tickable.Timestops;
 import net.arna.jcraft.common.util.*;
@@ -37,6 +38,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
@@ -93,8 +95,8 @@ public class JCraft implements ModInitializer {
     public static final GameRules.Key<GameRules.BooleanRule> STAND_GRIEFING = GameRuleRegistry.register("standGriefing", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
     public static final GameRules.Key<GameRules.BooleanRule> KEEP_STAND = GameRuleRegistry.register("keepStand", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
     public static final GameRules.Key<GameRules.BooleanRule> KEEP_SPEC = GameRuleRegistry.register("keepSpec", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
-    public static final GameRules.Key<GameRules.IntRule> DEFAULT_SPEC = GameRuleRegistry.register("defaultSpec", GameRules.Category.PLAYER, GameRuleFactory.createIntRule(0, 0, 2));
     //public static GameRules.Key<GameRules.IntRule> DAMAGE_MULT = GameRuleRegistry.register("jcraftDamageMult", GameRules.Category.MISC, GameRuleFactory.createIntRule(0, 0, 100));
+
     // Dimensional travel bullshit
     /**
      * Used to lock the AU chunks from being unloaded automatically by JServerTickEvents
@@ -184,6 +186,58 @@ public class JCraft implements ModInitializer {
         Timestops.remove(timestop);
     }
 
+    private static void appendJcraftGroupStacks(List<ItemStack> stacks) {
+        stacks.add(new ItemStack(JObjectRegistry.STAND_ARROWHEAD));
+        stacks.add(new ItemStack(JObjectRegistry.STANDARROW));
+        stacks.add(new ItemStack(JObjectRegistry.LIVINGARROW));
+        stacks.add(new ItemStack(JObjectRegistry.REQUIEMARROW));
+        stacks.add(new ItemStack(JObjectRegistry.REQUIEMRUBY));
+
+        stacks.add(new ItemStack(JObjectRegistry.ANUBIS));
+        stacks.add(new ItemStack(JObjectRegistry.ANUBISSHEATHED));
+        stacks.add(new ItemStack(JObjectRegistry.KNIFE));
+        stacks.add(new ItemStack(JObjectRegistry.KNIFEBUNDLE));
+        stacks.add(JObjectRegistry.FV_REVOLVER.getDefaultStack());
+        stacks.add(JObjectRegistry.BULLET.getDefaultStack());
+
+        stacks.add(new ItemStack(JObjectRegistry.SINNERSSOUL));
+        stacks.add(new ItemStack(JObjectRegistry.SOUL_BLOCK.asItem()));
+        stacks.add(new ItemStack(JObjectRegistry.METEORITE_BLOCK.asItem()));
+        stacks.add(new ItemStack(JObjectRegistry.METEORITE_IRON_ORE_BLOCK.asItem()));
+        stacks.add(new ItemStack(JObjectRegistry.STELLAR_IRON_INGOT));
+        stacks.add(new ItemStack(JObjectRegistry.GREENBABY));
+        stacks.add(new ItemStack(JObjectRegistry.DIOSDIARY));
+
+        stacks.add(new ItemStack(JObjectRegistry.BOXINGGLOVES));
+
+        stacks.add(new ItemStack(JObjectRegistry.DIOHEADBAND));
+        stacks.add(new ItemStack(JObjectRegistry.DIOJACKET));
+        stacks.add(new ItemStack(JObjectRegistry.DIOPANTS));
+        stacks.add(new ItemStack(JObjectRegistry.DIOBOOTS));
+        stacks.add(new ItemStack(JObjectRegistry.DIOCAPE));
+
+        stacks.add(new ItemStack(JObjectRegistry.JOTAROCAP));
+        stacks.add(new ItemStack(JObjectRegistry.JOTAROJACKET));
+        stacks.add(new ItemStack(JObjectRegistry.JOTAROPANTS));
+        stacks.add(new ItemStack(JObjectRegistry.JOTAROBOOTS));
+
+        stacks.add(new ItemStack(JObjectRegistry.KQ_COIN));
+        stacks.add(new ItemStack(JObjectRegistry.FOOLISH_SAND_BLOCK.asItem()));
+
+        stacks.add(new ItemStack(JObjectRegistry.CINDERELLA_MASK));
+
+        stacks.add(new ItemStack(JObjectRegistry.KARSHEADWRAP));
+        stacks.add(new ItemStack(JObjectRegistry.RED_HAT));
+
+        stacks.add(new ItemStack(JObjectRegistry.COFFIN_BLOCK.asItem()));
+
+        stacks.add(new ItemStack(JObjectRegistry.STONE_MASK));
+
+        StandDiscItem.appendStacks(JCRAFT_GROUP, stacks);
+
+        BloodBottleItem.appendStacks(JCRAFT_GROUP, stacks);
+    }
+
     // Dashes
 
     /**
@@ -225,7 +279,6 @@ public class JCraft implements ModInitializer {
 
     public static void tryDash(int forward, int side, LivingEntity entity) {
         CooldownsComponent cooldowns = JComponents.COOLDOWNS.get(entity);
-        //todo: make a JCraftUtils method for checking if the player should be effectively disabled? like when stunned or knocked down as shown here:
         if (cooldowns.getCooldown(CooldownType.DASH) > 0 || !entity.isOnGround() || entity.hasStatusEffect(JStatusRegistry.DAZED) || entity.hasStatusEffect(JStatusRegistry.KNOCKDOWN))
             return;
         cooldowns.setCooldown(CooldownType.DASH, dashCooldown);
@@ -251,7 +304,7 @@ public class JCraft implements ModInitializer {
             JSpec<?, ?> spec = JUtils.getSpec(player);
 
             if (spec == null || spec.moveStun < 1)
-                PlayerLookup.around((ServerWorld) entity.getWorld(), entity.getPos(), 96).forEach( //todo: find a less arbitrary number for radius here
+                PlayerLookup.around((ServerWorld) entity.getWorld(), entity.getPos(), 96).forEach(
                         serverPlayer -> PlayerAnimPacket.send(player, serverPlayer, "dash"));
         }
     }
@@ -290,9 +343,13 @@ public class JCraft implements ModInitializer {
         stand.startRiding(user);
         stand.setUser(user);
 
-        if (user instanceof ServerPlayerEntity player && JUtils.canAct(user) && StandBlockPacket.isBlocking(player)) {
-            stand.wantToBlock = true;
-            stand.blocking = true;
+        if (user instanceof ServerPlayerEntity player) {
+            if (JUtils.canAct(user) && StandBlockPacket.isBlocking(player)) {
+                stand.wantToBlock = true;
+                stand.tryBlock();
+            }
+        } else if (user instanceof MobEntity mob) {
+            JEnemies.add(mob);
         }
 
         world.spawnEntity(stand);
@@ -325,13 +382,15 @@ public class JCraft implements ModInitializer {
         JEnchantmentRegistry.init();
         JLootTableHelper.init();
         JServerConfig.init();
-
+        JStatRegistry.init();
 
         ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_PLAYER_INPUT, PlayerInputPacket::handle);
+        ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_PLAYER_INPUT_HOLD, PlayerInputPacket::handleHold);
         ServerPlayNetworking.registerGlobalReceiver(ConfigUpdatePacket.ID, ConfigUpdatePacket::handle);
         ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_STAND_BLOCK, StandBlockPacket::handle);
         ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_COOLDOWN_CANCEL, CooldownCancelPacket::handle);
         ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_REMOTE_STAND_INTERACT, RemoteStandInteractPacket::handle);
+        ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_PREDICTION_TRIGGER, PredictionTriggerPacket::handle);
 
         ItemGroupEvents.MODIFY_ENTRIES_ALL.register(JCraft::make);
     }
@@ -434,56 +493,5 @@ public class JCraft implements ModInitializer {
 
         finalEnt.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 100, 9, true, false, true));
         PastDimensions.enqueue(new DimensionData(finalEnt, pos, original.getRegistryKey()));
-    }
-
-    private static void make(ItemGroup creativeModeTab, FabricItemGroupEntries entries) {
-        if (creativeModeTab == JCRAFT_GROUP) {
-
-            entries.add(new ItemStack(JObjectRegistry.STANDARROW));
-            entries.add(new ItemStack(JObjectRegistry.LIVINGARROW));
-            entries.add(new ItemStack(JObjectRegistry.REQUIEMARROW));
-            entries.add(new ItemStack(JObjectRegistry.REQUIEMRUBY));
-
-            entries.add(new ItemStack(JObjectRegistry.ANUBIS));
-            entries.add(new ItemStack(JObjectRegistry.ANUBISSHEATHED));
-            entries.add(new ItemStack(JObjectRegistry.KNIFE));
-            entries.add(new ItemStack(JObjectRegistry.KNIFEBUNDLE));
-            entries.add(JObjectRegistry.FV_REVOLVER.getDefaultStack());
-            entries.add(JObjectRegistry.BULLET.getDefaultStack());
-
-            entries.add(new ItemStack(JObjectRegistry.SINNERSSOUL));
-            entries.add(new ItemStack(JObjectRegistry.SOUL_BLOCK.asItem()));
-            entries.add(new ItemStack(JObjectRegistry.METEORITE_BLOCK.asItem()));
-            entries.add(new ItemStack(JObjectRegistry.GREENBABY));
-            entries.add(new ItemStack(JObjectRegistry.DIOSDIARY));
-
-            entries.add(new ItemStack(JObjectRegistry.BOXINGGLOVES));
-
-            entries.add(new ItemStack(JObjectRegistry.DIOHEADBAND));
-            entries.add(new ItemStack(JObjectRegistry.DIOJACKET));
-            entries.add(new ItemStack(JObjectRegistry.DIOPANTS));
-            entries.add(new ItemStack(JObjectRegistry.DIOBOOTS));
-
-            entries.add(new ItemStack(JObjectRegistry.JOTAROCAP));
-            entries.add(new ItemStack(JObjectRegistry.JOTAROJACKET));
-            entries.add(new ItemStack(JObjectRegistry.JOTAROPANTS));
-            entries.add(new ItemStack(JObjectRegistry.JOTAROBOOTS));
-
-            entries.add(new ItemStack(JObjectRegistry.KQ_COIN));
-            entries.add(new ItemStack(JObjectRegistry.FOOLISH_SAND_BLOCK.asItem()));
-
-            entries.add(new ItemStack(JObjectRegistry.CINDERELLA_MASK));
-
-            entries.add(new ItemStack(JObjectRegistry.KARSHEADWRAP));
-            entries.add(new ItemStack(JObjectRegistry.RED_HAT));
-
-            entries.add(new ItemStack(JObjectRegistry.COFFIN_BLOCK.asItem()));
-
-            entries.add(new ItemStack(JObjectRegistry.STONE_MASK));
-
-            StandDiscItem.appendStacks(JCRAFT_GROUP, entries.getDisplayStacks());
-
-            BloodBottleItem.appendStacks(JCRAFT_GROUP, entries.getDisplayStacks());
-        }
     }
 }
