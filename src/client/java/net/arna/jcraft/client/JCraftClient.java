@@ -10,6 +10,7 @@ import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.gravity.util.GravityChannelClient;
 import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
+import net.arna.jcraft.client.gui.screen.MenuScreen;
 import net.arna.jcraft.client.net.ClientPacketHandler;
 import net.arna.jcraft.client.particle.*;
 import net.arna.jcraft.client.registry.*;
@@ -28,13 +29,16 @@ import net.arna.jcraft.common.component.living.CooldownsComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.network.c2s.PlayerInputPacket;
 import net.arna.jcraft.common.network.c2s.StandBlockPacket;
+import net.arna.jcraft.common.screenhandler.MenuScreenHandler;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JBlockEntityTypeRegistry;
 import net.arna.jcraft.registry.JObjectRegistry;
 import net.arna.jcraft.registry.JPacketRegistry;
 import net.arna.jcraft.registry.JParticleTypeRegistry;
+import net.arna.jcraft.registry.JScreenHandlerTypeRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
@@ -46,6 +50,7 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
@@ -55,9 +60,14 @@ import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceType;
+import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
 import net.minecraft.util.math.Box;
@@ -103,6 +113,7 @@ public class JCraftClient implements ClientModInitializer {
     private static final Map<TrackedKeyBinding, MovementInputType> movementBindings = createMovementBindingsMap();
     @Getter(lazy = true)
     private static final TrackedKeyBinding trackedUseKey = TrackedKeyBinding.wrap(MinecraftClient.getInstance().options.useKey);
+    private static KeyBinding menuKeyBinding;
     private static Supplier<DecimalFormat> decimalFormat = Suppliers.memoize(JCraftClient::createDecimalFormat);
     private static boolean comboStarted = false;
     private static int framesSinceComboStarted = 0;
@@ -174,6 +185,7 @@ public class JCraftClient implements ClientModInitializer {
         cooldownCancel = TrackedKeyBinding.createAndRegister("key.jcraft.cooldowncancel", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_ALT, "key.category.jcraft");
         utility = TrackedKeyBinding.createAndRegister("key.jcraft.utility", InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_5, "key.category.jcraft");
         dash = TrackedKeyBinding.createAndRegister("key.jcraft.dash", InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_4, "key.category.jcraft");
+        menuKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.menu", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_DIVIDE, "key.category.jcraft"));
 
         ClientPacketHandler.init();
 
@@ -182,6 +194,9 @@ public class JCraftClient implements ClientModInitializer {
         TimeErasePredictionEffectRenderer.init();
         SplatterEffectRenderer.init();
         ShockwaveEffectRenderer.init();
+
+        // Screens
+        HandledScreens.register(JScreenHandlerTypeRegistry.MENU_SCREEN_HANDLER, MenuScreen::new);
 
         HudRenderCallback.EVENT.register(this::renderHud);
 
@@ -352,6 +367,23 @@ public class JCraftClient implements ClientModInitializer {
     private void tickClient(MinecraftClient client) {
         ClientPlayerEntity player = client.player;
         if (player == null) return;
+
+        if (menuKeyBinding.wasPressed()) {
+            client.player.sendMessage(Text.literal("Key / was pressed!"), false);
+            player.openHandledScreen(new NamedScreenHandlerFactory() {
+                @Override
+                public Text getDisplayName() {
+                    return Text.literal("test");
+                }
+
+                @Override
+                public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
+                    return new MenuScreenHandler(syncId);
+                }
+            });
+            return;
+        }
+
         StandEntity<?, ?> stand = JUtils.getStand(player);
 
         // Handle JCraft inputs (stand, spec, universal controls)
