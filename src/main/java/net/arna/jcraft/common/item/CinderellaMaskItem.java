@@ -14,7 +14,6 @@ import java.util.List;
 public class CinderellaMaskItem extends Item {
     public CinderellaMaskItem() {
         super(new Settings()
-                .group(JCraft.JCRAFT_GROUP)
                 .rarity(Rarity.RARE));
     }
 

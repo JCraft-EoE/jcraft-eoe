@@ -13,6 +13,7 @@ import net.arna.jcraft.common.attack.moves.base.AbstractMove;
 import net.arna.jcraft.common.attack.moves.base.AbstractMultiHitAttack;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.living.CooldownsComponent;
+import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.network.s2c.PlayerAnimPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.CooldownType;
@@ -23,6 +24,7 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -79,7 +81,7 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
 
     @Override
     public DamageSource getDamageSource() {
-        return DamageSource.player(player);
+        return JDamageSources.create(player.getWorld(), DamageTypes.PLAYER_ATTACK);
     }
 
     @Override

@@ -23,7 +23,7 @@ public class RemoteStandInteractPacket {
     public static void handle(MinecraftServer server, ServerPlayerEntity serverPlayer, ServerPlayNetworkHandler serverPlayNetworkHandler, PacketByteBuf buf, PacketSender packetSender) {
         StandEntity<?, ?> stand = JUtils.getStand(serverPlayer);
         if (stand == null || !stand.isRemote()) return;
-        ServerWorld world = serverPlayer.getWorld();
+        ServerWorld world = (ServerWorld) serverPlayer.getWorld();
 
         Vec3d eyePos = RotationUtil.vecPlayerToWorld(stand.getEyePos(), GravityChangerAPI.getGravityDirection(stand));
 

@@ -15,10 +15,18 @@ import net.minecraft.text.Text;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class StoneMaskItem extends ArmorItem implements GeoItem {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
@@ -46,19 +54,32 @@ public class StoneMaskItem extends ArmorItem implements GeoItem {
         super.appendTooltip(stack, world, tooltip, context);
     }
 
-    @SuppressWarnings("SameReturnValue")
-    private <P extends IAnimatable> PlayState predicate(AnimationEvent<P> event) {
-        LivingEntity livingEntity = event.getExtraDataOfType(LivingEntity.class).get(0);
-        event.getController().setAnimation(new AnimationBuilder().addAnimation(
-                livingEntity.getDamageTracker().wasRecentlyAttacked() ? "animation.stone_mask.clench" : "animation.stone_mask.dormant", ILoopType.EDefaultLoopTypes.LOOP));
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "controller", 5, this::predicate));
+    }
+
+    private PlayState predicate(AnimationState<StoneMaskItem> state) {
+        Entity entity = (Entity) state.getData(DataTickets.ENTITY);
+        if (entity instanceof LivingEntity livingEntity) {
+            state.getController().setAnimation(RawAnimation.begin().thenLoop(livingEntity.getDamageTracker().wasRecentlyAttacked() ? "animation.stone_mask.clench" : "animation.stone_mask.dormant"));
+
+        }
         return PlayState.CONTINUE;
     }
-    @Override
-    public void registerControllers(AnimationData data) {
-        data.addAnimationController(new AnimationController<>(this, "controller", 5, this::predicate));
-    }
+
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return cache;
+    }
+
+    @Override
+    public void createRenderer(Consumer<Object> consumer) {
+
+    }
+
+    @Override
+    public Supplier<Object> getRenderProvider() {
+        return null;
     }
 }

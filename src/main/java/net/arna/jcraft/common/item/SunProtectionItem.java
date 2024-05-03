@@ -12,6 +12,9 @@ import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
@@ -37,20 +40,18 @@ public class SunProtectionItem extends ArmorItem implements GeoItem {
         super.appendTooltip(stack, world, tooltip, context);
     }
 
-    @SuppressWarnings("SameReturnValue")
-    private <P extends IAnimatable> PlayState predicate(AnimationEvent<P> event) { return PlayState.STOP; }
 
-    @Override
-    public void registerControllers(AnimationData data) { data.addAnimationController(new AnimationController(this, "controller", 20, this::predicate)); }
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-
+        controllers.add(new AnimationController(this, "controller", 20, this::predicate));
     }
 
-    public void registerControllers(AnimationData data) {
-        data.addAnimationController(new AnimationController<>(this, "controller", 20, this::predicate));
+    private PlayState predicate(AnimationState animationState) {
+        return PlayState.STOP;
     }
+
+
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return cache;

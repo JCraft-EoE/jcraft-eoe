@@ -40,7 +40,7 @@ public class SplatterSection {
         Vector3f center = new Vector3f(min);
         Vector3f delta =  new Vector3f(max); // Delta = (max - min) / 2
         delta.sub(min);
-        delta.modify(x -> x / 2f);
+        delta = delta.div(2);
         center.add(delta); // (max - min) / 2 + min = center
 
         return center;

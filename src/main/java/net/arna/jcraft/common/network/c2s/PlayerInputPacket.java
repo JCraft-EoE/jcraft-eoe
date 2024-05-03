@@ -235,7 +235,7 @@ public class PlayerInputPacket {
      */
     private static CompletableFuture<Boolean> handleMoveInput(MinecraftServer server, ServerPlayerEntity player, MoveInputType type) {
         CompletableFuture<Boolean> future = new CompletableFuture<>();
-        ServerWorld world = player.getWorld();
+        ServerWorld world = (ServerWorld) player.getWorld();
         server.execute(() -> {
             switch (type) {
                 case STAND_SUMMON -> {
@@ -318,7 +318,7 @@ public class PlayerInputPacket {
         if (sm == null || !sm.jumping || !player.isSneaking() || JUtils.isBlocking(player)) return;
 
         StatusEffectInstance stun = player.getStatusEffect(JStatusRegistry.DAZED);
-        if (stun != null) JCraft.comboBreak(player.getWorld(), player, stun);
+        if (stun != null) JCraft.comboBreak((ServerWorld) player.getWorld(), player, stun);
     }
 
     public static InputStateManager getInputStateManager(ServerPlayerEntity player) {

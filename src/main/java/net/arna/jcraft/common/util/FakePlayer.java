@@ -16,7 +16,7 @@ public class FakePlayer extends ServerPlayerEntity {
     private static final GameProfile FAKE_PROFILE = new GameProfile(UUID.nameUUIDFromBytes("jcraft".getBytes()), "[JCraft]");
 
     public FakePlayer(ServerWorld world) {
-        super(world.getServer(), world, FAKE_PROFILE, null);
+        super(world.getServer(), world, FAKE_PROFILE);
         this.networkHandler = new ServerPlayNetworkHandler(world.getServer(), new ClientConnection(NetworkSide.CLIENTBOUND), this);
     }
 
