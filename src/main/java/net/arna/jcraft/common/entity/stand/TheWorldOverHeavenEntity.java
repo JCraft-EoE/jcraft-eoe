@@ -43,9 +43,10 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withLaunch()
+            .withBlockStun(4)
             .withInfo(
                     Text.literal("Lunge"),
-                    Text.literal("medium speed launcher")
+                    Text.literal("medium speed launcher, high range, low blockstun")
             );
     public static final SimpleAttack<TheWorldOverHeavenEntity> LOW_KICK = SimpleAttack.<TheWorldOverHeavenEntity>lightAttack(
                     6, 12, 0.75f, 6f, 14, 0.25f, 0.25f)

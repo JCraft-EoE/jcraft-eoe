@@ -21,10 +21,10 @@ import static net.arna.jcraft.common.entity.stand.StandEntity.standUserAI;
 public class JEnemies {
     private static final HashMap<MobEntity, RegistryKey<World>> enemies = new HashMap<>();
     /**
-     * A queue designed to prevent any ConcurrentModificationException.
+     * A stack designed to prevent any ConcurrentModificationException.
      * Stores to-be JEnemies temporarily if they were attempted to be registered while {@link JEnemies#ticking} is true.
      */
-    private static final PriorityQueue<MobEntity> queuedEnemies = new PriorityQueue<>();
+    private static final Stack<MobEntity> queuedEnemies = new Stack<>();
     private static boolean ticking = false;
 
     public static void add(MobEntity entity) {
@@ -45,9 +45,8 @@ public class JEnemies {
         ticking = true;
 
         while (!queuedEnemies.isEmpty()) {
-            MobEntity queued = queuedEnemies.peek();
+            MobEntity queued = queuedEnemies.pop();
             add(queued, queued.getWorld().getRegistryKey());
-            queuedEnemies.remove();
         }
 
         Iterator<Map.Entry<MobEntity, RegistryKey<World>>> iter = enemies.entrySet().iterator();

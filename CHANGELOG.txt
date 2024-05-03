@@ -2697,8 +2697,7 @@ Purple Haze
 >Added Enable Friendly Fire config option, which works alongside Minecrafts /team system
 
 RELEASE 1.19.2-0.13.7
-//todo: fix enummap jank
-● 01/05/2024
+● 02/05/2024
 >NEW STANDS: The Sun, Purple Haze, Purple Haze: Distortion
 
 >ADDED METEORITES
@@ -2716,6 +2715,7 @@ RELEASE 1.19.2-0.13.7
 
 >Updated Sprites
 
+>Added several Advancements
 >Added heartbeat packet to held inputs (which will automatically release moves that accidentally register as always held)
 >Fixed King Crimson's and Made in Heaven's barrages not being able to mine properly
 >Fixed buffered holdable moves not being holdable for stands
@@ -2764,13 +2764,10 @@ Vampire
     >Updated all Heavy animations
 
 
-todo: combo counter is LYING
+todo: archive oldest jcraft version
+    combo counter is LYING
     esplash color :)
     anubis pommel IMPACT sound
-    fully charged esplash breaks blocks
-
-The reason the easings dont work is because kosmx is fucking stupid,
-see: dev.kosmx.playerAnim.core.util.Easing
 
 todo:
 research SoundInstance class for stopping jcraft sounds and having them consistently track ents
@@ -2787,3 +2784,6 @@ fix predict not working with projectiles spawned after it started
 
 particles for GE Soul punch(reanimate), Healing particles and special 3 life create,
 GER Heavy, healing move, RTZ, and sp 3 counter, and cream special 2 particles in a circle before appearing.
+
+The reason the easings dont work is because kosmx is fucking stupid,
+see: dev.kosmx.playerAnim.core.util.Easing
