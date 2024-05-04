@@ -60,13 +60,9 @@ import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceType;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
@@ -185,7 +181,7 @@ public class JCraftClient implements ClientModInitializer {
         cooldownCancel = TrackedKeyBinding.createAndRegister("key.jcraft.cooldowncancel", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_ALT, "key.category.jcraft");
         utility = TrackedKeyBinding.createAndRegister("key.jcraft.utility", InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_5, "key.category.jcraft");
         dash = TrackedKeyBinding.createAndRegister("key.jcraft.dash", InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_4, "key.category.jcraft");
-        menuKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.menu", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_DIVIDE, "key.category.jcraft"));
+        menuKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.menu", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_L, "key.category.jcraft"));
 
         ClientPacketHandler.init();
 
@@ -370,17 +366,7 @@ public class JCraftClient implements ClientModInitializer {
 
         if (menuKeyBinding.wasPressed()) {
             client.player.sendMessage(Text.literal("Key / was pressed!"), false);
-            player.openHandledScreen(new NamedScreenHandlerFactory() {
-                @Override
-                public Text getDisplayName() {
-                    return Text.literal("test");
-                }
-
-                @Override
-                public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-                    return new MenuScreenHandler(syncId);
-                }
-            });
+            client.setScreen(new MenuScreen(new MenuScreenHandler(100000), player.getInventory(), Text.literal("test")));
             return;
         }
 
