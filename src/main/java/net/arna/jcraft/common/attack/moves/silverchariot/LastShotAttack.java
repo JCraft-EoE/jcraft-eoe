@@ -12,7 +12,7 @@ import java.util.Set;
 public class LastShotAttack extends AbstractMove<LastShotAttack, SilverChariotEntity> {
     public LastShotAttack(int cooldown, int windup, int duration, float moveDistance) {
         super(cooldown, windup, duration, moveDistance);
-        ranged = true;
+        //ranged = true; // Technically true, but it makes the SC stand user AI suicidal
     }
 
     @Override

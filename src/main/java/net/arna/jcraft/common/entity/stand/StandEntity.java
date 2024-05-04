@@ -1421,9 +1421,11 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         StatusEffectInstance mobStun = mob.getStatusEffect(JStatusRegistry.DAZED);
         // If stunned, and about to get hit by another move, combo break sometimes
-        if (mobStun != null)
+        if (mobStun != null) {
             if (!stand.blocking && enemyAttack != null && enemyMoveStun > enemyAttack.getWindup() && stand.random.nextFloat() < 0.1f)
                 comboBreak((ServerWorld) stand.world, mob, mobStun);
+            enemyMoveStun -= mobStun.getDuration(); // Reduces perceived opponent moveStun due to being stunned
+        }
 
 
         EntityNavigation entityNavigation = mob.getNavigation();
@@ -1431,14 +1433,16 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if ( // in range (to get hit)
             (enemyAttack instanceof AbstractSimpleAttack<?,?> simpleEnemyAttack && !enemyAttack.isRanged() &&
                     distance < enemyAttack.getMoveDistance() + simpleEnemyAttack.getHitboxSize() * 1.5)
-        ) entityNavigation.setSpeed(-0.25);
+        ) {
+            entityNavigation.setSpeed(stand.blocking ? -1.0 : -0.25);
+        }
 
         if (!stand.blocking) {
             StatusEffectInstance stun = target.getStatusEffect(JStatusRegistry.DAZED);
             // Overestimating stun up to 1/4 of a second for longer combos and frametraps
-            int stunTicks = stun != null ? stun.getDuration() + stand.random.nextInt(5) : 0;
-            stunTicks += blockPlusTicks;
-            stunTicks += JComponents.getTimeStopData(target).getTicks();
+            int stunTicks = stun != null ? stun.getDuration() + stand.random.nextInt(5) : 0; // Enemy stun plus ticks + variance
+            stunTicks += blockPlusTicks; // Enemy blockstun plus ticks
+            stunTicks += JComponents.getTimeStopData(target).getTicks(); // TS plus ticks
 
             // Only select or buffer attacks when necessary
             if (stand.getMoveStun() <= 1) {
@@ -1510,7 +1514,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 mob.getMoveControl().strafeTo(fStrafe, sStrafe);
             }
 
-        } else if (stand.getMoveStun() > 4) { // blocking & movestun > 4 likely means the enemy made you block
+        } else if (stand.getMoveStun() > 2) { // blocking & movestun > 2 likely means the enemy made you block
             // Don't buffer any attacks as you are minus and will DIE
             stand.queuedMove = null;
         }
@@ -1590,6 +1594,12 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 break;
             }
             if (result == MoveSelectionResult.STOP) continue;
+
+            // 50% chance every tick to try to armor through a move the opponent is pressing
+            if (random.nextBoolean() && enemyMoveStun >= attack.getWindup() && attack.getArmor() > 0) {
+                selectedAttack = attack;
+                break;
+            }
 
             // Use mobility if opponent is far away
             if (attack.getMobilityType() != null) {
@@ -1811,5 +1821,5 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     /**
      * Gets called after damage calculation if the damaged entity was slain.
      */
-    protected void freshKill(@Nullable LivingEntity entity) { }
+    public void freshKill(@Nullable LivingEntity entity) { }
 }

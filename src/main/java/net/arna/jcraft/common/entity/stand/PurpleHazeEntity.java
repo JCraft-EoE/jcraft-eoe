@@ -282,6 +282,14 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                             setTarget(potentialTarget);
                             break;
                         }
+
+                        if (getTarget() == null) {
+                            if (blocking)
+                                tryUnblock();
+                            if (!navigation.isIdle())
+                                navigation.stop();
+                            getMoveControl().strafeTo(0, 0);
+                        }
                     } else {
                         double speed = getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED);
                         // user is not null (see above)
@@ -298,7 +306,7 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                 }
 
                 if (isRemote)
-                    tickRemoteState(getMoveControl().getSpeed(), getMoveControl().sidewaysMovement, onGround);
+                    tickRemoteState(navigation.isIdle() ? 0.0 : 1.0, getMoveControl().sidewaysMovement, onGround);
             }
         }
     }
@@ -308,10 +316,14 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
         LivingEntity user = getUserOrThrow();
         if (getState() == State.IDLE) {
             if (JUtils.canAct(user)) {
-                if (s > 0) setStateNoReset(dashing ? State.RIGHT : State.RIGHT_DASH);
-                if (s < 0) setStateNoReset(dashing ? State.LEFT : State.LEFT_DASH);
-                if (f < 0) setStateNoReset(dashing ? State.BACKWARD : State.BACKWARD_DASH);
-                if (f > 0) setStateNoReset(dashing ? State.FORWARD : State.FORWARD_DASH);
+                if (f == 0 && s == 0) {
+                    setStateNoReset(State.IDLE);
+                } else {
+                    if (s > 0) setStateNoReset(dashing ? State.RIGHT : State.RIGHT_DASH);
+                    if (s < 0) setStateNoReset(dashing ? State.LEFT : State.LEFT_DASH);
+                    if (f < 0) setStateNoReset(dashing ? State.BACKWARD : State.BACKWARD_DASH);
+                    if (f > 0) setStateNoReset(dashing ? State.FORWARD : State.FORWARD_DASH);
+                }
             } else {
                 setStateNoReset(State.HURT);
             }

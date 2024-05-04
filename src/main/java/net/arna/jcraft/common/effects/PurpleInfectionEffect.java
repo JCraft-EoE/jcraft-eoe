@@ -2,10 +2,13 @@ package net.arna.jcraft.common.effects;
 
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
+import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.StandType;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
+import org.jetbrains.annotations.NotNull;
 
 public class PurpleInfectionEffect extends StatusEffect {
     public PurpleInfectionEffect() {
@@ -23,11 +26,19 @@ public class PurpleInfectionEffect extends StatusEffect {
     }
 
     @Override
-    public void applyUpdateEffect(LivingEntity entity, int amplifier) {
+    public void applyUpdateEffect(@NotNull LivingEntity entity, int amplifier) {
         StandType standType = JComponents.getStandData(entity).getType();
         float damage = 0.6666f; // 1/3rd of a heart
         if (standType == StandType.PURPLE_HAZE_DISTORTION)
             damage /= 3.0f;
-        entity.damage(JDamageSources.phpoison(), damage);
+
+        // Count poison kills as the most recent attackers kill
+        if (entity.damage(JDamageSources.phpoison(), damage) && (entity.getHealth() <= 0 || entity.isDead())) {
+            LivingEntity attacker = entity.getAttacker();
+            if (attacker != null) {
+                StandEntity<?, ?> stand = JUtils.getStand(attacker);
+                if (stand != null) stand.freshKill(entity);
+            }
+        }
     }
 }

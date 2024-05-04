@@ -48,6 +48,7 @@ import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -398,6 +399,7 @@ public final class JUtils {
     }
 
     @Nullable
+    @Contract("null -> null")
     public static StandEntity<?, ?> getStand(LivingEntity entity) {
         return entity == null ? null : entity instanceof StandEntity<?, ?> stand ? stand : JComponents.getStandData(entity).getStand();
     }
@@ -501,7 +503,7 @@ public final class JUtils {
         if (type.isIn(EntityTypeTags.RAIDERS))
             return 1.5f;
 
-        if (type.isIn(EntityTypeTags.SKELETONS) || entity instanceof JAttackEntity)
+        if (type.isIn(EntityTypeTags.SKELETONS) || entity instanceof StandEntity<?,?> || entity instanceof JAttackEntity)
             return 0;
 
         if (type.isIn(EntityTypeTags.AXOLOTL_HUNT_TARGETS)) // Fishes
