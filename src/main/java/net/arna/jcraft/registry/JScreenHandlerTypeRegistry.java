@@ -7,7 +7,7 @@ import net.minecraft.util.registry.Registry;
 
 public interface JScreenHandlerTypeRegistry {
 
-    ExtendedScreenHandlerType<MenuScreenHandler> MENU_SCREEN_HANDLER = new ExtendedScreenHandlerType<>(((syncId, inventory, buf) -> new MenuScreenHandler(syncId)));
+    ExtendedScreenHandlerType<MenuScreenHandler> MENU_SCREEN_HANDLER = new ExtendedScreenHandlerType<>(((syncId, inventory, buf) -> new MenuScreenHandler(syncId, buf)));
 
     static void init() {
         Registry.register(Registry.SCREEN_HANDLER, JCraft.id("menush"), MENU_SCREEN_HANDLER);

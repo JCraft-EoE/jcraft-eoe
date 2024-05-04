@@ -1,6 +1,8 @@
 package net.arna.jcraft.common.network.c2s;
 
+import net.arna.jcraft.common.entity.stand.StandEntity;
 import net.arna.jcraft.common.screenhandler.MenuScreenHandler;
+import net.arna.jcraft.common.util.JUtils;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
@@ -32,17 +34,25 @@ public class MenuCallPacket {
             player.openHandledScreen(new ExtendedScreenHandlerFactory() {
                 @Override
                 public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
-                    // nothing to add for now
+                    final StandEntity<?, ?> stand = JUtils.getStand(player);
+                    if (stand == null) {
+                        buf.writeBoolean(false); // indicates no stand
+                    }
+                    else {
+                        buf.writeBoolean(true);
+                        // id
+                        //buf.writeText(J)
+                    }
                 }
 
                 @Override
                 public Text getDisplayName() {
-                    return Text.literal("test");
+                    return Text.literal("JCraft Info Screen");
                 }
 
                 @Override
                 public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-                    return new MenuScreenHandler(syncId);
+                    return new MenuScreenHandler(syncId, null);
                 }
             });
         }
