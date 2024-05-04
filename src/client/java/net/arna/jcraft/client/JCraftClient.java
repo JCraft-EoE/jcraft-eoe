@@ -365,6 +365,7 @@ public class JCraftClient implements ClientModInitializer {
         if (player == null) return;
 
         if (menuKeyBinding.wasPressed()) {
+            // TODO the closing doesn't work for some reason
             if (client.currentScreen instanceof MenuScreen) {
                 ClientPlayNetworking.send(JPacketRegistry.C2S_MENU_CALL, MenuCallPacket.closeScreenPacket());
                 return;
