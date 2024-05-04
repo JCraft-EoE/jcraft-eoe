@@ -27,4 +27,5 @@ public interface JPacketRegistry {
     Identifier C2S_PLAYER_INPUT_HOLD = JCraft.id("plr_input_h");
     Identifier C2S_REMOTE_STAND_INTERACT = JCraft.id("rmt_stnd_act");
     Identifier C2S_PREDICTION_TRIGGER = JCraft.id("prdct_trig");
+    Identifier C2S_MENU_CALL = JCraft.id("m");
 }

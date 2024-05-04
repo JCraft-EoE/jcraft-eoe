@@ -391,6 +391,7 @@ public class JCraft implements ModInitializer {
         ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_COOLDOWN_CANCEL, CooldownCancelPacket::handle);
         ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_REMOTE_STAND_INTERACT, RemoteStandInteractPacket::handle);
         ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_PREDICTION_TRIGGER, PredictionTriggerPacket::handle);
+        ServerPlayNetworking.registerGlobalReceiver(JPacketRegistry.C2S_MENU_CALL, MenuCallPacket::handle);
     }
 
     public static void createParticle(ServerWorld world, double x, double y, double z, JParticleType type) {

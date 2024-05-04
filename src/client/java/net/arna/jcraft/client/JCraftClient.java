@@ -27,9 +27,9 @@ import net.arna.jcraft.common.attack.core.MoveInputType;
 import net.arna.jcraft.common.component.JComponents;
 import net.arna.jcraft.common.component.living.CooldownsComponent;
 import net.arna.jcraft.common.entity.stand.StandEntity;
+import net.arna.jcraft.common.network.c2s.MenuCallPacket;
 import net.arna.jcraft.common.network.c2s.PlayerInputPacket;
 import net.arna.jcraft.common.network.c2s.StandBlockPacket;
-import net.arna.jcraft.common.screenhandler.MenuScreenHandler;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.registry.JBlockEntityTypeRegistry;
 import net.arna.jcraft.registry.JObjectRegistry;
@@ -181,7 +181,7 @@ public class JCraftClient implements ClientModInitializer {
         cooldownCancel = TrackedKeyBinding.createAndRegister("key.jcraft.cooldowncancel", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_ALT, "key.category.jcraft");
         utility = TrackedKeyBinding.createAndRegister("key.jcraft.utility", InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_5, "key.category.jcraft");
         dash = TrackedKeyBinding.createAndRegister("key.jcraft.dash", InputUtil.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_4, "key.category.jcraft");
-        menuKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.menu", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_L, "key.category.jcraft"));
+        menuKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.jcraft.menu", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_DIVIDE, "key.category.jcraft"));
 
         ClientPacketHandler.init();
 
@@ -365,9 +365,14 @@ public class JCraftClient implements ClientModInitializer {
         if (player == null) return;
 
         if (menuKeyBinding.wasPressed()) {
-            client.player.sendMessage(Text.literal("Key / was pressed!"), false);
-            client.setScreen(new MenuScreen(new MenuScreenHandler(100000), player.getInventory(), Text.literal("test")));
-            return;
+            if (client.currentScreen instanceof MenuScreen) {
+                ClientPlayNetworking.send(JPacketRegistry.C2S_MENU_CALL, MenuCallPacket.closeScreenPacket());
+                return;
+            }
+            else if (client.currentScreen == null) {
+                ClientPlayNetworking.send(JPacketRegistry.C2S_MENU_CALL, MenuCallPacket.openScreenPacket());
+                return;
+            }
         }
 
         StandEntity<?, ?> stand = JUtils.getStand(player);
