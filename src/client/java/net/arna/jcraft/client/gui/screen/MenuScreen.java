@@ -1,6 +1,7 @@
 package net.arna.jcraft.client.gui.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.screenhandler.MenuScreenHandler;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -23,18 +24,11 @@ public class MenuScreen extends HandledScreen<MenuScreenHandler> {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         // becomes getPositionTexProgram in 1.20
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, new Identifier("minecraft", "textures/gui/container/dispenser.png"));
+        RenderSystem.setShaderTexture(0, JCraft.id("textures/gui/menu_screen.png"));
         int x = (width - backgroundWidth) / 2;
         int y = (height - backgroundHeight) / 2;
         drawTexture(matrices, x, y, 0, 0, backgroundWidth, backgroundHeight);
         //in 1.20 or above,this method is in DrawContext class.
-    }
-
-    @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        renderBackground(matrices);
-        super.render(matrices, mouseX, mouseY, delta);
-        drawMouseoverTooltip(matrices, mouseX, mouseY);
     }
 
     @Override
@@ -44,4 +38,8 @@ public class MenuScreen extends HandledScreen<MenuScreenHandler> {
         titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2;
     }
 
+    @Override
+    protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
+        this.textRenderer.draw(matrices, this.title, (float)this.titleX, (float)this.titleY, 4210752);
+    }
 }
