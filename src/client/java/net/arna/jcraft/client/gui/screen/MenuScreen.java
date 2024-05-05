@@ -14,8 +14,11 @@ import net.minecraft.text.Text;
 @Environment(EnvType.CLIENT)
 public class MenuScreen extends HandledScreen<MenuScreenHandler> {
 
+    protected final Text standName;
+
     public MenuScreen(MenuScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
+        standName = handler.getStandName();
     }
 
     @Override
@@ -40,6 +43,6 @@ public class MenuScreen extends HandledScreen<MenuScreenHandler> {
     @Override
     protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
         this.textRenderer.draw(matrices, this.title, (float)this.titleX, (float)this.titleY, 4210752);
-        this.textRenderer.draw(matrices, Text.literal("Stand: "), 4f, this.titleY+10f, 4210752);
+        this.textRenderer.draw(matrices, standName, 4f, this.titleY+10f, 4210752);
     }
 }

@@ -41,7 +41,7 @@ public class MenuCallPacket {
                     else {
                         buf.writeBoolean(true);
                         // id
-                        //buf.writeText(J)
+                        buf.writeInt(stand.getStandType().getId());
                     }
                 }
 
