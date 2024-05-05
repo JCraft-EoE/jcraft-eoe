@@ -1,12 +1,12 @@
 {
-  "name": "yard_middle_3_pool",
+  "name": "meteorite",
   "fallback": "minecraft:empty",
   "elements": [
     {
       "weight": 1,
       "element": {
         "element_type": "minecraft:single_pool_element",
-        "location": "jcraft:joestar_mansion/yard_middle_3",
+        "location": "jcraft:joestar_mansion",
         "projection": "rigid",
         "processors": "minecraft:empty"
       }

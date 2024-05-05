@@ -4,7 +4,7 @@
   "step": "surface_structures",
   "spawn_overrides": {},
   "terrain_adaptation": "none",
-  "start_pool": "jcraft:joestar_mansion/front_1_pool",
+  "start_pool": "jcraft:joestar_mansion",
   "size": 5,
   "start_height": {
     "absolute": 0
