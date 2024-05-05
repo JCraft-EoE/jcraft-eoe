@@ -9,6 +9,7 @@ import net.minecraft.text.Text;
 import net.minecraft.world.World;
 
 import java.util.List;
+import java.util.Map;
 
 public abstract sealed class AbstractStarPlatinumEntity<E extends AbstractStarPlatinumEntity<E, S>, S extends Enum<S> & StandAnimationState<E>> extends StandEntity<E, S>
         permits StarPlatinumEntity, SPTWEntity {
@@ -39,6 +40,16 @@ public abstract sealed class AbstractStarPlatinumEntity<E extends AbstractStarPl
                     Text.literal("Star Breaker"),
                     Text.literal("slow, uninterruptible launcher")
             );
+
+    record StandTypeForm(StandType type, Object form) {
+
+    }
+
+    record StandInfo(String pros, String etc) {
+
+    }
+
+    static Map<StandTypeForm, StandInfo> standInfoMap;
 
     protected AbstractStarPlatinumEntity(StandType type, World worldIn) {
         super(type, worldIn, JSoundRegistry.STAR_PLATINUM_SUMMON);
