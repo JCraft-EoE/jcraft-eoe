@@ -1,6 +1,6 @@
 {
   "type": "minecraft:jigsaw",
-  "biomes": "#jcraft:has_structure/meteorite_land",
+  "biomes": "#jcraft:has_structure/joestar_mansion",
   "step": "surface_structures",
   "spawn_overrides": {},
   "terrain_adaptation": "none",
