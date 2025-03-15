@@ -2,7 +2,9 @@ package net.arna.jcraft.registry;
 
 import dev.architectury.registry.CreativeTabRegistry;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.entity.BrainType;
 import net.arna.jcraft.common.entity.stand.StandType;
+import net.arna.jcraft.common.item.BrainDiscItem;
 import net.arna.jcraft.common.item.StandDiscItem;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -184,6 +186,10 @@ public interface JCreativeMenuTabRegistry {
                         for (int skin = 0; skin < standType.getSkinCount(); skin++) {
                             entries.accept(StandDiscItem.createDiscStack(standType, skin));
                         }
+                    }
+                    entries.accept(BrainDiscItem.createDiscStack(null));
+                    for (final BrainType brainType : BrainType.values()) {
+                        entries.accept(BrainDiscItem.createDiscStack(brainType));
                     }
                     // spawn eggs season 3
                     entries.accept(JItemRegistry.DARBY_OLDER_SPAWN_EGG.get());

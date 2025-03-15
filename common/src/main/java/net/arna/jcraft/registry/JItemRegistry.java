@@ -30,6 +30,8 @@ public interface JItemRegistry {
 
     RegistrySupplier<Item> STAND_DISC = register("stand_disc", () -> new StandDiscItem(settings().rarity(Rarity.RARE).fireResistant().stacksTo(1)));
 
+    RegistrySupplier<Item> BRAIN_DISC = register("brain_disc", () -> new BrainDiscItem(settings().rarity(Rarity.RARE).fireResistant().stacksTo(1)));
+
     RegistrySupplier<Item> FV_REVOLVER = register("fv_revolver", () -> new FVRevolverItem(settings().rarity(Rarity.UNCOMMON).durability(1200)));
 
     RegistrySupplier<Item> BULLET = register("bullet", () -> new BulletItem(settings()));
