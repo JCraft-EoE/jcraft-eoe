@@ -32,5 +32,10 @@ accessible field net/minecraft/world/level/storage/loot/LootContext params Lnet/
 accessible field net/minecraft/world/entity/boss/wither/WitherBoss LIVING_ENTITY_SELECTOR Ljava/util/function/Predicate;
 mutable field net/minecraft/world/entity/boss/wither/WitherBoss LIVING_ENTITY_SELECTOR Ljava/util/function/Predicate;
 accessible field net/minecraft/world/entity/boss/wither/WitherBoss TARGETING_CONDITIONS Lnet/minecraft/world/entity/ai/targeting/TargetingConditions;
+accessible field net/minecraft/world/entity/LivingEntity brain Lnet/minecraft/world/entity/ai/Brain;
+accessible field net/minecraft/world/entity/Mob goalSelector Lnet/minecraft/world/entity/ai/goal/GoalSelector;
+mutable field net/minecraft/world/entity/Mob goalSelector Lnet/minecraft/world/entity/ai/goal/GoalSelector;
+accessible field net/minecraft/world/entity/Mob targetSelector Lnet/minecraft/world/entity/ai/goal/GoalSelector;
+mutable field net/minecraft/world/entity/Mob targetSelector Lnet/minecraft/world/entity/ai/goal/GoalSelector;
 
 accessible field net/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder builder Ljava/util/Map;

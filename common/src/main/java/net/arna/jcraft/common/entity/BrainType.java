@@ -3,14 +3,14 @@ package net.arna.jcraft.common.entity;
 import net.arna.jcraft.common.util.NameHolder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.animal.Cow;
 import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.level.Level;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Locale;
-import java.util.logging.Level;
 
 public enum BrainType implements NameHolder {
 
@@ -18,21 +18,32 @@ public enum BrainType implements NameHolder {
     ZOMBIE(Zombie.class, EntityType.ZOMBIE),
     COW(Cow.class, EntityType.COW);
 
-    Class<? extends LivingEntity> entityClass;
+    Class<? extends Mob> entityClass;
 
-    EntityType<? extends LivingEntity> entityType;
+    EntityType<? extends Mob> entityType;
 
-    <T extends LivingEntity> BrainType(final Class<T> entityClass, final EntityType<T> entityType) {
+    <T extends Mob> BrainType(final Class<T> entityClass, final EntityType<T> entityType) {
         this.entityClass = entityClass;
         this.entityType = entityType;
     }
 
-    public Brain<?> createBrain(final Level level) {
+    public Behavior createBehavior(final Level level) {
         try {
-            return entityClass.getConstructor(EntityType.class, Level.class).newInstance(entityType, level).getBrain();
+            final Mob mob = entityClass.getConstructor(EntityType.class, Level.class).newInstance(entityType, level);
+            return new Behavior(mob.getBrain(), mob.goalSelector, mob.targetSelector);
         }
         catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException ex) {
             // TODO log error
+        }
+        return null;
+    }
+
+    public static BrainType find(final Mob mob) {
+        if (mob instanceof Zombie) {
+            return ZOMBIE;
+        }
+        else if (mob instanceof Cow) {
+            return COW;
         }
         return null;
     }

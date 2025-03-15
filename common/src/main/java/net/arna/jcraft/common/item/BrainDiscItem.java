@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.item;
 
+import com.google.common.collect.ImmutableList;
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.component.living.CommonStandComponent;
@@ -14,13 +15,17 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,6 +34,8 @@ import java.util.List;
 public class BrainDiscItem extends Item {
 
     private static final String BRAIN_ID_STR = "BrainID";
+
+    public static final Brain<?> NO_BRAINER = new Brain<>(List.of(), List.of(), ImmutableList.of(), () -> Brain.codec(List.of(), List.of()));
 
     public BrainDiscItem(Properties settings) {
         super(settings);
