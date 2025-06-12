@@ -13,11 +13,12 @@ import net.minecraft.world.level.levelgen.GenerationStep;
 // see https://minecraft.fandom.com/wiki/Custom_biome
 public class JBiomeProvider {
 
-    public static void bootstrap(BootstapContext<Biome> context) {
+    public static void bootstrap(final BootstapContext<Biome> context) {
         context.register(JBiomeRegistry.DEVILS_PALM, devilsPalm(context));
+        context.register(JBiomeRegistry.TUTORIAL, tutorial(context));
     }
 
-    private static Biome devilsPalm(BootstapContext<Biome> context) {
+    private static Biome devilsPalm(final BootstapContext<Biome> context) {
         MobSpawnSettings.Builder spawnBuilder = new MobSpawnSettings.Builder();
 
         BiomeGenerationSettings.Builder generationBuilder =
@@ -36,6 +37,23 @@ public class JBiomeProvider {
                         .waterFogColor(6645121)
                         .skyColor(14987035)
                         .fogColor(16314057)
+                        .build())
+                .build();
+    }
+
+    private static Biome tutorial(final BootstapContext<Biome> context) {
+        return new Biome.BiomeBuilder()
+                .hasPrecipitation(false)
+                .downfall(0f)
+                .temperature(0f)
+                .generationSettings(BiomeGenerationSettings.EMPTY)
+                .mobSpawnSettings(new MobSpawnSettings.Builder().build())
+                .specialEffects((new BiomeSpecialEffects.Builder())
+                        // plains properties
+                        .waterColor(0x3f76e4)
+                        .waterFogColor(0x050533)
+                        .skyColor(0x78a7ff)
+                        .fogColor(0xc0d8ff)
                         .build())
                 .build();
     }

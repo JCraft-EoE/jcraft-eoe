@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:jigsaw",
+  "biomes": "jcraft:tutorial",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "beard_thin",
+  "start_pool": "jcraft:tutorial",
+  "size": 1,
+  "start_height": {
+    "absolute": -1
+  },
+  "max_distance_from_center": 80,
+  "use_expansion_hack": false
+}

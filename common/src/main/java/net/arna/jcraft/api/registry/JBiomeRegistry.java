@@ -7,4 +7,5 @@ import net.minecraft.world.level.biome.Biome;
 
 public interface JBiomeRegistry {
     ResourceKey<Biome> DEVILS_PALM = ResourceKey.create(Registries.BIOME, JCraft.id("devils_palm"));
+    ResourceKey<Biome> TUTORIAL = ResourceKey.create(Registries.BIOME, JCraft.id("tutorial"));
 }

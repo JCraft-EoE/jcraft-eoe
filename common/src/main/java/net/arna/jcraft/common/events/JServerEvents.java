@@ -79,12 +79,13 @@ public class JServerEvents {
     );
 
     public static void finishLoading(final MinecraftServer server) {
-        JCraft.auWorld = server.getLevel(JDimensionRegistry.AU_DIMENSION_KEY);
-        JCraft.setExclusiveStandsData(ExclusiveStandsData.fromDefaultFile(server));
+        auWorld = server.getLevel(JDimensionRegistry.AU_DIMENSION_KEY);
+        tutorialWorld = server.getLevel(JDimensionRegistry.TUTORIAL_DIMENSION_KEY);
+        setExclusiveStandsData(ExclusiveStandsData.fromDefaultFile(server));
     }
 
     public static void saveExclusives(final MinecraftServer server) {
-        JCraft.getExclusiveStandsData().saveToDefaultFile(server);
+        getExclusiveStandsData().saveToDefaultFile(server);
     }
 
     private static final int PREDICTION_RADIUS = 6 * 16;

@@ -132,6 +132,7 @@ public final class JCraft {
      */
     public static int preloadLockTicks = 0;
     public static ServerLevel auWorld;
+    public static ServerLevel tutorialWorld;
     private static final List<ChunkPos> preloadedChunks = new ArrayList<>();
 
     public static final Object2IntMap<LivingEntity> burstTimers = new Object2IntOpenHashMap<>();
