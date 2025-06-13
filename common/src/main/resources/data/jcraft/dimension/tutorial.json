@@ -2,8 +2,6 @@
   "type": "jcraft:tutorial",
   "generator": {
     "type": "jcraft:tutorial",
-    "settings": {
-      "dimensional": true
-    }
+    "dimensional": true
   }
 }

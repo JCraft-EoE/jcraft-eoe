@@ -202,6 +202,7 @@ public final class JCraft {
         JEntityTypeRegistry.registerAttributes();
 
         JChunkGeneratorRegistry.register();
+        CHUNK_GENERATORS.register();
         JDimensionRegistry.init();
 
         // Command Arguments are registered separately in JCraftFabric and JCraftForge
