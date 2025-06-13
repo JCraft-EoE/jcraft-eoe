@@ -2,11 +2,14 @@ package net.arna.jcraft.common.worldgen;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.registry.JBiomeRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.NoiseColumn;
 import net.minecraft.world.level.StructureManager;
@@ -21,6 +24,10 @@ import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.blending.Blender;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.levelgen.structure.StructureStart;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -54,7 +61,38 @@ public final class TutorialChunkGenerator extends ChunkGenerator {
 
     @Override
     public void buildSurface(final @NotNull WorldGenRegion level, final @NotNull StructureManager structureManager, final @NotNull RandomState random, final @NotNull ChunkAccess chunk) {
-        /* Empty on purpose */
+        if (chunk.getPos().x % 3 != 0 || chunk.getPos().z % 3 != 0) {
+            return;
+        }
+        final Structure tutorialStructure = level.getServer().registryAccess().registryOrThrow(Registries.STRUCTURE).get(JCraft.id("tutorial"));
+        final StructureTemplateManager structureTemplateManager = level.getServer().getStructureManager();
+        final StructureStart structureStart = tutorialStructure.generate(
+                level.registryAccess(),
+                this,
+                this.getBiomeSource(),
+                random,
+                structureTemplateManager,
+                level.getSeed(),
+                chunk.getPos(),
+                0,
+                level,
+                (holder) -> true);
+        if (structureStart.isValid()) {
+            final ChunkPos endPos = new ChunkPos(chunk.getPos().x + 2, chunk.getPos().z + 2);
+            ChunkPos.rangeClosed(chunk.getPos(), endPos).forEach(
+                    (chunkPos) -> structureStart.placeInChunk(
+                            level,
+                            structureManager,
+                            this,
+                            level.getRandom(),
+                            new BoundingBox(
+                                    chunkPos.getMinBlockX(), 0, chunkPos.getMinBlockZ(),
+                                    chunkPos.getMaxBlockX(), 48, chunkPos.getMaxBlockZ()
+                            ),
+                            chunkPos
+                    )
+            );
+        }
     }
 
     @Override
