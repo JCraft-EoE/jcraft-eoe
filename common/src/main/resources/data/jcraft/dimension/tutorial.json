@@ -1,21 +1,9 @@
 {
   "type": "jcraft:tutorial",
   "generator": {
-    "type": "minecraft:flat",
+    "type": "jcraft:tutorial",
     "settings": {
-      "biome": "jcraft:tutorial",
-      "lakes": false,
-      "features": false,
-      "layers": [
-        {
-          "block": "minecraft:air",
-          "height": 63
-        },
-        {
-          "block": "minecraft:reinforced_deepslate",
-          "height": 1
-        }
-      ]
+      "dimensional": true
     }
   }
 }

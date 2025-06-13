@@ -1,6 +1,7 @@
 package net.arna.jcraft;
 
 import com.mojang.brigadier.StringReader;
+import com.mojang.serialization.Codec;
 import dev.architectury.event.events.common.CommandRegistrationEvent;
 import dev.architectury.networking.NetworkManager;
 import dev.architectury.registry.registries.DeferredRegister;
@@ -71,6 +72,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.apache.logging.log4j.LogManager;
@@ -111,7 +113,8 @@ public final class JCraft {
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(MOD_ID, Registries.SOUND_EVENT);
     public static final DeferredRegister<Enchantment> ENCHANTMENT = DeferredRegister.create(MOD_ID, Registries.ENCHANTMENT);
     public static final DeferredRegister<ResourceLocation> STATS = DeferredRegister.create(MOD_ID, Registries.CUSTOM_STAT);
-    public static final DeferredRegister<MenuType<?>> MENU_REGISTRY = DeferredRegister.create(JCraft.MOD_ID, Registries.MENU);
+    public static final DeferredRegister<MenuType<?>> MENU_REGISTRY = DeferredRegister.create(MOD_ID, Registries.MENU);
+    public static final DeferredRegister<Codec<? extends ChunkGenerator>> CHUNK_GENERATORS = DeferredRegister.create(MOD_ID, Registries.CHUNK_GENERATOR);
 
     // Gamerules
     //public static final GameRules.Key<GameRules.BooleanRule> KINGCRIMSON_TELEPORT_EFFECT = GameRuleRegistry.register("kingCrimsonTeleportEffect", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(false));
@@ -198,6 +201,7 @@ public final class JCraft {
 
         JEntityTypeRegistry.registerAttributes();
 
+        JChunkGeneratorRegistry.register();
         JDimensionRegistry.init();
 
         // Command Arguments are registered separately in JCraftFabric and JCraftForge
