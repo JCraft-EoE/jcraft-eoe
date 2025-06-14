@@ -61,11 +61,9 @@ public final class TutorialChunkGenerator extends ChunkGenerator {
 
     @Override
     public void buildSurface(final @NotNull WorldGenRegion level, final @NotNull StructureManager structureManager, final @NotNull RandomState random, final @NotNull ChunkAccess chunk) {
-        if (chunk.getPos().x % 3 != 0 || chunk.getPos().z % 3 != 0) {
-            return;
-        }
         final Structure tutorialStructure = level.getServer().registryAccess().registryOrThrow(Registries.STRUCTURE).get(JCraft.id("tutorial"));
         final StructureTemplateManager structureTemplateManager = level.getServer().getStructureManager();
+        final ChunkPos startPos = new ChunkPos(chunk.getPos().x / 3 * 3, chunk.getPos().z / 3 * 3);
         final StructureStart structureStart = tutorialStructure.generate(
                 level.registryAccess(),
                 this,
@@ -73,24 +71,21 @@ public final class TutorialChunkGenerator extends ChunkGenerator {
                 random,
                 structureTemplateManager,
                 level.getSeed(),
-                chunk.getPos(),
+                startPos,
                 0,
                 level,
                 (holder) -> true);
         if (structureStart.isValid()) {
-            final ChunkPos endPos = new ChunkPos(chunk.getPos().x + 2, chunk.getPos().z + 2);
-            ChunkPos.rangeClosed(chunk.getPos(), endPos).forEach(
-                    (chunkPos) -> structureStart.placeInChunk(
-                            level,
-                            structureManager,
-                            this,
-                            level.getRandom(),
-                            new BoundingBox(
-                                    chunkPos.getMinBlockX(), 0, chunkPos.getMinBlockZ(),
-                                    chunkPos.getMaxBlockX(), 48, chunkPos.getMaxBlockZ()
-                            ),
-                            chunkPos
-                    )
+            structureStart.placeInChunk(
+                    level,
+                    structureManager,
+                    this,
+                    level.getRandom(),
+                    new BoundingBox(
+                            chunk.getPos().getMinBlockX(), 0, chunk.getPos().getMinBlockZ(),
+                            chunk.getPos().getMaxBlockX(), 48, chunk.getPos().getMaxBlockZ()
+                    ),
+                    chunk.getPos()
             );
         }
     }
