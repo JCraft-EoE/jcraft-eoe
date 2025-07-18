@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "jcraft:joestar_mansion",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 20,
+    "separation": 10,
+    "salt": 765389024
+  }
+}
