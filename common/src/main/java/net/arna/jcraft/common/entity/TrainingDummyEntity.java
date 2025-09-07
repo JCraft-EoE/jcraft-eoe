@@ -10,7 +10,9 @@ import mod.azure.azurelib.core.animation.AnimationState;
 import mod.azure.azurelib.core.animation.RawAnimation;
 import mod.azure.azurelib.core.object.PlayState;
 import mod.azure.azurelib.util.AzureLibUtil;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.MoveUsage;
+import net.arna.jcraft.api.component.living.CommonHitPropertyComponent.HitAnimation;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JItemRegistry;
 import net.arna.jcraft.api.registry.JPacketRegistry;
@@ -61,6 +63,7 @@ public class TrainingDummyEntity extends Mob implements GeoEntity, ICustomDamage
     public TrainingDummyEntity(EntityType<? extends TrainingDummyEntity> entityType, Level level) {
         super(entityType, level);
         this.setMaxUpStep(0.0F);
+        setPersistenceRequired();
     }
 
     public static AttributeSupplier.@NotNull Builder createLivingAttributes() {
@@ -155,47 +158,43 @@ public class TrainingDummyEntity extends Mob implements GeoEntity, ICustomDamage
     @Override
     public boolean handleDamage(Vec3 kbVec, int stunTicks, int stunLevel, boolean overrideStun, float damage,
                                 boolean lift, int blockstun, DamageSource source, Entity attacker,
-                                net.arna.jcraft.api.component.living.CommonHitPropertyComponent.HitAnimation hitAnimation,
+                                HitAnimation hitAnimation,
                                 MoveUsage moveUsage, boolean canBackstab, boolean unblockable) {
-        if (!level().isClientSide() && !isRemoved()) {
-            // Send damage number packet
-            if (damage > 0) {
-                sendDamageNumberPacket(this, damage);
-            }
+        if (level().isClientSide() || isRemoved()) {
+            return false;
+        }
 
-            if (attacker != null) {
-                double deltaX = attacker.getX() - getX();
-                double deltaZ = attacker.getZ() - getZ();
-                float yaw = (float) (Math.atan2(deltaZ, deltaX) * 180.0D / Math.PI) - 90.0F;
-                setYRot(yaw);
-                setYHeadRot(yaw);
-                setYBodyRot(yaw);
-            }
+        // Send damage number packet
+        if (damage > 0) {
+            sendDamageNumberPacket(this, damage);
+        }
 
-            // Trigger hit animation by incrementing counter and setting start time
-            int currentCounter = entityData.get(HIT_COUNTER);
-            entityData.set(HIT_COUNTER, currentCounter + 1);
-            entityData.set(HIT_START_TIME, level().getGameTime());
+        if (attacker != null) {
+            double deltaX = attacker.getX() - getX();
+            double deltaZ = attacker.getZ() - getZ();
+            float yaw = (float) (Math.atan2(deltaZ, deltaX) * 180.0D / Math.PI) - 90.0F;
+            setYRot(yaw);
+            setYHeadRot(yaw);
+            setYBodyRot(yaw);
+        }
 
-            level().broadcastEntityEvent(this, (byte)32);
-            level().broadcastEntityEvent(this, (byte)2);
+        // Trigger hit animation by incrementing counter and setting start time
+        int currentCounter = entityData.get(HIT_COUNTER);
+        entityData.set(HIT_COUNTER, currentCounter + 1);
+        entityData.set(HIT_START_TIME, level().getGameTime());
 
-            // Apply knockback ONLY if the move specifies it and not on red sandstone slab
-            if (!isOnKnockbackBlockingBlock() && kbVec != null && (kbVec.x != 0 || kbVec.y != 0 || kbVec.z != 0)) {
-                push(kbVec.x, kbVec.y, kbVec.z);
-                hasImpulse = true;
-            }
+        level().broadcastEntityEvent(this, EntityEvent.ARMORSTAND_WOBBLE);
+        level().broadcastEntityEvent(this, (byte)2);
 
-            // Dazed effect util for combos
-            if (stunTicks > 0) {
-                addEffect(new net.minecraft.world.effect.MobEffectInstance(
-                        JStatusRegistry.DAZED.get(),
-                        stunTicks,
-                        stunLevel,
-                        false,
-                        false
-                ));
-            }
+        // Apply knockback ONLY if the move specifies it and not on red sandstone slab
+        if (!isOnKnockbackBlockingBlock() && kbVec != null && (kbVec.x != 0 || kbVec.y != 0 || kbVec.z != 0)) {
+            push(kbVec.x, kbVec.y, kbVec.z);
+            hasImpulse = true;
+        }
+
+        // Dazed effect util for combos
+        if (stunTicks > 0) {
+            JCraft.stun(this, stunTicks, stunLevel);
         }
 
         return false; // Prevent actual damage

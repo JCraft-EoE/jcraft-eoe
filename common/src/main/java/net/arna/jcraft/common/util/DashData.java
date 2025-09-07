@@ -2,12 +2,13 @@ package net.arna.jcraft.common.util;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
-import net.arna.jcraft.common.network.s2c.PlayerAnimPacket;
-import net.arna.jcraft.api.spec.JSpec;
-import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.arna.jcraft.api.registry.JSpecTypeRegistry;
 import net.arna.jcraft.api.registry.JStatRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
+import net.arna.jcraft.api.spec.JSpec;
+import net.arna.jcraft.api.spec.JSpecHolder;
+import net.arna.jcraft.common.network.s2c.PlayerAnimPacket;
+import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -72,21 +73,28 @@ public class DashData {
 
         JCraft.dashes.put(entity, new DashData(rotVec.normalize().scale(dashSpeed), entity));
 
-        // Syncs dash anim (unless already attacking with a spec) with every player in the vicinity
-        if (entity instanceof final ServerPlayer player) {
-            player.awardStat(JStatRegistry.DASHES.get());
-            final JSpec<?, ?> spec = JUtils.getSpec(player);
+        final JSpec<?, ?> spec = JUtils.getSpec(entity);
 
-            if (spec == null || spec.moveStun < 1) {
-                String dashAnim = forward >= 0 ? "dash" : "bdash";
-                if (spec != null) {
-                    if (spec.getType() == JSpecTypeRegistry.VAMPIRE.get()) {
-                        dashAnim = "vm." + dashAnim;
-                    }
+        final ServerPlayer player = entity instanceof ServerPlayer cast ? cast : null;
+
+        if (player != null) {
+            player.awardStat(JStatRegistry.DASHES.get());
+        }
+
+        if (spec == null || spec.moveStun < 1) {
+            String dashAnim = forward >= 0 ? "dash" : "bdash";
+            if (spec != null) {
+                if (spec.getType() == JSpecTypeRegistry.VAMPIRE.get()) {
+                    dashAnim = "vm." + dashAnim;
                 }
+            }
+
+            if (player != null) {
                 for (final ServerPlayer recipient : JUtils.around((ServerLevel) entity.level(), entity.position(), 96)) {
                     PlayerAnimPacket.send(player, recipient, dashAnim);
                 }
+            } else if (entity instanceof JSpecHolder specHolder) {
+                specHolder.setAnimation(dashAnim, 1.0f);
             }
         }
     }

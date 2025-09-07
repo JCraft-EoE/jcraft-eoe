@@ -66,6 +66,7 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.util.DefaultRandomPos;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.pathfinder.Path;
@@ -1476,9 +1477,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             boolean anyInAir = false;
 
             for (Projectile projectile : nearbyProjectiles) {
-                if (projectile.getOwner() == mob) {
-                    continue;
-                }
+                if (projectile.getOwner() == mob) continue;
+                if (projectile instanceof AbstractArrow abstractArrow && abstractArrow.inGround) continue;
                 // Is it moving towards the stand?
                 if (projectile.distanceToSqr(pos) < new Vec3(projectile.xo, projectile.yo, projectile.zo).distanceToSqr(pos)) {
                     anyInAir = true;
@@ -1530,13 +1530,23 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 // Enough stand gauge available
                 simpleEnemyAttack.getDamage() * 2 < this.getStandGauge() && !simpleEnemyAttack.getBlockableType().isNonBlockable()
             ) {
-                return DesiredBlocking.BLOCK;
+                if (enemyCtx.moveStun() < move.getWindupPoint() + 5 // About to hit
+                    || mob.getRandom().nextFloat() > 0.9f) {
+                    return DesiredBlocking.BLOCK;
+                } else {
+                    return DesiredBlocking.DONT_BLOCK;
+                }
             }
         }
 
         // Block regardless of range if the attack is ranged
         if (move.isRanged()) {
-            return DesiredBlocking.BLOCK;
+            if (enemyCtx.moveStun() < move.getWindupPoint() + 5 // About to hit
+                    || mob.getRandom().nextFloat() > 0.9f) {
+                return DesiredBlocking.BLOCK;
+            } else {
+                return DesiredBlocking.DONT_BLOCK;
+            }
         }
 
         return DesiredBlocking.PASS;

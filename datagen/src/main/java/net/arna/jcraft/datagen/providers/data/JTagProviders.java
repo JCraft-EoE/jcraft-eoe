@@ -641,6 +641,11 @@ public class JTagProviders {
             // impossible to stun
             getOrCreateRawBuilder(JTagRegistry.CANNOT_BE_STUNNED).addElement(BuiltInRegistries.ENTITY_TYPE.getKey(EntityType.WARDEN));
 
+            // spec users
+            getOrCreateRawBuilder(JTagRegistry.SPEC_USER).addElement(BuiltInRegistries.ENTITY_TYPE.getKey(JEntityTypeRegistry.BRAWLER_SPEC_USER.get()));
+            getOrCreateRawBuilder(JTagRegistry.SPEC_USER).addElement(BuiltInRegistries.ENTITY_TYPE.getKey(JEntityTypeRegistry.VAMPIRE_SPEC_USER.get()));
+            getOrCreateRawBuilder(JTagRegistry.SPEC_USER).addElement(BuiltInRegistries.ENTITY_TYPE.getKey(JEntityTypeRegistry.ANUBIS_SPEC_USER.get()));
+
             // stands
             final var stands = getOrCreateTagBuilder(JTagRegistry.STANDS);
             for (final StandType stand : StandTypeUtil.streamAll().toList()) {

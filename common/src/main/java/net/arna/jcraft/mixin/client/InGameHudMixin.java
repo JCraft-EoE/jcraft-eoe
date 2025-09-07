@@ -1,5 +1,7 @@
 package net.arna.jcraft.mixin.client;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
@@ -16,7 +18,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -33,9 +34,9 @@ public abstract class InGameHudMixin {
     @Unique
     private static final ResourceLocation FULL_BLOOD_ICON = JCraft.id("textures/gui/blood_full.png");
     @Unique
-    private ResourceLocation currentBloodIcon = EMPTY_BLOOD_ICON;
+    private ResourceLocation jcraft$currentBloodIcon = EMPTY_BLOOD_ICON;
 
-    @Redirect(
+    @WrapOperation(
             method = "renderPlayerHealth",
             slice = @Slice(
                     from = @At(
@@ -53,12 +54,14 @@ public abstract class InGameHudMixin {
             ),
             require = 3
     )
-    void showVampireBloodIcons(GuiGraphics instance, ResourceLocation texture, int x, int y, int u, int v, int width, int height) {
-        Player player = minecraft.player;
+    void showVampireBloodIcons(GuiGraphics instance, ResourceLocation atlasLocation,
+                               int x, int y, int uOffset, int vOffset, int uWidth, int vHeight, Operation<Void> original) {
+        final Player player = minecraft.player;
+
         if (JComponentPlatformUtils.getVampirism(player).isVampire()) {
-            instance.blit(currentBloodIcon, x, y, 0, 0, width, height, 9, 9);
+            instance.blit(jcraft$currentBloodIcon, x, y, 0, 0, uWidth, vHeight, 9, 9);
         } else {
-            instance.blit(texture, x, y, u, v, width, height);
+            original.call(instance, atlasLocation, x, y, uOffset, vOffset, uWidth, vHeight);
         }
     }
 
@@ -81,7 +84,7 @@ public abstract class InGameHudMixin {
             )
     )
     void switchToEmptyBloodIcon(GuiGraphics context, CallbackInfo ci) {
-        currentBloodIcon = EMPTY_BLOOD_ICON;
+        jcraft$currentBloodIcon = EMPTY_BLOOD_ICON;
     }
 
     @Inject(
@@ -103,7 +106,7 @@ public abstract class InGameHudMixin {
             )
     )
     void switchToHalfBloodIcon(GuiGraphics context, CallbackInfo ci) {
-        currentBloodIcon = HALF_BLOOD_ICON;
+        jcraft$currentBloodIcon = HALF_BLOOD_ICON;
     }
 
     @Inject(
@@ -125,7 +128,7 @@ public abstract class InGameHudMixin {
             )
     )
     void switchToFullBloodIcon(GuiGraphics context, CallbackInfo ci) {
-        currentBloodIcon = FULL_BLOOD_ICON;
+        jcraft$currentBloodIcon = FULL_BLOOD_ICON;
     }
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;getTicksFrozen()I"))

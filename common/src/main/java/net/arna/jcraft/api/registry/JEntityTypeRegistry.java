@@ -6,12 +6,15 @@ import dev.architectury.registry.registries.RegistrySupplier;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.spec.SpecUserMob;
 import net.arna.jcraft.common.entity.*;
 import net.arna.jcraft.common.entity.npc.AyaTsujiEntity;
 import net.arna.jcraft.common.entity.npc.DarbyOlderEntity;
 import net.arna.jcraft.common.entity.npc.DarbyYoungerEntity;
 import net.arna.jcraft.common.entity.npc.PetshopEntity;
 import net.arna.jcraft.common.entity.projectile.*;
+import net.arna.jcraft.common.entity.spec.AnubisSpecUser;
+import net.arna.jcraft.common.entity.spec.BrawlerSpecUser;
 import net.arna.jcraft.common.entity.spec.VampireSpecUser;
 import net.arna.jcraft.common.entity.stand.*;
 import net.arna.jcraft.common.entity.vehicle.RoadRollerEntity;
@@ -664,11 +667,42 @@ public interface JEntityTypeRegistry {
             ).sized(0.6f, 1.8f).build("training_dummy")
     );
 
-    RegistrySupplier<EntityType<VampireSpecUser>> VAMPIRE_SPEC_USER = ENTITY_TYPE_REGISTRY.register(JCraft.id("vampire_spec_user"),
+
+    @NotNull
+    private static <T extends SpecUserMob> EntityType<T> createSpecUser(Function<Level, T> ctor, String id) {
+        // this can be generalized for a lot of these registrations.
+        return EntityType.Builder.of(
+                WorldOnlyEntityFactory.from(ctor),
+                MobCategory.CREATURE
+        ).sized(0.6f, 1.8f).build(id);
+    }
+
+    RegistrySupplier<EntityType<BrawlerSpecUser>> BRAWLER_SPEC_USER = ENTITY_TYPE_REGISTRY.register(
+            JCraft.id("brawler_spec_user"),
+            () -> createSpecUser(BrawlerSpecUser::new, "brawler_spec_user")
+    );
+
+    RegistrySupplier<EntityType<VampireSpecUser>> VAMPIRE_SPEC_USER = ENTITY_TYPE_REGISTRY.register(
+            JCraft.id("vampire_spec_user"),
+            () -> createSpecUser(VampireSpecUser::new, "vampire_spec_user")
+    );
+
+    RegistrySupplier<EntityType<AnubisSpecUser>> ANUBIS_SPEC_USER = ENTITY_TYPE_REGISTRY.register(
+            JCraft.id("anubis_spec_user"),
+            () -> createSpecUser(AnubisSpecUser::new, "anubis_spec_user")
+    );
+
+    RegistrySupplier<EntityType<Entity>> RANDOM_SPEC_USER = ENTITY_TYPE_REGISTRY.register(
+            JCraft.id("random_spec_user"),
             () -> EntityType.Builder.of(
-                    WorldOnlyEntityFactory.from(VampireSpecUser::new),
+                    (type, world) -> switch (world.getRandom().nextInt(2)) {
+                        case (0) -> new BrawlerSpecUser(world);
+                        case (1) -> new VampireSpecUser(world);
+                        case (2) -> new AnubisSpecUser(world);
+                        default -> throw new IllegalStateException("Unexpected value");
+                    },
                     MobCategory.CREATURE
-            ).sized(0.6f, 1.8f).build("vampire_spec_user")
+            ).sized(0.6f, 1.8f).build("random_spec_user")
     );
 
     RegistrySupplier<EntityType<SpeedKingEntity>> SPEED_KING = ENTITY_TYPE_REGISTRY.register(JCraft.id("speed_king"),
@@ -677,7 +711,6 @@ public interface JEntityTypeRegistry {
                     MobCategory.CREATURE
             ).sized(0.6f, 1.8f).build("speed_king")
     );
-
 
     static void registerAttributes() {
         EntityAttributeRegistry.register(STAR_PLATINUM, StarPlatinumEntity::createMobAttributes);
@@ -760,7 +793,9 @@ public interface JEntityTypeRegistry {
                 .add(Attributes.KNOCKBACK_RESISTANCE, 0.9)
         );
 
+        EntityAttributeRegistry.register(BRAWLER_SPEC_USER, BrawlerSpecUser::createUserAttributes);
         EntityAttributeRegistry.register(VAMPIRE_SPEC_USER, VampireSpecUser::createUserAttributes);
+        EntityAttributeRegistry.register(ANUBIS_SPEC_USER, AnubisSpecUser::createUserAttributes);
     }
 
     static void init() {

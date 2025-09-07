@@ -5,15 +5,14 @@ import net.arna.jcraft.api.registry.JBlockRegistry;
 import net.arna.jcraft.api.registry.JItemRegistry;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
-import net.minecraft.advancements.critereon.InventoryChangeTrigger;
-import net.minecraft.data.recipes.FinishedRecipe;
-import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.data.recipes.ShapelessRecipeBuilder;
-import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
+import net.minecraft.advancements.critereon.*;
+import net.minecraft.data.recipes.*;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+
 import java.util.function.Consumer;
 
 public class JRecipeProvider extends FabricRecipeProvider {
@@ -1063,5 +1062,27 @@ public class JRecipeProvider extends FabricRecipeProvider {
                 .define('L', Items.LIME_DYE)
                 .unlockedBy("has_iron_ingot", InventoryChangeTrigger.TriggerInstance.hasItems(Items.IRON_INGOT))
                 .save(exporter);
+        // training dummy
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, JItemRegistry.TRAINING_DUMMY.get())
+                .pattern("CWC")
+                .pattern("CWC")
+                .pattern("CWC")
+                .define('W', ItemTags.WOOL)
+                .define('C', ItemTags.WOOL_CARPETS)
+                .unlockedBy("has_wool", InventoryChangeTrigger.TriggerInstance.hasItems(ofTag(ItemTags.WOOL)))
+                .unlockedBy("has_wool_carpet", InventoryChangeTrigger.TriggerInstance.hasItems(ofTag(ItemTags.WOOL_CARPETS)))
+                .save(exporter);
+    }
+
+    public static ItemPredicate ofTag(TagKey<Item> tag) {
+        return new ItemPredicate(tag,
+                null,
+                MinMaxBounds.Ints.ANY,
+                MinMaxBounds.Ints.ANY,
+                EnchantmentPredicate.NONE,
+                EnchantmentPredicate.NONE,
+                null,
+                NbtPredicate.ANY
+        );
     }
 }

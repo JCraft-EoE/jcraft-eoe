@@ -146,7 +146,10 @@ public interface IAttacker<A extends IAttacker<? extends A, S>, S extends Enum<?
         } else if (state == AttackerBrainInfo.State.DEFENSE) {
             // If we are on defense, and neither side has an advantage, or the opponent is somehow disadvantaged, we can move out of defense.
             if (attackerCtx.disadvantage() <= targetCtx.disadvantage())
-                state = AttackerBrainInfo.State.IDLE;
+                state = JUtils.chooseRandom(getBaseEntity().getRandom(),
+                        AttackerBrainInfo.State.KEEPAWAY,
+                        AttackerBrainInfo.State.PRESSURE,
+                        AttackerBrainInfo.State.DISENGAGE);
                 // Otherwise, we stay on defense.
             else return;
         }
@@ -290,7 +293,7 @@ public interface IAttacker<A extends IAttacker<? extends A, S>, S extends Enum<?
              return null;
          }
 
-         int selectedAttackInitTime = selectedAttack.getDuration() - selectedAttack.getWindup();
+         int selectedAttackInitTime = selectedAttack.getWindupPoint();
 
          final RandomSource random = mob.getRandom();
 

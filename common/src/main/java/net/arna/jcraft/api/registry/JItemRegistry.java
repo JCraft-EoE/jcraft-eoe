@@ -190,11 +190,20 @@ public interface JItemRegistry {
     int PART_7_COLOR = 0x6de97b;
     int PART_8_COLOR = 0x4c9ad5;
     int PART_9_COLOR = 0xafd2d0;
-    RegistrySupplier<Item> VAMPIRE_SPAWN_EGG = register("vampire_spawn_egg", () -> new ArchitecturySpawnEggItem(JEntityTypeRegistry.VAMPIRE_SPEC_USER, BASE_COLOR, PART_1_COLOR, settings()));
-    RegistrySupplier<Item> PETSHOP_SPAWN_EGG = register("petshop_spawn_egg", () -> new ArchitecturySpawnEggItem(JEntityTypeRegistry.PETSHOP, BASE_COLOR, PART_3_COLOR, settings()));
-    RegistrySupplier<Item> AYA_TSUJI_SPAWN_EGG = register("aya_tsuji_spawn_egg", () -> new ArchitecturySpawnEggItem(JEntityTypeRegistry.AYA_TSUJI, BASE_COLOR, PART_4_COLOR, settings()));
-    RegistrySupplier<Item> DARBY_OLDER_SPAWN_EGG = register("darby_older_spawn_egg", () -> new ArchitecturySpawnEggItem(JEntityTypeRegistry.DARBY_OLDER, BASE_COLOR, PART_3_COLOR, settings()));
-    RegistrySupplier<Item> DARBY_YOUNGER_SPAWN_EGG = register("darby_younger_spawn_egg", () -> new ArchitecturySpawnEggItem(JEntityTypeRegistry.DARBY_YOUNGER, BASE_COLOR, PART_3_COLOR, settings()));
+    RegistrySupplier<Item> BRAWLER_SPAWN_EGG = register("brawler_spawn_egg",
+            () -> new ArchitecturySpawnEggItem(JEntityTypeRegistry.BRAWLER_SPEC_USER, BASE_COLOR, PART_1_COLOR, settings()));
+    RegistrySupplier<Item> VAMPIRE_SPAWN_EGG = register("vampire_spawn_egg",
+            () -> new ArchitecturySpawnEggItem(JEntityTypeRegistry.VAMPIRE_SPEC_USER, PART_2_COLOR, PART_1_COLOR, settings()));
+    RegistrySupplier<Item> ANUBIS_USER_SPAWN_EGG = register("anubis_user_spawn_egg",
+            () -> new ArchitecturySpawnEggItem(JEntityTypeRegistry.ANUBIS_SPEC_USER, BASE_COLOR, PART_3_COLOR, settings()));
+    RegistrySupplier<Item> PETSHOP_SPAWN_EGG = register("petshop_spawn_egg",
+            () -> new ArchitecturySpawnEggItem(JEntityTypeRegistry.PETSHOP, BASE_COLOR, PART_3_COLOR, settings()));
+    RegistrySupplier<Item> AYA_TSUJI_SPAWN_EGG = register("aya_tsuji_spawn_egg",
+            () -> new ArchitecturySpawnEggItem(JEntityTypeRegistry.AYA_TSUJI, BASE_COLOR, PART_4_COLOR, settings()));
+    RegistrySupplier<Item> DARBY_OLDER_SPAWN_EGG = register("darby_older_spawn_egg",
+            () -> new ArchitecturySpawnEggItem(JEntityTypeRegistry.DARBY_OLDER, BASE_COLOR, PART_3_COLOR, settings()));
+    RegistrySupplier<Item> DARBY_YOUNGER_SPAWN_EGG = register("darby_younger_spawn_egg",
+            () -> new ArchitecturySpawnEggItem(JEntityTypeRegistry.DARBY_YOUNGER, BASE_COLOR, PART_3_COLOR, settings()));
 
     RegistrySupplier<Item> MOCK_ITEM = register("mock_item", MockItem::new);
 

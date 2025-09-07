@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "jcraft:arrow_ruin",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 36,
+    "separation": 10,
+    "salt": 765389025
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": {
+        "min": 2,
+        "max": 9
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "jcraft:requiem_arrow",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:sand",
+          "weight": 99
+        }
+      ]
+    },
+    {
+      "rolls": {
+        "min": 3,
+        "max": 8
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "jcraft:stand_arrow",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "jcraft:stand_arrowhead",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:flint",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:stick",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:feather",
+          "weight": 1
+        }
+      ]
+    }
+  ],
+  "random_sequence": "jcraft:arrow_ruin/main"
+}

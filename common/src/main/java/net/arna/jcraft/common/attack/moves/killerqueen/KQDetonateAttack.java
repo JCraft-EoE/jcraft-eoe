@@ -81,17 +81,21 @@ public final class KQDetonateAttack extends AbstractMove<KQDetonateAttack, Abstr
     }
 
     public static void explode(final AbstractKillerQueenEntity<?, ?> stand, final Entity user, final Vec3 pos) {
+        explode(stand, user, pos, 11.0f, 4.4);
+    }
+
+    public static void explode(final AbstractKillerQueenEntity<?, ?> stand, final Entity user, final Vec3 pos, float damage, double hitboxSize) {
         final ServerLevel serverWorld = (ServerLevel) stand.level();
 
         JCraft.createParticle(serverWorld, pos.x, pos.y, pos.z, JParticleType.BOOM);
         JUtils.serverPlaySound(JSoundRegistry.KQ_EXPLODE.get(), serverWorld, pos, 96);
 
         final DamageSource damageSource = JDamageSources.stand(stand);
-        final Set<? extends LivingEntity> toExplode = AbstractSimpleAttack.findHits(stand, pos, 4.4, damageSource);
+        final Set<? extends LivingEntity> toExplode = AbstractSimpleAttack.findHits(stand, pos, hitboxSize, damageSource);
 
         for (LivingEntity living : toExplode) {
             final Vec3 kbVec = living.getEyePosition().subtract(pos).normalize();
-            damageLogic(stand.level(), living, kbVec, 2, 3, true, 11f, false, 4, damageSource, user, null);
+            damageLogic(stand.level(), living, kbVec, 2, 3, true, damage, false, 4, damageSource, user, null);
             living.addEffect(new MobEffectInstance(JStatusRegistry.KNOCKDOWN.get(), 35, 0, true, false));
         }
     }

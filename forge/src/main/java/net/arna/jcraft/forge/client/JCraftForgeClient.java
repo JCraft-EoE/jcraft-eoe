@@ -12,6 +12,7 @@ import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
 import net.arna.jcraft.client.particle.*;
 import net.arna.jcraft.client.renderer.block.CoffinTileRenderer;
 import net.arna.jcraft.client.particle.DamageNumberParticle;
+import net.arna.jcraft.client.rendering.DamageIndicatorManager;
 import net.arna.jcraft.forge.JCraftForge;
 import net.arna.jcraft.forge.capability.impl.entity.GrabCapability;
 import net.arna.jcraft.forge.capability.impl.entity.GravityCapability;
@@ -98,6 +99,7 @@ public class JCraftForgeClient {
         event.registerSpriteSet(JParticleTypeRegistry.PURPLE_HAZE_CLOUD.get(), PurpleHazeCloudParticle.Factory::new);
         event.registerSpriteSet(JParticleTypeRegistry.PURPLE_HAZE_PARTICLE.get(), PurpleHazeErraticParticle.Factory::new);
         event.registerSpriteSet(JParticleTypeRegistry.DAMAGE_NUMBER.get(), DamageNumberParticle.Factory::new);
+        DamageIndicatorManager.setDamageNumberParticle(JParticleTypeRegistry.DAMAGE_NUMBER.get());
     }
 
     private static void registerClientCapabilityReceivers() {

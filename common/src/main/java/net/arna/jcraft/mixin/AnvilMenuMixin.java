@@ -3,18 +3,23 @@ package net.arna.jcraft.mixin;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
+import net.arna.jcraft.api.registry.JItemRegistry;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.common.enchantments.CinderellasKissEnchantment;
 import net.arna.jcraft.common.item.StandDiscItem;
-import net.arna.jcraft.api.registry.JItemRegistry;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.*;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Map;
@@ -60,7 +65,7 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
         return isValid || isValidStandSkinRecipe(inputSlots.getItem(0), inputSlots.getItem(1));
     }
 
-    @Redirect(
+    @ModifyExpressionValue(
             method = "createResult",
             at = @At(
                     value = "INVOKE",
@@ -68,9 +73,9 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
                     ordinal = 1
             )
     )
-    private Map<Enchantment, Integer> modifyMaskEnchantments(ItemStack stack) {
+    private Map<Enchantment, Integer> modifyMaskEnchantments(Map<Enchantment, Integer> original, @Local(ordinal = 1) ItemStack stack) {
         // Pretend masks have no enchantments.
-        return stack.is(JItemRegistry.CINDERELLA_MASK.get()) ? Map.of() : EnchantmentHelper.getEnchantments(stack);
+        return stack.is(JItemRegistry.CINDERELLA_MASK.get()) ? Map.of() : original;
     }
 
     @ModifyVariable(

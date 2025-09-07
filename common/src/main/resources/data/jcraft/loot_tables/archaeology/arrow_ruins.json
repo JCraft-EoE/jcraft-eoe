@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:archaeology",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "jcraft:stand_arrow"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "jcraft:stand_arrowhead"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "jcraft:requiem_arrow"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "jcraft:archaeology/arrow_ruins"
+}

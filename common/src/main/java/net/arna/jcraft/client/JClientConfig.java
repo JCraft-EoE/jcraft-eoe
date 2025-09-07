@@ -17,7 +17,7 @@ public class JClientConfig implements ConfigData {
     private static JClientConfig instance;
 
     private UIPos uiPosition = UIPos.RIGHT;
-    private boolean clientsidePrediction = false;
+    // private boolean clientsidePrediction = false;
     private int horizontalHudOffset = 0;
     private int verticalHudOffset = 0;
     private boolean iconHudPeekAllMoves = true;

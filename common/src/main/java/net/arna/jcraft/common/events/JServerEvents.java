@@ -377,9 +377,7 @@ public class JServerEvents {
             if (100 - random.nextInt(0, 100) > gameRules.getInt(CHANCE_MOB_SPAWNS_WITH_STAND)) {
                 return EventResult.pass();
             }
-            final StandType type = gameRules.getBoolean(ALLOW_MOB_EVOLVED_STANDS)
-                    ? StandTypeUtil.getRandom(entity.level().random)
-                    : StandTypeUtil.getRandomRegular(entity.level().random);
+            final StandType type = StandTypeUtil.generateStandTypeForMob(entity, gameRules);
             standData.setType(type);
 
             // ATTRIBUTES
@@ -399,7 +397,7 @@ public class JServerEvents {
                 return EventResult.pass();
             }
 
-            NonNullList<ItemStack> handItems = (NonNullList<ItemStack>) mob.getHandSlots(), armorItems = (NonNullList<ItemStack>) mob.getArmorSlots();
+            NonNullList<ItemStack> handItems = (NonNullList<ItemStack>) mob.getHandSlots();
             // Silver chariot users may spawn with Anubis (25% chance)
             if (type == JStandTypeRegistry.SILVER_CHARIOT.get() && random.nextInt(5) == 4) {
                 handItems.set(0, new ItemStack(JItemRegistry.ANUBIS.get()));
@@ -410,27 +408,34 @@ public class JServerEvents {
                 mob.setDropChance(EquipmentSlot.OFFHAND, 100f);
             }
 
-            Enchantment enchantment;
-            ItemStack itemStack;
-            int baseArmorLevel = random.nextInt(1, 6);
-            int enchantsSize = JCRAFT_ARMOR_ENCHANTS.size();
-            for (int i = 0; i < 4; i++) {
-                final int armorLevel = baseArmorLevel + random.nextInt(-1, 1); // TODO: scale with difficulty
-
-                itemStack = new ItemStack(EQUIPMENT.get(i).get(armorLevel));
-                enchantment = JCRAFT_ARMOR_ENCHANTS.get(random.nextInt(enchantsSize));
-                itemStack.enchant(enchantment, enchantment.getMaxLevel());
-                armorItems.set(i, itemStack);
-
-                final int diamondLevel = 4; // Check above
-                if (armorLevel >= diamondLevel) {
-                    mob.setDropChance(EquipmentSlot.byTypeAndIndex(EquipmentSlot.Type.ARMOR, i), 0f);
-                }
-            }
+            armorMob(mob);
 
             JEnemies.add(mob);
         }
         return EventResult.pass();
+    }
+
+    public static void armorMob(Mob mob) {
+        final RandomSource random = mob.getRandom();
+        final NonNullList<ItemStack> armorItems = (NonNullList<ItemStack>) mob.getArmorSlots();
+
+        Enchantment enchantment;
+        ItemStack itemStack;
+        int baseArmorLevel = random.nextInt(1, 6);
+        int enchantsSize = JCRAFT_ARMOR_ENCHANTS.size();
+        for (int i = 0; i < 4; i++) {
+            final int armorLevel = baseArmorLevel + random.nextInt(-1, 1);
+
+            itemStack = new ItemStack(EQUIPMENT.get(i).get(armorLevel));
+            enchantment = JCRAFT_ARMOR_ENCHANTS.get(random.nextInt(enchantsSize));
+            itemStack.enchant(enchantment, enchantment.getMaxLevel());
+            armorItems.set(i, itemStack);
+
+            final int diamondLevel = 4; // Check above
+            if (armorLevel >= diamondLevel) {
+                mob.setDropChance(EquipmentSlot.byTypeAndIndex(EquipmentSlot.Type.ARMOR, i), 0f);
+            }
+        }
     }
 
     public static EventResult rightClickBlock(Player player, InteractionHand hand, BlockPos blockPos, Direction direction) {
@@ -469,32 +474,36 @@ public class JServerEvents {
         return CompoundEventResult.pass();
     }
 
-    public static EventResult death(LivingEntity living, DamageSource source) {
-        if (living.level() instanceof ServerLevel serverWorld) {
-            if (living instanceof ServerPlayer serverPlayer) {
-                GameRules gameRules = serverWorld.getGameRules();
+    public static EventResult death(final LivingEntity living, final DamageSource source) {
+        if (living.level() instanceof final ServerLevel serverWorld) {
+            if (living instanceof final ServerPlayer serverPlayer) {
+                final GameRules gameRules = serverWorld.getGameRules();
+
                 if (!gameRules.getBoolean(JCraft.KEEP_STAND)) {
                     JComponentPlatformUtils.getStandComponent(living).setTypeAndSkin(JStandTypeRegistry.NONE.get(), 0);
                 }
+
                 if (!gameRules.getBoolean(JCraft.KEEP_SPEC)) {
                     JComponentPlatformUtils.getSpecData(serverPlayer)
                             .setType(JSpecTypeRegistry.NONE.get());
                 }
 
                 if (source.getEntity() instanceof LivingEntity killer) {
+                    if (serverPlayer.getId() == killer.getId()) return EventResult.pass();
+
                     JComponentPlatformUtils.getCooldowns(killer).clear(CooldownType.COMBO_BREAKER);
 
                     boolean killVampirism = JServerConfig.KILL_VAMPIRISM.getValue();
-                    if (killer instanceof ServerPlayer killerPlayer) {
-                        if (killVampirism) {
+
+                    if (killVampirism) {
+                        if (killer instanceof ServerPlayer killerPlayer) {
                             killerPlayer.getFoodData().eat(20, 20f);
                             CommonVampireComponent vampireComponent = JComponentPlatformUtils.getVampirism(killerPlayer);
                             if (vampireComponent.isVampire()) {
                                 vampireComponent.setBlood(20.0f);
                             }
                         }
-                    }
-                    if (killVampirism) {
+
                         killer.setHealth(killer.getMaxHealth());
                     }
                 }

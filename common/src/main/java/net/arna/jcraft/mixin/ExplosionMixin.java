@@ -1,5 +1,6 @@
 package net.arna.jcraft.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.arna.jcraft.common.util.IJExplosion;
@@ -16,13 +17,9 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(value = Explosion.class)
 public class ExplosionMixin implements IJExplosion {
-    @Shadow
-    @Final
-    private boolean fire;
     @Shadow
     @Final
     private Level level;
@@ -43,9 +40,12 @@ public class ExplosionMixin implements IJExplosion {
         return modifier == null || modifier.getBlockInteraction() == null ? original.call(instance) : modifier.getBlockInteraction();
     }
 
-    @Redirect(method = "finalizeExplosion", at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/Explosion;fire:Z"))
-    private boolean overrideCreateFire(Explosion thiz) {
-        return modifier == null || modifier.getCreateFire() == null ? fire : modifier.getCreateFire();
+    @ModifyExpressionValue(method = "finalizeExplosion", at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/Explosion;fire:Z"))
+    private boolean overrideCreateFire(boolean original) {
+        if (modifier == null || modifier.getCreateFire() == null) {
+            return original;
+        }
+        return modifier.getCreateFire();
     }
 
     @ModifyVariable(method = "finalizeExplosion", at = @At("HEAD"), argsOnly = true)

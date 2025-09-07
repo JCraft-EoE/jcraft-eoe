@@ -169,7 +169,9 @@ public interface JCreativeMenuTabRegistry {
         });
         // spawn eggs
         CreativeTabRegistry.modifyBuiltin(BuiltInRegistries.CREATIVE_MODE_TAB.get(CreativeModeTabs.SPAWN_EGGS.location()), (flags, output, canUseGameMasterBlocks) -> {
+            output.acceptAfter(Items.ALLAY_SPAWN_EGG, JItemRegistry.ANUBIS_USER_SPAWN_EGG.get());
             output.acceptAfter(Items.AXOLOTL_SPAWN_EGG, JItemRegistry.AYA_TSUJI_SPAWN_EGG.get());
+            output.acceptAfter(Items.BAT_SPAWN_EGG, JItemRegistry.BRAWLER_SPAWN_EGG.get());
             output.acceptAfter(Items.CREEPER_SPAWN_EGG, JItemRegistry.DARBY_OLDER_SPAWN_EGG.get());
             output.acceptAfter(JItemRegistry.DARBY_OLDER_SPAWN_EGG.get(), JItemRegistry.DARBY_YOUNGER_SPAWN_EGG.get());
             output.acceptAfter(Items.PARROT_SPAWN_EGG, JItemRegistry.PETSHOP_SPAWN_EGG.get());
@@ -246,13 +248,16 @@ public interface JCreativeMenuTabRegistry {
                         nbt.put("StoredEnchantments", enchantments);
                         entries.accept(stack);
                     }
-                    // spawn eggs season 1
+                    // spawn eggs part 1
+                    entries.accept(JItemRegistry.BRAWLER_SPAWN_EGG.get());
                     entries.accept(JItemRegistry.VAMPIRE_SPAWN_EGG.get());
-                    // spawn eggs season 3
+                    // spawn eggs part 3
+                    entries.accept(JItemRegistry.ANUBIS_USER_SPAWN_EGG.get());
+
                     entries.accept(JItemRegistry.DARBY_OLDER_SPAWN_EGG.get());
                     entries.accept(JItemRegistry.DARBY_YOUNGER_SPAWN_EGG.get());
                     entries.accept(JItemRegistry.PETSHOP_SPAWN_EGG.get());
-                    // spawn eggs season 4
+                    // spawn eggs part 4
                     entries.accept(JItemRegistry.AYA_TSUJI_SPAWN_EGG.get());
                     // weird items
                     if (JItemRegistry.DEBUG_WAND != null) {

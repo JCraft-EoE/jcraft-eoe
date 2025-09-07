@@ -3,6 +3,7 @@ package net.arna.jcraft.common.component.impl;
 import lombok.Getter;
 import net.arna.jcraft.api.component.living.CommonVampireComponent;
 import net.arna.jcraft.api.spec.JSpec;
+import net.arna.jcraft.common.food.IFoodData;
 import net.arna.jcraft.common.spec.VampireSpec;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.api.registry.JSpecTypeRegistry;
@@ -14,14 +15,12 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
 import net.minecraft.world.level.Level;
 
 public abstract class CommonVampireComponentImpl implements CommonVampireComponent {
     private final LivingEntity entity;
-    private final Player player;
-    private FoodData hungerManager = null;
+    private FoodData foodData = null;
     private boolean isVampire = false;
     @Getter
     private float blood = 20;
@@ -32,10 +31,10 @@ public abstract class CommonVampireComponentImpl implements CommonVampireCompone
 
     public CommonVampireComponentImpl(final LivingEntity entity) {
         this.entity = entity;
-        if (entity instanceof Player playerEntity) {
-            this.player = playerEntity;
-            hungerManager = playerEntity.getFoodData();
-        } else this.player = null;
+
+        if (entity instanceof IFoodData iFoodData) {
+            foodData = iFoodData.getFoodData();
+        }
     }
 
     public void tick() {
@@ -44,18 +43,21 @@ public abstract class CommonVampireComponentImpl implements CommonVampireCompone
             return;
         }
 
-        if (player != null) {
-            JSpec<?, ?> spec = JUtils.getSpec(player);
-            // FOR NOW, these are intrinsically tied.
-            setVampire(spec != null && spec.getType() == JSpecTypeRegistry.VAMPIRE.get());
-        }
+        JSpec<?, ?> spec = JUtils.getSpec(entity);
+        // FOR NOW, these are intrinsically tied.
+        setVampire(spec != null && spec.getType() == JSpecTypeRegistry.VAMPIRE.get());
 
         if (!isVampire) {
             return;
         }
 
         // Taking damage when unprotected from sunlight.
-        if (world.isDay() && !world.isRaining() && !world.isThundering() && !(entity.getItemBySlot(EquipmentSlot.HEAD).is(JTagRegistry.PROTECTS_FROM_SUN)) && world.canSeeSky(entity.blockPosition())) {
+        if (world.isDay() &&
+                !world.isRaining() &&
+                !world.isThundering() &&
+                !(entity.getItemBySlot(EquipmentSlot.HEAD).is(JTagRegistry.PROTECTS_FROM_SUN)) &&
+                world.canSeeSky(entity.blockPosition())
+        ) {
             entity.setSecondsOnFire(1);
             entity.hurt(world.damageSources().dryOut(), 2.0F);
         }
@@ -63,16 +65,21 @@ public abstract class CommonVampireComponentImpl implements CommonVampireCompone
         // Vampires do not have to breathe.
         entity.setAirSupply(entity.getMaxAirSupply());
 
-        if (player != null) {
+        if (foodData == null && entity instanceof IFoodData iFoodData) {
+            foodData = iFoodData.getFoodData();
+        }
+
+        // Replace food logic with blood logic. (Optional)
+        if (foodData != null) {
             if (blood < 1 && --starveTick < 1) {
                 // Starve
-                player.hurt(world.damageSources().starve(), 1.0F);
+                entity.hurt(world.damageSources().starve(), 1.0F);
                 starveTick = 80;
             } else {
                 // Regenerate
                 float health = entity.getHealth();
                 if (health < entity.getMaxHealth() && blood >= MIN_REGEN_BLOOD && --regenTick < 1) {
-                    player.heal(1);
+                    entity.heal(1);
 
                     // Every third heal takes away a blood unit
                     if (++healCount > 2) {
@@ -83,22 +90,16 @@ public abstract class CommonVampireComponentImpl implements CommonVampireCompone
                     regenTick = 10;
                 }
             }
-        }
 
-        // Prevent the player's default hunger from doing anything
-        if (hungerManager == null) {
-            if (player != null) {
-                hungerManager = player.getFoodData();
-            }
-        } else {
             // Vampires get tired slower
-            if (hungerManager.getExhaustionLevel() > 32.0F) {
-                hungerManager.addExhaustion(-32.0F);
+            if (foodData.getExhaustionLevel() > 32.0F) {
+                foodData.addExhaustion(-32.0F);
                 setBlood(blood - 1);
             }
 
-            hungerManager.setFoodLevel(20);
-            hungerManager.setSaturation(0f);
+            // Prevent the player's default hunger from doing anything
+            foodData.setFoodLevel(20);
+            foodData.setSaturation(0f);
         }
     }
 
@@ -110,7 +111,7 @@ public abstract class CommonVampireComponentImpl implements CommonVampireCompone
 
     @Override
     public boolean isVampire() {
-        return isVampire || player != null && JUtils.getSpec(player) instanceof VampireSpec;
+        return isVampire || JUtils.getSpec(entity) instanceof VampireSpec;
     }
 
     @Override
