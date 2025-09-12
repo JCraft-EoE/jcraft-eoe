@@ -31,6 +31,41 @@ public interface JParticleTypeRegistry {
     RegistrySupplier<SimpleParticleType> PURPLE_HAZE_PARTICLE = PARTICLES.register("purple_haze_particle", () -> new SimpleParticleType(false));
     RegistrySupplier<SimpleParticleType> DAMAGE_NUMBER = PARTICLES.register("damage_number", () -> new SimpleParticleType(false));
 
+    /*
+    TODO: impl this properly (fuck forge)
+
+    record ParticleData <T extends ParticleType<T> & ParticleOptions> (
+            RegistrySupplier<? extends ParticleType<T>> supplier,
+            ParticleProviderRegistry.DeferredParticleProvider<T> provider) {
+    }
+
+    ParticleData<?>[] entries = {
+            new ParticleData<>(JParticleTypeRegistry.COMBO_BREAK, ComboBreakerParticle.Factory::new),
+            new ParticleData<>(JParticleTypeRegistry.COOLDOWN_CANCEL, CooldownCancelParticle.Factory::new),
+            new ParticleData<>(JParticleTypeRegistry.HITSPARK_1, provider -> new HitsparkParticle.Factory(provider, 0.4f, 5)),
+            new ParticleData<>(JParticleTypeRegistry.HITSPARK_2, provider -> new HitsparkParticle.Factory(provider, 0.66f, 6)),
+            new ParticleData<>(JParticleTypeRegistry.HITSPARK_3, provider -> new HitsparkParticle.Factory(provider, 1f, 8)),
+            new ParticleData<>(JParticleTypeRegistry.INVERTED_HITSPARK_3, provider -> new InvertedHitsparkParticle.Factory(provider, 1f, 8)),
+            new ParticleData<>(JParticleTypeRegistry.STUN_SLASH, provider -> new HitsparkParticle.Factory(provider, 0.6f, 6)),
+            new ParticleData<>(JParticleTypeRegistry.STUN_PIERCE, provider -> new HitsparkParticle.Factory(provider, 0.6f, 6)),
+            new ParticleData<>(JParticleTypeRegistry.KCPARTICLE, KCParticle.Factory::new),
+            new ParticleData<>(JParticleTypeRegistry.BACKSTAB, BackstabParticle.Factory::new),
+            new ParticleData<>(JParticleTypeRegistry.SPEED_PARTICLE, SpeedParticle.Factory::new),
+            new ParticleData<>(JParticleTypeRegistry.BITES_THE_DUST, BitesTheDustParticle.Factory::new),
+            new ParticleData<>(JParticleTypeRegistry.BOOM_1, BoomParticle.Factory::new),
+            new ParticleData<>(JParticleTypeRegistry.PIXEL, PixelParticle.Factory::new),
+            new ParticleData<>(JParticleTypeRegistry.BLOCKSPARK, provider -> new BlocksparkParticle.Factory(provider, 0.15f)),
+            new ParticleData<>(JParticleTypeRegistry.GO, GoParticle.Factory::new),
+            new ParticleData<>(JParticleTypeRegistry.AURA_ARC, AuraArcParticle.Factory::new),
+            new ParticleData<>(JParticleTypeRegistry.AURA_BLOB, AuraBlobParticle.Factory::new),
+            new ParticleData<>(JParticleTypeRegistry.INVERSION, InversionParticle.Factory::new),
+            new ParticleData<>(JParticleTypeRegistry.SUN_LOCK_ON, BackstabParticle.Factory::new), // 9 frames, reusing
+            new ParticleData<>(JParticleTypeRegistry.PURPLE_HAZE_CLOUD, PurpleHazeCloudParticle.Factory::new),
+            new ParticleData<>(JParticleTypeRegistry.PURPLE_HAZE_PARTICLE, PurpleHazeErraticParticle.Factory::new),
+            new ParticleData<>(JParticleTypeRegistry.DAMAGE_NUMBER, DamageNumberParticle.Factory::new),
+    };
+     */
+
     static void init() {
         // intentionally left empty
     }

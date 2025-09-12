@@ -1,20 +1,18 @@
 # Changelog
 ## General
-* 
+* …
 ### Blocks & Items
-* 
+* …
 ### NPCs & Stands
-* 
+* …
 ### Configs
-* 
+* …
 ### Commands
-* 
+* …
 ### Bug Fixes
-* Fixed Purple Haze not attacking properly
-* Fixed Purple Haze not rendering properly
+* …
 ### Known Bugs
-* Enemies can attack through dimensions (hit something -> D4C ult -> attacked by out-of-world ent)
-* The Hand can erase Reinforced Deepslate
+* …
 
 ## TODO (SOME UPDATE) :D
 * Spin

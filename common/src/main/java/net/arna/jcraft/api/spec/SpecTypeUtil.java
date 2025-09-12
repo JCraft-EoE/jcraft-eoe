@@ -6,8 +6,10 @@ import net.arna.jcraft.api.registry.JSpecTypeRegistry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -18,6 +20,11 @@ public class SpecTypeUtil {
 
     public static boolean isNone(final SpecType type) {
         return type == null || type == JSpecTypeRegistry.NONE.get();
+    }
+
+    public static SpecType getRandom(final RandomSource random) {
+        final List<SpecType> types = streamAll().toList();
+        return types.get(random.nextInt(types.size()));
     }
 
     public static Stream<SpecType> streamAll() {

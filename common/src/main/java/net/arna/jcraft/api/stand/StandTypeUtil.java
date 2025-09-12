@@ -8,7 +8,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.GameRules;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -16,6 +18,8 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import static net.arna.jcraft.JCraft.ALLOW_MOB_EVOLVED_STANDS;
 
 @UtilityClass
 public class StandTypeUtil {
@@ -120,5 +124,11 @@ public class StandTypeUtil {
      */
     public static StandData getStandData(final ResourceLocation id) {
         return AttackerDataLoader.getStandData(id);
+    }
+
+    public static StandType generateStandTypeForMob(Entity entity, GameRules gameRules) {
+        return gameRules.getBoolean(ALLOW_MOB_EVOLVED_STANDS)
+                ? getRandom(entity.level().random)
+                : getRandomRegular(entity.level().random);
     }
 }

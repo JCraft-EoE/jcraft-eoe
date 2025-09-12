@@ -1,49 +1,67 @@
 accessWidener v2 named
 
 accessible field net/minecraft/world/damagesource/CombatTracker inCombat Z
-accessible class net/minecraft/client/renderer/FogRenderer$FogData
 accessible class net/minecraft/world/entity/monster/EnderMan$EndermanFreezeWhenLookedAt
+
+accessible field net/minecraft/client/gui/Gui overlayMessageTime I
+
+accessible class net/minecraft/client/renderer/FogRenderer$FogData
 accessible method net/minecraft/client/renderer/GameRenderer getFov (Lnet/minecraft/client/Camera;FZ)D
 accessible field net/minecraft/client/renderer/PostChain passes Ljava/util/List;
 accessible field net/minecraft/client/renderer/RenderType$CompositeRenderType state Lnet/minecraft/client/renderer/RenderType$CompositeState;
 accessible field net/minecraft/client/renderer/RenderType$CompositeState shaderState Lnet/minecraft/client/renderer/RenderStateShard$ShaderStateShard;
-accessible method net/minecraft/core/particles/SimpleParticleType <init> (Z)V
-accessible field net/minecraft/world/entity/ai/control/MoveControl strafeRight F
-accessible method net/minecraft/world/damagesource/CombatTracker getMostSignificantFall ()Lnet/minecraft/world/damagesource/CombatEntry;
-accessible field net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity litTime I
-accessible method net/minecraft/world/level/block/IceBlock melt (Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)V
-accessible field net/minecraft/client/renderer/EffectInstance samplerMap Ljava/util/Map;
-accessible field net/minecraft/server/level/ServerLevel sleepStatus Lnet/minecraft/server/players/SleepStatus;
 accessible field net/minecraft/client/renderer/RenderStateShard$ShaderStateShard shader Ljava/util/Optional;
-accessible method net/minecraft/data/worldgen/placement/OrePlacements commonOrePlacement (ILnet/minecraft/world/level/levelgen/placement/PlacementModifier;)Ljava/util/List;
 accessible field net/minecraft/client/renderer/ShaderInstance samplerMap Ljava/util/Map;
 accessible method net/minecraft/client/renderer/ShaderInstance parseUniformNode (Lcom/google/gson/JsonElement;)V
 extendable method net/minecraft/client/renderer/ShaderInstance parseUniformNode (Lcom/google/gson/JsonElement;)V
 accessible field net/minecraft/client/renderer/ShaderInstance uniformMap Ljava/util/Map;
 accessible field net/minecraft/client/renderer/ShaderInstance uniforms Ljava/util/List;
-accessible field net/minecraft/world/entity/monster/Witch attackPlayersGoal Lnet/minecraft/world/entity/ai/goal/target/NearestAttackableWitchTargetGoal;
+accessible field net/minecraft/client/renderer/EffectInstance samplerMap Ljava/util/Map;
 accessible method net/minecraft/client/renderer/item/ItemProperties register (Lnet/minecraft/world/item/Item;Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/client/renderer/item/ClampedItemPropertyFunction;)V
-accessible class net/minecraft/server/level/ChunkMap$TrackedEntity
-accessible field net/minecraft/server/level/ChunkMap$TrackedEntity seenBy Ljava/util/Set;
-accessible field net/minecraft/server/level/ChunkMap entityMap Lit/unimi/dsi/fastutil/ints/Int2ObjectMap;
-accessible method net/minecraft/world/level/block/BedBlock kickVillagerOutOfBed (Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)Z
-accessible field net/minecraft/client/gui/Gui overlayMessageTime I
-accessible field net/minecraft/world/level/storage/loot/LootContext params Lnet/minecraft/world/level/storage/loot/LootParams;
+
+accessible method net/minecraft/core/particles/SimpleParticleType <init> (Z)V
+accessible method net/minecraft/world/damagesource/CombatTracker getMostSignificantFall ()Lnet/minecraft/world/damagesource/CombatEntry;
+accessible field net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity litTime I
+accessible method net/minecraft/world/level/block/IceBlock melt (Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)V
+accessible field net/minecraft/server/level/ServerLevel sleepStatus Lnet/minecraft/server/players/SleepStatus;
+
+accessible method net/minecraft/data/worldgen/placement/OrePlacements commonOrePlacement (ILnet/minecraft/world/level/levelgen/placement/PlacementModifier;)Ljava/util/List;
+
+accessible field net/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder builder Ljava/util/Map;
+accessible field net/minecraft/world/entity/ai/control/MoveControl strafeRight F
+accessible method net/minecraft/world/entity/LivingEntity dismountVehicle (Lnet/minecraft/world/entity/Entity;)V
+accessible field net/minecraft/world/entity/monster/Witch attackPlayersGoal Lnet/minecraft/world/entity/ai/goal/target/NearestAttackableWitchTargetGoal;
+accessible method net/minecraft/world/entity/projectile/ThrownPotion applySplash (Ljava/util/List;Lnet/minecraft/world/entity/Entity;)V
+accessible method net/minecraft/world/entity/projectile/ThrownPotion makeAreaOfEffectCloud (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/alchemy/Potion;)V
+accessible field net/minecraft/world/entity/projectile/AbstractArrow inGround Z
 accessible field net/minecraft/world/entity/boss/wither/WitherBoss LIVING_ENTITY_SELECTOR Ljava/util/function/Predicate;
 mutable field net/minecraft/world/entity/boss/wither/WitherBoss LIVING_ENTITY_SELECTOR Ljava/util/function/Predicate;
 accessible field net/minecraft/world/entity/boss/wither/WitherBoss TARGETING_CONDITIONS Lnet/minecraft/world/entity/ai/targeting/TargetingConditions;
+accessible field net/minecraft/world/entity/animal/horse/AbstractHorse inventory Lnet/minecraft/world/SimpleContainer;
+
+accessible field net/minecraft/world/level/levelgen/structure/pools/SinglePoolElement template Lcom/mojang/datafixers/util/Either;
+accessible field net/minecraft/world/level/levelgen/structure/pools/StructureTemplatePool templates Lit/unimi/dsi/fastutil/objects/ObjectArrayList;
+
+accessible class net/minecraft/server/level/ChunkMap$TrackedEntity
+accessible field net/minecraft/server/level/ChunkMap$TrackedEntity seenBy Ljava/util/Set;
+accessible field net/minecraft/server/level/ChunkMap entityMap Lit/unimi/dsi/fastutil/ints/Int2ObjectMap;
+
+accessible method net/minecraft/world/level/block/BedBlock kickVillagerOutOfBed (Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)Z
+accessible field net/minecraft/world/level/storage/loot/LootContext params Lnet/minecraft/world/level/storage/loot/LootParams;
+
 accessible field net/minecraft/server/MinecraftServer storageSource Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;
 accessible field net/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess levelDirectory Lnet/minecraft/world/level/storage/LevelStorageSource$LevelDirectory;
-accessible method net/minecraft/world/entity/LivingEntity dismountVehicle (Lnet/minecraft/world/entity/Entity;)V
+
 accessible method net/minecraft/core/HolderSet$Named <init> (Lnet/minecraft/core/HolderOwner;Lnet/minecraft/tags/TagKey;)V
+
 accessible field net/minecraft/world/item/BucketItem content Lnet/minecraft/world/level/material/Fluid;
-accessible method net/minecraft/world/entity/projectile/ThrownPotion applySplash (Ljava/util/List;Lnet/minecraft/world/entity/Entity;)V
-accessible method net/minecraft/world/entity/projectile/ThrownPotion makeAreaOfEffectCloud (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/alchemy/Potion;)V
 accessible method net/minecraft/world/item/AxeItem getStripped (Lnet/minecraft/world/level/block/state/BlockState;)Ljava/util/Optional;
 accessible field net/minecraft/world/item/HoeItem TILLABLES Ljava/util/Map;
 accessible method net/minecraft/world/item/context/UseOnContext <init> (Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/phys/BlockHitResult;)V
-accessible field net/minecraft/world/entity/animal/horse/AbstractHorse inventory Lnet/minecraft/world/SimpleContainer;
 
-
-accessible field net/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder builder Ljava/util/Map;
+accessible field net/minecraft/world/food/FoodData lastFoodLevel I
+accessible field net/minecraft/world/food/FoodData foodLevel I
+accessible field net/minecraft/world/food/FoodData exhaustionLevel F
+accessible field net/minecraft/world/food/FoodData saturationLevel F
+accessible field net/minecraft/world/food/FoodData tickTimer I
 

@@ -1,8 +1,10 @@
 package net.arna.jcraft.mixin.gravity;
 
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.minecraft.core.Direction;
@@ -16,7 +18,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(ServerGamePacketListenerImpl.class)
 public abstract class ServerPlayNetworkHandlerMixin {
@@ -46,21 +47,23 @@ public abstract class ServerPlayNetworkHandlerMixin {
     @Shadow
     private double lastGoodZ;
 
-    @Redirect(
+    @ModifyExpressionValue(
             method = "handleMovePlayer",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/server/level/ServerPlayer;getY()D",
                     ordinal = 3
-            )
+            ),
+            require = 0
     )
-    private double redirect_onPlayerMove_getY_3(ServerPlayer serverPlayerEntity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(serverPlayerEntity);
+    private double modify_onPlayerMove_getY_3(double originalY, @Local(argsOnly = true, index = 1) ServerboundMovePlayerPacket packet) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
+
         if (gravityDirection == Direction.DOWN) {
-            return serverPlayerEntity.getY();
+            return originalY;
         }
 
-        return RotationUtil.vecWorldToPlayer(serverPlayerEntity.position(), gravityDirection).y;
+        return RotationUtil.vecWorldToPlayer(player.position(), gravityDirection).y;
     }
 
     @WrapOperation(
@@ -72,10 +75,12 @@ public abstract class ServerPlayNetworkHandlerMixin {
     )
     private void jGravityAPI$doCheckFallDamage(ServerPlayer instance, double movementX, double movementY, double movementZ, boolean onGround, Operation<Void> original) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
+
         if (gravityDirection == Direction.DOWN) {
             original.call(instance, movementX, movementY, movementZ, onGround);
             return;
         }
+
         Vec3 movement = RotationUtil.vecWorldToPlayer( new Vec3(movementX, movementY, movementZ), gravityDirection);
         original.call(instance, movement.x, movement.y, movement.z, onGround);
     }
@@ -101,17 +106,17 @@ public abstract class ServerPlayNetworkHandlerMixin {
     }
      */
 
-    @ModifyVariable(
+    @ModifyExpressionValue(
             method = "handleMovePlayer",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/server/level/ServerPlayer;onGround()Z",
                     ordinal = 0
-            ),
-            ordinal = 0
+            )
     )
     private boolean modify_onPlayerMove_boolean_0(boolean value, ServerboundMovePlayerPacket packet) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
+
         if (gravityDirection == Direction.DOWN) {
             return value;
         }

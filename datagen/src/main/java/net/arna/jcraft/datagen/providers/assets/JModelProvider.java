@@ -142,7 +142,9 @@ public class JModelProvider extends FabricModelProvider {
         generator.generateFlatItem(JItemRegistry.STEEL_BALL.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.TRAINING_DUMMY.get(), ModelTemplates.FLAT_ITEM);
 
+        generator.generateFlatItem(JItemRegistry.BRAWLER_SPAWN_EGG.get(), SPAWN_EGG_MODEL);
         generator.generateFlatItem(JItemRegistry.VAMPIRE_SPAWN_EGG.get(), SPAWN_EGG_MODEL);
+        generator.generateFlatItem(JItemRegistry.ANUBIS_USER_SPAWN_EGG.get(), SPAWN_EGG_MODEL);
         generator.generateFlatItem(JItemRegistry.PETSHOP_SPAWN_EGG.get(), SPAWN_EGG_MODEL);
         generator.generateFlatItem(JItemRegistry.AYA_TSUJI_SPAWN_EGG.get(), SPAWN_EGG_MODEL);
         generator.generateFlatItem(JItemRegistry.DARBY_OLDER_SPAWN_EGG.get(), SPAWN_EGG_MODEL);

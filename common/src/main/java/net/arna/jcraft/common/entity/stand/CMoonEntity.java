@@ -76,8 +76,8 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             .build();
 
     public static final int GRAVITY_CHANGE_DURATION = 600; // in ticks
-    public static final SimpleAttack<CMoonEntity> INVERSION_PUNCH = SimpleAttack.<CMoonEntity>lightAttack(0,
-                    12,0.75f, 5f, 9, 0.5f, -0.1f)
+    public static final SimpleAttack<CMoonEntity> INVERSION_PUNCH = SimpleAttack.<CMoonEntity>lightAttack(
+            6,12,0.75f, 5f, 9, 0.5f, -0.1f)
             .withAnim(State.INVERSION_PUNCH)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withAction(CMoonInversionAction.addInversion(70, 0.5f, true))

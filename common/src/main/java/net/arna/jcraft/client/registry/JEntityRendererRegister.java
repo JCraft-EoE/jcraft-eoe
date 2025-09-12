@@ -5,6 +5,8 @@ import dev.architectury.registry.registries.RegistrySupplier;
 import lombok.NonNull;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.client.model.entity.BisectModel;
+import net.arna.jcraft.client.model.entity.spec.AnubisSpecUserModel;
+import net.arna.jcraft.client.model.entity.spec.BrawlerSpecUserModel;
 import net.arna.jcraft.client.model.entity.spec.VampireSpecUserModel;
 import net.arna.jcraft.client.renderer.entity.*;
 import net.arna.jcraft.client.renderer.entity.npc.*;
@@ -127,7 +129,9 @@ public interface JEntityRendererRegister {
 
             new RendererData<>(JEntityTypeRegistry.ITEM_TOSS_PROJECTILE, ItemTossProjectileRenderer::new),
 
-            new RendererData<>(JEntityTypeRegistry.VAMPIRE_SPEC_USER, context -> new SpecUserRenderer<>(context, new VampireSpecUserModel()))
+            new RendererData<>(JEntityTypeRegistry.BRAWLER_SPEC_USER, context -> new SpecUserRenderer<>(context, new BrawlerSpecUserModel())),
+            new RendererData<>(JEntityTypeRegistry.VAMPIRE_SPEC_USER, context -> new SpecUserRenderer<>(context, new VampireSpecUserModel())),
+            new RendererData<>(JEntityTypeRegistry.ANUBIS_SPEC_USER, context -> new SpecUserRenderer<>(context, new AnubisSpecUserModel())),
     };
 
     static void registerEntityRenderers(Consumer<RendererData<?>> consumer) {

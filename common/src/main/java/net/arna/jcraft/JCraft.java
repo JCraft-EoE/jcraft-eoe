@@ -206,6 +206,9 @@ public final class JCraft {
 
         JEntityTypeRegistry.registerAttributes();
 
+        JStructureTypeRegistry.register();
+        JStructurePieceRegistry.register();
+
         JDimensionRegistry.init();
 
         // Command Arguments are registered separately in JCraftFabric and JCraftForge

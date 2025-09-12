@@ -4,12 +4,19 @@
   "elements": [
     {
       "weight": 1,
-      "element": {
-        "element_type": "minecraft:single_pool_element",
-        "location": "jcraft:cinderella",
-        "projection": "rigid",
-        "processors": "minecraft:empty"
-      }
+      "element": { "element_type": "minecraft:single_pool_element", "location": "jcraft:cinderella", "projection": "rigid", "processors": "minecraft:empty" }
+    },
+    {
+      "weight": 3,
+      "element": { "element_type": "minecraft:single_pool_element", "location": "jcraft:morioh/house_1", "projection": "rigid", "processors": "minecraft:empty" }
+    },
+    {
+      "weight": 2,
+      "element": { "element_type": "minecraft:single_pool_element", "location": "jcraft:morioh/house_2", "projection": "rigid", "processors": "minecraft:empty" }
+    },
+    {
+      "weight": 1,
+      "element": { "element_type": "minecraft:single_pool_element", "location": "jcraft:morioh/house_3", "projection": "rigid", "processors": "minecraft:empty" }
     }
   ]
 }
