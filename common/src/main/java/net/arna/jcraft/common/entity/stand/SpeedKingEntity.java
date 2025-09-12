@@ -40,53 +40,59 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
             JStandTypeRegistry.SPEED_KING, "default", SpeedKingEntity::registerMoves, State.class);
 
     public static final StandData DATA = StandData.builder()
-            .idleRotation(270f)
+            .idleRotation(-45f)
+            .idleDistance(0.75f)
             .info(StandInfo.builder()
                     .name(Component.translatable("entity.jcraft.speed_king"))
                     .freeSpace(Component.literal("""                
                 BNBs:
                     -the quickie
                     Punch>Barrage>Head Smack
+                    
+                    -heat zone
+                    Punch>Barrage>Head Smack>Fire Grab,
                 
                     -the dutch oven
                     Punch>Barrage>Fire grab>Flashbang"""))
 
                     .skinName(Component.literal("Rudolph"))
-                    .skinName(Component.literal("Something"))
-                    .skinName(Component.literal("AnotherSomething"))
+                    .skinName(Component.literal("Manga"))
+                    .skinName(Component.literal("Monarch"))
                     .build())
             .summonData(SummonData.of(JSoundRegistry.STAND_SUMMON))
             .build();
 
-    public static final SimpleAttack<SpeedKingEntity> PUNCH_FOLLOWUP = new SimpleAttack<SpeedKingEntity>(14,
-            14, 12, 0.65f, 5f, 10, 2f, 1.0f, -0.1f)
-            .withImpactSound(JSoundRegistry.IMPACT_1)
-            .withLaunch()
-            .withBlockStun(4)
-            .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withInfo(
-                    Component.literal("Heat Punch"),
-                    Component.literal("quick combo finisher with heat")
-            );
-
-    private static final FlamePunchAttack FLAME_PUNCH = new FlamePunchAttack(20, 14, 15, 0.75f, 5f, 16, 2f, 0.3f, -0.1f)
+    
+    private static final FlamePunchAttack FLAME_PUNCH = new FlamePunchAttack(20, 14, 15, 0.75f, 6f, 16, 2f, 0.3f, -0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(
                     Component.literal("Flame Punch"),
                     Component.literal("slower heat-imbued punch, sets target on fire")
             );
 
-    public static final SimpleAttack<SpeedKingEntity> PUNCH = new SimpleAttack<SpeedKingEntity>(JCraft.LIGHT_COOLDOWN,
-            4, 8, 0.75f, 5f, 14, 2f, 0.2f, -0.1f)
-            .withFollowup(PUNCH_FOLLOWUP)
-            .withCrouchingVariant(FLAME_PUNCH)
+
+    public static final SimpleAttack<SpeedKingEntity> PUNCH_FOLLOWUP = new SimpleAttack<SpeedKingEntity>(
+            0, 7, 11, 0.75f, 6f, 8, 1.5f, 1f, 0)
+            .withAnim(State.PUNCH_FOLLOWUP)
             .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withLaunch()
+            .withBlockStun(4)
+            .withExtraHitBox(0, 0, 1)
             .withInfo(
                     Component.literal("Punch"),
-                    Component.literal("fast combo starter, 2.5 hearts damage")
+                    Component.literal("quick combo finisher")
             );
-
-    public static final HeadSmackAttack HEAD_SMACK = new HeadSmackAttack(0, 20, 20, 1f, 8f, 15, 2f, 0.4f, 0.1f, 60, 100)
+    public static final SimpleAttack<SpeedKingEntity> PUNCH = SimpleAttack.<SpeedKingEntity>lightAttack(
+                    5, 7, 0.75f, 5, 10, 0.1f, -0.1f)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withFollowup(PUNCH_FOLLOWUP)
+            .withCrouchingVariant(FLAME_PUNCH)
+            .withInfo(
+                    Component.literal("Punch"),
+                    Component.literal("quick combo starter")
+            );
+    public static final HeadSmackAttack HEAD_SMACK = new HeadSmackAttack(0, 20, 20, 1f, 8f, 25, 2f, 0.4f, 0.1f, 60, 100)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.HIGH)
             .withInfo(
@@ -102,7 +108,7 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
                     Component.literal("fast high damage barrage, 5-6 hearts total")
             );
 
-    public static final FireGrabHitAttack FIRE_GRAB_HIT = new FireGrabHitAttack(0, 8, 2, 0.75f,
+    public static final FireGrabHitAttack FIRE_GRAB_HIT = new FireGrabHitAttack(0, 8, 20, 0.75f,
             4f, 20)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(
@@ -123,10 +129,11 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
                     Component.literal("heats nearby items/blocks, damages and knockbacks on pickup, deletes the item. ")
             );
 
-    public static final PureHeatAccumulationAttack PURE_HEAT = new PureHeatAccumulationAttack(300, 15, 25, 1f)
+    public static final PureHeatAccumulationAttack PURE_HEAT = new PureHeatAccumulationAttack(300, 8, 25, 1f,
+            0f, 25, 8f, 0f, 1f)
             .withInfo(
                     Component.literal("Pure Heat Accumulation"),
-                    Component.literal("AoE slam causing heat accumulation")
+                    Component.literal("Creates a 5 radius heat zone in front of the user")
             );
 
     public static final FireSparksAttack FIRE_SPARKS = new FireSparksAttack(800, 20, 30, 0.75f)
@@ -191,19 +198,19 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
     }
 
     public enum State implements StandAnimationState<SpeedKingEntity> { //yea no animations sorry (garlic better get to work)
-        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("new"))),
-        PUNCH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("new"))),
-        PUNCH_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("new"))),
-        FLAME_PUNCH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("new"))),
-        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("new"))),
-        HEAD_SMACK(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("new"))),
-        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("new"))),
-        FIRE_GRAB(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("new"))),
-        FIRE_GRAB_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("new"))),
-        IMBUE_ITEM(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("new"))),
-        PURE_HEAT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("new"))),
-        FIRE_SPARKS(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("new"))),
-        FLASHBANG(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("new")));
+        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.speed_king.idle"))),
+        PUNCH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.speed_king.light"))),
+        PUNCH_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.speed_king.light_followup"))),
+        FLAME_PUNCH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.speed_king.flame_punch"))),
+        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.speed_king.block"))),
+        HEAD_SMACK(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.speed_king.idle"))),
+        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.speed_king.barrage"))),
+        FIRE_GRAB(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.speed_king.grab"))),
+        FIRE_GRAB_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.speed_king.grabhit"))),
+        IMBUE_ITEM(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.speed_king.imbue_item"))),
+        PURE_HEAT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.speed_king.heat_accumilation"))),
+        FIRE_SPARKS(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.speed_king.fire_sparks"))),
+        FLASHBANG(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.speed_king.flashbang")));
 
         private final Consumer<AnimationState<SpeedKingEntity>> animator;
 
@@ -224,7 +231,7 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
 
     @Override
     protected String getSummonAnimation() {
-        return "new";
+        return "animation.speed_king.summon";
     }
 
     @Override
