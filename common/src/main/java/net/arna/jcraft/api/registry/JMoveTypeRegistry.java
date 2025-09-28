@@ -93,6 +93,7 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> GOLDEXPERIENCE_REQUIEM_NULLIFICATION_ATTACK = register("goldexperience_requiem_nullification_attack", NullificationAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> GOLDEXPERIENCE_REQUIEM_OVERHEAD_KICK_ATTACK = register("goldexperience_requiem_overhead_kick_attack", OverheadKickAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> GOLDEXPERIENCE_REQUIEM_RETURN_TO_ZERO_MOVE = register("goldexperience_requiem_return_to_zero_move", ReturnToZeroMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> GOLDEXPERIENCE_REQUIEM_RETURN_TO_ZERO_HEAL_MOVE = register("goldexperience_requiem_return_to_zero_heal_move", ReturnToZeroHealMove.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> HIEROPHANTGREEN_EMERALD_SPLASH_ATTACK = register("hierophantgreen_emerald_splash_attack", EmeraldSplashAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> HIEROPHANTGREEN_NET_SET_MOVE = register("hierophantgreen_net_set_move", NetSetMove.Type.INSTANCE);
