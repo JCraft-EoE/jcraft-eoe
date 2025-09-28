@@ -166,7 +166,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
                     Component.empty()
             );
     public static final ReturnToZeroHealMove HEAL_SELF = new ReturnToZeroHealMove(520, 10, 14,
-            1f, 5, 8, 100, CountdownMove.ENTITY_STUFF_TO_SAVE, JMarkerExtractorRegistry.ALL.get(), JMarkerInjectorRegistry.ALL.get())
+            1f, 5, 8, 20, CountdownMove.ENTITY_STUFF_TO_SAVE, JMarkerExtractorRegistry.ALL.get(), JMarkerInjectorRegistry.ALL.get())
             .withCrouchingVariant(HEAL)
             .withSound(JSoundRegistry.GE_HEAL)
             .withInfo(
