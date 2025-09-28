@@ -7,6 +7,7 @@
 * Diego outfit has been updated
 ### NPCs & Stands
 * (re)added max reach for Mandom, BTD Ult and GER RTZ teleport, all default to 200 blocks
+* changed GER's self-heal move to work similar to Mandom
 * Training Dummy is now vulnerable if below build height (to be able to die in the void) and killable via /kill
 ### Configs
 * made Roadroller paving/destruction configurable via server config
