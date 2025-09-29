@@ -12,15 +12,16 @@ import net.arna.jcraft.api.attack.MoveSet;
 import net.arna.jcraft.api.attack.MoveSetManager;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.MoveMap;
-import net.arna.jcraft.api.attack.StateContainer;
+import net.arna.jcraft.api.attack.enums.StunType;
 import net.arna.jcraft.common.attack.moves.speedking.FlamePunchAttack;
 import net.arna.jcraft.common.attack.moves.speedking.HeadSmackAttack;
 import net.arna.jcraft.common.attack.moves.speedking.FireGrabAttack;
-import net.arna.jcraft.common.attack.moves.speedking.FireGrabHitAttack;
+import net.arna.jcraft.common.attack.moves.speedking.FlashbangAttack;
 import net.arna.jcraft.common.attack.moves.speedking.ImbueItemAttack;
 import net.arna.jcraft.common.attack.moves.speedking.PureHeatAccumulationAttack;
 import net.arna.jcraft.common.attack.moves.speedking.FireSparksAttack;
-import net.arna.jcraft.common.attack.moves.speedking.FlashbangAttack;
+import net.arna.jcraft.common.attack.moves.speedking.HeatWavesAttack;
+import net.arna.jcraft.common.attack.moves.speedking.UpdraftAttack;
 import net.arna.jcraft.common.attack.moves.shared.KnockdownAttack;
 import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
@@ -102,25 +103,30 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
                     Component.literal("fast high damage barrage, 5-6 hearts total")
             );
 
-    public static final FireGrabHitAttack FIRE_GRAB_HIT = new FireGrabHitAttack(0, 8, 2, 0.75f,
-            4f, 20)
-            .withImpactSound(JSoundRegistry.IMPACT_1)
+    public static final SimpleAttack<SpeedKingEntity> FIRE_GRAB_HIT = new SimpleAttack<SpeedKingEntity>(0,
+            0, 10, 0.75f, 0f, 20, 2f, 1.5f, 0f)
+            .withStunType(StunType.UNBURSTABLE)
             .withInfo(
-                    Component.literal("Fire Grab (Hit)"),
-                    Component.literal("imbues target with heat")
-            );
+                    Component.literal("Fire Grab Hit"),
+                    Component.empty());
 
     public static final FireGrabAttack FIRE_GRAB = new FireGrabAttack(100, 10, 16, 0.75f,
-            4f, 30, 2f, 3f, 0f, FIRE_GRAB_HIT, StateContainer.of(State.FIRE_GRAB_HIT), 20, 1)
+            0f, 0, 2.0f, 0f, 0.0f, FIRE_GRAB_HIT, 60, 1.0)
             .withInfo(
                     Component.literal("Fire Grab"),
-                    Component.literal("grab that imbues target with internal heat, causes nausea and fire damage")
+                    Component.literal("holdable grab that builds boiling stacks and knockback over time")
             );
 
     public static final ImbueItemAttack IMBUE_ITEM = new ImbueItemAttack(150, 12, 18, 0.75f)
             .withInfo(
                     Component.literal("Imbue Item with Heat"),
-                    Component.literal("heats nearby items/blocks, damages and knockbacks on pickup, deletes the item. ")
+                    Component.literal("heats nearby items/blocks, causes boiling on pickup")
+            );
+
+    public static final FlashbangAttack FLASHBANG = new FlashbangAttack(200, 8, 12, 0.75f, 60)
+            .withInfo(
+                    Component.literal("Flashbang Timer"),
+                    Component.literal("plants a timed explosive that blinds nearby enemies")
             );
 
     public static final PureHeatAccumulationAttack PURE_HEAT = new PureHeatAccumulationAttack(300, 15, 25, 1f)
@@ -129,16 +135,23 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
                     Component.literal("AoE slam causing heat accumulation")
             );
 
-    public static final FireSparksAttack FIRE_SPARKS = new FireSparksAttack(800, 20, 30, 0.75f)
+    public static final FireSparksAttack FIRE_SPARKS = new FireSparksAttack(0, 8, 20, 0.75f)
             .withInfo(
                     Component.literal("Fire Sparks"),
-                    Component.literal("shoots spreading fire sparks that create persistent flame areas")
+                    Component.literal("holdable attack that shoots spreading sparks causing boiling")
             );
 
-    public static final FlashbangAttack FLASHBANG = new FlashbangAttack(200, 8, 12, 0.75f)
+    public static final HeatWavesAttack HEAT_WAVES = new HeatWavesAttack(800, 20, 30, 0.75f)
             .withInfo(
-                    Component.literal("Flashbang"),
-                    Component.literal("fire sparks that blind nearby targets for repositioning")
+                    Component.literal("Heat Waves"),
+                    Component.literal("shoots projectiles that create heat wave explosions on impact")
+            );
+
+    public static final UpdraftAttack UPDRAFT = new UpdraftAttack(400, 10, 15, 0f, 180, 60)
+            .withCrouchingVariant(IMBUE_ITEM)
+            .withInfo(
+                    Component.literal("Updraft"),
+                    Component.literal("creates wind launcher that sends you up after 3 seconds")
             );
 
     public SpeedKingEntity(Level worldIn) {
@@ -155,16 +168,17 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
     private static void registerMoves(MoveMap<SpeedKingEntity, State> moves) {
         moves.registerImmediate(MoveClass.LIGHT, PUNCH, State.PUNCH);
 
-        moves.register(MoveClass.HEAVY, HEAD_SMACK, State.HEAD_SMACK);
+        moves.register(MoveClass.HEAVY, FIRE_SPARKS, State.FIRE_SPARKS);
         moves.register(MoveClass.BARRAGE, HEAT_BARRAGE, State.BARRAGE);
 
         moves.register(MoveClass.SPECIAL1, FIRE_GRAB, State.FIRE_GRAB);
-        moves.register(MoveClass.SPECIAL2, IMBUE_ITEM, State.IMBUE_ITEM);
+        moves.register(MoveClass.SPECIAL2, FLASHBANG, State.FLASHBANG);
         moves.register(MoveClass.SPECIAL3, PURE_HEAT, State.PURE_HEAT);
 
-        moves.register(MoveClass.ULTIMATE, FIRE_SPARKS, State.FIRE_SPARKS);
+        moves.register(MoveClass.ULTIMATE, HEAT_WAVES, State.HEAT_WAVES);
 
-        moves.register(MoveClass.UTILITY, FLASHBANG, State.FLASHBANG);
+        moves.register(MoveClass.UTILITY, UPDRAFT, State.UPDRAFT);
+        moves.register(MoveClass.TOSS, HEAD_SMACK, State.HEAD_SMACK);
     }
 
     @Override
@@ -185,25 +199,25 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
     }
 
     @Override
-    @NonNull
     public SpeedKingEntity getThis() {
         return this;
     }
 
-    public enum State implements StandAnimationState<SpeedKingEntity> { //yea no animations sorry (garlic better get to work)
-        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("new"))),
-        PUNCH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("new"))),
-        PUNCH_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("new"))),
-        FLAME_PUNCH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("new"))),
-        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("new"))),
-        HEAD_SMACK(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("new"))),
-        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("new"))),
-        FIRE_GRAB(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("new"))),
-        FIRE_GRAB_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("new"))),
-        IMBUE_ITEM(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("new"))),
-        PURE_HEAT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("new"))),
-        FIRE_SPARKS(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("new"))),
-        FLASHBANG(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("new")));
+    public enum State implements StandAnimationState<SpeedKingEntity> {
+        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("idle"))),
+        PUNCH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("light"))),
+        PUNCH_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("light_followup"))),
+        FLAME_PUNCH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("flame_punch"))),
+        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("block"))),
+        HEAD_SMACK(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("head_smack"))),
+        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("barrage"))),
+        FIRE_GRAB(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("grab"))),
+        IMBUE_ITEM(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("imbue_item"))),
+        PURE_HEAT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("heat_accumilation"))),
+        FIRE_SPARKS(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("fire_sparks"))),
+        HEAT_WAVES(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("fire_sparks"))),
+        FLASHBANG(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("flashbang"))),
+        UPDRAFT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("imbue_item")));
 
         private final Consumer<AnimationState<SpeedKingEntity>> animator;
 
@@ -224,7 +238,7 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
 
     @Override
     protected String getSummonAnimation() {
-        return "new";
+        return "summon";
     }
 
     @Override

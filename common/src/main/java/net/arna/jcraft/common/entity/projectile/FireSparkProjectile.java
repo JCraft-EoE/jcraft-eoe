@@ -2,6 +2,7 @@ package net.arna.jcraft.common.entity.projectile;
 
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
+import net.arna.jcraft.common.attack.moves.speedking.HeatWavesAttack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -21,14 +22,12 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
-/**
- * Fire Spark projectile for Speed King attacks.
- * Can operate in two modes: normal (for Fire Sparks attack) and flashbang mode.
- * In bouncing mode, bounces up to 3 times off blocks with increasing damage.
- */
+import java.util.List;
+
 public class FireSparkProjectile extends ThrowableProjectile {
     private static final EntityDataAccessor<Boolean> FLASHBANG_MODE = SynchedEntityData.defineId(FireSparkProjectile.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> BOUNCING_MODE = SynchedEntityData.defineId(FireSparkProjectile.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> HEAT_WAVE_MODE = SynchedEntityData.defineId(FireSparkProjectile.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Float> BASE_DAMAGE = SynchedEntityData.defineId(FireSparkProjectile.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Integer> BOUNCE_COUNT = SynchedEntityData.defineId(FireSparkProjectile.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> MAX_BOUNCES = SynchedEntityData.defineId(FireSparkProjectile.class, EntityDataSerializers.INT);
@@ -54,6 +53,7 @@ public class FireSparkProjectile extends ThrowableProjectile {
     protected void defineSynchedData() {
         this.entityData.define(FLASHBANG_MODE, false);
         this.entityData.define(BOUNCING_MODE, false);
+        this.entityData.define(HEAT_WAVE_MODE, false);
         this.entityData.define(BASE_DAMAGE, 2.0f);
         this.entityData.define(BOUNCE_COUNT, 0);
         this.entityData.define(MAX_BOUNCES, 3);
@@ -73,6 +73,14 @@ public class FireSparkProjectile extends ThrowableProjectile {
 
     public boolean isBouncingMode() {
         return this.entityData.get(BOUNCING_MODE);
+    }
+
+    public void setHeatWaveMode(boolean heatWave) {
+        this.entityData.set(HEAT_WAVE_MODE, heatWave);
+    }
+
+    public boolean isHeatWaveMode() {
+        return this.entityData.get(HEAT_WAVE_MODE);
     }
 
     public void setBaseDamage(float damage) {
@@ -142,20 +150,32 @@ public class FireSparkProjectile extends ThrowableProjectile {
             EntityHitResult entityHit = (EntityHitResult) hitResult;
             if (entityHit.getEntity() instanceof LivingEntity livingEntity && entityHit.getEntity() != getOwner()) {
                 hitEntity(livingEntity);
-                if (!isBouncingMode()) {
+                if (!isBouncingMode() && !isHeatWaveMode()) {
                     discard();
                 }
             }
         } else if (hitResult.getType() == HitResult.Type.BLOCK) {
             BlockHitResult blockHit = (BlockHitResult) hitResult;
 
-            if (isBouncingMode()) {
+            if (isHeatWaveMode()) {
+                createHeatWave(blockHit.getBlockPos());
+                HeatWavesAttack.cleanupProjectile(this);
+                discard();
+            } else if (isBouncingMode()) {
                 handleBounce(blockHit);
             } else {
                 handleBlockHit(blockHit);
                 discard();
             }
         }
+    }
+
+    @Override
+    public void remove(RemovalReason reason) {
+        if (isHeatWaveMode()) {
+            HeatWavesAttack.cleanupProjectile(this);
+        }
+        super.remove(reason);
     }
 
     private void hitEntity(LivingEntity target) {
@@ -165,10 +185,14 @@ public class FireSparkProjectile extends ThrowableProjectile {
         if (isFlashbangMode()) {
             // Flashbang effects: blindness only
             target.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 100, 0, false, true)); // 5 seconds
+            target.addEffect(new MobEffectInstance(JStatusRegistry.BOILING.get(), 100, 0, false, true)); // 5 seconds
+        } else if (getBaseDamage() <= 2.0f) {
+            // Fire Sparks Heavy: lower damage = boiling only, no stun
+            target.addEffect(new MobEffectInstance(JStatusRegistry.BOILING.get(), 100, 0, false, true)); // 5 seconds
         } else if (isBouncingMode()) {
             // Fire Sparks effects: Boiling, blindness, slowness
             target.addEffect(new MobEffectInstance(JStatusRegistry.BOILING.get(), 200, 0, false, true)); // 10 seconds
-            target.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 60, 0, false, true)); // 3 seconds
+            target.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 60, 10, false, true)); // 3 seconds
             target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 1, false, true)); // 5 seconds
         } else {
             // Regular fire spark: just set on fire
@@ -177,6 +201,35 @@ public class FireSparkProjectile extends ThrowableProjectile {
 
         // Destroy nearby plants and water for all modes
         destroyPlantsAndWater(target.blockPosition());
+    }
+
+    private void createHeatWave(BlockPos impactPos) {
+        // Create a 2-block radius heat wave similar to Pure Heat Accumulation
+        int radius = 2;
+        Vec3 center = Vec3.atCenterOf(impactPos);
+
+        // Apply boiling to entities in the area
+        List<LivingEntity> entitiesInArea = level().getEntitiesOfClass(LivingEntity.class,
+                new net.minecraft.world.phys.AABB(center.add(-radius, -2, -radius), center.add(radius, 2, radius)),
+                entity -> entity != getOwner());
+
+        for (LivingEntity entity : entitiesInArea) {
+            entity.addEffect(new MobEffectInstance(JStatusRegistry.BOILING.get(), 200, 0, false, true));
+        }
+
+        // Destroy plants and water in the area
+        for (int x = -radius; x <= radius; x++) {
+            for (int y = -2; y <= 2; y++) {
+                for (int z = -radius; z <= radius; z++) {
+                    BlockPos pos = impactPos.offset(x, y, z);
+                    destroyPlantsAndWater(pos);
+                }
+            }
+        }
+    }
+
+    public void explodeAsHeatWave() {
+        createHeatWave(blockPosition());
     }
 
     private void handleBounce(BlockHitResult blockHit) {
@@ -215,7 +268,7 @@ public class FireSparkProjectile extends ThrowableProjectile {
             int radius = 4; // 4 block radius for flashbang effect
 
             // Find all living entities in the area
-            java.util.List<LivingEntity> entitiesInArea = level().getEntitiesOfClass(LivingEntity.class,
+            List<LivingEntity> entitiesInArea = level().getEntitiesOfClass(LivingEntity.class,
                     new net.minecraft.world.phys.AABB(explosionPos.add(-radius, -radius, -radius), explosionPos.add(radius, radius, radius)),
                     entity -> entity != getOwner());
 
@@ -228,7 +281,7 @@ public class FireSparkProjectile extends ThrowableProjectile {
             // Create explosion visual/sound effect but no damage
             if (!level().isClientSide) {
                 level().explode(this, explosionPos.x, explosionPos.y, explosionPos.z, 0.5f, false,
-                        net.minecraft.world.level.Level.ExplosionInteraction.NONE);
+                        Level.ExplosionInteraction.NONE);
             }
         } else {
             // Regular fire spark: create fire
@@ -249,7 +302,6 @@ public class FireSparkProjectile extends ThrowableProjectile {
                     BlockPos pos = center.offset(x, y, z);
                     BlockState state = level().getBlockState(pos);
 
-                    // Destroy plants using proper 1.20.1 methods
                     if (state.is(BlockTags.FLOWERS) ||
                             state.is(BlockTags.CROPS) ||
                             state.is(BlockTags.SAPLINGS) ||
