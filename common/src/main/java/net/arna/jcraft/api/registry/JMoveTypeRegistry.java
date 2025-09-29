@@ -262,7 +262,8 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> SPEEDKING_FLAME_PUNCH_ATTACK = register("speedking_flame_punch_attack", FlamePunchAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SPEEDKING_HEAD_SMACK_ATTACK = register("speedking_head_smack_attack", HeadSmackAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SPEEDKING_FIRE_GRAB_ATTACK = register("speedking_fire_grab_attack", FireGrabAttack.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> SPEEDKING_FIRE_GRAB_HIT_ATTACK = register("speedking_fire_grab_hit_attack", FireGrabHitAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> SPEEDKING_HEAT_WAVES_ATTACK = register("speedking_heat_waves_attack", HeatWavesAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> SPEEDKING_UPDRAFT_ATTACK = register("speedking_updraft_attack", UpdraftAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SPEEDKING_IMBUE_ITEM_ATTACK = register("speedking_imbue_item_attack", ImbueItemAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SPEEDKING_PURE_HEAT_ACCUMULATION_ATTACK = register("speedking_pure_heat_accumulation_attack", PureHeatAccumulationAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SPEEDKING_FIRE_SPARKS_ATTACK = register("speedking_fire_sparks_attack", FireSparksAttack.Type.INSTANCE);
