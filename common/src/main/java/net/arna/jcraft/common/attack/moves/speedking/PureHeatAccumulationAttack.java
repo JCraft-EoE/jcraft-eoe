@@ -2,6 +2,7 @@ package net.arna.jcraft.common.attack.moves.speedking;
 
 import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@Getter
 public final class PureHeatAccumulationAttack extends AbstractSimpleAttack<PureHeatAccumulationAttack, SpeedKingEntity> {
     private static final Map<String, Long> HEATED_BLOCKS = new HashMap<>();
     private static final Map<String, Long> ACTIVE_GEYSER = new HashMap<>();

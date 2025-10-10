@@ -11,7 +11,6 @@ import net.arna.jcraft.common.entity.stand.SpeedKingEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -22,13 +21,10 @@ import java.util.Set;
 
 @Getter
 public final class UpdraftAttack extends AbstractMove<UpdraftAttack, SpeedKingEntity> {
-    private final int windDuration;
     private static final Map<String, UpdraftPad> ACTIVE_PADS = new HashMap<>();
 
-    public UpdraftAttack(final int cooldown, final int windup, final int duration, final float moveDistance,
-                         final int windDuration, final int finalLaunchDamage) {
+    public UpdraftAttack(final int cooldown, final int windup, final int duration, final float moveDistance) {
         super(cooldown, windup, duration, moveDistance);
-        this.windDuration = windDuration;
     }
 
     @Override
@@ -49,7 +45,7 @@ public final class UpdraftAttack extends AbstractMove<UpdraftAttack, SpeedKingEn
         ACTIVE_PADS.put(padKey, new UpdraftPad(
                 attacker.level(),
                 padPos,
-                attacker.level().getGameTime() + windDuration,
+                attacker.level().getGameTime() + 60, // 3 seconds hardcoded
                 user
         ));
 
@@ -70,7 +66,7 @@ public final class UpdraftAttack extends AbstractMove<UpdraftAttack, SpeedKingEn
                 if (currentTime >= pad.finalLaunchTime) {
                     // Final launch with damage
                     entity.push(0, 6.0, 0); // 6 blocks up
-                    entity.hurt(entity.damageSources().magic(), pad.finalLaunchDamage / 10f); // 1 heart damage
+                    entity.hurt(entity.damageSources().magic(), 1.0f); // 1 heart damage
                     entity.hurtMarked = true;
                 } else if (currentTime >= startTime) {
                     // Continuous wind effect - 4 blocks up over 3 seconds
@@ -103,8 +99,7 @@ public final class UpdraftAttack extends AbstractMove<UpdraftAttack, SpeedKingEn
 
     @Override
     public @NonNull UpdraftAttack copy() {
-        return copyExtras(new UpdraftAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(),
-                getWindDuration(), getFinalLaunchDamage()));
+        return copyExtras(new UpdraftAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
     }
 
     public static class UpdraftPad {
@@ -113,7 +108,6 @@ public final class UpdraftAttack extends AbstractMove<UpdraftAttack, SpeedKingEn
         public final long finalLaunchTime;
         public final int windDuration;
         public final LivingEntity owner;
-        public final int finalLaunchDamage;
 
         public UpdraftPad(Level level, BlockPos pos, long finalLaunchTime, LivingEntity owner) {
             this.level = level;
@@ -121,7 +115,6 @@ public final class UpdraftAttack extends AbstractMove<UpdraftAttack, SpeedKingEn
             this.finalLaunchTime = finalLaunchTime;
             this.windDuration = 60; // 3 seconds
             this.owner = owner;
-            this.finalLaunchDamage = 10; // 1 heart
         }
     }
 
@@ -130,10 +123,7 @@ public final class UpdraftAttack extends AbstractMove<UpdraftAttack, SpeedKingEn
 
         @Override
         protected @NonNull App<RecordCodecBuilder.Mu<UpdraftAttack>, UpdraftAttack> buildCodec(RecordCodecBuilder.Instance<UpdraftAttack> instance) {
-            return baseDefault(instance)
-                    .and(Codec.INT.fieldOf("wind_duration").forGetter(UpdraftAttack::getWindDuration))
-                    .and(Codec.INT.fieldOf("final_launch_damage").forGetter(UpdraftAttack::getFinalLaunchDamage))
-                    .apply(instance, applyExtras(UpdraftAttack::new));
+            return baseDefault(instance, UpdraftAttack::new);
         }
     }
 }

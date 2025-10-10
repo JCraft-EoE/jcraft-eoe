@@ -1,7 +1,6 @@
 package net.arna.jcraft.common.attack.moves.speedking;
 
 import com.mojang.datafixers.kinds.App;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -24,12 +23,10 @@ import java.util.Set;
 
 @Getter
 public final class FlashbangAttack extends AbstractMove<FlashbangAttack, SpeedKingEntity> {
-    private final int timerDuration;
     private static final Map<String, FlashbangTimer> ACTIVE_TIMERS = new HashMap<>();
 
-    public FlashbangAttack(final int cooldown, final int windup, final int duration, final float moveDistance, final int timerDuration) {
+    public FlashbangAttack(final int cooldown, final int windup, final int duration, final float moveDistance) {
         super(cooldown, windup, duration, moveDistance);
-        this.timerDuration = timerDuration;
     }
 
     @Override
@@ -60,11 +57,11 @@ public final class FlashbangAttack extends AbstractMove<FlashbangAttack, SpeedKi
         String timerKey = attacker.level().dimension().location() + "_" +
                 bombPos.getX() + "_" + bombPos.getY() + "_" + bombPos.getZ();
 
-        // Plant the timer bomb
+        // Plant the timer bomb - uses the move's duration
         ACTIVE_TIMERS.put(timerKey, new FlashbangTimer(
                 attacker.level(),
                 bombPos,
-                attacker.level().getGameTime() + timerDuration,
+                attacker.level().getGameTime() + getDuration(),
                 user
         ));
 
@@ -115,7 +112,7 @@ public final class FlashbangAttack extends AbstractMove<FlashbangAttack, SpeedKi
 
     @Override
     public @NonNull FlashbangAttack copy() {
-        return copyExtras(new FlashbangAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getTimerDuration()));
+        return copyExtras(new FlashbangAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
     }
 
     public static class FlashbangTimer {
@@ -137,9 +134,7 @@ public final class FlashbangAttack extends AbstractMove<FlashbangAttack, SpeedKi
 
         @Override
         protected @NonNull App<RecordCodecBuilder.Mu<FlashbangAttack>, FlashbangAttack> buildCodec(RecordCodecBuilder.Instance<FlashbangAttack> instance) {
-            return baseDefault(instance)
-                    .and(Codec.INT.fieldOf("timer_duration").forGetter(FlashbangAttack::getTimerDuration))
-                    .apply(instance, applyExtras(FlashbangAttack::new));
+            return baseDefault(instance, FlashbangAttack::new);
         }
     }
 }

@@ -1316,7 +1316,7 @@
 				}
 			}
 		},
-		"animation.speed_king.light followup": {
+		"animation.speed_king.light_followup": {
 			"loop": "hold_on_last_frame",
 			"animation_length": 0.5,
 			"bones": {
