@@ -26,10 +26,19 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public final class ReturnToZeroHealMove extends AbstractMove<ReturnToZeroHealMove, GEREntity> {
+    /**
+     * How many stages are there.
+     */
     @Getter
     private final int stepAmount;
+    /**
+     * How many ticks between two stages during return phase.
+     */
     @Getter
     private final int stepDelay;
+    /**
+     * How many ticks between two stages being saved.
+     */
     @Getter
     private final int stepSave;
     @Getter
