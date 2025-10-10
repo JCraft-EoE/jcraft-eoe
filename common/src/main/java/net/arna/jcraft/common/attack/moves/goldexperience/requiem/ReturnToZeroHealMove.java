@@ -11,6 +11,7 @@ import net.arna.jcraft.common.entity.stand.GEREntity;
 import net.arna.jcraft.common.marker.EntityMarker;
 import net.arna.jcraft.common.marker.EntityMarkerType;
 import net.arna.jcraft.common.util.CycleDeque;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.TriConsumer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -104,7 +105,7 @@ public final class ReturnToZeroHealMove extends AbstractMove<ReturnToZeroHealMov
             final Optional<Vec3> nextPosOp = returnEntityMarkers.peekLast().extractPosition();
             if (nextPosOp.isPresent()) {
                 final Vec3 nextPos = nextPosOp.get();
-                // TODO change the velocity here
+                JUtils.setVelocity(user, nextPos.subtract(user.position()).scale(1.0 / (double)stepDelay));
             }
         }
     }
