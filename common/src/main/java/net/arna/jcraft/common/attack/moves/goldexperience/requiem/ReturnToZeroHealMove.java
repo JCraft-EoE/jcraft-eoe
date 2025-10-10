@@ -18,6 +18,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -98,6 +99,13 @@ public final class ReturnToZeroHealMove extends AbstractMove<ReturnToZeroHealMov
         ticksSinceLastStepReturn = 0;
         if (returnEntityMarkers.isEmpty()) {
             started = false;
+        }
+        else {
+            final Optional<Vec3> nextPosOp = returnEntityMarkers.peekLast().extractPosition();
+            if (nextPosOp.isPresent()) {
+                final Vec3 nextPos = nextPosOp.get();
+                // TODO change the velocity here
+            }
         }
     }
 
