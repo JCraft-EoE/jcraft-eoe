@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 public final class ReturnToZeroHealMove extends AbstractMove<ReturnToZeroHealMove, GEREntity> {
     /**
-     * How many stages are there.
+     * How many stages there are.
      */
     @Getter
     private final int stepAmount;
