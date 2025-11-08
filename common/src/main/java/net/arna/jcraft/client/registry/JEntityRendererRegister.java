@@ -61,7 +61,7 @@ public interface JEntityRendererRegister {
             new RendererData<>(JEntityTypeRegistry.GE_SNAKE, GESnakeRenderer::new),
             new RendererData<>(JEntityTypeRegistry.GE_BUTTERFLY, GEButterflyRenderer::new),
 
-            new RendererData<>(JEntityTypeRegistry.HIEROPHANT_GREEN, context -> new StandEntityRenderer<>(context, JStandTypeRegistry.HIEROPHANT_GREEN.get(), 0f, -0.2f)),
+            new RendererData<>(JEntityTypeRegistry.HIEROPHANT_GREEN, HGRenderer::new),
             new RendererData<>(JEntityTypeRegistry.EMERALD, context -> new ProjectileRenderer<>(context, "emerald")),
             new RendererData<>(JEntityTypeRegistry.BISECT, BisectRenderer::new),
             new RendererData<>(JEntityTypeRegistry.HG_NET, HGNetRenderer::new),
