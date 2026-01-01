@@ -50,7 +50,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-@SuppressWarnings("UnusedReturnValue")
+@SuppressWarnings({"UnusedReturnValue", "unused"}) // API, s
 @Getter
 public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAttacker<? extends A, ?>> {
     // Used to store the time this move was charged for, if any.

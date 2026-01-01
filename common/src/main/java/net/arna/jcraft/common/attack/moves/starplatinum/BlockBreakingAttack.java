@@ -3,7 +3,6 @@ package net.arna.jcraft.common.attack.moves.starplatinum;
 import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
 import net.arna.jcraft.common.entity.stand.AbstractStarPlatinumEntity;
@@ -12,7 +11,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -32,27 +30,27 @@ public final class BlockBreakingAttack extends AbstractSimpleAttack<BlockBreakin
                             final Set<AABB> boxes, final DamageSource damageSource, final Vec3 forwardPos,
                             final Vec3 rotationVector) {
         Level world = attacker.level();
-        if (world.getGameRules().getBoolean(JCraft.STAND_GRIEFING)) {
-            BlockPos bPos = attacker.blockPosition().offset((int) rotationVector.x, (int) rotationVector.y, (int) rotationVector.z);
-            for (int x = -1; x < 2; x++) {
-                for (int y = -1; y < 2; y++) {
-                    for (int z = -1; z < 2; z++) {
-                        BlockPos curPos = bPos.offset(x, y, z);
-                        BlockState curState = world.getBlockState(curPos);
-                        Block block = curState.getBlock();
+        LivingEntity user = attacker.getUserOrThrow();
+        if (!mayBreak(user, null)) return;
 
-                        if (block.defaultDestroyTime() < 0 || block.getExplosionResistance() > 10f || curState.isAir()) {
-                            continue;
-                        }
+        final BlockPos bPos = attacker.blockPosition().offset((int) rotationVector.x, (int) rotationVector.y, (int) rotationVector.z);
+        for (int x = -1; x < 2; x++) {
+            for (int y = -1; y < 2; y++) {
+                for (int z = -1; z < 2; z++) {
+                    final BlockPos curPos = bPos.offset(x, y, z);
 
-                        world.levelEvent(null, 2001, curPos, getId(curState)); // Particles
-
-                        FallingBlockEntity fallingBlock = FallingBlockEntity.fall(world, curPos, curState);
-                        fallingBlock.setDeltaMovement(rotationVector.add(x * 0.5, 0.5, z * 0.5));
-                        fallingBlock.time = -120;
-                        fallingBlock.hurtMarked = true;
-                        fallingBlock.hasImpulse = true;
+                    if (!mayBreak(user, curPos, s -> s.getBlock().getExplosionResistance() <= 10 && !s.isAir())) {
+                        continue;
                     }
+
+                    final BlockState curState = world.getBlockState(curPos);
+                    world.levelEvent(null, 2001, curPos, getId(curState)); // Particles
+
+                    FallingBlockEntity fallingBlock = FallingBlockEntity.fall(world, curPos, curState);
+                    fallingBlock.setDeltaMovement(rotationVector.add(x * 0.5, 0.5, z * 0.5));
+                    fallingBlock.time = -120;
+                    fallingBlock.hurtMarked = true;
+                    fallingBlock.hasImpulse = true;
                 }
             }
         }

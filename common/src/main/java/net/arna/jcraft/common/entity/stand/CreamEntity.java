@@ -14,6 +14,7 @@ import net.arna.jcraft.api.attack.MoveSetManager;
 import net.arna.jcraft.api.attack.StateContainer;
 import net.arna.jcraft.api.attack.enums.BlockableType;
 import net.arna.jcraft.api.attack.enums.MoveClass;
+import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
@@ -467,177 +468,186 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         }
 
         if (voiding) {
-            if (server) {
-                if (level().getGameRules().getBoolean(JCraft.STAND_GRIEFING)) {
-                    final BlockPos blockPos = blockPosition();
-                    // Fun 3x4x3 void code
-                    BlockPos from = blockPos.offset(-1, -1, -1);
-                    BlockPos to = blockPos.offset(1, 2, 1);
-                    BlockPos.betweenClosed(from, to).forEach(p -> {
-                        if (level().getBlockState(p).getBlock().getExplosionResistance() > 100.1f) {
-                            return;
-                        }
+            tickVoiding(server, notCreativeOrSpectator, user, userIsPlayer, voidTime, pos);
+        } else {
+            tickNotVoiding(user, pos);
+        }
+    }
 
-                        if (!JServerConfig.CREAM_ITEM_ERASE.getValue()) {
-                            // Drop items before destroying the block
-                            Block.dropResources(level().getBlockState(p), level(), p);
-                        }
+    private void tickNotVoiding(LivingEntity user, Vec3 pos) {
+        if (isIdle() && charging) {
+            charging = false;
+            setFree(false);
+        }
 
-                        level().setBlockAndUpdate(p, Block.stateById(0));
-                    });
-                }
+        if (!isHalfBall()) {
+            return;
+        }
+        setAlphaOverride(0.1f);
+        user.resetFallDistance();
+        user.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 5, 9, true, false));
 
-                // Blind normal players while in void
-                if (notCreativeOrSpectator && !isFree()) {
-                    user.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 25, 0, false, false));
-                }
-
-                if (charging) {
-                    if (isFree()) { // Surprise move
-                        final Vector3f newPos = getFreePos();
-                        // Find outDir
-                        Vector3f outDir = getCurrentMove() instanceof AbstractSurpriseMove<?> surpriseMove ?
-                                surpriseMove.getOutDir() : new Vector3f();
-                        newPos.add(outDir);
-                        setFreePos(newPos);
-                        if (getMoveStun() == 1) {
-                            setFree(false);
-                        }
-                    } else if (chargeDir != null) { // Void Charge move
-                        user.setDeltaMovement(chargeDir);
-                        user.hurtMarked = true;
-                        if (user instanceof ServerPlayer player) {
-                            player.connection.send(new ClientboundSetEntityMotionPacket(user));
-                        }
-                    }
-                } else { // Ultimate
-                    setStateNoReset(State.IDLE);
-
-                    if (!userIsPlayer) {
-                        handleAIVoid(user, voidTime);
-                    }
-                }
-
-                final AABB damageBox = new AABB(pos.add(1.5, 1.5, 1.5), pos.subtract(1.5, 1.5, 1.5));
-                final List<Entity> toDamage = level().getEntitiesOfClass(Entity.class,
-                        damageBox, EntitySelector.ENTITY_STILL_ALIVE.and(EntitySelector.NO_CREATIVE_OR_SPECTATOR));
-                JUtils.displayHitbox(level(), damageBox);
-
-                toDamage.remove(user);
-                toDamage.remove(this);
-
-                boolean hurt;
-                int stun = 2;
-                float damage = 1.5f;
-                if (charging) {
-                    hurt = getMoveStun() % 2 == 0; // More consistent
-                    stun = 4;
-                    damage = 5.0f;
-                } else {
-                    hurt = tickCount % 4 == 0;
-
-                    setAlphaOverride(0);
-                }
-
-                for (Entity ent : toDamage) {
-                     if (ent instanceof ItemEntity) {
-                         if (JServerConfig.CREAM_ITEM_ERASE.getValue()) {
-                             ent.discard();
-                         }
-                         continue;
-                    }
-                    if (ent instanceof LivingEntity livingEntity) {
-                        if (hurt) {
-                            JCraft.stun(livingEntity, stun, 0, user);
-                            JUtils.cancelMoves(livingEntity);
-                        }
-
-                        livingEntity.hurt(level().damageSources().fellOutOfWorld(), damage);
-                    }
-                }
-
-                voidTime--;
-                if (voidTime < 1) {
-                    resetAlphaOverride();
-                }
-                setVoidTime(voidTime);
-                setDistanceOffset(0);
-            } else {
-                for (int i = 0; i < 16; i++) {
-                    level().addParticle(ParticleTypes.MYCELIUM,
-                            pos.x + (random.nextFloat() - 0.5f) * 2f,
-                            pos.y + (random.nextFloat() - 0.5f) * 2f,
-                            pos.z + (random.nextFloat() - 0.5f) * 2f,
-                            0, 0, 0);
-                }
-            }
-        } else { // Not voiding
-            if (isIdle() && charging) {
-                charging = false;
-                setFree(false);
+        // Player Half-Ball controls
+        if (user instanceof ServerPlayer serverPlayer) {
+            if (serverPlayer.isFallFlying()) {
+                serverPlayer.stopFallFlying();
             }
 
-            if (!isHalfBall()) {
-                return;
+            if (lastRemoteInputTime - tickCount > 4) {
+                updateRemoteInputs(0, 0, false, false);
             }
-            setAlphaOverride(0.1f);
-            user.resetFallDistance();
-            user.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 5, 9, true, false));
 
-            // Player Half-Ball controls
-            if (user instanceof ServerPlayer serverPlayer) {
-                if (serverPlayer.isFallFlying()) {
-                    serverPlayer.stopFallFlying();
+            Vec3 finalSpeed = Vec3.ZERO;
+            if (!blocking && !user.hasEffect(JStatusRegistry.DAZED.get())) {
+                final Vec3 gravityVec = new Vec3(GravityChangerAPI.getGravityDirection(this).step());
+
+                final Vec3 userVel = JUtils.deltaPos(user);
+                final Vec3 userPos = user.position();
+                final Vec3 groundPos = level().clip(
+                        new ClipContext(
+                                userPos, userPos.add(gravityVec.scale(24)),
+                                ClipContext.Block.COLLIDER, ClipContext.Fluid.SOURCE_ONLY, user)).getLocation();
+
+                double groundDist = groundPos.distanceTo(pos);
+                if (groundDist < 2) {
+                    groundDist = 2; // Prevents extremely high jumps
+                }
+                final Vec3 stabilization = userVel.multiply(gravityVec).scale(10 / groundDist);
+
+                if (getRemoteJumpInput()) {
+                    user.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 10, 2, true, false));
+                    if (groundDist < 5) {
+                        GravityChangerAPI.addWorldVelocity(user, stabilization.subtract(gravityVec.scale(0.25 / groundDist)));
+                    }
                 }
 
-                if (lastRemoteInputTime - tickCount > 4) {
-                    updateRemoteInputs(0, 0, false, false);
+                final Vec3 rotVec = Vec3.directionFromRotation(getXRot(), getYRot());
+                Vec3 moveRotVec = Vec3.ZERO;
+                float forward = (float) getRemoteForwardInput();
+                if (forward != 0) {
+                    moveRotVec = moveRotVec.add(rotVec.scale(forward)); // Forward movement
+                }
+                float side = (float) getRemoteSideInput();
+                if (side != 0) {
+                    moveRotVec = moveRotVec.add(rotVec.yRot(1.57079632679f * side)); // Side movement
                 }
 
-                Vec3 finalSpeed = Vec3.ZERO;
-                if (!blocking && !user.hasEffect(JStatusRegistry.DAZED.get())) {
-                    final Vec3 gravityVec = new Vec3(GravityChangerAPI.getGravityDirection(this).step());
+                finalSpeed = finalSpeed.add(moveRotVec.normalize().scale(0.034));
 
-                    final Vec3 userVel = JUtils.deltaPos(user);
-                    final Vec3 userPos = user.position();
-                    final Vec3 groundPos = level().clip(
-                            new ClipContext(
-                                    userPos, userPos.add(gravityVec.scale(24)),
-                                    ClipContext.Block.COLLIDER, ClipContext.Fluid.SOURCE_ONLY, user)).getLocation();
+                user.push(finalSpeed.x, finalSpeed.y, finalSpeed.z);
+                user.hurtMarked = true;
+            }
+        } else {
+            resetAlphaOverride();
+        }
+    }
 
-                    double groundDist = groundPos.distanceTo(pos);
-                    if (groundDist < 2) {
-                        groundDist = 2; // Prevents extremely high jumps
-                    }
-                    final Vec3 stabilization = userVel.multiply(gravityVec).scale(10 / groundDist);
+    private void tickVoiding(boolean server, boolean notCreativeOrSpectator, LivingEntity user, boolean userIsPlayer, int voidTime, Vec3 pos) {
+        if (!server) {
+            for (int i = 0; i < 16; i++) {
+                level().addParticle(ParticleTypes.MYCELIUM,
+                        pos.x + (random.nextFloat() - 0.5f) * 2f,
+                        pos.y + (random.nextFloat() - 0.5f) * 2f,
+                        pos.z + (random.nextFloat() - 0.5f) * 2f,
+                        0, 0, 0);
+            }
 
-                    if (getRemoteJumpInput()) {
-                        user.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 10, 2, true, false));
-                        if (groundDist < 5) {
-                            GravityChangerAPI.addWorldVelocity(user, stabilization.subtract(gravityVec.scale(0.25 / groundDist)));
-                        }
-                    }
+            return;
+        }
 
-                    final Vec3 rotVec = Vec3.directionFromRotation(getXRot(), getYRot());
-                    Vec3 moveRotVec = Vec3.ZERO;
-                    float forward = (float) getRemoteForwardInput();
-                    if (forward != 0) {
-                        moveRotVec = moveRotVec.add(rotVec.scale(forward)); // Forward movement
-                    }
-                    float side = (float) getRemoteSideInput();
-                    if (side != 0) {
-                        moveRotVec = moveRotVec.add(rotVec.yRot(1.57079632679f * side)); // Side movement
-                    }
+        if (level().getGameRules().getBoolean(JCraft.STAND_GRIEFING)) {
+            final BlockPos blockPos = blockPosition();
+            // Fun 3x4x3 void code
+            BlockPos from = blockPos.offset(-1, -1, -1);
+            BlockPos to = blockPos.offset(1, 2, 1);
+            BlockPos.betweenClosed(from, to).forEach(p -> {
+                if (!AbstractMove.mayBreak(user, p, b -> b.getBlock().getExplosionResistance() <= 100f))
+                    return;
 
-                    finalSpeed = finalSpeed.add(moveRotVec.normalize().scale(0.034));
-
-                    user.push(finalSpeed.x, finalSpeed.y, finalSpeed.z);
-                    user.hurtMarked = true;
+                if (!JServerConfig.CREAM_ITEM_ERASE.getValue()) {
+                    // Drop items before destroying the block
+                    Block.dropResources(level().getBlockState(p), level(), p);
                 }
-            } else {
-                resetAlphaOverride();
+
+                level().setBlockAndUpdate(p, Block.stateById(0));
+            });
+        }
+
+        // Blind normal players while in void
+        if (notCreativeOrSpectator && !isFree()) {
+            user.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 25, 0, false, false));
+        }
+
+        if (charging) {
+            if (isFree()) { // Surprise move
+                final Vector3f newPos = getFreePos();
+                // Find outDir
+                Vector3f outDir = getCurrentMove() instanceof AbstractSurpriseMove<?> surpriseMove ?
+                        surpriseMove.getOutDir() : new Vector3f();
+                newPos.add(outDir);
+                setFreePos(newPos);
+                if (getMoveStun() == 1) {
+                    setFree(false);
+                }
+            } else if (chargeDir != null) { // Void Charge move
+                user.setDeltaMovement(chargeDir);
+                user.hurtMarked = true;
+                if (user instanceof ServerPlayer player) {
+                    player.connection.send(new ClientboundSetEntityMotionPacket(user));
+                }
+            }
+        } else { // Ultimate
+            setStateNoReset(State.IDLE);
+
+            if (!userIsPlayer) {
+                handleAIVoid(user, voidTime);
             }
         }
+
+        final AABB damageBox = new AABB(pos.add(1.5, 1.5, 1.5), pos.subtract(1.5, 1.5, 1.5));
+        final List<Entity> toDamage = level().getEntitiesOfClass(Entity.class,
+                damageBox, EntitySelector.ENTITY_STILL_ALIVE.and(EntitySelector.NO_CREATIVE_OR_SPECTATOR));
+        JUtils.displayHitbox(level(), damageBox);
+
+        toDamage.remove(user);
+        toDamage.remove(this);
+
+        boolean hurt;
+        int stun = 2;
+        float damage = 1.5f;
+        if (charging) {
+            hurt = getMoveStun() % 2 == 0; // More consistent
+            stun = 4;
+            damage = 5.0f;
+        } else {
+            hurt = tickCount % 4 == 0;
+
+            setAlphaOverride(0);
+        }
+
+        for (Entity ent : toDamage) {
+             if (ent instanceof ItemEntity) {
+                 if (JServerConfig.CREAM_ITEM_ERASE.getValue()) {
+                     ent.discard();
+                 }
+                 continue;
+            }
+            if (ent instanceof LivingEntity livingEntity) {
+                if (hurt) {
+                    JCraft.stun(livingEntity, stun, 0, user);
+                    JUtils.cancelMoves(livingEntity);
+                }
+
+                livingEntity.hurt(level().damageSources().fellOutOfWorld(), damage);
+            }
+        }
+
+        voidTime--;
+        if (voidTime < 1) {
+            resetAlphaOverride();
+        }
+        setVoidTime(voidTime);
+        setDistanceOffset(0);
     }
 
     private void handleAIVoid(LivingEntity user, int voidTime) {

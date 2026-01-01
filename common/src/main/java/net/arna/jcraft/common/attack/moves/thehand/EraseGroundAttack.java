@@ -32,7 +32,7 @@ public class EraseGroundAttack extends AbstractEraseAttack<EraseGroundAttack> {
         Set<LivingEntity> targets = super.perform(attacker, user);
 
         final Level level = user.level();
-        if (!mayGrief(user)) return targets;
+        if (!mayBreak(user, null)) return targets;
 
         final Vec3 rotVec = attacker.getLookAngle();
         final Vec3i rotVecI = new Vec3i((int) Math.round(rotVec.x), (int) Math.round(rotVec.y), (int) Math.round(rotVec.z));
@@ -51,17 +51,17 @@ public class EraseGroundAttack extends AbstractEraseAttack<EraseGroundAttack> {
         final BlockPos block1 = lowBlock1.subtract(gravityNormal);
         final BlockPos block2 = block1.offset(rotVecI);
         final BlockPos block3 = block2.offset(rotVecI);
-        eraseBlock(level, lowBlock1);
-        eraseBlock(level, lowBlock2);
-        eraseBlock(level, block1);
-        eraseBlock(level, block2);
-        eraseBlock(level, block3);
+        eraseBlock(user, level, lowBlock1);
+        eraseBlock(user, level, lowBlock2);
+        eraseBlock(user, level, block1);
+        eraseBlock(user, level, block2);
+        eraseBlock(user, level, block3);
 
         return targets;
     }
 
-    private static void eraseBlock(final Level level, final BlockPos lookedBlock) {
-        if (level.getBlockState(lookedBlock).getBlock().defaultDestroyTime() <= 0.0f) return;
+    private void eraseBlock(final LivingEntity user, final Level level, final BlockPos lookedBlock) {
+        if (!mayBreak(user, lookedBlock)) return;
         level.setBlock(lookedBlock, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
     }
 

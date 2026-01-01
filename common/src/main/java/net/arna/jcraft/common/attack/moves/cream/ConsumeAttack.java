@@ -12,7 +12,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 
 public final class ConsumeAttack extends AbstractSimpleAttack<ConsumeAttack, CreamEntity> {
-    public ConsumeAttack(final int cooldown, final int windup, final int duration, final float moveDistance, final float damage, final int stun, final float hitboxSize, final float knockback, final float offset) {
+    public ConsumeAttack(final int cooldown, final int windup, final int duration, final float moveDistance,
+                         final float damage, final int stun, final float hitboxSize, final float knockback, final float offset) {
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset);
         ranged = true;
     }
