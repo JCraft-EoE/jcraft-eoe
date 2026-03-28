@@ -62,6 +62,11 @@ dependencies {
     //Cloth
     modApi("me.shedaniel.cloth:cloth-config-forge:11.1.118"){ transitive = false }
 
+    // FTB Chunks
+    modImplementation "dev.ftb.mods:ftb-chunks-forge:${rootProject.ftb_chunks_version}"
+    modImplementation "dev.ftb.mods:ftb-library-forge:${rootProject.ftb_lib_version}"
+    modImplementation "dev.ftb.mods:ftb-teams-forge:${rootProject.ftb_teams_version}"
+
     //modImplementation("com.fusionflux:gravity_api-forge-${gravity_api_version}"){ transitive = false }
 
     // compatibilities

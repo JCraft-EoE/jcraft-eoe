@@ -30,9 +30,13 @@ dependencies {
     modImplementation "dev.kosmx.player-anim:player-animation-lib:${rootProject.player_anim_version}"
     modImplementation "dev.kosmx.player-anim:anim-core:${rootProject.player_anim_version}"
 
-
     //Cloth
     modApi "me.shedaniel.cloth:cloth-config:11.1.118"
+
+    // FTB Chunks
+    modImplementation "dev.ftb.mods:ftb-chunks:${rootProject.ftb_chunks_version}"
+    modImplementation "dev.ftb.mods:ftb-library:${rootProject.ftb_lib_version}"
+    modImplementation "dev.ftb.mods:ftb-teams:${rootProject.ftb_teams_version}"
 
     //modImplementation "com.fusionflux:gravity_api-common-${gravity_api_version}"
 
