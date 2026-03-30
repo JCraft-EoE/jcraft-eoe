@@ -21,9 +21,4 @@ public class JPlatformUtils {
     public static ShaderInstance getRred() {
         throw new AssertionError("This shouldn't happen");
     }
-
-    @ExpectPlatform
-    public static boolean isModLoaded(String name) {
-        throw new AssertionError("This shouldn't happen");
-    }
 }

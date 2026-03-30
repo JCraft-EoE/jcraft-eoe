@@ -1,11 +1,12 @@
 package net.arna.jcraft.common.compat;
 
+import dev.architectury.platform.Platform;
 import dev.ftb.mods.ftbchunks.api.ClaimedChunk;
 import dev.ftb.mods.ftbchunks.api.ClaimedChunkManager;
 import dev.ftb.mods.ftbchunks.api.FTBChunksAPI;
 import dev.ftb.mods.ftbchunks.api.FTBChunksProperties;
 import dev.ftb.mods.ftblibrary.math.ChunkDimPos;
-import net.arna.jcraft.platform.JPlatformUtils;
+import lombok.NonNull;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -19,7 +20,7 @@ public class FtbChunksCompat {
 
     public static Itf get() {
         if (instance == null) {
-            boolean isLoaded = JPlatformUtils.isModLoaded("ftbchunks");
+            boolean isLoaded = Platform.isModLoaded("ftbchunks");
             instance = isLoaded ? new Impl() : new Dummy();
         }
 
@@ -27,7 +28,7 @@ public class FtbChunksCompat {
     }
 
     public interface Itf {
-        boolean mayEdit(ServerPlayer player, ServerLevel level, BlockPos pos);
+        boolean mayEdit(ServerPlayer player, ServerLevel level, @NonNull BlockPos pos);
     }
 
     /**
@@ -35,7 +36,7 @@ public class FtbChunksCompat {
      */
     private static class Dummy implements Itf {
         @Override
-        public boolean mayEdit(ServerPlayer player, ServerLevel level, BlockPos pos) {
+        public boolean mayEdit(ServerPlayer player, ServerLevel level, @NonNull BlockPos pos) {
             return true;
         }
     }
@@ -47,7 +48,8 @@ public class FtbChunksCompat {
         private static FTBChunksAPI.API api;
 
         @Override
-        public boolean mayEdit(ServerPlayer player, ServerLevel level, BlockPos pos) {
+        public boolean mayEdit(ServerPlayer player, ServerLevel level, @NonNull BlockPos pos) {
+            ensureInstance();
             if (!api.isManagerLoaded()) return true;
 
             ClaimedChunkManager manager = api.getManager();

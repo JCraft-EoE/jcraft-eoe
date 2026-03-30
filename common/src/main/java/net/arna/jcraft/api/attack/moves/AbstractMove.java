@@ -842,7 +842,8 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         boolean standGriefing = level.getGameRules().getBoolean(JCraft.STAND_GRIEFING);
         boolean isSpawnProtected = serverLevel != null && player != null && pos != null &&
                 serverLevel.getServer().isUnderSpawnProtection(serverLevel, pos, player);
-        boolean mayBuild = !isPlayer || player.mayBuild() && FtbChunksCompat.get().mayEdit(player, serverLevel, pos);
+        boolean mayBuild = !isPlayer || pos == null ||
+                player.mayBuild() && FtbChunksCompat.get().mayEdit(player, serverLevel, pos);
 
         boolean mayAttempt = (isPlayer || mobGriefing) && standGriefing && !isSpawnProtected && mayBuild;
         if (!mayAttempt || pos == null) return mayAttempt;

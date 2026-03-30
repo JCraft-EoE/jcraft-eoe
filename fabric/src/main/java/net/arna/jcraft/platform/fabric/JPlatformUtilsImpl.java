@@ -3,7 +3,6 @@ package net.arna.jcraft.platform.fabric;
 import net.arna.jcraft.client.rendering.api.MultiInstancePostProcessor;
 import net.arna.jcraft.client.rendering.post.TimestopShaderFX;
 import net.arna.jcraft.fabric.client.JShaderRegistry;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.renderer.ShaderInstance;
 
 public class JPlatformUtilsImpl {
@@ -18,8 +17,5 @@ public class JPlatformUtilsImpl {
 
     public static ShaderInstance getRred() {
         return JShaderRegistry.RREDE.getInstance().get();
-    }
-    public static boolean isModLoaded(String name) {
-        return FabricLoader.getInstance().isModLoaded("name");
     }
 }

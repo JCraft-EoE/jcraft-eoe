@@ -2,6 +2,7 @@ package net.arna.jcraft.client.registry;
 
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import dev.architectury.platform.Platform;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.rendering.Phases;
 import net.arna.jcraft.client.rendering.RenderHandler;
@@ -70,7 +71,7 @@ public class JRenderLayerRegistry extends RenderStateShard {
      */
     public static RenderType createGenericRenderLayer(final String name, final VertexFormat format, final VertexFormat.Mode mode, final ShaderStateShard shader, final TransparencyStateShard transparency, final EmptyTextureStateShard texture) {
         final RenderType type = RenderType.create(//TODO add rubidium etc?
-                name, format, mode, JPlatformUtils.isModLoaded("sodium") ? 262144 : 256, false, false, RenderType.CompositeState.builder()
+                name, format, mode, Platform.isModLoaded("sodium") ? 262144 : 256, false, false, RenderType.CompositeState.builder()
                         .setShaderState(shader)
                         .setTransparencyState(transparency)
                         .setTextureState(texture)
