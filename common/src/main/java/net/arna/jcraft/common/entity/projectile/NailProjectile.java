@@ -25,6 +25,8 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class NailProjectile extends AbstractArrow implements IOwnable {
     public static final float NAIL_COST = 1.0f;
@@ -34,8 +36,10 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
     private LivingEntity master;
 
     private int ticksInAir;
+    @Setter
     private boolean spinning = false;
     private boolean wormhole = false;
+    @Setter
     private int chargeTime = 0;
     private boolean homing = false;
     private boolean penetrating = false;
@@ -47,7 +51,7 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
 
     private boolean isDrilling = false;
     private int lastHitTick = -1;
-    private final java.util.Map<java.util.UUID, Integer> drillingEntityLastHit = new java.util.HashMap<>();
+    private final Map<UUID, Integer> drillingEntityLastHit = new java.util.HashMap<>();
     private static final int DRILLING_HIT_INTERVAL = 4; // 0.2 seconds between hits per entity
     private float creepSpeed = 0.5f;
     public boolean isHandhole = false;
@@ -74,14 +78,6 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
         return ItemStack.EMPTY;
     }
 
-    public void setSpinning(boolean spinning) {
-        this.spinning = spinning;
-    }
-
-    public void setChargeTime(int chargeTime) {
-        this.chargeTime = chargeTime;
-    }
-
     public void setPenetrating(boolean penetrating) {
         this.penetrating = penetrating;
         if (penetrating) {
@@ -102,22 +98,11 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
     }
 
     @Override
-    protected void tickDespawn() {
-        // Wormhole nails have limited lifetime (5 seconds = 100 ticks)
-        if (wormhole && ticksInAir > 100) {
-            discard();
+    protected void onHitEntity(@NonNull EntityHitResult entityHitResult) {
+        setPierceLevel((byte)(getPierceLevel()-1));
+        if (level().isClientSide()) {
             return;
         }
-
-        // Regular nails despawn after 10 seconds
-        if (ticksInAir > 200) {
-            discard();
-        }
-    }
-
-    @Override
-    protected void onHitEntity(@NonNull EntityHitResult entityHitResult) {
-        if (level().isClientSide) return;
 
         final Entity entity = entityHitResult.getEntity();
         final Entity owner = this.getOwner();
@@ -135,15 +120,15 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
 
         LivingEntity target = JUtils.getUserIfStand((LivingEntity) entity);
 
-        // Drilling nails don't stop on hit - they continue through
-        if (isDrilling) {
-            // Just mark that we hit something, actual damage is dealt in tick()
-            return;
-        }
-
         // Handle damage
-        JUtils.projectileDamageLogic(this, level(), target, Vec3.ZERO, 10, 1, false, customDamage, 4,
-                CommonHitPropertyComponent.HitAnimation.MID, false, penetrating);
+        if (isCreeping) {
+            JUtils.projectileDamageLogic(this, level(), creepTarget, Vec3.ZERO, 5, 1, false,
+                    customDamage, 2, CommonHitPropertyComponent.HitAnimation.LOW);
+        }
+        else {
+            JUtils.projectileDamageLogic(this, level(), target, Vec3.ZERO, 10, 1, false, customDamage, 4,
+                    CommonHitPropertyComponent.HitAnimation.MID, false, penetrating);
+        }
         playSound(SoundEvents.ARROW_HIT, 1, 1);
 
         // Start creeping if we have creep distance and haven't started creeping yet
@@ -190,8 +175,24 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
     public void tick() {
         super.tick();
 
+        if (level().isClientSide()) {
+            return;
+        }
+
         if (!inGround) {
             ++ticksInAir;
+        }
+
+        // Wormhole nails have limited lifetime (5 seconds = 100 ticks)
+        if (wormhole && ticksInAir > 100) {
+            discard();
+            return;
+        }
+
+        // Regular nails despawn after 10 seconds
+        if (ticksInAir > 200) {
+            discard();
+            return;
         }
 
         // Creeping behavior
@@ -209,16 +210,7 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
 
             setDeltaMovement(direction.scale(creepSpeed));
             setNoGravity(true);
-            hurtMarked = true;
-
-            // Check if we hit the target
-            if (currentPos.distanceTo(targetPos) < 1.0) {
-                JUtils.projectileDamageLogic(this, level(), creepTarget, Vec3.ZERO, 5, 1, false,
-                        customDamage, 2, CommonHitPropertyComponent.HitAnimation.LOW);
-                playSound(SoundEvents.ARROW_HIT, 1, 1);
-                discard();
-                return;
-            }
+            // handle damage logic in onHitEntity()
         } else if (isCreeping) {
             // Target died or disappeared
             discard();
@@ -282,7 +274,7 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
         }
 
         // Blue particle trail
-        if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel && !this.inGround) {
+        if (this.level() instanceof ServerLevel serverLevel && !this.inGround) {
             Vec3 velocity = this.getDeltaMovement();
             double speed = velocity.length();
 
