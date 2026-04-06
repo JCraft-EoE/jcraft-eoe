@@ -134,6 +134,8 @@ public class JModelProvider extends FabricModelProvider {
         generator.generateFlatItem(JItemRegistry.STAND_ARROW.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
         generator.generateFlatItem(JItemRegistry.STAND_ARROWHEAD.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.ROAD_ROLLER.get(), ModelTemplates.FLAT_ITEM);
+        generator.generateFlatItem(JItemRegistry.LEFT_ARM.get(), ModelTemplates.FLAT_ITEM);
+        generator.generateFlatItem(JItemRegistry.HERBAL_TEA.get(), ModelTemplates.FLAT_ITEM);
 
         generator.generateFlatItem(JItemRegistry.DISC.get(), ModelTemplates.FLAT_ITEM);
         generateSpecDiscModels(generator);

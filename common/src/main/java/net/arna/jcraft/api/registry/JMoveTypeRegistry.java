@@ -46,6 +46,7 @@ import net.arna.jcraft.common.attack.moves.theworld.FeignBarrageCounterAttack;
 import net.arna.jcraft.common.attack.moves.theworld.TWChargeAttack;
 import net.arna.jcraft.common.attack.moves.theworld.TWDonutAttack;
 import net.arna.jcraft.common.attack.moves.theworld.overheaven.*;
+import net.arna.jcraft.common.attack.moves.tusk.*;
 import net.arna.jcraft.common.attack.moves.vampire.*;
 import net.arna.jcraft.common.attack.moves.whitesnake.ChargedSpewAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.GiveStandAttack;
@@ -267,7 +268,19 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> MANDOM_COUNTDOWN_MOVE = register("mandom_countdown_move", CountdownMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> MANDOM_REWIND_MOVE = register("mandom_rewind_move", RewindMove.Type.INSTANCE);
 
-
+    RegistrySupplier<MoveType<?>> TUSK_NAIL_SHOT = register("tusk_nail_shot", NailShotAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> TUSK_NAIL_WHEEL = register("tusk_nail_wheel", NailWheelAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> TUSK_GOLDEN_RECTANGLE_NAIL = register("tusk_golden_rectangle_nail", GoldenRectangleNailAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> TUSK_PERFECT_GOLDEN_ROTATION_CHARGE = register("tusk_perfect_golden_rotation_charge", PerfectGoldenRotationAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> TUSK_SPINNING_NAIL_CHARGE = register("tusk_spinning_nail_charge", SpinningNailChargeMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> TUSK_SPINNING_NAIL = register("tusk_spinning_nail", SpinningNailAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> TUSK_WORMHOLE = register("tusk_wormhole", WormholeAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> TUSK_ACT_SWITCH = register("tusk_act_switch", TuskActCycleMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> TUSK_ACT3_NAIL_SHOT = register("tusk_act3_nail_shot", Act3NailShotAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> TUSK_NAIL_BARRAGE = register("tusk_nail_barrage", NailBarrageAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> TUSK_HANDHOLE = register("tusk_handhole", HandholeAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> TUSK_VORTEX = register("tusk_vortex", VortexAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> TUSK_VOID_SHOT = register("tusk_void_shot", VoidShotAttack.Type.INSTANCE);
 
     private static RegistrySupplier<MoveType<?>> register(String id, MoveType<?> type) {
         return MOVE_TYPE_REGISTRY.register(id, () -> type);

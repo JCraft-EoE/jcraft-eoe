@@ -1,0 +1,65 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.model.pose": {
+      "loop": true,
+      "bones": {
+        "torso": {
+          "rotation": [-2.5, 0, 0]
+        },
+        "upperbody": {
+          "rotation": [14.99067, -0.43399, 2.46207]
+        },
+        "head": {
+          "rotation": [-7.5072, -4.67379, -0.02077]
+        },
+        "rightArm": {
+          "rotation": [-14.5073, -28.47176, 14.17383]
+        },
+        "lower_rightArm": {
+          "rotation": [-7.5, 0, 0]
+        },
+        "rightLeg": {
+          "rotation": [-17.5, 15, 0]
+        },
+        "lower_rightLeg": {
+          "rotation": [17.5, 0, 0]
+        },
+        "leftLeg": {
+          "rotation": [10.58081, -28.6395, -11.36756]
+        },
+        "lower_leftLeg": {
+          "rotation": [45, 0, 0]
+        },
+        "leftArm": {
+          "rotation": [-13.1878, 29.17623, -11.44678],
+          "position": [0.325, 0, 0]
+        },
+        "lower_leftArm": {
+          "rotation": [-4.99527, 0.21782, 2.4905]
+        },
+        "body": {
+          "rotation": [2.5, 0, -2.5]
+        },
+        "base": {
+          "scale": 1.05
+        }
+      }
+    },
+    "animation.tusk_act_3.idle": {
+      "loop": true
+    },
+    "animation.tusk_act_3.nail_shot": {
+      "loop": true
+    },
+    "animation.tusk_act_3.summon": {
+      "loop": true
+    },
+    "animation.tusk_act_3.wormhole_shoot": {
+      "loop": true
+    },
+    "animation.tusk_act_3.wormhole_teleport": {
+      "loop": true
+    }
+  }
+}

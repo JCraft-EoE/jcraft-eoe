@@ -362,6 +362,15 @@ public interface JEntityTypeRegistry {
                     .updateInterval(3)
                     .build("emerald")
     );
+    RegistrySupplier<EntityType<NailProjectile>> NAIL = ENTITY_TYPE_REGISTRY.register(JCraft.id("nail"),
+            () -> EntityType.Builder.of(
+                            WorldOnlyEntityFactory.from(NailProjectile::new),
+                            MobCategory.MISC
+                    ).sized(0.5f, 0.5f)
+                    .clientTrackingRange(6)
+                    .updateInterval(3)
+                    .build("nail")
+    );
 
     RegistrySupplier<EntityType<IcicleProjectile>> ICICLE = ENTITY_TYPE_REGISTRY.register(JCraft.id("icicle"),
             () -> EntityType.Builder.of(
@@ -680,12 +689,35 @@ public interface JEntityTypeRegistry {
                     MobCategory.CREATURE
             ).sized(0.6f, 1.8f).build("the_hand")
     );
+
     RegistrySupplier<EntityType<MandomEntity>> MANDOM = ENTITY_TYPE_REGISTRY.register(JCraft.id("mandom"),
             () -> EntityType.Builder.of(
                     WorldOnlyEntityFactory.from(MandomEntity::new),
                     MobCategory.CREATURE
             ).sized(0.3f, 0.9f).build("mandom")
     );
+
+    RegistrySupplier<EntityType<TuskAct1Entity>> TUSK_ACT_1 = ENTITY_TYPE_REGISTRY.register(JCraft.id("tusk_act_1"),
+            () -> EntityType.Builder.of(
+                    WorldOnlyEntityFactory.from(TuskAct1Entity::new),
+                    MobCategory.CREATURE
+            ).sized(0.3f, 0.9f).build("tusk_act_1")
+    );
+
+    RegistrySupplier<EntityType<TuskAct2Entity>> TUSK_ACT_2 = ENTITY_TYPE_REGISTRY.register(JCraft.id("tusk_act_2"),
+            () -> EntityType.Builder.of(
+                    WorldOnlyEntityFactory.from(TuskAct2Entity::new),
+                    MobCategory.CREATURE
+            ).sized(0.3f, 0.9f).build("tusk_act_2")
+    );
+
+    RegistrySupplier<EntityType<TuskAct3Entity>> TUSK_ACT_3 = ENTITY_TYPE_REGISTRY.register(JCraft.id("tusk_act_3"),
+            () -> EntityType.Builder.of(
+                    WorldOnlyEntityFactory.from(TuskAct3Entity::new),
+                    MobCategory.CREATURE
+            ).sized(0.3f, 0.9f).build("tusk_act_3")
+    );
+
     RegistrySupplier<EntityType<TrainingDummyEntity>> TRAINING_DUMMY = ENTITY_TYPE_REGISTRY.register(JCraft.id("training_dummy"),
             () -> EntityType.Builder.of(
                     (EntityType<TrainingDummyEntity> entityType, Level world) -> new TrainingDummyEntity(entityType, world),
@@ -752,6 +784,10 @@ public interface JEntityTypeRegistry {
         EntityAttributeRegistry.register(C_MOON, CMoonEntity::createMobAttributes);
 
         EntityAttributeRegistry.register(MANDOM, MandomEntity::createMobAttributes);
+
+        EntityAttributeRegistry.register(TUSK_ACT_1, TuskAct1Entity::createMobAttributes);
+        EntityAttributeRegistry.register(TUSK_ACT_2, TuskAct2Entity::createMobAttributes);
+        EntityAttributeRegistry.register(TUSK_ACT_3, TuskAct3Entity::createMobAttributes);
 
         EntityAttributeRegistry.register(MADE_IN_HEAVEN, MadeInHeavenEntity::createMobAttributes);
         EntityAttributeRegistry.register(SHADOW_THE_WORLD, ShadowTheWorldEntity::createMobAttributes);

@@ -25,6 +25,7 @@ import net.arna.jcraft.fabric.common.component.impl.living.MiscComponentImpl;
 import net.arna.jcraft.fabric.common.component.impl.living.StandComponentImpl;
 import net.arna.jcraft.fabric.common.component.impl.player.PhComponentImpl;
 import net.arna.jcraft.fabric.common.component.impl.player.SpecComponentImpl;
+import net.arna.jcraft.fabric.common.component.impl.player.TuskComponentImpl;
 import net.arna.jcraft.fabric.common.component.impl.world.ShockwaveHandlerComponentImpl;
 import net.arna.jcraft.fabric.common.component.impl.world.TexasHoldEmComponentImpl;
 import net.arna.jcraft.fabric.common.component.living.BombTrackerComponent;
@@ -37,6 +38,7 @@ import net.arna.jcraft.fabric.common.component.living.StandComponent;
 import net.arna.jcraft.fabric.common.component.living.VampireComponent;
 import net.arna.jcraft.fabric.common.component.player.PhComponent;
 import net.arna.jcraft.fabric.common.component.player.SpecComponent;
+import net.arna.jcraft.fabric.common.component.player.TuskComponent;
 import net.arna.jcraft.fabric.common.component.world.ShockwaveHandlerComponent;
 import net.arna.jcraft.fabric.common.component.world.TexasHoldEmComponent;
 import net.minecraft.world.entity.Entity;
@@ -74,6 +76,8 @@ public class JComponents implements EntityComponentInitializer, WorldComponentIn
             ComponentRegistry.getOrCreate(JCraft.id("hamon"), HamonComponent.class);
     public static final ComponentKey<VampireComponent> VAMPIRE =
             ComponentRegistry.getOrCreate(JCraft.id("vampire"), VampireComponent.class);
+//  public static final ComponentKey<TuskComponent> TUSK =
+//          ComponentRegistry.getOrCreate(JCraft.id("tusk"), TuskComponent.class);
 
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
@@ -89,6 +93,7 @@ public class JComponents implements EntityComponentInitializer, WorldComponentIn
                 .end(SpecComponentImpl::new);
 
         registry.registerForPlayers(PH, PhComponentImpl::new, RespawnCopyStrategy.ALWAYS_COPY);
+//        registry.registerForPlayers(TUSK, TuskComponentImpl::new, RespawnCopyStrategy.ALWAYS_COPY);
         registry.beginRegistration(LivingEntity.class, COOLDOWNS)
                 .respawnStrategy(RespawnCopyStrategy.LOSSLESS_ONLY)
                 .impl(CooldownsComponentImpl.class)

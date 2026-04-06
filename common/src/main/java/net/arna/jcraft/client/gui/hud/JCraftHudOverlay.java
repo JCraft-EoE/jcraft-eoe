@@ -6,6 +6,10 @@ import net.arna.jcraft.common.entity.stand.MadeInHeavenEntity;
 import net.arna.jcraft.common.entity.stand.MetallicaEntity;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.TheSunEntity;
+import net.arna.jcraft.common.entity.stand.TuskAct1Entity;
+import net.arna.jcraft.common.entity.stand.TuskAct2Entity;
+import net.arna.jcraft.common.entity.stand.TuskAct3Entity;
+import net.arna.jcraft.common.entity.stand.MandomEntity;
 import net.arna.jcraft.common.spec.AnubisSpec;
 import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.common.spec.HamonSpec;
@@ -41,7 +45,8 @@ public class JCraftHudOverlay {
             TIME_ACCEL_GAUGE = new Gauge(1.0f, 0.8f, 0.0f, MadeInHeavenEntity.MAXIMUM_SPEEDOMETER),
             BLOODLUST_GAUGE = new Gauge(0.8f, 0.1f, 0.2f, 5),
             HAMON_GAUGE = new Gauge(0.8f, 0.5f, 0.2f, (int) HamonSpec.MAX_CHARGE),
-            IRON_GAUGE = new Gauge(0.7f, 0.7f, 0.9f, (int) MetallicaEntity.IRON_MAX);
+            IRON_GAUGE = new Gauge(0.7f, 0.7f, 0.9f, (int) MetallicaEntity.IRON_MAX),
+            NAIL_GAUGE = new Gauge(0.4f, 0.6f, 1.0f, 10);
 
     public static void render(final GuiGraphics ctx) {
         final Minecraft client = Minecraft.getInstance();
@@ -62,6 +67,12 @@ public class JCraftHudOverlay {
         if (stand != null) {
             standGaugeFlashTicks--;
 
+            // Skip blocking gauge for stands that can't block
+            boolean shouldRenderBlockGauge = !(stand instanceof TuskAct1Entity ||
+                    stand instanceof TuskAct2Entity ||
+                    stand instanceof TuskAct3Entity ||
+                    stand instanceof MandomEntity);
+
             if (stand instanceof TheSunEntity theSun) {
                 final float darken = (theSun.isPassive() ? 0.4f : 0.0f);
                 SUN_SIZE_GAUGE.render(ctx,
@@ -71,13 +82,13 @@ public class JCraftHudOverlay {
                         gaugeX,
                         height + gaugeHeightOffset,
                         (int) (theSun.getRawScale() * 10.0F));
-            } else {
+            } else if (shouldRenderBlockGauge) {
                 final float standGauge = stand.getStandGauge();
                 Vector3f color = standGauge > stand.getMaxStandGauge() / 3.0f ?
                         BLOCK_GAUGE_OVER_THIRD :
                         BLOCK_GAUGE_UNDER_THIRD;
 
-                color = new Vector3f(color); // Writable copy
+                color = new Vector3f(color);
 
                 final int intStandGauge = (int) standGauge;
 
@@ -100,6 +111,21 @@ public class JCraftHudOverlay {
             if (stand instanceof MetallicaEntity metallica) {
                 IRON_GAUGE.render(ctx, gaugeX, height + gaugeHeightOffset, (int) metallica.getIron());
             }
+            if (stand instanceof TuskAct1Entity tusk1) {
+                float nails = tusk1.getNails();
+                String nailText = formatNails(nails);
+                NAIL_GAUGE.renderWithText(ctx, gaugeX, height + gaugeHeightOffset, (int) nails, nailText);
+            }
+            if (stand instanceof TuskAct2Entity tusk2) {
+                float nails = tusk2.getNails();
+                String nailText = formatNails(nails);
+                NAIL_GAUGE.renderWithText(ctx, gaugeX, height + gaugeHeightOffset, (int) nails, nailText);
+            }
+            if (stand instanceof TuskAct3Entity tusk3) {
+                float nails = tusk3.getNails();
+                String nailText = formatNails(nails);
+                NAIL_GAUGE.renderWithText(ctx, gaugeX, height + gaugeHeightOffset, (int) nails, nailText);
+            }
         }
 
         // don't display spec gauges in spectator
@@ -120,6 +146,21 @@ public class JCraftHudOverlay {
         }
     }
 
+    /**
+     * Formats nail count to show .5 decimals (e.g., 7.5, 6.0, 3.5)
+     */
+    private static String formatNails(float nails) {
+        float rounded = Math.round(nails * 2) / 2.0f; // Round to nearest 0.5
+
+        if (rounded == (int) rounded) {
+            // Whole number, show without decimal
+            return "Nails: " + (int) rounded + "/10";
+        } else {
+            // Has .5, show with decimal
+            return String.format("Nails: %.1f/10", rounded);
+        }
+    }
+
     protected record Gauge(float red, float green, float blue, int max) {
         public Gauge(Vector3f color, int max) {
             this(color.x(), color.y(), color.z(), max);
@@ -131,9 +172,7 @@ public class JCraftHudOverlay {
 
         public void render(GuiGraphics ctx, float r, float g, float b, int x, int y, int value) {
             RenderSystem.setShaderColor(r, g, b, 1);
-            //RenderSystem.setShaderTexture(0, EMPTY_GAUGE);
             ctx.blit(EMPTY_GAUGE, x, y, 0, 0, gaugeWidth, 5, gaugeWidth, 5);
-            //RenderSystem.setShaderTexture(0, FULL_GAUGE);
             ctx.blit(FULL_GAUGE, x, y, 0, 0, value * gaugeWidth / max, 5, gaugeWidth, 5);
             gaugeHeightOffset -= 6;
             RenderSystem.setShaderColor(1, 1, 1, 1f);
@@ -141,6 +180,21 @@ public class JCraftHudOverlay {
 
         public Vector3f colorCopy() {
             return new Vector3f(red, green, blue);
+        }
+
+        public void renderWithText(GuiGraphics ctx, int x, int y, int value, String text) {
+            // Don't call render() here - do it directly to avoid double rendering
+            RenderSystem.setShaderColor(red, green, blue, 1);
+            ctx.blit(EMPTY_GAUGE, x, y, 0, 0, gaugeWidth, 5, gaugeWidth, 5);
+            ctx.blit(FULL_GAUGE, x, y, 0, 0, value * gaugeWidth / max, 5, gaugeWidth, 5);
+            RenderSystem.setShaderColor(1, 1, 1, 1f);
+
+            int textX = x + gaugeWidth / 2 - Minecraft.getInstance().font.width(text) / 2;
+            int textY = y + 6;
+
+            ctx.drawString(Minecraft.getInstance().font, text, textX, textY, 0x5599FF, true);
+
+            gaugeHeightOffset -= 15; // 5px gauge + 1px spacing + 9px text
         }
     }
 }

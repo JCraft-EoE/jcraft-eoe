@@ -142,7 +142,7 @@ public final class OverwriteAttack extends AbstractSimpleAttack<OverwriteAttack,
     }
 
     @Getter
-    private static class Overwrite {
+    private static class  Overwrite {
         private final WeakReference<LivingEntity> entity;
         private int time;
 

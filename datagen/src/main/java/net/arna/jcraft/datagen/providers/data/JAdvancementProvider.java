@@ -13,6 +13,8 @@ import net.arna.jcraft.common.advancements.Hamon5Trigger;
 import net.arna.jcraft.common.advancements.Hamon6Trigger;
 import net.arna.jcraft.common.advancements.ObtainedSpecTrigger;
 import net.arna.jcraft.common.advancements.ObtainedStandTrigger;
+import net.arna.jcraft.common.advancements.TuskAct2Trigger;
+import net.arna.jcraft.common.advancements.TuskAct3Trigger;
 import net.arna.jcraft.common.item.SpecDiscItem;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricAdvancementProvider;
@@ -758,5 +760,47 @@ public class JAdvancementProvider extends FabricAdvancementProvider {
                 .addCriterion("waved", Hamon6Trigger.TriggerInstance.trigger())
                 .build(JCraft.id("hamon6"));
         consumer.accept(hamon6);
+        // Tusk Act 1
+        final Advancement tuskAct1 = Advancement.Builder.advancement()
+                .display(JItemRegistry.LEFT_ARM.get(),
+                        Component.translatable("advancements.jcraft.tusk_act1.title"),
+                        Component.translatable("advancements.jcraft.tusk_act1.description"),
+                        null,
+                        FrameType.TASK,
+                        true,
+                        true,
+                        false)
+                .parent(obtainStand)
+                .addCriterion("obtained", ObtainedStandTrigger.TriggerInstance.obtainedStand(JStandTypeRegistry.TUSK_ACT_1.get()))
+                .build(JCraft.id("tusk_act1"));
+        consumer.accept(tuskAct1);
+        // Tusk Act 2
+        final Advancement tuskAct2 = Advancement.Builder.advancement()
+                .display(JItemRegistry.LEFT_ARM.get(),
+                        Component.translatable("advancements.jcraft.tusk_act2.title"),
+                        Component.translatable("advancements.jcraft.tusk_act2.description"),
+                        null,
+                        FrameType.GOAL,
+                        true,
+                        true,
+                        false)
+                .parent(tuskAct1)
+                .addCriterion("unlocked", TuskAct2Trigger.TriggerInstance.trigger())
+                .build(JCraft.id("tusk_act2"));
+        consumer.accept(tuskAct2);
+        // Tusk Act 3
+        final Advancement tuskAct3 = Advancement.Builder.advancement()
+                .display(JItemRegistry.LEFT_ARM.get(),
+                        Component.translatable("advancements.jcraft.tusk_act3.title"),
+                        Component.translatable("advancements.jcraft.tusk_act3.description"),
+                        null,
+                        FrameType.CHALLENGE,
+                        true,
+                        true,
+                        false)
+                .parent(tuskAct2)
+                .addCriterion("unlocked", TuskAct3Trigger.TriggerInstance.trigger())
+                .build(JCraft.id("tusk_act3"));
+        consumer.accept(tuskAct3);
     }
 }

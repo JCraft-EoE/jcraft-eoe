@@ -63,6 +63,9 @@ public interface JStandTypeRegistry {
     RegistrySupplier<StandType> MANDOM = register("mandom", JEntityTypeRegistry.MANDOM);
     RegistrySupplier<StandType> CRAZY_DIAMOND = register("crazy_diamond", JEntityTypeRegistry.CRAZY_DIAMOND);
     RegistrySupplier<StandType> AEROSMITH = register("aerosmith", JEntityTypeRegistry.AEROSMITH);
+    RegistrySupplier<StandType> TUSK_ACT_1 = register("tusk_act_1", JEntityTypeRegistry.TUSK_ACT_1);
+    RegistrySupplier<StandType> TUSK_ACT_2 = register("tusk_act_2", JEntityTypeRegistry.TUSK_ACT_2);
+    RegistrySupplier<StandType> TUSK_ACT_3 = register("tusk_act_3", JEntityTypeRegistry.TUSK_ACT_3);
 
 
     // Maps numeric values (ordinals) of old stand types back from when this was an enum.

@@ -51,4 +51,14 @@ public interface CommonMiscComponent extends JComponent {
     float getMetallicaIron();
     void setMetallicaIron(final float iron);
 
+    // Tusk (ALL ENTITIES)
+    float getTuskNails();
+    void setTuskNails(final float nails);
+
+    // Tusk Progression
+    int getHighestTuskAct();
+    void setHighestTuskAct(final int act);
+    default boolean hasUnlockedTuskAct(int act) {
+        return act <= getHighestTuskAct();
+    }
 }

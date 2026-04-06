@@ -239,10 +239,22 @@ public interface JCreativeMenuTabRegistry {
                                 stack.getOrCreateTag().putFloat("Blood", 16f);
                                 entries.accept(stack);
                             }
+                            // herbal tea (Tusk consumable)
+                            {
+                                final ItemStack stack = new ItemStack(JItemRegistry.HERBAL_TEA.get());
+                                stack.getOrCreateTag().putInt("Sips", net.arna.jcraft.common.item.HerbalTeaItem.MAX_SIPS);
+                                entries.accept(stack);
+                            }
+                            // corpse parts
+                            entries.accept(JItemRegistry.LEFT_ARM.get());
 /*                    for (int i = 16; i >= 0; i--) {
                         final ItemStack stack = new ItemStack(JItemRegistry.BLOOD_BOTTLE.get());
                         stack.getOrCreateTag().putFloat("Blood", i);
                         entries.accept(stack);
+                    }
+                    // Corpse Parts
+                    entries.accept(JItemRegistry.LEFT_ARM.get());
+
                     }*/
 
                     // cinderella mask + enchantments

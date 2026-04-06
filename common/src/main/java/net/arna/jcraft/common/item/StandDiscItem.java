@@ -2,6 +2,8 @@ package net.arna.jcraft.common.item;
 
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.component.living.CommonMiscComponent;
+import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
@@ -66,6 +68,11 @@ public class StandDiscItem extends Item {
         itemStand = StandTypeUtil.readFromNBT(data, "StandID");
         if (data.contains("Skin", Tag.TAG_INT)) {
             itemSkin = data.getInt("Skin");
+        }
+
+        // Resolve Tusk act: give the highest act the player has unlocked, capped by the disc's act
+        if (itemStand != null) {
+            itemStand = resolveTuskAct(user, itemStand);
         }
 
         if (itemStand != null && JCraft.getExclusiveStandsData().isStandUsed(itemStand)) {
@@ -176,5 +183,40 @@ public class StandDiscItem extends Item {
 
         CompoundTag nbt = stack.getTag();
         return nbt == null || !nbt.contains("Skin", Tag.TAG_INT) ? 0 : nbt.getInt("Skin");
+    }
+
+    /**
+     * Resolves a Tusk disc stand type to the highest act the player has unlocked,
+     * capped by the disc's act. If the player hasn't unlocked anything, returns Act 1.
+     */
+    private static StandType resolveTuskAct(Player user, StandType discStand) {
+        int discAct = getTuskActNumber(discStand);
+        if (discAct < 1) return discStand; // Not a Tusk stand
+
+        CommonMiscComponent misc = JComponentPlatformUtils.getMiscData(user);
+        if (misc == null) return JStandTypeRegistry.TUSK_ACT_1.get();
+
+        int playerHighest = misc.getHighestTuskAct();
+        if (playerHighest < 1) playerHighest = 1;
+
+        // Give the player the highest act they've unlocked, up to what the disc offers
+        int grantAct = Math.min(playerHighest, discAct);
+        return getTuskActByNumber(grantAct);
+    }
+
+    private static int getTuskActNumber(StandType type) {
+        if (type == JStandTypeRegistry.TUSK_ACT_1.get()) return 1;
+        if (type == JStandTypeRegistry.TUSK_ACT_2.get()) return 2;
+        if (type == JStandTypeRegistry.TUSK_ACT_3.get()) return 3;
+        return -1;
+    }
+
+    private static StandType getTuskActByNumber(int act) {
+        return switch (act) {
+            case 1 -> JStandTypeRegistry.TUSK_ACT_1.get();
+            case 2 -> JStandTypeRegistry.TUSK_ACT_2.get();
+            case 3 -> JStandTypeRegistry.TUSK_ACT_3.get();
+            default -> JStandTypeRegistry.TUSK_ACT_1.get();
+        };
     }
 }

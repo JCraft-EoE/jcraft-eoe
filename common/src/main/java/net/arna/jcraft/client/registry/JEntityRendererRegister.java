@@ -74,6 +74,11 @@ public interface JEntityRendererRegister {
             new RendererData<>(JEntityTypeRegistry.PURPLE_HAZE_DISTORTION, context -> new StandEntityRenderer<>(context, JStandTypeRegistry.PURPLE_HAZE_DISTORTION.get())),
             new RendererData<>(JEntityTypeRegistry.PURPLE_HAZE, PurpleHazeRenderer::new),
 
+            new RendererData<>(JEntityTypeRegistry.TUSK_ACT_1, TuskAct1Renderer::new),
+            new RendererData<>(JEntityTypeRegistry.TUSK_ACT_2, TuskAct2Renderer::new),
+            new RendererData<>(JEntityTypeRegistry.TUSK_ACT_3, TuskAct3Renderer::new),
+            new RendererData<>(JEntityTypeRegistry.NAIL, NailProjectileRenderer::new),
+
             new RendererData<>(JEntityTypeRegistry.HORUS, HorusRenderer::new),
             new RendererData<>(JEntityTypeRegistry.ICICLE, IcicleRenderer::new),
             new RendererData<>(JEntityTypeRegistry.LARGE_ICICLE, LargeIcicleRenderer::new),

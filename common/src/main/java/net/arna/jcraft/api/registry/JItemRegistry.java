@@ -66,6 +66,13 @@ public interface JItemRegistry {
             (level, owner) -> new RoadRollerEntity(level)
     ));
 
+    // Corpse parts
+    RegistrySupplier<Item> LEFT_ARM = register("left_arm", () -> new LeftArmItem(settings().rarity(Rarity.RARE).stacksTo(1)));
+
+    // Tusk consumables
+    RegistrySupplier<Item> HERBAL_TEA = register("herbal_tea", () -> new HerbalTeaItem(settings().stacksTo(16)));
+
+
     RegistrySupplier<Item> REQUIEM_RUBY = register("requiem_ruby", () -> new Item(settings().rarity(Rarity.EPIC).fireResistant()));
 
     RegistrySupplier<RequiemArrowItem> REQUIEM_ARROW = register("requiem_arrow", () -> new RequiemArrowItem(settings().rarity(Rarity.EPIC).fireResistant()));

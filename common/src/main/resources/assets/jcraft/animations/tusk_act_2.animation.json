@@ -1,0 +1,68 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.tusk_act2.pose": {
+      "loop": true,
+      "bones": {
+        "base": {
+          "rotation": [10, 0, 0],
+          "scale": 0.8
+        },
+        "segment_2": {
+          "rotation": [2.5, 0, 0]
+        },
+        "segment_3": {
+          "rotation": [2.5, 0, 0]
+        },
+        "upper_body": {
+          "rotation": [4.80268, -7.88864, 0.48488]
+        },
+        "rightArm": {
+          "rotation": [-29.75778, 4.81281, 15.7589]
+        },
+        "lower_rightArm": {
+          "rotation": [-37.5, 0, 0]
+        },
+        "claw": {
+          "rotation": [-20, 0, 0]
+        },
+        "claw2": {
+          "rotation": [20.44582, -11.73507, -4.3361]
+        },
+        "claw3": {
+          "rotation": [12.79362, 12.19908, 2.74715]
+        },
+        "head": {
+          "rotation": [-13.16909, 8.42476, -5.55909]
+        },
+        "leftArm": {
+          "rotation": [-14.59734, -12.97065, -14.90585]
+        },
+        "lower_leftArm": {
+          "rotation": [-40, 0, 0]
+        },
+        "claw4": {
+          "rotation": [-10, 0, 0]
+        },
+        "claw5": {
+          "rotation": [5, 0, -5]
+        },
+        "claw6": {
+          "rotation": [4.95744, -0.65182, 7.47178]
+        }
+      }
+    },
+    "animation.tusk_act_2.idle": {
+      "loop": true
+    },
+    "animation.tusk_act_2.summon": {
+      "loop": true
+    },
+    "animation.tusk_act_2.spinning_nail_charge": {
+      "loop": true
+    },
+    "animation.tusk_act_2.spinning_nail_release": {
+      "loop": true
+    }
+  }
+}

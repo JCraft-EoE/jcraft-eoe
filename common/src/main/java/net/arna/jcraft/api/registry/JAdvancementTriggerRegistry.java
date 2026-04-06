@@ -8,6 +8,8 @@ import net.arna.jcraft.common.advancements.Hamon5Trigger;
 import net.arna.jcraft.common.advancements.Hamon6Trigger;
 import net.arna.jcraft.common.advancements.ObtainedSpecTrigger;
 import net.arna.jcraft.common.advancements.ObtainedStandTrigger;
+import net.arna.jcraft.common.advancements.TuskAct2Trigger;
+import net.arna.jcraft.common.advancements.TuskAct3Trigger;
 import net.minecraft.advancements.CriteriaTriggers;
 
 public interface JAdvancementTriggerRegistry {
@@ -20,6 +22,8 @@ public interface JAdvancementTriggerRegistry {
     Hamon4Trigger HAMON4 = CriteriaTriggers.register(new Hamon4Trigger());
     Hamon5Trigger HAMON5 = CriteriaTriggers.register(new Hamon5Trigger());
     Hamon6Trigger HAMON6 = CriteriaTriggers.register(new Hamon6Trigger());
+    TuskAct2Trigger TUSK_ACT2 = CriteriaTriggers.register(new TuskAct2Trigger());
+    TuskAct3Trigger TUSK_ACT3 = CriteriaTriggers.register(new TuskAct3Trigger());
 
     static void init() {
         /* empty on purpose */

@@ -7,6 +7,7 @@ import net.arna.jcraft.api.JRegistries;
 import net.arna.jcraft.common.attack.conditions.HamonChargeCondition;
 import net.arna.jcraft.common.attack.conditions.HoldingAnubisCondition;
 import net.arna.jcraft.common.attack.conditions.MetallicaIronCondition;
+import net.arna.jcraft.common.attack.conditions.TuskNailCondition;
 import net.arna.jcraft.api.attack.core.MoveConditionType;
 
 public interface JMoveConditionTypeRegistry {
@@ -14,6 +15,7 @@ public interface JMoveConditionTypeRegistry {
 
     RegistrySupplier<MoveConditionType<?>> METALLICA_IRON = register("metallica_iron", MetallicaIronCondition.Type.INSTANCE);
     RegistrySupplier<MoveConditionType<?>> HOLDING_ANUBIS = register("holding_anubis", HoldingAnubisCondition.Type.INSTANCE);
+    RegistrySupplier<MoveConditionType<?>> TUSK_NAIL = register("tusk_nail", TuskNailCondition.Type.INSTANCE);
     RegistrySupplier<MoveConditionType<?>> HAMON_CHARGE = register("hamon_charge", HamonChargeCondition.Type.INSTANCE);
 
     private static RegistrySupplier<MoveConditionType<?>> register(String name, MoveConditionType<?> type) {

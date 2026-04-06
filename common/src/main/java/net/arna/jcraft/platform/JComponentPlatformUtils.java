@@ -7,6 +7,7 @@ import net.arna.jcraft.api.component.entity.CommonTimeStopComponent;
 import net.arna.jcraft.api.component.living.*;
 import net.arna.jcraft.api.component.player.CommonPhComponent;
 import net.arna.jcraft.api.component.player.CommonSpecComponent;
+import net.arna.jcraft.api.component.player.CommonTuskComponent;
 import net.arna.jcraft.api.component.world.CommonShockwaveHandlerComponent;
 import net.arna.jcraft.api.component.world.CommonTexasHoldEmComponent;
 import net.minecraft.world.entity.Entity;
@@ -35,6 +36,11 @@ public class JComponentPlatformUtils {
 
     @ExpectPlatform
     public static CommonPhComponent getPhData(Player player) {
+        throw new AssertionError();
+    }
+
+    @ExpectPlatform
+    public static CommonTuskComponent getTuskData(Player player) {
         throw new AssertionError();
     }
 
