@@ -28,6 +28,7 @@ import net.arna.jcraft.client.renderer.effects.AttackHitboxEffectRenderer;
 import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer;
 import net.arna.jcraft.client.rendering.RenderHandler;
 import net.arna.jcraft.client.rendering.handler.*;
+import net.arna.jcraft.client.rendering.shader.JShaderRegistry;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
 import net.arna.jcraft.client.util.TrackedKeyBinding;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
@@ -96,6 +97,7 @@ public class JCraftClient {
 
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, new DecimalFormatUpdater());
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, StandUserPoseLoader::onReload);
+        ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, JShaderRegistry::onReload);
 
         GravityChannelClient.init();
 
@@ -105,6 +107,7 @@ public class JCraftClient {
         JClientEventsRegistry.registerClientEvents();
         JCraftAbilityHud.init();
         PoseModifiers.register();
+        JShaderRegistry.init();
 
         AzArmorRendererRegistry.register(
                 ArmorRenderer.simple("diavoloclothes"),

@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.arna.jcraft.client.rendering.api.PostEffect;
 import net.arna.jcraft.client.rendering.api.PostProcessHandler;
 import net.arna.jcraft.client.rendering.api.callbacks.PostShaderRenderCallback;
+import net.arna.jcraft.client.rendering.shader.JShaderRegistry;
 import net.arna.jcraft.common.entity.stand.CreamEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.Minecraft;
@@ -49,6 +50,7 @@ public class GameRendererMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LevelRenderer;doEntityOutline()V", shift = AFTER)
     )
     private void hookShaderRender(float tickDelta, long nanoTime, boolean renderLevel, CallbackInfo info) {
+        // NOTE: The main depth buffer has been cleared by now
         PostShaderRenderCallback.EVENT.invoker().renderEffect(tickDelta);
     }
 
