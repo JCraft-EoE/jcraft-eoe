@@ -12,8 +12,7 @@ import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
-import net.arna.jcraft.common.attack.moves.shared.RestorationAttack;
-import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
+import net.arna.jcraft.common.attack.moves.shared.SimpleHitscanAttack;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
@@ -22,9 +21,9 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     public static final MoveSet<AerosmithEntity, AerosmithEntity.State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.AEROSMITH,
             AerosmithEntity::registerDefaultMoves, AerosmithEntity.State.class);
 
-    // TODO Ayutac copied the values from CreamEntity
-    public static final SimpleAttack<AerosmithEntity> PUNCH = SimpleAttack.<AerosmithEntity>lightAttack(
-            6, 14, 0.75f, 5f, 20, 0.3f, -0.1f);
+    // TODO Arna balance this
+    public static final SimpleHitscanAttack<AerosmithEntity> BULLET = new SimpleHitscanAttack<AerosmithEntity>(
+            1, 1, 2, 0f, 1f, 0, 0f, 30f, 10f, 1/6f);
 
     public static final StandData DATA = StandData.builder()
             .info(StandInfo.builder()
@@ -34,6 +33,13 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
     public AerosmithEntity(final Level world) {
         super(JStandTypeRegistry.AEROSMITH.get(), world);
+        setYDistanceOffset(1.2f); // TODO for patrol mode 10f
+        setNoGravity(true);
+    }
+
+    @Override
+    public void playSummonAnimation() {
+        // intentionally left empty // TODO remove this override
     }
 
     @Override
@@ -42,7 +48,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     }
 
     private static void registerDefaultMoves(final @NonNull MoveMap<AerosmithEntity, AerosmithEntity.State> moves) {
-        moves.registerImmediate(MoveClass.LIGHT, PUNCH, AerosmithEntity.State.LIGHT);
+        moves.registerImmediate(MoveClass.LIGHT, BULLET, AerosmithEntity.State.LIGHT);
     }
 
     public enum State implements StandAnimationState<AerosmithEntity> {

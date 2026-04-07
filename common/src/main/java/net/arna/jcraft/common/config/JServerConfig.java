@@ -80,6 +80,7 @@ public class JServerConfig {
     public static final BooleanOption ROLLER_FLATTENING = new BooleanOption("rollerFlattening", INTERACTION, true);
     public static final BooleanOption ROLLER_DESTROYING = new BooleanOption("rollerDestroying", INTERACTION, true);
     public static final BooleanOption PLAYER_VAMPS_DIE_TO_HAMON = new BooleanOption("playerVampsDieToHamon", INTERACTION, false);
+    public static final BooleanOption MANDOM_AFFECTS_BLOCKS = new BooleanOption("mandomAffectsBlocks", INTERACTION, true);
     /*
     public static final BooleanOption UNIVERSAL_ABILITIES = new BooleanOption("universalAbilities", INTERACTION, true);
     public static final BooleanOption STAND_GRIEFING = new BooleanOption("standGriefing", INTERACTION, true);

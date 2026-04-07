@@ -45,7 +45,7 @@ public class TonpettyEntity extends HamonSpecUser {
     protected InteractionResult mobInteract(final Player player, final InteractionHand hand) {
         final CommonSpecComponent specData = JComponentPlatformUtils.getSpecData(player);
 
-        if (specData.getType() != JSpecTypeRegistry.HAMON.get() && !greeted.contains(player)) {
+        if (specData.getType() != JSpecTypeRegistry.HAMON.get() && !greeted.contains(player) && !player.level().isClientSide()) {
             player.sendSystemMessage(Component.translatable("dialogue.tonpetty.greeting"));
             greeted.add(player);
             if (SpecTypeUtil.isNone(specData.getType())) {

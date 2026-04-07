@@ -63,6 +63,10 @@ public final class InhaleAttack extends AbstractMove<InhaleAttack, StarPlatinumE
         final Vec3 fPos = eyePos.add(rotVec.scale(1.75));
         final Vec3 ffPos = eyePos.add(rotVec.scale(3.25));
 
+        // In some rare cases, this appears to be possible, which will crash the game later in the method.
+        if (Double.isNaN(fPos.x) || Double.isNaN(fPos.y) || Double.isNaN(fPos.z))
+            return;
+
         if (attacker.level().isClientSide) {
             if (inhaleTime % 20 == 0) attacker.playSound(JSoundRegistry.INHALE_LOOP.get());
 

@@ -5,7 +5,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 
 public class ValentineTopRenderer extends ArmorRenderer {
 
-    public static final String ID = "valentinetop";
+    public static final String ID = "valentinecoat";
 
     public ValentineTopRenderer() {
         super(() -> new ArmorAnimator(ID), new ValentineTopBoneContext(), ID);
@@ -21,9 +21,6 @@ public class ValentineTopRenderer extends ArmorRenderer {
                 setBoneVisible(this.rightLeg, true);
                 setBoneVisible(this.leftArm, true);
                 setBoneVisible(this.rightArm, true);
-            }
-            else if (currentSlot == EquipmentSlot.HEAD) {
-                setBoneVisible(this.head, true);
             }
         }
     }

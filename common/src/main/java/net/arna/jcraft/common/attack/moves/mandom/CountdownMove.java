@@ -13,6 +13,7 @@ import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.attack.moves.BlockMarkerMove;
 import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
 import net.arna.jcraft.api.registry.JPacketRegistry;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.entity.stand.MandomEntity;
 import net.arna.jcraft.common.marker.*;
 import net.arna.jcraft.common.util.CooldownType;
@@ -28,6 +29,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -54,7 +56,7 @@ public final class CountdownMove extends AbstractMove<CountdownMove, MandomEntit
             Identifiers.VEHICLE
     );
     static final BlockMarkerType BLOCK_MARKER_TYPE = new BlockMarkerType(
-            (pos, state) -> false,
+            (pos, state) -> JServerConfig.MANDOM_AFFECTS_BLOCKS.getValue(),
             (marker, level) -> true
     );
     @Getter
@@ -78,6 +80,11 @@ public final class CountdownMove extends AbstractMove<CountdownMove, MandomEntit
     @Getter
     private int countdownTicks;
     private BlockPos attackerBlockPos;
+    @Getter
+    private final UUID uuid = UUID.randomUUID();
+    @Getter
+    private final List<Boolean> iteration = new LinkedList<>();
+    private Level lastLevel = null;
 
     public CountdownMove(final int cooldown, final int windup, final int duration, final float moveDistance, final int radius, final int maxCountdownTicks,
                          final @NonNull Set<ResourceLocation> rewindIds,
@@ -114,12 +121,12 @@ public final class CountdownMove extends AbstractMove<CountdownMove, MandomEntit
     }
 
     @Override
-    public boolean addBlock(final @NonNull BlockPos pos, final @NonNull BlockState state) {
+    public boolean addBlock(final @NonNull BlockPos pos, final @NonNull BlockState state, final @NonNull Level level) {
         if (!countdownActive) {
             return false;
         }
 
-        if (pos.distSqr(attackerBlockPos) > radius * radius) {
+        if (!isInRange(pos, level)) {
             return false;
         }
 
@@ -140,6 +147,10 @@ public final class CountdownMove extends AbstractMove<CountdownMove, MandomEntit
 
     @Override
     public @NonNull Set<LivingEntity> perform(final MandomEntity attacker, final LivingEntity user) {
+        lastLevel = attacker.level();
+        if (isRecording()) {
+            getIteration().add(false);
+        }
         BlockMarkerMoves.add(attacker, this);
         final List<Entity> toCapture = attacker.level().getEntitiesOfClass(Entity.class,
                 attacker.getBoundingBox().inflate(radius),
@@ -201,6 +212,16 @@ public final class CountdownMove extends AbstractMove<CountdownMove, MandomEntit
 
             NetworkManager.sendToPlayer(serverPlayer, JPacketRegistry.S2C_MANDOM_DATA, buf);
         }
+    }
+
+    @Override
+    public boolean isInRange(final @NonNull BlockPos pos, final @NonNull Level level) {
+        return level == lastLevel && pos.distSqr(attackerBlockPos) <= radius * radius;
+    }
+
+    @Override
+    public boolean isRecording() {
+        return countdownActive;
     }
 
     @Override

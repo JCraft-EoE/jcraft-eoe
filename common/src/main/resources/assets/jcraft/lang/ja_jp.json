@@ -1,10 +1,16 @@
 {
   "advancements.jcraft.find_stone_mask.description": "石仮面を見つける",
   "advancements.jcraft.find_stone_mask.title": "これは痛いぞ…",
+  "advancements.jcraft.hamon1.description": "呼吸（アルティメット）で波紋メーターを完全に満たす",
+  "advancements.jcraft.hamon1.title": "深呼吸",
+  "advancements.jcraft.hamon2.description": "オーバードライブ（ラッシュ）の切り替え",
   "advancements.jcraft.hamon2.title": "集中",
   "advancements.jcraft.hamon3.description": "敵対Mobをズームパンチする",
   "advancements.jcraft.hamon3.title": "ズーム・ズーム",
+  "advancements.jcraft.hamon4.description": "ズームパンチで敵対的Mobを攻撃し、続けて波紋アッパーカット（波紋化必殺技2）を当てて倒す",
   "advancements.jcraft.hamon4.title": "カンフーを知っている",
+  "advancements.jcraft.hamon5.description": "波紋の波（波紋化必殺技1）で小さな群れを攻撃する",
+  "advancements.jcraft.hamon6.description": "敵対的Mobに仙道ウェーブキック（波紋化空中必殺技2）を当てた後、踏みつけ（必殺技1）を使用する。",
   "advancements.jcraft.hamon6.title": "波紋マスター",
   "advancements.jcraft.kill_dummy.description": "訓練用ダミーを倒す",
   "advancements.jcraft.kill_dummy.title": "虚空へ",
@@ -712,7 +718,7 @@
   "jcraft.serverconfig.option.ignoreArmor": "スタンドの防具貫通",
   "jcraft.serverconfig.option.invisCreamVoid": "クリームの暗黒空間の透明化",
   "jcraft.serverconfig.option.kcTimeErasureDuration": "キング・クリムゾンの時の消し飛ばしの持続時間",
-  "jcraft.serverconfig.option.killVampirism": "吸血鬼のKill",
+  "jcraft.serverconfig.option.killVampirism": "倒した時の回復",
   "jcraft.serverconfig.option.meteorSpawnRate": "隕石の出現確率(%)",
   "jcraft.serverconfig.option.mihAccelerateTicks": "メイド・イン・ヘブンの時の加速の持続時間",
   "jcraft.serverconfig.option.mihTimeAccelerationDuration": "メイド・イン・ヘブンの時の加速の持続時間",
@@ -1538,5 +1544,6 @@
   "text.autoconfig.jcraft.title": "JCraft 設定",
   "tooltip.jcraft.peacemaker.shots": "弾数：",
   "warning.jcraft.spec.change": "使用するとスペックが変更されますが、よろしいですか？",
+  "warning.jcraft.spec.change.mob": "このエンティティとインタラクトすると、スペックが変更されますが、よろしいですか？",
   "warning.jcraft.stand.change": "使用するとスタンドが変更されますが、よろしいですか？"
 }

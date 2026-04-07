@@ -192,10 +192,6 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
                 new Vector3f(1.0f, 0.0f, 0.0f),
                 new Vector3f(1.0f, 0.2f, 0.4f)
         };
-
-        MoveMap<MagiciansRedEntity, State> movemap = new MoveMapImpl<>();
-        registerMoves(movemap);
-        getMoveMap().copyFrom(movemap, true);
     }
 
     private static void registerMoves(MoveMap<MagiciansRedEntity, State> moves) {

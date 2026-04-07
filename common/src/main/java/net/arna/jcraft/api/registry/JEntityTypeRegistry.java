@@ -281,8 +281,8 @@ public interface JEntityTypeRegistry {
                     WorldOnlyEntityFactory.from(AerosmithEntity::new),
                     MobCategory.CREATURE
             ).sized(
-                    0.6f,
-                    1.8f
+                    1.2f,
+                    0.9f
             ).build("aerosmith"));
 
     RegistrySupplier<EntityType<GEREntity>> GER = ENTITY_TYPE_REGISTRY.register(JCraft.id("ger"),

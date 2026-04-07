@@ -195,6 +195,7 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> SHARED_STANDBY_OFF_MOVE = register("shared_standby_off_move", StandbyDeactivationMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SHARED_TOSS_CHARGE_MOVE = register("shared_toss_charge_move", TossChargeMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SHARED_TOSS_MOVE = register("shared_toss_move", TossMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> SHARED_SIMPLE_HITSCAN_ATTACK = register("shared_simple_hitscan_attack", SimpleHitscanAttack.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> SILVERCHARIOT_ARMOR_OFF_ATTACK = register("silverchariot_armor_off_attack", ArmorOffAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SILVERCHARIOT_CIRCLE_SLASH_ATTACK = register("silverchariot_circle_slash_attack", CircleSlashAttack.Type.INSTANCE);

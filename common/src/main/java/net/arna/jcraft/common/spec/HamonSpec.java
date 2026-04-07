@@ -262,7 +262,7 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
             return;
         }
 
-        if (moveStun <= 0) {
+        if (moveStun <= 0 && (user == null || user.getAirSupply() == user.getMaxAirSupply())) {
             if (charge < MAX_CHARGE) {
                 float add = 0.1f;
 

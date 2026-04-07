@@ -93,6 +93,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     private static final EntityDataAccessor<Integer> SKIN;
     private static final EntityDataAccessor<Float> ROTATIONOFFSET;
     private static final EntityDataAccessor<Float> DISTANCEOFFSET;
+    private static final EntityDataAccessor<Float> YDISTANCEOFFSET;
 
     private static final EntityDataAccessor<Float> ALPHA_OVERRIDE;
 
@@ -191,6 +192,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         SKIN = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.INT);
         ROTATIONOFFSET = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.FLOAT);
         DISTANCEOFFSET = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.FLOAT);
+        YDISTANCEOFFSET = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.FLOAT);
 
         ALPHA_OVERRIDE = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.FLOAT);
 
@@ -341,6 +343,14 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      */
     public void setDistanceOffset(float distanceOffset) {
         this.entityData.set(DISTANCEOFFSET, distanceOffset);
+    }
+
+    public float getYDistanceOffset() {
+        return this.entityData.get(YDISTANCEOFFSET);
+    }
+
+    public void setYDistanceOffset(float yDistanceOffset) {
+        this.entityData.set(YDISTANCEOFFSET, yDistanceOffset);
     }
 
     public boolean hasAlphaOverride() {
@@ -642,6 +652,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         entityData.define(SKIN, 0);
         entityData.define(ROTATIONOFFSET, -90f);
         entityData.define(DISTANCEOFFSET, 1f);
+        entityData.define(YDISTANCEOFFSET, 0f);
 
         entityData.define(ALPHA_OVERRIDE, -1f);
 

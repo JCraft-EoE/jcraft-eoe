@@ -1,5 +1,7 @@
 package net.arna.jcraft.datagen.providers.data;
 
+import dev.architectury.registry.registries.RegistrySupplier;
+import lombok.SneakyThrows;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.registry.JBlockRegistry;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
@@ -9,6 +11,7 @@ import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
 import net.arna.jcraft.common.gravity.util.EntityTags;
+import net.arna.jcraft.common.item.CosplayItem;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
@@ -22,6 +25,7 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagBuilder;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
@@ -100,92 +104,20 @@ public class JTagProviders {
 
             getOrCreateRawBuilder(JTagRegistry.SOUL_LOG_ITEMS).addElement(JItemRegistry.SOUL_WOOD_BLOCK.getId());
 
-            getOrCreateRawBuilder(JTagRegistry.PROTECTS_FROM_SUN).addElement(JItemRegistry.KARS_HEADWRAP.getId());
-            getOrCreateRawBuilder(JTagRegistry.PROTECTS_FROM_SUN).addElement(JItemRegistry.RED_HAT.getId());
-            getOrCreateRawBuilder(JTagRegistry.PROTECTS_FROM_SUN).addElement(JItemRegistry.PUCCIS_HAT.getId());
-            getOrCreateRawBuilder(JTagRegistry.PROTECTS_FROM_SUN).addElement(JItemRegistry.RISOTTO_CAP.getId());
-            getOrCreateRawBuilder(JTagRegistry.PROTECTS_FROM_SUN).addElement(JItemRegistry.DIEGO_HAT.getId());
+            addCosplayTags();
+
+            getOrCreateRawBuilder(JTagRegistry.PROTECTS_FROM_SUN).addTag(JItemRegistry.KARS_HEADWRAP.getTag().location());
+            getOrCreateRawBuilder(JTagRegistry.PROTECTS_FROM_SUN).addTag(JItemRegistry.RED_HAT.getTag().location());
+            getOrCreateRawBuilder(JTagRegistry.PROTECTS_FROM_SUN).addTag(JItemRegistry.PUCCIS_HAT.getTag().location());
+            getOrCreateRawBuilder(JTagRegistry.PROTECTS_FROM_SUN).addTag(JItemRegistry.RISOTTO_CAP.getTag().location());
+            getOrCreateRawBuilder(JTagRegistry.PROTECTS_FROM_SUN).addTag(JItemRegistry.DIEGO_HAT.getTag().location());
+            getOrCreateRawBuilder(JTagRegistry.PROTECTS_FROM_SUN).addTag(JItemRegistry.MOUNTAIN_TIM_HAT.getTag().location());
+            getOrCreateRawBuilder(JTagRegistry.PROTECTS_FROM_SUN).addTag(JItemRegistry.COWBOY_HAT.getTag().location());
 
             final var cosplay = getOrCreateTagBuilder(JTagRegistry.COSPLAY);
-            cosplay.add(JItemRegistry.RED_HAT.get());
-            cosplay.add(JItemRegistry.DIO_P1_WIG.get());
-            cosplay.add(JItemRegistry.DIO_P1_JACKET.get());
-            cosplay.add(JItemRegistry.DIO_P1_PANTS.get());
-            cosplay.add(JItemRegistry.DIO_P1_BOOTS.get());
-            cosplay.add(JItemRegistry.STRAIZO_PONCHO.get());
-            cosplay.add(JItemRegistry.KARS_HEADWRAP.get());
-            cosplay.add(JItemRegistry.JOTARO_CAP.get());
-            cosplay.add(JItemRegistry.JOTARO_JACKET.get());
-            cosplay.add(JItemRegistry.JOTARO_PANTS.get());
-            cosplay.add(JItemRegistry.JOTARO_BOOTS.get());
-            cosplay.add(JItemRegistry.KAKYOIN_WIG.get());
-            cosplay.add(JItemRegistry.KAKYOIN_COAT.get());
-            cosplay.add(JItemRegistry.KAKYOIN_PANTS.get());
-            cosplay.add(JItemRegistry.KAKYOIN_BOOTS.get());
-            cosplay.add(JItemRegistry.DIO_HEADBAND.get());
-            cosplay.add(JItemRegistry.DIO_CAPE.get());
-            cosplay.add(JItemRegistry.DIO_JACKET.get());
-            cosplay.add(JItemRegistry.DIO_PANTS.get());
-            cosplay.add(JItemRegistry.DIO_BOOTS.get());
-            cosplay.add(JItemRegistry.HEAVEN_ATTAINED_WIG.get());
-            cosplay.add(JItemRegistry.HEAVEN_ATTAINED_SHIRT.get());
-            cosplay.add(JItemRegistry.HEAVEN_ATTAINED_PANTS.get());
-            cosplay.add(JItemRegistry.HEAVEN_ATTAINED_BOOTS.get());
-            cosplay.add(JItemRegistry.JOTARO_P4_CAP.get());
-            cosplay.add(JItemRegistry.JOTARO_P4_JACKET.get());
-            cosplay.add(JItemRegistry.JOTARO_P4_PANTS.get());
-            cosplay.add(JItemRegistry.JOTARO_P4_BOOTS.get());
-            cosplay.add(JItemRegistry.JOTARO_P6_CAP.get());
-            cosplay.add(JItemRegistry.JOTARO_P6_JACKET.get());
-            cosplay.add(JItemRegistry.JOTARO_P6_PANTS.get());
-            cosplay.add(JItemRegistry.JOTARO_P6_BOOTS.get());
-            cosplay.add(JItemRegistry.KIRA_WIG.get());
-            cosplay.add(JItemRegistry.KIRA_JACKET.get());
-            cosplay.add(JItemRegistry.KIRA_PANTS.get());
-            cosplay.add(JItemRegistry.KIRA_BOOTS.get());
-            cosplay.add(JItemRegistry.KOSAKU_WIG.get());
-            cosplay.add(JItemRegistry.KOSAKU_JACKET.get());
-            cosplay.add(JItemRegistry.KOSAKU_PANTS.get());
-            cosplay.add(JItemRegistry.KOSAKU_BOOTS.get());
-            cosplay.add(JItemRegistry.FINAL_KIRA_WIG.get());
-            cosplay.add(JItemRegistry.FINAL_KIRA_JACKET.get());
-            cosplay.add(JItemRegistry.FINAL_KIRA_PANTS.get());
-            cosplay.add(JItemRegistry.FINAL_KIRA_BOOTS.get());
-            cosplay.add(JItemRegistry.GIORNO_WIG.get());
-            cosplay.add(JItemRegistry.GIORNO_JACKET.get());
-            cosplay.add(JItemRegistry.GIORNO_PANTS.get());
-            cosplay.add(JItemRegistry.GIORNO_BOOTS.get());
-            cosplay.add(JItemRegistry.RISOTTO_CAP.get());
-            cosplay.add(JItemRegistry.RISOTTO_JACKET.get());
-            cosplay.add(JItemRegistry.RISOTTO_PANTS.get());
-            cosplay.add(JItemRegistry.RISOTTO_BOOTS.get());
-            cosplay.add(JItemRegistry.DOPPIO_WIG.get());
-            cosplay.add(JItemRegistry.DOPPIO_SHIRT.get());
-            cosplay.add(JItemRegistry.DIAVOLO_WIG.get());
-            cosplay.add(JItemRegistry.DIAVOLO_SHIRT.get());
-            cosplay.add(JItemRegistry.DIAVOLO_PANTS.get());
-            cosplay.add(JItemRegistry.DIAVOLO_BOOTS.get());
-            cosplay.add(JItemRegistry.JOHNNY_CAP.get());
-            cosplay.add(JItemRegistry.JOHNNY_JACKET.get());
-            cosplay.add(JItemRegistry.JOHNNY_PANTS.get());
-            cosplay.add(JItemRegistry.JOHNNY_BOOTS.get());
-            cosplay.add(JItemRegistry.GYRO_HAT.get());
-            cosplay.add(JItemRegistry.GYRO_SHIRT.get());
-            cosplay.add(JItemRegistry.GYRO_PANTS.get());
-            cosplay.add(JItemRegistry.GYRO_BOOTS.get());
-            cosplay.add(JItemRegistry.DIEGO_HAT.get());
-            cosplay.add(JItemRegistry.DIEGO_SHIRT.get());
-            cosplay.add(JItemRegistry.DIEGO_PANTS.get());
-            cosplay.add(JItemRegistry.DIEGO_BOOTS.get());
-            cosplay.add(JItemRegistry.RINGO_OUTFIT.get());
-            cosplay.add(JItemRegistry.RINGO_BOOTS.get());
-            cosplay.add(JItemRegistry.VALENTINE_WIG.get());
-            cosplay.add(JItemRegistry.VALENTINE_JACKET.get());
-            cosplay.add(JItemRegistry.VALENTINE_PANTS.get());
-            cosplay.add(JItemRegistry.VALENTINE_BOOTS.get());
-            cosplay.add(JItemRegistry.PUCCI_ROBE.get());
-            cosplay.add(JItemRegistry.PUCCI_PANTS.get());
-            cosplay.add(JItemRegistry.PUCCI_BOOTS.get());
+            for (final CosplayItem<?> cosplayItem : CosplayItem.all()) {
+                cosplay.addTag(cosplayItem.getTag());
+            }
 
             final var equipables = getOrCreateTagBuilder(JTagRegistry.EQUIPABLES);
             equipables.add(Items.LEATHER_HELMET);
@@ -223,8 +155,6 @@ public class JTagProviders {
             equipables.add(Items.WITHER_SKELETON_SKULL);
             equipables.add(Items.ZOMBIE_HEAD);
             equipables.add(JItemRegistry.STONE_MASK.get());
-            equipables.add(JItemRegistry.KARS_HEADWRAP.get());
-            equipables.add(JItemRegistry.RED_HAT.get());
             equipables.addTag(JTagRegistry.COSPLAY);
 
             final var sandBlocks = getOrCreateTagBuilder(JTagRegistry.SAND_BLOCKS);
@@ -273,8 +203,8 @@ public class JTagProviders {
             blindsOnImpact.add(Items.NETHERRACK);
             blindsOnImpact.add(Items.GLOWSTONE);
             blindsOnImpact.add(Items.SHROOMLIGHT);
-            blindsOnImpact.add(JItemRegistry.DIO_CAPE.getId());
-            blindsOnImpact.add(JItemRegistry.KARS_HEADWRAP.getId());
+            blindsOnImpact.addTag(JItemRegistry.DIO_CAPE.getTag());
+            blindsOnImpact.addTag(JItemRegistry.KARS_HEADWRAP.getTag());
 
             final var slowsOnImpact = getOrCreateTagBuilder(JTagRegistry.SLOWS_ON_IMPACT);
             slowsOnImpact.add(Items.STICK);
@@ -585,6 +515,22 @@ public class JTagProviders {
             discs.add(JItemRegistry.DISC.get());
             discs.add(JItemRegistry.STAND_DISC.get());
             discs.add(JItemRegistry.SPEC_DISC.get());
+        }
+
+        @SneakyThrows
+        protected void addCosplayTags() {
+            final var cosplayTag = getOrCreateTagBuilder(JTagRegistry.COSPLAY);
+            final var protectsFromSunTag = getOrCreateTagBuilder(JTagRegistry.PROTECTS_FROM_SUN);
+            for (final CosplayItem<?> cosplayItem : CosplayItem.all()) {
+                final var pieceTag = getOrCreateTagBuilder(cosplayItem.getTag());
+                cosplayTag.addTag(cosplayItem.getTag());
+                for (final RegistrySupplier<? extends ArmorItem> item : cosplayItem) {
+                    pieceTag.add(item.get());
+                    if (cosplayItem.isVampireProtection() && cosplayItem.getSlot() == ArmorItem.Type.HELMET) {
+                        protectsFromSunTag.add(item.get());
+                    }
+                }
+            }
         }
     }
 

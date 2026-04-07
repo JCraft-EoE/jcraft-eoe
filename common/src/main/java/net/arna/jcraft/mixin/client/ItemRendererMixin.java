@@ -2,6 +2,7 @@ package net.arna.jcraft.mixin.client;
 
 import net.arna.jcraft.common.item.DebugWand;
 import net.arna.jcraft.common.item.MockItem;
+import net.arna.jcraft.common.item.RewindMockItem;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.ItemModelShaper;
 import net.minecraft.client.renderer.entity.ItemRenderer;
@@ -38,17 +39,16 @@ public class ItemRendererMixin {
 
     @ModifyVariable(method = "getModel", at = @At("HEAD"), argsOnly = true, ordinal = 0)
     private ItemStack mockModelInGetModel(ItemStack stack) {
-        return MockItem.isMockItem(stack) ? MockItem.getMockedStack(stack) : stack;
+        return stack.getItem() instanceof MockItem ? MockItem.getMockedStack(stack) : stack;
     }
 
     @ModifyVariable(method = "render", at = @At("HEAD"), argsOnly = true, ordinal = 0)
     private ItemStack mockModelInRenderGuiIcon(ItemStack stack) {
-        return MockItem.isMockItem(stack) ? MockItem.getMockedStack(stack) : stack;
+        return stack.getItem() instanceof MockItem ? MockItem.getMockedStack(stack) : stack;
     }
 
-    @ModifyVariable(method = "render",
-            at = @At("HEAD"), argsOnly = true, ordinal = 0)
+    @ModifyVariable(method = "render", at = @At("HEAD"), argsOnly = true, ordinal = 0)
     private ItemStack mockModelInRenderItem(ItemStack stack) {
-        return MockItem.isMockItem(stack) ? MockItem.getMockedStack(stack) : stack;
+        return stack.getItem() instanceof MockItem ? MockItem.getMockedStack(stack) : stack;
     }
 }

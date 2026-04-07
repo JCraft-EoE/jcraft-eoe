@@ -4,8 +4,9 @@ import dev.architectury.event.CompoundEventResult;
 import dev.architectury.event.EventResult;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import lombok.NonNull;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
+import net.arna.jcraft.api.attack.moves.BlockMarkerMove;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.api.component.living.CommonVampireComponent;
 import net.arna.jcraft.api.registry.*;
@@ -17,7 +18,8 @@ import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.data.AttackerDataLoader;
 import net.arna.jcraft.common.entity.StandMeteorEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
-import net.arna.jcraft.common.item.MockItem;
+import net.arna.jcraft.common.item.AuMockItem;
+import net.arna.jcraft.common.item.RewindMockItem;
 import net.arna.jcraft.common.marker.BlockMarkerMoves;
 import net.arna.jcraft.common.network.s2c.AttackerDataPacket;
 import net.arna.jcraft.common.saveddata.ExclusiveStandsData;
@@ -59,6 +61,7 @@ import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.phys.AABB;
@@ -315,18 +318,18 @@ public class JServerEvents {
 
             // ... in the AU
             if (world.dimension().equals(JDimensionRegistry.AU_DIMENSION_KEY)) {
-                if (item.getOwner() != null || MockItem.isMockItem(stack)) {
+                if (item.getOwner() != null || stack.getItem() instanceof AuMockItem) {
                     return EventResult.pass();
                 }
 
-                ItemStack mockStack = MockItem.createMockStack(stack); // Convert it to a mock item (incompatible and useless)
+                ItemStack mockStack = AuMockItem.createMockStack(stack); // Convert it to a mock item (incompatible and useless)
                 if (stack.getItem() instanceof BlockItem) // ... and mark down all relevant data
                 {
                     mockStack.getOrCreateTag().putIntArray("AttractPos", new int[]{item.getBlockX(), item.getBlockY(), item.getBlockZ()});
                 }
                 item.setItem(mockStack);
             } else { // ... outside the AU
-                if (MockItem.isMockItem(stack)) {
+                if (stack.getItem() instanceof AuMockItem) {
                     // Mark it as an item of interest, and save relevant data
                     CompoundTag stackData = stack.getOrCreateTag();
                     if (stackData.contains("AttractPos")) { // if attracted to a specific position
@@ -642,14 +645,33 @@ public class JServerEvents {
         }
     }
 
-    public static EventResult beforeBlockSet(BlockPos blockPos, BlockState oldBlockState, BlockState newBlockState) {
+    public static EventResult beforeBlockSet(final @NonNull BlockPos blockPos, final @NonNull BlockState oldBlockState, final @NonNull BlockState newBlockState, final @NonNull Level level) {
         if (oldBlockState.is(BlockTags.LEAVES) && newBlockState.is(BlockTags.LEAVES)) {
             return EventResult.pass();
         }
 
         BlockMarkerMoves.mergeQueues();
-        BlockMarkerMoves.forEach(move -> move.addBlock(blockPos, oldBlockState));
+        BlockMarkerMoves.forEach(move -> move.addBlock(blockPos, oldBlockState, level));
 
+        return EventResult.pass();
+    }
+
+    public static EventResult processBlockLoot(final @NonNull List<ItemStack> loot, final @NonNull BlockState state, final @NonNull ServerLevel serverLevel, final @NonNull BlockPos pos, final @Nullable BlockEntity blockEntity) {
+        if (JServerConfig.MANDOM_AFFECTS_BLOCKS.getValue()) {
+            final Optional<BlockMarkerMove> move = BlockMarkerMoves.findFirst(m -> m.isRecording() && m.isInRange(pos, serverLevel));
+            if (move.isPresent()) {
+                final List<ItemStack> modifiedList = new LinkedList<>();
+                for (ItemStack stack : loot) {
+                    if (stack.getItem() instanceof RewindMockItem) {
+                        modifiedList.add(stack);
+                    } else {
+                        modifiedList.add(RewindMockItem.createMockStack(stack, move.get()));
+                    }
+                }
+                loot.clear();
+                loot.addAll(modifiedList);
+            }
+        }
         return EventResult.pass();
     }
 }
