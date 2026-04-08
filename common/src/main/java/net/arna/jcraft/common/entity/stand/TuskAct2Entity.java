@@ -54,17 +54,17 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
                     .proCount(3)
                     .conCount(2)
                     .freeSpace(Component.literal("""
-                            Contains up to 10 nails.
-                            Nails regenerate passively at the cost of hunger.
-                            Layerable with specs"""))
+                            Contains up to 10 nails. Nails regenerate passively at the cost of hunger.
+                            Herbal Tea grants Keratin Growth, speeding up nail regen.
+                            Layerable with specs."""))
                     .build())
-            .summonData(SummonData.of(() -> null))
+            .summonData(SummonData.of(JSoundRegistry.TUSK_MIMIMIN))
             .build();
 
     public static final EntityDataAccessor<Float> NAILS = SynchedEntityData.defineId(TuskAct2Entity.class, EntityDataSerializers.FLOAT);
     public static final float NAILS_MAX = 10.0f;
 
-    public static final GoldenRectangleNailAttack GOLDEN_RECTANGLE_NAIL = new GoldenRectangleNailAttack(0, 1, 15, 0.75f, 2.5f, 15.0f, 8.0f)
+    public static final GoldenRectangleNailAttack GOLDEN_RECTANGLE_NAIL = new GoldenRectangleNailAttack(0, 1, 15, 0.75f, 4.0f, 15.0f, 15.0f)
             .withCondition(TuskNailCondition.atLeast(1.0f))
             .withInfo(
                     Component.literal("Golden Rectangle Nail"),
@@ -152,12 +152,16 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
 
         if (!level().isClientSide() && hasUser()) {
             LivingEntity user = getUser();
-            if (user instanceof Player player && --regenTick <= 0) {
-                regenTick = Math.max(1, TuskAct1Entity.calcNailRegenInterval(player, miscComponent));
-                if (getNails() < NAILS_MAX) {
-                    addNails(1.0f);
-                    TuskAct1Entity.drainNailResource(player);
-                    playSound(JSoundRegistry.TUSK_NAIL_GROWTH.get(), 0.5f, 1.0f);
+            if (user instanceof Player player) {
+                if (player.isCreative()) {
+                    setNails(NAILS_MAX);
+                } else if (--regenTick <= 0) {
+                    regenTick = Math.max(1, TuskAct1Entity.calcNailRegenInterval(player));
+                    if (getNails() < NAILS_MAX) {
+                        addNails(1.0f);
+                        TuskAct1Entity.drainNailResource(player);
+                        playSound(JSoundRegistry.TUSK_NAIL_GROWTH.get(), 0.5f, 1.0f);
+                    }
                 }
             }
         }

@@ -1,7 +1,7 @@
 package net.arna.jcraft.common.item;
 
-import net.arna.jcraft.api.component.living.CommonMiscComponent;
-import net.arna.jcraft.platform.JComponentPlatformUtils;
+import net.arna.jcraft.api.registry.JStatusRegistry;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
@@ -41,11 +41,12 @@ public class HerbalTeaItem extends Item {
         if (!(user instanceof Player player)) return stack;
 
         if (!world.isClientSide) {
-            CommonMiscComponent misc = JComponentPlatformUtils.getMiscData(player);
-            if (misc != null) {
-                misc.setHerbalTeaTicks(Math.min(misc.getHerbalTeaTicks() + 3600, 7200));
-                player.awardStat(Stats.ITEM_USED.get(this));
-            }
+            // Add 3 min of Keratin Growth, stacking up to 6 min
+            int existing = player.hasEffect(JStatusRegistry.KERATIN_GROWTH.get())
+                    ? player.getEffect(JStatusRegistry.KERATIN_GROWTH.get()).getDuration() : 0;
+            int newDuration = Math.min(existing + 3600, 7200);
+            player.addEffect(new MobEffectInstance(JStatusRegistry.KERATIN_GROWTH.get(), newDuration, 0, false, true));
+            player.awardStat(Stats.ITEM_USED.get(this));
         }
 
         user.gameEvent(GameEvent.DRINK);

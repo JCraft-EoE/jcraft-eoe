@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
+import net.arna.jcraft.common.entity.projectile.NailProjectile;
 import net.arna.jcraft.common.entity.stand.TuskAct3Entity;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
@@ -33,9 +34,16 @@ public final class VoidShotAttack extends AbstractMove<VoidShotAttack, TuskAct3E
 
     @Override
     public @NonNull Set<LivingEntity> perform(TuskAct3Entity attacker, LivingEntity user) {
-        // Grant the stand invulnerability for VOID_DURATION ticks
-        // Tracked via TuskAct3Entity.voidTicks field
-        attacker.enterVoid();
+        // Fire the wormhole nail — user will pilot it
+        NailProjectile nail = NailProjectile.wormholeFromTuskAct3(attacker);
+        if (nail == null) return Set.of();
+
+        nail.setNoGravity(true);
+        nail.setPos(user.position().add(0, user.getBbHeight() * 0.75, 0));
+        nail.shootFromRotation(user, user.getXRot(), user.getYRot(), 0.0F, 2.5F, 0.0F);
+        attacker.level().addFreshEntity(nail);
+
+        attacker.enterVoid(nail);
         return Set.of();
     }
 

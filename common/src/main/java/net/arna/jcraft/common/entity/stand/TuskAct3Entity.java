@@ -53,10 +53,10 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
                     .proCount(4)
                     .conCount(2)
                     .freeSpace(Component.literal("""
-                            Contains up to 10 nails.
-                            Nails regenerate passively at the cost of hunger."""))
+                            Contains up to 10 nails. Nails regenerate passively at the cost of hunger.
+                            Herbal Tea grants Keratin Growth, speeding up nail regen."""))
                     .build())
-            .summonData(SummonData.of(() -> null))
+            .summonData(SummonData.of(JSoundRegistry.TUSK_MIMIMIN))
             .build();
 
     public static final EntityDataAccessor<Float> NAILS = SynchedEntityData.defineId(TuskAct3Entity.class, EntityDataSerializers.FLOAT);
@@ -64,7 +64,7 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
 
     // ---- Moves ----
 
-    public static final Act3NailShotAttack NAIL_SHOT = new Act3NailShotAttack(0, 1, 15, 0.75f, 2.5f, 15.0f, 8.0f)
+    public static final Act3NailShotAttack NAIL_SHOT = new Act3NailShotAttack(0, 1, 15, 0.75f, 4.0f, 15.0f, 15.0f)
             .withCondition(TuskNailCondition.atLeast(1.0f))
             .withInfo(
                     Component.literal("Golden Rectangle Nail"),
@@ -123,9 +123,10 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
     @Setter
     private CommonMiscComponent miscComponent;
 
-    /** Ticks remaining of Voidshot invulnerability (server-side). */
+    /** Ticks remaining of Voidshot nail-piloting (server-side). */
     private int voidTicks = 0;
     private int regenTick = 40;
+    private java.lang.ref.WeakReference<net.arna.jcraft.common.entity.projectile.NailProjectile> voidNail = null;
 
     public TuskAct3Entity(Level worldIn) {
         super(JStandTypeRegistry.TUSK_ACT_3.get(), worldIn);
@@ -185,18 +186,22 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
         return true;
     }
 
-    /** Enter Voidshot invulnerability for VOID_DURATION ticks. */
-    public void enterVoid() {
+    /** Enter Voidshot — user becomes the nail for up to VOID_DURATION ticks. */
+    public void enterVoid(net.arna.jcraft.common.entity.projectile.NailProjectile nail) {
         voidTicks = VoidShotAttack.VOID_DURATION;
+        voidNail = new java.lang.ref.WeakReference<>(nail);
         LivingEntity user = getUser();
         if (user != null) {
             user.setInvulnerable(true);
         }
     }
 
-    /** Force the user out of the void early (used when they try to use a move inside). */
+    /** Force the user out of the void early. */
     public void exitVoid() {
         voidTicks = 0;
+        net.arna.jcraft.common.entity.projectile.NailProjectile nail = voidNail == null ? null : voidNail.get();
+        if (nail != null && nail.isAlive()) nail.discard();
+        voidNail = null;
         LivingEntity user = getUser();
         if (user != null) {
             user.setInvulnerable(false);
@@ -214,18 +219,34 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
         if (!level().isClientSide() && hasUser()) {
             // Nail regeneration
             LivingEntity user = getUser();
-            if (user instanceof Player player && --regenTick <= 0) {
-                regenTick = Math.max(1, TuskAct1Entity.calcNailRegenInterval(player, miscComponent));
-                if (getNails() < NAILS_MAX) {
-                    addNails(1.0f);
-                    TuskAct1Entity.drainNailResource(player);
-                    playSound(JSoundRegistry.TUSK_NAIL_GROWTH.get(), 0.5f, 1.0f);
+            if (user instanceof Player player) {
+                if (player.isCreative()) {
+                    setNails(NAILS_MAX);
+                } else if (--regenTick <= 0) {
+                    regenTick = Math.max(1, TuskAct1Entity.calcNailRegenInterval(player));
+                    if (getNails() < NAILS_MAX) {
+                        addNails(1.0f);
+                        TuskAct1Entity.drainNailResource(player);
+                        playSound(JSoundRegistry.TUSK_NAIL_GROWTH.get(), 0.5f, 1.0f);
+                    }
                 }
             }
 
-            // Voidshot countdown
+            // Voidshot — pilot the nail
             if (voidTicks > 0) {
-                voidTicks--;
+                net.arna.jcraft.common.entity.projectile.NailProjectile nail = voidNail == null ? null : voidNail.get();
+                if (nail != null && nail.isAlive() && !nail.inGround) {
+                    // Steer nail by player look direction
+                    net.minecraft.world.phys.Vec3 lookVec = user.getLookAngle();
+                    net.minecraft.world.phys.Vec3 currentVel = nail.getDeltaMovement();
+                    nail.setDeltaMovement(currentVel.lerp(lookVec.scale(currentVel.length()), 0.3));
+                    // Teleport user (and stand) to nail position
+                    user.teleportTo(nail.getX(), nail.getY(), nail.getZ());
+                    voidTicks--;
+                } else {
+                    // Nail stopped or gone — exit void
+                    exitVoid();
+                }
                 if (voidTicks <= 0) {
                     exitVoid();
                 }
@@ -263,13 +284,14 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
             return;
         }
 
-        // Handhole intercept: while hole is active, redirect Light to fire from the hole
+        // Handhole intercept: while hole is active, only fire from hole (never normal M1)
         if (moveClass == MoveClass.LIGHT) {
             MoveMap.Entry<TuskAct3Entity, State> sp1Entry = getMoveMap().getFirstValidEntry(
                     MoveClass.SPECIAL1, this, false, false);
             if (sp1Entry != null && sp1Entry.getMove() instanceof HandholeAttack handhole) {
-                if (handhole.isHoleActive() && handhole.tryFireFromHole(this, getUser())) {
-                    return; // Shot fired from hole, suppress normal M1
+                if (handhole.isHoleActive()) {
+                    handhole.tryFireFromHole(this, getUser());
+                    return; // Always suppress normal M1 when hole is active
                 }
             }
         }

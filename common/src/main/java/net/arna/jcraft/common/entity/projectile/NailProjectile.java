@@ -111,8 +111,8 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
         final Entity entity = entityHitResult.getEntity();
         final Entity owner = this.getOwner();
 
-        if (owner != null && owner.hasPassenger(entity) || entity == owner) return;
-        if (entity instanceof JAttackEntity attackEntity && attackEntity.getMaster() == owner) return;
+        if (entity == owner) return;
+        if (entity instanceof JAttackEntity) return; // filter all stands
 
         // Wormhole nails don't deal damage
         if (wormhole) {
@@ -135,17 +135,23 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
         }
         playSound(SoundEvents.ARROW_HIT, 1, 1);
 
+        // Slow down creep speed on each hit
+        if (isCreeping) {
+            creepSpeed *= 0.75f;
+        }
+
         // Start creeping if we have creep distance and haven't started creeping yet
         if (creepDistance > 0 && !isCreeping) {
-            inGround = true;
             isCreeping = true;
             creepStartPos = position();
             ticksInAir = 0;
+            this.noPhysics = true;
+            inGround = false;
 
             // Find nearby entity to creep towards (exclude current target and owner)
             List<LivingEntity> nearbyTargets = level().getEntitiesOfClass(LivingEntity.class,
                     getBoundingBox().inflate(creepDistance),
-                    e -> e != owner && e != target && !e.isSpectator() && e.isAlive());
+                    e -> e != owner && e != target && !(e instanceof JAttackEntity) && !e.isSpectator() && e.isAlive());
 
             if (!nearbyTargets.isEmpty()) {
                 // Find closest target
@@ -172,19 +178,22 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
 
     @Override
     protected void onHitBlock(@NonNull BlockHitResult blockHitResult) {
-        super.onHitBlock(blockHitResult);
         if (level().isClientSide()) return;
         if (creepDistance > 0 && !isCreeping) {
             BlockState hitBlock = level().getBlockState(blockHitResult.getBlockPos());
-            if (!hitBlock.isSolid()) return;
-            inGround = true;
+            if (!hitBlock.isSolid()) {
+                super.onHitBlock(blockHitResult);
+                return;
+            }
             isCreeping = true;
             creepStartPos = position();
             ticksInAir = 0;
+            this.noPhysics = true;
+            inGround = false;
             Entity owner = getOwner();
             List<LivingEntity> nearbyTargets = level().getEntitiesOfClass(LivingEntity.class,
                     getBoundingBox().inflate(creepDistance),
-                    e -> e != owner && !e.isSpectator() && e.isAlive());
+                    e -> e != owner && !(e instanceof JAttackEntity) && !e.isSpectator() && e.isAlive());
             if (!nearbyTargets.isEmpty()) {
                 LivingEntity closest = nearbyTargets.get(0);
                 double closestDist = distanceToSqr(closest);
@@ -201,6 +210,8 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
             } else {
                 discard();
             }
+        } else {
+            super.onHitBlock(blockHitResult);
         }
     }
 
@@ -419,7 +430,7 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
 
         NailProjectile nail = new NailProjectile(tusk.level(), tusk.getUserOrThrow());
         nail.setSpinning(true);
-        nail.setCustomDamage(7.0f);
+        nail.setCustomDamage(6.0f); // Act 2: 1.5x Act 1
         nail.maxRange = maxRange;
         nail.creepDistance = creepDistance;
         return nail;
@@ -439,8 +450,8 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
         nail.maxRange = maxRange;
         nail.setDrilling(true); // Enable drilling mode - hits once per tick
 
-        // Damage: 0.5-1 per tick based on charge (0-100 ticks)
-        float damage = 0.5f + (chargeTime / 100.0f * 0.5f);
+        // Damage: 1-2 per tick based on charge (0-100 ticks)
+        float damage = 1.0f + (chargeTime / 100.0f * 1.0f);
         nail.setCustomDamage(damage);
 
         return nail;
@@ -454,7 +465,7 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
 
         NailProjectile nail = new NailProjectile(tusk.level(), tusk.getUserOrThrow());
         nail.setSpinning(true);
-        nail.setCustomDamage(7.0f);
+        nail.setCustomDamage(8.0f); // Act 3: 2x Act 1
         nail.maxRange = maxRange;
         nail.creepDistance = creepDistance;
         return nail;

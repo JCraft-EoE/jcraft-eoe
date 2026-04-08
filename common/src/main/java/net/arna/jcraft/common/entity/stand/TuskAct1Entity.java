@@ -24,6 +24,7 @@ import net.arna.jcraft.common.attack.moves.tusk.NailShotAttack;
 import net.arna.jcraft.common.attack.moves.tusk.NailWheelAttack;
 import net.arna.jcraft.common.attack.moves.tusk.TuskActCycleMove;
 import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -56,11 +57,11 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
                     .proCount(2)
                     .conCount(3)
                     .freeSpace(Component.literal("""
-                            Contains up to 10 nails.
-                            Nails regenerate passively at the cost of hunger.
-                            Layerable with specs"""))
+                            Contains up to 10 nails. Nails regenerate passively at the cost of hunger.
+                            Herbal Tea grants Keratin Growth, speeding up nail regen.
+                            Layerable with specs."""))
                     .build())
-            .summonData(SummonData.of(() -> null))
+            .summonData(SummonData.of(JSoundRegistry.TUSK_MIMIMIN))
             .build();
 
     public static final EntityDataAccessor<Float> NAILS = SynchedEntityData.defineId(TuskAct1Entity.class, EntityDataSerializers.FLOAT);
@@ -73,7 +74,7 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
                     Component.literal("Short range nail (5 blocks), costs 0.5 nails, longer windup")
             );
 
-    public static final NailShotAttack<TuskAct1Entity> NAIL_SHOT = new NailShotAttack<TuskAct1Entity>(0, 1, 10, 0.75f, 2.0f, 10.0f)
+    public static final NailShotAttack<TuskAct1Entity> NAIL_SHOT = new NailShotAttack<TuskAct1Entity>(0, 1, 10, 0.75f, 4.0f, 10.0f)
             .withCondition(TuskNailCondition.atLeast(1.0f))
             .withCrouchingVariant(TOENAIL_SHOT)
             .withInfo(
@@ -166,12 +167,16 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
 
         if (!level().isClientSide && hasUser()) {
             LivingEntity user = getUser();
-            if (user instanceof Player player && --regenTick <= 0) {
-                regenTick = Math.max(1, calcNailRegenInterval(player, miscComponent));
-                if (getNails() < NAILS_MAX) {
-                    addNails(1.0f);
-                    drainNailResource(player);
-                    playSound(JSoundRegistry.TUSK_NAIL_GROWTH.get(), 0.5f, 1.0f);
+            if (user instanceof Player player) {
+                if (player.isCreative()) {
+                    setNails(NAILS_MAX);
+                } else if (--regenTick <= 0) {
+                    regenTick = Math.max(1, calcNailRegenInterval(player));
+                    if (getNails() < NAILS_MAX) {
+                        addNails(1.0f);
+                        drainNailResource(player);
+                        playSound(JSoundRegistry.TUSK_NAIL_GROWTH.get(), 0.5f, 1.0f);
+                    }
                 }
             }
         }
@@ -229,18 +234,18 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
         return this;
     }
 
-    /** Returns nail regen interval in ticks. Range: 40 (full hunger) to 160 (0 hunger). Tea buff reduces by 1/3. */
-    public static int calcNailRegenInterval(Player player, CommonMiscComponent misc) {
+    /** Returns nail regen interval in ticks. Base is 1.5x faster than vanilla. Keratin Growth halves it further. */
+    public static int calcNailRegenInterval(Player player) {
         CommonVampireComponent vampire = JComponentPlatformUtils.getVampirism(player);
         int resourceLevel;
         if (vampire != null && vampire.isVampire()) {
-            // blood is 0-20, same scale as food level
             resourceLevel = Math.round(vampire.getBlood());
         } else {
             resourceLevel = player.getFoodData().getFoodLevel();
         }
-        int interval = 160 - 6 * resourceLevel;
-        if (misc != null && misc.getHerbalTeaTicks() > 0) {
+        // Base: 27-107 ticks (1.5x faster than original 40-160)
+        int interval = (160 - 6 * resourceLevel) * 2 / 3;
+        if (player.hasEffect(JStatusRegistry.KERATIN_GROWTH.get())) {
             interval = interval * 2 / 3;
         }
         return interval;

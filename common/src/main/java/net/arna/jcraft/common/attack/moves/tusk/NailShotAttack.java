@@ -56,8 +56,8 @@ public final class NailShotAttack<A extends IAttacker<A, ?>> extends AbstractMov
         SoundEvent shotSound = maxRange <= 5.0f ? JSoundRegistry.TUSK_CHU.get() : JSoundRegistry.TUSK_SHOT.get();
         attacker.getBaseEntity().playSound(shotSound, 1.0f, 1.0f);
 
-        // Position at stand height
-        nail.setPos(attacker.getBaseEntity().position().add(0, attacker.getBaseEntity().getBbHeight() * 0.75, 0));
+        // Fire from player position at eye level
+        nail.setPos(user.position().add(0, user.getBbHeight() * 0.75, 0));
         nail.shootFromRotation(user, user.getXRot(), user.getYRot(), 0.0F, baseSpeed, 1.0F);
 
         attacker.getBaseEntity().level().addFreshEntity(nail);

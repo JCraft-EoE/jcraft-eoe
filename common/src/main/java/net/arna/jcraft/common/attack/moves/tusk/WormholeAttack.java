@@ -3,14 +3,17 @@ package net.arna.jcraft.common.attack.moves.tusk;
 import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
+import net.arna.jcraft.api.Attacks;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
+import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.projectile.NailProjectile;
 import net.arna.jcraft.common.entity.stand.TuskAct3Entity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
@@ -57,6 +60,13 @@ public final class WormholeAttack extends AbstractMove<WormholeAttack, TuskAct3E
             // Second press: Teleport to nail — no cooldown applied
             Vec3 nailPos = existingNail.position();
             user.teleportTo(nailPos.x, nailPos.y, nailPos.z);
+
+            // Void damage in 2-block radius at arrival point
+            AABB blastBox = new AABB(nailPos.x - 2, nailPos.y - 2, nailPos.z - 2,
+                    nailPos.x + 2, nailPos.y + 2, nailPos.z + 2);
+            attacker.level().getEntitiesOfClass(LivingEntity.class, blastBox,
+                    e -> e != user && e.isAlive() && !e.isSpectator())
+                    .forEach(e -> Attacks.trueDamage(6, JDamageSources.stand(attacker), e));
 
             existingNail.discard();
             wormholeNail = null;

@@ -45,8 +45,8 @@ public final class PerfectGoldenRotationAttack extends AbstractHoldableMove<Perf
         if (nail == null) return Set.of();
 
         attacker.playSound(JSoundRegistry.TUSK_HEAVY_SHOT.get(), 1.0f, 1.0f);
-        // Position at stand height
-        nail.setPos(attacker.position().add(0, attacker.getBbHeight() * 0.75, 0));
+        // Fire from player position at eye level
+        nail.setPos(user.position().add(0, user.getBbHeight() * 0.75, 0));
 
         // Speed increases with charge: 1.0x to 2.0x
         float speedMultiplier = 1.0f + (chargeTime / 100.0f);

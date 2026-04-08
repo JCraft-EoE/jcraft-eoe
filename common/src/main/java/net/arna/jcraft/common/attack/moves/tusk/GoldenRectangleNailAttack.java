@@ -42,8 +42,8 @@ public final class GoldenRectangleNailAttack extends AbstractMove<GoldenRectangl
         if (nail == null) return Set.of();
 
         attacker.playSound(JSoundRegistry.TUSK_SHOT.get(), 1.0f, 1.0f);
-        // Position at stand height
-        nail.setPos(attacker.position().add(0, attacker.getBbHeight() * 0.75, 0));
+        // Fire from player position at eye level
+        nail.setPos(user.position().add(0, user.getBbHeight() * 0.75, 0));
         nail.shootFromRotation(user, user.getXRot(), user.getYRot(), 0.0F, baseSpeed, 1.0F);
 
         attacker.level().addFreshEntity(nail);

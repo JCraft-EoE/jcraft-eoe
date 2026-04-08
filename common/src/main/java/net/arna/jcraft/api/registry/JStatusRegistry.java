@@ -3,6 +3,7 @@ package net.arna.jcraft.api.registry;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.arna.jcraft.common.effects.*;
 import net.minecraft.world.effect.MobEffect;
+import net.arna.jcraft.common.effects.KeratinGrowthEffect;
 
 import static net.arna.jcraft.JCraft.EFFECTS;
 
@@ -18,6 +19,7 @@ public interface JStatusRegistry {
     RegistrySupplier<MobEffect> BLEEDING = EFFECTS.register("jbleeding", BleedingEffect::new);
     RegistrySupplier<MobEffect> PHPOISON = EFFECTS.register("phpoison", PurpleInfectionEffect::new);
     RegistrySupplier<MobEffect> HYPOXIA = EFFECTS.register("hypoxia", HypoxiaEffect::new);
+    RegistrySupplier<MobEffect> KERATIN_GROWTH = EFFECTS.register("keratin_growth", KeratinGrowthEffect::new);
 
     static void init() {
         // intentionally left empty
