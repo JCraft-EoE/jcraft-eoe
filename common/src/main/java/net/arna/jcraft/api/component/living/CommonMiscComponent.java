@@ -61,4 +61,8 @@ public interface CommonMiscComponent extends JComponent {
     default boolean hasUnlockedTuskAct(int act) {
         return act <= getHighestTuskAct();
     }
+
+    // Herbal Tea buff (ticks remaining of 1.5x nail regen speed)
+    int getHerbalTeaTicks();
+    void setHerbalTeaTicks(final int ticks);
 }

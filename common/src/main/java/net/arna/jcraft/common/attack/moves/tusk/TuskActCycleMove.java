@@ -9,25 +9,23 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
-import net.arna.jcraft.api.component.living.CommonMiscComponent;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
-import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
-import net.minecraft.network.chat.Component;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
 /**
- * Tusk Act Cycle Move
- * Click Utility: Cycle up through acts (1→2→3→1...)
- * Shift + Utility: Cycle down through acts (3→2→1→3...)
- * Only cycles through unlocked acts (based on CommonMiscComponent.getHighestTuskAct())
+ * Utility move that cycles through unlocked Tusk acts (forward or backward).
+ * Switching is handled directly in each entity's initMove() via tryCycle().
  */
 public final class TuskActCycleMove<A extends IAttacker<A, ?>> extends AbstractMove<TuskActCycleMove<A>, A> {
     @Getter
@@ -48,53 +46,58 @@ public final class TuskActCycleMove<A extends IAttacker<A, ?>> extends AbstractM
 
     @Override
     public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user) {
-        if (!(user instanceof Player player)) return Set.of();
-        if (player.level().isClientSide()) return Set.of();
-
-        CommonMiscComponent miscComponent = JComponentPlatformUtils.getMiscData(player);
-        if (miscComponent == null) return Set.of();
-
-        int maxUnlockedAct = miscComponent.getHighestTuskAct();
-        if (maxUnlockedAct < 1) maxUnlockedAct = 1;
-
-        int nextAct = getNextAct(currentAct, maxUnlockedAct, backward);
-        if (nextAct == currentAct) return Set.of(); // Only one act unlocked
-
-        CommonStandComponent standData = JComponentPlatformUtils.getStandComponent(player);
-        StandType newType = getStandTypeForAct(nextAct);
-        if (newType == null) return Set.of();
-
-        StandEntity<?, ?> currentStand = standData.getStand();
-        if (currentStand != null) {
-            currentStand.desummon(false);
-        }
-
-        standData.setType(newType);
-        JCraft.summon(player.level(), player);
-
-        return Set.of();
+        return Set.of(); // Switching is handled in initMove directly; this is never reached
     }
 
-    private int getNextAct(int current, int maxUnlocked, boolean backward) {
-        if (maxUnlocked <= 1) return current; // Nothing to cycle to
-        if (backward) {
-            int next = current - 1;
-            if (next < 1) next = maxUnlocked;
-            return next;
+    /** Switches to the next (or previous, if shift is held) unlocked Tusk act. Mirrors /stand set. */
+    public static boolean tryCycle(int currentAct, @Nullable LivingEntity user) {
+        if (!(user instanceof ServerPlayer sp)) return false;
+        if (sp.level().isClientSide()) return false;
+
+        int maxAct = getMaxActFromAdvancements(sp);
+        if (maxAct <= 1) return false; // Nothing to cycle to
+
+        int nextAct;
+        if (sp.isShiftKeyDown()) {
+            nextAct = currentAct - 1;
+            if (nextAct < 1) nextAct = maxAct;
         } else {
-            int next = current + 1;
-            if (next > maxUnlocked) next = 1;
-            return next;
+            nextAct = currentAct + 1;
+            if (nextAct > maxAct) nextAct = 1;
         }
+
+        if (nextAct == currentAct) return false;
+
+        StandType newType = getActStandType(nextAct);
+        if (newType == null) return false;
+
+        CommonStandComponent standData = JComponentPlatformUtils.getStandComponent(sp);
+        standData.setTypeAndSkin(newType, 0);
+        JUtils.maySendStandAboutInfo(sp);
+        sp.unRide();
+        JCraft.summon(sp.level(), sp);
+        return true;
     }
 
-    private StandType getStandTypeForAct(int act) {
+    public static @Nullable StandType getActStandType(int act) {
         return switch (act) {
             case 1 -> JStandTypeRegistry.TUSK_ACT_1.get();
             case 2 -> JStandTypeRegistry.TUSK_ACT_2.get();
             case 3 -> JStandTypeRegistry.TUSK_ACT_3.get();
             default -> null;
         };
+    }
+
+    /** Returns the highest act the player has unlocked, determined from advancements. */
+    private static int getMaxActFromAdvancements(ServerPlayer player) {
+        var serverAdv = player.getServer() != null ? player.getServer().getAdvancements() : null;
+        if (serverAdv == null) return 1;
+        int max = 1;
+        Advancement act2 = serverAdv.getAdvancement(new ResourceLocation("jcraft", "tusk_act2"));
+        if (act2 != null && player.getAdvancements().getOrStartProgress(act2).isDone()) max = 2;
+        Advancement act3 = serverAdv.getAdvancement(new ResourceLocation("jcraft", "tusk_act3"));
+        if (act3 != null && player.getAdvancements().getOrStartProgress(act3).isDone()) max = 3;
+        return max;
     }
 
     @Override

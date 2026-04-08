@@ -10,6 +10,7 @@ import net.arna.jcraft.api.stand.StandTypeUtil;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.common.util.TuskProgressionHelper;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.arna.jcraft.api.registry.JItemRegistry;
 import net.minecraft.ChatFormatting;
@@ -196,11 +197,9 @@ public class StandDiscItem extends Item {
         CommonMiscComponent misc = JComponentPlatformUtils.getMiscData(user);
         if (misc == null) return JStandTypeRegistry.TUSK_ACT_1.get();
 
-        int playerHighest = misc.getHighestTuskAct();
-        if (playerHighest < 1) playerHighest = 1;
-
-        // Give the player the highest act they've unlocked, up to what the disc offers
-        int grantAct = Math.min(playerHighest, discAct);
+        // Give the player the highest act they've unlocked, up to what the disc offers.
+        // Acts are unlocked via Upgrade Tusk items, not by using a disc.
+        int grantAct = Math.min(misc.getHighestTuskAct(), discAct);
         return getTuskActByNumber(grantAct);
     }
 

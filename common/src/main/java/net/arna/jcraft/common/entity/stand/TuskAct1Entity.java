@@ -27,6 +27,7 @@ import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.api.component.living.CommonMiscComponent;
+import net.arna.jcraft.api.component.living.CommonVampireComponent;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -54,14 +55,9 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
                     .proCount(2)
                     .conCount(3)
                     .freeSpace(Component.literal("""
-                            Tusk Act 1 is an evolution stand.
                             Contains up to 10 nails.
                             Nails regenerate passively at the cost of hunger.
-                            Layerable with specs.
-                            
-                            Utility: Cycle acts
-                            - Click: Next act (1→2→3→1)
-                            - Shift+Click: Previous act (1→3→2→1)"""))
+                            Layerable with specs"""))
                     .build())
             .summonData(SummonData.of(() -> null))
             .build();
@@ -105,6 +101,8 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
     @Getter
     @Setter
     private CommonMiscComponent miscComponent;
+
+    private int regenTick = 40;
 
     public TuskAct1Entity(Level worldIn) {
         super(JStandTypeRegistry.TUSK_ACT_1.get(), worldIn);
@@ -166,14 +164,12 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
         super.tick();
 
         if (!level().isClientSide && hasUser()) {
-            if (getNails() < NAILS_MAX && tickCount % 30 == 0) {
-                LivingEntity user = getUser();
-                if (user instanceof Player player) {
-                    int currentHunger = player.getFoodData().getFoodLevel();
-                    if (currentHunger > 0) {
-                        addNails(1.0f);
-                        player.getFoodData().setFoodLevel(currentHunger - 1);
-                    }
+            LivingEntity user = getUser();
+            if (user instanceof Player player && --regenTick <= 0) {
+                regenTick = Math.max(1, calcNailRegenInterval(player, miscComponent));
+                if (getNails() < NAILS_MAX) {
+                    addNails(1.0f);
+                    drainNailResource(player);
                 }
             }
         }
@@ -210,28 +206,9 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
     @Override
     public boolean initMove(MoveClass moveClass) {
         if (moveClass == MoveClass.UTILITY) {
-            MoveMap.Entry<TuskAct1Entity, State> entry = getMoveMap().getFirstValidEntry(
-                    MoveClass.UTILITY, this, false, false
-            );
-
-            if (entry != null && entry.getMove() instanceof TuskActCycleMove<?>) {
-                TuskActCycleMove<?> originalMove = (TuskActCycleMove<?>) entry.getMove();
-
-                boolean shifting = getUser() != null && getUser().isShiftKeyDown();
-
-                TuskActCycleMove<TuskAct1Entity> directedMove = new TuskActCycleMove<>(
-                        originalMove.getCooldown(),
-                        originalMove.getWindup(),
-                        originalMove.getDuration(),
-                        originalMove.getMoveDistance(),
-                        1,
-                        shifting
-                );
-
-                return handleMove(directedMove, CooldownType.UTILITY, State.ACT_CYCLE);
-            }
+            TuskActCycleMove.tryCycle(1, getUser());
+            return true;
         }
-
         return super.initMove(moveClass);
     }
 
@@ -248,6 +225,35 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
     @NonNull
     public TuskAct1Entity getThis() {
         return this;
+    }
+
+    /** Returns nail regen interval in ticks. Range: 40 (full hunger) to 160 (0 hunger). Tea buff reduces by 1/3. */
+    public static int calcNailRegenInterval(Player player, CommonMiscComponent misc) {
+        CommonVampireComponent vampire = JComponentPlatformUtils.getVampirism(player);
+        int resourceLevel;
+        if (vampire != null && vampire.isVampire()) {
+            // blood is 0-20, same scale as food level
+            resourceLevel = Math.round(vampire.getBlood());
+        } else {
+            resourceLevel = player.getFoodData().getFoodLevel();
+        }
+        int interval = 160 - 6 * resourceLevel;
+        if (misc != null && misc.getHerbalTeaTicks() > 0) {
+            interval = interval * 2 / 3;
+        }
+        return interval;
+    }
+
+    /** Drains 1 hunger point (or 1 blood for vampires) when a nail regenerates. */
+    public static void drainNailResource(Player player) {
+        CommonVampireComponent vampire = JComponentPlatformUtils.getVampirism(player);
+        if (vampire != null && vampire.isVampire()) {
+            float blood = vampire.getBlood();
+            if (blood > 0) vampire.setBlood(blood - 1);
+        } else {
+            int hunger = player.getFoodData().getFoodLevel();
+            if (hunger > 0) player.getFoodData().setFoodLevel(hunger - 1);
+        }
     }
 
     public enum State implements StandAnimationState<TuskAct1Entity> {

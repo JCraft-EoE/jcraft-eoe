@@ -22,7 +22,6 @@ import net.arna.jcraft.api.stand.SummonData;
 import net.arna.jcraft.common.attack.conditions.TuskNailCondition;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.tusk.*;
-import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.api.component.living.CommonMiscComponent;
@@ -53,20 +52,8 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
                     .proCount(4)
                     .conCount(2)
                     .freeSpace(Component.literal("""
-                            Tusk Act 3 is an evolution stand.
                             Contains up to 10 nails.
-                            Nails regenerate passively at the cost of hunger.
-                            M1: Golden Rectangle Nail (same as Act 2)
-                            Ult: Wormhole teleport nail.
-                            Sp1: Handhole arm.
-                            Sp2: Vortex pull hole.
-                            Sp3: Voidshot invulnerability.
-                            Heavy: Nail Jab.
-                            Barrage: Nail Swipes.
-
-                            Utility: Cycle acts
-                            - Click: Next act (1→2→3→1)
-                            - Shift+Click: Previous act (1→3→2→1)"""))
+                            Nails regenerate passively at the cost of hunger."""))
                     .build())
             .summonData(SummonData.of(() -> null))
             .build();
@@ -106,7 +93,8 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
                     Component.literal("Fire at your own head and enter the wormhole.\nInvulnerable for up to 1 second. Punishable on entry/exit."))
             .withCondition(TuskNailCondition.atLeast(1.0f));
 
-    // Heavy: Nail Jab — close-range spinning nail poke, can't combo-start
+    // Heavy: Nail Jab — close-range spinning nail poke, can't
+
     public static final SimpleAttack<TuskAct3Entity> NAIL_JAB = new SimpleAttack<TuskAct3Entity>(
             200, 5, 15, 1.5f, 3.0f, 5, 1.5f, 0.5f, 0.0f)
             .withCondition(TuskNailCondition.atLeast(1.0f))
@@ -136,6 +124,7 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
 
     /** Ticks remaining of Voidshot invulnerability (server-side). */
     private int voidTicks = 0;
+    private int regenTick = 40;
 
     public TuskAct3Entity(Level worldIn) {
         super(JStandTypeRegistry.TUSK_ACT_3.get(), worldIn);
@@ -223,14 +212,12 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
 
         if (!level().isClientSide() && hasUser()) {
             // Nail regeneration
-            if (getNails() < NAILS_MAX && tickCount % 30 == 0) {
-                LivingEntity user = getUser();
-                if (user instanceof Player player) {
-                    int currentHunger = player.getFoodData().getFoodLevel();
-                    if (currentHunger > 0) {
-                        addNails(1.0f);
-                        player.getFoodData().setFoodLevel(currentHunger - 1);
-                    }
+            LivingEntity user = getUser();
+            if (user instanceof Player player && --regenTick <= 0) {
+                regenTick = Math.max(1, TuskAct1Entity.calcNailRegenInterval(player, miscComponent));
+                if (getNails() < NAILS_MAX) {
+                    addNails(1.0f);
+                    TuskAct1Entity.drainNailResource(player);
                 }
             }
 
@@ -295,20 +282,9 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
     @Override
     public boolean initMove(MoveClass moveClass) {
         if (moveClass == MoveClass.UTILITY) {
-            MoveMap.Entry<TuskAct3Entity, State> entry = getMoveMap().getFirstValidEntry(
-                    MoveClass.UTILITY, this, false, false);
-
-            if (entry != null && entry.getMove() instanceof TuskActCycleMove<?>) {
-                TuskActCycleMove<?> originalMove = (TuskActCycleMove<?>) entry.getMove();
-                boolean shifting = getUser() != null && getUser().isShiftKeyDown();
-                TuskActCycleMove<TuskAct3Entity> directedMove = new TuskActCycleMove<>(
-                        originalMove.getCooldown(), originalMove.getWindup(),
-                        originalMove.getDuration(), originalMove.getMoveDistance(),
-                        3, shifting);
-                return handleMove(directedMove, CooldownType.UTILITY, State.ACT_CYCLE);
-            }
+            TuskActCycleMove.tryCycle(3, getUser());
+            return true;
         }
-
         return super.initMove(moveClass);
     }
 

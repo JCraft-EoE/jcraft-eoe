@@ -23,7 +23,6 @@ import net.arna.jcraft.common.attack.conditions.TuskNailCondition;
 import net.arna.jcraft.common.attack.moves.tusk.GoldenRectangleNailAttack;
 import net.arna.jcraft.common.attack.moves.tusk.PerfectGoldenRotationAttack;
 import net.arna.jcraft.common.attack.moves.tusk.TuskActCycleMove;
-import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.api.component.living.CommonMiscComponent;
@@ -54,14 +53,9 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
                     .proCount(3)
                     .conCount(2)
                     .freeSpace(Component.literal("""
-                            Tusk Act 2 is an evolution stand.
                             Contains up to 10 nails.
-                            Direct upgrade in nail shots
-                            Layerable with specs.
-                            
-                            Utility: Cycle acts
-                            - Click: Next act (1→2→3→1)
-                            - Shift+Click: Previous act (1→3→2→1)"""))
+                            Nails regenerate passively at the cost of hunger.
+                            Layerable with specs"""))
                     .build())
             .summonData(SummonData.of(() -> null))
             .build();
@@ -95,6 +89,8 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
     @Setter
     private CommonMiscComponent miscComponent;
 
+    private int regenTick = 40;
+
     public TuskAct2Entity(Level worldIn) {
         super(JStandTypeRegistry.TUSK_ACT_2.get(), worldIn);
 
@@ -121,7 +117,8 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
         setNails(miscComponent.getTuskNails());
     }
 
-    private static void registerMoves(MoveMap<TuskAct2Entity, State> moves) {
+    private static void registerMoves(MoveMap
+                                              <TuskAct2Entity, State> moves) {
         moves.register(MoveClass.LIGHT, GOLDEN_RECTANGLE_NAIL, State.GOLDEN_RECTANGLE_NAIL);
         moves.register(MoveClass.ULTIMATE, PERFECT_GOLDEN_ROTATION, State.PERFECT_GOLDEN_ROTATION);
         moves.register(MoveClass.UTILITY, ACT_CYCLE, State.ACT_CYCLE);
@@ -153,14 +150,12 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
         super.tick();
 
         if (!level().isClientSide() && hasUser()) {
-            if (getNails() < NAILS_MAX && tickCount % 30 == 0) {
-                LivingEntity user = getUser();
-                if (user instanceof Player player) {
-                    int currentHunger = player.getFoodData().getFoodLevel();
-                    if (currentHunger > 0) {
-                        addNails(1.0f);
-                        player.getFoodData().setFoodLevel(currentHunger - 1);
-                    }
+            LivingEntity user = getUser();
+            if (user instanceof Player player && --regenTick <= 0) {
+                regenTick = Math.max(1, TuskAct1Entity.calcNailRegenInterval(player, miscComponent));
+                if (getNails() < NAILS_MAX) {
+                    addNails(1.0f);
+                    TuskAct1Entity.drainNailResource(player);
                 }
             }
         }
@@ -197,28 +192,9 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
     @Override
     public boolean initMove(MoveClass moveClass) {
         if (moveClass == MoveClass.UTILITY) {
-            MoveMap.Entry<TuskAct2Entity, State> entry = getMoveMap().getFirstValidEntry(
-                    MoveClass.UTILITY, this, false, false
-            );
-
-            if (entry != null && entry.getMove() instanceof TuskActCycleMove<?>) {
-                TuskActCycleMove<?> originalMove = (TuskActCycleMove<?>) entry.getMove();
-
-                boolean shifting = getUser() != null && getUser().isShiftKeyDown();
-
-                TuskActCycleMove<TuskAct2Entity> directedMove = new TuskActCycleMove<>(
-                        originalMove.getCooldown(),
-                        originalMove.getWindup(),
-                        originalMove.getDuration(),
-                        originalMove.getMoveDistance(),
-                        2,
-                        shifting
-                );
-
-                return handleMove(directedMove, CooldownType.UTILITY, State.ACT_CYCLE);
-            }
+            TuskActCycleMove.tryCycle(2, getUser());
+            return true;
         }
-
         return super.initMove(moveClass);
     }
 

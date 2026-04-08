@@ -246,6 +246,10 @@ public interface JCreativeMenuTabRegistry {
                                 stack.getOrCreateTag().putInt("Sips", net.arna.jcraft.common.item.HerbalTeaItem.MAX_SIPS);
                                 entries.accept(stack);
                             }
+                            entries.accept(JItemRegistry.UPGRADE_TUSK_1.get());
+                            entries.accept(JItemRegistry.UPGRADE_TUSK_2.get());
+                            // D4C heart
+                            entries.accept(JItemRegistry.D4C_HEART.get());
                             // corpse parts
                             entries.accept(JItemRegistry.LEFT_ARM.get());
 /*                    for (int i = 16; i >= 0; i--) {

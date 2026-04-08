@@ -69,8 +69,13 @@ public interface JItemRegistry {
     // Corpse parts
     RegistrySupplier<Item> LEFT_ARM = register("left_arm", () -> new LeftArmItem(settings().rarity(Rarity.RARE).stacksTo(1)));
 
+    // D4C obtainment
+    RegistrySupplier<Item> D4C_HEART = register("d4c_heart", () -> new D4CHeartItem(settings().rarity(Rarity.EPIC).stacksTo(1)));
+
     // Tusk consumables
     RegistrySupplier<Item> HERBAL_TEA = register("herbal_tea", () -> new HerbalTeaItem(settings().stacksTo(16)));
+    RegistrySupplier<Item> UPGRADE_TUSK_1 = register("upgrade_tusk_1", () -> new TuskUpgradeItem(settings().stacksTo(1), 2));
+    RegistrySupplier<Item> UPGRADE_TUSK_2 = register("upgrade_tusk_2", () -> new TuskUpgradeItem(settings().stacksTo(1), 3));
 
 
     RegistrySupplier<Item> REQUIEM_RUBY = register("requiem_ruby", () -> new Item(settings().rarity(Rarity.EPIC).fireResistant()));

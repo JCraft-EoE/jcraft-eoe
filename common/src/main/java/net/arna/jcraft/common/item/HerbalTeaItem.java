@@ -1,13 +1,10 @@
 package net.arna.jcraft.common.item;
 
-import net.arna.jcraft.common.entity.stand.TuskAct1Entity;
-import net.arna.jcraft.common.entity.stand.TuskAct2Entity;
-import net.arna.jcraft.common.entity.stand.TuskAct3Entity;
-import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.api.component.living.CommonMiscComponent;
+import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -25,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 /**
- * Herbal Tea — restores 1 nail per sip for Tusk users.
+ * Herbal Tea — grants 1.5x nail regen speed for 3 minutes per sip.
  * Each item holds up to 16 sips (stored in NBT "Sips").
  */
 public class HerbalTeaItem extends Item {
@@ -52,21 +49,10 @@ public class HerbalTeaItem extends Item {
         if (sips <= 0) return stack;
 
         if (!world.isClientSide) {
-            // Add 1 nail to the active Tusk stand if the player has one
-            var stand = JUtils.getStand(player);
-            boolean addedNail = false;
-            if (stand instanceof TuskAct1Entity tusk1) {
-                tusk1.addNails(1.0f);
-                addedNail = true;
-            } else if (stand instanceof TuskAct2Entity tusk2) {
-                tusk2.addNails(1.0f);
-                addedNail = true;
-            } else if (stand instanceof TuskAct3Entity tusk3) {
-                tusk3.addNails(1.0f);
-                addedNail = true;
-            }
-
-            if (addedNail) {
+            CommonMiscComponent misc = JComponentPlatformUtils.getMiscData(player);
+            if (misc != null) {
+                // 3 minutes = 3600 ticks; stacks additively up to a cap
+                misc.setHerbalTeaTicks(Math.min(misc.getHerbalTeaTicks() + 3600, 7200));
                 setSips(stack, sips - 1);
                 player.awardStat(Stats.ITEM_USED.get(this));
             }

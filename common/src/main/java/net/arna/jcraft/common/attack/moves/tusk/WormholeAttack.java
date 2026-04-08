@@ -8,6 +8,8 @@ import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.common.entity.projectile.NailProjectile;
 import net.arna.jcraft.common.entity.stand.TuskAct3Entity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.util.CooldownType;
+import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +29,7 @@ public final class WormholeAttack extends AbstractMove<WormholeAttack, TuskAct3E
     public WormholeAttack(int cooldown, int windup, int duration, float moveDistance) {
         super(cooldown, windup, duration, moveDistance);
         ranged = true;
+        manualCooldown = true; // Only apply cooldown on first press, not second
     }
 
     @Override
@@ -51,24 +54,22 @@ public final class WormholeAttack extends AbstractMove<WormholeAttack, TuskAct3E
         final NailProjectile existingNail = wormholeNail == null ? null : wormholeNail.get();
 
         if (existingNail != null && existingNail.isAlive() && nailActive) {
-            // Second press: Teleport to nail
+            // Second press: Teleport to nail — no cooldown applied
             Vec3 nailPos = existingNail.position();
             user.teleportTo(nailPos.x, nailPos.y, nailPos.z);
 
-            // Discard the nail
             existingNail.discard();
             wormholeNail = null;
             nailActive = false;
         } else {
-            // First press: Fire wormhole nail
+            // First press: Fire wormhole nail — apply cooldown now
             NailProjectile nail = NailProjectile.wormholeFromTuskAct3(attacker);
             if (nail == null) return Set.of();
 
-            // Position nail at stand height
+            JComponentPlatformUtils.getCooldowns(user).setCooldown(CooldownType.STAND_ULTIMATE, getCooldown());
+
             Vec3 heightOffset = GravityChangerAPI.getEyeOffset(user).scale(0.75);
             nail.setPos(attacker.position().add(heightOffset));
-
-            // Shoot slowly
             nail.shootFromRotation(user, user.getXRot(), user.getYRot(), 0.0F, 0.5F, 0.0F);
 
             attacker.level().addFreshEntity(nail);

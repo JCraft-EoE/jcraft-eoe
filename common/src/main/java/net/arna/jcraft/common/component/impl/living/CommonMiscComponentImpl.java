@@ -38,6 +38,7 @@ public class CommonMiscComponentImpl implements CommonMiscComponent {
     private float metallicaIron = MetallicaEntity.IRON_MAX;
     private float tuskNails = 10.0f;
     private int highestTuskAct = 1; // Tusk progression - start with Act 1 unlocked
+    private int herbalTeaTicks = 0;
 
     public CommonMiscComponentImpl(final LivingEntity entity) {
         this.entity = entity;
@@ -142,13 +143,20 @@ public class CommonMiscComponentImpl implements CommonMiscComponent {
 
     @Override
     public void setHighestTuskAct(int act) {
-        // Validate and clamp
         if (act < 1 || act > 4) return;
-
-        // Can only increase, never decrease (progression is permanent)
         if (act > highestTuskAct) {
             highestTuskAct = act;
         }
+    }
+
+    @Override
+    public int getHerbalTeaTicks() {
+        return herbalTeaTicks;
+    }
+
+    @Override
+    public void setHerbalTeaTicks(int ticks) {
+        this.herbalTeaTicks = Math.max(0, ticks);
     }
 
     public void tick() {
@@ -157,6 +165,9 @@ public class CommonMiscComponentImpl implements CommonMiscComponent {
         }
         if (armoredHitTicks > 0) {
             armoredHitTicks--;
+        }
+        if (herbalTeaTicks > 0) {
+            herbalTeaTicks--;
         }
 
         if (entity.level().isClientSide()) {
@@ -233,12 +244,10 @@ public class CommonMiscComponentImpl implements CommonMiscComponent {
         damageTimer = tag.getInt("DamageTimer");
         metallicaIron = tag.getFloat("MetallicaIron");
         tuskNails = tag.getFloat("TuskNails");
-
-        // Load Tusk progression
+        herbalTeaTicks = tag.getInt("HerbalTeaTicks");
         highestTuskAct = tag.getInt("HighestTuskAct");
-        if (highestTuskAct < 1) highestTuskAct = 1; // Safety: default to Act 1
-        if (highestTuskAct > 4) highestTuskAct = 4; // Safety: cap at Act 4
-
+        if (highestTuskAct < 1) highestTuskAct = 1;
+        if (highestTuskAct > 4) highestTuskAct = 4;
 
         if (tag.hasUUID("SlavedTo")) {
             slavedTo = tag.getUUID("SlavedTo");
@@ -254,7 +263,8 @@ public class CommonMiscComponentImpl implements CommonMiscComponent {
         tag.putInt("DamageTimer", damageTimer);
         tag.putFloat("MetallicaIron", metallicaIron);
         tag.putFloat("TuskNails", tuskNails);
-        tag.putInt("HighestTuskAct", highestTuskAct); // Save Tusk progression
+        tag.putInt("HighestTuskAct", highestTuskAct);
+        tag.putInt("HerbalTeaTicks", herbalTeaTicks);
 
         if (slavedTo != null) {
             tag.putUUID("SlavedTo", slavedTo);
