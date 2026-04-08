@@ -19,6 +19,7 @@ import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.api.stand.SummonData;
+import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.attack.conditions.TuskNailCondition;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.tusk.*;
@@ -63,7 +64,7 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
 
     // ---- Moves ----
 
-    public static final Act3NailShotAttack NAIL_SHOT = new Act3NailShotAttack(0, 10, 15, 0.75f, 2.5f, 15.0f, 8.0f)
+    public static final Act3NailShotAttack NAIL_SHOT = new Act3NailShotAttack(0, 1, 15, 0.75f, 2.5f, 15.0f, 8.0f)
             .withCondition(TuskNailCondition.atLeast(1.0f))
             .withInfo(
                     Component.literal("Golden Rectangle Nail"),
@@ -218,6 +219,7 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
                 if (getNails() < NAILS_MAX) {
                     addNails(1.0f);
                     TuskAct1Entity.drainNailResource(player);
+                    playSound(JSoundRegistry.TUSK_NAIL_GROWTH.get(), 0.5f, 1.0f);
                 }
             }
 

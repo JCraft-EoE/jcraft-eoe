@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractHoldableMove;
+import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.entity.projectile.NailProjectile;
 import net.arna.jcraft.common.entity.stand.TuskAct2Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -43,6 +44,7 @@ public final class PerfectGoldenRotationAttack extends AbstractHoldableMove<Perf
         NailProjectile nail = NailProjectile.fromTuskAct2Perfect(attacker, nailCost, chargeTime, maxRange);
         if (nail == null) return Set.of();
 
+        attacker.playSound(JSoundRegistry.TUSK_HEAVY_SHOT.get(), 1.0f, 1.0f);
         // Position at stand height
         nail.setPos(attacker.position().add(0, attacker.getBbHeight() * 0.75, 0));
 

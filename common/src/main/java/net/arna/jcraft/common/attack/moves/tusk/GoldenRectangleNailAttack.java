@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
+import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.entity.projectile.NailProjectile;
 import net.arna.jcraft.common.entity.stand.TuskAct2Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -40,6 +41,7 @@ public final class GoldenRectangleNailAttack extends AbstractMove<GoldenRectangl
         NailProjectile nail = NailProjectile.fromTuskAct2(attacker, maxRange, creepDistance);
         if (nail == null) return Set.of();
 
+        attacker.playSound(JSoundRegistry.TUSK_SHOT.get(), 1.0f, 1.0f);
         // Position at stand height
         nail.setPos(attacker.position().add(0, attacker.getBbHeight() * 0.75, 0));
         nail.shootFromRotation(user, user.getXRot(), user.getYRot(), 0.0F, baseSpeed, 1.0F);

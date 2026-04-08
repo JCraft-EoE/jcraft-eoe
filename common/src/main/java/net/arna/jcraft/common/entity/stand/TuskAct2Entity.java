@@ -19,6 +19,7 @@ import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.api.stand.SummonData;
+import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.attack.conditions.TuskNailCondition;
 import net.arna.jcraft.common.attack.moves.tusk.GoldenRectangleNailAttack;
 import net.arna.jcraft.common.attack.moves.tusk.PerfectGoldenRotationAttack;
@@ -63,7 +64,7 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
     public static final EntityDataAccessor<Float> NAILS = SynchedEntityData.defineId(TuskAct2Entity.class, EntityDataSerializers.FLOAT);
     public static final float NAILS_MAX = 10.0f;
 
-    public static final GoldenRectangleNailAttack GOLDEN_RECTANGLE_NAIL = new GoldenRectangleNailAttack(0, 10, 15, 0.75f, 2.5f, 15.0f, 8.0f)
+    public static final GoldenRectangleNailAttack GOLDEN_RECTANGLE_NAIL = new GoldenRectangleNailAttack(0, 1, 15, 0.75f, 2.5f, 15.0f, 8.0f)
             .withCondition(TuskNailCondition.atLeast(1.0f))
             .withInfo(
                     Component.literal("Golden Rectangle Nail"),
@@ -156,6 +157,7 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
                 if (getNails() < NAILS_MAX) {
                     addNails(1.0f);
                     TuskAct1Entity.drainNailResource(player);
+                    playSound(JSoundRegistry.TUSK_NAIL_GROWTH.get(), 0.5f, 1.0f);
                 }
             }
         }

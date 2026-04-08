@@ -1224,5 +1224,30 @@
     "sounds": [
       "jcraft:vehicles/roadroller/ignition"
     ]
+  },
+  "tuskshot": {
+    "sounds": [
+      "jcraft:stands/tusk/shot"
+    ]
+  },
+  "tuskheavyshot": {
+    "sounds": [
+      "jcraft:stands/tusk/heavyshot"
+    ]
+  },
+  "tusknailgrowth": {
+    "sounds": [
+      "jcraft:stands/tusk/nail_growth"
+    ]
+  },
+  "tuskmimimin": {
+    "sounds": [
+      "jcraft:stands/tusk/mimimin"
+    ]
+  },
+  "tuskchu": {
+    "sounds": [
+      "jcraft:stands/tusk/chu"
+    ]
   }
 }

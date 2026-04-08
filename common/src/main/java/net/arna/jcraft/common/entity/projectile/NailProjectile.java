@@ -19,7 +19,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -52,7 +54,7 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
     private boolean isDrilling = false;
     private int lastHitTick = -1;
     private final Map<UUID, Integer> drillingEntityLastHit = new java.util.HashMap<>();
-    private static final int DRILLING_HIT_INTERVAL = 4; // 0.2 seconds between hits per entity
+    private static final int DRILLING_HIT_INTERVAL = 1; // hit once per tick
     private float creepSpeed = 0.5f;
     public boolean isHandhole = false;
     public boolean isVortex = false;
@@ -63,6 +65,7 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
     public NailProjectile(Level world) {
         super(JEntityTypeRegistry.NAIL.get(), world);
         setNoGravity(true);
+        this.pickup = AbstractArrow.Pickup.DISALLOWED;
     }
 
     public NailProjectile(Level world, LivingEntity owner) {
@@ -71,6 +74,7 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
         setOwner(owner);
         setMaster(owner);
         setSoundEvent(SoundEvents.ARROW_HIT);
+        this.pickup = AbstractArrow.Pickup.DISALLOWED;
     }
 
     @Override
@@ -163,6 +167,40 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
             }
         } else if (!penetrating) {
             discard();
+        }
+    }
+
+    @Override
+    protected void onHitBlock(@NonNull BlockHitResult blockHitResult) {
+        super.onHitBlock(blockHitResult);
+        if (level().isClientSide()) return;
+        if (creepDistance > 0 && !isCreeping) {
+            BlockState hitBlock = level().getBlockState(blockHitResult.getBlockPos());
+            if (!hitBlock.isSolid()) return;
+            inGround = true;
+            isCreeping = true;
+            creepStartPos = position();
+            ticksInAir = 0;
+            Entity owner = getOwner();
+            List<LivingEntity> nearbyTargets = level().getEntitiesOfClass(LivingEntity.class,
+                    getBoundingBox().inflate(creepDistance),
+                    e -> e != owner && !e.isSpectator() && e.isAlive());
+            if (!nearbyTargets.isEmpty()) {
+                LivingEntity closest = nearbyTargets.get(0);
+                double closestDist = distanceToSqr(closest);
+                for (LivingEntity potential : nearbyTargets) {
+                    double dist = distanceToSqr(potential);
+                    if (dist < closestDist) {
+                        closest = potential;
+                        closestDist = dist;
+                    }
+                }
+                creepTarget = closest;
+                setNoGravity(true);
+                setCustomDamage(customDamage * 0.5f);
+            } else {
+                discard();
+            }
         }
     }
 
@@ -401,8 +439,8 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
         nail.maxRange = maxRange;
         nail.setDrilling(true); // Enable drilling mode - hits once per tick
 
-        // Damage: 6-12 based on charge (0-100 ticks)
-        float damage = 6.0f + (chargeTime / 100.0f * 6.0f);
+        // Damage: 0.5-1 per tick based on charge (0-100 ticks)
+        float damage = 0.5f + (chargeTime / 100.0f * 0.5f);
         nail.setCustomDamage(damage);
 
         return nail;

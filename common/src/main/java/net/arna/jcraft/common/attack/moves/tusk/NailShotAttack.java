@@ -8,7 +8,9 @@ import lombok.NonNull;
 import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
+import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.entity.projectile.NailProjectile;
+import net.minecraft.sounds.SoundEvent;
 import net.arna.jcraft.common.entity.stand.TuskAct1Entity;
 import net.arna.jcraft.common.entity.stand.TuskAct3Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -50,6 +52,9 @@ public final class NailShotAttack<A extends IAttacker<A, ?>> extends AbstractMov
         }
 
         if (nail == null) return Set.of();
+
+        SoundEvent shotSound = maxRange <= 5.0f ? JSoundRegistry.TUSK_CHU.get() : JSoundRegistry.TUSK_SHOT.get();
+        attacker.getBaseEntity().playSound(shotSound, 1.0f, 1.0f);
 
         // Position at stand height
         nail.setPos(attacker.getBaseEntity().position().add(0, attacker.getBaseEntity().getBbHeight() * 0.75, 0));

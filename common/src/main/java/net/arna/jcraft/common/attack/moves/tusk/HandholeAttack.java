@@ -98,7 +98,7 @@ public final class HandholeAttack extends AbstractMove<HandholeAttack, TuskAct3E
         NailProjectile shot = NailProjectile.handholeShot(attacker);
         if (shot == null) return false;
 
-        shot.setPos(hole.position());
+        shot.setPos(hole.position().add(0, 1, 0));
         shot.shootFromRotation(user, user.getXRot(), user.getYRot(), 0.0F, 2.5F, 0.5F);
         attacker.level().addFreshEntity(shot);
 

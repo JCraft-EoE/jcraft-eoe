@@ -318,6 +318,13 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> BULLET_PENETRATE = register("bulletpenetrate");
     RegistrySupplier<SoundEvent> LOAD = register("reload");
 
+    // Tusk
+    RegistrySupplier<SoundEvent> TUSK_SHOT = register("tuskshot");
+    RegistrySupplier<SoundEvent> TUSK_HEAVY_SHOT = register("tuskheavyshot");
+    RegistrySupplier<SoundEvent> TUSK_NAIL_GROWTH = register("tusknailgrowth");
+    RegistrySupplier<SoundEvent> TUSK_MIMIMIN = register("tuskmimimin");
+    RegistrySupplier<SoundEvent> TUSK_CHU = register("tuskchu");
+
     // ROAD ROLLER
     RegistrySupplier<SoundEvent> ROAD_ROLLER_HIT = register("rrhit");
     RegistrySupplier<SoundEvent> ROAD_ROLLER_SLAM = register("rrslam");

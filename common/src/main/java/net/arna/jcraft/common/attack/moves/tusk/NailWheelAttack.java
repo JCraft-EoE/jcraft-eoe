@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractBarrageAttack;
+import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.entity.stand.TuskAct1Entity;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.world.entity.LivingEntity;
@@ -48,6 +49,7 @@ public final class NailWheelAttack extends AbstractBarrageAttack<NailWheelAttack
 
     @Override
     public @NonNull Set<LivingEntity> perform(TuskAct1Entity attacker, LivingEntity user) {
+        attacker.playSound(JSoundRegistry.TUSK_MIMIMIN.get(), 1.0f, 1.0f);
         // Attack logic is handled by AbstractBarrageAttack
         return super.perform(attacker, user);
     }

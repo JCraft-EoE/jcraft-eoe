@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
+import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.entity.projectile.NailProjectile;
 import net.arna.jcraft.common.entity.stand.TuskAct3Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -45,6 +46,7 @@ public final class Act3NailShotAttack extends AbstractMove<Act3NailShotAttack, T
         NailProjectile nail = NailProjectile.fromTuskAct3(attacker, maxRange, creepDistance);
         if (nail == null) return Set.of();
 
+        attacker.playSound(JSoundRegistry.TUSK_SHOT.get(), 1.0f, 1.0f);
         nail.setPos(attacker.position().add(0, attacker.getBbHeight() * 0.75, 0));
         nail.shootFromRotation(user, user.getXRot(), user.getYRot(), 0.0F, baseSpeed, 1.0F);
 

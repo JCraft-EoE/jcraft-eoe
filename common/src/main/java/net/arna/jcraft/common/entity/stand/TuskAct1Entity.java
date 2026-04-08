@@ -23,6 +23,7 @@ import net.arna.jcraft.common.attack.conditions.TuskNailCondition;
 import net.arna.jcraft.common.attack.moves.tusk.NailShotAttack;
 import net.arna.jcraft.common.attack.moves.tusk.NailWheelAttack;
 import net.arna.jcraft.common.attack.moves.tusk.TuskActCycleMove;
+import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -72,7 +73,7 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
                     Component.literal("Short range nail (5 blocks), costs 0.5 nails, longer windup")
             );
 
-    public static final NailShotAttack<TuskAct1Entity> NAIL_SHOT = new NailShotAttack<TuskAct1Entity>(0, 5, 10, 0.75f, 2.0f, 10.0f)
+    public static final NailShotAttack<TuskAct1Entity> NAIL_SHOT = new NailShotAttack<TuskAct1Entity>(0, 1, 10, 0.75f, 2.0f, 10.0f)
             .withCondition(TuskNailCondition.atLeast(1.0f))
             .withCrouchingVariant(TOENAIL_SHOT)
             .withInfo(
@@ -170,6 +171,7 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
                 if (getNails() < NAILS_MAX) {
                     addNails(1.0f);
                     drainNailResource(player);
+                    playSound(JSoundRegistry.TUSK_NAIL_GROWTH.get(), 0.5f, 1.0f);
                 }
             }
         }
