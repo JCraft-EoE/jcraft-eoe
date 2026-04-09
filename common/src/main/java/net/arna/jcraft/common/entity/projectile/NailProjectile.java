@@ -61,9 +61,17 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
     private float creepSpeed = 0.5f;
     public boolean isHandhole = false;
     public boolean isVortex = false;
+    private boolean growing = false; // Act 3 M1: +5 creep range per entity hit
+    private final java.util.Set<UUID> hitEntityIds = new java.util.HashSet<>(); // for chain-hit tracking
     private LivingEntity creepTarget = null;
     private boolean isCreeping = false;
     private Vec3 creepStartPos = null;
+    /** Non-null when this handhole nail is latched onto a living entity instead of a block. */
+    public LivingEntity entityStuckTo = null;
+    /** Per-nail maximum lifetime in ticks (default 200 = 10 sec). */
+    private int maxLifetimeTicks = 200;
+    /** If true, each entity hit halves the current nail speed. */
+    private boolean slowsOnHit = false;
 
     public NailProjectile(Level world) {
         super(JEntityTypeRegistry.NAIL.get(), world);
@@ -121,6 +129,14 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
         // Wormhole nails pass through everything — they're utility-only
         if (wormhole) return;
 
+        // Handhole nails latch onto living entities (hole is placed on/above the entity)
+        if (isHandhole && entity instanceof LivingEntity le) {
+            entityStuckTo = le;
+            noPhysics = true;
+            setDeltaMovement(Vec3.ZERO);
+            return; // no damage, just stick
+        }
+
         if (!(entity instanceof LivingEntity)) return;
 
         LivingEntity target = JUtils.getUserIfStand((LivingEntity) entity);
@@ -170,6 +186,10 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
                 setNoGravity(true);
                 // Set reduced damage for creeping
                 setCustomDamage(customDamage * 0.5f);
+                // Speed halving on first hit: creep at half the current flight speed
+                if (slowsOnHit) {
+                    creepSpeed = (float)(getDeltaMovement().length() * 0.5f);
+                }
             } else {
                 discard();
             }
@@ -222,6 +242,12 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
         return 0.8F;
     }
 
+    /** Lower the passenger's position so the camera sits near nail level, not floating above it. */
+    @Override
+    public double getPassengersRidingOffset() {
+        return -1.0;
+    }
+
     @Override
     public void tick() {
         super.tick();
@@ -234,14 +260,25 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
             ++ticksInAir;
         }
 
-        // Wormhole nails have limited lifetime (5 seconds = 100 ticks)
-        if (wormhole && ticksInAir > 100) {
+        // Handhole nail stuck to a living entity — follow it
+        if (entityStuckTo != null) {
+            if (!entityStuckTo.isAlive()) {
+                discard();
+                return;
+            }
+            // Stay just above the entity's head
+            setPos(entityStuckTo.getX(), entityStuckTo.getY() + entityStuckTo.getBbHeight() * 0.9, entityStuckTo.getZ());
+            setDeltaMovement(Vec3.ZERO);
+        }
+
+        // Wormhole nails have limited lifetime (15 seconds = 300 ticks, longer than 200-tick cooldown)
+        if (wormhole && ticksInAir > 300) {
             discard();
             return;
         }
 
-        // Regular nails despawn after 10 seconds
-        if (ticksInAir > 200) {
+        // Regular nails despawn after maxLifetimeTicks
+        if (!wormhole && ticksInAir > maxLifetimeTicks) {
             discard();
             return;
         }
@@ -258,6 +295,31 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
             if (getBoundingBox().inflate(0.3).intersects(creepTarget.getBoundingBox())) {
                 JUtils.projectileDamageLogic(this, level(), creepTarget, Vec3.ZERO, 5, 1, false,
                         customDamage, 2, CommonHitPropertyComponent.HitAnimation.LOW);
+                playSound(JSoundRegistry.IMPACT_11.get(), 1.0f, 1.0f);
+                hitEntityIds.add(creepTarget.getUUID());
+                if (slowsOnHit) { creepSpeed *= 0.5f; }
+
+                if (growing) {
+                    // Chain: +5 range, find next target excluding already-hit entities
+                    creepDistance += 5.0f;
+                    creepStartPos = position();
+                    ticksInAir = 0;
+                    Entity owner = getOwner();
+                    List<LivingEntity> nextTargets = level().getEntitiesOfClass(LivingEntity.class,
+                            getBoundingBox().inflate(creepDistance),
+                            e -> e != owner && !(e instanceof JAttackEntity) && !(e instanceof StandEntity<?, ?>)
+                                    && !hitEntityIds.contains(e.getUUID()) && !e.isSpectator() && e.isAlive());
+                    if (!nextTargets.isEmpty()) {
+                        LivingEntity closest = nextTargets.get(0);
+                        double closestDist = distanceToSqr(closest);
+                        for (LivingEntity potential : nextTargets) {
+                            double dist = distanceToSqr(potential);
+                            if (dist < closestDist) { closest = potential; closestDist = dist; }
+                        }
+                        creepTarget = closest;
+                        return; // Continue creeping to next target
+                    }
+                }
                 discard();
                 return;
             }
@@ -335,8 +397,14 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
             Vec3 velocity = this.getDeltaMovement();
             double speed = velocity.length();
 
-            // Only spawn particles if nail is moving
-            if (speed > 0.1) {
+            // Wormhole nails always emit a guaranteed pulse at exact position — no spread, no gaps
+            if (wormhole) {
+                serverLevel.sendParticles(JParticleTypeRegistry.NAIL_TRAIL.get(),
+                        getX(), getY(), getZ(), 2, 0, 0, 0, 0.0);
+            }
+
+            // Spawn trail particles proportional to distance travelled this tick
+            if (speed > 0.05) {
                 double currentX = this.getX();
                 double currentY = this.getY();
                 double currentZ = this.getZ();
@@ -429,6 +497,16 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
     }
 
     /**
+     * Tusk Act 2 - Free toenail (crouching variant, no nail cost, same as Act 1 toenail)
+     */
+    public static @Nullable NailProjectile fromTuskAct1Toenail2(TuskAct2Entity tusk, float maxRange) {
+        NailProjectile nail = new NailProjectile(tusk.level(), tusk.getUserOrThrow());
+        nail.setCustomDamage(5.0f);
+        nail.maxRange = maxRange;
+        return nail;
+    }
+
+    /**
      * Tusk Act 2 - Golden Rectangle Nail (15 blocks, creeping)
      */
     public static @Nullable NailProjectile fromTuskAct2(TuskAct2Entity tusk, float maxRange, float creepDistance) {
@@ -439,6 +517,8 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
         nail.setCustomDamage(6.0f); // Act 2: 1.5x Act 1
         nail.maxRange = maxRange;
         nail.creepDistance = creepDistance;
+        nail.maxLifetimeTicks = 300; // 15 seconds
+        nail.slowsOnHit = true;
         return nail;
     }
 
@@ -474,6 +554,8 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
         nail.setCustomDamage(8.0f); // Act 3: 2x Act 1
         nail.maxRange = maxRange;
         nail.creepDistance = creepDistance;
+        nail.growing = true; // +5 creep range per chain hit
+        nail.slowsOnHit = true; // maxLifetimeTicks stays 200 (10 sec)
         return nail;
     }
 

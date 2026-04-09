@@ -6,12 +6,12 @@ import lombok.NonNull;
 import net.arna.jcraft.api.Attacks;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
-import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.projectile.NailProjectile;
 import net.arna.jcraft.common.entity.stand.TuskAct3Entity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.CooldownType;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -24,17 +24,28 @@ import java.util.Set;
 /**
  * Tusk Act 3 - Wormhole (Ultimate)
  * First press: Fires a slow homing nail.
- * Second press (while nail is alive): Teleports to the nail. Deals 6 void damage in 2-block radius.
+ * Second press (while nail is alive): Teleports to the nail. Deals damage in configurable radius.
  * Like KQBTD's Bites the Dust — initMove routes to teleport when nail is active.
  */
 public final class WormholeAttack extends AbstractMove<WormholeAttack, TuskAct3Entity> {
     private WeakReference<NailProjectile> wormholeNail;
     private boolean nailActive = false;
 
+    // Configurable via .withTeleportDamage() in the moveset definition
+    private float teleportDamage = 0f;
+    private float teleportBlastRadius = 0f;
+
     public WormholeAttack(int cooldown, int windup, int duration, float moveDistance) {
         super(cooldown, windup, duration, moveDistance);
         ranged = true;
         manualCooldown = true;
+    }
+
+    /** Set the teleport arrival damage and blast radius (call from moveset builder). */
+    public WormholeAttack withTeleportDamage(float damage, float blastRadius) {
+        this.teleportDamage = damage;
+        this.teleportBlastRadius = blastRadius;
+        return this;
     }
 
     @Override
@@ -48,7 +59,7 @@ public final class WormholeAttack extends AbstractMove<WormholeAttack, TuskAct3E
 
     /**
      * Immediately teleports to the nail — bypasses ALL cooldown/movestun checks.
-     * Called directly from onUserMoveInput (before canAttack check), like BTD detonation.
+     * Called from initMove (before super.initMove), like BTD detonation.
      */
     public boolean doTeleportNow(TuskAct3Entity attacker, LivingEntity user) {
         final NailProjectile nail = wormholeNail == null ? null : wormholeNail.get();
@@ -76,15 +87,15 @@ public final class WormholeAttack extends AbstractMove<WormholeAttack, TuskAct3E
         Vec3 nailPos = nail.position();
         user.teleportTo(nailPos.x, nailPos.y, nailPos.z);
 
-        // Hit feedback
-        attacker.playSound(JSoundRegistry.IMPACT_1.get(), 1.0f, 0.8f);
-
-        // Void damage in 2-block radius
-        AABB blastBox = new AABB(nailPos.x - 2, nailPos.y - 2, nailPos.z - 2,
-                nailPos.x + 2, nailPos.y + 2, nailPos.z + 2);
-        attacker.level().getEntitiesOfClass(LivingEntity.class, blastBox,
-                e -> e != user && e.isAlive() && !e.isSpectator())
-                .forEach(e -> Attacks.trueDamage(6, JDamageSources.stand(attacker), e));
+        // Damage in blast radius (configured via withTeleportDamage in the moveset)
+        if (teleportDamage > 0 && teleportBlastRadius > 0) {
+            float r = teleportBlastRadius;
+            AABB blastBox = new AABB(nailPos.x - r, nailPos.y - r, nailPos.z - r,
+                    nailPos.x + r, nailPos.y + r, nailPos.z + r);
+            attacker.level().getEntitiesOfClass(LivingEntity.class, blastBox,
+                    e -> e != user && e.isAlive() && !e.isSpectator())
+                    .forEach(e -> Attacks.trueDamage(teleportDamage, JDamageSources.stand(attacker), e));
+        }
 
         nail.discard();
         wormholeNail = null;
@@ -97,9 +108,13 @@ public final class WormholeAttack extends AbstractMove<WormholeAttack, TuskAct3E
 
         JComponentPlatformUtils.getCooldowns(user).setCooldown(CooldownType.STAND_ULTIMATE, getCooldown());
 
-        Vec3 heightOffset = GravityChangerAPI.getEyeOffset(user).scale(0.75);
-        nail.setPos(user.position().add(heightOffset));
-        nail.shootFromRotation(user, user.getXRot(), user.getYRot(), 0.0F, 0.5F, 0.0F);
+        // Redirect through handhole if active, otherwise fire from eye level with crosshair aim
+        if (!attacker.redirectThroughHandhole(nail, user, 0.5f)) {
+            Vec3 spawnPos = user.position().add(GravityChangerAPI.getEyeOffset(user).scale(0.75));
+            nail.setPos(spawnPos);
+            Vec3 target = JUtils.getCrosshairTarget(user, 50.0);
+            nail.setDeltaMovement(target.subtract(spawnPos).normalize().scale(0.5));
+        }
 
         attacker.level().addFreshEntity(nail);
         wormholeNail = new WeakReference<>(nail);
@@ -113,7 +128,10 @@ public final class WormholeAttack extends AbstractMove<WormholeAttack, TuskAct3E
 
     @Override
     public @NonNull WormholeAttack copy() {
-        return copyExtras(new WormholeAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
+        WormholeAttack copy = new WormholeAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance());
+        copy.teleportDamage = this.teleportDamage;
+        copy.teleportBlastRadius = this.teleportBlastRadius;
+        return copyExtras(copy);
     }
 
     public static class Type extends AbstractMove.Type<WormholeAttack> {

@@ -22,7 +22,11 @@ import net.arna.jcraft.api.stand.SummonData;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.attack.conditions.TuskNailCondition;
 import net.arna.jcraft.common.entity.projectile.NailProjectile;
+import net.arna.jcraft.common.item.Peacemaker;
 import java.lang.ref.WeakReference;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.tusk.*;
@@ -67,49 +71,46 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
 
     // ---- Moves ----
 
-    public static final Act3NailShotAttack NAIL_SHOT = new Act3NailShotAttack(0, 1, 15, 0.75f, 4.0f, 20.0f, 15.0f)
+    public static final Act3NailShotAttack NAIL_SHOT = new Act3NailShotAttack(0, 10, 15, 0.75f, 2.7f, 20.0f, 15.0f)
             .withCondition(TuskNailCondition.atLeast(1.0f))
+            .withSound(JSoundRegistry.TUSK_SHOT)
             .withInfo(
                     Component.literal("Golden Rectangle Nail"),
                     Component.literal("Fires a spinning nail (15 blocks). On hit, creeps 8 blocks through terrain."));
 
     // Heavy: Nail Jab — close-range spinning nail poke
     public static final SimpleAttack<TuskAct3Entity> NAIL_JAB = new SimpleAttack<TuskAct3Entity>(
-            200, 5, 15, 0.5f, 7.0f, 15, 2f, 0.5f, 0.0f)
+            200, 5, 15, 1f, 7.0f, 15, 2f, 0.5f, 0.0f)
             .withCondition(TuskNailCondition.atLeast(1.0f))
-            .withSound(JSoundRegistry.ARMORED_HIT)
+            .withImpactSound(JSoundRegistry.ARMORED_HIT)
             .withInfo(
                     Component.literal("Nail Jab"),
                     Component.literal("Close-range nail poke."));
 
     // Barrage: Nail Swipes — 5 hits, quick startup
     public static final NailBarrageAttack NAIL_SWIPES = new NailBarrageAttack(
-            280, 2, 50, 1.5f, 2.0f, 8, 2.0f, 0.3f, 0.0f, 10)
+            280, 2, 50, 1f, 3.0f, 12, 2.0f, 0.3f, 0.0f, 10)
             .withCondition(TuskNailCondition.atLeast(1.0f))
-            .withSound(JSoundRegistry.CREAM_COMBO)
+            .withImpactSound(JSoundRegistry.IMPACT_2)
             .withInfo(
                     Component.literal("Nail Swipes"),
                     Component.literal("Quick 5-hit nail swipes. Medium cooldown."));
 
-    public static final WormholeAttack WORMHOLE = new WormholeAttack(100, 5, 10, 0.75f)
-            .withInfo(
-                    Component.literal("Wormhole Nail"),
-                    Component.literal("First use: fires a slow homing nail.\nSecond use: teleports to nail."))
-            .withCondition(TuskNailCondition.atLeast(1.0f));
-
     public static final HandholeAttack HANDHOLE = new HandholeAttack(80, 8, 15, 0.75f)
+            .withSound(JSoundRegistry.TUSK_SHOT)
             .withInfo(
                     Component.literal("Handhole"),
-                    Component.literal("Fires a hole onto a surface. While active, Light fires from that position.\nPress Sp1 again to recall the arm."))
+                    Component.literal("Fires a hole onto a surface or entity. While active, ALL attacks fire from that position.\nPress Sp1 again to recall the arm."))
             .withCondition(TuskNailCondition.atLeast(1.0f));
 
     public static final VortexAttack VORTEX = new VortexAttack(120, 8, 15, 0.75f)
+            .withSound(JSoundRegistry.TUSK_SHOT)
             .withInfo(
                     Component.literal("Vortex"),
                     Component.literal("Fires a hole that drags nearby entities (and the user) toward it."))
             .withCondition(TuskNailCondition.atLeast(1.0f));
 
-    public static final VoidShotAttack VOID_SHOT = new VoidShotAttack(300, 10, 30, 0.75f)
+    public static final VoidShotAttack VOID_SHOT = new VoidShotAttack(300, 25, 30, 0.75f)
             .withInfo(
                     Component.literal("Voidshot"),
                     Component.literal("Fire at your own head and enter the wormhole.\nInvulnerable for up to 1 second. Punishable on entry/exit."))
@@ -124,6 +125,15 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
                             "Utility → Cycle forward (Act 1→2→3→1...)\n" +
                             "Shift + Utility → Cycle backward (Act 3→2→1→3...)"));
 
+    public static final WormholeAttack WORMHOLE = new WormholeAttack(200, 5, 10, 0.75f)
+            .withTeleportDamage(6.0f, 2.0f)
+            .withSound(JSoundRegistry.TUSK_SHOT)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withInfo(
+                    Component.literal("Wormhole Nail"),
+                    Component.literal("First use: fires a slow homing nail.\nSecond use: teleports to nail, dealing 6 damage in 2-block radius."))
+            .withCondition(TuskNailCondition.atLeast(1.0f));
+    
     @Getter
     @Setter
     private CommonMiscComponent miscComponent;
@@ -132,6 +142,12 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
     private int voidTicks = 0;
     private int regenTick = 40;
     private WeakReference<NailProjectile> voidNail = null;
+
+    /**
+     * Directly tracked by HandholeAttack.tick() — avoids getMove() instance identity issues.
+     * Non-null and inGround = hole is active.
+     */
+    public NailProjectile activeHandholeNail = null;
 
     public TuskAct3Entity(Level worldIn) {
         super(JStandTypeRegistry.TUSK_ACT_3.get(), worldIn);
@@ -197,22 +213,45 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
         voidNail = new WeakReference<>(nail);
         LivingEntity user = getUser();
         if (user != null) {
+            user.startRiding(nail, true); // player rides the nail — follows it automatically
+            // Full invisibility: flag + effect (hides armor/particles for others)
+            user.setInvisible(true);
+            user.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, VoidShotAttack.VOID_DURATION + 10, 0, false, false));
             user.setInvulnerable(true);
-            user.setInvisible(true); // hide player — they are the nail now
         }
+        this.setInvisible(true); // hide stand too
     }
 
     /** Force the user out of the void early. */
     public void exitVoid() {
         voidTicks = 0;
         NailProjectile nail = voidNail == null ? null : voidNail.get();
-        if (nail != null && nail.isAlive()) nail.discard();
-        voidNail = null;
         LivingEntity user = getUser();
         if (user != null) {
-            user.setInvulnerable(false);
+            user.stopRiding();
             user.setInvisible(false);
+            user.removeEffect(MobEffects.INVISIBILITY);
+            user.setInvulnerable(false);
         }
+        this.setInvisible(false); // show stand again
+        if (nail != null && nail.isAlive()) nail.discard();
+        voidNail = null;
+    }
+
+    /**
+     * If the handhole is active, repositions the nail to fire from the hole toward the crosshair.
+     * Call BEFORE addFreshEntity. Returns true if the nail was redirected.
+     */
+    public boolean redirectThroughHandhole(NailProjectile nail, LivingEntity user, float speed) {
+        if (activeHandholeNail == null || !activeHandholeNail.isAlive()
+                || (!activeHandholeNail.inGround && activeHandholeNail.entityStuckTo == null)) {
+            return false;
+        }
+        Vec3 origin = activeHandholeNail.position().add(0, 1, 0);
+        nail.setPos(origin);
+        Vec3 target = JUtils.getCrosshairTarget(user, 50.0);
+        nail.setDeltaMovement(target.subtract(origin).normalize().scale(speed));
+        return true;
     }
 
     public boolean isInVoid() {
@@ -239,23 +278,18 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
                 }
             }
 
-            // Voidshot — pilot the nail
+            // Voidshot — player rides the nail
             if (voidTicks > 0) {
                 NailProjectile nail = voidNail == null ? null : voidNail.get();
-                if (nail != null && nail.isAlive() && !nail.inGround) {
-                    // Steer nail by player look direction
-                    Vec3 lookVec = user.getLookAngle();
-                    Vec3 currentVel = nail.getDeltaMovement();
-                    nail.setDeltaMovement(currentVel.lerp(lookVec.scale(currentVel.length()), 0.3));
-                    // Teleport user (and stand) to nail position
-                    user.teleportTo(nail.getX(), nail.getY(), nail.getZ());
-                    voidTicks--;
+                if (nail == null || !nail.isAlive() || nail.inGround) {
+                    // Nail stopped, hit something, or gone — exit void
+                    exitVoid();
+                } else if (!nail.hasPassenger(user)) {
+                    // Player dismounted (pressed sneak, etc.)
+                    exitVoid();
                 } else {
-                    // Nail stopped or gone — exit void
-                    exitVoid();
-                }
-                if (voidTicks <= 0) {
-                    exitVoid();
+                    voidTicks--;
+                    if (voidTicks <= 0) exitVoid();
                 }
             }
         }
@@ -291,23 +325,8 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
             return;
         }
 
-        // Handhole intercept: while hole is active, only fire from hole (never normal M1)
-        if (moveClass == MoveClass.LIGHT) {
-            HandholeAttack handhole = getMove(HandholeAttack.class);
-            if (handhole != null && handhole.isHoleActive()) {
-                handhole.tryFireFromHole(this, getUser());
-                return; // Always suppress normal M1 when hole is active
-            }
-        }
-
-        // Wormhole teleport: bypass ALL cooldown/movestun — activates regardless of state, like BTD
-        if (moveClass == MoveClass.ULTIMATE) {
-            WormholeAttack wormhole = getMove(WormholeAttack.class);
-            if (wormhole != null && wormhole.isNailActive()) {
-                wormhole.doTeleportNow(this, getUser());
-                return;
-            }
-        }
+        // If initMove already handled this input, don't call initMove again
+        if (moveInitiated) return;
 
         if (canAttack()) {
             initMove(moveClass);
@@ -318,10 +337,32 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
 
     @Override
     public boolean initMove(MoveClass moveClass) {
+        // Act cycle — guard against auto-cycle on fresh summon (PlayerInputPacket calls initMove(UTILITY) on the new stand)
         if (moveClass == MoveClass.UTILITY) {
+            if (tickCount < 2) return false;
             TuskActCycleMove.tryCycle(3, getUser());
             return true;
         }
+
+        LivingEntity user = getUser();
+
+        // Peacemaker lock — Tusk cannot fire attacks while the gun is held
+        if (user != null) {
+            if (user.getMainHandItem().getItem() instanceof Peacemaker
+                    || user.getOffhandItem().getItem() instanceof Peacemaker) {
+                return false;
+            }
+        }
+
+        // Wormhole teleport: if nail is alive, teleport instead of firing a new nail
+        if (moveClass == MoveClass.ULTIMATE) {
+            WormholeAttack wormhole = getMove(WormholeAttack.class);
+            if (wormhole != null && wormhole.isNailActive()) {
+                wormhole.doTeleportNow(this, user);
+                return true;
+            }
+        }
+
         return super.initMove(moveClass);
     }
 

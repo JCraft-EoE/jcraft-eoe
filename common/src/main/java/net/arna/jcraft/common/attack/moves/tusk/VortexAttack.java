@@ -8,6 +8,7 @@ import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.common.entity.projectile.NailProjectile;
 import net.arna.jcraft.common.entity.stand.TuskAct3Entity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -38,9 +39,12 @@ public final class VortexAttack extends AbstractMove<VortexAttack, TuskAct3Entit
         NailProjectile nail = NailProjectile.vortexFromTuskAct3(attacker);
         if (nail == null) return Set.of();
 
-        Vec3 heightOffset = GravityChangerAPI.getEyeOffset(user).scale(0.75);
-        nail.setPos(attacker.position().add(heightOffset));
-        nail.shootFromRotation(user, user.getXRot(), user.getYRot(), 0.0F, 1.2F, 0.2F);
+        if (!attacker.redirectThroughHandhole(nail, user, 1.2f)) {
+            Vec3 spawnPos = attacker.position().add(GravityChangerAPI.getEyeOffset(user).scale(0.75));
+            nail.setPos(spawnPos);
+            Vec3 target = JUtils.getCrosshairTarget(user, 50.0);
+            nail.setDeltaMovement(target.subtract(spawnPos).normalize().scale(1.2));
+        }
 
         attacker.level().addFreshEntity(nail);
         return Set.of();

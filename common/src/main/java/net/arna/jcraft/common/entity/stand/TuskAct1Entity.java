@@ -23,6 +23,7 @@ import net.arna.jcraft.common.attack.conditions.TuskNailCondition;
 import net.arna.jcraft.common.attack.moves.tusk.NailShotAttack;
 import net.arna.jcraft.common.attack.moves.tusk.NailWheelAttack;
 import net.arna.jcraft.common.attack.moves.tusk.TuskActCycleMove;
+import net.arna.jcraft.common.item.Peacemaker;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.common.util.CooldownType;
@@ -83,7 +84,7 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
             );
 
     public static final NailWheelAttack NAIL_WHEEL = new NailWheelAttack(
-            500, 8, 30, 0.75f, 8.0f, 20, 1.5f, 1.5f, 0.4f, 2, 0.15f)
+            500, 8, 30, 0.75f, 2.0f, 20, 2f, 1.5f, 0.4f, 2, 0.15f)
             .withInfo(
                     Component.literal("Nail Wheel"),
                     Component.literal("Dash forward dealing repeated damage. Distance and stun based on nail meter.")
@@ -212,8 +213,15 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
     @Override
     public boolean initMove(MoveClass moveClass) {
         if (moveClass == MoveClass.UTILITY) {
+            if (tickCount < 2) return false; // Just summoned — prevent auto-cycle
             TuskActCycleMove.tryCycle(1, getUser());
             return true;
+        }
+        // Peacemaker lock
+        LivingEntity user = getUser();
+        if (user != null && (user.getMainHandItem().getItem() instanceof Peacemaker
+                || user.getOffhandItem().getItem() instanceof Peacemaker)) {
+            return false;
         }
         return super.initMove(moveClass);
     }
@@ -250,15 +258,26 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
         return interval;
     }
 
-    /** Drains 1 hunger point (or 1 blood for vampires) when a nail regenerates. */
+    /**
+     * Drains 0.5 saturation (or 0.5 blood for vampires) when a nail regenerates.
+     * Saturation is depleted first; hunger only drains when saturation is already empty.
+     * Half the cost of the original 1-point hunger drain.
+     */
     public static void drainNailResource(Player player) {
         CommonVampireComponent vampire = JComponentPlatformUtils.getVampirism(player);
         if (vampire != null && vampire.isVampire()) {
             float blood = vampire.getBlood();
-            if (blood > 0) vampire.setBlood(blood - 1);
+            if (blood > 0) vampire.setBlood(blood - 0.5f);
         } else {
-            int hunger = player.getFoodData().getFoodLevel();
-            if (hunger > 0) player.getFoodData().setFoodLevel(hunger - 1);
+            float saturation = player.getFoodData().getSaturationLevel();
+            if (saturation >= 0.5f) {
+                // Drain saturation first — invisible cost, hunger bar unchanged
+                player.getFoodData().setSaturation(saturation - 0.5f);
+            } else {
+                // Saturation exhausted: fall through to hunger drain
+                int hunger = player.getFoodData().getFoodLevel();
+                if (hunger > 0) player.getFoodData().setFoodLevel(hunger - 1);
+            }
         }
     }
 

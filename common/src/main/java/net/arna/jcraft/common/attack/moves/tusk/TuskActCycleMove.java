@@ -49,34 +49,42 @@ public final class TuskActCycleMove<A extends IAttacker<A, ?>> extends AbstractM
         return Set.of(); // Switching is handled in initMove directly; this is never reached
     }
 
+    private static boolean cycling = false;
+
     /** Switches to the next (or previous, if shift is held) unlocked Tusk act. Mirrors /stand set. */
     public static boolean tryCycle(int currentAct, @Nullable LivingEntity user) {
-        if (!(user instanceof ServerPlayer sp)) return false;
-        if (sp.level().isClientSide()) return false;
+        if (cycling) return false;
+        cycling = true;
+        try {
+            if (!(user instanceof ServerPlayer sp)) return false;
+            if (sp.level().isClientSide()) return false;
 
-        int maxAct = getMaxActFromAdvancements(sp);
-        if (maxAct <= 1) return false; // Nothing to cycle to
+            int maxAct = getMaxActFromAdvancements(sp);
+            if (maxAct <= 1) return false; // Nothing to cycle to
 
-        int nextAct;
-        if (sp.isShiftKeyDown()) {
-            nextAct = currentAct - 1;
-            if (nextAct < 1) nextAct = maxAct;
-        } else {
-            nextAct = currentAct + 1;
-            if (nextAct > maxAct) nextAct = 1;
+            int nextAct;
+            if (sp.isShiftKeyDown()) {
+                nextAct = currentAct - 1;
+                if (nextAct < 1) nextAct = maxAct;
+            } else {
+                nextAct = currentAct + 1;
+                if (nextAct > maxAct) nextAct = 1;
+            }
+
+            if (nextAct == currentAct) return false;
+
+            StandType newType = getActStandType(nextAct);
+            if (newType == null) return false;
+
+            CommonStandComponent standData = JComponentPlatformUtils.getStandComponent(sp);
+            standData.setTypeAndSkin(newType, 0);
+            JUtils.maySendStandAboutInfo(sp);
+            sp.unRide();
+            JCraft.summon(sp.level(), sp);
+            return true;
+        } finally {
+            cycling = false;
         }
-
-        if (nextAct == currentAct) return false;
-
-        StandType newType = getActStandType(nextAct);
-        if (newType == null) return false;
-
-        CommonStandComponent standData = JComponentPlatformUtils.getStandComponent(sp);
-        standData.setTypeAndSkin(newType, 0);
-        JUtils.maySendStandAboutInfo(sp);
-        sp.unRide();
-        JCraft.summon(sp.level(), sp);
-        return true;
     }
 
     public static @Nullable StandType getActStandType(int act) {

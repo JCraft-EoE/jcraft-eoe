@@ -10,7 +10,9 @@ import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.entity.projectile.NailProjectile;
 import net.arna.jcraft.common.entity.stand.TuskAct2Entity;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
@@ -42,8 +44,10 @@ public final class GoldenRectangleNailAttack extends AbstractMove<GoldenRectangl
         if (nail == null) return Set.of();
 
         attacker.playSound(JSoundRegistry.TUSK_SHOT.get(), 1.0f, 1.0f);
-        nail.setPos(user.position().add(0, user.getBbHeight() * 0.55, 0));
-        nail.shootFromRotation(user, user.getXRot(), user.getYRot(), 0.0F, baseSpeed, 1.0F);
+        Vec3 spawnPos = user.position().add(0, user.getBbHeight() * 0.55, 0);
+        nail.setPos(spawnPos);
+        Vec3 target = JUtils.getCrosshairTarget(user, 50.0);
+        nail.setDeltaMovement(target.subtract(spawnPos).normalize().scale(baseSpeed));
 
         attacker.level().addFreshEntity(nail);
         return Set.of();

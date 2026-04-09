@@ -25,6 +25,7 @@ import net.arna.jcraft.common.attack.moves.tusk.GoldenRectangleNailAttack;
 import net.arna.jcraft.common.attack.moves.tusk.NailShotAttack;
 import net.arna.jcraft.common.attack.moves.tusk.PerfectGoldenRotationAttack;
 import net.arna.jcraft.common.attack.moves.tusk.TuskActCycleMove;
+import net.arna.jcraft.common.item.Peacemaker;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.api.component.living.CommonMiscComponent;
@@ -72,7 +73,7 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
                     Component.literal("Short range nail (5 blocks), costs 0.5 nails, longer windup")
             );
 
-    public static final GoldenRectangleNailAttack GOLDEN_RECTANGLE_NAIL = new GoldenRectangleNailAttack(0, 1, 15, 0.75f, 4.0f, 20.0f, 15.0f)
+    public static final GoldenRectangleNailAttack GOLDEN_RECTANGLE_NAIL = new GoldenRectangleNailAttack(0, 10, 15, 0.75f, 2.7f, 20.0f, 15.0f)
             .withCondition(TuskNailCondition.atLeast(1.0f))
             .withCrouchingVariant(TOENAIL_SHOT)
             .withInfo(
@@ -206,8 +207,15 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
     @Override
     public boolean initMove(MoveClass moveClass) {
         if (moveClass == MoveClass.UTILITY) {
+            if (tickCount < 2) return false; // Just summoned — prevent auto-cycle
             TuskActCycleMove.tryCycle(2, getUser());
             return true;
+        }
+        // Peacemaker lock
+        LivingEntity user = getUser();
+        if (user != null && (user.getMainHandItem().getItem() instanceof Peacemaker
+                || user.getOffhandItem().getItem() instanceof Peacemaker)) {
+            return false;
         }
         return super.initMove(moveClass);
     }

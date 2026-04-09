@@ -8,6 +8,7 @@ import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.common.entity.projectile.NailProjectile;
 import net.arna.jcraft.common.entity.stand.TuskAct3Entity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +43,7 @@ public final class HandholeAttack extends AbstractMove<HandholeAttack, TuskAct3E
     public void tick(TuskAct3Entity attacker) {
         NailProjectile nail = handholeNail == null ? null : handholeNail.get();
         if (nail != null && nail.isAlive()) {
-            if (nail.inGround) {
+            if (nail.inGround || nail.entityStuckTo != null) {
                 idleTicks++;
                 if (idleTicks > IDLE_TIMEOUT) {
                     nail.discard();
@@ -55,18 +56,23 @@ public final class HandholeAttack extends AbstractMove<HandholeAttack, TuskAct3E
             holeActive = false;
             handholeNail = null;
         }
+        // Keep TuskAct3Entity's direct reference in sync — used for M1 intercept
+        NailProjectile live = handholeNail == null ? null : handholeNail.get();
+        attacker.activeHandholeNail = (live != null && live.isAlive()
+                && (live.inGround || live.entityStuckTo != null)) ? live : null;
     }
 
     @Override
     public @NonNull Set<LivingEntity> perform(TuskAct3Entity attacker, LivingEntity user) {
         NailProjectile existing = handholeNail == null ? null : handholeNail.get();
 
-        if (existing != null && existing.isAlive() && existing.inGround) {
+        if (existing != null && existing.isAlive() && (existing.inGround || existing.entityStuckTo != null)) {
             // Second press with an active hole: discard it (recall arm)
             existing.discard();
             holeActive = false;
             handholeNail = null;
             idleTicks = 0;
+            attacker.activeHandholeNail = null;
             return Set.of();
         }
 
@@ -74,9 +80,10 @@ public final class HandholeAttack extends AbstractMove<HandholeAttack, TuskAct3E
         NailProjectile nail = NailProjectile.handholeFromTuskAct3(attacker);
         if (nail == null) return Set.of();
 
-        Vec3 heightOffset = GravityChangerAPI.getEyeOffset(user).scale(0.75);
-        nail.setPos(attacker.position().add(heightOffset));
-        nail.shootFromRotation(user, user.getXRot(), user.getYRot(), 0.0F, 2.5F, 0.5F);
+        Vec3 spawnPos = attacker.position().add(GravityChangerAPI.getEyeOffset(user).scale(0.75));
+        nail.setPos(spawnPos);
+        Vec3 target = JUtils.getCrosshairTarget(user, 50.0);
+        nail.setDeltaMovement(target.subtract(spawnPos).normalize().scale(2.5));
 
         attacker.level().addFreshEntity(nail);
         handholeNail = new WeakReference<>(nail);

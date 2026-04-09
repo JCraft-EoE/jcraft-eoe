@@ -273,6 +273,18 @@ public final class JUtils {
         );
     }
 
+    /**
+     * Returns the exact world point the entity's crosshair is aimed at (block outline hit, up to maxDist).
+     * Falls back to the endpoint if no block is hit.
+     */
+    public static Vec3 getCrosshairTarget(Entity entity, double maxDist) {
+        Vec3 eye = entity.getEyePosition();
+        Vec3 end = eye.add(entity.getLookAngle().scale(maxDist));
+        BlockHitResult hit = entity.level().clip(
+                new ClipContext(eye, end, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, entity));
+        return hit.getLocation();
+    }
+
     public static HitResult raycastAll(Entity entity, Vec3 start, Vec3 end, ClipContext.Fluid fluidHandling) {
         return raycastAll(entity, start, end, fluidHandling, null);
     }
