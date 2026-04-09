@@ -61,7 +61,7 @@ public class JModelProvider extends FabricModelProvider {
         generator.generateFlatItem(JItemRegistry.STAND_ARROWHEAD.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.ROAD_ROLLER.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.LEFT_ARM.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.D4C_HEART.get(), ModelTemplates.FLAT_ITEM);
+        generator.generateFlatItem(JItemRegistry.HEART.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.HERBAL_TEA.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.UPGRADE_TUSK_1.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.UPGRADE_TUSK_2.get(), ModelTemplates.FLAT_ITEM);

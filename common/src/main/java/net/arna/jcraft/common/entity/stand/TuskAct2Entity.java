@@ -22,6 +22,7 @@ import net.arna.jcraft.api.stand.SummonData;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.attack.conditions.TuskNailCondition;
 import net.arna.jcraft.common.attack.moves.tusk.GoldenRectangleNailAttack;
+import net.arna.jcraft.common.attack.moves.tusk.NailShotAttack;
 import net.arna.jcraft.common.attack.moves.tusk.PerfectGoldenRotationAttack;
 import net.arna.jcraft.common.attack.moves.tusk.TuskActCycleMove;
 import net.arna.jcraft.common.util.JUtils;
@@ -64,8 +65,16 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
     public static final EntityDataAccessor<Float> NAILS = SynchedEntityData.defineId(TuskAct2Entity.class, EntityDataSerializers.FLOAT);
     public static final float NAILS_MAX = 10.0f;
 
-    public static final GoldenRectangleNailAttack GOLDEN_RECTANGLE_NAIL = new GoldenRectangleNailAttack(0, 1, 15, 0.75f, 4.0f, 15.0f, 15.0f)
+    public static final NailShotAttack<TuskAct2Entity> TOENAIL_SHOT = new NailShotAttack<TuskAct2Entity>(0, 10, 15, 0.75f, 1.5f, 8.0f)
+            .withCondition(TuskNailCondition.atLeast(0.5f))
+            .withInfo(
+                    Component.literal("Toenail Shot"),
+                    Component.literal("Short range nail (5 blocks), costs 0.5 nails, longer windup")
+            );
+
+    public static final GoldenRectangleNailAttack GOLDEN_RECTANGLE_NAIL = new GoldenRectangleNailAttack(0, 1, 15, 0.75f, 4.0f, 20.0f, 15.0f)
             .withCondition(TuskNailCondition.atLeast(1.0f))
+            .withCrouchingVariant(TOENAIL_SHOT)
             .withInfo(
                     Component.literal("Golden Rectangle Nail"),
                     Component.literal("Fires a spinning nail (15 blocks). On hit, creeps 8 blocks through terrain towards nearby enemies."));
@@ -76,7 +85,7 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
                     Component.literal("Hold to charge. Fires a drilling nail that hits once per tick. Damage (6-12) and speed (1x-2x) increase with charge."));
 
     public static final TuskActCycleMove<TuskAct2Entity> ACT_CYCLE = new TuskActCycleMove<TuskAct2Entity>(
-            0, 0, 1, 0f, 2, false)
+            0, 1, 1, 0f, 2, false)
             .withInfo(
                     Component.literal("Cycle Act"),
                     Component.literal("Cycle through unlocked Tusk acts.\n" +
@@ -118,9 +127,8 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
         setNails(miscComponent.getTuskNails());
     }
 
-    private static void registerMoves(MoveMap
-                                              <TuskAct2Entity, State> moves) {
-        moves.register(MoveClass.LIGHT, GOLDEN_RECTANGLE_NAIL, State.GOLDEN_RECTANGLE_NAIL);
+    private static void registerMoves(MoveMap<TuskAct2Entity, State> moves) {
+        moves.register(MoveClass.LIGHT, GOLDEN_RECTANGLE_NAIL, State.GOLDEN_RECTANGLE_NAIL).withCrouchingVariant(TuskAct2Entity.State.TOENAIL_SHOT);
         moves.register(MoveClass.ULTIMATE, PERFECT_GOLDEN_ROTATION, State.PERFECT_GOLDEN_ROTATION);
         moves.register(MoveClass.UTILITY, ACT_CYCLE, State.ACT_CYCLE);
     }
@@ -222,6 +230,7 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
     public enum State implements StandAnimationState<TuskAct2Entity> {
         IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.tusk_act_2.idle", AzPlayBehaviors.LOOP)),
         GOLDEN_RECTANGLE_NAIL(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_2.golden_rectangle_nail", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        TOENAIL_SHOT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_1.toenail_shot", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         PERFECT_GOLDEN_ROTATION(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_2.perfect_golden_rotation", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         ACT_CYCLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.tusk_act_2.idle", AzPlayBehaviors.LOOP));
 

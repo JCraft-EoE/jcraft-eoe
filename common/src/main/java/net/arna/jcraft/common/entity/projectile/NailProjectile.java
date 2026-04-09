@@ -4,6 +4,9 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
+import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.common.entity.projectile.JAttackEntity;
 import net.arna.jcraft.common.entity.stand.TuskAct1Entity;
 import net.arna.jcraft.common.entity.stand.TuskAct2Entity;
 import net.arna.jcraft.common.entity.stand.TuskAct3Entity;
@@ -112,33 +115,32 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
         final Entity owner = this.getOwner();
 
         if (entity == owner) return;
-        if (entity instanceof JAttackEntity) return; // filter all stands
+        if (entity instanceof JAttackEntity) return; // filter projectile attack entities
+        if (entity instanceof StandEntity<?, ?>) return; // filter all stands (StandEntity extends Mob, not JAttackEntity)
 
-        // Wormhole nails don't deal damage
-        if (wormhole) {
-            inGround = true;
-            return;
-        }
+        // Wormhole nails pass through everything — they're utility-only
+        if (wormhole) return;
 
         if (!(entity instanceof LivingEntity)) return;
 
         LivingEntity target = JUtils.getUserIfStand((LivingEntity) entity);
 
-        // Handle damage
-        if (isCreeping) {
-            JUtils.projectileDamageLogic(this, level(), creepTarget, Vec3.ZERO, 5, 1, false,
-                    customDamage, 2, CommonHitPropertyComponent.HitAnimation.LOW);
-        }
-        else {
-            JUtils.projectileDamageLogic(this, level(), target, Vec3.ZERO, 10, 1, false, customDamage, 4,
-                    CommonHitPropertyComponent.HitAnimation.MID, false, penetrating);
-        }
-        playSound(SoundEvents.ARROW_HIT, 1, 1);
+        // Impact sound
+        playSound(JSoundRegistry.IMPACT_11.get(), 1.0f, 1.0f);
 
-        // Slow down creep speed on each hit
         if (isCreeping) {
-            creepSpeed *= 0.75f;
+            // While homing: only stop and deal damage when we hit the actual creep target
+            if (creepTarget != null && (entity == creepTarget || target == creepTarget)) {
+                JUtils.projectileDamageLogic(this, level(), creepTarget, Vec3.ZERO, 5, 1, false,
+                        customDamage, 2, CommonHitPropertyComponent.HitAnimation.LOW);
+                discard();
+            }
+            // Pass through all other entities while homing (noclip through entities is NOT desired, but we ignore non-targets)
+            return;
         }
+
+        JUtils.projectileDamageLogic(this, level(), target, Vec3.ZERO, 10, 1, false, customDamage, 4,
+                CommonHitPropertyComponent.HitAnimation.MID, false, penetrating);
 
         // Start creeping if we have creep distance and haven't started creeping yet
         if (creepDistance > 0 && !isCreeping) {
@@ -151,7 +153,7 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
             // Find nearby entity to creep towards (exclude current target and owner)
             List<LivingEntity> nearbyTargets = level().getEntitiesOfClass(LivingEntity.class,
                     getBoundingBox().inflate(creepDistance),
-                    e -> e != owner && e != target && !(e instanceof JAttackEntity) && !e.isSpectator() && e.isAlive());
+                    e -> e != owner && e != target && !(e instanceof JAttackEntity) && !(e instanceof StandEntity<?, ?>) && !e.isSpectator() && e.isAlive());
 
             if (!nearbyTargets.isEmpty()) {
                 // Find closest target
@@ -193,7 +195,7 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
             Entity owner = getOwner();
             List<LivingEntity> nearbyTargets = level().getEntitiesOfClass(LivingEntity.class,
                     getBoundingBox().inflate(creepDistance),
-                    e -> e != owner && !(e instanceof JAttackEntity) && !e.isSpectator() && e.isAlive());
+                    e -> e != owner && !(e instanceof JAttackEntity) && !(e instanceof StandEntity<?, ?>) && !e.isSpectator() && e.isAlive());
             if (!nearbyTargets.isEmpty()) {
                 LivingEntity closest = nearbyTargets.get(0);
                 double closestDist = distanceToSqr(closest);
@@ -252,14 +254,20 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
                 return;
             }
 
+            // Manual hit detection — noPhysics=true means onHitEntity never fires while creeping
+            if (getBoundingBox().inflate(0.3).intersects(creepTarget.getBoundingBox())) {
+                JUtils.projectileDamageLogic(this, level(), creepTarget, Vec3.ZERO, 5, 1, false,
+                        customDamage, 2, CommonHitPropertyComponent.HitAnimation.LOW);
+                discard();
+                return;
+            }
+
             // Move towards target through blocks
             Vec3 targetPos = creepTarget.position().add(0, creepTarget.getBbHeight() / 2, 0);
-            Vec3 currentPos = position();
-            Vec3 direction = targetPos.subtract(currentPos).normalize();
+            Vec3 direction = targetPos.subtract(position()).normalize();
 
             setDeltaMovement(direction.scale(creepSpeed));
             setNoGravity(true);
-            // handle damage logic in onHitEntity()
         } else if (isCreeping) {
             // Target died or disappeared
             discard();
@@ -411,11 +419,9 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
     }
 
     /**
-     * Tusk Act 1 - Toenail shot (5 blocks, 0.5 nail cost)
+     * Tusk Act 1 - Toenail shot (free, does not consume nails or hunger)
      */
     public static @Nullable NailProjectile fromTuskAct1Toenail(TuskAct1Entity tusk, float maxRange) {
-        if (!tusk.drainNails(0.5f)) return null;
-
         NailProjectile nail = new NailProjectile(tusk.level(), tusk.getUserOrThrow());
         nail.setCustomDamage(5.0f);
         nail.maxRange = maxRange;
@@ -450,8 +456,8 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
         nail.maxRange = maxRange;
         nail.setDrilling(true); // Enable drilling mode - hits once per tick
 
-        // Damage: 1-2 per tick based on charge (0-100 ticks)
-        float damage = 1.0f + (chargeTime / 100.0f * 1.0f);
+        // Damage: 2-4 per tick based on charge (0-100 ticks)
+        float damage = 2.0f + (chargeTime / 100.0f * 2.0f);
         nail.setCustomDamage(damage);
 
         return nail;
@@ -480,6 +486,7 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
         NailProjectile nail = new NailProjectile(tusk.level(), tusk.getUserOrThrow());
         nail.wormhole = true;
         nail.homing = true;
+        nail.noPhysics = true; // noclip through blocks
         nail.setCustomDamage(0.0f);
         return nail;
     }

@@ -39,7 +39,7 @@ public final class VoidShotAttack extends AbstractMove<VoidShotAttack, TuskAct3E
         if (nail == null) return Set.of();
 
         nail.setNoGravity(true);
-        nail.setPos(user.position().add(0, user.getBbHeight() * 0.75, 0));
+        nail.setPos(user.position().add(0, user.getBbHeight() * 0.55, 0));
         nail.shootFromRotation(user, user.getXRot(), user.getYRot(), 0.0F, 2.5F, 0.0F);
         attacker.level().addFreshEntity(nail);
 

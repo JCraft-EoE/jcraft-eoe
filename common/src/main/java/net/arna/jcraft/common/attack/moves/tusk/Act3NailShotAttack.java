@@ -47,7 +47,7 @@ public final class Act3NailShotAttack extends AbstractMove<Act3NailShotAttack, T
         if (nail == null) return Set.of();
 
         attacker.playSound(JSoundRegistry.TUSK_SHOT.get(), 1.0f, 1.0f);
-        nail.setPos(user.position().add(0, user.getBbHeight() * 0.75, 0));
+        nail.setPos(user.position().add(0, user.getBbHeight() * 0.55, 0));
         nail.shootFromRotation(user, user.getXRot(), user.getYRot(), 0.0F, baseSpeed, 1.0F);
 
         attacker.level().addFreshEntity(nail);

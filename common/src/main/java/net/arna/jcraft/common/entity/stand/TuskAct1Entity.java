@@ -67,14 +67,14 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
     public static final EntityDataAccessor<Float> NAILS = SynchedEntityData.defineId(TuskAct1Entity.class, EntityDataSerializers.FLOAT);
     public static final float NAILS_MAX = 10.0f;
 
-    public static final NailShotAttack<TuskAct1Entity> TOENAIL_SHOT = new NailShotAttack<TuskAct1Entity>(0, 10, 15, 0.75f, 1.5f, 5.0f)
+    public static final NailShotAttack<TuskAct1Entity> TOENAIL_SHOT = new NailShotAttack<TuskAct1Entity>(0, 10, 15, 0.75f, 1.5f, 8.0f)
             .withCondition(TuskNailCondition.atLeast(0.5f))
             .withInfo(
                     Component.literal("Toenail Shot"),
                     Component.literal("Short range nail (5 blocks), costs 0.5 nails, longer windup")
             );
 
-    public static final NailShotAttack<TuskAct1Entity> NAIL_SHOT = new NailShotAttack<TuskAct1Entity>(0, 1, 10, 0.75f, 4.0f, 10.0f)
+    public static final NailShotAttack<TuskAct1Entity> NAIL_SHOT = new NailShotAttack<TuskAct1Entity>(0, 1, 10, 0.75f, 4.0f, 20.0f)
             .withCondition(TuskNailCondition.atLeast(1.0f))
             .withCrouchingVariant(TOENAIL_SHOT)
             .withInfo(
@@ -90,7 +90,7 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
             );
 
     public static final TuskActCycleMove<TuskAct1Entity> ACT_CYCLE = new TuskActCycleMove<TuskAct1Entity>(
-            0, 0, 1, 0f, 1, false)
+            0, 1, 1, 0f, 1, false)
             .withInfo(
                     Component.literal("Cycle Act"),
                     Component.literal("Cycle through unlocked Tusk acts.\n" +
@@ -133,8 +133,7 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
     }
 
     private static void registerMoves(MoveMap<TuskAct1Entity, State> moves) {
-        MoveMap.Entry<TuskAct1Entity, State> light = moves.register(MoveClass.LIGHT, NAIL_SHOT, State.NAIL_SHOT);
-        light.withCrouchingVariant(State.TOENAIL_SHOT);
+        moves.register(MoveClass.LIGHT, NAIL_SHOT, State.NAIL_SHOT).withCrouchingVariant(State.TOENAIL_SHOT);
 
         moves.register(MoveClass.ULTIMATE, NAIL_WHEEL, State.NAIL_WHEEL);
         moves.register(MoveClass.UTILITY, ACT_CYCLE, State.ACT_CYCLE);
@@ -267,7 +266,7 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
         IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.tusk_act_1.idle", AzPlayBehaviors.LOOP)),
         NAIL_SHOT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_1.nail_shot", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         TOENAIL_SHOT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_1.toenail_shot", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        NAIL_WHEEL(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_1.nail_wheel", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        NAIL_WHEEL(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_1.nail_shot", AzPlayBehaviors.HOLD_ON_LAST_FRAME)), // TODO: replace with nail_wheel animation when available
         ACT_CYCLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.tusk_act_1.idle", AzPlayBehaviors.LOOP));
 
         private final AzCommand animator;

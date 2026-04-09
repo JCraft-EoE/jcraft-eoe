@@ -26,7 +26,7 @@ public final class HandholeAttack extends AbstractMove<HandholeAttack, TuskAct3E
     private WeakReference<NailProjectile> handholeNail;
     private boolean holeActive = false;
     private int idleTicks = 0;
-    private static final int IDLE_TIMEOUT = 20;
+    private static final int IDLE_TIMEOUT = 200;
 
     public HandholeAttack(int cooldown, int windup, int duration, float moveDistance) {
         super(cooldown, windup, duration, moveDistance);
@@ -98,10 +98,16 @@ public final class HandholeAttack extends AbstractMove<HandholeAttack, TuskAct3E
         NailProjectile shot = NailProjectile.handholeShot(attacker);
         if (shot == null) return false;
 
-        shot.setPos(hole.position().add(0, 1, 0));
-        shot.shootFromRotation(user, user.getXRot(), user.getYRot(), 0.0F, 2.5F, 0.5F);
-        attacker.level().addFreshEntity(shot);
+        Vec3 shotOrigin = hole.position().add(0, 1, 0);
+        shot.setPos(shotOrigin);
 
+        // Aim at the exact point the crosshair is targeting (not just the look direction from a different position)
+        Vec3 eyePos = user.getEyePosition();
+        Vec3 targetPoint = eyePos.add(user.getLookAngle().scale(50.0));
+        Vec3 shootDir = targetPoint.subtract(shotOrigin).normalize();
+        shot.setDeltaMovement(shootDir.scale(2.5));
+
+        attacker.level().addFreshEntity(shot);
         idleTicks = 0; // Reset idle timer on use
         return true;
     }

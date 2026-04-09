@@ -6,6 +6,7 @@ import lombok.NonNull;
 import net.arna.jcraft.api.Attacks;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
+import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.projectile.NailProjectile;
 import net.arna.jcraft.common.entity.stand.TuskAct3Entity;
@@ -21,9 +22,10 @@ import java.lang.ref.WeakReference;
 import java.util.Set;
 
 /**
- * Tusk Act 3's wormhole attack.
- * First press: Fires a slow homing nail that deals no damage
- * Second press: Teleports user to nail location
+ * Tusk Act 3 - Wormhole (Ultimate)
+ * First press: Fires a slow homing nail.
+ * Second press (while nail is alive): Teleports to the nail. Deals 6 void damage in 2-block radius.
+ * Like KQBTD's Bites the Dust — initMove routes to teleport when nail is active.
  */
 public final class WormholeAttack extends AbstractMove<WormholeAttack, TuskAct3Entity> {
     private WeakReference<NailProjectile> wormholeNail;
@@ -32,7 +34,7 @@ public final class WormholeAttack extends AbstractMove<WormholeAttack, TuskAct3E
     public WormholeAttack(int cooldown, int windup, int duration, float moveDistance) {
         super(cooldown, windup, duration, moveDistance);
         ranged = true;
-        manualCooldown = true; // Only apply cooldown on first press, not second
+        manualCooldown = true;
     }
 
     @Override
@@ -40,54 +42,68 @@ public final class WormholeAttack extends AbstractMove<WormholeAttack, TuskAct3E
         return Type.INSTANCE;
     }
 
+    public boolean isNailActive() {
+        return nailActive;
+    }
+
+    /**
+     * Immediately teleports to the nail — bypasses ALL cooldown/movestun checks.
+     * Called directly from onUserMoveInput (before canAttack check), like BTD detonation.
+     */
+    public boolean doTeleportNow(TuskAct3Entity attacker, LivingEntity user) {
+        final NailProjectile nail = wormholeNail == null ? null : wormholeNail.get();
+        if (nail == null || !nail.isAlive()) return false;
+        doTeleport(attacker, user, nail);
+        return true;
+    }
+
     @Override
     public void tick(final TuskAct3Entity attacker) {
-        // Check if wormhole nail is still alive
         final NailProjectile nail = wormholeNail == null ? null : wormholeNail.get();
-        if (nail != null && nail.isAlive()) {
-            // Update nail to curve towards user's aim (handled in NailProjectile.tick())
-            nailActive = true;
-        } else {
-            nailActive = false;
+        nailActive = nail != null && nail.isAlive();
+        if (!nailActive) {
+            wormholeNail = null;
         }
     }
 
     @Override
     public @NonNull Set<LivingEntity> perform(TuskAct3Entity attacker, LivingEntity user) {
-        final NailProjectile existingNail = wormholeNail == null ? null : wormholeNail.get();
-
-        if (existingNail != null && existingNail.isAlive() && nailActive) {
-            // Second press: Teleport to nail — no cooldown applied
-            Vec3 nailPos = existingNail.position();
-            user.teleportTo(nailPos.x, nailPos.y, nailPos.z);
-
-            // Void damage in 2-block radius at arrival point
-            AABB blastBox = new AABB(nailPos.x - 2, nailPos.y - 2, nailPos.z - 2,
-                    nailPos.x + 2, nailPos.y + 2, nailPos.z + 2);
-            attacker.level().getEntitiesOfClass(LivingEntity.class, blastBox,
-                    e -> e != user && e.isAlive() && !e.isSpectator())
-                    .forEach(e -> Attacks.trueDamage(6, JDamageSources.stand(attacker), e));
-
-            existingNail.discard();
-            wormholeNail = null;
-            nailActive = false;
-        } else {
-            // First press: Fire wormhole nail — apply cooldown now
-            NailProjectile nail = NailProjectile.wormholeFromTuskAct3(attacker);
-            if (nail == null) return Set.of();
-
-            JComponentPlatformUtils.getCooldowns(user).setCooldown(CooldownType.STAND_ULTIMATE, getCooldown());
-
-            Vec3 heightOffset = GravityChangerAPI.getEyeOffset(user).scale(0.75);
-            nail.setPos(attacker.position().add(heightOffset));
-            nail.shootFromRotation(user, user.getXRot(), user.getYRot(), 0.0F, 0.5F, 0.0F);
-
-            attacker.level().addFreshEntity(nail);
-            wormholeNail = new WeakReference<>(nail);
-            nailActive = true;
-        }
-
+        fireNail(attacker, user);
         return Set.of();
+    }
+
+    private void doTeleport(TuskAct3Entity attacker, LivingEntity user, NailProjectile nail) {
+        Vec3 nailPos = nail.position();
+        user.teleportTo(nailPos.x, nailPos.y, nailPos.z);
+
+        // Hit feedback
+        attacker.playSound(JSoundRegistry.IMPACT_1.get(), 1.0f, 0.8f);
+
+        // Void damage in 2-block radius
+        AABB blastBox = new AABB(nailPos.x - 2, nailPos.y - 2, nailPos.z - 2,
+                nailPos.x + 2, nailPos.y + 2, nailPos.z + 2);
+        attacker.level().getEntitiesOfClass(LivingEntity.class, blastBox,
+                e -> e != user && e.isAlive() && !e.isSpectator())
+                .forEach(e -> Attacks.trueDamage(6, JDamageSources.stand(attacker), e));
+
+        nail.discard();
+        wormholeNail = null;
+        nailActive = false;
+    }
+
+    private void fireNail(TuskAct3Entity attacker, LivingEntity user) {
+        NailProjectile nail = NailProjectile.wormholeFromTuskAct3(attacker);
+        if (nail == null) return;
+
+        JComponentPlatformUtils.getCooldowns(user).setCooldown(CooldownType.STAND_ULTIMATE, getCooldown());
+
+        Vec3 heightOffset = GravityChangerAPI.getEyeOffset(user).scale(0.75);
+        nail.setPos(user.position().add(heightOffset));
+        nail.shootFromRotation(user, user.getXRot(), user.getYRot(), 0.0F, 0.5F, 0.0F);
+
+        attacker.level().addFreshEntity(nail);
+        wormholeNail = new WeakReference<>(nail);
+        nailActive = true;
     }
 
     @Override

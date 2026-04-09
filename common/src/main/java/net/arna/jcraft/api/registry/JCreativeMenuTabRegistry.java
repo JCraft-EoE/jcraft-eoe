@@ -246,12 +246,12 @@ public interface JCreativeMenuTabRegistry {
                                 stack.getOrCreateTag().putInt("Sips", net.arna.jcraft.common.item.HerbalTeaItem.MAX_SIPS);
                                 entries.accept(stack);
                             }
+                            //placeholder item to grant achievement - remove later when upgrade obtainable in survival
                             entries.accept(JItemRegistry.UPGRADE_TUSK_1.get());
                             entries.accept(JItemRegistry.UPGRADE_TUSK_2.get());
-                            // D4C heart
-                            entries.accept(JItemRegistry.D4C_HEART.get());
                             // corpse parts
                             entries.accept(JItemRegistry.LEFT_ARM.get());
+                            entries.accept(JItemRegistry.HEART.get());
 /*                    for (int i = 16; i >= 0; i--) {
                         final ItemStack stack = new ItemStack(JItemRegistry.BLOOD_BOTTLE.get());
                         stack.getOrCreateTag().putFloat("Blood", i);

@@ -41,8 +41,8 @@ public final class NailShotAttack<A extends IAttacker<A, ?>> extends AbstractMov
         NailProjectile nail = null;
 
         if (attacker instanceof TuskAct1Entity tusk1) {
-            // Check if this is toenail shot based on maxRange (5 blocks or less)
-            if (maxRange <= 5.0f) {
+            // Toenail is any range < 20 (regular nail is exactly 20)
+            if (maxRange < 20.0f) {
                 nail = NailProjectile.fromTuskAct1Toenail(tusk1, maxRange);
             } else {
                 nail = NailProjectile.fromTuskAct1(tusk1, maxRange);
@@ -56,8 +56,7 @@ public final class NailShotAttack<A extends IAttacker<A, ?>> extends AbstractMov
         SoundEvent shotSound = maxRange <= 5.0f ? JSoundRegistry.TUSK_CHU.get() : JSoundRegistry.TUSK_SHOT.get();
         attacker.getBaseEntity().playSound(shotSound, 1.0f, 1.0f);
 
-        // Fire from player position at eye level
-        nail.setPos(user.position().add(0, user.getBbHeight() * 0.75, 0));
+        nail.setPos(user.position().add(0, user.getBbHeight() * 0.55, 0));
         nail.shootFromRotation(user, user.getXRot(), user.getYRot(), 0.0F, baseSpeed, 1.0F);
 
         attacker.getBaseEntity().level().addFreshEntity(nail);
