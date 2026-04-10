@@ -8,11 +8,15 @@ import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.MoveSet;
 import net.arna.jcraft.api.attack.MoveSetManager;
 import net.arna.jcraft.api.attack.enums.MoveClass;
+import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
-import net.arna.jcraft.common.attack.moves.shared.SimpleHitscanAttack;
+import net.arna.jcraft.common.attack.moves.aerosmith.BombDropAttack;
+import net.arna.jcraft.common.attack.moves.aerosmith.MuzzleHitscanAttack;
+import net.arna.jcraft.common.attack.moves.aerosmith.PatrolMove;
+import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
@@ -22,8 +26,22 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
             AerosmithEntity::registerDefaultMoves, AerosmithEntity.State.class);
 
     // TODO Arna balance this
-    public static final SimpleHitscanAttack<AerosmithEntity> BULLET = new SimpleHitscanAttack<AerosmithEntity>(
-            1, 1, 2, 0f, 1f, 0, 0f, 30f, 10f, 1/6f);
+    public static final MuzzleHitscanAttack<AerosmithEntity> BULLET = new MuzzleHitscanAttack<AerosmithEntity>(
+            1, 1, 2, 0f, 1f, 0, 0f, 30f, 10f, 1/6f, 0.05f)
+            .withSound(JSoundRegistry.BULLET_PENETRATE) // TODO record improve
+            .withHitSpark(JParticleType.HIT_SPARK_2) // TODO record improve
+            .withShootSpark(JParticleType.HIT_SPARK_1); // TODO record improve // TODO Planet why isn't this working?
+    // TODO Arna description
+
+    // TODO Arna balance this
+    public static final BombDropAttack<AerosmithEntity> BOMB_DROP = new BombDropAttack<>(
+            200, 1, 100, 0f, 30f);
+    // TODO Arna description
+
+    // TODO Arna balance this
+    public static final PatrolMove<AerosmithEntity> PATROL = new PatrolMove<>(
+            200, 1, 100, 0f, 30f, 10f, 0.5f);
+    // TODO Arna description
 
     public static final StandData DATA = StandData.builder()
             .info(StandInfo.builder()
@@ -33,8 +51,14 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
     public AerosmithEntity(final Level world) {
         super(JStandTypeRegistry.AEROSMITH.get(), world);
-        setYDistanceOffset(1.2f); // TODO for patrol mode 10f
+//        setYDistanceOffset(10f); // TODO for patrol mode
+        setYDistanceOffset(1.2f);
         setNoGravity(true);
+    }
+
+    @Override
+    public boolean remoteControllable() {
+        return false;
     }
 
     @Override
@@ -48,7 +72,9 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     }
 
     private static void registerDefaultMoves(final @NonNull MoveMap<AerosmithEntity, AerosmithEntity.State> moves) {
-        moves.registerImmediate(MoveClass.LIGHT, BULLET, AerosmithEntity.State.LIGHT);
+        moves.registerImmediate(MoveClass.LIGHT, BULLET, State.LIGHT);
+        moves.registerImmediate(MoveClass.HEAVY, BOMB_DROP, State.IDLE);
+        moves.registerImmediate(MoveClass.UTILITY, PATROL, State.IDLE);
     }
 
     public enum State implements StandAnimationState<AerosmithEntity> {

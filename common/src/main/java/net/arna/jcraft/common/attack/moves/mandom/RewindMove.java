@@ -9,8 +9,10 @@ import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.common.entity.stand.MandomEntity;
 import net.arna.jcraft.common.marker.BlockMarker;
 import net.arna.jcraft.common.marker.EntityMarker;
+import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
@@ -45,6 +47,10 @@ public final class RewindMove extends AbstractMove<RewindMove, MandomEntity> {
 
         final ServerLevel level = (ServerLevel) attacker.level();
 
+        if (user instanceof ServerPlayer serverPlayer) {
+            ShaderActivationPacket.sendMandomRewind(serverPlayer, 23, attacker.getAuraColor());
+        }
+
         final List<BlockMarker> blockMarkers = countdownMove.getTimeBlockMarkers();
         countdownMove.setResolving(true);
         for (final BlockMarker marker : blockMarkers) {
@@ -52,7 +58,9 @@ public final class RewindMove extends AbstractMove<RewindMove, MandomEntity> {
                 CountdownMove.BLOCK_MARKER_TYPE.load(marker, level);
             }
         }
+
         final List<EntityMarker> entityMarkers = countdownMove.getTimeEntityMarkers();
+
         for (final EntityMarker marker : entityMarkers) {
             if (countdownMove.getEntityMarkerType().shouldLoad(marker, level) && JUtils.nullSafeDistanceSqr(level.getEntity(marker.id()), attacker.getUser()) <= reach * reach) {
                 countdownMove.getEntityMarkerType().load(marker, level);

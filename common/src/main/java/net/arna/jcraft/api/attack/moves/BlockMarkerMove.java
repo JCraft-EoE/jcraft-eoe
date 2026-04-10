@@ -23,6 +23,8 @@ public interface BlockMarkerMove {
      */
     boolean addBlock(final @NonNull BlockPos pos, final @NonNull BlockState state, final @NonNull Level level);
 
+    boolean removeBlock(@NonNull BlockPos pos, @NonNull Level level);
+
     boolean isInRange(final @NonNull BlockPos pos, final @NonNull Level level);
 
     boolean isRecording();
@@ -30,5 +32,4 @@ public interface BlockMarkerMove {
     UUID getUuid();
 
     List<Boolean> getIteration();
-
 }

@@ -6,6 +6,7 @@ import net.arna.jcraft.common.entity.SheerHeartAttackEntity;
 import net.arna.jcraft.common.entity.stand.*;
 import net.arna.jcraft.common.entity.vehicle.AbstractGroundVehicleEntity;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 
 public interface IClientEntityHandler {
     void bombTrackerParticleTick(Entity entity, CommonBombTrackerComponent.BombData bombData);
@@ -23,4 +24,6 @@ public interface IClientEntityHandler {
     void displayMetallicaAura(MetallicaEntity metallica);
 
     void vehicleMovementTick(AbstractGroundVehicleEntity vehicle);
+
+    void spawnGroundedMoshParticles(AbstractArrow projectile);
 }

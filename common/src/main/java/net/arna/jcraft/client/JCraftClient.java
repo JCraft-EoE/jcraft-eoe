@@ -116,6 +116,7 @@ public class JCraftClient {
         ZaWarudoShaderHandler.INSTANCE.init();
         CrimsonShaderHandler.INSTANCE.init();
         EpitaphVignetteShaderHandler.INSTANCE.init();
+        MandomRewindShaderHandler.INSTANCE.init();
 
         // Renderer registration
         // JArmorRendererRegistry.registerArmorRenderers();
@@ -365,6 +366,7 @@ public class JCraftClient {
         ParticleProviderRegistry.register(JParticleTypeRegistry.PIXEL, PixelParticle.Factory::new);
         ParticleProviderRegistry.register(JParticleTypeRegistry.BLOCKSPARK, provider -> new BlocksparkParticle.Factory(provider, 0.15f));
         ParticleProviderRegistry.register(JParticleTypeRegistry.GO, GoParticle.Factory::new);
+        ParticleProviderRegistry.register(JParticleTypeRegistry.DO, GoParticle.Factory::new);
         ParticleProviderRegistry.register(JParticleTypeRegistry.AURA_ARC, AuraArcParticle.Factory::new);
         ParticleProviderRegistry.register(JParticleTypeRegistry.AURA_BLOB, AuraBlobParticle.Factory::new);
         ParticleProviderRegistry.register(JParticleTypeRegistry.INVERSION, InversionParticle.Factory::new);
@@ -376,6 +378,11 @@ public class JCraftClient {
         ParticleProviderRegistry.register(JParticleTypeRegistry.NAIL_TRAIL.get(), NailTrailParticle.Factory::new);
         DamageIndicatorManager.setDamageNumberParticle(JParticleTypeRegistry.DAMAGE_NUMBER.get());
         ParticleProviderRegistry.register(JParticleTypeRegistry.HAMON_SPARK, provider -> new HitsparkParticle.Factory(provider, 0.2f, 6));
+        ParticleProviderRegistry.register(JParticleTypeRegistry.METALLICA_MOSH_1, MoshParticle.Factory::new);
+        ParticleProviderRegistry.register(JParticleTypeRegistry.METALLICA_MOSH_2, MoshParticle.Factory::new);
+        ParticleProviderRegistry.register(JParticleTypeRegistry.METALLICA_MOSH_3, MoshParticle.Factory::new);
+        ParticleProviderRegistry.register(JParticleTypeRegistry.METALLICA_MOSH_4, MoshParticle.Factory::new);
+        ParticleProviderRegistry.register(JParticleTypeRegistry.METALLICA_MOSH_5, MoshParticle.Factory::new);
     }
 
     @Getter

@@ -23,6 +23,7 @@ import net.arna.jcraft.common.attack.moves.whitesnake.ChargedSpewAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.GiveStandAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.MeltYourHeartAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.PoisonSpewAttack;
+import net.arna.jcraft.common.attack.moves.whitesnake.StealStandAttack;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -136,7 +137,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
                     Component.literal("Give Stand Disk"),
                     Component.literal("gives a single hit target a stand, provided they do not have one already, from a disk in the user's off hand")
             );
-    public static final SimpleAttack<WhiteSnakeEntity> STAND_DISC = new SimpleAttack<WhiteSnakeEntity>(480,
+    public static final StealStandAttack STAND_DISC = new StealStandAttack(480,
             22, 34, 1, 8f, 20, 2, 0.5f, 0)
             .withSound(JSoundRegistry.WS_STAND_DISC)
             .withImpactSound(JSoundRegistry.IMPACT_2)

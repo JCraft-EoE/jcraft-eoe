@@ -13,13 +13,11 @@ import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
 import net.arna.jcraft.common.argumenttype.StandArgumentType;
 import net.arna.jcraft.common.config.JServerConfig;
-import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -104,10 +102,6 @@ public class SetStandCommand {
                 }
                 else { // i.e. rng != null
                     standData.setType(StandTypeUtil.getRandom(rng));
-                }
-
-                if (livingEntity instanceof ServerPlayer player) {
-                    JUtils.maySendStandAboutInfo(player);
                 }
 
                 livingEntity.unRide();

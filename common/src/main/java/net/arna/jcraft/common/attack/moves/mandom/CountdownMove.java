@@ -33,6 +33,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3f;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -146,6 +147,24 @@ public final class CountdownMove extends AbstractMove<CountdownMove, MandomEntit
     }
 
     @Override
+    public boolean removeBlock(@NonNull final BlockPos pos, @NonNull final Level level) {
+        if (!countdownActive || !isInRange(pos, level) || resolving) {
+            return false;
+        }
+        BlockMarker match = null;
+        for (final BlockMarker timeBlockMarker : timeBlockMarkers) {
+            if (timeBlockMarker.pos().equals(pos)) {
+                match = timeBlockMarker;
+                break;
+            }
+        }
+        if (match != null) {
+            timeBlockMarkers.remove(match);
+        }
+        return match != null;
+    }
+
+    @Override
     public @NonNull Set<LivingEntity> perform(final MandomEntity attacker, final LivingEntity user) {
         lastLevel = attacker.level();
         if (isRecording()) {
@@ -209,6 +228,10 @@ public final class CountdownMove extends AbstractMove<CountdownMove, MandomEntit
             buf.writeDouble(position.x());
             buf.writeDouble(position.y());
             buf.writeDouble(position.z());
+            final Vector3f color = attacker.getAuraColor();
+            buf.writeFloat(color.x());
+            buf.writeFloat(color.y());
+            buf.writeFloat(color.z());
 
             NetworkManager.sendToPlayer(serverPlayer, JPacketRegistry.S2C_MANDOM_DATA, buf);
         }

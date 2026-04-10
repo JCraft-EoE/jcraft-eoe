@@ -3,11 +3,7 @@ package net.arna.jcraft.datagen.providers.data;
 import dev.architectury.registry.registries.RegistrySupplier;
 import lombok.SneakyThrows;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.api.registry.JBlockRegistry;
-import net.arna.jcraft.api.registry.JEntityTypeRegistry;
-import net.arna.jcraft.api.registry.JItemRegistry;
-import net.arna.jcraft.api.registry.JStandTypeRegistry;
-import net.arna.jcraft.api.registry.JTagRegistry;
+import net.arna.jcraft.api.registry.*;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
 import net.arna.jcraft.common.gravity.util.EntityTags;
@@ -19,17 +15,15 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.EntityTypeTags;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.TagBuilder;
-import net.minecraft.tags.TagKey;
+import net.minecraft.tags.*;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 public class JTagProviders {
@@ -515,6 +509,12 @@ public class JTagProviders {
             discs.add(JItemRegistry.DISC.get());
             discs.add(JItemRegistry.STAND_DISC.get());
             discs.add(JItemRegistry.SPEC_DISC.get());
+
+            final var spurs = getOrCreateTagBuilder(JTagRegistry.BOOTS_WITH_THE_SPURS);
+            addAll(spurs, JItemRegistry.GYRO_BOOTS.getAll());
+            addAll(spurs, JItemRegistry.MOUNTAIN_TIM_BOOTS.getAll());
+            addAll(spurs, JItemRegistry.DIEGO_BOOTS.getAll());
+            addAll(spurs, JItemRegistry.COWBOY_GUNBELT_SPURS.getAll());
         }
 
         @SneakyThrows
@@ -531,6 +531,11 @@ public class JTagProviders {
                     }
                 }
             }
+        }
+
+        private static void addAll(final FabricTagBuilder tagBuilder,
+                                   final Collection<? extends RegistrySupplier<? extends Item>> collection) {
+            collection.forEach(i -> tagBuilder.add(i.get()));
         }
     }
 
@@ -659,6 +664,9 @@ public class JTagProviders {
 
             final var noAIStandUsers = getOrCreateTagBuilder(JTagRegistry.NO_STAND_USER_AI);
             noAIStandUsers.add(JEntityTypeRegistry.TRAINING_DUMMY.getId());
+
+            final var cannotTakeStandFrom = getOrCreateTagBuilder(JTagRegistry.CANNOT_TAKE_STAND_FROM);
+            cannotTakeStandFrom.add(JEntityTypeRegistry.PLAYER_CLONE.getId());
 
             final var gravityForbiddenEntities = getOrCreateTagBuilder(EntityTags.FORBIDDEN_ENTITIES);
             gravityForbiddenEntities.add(EntityType.ITEM_FRAME);

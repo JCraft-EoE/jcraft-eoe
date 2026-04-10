@@ -81,11 +81,11 @@ public class JServerConfig {
     public static final BooleanOption ROLLER_DESTROYING = new BooleanOption("rollerDestroying", INTERACTION, true);
     public static final BooleanOption PLAYER_VAMPS_DIE_TO_HAMON = new BooleanOption("playerVampsDieToHamon", INTERACTION, false);
     public static final BooleanOption MANDOM_AFFECTS_BLOCKS = new BooleanOption("mandomAffectsBlocks", INTERACTION, true);
+    public static final BooleanOption WS_STEAL_STANDS_FROM_PLAYERS = new BooleanOption("wsStealStandsFromPlayers", INTERACTION, false);
     /*
     public static final BooleanOption UNIVERSAL_ABILITIES = new BooleanOption("universalAbilities", INTERACTION, true);
     public static final BooleanOption STAND_GRIEFING = new BooleanOption("standGriefing", INTERACTION, true);
     public static final BooleanOption SPTW_IGNITE_CAMPFIRES = new BooleanOption("sptwIgniteCampfires", INTERACTION, true);
-    public static final BooleanOption WS_STEAL_STANDS = new BooleanOption("wsStealStands", INTERACTION, false);
     public static final IntOption SHA_SEARCH_RADIUS = new IntOption("shaSearchRadius", INTERACTION, 10, 3, 32);
     public static final BooleanOption MIH_ACCELERATE_TICKS = new BooleanOption("mihAccelerateTicks", INTERACTION, true);
     public static final BooleanOption USE_FOOLISH_SAND = new BooleanOption("useFoolishSand", INTERACTION, true);

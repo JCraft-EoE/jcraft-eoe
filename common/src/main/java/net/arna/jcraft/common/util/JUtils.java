@@ -9,7 +9,6 @@ import net.arna.jcraft.api.AttackData;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JSoundRegistry;
-import net.arna.jcraft.api.registry.JStatRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.spec.JSpec;
@@ -48,7 +47,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerPlayerConnection;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.stats.Stats;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -924,8 +922,14 @@ public final class JUtils {
     }
 
     public static void maySendStandAboutInfo(final ServerPlayer player) {
-        if (player.getStats().getValue(Stats.CUSTOM.get(JStatRegistry.STAND_SUMMONED.get())) == 0) {
+        if (!hasAdvancement(player, JCraft.id("obtain_any_stand"))) {
             player.sendSystemMessage(Component.translatable("info.jcraft.first_stand"));
+        }
+    }
+
+    public static void maySendSpecAboutInfo(final ServerPlayer player) {
+        if (!hasAdvancement(player, JCraft.id("obtain_any_spec"))) {
+            player.sendSystemMessage(Component.translatable("info.jcraft.first_spec"));
         }
     }
 }

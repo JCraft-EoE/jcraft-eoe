@@ -5,6 +5,9 @@ import dev.architectury.registry.registries.RegistrySupplier;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.JRegistries;
 import net.arna.jcraft.api.attack.MoveType;
+import net.arna.jcraft.common.attack.moves.aerosmith.BombDropAttack;
+import net.arna.jcraft.common.attack.moves.aerosmith.MuzzleHitscanAttack;
+import net.arna.jcraft.common.attack.moves.aerosmith.PatrolMove;
 import net.arna.jcraft.common.attack.moves.anubis.*;
 import net.arna.jcraft.common.attack.moves.cmoon.*;
 import net.arna.jcraft.common.attack.moves.cream.*;
@@ -52,6 +55,7 @@ import net.arna.jcraft.common.attack.moves.whitesnake.ChargedSpewAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.GiveStandAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.MeltYourHeartAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.PoisonSpewAttack;
+import net.arna.jcraft.common.attack.moves.whitesnake.StealStandAttack;
 
 public interface JMoveTypeRegistry {
     DeferredRegister<MoveType<?>> MOVE_TYPE_REGISTRY = DeferredRegister.create(JCraft.MOD_ID, JRegistries.MOVE_TYPE_REGISTRY_KEY);
@@ -265,9 +269,14 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> WHITESNAKE_GIVE_STAND_ATTACK = register("whitesnake_give_stand_attack", GiveStandAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> WHITESNAKE_MELT_YOUR_HEART_ATTACK = register("whitesnake_melt_your_heart_attack", MeltYourHeartAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> WHITESNAKE_POISON_SPEW_ATTACK = register("whitesnake_poison_spew_attack", PoisonSpewAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> WHITESNAKE_STEAL_STAND_ATTACK = register("whitesnake_steal_stand_attack", StealStandAttack.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> MANDOM_COUNTDOWN_MOVE = register("mandom_countdown_move", CountdownMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> MANDOM_REWIND_MOVE = register("mandom_rewind_move", RewindMove.Type.INSTANCE);
+
+    RegistrySupplier<MoveType<?>> AEROSMITH_BULLET_ATTACK = register("aerosmith_bullet_attack", MuzzleHitscanAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> AEROSMITH_BOMB_DROP_ATTACK = register("aerosmith_bomb_drop_attack", BombDropAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> AEROSMITH_PATROL_MOVE = register("aerosmith_patrol_move", PatrolMove.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> TUSK_NAIL_SHOT = register("tusk_nail_shot", NailShotAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> TUSK_NAIL_WHEEL = register("tusk_nail_wheel", NailWheelAttack.Type.INSTANCE);

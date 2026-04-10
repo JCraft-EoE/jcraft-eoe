@@ -21,6 +21,7 @@ public interface JEventsRegistry {
         TickEvent.SERVER_LEVEL_POST.register(JServerEvents::serverLevelPostTick);
         JBlockEvents.BEFORE_SET.register(JServerEvents::beforeBlockSet);
         JBlockEvents.BEFORE_BLOCK_LOOT.register(JServerEvents::processBlockLoot);
+        JBlockEvents.AFTER_EXPLOSION.register(JServerEvents::afterExplosion);
 
         // Disable item/block usage while stunned
         InteractionEvent.RIGHT_CLICK_ITEM.register(JServerEvents::rightClick);

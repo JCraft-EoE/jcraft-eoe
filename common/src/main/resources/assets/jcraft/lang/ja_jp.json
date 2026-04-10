@@ -744,7 +744,6 @@
   "jcraft.serverconfig.option.universalAbilities": "全般の能力",
   "jcraft.serverconfig.option.useFoolishSand": "愚かなる砂の使用",
   "jcraft.serverconfig.option.vsStandlessDamageMultiplier": "スタンド不所持者に対するダメージの倍数",
-  "jcraft.serverconfig.option.wsStealStands": "ホワイトスネイクのスタンドの盗み",
   "jcraft.sheathedanubis.blockdesc": "§eしゃがみ + 右クリック§9で§eガード§9を使用できる。",
   "jcraft.sheathedanubis.desc": "§e納める§9ことができる",
   "jcraft.sptw.crm1": "グラウンドスラム",
