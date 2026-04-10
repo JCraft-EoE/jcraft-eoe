@@ -32,6 +32,8 @@ public class JClientConfig implements ConfigData {
     private boolean comboCounter = true;
     private boolean dynamicFirstPersonStandOpacity = true;
     private float firstPersonStandOpacityMult = 1.0f;
+    private boolean showStandUserWarningPlayer = true;
+    private boolean showStandUserWarningMob = true;
 
     public static void load() {
         instance = AutoConfig.getConfigHolder(JClientConfig.class).getConfig();

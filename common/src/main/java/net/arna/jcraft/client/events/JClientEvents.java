@@ -71,6 +71,8 @@ public class JClientEvents {
     // Tracks the game-time tick for each stand user (by UUID)
     // the 100-block menacing radius. Cleared when they leave range.
     private static final Map<UUID, Integer> menacingEntryTimes = new HashMap<>();
+    // tracks which entities were last seen, cleared after a certain time only
+    private static final Map<UUID, Integer> menacingCheckTimes = new HashMap<>();
 
     public static void onLast(final PoseStack matrixStack, final Vec3 cameraPos) {
         matrixStack.pushPose();
@@ -311,7 +313,7 @@ public class JClientEvents {
         }
         TrackedKeyBinding.resetValues(client.screen != null);
 
-        // Menacing (ゴ/ド) particles — 10-second burst when a stand user enters 100-block radius.
+        // Menacing (ゴ/ド) particles — 4-second burst when a stand user enters 100-block radius.
         // Works regardless of whether the local player or target has their stand summoned.
         tickMenacing(client, player);
 
@@ -321,7 +323,9 @@ public class JClientEvents {
 
     private static void tickMenacing(final Minecraft client, final LocalPlayer player) {
         final ClientLevel level = client.level;
-        if (level == null) {
+        final boolean playerWarning = JClientConfig.getInstance().isShowStandUserWarningPlayer();
+        final boolean mobWarning = JClientConfig.getInstance().isShowStandUserWarningMob();
+        if (level == null || (!playerWarning && !mobWarning)) {
             return;
         }
 
@@ -329,11 +333,13 @@ public class JClientEvents {
         final StandType type = JComponentPlatformUtils.getStandComponent(player).getType();
         if (StandTypeUtil.isNone(type)) {
             menacingEntryTimes.clear();
+            menacingCheckTimes.clear();
             return;
         }
 
         if (!JClientUtils.shouldRenderStands()) {
             menacingEntryTimes.clear();
+            menacingCheckTimes.clear();
             return;
         }
 
@@ -343,35 +349,41 @@ public class JClientEvents {
         final Set<UUID> inRangeIds = new HashSet<>();
 
         // find all stand users nearby, for each do
-        for (final Player p : level.getEntitiesOfClass(Player.class, searchBox,
-                p -> {
-                    var pType = JComponentPlatformUtils.getStandComponent(p).getType();
-                    return p != player && !p.isSpectator() && !p.isCreative()
-                        && p.distanceToSqr(player) <= radiusSq
-                        && !p.isInvisible() && !JClientUtils.shouldNotRender(p)
-                        && !StandTypeUtil.isNone(pType);
-                }
-        )) {
-            tickMenacing(p, inRangeIds, level, JParticleTypeRegistry.DO);
+        if (playerWarning) {
+            for (final Player p : level.getEntitiesOfClass(Player.class, searchBox,
+                    p -> {
+                        var pType = JComponentPlatformUtils.getStandComponent(p).getType();
+                        return p != player && !p.isSpectator() && !p.isCreative()
+                                && p.distanceToSqr(player) <= radiusSq
+                                && !p.isInvisible() && !JClientUtils.shouldNotRender(p)
+                                && !StandTypeUtil.isNone(pType);
+                    }
+            )) {
+                tickMenacing(p, inRangeIds, level, JParticleTypeRegistry.DO);
+            }
         }
 
         // get all other stand users via their stands
-        for (final StandEntity<?, ?> stand : level.getEntitiesOfClass(
-                StandEntity.class, searchBox,
-                stand -> stand.hasUser() && stand.distanceToSqr(player) <= radiusSq && !stand.isInvisible())
-        ) {
-            final LivingEntity user = stand.getUserOrThrow();
-            if (user instanceof Player) { // handled before
-                continue;
+        if (mobWarning) {
+            for (final StandEntity<?, ?> stand : level.getEntitiesOfClass(
+                    StandEntity.class, searchBox,
+                    stand -> stand.hasUser() && stand.distanceToSqr(player) <= radiusSq && !stand.isInvisible())
+            ) {
+                final LivingEntity user = stand.getUserOrThrow();
+                if (user instanceof Player) { // handled before
+                    continue;
+                }
+                if (JClientUtils.shouldNotRender(user)) {
+                    continue;
+                }
+                tickMenacing(user, inRangeIds, level, JParticleTypeRegistry.GO);
             }
-            if (JClientUtils.shouldNotRender(user)) {
-                continue;
-            }
-            tickMenacing(user, inRangeIds, level, JParticleTypeRegistry.GO);
         }
 
         // Remove entries for stand users who left range
         menacingEntryTimes.keySet().removeIf(id -> !inRangeIds.contains(id));
+        // remove entries for stand users who have been checked for a long time
+        menacingCheckTimes.entrySet().removeIf(entry -> entry.getValue() > 600);
     }
 
     private static void tickMenacing(final LivingEntity living, final Set<UUID> inRangeIds, final ClientLevel level, final RegistrySupplier<SimpleParticleType> particle) {
@@ -379,7 +391,9 @@ public class JClientEvents {
         inRangeIds.add(uuid);
         menacingEntryTimes.putIfAbsent(uuid, -1);
         menacingEntryTimes.put(uuid, menacingEntryTimes.get(uuid) + 1);
-        if (menacingEntryTimes.get(uuid) >= 80) {
+        menacingCheckTimes.putIfAbsent(uuid, -1);
+        menacingCheckTimes.put(uuid, menacingCheckTimes.get(uuid) + 1);
+        if (menacingEntryTimes.get(uuid) >= 80 || menacingCheckTimes.get(uuid) >= 80) {
             return;
         }
         final RandomSource rng = level.getRandom();

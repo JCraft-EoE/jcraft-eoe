@@ -922,7 +922,7 @@ public final class JUtils {
     }
 
     public static void maySendStandAboutInfo(final ServerPlayer player) {
-        if (!hasAdvancement(player, JCraft.id("obtain_any_stand"))) {
+        if (!hasAdvancement(player, JCraft.id("obtain_stand"))) {
             player.sendSystemMessage(Component.translatable("info.jcraft.first_stand"));
         }
     }

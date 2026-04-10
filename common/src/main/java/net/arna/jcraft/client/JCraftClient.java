@@ -215,7 +215,7 @@ public class JCraftClient {
         initCosplay(JItemRegistry.RED_HAT, ArmorRenderer.simple("red_hat"));
         initCosplay(JItemRegistry.RINGO_OUTFIT, RingoOutfitRenderer::new);
         initCosplay(JItemRegistry.RINGO_BOOTS, RingoOutfitRenderer::new);
-        initCosplay(JItemRegistry.RISOTTO_JACKET, RisottoCapRenderer::new);
+        initCosplay(JItemRegistry.RISOTTO_CAP, RisottoCapRenderer::new);
         initCosplay(JItemRegistry.RISOTTO_JACKET, ArmorRenderer.simple("risottotop"));
         initCosplay(JItemRegistry.RISOTTO_PANTS, RisottoBottomRenderer::new);
         initCosplay(JItemRegistry.RISOTTO_BOOTS, RisottoBottomRenderer::new);

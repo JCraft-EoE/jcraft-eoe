@@ -28,7 +28,7 @@ public class BombDropAttack<A extends StandEntity<? extends A, ?>> extends Abstr
     private float range;
     @Setter
     private Vec3 dropLocation;
-    private int underway;
+    private float speed;
     private boolean returning;
 
     public BombDropAttack(final int cooldown, final int windup, final int duration, final float moveDistance, final float range) {
@@ -51,41 +51,34 @@ public class BombDropAttack<A extends StandEntity<? extends A, ?>> extends Abstr
         final Vec3 rotVec = user.getLookAngle();
         final HitResult goal = JUtils.raycastAll(user, userEyePos, userEyePos.add(rotVec.scale(getRange())), ClipContext.Fluid.NONE, EntitySelector.LIVING_ENTITY_STILL_ALIVE.and(EntitySelector.NO_SPECTATORS));
         setDropLocation(goal.getLocation().add(0d, 10d, 0d));
+        speed = (float)dropLocation.subtract(attacker.position()).scale(2d / getDuration()).length();
         attacker.setRemote(true);
-        attacker.setDeltaMovement(dropLocation.subtract(attacker.position()).scale(2d / getDuration()));
+        attacker.setDeltaMovement(dropLocation.subtract(attacker.position()).normalize().scale(speed));
         return Set.of();
     }
 
     @Override
     public void tick(final A attacker) {
         if (dropLocation != null) {
-            if (attacker.position().distanceTo(dropLocation) <= 0.5) {
+            if (attacker.position().distanceTo(dropLocation) <= 1) {
                 // TODO play the animation
                 dropBomb(attacker);
                 returning = true;
-                underway = 0;
                 dropLocation = null;
             }
             else {
-                underway++;
-                if (underway < getDuration()) {
-                    attacker.setDeltaMovement(dropLocation.subtract(attacker.position()).scale(2d / (getDuration() - underway)));
-                }
+                attacker.setDeltaMovement(dropLocation.subtract(attacker.position()).normalize().scale(speed));
             }
         }
         if (returning && attacker.hasUser()) {
             final LivingEntity user = attacker.getUserOrThrow();
-            if (attacker.position().distanceTo(user.position()) <= 0.5) {
+            if (attacker.position().distanceTo(user.getEyePosition()) <= 1) {
                 attacker.setDeltaMovement(Vec3.ZERO);
                 attacker.setRemote(false);
                 returning = false;
-                underway = 0;
             }
             else {
-                underway++;
-                if (underway < getDuration()) {
-                    attacker.setDeltaMovement(user.position().subtract(attacker.position()).scale(2d / (getDuration() - underway)));
-                }
+                attacker.setDeltaMovement(user.getEyePosition().subtract(attacker.position()).normalize().scale(speed));
             }
         }
     }
@@ -94,6 +87,11 @@ public class BombDropAttack<A extends StandEntity<? extends A, ?>> extends Abstr
         AerobombProjectile bomb = new AerobombProjectile(attacker.level());
         bomb.setOwner(attacker.hasUser() ? attacker.getUserOrThrow() : attacker);
         bomb.setPos(attacker.position().subtract(0d, 1d, 0d));
+        bomb.setXRot(attacker.getXRot());
+        bomb.xRotO = attacker.xRotO;
+        bomb.setYRot(attacker.getYRot());
+        bomb.yRotO = attacker.yRotO;
+        bomb.setDeltaMovement(attacker.getDeltaMovement().normalize().scale(1d/16));
         attacker.level().addFreshEntity(bomb);
     }
 

@@ -667,6 +667,7 @@ public class JTagProviders {
 
             final var cannotTakeStandFrom = getOrCreateTagBuilder(JTagRegistry.CANNOT_TAKE_STAND_FROM);
             cannotTakeStandFrom.add(JEntityTypeRegistry.PLAYER_CLONE.getId());
+            cannotTakeStandFrom.add(JEntityTypeRegistry.AYA_TSUJI.getId());
 
             final var gravityForbiddenEntities = getOrCreateTagBuilder(EntityTags.FORBIDDEN_ENTITIES);
             gravityForbiddenEntities.add(EntityType.ITEM_FRAME);
