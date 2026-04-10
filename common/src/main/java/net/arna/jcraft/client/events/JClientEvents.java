@@ -418,11 +418,15 @@ public class JClientEvents {
         if (!player.isCrouching()) entities.add(player);
 
         for (Entity entity : entities) {
-            if (!entity.onGround()) continue;
+            if (!entity.onGround() || !level.getBlockState(entity.blockPosition()).getFluidState().isEmpty()) {
+                continue;
+            }
             Jangler jangler = (Jangler) entity;
 
             for (ItemStack armorSlot : entity.getArmorSlots()) {
-                if (!armorSlot.is(JTagRegistry.BOOTS_WITH_THE_SPURS)) continue;
+                if (!armorSlot.is(JTagRegistry.BOOTS_WITH_THE_SPURS)) {
+                    continue;
+                }
 
                 double speedMin    = 0.02,  speedMax    = 0.10;
                 double intervalMin = 4,    intervalMax = 12;
@@ -438,7 +442,9 @@ public class JClientEvents {
                 int interval = (int) Mth.lerp(delta, intervalMin, intervalMax);
 
                 // Play jangle once every few tick, depending on their speed
-                if (entity.tickCount - jangler.jcraft$getLastJangleAge() < interval) continue;
+                if (entity.tickCount - jangler.jcraft$getLastJangleAge() < interval) {
+                    continue;
+                }
 
                 // We found an armor piece that has spurs for an entity that is moving,
                 // and we haven't played this sound in 5 ticks, play jangle sound.
