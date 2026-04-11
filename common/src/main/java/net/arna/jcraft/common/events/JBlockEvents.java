@@ -7,6 +7,7 @@ import lombok.NonNull;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -29,7 +30,19 @@ public interface JBlockEvents<T> {
 
     Event<BeforeBlockLoot> BEFORE_BLOCK_LOOT = EventFactory.createEventResult();
 
+    /**
+     * Invoked before a block is broken (doesn't work on explosions).
+     */
     interface BeforeBlockLoot {
         EventResult processBlockLoot(final @NonNull List<ItemStack> loot, final @NonNull BlockState state, final @NonNull ServerLevel level, final @NonNull BlockPos pos, final @Nullable BlockEntity blockEntity);
+    }
+
+    Event<AfterExplosion> AFTER_EXPLOSION = EventFactory.createEventResult();
+
+    /**
+     * Invoked directly after a block has been exploded.
+     */
+    interface AfterExplosion {
+        EventResult exploded(final @NonNull Level level, final @NonNull BlockPos pos, final @NonNull Explosion explosion);
     }
 }

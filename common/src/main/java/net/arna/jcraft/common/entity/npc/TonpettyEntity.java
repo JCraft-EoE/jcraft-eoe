@@ -10,11 +10,8 @@ import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.spec.HamonSpecUser;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
-import net.minecraft.advancements.Advancement;
-import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -38,7 +35,6 @@ public class TonpettyEntity extends HamonSpecUser {
 
     public TonpettyEntity(final Level level) {
         super(JEntityTypeRegistry.TONPETTY.get(), level);
-        setPersistenceRequired();
     }
 
     @Override

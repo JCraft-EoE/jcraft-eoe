@@ -525,7 +525,7 @@ public class JRecipeProvider extends FabricRecipeProvider {
                 "LXL",
                 "LLL"
         },
-                new SymbolItem('L', Items.LEATHER),
+                new SymbolItem('L', Items.RED_CARPET),
                 new SymbolItem('R', Items.RED_WOOL));
         generateCosplayRecipes(JItemRegistry.DIO_PANTS, exporter, new String[] {
                 "GGG",

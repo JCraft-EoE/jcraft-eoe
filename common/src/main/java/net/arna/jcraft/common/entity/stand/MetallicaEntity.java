@@ -370,6 +370,13 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
         return super.getAuraColor();
     }
 
+    public Vector3f getMoshColor() {
+        if (getSkin() == 0) {
+            return new Vector3f(1.0f, 1.0f, 1.0f);
+        }
+        return getAuraColor();
+    }
+
     @Override
     public void setUser(@Nullable LivingEntity user) {
         super.setUser(user);

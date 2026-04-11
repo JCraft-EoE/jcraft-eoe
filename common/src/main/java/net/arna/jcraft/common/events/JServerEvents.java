@@ -674,4 +674,9 @@ public class JServerEvents {
         }
         return EventResult.pass();
     }
+
+    public static EventResult afterExplosion(final @NonNull Level level, final @NonNull BlockPos pos, final @NonNull Explosion explosion) {
+        BlockMarkerMoves.forEach(move -> move.removeBlock(pos, level));
+        return EventResult.pass();
+    }
 }

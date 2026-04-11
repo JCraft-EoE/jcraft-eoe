@@ -8,6 +8,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 public class ShaderActivationPacket {
 
@@ -31,10 +32,25 @@ public class ShaderActivationPacket {
         NetworkManager.sendToPlayer(serverPlayerEntity, JPacketRegistry.S2C_SHADER_ACTIVATION, buf);
     }
 
+    /**
+     * Send a MANDOM_REWIND shader packet with the attacker's aura color.
+     */
+    public static void sendMandomRewind(ServerPlayer target, int duration, Vector3f color) {
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+        buf.writeInt(0); // tickDelay
+        buf.writeInt(duration);
+        buf.writeUtf(Type.MANDOM_REWIND.getSerializedName());
+        buf.writeFloat(color.x());
+        buf.writeFloat(color.y());
+        buf.writeFloat(color.z());
+        NetworkManager.sendToPlayer(target, JPacketRegistry.S2C_SHADER_ACTIVATION, buf);
+    }
+
     public enum Type implements StringRepresentable {
         NONE("none"),
         ZA_WARUDO("za_warudo"),
-        CRIMSON("crimson");
+        CRIMSON("crimson"),
+        MANDOM_REWIND("mandom_rewind");
 
         private final String name;
 

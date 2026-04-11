@@ -1342,6 +1342,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             case IDLE -> {}
             case APPROACH -> {
                 final PathNavigation navigation = mob.getNavigation();
+                if (!target.isAlive()) {
+                    navigation.stop();
+                    break;
+                }
                 navigation.moveTo(target, 1.0);
 
                 lookControl.setLookAt(target);
@@ -1355,6 +1359,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             }
             case PRESSURE, COMBOING -> {
                 final PathNavigation navigation = mob.getNavigation();
+                if (!target.isAlive()) {
+                    navigation.stop();
+                    break;
+                }
                 Path path = navigation.createPath(target, 2);
                 if (path != null) navigation.moveTo(path, 1.0);
 

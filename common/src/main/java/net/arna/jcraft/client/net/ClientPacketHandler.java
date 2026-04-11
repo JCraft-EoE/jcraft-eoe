@@ -21,6 +21,7 @@ import net.arna.jcraft.client.renderer.effects.AttackHitboxEffectRenderer;
 import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer;
 import net.arna.jcraft.client.rendering.DamageIndicatorManager;
 import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
+import net.arna.jcraft.client.rendering.handler.MandomRewindShaderHandler;
 import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
 import net.arna.jcraft.client.util.JClientUtils;
 import net.arna.jcraft.common.config.ConfigOption;
@@ -475,6 +476,9 @@ public class ClientPacketHandler {
     public static void handleMandomData(final @NonNull Minecraft client, final FriendlyByteBuf buf) {
         final int entID = buf.readInt();
         final Vec3 originalPos = new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
+        final float r = buf.readFloat();
+        final float g = buf.readFloat();
+        final float b = buf.readFloat();
 
         client.execute(() -> {
             final Entity ent = client.level.getEntity(entID);
@@ -485,7 +489,7 @@ public class ClientPacketHandler {
             final Vec3 originalToCurrent = currentPos.subtract(originalPos).normalize();
             for (double h = 0; h < currentPos.distanceTo(originalPos); ++h) {
                 client.level.addParticle(
-                        new DustParticleOptions(new Vector3f(1.0f, 0.2f, 0.6f), 1.0f), // Pink color
+                        new DustParticleOptions(new Vector3f(r, g, b), 1.0f),
                         originalPos.x + originalToCurrent.x * h,
                         originalPos.y + originalToCurrent.y * h,
                         originalPos.z + originalToCurrent.z * h,
@@ -532,6 +536,17 @@ public class ClientPacketHandler {
 
 
             });
+            case MANDOM_REWIND -> {
+                final float r = buf.readFloat();
+                final float g = buf.readFloat();
+                final float b = buf.readFloat();
+                client.execute(() -> {
+                    MandomRewindShaderHandler mandomHandler = MandomRewindShaderHandler.INSTANCE;
+                    mandomHandler.duration = duration;
+                    mandomHandler.shaderColor = new Vector3f(r, g, b);
+                    mandomHandler.shouldRender = true;
+                });
+            }
         }
     }
 

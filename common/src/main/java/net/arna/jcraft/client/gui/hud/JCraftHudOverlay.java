@@ -2,6 +2,7 @@ package net.arna.jcraft.client.gui.hud;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.entity.stand.AerosmithEntity;
 import net.arna.jcraft.common.entity.stand.MadeInHeavenEntity;
 import net.arna.jcraft.common.entity.stand.MetallicaEntity;
 import net.arna.jcraft.api.stand.StandEntity;
@@ -47,6 +48,8 @@ public class JCraftHudOverlay {
             HAMON_GAUGE = new Gauge(0.8f, 0.5f, 0.2f, (int) HamonSpec.MAX_CHARGE),
             IRON_GAUGE = new Gauge(0.7f, 0.7f, 0.9f, (int) MetallicaEntity.IRON_MAX),
             NAIL_GAUGE = new Gauge(0.4f, 0.6f, 1.0f, 10);
+            IRON_GAUGE = new Gauge(0.7f, 0.7f, 0.9f, (int) MetallicaEntity.IRON_MAX),
+            OVERHEAT_GAUGE = new Gauge(0.8f, 0.1f, 0.2f, (int) AerosmithEntity.OVERHEAT_MAX);
 
     public static void render(final GuiGraphics ctx) {
         final Minecraft client = Minecraft.getInstance();
@@ -125,6 +128,9 @@ public class JCraftHudOverlay {
                 float nails = tusk3.getNails();
                 String nailText = formatNails(nails);
                 NAIL_GAUGE.renderWithText(ctx, gaugeX, height + gaugeHeightOffset, (int) nails, nailText);
+            }
+            if (stand instanceof AerosmithEntity aerosmith) {
+                OVERHEAT_GAUGE.render(ctx, gaugeX, height + gaugeHeightOffset, (int) aerosmith.getOverheat());
             }
         }
 

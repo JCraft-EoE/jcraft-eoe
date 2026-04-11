@@ -2,14 +2,12 @@ package net.arna.jcraft.common.item;
 
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.api.registry.JStatRegistry;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.projectile.StandArrowEntity;
 import net.arna.jcraft.api.stand.StandEntity;
-import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -93,7 +91,6 @@ public class StandArrowItem extends ArrowItem {
                 oldStand.desummon(); // Does any extra desummoning logic, like disabling flight
                 oldStand.discard(); // Actually removes the stand
             }
-            JUtils.maySendStandAboutInfo((ServerPlayer)user);
 
             // Roll for stand (can't roll the same one twice)
             final RandomSource random = RandomSource.create();

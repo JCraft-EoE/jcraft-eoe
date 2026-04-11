@@ -91,6 +91,7 @@ public class JCraftForgeClient {
         event.registerSpriteSet(JParticleTypeRegistry.PIXEL.get(), PixelParticle.Factory::new);
         event.registerSpriteSet(JParticleTypeRegistry.BLOCKSPARK.get(), provider -> new BlocksparkParticle.Factory(provider, 0.15f));
         event.registerSpriteSet(JParticleTypeRegistry.GO.get(), GoParticle.Factory::new);
+        event.registerSpriteSet(JParticleTypeRegistry.DO.get(), GoParticle.Factory::new);
         event.registerSpriteSet(JParticleTypeRegistry.AURA_ARC.get(), AuraArcParticle.Factory::new);
         event.registerSpriteSet(JParticleTypeRegistry.AURA_BLOB.get(), AuraBlobParticle.Factory::new);
         event.registerSpriteSet(JParticleTypeRegistry.INVERSION.get(), InversionParticle.Factory::new);

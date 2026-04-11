@@ -3,11 +3,7 @@ package net.arna.jcraft.datagen.providers.data;
 import dev.architectury.registry.registries.RegistrySupplier;
 import lombok.SneakyThrows;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.api.registry.JBlockRegistry;
-import net.arna.jcraft.api.registry.JEntityTypeRegistry;
-import net.arna.jcraft.api.registry.JItemRegistry;
-import net.arna.jcraft.api.registry.JStandTypeRegistry;
-import net.arna.jcraft.api.registry.JTagRegistry;
+import net.arna.jcraft.api.registry.*;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
 import net.arna.jcraft.common.gravity.util.EntityTags;
@@ -19,17 +15,15 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.EntityTypeTags;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.TagBuilder;
-import net.minecraft.tags.TagKey;
+import net.minecraft.tags.*;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 public class JTagProviders {
@@ -105,14 +99,6 @@ public class JTagProviders {
             getOrCreateRawBuilder(JTagRegistry.SOUL_LOG_ITEMS).addElement(JItemRegistry.SOUL_WOOD_BLOCK.getId());
 
             addCosplayTags();
-
-            getOrCreateRawBuilder(JTagRegistry.PROTECTS_FROM_SUN).addTag(JItemRegistry.KARS_HEADWRAP.getTag().location());
-            getOrCreateRawBuilder(JTagRegistry.PROTECTS_FROM_SUN).addTag(JItemRegistry.RED_HAT.getTag().location());
-            getOrCreateRawBuilder(JTagRegistry.PROTECTS_FROM_SUN).addTag(JItemRegistry.PUCCIS_HAT.getTag().location());
-            getOrCreateRawBuilder(JTagRegistry.PROTECTS_FROM_SUN).addTag(JItemRegistry.RISOTTO_CAP.getTag().location());
-            getOrCreateRawBuilder(JTagRegistry.PROTECTS_FROM_SUN).addTag(JItemRegistry.DIEGO_HAT.getTag().location());
-            getOrCreateRawBuilder(JTagRegistry.PROTECTS_FROM_SUN).addTag(JItemRegistry.MOUNTAIN_TIM_HAT.getTag().location());
-            getOrCreateRawBuilder(JTagRegistry.PROTECTS_FROM_SUN).addTag(JItemRegistry.COWBOY_HAT.getTag().location());
 
             final var cosplay = getOrCreateTagBuilder(JTagRegistry.COSPLAY);
             for (final CosplayItem<?> cosplayItem : CosplayItem.all()) {
@@ -515,6 +501,12 @@ public class JTagProviders {
             discs.add(JItemRegistry.DISC.get());
             discs.add(JItemRegistry.STAND_DISC.get());
             discs.add(JItemRegistry.SPEC_DISC.get());
+
+            final var spurs = getOrCreateTagBuilder(JTagRegistry.BOOTS_WITH_THE_SPURS);
+            addAll(spurs, JItemRegistry.GYRO_BOOTS.getAll());
+            addAll(spurs, JItemRegistry.MOUNTAIN_TIM_BOOTS.getAll());
+            addAll(spurs, JItemRegistry.DIEGO_BOOTS.getAll());
+            addAll(spurs, JItemRegistry.COWBOY_GUNBELT_SPURS.getAll());
         }
 
         @SneakyThrows
@@ -531,6 +523,11 @@ public class JTagProviders {
                     }
                 }
             }
+        }
+
+        private static void addAll(final FabricTagBuilder tagBuilder,
+                                   final Collection<? extends RegistrySupplier<? extends Item>> collection) {
+            collection.forEach(i -> tagBuilder.add(i.get()));
         }
     }
 
@@ -631,6 +628,7 @@ public class JTagProviders {
             // spec users
             getOrCreateRawBuilder(JTagRegistry.SPEC_USER).addElement(BuiltInRegistries.ENTITY_TYPE.getKey(JEntityTypeRegistry.BRAWLER_SPEC_USER.get()));
             getOrCreateRawBuilder(JTagRegistry.SPEC_USER).addElement(BuiltInRegistries.ENTITY_TYPE.getKey(JEntityTypeRegistry.HAMON_SPEC_USER.get()));
+            getOrCreateRawBuilder(JTagRegistry.SPEC_USER).addElement(BuiltInRegistries.ENTITY_TYPE.getKey(JEntityTypeRegistry.TONPETTY.get()));
             getOrCreateRawBuilder(JTagRegistry.SPEC_USER).addElement(BuiltInRegistries.ENTITY_TYPE.getKey(JEntityTypeRegistry.VAMPIRE_SPEC_USER.get()));
             getOrCreateRawBuilder(JTagRegistry.SPEC_USER).addElement(BuiltInRegistries.ENTITY_TYPE.getKey(JEntityTypeRegistry.ANUBIS_SPEC_USER.get()));
 
@@ -656,9 +654,14 @@ public class JTagProviders {
             neverStands.add(JEntityTypeRegistry.RED_BIND.getId());
             neverStands.add(JEntityTypeRegistry.SAND_TORNADO.getId());
             neverStands.add(JEntityTypeRegistry.STAND_METEOR.getId());
+            neverStands.add(JEntityTypeRegistry.ROAD_ROLLER.getId());
 
             final var noAIStandUsers = getOrCreateTagBuilder(JTagRegistry.NO_STAND_USER_AI);
             noAIStandUsers.add(JEntityTypeRegistry.TRAINING_DUMMY.getId());
+
+            final var cannotTakeStandFrom = getOrCreateTagBuilder(JTagRegistry.CANNOT_TAKE_STAND_FROM);
+            cannotTakeStandFrom.add(JEntityTypeRegistry.PLAYER_CLONE.getId());
+            cannotTakeStandFrom.add(JEntityTypeRegistry.AYA_TSUJI.getId());
 
             final var gravityForbiddenEntities = getOrCreateTagBuilder(EntityTags.FORBIDDEN_ENTITIES);
             gravityForbiddenEntities.add(EntityType.ITEM_FRAME);

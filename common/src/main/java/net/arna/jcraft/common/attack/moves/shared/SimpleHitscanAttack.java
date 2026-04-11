@@ -9,8 +9,8 @@ import net.arna.jcraft.api.attack.moves.AbstractHitscanAttack;
 
 public class SimpleHitscanAttack<A extends IAttacker<? extends A, ?>> extends AbstractHitscanAttack<SimpleHitscanAttack<A>, A> {
 
-    public SimpleHitscanAttack(final int cooldown, final int windup, final int duration, final float moveDistance, final float damage, final int stun, final float knockback, final float range, final float hardness, final float breakChance) {
-        super(cooldown, windup, duration, moveDistance, damage, stun, knockback, range, hardness, breakChance);
+    public SimpleHitscanAttack(final int cooldown, final int windup, final int duration, final float moveDistance, final float damage, final int stun, final float knockback, final float range, final float hardness, final float breakChance, final float spread) {
+        super(cooldown, windup, duration, moveDistance, damage, stun, knockback, range, hardness, breakChance, spread);
     }
 
     @Override
@@ -26,7 +26,7 @@ public class SimpleHitscanAttack<A extends IAttacker<? extends A, ?>> extends Ab
     @Override
     public @NonNull SimpleHitscanAttack<A> copy() {
         return copyExtras(new SimpleHitscanAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getKnockback(), getRange(), getHardness(), getBreakChance()));
+                getKnockback(), getRange(), getHardness(), getBreakChance(), getSpread()));
     }
 
     public static class Type extends AbstractHitscanAttack.Type<SimpleHitscanAttack<?>> {

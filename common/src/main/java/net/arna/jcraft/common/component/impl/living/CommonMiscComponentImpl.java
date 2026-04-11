@@ -2,6 +2,7 @@ package net.arna.jcraft.common.component.impl.living;
 
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import net.arna.jcraft.api.component.living.CommonMiscComponent;
 import net.arna.jcraft.common.entity.stand.MetallicaEntity;
 import net.arna.jcraft.api.registry.JSoundRegistry;
@@ -23,6 +24,7 @@ public class CommonMiscComponentImpl implements CommonMiscComponent {
     private Vec3 desiredVelocity = Vec3.ZERO;
     @Getter
     private @Nullable UUID slavedTo = null;
+    @Getter
     private LivingEntity master = null;
     private int damageTimer;
     private int knifeTimer;
@@ -35,10 +37,15 @@ public class CommonMiscComponentImpl implements CommonMiscComponent {
     private boolean prevNoGrav;
     @Getter
     private float attackSpeedMult;
+    @Getter
+    @Setter
     private float metallicaIron = MetallicaEntity.IRON_MAX;
     private float tuskNails = 10.0f;
     private int highestTuskAct = 1; // Tusk progression - start with Act 1 unlocked
     private int herbalTeaTicks = 0;
+    @Getter
+    @Setter
+    private float aerosmithOverheat = 0f;
 
     public CommonMiscComponentImpl(final LivingEntity entity) {
         this.entity = entity;
@@ -210,10 +217,6 @@ public class CommonMiscComponentImpl implements CommonMiscComponent {
         }
     }
 
-    public LivingEntity getMaster() {
-        return master;
-    }
-
     private void updateKnifeTimer() {
         knifeTimer = 20 * (30 - stuckKnifeCount);
         sync(entity);
@@ -248,6 +251,7 @@ public class CommonMiscComponentImpl implements CommonMiscComponent {
         highestTuskAct = tag.getInt("HighestTuskAct");
         if (highestTuskAct < 1) highestTuskAct = 1;
         if (highestTuskAct > 4) highestTuskAct = 4;
+        aerosmithOverheat = tag.getFloat("AerosmithOverheat");
 
         if (tag.hasUUID("SlavedTo")) {
             slavedTo = tag.getUUID("SlavedTo");
@@ -266,6 +270,7 @@ public class CommonMiscComponentImpl implements CommonMiscComponent {
         tag.putInt("HighestTuskAct", highestTuskAct);
         tag.putInt("HerbalTeaTicks", herbalTeaTicks);
 
+        tag.putFloat("AerosmithOverheat", aerosmithOverheat);
         if (slavedTo != null) {
             tag.putUUID("SlavedTo", slavedTo);
         }

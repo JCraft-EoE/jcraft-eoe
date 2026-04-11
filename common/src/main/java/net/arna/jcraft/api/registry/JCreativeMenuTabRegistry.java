@@ -6,6 +6,7 @@ import net.arna.jcraft.api.spec.SpecType;
 import net.arna.jcraft.api.spec.SpecTypeUtil;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.item.CosplayItem;
 import net.arna.jcraft.common.item.SpecDiscItem;
 import net.arna.jcraft.common.item.StandDiscItem;
@@ -304,8 +305,18 @@ public interface JCreativeMenuTabRegistry {
                 .displayItems((displayContext, entries) -> {
                     // cosplay
                     for (final CosplayItem<?> cosplayItem : CosplayItem.all()) {
-                        for (final RegistrySupplier<? extends ArmorItem> item : cosplayItem) {
-                            entries.accept(item.get());
+                        if (JServerConfig.SHOW_ALL_COSPLAY.getValue()) {
+                            for (final RegistrySupplier<? extends ArmorItem> item : cosplayItem) {
+                                entries.accept(item.get());
+                            }
+                        }
+                        else {
+                            if (cosplayItem.isVampireProtection()) {
+                                entries.accept(cosplayItem.get(ArmorMaterials.IRON).get());
+                            }
+                            else {
+                                entries.accept(cosplayItem.get(ArmorMaterials.NETHERITE).get());
+                            }
                         }
                     }
                 })

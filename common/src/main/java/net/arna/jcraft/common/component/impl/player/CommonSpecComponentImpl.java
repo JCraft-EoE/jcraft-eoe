@@ -7,6 +7,7 @@ import net.arna.jcraft.api.spec.SpecTypeUtil;
 import net.arna.jcraft.api.component.player.CommonSpecComponent;
 import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.api.registry.JSpecTypeRegistry;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -37,6 +38,7 @@ public abstract class CommonSpecComponentImpl implements CommonSpecComponent {
         this.type = type;
         spec = type == null ? null : type.createSpec(user);
         if (!SpecTypeUtil.isNone(type) && user instanceof ServerPlayer player) {
+            JUtils.maySendSpecAboutInfo(player);
             JAdvancementTriggerRegistry.OBTAINED_SPEC.trigger(player, type);
         }
     }

@@ -115,6 +115,7 @@ public interface JEntityRendererRegister {
             new RendererData<>(JEntityTypeRegistry.PH_CAPSULE, context -> new ProjectileRenderer<>(context, "ph_capsule")),
             new RendererData<>(JEntityTypeRegistry.PURPLE_HAZE_CLOUD, JEntityRendererRegister::createEmpty),
             new RendererData<>(JEntityTypeRegistry.STAND_ARROW_PROJECTILE, context -> new ProjectileRenderer<>(context, "stand_arrow")),
+            new RendererData<>(JEntityTypeRegistry.AEROBOMB, context -> new ProjectileRenderer<>(context, "aerobomb")),
             new RendererData<>(JEntityTypeRegistry.HAMON_WAVE, JEntityRendererRegister::createEmpty),
 
             new RendererData<>(JEntityTypeRegistry.ROAD_ROLLER, RoadRollerRenderer::new),

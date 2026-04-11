@@ -13,10 +13,7 @@ import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 
 public class CosplayItem<T extends ArmorItem> implements Iterable<RegistrySupplier<T>> {
@@ -88,6 +85,10 @@ public class CosplayItem<T extends ArmorItem> implements Iterable<RegistrySuppli
 
     public @Nullable RegistrySupplier<T> get(final @NonNull ArmorMaterial material) {
         return items.get(material);
+    }
+
+    public Collection<RegistrySupplier<T>> getAll() {
+        return items.values();
     }
 
     @Override

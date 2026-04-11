@@ -264,7 +264,7 @@ public interface JEntityTypeRegistry {
             () -> EntityType.Builder.of(
                     WorldOnlyEntityFactory.from(HorusEntity::new),
                     MobCategory.CREATURE
-            ).sized(0.6f, 1.8f).build("horus")
+            ).sized(0.8f, 2.2f).build("horus")
     );
 
     RegistrySupplier<EntityType<CrazyDiamondEntity>> CRAZY_DIAMOND = ENTITY_TYPE_REGISTRY.register(JCraft.id("crazy_diamond"),
@@ -566,6 +566,14 @@ public interface JEntityTypeRegistry {
                             MobCategory.MISC
                     ).sized(1f, 1f)
                     .build("purple_haze_cloud")
+    );
+
+    RegistrySupplier<EntityType<AerobombProjectile>> AEROBOMB = ENTITY_TYPE_REGISTRY.register(JCraft.id("aerobomb"),
+            () -> EntityType.Builder.of(
+                            WorldOnlyEntityFactory.from(AerobombProjectile::new),
+                            MobCategory.MISC
+                    ).sized(4f/16, 2f/16)
+                    .build("aerobomb")
     );
 
     RegistrySupplier<EntityType<HamonWaveEntity>> HAMON_WAVE = ENTITY_TYPE_REGISTRY.register(JCraft.id("hamon_wave"),

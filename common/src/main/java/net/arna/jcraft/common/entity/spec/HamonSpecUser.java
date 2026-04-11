@@ -21,6 +21,7 @@ public class HamonSpecUser extends SpecUserMob {
 
     protected HamonSpecUser(EntityType<? extends PathfinderMob> entityType, Level level) {
         super(entityType, level);
+        setSpecType(JSpecTypeRegistry.HAMON.get());
     }
 
     @Override
