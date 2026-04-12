@@ -88,7 +88,7 @@ public final class WormholeAttack extends AbstractMove<WormholeAttack, TuskAct3E
         user.teleportTo(nailPos.x, nailPos.y, nailPos.z);
 
         // Damage in blast radius (configured via withTeleportDamage in the moveset)
-        if (teleportDamage > 0 && teleportBlastRadius > 0) {
+        if (!attacker.level().isClientSide() && teleportDamage > 0 && teleportBlastRadius > 0) {
             float r = teleportBlastRadius;
             AABB blastBox = new AABB(nailPos.x - r, nailPos.y - r, nailPos.z - r,
                     nailPos.x + r, nailPos.y + r, nailPos.z + r);

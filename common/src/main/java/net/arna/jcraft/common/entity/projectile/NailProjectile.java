@@ -478,7 +478,7 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
                         entity -> entity.isAlive() && !entity.isSpectator());
                 Vec3 center = position();
                 for (LivingEntity target : targets) {
-                    Vec3 pull = center.subtract(target.position()).normalize().scale(1.0);
+                    Vec3 pull = center.subtract(target.position()).normalize().scale(0.5f);
                     target.push(pull.x, pull.y, pull.z);
                     target.hurtMarked = true;
                     // Deal 4 damage once per second

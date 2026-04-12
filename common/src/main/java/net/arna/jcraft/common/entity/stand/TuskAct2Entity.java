@@ -155,7 +155,7 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
 
     private static void registerMoves(MoveMap<TuskAct2Entity, State> moves) {
         moves.register(MoveClass.LIGHT, GOLDEN_RECTANGLE_NAIL, State.GOLDEN_RECTANGLE_NAIL).withCrouchingVariant(TuskAct2Entity.State.TOENAIL_SHOT);
-        moves.register(MoveClass.HEAVY, DRILL_SHOT_CHARGE, State.DRILL_SHOT_CHARGE).withFollowup(State.PERFECT_GOLDEN_ROTATION);
+        moves.register(MoveClass.HEAVY, DRILL_SHOT_CHARGE, State.DRILL_SHOT_CHARGE).withFollowup(State.NONE);
         moves.register(MoveClass.ULTIMATE, FAN_NAIL_ATTACK, State.FAN_NAIL);
         moves.register(MoveClass.UTILITY, ACT_CYCLE, State.ACT_CYCLE);
     }
@@ -263,6 +263,7 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
 
     public enum State implements StandAnimationState<TuskAct2Entity> {
         IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.tusk_act_2.idle", AzPlayBehaviors.LOOP)),
+        NONE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.tusk_act_2.idle", AzPlayBehaviors.LOOP)),
         GOLDEN_RECTANGLE_NAIL(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_2.golden_rectangle_nail", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         TOENAIL_SHOT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_2.toe_shot", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         DRILL_SHOT_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_2.spinning_nail_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
