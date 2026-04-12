@@ -1233,6 +1233,11 @@
       "jcraft:generic/jangle4"
     ]
   },
+  "tuska1shot": {
+    "sounds": [
+      "jcraft:stands/tusk/ta1shot"
+    ]
+  },
   "tuskshot": {
     "sounds": [
       "jcraft:stands/tusk/shot"

@@ -60,7 +60,8 @@ public final class NailShotAttack<A extends IAttacker<A, ?>> extends AbstractMov
 
         if (nail == null) return Set.of();
 
-        SoundEvent shotSound = isToenail ? JSoundRegistry.TUSK_CHU.get() : JSoundRegistry.TUSK_SHOT.get();
+        SoundEvent shotSound = isToenail ? JSoundRegistry.TUSK_CHU.get() :
+                attacker instanceof TuskAct1Entity ? JSoundRegistry.TUSK_A1_SHOT.get() : JSoundRegistry.TUSK_SHOT.get();
         attacker.getBaseEntity().playSound(shotSound, 1.0f, 1.0f);
 
         // Toenail fires from lower position (hip/knee level); regular nail fires from chest

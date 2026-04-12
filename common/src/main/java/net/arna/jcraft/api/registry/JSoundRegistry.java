@@ -320,6 +320,7 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> LOAD = register("reload");
 
     // Tusk
+    RegistrySupplier<SoundEvent> TUSK_A1_SHOT = register("tuska1shot");
     RegistrySupplier<SoundEvent> TUSK_SHOT = register("tuskshot");
     RegistrySupplier<SoundEvent> TUSK_HEAVY_SHOT = register("tuskheavyshot");
     RegistrySupplier<SoundEvent> TUSK_NAIL_GROWTH = register("tusknailgrowth");
