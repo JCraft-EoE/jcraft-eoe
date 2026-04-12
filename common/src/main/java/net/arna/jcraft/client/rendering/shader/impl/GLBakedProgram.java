@@ -4,6 +4,11 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.arna.jcraft.client.rendering.shader.api.BakedProgram;
 import net.minecraft.client.Minecraft;
+import org.jetbrains.annotations.Nullable;
+import org.lwjgl.opengl.GL20C;
+
+import java.util.Map;
+import java.util.function.BiFunction;
 
 import static org.lwjgl.opengl.GL33C.*;
 
@@ -50,7 +55,10 @@ public class GLBakedProgram extends BakedProgram {
         Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
 
         RenderSystem.disableDepthTest();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
         buffer.draw();
+        RenderSystem.disableBlend();
         RenderSystem.enableDepthTest();
 
         VertexBuffer.unbind();
@@ -62,5 +70,27 @@ public class GLBakedProgram extends BakedProgram {
     @Override
     public int handle() {
         return handle;
+    }
+
+    @Override
+    public int getUniformLocation(String name) {
+        return glGetUniformLocation(handle, name);
+    }
+
+    private static final Map<Class<?>, BiFunction<Integer, Integer, ?>> UNIFORM_DECODERS = Map.of(
+            Float.class, GL20C::glGetUniformf,
+            Integer.class, GL20C::glGetUniformi
+    );
+
+    @Override
+    public @Nullable <T> T getUniform(Class<T> type, String name) {
+        int uniformLoc = getUniformLocation(name);
+        if (uniformLoc == -1) return null;
+
+        BiFunction<Integer, Integer, ?> decoder = UNIFORM_DECODERS.get(type);
+        if (decoder == null) return null;
+
+        //noinspection unchecked
+        return (T)decoder.apply(handle, uniformLoc);
     }
 }
