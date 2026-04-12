@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.ai;
 
 import net.arna.jcraft.api.attack.enums.StunType;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
@@ -48,8 +49,12 @@ public interface IJAttackerBrain {
     @Nullable
     static CombatInstantContext target(Mob mob, AttackerBrainInfo info) {
         LivingEntity target = mob.getTarget();
-        if (target == null) target = mob.getLastAttacker();
-        if (target == null) return null;
+        if (target == null) {
+            target = mob.getLastAttacker();
+        }
+        if (target == null || (target instanceof ServerPlayer player && (player.isCreative() || player.isSpectator()))) {
+            return null;
+        }
 
         final CombatInstantContext combatCtx = info.getCombatCtx();
         combatCtx.update(mob, target);

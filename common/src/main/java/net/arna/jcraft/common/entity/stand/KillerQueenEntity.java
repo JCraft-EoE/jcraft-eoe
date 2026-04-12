@@ -1,8 +1,10 @@
 package net.arna.jcraft.common.entity.stand;
 
 import lombok.NonNull;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.Attacks;
 import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.MoveSet;
 import net.arna.jcraft.api.attack.MoveSetManager;
@@ -21,14 +23,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import org.joml.Vector3f;
 
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
  * The {@link StandEntity} for <a href="https://jojowiki.com/Killer_Queen">Killer Queen</a>.
  * @see JStandTypeRegistry#KILLER_QUEEN
- * @see net.arna.jcraft.client.model.entity.stand.KillerQueenModel KillerQueenModel
- * @see net.arna.jcraft.client.renderer.entity.stands.KillerQueenRenderer KillerQueenRenderer
  * @see net.arna.jcraft.common.attack.moves.killerqueen.BombPlantAttack BombPlantAttack
  * @see CoinTossMove
  * @see KQDetonateAttack DetonateAttack
@@ -140,40 +139,34 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
 
     // Animations
     public enum State implements StandAnimationState<KillerQueenEntity> {
-        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.killerqueen.idle"))),
-        LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.killerqueen.light"))),
-        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.killerqueen.block"))),
-        HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.killerqueen.heavy"))),
-        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.killerqueen.barrage"))),
-        DETONATE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.killerqueen.detonate"))),
-        BOMB_PLANT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.killerqueen.bombplant"))),
-        SHA(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.killerqueen.sha"))),
-        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.killerqueen.light_followup"))),
-        LOW(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.killerqueen.low"))),
-        GRAB(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.killerqueen.grab"))),
-        GRAB_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.killerqueen.grab_hit")));
+        IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.killerqueen.idle", AzPlayBehaviors.LOOP)),
+        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.killerqueen.block", AzPlayBehaviors.LOOP)),
+        HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.heavy", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.barrage", AzPlayBehaviors.LOOP)),
+        DETONATE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.detonate", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BOMB_PLANT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.bombplant", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        SHA(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.sha", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LOW(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.low", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        GRAB(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.grab", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        GRAB_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.grab_hit", AzPlayBehaviors.HOLD_ON_LAST_FRAME));
 
+        private final AzCommand animator;
 
-        private final Consumer<AnimationState<KillerQueenEntity>> animator;
-
-        State(Consumer<AnimationState<KillerQueenEntity>> animator) {
+        State(AzCommand animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(KillerQueenEntity attacker, AnimationState<KillerQueenEntity> builder) {
-            animator.accept(builder);
+        public void playAnimation(KillerQueenEntity attacker) {
+            animator.sendForEntity(attacker);
         }
     }
 
     @Override
     protected State[] getStateValues() {
         return State.values();
-    }
-
-    @Override
-    protected @NonNull String getSummonAnimation() {
-        return "animation.killerqueen.summon";
     }
 
     @Override

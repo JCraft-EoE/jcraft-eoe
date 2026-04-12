@@ -2,6 +2,7 @@ package net.arna.jcraft.forge.capability.impl.living;
 
 import dev.architectury.networking.NetworkManager;
 import io.netty.buffer.Unpooled;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.component.impl.living.CommonBombTrackerComponentImpl;
 import net.arna.jcraft.forge.capability.api.JCapability;
 import net.minecraft.nbt.CompoundTag;
@@ -15,10 +16,8 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.util.LazyOptional;
 
-import static net.arna.jcraft.JCraft.MOD_ID;
-
 public class BombTrackerCapability extends CommonBombTrackerComponentImpl implements JCapability {
-    public static ResourceLocation BOMB_S2C = new ResourceLocation(MOD_ID, "bomb_s2c");
+    public static ResourceLocation BOMB_S2C = JCraft.id("bomb_s2c");
 
     public static Capability<BombTrackerCapability> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
 

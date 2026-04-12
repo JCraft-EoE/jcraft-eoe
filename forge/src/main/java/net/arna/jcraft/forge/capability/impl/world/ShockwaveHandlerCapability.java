@@ -3,6 +3,7 @@ package net.arna.jcraft.forge.capability.impl.world;
 
 import dev.architectury.networking.NetworkManager;
 import io.netty.buffer.Unpooled;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.component.impl.world.CommonShockwaveHandlerComponentImpl;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.forge.capability.api.JCapability;
@@ -16,12 +17,10 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.util.LazyOptional;
 
-import static net.arna.jcraft.JCraft.MOD_ID;
-
 public class ShockwaveHandlerCapability extends CommonShockwaveHandlerComponentImpl implements JCapability {
 
-    public static ResourceLocation SHOCK_S2C = new ResourceLocation(MOD_ID, "shock_s2c");
-    // public static ResourceLocation SHOCK_C2S = new ResourceLocation(MOD_ID, "shock_c2s");
+    public static ResourceLocation SHOCK_S2C = JCraft.id("shock_s2c");
+    // public static ResourceLocation SHOCK_C2S = JCraft.id("shock_c2s");
 
     public static Capability<ShockwaveHandlerCapability> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
 

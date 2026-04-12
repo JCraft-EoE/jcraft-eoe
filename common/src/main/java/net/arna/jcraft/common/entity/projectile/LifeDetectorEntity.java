@@ -1,16 +1,8 @@
 package net.arna.jcraft.common.entity.projectile;
 
 import lombok.NonNull;
-import mod.azure.azurelib.animatable.GeoEntity;
-import mod.azure.azurelib.core.animatable.GeoAnimatable;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.core.animation.AnimationController;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
-import mod.azure.azurelib.core.object.PlayState;
-import mod.azure.azurelib.util.AzureLibUtil;
-import net.arna.jcraft.api.Attacks;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.common.util.IOwnable;
@@ -37,9 +29,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Set;
 
-import static net.arna.jcraft.api.Attacks.*;
+import static net.arna.jcraft.api.Attacks.damageLogic;
 
-public class LifeDetectorEntity extends JAttackEntity implements GeoEntity {
+public class LifeDetectorEntity extends JAttackEntity {
     private static final EntityDataAccessor<Boolean> EXPLODED;
     private LivingEntity target;
 
@@ -97,6 +89,8 @@ public class LifeDetectorEntity extends JAttackEntity implements GeoEntity {
         entityData.set(EXPLODED, true);
 
         playSound(SoundEvents.FIRECHARGE_USE, 1f, 1f);
+
+        EXPLODE.sendForEntity(this);
 
         kill();
     }
@@ -166,6 +160,8 @@ public class LifeDetectorEntity extends JAttackEntity implements GeoEntity {
         }
     }
 
+    public static final AzCommand EXPLODE = AzCommand.create(JCraft.BASE_CONTROLLER, "animation.detector.explode");
+
     @Override
     public boolean fireImmune() {
         return true;
@@ -219,24 +215,5 @@ public class LifeDetectorEntity extends JAttackEntity implements GeoEntity {
     public void readAdditionalSaveData(@NonNull CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         readMasterNbt(tag);
-    }
-
-    // Animations
-    private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
-
-    @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "controller", 0, this::predicate));
-    }
-
-    private static final RawAnimation EXPLODE = RawAnimation.begin().thenLoop("animation.detector.explode");
-    private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.detector.idle");
-    private PlayState predicate(AnimationState<GeoAnimatable> state) {
-        return state.setAndContinue(hasExploded() ? EXPLODE : IDLE);
-    }
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return cache;
     }
 }

@@ -1,8 +1,6 @@
 {
   "advancements.jcraft.find_stone_mask.description": "Taş Maske bul",
   "advancements.jcraft.find_stone_mask.title": "Bu acıtacak…",
-  "advancements.jcraft.obtain_all_music_discs.description": "Bütün JCraft Müzik Disklerine sahip ol",
-  "advancements.jcraft.obtain_all_music_discs.title": "Disk Jokeyi",
   "advancements.jcraft.obtain_all_specs.description": "Bütün Speclere sahip ol",
   "advancements.jcraft.obtain_all_specs.title": "Miras",
   "advancements.jcraft.obtain_all_stands.description": "Bütün Standlara sahip ol",
@@ -678,7 +676,6 @@
   "jcraft.serverconfig.option.universalAbilities": "Evrensel Yetenekler",
   "jcraft.serverconfig.option.useFoolishSand": "Aptal Kum kullan",
   "jcraft.serverconfig.option.vsStandlessDamageMultiplier": "VS Standsız Hasar Ölçeklendirme",
-  "jcraft.serverconfig.option.wsStealStands": "Whitesnake Standları Çalma",
   "jcraft.sheathedanubis.blockdesc": "§9Eğilme + Sağ Tıklamayla §cBloklanabilir.",
   "jcraft.sheathedanubis.desc": "§9Kınından §eçıkarılabilir",
   "jcraft.sptw.crm1": "Yere Çarpma",

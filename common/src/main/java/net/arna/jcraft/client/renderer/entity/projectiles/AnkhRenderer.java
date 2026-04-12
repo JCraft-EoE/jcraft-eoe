@@ -1,31 +1,32 @@
 package net.arna.jcraft.client.renderer.entity.projectiles;
 
 import lombok.NonNull;
-import net.arna.jcraft.client.model.JProjectileModel;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.projectile.AnkhProjectile;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
 
 /**
- * The {@link GeoProjectileRenderer} for {@link AnkhProjectile}.
+ * The {@link ProjectileRenderer} for {@link AnkhProjectile}.
  */
-public class AnkhRenderer extends GeoProjectileRenderer<AnkhProjectile> {
-    public AnkhRenderer(final EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, new JProjectileModel<>("ankh"));
+@Environment(EnvType.CLIENT)
+public class AnkhRenderer extends ProjectileRenderer<AnkhProjectile> {
+
+    public static final String ID = "ankh";
+    private static final RenderType RENDER_TYPE = RenderType.eyes(JCraft.id(TEXTURE_STR_TEMPLATE.formatted(ID)));
+
+    public AnkhRenderer(final @NonNull EntityRendererProvider.Context context) {
+        super(context, () -> new EntityAnimator<>(ID), b -> b
+                .setRenderType(RENDER_TYPE),
+                ID);
     }
 
     @Override
-    protected int getBlockLightLevel(final @NonNull AnkhProjectile entity, final @NonNull BlockPos pos) {
+    public int getBlockLightLevel(final @NonNull AnkhProjectile entity, final @NonNull BlockPos pos) {
         return 15;
     }
 
-    @Override
-    public RenderType getRenderType(final @NonNull AnkhProjectile animatable, final ResourceLocation texture,
-                                    final @Nullable MultiBufferSource bufferSource, final float partialTick) {
-        return RenderType.eyes(texture);
-    }
 }

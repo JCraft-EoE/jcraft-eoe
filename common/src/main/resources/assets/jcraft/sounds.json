@@ -1140,6 +1140,46 @@
       "jcraft:specs/vampire/spec_change"
     ]
   },
+  "hamoncrash": {
+    "sounds": [
+      "jcraft:specs/hamon/crash"
+    ]
+  },
+  "hamonecho": {
+    "sounds": [
+      "jcraft:specs/hamon/echo"
+    ]
+  },
+  "hamonring": {
+    "sounds": [
+      "jcraft:specs/hamon/ring"
+    ]
+  },
+  "hamonsurge": {
+    "sounds": [
+      "jcraft:specs/hamon/surge"
+    ]
+  },
+  "hamonswoosh": {
+    "sounds": [
+      "jcraft:specs/hamon/swoosh"
+    ]
+  },
+  "hamoncrackleimpact": {
+    "sounds": [
+      "jcraft:specs/hamon/crackle_impact"
+    ]
+  },
+  "hamoncrackles": {
+    "sounds": [
+      "jcraft:specs/hamon/crackles"
+    ]
+  },
+  "hamonbreathe": {
+    "sounds": [
+      "jcraft:specs/hamon/breathe"
+    ]
+  },
   "bulletricochet": {
     "sounds": [
       "jcraft:projectiles/bullet/ricochet"
@@ -1183,6 +1223,28 @@
   "rrignition": {
     "sounds": [
       "jcraft:vehicles/roadroller/ignition"
+    ]
+  },
+  "jangle": {
+    "sounds": [
+      "jcraft:generic/jangle1",
+      "jcraft:generic/jangle2",
+      "jcraft:generic/jangle3",
+      "jcraft:generic/jangle4"
+    ]
+  },
+  "asshoot": {
+    "sounds": [
+      "jcraft:stands/aerosmith/burst1",
+      "jcraft:stands/aerosmith/burst2",
+      "jcraft:stands/aerosmith/burst3",
+      "jcraft:stands/aerosmith/burst4",
+      "jcraft:stands/aerosmith/burst5"
+    ]
+  },
+  "assummon": {
+    "sounds": [
+      "jcraft:stands/aerosmith/summon"
     ]
   }
 }

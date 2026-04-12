@@ -7,7 +7,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.animal.IronGolem;
-import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.level.Level;
 
 public class BrawlerSpecUser extends SpecUserMob {
@@ -21,7 +20,6 @@ public class BrawlerSpecUser extends SpecUserMob {
         super.registerGoals();
 
         targetSelector.addGoal(3, new NearestAttackableTargetGoal(this, IronGolem.class, true));
-        targetSelector.addGoal(3, new NearestAttackableTargetGoal(this, Villager.class, true));
     }
 
     public static AttributeSupplier.Builder createUserAttributes() {

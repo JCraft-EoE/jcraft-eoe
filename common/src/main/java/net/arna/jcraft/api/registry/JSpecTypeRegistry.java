@@ -10,6 +10,7 @@ import net.arna.jcraft.api.spec.SpecType;
 import net.arna.jcraft.common.spec.AnubisSpec;
 import net.arna.jcraft.common.spec.BrawlerSpec;
 import net.arna.jcraft.api.spec.JSpec;
+import net.arna.jcraft.common.spec.HamonSpec;
 import net.arna.jcraft.common.spec.VampireSpec;
 import net.minecraft.Util;
 import net.minecraft.world.entity.LivingEntity;
@@ -23,6 +24,7 @@ public interface JSpecTypeRegistry {
     RegistrySupplier<SpecType> BRAWLER = register("brawler", BrawlerSpec::new);
     RegistrySupplier<SpecType> ANUBIS = register("anubis", AnubisSpec::new);
     RegistrySupplier<SpecType> VAMPIRE = register("vampire", VampireSpec::new);
+    RegistrySupplier<SpecType> HAMON = register("hamon", HamonSpec::new);
 
     Int2ObjectMap<RegistrySupplier<SpecType>> LEGACY_ORDINALS = Util.make(new Int2ObjectArrayMap<>(), map -> {
         map.put(0, NONE);

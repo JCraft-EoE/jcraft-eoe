@@ -4,7 +4,7 @@ package net.arna.jcraft.api.component.living;
 public interface CommonGravityShiftComponent {
     void startRadial();
 
-    void startDirectional();
+    void startDirectional(final int range);
 
     void swapRadialType();
 

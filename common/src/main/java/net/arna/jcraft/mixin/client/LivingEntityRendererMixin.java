@@ -1,6 +1,7 @@
 package net.arna.jcraft.mixin.client;
 
 import net.arna.jcraft.client.renderer.features.ArmoredMoveFeatureRenderer;
+import net.arna.jcraft.client.renderer.features.HamonParticlesFeatureRenderer;
 import net.arna.jcraft.client.renderer.features.StuckKnivesFeatureRenderer;
 import net.arna.jcraft.client.util.PlayerCloneClientPlayerEntity;
 import net.minecraft.client.model.AgeableListModel;
@@ -38,9 +39,12 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
     @SuppressWarnings("unchecked")
     @Inject(at = @At("RETURN"), method = "<init>")
     private void addFeatureRenderers(EntityRendererProvider.Context ctx, EntityModel<?> model, float shadowRadius, CallbackInfo ci) {
-        if (model instanceof AgeableListModel<?>) // StuckKnives
+        if (model instanceof AgeableListModel<?>)
         {
+            // Stuck Knives
             addLayer((RenderLayer<T, M>) new StuckKnivesFeatureRenderer<>(ctx, (LivingEntityRenderer<T, ? extends AgeableListModel<T>>) (Object) this));
+            // Hamon Particles
+            addLayer((RenderLayer<T, M>) new HamonParticlesFeatureRenderer<>(ctx, (LivingEntityRenderer<T, ? extends AgeableListModel<T>>) (Object) this));
         }
         if (model != null) {
             addLayer((RenderLayer<T, M>) new ArmoredMoveFeatureRenderer<>(ctx, (LivingEntityRenderer<T, ? extends EntityModel<T>>) (Object) this));

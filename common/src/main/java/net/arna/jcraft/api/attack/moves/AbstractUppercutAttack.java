@@ -30,8 +30,9 @@ public abstract class AbstractUppercutAttack<T extends AbstractUppercutAttack<T,
     @Override
     public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
         final Set<LivingEntity> targets = super.perform(attacker, user);
+        final Vec3 upDir = new Vec3(GravityChangerAPI.getGravityDirection(user).step()).scale(-strength);
+
         for (LivingEntity target : targets) {
-            final Vec3 upDir = new Vec3(GravityChangerAPI.getGravityDirection(user).step()).scale(-strength);
             JUtils.addVelocity(target, upDir);
         }
 

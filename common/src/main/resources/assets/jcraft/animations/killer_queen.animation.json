@@ -945,7 +945,7 @@
 				}
 			}
 		},
-		"animation.killerqueen.summon": {
+		"summon": {
 			"animation_length": 1.3,
 			"bones": {
 				"torso": {

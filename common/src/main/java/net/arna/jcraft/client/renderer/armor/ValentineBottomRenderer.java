@@ -1,28 +1,31 @@
 package net.arna.jcraft.client.renderer.armor;
 
-import net.arna.jcraft.client.model.armor.JArmorModel;
-import net.arna.jcraft.common.item.FlutteringArmorItem;
+import mod.azure.azurelib.render.armor.bone.AzArmorBoneContext;
 import net.minecraft.world.entity.EquipmentSlot;
 
-public class ValentineBottomRenderer extends JArmor<FlutteringArmorItem> {
+public class ValentineBottomRenderer extends ArmorRenderer {
+
+    public static final String ID = "valentinebottom";
+
     public ValentineBottomRenderer() {
-        super(new JArmorModel<>("valentinebottom"));
+        super(() -> new ArmorAnimator(ID), new ValentineBottomBoneContext(), ID);
     }
 
-    @Override
-    protected void applyBoneVisibilityBySlot(EquipmentSlot currentSlot) {
-        setAllVisible(false);
+    public static class ValentineBottomBoneContext extends AzArmorBoneContext {
+        public void applyBoneVisibilityBySlot(EquipmentSlot currentSlot) {
+            setAllVisible(false);
 
-        if (currentSlot == EquipmentSlot.LEGS) {
-            setBoneVisible(this.body, true);
-            setBoneVisible(this.leftLeg, true);
-            setBoneVisible(this.rightLeg, true);
-            setBoneVisible(this.leftArm, true);
-            setBoneVisible(this.rightArm, true);
-        }
-        else if (currentSlot == EquipmentSlot.FEET) {
-            setBoneVisible(this.leftBoot, true);
-            setBoneVisible(this.rightBoot, true);
+            if (currentSlot == EquipmentSlot.LEGS) {
+                setBoneVisible(this.body, true);
+                setBoneVisible(this.leftLeg, true);
+                setBoneVisible(this.rightLeg, true);
+                setBoneVisible(this.leftArm, true);
+                setBoneVisible(this.rightArm, true);
+            }
+            else if (currentSlot == EquipmentSlot.FEET) {
+                setBoneVisible(this.leftBoot, true);
+                setBoneVisible(this.rightBoot, true);
+            }
         }
     }
 }

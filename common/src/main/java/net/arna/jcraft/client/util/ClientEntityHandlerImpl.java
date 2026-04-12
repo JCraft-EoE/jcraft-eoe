@@ -5,6 +5,7 @@ import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.particle.AuraArcParticle;
 import net.arna.jcraft.client.particle.AuraBlobParticle;
+import net.arna.jcraft.client.particle.MoshParticle;
 import net.arna.jcraft.api.component.living.CommonBombTrackerComponent;
 import net.arna.jcraft.common.entity.SheerHeartAttackEntity;
 import net.arna.jcraft.common.entity.stand.*;
@@ -25,6 +26,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
@@ -148,6 +150,15 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
                         auraColor
                 );
             }
+
+            if (stand instanceof MetallicaEntity metallica && !metallica.isInvisible() && !isOwnerAndFP && !JClientUtils.shouldNotRender(user)) {
+                final boolean doingMove = !metallica.isIdle() && !metallica.isBlocking();
+                if (random.nextInt(doingMove ? 2 : 4) == 0) {
+                    final int count = doingMove ? (1 + random.nextInt(2)) : 1;
+                    final Vector3f userBox = RotationUtil.vecPlayerToWorld(user.getBbWidth(), user.getBbHeight(), user.getBbWidth(), gravity);
+                    displayMoshParticles(clientWorld, random, user, userBox, count, metallica.getMoshColor());
+                }
+            }
         }
     }
 
@@ -198,16 +209,72 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
 
         final Direction gravity = GravityChangerAPI.getGravityDirection(metallica);
         final Vector3f auraColor = metallica.getAuraColor();
+        final ClientLevel clientWorld = (ClientLevel) metallica.level();
+        final RandomSource random = metallica.getRandom();
 
         displayAuraParticles(
-                (ClientLevel) metallica.level(),
-                metallica.getRandom(),
+                clientWorld,
+                random,
                 metallica,
                 RotationUtil.vecPlayerToWorld(user.getBbWidth(), user.getBbHeight(), user.getBbWidth(), gravity),
                 gravity,
                 auraColor,
                 true
         );
+
+        if (random.nextBoolean()) {
+            displayMoshParticles(clientWorld, random, metallica,
+                    RotationUtil.vecPlayerToWorld(user.getBbWidth(), user.getBbHeight(), user.getBbWidth(), gravity),
+                    1 + random.nextInt(2), metallica.getMoshColor());
+        }
+    }
+
+    private void displayMoshParticles(ClientLevel clientWorld, RandomSource random, Entity entity,
+                                      Vector3f maxBox, int count, Vector3f color) {
+        MoshParticle.Factory.color = color;
+        final Vec3 pos = entity.position();
+        final int typeIndex = random.nextInt(JParticleTypeRegistry.MOSH_TYPES.size());
+        for (int i = 0; i < count; i++) {
+            clientWorld.addParticle(JParticleTypeRegistry.MOSH_TYPES.get(typeIndex).get(), false,
+                    pos.x + maxBox.x() * random.triangle(0, 2),
+                    pos.y + maxBox.y() * random.triangle(0.5, 0.5),
+                    pos.z + maxBox.z() * random.triangle(0, 2),
+                    0, 0, 0);
+        }
+    }
+
+    @Override
+    public void spawnGroundedMoshParticles(AbstractArrow projectile) {
+        if (!JClientConfig.getInstance().isStandAuras()) {
+            return;
+        }
+        if (!JUtils.shouldRenderStandsFor(Minecraft.getInstance().player)) {
+            return;
+        }
+
+        final Entity owner = projectile.getOwner();
+        if (!(owner instanceof LivingEntity living)) {
+            return;
+        }
+        if (owner != Minecraft.getInstance().player) {
+            return;
+        }
+        final var stand = JUtils.getStand(living);
+        if (!(stand instanceof MetallicaEntity metallica)) {
+            return;
+        }
+
+        final Vec3 pos = projectile.position();
+        final Vector3f color = metallica.getMoshColor();
+        MoshParticle.Factory.color = color;
+        final ClientLevel clientWorld = (ClientLevel) projectile.level();
+        final RandomSource random = clientWorld.getRandom();
+        final int typeIndex = random.nextInt(JParticleTypeRegistry.MOSH_TYPES.size());
+        clientWorld.addParticle(JParticleTypeRegistry.MOSH_TYPES.get(typeIndex).get(), false,
+                pos.x + random.triangle(0, 0.2),
+                pos.y + 0.5 + random.triangle(0, 0.2),
+                pos.z + random.triangle(0, 0.2),
+                0, 0, 0);
     }
 
     @Override

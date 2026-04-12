@@ -1,22 +1,45 @@
 package net.arna.jcraft.client.renderer.entity.projectiles;
 
-import net.arna.jcraft.client.model.entity.RazorModel;
+import lombok.NonNull;
+import mod.azure.azurelib.render.entity.AzEntityRendererConfig;
+import mod.azure.azurelib.render.entity.AzEntityRendererPipeline;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.projectile.RazorProjectile;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.Map;
+
 /**
- * The {@link GeoProjectileRenderer} for {@link RazorProjectile}.
+ * The {@link ProjectileRenderer} for {@link RazorProjectile}.
  */
-public class RazorRenderer extends GeoProjectileRenderer<RazorProjectile> {
-    public RazorRenderer(final EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, new RazorModel());
+@Environment(EnvType.CLIENT)
+public class RazorRenderer extends ProjectileRenderer<RazorProjectile> {
+
+    protected static final Map<Integer, ResourceLocation> SKINS = Map.of(
+            0, JCraft.id("textures/entity/projectiles/razor.png"),
+            1, JCraft.id("textures/entity/projectiles/nail.png"),
+            2, JCraft.id("textures/entity/projectiles/scissors.png"));
+
+    public static final String ID = "razor";
+
+    public RazorRenderer(final @NonNull EntityRendererProvider.Context context) {
+        super(AzEntityRendererConfig.builder(
+                entity -> JCraft.id(MODEL_STR_TEMPLATE.formatted(ID)),
+                RazorRenderer::getTexture
+                )
+                .setRenderType(entity -> RenderType.entityTranslucent(getTexture(entity)))
+                .setModelRenderer((pipeline, layer) ->
+                        new ProjectileModelRenderer<>((AzEntityRendererPipeline<RazorProjectile>) pipeline, layer))
+                .build(),
+                context, ID);
     }
 
-    @Override
-    public RenderType getRenderType(final RazorProjectile animatable, final ResourceLocation texture, final MultiBufferSource bufferSource, final float partialTick) {
-        return RenderType.entityTranslucent(texture);
+    protected static ResourceLocation getTexture(final @NonNull RazorProjectile razor) {
+        return SKINS.get(razor.getId() % 3);
     }
+
 }

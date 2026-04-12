@@ -13,26 +13,33 @@ import lombok.NonNull;
 import lombok.Setter;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.MoveSelectionResult;
-import net.arna.jcraft.api.attack.*;
+import net.arna.jcraft.api.attack.IAttacker;
+import net.arna.jcraft.api.attack.MoveMap;
+import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.core.MoveAction;
 import net.arna.jcraft.api.attack.core.MoveCondition;
-import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.core.RunMoment;
 import net.arna.jcraft.api.attack.enums.MobilityType;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
+import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.attack.actions.PlaySoundAction;
 import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
-import net.arna.jcraft.common.util.ExtraProducts;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
-import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.common.compat.FtbChunksCompat;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.util.ExtraProducts;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -40,9 +47,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-@SuppressWarnings("UnusedReturnValue")
+@SuppressWarnings({"UnusedReturnValue", "unused"}) // API, s
 @Getter
 public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAttacker<? extends A, ?>> {
     // Used to store the time this move was charged for, if any.
@@ -790,9 +798,65 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         return attacker.getBaseEntity().position().add(heightOffset);
     }
 
-    protected boolean mayGrief(final LivingEntity user) {
-        return (user instanceof Player || user.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) &&
-                user.level().getGameRules().getBoolean(JCraft.STAND_GRIEFING);
+    /**
+     * Helper method that determines whether the given user may break the given block.
+     * For a general check, you can pass {@code null} as the pos.
+     * @param user The user to check for
+     * @param pos The position to check for, or null if no position is applicable yet.
+     * @return Whether the user may break either the given blocks or blocks in general.
+     */
+    public static boolean mayBreak(final LivingEntity user, @Nullable final BlockPos pos) {
+        return mayBreak(user, pos, null);
+    }
+
+    /**
+     * Helper method that determines whether the given user may break the given block.
+     * For a general check, you can pass {@code null} as the pos.
+     * @param user The user to check for
+     * @param pos The position to check for, or null if no position is applicable yet.
+     * @param pred An optional predicate to add extra checks for a state (such as explosion resistance).
+     *             Prevents the need to acquire the state again for such checks afterward.
+     * @return Whether the user may break either the given blocks or blocks in general.
+     */
+    public static boolean mayBreak(final LivingEntity user, @Nullable final BlockPos pos, @Nullable Predicate<BlockState> pred) {
+        return mayBreak(user.level(), user, pos, pred);
+    }
+
+    /**
+     * Helper method that determines whether the given user may break the given block.
+     * For a general check, you can pass {@code null} as the pos.
+     * @param level The level to check in
+     * @param user The user to check for
+     * @param pos The position to check for, or null if no position is applicable yet.
+     * @param pred An optional predicate to add extra checks for a state (such as explosion resistance).
+     *             Prevents the need to acquire the state again for such checks afterward.
+     * @return Whether the user may break either the given blocks or blocks in general.
+     */
+    public static boolean mayBreak(final @NonNull Level level, @Nullable final LivingEntity user, @Nullable final BlockPos pos,
+                                   @Nullable Predicate<BlockState> pred) {
+        ServerLevel serverLevel = level instanceof ServerLevel sl ? sl : null;
+        ServerPlayer player = user instanceof ServerPlayer p ? p : null;
+
+        boolean isPlayer = player != null;
+        boolean mobGriefing = level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
+        boolean standGriefing = level.getGameRules().getBoolean(JCraft.STAND_GRIEFING);
+        boolean isSpawnProtected = serverLevel != null && player != null && pos != null &&
+                serverLevel.getServer().isUnderSpawnProtection(serverLevel, pos, player);
+        boolean mayBuild = !isPlayer || pos == null ||
+                player.mayBuild() && FtbChunksCompat.get().mayEdit(player, serverLevel, pos);
+
+        boolean mayAttempt = (isPlayer || mobGriefing) && standGriefing && !isSpawnProtected && mayBuild;
+        if (!mayAttempt || pos == null) return mayAttempt;
+
+        // The move may attempt to destroy this block, check if it should be possible to.
+        BlockState state = level.getBlockState(pos);
+        Block block = state.getBlock();
+        float destroyTime = block.defaultDestroyTime();
+
+        boolean mayDestroy = destroyTime > 0;
+        boolean extraChecks = pred == null || pred.test(state);
+
+        return mayDestroy && extraChecks;
     }
 
     /**

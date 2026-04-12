@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.item;
 
+import dev.architectury.registry.registries.RegistrySupplier;
 import net.arna.jcraft.api.registry.JItemRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -12,14 +13,8 @@ import net.minecraft.world.item.Items;
 public class MockItem extends Item {
     private static final ItemStack FALLBACK = new ItemStack(Items.DIRT);
 
-    public MockItem() {
+    protected MockItem() {
         super(new Properties());
-    }
-
-    public static boolean isMockItem(ItemStack stack) {
-        // Crashes on startup due to FireBlock.bootStrap(), requiring this
-        if (!JItemRegistry.MOCK_ITEM.isPresent()) return false;
-        return stack.getItem() == JItemRegistry.MOCK_ITEM.get();
     }
 
     public static ItemStack getMockedStack(ItemStack mockItemStack) {
@@ -39,20 +34,14 @@ public class MockItem extends Item {
         return mockedStack;
     }
 
-    public static ItemStack createMockStack(ItemStack stack) {
-        // No need to create a mock stack if it already is one
-        if (isMockItem(stack)) {
-            return stack;
-        }
-
-        ItemStack mockStack = new ItemStack(JItemRegistry.MOCK_ITEM.get(), stack.getCount());
+    protected static ItemStack createMockStack(ItemStack stack, RegistrySupplier<Item> mockItem) {
+        ItemStack mockStack = new ItemStack(mockItem.get(), stack.getCount());
         CompoundTag nbt = mockStack.getOrCreateTag();
         // Register which item it's mocking and copy all relevant NBT data
         nbt.putString("MockItem", BuiltInRegistries.ITEM.getKey(stack.getItem()).toString());
         if (stack.getTag() != null) {
             nbt.put("MockData", stack.getTag());
         }
-
         return mockStack;
     }
 

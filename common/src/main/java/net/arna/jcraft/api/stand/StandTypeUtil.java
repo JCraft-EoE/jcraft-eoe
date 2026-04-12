@@ -2,13 +2,12 @@ package net.arna.jcraft.api.stand;
 
 import lombok.experimental.UtilityClass;
 import net.arna.jcraft.api.JRegistries;
-import net.arna.jcraft.common.data.AttackerDataLoader;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
+import net.arna.jcraft.common.data.AttackerDataLoader;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.GameRules;
 
@@ -126,9 +125,11 @@ public class StandTypeUtil {
         return AttackerDataLoader.getStandData(id);
     }
 
-    public static StandType generateStandTypeForMob(Entity entity, GameRules gameRules) {
+    public static StandType generateStandTypeForMob(GameRules gameRules) {
+        final RandomSource random = RandomSource.create();
+
         return gameRules.getBoolean(ALLOW_MOB_EVOLVED_STANDS)
-                ? getRandom(entity.level().random)
-                : getRandomRegular(entity.level().random);
+                ? getRandom(random)
+                : getRandomRegular(random);
     }
 }

@@ -1,7 +1,5 @@
 package net.arna.jcraft.client.model.entity.stand;
 
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.model.GeoModel;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.client.util.JClientUtils;
 import net.arna.jcraft.api.stand.StandEntity;
@@ -12,11 +10,11 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 /**
- * The base {@link GeoModel} for stands of any {@link StandType}.
+ * The base Model for stands of any {@link StandType}.
  * @param <E> the entity to model
  * @see net.arna.jcraft.client.renderer.entity.stands.StandEntityRenderer StandEntityRenderer
  */
-public class StandEntityModel<E extends StandEntity<?, ?>> extends GeoModel<E> {
+public class StandEntityModel<E extends StandEntity<?, ?>> {
     private final StandType type;
     private final ResourceLocation model;
     private final List<ResourceLocation> skins;
@@ -45,7 +43,7 @@ public class StandEntityModel<E extends StandEntity<?, ?>> extends GeoModel<E> {
         this.headPitchOffset = headPitchOffset;
         this.velInfluence = velInfluence;
     }
-
+    /*
     @Override
     public ResourceLocation getModelResource(final E entity) {
         return model;
@@ -71,7 +69,7 @@ public class StandEntityModel<E extends StandEntity<?, ?>> extends GeoModel<E> {
         // Note: KingCrimsonEntity overrides this due to some inversions, we should probably change the model later and standardize him.
         JClientUtils.animateGenericHumanoid(this, animatable, animatable.getUser(), animationState.getPartialTick(),
                 true, true, torsoPitchOffset, headPitchOffset, velInfluence);
-    }
+    }*/
 
     protected boolean skipCustomAnimations() {
         return false;

@@ -194,6 +194,11 @@ public class JCraftAbilityHud {
      */
     private static void renderIcons(final GuiGraphics ctx, final Map<CooldownType, IconPos> icons, final int selectedX,
                                     final int selectedY, final Function<CooldownType, ResourceLocation> type) {
+        final JClientConfig.UIDuration uiDuration = JClientConfig.getInstance().getUiDuration();
+        if (uiDuration == JClientConfig.UIDuration.NEVER) {
+            return;
+        }
+
         final Font textRenderer = Minecraft.getInstance().gui.getFont();
 
         for (Map.Entry<CooldownType, IconPos> entry : icons.entrySet()) {
@@ -212,7 +217,9 @@ public class JCraftAbilityHud {
                 alpha = 1.0f;
             }
 
-            if (timeSinceNoCooldowns >= 100) continue;
+            if (timeSinceNoCooldowns >= 100 && uiDuration == JClientConfig.UIDuration.COOLDOWN) {
+                continue;
+            }
 
             if (alpha <= 0.0f) continue;
 

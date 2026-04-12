@@ -1,39 +1,58 @@
 package net.arna.jcraft.client.renderer.entity.stands;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import mod.azure.azurelib.cache.object.BakedGeoModel;
-import net.arna.jcraft.client.model.entity.stand.ShadowTheWorldModel;
+import lombok.NonNull;
+import mod.azure.azurelib.animation.controller.AzAnimationController;
+import mod.azure.azurelib.animation.controller.AzAnimationControllerContainer;
+import mod.azure.azurelib.render.entity.AzEntityRendererConfig;
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.registry.JStandTypeRegistry;
+import net.arna.jcraft.api.stand.StandType;
+import net.arna.jcraft.client.renderer.entity.StandEntityModelRenderer;
 import net.arna.jcraft.client.renderer.entity.layer.STWGlowLayer;
 import net.arna.jcraft.common.entity.stand.ShadowTheWorldEntity;
-import net.arna.jcraft.common.util.JUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * The {@link StandEntityRenderer} for {@link ShadowTheWorldEntity}.
- * @see ShadowTheWorldModel
  */
+
 public class ShadowTheWorldRenderer extends StandEntityRenderer<ShadowTheWorldEntity> {
-    public ShadowTheWorldRenderer(final EntityRendererProvider.Context context) {
-        super(context, new ShadowTheWorldModel());
-        addRenderLayer(new STWGlowLayer(this));
+    private ShadowTheWorldRenderer(EntityRendererProvider.@NonNull Context context, @NonNull StandType type) {
+        super(context, type);
     }
 
-    @Override
-    public RenderType getRenderType(final ShadowTheWorldEntity animatable, final ResourceLocation texture, final @Nullable MultiBufferSource bufferSource, final float partialTick) {
-        Minecraft mcClient = Minecraft.getInstance();
-        return mcClient.options.getCameraType().isFirstPerson() && mcClient.player != null && JUtils.getStand(mcClient.player) == animatable ?
-                RenderType.entityNoOutline(texture) : RenderType.entityTranslucentCull(texture);
+    public static StandEntityRenderer<ShadowTheWorldEntity> of(final @NonNull EntityRendererProvider.Context context) {
+        final StandType type = JStandTypeRegistry.SHADOW_THE_WORLD.get();
+        final var id = type.getId().getPath();
+        final var animation = JCraft.id(ANIMATION_STR_TEMPLATE.formatted(id));
+        final var model = type.getId().withPath(MODEL_STR_TEMPLATE.formatted(id));
+        final var texture = getTextureLocation(type);
+
+        return StandEntityRenderer.of(
+                AzEntityRendererConfig
+                        .<ShadowTheWorldEntity>builder(model, texture)
+                        .addRenderLayer(new STWGlowLayer())
+                        .setAnimatorProvider(() -> new STWAnimator(animation, false, false, -0.1745329251f, -0.1745329251f, 90f))
+                        .setModelRenderer(StandEntityModelRenderer::new)
+                        .setRenderType(renderType())
+                        .setPrerenderEntry(preRenderEntry())
+                        .build(),
+                context,
+                model,
+                texture
+        );
     }
 
-    @Override
-    public void actuallyRender(final PoseStack poseStack, final ShadowTheWorldEntity animatable, final BakedGeoModel model, final RenderType renderType, final MultiBufferSource bufferSource, final VertexConsumer buffer, final boolean isReRender, final float partialTick, final int packedLight, final int packedOverlay, final float red, final float green, final float blue, final float alpha) {
-        final float a = StandEntityRenderer.getAlpha(animatable, partialTick);
-        super.actuallyRender(poseStack, animatable, model, renderType, bufferSource, buffer, isReRender, partialTick, 15728640, packedOverlay, red, green, blue, a);
+    private static class STWAnimator extends StandAnimator<ShadowTheWorldEntity> {
+        public STWAnimator(final @NonNull ResourceLocation animation, boolean flipBody, boolean flipHead, float torsoPitchOffset, float headPitchOffset, float velInfluence) {
+            super(animation, flipBody, flipHead, torsoPitchOffset, headPitchOffset, velInfluence);
+        }
+
+        @Override
+        public void registerControllers(@NonNull AzAnimationControllerContainer<ShadowTheWorldEntity> animationControllerContainer) {
+            animationControllerContainer.add(AzAnimationController.builder(this, ShadowTheWorldEntity.DESUMMON_CONTROLLER).setTransitionLength(0).build());
+            super.registerControllers(animationControllerContainer);
+        }
     }
 }

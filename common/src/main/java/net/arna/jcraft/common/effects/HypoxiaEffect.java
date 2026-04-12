@@ -76,12 +76,25 @@ public class HypoxiaEffect extends MobEffect {
             // Only apply attribute modifiers appropriate to the amplifier
             if (amplifier < entry.getKey()) continue;
 
-            Tuple<Attribute, AttributeModifier> modifier = entry.getValue();
-            AttributeInstance attributeInstance = attributeMap.getInstance(modifier.getA());
+            final Tuple<Attribute, AttributeModifier> modifier = entry.getValue();
+            final Attribute attribute = modifier.getA();
+            final AttributeInstance attributeInstance = attributeMap.getInstance(attribute);
             if (attributeInstance != null) {
+                int multiplier = amplifier;
+
+                if (attribute == Attributes.MOVEMENT_SPEED && multiplier > 2) {
+                    multiplier = 2;
+                }
+
                 AttributeModifier attributeModifier = modifier.getB();
                 attributeInstance.removeModifier(attributeModifier);
-                attributeInstance.addPermanentModifier(new AttributeModifier(attributeModifier.getId(), this.getDescriptionId() + " " + amplifier, this.getAttributeModifierValue(amplifier, attributeModifier), attributeModifier.getOperation()));
+                attributeInstance.addPermanentModifier(
+                        new AttributeModifier(attributeModifier.getId(),
+                                this.getDescriptionId() + " " + multiplier,
+                                this.getAttributeModifierValue(multiplier, attributeModifier),
+                                attributeModifier.getOperation()
+                        )
+                );
             }
         }
     }

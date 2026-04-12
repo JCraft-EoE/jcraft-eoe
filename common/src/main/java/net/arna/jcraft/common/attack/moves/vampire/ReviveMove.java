@@ -54,6 +54,7 @@ public final class ReviveMove extends AbstractMove<ReviveMove, VampireSpec> {
 
             Entity entity = entityType.create(serverWorld);
             if (entity instanceof final LivingEntity living) {
+                living.skipDropExperience();
                 if (isBoss(living)) {
                     continue;
                 }

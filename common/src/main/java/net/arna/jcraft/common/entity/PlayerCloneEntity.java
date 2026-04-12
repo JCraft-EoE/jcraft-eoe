@@ -113,6 +113,10 @@ public class PlayerCloneEntity extends Monster implements RangedAttackMob, IOwna
         allowItemExchange = false;
     }
 
+    public void disableExperience() {
+        xpReward = 0;
+    }
+
     @Override
     public LivingEntity getMaster() {
         return master;

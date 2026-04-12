@@ -547,7 +547,7 @@
 				}
 			}
 		},
-		"animation.whitesnake.summon": {
+		"summon": {
 			"loop": "hold_on_last_frame",
 			"animation_length": 1.04,
 			"bones": {

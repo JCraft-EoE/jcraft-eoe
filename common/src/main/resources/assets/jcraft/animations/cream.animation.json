@@ -630,7 +630,7 @@
 				}
 			}
 		},
-		"animation.cream.summon": {
+		"summon": {
 			"animation_length": 1,
 			"bones": {
 				"Stand": {

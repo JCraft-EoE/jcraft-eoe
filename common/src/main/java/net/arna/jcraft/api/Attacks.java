@@ -2,15 +2,21 @@ package net.arna.jcraft.api;
 
 import dev.architectury.networking.NetworkManager;
 import io.netty.buffer.Unpooled;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehavior;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.attack.moves.AbstractCounterAttack;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
+import net.arna.jcraft.api.component.living.CommonHamonComponent;
+import net.arna.jcraft.api.registry.JAdvancementTriggerRegistry;
 import net.arna.jcraft.api.registry.JPacketRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.registry.JSpecTypeRegistry;
 import net.arna.jcraft.api.registry.JStatRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.spec.JSpec;
+import net.arna.jcraft.api.spec.SpecType;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.entity.TrainingDummyEntity;
@@ -38,9 +44,48 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+import static mod.azure.azurelib.animation.dispatch.command.AzCommand.controllerBuilder;
 import static net.arna.jcraft.api.component.living.CommonHitPropertyComponent.HitAnimation;
 
 public interface Attacks {
+
+    /**
+     * Use instead of AzCommand.create() inside stand's State enums.
+     */
+    static AzCommand createAnimationCommand(
+            String controllerName,
+            String animationName,
+            AzPlayBehavior playBehavior
+    ) {
+        return createAnimationCommand(controllerName, animationName, playBehavior, 0f, 1f, 0f, 0f, false);
+    }
+
+    static AzCommand createAnimationCommand(
+            String controllerName,
+            String animationName,
+            AzPlayBehavior playBehavior,
+            float startTickOffset,
+            float animationSpeed,
+            float freezeTickOffset,
+            float repeatXTimes,
+            boolean isReversing
+    ) {
+        return controllerBuilder()
+                .cancel(controllerName)
+                .playSequence(
+                        controllerName,
+                        sequenceBuilder -> sequenceBuilder.queue(
+                                animationName,
+                                props -> props.withPlayBehavior(playBehavior)
+                        )
+                )
+                .setFreezeTickOffset(controllerName, freezeTickOffset)
+                .setStartTickOffset(controllerName, startTickOffset)
+                .setSpeed(controllerName, animationSpeed)
+                .setRepeatAmount(controllerName, repeatXTimes)
+                .setReverseAnimation(controllerName, isReversing)
+                .build();
+    }
 
     /**
      * (LEGACY) Highest level damage method, handles combo counting, DEFAULTS unblockable TO FALSE
@@ -326,6 +371,27 @@ public interface Attacks {
 
         damage(attacker, damage, source, victim);
 
+        if (livingAttacker != null) {
+            final JSpec<?, ?> userSpec = JUtils.getSpec(livingAttacker);
+            if (userSpec != null) {
+                final SpecType userSpecType = userSpec.getType();
+                // combo acknowledger
+                if (userSpecType == JSpecTypeRegistry.HAMON.get() && livingAttacker instanceof ServerPlayer player) {
+                    final CommonHamonComponent hamon = JComponentPlatformUtils.getHamon(player);
+                    if (victim.getUUID().equals(hamon.getLastSendoAired()) && victim.getUUID().equals(hamon.getLastStomped()) &&
+                            // make sure stomp was used after sendo air
+                            hamon.getLastStompedTick() < hamon.getLastSendoAiredTick() &&
+                            // but not too long ago (30 seconds)
+                            hamon.getLastSendoAiredTick() - hamon.getLastStompedTick() <= 600 &&
+                            // check that stomp was last used move TODO do something less hacky than "was it used within the last five seconds"
+                            hamon.getLastStompedTick() <= 100
+                    ) {
+                        JAdvancementTriggerRegistry.HAMON6.trigger(player);
+                    }
+                }
+            }
+        }
+
         if ( (victim.isDeadOrDying() || victim.getHealth() <= 0f) && livingAttacker != null) {
             final StandEntity<?, ?> standAttacker = JUtils.getStand(livingAttacker);
             if (standAttacker != null) {
@@ -334,6 +400,24 @@ public interface Attacks {
             if (stand != null && stand.hasUser() && // if killed entity was a using a stand
                     (standAttacker != null ? standAttacker.getUser() : livingAttacker) instanceof final Player player && !player.level().isClientSide()) {
                 player.awardStat(JStatRegistry.STAND_USERS_KILLED.get());
+            }
+            final JSpec<?,?> userSpec = JUtils.getSpec(livingAttacker);
+            if (userSpec != null) {
+                final SpecType userSpecType = userSpec.getType();
+                // combo acknowledger
+                if (userSpecType == JSpecTypeRegistry.HAMON.get() && livingAttacker instanceof ServerPlayer player) {
+                    final CommonHamonComponent hamon = JComponentPlatformUtils.getHamon(player);
+                    if (victim.getUUID().equals(hamon.getLastZoomPunched()) && victim.getUUID().equals(hamon.getLastSendoed()) &&
+                            // make sure sendo was used after zoom punch
+                            hamon.getLastSendoedTick() < hamon.getLastZoomPunchedTick() &&
+                            // but not too long ago (30 seconds)
+                            hamon.getLastZoomPunchedTick() - hamon.getLastSendoedTick() <= 600 &&
+                            // check that sendo was last used move TODO do something less hacky than "was it used within the last five seconds"
+                            hamon.getLastSendoedTick() <= 100
+                    ) {
+                        JAdvancementTriggerRegistry.HAMON4.trigger(player);
+                    }
+                }
             }
         }
 
@@ -395,6 +479,9 @@ public interface Attacks {
         // Armor and toughness considerations are also capped in here at netherite levels
         damage = JUtils.getDamageThroughArmor(damage, armor * 0.9f, toughness * 0.9f);
         damage = ((LivingEntityInvoker) ent).invokeModifyAppliedDamage(damageSource, damage);
+
+        // Functionally a callback invocation; we can't copy the nuances of all damage effects, so we do this instead.
+        // ent.hurt(damageSource, Float.MIN_NORMAL);
 
         // Apply absorption
         applyAbsorptionAndStats(damage, damageSource, ent);
@@ -506,9 +593,19 @@ public interface Attacks {
         ent.setHealth(h - damage);
         ent.getCombatTracker().recordDamage(damageSource, damage);
         ent.gameEvent(GameEvent.ENTITY_DAMAGE);
+
         if (damageSource.getEntity() instanceof LivingEntity livingAttacker) {
             ent.setLastHurtByMob(livingAttacker);
+            if (livingAttacker instanceof Player player) {
+                invoker.setLastHurtByPlayerTime(100);
+                ent.setLastHurtByPlayer(player);
+            }
+            else if (livingAttacker instanceof StandEntity<?,?> stand && stand.hasUser() && stand.getUser() instanceof Player player) {
+                invoker.setLastHurtByPlayerTime(100);
+                ent.setLastHurtByPlayer(player);
+            }
         }
+
         if (ent.isDeadOrDying()) {
             ent.die(damageSource);
         }

@@ -1,31 +1,14 @@
 package net.arna.jcraft.client.renderer.armor;
 
-import net.arna.jcraft.client.model.armor.JArmorModel;
-import net.arna.jcraft.common.item.FlutteringArmorItem;
-import net.minecraft.world.entity.EquipmentSlot;
+import net.arna.jcraft.JCraft;
+import net.minecraft.resources.ResourceLocation;
 
-public class KosakuArmorRenderer extends JArmor<FlutteringArmorItem> {
+public class KosakuArmorRenderer extends ArmorRenderer {
+
+    public static final String ID = "kosakuoutfit";
+    public static final ResourceLocation TEXTURE = JCraft.id(TEXTURE_STR_TEMPLATE.formatted(ID));
+
     public KosakuArmorRenderer() {
-        super(new JArmorModel<>("kiraoutfit", "kosakuoutfit"));
-    }
-
-    @Override
-    protected void applyBoneVisibilityBySlot(EquipmentSlot currentSlot) {
-        setAllVisible(false);
-
-        if (currentSlot == EquipmentSlot.LEGS) {
-            setBoneVisible(this.body, true);
-            setBoneVisible(this.leftLeg, true);
-            setBoneVisible(this.rightLeg, true);
-            setBoneVisible(this.leftArm, true);
-            setBoneVisible(this.rightArm, true);
-        }
-        else if (currentSlot == EquipmentSlot.FEET) {
-            setBoneVisible(this.leftBoot, true);
-            setBoneVisible(this.rightBoot, true);
-        }
-        else if (currentSlot == EquipmentSlot.HEAD) {
-            setBoneVisible(this.head, true);
-        }
+        super(() -> new ArmorAnimator(ID), new KiraArmorRenderer.KiraArmorBoneContext(), KiraArmorRenderer.MODEL, TEXTURE);
     }
 }

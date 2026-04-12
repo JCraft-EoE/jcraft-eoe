@@ -48,7 +48,7 @@ public class EntityMixinLogic {
             final double heightOffset = stand.shouldOffsetHeight() ? Vec3.directionFromRotation(thisEntity.getXRot(), thisEntity.getYRot()).y : 0;
             final Vec3 adjustedOffset = RotationUtil.vecPlayerToWorld(
                     Mth.cos(y) * dist,
-                    passenger.getMyRidingOffset() + heightOffset,
+                    passenger.getMyRidingOffset() + heightOffset + stand.getYDistanceOffset(),
                     Mth.sin(y) * dist,
                     GravityChangerAPI.getGravityDirection(thisEntity)
             );

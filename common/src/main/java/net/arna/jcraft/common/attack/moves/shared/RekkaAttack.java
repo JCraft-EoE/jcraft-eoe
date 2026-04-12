@@ -12,12 +12,11 @@ import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
-import mod.azure.azurelib.animatable.GeoEntity;
 
 import java.util.Set;
 
 @Getter
-public final class RekkaAttack<A extends IAttacker<A, S> & GeoEntity, S extends Enum<S> & StandAnimationState<A>>
+public final class RekkaAttack<A extends IAttacker<A, S>, S extends Enum<S> & StandAnimationState<A>>
         extends AbstractSimpleAttack<RekkaAttack<A, S>, A> {
     private final int rekkaLevel;
     private final RekkaAttack<A, S> next;

@@ -4,6 +4,7 @@ import com.mojang.brigadier.StringReader;
 import dev.architectury.event.events.common.CommandRegistrationEvent;
 import dev.architectury.networking.NetworkManager;
 import dev.architectury.registry.registries.DeferredRegister;
+import dev.architectury.registry.registries.RegistrySupplier;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
@@ -12,6 +13,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import mod.azure.azurelib.animation.cache.AzIdentityRegistry;
 import net.arna.jcraft.api.JRegistries;
 import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
@@ -27,6 +29,7 @@ import net.arna.jcraft.common.entity.projectile.KnifeProjectile;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.config.GravityChangerConfig;
 import net.arna.jcraft.common.gravity.util.GravityChannel;
+import net.arna.jcraft.common.item.CosplayItem;
 import net.arna.jcraft.common.loot.JLootTableHelper;
 import net.arna.jcraft.common.network.RemoteStandInteractPacket;
 import net.arna.jcraft.common.network.c2s.*;
@@ -67,6 +70,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -131,6 +135,10 @@ public final class JCraft {
     public static final GameRules.Key<IntegerValue> STAND_ARROW_BASE_DAMAGE = register("standArrowBaseDamage", Category.MISC, IntegerValue.create(2));
 
     public static final GameRules.Key<BooleanValue> FALLING_METEORS = register("doFallingMeteors", Category.SPAWNING, BooleanValue.create(true));
+    /**
+     * String ID of the base controller.
+     */
+    public static final String BASE_CONTROLLER = "base_controller";
 
     // Dimensional travel bullshit
     /**
@@ -178,6 +186,8 @@ public final class JCraft {
         BLOCK_REGISTRY.register();
         ITEM_REGISTRY.register();
         BLOCK_ENTITY_TYPE_REGISTRY.register();
+
+        JRecipeRegistry.register();
 
         // Custom registries
         STAND_TYPE_REGISTRY.register();
@@ -241,11 +251,23 @@ public final class JCraft {
         NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_MENU_CALL, MenuCallPacket::handle);
     }
 
+    private static void registerAzArmor() {
+        AzIdentityRegistry.register(
+                JItemRegistry.STONE_MASK.get()
+        );
+        for (final CosplayItem<?> cosplayItem : CosplayItem.all()) {
+            for (final RegistrySupplier<? extends ArmorItem> item : cosplayItem) {
+                AzIdentityRegistry.register(item.get());
+            }
+        }
+    }
+
     public static void postInit() {
         initBlockPostLoad();
         EvolutionItemHandler.init();
         initDispenserBehaviors();
         JStatRegistry.initFormatters();
+        registerAzArmor();
     }
 
     private static void initBlockPostLoad() {
@@ -461,6 +483,24 @@ public final class JCraft {
         ServerChannelFeedbackPacket.send(JUtils.around(world, new Vec3(x, y, z), 128), buf);
     }
 
+    public static void createHitscanTraceParticle(ServerLevel world, Vec3 start, Vec3 velocity, JParticleType type) {
+        if (world == null || type == null) {
+            return;
+        }
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+
+        buf.writeShort(14);
+        buf.writeDouble(start.x());
+        buf.writeDouble(start.y());
+        buf.writeDouble(start.z());
+        buf.writeDouble(velocity.x());
+        buf.writeDouble(velocity.y());
+        buf.writeDouble(velocity.z());
+        buf.writeEnum(type);
+
+        ServerChannelFeedbackPacket.send(JUtils.around(world, start, 128), buf);
+    }
+
     public static void tryPushBlock(final ServerLevel world, final LivingEntity user, final @NonNull StandEntity<?, ?> stand) {
         if (pushblockCooldowns.getOrDefault(user, -1) > 0) {
             return;
@@ -589,10 +629,16 @@ public final class JCraft {
         return null;
     }
 
-    public static void dimensionHop(LivingEntity entity, int heightOffset) {
-        ServerLevel original = (ServerLevel) entity.level();
-        MinecraftServer server = original.getServer();
-        ServerLevel au = server.getLevel(JDimensionRegistry.AU_DIMENSION_KEY);
+    /**
+     * @param entity the entity to hop
+     * @param heightOffset the height offset
+     * @param time the time in the other dimension
+     * @throws IllegalArgumentException If <code>time</code> is not positive.
+     */
+    public static void dimensionHop(final LivingEntity entity, final int heightOffset, final int time) {
+        final ServerLevel original = (ServerLevel) entity.level();
+        final MinecraftServer server = original.getServer();
+        final ServerLevel au = server.getLevel(JDimensionRegistry.AU_DIMENSION_KEY);
         if (au == null) {
             JCraft.LOGGER.fatal("Alternate universe world does not exist!");
             return;
@@ -601,11 +647,11 @@ public final class JCraft {
             return;
         }
 
-        Vec3 pos = entity.position();
+        final Vec3 pos = entity.position();
         LivingEntity finalEnt = entity;
 
         if (entity instanceof ServerPlayer player) {
-            ChunkPos chunkPos = new ChunkPos(BlockPos.containing(pos.x, pos.y, pos.z));
+            final ChunkPos chunkPos = new ChunkPos(BlockPos.containing(pos.x, pos.y, pos.z));
             au.getChunkSource().addRegionTicket(TicketType.POST_TELEPORT, chunkPos, 1, player.getId());
             player.teleportTo(au, pos.x, pos.y - heightOffset, pos.z, entity.getYRot(), entity.getXRot());
             player.connection.send(
@@ -621,7 +667,7 @@ public final class JCraft {
         }
 
         finalEnt.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 9, true, false, true));
-        PastDimensions.enqueue(new DimensionData(finalEnt, pos, original.dimension()));
+        PastDimensions.enqueue(new DimensionData(finalEnt, pos, original.dimension(), time)); // throws IAE
     }
 
     public static boolean wasRecentlyAttacked(CombatTracker tracker) {

@@ -148,12 +148,12 @@ public abstract class CommonGravityShiftComponentImpl implements CommonGravitySh
     }
 
     @Override
-    public void startDirectional() {
+    public void startDirectional(final int range) {
         time = 600;
         type = ShiftType.DIRECTIONAL;
 
         Direction lookDir = JUtils.getLookDirection(user);
-        List<Entity> toCatch = user.level().getEntitiesOfClass(Entity.class, user.getBoundingBox().inflate(16),
+        List<Entity> toCatch = user.level().getEntitiesOfClass(Entity.class, user.getBoundingBox().inflate(Math.max(1, range)),
                 EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(e -> !e.isPassengerOfSameVehicle(user)));
 
         Gravity gravity = new Gravity(lookDir, 3, GRAVITY_CHANGE_DURATION, GRAVITY_SOURCE);

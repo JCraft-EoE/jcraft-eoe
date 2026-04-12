@@ -993,7 +993,7 @@
 				}
 			}
 		},
-		"animation.kqbtd.summon": {
+		"summon": {
 			"animation_length": 1.12,
 			"bones": {
 				"torso": {

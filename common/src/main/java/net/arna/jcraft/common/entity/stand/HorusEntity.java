@@ -1,8 +1,10 @@
 package net.arna.jcraft.common.entity.stand;
 
 import lombok.NonNull;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.Attacks;
 import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.MoveSet;
 import net.arna.jcraft.api.attack.MoveSetManager;
@@ -30,17 +32,14 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.enchantment.FrostWalkerEnchantment;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.lang.ref.WeakReference;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 /**
  * The {@link StandEntity} for <a href="https://jojowiki.com/Horus">Horus</a>.
  * @see JStandTypeRegistry#HORUS
- * @see net.arna.jcraft.client.model.entity.stand.HorusModel HorusModel
  * @see net.arna.jcraft.client.renderer.entity.stands.HorusRenderer HorusRenderer
  * @see net.arna.jcraft.common.entity.npc.PetshopEntity PetshopEntity
  * @see HorusBarrageAttack
@@ -325,46 +324,41 @@ public class HorusEntity extends StandEntity<HorusEntity, HorusEntity.State> {
 
     // Animation code
     public enum State implements StandAnimationState<HorusEntity> {
-        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.horus.idle"))),
-        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.horus.block"))),
-        LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlay("animation.horus.light"))),
-        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlay("animation.horus.light_followup"))),
-        LIGHT_LOW(builder -> builder.setAnimation(RawAnimation.begin().thenPlay("animation.horus.light_low"))),
-        LIGHT_AIR(builder -> builder.setAnimation(RawAnimation.begin().thenPlay("animation.horus.light_air"))),
-        IMPALE(builder -> builder.setAnimation(RawAnimation.begin().thenPlay("animation.horus.impale"))),
-        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenPlay("animation.horus.barrage"))),
-        STOMP(builder -> builder.setAnimation(RawAnimation.begin().thenPlay("animation.horus.stomp"))),
-        DETONATE(builder -> builder.setAnimation(RawAnimation.begin().thenPlay("animation.horus.detonate"))),
-        DIVEKICK(builder -> builder.setAnimation(RawAnimation.begin().thenPlay("animation.horus.divekick"))),
-        DIVEKICK_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlay("animation.horus.divekick_hit"))),
-        SCATTER(builder -> builder.setAnimation(RawAnimation.begin().thenPlay("animation.horus.scatter"))),
-        CHARGE_ICICLE(builder -> builder.setAnimation(RawAnimation.begin().thenPlay("animation.horus.charge_icicle"))),
-        CHARGE_FIRE(builder -> builder.setAnimation(RawAnimation.begin().thenPlay("animation.horus.charge_fire"))),
-        PLACE(builder -> builder.setAnimation(RawAnimation.begin().thenPlay("animation.horus.place"))),
-        ULTIMATE(builder -> builder.setAnimation(RawAnimation.begin().thenPlay("animation.horus.ultimate"))),
-        LANCE(builder -> builder.setAnimation(RawAnimation.begin().thenPlay("animation.horus.lance"))),
+        IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.horus.idle", AzPlayBehaviors.LOOP)),
+        BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.horus.block", AzPlayBehaviors.LOOP)),
+        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT_LOW(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.light_low", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT_AIR(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.light_air", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        IMPALE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.impale", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.barrage", AzPlayBehaviors.LOOP)),
+        STOMP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.stomp", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        DETONATE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.detonate", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        DIVEKICK(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.divekick", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        DIVEKICK_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.divekick_hit", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        SCATTER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.scatter", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        CHARGE_ICICLE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.charge_icicle", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        CHARGE_FIRE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.charge_fire", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        PLACE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.place", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ULTIMATE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.ultimate", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LANCE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.lance", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         ;
 
-        private final Consumer<AnimationState<HorusEntity>> animator;
+        private final AzCommand animator;
 
-        State(Consumer<AnimationState<HorusEntity>> animator) {
+        State(AzCommand animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(HorusEntity attacker, AnimationState<HorusEntity> builder) {
-            animator.accept(builder);
+        public void playAnimation(HorusEntity attacker) {
+            animator.sendForEntity(attacker);
         }
     }
 
     @Override
     protected HorusEntity.State[] getStateValues() {
         return State.values();
-    }
-
-    @Override
-    protected @Nullable String getSummonAnimation() {
-        return "animation.horus.summon";
     }
 
     @Override

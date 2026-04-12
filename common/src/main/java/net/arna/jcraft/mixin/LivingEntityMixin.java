@@ -163,17 +163,6 @@ public abstract class LivingEntityMixin implements IJCraftComboTracker {
         }
     }
 
-    @Inject(at = @At("RETURN"), method = "hurt")
-    private void hurt(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-        if (cir.getReturnValueZ() && source.getEntity() instanceof StandEntity<?,?> stand && stand.hasUser()) {
-            final LivingEntity user = stand.getUser();
-            if (user instanceof Player player) {
-                this.lastHurtByPlayerTime = 100;
-                this.lastHurtByPlayer = player;
-            }
-        }
-    }
-
     // Counter hook - Living entity
     @Inject(cancellable = true, at = @At("HEAD"), method = "actuallyHurt")
     protected void jcraft$applyDamage(DamageSource source, float amount, CallbackInfo info) {
@@ -232,6 +221,14 @@ public abstract class LivingEntityMixin implements IJCraftComboTracker {
 
         if (JComponentPlatformUtils.getMiscData(livingEntity).getMaster() == entity) {
             cir.setReturnValue(false);
+        }
+    }
+
+    @Inject(cancellable = true, method = "dropFromLootTable(Lnet/minecraft/world/damagesource/DamageSource;Z)V", at = @At("HEAD"))
+    protected void jcraft$dropFromLootTable(final DamageSource damageSource, final boolean hitByPlayer, final CallbackInfo ci) {
+        LivingEntity living = (LivingEntity) (Object) this;
+        if (JComponentPlatformUtils.getMiscData(living).getMaster() != null) {
+            ci.cancel();
         }
     }
 }

@@ -1,23 +1,20 @@
 package net.arna.jcraft.common.entity.stand;
 
 import lombok.NonNull;
-import mod.azure.azurelib.core.animation.AnimationState;
+import net.arna.jcraft.api.attack.MoveMap;
+import net.arna.jcraft.api.attack.MoveSet;
+import net.arna.jcraft.api.attack.MoveSetManager;
+import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
-import net.arna.jcraft.api.attack.MoveSetManager;
-import net.arna.jcraft.api.attack.MoveMap;
-import net.arna.jcraft.api.attack.MoveSet;
 import net.arna.jcraft.common.util.StandAnimationState;
-import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * The {@link StandEntity} for <a href="https://jojowiki.com/Chariot_Requiem">Chariot Requiem</a>.
  * @see JStandTypeRegistry#CHARIOT_REQUIEM
- * @see net.arna.jcraft.client.model.entity.stand.ChariotRequiemModel ChariotRequiemModel
  * @see net.arna.jcraft.client.renderer.entity.stands.ChariotRequiemRenderer ChariotRequiemRenderer
  */
 public class ChariotRequiemEntity extends StandEntity<ChariotRequiemEntity, ChariotRequiemEntity.State> {
@@ -44,7 +41,7 @@ public class ChariotRequiemEntity extends StandEntity<ChariotRequiemEntity, Char
         BLOCK;
 
         @Override
-        public void playAnimation(ChariotRequiemEntity attacker, AnimationState<ChariotRequiemEntity> state) {
+        public void playAnimation(ChariotRequiemEntity attacker) {
             // TODO Arna
         }
     }
@@ -52,11 +49,6 @@ public class ChariotRequiemEntity extends StandEntity<ChariotRequiemEntity, Char
     @Override
     protected State[] getStateValues() {
         return State.values();
-    }
-
-    @Override
-    protected @Nullable String getSummonAnimation() {
-        return "animation.chariotrequiem.summon";
     }
 
     @Override

@@ -4,12 +4,10 @@ import com.mojang.datafixers.util.Either;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.Getter;
 import lombok.NonNull;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.core.animation.AnimationController;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
-import mod.azure.azurelib.core.object.PlayState;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.Attacks;
 import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
@@ -38,18 +36,16 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.level.Level;
 import org.joml.Vector3f;
 
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-
 /**
  * The {@link StandEntity} for <a href="https://jojowiki.com/The_World">Shadow The World</a>.
  * @see JStandTypeRegistry#SHADOW_THE_WORLD
- * @see net.arna.jcraft.client.model.entity.stand.ShadowTheWorldModel ShadowTheWorldModel
  * @see net.arna.jcraft.client.renderer.entity.stands.ShadowTheWorldRenderer ShadowTheWorldRenderer
  * @see STWCounterAttack
  */
 @Getter
 public final class ShadowTheWorldEntity extends AbstractTheWorldEntity<ShadowTheWorldEntity, ShadowTheWorldEntity.State> {
+    public static final String DESUMMON_CONTROLLER = "desummon";
+
     public static final MoveSet<ShadowTheWorldEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.SHADOW_THE_WORLD,
             ShadowTheWorldEntity::registerMoves, State.class);
     public static final StandData DATA = StandData.builder()
@@ -217,12 +213,14 @@ public final class ShadowTheWorldEntity extends AbstractTheWorldEntity<ShadowThe
         moves.register(MoveClass.UTILITY, TIME_SKIP, State.IDLE);
     }
 
+    private final AzCommand DESUMMON = AzCommand.create(DESUMMON_CONTROLLER, "animation.shadow_the_world.desummon");
     public void startAnimatedDesummon() {
         entityData.set(DESUMMONING, true);
         //todo: playSound(JSoundRegistry.SHADOW_THE_WORLD_DESUMMON);
         if (isFree()) return;
         setFree(true);
         setFreePos(position().toVector3f());
+        DESUMMON.sendForEntity(this);
     }
 
     public boolean isAnimatedDesummoning() {
@@ -282,60 +280,52 @@ public final class ShadowTheWorldEntity extends AbstractTheWorldEntity<ShadowThe
 
     // Animation code
     public enum State implements StandAnimationState<ShadowTheWorldEntity> {
-        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.shadow_the_world.idle"))),
-        LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.shadow_the_world.light"))),
-        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.shadow_the_world.block"))),
-        LUNGE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.shadow_the_world.lunge"))),
-        GUARD_CANCEL(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.shadow_the_world.guard_cancel"))),
-        THREE_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.shadow_the_world.3hit"))),
-        IMPALING_THRUST_CHARGE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.shadow_the_world.impaling_thrust_charge"))),
-        IMPALING_THRUST_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.shadow_the_world.impaling_thrust_hit"))),
-        CHARGE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.shadow_the_world.charge"))),
-        CHARGE_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.shadow_the_world.charge_hit"))),
-        UPPERCUT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.shadow_the_world.uppercut"))),
-        COUNTER(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.shadow_the_world.counter"))),
-        TIME_STOP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.shadow_the_world.timestop"))),
+        IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.idle", AzPlayBehaviors.LOOP)),
+        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.block", AzPlayBehaviors.LOOP)),
+        LUNGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.lunge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        GUARD_CANCEL(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.guard_cancel", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        THREE_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.3hit", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        IMPALING_THRUST_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.impaling_thrust_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        IMPALING_THRUST_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.impaling_thrust_hit", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        CHARGE_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.charge_hit", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        UPPERCUT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.uppercut", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        COUNTER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.counter", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        TIME_STOP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.timestop", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         ;
+        
+        private final AzCommand animator;
 
-        private final BiConsumer<ShadowTheWorldEntity, AnimationState<ShadowTheWorldEntity>> animator;
-
-        State(Consumer<AnimationState<ShadowTheWorldEntity>> animator) {
-            this((stand, builder) -> animator.accept(builder));
-        }
-
-        State(BiConsumer<ShadowTheWorldEntity, AnimationState<ShadowTheWorldEntity>> animator) {
+        State(AzCommand animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(ShadowTheWorldEntity attacker, AnimationState<ShadowTheWorldEntity> builder) {
-            animator.accept(attacker, builder);
+        public void playAnimation(ShadowTheWorldEntity attacker) {
+            animator.sendForEntity(attacker);
         }
     }
 
+    /*
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         super.registerControllers(controllers);
         controllers.add(new AnimationController<>(getThis(), "desummon", 0, this::desummonPredicate));
     }
 
-    private static final RawAnimation DESUMMON_SQUEEZE = RawAnimation.begin().thenPlayAndHold("animation.shadow_the_world.desummon");
+    private static final RawAnimation DESUMMON_SQUEEZE = RawAnimation.begin()."animation.shadow_the_world.desummon");
     private PlayState desummonPredicate(AnimationState<ShadowTheWorldEntity> state) {
         if (isAnimatedDesummoning()) {
             state.getController().setAnimation(DESUMMON_SQUEEZE);
             return PlayState.CONTINUE;
         }
         return PlayState.STOP;
-    }
+    }*/
 
     @Override
     protected ShadowTheWorldEntity.State[] getStateValues() {
         return ShadowTheWorldEntity.State.values();
-    }
-
-    @Override
-    protected @NonNull String getSummonAnimation() {
-        return "animation.shadow_the_world.summon";
     }
 
     @Override

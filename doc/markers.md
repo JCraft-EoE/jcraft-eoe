@@ -2,7 +2,7 @@
 ## Overview
 Most of the following classes/interfaces/records can be found in `net.arna.jcraft.common.marker`.
 
-A `Marker` is a `Codec`-serializable object that has some kind of ID of type `I`. The other type parameter `M` is the type of the class, similar to `IAttacker` works. It is WHAT is being saved.
+A `Marker` is a `Codec`-serializable object that has some kind of ID of type `I`. The other type parameter `M` is the type of the class, similar to how `IAttacker` works. It is WHAT is being saved.
 
 A `MarkerType` doesn't need to be serializable. It has three type parameters: the id type `I`, the type of information to save `T` and the type of the marker `M`. A `MarkerType` decides HOW an instance of `T` is saved into a marker `M` and HOW it is loaded back in.
 

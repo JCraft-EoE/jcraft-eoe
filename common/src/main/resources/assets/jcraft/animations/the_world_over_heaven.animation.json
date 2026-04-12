@@ -1,7 +1,7 @@
 {
 	"format_version": "1.8.0",
 	"animations": {
-		"animation.twoh.summon": {
+		"summon": {
 			"animation_length": 1.64,
 			"bones": {
 				"Stand": {

@@ -1,16 +1,27 @@
 package net.arna.jcraft.client.renderer.entity;
 
-import net.arna.jcraft.client.model.JProjectileModel;
-import net.arna.jcraft.client.renderer.entity.projectiles.GeoProjectileRenderer;
+import lombok.NonNull;
+import net.arna.jcraft.client.renderer.entity.projectiles.ProjectileRenderer;
 import net.arna.jcraft.common.entity.projectile.GETreeEntity;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 
 /**
- * The {@link GeoProjectileRenderer} for {@link GETreeEntity}.
+ * The {@link ProjectileRenderer} for {@link GETreeEntity}.
  */
-public class GETreeRenderer extends GeoProjectileRenderer<GETreeEntity> {
-    public GETreeRenderer(final EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, new JProjectileModel<>("getree", true));
-        shadowRadius = 2.5f;
+public class GETreeRenderer extends ProjectileRenderer<GETreeEntity> {
+
+    public static final String ID = "getree";
+
+    public GETreeRenderer(final @NonNull EntityRendererProvider.Context context) {
+        super(context, () -> new EntityAnimator<>(ID),
+                b -> b.setShadowRadius(2.5f)
+                        .setRenderEntry(contextPipeline -> {
+                            final var animatable = contextPipeline.animatable();
+
+                            GETreeEntity.ANIMATION.sendForEntity(animatable);
+
+                            return contextPipeline;
+                        }),
+                ID);
     }
 }

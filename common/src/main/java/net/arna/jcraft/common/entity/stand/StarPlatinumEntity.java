@@ -1,9 +1,10 @@
 package net.arna.jcraft.common.entity.stand;
 
 import lombok.NonNull;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.Attacks;
 import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.MoveSet;
 import net.arna.jcraft.api.attack.MoveSetManager;
@@ -33,14 +34,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import org.joml.Vector3f;
 
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
  * The {@link StandEntity} for <a href="https://jojowiki.com/Star_Platinum">Star Platinum</a>.
  * @see JStandTypeRegistry#STAR_PLATINUM
- * @see net.arna.jcraft.client.model.entity.stand.StarPlatinumModel StarPlatinumModel
  * @see net.arna.jcraft.client.renderer.entity.stands.StarPlatinumRenderer StarPlatinumRenderer
  * @see net.arna.jcraft.common.attack.moves.starplatinum.BlockBreakingAttack BlockBreakingAttack
  * @see InhaleAttack
@@ -262,6 +260,15 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
     }
 
     @Override
+    public void tick() {
+        super.tick();
+
+        if (level().isClientSide) {
+            INHALE.tick(this);
+        }
+    }
+
+    @Override
     public boolean initMove(MoveClass moveClass) {
         if (tryFollowUp(moveClass, MoveClass.LIGHT)) return true;
         return super.initMove(moveClass);
@@ -275,49 +282,45 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
 
     // Animation code
     public enum State implements StandAnimationState<StarPlatinumEntity> {
-        IDLE((starPlatinum, builder) -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.starplatinum." +
-                (starPlatinum.getInhaleTime() > 0 ? "inhaleidle" : "idle")))),
-        PUNCH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.light"))),
-        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.starplatinum.block"))),
-        HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.heavy"))),
-        GROUND_BREAKER(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.ground_slam"))),
-        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.starplatinum.barrage"))),
-        STAR_FINGER(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.star_finger"))),
-        INHALE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.inhale"))),
-        KNEE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.knee"))),
-        KNEE_UP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.knee_up"))),
-        JUMP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.jump"))),
-        GRAB(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.grab"))),
-        GRAB_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.grabhit"))),
-        UPPERCUT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.uppercut"))),
-        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.light_followup"))),
-        ITEM_TOSS_CHARGE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.starplatinum.itemthrow_charge"))),
-        ITEM_TOSS(builder -> builder.setAnimation(RawAnimation.begin().thenPlay("animation.starplatinum.itemthrow")));
+        IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.star_platinum.idle", AzPlayBehaviors.LOOP)),
+        INHALE_IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.star_platinum.inhaleidle", AzPlayBehaviors.LOOP)),
+        PUNCH(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.star_platinum.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.star_platinum.block", AzPlayBehaviors.LOOP)),
+        HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.star_platinum.heavy", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        GROUND_BREAKER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.star_platinum.ground_slam", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.star_platinum.barrage", AzPlayBehaviors.LOOP)),
+        STAR_FINGER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.star_platinum.star_finger", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        INHALE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.star_platinum.inhale", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        KNEE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.star_platinum.knee", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        KNEE_UP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.star_platinum.knee_up", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        JUMP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.star_platinum.jump", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        GRAB(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.star_platinum.grab", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        GRAB_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.star_platinum.grabhit", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        UPPERCUT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.star_platinum.uppercut", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.star_platinum.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.star_platinum.itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.star_platinum.itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
-        private final BiConsumer<StarPlatinumEntity, AnimationState<StarPlatinumEntity>> animator;
+        private final AzCommand animator;
 
-        State(Consumer<AnimationState<StarPlatinumEntity>> animator) {
-            this((stand, builder) -> animator.accept(builder));
-        }
-
-        State(BiConsumer<StarPlatinumEntity, AnimationState<StarPlatinumEntity>> animator) {
+        State(AzCommand animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(StarPlatinumEntity attacker, AnimationState<StarPlatinumEntity> builder) {
-            animator.accept(attacker, builder);
+        public void playAnimation(StarPlatinumEntity attacker) {
+            if (this == IDLE && attacker.getInhaleTime() > 0) {
+                INHALE_IDLE.animator.sendForEntity(attacker);
+                return;
+            }
+
+            animator.sendForEntity(attacker);
         }
     }
 
     @Override
     protected State[] getStateValues() {
         return State.values();
-    }
-
-    @Override
-    protected @NonNull String getSummonAnimation() {
-        return "animation.starplatinum.summon";
     }
 
     @Override

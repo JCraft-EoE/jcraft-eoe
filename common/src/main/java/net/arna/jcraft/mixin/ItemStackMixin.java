@@ -14,20 +14,19 @@ public class ItemStackMixin {
     @Inject(method = "is(Lnet/minecraft/world/item/Item;)Z", at = @At("HEAD"), cancellable = true)
     private void mockItem(Item item, CallbackInfoReturnable<Boolean> cir) {
         ItemStack thiz = (ItemStack) (Object) this;
-        if (MockItem.isMockItem(thiz)) {
+        if (thiz.getItem() instanceof MockItem) {
             cir.setReturnValue(MockItem.getMockedStack(thiz).is(item));
         }
     }
 
     @Inject(method = "matches", at = @At("HEAD"), cancellable = true)
     private static void mockItemEqualsCheck(ItemStack left, ItemStack right, CallbackInfoReturnable<Boolean> cir) {
-
-        if (!MockItem.isMockItem(left) && !MockItem.isMockItem(right)) {
+        if (!(left.getItem() instanceof MockItem) && !(right.getItem() instanceof  MockItem)) {
             return;
         }
 
-        ItemStack stack1 = MockItem.isMockItem(left) ? MockItem.getMockedStack(left) : left;
-        ItemStack stack2 = MockItem.isMockItem(right) ? MockItem.getMockedStack(right) : right;
+        ItemStack stack1 = left.getItem() instanceof MockItem ? MockItem.getMockedStack(left) : left;
+        ItemStack stack2 = right.getItem() instanceof MockItem ? MockItem.getMockedStack(right) : right;
 
         cir.setReturnValue(ItemStack.matches(stack1, stack2));
     }

@@ -1,22 +1,26 @@
 package net.arna.jcraft.client.renderer.entity.projectiles;
 
-import net.arna.jcraft.client.model.JProjectileModel;
+import lombok.NonNull;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.projectile.WSAcidProjectile;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.resources.ResourceLocation;
 
 /**
- * The {@link GeoProjectileRenderer} for {@link WSAcidProjectile}.
+ * The {@link ProjectileRenderer} for {@link WSAcidProjectile}.
  */
-public class WSAcidRenderer extends GeoProjectileRenderer<WSAcidProjectile> {
-    public WSAcidRenderer(final EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, new JProjectileModel<>("wsacid", true));
+@Environment(EnvType.CLIENT)
+public class WSAcidRenderer extends ProjectileRenderer<WSAcidProjectile> {
+
+    public static final String ID = "wsacid";
+    private static final RenderType RENDER_TYPE = RenderType.entityTranslucent(JCraft.id(TEXTURE_STR_TEMPLATE.formatted(ID)));
+
+    public WSAcidRenderer(final @NonNull EntityRendererProvider.Context context) {
+        super(context, () -> new EntityAnimator<>(ID), b -> b
+                .setRenderType(RENDER_TYPE),
+                ID);
     }
 
-    @Override
-    public RenderType getRenderType(final WSAcidProjectile animatable, final ResourceLocation texture, final MultiBufferSource bufferSource, final float partialTick) {
-        return RenderType.entityTranslucent(texture);
-    }
 }

@@ -2,6 +2,7 @@ package net.arna.jcraft.forge.capability.impl.player;
 
 import dev.architectury.networking.NetworkManager;
 import lombok.NonNull;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.component.impl.player.CommonPhComponentImpl;
 import net.arna.jcraft.forge.JNetworkingForge;
 import net.arna.jcraft.forge.capability.api.JCapability;
@@ -16,13 +17,11 @@ import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 
-import static net.arna.jcraft.JCraft.MOD_ID;
-
 
 public class PhCapability extends CommonPhComponentImpl implements JCapability {
 
-    public static ResourceLocation PH_S2C = new ResourceLocation(MOD_ID, "ph_s2c");
-    public static ResourceLocation PH_C2S = new ResourceLocation(MOD_ID, "ph_c2s");
+    public static ResourceLocation PH_S2C = JCraft.id("ph_s2c");
+    public static ResourceLocation PH_C2S = JCraft.id("ph_c2s");
 
     public static Capability<PhCapability> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {
     });

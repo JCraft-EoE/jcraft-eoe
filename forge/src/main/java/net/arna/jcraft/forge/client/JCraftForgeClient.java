@@ -5,13 +5,14 @@ import dev.architectury.networking.NetworkManager;
 import me.shedaniel.autoconfig.AutoConfig;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.JRegistries;
+import net.arna.jcraft.api.registry.JBlockEntityTypeRegistry;
+import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.JCraftClient;
 import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
 import net.arna.jcraft.client.particle.*;
 import net.arna.jcraft.client.renderer.block.CoffinTileRenderer;
-import net.arna.jcraft.client.particle.DamageNumberParticle;
 import net.arna.jcraft.client.rendering.DamageIndicatorManager;
 import net.arna.jcraft.forge.JCraftForge;
 import net.arna.jcraft.forge.capability.impl.entity.GrabCapability;
@@ -19,10 +20,8 @@ import net.arna.jcraft.forge.capability.impl.entity.GravityCapability;
 import net.arna.jcraft.forge.capability.impl.entity.TimeStopCapability;
 import net.arna.jcraft.forge.capability.impl.living.*;
 import net.arna.jcraft.forge.capability.impl.player.PhCapability;
-import net.arna.jcraft.forge.capability.impl.player.SpecCapability;
+import net.arna.jcraft.forge.capability.impl.living.SpecCapability;
 import net.arna.jcraft.forge.capability.impl.world.ShockwaveHandlerCapability;
-import net.arna.jcraft.api.registry.JBlockEntityTypeRegistry;
-import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
@@ -51,7 +50,7 @@ import static net.arna.jcraft.forge.capability.impl.living.MiscCapability.MISC_S
 import static net.arna.jcraft.forge.capability.impl.living.StandCapability.STAND_S2C;
 import static net.arna.jcraft.forge.capability.impl.living.VampireCapability.VAMP_S2C;
 import static net.arna.jcraft.forge.capability.impl.player.PhCapability.PH_S2C;
-import static net.arna.jcraft.forge.capability.impl.player.SpecCapability.SPEC_S2C;
+import static net.arna.jcraft.forge.capability.impl.living.SpecCapability.SPEC_S2C;
 import static net.arna.jcraft.forge.capability.impl.world.ShockwaveHandlerCapability.SHOCK_S2C;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD, modid = JCraft.MOD_ID)
@@ -66,7 +65,7 @@ public class JCraftForgeClient {
         ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () -> new ConfigScreenHandler.ConfigScreenFactory(
                 (minecraft, screen) -> AutoConfig.getConfigScreen(JClientConfig.class, screen).get()));
 
-        BlockEntityRenderers.register(JBlockEntityTypeRegistry.COFFIN_TILE.get(), CoffinTileRenderer::new);
+        BlockEntityRenderers.register(JBlockEntityTypeRegistry.COFFIN_TILE.get(), context -> new CoffinTileRenderer());
 
         registerClientCapabilityReceivers();
 
@@ -92,25 +91,54 @@ public class JCraftForgeClient {
         event.registerSpriteSet(JParticleTypeRegistry.PIXEL.get(), PixelParticle.Factory::new);
         event.registerSpriteSet(JParticleTypeRegistry.BLOCKSPARK.get(), provider -> new BlocksparkParticle.Factory(provider, 0.15f));
         event.registerSpriteSet(JParticleTypeRegistry.GO.get(), GoParticle.Factory::new);
+        event.registerSpriteSet(JParticleTypeRegistry.DO.get(), GoParticle.Factory::new);
         event.registerSpriteSet(JParticleTypeRegistry.AURA_ARC.get(), AuraArcParticle.Factory::new);
         event.registerSpriteSet(JParticleTypeRegistry.AURA_BLOB.get(), AuraBlobParticle.Factory::new);
         event.registerSpriteSet(JParticleTypeRegistry.INVERSION.get(), InversionParticle.Factory::new);
+        event.registerSpriteSet(JParticleTypeRegistry.OVERLAP.get(), OverlappingParticle.Factory::new);
         event.registerSpriteSet(JParticleTypeRegistry.SUN_LOCK_ON.get(), BackstabParticle.Factory::new); // 9 frames, reusing
         event.registerSpriteSet(JParticleTypeRegistry.PURPLE_HAZE_CLOUD.get(), PurpleHazeCloudParticle.Factory::new);
         event.registerSpriteSet(JParticleTypeRegistry.PURPLE_HAZE_PARTICLE.get(), PurpleHazeErraticParticle.Factory::new);
         event.registerSpriteSet(JParticleTypeRegistry.DAMAGE_NUMBER.get(), DamageNumberParticle.Factory::new);
         DamageIndicatorManager.setDamageNumberParticle(JParticleTypeRegistry.DAMAGE_NUMBER.get());
+        event.registerSpriteSet(JParticleTypeRegistry.HAMON_SPARK.get(), provider -> new HitsparkParticle.Factory(provider, 0.2f, 4));
     }
 
     private static void registerClientCapabilityReceivers() {
         NetworkManager.registerReceiver(NetworkManager.Side.S2C, GRAB_S2C, (buf, context) -> {
             int id = buf.readVarInt();
+
             if (Minecraft.getInstance().level != null) {
                 Entity entity = Minecraft.getInstance().level.getEntity(id);
                 if (entity == null) return;
                 GrabCapability.getCapabilityOptional(entity).ifPresent(c -> c.applySyncPacket(buf));
             }
         });
+
+        NetworkManager.registerReceiver(NetworkManager.Side.S2C, MISC_S2C, (buf, context) -> {
+            int id = buf.readVarInt();
+
+            if (Minecraft.getInstance().level != null && Minecraft.getInstance().level.getEntity(id) instanceof LivingEntity living) {
+                MiscCapability.getCapabilityOptional(living).ifPresent(c -> c.applySyncPacket(buf));
+            }
+        });
+
+        NetworkManager.registerReceiver(NetworkManager.Side.S2C, STAND_S2C, (buf, context) -> {
+            int id = buf.readInt();
+            boolean noStand = buf.readBoolean();
+            ResourceLocation standTypeId = noStand ? null : buf.readResourceLocation();
+            StandType standType = standTypeId == null ? null : JRegistries.STAND_TYPE_REGISTRY.get(standTypeId);
+            int skin = buf.readInt();
+
+            if (Minecraft.getInstance().level != null && Minecraft.getInstance().level.getEntity(id) instanceof LivingEntity livingEntity) {
+                StandCapability.getCapabilityOptional(livingEntity).ifPresent(c -> {
+                    c.setTypeAndSkin(standType, skin);
+                    c.applySyncPacket(buf);
+                });
+            }
+        });
+
+        // NBT-driven
 
         NetworkManager.registerReceiver(NetworkManager.Side.S2C, G_S2C, (buf, context) -> {
             int id = buf.readInt();
@@ -168,28 +196,11 @@ public class JCraftForgeClient {
             }
         });
 
-        NetworkManager.registerReceiver(NetworkManager.Side.S2C, MISC_S2C, (buf, context) -> {
-            int id = buf.readInt();
-            CompoundTag nbt = buf.readNbt();
-
-            if (Minecraft.getInstance().level != null && Minecraft.getInstance().level.getEntity(id) instanceof Player player) {
-                MiscCapability.getCapabilityOptional(player).ifPresent(c -> c.deserializeNBT(nbt));
-            }
-
-        });
-
-        NetworkManager.registerReceiver(NetworkManager.Side.S2C, STAND_S2C, (buf, context) -> {
-            int id = buf.readInt();
-            boolean noStand = buf.readBoolean();
-            ResourceLocation standTypeId = noStand ? null : buf.readResourceLocation();
-            StandType standType = standTypeId == null ? null : JRegistries.STAND_TYPE_REGISTRY.get(standTypeId);
-            int skin = buf.readInt();
-
-            if (Minecraft.getInstance().level != null && Minecraft.getInstance().level.getEntity(id) instanceof LivingEntity livingEntity) {
-                StandCapability.getCapabilityOptional(livingEntity).ifPresent(c -> {
-                    c.setTypeAndSkin(standType, skin);
-                    c.applySyncPacket(buf);
-                });
+        NetworkManager.registerReceiver(NetworkManager.Side.S2C, HamonCapability.HAMON_S2C, (buf, context) -> {
+            // Received by the HamonCapability holder and only them
+            LocalPlayer localPlayer = Minecraft.getInstance().player;
+            if (localPlayer != null) {
+                HamonCapability.getCapabilityOptional(localPlayer).ifPresent(c -> c.applySyncPacket(buf));
             }
         });
 
@@ -199,6 +210,12 @@ public class JCraftForgeClient {
             if (localPlayer != null) {
                 VampireCapability.getCapabilityOptional(localPlayer).ifPresent(c -> c.applySyncPacket(buf));
             }
+        });
+
+        NetworkManager.registerReceiver(NetworkManager.Side.S2C, SHOCK_S2C, (buf, context) -> {
+            ClientLevel clientWorld = Minecraft.getInstance().level;
+            if (clientWorld == null) return;
+            ShockwaveHandlerCapability.getCapabilityOptional(clientWorld).ifPresent(shockwaveCap -> shockwaveCap.applySyncPacket(buf));
         });
 
         NetworkManager.registerReceiver(NetworkManager.Side.S2C, PH_S2C, (buf, context) -> {
@@ -219,12 +236,6 @@ public class JCraftForgeClient {
             if (Minecraft.getInstance().level != null && Minecraft.getInstance().level.getEntity(id) instanceof Player player) {
                 SpecCapability.getCapabilityOptional(player).ifPresent(c -> c.deserializeNBT(nbt));
             }
-        });
-
-        NetworkManager.registerReceiver(NetworkManager.Side.S2C, SHOCK_S2C, (buf, context) -> {
-            ClientLevel clientWorld = Minecraft.getInstance().level;
-            if (clientWorld == null) return;
-            ShockwaveHandlerCapability.getCapabilityOptional(clientWorld).ifPresent(shockwaveCap -> shockwaveCap.applySyncPacket(buf));
         });
     }
 }

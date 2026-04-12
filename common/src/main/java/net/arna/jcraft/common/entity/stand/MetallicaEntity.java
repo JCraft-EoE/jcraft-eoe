@@ -3,37 +3,42 @@ package net.arna.jcraft.common.entity.stand;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.Attacks;
+import net.arna.jcraft.api.MoveSelectionResult;
+import net.arna.jcraft.api.attack.MoveMap;
+import net.arna.jcraft.api.attack.MoveSet;
+import net.arna.jcraft.api.attack.MoveSetManager;
+import net.arna.jcraft.api.attack.StateContainer;
+import net.arna.jcraft.api.attack.enums.MoveClass;
+import net.arna.jcraft.api.attack.enums.MoveInputType;
+import net.arna.jcraft.api.attack.enums.StunType;
+import net.arna.jcraft.api.attack.moves.AbstractMove;
+import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
+import net.arna.jcraft.api.component.living.CommonMiscComponent;
+import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.registry.JStandTypeRegistry;
+import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.api.stand.SummonData;
-import net.arna.jcraft.api.attack.MoveSetManager;
+import net.arna.jcraft.common.ai.AttackerBrainInfo;
 import net.arna.jcraft.common.attack.actions.CancelSpecMoveAction;
 import net.arna.jcraft.common.attack.actions.EffectAction;
 import net.arna.jcraft.common.attack.actions.MetallicaAddIronAction;
 import net.arna.jcraft.common.attack.actions.UserAnimationAction;
 import net.arna.jcraft.common.attack.conditions.MetallicaIronCondition;
-import net.arna.jcraft.api.attack.enums.MoveClass;
-import net.arna.jcraft.api.attack.enums.MoveInputType;
-import net.arna.jcraft.api.attack.MoveMap;
-import net.arna.jcraft.api.attack.enums.StunType;
-import net.arna.jcraft.api.attack.MoveSet;
-import net.arna.jcraft.api.attack.StateContainer;
 import net.arna.jcraft.common.attack.moves.metallica.*;
 import net.arna.jcraft.common.attack.moves.shared.*;
-import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
-import net.arna.jcraft.api.component.living.CommonMiscComponent;
+import net.arna.jcraft.common.entity.projectile.RazorProjectile;
 import net.arna.jcraft.common.entity.projectile.ScalpelProjectile;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
-import net.arna.jcraft.api.registry.JSoundRegistry;
-import net.arna.jcraft.api.registry.JStandTypeRegistry;
-import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -47,6 +52,8 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.control.JumpControl;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
@@ -54,14 +61,11 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.*;
 
 /**
  * The {@link StandEntity} for <a href="https://jojowiki.com/Metallica">Metallica</a>.
  * @see JStandTypeRegistry#METALLICA
- * @see net.arna.jcraft.client.model.entity.stand.MetallicaModel MetallicaModel
  * @see net.arna.jcraft.client.renderer.entity.stands.MetallicaRenderer MetallicaRenderer
  * @see HarvestMove
  */
@@ -188,6 +192,7 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.CRUSH)
             .withHyperArmor()
             .withExtraHitBox(2.0, 0.5, 1.5)
+            .markRanged()
             .withInfo(
                     Component.literal("Smash"),
                     Component.literal("""
@@ -256,7 +261,8 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
                             Must be pointed at a block.
                             Summons an attractive ferromagnetic field which lasts for 1 minute.""")
             )
-            .withInitAction(UserAnimationAction.play("mtl.sfk"));
+            .withInitAction(UserAnimationAction.play("mtl.sfk"))
+            .withCondition(MetallicaIronCondition.atLeast(CreateMagneticFieldMove.IRON_COST));
     /* public static final InternalAttack INTERNAL_ATTACK = new InternalAttack(200, 10, 15)
             .withCrouchingVariant(CREATE_MAGNETIC_FIELD)
             .withInfo(
@@ -354,7 +360,7 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
     }
 
     @Override
-    protected AABB makeBoundingBox() {
+    protected @NonNull AABB makeBoundingBox() {
         return AABB.ofSize(getPosition(0f).add(0,0.5,0),0.5,1,0.5);
     }
 
@@ -364,6 +370,13 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
         return super.getAuraColor();
     }
 
+    public Vector3f getMoshColor() {
+        if (getSkin() == 0) {
+            return new Vector3f(1.0f, 1.0f, 1.0f);
+        }
+        return getAuraColor();
+    }
+
     @Override
     public void setUser(@Nullable LivingEntity user) {
         super.setUser(user);
@@ -371,6 +384,29 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
         miscComponent = JComponentPlatformUtils.getMiscData(getUser());
         if (miscComponent == null) return;
         setIron(miscComponent.getMetallicaIron());
+    }
+
+    private boolean shouldThrowScalpels() {
+        final float iron = getIron();
+        if (iron < ScalpelProjectile.IRON_COST) return false;
+        final float choice = random.nextFloat();
+        // per actionable tick
+        return choice <= 0.05 * (iron / IRON_MAX);
+    }
+
+    @Override
+    public MoveSelectionResult overrideMoveExecution(AbstractMove<?, ? super MetallicaEntity> selectedAttack, AttackerBrainInfo info, Mob mob,
+                                                     LivingEntity target, JumpControl mobJumpControl, StandEntity<?, ?> enemyStand, AbstractMove<?, ?> enemyAttack,
+                                                     double distance, int enemyMoveStun, int stunTicks) {
+        if (
+                (selectedAttack instanceof PreciseTossAttack precise) ||
+                (selectedAttack instanceof FanTossAttack fan) ||
+                (selectedAttack instanceof RemoteScalpelMove remote)
+        ) {
+            if (!shouldThrowScalpels()) return MoveSelectionResult.STOP;
+        }
+
+        return MoveSelectionResult.PASS;
     }
 
     private static void registerMoves(MoveMap<MetallicaEntity, MetallicaEntity.State> moves) {
@@ -450,28 +486,94 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
         return true;
     }
 
+    private final Set<AbstractArrow> pickingUp = new HashSet<>(12);
+
     @Override
     public void tick() {
         super.tick();
 
-        if (!level().isClientSide()) return;
+        if (level().isClientSide()) {
+            if (isInvisible() && !isIdle() && !isBlocking()) {
+                JCraft.getClientEntityHandler().displayMetallicaAura(this);
+            }
 
-        if (isInvisible() && !isIdle() && !isBlocking()) {
-            JCraft.getClientEntityHandler().displayMetallicaAura(this);
+            if (getState() == State.GRAB_HIT) {
+                final Vec3 toUser = getUserOrThrow().position().subtract(position()).normalize().scale(0.5);
+                final Vec3 midVec = GravityChangerAPI.getEyeOffset(this).add(position());
+                for (int i = 0; i < 3; i++) {
+                    level().addParticle(random.nextBoolean() ? ParticleTypes.ELECTRIC_SPARK : FAKE_BLOOD,
+                            midVec.x + random.nextGaussian() * 0.2 - 0.1,
+                            midVec.y + random.nextGaussian() * 0.2 - 0.1,
+                            midVec.z + random.nextGaussian() * 0.2 - 0.1,
+                            toUser.x, toUser.y, toUser.z
+                    );
+                }
+            }
+        } else {
+            // Allow Metallica-using mobs to pick up metal projectiles
+            if (getUser() instanceof Mob mob) {
+                if (getIron() >= MetallicaEntity.IRON_MAX) return;
+
+                final AABB aabb = mob.getBoundingBox();
+                final List<AbstractArrow> projectiles = level().getEntitiesOfClass(AbstractArrow.class, aabb.inflate(1.0));
+
+                for (AbstractArrow proj : projectiles) {
+                    if (pickingUp.contains(proj)) continue;
+                    if (!proj.inGround) continue;
+
+                    if ( (proj instanceof ScalpelProjectile scalpelProjectile) || (proj instanceof RazorProjectile razor) ) {
+                        proj.setDeltaMovement(Vec3.ZERO);
+                        proj.setNoPhysics(true);
+                        proj.setNoGravity(true);
+                        proj.inGround = false;
+                        pickingUp.add(proj);
+                    }
+                }
+
+                pickingUp.removeIf(a -> !a.isAlive());
+
+                if (pickingUp.isEmpty()) return;
+
+                final Vec3 target = mob.position();
+                boolean clearAll = false;
+
+                for (AbstractArrow proj : pickingUp) {
+                    if (!proj.isAlive()) continue;
+
+                    final Vec3 toward = target.subtract(proj.position()).normalize().scale(0.02);
+                    proj.push(toward.x, toward.y, toward.z);
+
+                    if (proj.distanceToSqr(mob) <= aabb.getSize() * aabb.getSize()) {
+                        ironProjectilePickup(mob, 5.0f);
+                        proj.kill();
+                        if (getIron() >= MetallicaEntity.IRON_MAX) {
+                            clearAll = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (clearAll) {
+                    for (AbstractArrow proj : pickingUp) {
+                        proj.setNoPhysics(false);
+                        proj.setNoGravity(false);
+                    }
+
+                    pickingUp.clear();
+                }
+            }
+        }
+    }
+
+    public static boolean ironProjectilePickup(@NonNull LivingEntity grabber, final float ironCost) {
+        if (JComponentPlatformUtils.getStandComponent(grabber).getStand() instanceof MetallicaEntity metallica) {
+            if (metallica.getIron() < MetallicaEntity.IRON_MAX) {
+                metallica.addIron(ironCost);
+                return true;
+            }
         }
 
-        if (getState() != State.GRAB_HIT) return;
-
-        final Vec3 toUser = getUserOrThrow().position().subtract(position()).normalize().scale(0.5);
-        final Vec3 midVec = GravityChangerAPI.getEyeOffset(this).add(position());
-        for (int i = 0; i < 3; i++) {
-            level().addParticle(random.nextBoolean() ? ParticleTypes.ELECTRIC_SPARK : FAKE_BLOOD,
-                    midVec.x + random.nextGaussian() * 0.2 - 0.1,
-                    midVec.y + random.nextGaussian() * 0.2 - 0.1,
-                    midVec.z + random.nextGaussian() * 0.2 - 0.1,
-                    toUser.x, toUser.y, toUser.z
-            );
-        }
+        return false;
     }
 
     @Override
@@ -507,44 +609,39 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
 
     // Animations
     public enum State implements StandAnimationState<MetallicaEntity> {
-        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.metallica.idle"))),
-        NONE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.metallica.idle"))),
-        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.metallica.block"))),
-        LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.metallica.light"))),
-        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.metallica.light2"))),
-        LIGHT_FINAL(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.metallica.light3"))),
-        PRECISE_TOSS(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.metallica.precise_toss"))),
-        FAN_TOSS(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.metallica.fan_toss"))),
-        HARVEST(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.metallica.harvest"))),
-        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.metallica.barrage"))),
-        SMASH(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.metallica.smash"))),
-        CLEAVE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.metallica.cleave"))),
-        SWEEP(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.metallica.sweep"))),
-        GRAB_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.metallica.grab_hit"))),
-        BISECT(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.metallica.bisect"))),
-        GIVE_SCALPEL(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.metallica.give_scalpel"))),
+        IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.metallica.idle", AzPlayBehaviors.LOOP)),
+        NONE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.metallica.idle", AzPlayBehaviors.LOOP)),
+        BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.metallica.block", AzPlayBehaviors.LOOP)),
+        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.metallica.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.metallica.light2", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT_FINAL(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.metallica.light3", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        PRECISE_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.metallica.precise_toss", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        FAN_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.metallica.fan_toss", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        HARVEST(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.metallica.harvest", AzPlayBehaviors.LOOP)),
+        BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.metallica.barrage", AzPlayBehaviors.LOOP)),
+        SMASH(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.metallica.smash", AzPlayBehaviors.LOOP)),
+        CLEAVE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.metallica.cleave", AzPlayBehaviors.LOOP)),
+        SWEEP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.metallica.sweep", AzPlayBehaviors.LOOP)),
+        GRAB_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.metallica.grab_hit", AzPlayBehaviors.LOOP)),
+        BISECT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.metallica.bisect", AzPlayBehaviors.LOOP)),
+        GIVE_SCALPEL(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.metallica.give_scalpel", AzPlayBehaviors.LOOP)),
         ;
 
-        private final Consumer<AnimationState<MetallicaEntity>> animator;
+        private final AzCommand animator;
 
-        State(Consumer<AnimationState<MetallicaEntity>> animator) {
+        State(AzCommand animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(MetallicaEntity attacker, AnimationState<MetallicaEntity> builder) {
-            animator.accept(builder);
+        public void playAnimation(MetallicaEntity attacker) {
+            animator.sendForEntity(attacker);
         }
     }
 
     @Override
     protected MetallicaEntity.State[] getStateValues() {
         return MetallicaEntity.State.values();
-    }
-
-    @Override
-    protected @Nullable String getSummonAnimation() {
-        return "animation.metallica.summon";
     }
 
     @Override

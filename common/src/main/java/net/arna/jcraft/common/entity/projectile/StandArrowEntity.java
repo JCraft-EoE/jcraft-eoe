@@ -1,10 +1,6 @@
 package net.arna.jcraft.common.entity.projectile;
 
 import lombok.NonNull;
-import mod.azure.azurelib.animatable.GeoEntity;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.util.AzureLibUtil;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.stand.StandTypeUtil;
@@ -18,9 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 
-public class StandArrowEntity extends AbstractArrow implements GeoEntity {
-
-    private final AnimatableInstanceCache geoCache = AzureLibUtil.createInstanceCache(this);
+public class StandArrowEntity extends AbstractArrow {
 
     public StandArrowEntity(Level level) {
         super(JEntityTypeRegistry.STAND_ARROW_PROJECTILE.get(), level);
@@ -33,16 +27,6 @@ public class StandArrowEntity extends AbstractArrow implements GeoEntity {
     @Override
     protected @NonNull ItemStack getPickupItem() {
         return new ItemStack(JItemRegistry.STAND_ARROW.get());
-    }
-
-    @Override
-    public void registerControllers(final AnimatableManager.ControllerRegistrar controllers) {
-        // intentionally left empty
-    }
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return geoCache;
     }
 
     @Override

@@ -3,9 +3,8 @@ package net.arna.jcraft.common.entity.vehicle;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import mod.azure.azurelib.animatable.GeoEntity;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.util.AzureLibUtil;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.JUtils;
@@ -31,7 +30,23 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 
-public abstract class AbstractGroundVehicleEntity extends LivingEntity implements GeoEntity {
+public abstract class AbstractGroundVehicleEntity extends LivingEntity {
+
+    public static final String DEATH_CONTROLLER = "death";
+    public static final String SHAKE_CONTROLLER = "shake";
+    public static final String MOVEMENT_CONTROLLER = "movement";
+    public static final String STEERING_CONTROLLER = "steering";
+    public static final String HIT_CONTROLLER = "hit";
+
+    protected static final AzCommand DEATH_CMD = AzCommand.create(DEATH_CONTROLLER, "explode", AzPlayBehaviors.PLAY_ONCE);
+    protected static final AzCommand SHAKE_CMD = AzCommand.create(SHAKE_CONTROLLER, "shake", AzPlayBehaviors.PLAY_ONCE);
+    protected static final AzCommand MOVE_FORWARD_CMD = AzCommand.create(MOVEMENT_CONTROLLER, "forward", AzPlayBehaviors.PLAY_ONCE);
+    protected static final AzCommand MOVE_BACKWARD_CMD = AzCommand.create(MOVEMENT_CONTROLLER, "back", AzPlayBehaviors.PLAY_ONCE);
+    protected static final AzCommand STEER_NEUTRAL_CMD = AzCommand.create(STEERING_CONTROLLER, "steer_neutral", AzPlayBehaviors.PLAY_ONCE);
+    protected static final AzCommand STEER_LEFT_CMD = AzCommand.create(STEERING_CONTROLLER, "steer_left", AzPlayBehaviors.PLAY_ONCE);
+    protected static final AzCommand STEER_RIGHT_CMD = AzCommand.create(STEERING_CONTROLLER, "steer_right", AzPlayBehaviors.PLAY_ONCE);
+    protected static final AzCommand HIT_CMD = AzCommand.create(HIT_CONTROLLER, "hit", AzPlayBehaviors.PLAY_ONCE);
+
     // Movement Inputs
     protected boolean
     left = false,
@@ -70,7 +85,7 @@ public abstract class AbstractGroundVehicleEntity extends LivingEntity implement
     }
 
     @Override
-    protected Entity.MovementEmission getMovementEmission() {
+    protected @NonNull Entity.MovementEmission getMovementEmission() {
         return MovementEmission.EVENTS;
     }
 
@@ -210,13 +225,13 @@ public abstract class AbstractGroundVehicleEntity extends LivingEntity implement
     }
 
     @Override
-    public Iterable<ItemStack> getArmorSlots() { return Collections.emptyList(); }
+    public @NonNull Iterable<ItemStack> getArmorSlots() { return Collections.emptyList(); }
     @Override
-    public ItemStack getItemBySlot(EquipmentSlot slot) { return ItemStack.EMPTY; }
+    public @NonNull ItemStack getItemBySlot(final @NonNull EquipmentSlot slot) { return ItemStack.EMPTY; }
     @Override
-    public void setItemSlot(EquipmentSlot slot, ItemStack stack) { }
+    public void setItemSlot(final @NonNull EquipmentSlot slot, final @NonNull ItemStack stack) { }
     @Override
-    public HumanoidArm getMainArm() { return HumanoidArm.RIGHT; }
+    public @NonNull HumanoidArm getMainArm() { return HumanoidArm.RIGHT; }
 
     @Override
     public boolean shouldShowName() {
@@ -229,13 +244,4 @@ public abstract class AbstractGroundVehicleEntity extends LivingEntity implement
         return null;
     }
 
-    // Animations
-    private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
-
-    @Override
-    public final AnimatableInstanceCache getAnimatableInstanceCache() {
-        return cache;
-    }
-
-    // Subclasses must implement registerControllers
 }

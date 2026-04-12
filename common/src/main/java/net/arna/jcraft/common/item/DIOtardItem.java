@@ -1,8 +1,6 @@
 package net.arna.jcraft.common.item;
 
 import lombok.NonNull;
-import mod.azure.azurelib.animatable.client.RenderProvider;
-import mod.azure.azurelib.renderer.GeoArmorRenderer;
 import net.arna.jcraft.client.renderer.armor.DIOtardRenderer;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -16,7 +14,8 @@ public class DIOtardItem extends DIOJacketItem {
     public DIOtardItem(ArmorMaterial materialIn, Type slot, Properties builder) {
         super(materialIn, slot, builder);
     }
-    @Override
+
+    /*@Override
     public void createRenderer(Consumer<Object> consumer) {
         consumer.accept(new RenderProvider() {
             private static GeoArmorRenderer<?> renderer;
@@ -27,5 +26,5 @@ public class DIOtardItem extends DIOJacketItem {
                 renderer.prepForRender(livingEntity, itemStack, equipmentSlot, original);
                 return renderer;
             }});
-    }
+    }*/
 }

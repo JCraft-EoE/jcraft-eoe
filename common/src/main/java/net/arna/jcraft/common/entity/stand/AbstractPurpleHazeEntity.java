@@ -64,7 +64,7 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
             );
 
     public static final SimpleAttack<AbstractPurpleHazeEntity<?, ?>> LIGHT = new SimpleAttack<AbstractPurpleHazeEntity<?, ?>>(
-            9, 6, 9, 0.75f, 5f, 11, 1.5f, 0.25f, 0.1f)
+            15, 6, 9, 0.75f, 5f, 11, 1.5f, 0.25f, 0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(BACKHAND)
@@ -196,6 +196,7 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
     @Override
     public void tick() {
         super.tick();
+        idleOverride = isRemote();
 
         if (!isRemoteAndControllable()) {
             return;
@@ -270,8 +271,11 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
             remoteSpeed = userPos.subtract(pos).scale(0.05); // 1/20th so it scales with distance
         }
 
+        if (f == 0 && s == 0 && !jump) {
+            push(-getDeltaMovement().x * 0.4, -getDeltaMovement().y * 0.4, -getDeltaMovement().z * 0.4);
+        }
+
         push(remoteSpeed.x, remoteSpeed.y, remoteSpeed.z);
-        hasImpulse = true;
         hurtMarked = true;
     }
 

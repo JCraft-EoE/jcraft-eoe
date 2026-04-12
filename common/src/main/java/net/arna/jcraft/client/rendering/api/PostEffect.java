@@ -22,6 +22,7 @@ public class PostEffect implements DisplayResizeCallback {
     @Getter
     private final ResourceLocation location;
     private final Consumer<PostEffect> initCallback;
+    @Getter
     private PostChain postChain;
 
     public PostEffect(final ResourceLocation location) {

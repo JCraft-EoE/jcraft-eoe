@@ -1,32 +1,14 @@
 package net.arna.jcraft.common.item;
 
-import lombok.NonNull;
-import mod.azure.azurelib.animatable.GeoItem;
-import mod.azure.azurelib.animatable.client.RenderProvider;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.core.animation.AnimationController;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.object.PlayState;
-import mod.azure.azurelib.renderer.GeoArmorRenderer;
-import mod.azure.azurelib.util.AzureLibUtil;
-import net.arna.jcraft.client.renderer.armor.KiraJacketRenderer;
-import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.ItemStack;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
-public class KiraJacketItem extends ArmorItem implements GeoItem {
+public class KiraJacketItem extends ArmorItem {
     public KiraJacketItem(ArmorMaterial materialIn, Type slot, Properties builder) {
         super(materialIn, slot, builder);
     }
 
-    @Override
+    /*@Override
     public void createRenderer(Consumer<Object> consumer) {
         consumer.accept(new RenderProvider() {
             private static GeoArmorRenderer<?> renderer;
@@ -59,5 +41,5 @@ public class KiraJacketItem extends ArmorItem implements GeoItem {
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return cache;
-    }
+    }*/
 }

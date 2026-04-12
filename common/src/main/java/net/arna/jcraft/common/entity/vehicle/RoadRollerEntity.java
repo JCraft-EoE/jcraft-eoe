@@ -1,17 +1,12 @@
 package net.arna.jcraft.common.entity.vehicle;
 
 import lombok.NonNull;
-import mod.azure.azurelib.core.animatable.GeoAnimatable;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.core.animation.AnimationController;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
-import mod.azure.azurelib.core.object.PlayState;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JItemRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.util.JUtils;
@@ -54,6 +49,7 @@ import java.util.Set;
 import static net.arna.jcraft.api.Attacks.damageLogic;
 
 public class RoadRollerEntity extends AbstractGroundVehicleEntity {
+
     private static boolean recipeChecked = false;
     private static Recipe<?> recipe = null; // lazy-loaded (allows dynamic loading in case someone is trying to replace our recipe)
     public RoadRollerEntity(final Level level) {
@@ -76,6 +72,7 @@ public class RoadRollerEntity extends AbstractGroundVehicleEntity {
 
         if (level().isClientSide()) {
             if (isVehicle()) {
+                SHAKE_CMD.sendForEntity(this);
                 if ((ridingTicks - 52) % 82 == 0)
                     level().playLocalSound(getX(), getY(), getZ(), JSoundRegistry.ROAD_ROLLER_ACTIVE.get(), SoundSource.NEUTRAL, 1.0f, 1.0f, true);
                 ridingTicks++;
@@ -120,6 +117,28 @@ public class RoadRollerEntity extends AbstractGroundVehicleEntity {
             } else {
                 ridingTicks = 0;
             }
+            // other animations
+            if (steeringLeft()) {
+                STEER_LEFT_CMD.sendForEntity(this);
+            }
+            else if (steeringRignt()) {
+                STEER_RIGHT_CMD.sendForEntity(this);
+            }
+            else {
+                STEER_NEUTRAL_CMD.sendForEntity(this);
+            }
+            if (movingForward()) {
+                MOVE_FORWARD_CMD.sendForEntity(this);
+            }
+            else if (movingBack()) {
+                MOVE_BACKWARD_CMD.sendForEntity(this);
+            }
+            if (getHurtTime() > 0) {
+                HIT_CMD.sendForEntity(this);
+            }
+            if (deathTime > 0) {
+                DEATH_CMD.sendForEntity(this);
+            }
         }
     }
 
@@ -155,7 +174,7 @@ public class RoadRollerEntity extends AbstractGroundVehicleEntity {
     }
 
     private static final double INLINE_SPEED = 0.1d, TURN_RATE = 5.0d;
-    private static final Map<BlockState, BlockState> flattenedBlockStates = Map.ofEntries(
+    private static final Map<BlockState, BlockState> FLATTENED_BLOCK_STATES = Map.ofEntries(
             Map.entry(Blocks.DIRT.defaultBlockState(), Blocks.FARMLAND.defaultBlockState()),
             Map.entry(Blocks.GRASS_BLOCK.defaultBlockState(), Blocks.DIRT_PATH.defaultBlockState()),
             Map.entry(Blocks.COBBLESTONE.defaultBlockState(), Blocks.STONE.defaultBlockState()),
@@ -230,10 +249,13 @@ public class RoadRollerEntity extends AbstractGroundVehicleEntity {
 
                         final BlockState state = serverLevel.getBlockState(blockPos);
                         final Block block = state.getBlock();
-                        if (flattenedBlockStates.containsKey(state))
-                            serverLevel.setBlock(blockPos, flattenedBlockStates.get(state), Block.UPDATE_ALL);
+                        if (FLATTENED_BLOCK_STATES.containsKey(state)) {
+                            if (JServerConfig.ROLLER_FLATTENING.getValue()) {
+                                serverLevel.setBlock(blockPos, FLATTENED_BLOCK_STATES.get(state), Block.UPDATE_ALL);
+                            }
+                        }
                         // Break replaceable blocks or ones under a certain resistance on the same height level as the Road Roller
-                        else if (block != Blocks.DIRT_PATH &&
+                        else if (block != Blocks.DIRT_PATH && JServerConfig.ROLLER_DESTROYING.getValue() &&
                                 (state.canBeReplaced() || (y == 0 && block.getExplosionResistance() <= 3.0f))
                         ) {
                             serverLevel.destroyBlock(blockPos, true);
@@ -247,7 +269,7 @@ public class RoadRollerEntity extends AbstractGroundVehicleEntity {
     }
 
     @Override
-    public InteractionResult interact(Player player, InteractionHand hand) {
+    public @NonNull InteractionResult interact(final @NonNull Player player, final @NonNull InteractionHand hand) {
         if (player.isSecondaryUseActive()) return InteractionResult.PASS;
 
         if (getFirstPassenger() == null) {
@@ -269,12 +291,12 @@ public class RoadRollerEntity extends AbstractGroundVehicleEntity {
 
     @Nullable
     @Override
-    protected SoundEvent getHurtSound(DamageSource damageSource) {
+    protected SoundEvent getHurtSound(final @NonNull DamageSource damageSource) {
         return JSoundRegistry.ROAD_ROLLER_HIT.get();
     }
 
     @Override
-    protected void addPassenger(Entity passenger) {
+    protected void addPassenger(final @NonNull Entity passenger) {
         super.addPassenger(passenger);
         if (passenger == getFirstPassenger()) playSound(JSoundRegistry.ROAD_ROLLER_IGNITION.get());
     }
@@ -350,29 +372,12 @@ public class RoadRollerEntity extends AbstractGroundVehicleEntity {
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {}
+    public void readAdditionalSaveData(final @NonNull CompoundTag compound) {}
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {}
+    public void addAdditionalSaveData(final @NonNull CompoundTag compound) {}
 
     // Animations
-    @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "death", 0, this::deathPredicate));
-
-        controllers.add(new AnimationController<>(this, "shake", 0, this::shakePredicate));
-        controllers.add(new AnimationController<>(this, "movement", 5, this::movePredicate));
-        controllers.add(new AnimationController<>(this, "steering", 5, this::steerPredicate));
-        controllers.add(new AnimationController<>(this, "hit", 0, this::hitPredicate));
-    }
-
-    private static final RawAnimation NEUTRAL = RawAnimation.begin().thenLoop("steer_neutral");
-    private static final RawAnimation LEFT = RawAnimation.begin().thenLoop("steer_left");
-    private static final RawAnimation RIGHT = RawAnimation.begin().thenLoop("steer_right");
-    private <T extends GeoAnimatable> PlayState steerPredicate(AnimationState<T> state) {
-        if (steeringLeft()) return state.setAndContinue(LEFT);
-        if (steeringRignt()) return state.setAndContinue(RIGHT);
-        return state.setAndContinue(NEUTRAL);
-    }
+    /*
 
     private static final RawAnimation FORWARD = RawAnimation.begin().thenLoop("forward");
     private static final RawAnimation BACK = RawAnimation.begin().thenLoop("back");
@@ -398,5 +403,5 @@ public class RoadRollerEntity extends AbstractGroundVehicleEntity {
     private <T extends GeoAnimatable> PlayState deathPredicate(AnimationState<T> state) {
         if (deathTime > 0) return state.setAndContinue(DEATH);
         return PlayState.STOP;
-    }
+    }*/
 }

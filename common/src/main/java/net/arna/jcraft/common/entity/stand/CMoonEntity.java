@@ -2,31 +2,31 @@ package net.arna.jcraft.common.entity.stand;
 
 import lombok.Data;
 import lombok.NonNull;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.Attacks;
+import net.arna.jcraft.api.attack.MoveMap;
+import net.arna.jcraft.api.attack.MoveSet;
+import net.arna.jcraft.api.attack.MoveSetManager;
+import net.arna.jcraft.api.attack.enums.BlockableType;
+import net.arna.jcraft.api.attack.enums.MoveClass;
+import net.arna.jcraft.api.component.living.CommonGravityShiftComponent;
+import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
+import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.api.stand.SummonData;
-import net.arna.jcraft.api.attack.MoveSetManager;
 import net.arna.jcraft.common.attack.actions.CMoonInversionAction;
-import net.arna.jcraft.api.attack.enums.BlockableType;
-import net.arna.jcraft.api.attack.enums.MoveClass;
-import net.arna.jcraft.api.attack.MoveMap;
-import net.arna.jcraft.api.attack.MoveSet;
 import net.arna.jcraft.common.attack.moves.cmoon.*;
 import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
-import net.arna.jcraft.api.component.living.CommonGravityShiftComponent;
-import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.common.entity.projectile.BlockProjectile;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
-import net.arna.jcraft.api.registry.JSoundRegistry;
-import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -39,7 +39,6 @@ import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * The {@link StandEntity} for <a href="https://jojowiki.com/C-MOON">C-MOON</a>.
@@ -174,7 +173,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
                             lasts 10 seconds
                             swap between attraction/repulsion by pressing ultimate again""")
             );
-    public static final GravityShiftPulseMove GRAV_SHIFT_PULSE = new GravityShiftPulseMove(1400, 20, 32, 1f)
+    public static final GravityShiftPulseMove GRAV_SHIFT_PULSE = new GravityShiftPulseMove(1400, 20, 32, 1f, 16)
             .withCrouchingVariant(GRAV_SHIFT)
             .withSound(JSoundRegistry.CMOON_GRAVSHIFT_DIRECTIONAL)
             .withInfo(
@@ -341,39 +340,34 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
 
     // Animation code
     public enum State implements StandAnimationState<CMoonEntity> {
-        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.cmoon.idle"))),
-        LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cmoon.light"))),
-        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.cmoon.block"))),
-        DONUT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cmoon.donut"))),
-        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.cmoon.barrage"))),
-        GRAV_PUNCH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cmoon.gravpunch"))),
-        GROUND_SLAM(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cmoon.groundslam"))),
-        GROUND_SHOOT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cmoon.groundshoot"))),
-        GRAV_SHIFT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cmoon.gravshift"))),
-        DIRECTIONAL_SHIFT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cmoon.directionalshift"))),
-        INVERSION_PUNCH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cmoon.inversionpunch"))),
-        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cmoon.light_followup")));
+        IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.cmoon.idle", AzPlayBehaviors.LOOP)),
+        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cmoon.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.cmoon.block", AzPlayBehaviors.LOOP)),
+        DONUT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cmoon.donut", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cmoon.barrage", AzPlayBehaviors.LOOP)),
+        GRAV_PUNCH(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cmoon.gravpunch", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        GROUND_SLAM(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cmoon.groundslam", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        GROUND_SHOOT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cmoon.groundshoot", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        GRAV_SHIFT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cmoon.gravshift", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        DIRECTIONAL_SHIFT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cmoon.directionalshift", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        INVERSION_PUNCH(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cmoon.inversionpunch", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cmoon.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME));
 
-        private final Consumer<AnimationState<CMoonEntity>> animator;
+        private final AzCommand animator;
 
-        State(Consumer<AnimationState<CMoonEntity>> animator) {
+        State(AzCommand animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(CMoonEntity attacker, AnimationState<CMoonEntity> state) {
-            animator.accept(state);
+        public void playAnimation(CMoonEntity attacker) {
+            animator.sendForEntity(attacker);
         }
     }
 
     @Override
     protected State[] getStateValues() {
         return State.values();
-    }
-
-    @Override
-    protected String getSummonAnimation() {
-        return "animation.cmoon.summon";
     }
 
     @Override

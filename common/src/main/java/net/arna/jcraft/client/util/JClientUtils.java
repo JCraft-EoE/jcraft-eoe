@@ -1,10 +1,9 @@
 package net.arna.jcraft.client.util;
 
-import mod.azure.azurelib.core.animatable.model.CoreGeoBone;
-import mod.azure.azurelib.core.animation.AnimationProcessor;
+import lombok.NonNull;
+import mod.azure.azurelib.animation.AzAnimationContext;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.stand.StandEntity;
-import net.arna.jcraft.client.model.entity.stand.StandEntityModel;
 import net.arna.jcraft.common.entity.stand.CreamEntity;
 import net.arna.jcraft.common.entity.stand.D4CEntity;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
@@ -81,26 +80,17 @@ public class JClientUtils {
     }
 
     // Torso/Head rotation for stands
-    public static void animateGenericHumanoid(final StandEntityModel<?> model, final StandEntity<?, ?> entity, final LivingEntity player, final float partialTick) {
-        animateGenericHumanoid(model, entity, player, partialTick, false, false);
-    }
-
-    public static void animateGenericHumanoid(final StandEntityModel<?> model, final StandEntity<?, ?> entity, final LivingEntity player, final float partialTick, final boolean flipBody, final boolean flipHead) {
-        animateGenericHumanoid(model, entity, player, partialTick, flipBody, flipHead, 0, 0, 90f);
-    }
-
-    public static void animateGenericHumanoid(final StandEntityModel<?> model, final StandEntity<?, ?> entity, final LivingEntity player, final float partialTick, final boolean flipBody, final boolean flipHead, final float tPO, final float hPO) {
-        animateGenericHumanoid(model, entity, player, partialTick, flipBody, flipHead, tPO, hPO, 90f);
-    }
-
     // basically, unless the animation specifies every rotation, said rotations will persist through each model.
-    public static void animateGenericHumanoid(final StandEntityModel<?> model, final StandEntity<?, ?> entity, final LivingEntity player, final float partialTick, final boolean flipBody, final boolean flipHead, final float tPO, final float hPO, float velInfluence) {
+    public static <T extends StandEntity<?,?>> void animateGenericHumanoid(final @NonNull AzAnimationContext<T> context, T entity, final boolean flipBody, final boolean flipHead, final float tPO, final float hPO, float velInfluence) {
         float overVel = 0;
+        final var model = context.boneCache().getBakedModel();
+        final LivingEntity user = entity.getUser();
 
-        final AnimationProcessor<?> animationProcessor = model.getAnimationProcessor();
-
+        if (user == null) {
+            return;
+        }
         if (entity.getMoveStun() < 1) {
-            Vec3 playerVel = (entity.isRemote() && !entity.remoteControllable()) ? entity.getDeltaMovement() : deltaPos(player);
+            Vec3 playerVel = (entity.isRemote() && !entity.remoteControllable()) ? entity.getDeltaMovement() : deltaPos(user);
             overVel = Mth.clamp((float) playerVel.horizontalDistance() - 0.05f, -1f, 1f);
 
             // If going backwards
@@ -108,11 +98,11 @@ public class JClientUtils {
                 velInfluence *= -1;
 
             // Tilt torso relative to speed
-            CoreGeoBone torso = animationProcessor.getBone("torso");
+            final var torso = model.getBoneOrNull("torso");
             if (torso != null) {
                 //model.prevTorsoPitch = torso.getRotX();
                 float pitch = (180f + overVel * velInfluence) * 3.1415f / 180f;
-                if (flipBody) {
+                if (!flipBody) {
                     pitch += 3.1415f;
                     pitch = -pitch;
                 }
@@ -122,20 +112,22 @@ public class JClientUtils {
 
         if (entity.isBlocking() || entity.isIdle()) {
             // Look up/down, same as the stand user
-            final CoreGeoBone head = animationProcessor.getBone("head");
+            final var head = model.getBoneOrNull("head");
             if (head != null) {
                 //model.prevHeadPitch = head.getRotX();
-                float headPitch = (player.getXRot() - overVel * velInfluence) * 3.1415f / 180f;
-                if (flipHead) headPitch = -headPitch;
+                float headPitch = (user.getXRot() - overVel * velInfluence) * 3.1415f / 180f;
+                if (!flipHead) {
+                    headPitch = -headPitch;
+                }
                 head.setRotX(headPitch + hPO);
             }
         } else if (entity.getMoveStun() > 0) { // if doing something
             if (entity.shouldOffsetHeight()) {
                 // Turn entire stand up/down
-                final CoreGeoBone base = animationProcessor.getBone("base");
+                final var base = model.getBoneOrNull("base");
                 if (base != null) {
                     //model.prevBasePitch = base.getRotX();
-                    float torsoPitch = (player.getXRot() * 0.9f) * 3.1415f / 180f;
+                    float torsoPitch = (user.getXRot() * 0.9f) * 3.1415f / 180f;
                     base.setRotX(base.getRotX() - torsoPitch);
                 }
             }

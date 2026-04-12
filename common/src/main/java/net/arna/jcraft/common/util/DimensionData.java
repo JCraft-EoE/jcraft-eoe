@@ -30,6 +30,9 @@ public class DimensionData {
         this.user = user;
         this.pos = pos;
         this.worldKey = worldKey;
+        if (timer <= 0) {
+            throw new IllegalArgumentException("timer must be positive!");
+        }
         this.timer = timer;
     }
 

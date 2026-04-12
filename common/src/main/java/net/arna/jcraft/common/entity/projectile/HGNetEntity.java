@@ -1,15 +1,8 @@
 package net.arna.jcraft.common.entity.projectile;
 
 import lombok.NonNull;
-import mod.azure.azurelib.animatable.GeoEntity;
-import mod.azure.azurelib.core.animatable.GeoAnimatable;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.core.animation.AnimationController;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
-import mod.azure.azurelib.core.object.PlayState;
-import mod.azure.azurelib.util.AzureLibUtil;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.MoveUsage;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
@@ -44,7 +37,7 @@ import java.util.List;
 
 import static net.arna.jcraft.api.Attacks.damageLogic;
 
-public class HGNetEntity extends JAttackEntity implements GeoEntity, ICustomDamageHandler {
+public class HGNetEntity extends JAttackEntity implements ICustomDamageHandler {
     public static final EntityDataAccessor<Integer> SKIN;
     public static final EntityDataAccessor<Integer> STATE;
     public static final EntityDataAccessor<Boolean> CHARGED;
@@ -335,7 +328,13 @@ public class HGNetEntity extends JAttackEntity implements GeoEntity, ICustomDama
         readMasterNbt(tag);
     }
 
+    public static final AzCommand SPAWN = AzCommand.create( JCraft.BASE_CONTROLLER, "animation.hg_nets.spawn");
+    public static final AzCommand WILT = AzCommand.create( JCraft.BASE_CONTROLLER, "animation.hg_nets.wilt");
+    public static final AzCommand CONSTRICT = AzCommand.create( JCraft.BASE_CONTROLLER, "animation.hg_nets.constrict");
+    public static final AzCommand IDLE = AzCommand.create( JCraft.BASE_CONTROLLER, "animation.hg_nets.idle", AzPlayBehaviors.LOOP);
+
     // Animations
+    /*
     private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
 
     @Override
@@ -366,5 +365,5 @@ public class HGNetEntity extends JAttackEntity implements GeoEntity, ICustomDama
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return cache;
-    }
+    }*/
 }

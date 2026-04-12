@@ -455,7 +455,7 @@
 				}
 			}
 		},
-		"animation.thefool.summon": {
+		"summon": {
 			"loop": true,
 			"animation_length": 1.2,
 			"bones": {

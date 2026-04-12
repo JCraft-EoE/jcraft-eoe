@@ -2,6 +2,7 @@ package net.arna.jcraft.forge.capability.impl.living;
 
 import dev.architectury.networking.NetworkManager;
 import io.netty.buffer.Unpooled;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.common.component.impl.living.CommonStandComponentImpl;
 import net.arna.jcraft.forge.capability.api.JCapability;
@@ -18,11 +19,9 @@ import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 
-import static net.arna.jcraft.JCraft.MOD_ID;
-
 public class StandCapability extends CommonStandComponentImpl implements JCapability {
-    public static ResourceLocation STAND_S2C = new ResourceLocation(MOD_ID, "stand_s2c");
-    //public static ResourceLocation STAND_C2S = new ResourceLocation(MOD_ID, "standard_c2s");
+    public static ResourceLocation STAND_S2C = JCraft.id("stand_s2c");
+    //public static ResourceLocation STAND_C2S = JCraft.id("standard_c2s");
 
     public static Capability<StandCapability> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
 

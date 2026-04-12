@@ -2,6 +2,7 @@ package net.arna.jcraft.forge.capability.impl.living;
 
 import dev.architectury.networking.NetworkManager;
 import io.netty.buffer.Unpooled;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.component.impl.living.CommonHitPropertyComponentImpl;
 import net.arna.jcraft.forge.capability.api.JCapability;
 import net.minecraft.nbt.CompoundTag;
@@ -19,10 +20,8 @@ import net.minecraftforge.common.util.LazyOptional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static net.arna.jcraft.JCraft.MOD_ID;
-
 public class HitPropertyCapability extends CommonHitPropertyComponentImpl implements JCapability {
-    public static ResourceLocation HIT_S2C = new ResourceLocation(MOD_ID, "hit_s2c");
+    public static ResourceLocation HIT_S2C = JCraft.id("hit_s2c");
 
     public static Capability<HitPropertyCapability> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
 

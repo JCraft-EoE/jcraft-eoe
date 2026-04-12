@@ -9,6 +9,7 @@ import net.arna.jcraft.api.stand.StandTypeUtil;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.common.entity.stand.AbstractKillerQueenEntity;
 import net.arna.jcraft.common.item.BloodBottleItem;
+import net.arna.jcraft.common.spec.VampireSpec;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JItemRegistry;
@@ -251,7 +252,7 @@ public class ItemTossProjectile extends AbstractArrow {
                 if (vampireComponent.isVampire()) {
                     final CompoundTag nbt = getItem().getOrCreateTag();
                     int blood = (int)Math.floor(nbt.getFloat("Blood"));
-                    vampireComponent.setBlood(Math.min(20, vampireComponent.getBlood() + blood));
+                    vampireComponent.setBlood(Math.min(VampireSpec.MAX_BLOOD, vampireComponent.getBlood() + blood));
                     effectActivated = true;
                 }
             }

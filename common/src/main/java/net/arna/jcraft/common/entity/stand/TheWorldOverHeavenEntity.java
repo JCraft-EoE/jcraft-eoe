@@ -2,10 +2,11 @@ package net.arna.jcraft.common.entity.stand;
 
 import com.mojang.datafixers.util.Either;
 import lombok.NonNull;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
 import mod.azure.azurelib.core.object.Color;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.Attacks;
 import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.MoveSet;
 import net.arna.jcraft.api.attack.MoveSetManager;
@@ -31,16 +32,13 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
  * The {@link StandEntity} for <a href="https://jojowiki.com/The_World">The World Over Heaven</a>.
  * @see JStandTypeRegistry#THE_WORLD
- * @see net.arna.jcraft.client.model.entity.stand.TheWorldOverHeavenModel TheWorldOverHeavenModel
  * @see net.arna.jcraft.client.renderer.entity.stands.TheWorldOverHeavenRenderer TheWorldOverHeavenRenderer
  * @see AerialDivineFinisherAttack
  * @see DivineFinisherAttack
@@ -340,45 +338,40 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
 
     // Animation code
     public enum State implements StandAnimationState<TheWorldOverHeavenEntity> {
-        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.twoh.idle"))),
-        LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.twoh.light"))),
-        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.twoh.block"))),
-        HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.twoh.heavy"))),
-        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.twoh.barrage"))),
-        SMITE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.twoh.smite"))),
-        TIME_STOP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.twoh.timestop"))),
-        CHARGE_OVERWRITE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.twoh.chargeoverwrite"))),
-        OVERWRITE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.twoh.overwrite"))),
-        THROW(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.twoh.throw"))),
-        AIR_KNIVES(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.twoh.airknives"))),
-        TIME_SKIP(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.twoh.idle"))),
-        LUNGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.twoh.lunge"))),
-        LOW_KICK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.twoh.low_kick"))),
-        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.twoh.light_followup"))),
-        SINGULARITY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.twoh.singularity"))),
-        AIR_HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.twoh.air_heavy"))),
+        IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.twoh.idle", AzPlayBehaviors.LOOP)),
+        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.twoh.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.twoh.block", AzPlayBehaviors.LOOP)),
+        HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.twoh.heavy", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.twoh.barrage", AzPlayBehaviors.LOOP)),
+        SMITE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.twoh.smite", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        TIME_STOP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.twoh.timestop", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        CHARGE_OVERWRITE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.twoh.chargeoverwrite", AzPlayBehaviors.LOOP)),
+        OVERWRITE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.twoh.overwrite", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        THROW(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.twoh.throw", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        AIR_KNIVES(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.twoh.airknives", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        TIME_SKIP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.twoh.idle", AzPlayBehaviors.LOOP)),
+        LUNGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.twoh.lunge", AzPlayBehaviors.LOOP)),
+        LOW_KICK(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.twoh.low_kick", AzPlayBehaviors.LOOP)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.twoh.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        SINGULARITY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.twoh.singularity", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        AIR_HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.twoh.air_heavy", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         ;
 
-        private final Consumer<AnimationState<TheWorldOverHeavenEntity>> animator;
+        private final AzCommand animator;
 
-        State(Consumer<AnimationState<TheWorldOverHeavenEntity>> animator) {
+        State(AzCommand animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(TheWorldOverHeavenEntity attacker, AnimationState<TheWorldOverHeavenEntity> builder) {
-            animator.accept(builder);
+        public void playAnimation(TheWorldOverHeavenEntity attacker) {
+            animator.sendForEntity(attacker);
         }
     }
 
     @Override
     protected State[] getStateValues() {
         return State.values();
-    }
-
-    @Override
-    protected @Nullable String getSummonAnimation() {
-        return "animation.twoh.summon";
     }
 
     @Override

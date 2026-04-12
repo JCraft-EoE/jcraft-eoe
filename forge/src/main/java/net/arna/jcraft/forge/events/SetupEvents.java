@@ -10,7 +10,7 @@ import net.arna.jcraft.forge.capability.impl.entity.GrabCapability;
 import net.arna.jcraft.forge.capability.impl.entity.TimeStopCapability;
 import net.arna.jcraft.forge.capability.impl.living.*;
 import net.arna.jcraft.forge.capability.impl.player.PhCapability;
-import net.arna.jcraft.forge.capability.impl.player.SpecCapability;
+import net.arna.jcraft.forge.capability.impl.living.SpecCapability;
 import net.arna.jcraft.forge.capability.impl.world.ShockwaveHandlerCapability;
 import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
@@ -41,6 +41,7 @@ public class SetupEvents {
         event.register(HitPropertyCapability.class);
         event.register(MiscCapability.class);
         event.register(StandCapability.class);
+        event.register(HamonCapability.class);
         event.register(VampireCapability.class);
 
         //World

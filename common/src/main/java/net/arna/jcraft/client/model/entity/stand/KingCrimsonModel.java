@@ -1,7 +1,5 @@
 package net.arna.jcraft.client.model.entity.stand;
 
-import mod.azure.azurelib.core.animatable.model.CoreGeoBone;
-import mod.azure.azurelib.core.animation.AnimationState;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.minecraft.world.entity.LivingEntity;
@@ -17,7 +15,7 @@ public class KingCrimsonModel extends StandEntityModel<KingCrimsonEntity> {
         super(JStandTypeRegistry.KING_CRIMSON.get());
     }
 
-    @Override
+    /*@Override
     public void setCustomAnimations(final KingCrimsonEntity animatable, final long instanceId, final AnimationState<KingCrimsonEntity> animationState) {
         super.setCustomAnimations(animatable, instanceId, animationState);
         if (!animatable.hasUser()) {
@@ -58,5 +56,5 @@ public class KingCrimsonModel extends StandEntityModel<KingCrimsonEntity> {
     @Override
     protected boolean skipCustomAnimations() {
         return true;
-    }
+    }*/
 }

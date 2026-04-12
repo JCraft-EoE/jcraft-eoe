@@ -3,6 +3,7 @@ package net.arna.jcraft.common.marker;
 import com.mojang.datafixers.util.Pair;
 import lombok.Getter;
 import lombok.NonNull;
+import net.arna.jcraft.common.util.TriConsumer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -112,5 +113,16 @@ public class EntityMarkerType implements MarkerSavePredicate<UUID, Entity>, Mark
     @Override
     public EntityMarkerType negateSave() {
         return new EntityMarkerType(savePredicate.negateSave(), loadPredicate, ids, dataHandler);
+    }
+
+    public static @NotNull EntityMarkerType defaultType(final @NotNull Set<ResourceLocation> rewindIds, final @NotNull TriConsumer<ResourceLocation, Entity, CompoundTag> extractor, final @NotNull TriConsumer<ResourceLocation, Entity, CompoundTag> injector) {
+        return new EntityMarkerType(
+                // we catch all entities to save earlier in the code
+                entity -> true,
+                // but we don't know their state when loading
+                Predicates.DEFAULT_LOAD,
+                // this is all we need to check when saving/loading
+                rewindIds,
+                new EntityDataHandler(Predicates.fromSet(rewindIds), extractor, injector));
     }
 }

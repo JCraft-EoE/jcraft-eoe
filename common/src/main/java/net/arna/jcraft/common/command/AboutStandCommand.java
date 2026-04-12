@@ -18,8 +18,7 @@ import net.minecraft.network.chat.ComponentContents;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 
-//todo: replace with a Patchouli in-game wikipedia
-@Deprecated(forRemoval = true)
+// TODO: better client-facing docs for stands and gameplay in general
 public class AboutStandCommand {
     public static void register(final CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("stand")
@@ -31,7 +30,7 @@ public class AboutStandCommand {
         StandEntity<?, ?> stand = JUtils.getStand(player);
 
         if (stand == null) {
-            context.getSource().sendSuccess(() -> Component.translatable("jcraft.commands.error.nostand"), true);
+            context.getSource().sendSuccess(() -> Component.translatable("jcraft.commands.error.nostand"), false);
             return 0;
         }
 

@@ -8,6 +8,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 
 public interface JTagRegistry {
 
@@ -32,20 +33,27 @@ public interface JTagRegistry {
     TagKey<Item> OBTUSE = TagKey.create(Registries.ITEM, JCraft.id("obtuse"));
     TagKey<Item> DISCS = TagKey.create(Registries.ITEM, JCraft.id("discs"));
     TagKey<Item> SOUL_LOG_ITEMS = TagKey.create(Registries.ITEM, JCraft.id("soul_logs"));
+    TagKey<Item> BOOTS_WITH_THE_SPURS = TagKey.create(Registries.ITEM, JCraft.id("has_spurs"));
 
     TagKey<Block> SOUL_LOG_BLOCKS = TagKey.create(Registries.BLOCK, JCraft.id("soul_logs"));
     TagKey<Block> IRON_BLOCKS = TagKey.create(Registries.BLOCK, JCraft.id("iron_blocks"));
     TagKey<Block> DUMMY_KNOCKBACK_BLOCKING = TagKey.create(Registries.BLOCK, JCraft.id("dummy_knockback_blocking"));
+    TagKey<Block> AU_REPLACED_WITH_AIR = TagKey.create(Registries.BLOCK, JCraft.id("au_replaced_with_air"));
 
     TagKey<EntityType<?>> FERROUS_ENTITIES = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("ferrous_entities"));
+    TagKey<EntityType<?>> BLOODLESS_ENTITIES = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("bloodless_entities"));
+    TagKey<EntityType<?>> IRONLESS_ENTITIES = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("ironless_entities"));
     TagKey<EntityType<?>> CAN_HAVE_STAND = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("can_have_stand"));
     TagKey<EntityType<?>> CANNOT_BE_STUNNED = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("cannot_be_stunned"));
     TagKey<EntityType<?>> STANDS = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("stands"));
     TagKey<EntityType<?>> CAN_NEVER_HAVE_STAND = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("can_never_have_stand"));
     TagKey<EntityType<?>> NO_STAND_USER_AI = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("no_stand_user_ai"));
     TagKey<EntityType<?>> SPEC_USER = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("spec_user"));
+    TagKey<EntityType<?>> CANNOT_TAKE_STAND_FROM = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("cannot_take_stand_from"));
 
     TagKey<Biome> METEORS_CAN_FALL = TagKey.create(Registries.BIOME, JCraft.id("meteors_can_fall"));
+
+    TagKey<StructureTemplatePool> STONE_BASE = TagKey.create(Registries.TEMPLATE_POOL, JCraft.id("stone_base"));
 
     static void init() {
         // intentionally left empty

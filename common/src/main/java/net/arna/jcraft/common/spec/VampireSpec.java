@@ -97,6 +97,8 @@ public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
             .withSound(JSoundRegistry.VAMPIRE_REANIMATE)
             .withInfo(Component.literal("Resurrection"), Component.literal("revives humanoid/undead enemies within 5 meters, that died within the last 1 minute"));
 
+    public static final float MAX_BLOOD = 20f;
+
     private final CommonVampireComponent vampireComponent;
 
     public VampireSpec(LivingEntity livingEntity) {

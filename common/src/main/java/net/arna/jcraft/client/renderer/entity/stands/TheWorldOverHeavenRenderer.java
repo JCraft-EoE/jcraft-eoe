@@ -1,28 +1,21 @@
 package net.arna.jcraft.client.renderer.entity.stands;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import mod.azure.azurelib.cache.object.BakedGeoModel;
-import net.arna.jcraft.client.model.entity.stand.TheWorldOverHeavenModel;
+import lombok.NonNull;
+import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.client.renderer.entity.layer.TWOHEyesLayer;
 import net.arna.jcraft.common.entity.stand.TheWorldOverHeavenEntity;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 
 /**
  * The {@link StandEntityRenderer} for {@link TheWorldOverHeavenEntity}.
- * @see TheWorldOverHeavenModel
  */
+@Environment(EnvType.CLIENT)
 public class TheWorldOverHeavenRenderer extends StandEntityRenderer<TheWorldOverHeavenEntity> {
-    public TheWorldOverHeavenRenderer(final EntityRendererProvider.Context context) {
-        super(context, new TheWorldOverHeavenModel());
-        this.addRenderLayer(new TWOHEyesLayer(this));
+
+    public TheWorldOverHeavenRenderer(final @NonNull EntityRendererProvider.Context context) {
+        super(context, b -> b.addRenderLayer(new TWOHEyesLayer()), JStandTypeRegistry.THE_WORLD_OVER_HEAVEN.get(), -0.1745329251f, -0.31f);
     }
 
-    @Override
-    public void actuallyRender(final PoseStack poseStack, final TheWorldOverHeavenEntity animatable, final BakedGeoModel model, final RenderType renderType, final MultiBufferSource bufferSource, final VertexConsumer buffer, final boolean isReRender, final float partialTick, final int packedLight, final int packedOverlay, final float red, final float green, final float blue, final float alpha) {
-        final float a = StandEntityRenderer.getAlpha(animatable, partialTick);
-        super.actuallyRender(poseStack, animatable, model, renderType, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, red, green, blue, a);
-    }
 }

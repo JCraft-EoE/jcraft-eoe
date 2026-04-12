@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.item;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -16,8 +17,14 @@ public class CinderellaMaskItem extends Item {
                 .rarity(Rarity.RARE));
     }
 
+    // we don't want Cinderella enchantable via enchantment table
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context) {
+    public boolean isEnchantable(final @NotNull ItemStack stack) {
+        return false;
+    }
+
+    @Override
+    public void appendHoverText(final @NotNull ItemStack stack, final @Nullable Level world, final List<Component> tooltip, final @NotNull TooltipFlag context) {
         tooltip.add(Component.translatable("jcraft.cinderella_mask.enchdesc"));
         tooltip.add(Component.translatable("jcraft.cinderella_mask.usedesc"));
         super.appendHoverText(stack, world, tooltip, context);

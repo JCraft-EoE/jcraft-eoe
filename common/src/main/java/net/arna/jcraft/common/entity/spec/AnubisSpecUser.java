@@ -10,6 +10,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 public class AnubisSpecUser extends SpecUserMob {
@@ -24,6 +25,7 @@ public class AnubisSpecUser extends SpecUserMob {
     protected void registerGoals() {
         super.registerGoals();
 
+        targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
         targetSelector.addGoal(3, new NearestAttackableTargetGoal(this, IronGolem.class, true));
         targetSelector.addGoal(3, new NearestAttackableTargetGoal(this, Villager.class, true));
     }

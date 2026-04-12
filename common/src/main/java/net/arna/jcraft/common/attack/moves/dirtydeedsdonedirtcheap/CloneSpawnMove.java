@@ -54,6 +54,7 @@ public final class CloneSpawnMove extends AbstractMove<CloneSpawnMove, D4CEntity
             clone.copyPosition(playerEntity);
             clone.setMaster(playerEntity);
             clone.disableDrops();
+            clone.disableExperience();
 
             attacker.level().addFreshEntity(clone);
             clone.setItemSlot(EquipmentSlot.MAINHAND, weapon);

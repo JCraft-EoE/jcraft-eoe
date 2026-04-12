@@ -20,6 +20,8 @@ public interface JMoveActionTypeRegistry {
     RegistrySupplier<RunCommandAction.Type> RUN_COMMAND = register("run_command", RunCommandAction.Type.INSTANCE);
     RegistrySupplier<ScoreboardAction.Type> SCOREBOARD = register("scoreboard", ScoreboardAction.Type.INSTANCE);
     RegistrySupplier<LightOnFireAction.Type> LIGHT_ON_FIRE = register("light_on_fire", LightOnFireAction.Type.INSTANCE);
+    RegistrySupplier<LaunchUpAction.Type> LAUNCH_UP = register("launch_up", LaunchUpAction.Type.INSTANCE);
+    RegistrySupplier<NotifyHamonStompAction.Type> NOTIFY_HAMON_STOMP_ACTION = register("notify_hamon_stomp_action", NotifyHamonStompAction.Type.INSTANCE);
 
     private static <T extends MoveActionType<?>> RegistrySupplier<T> register(String name, T type) {
         return MOVE_ACTION_TYPE_REGISTRY.register(name, () -> type);

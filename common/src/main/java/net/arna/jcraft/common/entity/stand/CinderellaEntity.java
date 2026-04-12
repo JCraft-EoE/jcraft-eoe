@@ -1,31 +1,28 @@
 package net.arna.jcraft.common.entity.stand;
 
 import lombok.NonNull;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.Attacks;
+import net.arna.jcraft.api.attack.MoveMap;
+import net.arna.jcraft.api.attack.MoveSet;
+import net.arna.jcraft.api.attack.MoveSetManager;
+import net.arna.jcraft.api.attack.enums.MoveClass;
+import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
-import net.arna.jcraft.api.attack.MoveSetManager;
-import net.arna.jcraft.api.attack.enums.MoveClass;
-import net.arna.jcraft.api.attack.MoveMap;
-import net.arna.jcraft.api.attack.MoveSet;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
-import net.arna.jcraft.api.registry.JSoundRegistry;
-import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Consumer;
 
 /**
  * The {@link StandEntity} for <a href="https://jojowiki.com/Cinderella">Cinderella</a>.
  * @see JStandTypeRegistry#CINDERELLA
- * @see net.arna.jcraft.client.model.entity.stand.CinderellaModel CinderellaModel
- * @see net.arna.jcraft.client.renderer.entity.stands.CinderellaRenderer CinderellaRenderer
  * @see net.arna.jcraft.common.entity.npc.AyaTsujiEntity AyaTsujiEntity
  */
 public class CinderellaEntity extends StandEntity<CinderellaEntity, CinderellaEntity.State> {
@@ -68,20 +65,20 @@ public class CinderellaEntity extends StandEntity<CinderellaEntity, CinderellaEn
     }
 
     public enum State implements StandAnimationState<CinderellaEntity> {
-        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.cinderella.idle"))),
-        LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.cinderella.light"))),
-        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.cinderella.block"))),
+        IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.cinderella.idle", AzPlayBehaviors.LOOP)),
+        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cinderella.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.cinderella.block", AzPlayBehaviors.LOOP)),
         ;
 
-        private final Consumer<AnimationState<CinderellaEntity>> animator;
+        private final AzCommand animator;
 
-        State(Consumer<AnimationState<CinderellaEntity>> animator) {
+        State(AzCommand animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(CinderellaEntity attacker, AnimationState<CinderellaEntity> state) {
-            animator.accept(state);
+        public void playAnimation(CinderellaEntity attacker) {
+            animator.sendForEntity(attacker);
         }
     }
 
@@ -95,8 +92,4 @@ public class CinderellaEntity extends StandEntity<CinderellaEntity, CinderellaEn
         return State.BLOCK;
     }
 
-    @Override
-    protected @Nullable String getSummonAnimation() {
-        return "animation.cinderella.summon";
-    }
 }

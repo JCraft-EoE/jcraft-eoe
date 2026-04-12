@@ -7,7 +7,7 @@ import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import net.arna.jcraft.client.rendering.handler.InversionShaderHandler;
+import net.arna.jcraft.client.rendering.handler.SpecialParticleShaderHandler;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -46,8 +46,8 @@ public class JParticleTextureSheet {
         public void begin(final BufferBuilder builder, final @NotNull TextureManager textureManager) {
             // Doesn't seem to work by using a blend function, so we'll use a shader instead.
             // Think that is because of the render order, but I'm not sure.
-            InversionShaderHandler.getToInvertBuffer().copyDepthFrom(Minecraft.getInstance().getMainRenderTarget()); // Copy depth buffer
-            InversionShaderHandler.getToInvertBuffer().bindWrite(true); // Render to inversion buffer
+            SpecialParticleShaderHandler.getToInvertBuffer().copyDepthFrom(Minecraft.getInstance().getMainRenderTarget()); // Copy depth buffer
+            SpecialParticleShaderHandler.getToInvertBuffer().bindWrite(true); // Render to inversion buffer
 
             RenderSystem.disableBlend();
             RenderSystem.enableDepthTest();
@@ -55,7 +55,7 @@ public class JParticleTextureSheet {
             RenderSystem.setShader(GameRenderer::getParticleShader);
             RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_PARTICLES);
 
-            builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+            builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
         }
 
         public void end(final Tesselator tessellator) {
@@ -69,5 +69,29 @@ public class JParticleTextureSheet {
         }
     };
 
-    public static final List<ParticleRenderType> J_SHEETS = ImmutableList.of(INVERSION_SHEET, PARTICLE_SHEET_AURA);
+    public static final ParticleRenderType OVERLAP_SHEET = new ParticleRenderType() {
+        public void begin(final BufferBuilder builder, final @NotNull TextureManager textureManager) {
+            SpecialParticleShaderHandler.getOverlapBuffer().bindWrite(true); // Render to overlap buffer
+
+            RenderSystem.disableBlend();
+            RenderSystem.disableDepthTest(); // No depth
+            RenderSystem.depthMask(false);
+            RenderSystem.setShader(GameRenderer::getParticleShader);
+            RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_PARTICLES);
+
+            builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
+        }
+
+        public void end(final Tesselator tessellator) {
+            tessellator.end();
+
+            Minecraft.getInstance().getMainRenderTarget().bindWrite(true); // Revert to the main buffer
+        }
+
+        public String toString() {
+            return "OVERLAP_SHEET";
+        }
+    };
+
+    public static final List<ParticleRenderType> J_SHEETS = ImmutableList.of(INVERSION_SHEET, OVERLAP_SHEET, PARTICLE_SHEET_AURA);
 }

@@ -1,30 +1,46 @@
 package net.arna.jcraft.client.renderer.entity.projectiles;
 
 import lombok.NonNull;
-import net.arna.jcraft.client.model.entity.MeteorModel;
+import mod.azure.azurelib.render.entity.AzEntityRendererConfig;
+import mod.azure.azurelib.render.entity.AzEntityRendererPipeline;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.projectile.MeteorProjectile;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.List;
+import java.util.stream.IntStream;
+
 /**
- * The {@link GeoProjectileRenderer} for {@link MeteorProjectile}.
- * @see MeteorModel
+ * The {@link ProjectileRenderer} for {@link MeteorProjectile}.
  */
-public class MeteorRenderer extends GeoProjectileRenderer<MeteorProjectile> {
-    public MeteorRenderer(final EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, new MeteorModel());
+@Environment(EnvType.CLIENT)
+public class MeteorRenderer extends ProjectileRenderer<MeteorProjectile> {
+    protected static final List<ResourceLocation> SKINS = IntStream.range(0, 4).mapToObj(
+            i -> JCraft.id("textures/entity/meteor/skin_" + i + ".png")).toList();
+
+    public static final String ID = "meteor";
+
+    public MeteorRenderer(final @NonNull EntityRendererProvider.Context context) {
+        super(AzEntityRendererConfig.<MeteorProjectile>builder(
+                entity -> JCraft.id(MODEL_STR_TEMPLATE.formatted(ID)),
+                entity -> SKINS.get(entity.getSkin())
+                )
+                .setRenderType(entity -> RenderType.eyes(SKINS.get(entity.getSkin())))
+                .setAnimatorProvider(() -> new EntityAnimator<>(ID))
+                .setModelRenderer((pipeline, layer) ->
+                        new ProjectileModelRenderer<>((AzEntityRendererPipeline<MeteorProjectile>) pipeline, layer))
+                .build(),
+                context, ID);
     }
 
     @Override
-    protected int getBlockLightLevel(final @NonNull MeteorProjectile entity, final @NonNull BlockPos pos) {
+    public int getBlockLightLevel(final @NonNull MeteorProjectile entity, final @NonNull BlockPos pos) {
         return 15;
     }
 
-    @Override
-    public RenderType getRenderType(final MeteorProjectile animatable, final ResourceLocation texture, final MultiBufferSource bufferSource, final float partialTick) {
-        return RenderType.eyes(texture);
-    }
 }

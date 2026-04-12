@@ -6,35 +6,19 @@ import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import lombok.NonNull;
-import mod.azure.azurelib.animatable.GeoItem;
-import mod.azure.azurelib.animatable.client.RenderProvider;
-import mod.azure.azurelib.constant.DataTickets;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.core.animation.AnimationController;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
-import mod.azure.azurelib.core.object.PlayState;
-import mod.azure.azurelib.renderer.GeoArmorRenderer;
-import mod.azure.azurelib.util.AzureLibUtil;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.component.player.CommonSpecComponent;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JSpecTypeRegistry;
-import net.arna.jcraft.client.renderer.armor.StoneMaskRenderer;
-import net.arna.jcraft.common.network.s2c.StoneMaskClenchPacket;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.fabricmc.api.EnvType;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
@@ -44,14 +28,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
-public class StoneMaskItem extends ArmorItem implements GeoItem {
-    private static final int CLENCH_DURATION = 100; // Duration in ticks for which the clench animation plays
-    private static final Int2IntMap CLENCH = new Int2IntOpenHashMap();
-    private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
-    private final Supplier<Object> renderProvider = GeoItem.makeRenderer(this);
+public class StoneMaskItem extends ArmorItem {
+
+    protected static final AzCommand DORMANT_CMD = AzCommand.create(JCraft.BASE_CONTROLLER, "animation.stone_mask.dormant", AzPlayBehaviors.LOOP);
+    protected static final AzCommand CLENCH_CMD = AzCommand.create(JCraft.BASE_CONTROLLER, "animation.stone_mask.clench", AzPlayBehaviors.PLAY_ONCE);
+
+    protected static final int CLENCH_DURATION = 100; // Duration in ticks for which the clench animation plays
+    protected static final Int2IntMap CLENCH = new Int2IntOpenHashMap();
 
     static {
         if (Platform.getEnv() == EnvType.CLIENT) {
@@ -75,30 +59,9 @@ public class StoneMaskItem extends ArmorItem implements GeoItem {
         super(materialIn, slot, builder);
     }
 
-    public static void clench(final LivingEntity entity) {
-        if (entity == null || !entity.isAlive()) {
-            return;
-        }
-
-        if (Platform.getEnv() == EnvType.CLIENT) {
-            CLENCH.put(entity.getId(), CLENCH_DURATION);
-
-            // entity.level() is a server level on singleplayer.
-            ClientLevel level = Minecraft.getInstance().level;
-            if (level == null) {
-                return;
-            }
-
-            level.playLocalSound(entity.blockPosition(), JSoundRegistry.VAMPIRE_SPEC_CHANGE.get(), SoundSource.PLAYERS,
-                    1f, 1f, true);
-        } else {
-            StoneMaskClenchPacket.sendStoneMaskClench((ServerPlayer) entity);
-        }
-    }
-
     @Override
-    public void inventoryTick(@NotNull ItemStack stack, @NotNull Level world, @NotNull Entity entity, int slot, boolean selected) {
-        super.inventoryTick(stack, world, entity, slot, selected);
+    public void inventoryTick(@NotNull ItemStack stack, @NotNull Level level, @NotNull Entity entity, int slot, boolean selected) {
+        super.inventoryTick(stack, level, entity, slot, selected);
 
         if (slot != EquipmentSlot.HEAD.getIndex()) {
             return;
@@ -109,8 +72,13 @@ public class StoneMaskItem extends ArmorItem implements GeoItem {
             CommonSpecComponent specComponent = JComponentPlatformUtils.getSpecData(player);
             if (specComponent.getType() != JSpecTypeRegistry.VAMPIRE.get()) {
                 specComponent.setType(JSpecTypeRegistry.VAMPIRE.get());
-                clench(player);
+                level.playLocalSound(entity.blockPosition(), JSoundRegistry.VAMPIRE_SPEC_CHANGE.get(), SoundSource.PLAYERS, 1f, 1f, true);
+                CLENCH.put(entity.getId(), CLENCH_DURATION);
+                CLENCH_CMD.sendForItem(entity, stack);
             }
+        }
+        if (!level.isClientSide() && !CLENCH.containsKey(entity.getId())) {
+            DORMANT_CMD.sendForItem(entity, stack);
         }
     }
 
@@ -120,44 +88,4 @@ public class StoneMaskItem extends ArmorItem implements GeoItem {
         super.appendHoverText(stack, world, tooltip, context);
     }
 
-    @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "controller", 5, this::predicate));
-    }
-
-    private PlayState predicate(AnimationState<StoneMaskItem> state) {
-        Entity entity = state.getData(DataTickets.ENTITY);
-        if (entity instanceof LivingEntity livingEntity) {
-            RawAnimation anim = CLENCH.containsKey(livingEntity.getId())
-                    ? RawAnimation.begin().thenPlayAndHold("animation.stone_mask.clench")
-                    : RawAnimation.begin().thenLoop("animation.stone_mask.dormant");
-
-            state.getController().setAnimation(anim);
-
-        }
-        return PlayState.CONTINUE;
-    }
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return cache;
-    }
-
-    @Override
-    public void createRenderer(Consumer<Object> consumer) {
-        consumer.accept(new RenderProvider() {
-            private static GeoArmorRenderer<?> renderer;
-            @SuppressWarnings("unchecked")
-            @Override public @NonNull HumanoidModel<LivingEntity> getHumanoidArmorModel(
-                    LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<LivingEntity> original) {
-                if (renderer == null) renderer = new StoneMaskRenderer();
-                renderer.prepForRender(livingEntity, itemStack, equipmentSlot, original);
-                return renderer;
-            }});
-    }
-
-    @Override
-    public Supplier<Object> getRenderProvider() {
-        return renderProvider;
-    }
 }

@@ -3,7 +3,6 @@ package net.arna.jcraft.common.attack.moves.shared;
 import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
-import mod.azure.azurelib.animatable.GeoEntity;
 import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.StateContainer;
@@ -12,7 +11,7 @@ import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.common.util.StandAnimationState;
 
 
-public final class GrabAttack<A extends IAttacker<A, S> & GeoEntity, S extends Enum<S> & StandAnimationState<A>>
+public final class GrabAttack<A extends IAttacker<A, S>, S extends Enum<S> & StandAnimationState<A>>
         extends AbstractGrabAttack<GrabAttack<A, S>, A, S> {
 
     public GrabAttack(final int cooldown, final int windup, final int duration, final float moveDistance,

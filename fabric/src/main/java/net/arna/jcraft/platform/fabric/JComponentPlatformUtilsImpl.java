@@ -86,6 +86,10 @@ public class JComponentPlatformUtilsImpl {
         return JComponents.TEXAS_HOLD_EM.get(world);
     }
 
+    public static CommonHamonComponent getHamon(LivingEntity living) {
+        return JComponents.HAMON.get(living);
+    }
+
     public static CommonVampireComponent getVampirism(LivingEntity living) {
         return JComponents.VAMPIRE.get(living);
     }

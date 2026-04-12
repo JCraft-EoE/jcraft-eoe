@@ -9,22 +9,16 @@ public class JPlatformUtils {
 
     @ExpectPlatform
     public static MultiInstancePostProcessor<TimestopShaderFX> getZaWarudo(){
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new AssertionError("This shouldn't happen");
     }
 
     @ExpectPlatform
     public static ShaderInstance getTest() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new AssertionError("This shouldn't happen");
     }
 
     @ExpectPlatform
     public static ShaderInstance getRred() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-
-    @ExpectPlatform
-    public static boolean isModLoaded(String name) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new AssertionError("This shouldn't happen");
     }
 }

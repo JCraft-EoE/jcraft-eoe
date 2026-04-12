@@ -1,24 +1,20 @@
 package net.arna.jcraft.common.entity.stand;
 
 import lombok.NonNull;
-import mod.azure.azurelib.core.animation.AnimationState;
+import net.arna.jcraft.api.attack.MoveMap;
+import net.arna.jcraft.api.attack.MoveSet;
+import net.arna.jcraft.api.attack.MoveSetManager;
+import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
-import net.arna.jcraft.api.attack.MoveSet;
-import net.arna.jcraft.api.attack.MoveSetManager;
-import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.common.util.StandAnimationState;
-import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * The {@link StandEntity} for <a href="https://jojowiki.com/Foo_Fighters_(Stand)">Foo Fighters</a>.
  * @see JStandTypeRegistry#FOO_FIGHTERS
- * @see net.arna.jcraft.client.model.entity.stand.FooFightersModel FooFightersModel
- * @see net.arna.jcraft.client.renderer.entity.stands.FooFightersRenderer FooFightersRenderer
  */
 public class FooFightersEntity extends StandEntity<FooFightersEntity, FooFightersEntity.State> {
     public static final MoveSet<FooFightersEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.FOO_FIGHTERS,
@@ -39,7 +35,7 @@ public class FooFightersEntity extends StandEntity<FooFightersEntity, FooFighter
         BLOCK;
 
         @Override
-        public void playAnimation(FooFightersEntity attacker, AnimationState<FooFightersEntity> state) {
+        public void playAnimation(FooFightersEntity attacker) {
             // TODO Arna
         }
     }
@@ -52,11 +48,6 @@ public class FooFightersEntity extends StandEntity<FooFightersEntity, FooFighter
     @Override
     protected State[] getStateValues() {
         return State.values();
-    }
-
-    @Override
-    protected @Nullable String getSummonAnimation() {
-        return "animation.foo_fighters.summon";
     }
 
     @Override

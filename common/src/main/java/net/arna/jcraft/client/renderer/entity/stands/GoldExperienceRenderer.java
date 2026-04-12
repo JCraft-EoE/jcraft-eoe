@@ -1,32 +1,27 @@
 package net.arna.jcraft.client.renderer.entity.stands;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import mod.azure.azurelib.cache.object.BakedGeoModel;
-import net.arna.jcraft.client.model.entity.stand.GoldenExperienceModel;
+import lombok.NonNull;
+import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.common.entity.stand.GoldExperienceEntity;
-import net.arna.jcraft.common.util.JUtils;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3d;
 
 /**
  * The {@link StandEntityRenderer} for {@link GoldExperienceEntity}.
- * @see GoldenExperienceModel
  */
+@Environment(EnvType.CLIENT)
 public class GoldExperienceRenderer extends StandEntityRenderer<GoldExperienceEntity> {
     private int currentTick = -1;
     private static final ParticleOptions chargeParticle = ParticleTypes.COMPOSTER;
 
-    public GoldExperienceRenderer(final EntityRendererProvider.Context context) {
-        super(context, new GoldenExperienceModel());
+    public GoldExperienceRenderer(final @NonNull EntityRendererProvider.Context context) {
+        super(context, JStandTypeRegistry.GOLD_EXPERIENCE.get(), 0, -0.1f);
     }
 
+    /*
     @Override
     public void actuallyRender(final PoseStack poseStack, final GoldExperienceEntity stand, final BakedGeoModel model,
                                final RenderType renderType, final MultiBufferSource bufferSource, final VertexConsumer buffer,
@@ -53,5 +48,5 @@ public class GoldExperienceRenderer extends StandEntityRenderer<GoldExperienceEn
                 });
             }
         }
-    }
+    }*/
 }

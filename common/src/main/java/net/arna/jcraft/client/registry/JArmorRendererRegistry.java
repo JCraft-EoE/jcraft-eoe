@@ -1,8 +1,6 @@
 package net.arna.jcraft.client.registry;
 
 import lombok.NonNull;
-import mod.azure.azurelib.animatable.client.RenderProvider;
-import mod.azure.azurelib.renderer.GeoArmorRenderer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.model.HumanoidModel;
@@ -20,6 +18,7 @@ public class JArmorRendererRegistry {
      * Creating a class that implements RenderProvider also does not work.
      * Any known attempt to reduce boilerplate causes specifically Fabric Serverside to tweak out over trying to load HumanoidModel.
      */
+    /*
     @Deprecated(forRemoval = true)
     public static void createRenderer(Consumer<Object> consumer, GeoArmorRenderer<?> pRenderer) {
         consumer.accept(new RenderProvider() {
@@ -37,5 +36,5 @@ public class JArmorRendererRegistry {
                 return this.renderer;
             }
         });
-    }
+    }*/
 }

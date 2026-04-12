@@ -28,7 +28,7 @@ public final class JCraftFabricClient implements ClientModInitializer {
         JCraftClient.init();
         JEntityModelLayerRegistry.init(modelLayerDefinition -> EntityModelLayerRegistry.register(modelLayerDefinition.getKey(), modelLayerDefinition.getValue()));
         JEntityRendererRegister.registerEntityRenderers(JEntityRendererRegister.RendererData::registerFabric);
-        BlockEntityRenderers.register(JBlockEntityTypeRegistry.COFFIN_TILE.get(), CoffinTileRenderer::new);
+        BlockEntityRenderers.register(JBlockEntityTypeRegistry.COFFIN_TILE.get(), context -> new CoffinTileRenderer());
 
         JCraftClient.registerParticleSpriteSets();
 

@@ -5,8 +5,8 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
 import lombok.NonNull;
-import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.IAttacker;
+import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.attack.moves.AbstractBarrageAttack;
 import net.arna.jcraft.common.config.JServerConfig;
@@ -15,9 +15,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Set;
@@ -51,10 +48,10 @@ public final class MainBarrageAttack<A extends IAttacker<? extends A, ?>> extend
     @Override
     public void onInitiate(final A attacker) {
         breakBlocks = attacker.getUserOrThrow().isShiftKeyDown() && JServerConfig.MINING_BARRAGE.getValue();
-        if (breakBlocks && !mayGrief(attacker.getUser()) && !(attacker.getUser() instanceof Player) ||
-                attacker instanceof Player player && !player.mayBuild()) {
+        if (!mayBreak(attacker.getUser(), null)) {
             breakBlocks = false;
         }
+
         withDuration(breakBlocks ? MINING_BARRAGE_TIME : baseDuration);
         super.onInitiate(attacker);
         withStun(breakBlocks ? 1 : baseStun);
@@ -108,12 +105,7 @@ public final class MainBarrageAttack<A extends IAttacker<? extends A, ?>> extend
     }
 
     private void tryBreak(final ServerLevel world, final BlockPos pos, final LivingEntity user) {
-        final Block block = world.getBlockState(pos).getBlock();
-        if (block.defaultDestroyTime() < 0) {
-            return;
-        }
-        if (block.defaultDestroyTime() <= mineableHardness &&
-                (user instanceof Player || world.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING))) {
+        if (mayBreak(user, pos, b -> b.getBlock().defaultDestroyTime() <= mineableHardness)) {
             world.destroyBlock(pos, true, user);
         }
     }

@@ -211,6 +211,9 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
     @Override
     public void tickSpec() {
         super.tickSpec();
+        if (user != null && user.isSpectator()) {
+            return;
+        }
         if (++ticksSinceLastHit > 80 && attackSpeedMult > 1f) {
             ticksSinceLastHit = 0; // Technically untrue, but all this serves for is counting 5s since last hit then rolling over
             attackSpeedMult -= 0.2f;

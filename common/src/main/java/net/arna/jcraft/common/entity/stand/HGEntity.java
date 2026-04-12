@@ -2,47 +2,43 @@ package net.arna.jcraft.common.entity.stand;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.NonNull;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.Attacks;
+import net.arna.jcraft.api.attack.MoveMap;
+import net.arna.jcraft.api.attack.MoveSet;
+import net.arna.jcraft.api.attack.MoveSetManager;
+import net.arna.jcraft.api.attack.enums.MoveClass;
+import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
+import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.api.stand.SummonData;
-import net.arna.jcraft.api.attack.MoveSet;
-import net.arna.jcraft.api.attack.MoveSetManager;
-import net.arna.jcraft.api.attack.enums.MoveClass;
-import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.common.attack.moves.hierophantgreen.EmeraldSplashAttack;
 import net.arna.jcraft.common.attack.moves.hierophantgreen.NetSetMove;
 import net.arna.jcraft.common.attack.moves.shared.*;
-import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.common.entity.projectile.HGNetEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.IOwnable;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
-import net.arna.jcraft.api.registry.JSoundRegistry;
-import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
  * The {@link StandEntity} for <a href="https://jojowiki.com/Hierophant_Green">Hierophant Green</a>.
  * @see JStandTypeRegistry#HIEROPHANT_GREEN
- * @see net.arna.jcraft.client.model.entity.stand.HGModel HGModel
- * @see net.arna.jcraft.client.renderer.entity.stands.HGRenderer HGRenderer
  * @see EmeraldSplashAttack
  * @see NetSetMove
  */
@@ -316,7 +312,9 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
         super.tick();
 
         final boolean isRemote = isRemote();
+        idleOverride = isRemote;
         setNoGravity(isRemote);
+
         if (!isRemote) {
             return;
         }
@@ -329,18 +327,22 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
 
             tickRemoteMovement(f, s, getRemoteJumpInput(), getRemoteSneakInput());
 
-            if (getState() == State.IDLE && getMoveStun() <= 0) { // Replace idle anim
-                if (s > 0) {
-                    setStateNoReset(State.RIGHT);
-                }
-                if (s < 0) {
-                    setStateNoReset(State.LEFT);
-                }
-                if (f < 0) {
-                    setStateNoReset(State.BACKWARD);
-                }
-                if (f > 0) {
-                    setStateNoReset(State.FORWARD);
+            if (getMoveStun() <= 0) {
+                if (f == 0) {
+                    if (s > 0) {
+                        setStateNoReset(State.RIGHT);
+                    } else if (s < 0) {
+                        setStateNoReset(State.LEFT);
+                    } else {
+                        setStateNoReset(State.IDLE);
+                    }
+                } else {
+                    if (f < 0) {
+                        setStateNoReset(State.BACKWARD);
+                    }
+                    if (f > 0) {
+                        setStateNoReset(State.FORWARD);
+                    }
                 }
             }
         }
@@ -375,12 +377,14 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
 
         remoteSpeed = remoteSpeed.scale(dragMult);
 
+        final double stabilization = (f == 0 && s == 0 && !jump && !sneak) ? 0.7 : 0.2;
+
         final Vec3 userPos = getUserOrThrow().position();
         if (pos.add(remoteSpeed).distanceToSqr(userPos) > 30 * 30) {
             remoteSpeed = userPos.subtract(pos).scale(0.025); // 1/40th so it scales with distance
         }
 
-        push(-getDeltaMovement().x * 0.2, -getDeltaMovement().y * 0.2, -getDeltaMovement().z * 0.2);
+        push(-getDeltaMovement().x * stabilization, -getDeltaMovement().y * stabilization, -getDeltaMovement().z * stabilization);
         push(remoteSpeed.x, remoteSpeed.y, remoteSpeed.z);
         hasImpulse = true;
         hurtMarked = true;
@@ -395,54 +399,45 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
 
     // Animation code
     public enum State implements StandAnimationState<HGEntity> {
-        IDLE((hg, builder) -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.hg.idle"))),
-        LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.hg.light"))),
-        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.hg.light_followup"))),
-        CROUCHING_LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.hg.crouching_light"))),
-        CROUCHING_LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.hg.crouching_light_followup"))),
-        AIR_LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.hg.air_light"))),
-        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.hg.block"))),
-        SENDOFF(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.hg.sendoff"))),
-        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.hg.barrage"))),
-        NET_SET(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.hg.net_place"))),
+        IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.hg.idle", AzPlayBehaviors.LOOP)),
+        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.hg.block", AzPlayBehaviors.LOOP)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        CROUCHING_LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.crouching_light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        CROUCHING_LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.crouching_light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        AIR_LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.air_light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        SENDOFF(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.sendoff", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.barrage", AzPlayBehaviors.LOOP)),
+        NET_SET(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.net_place", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
 
-        EMERALD_CHARGE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.hg.emerald_charge"))),
-        EMERALD_SPLASH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.hg.emerald_splash"))),
-        EMERALD_SUPER(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.hg.emerald_super"))),
-        EXTEND_UP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.hg.extend_up"))),
-        EXTEND_FORWARD(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.hg.extend_forward"))),
+        EMERALD_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.emerald_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        EMERALD_SPLASH(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.emerald_splash", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        EMERALD_SUPER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.emerald_super", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        EXTEND_UP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.extend_up", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        EXTEND_FORWARD(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.extend_forward", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
 
-        UPPERCUT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.hg.uppercut"))),
+        UPPERCUT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.uppercut", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
 
-        FORWARD(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.hg.forw"))),
-        BACKWARD(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.hg.back"))),
-        LEFT(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.hg.left"))),
-        RIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.hg.right")));
+        FORWARD(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.hg.forw", AzPlayBehaviors.LOOP)),
+        BACKWARD(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.hg.back", AzPlayBehaviors.LOOP)),
+        LEFT(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.hg.left", AzPlayBehaviors.LOOP)),
+        RIGHT(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.hg.right", AzPlayBehaviors.LOOP));
 
-        private final BiConsumer<HGEntity, AnimationState<HGEntity>> animator;
+        private final AzCommand animator;
 
-        State(Consumer<AnimationState<HGEntity>> animator) {
-            this((whiteSnake, builder) -> animator.accept(builder));
-        }
-
-        State(BiConsumer<HGEntity, AnimationState<HGEntity>> animator) {
+        State(AzCommand animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(HGEntity attacker, AnimationState<HGEntity> builder) {
-            animator.accept(attacker, builder);
+        public void playAnimation(HGEntity attacker) {
+            animator.sendForEntity(attacker);
         }
     }
 
     @Override
     protected State[] getStateValues() {
         return State.values();
-    }
-
-    @Override
-    protected @Nullable String getSummonAnimation() {
-        return "animation.hg.summon";
     }
 
     @Override

@@ -8,10 +8,11 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 
 public class MiscComponentImpl extends CommonMiscComponentImpl implements MiscComponent {
 
-    public MiscComponentImpl(Entity entity) {
+    public MiscComponentImpl(LivingEntity entity) {
         super(entity);
     }
 

@@ -36,6 +36,12 @@ configurations {
     }
 }
 
+repositories {
+    //maven { url "https://maven.createmod.net/" } // for flywheel, ponder, create
+    //maven { url "https://maven.fzzyhmstrs.me/" } // for fzzy config
+    //maven { url = "https://thedarkcolour.github.io/KotlinForForge/" } // for kotlin
+}
+
 dependencies {
 
     forge "net.minecraftforge:forge:$rootProject.forge_version"
@@ -43,14 +49,12 @@ dependencies {
     // Architectury API. This is optional, and you can comment it out if you don't need it.
     modImplementation "dev.architectury:architectury-forge:$architectury_api_version"
 
-    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.5"))
-    implementation(include("io.github.llamalad7:mixinextras-forge:0.3.5"))
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
+    implementation(include("io.github.llamalad7:mixinextras-forge:0.4.1"))
 
 
-    //Geckolib
-    //implementation("software.bernie.geckolib:geckolib-forge-${minecraft_version}:${geckolib_version}")
-    //implementation("com.eliotlash.mclib:mclib:20")
-    implementation "mod.azure.azurelib:azurelib-forge-1.20.1:1.0.34"
+    // AzureLib
+    modImplementation "mod.azure.azurelib:azurelib-neo-${minecraft_version}:${azurelib_version}"
 
     //Player Anim
     modImplementation("dev.kosmx.player-anim:player-animation-lib-forge:${player_anim_version}")
@@ -64,14 +68,50 @@ dependencies {
     //Cloth
     modApi("me.shedaniel.cloth:cloth-config-forge:11.1.118"){ transitive = false }
 
+    // FTB Chunks
+    modImplementation "dev.ftb.mods:ftb-chunks-forge:${rootProject.ftb_chunks_version}"
+    modImplementation "dev.ftb.mods:ftb-library-forge:${rootProject.ftb_lib_version}"
+    modImplementation "dev.ftb.mods:ftb-teams-forge:${rootProject.ftb_teams_version}"
+
     //modImplementation("com.fusionflux:gravity_api-forge-${gravity_api_version}"){ transitive = false }
 
     // compatibilities
+    // to see what I'm looking at
+    modRuntimeOnly("curse.maven:badpackets-615134:4784395")
+    modRuntimeOnly("curse.maven:wthit-forge-455982:7174123")
     // for enigmatic legacy
-    modRuntimeOnly("curse.maven:curios-309927:6418456")
-    modRuntimeOnly("curse.maven:caelus-308989:4581481")
-    modRuntimeOnly("curse.maven:patchouli-306770:4636277")
-    modRuntimeOnly("curse.maven:enigmatic-legacy-336184:5600004")
+    //modRuntimeOnly("curse.maven:curios-309927:6418456")
+    //modRuntimeOnly("curse.maven:caelus-308989:4581481")
+    //modRuntimeOnly("curse.maven:patchouli-306770:4636277")
+    //modRuntimeOnly("curse.maven:enigmatic-legacy-336184:5600004")
+    // for l_ender cataclysm
+    //modRuntimeOnly("curse.maven:curios-309927:6418456")
+    //modRuntimeOnly("curse.maven:lionfish-api-1001614:5922047")
+    //modRuntimeOnly("curse.maven:lendercataclysm-551586:6906993")
+    // for Ice and Fire
+    //modRuntimeOnly("curse.maven:citadel-331936:6702068")
+    //modRuntimeOnly("curse.maven:ice-and-fire-dragons-264231:5633453")
+    // for Weather, Storms and Tornadoes
+    modRuntimeOnly("curse.maven:coroutil-237749:5096038")
+    modRuntimeOnly("curse.maven:weather-storms-tornadoes-237746:5244118")
+    //modRuntimeOnly("curse.maven:weather2-additions-1091174:6666847")
+    //modRuntimeOnly("curse.maven:wuffys-weather2-additions-1115203:5807550")
+    // for Particle Core
+    //modRuntimeOnly("thedarkcolour:kotlinforforge:4.12.0")
+    //modRuntimeOnly("me.fzzyhmstrs:fzzy_config:0.7.3+1.20.1+forge")
+    //modRuntimeOnly("curse.maven:particle-core-985426:6427560")
+    // for Waystones
+    //modRuntimeOnly("curse.maven:balm-531761:7087245")
+    //modRuntimeOnly("curse.maven:waystones-245755:6856603")
+    // for Embeddium
+    //modRuntimeOnly("curse.maven:embeddium-908741:5681725")
+    // for Happy Ghast backport
+    //modRuntimeOnly("curse.maven:happy-ghast-backport-1225630:6359385")
+    // for Effortless Building
+    //modRuntimeOnly("net.createmod.ponder:Ponder-Forge-1.20.1:1.0.92")
+    //modRuntimeOnly("dev.engine-room.flywheel:flywheel-forge-1.20.1:1.0")
+    //modRuntimeOnly("curse.maven:effortless-building-302113:6330928")
+
 
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
     shadowBundle(project(path: ':common', configuration: 'transformProductionForge')){ transitive = false }

@@ -1,23 +1,28 @@
 package net.arna.jcraft.client.renderer.armor;
 
-import net.arna.jcraft.client.model.armor.JArmorModel;
-import net.arna.jcraft.common.item.FlutteringArmorItem;
+import mod.azure.azurelib.render.armor.bone.AzArmorBoneContext;
 import net.minecraft.world.entity.EquipmentSlot;
 
-public class DIOCapeRenderer extends JArmor<FlutteringArmorItem> {
+public class DIOCapeRenderer extends ArmorRenderer {
+
+    public static final String ID = "diocape";
+
     public DIOCapeRenderer() {
-        super(new JArmorModel<>("diocape"));
+        super(() -> new FlutteringArmorAnimator(ID), new DIOCapeBoneContext(), ID);
     }
 
-    @Override
-    protected void applyBoneVisibilityBySlot(EquipmentSlot currentSlot) {
-        setAllVisible(false);
+    protected static class DIOCapeBoneContext extends AzArmorBoneContext {
+        @Override
+        public void applyBoneVisibilityBySlot(final EquipmentSlot currentSlot) {
+            setAllVisible(false);
 
-        if (currentSlot == EquipmentSlot.CHEST) {
-            setBoneVisible(this.body, true);
-            setBoneVisible(this.head, true);
-            setBoneVisible(this.leftArm, true);
-            setBoneVisible(this.rightArm, true);
+            if (currentSlot == EquipmentSlot.CHEST) {
+                setBoneVisible(this.body, true);
+                setBoneVisible(this.head, true);
+                setBoneVisible(this.leftArm, true);
+                setBoneVisible(this.rightArm, true);
+            }
         }
     }
+
 }

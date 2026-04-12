@@ -32,7 +32,8 @@ public class InversionParticle extends RisingParticle {
 
         @Nullable
         @Override
-        public Particle createParticle(final SimpleParticleType parameters, final ClientLevel world, final double x, final double y, final double z, final double velocityX, final double velocityY, final double velocityZ) {
+        public Particle createParticle(final SimpleParticleType parameters, final ClientLevel world, final double x,
+                                       final double y, final double z, final double velocityX, final double velocityY, final double velocityZ) {
             return new InversionParticle(world, x, y, z, velocityX, velocityY, velocityZ, spriteProvider);
         }
     }

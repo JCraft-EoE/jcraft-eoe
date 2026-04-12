@@ -1,10 +1,6 @@
 package net.arna.jcraft.common.entity.projectile;
 
 import lombok.NonNull;
-import mod.azure.azurelib.animatable.GeoEntity;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.util.AzureLibUtil;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
@@ -22,7 +18,7 @@ import net.minecraft.world.phys.Vec3;
 
 import static net.arna.jcraft.api.Attacks.damageLogic;
 
-public class BloodProjectile extends AbstractArrow implements GeoEntity {
+public class BloodProjectile extends AbstractArrow {
     public BloodProjectile(final Level world) {
         super(JEntityTypeRegistry.BLOOD_PROJECTILE.get(), world);
         this.pickup = Pickup.DISALLOWED;
@@ -77,16 +73,4 @@ public class BloodProjectile extends AbstractArrow implements GeoEntity {
         return false;
     }
 
-    // Animations
-    private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
-
-    @Override
-    public void registerControllers(final AnimatableManager.ControllerRegistrar controllers) {
-
-    }
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return cache;
-    }
 }

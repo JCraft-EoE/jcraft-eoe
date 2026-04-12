@@ -1,21 +1,70 @@
 package net.arna.jcraft.datagen.providers.data;
 
+import dev.architectury.registry.registries.RegistrySupplier;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.registry.JBlockRegistry;
 import net.arna.jcraft.api.registry.JItemRegistry;
+import net.arna.jcraft.common.item.CosplayItem;
+import net.arna.jcraft.datagen.builder.CrazyDiamondRecipeBuilder;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.advancements.critereon.*;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.*;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.ArmorMaterials;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.block.Blocks;
 
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class JRecipeProvider extends FabricRecipeProvider {
+
+    public static final Map<ArmorMaterial, Item> HELMET_MAP = Map.ofEntries(
+            Map.entry(ArmorMaterials.LEATHER, Items.LEATHER_HELMET),
+            Map.entry(ArmorMaterials.GOLD, Items.GOLDEN_HELMET),
+            Map.entry(ArmorMaterials.CHAIN, Items.CHAINMAIL_HELMET),
+            Map.entry(ArmorMaterials.IRON, Items.IRON_HELMET),
+            Map.entry(ArmorMaterials.DIAMOND, Items.DIAMOND_HELMET),
+            Map.entry(ArmorMaterials.TURTLE, Items.TURTLE_HELMET),
+            Map.entry(ArmorMaterials.NETHERITE, Items.NETHERITE_HELMET)
+    );
+    public static final Map<ArmorMaterial, Item> CHESTPLATE_MAP = Map.ofEntries(
+            Map.entry(ArmorMaterials.LEATHER, Items.LEATHER_CHESTPLATE),
+            Map.entry(ArmorMaterials.GOLD, Items.GOLDEN_CHESTPLATE),
+            Map.entry(ArmorMaterials.CHAIN, Items.CHAINMAIL_CHESTPLATE),
+            Map.entry(ArmorMaterials.IRON, Items.IRON_CHESTPLATE),
+            Map.entry(ArmorMaterials.DIAMOND, Items.DIAMOND_CHESTPLATE),
+            Map.entry(ArmorMaterials.NETHERITE, Items.NETHERITE_CHESTPLATE)
+    );
+    public static final Map<ArmorMaterial, Item> LEGGINGS_MAP = Map.ofEntries(
+            Map.entry(ArmorMaterials.LEATHER, Items.LEATHER_LEGGINGS),
+            Map.entry(ArmorMaterials.GOLD, Items.GOLDEN_LEGGINGS),
+            Map.entry(ArmorMaterials.CHAIN, Items.CHAINMAIL_LEGGINGS),
+            Map.entry(ArmorMaterials.IRON, Items.IRON_LEGGINGS),
+            Map.entry(ArmorMaterials.DIAMOND, Items.DIAMOND_LEGGINGS),
+            Map.entry(ArmorMaterials.NETHERITE, Items.NETHERITE_LEGGINGS)
+    );
+    public static final Map<ArmorMaterial, Item> BOOTS_MAP = Map.ofEntries(
+            Map.entry(ArmorMaterials.LEATHER, Items.LEATHER_BOOTS),
+            Map.entry(ArmorMaterials.GOLD, Items.GOLDEN_BOOTS),
+            Map.entry(ArmorMaterials.CHAIN, Items.CHAINMAIL_BOOTS),
+            Map.entry(ArmorMaterials.IRON, Items.IRON_BOOTS),
+            Map.entry(ArmorMaterials.DIAMOND, Items.DIAMOND_BOOTS),
+            Map.entry(ArmorMaterials.NETHERITE, Items.NETHERITE_BOOTS)
+    );
+    public static final Map<ArmorItem.Type, Map<ArmorMaterial, Item>> TYPE_MAP = Map.of(
+        ArmorItem.Type.HELMET, HELMET_MAP,
+        ArmorItem.Type.CHESTPLATE, CHESTPLATE_MAP,
+        ArmorItem.Type.LEGGINGS, LEGGINGS_MAP,
+        ArmorItem.Type.BOOTS, BOOTS_MAP
+    );
 
     public JRecipeProvider(FabricDataOutput output) {
         super(output);
@@ -173,7 +222,6 @@ public class JRecipeProvider extends FabricRecipeProvider {
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, JItemRegistry.REQUIEM_ARROW.get())
                 .requires(JItemRegistry.STAND_ARROW.get())
                 .requires(JItemRegistry.REQUIEM_RUBY.get())
-                .requires(Items.TIPPED_ARROW)
                 .unlockedBy("has_arrow", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.STAND_ARROW.get()))
                 .unlockedBy("has_ruby", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.REQUIEM_RUBY.get()))
                 .save(exporter);
@@ -200,34 +248,6 @@ public class JRecipeProvider extends FabricRecipeProvider {
                 .unlockedBy("has_white_bed", InventoryChangeTrigger.TriggerInstance.hasItems(Items.WHITE_BED))
                 .unlockedBy("has_yellow_bed", InventoryChangeTrigger.TriggerInstance.hasItems(Items.YELLOW_BED))
                 .save(exporter);
-        // Strazo's Poncho
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.STRAIZO_PONCHO.get())
-                .pattern("BBB")
-                .pattern("BCB")
-                .pattern(" B ")
-                .define('B', Items.BLACK_DYE)
-                .define('C', Items.NETHERITE_CHESTPLATE)
-                .unlockedBy("has_netherite_chestplate", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_CHESTPLATE))
-                .save(exporter);
-        // Kars' headwrap
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.KARS_HEADWRAP.get())
-                .pattern(" C ")
-                .pattern("L L")
-                .pattern(" B ")
-                .define('B', Items.BLACK_DYE)
-                .define('C', Items.LEATHER_HELMET)
-                .define('L', Items.LEATHER)
-                .unlockedBy("has_leather_helmet", InventoryChangeTrigger.TriggerInstance.hasItems(Items.LEATHER_HELMET))
-                .save(exporter);
-        // red hat
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.RED_HAT.get())
-                .pattern(" R ")
-                .pattern("LCL")
-                .define('C', Items.LEATHER_HELMET)
-                .define('L', Items.LEATHER)
-                .define('R', Items.RED_DYE)
-                .unlockedBy("has_leather_helmet", InventoryChangeTrigger.TriggerInstance.hasItems(Items.LEATHER_HELMET))
-                .save(exporter);
         // blood bottle
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, JItemRegistry.BLOOD_BOTTLE.get())
                 .pattern(" B ")
@@ -236,200 +256,6 @@ public class JRecipeProvider extends FabricRecipeProvider {
                 .define('B', ItemTags.BUTTONS)
                 .define('G', Items.GLASS)
                 .unlockedBy("has_glass", InventoryChangeTrigger.TriggerInstance.hasItems(Items.GLASS))
-                .save(exporter);
-        // Dio's P1 wig
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.DIO_P1_WIG.get())
-                .pattern(" W ")
-                .pattern("WHW")
-                .define('H', Items.NETHERITE_HELMET)
-                .define('W', Items.WHEAT)
-                .unlockedBy("has_netherite_helmet", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_HELMET))
-                .save(exporter);
-        // Dio's P1 jacket
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.DIO_P1_JACKET.get())
-                .pattern("RPR")
-                .pattern("RCR")
-                .pattern("WBW")
-                .define('B', Items.BROWN_DYE)
-                .define('C', Items.NETHERITE_CHESTPLATE)
-                .define('P', Items.PURPLE_DYE)
-                .define('R', Items.RED_DYE)
-                .define('W', Items.WHITE_DYE)
-                .unlockedBy("has_netherite_chestplate", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_CHESTPLATE))
-                .save(exporter);
-        // Dio's P1 pants
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.DIO_P1_PANTS.get())
-                .pattern("RWR")
-                .pattern("RLR")
-                .pattern("R R")
-                .define('L', Items.NETHERITE_LEGGINGS)
-                .define('R', Items.RED_DYE)
-                .define('W', Items.WHITE_DYE)
-                .unlockedBy("has_netherite_leggings", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_LEGGINGS))
-                .save(exporter);
-        // Dio's P1 boots
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.DIO_P1_BOOTS.get())
-                .pattern("PNP")
-                .pattern("B B")
-                .define('B', Items.BLACK_DYE)
-                .define('N', Items.NETHERITE_BOOTS)
-                .define('P', Items.PURPLE_DYE)
-                .unlockedBy("has_netherite_boots", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_BOOTS))
-                .save(exporter);
-        // Jotaro's cap
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.JOTARO_CAP.get())
-                .pattern("BYB")
-                .pattern("BHB")
-                .define('B', Items.BLACK_DYE)
-                .define('H', Items.NETHERITE_HELMET)
-                .define('Y', Items.YELLOW_DYE)
-                .unlockedBy("has_netherite_helmet", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_HELMET))
-                .save(exporter);
-        // Jotaro's jacket
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.JOTARO_JACKET.get())
-                .pattern("B B")
-                .pattern("BCB")
-                .pattern("BBB")
-                .define('B', Items.BLACK_DYE)
-                .define('C', Items.NETHERITE_CHESTPLATE)
-                .unlockedBy("has_netherite_chestplate", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_CHESTPLATE))
-                .save(exporter);
-        // Jotaro's pants
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.JOTARO_PANTS.get())
-                .pattern("YYY")
-                .pattern("BLB")
-                .pattern("B B")
-                .define('B', Items.BLACK_DYE)
-                .define('L', Items.NETHERITE_LEGGINGS)
-                .define('Y', Items.YELLOW_DYE)
-                .unlockedBy("has_netherite_leggings", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_LEGGINGS))
-                .save(exporter);
-        // Jotaro's boots
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.JOTARO_BOOTS.get())
-                .pattern("BNB")
-                .pattern("B B")
-                .define('B', Items.BLACK_DYE)
-                .define('N', Items.NETHERITE_BOOTS)
-                .unlockedBy("has_netherite_boots", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_BOOTS))
-                .save(exporter);
-        // Kakyoin's wig
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.KAKYOIN_WIG.get())
-                .pattern("WRW")
-                .pattern("RHR")
-                .define('H', Items.NETHERITE_HELMET)
-                .define('R', Items.RED_DYE)
-                .define('W', Items.WHEAT)
-                .unlockedBy("has_netherite_helmet", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_HELMET))
-                .save(exporter);
-        // Kakyoin's coat
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.KAKYOIN_COAT.get())
-                .pattern("GYG")
-                .pattern("GCG")
-                .pattern("GGG")
-                .define('C', Items.NETHERITE_CHESTPLATE)
-                .define('G', Items.GREEN_DYE)
-                .define('Y', Items.YELLOW_DYE)
-                .unlockedBy("has_netherite_chestplate", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_CHESTPLATE))
-                .save(exporter);
-        // Kakyoin's pants
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.KAKYOIN_PANTS.get())
-                .pattern("GGG")
-                .pattern("GLG")
-                .pattern("G G")
-                .define('G', Items.GREEN_DYE)
-                .define('L', Items.NETHERITE_LEGGINGS)
-                .unlockedBy("has_netherite_leggings", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_LEGGINGS))
-                .save(exporter);
-        // Kakyoin's boots
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.KAKYOIN_BOOTS.get())
-                .pattern("BNB")
-                .pattern("B B")
-                .define('B', Items.BROWN_DYE)
-                .define('N', Items.NETHERITE_BOOTS)
-                .unlockedBy("has_netherite_boots", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_BOOTS))
-                .save(exporter);
-        // Dio's headband
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.DIO_HEADBAND.get())
-                .pattern("GHG")
-                .define('G', Items.GREEN_DYE)
-                .define('H', Items.NETHERITE_HELMET)
-                .unlockedBy("has_netherite_helmet", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_HELMET))
-                .save(exporter);
-        // Dio's jacket
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.DIO_JACKET.get())
-                .pattern("Y Y")
-                .pattern("YCY")
-                .pattern("YBY")
-                .define('B', Items.BLACK_DYE)
-                .define('C', Items.NETHERITE_CHESTPLATE)
-                .define('Y', Items.YELLOW_DYE)
-                .unlockedBy("has_netherite_chestplate", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_CHESTPLATE))
-                .save(exporter);
-        // Dio's cape
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.DIO_CAPE.get())
-                .pattern("RLR")
-                .pattern("LCL")
-                .pattern("LLL")
-                .define('C', Items.NETHERITE_CHESTPLATE)
-                .define('L', Items.LEATHER)
-                .define('R', Items.RED_DYE)
-                .unlockedBy("has_netherite_chestplate", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_CHESTPLATE))
-                .save(exporter);
-        // Dio's pants
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.DIO_PANTS.get())
-                .pattern("GGG")
-                .pattern("YLY")
-                .pattern("Y Y")
-                .define('G', Items.GREEN_DYE)
-                .define('L', Items.NETHERITE_LEGGINGS)
-                .define('Y', Items.YELLOW_DYE)
-                .unlockedBy("has_netherite_leggings", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_LEGGINGS))
-                .save(exporter);
-        // Dio's boots
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.DIO_BOOTS.get())
-                .pattern("YBY")
-                .pattern("Y Y")
-                .define('B', Items.NETHERITE_BOOTS)
-                .define('Y', Items.YELLOW_DYE)
-                .unlockedBy("has_netherite_boots", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_BOOTS))
-                .save(exporter);
-        // Heaven Attained Dio's wig
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.HEAVEN_ATTAINED_WIG.get())
-                .pattern("SSS")
-                .pattern("SHS")
-                .pattern("S S")
-                .define('H', Items.NETHERITE_HELMET)
-                .define('S', Items.WHEAT)
-                .unlockedBy("has_netherite_helmet", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_HELMET))
-                .save(exporter);
-        // Heaven Attained Dio's shirt
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.HEAVEN_ATTAINED_SHIRT.get())
-                .pattern("WWW")
-                .pattern("GCG")
-                .pattern("X X")
-                .define('C', Items.NETHERITE_CHESTPLATE)
-                .define('G', Items.GOLD_INGOT)
-                .define('X', Items.WHITE_CARPET)
-                .define('W', Items.WHITE_DYE)
-                .unlockedBy("has_netherite_chestplate", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_CHESTPLATE))
-                .save(exporter);
-        // Heaven Attained Dio's pants
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.HEAVEN_ATTAINED_PANTS.get())
-                .pattern("WWW")
-                .pattern("GLG")
-                .pattern("W W")
-                .define('G', Items.GOLD_INGOT)
-                .define('L', Items.NETHERITE_LEGGINGS)
-                .define('W', Items.WHITE_DYE)
-                .unlockedBy("has_netherite_leggings", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_LEGGINGS))
-                .save(exporter);
-        // Heaven Attained Dio's boots
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.HEAVEN_ATTAINED_BOOTS.get())
-                .pattern("GBG")
-                .pattern("G G")
-                .define('B', Items.NETHERITE_BOOTS)
-                .define('G', Items.GOLD_INGOT)
-                .unlockedBy("has_netherite_boots", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_BOOTS))
                 .save(exporter);
         // Dio's Diary
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, JItemRegistry.DIOS_DIARY.get())
@@ -455,522 +281,6 @@ public class JRecipeProvider extends FabricRecipeProvider {
                 .requires(Items.EMERALD)
                 .unlockedBy("has_netherite_ingot", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_INGOT))
                 .save(exporter);
-        // Jotaro's P4 cap
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.JOTARO_P4_CAP.get())
-                .pattern("WYW")
-                .pattern("GHG")
-                .define('G', Items.LIGHT_GRAY_DYE)
-                .define('H', Items.NETHERITE_HELMET)
-                .define('Y', Items.YELLOW_DYE)
-                .define('W', Items.WHITE_DYE)
-                .unlockedBy("has_netherite_helmet", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_HELMET))
-                .save(exporter);
-        // Jotaro's P4 jacket
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.JOTARO_P4_JACKET.get())
-                .pattern("W W")
-                .pattern("GCG")
-                .pattern("GWG")
-                .define('C', Items.NETHERITE_CHESTPLATE)
-                .define('G', Items.LIGHT_GRAY_DYE)
-                .define('W', Items.WHITE_DYE)
-                .unlockedBy("has_netherite_chestplate", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_CHESTPLATE))
-                .save(exporter);
-        // Jotaro's P4 pants
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.JOTARO_P4_PANTS.get())
-                .pattern("BBB")
-                .pattern("GLG")
-                .pattern("W W")
-                .define('B', Items.BLACK_DYE)
-                .define('G', Items.LIGHT_GRAY_DYE)
-                .define('L', Items.NETHERITE_LEGGINGS)
-                .define('W', Items.WHITE_DYE)
-                .unlockedBy("has_netherite_leggings", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_LEGGINGS))
-                .save(exporter);
-        // Jotaro's P4 boots
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.JOTARO_P4_BOOTS.get())
-                .pattern("W W")
-                .pattern("PNP")
-                .pattern("G G")
-                .define('G', Items.LIGHT_GRAY_DYE)
-                .define('N', Items.NETHERITE_BOOTS)
-                .define('P', Items.PURPLE_DYE)
-                .define('W', Items.WHITE_DYE)
-                .unlockedBy("has_netherite_boots", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_BOOTS))
-                .save(exporter);
-        // Kira's wig
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.KIRA_WIG.get())
-                .pattern("WYW")
-                .pattern("YHY")
-                .define('H', Items.NETHERITE_HELMET)
-                .define('W', Items.WHEAT)
-                .define('Y', Items.YELLOW_DYE)
-                .unlockedBy("has_netherite_helmet", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_HELMET))
-                .save(exporter);
-        // Kira's jacket
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.KIRA_JACKET.get())
-                .pattern("BPB")
-                .pattern("BCB")
-                .pattern("BYB")
-                .define('B', Items.BLUE_DYE)
-                .define('C', Items.NETHERITE_CHESTPLATE)
-                .define('P', Items.PURPLE_DYE)
-                .define('Y', Items.YELLOW_DYE)
-                .unlockedBy("has_netherite_chestplate", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_CHESTPLATE))
-                .save(exporter);
-        // Kira's pants
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.KIRA_PANTS.get())
-                .pattern("BPB")
-                .pattern("BLB")
-                .pattern("B B")
-                .define('B', Items.BLUE_DYE)
-                .define('L', Items.NETHERITE_LEGGINGS)
-                .define('P', Items.PURPLE_DYE)
-                .unlockedBy("has_netherite_leggings", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_LEGGINGS))
-                .save(exporter);
-        // Kira's boots
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.KIRA_BOOTS.get())
-                .pattern(" Y ")
-                .pattern("YNY")
-                .pattern("B B")
-                .define('B', Items.BROWN_DYE)
-                .define('N', Items.NETHERITE_BOOTS)
-                .define('Y', Items.YELLOW_DYE)
-                .unlockedBy("has_netherite_boots", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_BOOTS))
-                .save(exporter);
-        // Kosaku Kira's wig
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.KOSAKU_WIG.get())
-                .pattern("WBW")
-                .pattern("BHB")
-                .define('B', Items.BLACK_DYE)
-                .define('H', Items.NETHERITE_HELMET)
-                .define('W', Items.WHEAT)
-                .unlockedBy("has_netherite_helmet", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_HELMET))
-                .save(exporter);
-        // Kosaku Kira's jacket
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.KOSAKU_JACKET.get())
-                .pattern("WGW")
-                .pattern("WCW")
-                .pattern("WYW")
-                .define('C', Items.NETHERITE_CHESTPLATE)
-                .define('G', Items.GREEN_DYE)
-                .define('W', Items.WHITE_DYE)
-                .define('Y', Items.YELLOW_DYE)
-                .unlockedBy("has_netherite_chestplate", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_CHESTPLATE))
-                .save(exporter);
-        // Kosaku Kira's pants
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.KOSAKU_PANTS.get())
-                .pattern("WWW")
-                .pattern("GLG")
-                .pattern("W W")
-                .define('G', Items.LIGHT_GRAY_DYE)
-                .define('L', Items.NETHERITE_LEGGINGS)
-                .define('W', Items.WHITE_DYE)
-                .unlockedBy("has_netherite_leggings", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_LEGGINGS))
-                .save(exporter);
-        // Kosaku Kira's boots
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.KOSAKU_BOOTS.get())
-                .pattern("PNP")
-                .pattern("U U")
-                .define('N', Items.NETHERITE_BOOTS)
-                .define('P', Items.PINK_DYE)
-                .define('U', Items.PURPLE_DYE)
-                .unlockedBy("has_netherite_boots", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_BOOTS))
-                .save(exporter);
-        // Final Kira's wig
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.FINAL_KIRA_WIG.get())
-                .pattern("WBW")
-                .pattern("XHX")
-                .define('B', Items.BLACK_DYE)
-                .define('H', Items.NETHERITE_HELMET)
-                .define('W', Items.WHEAT)
-                .define('X', Items.WHITE_DYE)
-                .unlockedBy("has_netherite_helmet", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_HELMET))
-                .save(exporter);
-        // Final Kira's jacket
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.FINAL_KIRA_JACKET.get())
-                .pattern("WGW")
-                .pattern("WCW")
-                .pattern("WWW")
-                .define('C', Items.NETHERITE_CHESTPLATE)
-                .define('G', Items.LIME_DYE)
-                .define('W', Items.WHITE_DYE)
-                .unlockedBy("has_netherite_chestplate", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_CHESTPLATE))
-                .save(exporter);
-        // Final Kira's pants
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.FINAL_KIRA_PANTS.get())
-                .pattern("GWG")
-                .pattern("WLW")
-                .pattern("W W")
-                .define('G', Items.LIGHT_GRAY_DYE)
-                .define('L', Items.NETHERITE_LEGGINGS)
-                .define('W', Items.WHITE_DYE)
-                .unlockedBy("has_netherite_leggings", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_LEGGINGS))
-                .save(exporter);
-        // Final Kira's boots
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.FINAL_KIRA_BOOTS.get())
-                .pattern("GNG")
-                .pattern("B B")
-                .define('B', Items.BROWN_DYE)
-                .define('N', Items.NETHERITE_BOOTS)
-                .define('G', Items.GREEN_DYE)
-                .unlockedBy("has_netherite_boots", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_BOOTS))
-                .save(exporter);
-        // Giorno's wig
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.GIORNO_WIG.get())
-                .pattern("WWW")
-                .pattern(" H ")
-                .define('H', Items.NETHERITE_HELMET)
-                .define('W', Items.WHEAT)
-                .unlockedBy("has_netherite_helmet", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_HELMET))
-                .save(exporter);
-        // Giorno's jacket
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.GIORNO_JACKET.get())
-                .pattern("P P")
-                .pattern("PCP")
-                .pattern("PPP")
-                .define('C', Items.NETHERITE_CHESTPLATE)
-                .define('P', Items.PINK_DYE)
-                .unlockedBy("has_netherite_chestplate", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_CHESTPLATE))
-                .save(exporter);
-        // Giorno's pants
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.GIORNO_PANTS.get())
-                .pattern("PPP")
-                .pattern("PLP")
-                .pattern("P P")
-                .define('L', Items.NETHERITE_LEGGINGS)
-                .define('P', Items.PINK_DYE)
-                .unlockedBy("has_netherite_leggings", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_LEGGINGS))
-                .save(exporter);
-        // Giorno's boots
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.GIORNO_BOOTS.get())
-                .pattern("BNB")
-                .pattern("L L")
-                .define('B', Items.BLUE_DYE)
-                .define('L', Items.LIGHT_BLUE_DYE)
-                .define('N', Items.NETHERITE_BOOTS)
-                .unlockedBy("has_netherite_boots", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_BOOTS))
-                .save(exporter);
-        // Risotto's cap
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.RISOTTO_CAP.get())
-                .pattern("BBB")
-                .pattern("BHB")
-                .pattern("GGG")
-                .define('B', Items.BLACK_DYE)
-                .define('G', Items.GOLD_NUGGET)
-                .define('H', Items.LEATHER_HELMET)
-                .unlockedBy("has_leather_helmet", InventoryChangeTrigger.TriggerInstance.hasItems(Items.LEATHER_HELMET))
-                .save(exporter);
-        // Risotto's jacket
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.RISOTTO_JACKET.get())
-                .pattern("BBB")
-                .pattern("BCB")
-                .pattern("XGX")
-                .define('B', Items.BLACK_DYE)
-                .define('C', Items.NETHERITE_CHESTPLATE)
-                .define('G', Items.GOLD_INGOT)
-                .define('X', Items.BLACK_CARPET)
-                .unlockedBy("has_netherite_chestplate", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_CHESTPLATE))
-                .save(exporter);
-        // Risotto's pants
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.RISOTTO_PANTS.get())
-                .pattern("WBW")
-                .pattern("BLB")
-                .pattern("W W")
-                .define('B', Items.BLACK_DYE)
-                .define('L', Items.NETHERITE_LEGGINGS)
-                .define('W', Items.WHITE_DYE)
-                .unlockedBy("has_netherite_leggings", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_LEGGINGS))
-                .save(exporter);
-        // Risotto's boots
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.RISOTTO_BOOTS.get())
-                .pattern("BNB")
-                .pattern("L L")
-                .define('B', Items.BLACK_DYE)
-                .define('L', Items.LIGHT_GRAY_DYE)
-                .define('N', Items.NETHERITE_BOOTS)
-                .unlockedBy("has_netherite_boots", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_BOOTS))
-                .save(exporter);
-        // Doppio's wig
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.DOPPIO_WIG.get())
-                .pattern("WPW")
-                .pattern("PHP")
-                .pattern(" W ")
-                .define('H', Items.NETHERITE_HELMET)
-                .define('P', Items.PINK_DYE)
-                .define('W', Items.WHEAT)
-                .unlockedBy("has_netherite_helmet", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_HELMET))
-                .save(exporter);
-        // Doppio's shirt
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.DOPPIO_SHIRT.get())
-                .pattern("PPP")
-                .pattern("PCP")
-                .define('C', Items.NETHERITE_CHESTPLATE)
-                .define('P', Items.PURPLE_DYE)
-                .unlockedBy("has_netherite_chestplate", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_CHESTPLATE))
-                .save(exporter);
-        // Diavolo's wig
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.DIAVOLO_WIG.get())
-                .pattern("WPW")
-                .pattern("PHP")
-                .pattern(" B ")
-                .define('B', Items.BLACK_DYE)
-                .define('H', Items.NETHERITE_HELMET)
-                .define('P', Items.PINK_DYE)
-                .define('W', Items.WHEAT)
-                .unlockedBy("has_netherite_helmet", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_HELMET))
-                .save(exporter);
-        // Diavolo's shirt
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.DIAVOLO_SHIRT.get())
-                .pattern("B B")
-                .pattern(" C ")
-                .pattern("B B")
-                .define('B', Items.BLACK_DYE)
-                .define('C', Items.NETHERITE_CHESTPLATE)
-                .unlockedBy("has_netherite_chestplate", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_CHESTPLATE))
-                .save(exporter);
-        // Diavolo's pants
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.DIAVOLO_PANTS.get())
-                .pattern("GGG")
-                .pattern("PLP")
-                .pattern("P P")
-                .define('G', Items.GREEN_DYE)
-                .define('L', Items.NETHERITE_LEGGINGS)
-                .define('P', Items.PURPLE_DYE)
-                .unlockedBy("has_netherite_leggings", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_LEGGINGS))
-                .save(exporter);
-        // Diavolo's boots
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.DIAVOLO_BOOTS.get())
-                .pattern("BNB")
-                .pattern("L L")
-                .define('B', Items.BLUE_DYE)
-                .define('N', Items.NETHERITE_BOOTS)
-                .define('L', Items.LIGHT_BLUE_DYE)
-                .unlockedBy("has_netherite_boots", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_BOOTS))
-                .save(exporter);
-        // Johnny's cap
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.JOHNNY_CAP.get())
-                .pattern(" L ")
-                .pattern("WGW")
-                .pattern("WHW")
-                .define('G', Items.GOLD_INGOT)
-                .define('H', Items.NETHERITE_HELMET)
-                .define('L', Items.LIGHT_BLUE_DYE)
-                .define('W', Items.WHITE_DYE)
-                .unlockedBy("has_netherite_helmet", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_HELMET))
-                .save(exporter);
-        // Johnny's jacket
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.JOHNNY_JACKET.get())
-                .pattern("WFW")
-                .pattern("LCM")
-                .pattern("WPW")
-                .define('C', Items.NETHERITE_CHESTPLATE)
-                .define('F', Items.FEATHER)
-                .define('L', Items.LIGHT_BLUE_DYE)
-                .define('M', Items.MAGENTA_DYE)
-                .define('P', Items.PURPLE_DYE)
-                .define('W', Items.WHITE_DYE)
-                .unlockedBy("has_netherite_chestplate", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_CHESTPLATE))
-                .save(exporter);
-        // Johnny's pants
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.JOHNNY_PANTS.get())
-                .pattern("PPP")
-                .pattern("PLP")
-                .pattern("P P")
-                .define('L', Items.NETHERITE_LEGGINGS)
-                .define('P', Items.PURPLE_DYE)
-                .unlockedBy("has_netherite_leggings", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_LEGGINGS))
-                .save(exporter);
-        // Johnny's boots
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.JOHNNY_BOOTS.get())
-                .pattern("LNL")
-                .pattern("L L")
-                .define('L', Items.LIGHT_GRAY_DYE)
-                .define('N', Items.NETHERITE_BOOTS)
-                .unlockedBy("has_netherite_boots", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_BOOTS))
-                .save(exporter);
-        // Gyro's hat
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.GYRO_HAT.get())
-                .pattern("SPS")
-                .pattern("YHY")
-                .pattern("B B")
-                .define('B', Items.BROWN_DYE)
-                .define('H', Items.NETHERITE_HELMET)
-                .define('P', Items.GLASS_PANE)
-                .define('S', Items.STRING)
-                .define('Y', Items.YELLOW_DYE)
-                .unlockedBy("has_netherite_helmet", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_HELMET))
-                .save(exporter);
-        // Gyro's jacket
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.GYRO_SHIRT.get())
-                .pattern("GGG")
-                .pattern("PCP")
-                .pattern("BPB")
-                .define('B', Items.BLUE_DYE)
-                .define('C', Items.NETHERITE_CHESTPLATE)
-                .define('G', Items.GREEN_CARPET)
-                .define('P', Items.PURPLE_DYE)
-                .unlockedBy("has_netherite_chestplate", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_CHESTPLATE))
-                .save(exporter);
-        // Gyro's pants
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.GYRO_PANTS.get())
-                .pattern("YIY")
-                .pattern("YLY")
-                .pattern("B B")
-                .define('B', Items.BROWN_DYE)
-                .define('I', Items.IRON_INGOT)
-                .define('L', Items.NETHERITE_LEGGINGS)
-                .define('Y', Items.YELLOW_DYE)
-                .unlockedBy("has_netherite_leggings", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_LEGGINGS))
-                .save(exporter);
-        // Gyro's boots
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.GYRO_BOOTS.get())
-                .pattern("I I")
-                .pattern("BNB")
-                .pattern("G G")
-                .define('B', Items.BROWN_DYE)
-                .define('G', Items.GREEN_DYE)
-                .define('I', Items.IRON_NUGGET)
-                .define('N', Items.NETHERITE_BOOTS)
-                .unlockedBy("has_netherite_boots", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_BOOTS))
-                .save(exporter);
-        // Diego's hat
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.DIEGO_HAT.get())
-                .pattern("YYY")
-                .pattern("CHC")
-                .pattern("S S")
-                .define('C', Items.CYAN_DYE)
-                .define('H', Items.LEATHER_HELMET)
-                .define('S', Items.STRING)
-                .define('Y', Items.YELLOW_DYE)
-                .unlockedBy("has_leather_helmet", InventoryChangeTrigger.TriggerInstance.hasItems(Items.LEATHER_HELMET))
-                .save(exporter);
-        // Diego's shirt
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.DIEGO_SHIRT.get())
-                .pattern("CCC")
-                .pattern("YXY")
-                .pattern("CCC")
-                .define('C', Items.CYAN_DYE)
-                .define('X', Items.NETHERITE_CHESTPLATE)
-                .define('Y', Items.YELLOW_DYE)
-                .unlockedBy("has_netherite_chestplate", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_CHESTPLATE))
-                .save(exporter);
-        // Diego's pants
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.DIEGO_PANTS.get())
-                .pattern("BYB")
-                .pattern("YLY")
-                .pattern("B B")
-                .define('B', Items.BROWN_DYE)
-                .define('L', Items.NETHERITE_LEGGINGS)
-                .define('Y', Items.YELLOW_DYE)
-                .unlockedBy("has_netherite_leggings", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_LEGGINGS))
-                .save(exporter);
-        // Diego's boots
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.DIEGO_BOOTS.get())
-                .pattern("I I")
-                .pattern("BNB")
-                .pattern("B B")
-                .define('B', Items.BROWN_DYE)
-                .define('I', Items.IRON_NUGGET)
-                .define('N', Items.NETHERITE_BOOTS)
-                .unlockedBy("has_netherite_boots", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_BOOTS))
-                .save(exporter);
-        // Ringo's pants
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.RINGO_OUTFIT.get())
-                .pattern("XXX")
-                .pattern("WLW")
-                .pattern("W W")
-                .define('L', Items.NETHERITE_LEGGINGS)
-                .define('X', Items.WHITE_CARPET)
-                .define('W', Items.WHITE_DYE)
-                .unlockedBy("has_netherite_leggings", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_LEGGINGS))
-                .save(exporter);
-        // Ringo's boots
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.RINGO_BOOTS.get())
-                .pattern("BNB")
-                .pattern("W W")
-                .define('B', Items.BROWN_DYE)
-                .define('N', Items.NETHERITE_BOOTS)
-                .define('W', Items.WHITE_DYE)
-                .unlockedBy("has_netherite_boots", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_BOOTS))
-                .save(exporter);
-        // Valentine's hat
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.VALENTINE_WIG.get())
-                .pattern(" H ")
-                .pattern("W W")
-                .pattern("W W")
-                .define('H', Items.NETHERITE_HELMET)
-                .define('W', Items.WHEAT)
-                .unlockedBy("has_netherite_helmet", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_HELMET))
-                .save(exporter);
-        // Valentine's jacket
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.VALENTINE_JACKET.get())
-                .pattern("PPP")
-                .pattern("PCP")
-                .pattern("WPW")
-                .define('C', Items.NETHERITE_CHESTPLATE)
-                .define('P', Items.PINK_DYE)
-                .define('W', Items.WHITE_DYE)
-                .unlockedBy("has_netherite_chestplate", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_CHESTPLATE))
-                .save(exporter);
-        // Valentine's pants
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.VALENTINE_PANTS.get())
-                .pattern("PMP")
-                .pattern("PLP")
-                .pattern("P P")
-                .define('L', Items.NETHERITE_LEGGINGS)
-                .define('M', Items.MAGENTA_DYE)
-                .define('P', Items.PINK_DYE)
-                .unlockedBy("has_netherite_leggings", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_LEGGINGS))
-                .save(exporter);
-        // Valentine's boots
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.VALENTINE_BOOTS.get())
-                .pattern("PNP")
-                .pattern("P P")
-                .define('N', Items.NETHERITE_BOOTS)
-                .define('P', Items.PURPLE_DYE)
-                .unlockedBy("has_netherite_boots", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_BOOTS))
-                .save(exporter);
-        // Pucci's hat
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.PUCCIS_HAT.get())
-                .pattern("BNB")
-                .pattern("LCL")
-                .define('B', Items.BLACK_DYE)
-                .define('C', Items.LEATHER_HELMET)
-                .define('L', Items.LEATHER)
-                .define('N', Items.GOLD_NUGGET)
-                .unlockedBy("has_leather_helmet", InventoryChangeTrigger.TriggerInstance.hasItems(Items.LEATHER_HELMET))
-                .save(exporter);
-        // Pucci's robe
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.PUCCI_ROBE.get())
-                .pattern("BYB")
-                .pattern("BCB")
-                .pattern("WYW")
-                .define('B', Items.BLACK_DYE)
-                .define('C', Items.NETHERITE_CHESTPLATE)
-                .define('Y', Items.YELLOW_DYE)
-                .define('W', Items.BLACK_CARPET)
-                .unlockedBy("has_netherite_chestplate", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_CHESTPLATE))
-                .save(exporter);
-        // Pucci's pants
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.PUCCI_PANTS.get())
-                .pattern("BBB")
-                .pattern("GLG")
-                .pattern("B B")
-                .define('B', Items.BLACK_DYE)
-                .define('G', Items.GRAY_DYE)
-                .define('L', Items.NETHERITE_LEGGINGS)
-                .unlockedBy("has_netherite_leggings", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_LEGGINGS))
-                .save(exporter);
-        // Pucci's boots
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.PUCCI_BOOTS.get())
-                .pattern("BNB")
-                .pattern("L L")
-                .define('B', Items.BLUE_DYE)
-                .define('L', Items.GRAY_DYE)
-                .define('N', Items.NETHERITE_BOOTS)
-                .unlockedBy("has_netherite_boots", InventoryChangeTrigger.TriggerInstance.hasItems(Items.NETHERITE_BOOTS))
-                .save(exporter);
-
         // hot sand
         ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, JBlockRegistry.HOT_SAND_BLOCK.get(), 8)
                 .pattern("SSS")
@@ -1053,15 +363,15 @@ public class JRecipeProvider extends FabricRecipeProvider {
                 .define('G', Items.GRINDSTONE)
                 .unlockedBy("has_iron_block", InventoryChangeTrigger.TriggerInstance.hasItems(Items.IRON_BLOCK))
                 .save(exporter);
-        // road roller
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.STEEL_BALL.get())
-                .pattern(" I ")
-                .pattern("ILI")
-                .pattern(" I ")
-                .define('I', Items.IRON_INGOT)
-                .define('L', Items.LIME_DYE)
-                .unlockedBy("has_iron_ingot", InventoryChangeTrigger.TriggerInstance.hasItems(Items.IRON_INGOT))
-                .save(exporter);
+        // steel ball
+//        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.STEEL_BALL.get())
+//                .pattern(" I ")
+//                .pattern("ILI")
+//                .pattern(" I ")
+//                .define('I', Items.IRON_INGOT)
+//                .define('L', Items.LIME_DYE)
+//                .unlockedBy("has_iron_ingot", InventoryChangeTrigger.TriggerInstance.hasItems(Items.IRON_INGOT))
+//                .save(exporter);
         // training dummy
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, JItemRegistry.TRAINING_DUMMY.get())
                 .pattern("CWC")
@@ -1072,6 +382,718 @@ public class JRecipeProvider extends FabricRecipeProvider {
                 .unlockedBy("has_wool", InventoryChangeTrigger.TriggerInstance.hasItems(ofTag(ItemTags.WOOL)))
                 .unlockedBy("has_wool_carpet", InventoryChangeTrigger.TriggerInstance.hasItems(ofTag(ItemTags.WOOL_CARPETS)))
                 .save(exporter);
+        buildCosplayRecipes(exporter);
+        buildCdRecipes(exporter);
+    }
+
+    public record SymbolItem(char symbol, Item item) {
+        // intentionally left empty
+    }
+
+    public static void buildCosplayRecipes(Consumer<FinishedRecipe> exporter) {
+        generateCosplayRecipes(JItemRegistry.STRAIZO_PONCHO, exporter, new String[] {
+                "BBB",
+                "BXB",
+                " B "
+        },
+                new SymbolItem('B', Items.BLACK_WOOL));
+        generateCosplayRecipes(JItemRegistry.KARS_HEADWRAP, exporter, new String[] {
+                " X ",
+                "L L",
+                " B "
+        },
+                new SymbolItem('B', Items.BLACK_WOOL),
+                new SymbolItem('L', Items.LEATHER));
+        generateCosplayRecipes(JItemRegistry.RED_HAT, exporter, new String[] {
+                " R ",
+                "LXL"
+        },
+                new SymbolItem('L', Items.LEATHER),
+                new SymbolItem('R', Items.RED_WOOL));
+        generateCosplayRecipes(JItemRegistry.DIO_P1_WIG, exporter, new String[] {
+                " W ",
+                "WXW"
+        },
+                new SymbolItem('W', Items.WHEAT));
+        generateCosplayRecipes(JItemRegistry.DIO_P1_JACKET, exporter, new String[] {
+                "RPR",
+                "RXR",
+                "WBW"
+        },
+                new SymbolItem('B', Items.BROWN_WOOL),
+                new SymbolItem('P', Items.PURPLE_WOOL),
+                new SymbolItem('R', Items.RED_WOOL),
+                new SymbolItem('W', Items.WHITE_WOOL));
+        generateCosplayRecipes(JItemRegistry.DIO_P1_PANTS, exporter, new String[] {
+                "RWR",
+                "RXR",
+                "R R"
+        },
+                new SymbolItem('R', Items.RED_WOOL),
+                new SymbolItem('W', Items.WHITE_WOOL));
+        generateCosplayRecipes(JItemRegistry.DIO_P1_BOOTS, exporter, new String[] {
+                "PXP",
+                "B B"
+        },
+                new SymbolItem('B', Items.BLACK_WOOL),
+                new SymbolItem('P', Items.PURPLE_WOOL));
+        generateCosplayRecipes(JItemRegistry.JOTARO_CAP, exporter, new String[] {
+                "BYB",
+                "BXB"
+        },
+                new SymbolItem('B', Items.BLACK_WOOL),
+                new SymbolItem('Y', Items.YELLOW_WOOL));
+        generateCosplayRecipes(JItemRegistry.JOTARO_JACKET, exporter, new String[] {
+                "B B",
+                "BXB",
+                "BBB"
+        },
+                new SymbolItem('B', Items.BLACK_WOOL));
+        generateCosplayRecipes(JItemRegistry.JOTARO_PANTS, exporter, new String[] {
+                "YYY",
+                "BXB",
+                "B B"
+        },
+                new SymbolItem('B', Items.BLACK_WOOL),
+                new SymbolItem('Y', Items.YELLOW_WOOL));
+        generateCosplayRecipes(JItemRegistry.JOTARO_BOOTS, exporter, new String[] {
+                "BXB",
+                "B B"
+        },
+                new SymbolItem('B', Items.BLACK_WOOL));
+        generateCosplayRecipes(JItemRegistry.KAKYOIN_WIG, exporter, new String[] {
+                "WRW",
+                "RXR"
+        },
+                new SymbolItem('R', Items.RED_WOOL),
+                new SymbolItem('W', Items.WHEAT));
+        generateCosplayRecipes(JItemRegistry.KAKYOIN_COAT, exporter, new String[] {
+                "GYG",
+                "GXG",
+                "GGG"
+        },
+                new SymbolItem('G', Items.GREEN_WOOL),
+                new SymbolItem('Y', Items.YELLOW_WOOL));
+        generateCosplayRecipes(JItemRegistry.KAKYOIN_PANTS, exporter, new String[] {
+                "GGG",
+                "GXG",
+                "G G"
+        },
+                new SymbolItem('G', Items.GREEN_WOOL));
+        generateCosplayRecipes(JItemRegistry.KAKYOIN_BOOTS, exporter, new String[] {
+                "BXB",
+                "B B"
+        },
+                new SymbolItem('B', Items.BROWN_WOOL));
+        generateCosplayRecipes(JItemRegistry.POLNAREFF_WIG, exporter, new String[] {
+                "W",
+                "W",
+                "X"
+        },
+                new SymbolItem('W', Items.WHITE_WOOL));
+        generateCosplayRecipes(JItemRegistry.POLNAREFF_SHIRT, exporter, new String[] {
+                "  B",
+                "BXB",
+                "BBB"
+        },
+                new SymbolItem('B', Items.BLACK_WOOL));
+        generateCosplayRecipes(JItemRegistry.POLNAREFF_PANTS, exporter, new String[] {
+                "WRW",
+                "WXW",
+                "W W"
+        },
+                new SymbolItem('R', Items.RED_WOOL),
+                new SymbolItem('W', Items.WHITE_WOOL));
+        generateCosplayRecipes(JItemRegistry.POLNAREFF_BOOTS, exporter, new String[] {
+                "B B",
+                "BXB"
+        },
+                new SymbolItem('B', Items.BLACK_WOOL));
+        generateCosplayRecipes(JItemRegistry.DIO_HEADBAND, exporter, new String[] {
+                "GXG"
+        },
+                new SymbolItem('G', Items.GREEN_WOOL));
+        generateCosplayRecipes(JItemRegistry.DIO_JACKET, exporter, new String[] {
+                "Y Y",
+                "YXY",
+                "YBY"
+        },
+                new SymbolItem('B', Items.BLACK_WOOL),
+                new SymbolItem('Y', Items.YELLOW_WOOL));
+        generateCosplayRecipes(JItemRegistry.DIO_CAPE, exporter, new String[] {
+                "RLR",
+                "LXL",
+                "LLL"
+        },
+                new SymbolItem('L', Items.RED_CARPET),
+                new SymbolItem('R', Items.RED_WOOL));
+        generateCosplayRecipes(JItemRegistry.DIO_PANTS, exporter, new String[] {
+                "GGG",
+                "YXY",
+                "Y Y"
+        },
+                new SymbolItem('G', Items.GREEN_WOOL),
+                new SymbolItem('Y', Items.YELLOW_WOOL));
+        generateCosplayRecipes(JItemRegistry.DIO_BOOTS, exporter, new String[] {
+                "YXY",
+                "Y Y"
+        },
+                new SymbolItem('Y', Items.YELLOW_WOOL));
+        generateCosplayRecipes(JItemRegistry.OH_DIO_WIG, exporter, new String[] {
+                "OWO",
+                "WXW"
+        },
+                new SymbolItem('O', Items.ORANGE_WOOL),
+                new SymbolItem('W', Items.WHEAT));
+        generateCosplayRecipes(JItemRegistry.OH_DIO_JACKET, exporter, new String[] {
+                "PPP",
+                "BXB",
+                "GBG"
+        },
+                new SymbolItem('B', Items.BLACK_WOOL),
+                new SymbolItem('G', Items.GRAY_WOOL),
+                new SymbolItem('P', Items.PURPLE_WOOL));
+        generateCosplayRecipes(JItemRegistry.OH_DIO_PANTS, exporter, new String[] {
+                "LLL",
+                "BXB",
+                "B B"
+        },
+                new SymbolItem('B', Items.LIGHT_BLUE_WOOL),
+                new SymbolItem('L', Items.LIGHT_GRAY_WOOL));
+        generateCosplayRecipes(JItemRegistry.OH_DIO_BOOTS, exporter, new String[] {
+                "LXL",
+                "G G"
+        },
+                new SymbolItem('G', Items.GREEN_WOOL),
+                new SymbolItem('L', Items.LIME_WOOL));
+        generateCosplayRecipes(JItemRegistry.HEAVEN_ATTAINED_WIG, exporter, new String[] {
+                "WWW",
+                "WXW",
+                "W W"
+        },
+                new SymbolItem('W', Items.WHEAT));
+        generateCosplayRecipes(JItemRegistry.HEAVEN_ATTAINED_SHIRT, exporter, new String[] {
+                "WWW",
+                "GXG",
+                "U U"
+        },
+                new SymbolItem('G', Items.GOLD_INGOT),
+                new SymbolItem('U', Items.WHITE_CARPET),
+                new SymbolItem('W', Items.WHITE_WOOL));
+        generateCosplayRecipes(JItemRegistry.HEAVEN_ATTAINED_PANTS, exporter, new String[] {
+                "WWW",
+                "GXG",
+                "W W"
+        },
+                new SymbolItem('G', Items.GOLD_INGOT),
+                new SymbolItem('W', Items.WHITE_WOOL));
+        generateCosplayRecipes(JItemRegistry.HEAVEN_ATTAINED_BOOTS, exporter, new String[] {
+                "GXG",
+                "G G"
+        },
+                new SymbolItem('G', Items.GOLD_INGOT));
+        generateCosplayRecipes(JItemRegistry.JOTARO_P4_CAP, exporter, new String[] {
+                "WYW",
+                "GXG"
+        },
+                new SymbolItem('G', Items.LIGHT_GRAY_WOOL),
+                new SymbolItem('W', Items.WHITE_WOOL),
+                new SymbolItem('Y', Items.YELLOW_WOOL));
+        generateCosplayRecipes(JItemRegistry.JOTARO_P4_JACKET, exporter, new String[] {
+                "W W",
+                "GXG",
+                "GWG"
+        },
+                new SymbolItem('G', Items.LIGHT_GRAY_WOOL),
+                new SymbolItem('W', Items.WHITE_WOOL));
+        generateCosplayRecipes(JItemRegistry.JOTARO_P4_PANTS, exporter, new String[] {
+                "BBB",
+                "GXG",
+                "W W"
+        },
+                new SymbolItem('B', Items.BLACK_WOOL),
+                new SymbolItem('G', Items.LIGHT_GRAY_WOOL),
+                new SymbolItem('W', Items.WHITE_WOOL));
+        generateCosplayRecipes(JItemRegistry.JOTARO_P4_BOOTS, exporter, new String[] {
+                "W W",
+                "PXP",
+                "G G"
+        },
+                new SymbolItem('G', Items.LIGHT_GRAY_WOOL),
+                new SymbolItem('P', Items.PURPLE_WOOL),
+                new SymbolItem('W', Items.WHITE_WOOL));
+        generateCosplayRecipes(JItemRegistry.JOTARO_P6_CAP, exporter, new String[] {
+                "LGB",
+                "BXB"
+        },
+                new SymbolItem('B', Items.BLACK_WOOL),
+                new SymbolItem('G', Items.GOLD_NUGGET),
+                new SymbolItem('L', Items.LIME_WOOL));
+        generateCosplayRecipes(JItemRegistry.JOTARO_P6_JACKET, exporter, new String[] {
+                "B B",
+                "LXL",
+                "BWB"
+        },
+                new SymbolItem('B', Items.BLACK_WOOL),
+                new SymbolItem('L', Items.LIME_WOOL),
+                new SymbolItem('W', Items.WHITE_WOOL));
+        generateCosplayRecipes(JItemRegistry.JOTARO_P6_PANTS, exporter, new String[] {
+                "YBY",
+                "BXB",
+                "Y Y"
+        },
+                new SymbolItem('B', Items.BLACK_WOOL),
+                new SymbolItem('Y', Items.YELLOW_WOOL));
+        generateCosplayRecipes(JItemRegistry.JOTARO_P6_BOOTS, exporter, new String[] {
+                "O O",
+                "YXY",
+                "Y Y"
+        },
+                new SymbolItem('O', Items.ORANGE_WOOL),
+                new SymbolItem('Y', Items.YELLOW_WOOL));
+        generateCosplayRecipes(JItemRegistry.KIRA_WIG, exporter, new String[] {
+                "WYW",
+                "YXY"
+        },
+                new SymbolItem('W', Items.WHEAT),
+                new SymbolItem('Y', Items.YELLOW_WOOL));
+        generateCosplayRecipes(JItemRegistry.KIRA_JACKET, exporter, new String[] {
+                "BPB",
+                "BXB",
+                "BYB"
+        },
+                new SymbolItem('B', Items.BLUE_WOOL),
+                new SymbolItem('P', Items.PURPLE_WOOL),
+                new SymbolItem('Y', Items.YELLOW_WOOL));
+        generateCosplayRecipes(JItemRegistry.KIRA_PANTS, exporter, new String[] {
+                "BPB",
+                "BXB",
+                "B B"
+        },
+                new SymbolItem('B', Items.BLUE_WOOL),
+                new SymbolItem('P', Items.PURPLE_WOOL));
+        generateCosplayRecipes(JItemRegistry.KIRA_BOOTS, exporter, new String[] {
+                " Y ",
+                "YXY",
+                "B B"
+        },
+                new SymbolItem('B', Items.BROWN_WOOL),
+                new SymbolItem('Y', Items.YELLOW_WOOL));
+        generateCosplayRecipes(JItemRegistry.KOSAKU_WIG, exporter, new String[] {
+                "WBW",
+                "BXB"
+        },
+                new SymbolItem('B', Items.BLACK_WOOL),
+                new SymbolItem('W', Items.WHEAT));
+        generateCosplayRecipes(JItemRegistry.KOSAKU_JACKET, exporter, new String[] {
+                "WGW",
+                "WXW",
+                "WYW"
+        },
+                new SymbolItem('G', Items.GREEN_WOOL),
+                new SymbolItem('W', Items.WHITE_WOOL),
+                new SymbolItem('Y', Items.YELLOW_WOOL));
+        generateCosplayRecipes(JItemRegistry.KOSAKU_PANTS, exporter, new String[] {
+                "WWW",
+                "GXG",
+                "W W"
+        },
+                new SymbolItem('G', Items.LIGHT_GRAY_WOOL),
+                new SymbolItem('W', Items.WHITE_WOOL));
+        generateCosplayRecipes(JItemRegistry.KOSAKU_BOOTS, exporter, new String[] {
+                "PXP",
+                "U U"
+        },
+                new SymbolItem('P', Items.PINK_WOOL),
+                new SymbolItem('U', Items.PURPLE_WOOL));
+        generateCosplayRecipes(JItemRegistry.FINAL_KIRA_WIG, exporter, new String[] {
+                "WBW",
+                "YXY"
+        },
+                new SymbolItem('B', Items.BLACK_WOOL),
+                new SymbolItem('W', Items.WHEAT),
+                new SymbolItem('Y', Items.WHITE_WOOL));
+        generateCosplayRecipes(JItemRegistry.FINAL_KIRA_JACKET, exporter, new String[] {
+                "WGW",
+                "WXW",
+                "WWW"
+        },
+                new SymbolItem('G', Items.LIME_WOOL),
+                new SymbolItem('W', Items.WHITE_WOOL));
+        generateCosplayRecipes(JItemRegistry.FINAL_KIRA_PANTS, exporter, new String[] {
+                "GWG",
+                "WXW",
+                "W W"
+        },
+                new SymbolItem('G', Items.LIGHT_GRAY_WOOL),
+                new SymbolItem('W', Items.WHITE_WOOL));
+        generateCosplayRecipes(JItemRegistry.FINAL_KIRA_BOOTS, exporter, new String[] {
+                "GXG",
+                "B B"
+        },
+                new SymbolItem('B', Items.BROWN_WOOL),
+                new SymbolItem('G', Items.GREEN_WOOL));
+        generateCosplayRecipes(JItemRegistry.GIORNO_WIG, exporter, new String[] {
+                "WWW",
+                " X "
+        },
+                new SymbolItem('W', Items.WHEAT));
+        generateCosplayRecipes(JItemRegistry.GIORNO_JACKET, exporter, new String[] {
+                "P P",
+                "PXP",
+                "PPP"
+        },
+                new SymbolItem('P', Items.PINK_WOOL));
+        generateCosplayRecipes(JItemRegistry.GIORNO_PANTS, exporter, new String[] {
+                "PPP",
+                "PXP",
+                "P P"
+        },
+                new SymbolItem('P', Items.PINK_WOOL));
+        generateCosplayRecipes(JItemRegistry.GIORNO_BOOTS, exporter, new String[] {
+                "BXB",
+                "L L"
+        },
+                new SymbolItem('B', Items.BLUE_WOOL),
+                new SymbolItem('L', Items.LIGHT_BLUE_WOOL));
+        generateCosplayRecipes(JItemRegistry.RISOTTO_CAP, exporter, new String[] {
+                "BBB",
+                "BXB",
+                "GGG"
+        },
+                new SymbolItem('B', Items.BLACK_WOOL),
+                new SymbolItem('G', Items.GOLD_NUGGET));
+        generateCosplayRecipes(JItemRegistry.RISOTTO_JACKET, exporter, new String[] {
+                "BBB",
+                "BXB",
+                "ZGZ"
+        },
+                new SymbolItem('B', Items.BLACK_WOOL),
+                new SymbolItem('G', Items.GOLD_INGOT),
+                new SymbolItem('Z', Items.BLACK_CARPET));
+        generateCosplayRecipes(JItemRegistry.RISOTTO_PANTS, exporter, new String[] {
+                "WBW",
+                "BXB",
+                "W W"
+        },
+                new SymbolItem('B', Items.BLACK_WOOL),
+                new SymbolItem('W', Items.WHITE_WOOL));
+        generateCosplayRecipes(JItemRegistry.RISOTTO_BOOTS, exporter, new String[] {
+                "BXB",
+                "L L"
+        },
+                new SymbolItem('B', Items.BLACK_WOOL),
+                new SymbolItem('L', Items.LIGHT_GRAY_WOOL));
+        generateCosplayRecipes(JItemRegistry.DOPPIO_WIG, exporter, new String[] {
+                "WPW",
+                "PXP",
+                " W "
+        },
+                new SymbolItem('P', Items.PINK_WOOL),
+                new SymbolItem('W', Items.WHEAT));
+        generateCosplayRecipes(JItemRegistry.DOPPIO_SHIRT, exporter, new String[] {
+                "PPP",
+                "PXP",
+        },
+                new SymbolItem('P', Items.PINK_WOOL));
+        generateCosplayRecipes(JItemRegistry.DIAVOLO_WIG, exporter, new String[] {
+                "WPW",
+                "PXP",
+                " B "
+        },
+                new SymbolItem('B', Items.BLACK_WOOL),
+                new SymbolItem('P', Items.PINK_WOOL),
+                new SymbolItem('W', Items.WHEAT));
+        generateCosplayRecipes(JItemRegistry.DIAVOLO_SHIRT, exporter, new String[] {
+                "B B",
+                " X ",
+                "B B"
+        },
+                new SymbolItem('B', Items.BLACK_WOOL));
+        generateCosplayRecipes(JItemRegistry.DIAVOLO_PANTS, exporter, new String[] {
+                "GGG",
+                "PXP",
+                "P P"
+        },
+                new SymbolItem('G', Items.GREEN_WOOL),
+                new SymbolItem('P', Items.PURPLE_WOOL));
+        generateCosplayRecipes(JItemRegistry.DIAVOLO_BOOTS, exporter, new String[] {
+                "BXB",
+                "L L"
+        },
+                new SymbolItem('B', Items.BLUE_WOOL),
+                new SymbolItem('L', Items.LIGHT_BLUE_WOOL));
+        generateCosplayRecipes(JItemRegistry.JOHNNY_CAP, exporter, new String[] {
+                " L ",
+                "WGW",
+                "WXW"
+        },
+                new SymbolItem('G', Items.GOLD_INGOT),
+                new SymbolItem('L', Items.LIGHT_BLUE_WOOL),
+                new SymbolItem('W', Items.WHITE_WOOL));
+        generateCosplayRecipes(JItemRegistry.JOHNNY_JACKET, exporter, new String[] {
+                "WFW",
+                "LXM",
+                "WPW"
+        },
+                new SymbolItem('F', Items.FEATHER),
+                new SymbolItem('L', Items.LIGHT_BLUE_WOOL),
+                new SymbolItem('M', Items.MAGENTA_WOOL),
+                new SymbolItem('P', Items.PURPLE_WOOL),
+                new SymbolItem('W', Items.WHITE_WOOL));
+        generateCosplayRecipes(JItemRegistry.JOHNNY_PANTS, exporter, new String[] {
+                "PPP",
+                "PXP",
+                "P P"
+        },
+                new SymbolItem('P', Items.PURPLE_WOOL));
+        generateCosplayRecipes(JItemRegistry.JOHNNY_BOOTS, exporter, new String[] {
+                "LXL",
+                "L L"
+        },
+                new SymbolItem('L', Items.LIGHT_GRAY_WOOL));
+        generateCosplayRecipes(JItemRegistry.GYRO_HAT, exporter, new String[] {
+                "SPS",
+                "YXY",
+                "B B"
+        },
+                new SymbolItem('B', Items.BROWN_WOOL),
+                new SymbolItem('P', Items.GLASS_PANE),
+                new SymbolItem('S', Items.STRING),
+                new SymbolItem('Y', Items.YELLOW_WOOL));
+        generateCosplayRecipes(JItemRegistry.GYRO_SHIRT, exporter, new String[] {
+                "GGG",
+                "PXP",
+                "BPB"
+        },
+                new SymbolItem('B', Items.BLUE_WOOL),
+                new SymbolItem('G', Items.GREEN_CARPET),
+                new SymbolItem('P', Items.PURPLE_WOOL));
+        generateCosplayRecipes(JItemRegistry.GYRO_PANTS, exporter, new String[] {
+                "YIY",
+                "YXY",
+                "B B"
+        },
+                new SymbolItem('B', Items.BROWN_WOOL),
+                new SymbolItem('I', Items.IRON_INGOT),
+                new SymbolItem('Y', Items.YELLOW_WOOL));
+        generateCosplayRecipes(JItemRegistry.GYRO_BOOTS, exporter, new String[] {
+                "I I",
+                "BXB",
+                "G G"
+        },
+                new SymbolItem('B', Items.BROWN_WOOL),
+                new SymbolItem('G', Items.GREEN_WOOL),
+                new SymbolItem('I', Items.IRON_NUGGET));
+        generateCosplayRecipes(JItemRegistry.DIEGO_HAT, exporter, new String[] {
+                "YYY",
+                "CXC",
+                "S S"
+        },
+                new SymbolItem('C', Items.CYAN_WOOL),
+                new SymbolItem('S', Items.STRING),
+                new SymbolItem('Y', Items.YELLOW_WOOL));
+        generateCosplayRecipes(JItemRegistry.DIEGO_SHIRT, exporter, new String[] {
+                "CCC",
+                "YXY",
+                "CCC"
+        },
+                new SymbolItem('C', Items.CYAN_WOOL),
+                new SymbolItem('Y', Items.YELLOW_WOOL));
+        generateCosplayRecipes(JItemRegistry.DIEGO_PANTS, exporter, new String[] {
+                "BYB",
+                "YXY",
+                "B B"
+        },
+                new SymbolItem('B', Items.BROWN_WOOL),
+                new SymbolItem('Y', Items.YELLOW_WOOL));
+        generateCosplayRecipes(JItemRegistry.DIEGO_BOOTS, exporter, new String[] {
+                "I I",
+                "BXB",
+                "B B"
+        },
+                new SymbolItem('B', Items.BROWN_WOOL),
+                new SymbolItem('I', Items.IRON_NUGGET));
+        generateCosplayRecipes(JItemRegistry.RINGO_OUTFIT, exporter, new String[] {
+                "ZZZ",
+                "WXW",
+                "W W"
+        },
+                new SymbolItem('W', Items.WHITE_WOOL),
+                new SymbolItem('Z', Items.WHITE_CARPET));
+        generateCosplayRecipes(JItemRegistry.RINGO_BOOTS, exporter, new String[] {
+                "BXB",
+                "W W"
+        },
+                new SymbolItem('B', Items.BROWN_WOOL),
+                new SymbolItem('W', Items.WHITE_WOOL));
+        generateCosplayRecipes(JItemRegistry.COWBOY_HAT, exporter, new String[] {
+                "LNL",
+                "LXL"
+        },
+                new SymbolItem('L', Items.LEATHER),
+                new SymbolItem('N', Items.FEATHER));
+        generateCosplayRecipes(JItemRegistry.COWBOY_PONCHO, exporter, new String[] {
+                "LXL",
+                "NLN",
+                " N "
+        },
+                new SymbolItem('L', Items.GREEN_CARPET),
+                new SymbolItem('N', Items.WHITE_CARPET));
+        generateCosplayRecipes(JItemRegistry.COWBOY_GUNBELT_SPURS, exporter, new String[] {
+                "LXK",
+                "L  ",
+                "NLN"
+        },
+                new SymbolItem('L', Items.LEATHER),
+                new SymbolItem('K', Items.GOLD_NUGGET),
+                new SymbolItem('N', Items.IRON_NUGGET));
+        generateCosplayRecipes(JItemRegistry.VALENTINE_WIG, exporter, new String[] {
+                " X ",
+                "W W",
+                "W W"
+        },
+                new SymbolItem('W', Items.WHEAT));
+        generateCosplayRecipes(JItemRegistry.VALENTINE_JACKET, exporter, new String[] {
+                "PPP",
+                "PXP",
+                "WPW"
+        },
+                new SymbolItem('P', Items.PINK_WOOL),
+                new SymbolItem('W', Items.WHITE_WOOL));
+        generateCosplayRecipes(JItemRegistry.VALENTINE_PANTS, exporter, new String[] {
+                "PMP",
+                "PXP",
+                "P P"
+        },
+                new SymbolItem('M', Items.MAGENTA_WOOL),
+                new SymbolItem('P', Items.PINK_WOOL));
+        generateCosplayRecipes(JItemRegistry.VALENTINE_BOOTS, exporter, new String[] {
+                "PXP",
+                "P P"
+        },
+                new SymbolItem('P', Items.PURPLE_WOOL));
+        generateCosplayRecipes(JItemRegistry.PUCCIS_HAT, exporter, new String[] {
+                "BNB",
+                "LXL"
+        },
+                new SymbolItem('B', Items.BLACK_WOOL),
+                new SymbolItem('L', Items.LEATHER),
+                new SymbolItem('N', Items.GOLD_NUGGET));
+        generateCosplayRecipes(JItemRegistry.PUCCI_ROBE, exporter, new String[] {
+                "BYB",
+                "BXB",
+                "ZYZ"
+        },
+                new SymbolItem('B', Items.BLACK_WOOL),
+                new SymbolItem('Y', Items.YELLOW_WOOL),
+                new SymbolItem('Z', Items.BLACK_CARPET));
+        generateCosplayRecipes(JItemRegistry.PUCCI_PANTS, exporter, new String[] {
+                        "BBB",
+                        "GXG",
+                        "B B"
+                },
+                new SymbolItem('B', Items.BLACK_WOOL),
+                new SymbolItem('G', Items.GRAY_WOOL));
+        generateCosplayRecipes(JItemRegistry.PUCCI_BOOTS, exporter, new String[] {
+                        "BXB",
+                        "G G"
+                },
+                new SymbolItem('B', Items.BLUE_WOOL),
+                new SymbolItem('G', Items.GRAY_WOOL));
+    }
+
+    /**
+     *
+     * @param cosplay
+     * @param exporter
+     * @param pattern
+     * @param ingredients The item meanings for symbols; do NOT include X, for it marks the (tiered) armor piece
+     */
+    public static void generateCosplayRecipes(CosplayItem<?> cosplay, Consumer<FinishedRecipe> exporter, String[] pattern, SymbolItem... ingredients) {
+        for (Map.Entry<ArmorMaterial, Item> entry : TYPE_MAP.get(cosplay.getSlot()).entrySet()) {
+            final RegistrySupplier<? extends ArmorItem> cosplayItem = cosplay.get(entry.getKey());
+            if (cosplayItem == null) {
+                continue;
+            }
+            ShapedRecipeBuilder builder = ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, cosplayItem.get());
+            for (String line : pattern) {
+                builder = builder.pattern(line);
+            }
+            for (SymbolItem si : ingredients) {
+                builder = builder.define(si.symbol(), si.item());
+            }
+            builder.define('X', entry.getValue()) // the armor piece to change into cosplay
+                    .unlockedBy("has_" + BuiltInRegistries.ITEM.getKey(entry.getValue()).getPath(),
+                            InventoryChangeTrigger.TriggerInstance.hasItems(entry.getValue()))
+                    .save(exporter);
+        }
+    }
+
+    public static void buildCdRecipes(Consumer<FinishedRecipe> exporter) {
+        new CrazyDiamondRecipeBuilder(Blocks.STONE)
+                .requires(Blocks.COBBLESTONE)
+                .save(exporter, JCraft.id("crazy_diamond/stone"));
+        new CrazyDiamondRecipeBuilder(Blocks.DEEPSLATE)
+                .requires(Blocks.COBBLED_DEEPSLATE)
+                .save(exporter, JCraft.id("crazy_diamond/deepslate"));
+        new CrazyDiamondRecipeBuilder(Blocks.OAK_LOG)
+                .requires(Blocks.STRIPPED_OAK_LOG)
+                .save(exporter, JCraft.id("crazy_diamond/oak_log"));
+        new CrazyDiamondRecipeBuilder(Blocks.OAK_WOOD)
+                .requires(Blocks.STRIPPED_OAK_WOOD)
+                .save(exporter, JCraft.id("crazy_diamond/oak_wood"));
+        new CrazyDiamondRecipeBuilder(Blocks.BIRCH_LOG)
+                .requires(Blocks.STRIPPED_BIRCH_LOG)
+                .save(exporter, JCraft.id("crazy_diamond/birch_log"));
+        new CrazyDiamondRecipeBuilder(Blocks.BIRCH_WOOD)
+                .requires(Blocks.STRIPPED_BIRCH_WOOD)
+                .save(exporter, JCraft.id("crazy_diamond/birch_wood"));
+        new CrazyDiamondRecipeBuilder(Blocks.ACACIA_LOG)
+                .requires(Blocks.STRIPPED_ACACIA_LOG)
+                .save(exporter, JCraft.id("crazy_diamond/acacia_log"));
+        new CrazyDiamondRecipeBuilder(Blocks.ACACIA_WOOD)
+                .requires(Blocks.STRIPPED_ACACIA_WOOD)
+                .save(exporter, JCraft.id("crazy_diamond/acacia_wood"));
+        new CrazyDiamondRecipeBuilder(Blocks.SPRUCE_LOG)
+                .requires(Blocks.STRIPPED_SPRUCE_LOG)
+                .save(exporter, JCraft.id("crazy_diamond/spruce_log"));
+        new CrazyDiamondRecipeBuilder(Blocks.SPRUCE_WOOD)
+                .requires(Blocks.STRIPPED_SPRUCE_WOOD)
+                .save(exporter, JCraft.id("crazy_diamond/spruce_wood"));
+        new CrazyDiamondRecipeBuilder(Blocks.DARK_OAK_LOG)
+                .requires(Blocks.STRIPPED_DARK_OAK_LOG)
+                .save(exporter, JCraft.id("crazy_diamond/dark_oak_log"));
+        new CrazyDiamondRecipeBuilder(Blocks.DARK_OAK_WOOD)
+                .requires(Blocks.STRIPPED_DARK_OAK_WOOD)
+                .save(exporter, JCraft.id("crazy_diamond/dark_oak_wood"));
+        new CrazyDiamondRecipeBuilder(Blocks.JUNGLE_LOG)
+                .requires(Blocks.STRIPPED_JUNGLE_LOG)
+                .save(exporter, JCraft.id("crazy_diamond/jungle_log"));
+        new CrazyDiamondRecipeBuilder(Blocks.JUNGLE_WOOD)
+                .requires(Blocks.STRIPPED_JUNGLE_WOOD)
+                .save(exporter, JCraft.id("crazy_diamond/jungle_wood"));
+        new CrazyDiamondRecipeBuilder(Blocks.MANGROVE_LOG)
+                .requires(Blocks.STRIPPED_MANGROVE_LOG)
+                .save(exporter, JCraft.id("crazy_diamond/mangrove_log"));
+        new CrazyDiamondRecipeBuilder(Blocks.MANGROVE_WOOD)
+                .requires(Blocks.STRIPPED_MANGROVE_WOOD)
+                .save(exporter, JCraft.id("crazy_diamond/mangrove_wood"));
+        new CrazyDiamondRecipeBuilder(Blocks.BAMBOO_BLOCK)
+                .requires(Blocks.STRIPPED_BAMBOO_BLOCK)
+                .save(exporter, JCraft.id("crazy_diamond/bamboo_block"));
+        new CrazyDiamondRecipeBuilder(Blocks.CRIMSON_STEM)
+                .requires(Blocks.STRIPPED_CRIMSON_STEM)
+                .save(exporter, JCraft.id("crazy_diamond/crimson_stem"));
+        new CrazyDiamondRecipeBuilder(Blocks.CRIMSON_HYPHAE)
+                .requires(Blocks.STRIPPED_CRIMSON_HYPHAE)
+                .save(exporter, JCraft.id("crazy_diamond/crimson_hyphae"));
+        new CrazyDiamondRecipeBuilder(Blocks.WARPED_STEM)
+                .requires(Blocks.STRIPPED_WARPED_STEM)
+                .save(exporter, JCraft.id("crazy_diamond/warped_stem"));
+        new CrazyDiamondRecipeBuilder(Blocks.WARPED_HYPHAE)
+                .requires(Blocks.STRIPPED_WARPED_HYPHAE)
+                .save(exporter, JCraft.id("crazy_diamond/warped_hyphae"));
     }
 
     public static ItemPredicate ofTag(TagKey<Item> tag) {

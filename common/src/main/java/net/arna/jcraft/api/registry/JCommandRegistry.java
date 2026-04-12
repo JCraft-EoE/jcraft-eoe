@@ -9,12 +9,13 @@ import net.minecraft.commands.Commands;
 public interface JCommandRegistry {
     static void registerCommands(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext registryAccess, Commands.CommandSelection environment) {
         InduceAttackCommand.register(dispatcher);
-        //noinspection removal
         AboutStandCommand.register(dispatcher);
         AboutSpecCommand.register(dispatcher);
         SetStandCommand.register(dispatcher);
         ClearStandCommand.register(dispatcher);
         SetSpecCommand.register(dispatcher);
+        ResetSpecCommand.register(dispatcher);
+        ClearSpecCommand.register(dispatcher);
         FrameDataCommand.register(dispatcher);
         StandSkinCommand.register(dispatcher);
         StandBlockCommand.register(dispatcher);

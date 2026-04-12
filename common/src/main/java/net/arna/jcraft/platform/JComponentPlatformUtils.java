@@ -89,6 +89,11 @@ public class JComponentPlatformUtils {
     }
 
     @ExpectPlatform
+    public static CommonHamonComponent getHamon(LivingEntity living) {
+        throw new AssertionError();
+    }
+
+    @ExpectPlatform
     public static CommonVampireComponent getVampirism(LivingEntity living) {
         throw new AssertionError();
     }

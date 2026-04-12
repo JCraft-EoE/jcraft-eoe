@@ -1,13 +1,5 @@
 package net.arna.jcraft.common.entity.npc;
 
-import mod.azure.azurelib.animatable.GeoEntity;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.core.animation.AnimationController;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
-import mod.azure.azurelib.core.object.PlayState;
-import mod.azure.azurelib.util.AzureLibUtil;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.common.tickable.JEnemies;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
@@ -19,9 +11,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 
-public class PetshopEntity extends PathfinderMob implements GeoEntity {
-
-    private final AnimatableInstanceCache geoCache = AzureLibUtil.createInstanceCache(this);
+public class PetshopEntity extends PathfinderMob {
 
     public PetshopEntity(Level world) {
         super(JEntityTypeRegistry.PETSHOP.get(), world);
@@ -36,7 +26,7 @@ public class PetshopEntity extends PathfinderMob implements GeoEntity {
     public static AttributeSupplier.Builder createPetshopAttributes() {
         return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 10.0).add(Attributes.FLYING_SPEED, 1.0).add(Attributes.MOVEMENT_SPEED, 0.375);
     }
-
+    /*
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return geoCache;
@@ -58,5 +48,5 @@ public class PetshopEntity extends PathfinderMob implements GeoEntity {
         }
 
         return PlayState.CONTINUE;
-    }
+    }*/
 }

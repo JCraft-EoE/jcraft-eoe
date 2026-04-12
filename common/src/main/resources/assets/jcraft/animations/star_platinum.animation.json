@@ -1,7 +1,7 @@
 {
 	"format_version": "1.8.0",
 	"animations": {
-		"animation.starplatinum.summon": {
+		"summon": {
 			"loop": "hold_on_last_frame",
 			"animation_length": 1.0417,
 			"bones": {
@@ -676,7 +676,7 @@
 				}
 			}
 		},
-		"animation.starplatinum.idle": {
+		"animation.star_platinum.idle": {
 			"loop": true,
 			"animation_length": 3,
 			"bones": {
@@ -1291,7 +1291,7 @@
 				}
 			}
 		},
-		"animation.starplatinum.light": {
+		"animation.star_platinum.light": {
 			"loop": "hold_on_last_frame",
 			"animation_length": 0.48,
 			"bones": {
@@ -1855,7 +1855,7 @@
 				}
 			}
 		},
-		"animation.starplatinum.light_followup": {
+		"animation.star_platinum.light_followup": {
 			"loop": "hold_on_last_frame",
 			"animation_length": 0.75,
 			"bones": {
@@ -2344,7 +2344,7 @@
 				}
 			}
 		},
-		"animation.starplatinum.uppercut": {
+		"animation.star_platinum.uppercut": {
 			"loop": "hold_on_last_frame",
 			"animation_length": 0.72,
 			"bones": {
@@ -2868,7 +2868,7 @@
 				}
 			}
 		},
-		"animation.starplatinum.block": {
+		"animation.star_platinum.block": {
 			"loop": true,
 			"animation_length": 3,
 			"bones": {
@@ -3508,7 +3508,7 @@
 				}
 			}
 		},
-		"animation.starplatinum.barrage": {
+		"animation.star_platinum.barrage": {
 			"loop": true,
 			"animation_length": 0.9167,
 			"bones": {
@@ -5862,7 +5862,7 @@
 				}
 			}
 		},
-		"animation.starplatinum.heavy": {
+		"animation.star_platinum.heavy": {
 			"loop": "hold_on_last_frame",
 			"animation_length": 1.68,
 			"bones": {
@@ -6567,7 +6567,7 @@
 				}
 			}
 		},
-		"animation.starplatinum.ground_slam": {
+		"animation.star_platinum.ground_slam": {
 			"loop": "hold_on_last_frame",
 			"animation_length": 1.68,
 			"bones": {
@@ -7282,7 +7282,7 @@
 				}
 			}
 		},
-		"animation.starplatinum.star_finger": {
+		"animation.star_platinum.star_finger": {
 			"loop": "hold_on_last_frame",
 			"animation_length": 0.96,
 			"bones": {
@@ -7888,7 +7888,7 @@
 				}
 			}
 		},
-		"animation.starplatinum.inhale": {
+		"animation.star_platinum.inhale": {
 			"loop": "hold_on_last_frame",
 			"animation_length": 0.36,
 			"bones": {
@@ -8528,7 +8528,7 @@
 				}
 			}
 		},
-		"animation.starplatinum.inhaleidle": {
+		"animation.star_platinum.inhaleidle": {
 			"loop": true,
 			"animation_length": 0.48,
 			"bones": {
@@ -9276,7 +9276,7 @@
 				}
 			}
 		},
-		"animation.starplatinum.jump": {
+		"animation.star_platinum.jump": {
 			"loop": "hold_on_last_frame",
 			"animation_length": 1.32,
 			"bones": {
@@ -9910,7 +9910,7 @@
 				}
 			}
 		},
-		"animation.starplatinum.low_kick": {
+		"animation.star_platinum.low_kick": {
 			"loop": "hold_on_last_frame",
 			"animation_length": 0.64,
 			"bones": {
@@ -10450,7 +10450,7 @@
 				}
 			}
 		},
-		"animation.starplatinum.knee": {
+		"animation.star_platinum.knee": {
 			"loop": "hold_on_last_frame",
 			"animation_length": 0.84,
 			"bones": {
@@ -11001,7 +11001,7 @@
 				}
 			}
 		},
-		"animation.starplatinum.knee_up": {
+		"animation.star_platinum.knee_up": {
 			"loop": "hold_on_last_frame",
 			"animation_length": 0.96,
 			"bones": {
@@ -11572,7 +11572,7 @@
 				}
 			}
 		},
-		"animation.starplatinum.grab": {
+		"animation.star_platinum.grab": {
 			"animation_length": 1.2,
 			"bones": {
 				"base": {
@@ -11953,7 +11953,7 @@
 				}
 			}
 		},
-		"animation.starplatinum.grabhit": {
+		"animation.star_platinum.grabhit": {
 			"animation_length": 1.2,
 			"bones": {
 				"base": {
@@ -12401,7 +12401,7 @@
 				}
 			}
 		},
-		"animation.starplatinum.item_hold": {
+		"animation.star_platinum.item_hold": {
 			"loop": true,
 			"animation_length": 3,
 			"bones": {
@@ -12585,7 +12585,7 @@
 				}
 			}
 		},
-		"animation.starplatinum.itemthrow_charge": {
+		"animation.star_platinum.itemthrow_charge": {
 			"loop": "hold_on_last_frame",
 			"animation_length": 1.25,
 			"bones": {
@@ -12953,7 +12953,7 @@
 				}
 			}
 		},
-		"animation.starplatinum.itemthrow": {
+		"animation.star_platinum.itemthrow": {
 			"animation_length": 0.5,
 			"bones": {
 				"base": {

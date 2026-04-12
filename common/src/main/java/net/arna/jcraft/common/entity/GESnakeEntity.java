@@ -1,25 +1,16 @@
 package net.arna.jcraft.common.entity;
 
 import lombok.NonNull;
-import mod.azure.azurelib.animatable.GeoEntity;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.core.animation.AnimationController;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
-import mod.azure.azurelib.core.object.PlayState;
-import mod.azure.azurelib.util.AzureLibUtil;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
+import mod.azure.azurelib.util.MoveAnalysis;
 import net.arna.jcraft.common.entity.ai.goal.StunningMeleeAttackGoal;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.TamableAnimal;
-import net.minecraft.world.entity.ai.goal.FloatGoal;
-import net.minecraft.world.entity.ai.goal.FollowOwnerGoal;
-import net.minecraft.world.entity.ai.goal.LeapAtTargetGoal;
-import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
-import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
+import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.OwnerHurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.OwnerHurtTargetGoal;
 import net.minecraft.world.level.Level;
@@ -27,7 +18,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
-public class GESnakeEntity extends TamableAnimal implements GeoEntity {
+public class GESnakeEntity extends TamableAnimal {
+    public static final String ATTACK_CONTROLLER = "attack_controller";
+    public static final String MOVEMENT_CONTROLLER = "movement_controller";
+    public MoveAnalysis moveAnalysis = new MoveAnalysis(this);
+
     public GESnakeEntity(EntityType<? extends TamableAnimal> entityType, Level world) {
         super(entityType, world);
         Arrays.fill(this.handDropChances, 1F);
@@ -58,7 +53,10 @@ public class GESnakeEntity extends TamableAnimal implements GeoEntity {
         super.tick();
 
         if (level().isClientSide()) {
-            if (this.swinging) {
+            moveAnalysis.update();
+
+            if (this.swinging) { // attacking
+                ATTACK.sendForEntity(this);
                 this.swingTime += 1;
 
                 if (this.swingTime > 10) {
@@ -74,37 +72,6 @@ public class GESnakeEntity extends TamableAnimal implements GeoEntity {
         }
     }
 
-    // Animations
-    private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
-
-    @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "movement", 10, this::predicate));
-        controllers.add(new AnimationController<>(this, "attack", 0, this::attackPredicate));
-    }
-
-    private PlayState attackPredicate(AnimationState<GESnakeEntity> state) {
-        if (!swinging) {
-            return PlayState.STOP;
-        }
-
-        state.setAnimation(RawAnimation.begin().thenLoop("animation.gesnake.attack"));
-        return PlayState.CONTINUE;
-    }
-
-    private PlayState predicate(AnimationState<GESnakeEntity> state) {
-        if (state.isMoving()) {
-            state.setAnimation(RawAnimation.begin().thenLoop("animation.gesnake.move"));
-            state.getController().setAnimationSpeed(1 + this.getDeltaMovement().length());
-        } else {
-            state.setAnimation(RawAnimation.begin().thenLoop("animation.gesnake.idle"));
-        }
-
-        return PlayState.CONTINUE;
-    }
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return cache;
-    }
+    public static final AzCommand MOVE = AzCommand.create(MOVEMENT_CONTROLLER, "animation.gesnake.move", AzPlayBehaviors.LOOP);
+    public static final AzCommand ATTACK = AzCommand.create(ATTACK_CONTROLLER, "animation.gesnake.attack");
 }

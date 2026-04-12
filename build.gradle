@@ -59,6 +59,14 @@ subprojects {
         maven {
             url = "https://maven.minecraftforge.net/"
         }
+        maven {
+            name = "FTB"
+            url = "https://maven.ftb.dev/releases"
+        }
+        maven {
+            name = "Jared's maven"
+            url = "https://maven.blamejared.com/"
+        }
     }
 
     dependencies {

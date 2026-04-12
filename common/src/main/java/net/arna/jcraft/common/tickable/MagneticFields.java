@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class MagneticFields {
     public static class MagneticField {
@@ -77,6 +78,14 @@ public class MagneticFields {
             if (field.owner != owner) continue;
             if (field.level != owner.level()) continue;
             consumer.accept(field);
+        }
+    }
+
+    public static void forAllOfOwner(@NonNull final Entity owner, Function<MagneticField, Boolean> consumer) {
+        for (MagneticField field : fields) {
+            if (field.owner != owner) continue;
+            if (field.level != owner.level()) continue;
+            if (!consumer.apply(field)) break;
         }
     }
 

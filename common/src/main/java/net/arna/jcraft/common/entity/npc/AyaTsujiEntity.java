@@ -1,14 +1,6 @@
 package net.arna.jcraft.common.entity.npc;
 
 import lombok.NonNull;
-import mod.azure.azurelib.animatable.GeoEntity;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.core.animation.AnimationController;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
-import mod.azure.azurelib.core.object.PlayState;
-import mod.azure.azurelib.util.AzureLibUtil;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.common.tickable.JEnemies;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
@@ -39,7 +31,7 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class AyaTsujiEntity extends PathfinderMob implements GeoEntity, Merchant {
+public class AyaTsujiEntity extends PathfinderMob implements Merchant {
 
     private Player tradingPlayer;
     private final MerchantOffers merchantOffers = new MerchantOffers();
@@ -172,6 +164,7 @@ public class AyaTsujiEntity extends PathfinderMob implements GeoEntity, Merchant
     }
 
     // Animations
+    /*
     private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
 
     @Override
@@ -203,5 +196,5 @@ public class AyaTsujiEntity extends PathfinderMob implements GeoEntity, Merchant
         }
 
         return PlayState.STOP;
-    }
+    }*/
 }

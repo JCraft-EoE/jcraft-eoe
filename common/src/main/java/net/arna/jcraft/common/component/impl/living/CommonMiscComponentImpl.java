@@ -2,6 +2,7 @@ package net.arna.jcraft.common.component.impl.living;
 
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import net.arna.jcraft.api.component.living.CommonMiscComponent;
 import net.arna.jcraft.common.entity.stand.MetallicaEntity;
 import net.arna.jcraft.api.registry.JSoundRegistry;
@@ -18,11 +19,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 
 public class CommonMiscComponentImpl implements CommonMiscComponent {
-    private final Entity entity;
+    private final LivingEntity entity;
     @Getter
     private Vec3 desiredVelocity = Vec3.ZERO;
     @Getter
     private @Nullable UUID slavedTo = null;
+    @Getter
     private LivingEntity master = null;
     private int damageTimer;
     private int knifeTimer;
@@ -35,9 +37,14 @@ public class CommonMiscComponentImpl implements CommonMiscComponent {
     private boolean prevNoGrav;
     @Getter
     private float attackSpeedMult;
+    @Getter
+    @Setter
     private float metallicaIron = MetallicaEntity.IRON_MAX;
+    @Getter
+    @Setter
+    private float aerosmithOverheat = 0f;
 
-    public CommonMiscComponentImpl(final Entity entity) {
+    public CommonMiscComponentImpl(final LivingEntity entity) {
         this.entity = entity;
     }
 
@@ -113,16 +120,6 @@ public class CommonMiscComponentImpl implements CommonMiscComponent {
         sync(entity);
     }
 
-    @Override
-    public float getMetallicaIron() {
-        return this.metallicaIron;
-    }
-
-    @Override
-    public void setMetallicaIron(float iron) {
-        this.metallicaIron = iron;
-    }
-
     public void tick() {
         if (damageTimer > 0) {
             damageTimer--;
@@ -172,10 +169,6 @@ public class CommonMiscComponentImpl implements CommonMiscComponent {
         }
     }
 
-    public LivingEntity getMaster() {
-        return master;
-    }
-
     private void updateKnifeTimer() {
         knifeTimer = 20 * (30 - stuckKnifeCount);
         sync(entity);
@@ -205,6 +198,8 @@ public class CommonMiscComponentImpl implements CommonMiscComponent {
         desiredVelocity = new Vec3(dvComp.getDouble("X"), dvComp.getDouble("Y"), dvComp.getDouble("Z"));
         damageTimer = tag.getInt("DamageTimer");
         metallicaIron = tag.getFloat("MetallicaIron");
+        aerosmithOverheat = tag.getFloat("AerosmithOverheat");
+
         if (tag.hasUUID("SlavedTo")) {
             slavedTo = tag.getUUID("SlavedTo");
         }
@@ -218,6 +213,7 @@ public class CommonMiscComponentImpl implements CommonMiscComponent {
         tag.put("DesiredVelocity", dvComp);
         tag.putInt("DamageTimer", damageTimer);
         tag.putFloat("MetallicaIron", metallicaIron);
+        tag.putFloat("AerosmithOverheat", aerosmithOverheat);
         if (slavedTo != null) {
             tag.putUUID("SlavedTo", slavedTo);
         }

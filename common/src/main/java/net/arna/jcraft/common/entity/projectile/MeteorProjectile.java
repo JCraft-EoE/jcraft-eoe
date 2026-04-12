@@ -1,15 +1,9 @@
 package net.arna.jcraft.common.entity.projectile;
 
 import lombok.NonNull;
-import mod.azure.azurelib.animatable.GeoEntity;
-import mod.azure.azurelib.core.animatable.GeoAnimatable;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.core.animation.AnimationController;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
-import mod.azure.azurelib.core.object.PlayState;
-import mod.azure.azurelib.util.AzureLibUtil;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.stand.MagiciansRedEntity;
@@ -47,7 +41,7 @@ import java.util.Set;
 import static net.arna.jcraft.api.Attacks.damageLogic;
 import static net.arna.jcraft.common.util.JUtils.canDamage;
 
-public class MeteorProjectile extends AbstractArrow implements GeoEntity {
+public class MeteorProjectile extends AbstractArrow {
     private static final EntityDataAccessor<Integer> SKIN;
     private int ticksInAir = 0;
     private int ticksInGround = 0;
@@ -173,7 +167,9 @@ public class MeteorProjectile extends AbstractArrow implements GeoEntity {
                     getZ() + random.nextFloat() * 0.5f - 0.25f,
                     vel.x / 2, vel.y / 2, vel.z / 2
             );
+
             if (inGround) ticksInGround++;
+            else ANIMATION.sendForEntity(this);
         } else {
             if (this.inGround) {
                 if (explosive && ticksInGround == 0) {
@@ -217,6 +213,8 @@ public class MeteorProjectile extends AbstractArrow implements GeoEntity {
                         false, 10, JDamageSources.create(level(), DamageTypes.ON_FIRE), owner, CommonHitPropertyComponent.HitAnimation.LAUNCH);
             }
         }
+
+        EXPLODE.sendForEntity(this);
     }
 
     @Override
@@ -224,31 +222,22 @@ public class MeteorProjectile extends AbstractArrow implements GeoEntity {
         return true;
     }
 
-    // Animations
-    private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
-
-    @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "controller", 1, this::predicate));
-    }
-
-    private static final RawAnimation EXPLODE = RawAnimation.begin().thenPlayAndHold("animation.meteor.explode");
-    private static final RawAnimation IDLE = RawAnimation.begin()
-            .thenPlay("animation.meteor.spawn")
-            .thenLoop("animation.meteor.idle");
-    private PlayState predicate(AnimationState<GeoAnimatable> state) {
-        if (inGround) {
-            if (ticksInGround == 1) {
-                state.getController().setAnimation(EXPLODE);
-            }
-        } else {
-            state.getController().setAnimation(IDLE);
-        }
-        return PlayState.CONTINUE;
-    }
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return cache;
-    }
+    private static final AzCommand EXPLODE = AzCommand.create(JCraft.BASE_CONTROLLER, "animation.meteor.explode");
+    public static final AzCommand ANIMATION = AzCommand.controllerBuilder().
+            playSequence(
+                    JCraft.BASE_CONTROLLER,
+                    sequenceBuilder -> sequenceBuilder.queue(
+                            "animation.meteor.spawn",
+                            props -> props.withPlayBehavior(AzPlayBehaviors.PLAY_ONCE)
+                    ).queue(
+                            "animation.meteor.idle",
+                            props -> props.withPlayBehavior(AzPlayBehaviors.LOOP)
+                    )
+            )
+            .setFreezeTickOffset(JCraft.BASE_CONTROLLER, 0)
+            .setStartTickOffset(JCraft.BASE_CONTROLLER, 0)
+            .setSpeed(JCraft.BASE_CONTROLLER, 1)
+            .setRepeatAmount(JCraft.BASE_CONTROLLER, 0)
+            .setReverseAnimation(JCraft.BASE_CONTROLLER, false)
+            .build();
 }

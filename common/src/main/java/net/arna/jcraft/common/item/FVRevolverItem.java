@@ -41,7 +41,7 @@ public class FVRevolverItem extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
         ItemStack itemStack = user.getItemInHand(hand);
-        if (user.hasEffect(JStatusRegistry.DAZED.get())) {
+        if (user.hasEffect(JStatusRegistry.DAZED.get()) || user.isSpectator()) {
             return InteractionResultHolder.fail(itemStack);
         }
         CompoundTag data = itemStack.getOrCreateTag();

@@ -1,7 +1,5 @@
 {
   "values": [
-    "minecraft:plains",
-    "minecraft:cherry_grove",
-    "#is_mountain"
+    "minecraft:cherry_grove"
   ]
 }

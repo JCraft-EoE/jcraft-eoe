@@ -2,8 +2,10 @@ package net.arna.jcraft.common.entity.stand;
 
 import com.mojang.datafixers.util.Either;
 import lombok.NonNull;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.Attacks;
 import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.MoveSet;
 import net.arna.jcraft.api.attack.MoveSetManager;
@@ -44,17 +46,14 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 
 /**
  * The {@link StandEntity} for <a href="https://jojowiki.com/Made_in_Heaven">Made In Heaven</a>.
  * @see JStandTypeRegistry#MADE_IN_HEAVEN
- * @see net.arna.jcraft.client.model.entity.stand.MadeInHeavenModel MadeInHeavenModel
  * @see net.arna.jcraft.client.renderer.entity.stands.MadeInHeavenRenderer MadeInHeavenRenderer
  * @see CircleAttack
  * @see FuryChopAttack
@@ -107,7 +106,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                     Component.literal("Kick"),
                     Component.literal("quick combo finisher")
             );
-    public static final SimpleAttack<MadeInHeavenEntity> SLICE = new SimpleAttack<MadeInHeavenEntity>(8,
+    public static final SimpleAttack<MadeInHeavenEntity> SLICE = new SimpleAttack<MadeInHeavenEntity>(11,
             5, 8, 0.75f, 4f, 10, 1.5f, 0.15f, -0.1f)
             .noLoopPrevention()
             .withFollowup(LIGHT_FOLLOWUP)
@@ -423,41 +422,36 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
 
     // Animation code
     public enum State implements StandAnimationState<MadeInHeavenEntity> {
-        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.mih.idle"))),
-        SLICE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mih.slice"))),
-        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.mih.block"))),
-        DONUT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mih.donut"))),
-        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.mih.barrage"))),
-        SPEED_SLICE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mih.speedslice"))),
-        JUDGEMENT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mih.judgement"))),
-        LEG_CRUSHER(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mih.legcrusher"))),
-        FURY_CHOP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mih.furychop"))),
-        TIME_ACCELERATION(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mih.taccel"))),
-        CIRCLE_STARTUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mih.circlestartup"))),
-        SPEED_CHOP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mih.speedchop"))),
-        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mih.light_followup"))),
-        LOW_KICK(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.mih.lowkick")));
+        IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.mih.idle", AzPlayBehaviors.LOOP)),
+        SLICE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.slice", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.mih.block", AzPlayBehaviors.LOOP)),
+        DONUT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.donut", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.barrage", AzPlayBehaviors.LOOP)),
+        SPEED_SLICE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.speedslice", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        JUDGEMENT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.judgement", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LEG_CRUSHER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.legcrusher", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        FURY_CHOP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.furychop", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        TIME_ACCELERATION(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.taccel", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        CIRCLE_STARTUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.circlestartup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        SPEED_CHOP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.speedchop", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LOW_KICK(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.lowkick", AzPlayBehaviors.HOLD_ON_LAST_FRAME));
 
-        private final Consumer<AnimationState<MadeInHeavenEntity>> animator;
+        private final AzCommand animator;
 
-        State(Consumer<AnimationState<MadeInHeavenEntity>> animator) {
+        State(AzCommand animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(MadeInHeavenEntity attacker, AnimationState<MadeInHeavenEntity> builder) {
-            animator.accept(builder);
+        public void playAnimation(MadeInHeavenEntity attacker) {
+            animator.sendForEntity(attacker);
         }
     }
 
     @Override
     protected State[] getStateValues() {
         return State.values();
-    }
-
-    @Override
-    protected @Nullable String getSummonAnimation() {
-        return "animation.mih.summon";
     }
 
     @Override

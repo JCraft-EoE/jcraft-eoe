@@ -6,7 +6,7 @@ import lombok.NonNull;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.common.entity.stand.D4CEntity;
-import net.arna.jcraft.common.item.MockItem;
+import net.arna.jcraft.common.item.AuMockItem;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -54,7 +54,7 @@ public final class ItemPlaceMove extends AbstractMove<ItemPlaceMove, D4CEntity> 
         final ItemStack offHandStack = attacker.getOffhandItem();
 
         final ItemEntity item = new ItemEntity(attacker.level(), attacker.getX(), attacker.getY() + 0.2, attacker.getZ(),
-                MockItem.createMockStack(placing), 0, 0, 0);
+                AuMockItem.createMockStack(placing), 0, 0, 0);
         item.setPickUpDelay(200);
         attacker.level().addFreshEntity(item);
 

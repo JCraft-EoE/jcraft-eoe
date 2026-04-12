@@ -1,23 +1,26 @@
 package net.arna.jcraft.client.renderer.entity.projectiles;
 
-import net.arna.jcraft.client.model.JProjectileModel;
+import lombok.NonNull;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.projectile.IcicleProjectile;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
 
 /**
- * The {@link GeoProjectileRenderer} for {@link IcicleProjectile}.
+ * The {@link ProjectileRenderer} for {@link IcicleProjectile}.
  */
-public class IcicleRenderer extends GeoProjectileRenderer<IcicleProjectile> {
-    public IcicleRenderer(final EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, new JProjectileModel<>("icicle"));
+@Environment(EnvType.CLIENT)
+public class IcicleRenderer extends ProjectileRenderer<IcicleProjectile> {
+
+    public static final String ID = "icicle";
+    private static final RenderType RENDER_TYPE = RenderType.entityTranslucent(JCraft.id(TEXTURE_STR_TEMPLATE.formatted(ID)));
+
+    public IcicleRenderer(final @NonNull EntityRendererProvider.Context context) {
+        super(context, () -> new EntityAnimator<>(ID), b -> b
+                .setRenderType(RENDER_TYPE),
+                ID);
     }
 
-    @Override
-    public RenderType getRenderType(final IcicleProjectile animatable, final ResourceLocation texture, final @Nullable MultiBufferSource bufferSource, final float partialTick) {
-        return RenderType.entityTranslucent(texture);
-    }
 }

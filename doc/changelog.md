@@ -1,18 +1,24 @@
 # Changelog
 ## General
-* …
+* ### Added Hamon
+* Improved combat AI
 ### Blocks & Items
 * …
 ### NPCs & Stands
-* …
+* Whitesnake
+  * Poison Spew cooldowns increased by 4s
+  * Poison Spew Projectile no longer interrupts moves
 ### Configs
 * …
-### Commands
-* …
 ### Bug Fixes
-* …
+* Fix idle and blocking animations not playing sometimes
+* Fix Gold Experience's Snake not animating movement
+* Brawler spec user no longer attacks villagers
 ### Known Bugs
 * …
+
+
+
 
 ## TODO (SOME UPDATE) :D
 * Spin
@@ -20,5 +26,4 @@
 * MR barrage fire :)
 * Timestop should stop stand anims
 * CRAZY DIAMOND, Hermit Purple, Yellow Temperance
-* Stand NBT serialization
 * Actually use effect keyframes in animations

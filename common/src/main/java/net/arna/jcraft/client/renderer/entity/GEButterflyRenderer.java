@@ -1,76 +1,67 @@
 package net.arna.jcraft.client.renderer.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import mod.azure.azurelib.cache.object.BakedGeoModel;
-import mod.azure.azurelib.cache.object.GeoBone;
-import mod.azure.azurelib.renderer.DynamicGeoEntityRenderer;
-import mod.azure.azurelib.renderer.layer.BlockAndItemGeoLayer;
-import net.arna.jcraft.client.model.entity.GEButterflyModel;
+import lombok.NonNull;
+import mod.azure.azurelib.model.AzBone;
+import mod.azure.azurelib.render.AzRendererPipelineContext;
+import mod.azure.azurelib.render.layer.AzBlockAndItemLayer;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.GEButterflyEntity;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShieldItem;
-import org.jetbrains.annotations.Nullable;
+
+import java.util.UUID;
 
 /**
- * The {@link DynamicGeoEntityRenderer} for {@link GEButterflyEntity}.
- * @see GEButterflyModel
+ * The {@link AbstractEntityRenderer} for {@link GEButterflyEntity}.
  */
-public class GEButterflyRenderer extends DynamicGeoEntityRenderer<GEButterflyEntity> {
-    protected ItemStack mainHandItem;
+@Environment(EnvType.CLIENT)
+public class GEButterflyRenderer extends AbstractEntityRenderer<GEButterflyEntity> {
+    public static final String ID = "gebutterfly";
+    private static final RenderType RENDER_TYPE = RenderType.entityTranslucent(JCraft.id(TEXTURE_STR_TEMPLATE.formatted(ID)));
 
-    @Override
-    public RenderType getRenderType(final GEButterflyEntity animatable, final ResourceLocation texture, final @Nullable MultiBufferSource bufferSource, final float partialTick) {
-        return RenderType.entityTranslucent(texture);
+    public GEButterflyRenderer(final @NonNull EntityRendererProvider.Context context) {
+        super(context, () -> new EntityAnimator<>(ID), b -> b
+                .setRenderType(RENDER_TYPE)
+                .addRenderLayer(new GEButterflyRendererLayer()),
+                ID);
     }
 
-    public GEButterflyRenderer(final EntityRendererProvider.Context renderManager) {
-        super(renderManager, new GEButterflyModel());
-        addRenderLayer(new BlockAndItemGeoLayer<>(this) {
+    protected static class GEButterflyRendererLayer extends AzBlockAndItemLayer<UUID, GEButterflyEntity> {
+        protected ItemStack mainHandItem;
 
-            @Nullable
-            @Override
-            protected ItemStack getStackForBone(final GeoBone bone, final GEButterflyEntity animatable) {
-                // Retrieve the items in the entity's hands for the relevant bone
-                if (bone.getName().equals("base")) return mainHandItem;
-                return null;
+        @Override
+        public void preRender(final AzRendererPipelineContext<UUID, GEButterflyEntity> context) {
+            super.preRender(context);
+            mainHandItem = context.animatable().getItemBySlot(EquipmentSlot.MAINHAND);
+        }
+
+        @Override
+        public ItemStack itemStackForBone(final AzBone bone, final GEButterflyEntity animatable) {
+            if (bone.getName().equals("base")) {
+                return mainHandItem;
             }
+            return null;
+        }
 
-            @Override
-            protected ItemDisplayContext getTransformTypeForStack(final GeoBone bone, final ItemStack stack, final GEButterflyEntity animatable) {
-                // Apply the camera transform for the given hand
-                return ItemDisplayContext.NONE;
-            }
-
-            // Do some quick render modifications depending on what the item is
-            @Override
-            protected void renderStackForBone(final PoseStack poseStack, final GeoBone bone, final ItemStack stack, final GEButterflyEntity animatable,
-                                              final MultiBufferSource bufferSource, final float partialTick, final int packedLight, final int packedOverlay) {
-
-                if (stack == GEButterflyRenderer.this.mainHandItem) {
-                    poseStack.scale(0.33f, 0.33f, 0.33f);
-                    poseStack.mulPose(Axis.XP.rotationDegrees(-90f));
-
-                    if (stack.getItem() instanceof ShieldItem) {
-                        poseStack.translate(0, 0.125, -0.25);
-                    }
+        @Override
+        protected void renderItemForBone(final AzRendererPipelineContext<UUID, GEButterflyEntity> context, final AzBone bone, final ItemStack itemStack, final GEButterflyEntity animatable) {
+            final PoseStack poseStack = context.poseStack();
+            if (itemStack == mainHandItem) {
+                poseStack.scale(0.33f, 0.33f, 0.33f);
+                poseStack.mulPose(Axis.XP.rotationDegrees(-90f));
+                if (itemStack.getItem() instanceof ShieldItem) {
+                    poseStack.translate(0, 0.125, -0.25);
                 }
-
-                super.renderStackForBone(poseStack, bone, stack, animatable, bufferSource, partialTick, packedLight, packedOverlay);
             }
-        });
+            super.renderItemForBone(context, bone, itemStack, animatable);
+        }
     }
 
-    @Override
-    public void preRender(final PoseStack poseStack, final GEButterflyEntity animatable, final BakedGeoModel model, final MultiBufferSource bufferSource, final VertexConsumer buffer, final boolean isReRender, final float partialTick, final int packedLight, final int packedOverlay, final float red, final float green, final float blue, final float alpha) {
-        super.preRender(poseStack, animatable, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, red, green, blue, alpha);
-        this.mainHandItem = animatable.getItemBySlot(EquipmentSlot.MAINHAND);
-    }
 }

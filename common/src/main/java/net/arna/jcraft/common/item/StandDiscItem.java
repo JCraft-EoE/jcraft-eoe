@@ -102,6 +102,7 @@ public class StandDiscItem extends Item {
 
             standData.setStand(null);
         }
+
         JCraft.summon(world, user);
 
         // 1s usage cooldown to prevent overuse

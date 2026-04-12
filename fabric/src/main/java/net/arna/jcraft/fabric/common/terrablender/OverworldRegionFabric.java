@@ -21,6 +21,11 @@ public class OverworldRegionFabric extends Region {
 
     // see https://minecraft.fandom.com/wiki/Biome#Overworld_3
     @Override
+    public void addBiomes(
+            Registry<Biome> registry,
+            Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> mapper
+    ) {
+/*    @Override
     public void addBiomes(Registry<Biome> registry, Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> mapper) {
         VanillaParameterOverlayBuilder builder = new VanillaParameterOverlayBuilder();
         // Devil's Palm: The parameters for this biome are chosen to resemble the ones for the desert biome.
@@ -33,6 +38,6 @@ public class OverworldRegionFabric extends Region {
                 .weirdness(Weirdness.FULL_RANGE)
                 .build().forEach(point -> builder.add(point, JBiomeRegistry.DEVILS_PALM));
         // add our points to the mapper
-        builder.build().forEach(mapper);
+        builder.build().forEach(mapper);*/
     }
 }

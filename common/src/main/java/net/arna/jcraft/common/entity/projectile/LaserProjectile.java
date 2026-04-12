@@ -3,10 +3,6 @@ package net.arna.jcraft.common.entity.projectile;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import lombok.NonNull;
 import lombok.Setter;
-import mod.azure.azurelib.animatable.GeoEntity;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.util.AzureLibUtil;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
@@ -21,7 +17,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 
-public class LaserProjectile extends AbstractArrow implements GeoEntity {
+public class LaserProjectile extends AbstractArrow {
     private int lifetime = 60;
     private final IntOpenHashSet hit = new IntOpenHashSet(8);
     @Setter
@@ -98,7 +94,7 @@ public class LaserProjectile extends AbstractArrow implements GeoEntity {
         }
 
         JUtils.projectileDamageLogic(this, level(), entity, getDeltaMovement(), 20, 1, false,
-                5f, 0, CommonHitPropertyComponent.HitAnimation.CRUSH, unblockable, false);
+                5f, 0, CommonHitPropertyComponent.HitAnimation.CRUSH, false, unblockable);
         hit.add(entity.getId());
     }
 
@@ -118,14 +114,4 @@ public class LaserProjectile extends AbstractArrow implements GeoEntity {
         return true;
     }
 
-    // Animations
-    private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
-
-    @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {}
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return cache;
-    }
 }

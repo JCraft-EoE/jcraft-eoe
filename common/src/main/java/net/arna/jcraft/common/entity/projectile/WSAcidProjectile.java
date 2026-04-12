@@ -1,21 +1,16 @@
 package net.arna.jcraft.common.entity.projectile;
 
 import lombok.NonNull;
-import mod.azure.azurelib.animatable.GeoEntity;
-import mod.azure.azurelib.core.animatable.GeoAnimatable;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.core.animation.AnimationController;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
-import mod.azure.azurelib.core.object.PlayState;
-import mod.azure.azurelib.util.AzureLibUtil;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.AttackData;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
+import net.arna.jcraft.api.registry.JEntityTypeRegistry;
+import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.splatter.SplatterType;
 import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.api.registry.JEntityTypeRegistry;
-import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -33,7 +28,7 @@ import net.minecraft.world.phys.Vec3;
 
 import static net.arna.jcraft.api.Attacks.damageLogic;
 
-public class WSAcidProjectile extends AbstractArrow implements GeoEntity {
+public class WSAcidProjectile extends AbstractArrow {
     private static final EntityDataAccessor<Boolean> MYH; // Melt your Heart variant
 
     static {
@@ -91,8 +86,13 @@ public class WSAcidProjectile extends AbstractArrow implements GeoEntity {
             if (entity instanceof StandEntity<?, ?> stand && stand.hasUser()) {
                 target = stand.getUserOrThrow();
             }
-            damageLogic(level(), target, Vec3.ZERO, 10, 1, false, 5f, false, 6,
-                    level().damageSources().thrown(this, owner), owner, CommonHitPropertyComponent.HitAnimation.MID);
+
+            final Level level = level();
+            damageLogic(level, target,
+                    new AttackData(Vec3.ZERO, 10, 1, false, 5f, false, 6,
+                    level.damageSources().thrown(this, owner), owner, CommonHitPropertyComponent.HitAnimation.MID,
+                    null, false, false, false)
+            );
             target.addEffect(new MobEffectInstance(JStatusRegistry.WSPOISON.get(), 60, 0, false, true));
             discard();
         }
@@ -130,9 +130,10 @@ public class WSAcidProjectile extends AbstractArrow implements GeoEntity {
 
         // Display spit effects
         if (firstTick) {
-            double x = getX();
-            double y = getY();
-            double z = getZ();
+            final double x = getX();
+            final double y = getY();
+            final double z = getZ();
+
             for (int h = 0; h < 128; ++h) {
                 double pX = x + random.nextDouble() * 2 - 1;
                 double pY = y + random.nextDouble() * 2 - 1;
@@ -143,6 +144,12 @@ public class WSAcidProjectile extends AbstractArrow implements GeoEntity {
                         ParticleTypes.SPIT,
                         pX, pY, pZ,
                         -awayVector.x, -awayVector.y, awayVector.z);
+            }
+
+            if (entityData.get(MYH)) {
+                MELT_IDLE.sendForEntity(this);
+            } else {
+                IDLE.sendForEntity(this);
             }
         }
 
@@ -157,6 +164,9 @@ public class WSAcidProjectile extends AbstractArrow implements GeoEntity {
         }
     }
 
+    private static final AzCommand MELT_IDLE = AzCommand.create(JCraft.BASE_CONTROLLER, "animation.wsacid.meltidle", AzPlayBehaviors.LOOP);
+    private static final AzCommand IDLE = AzCommand.create(JCraft.BASE_CONTROLLER, "animation.wsacid.idle", AzPlayBehaviors.LOOP);
+
     @Override
     public @NonNull ItemStack getPickupItem() {
         return ItemStack.EMPTY;
@@ -165,24 +175,5 @@ public class WSAcidProjectile extends AbstractArrow implements GeoEntity {
     @Override
     public boolean isNoGravity() {
         return false;
-    }
-
-    // Animations
-    private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
-
-    @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "controller", 0, this::predicate));
-    }
-
-    private static final RawAnimation MELT_IDLE = RawAnimation.begin().thenLoop("animation.wsacid.meltidle");
-    private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.wsacid.idle");
-    private PlayState predicate(AnimationState<GeoAnimatable> state) {
-        return state.setAndContinue(entityData.get(MYH) ? MELT_IDLE : IDLE);
-    }
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return cache;
     }
 }

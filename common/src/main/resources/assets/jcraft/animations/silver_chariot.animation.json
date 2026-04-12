@@ -1,7 +1,7 @@
 {
 	"format_version": "1.8.0",
 	"animations": {
-		"animation.silverchariot.summon": {
+		"summon": {
 			"loop": true,
 			"animation_length": 1.1,
 			"bones": {
@@ -323,7 +323,7 @@
 				}
 			}
 		},
-		"animation.silverchariot.summon_possessed": {
+		"summon_possessed": {
 			"loop": true,
 			"animation_length": 1.08,
 			"bones": {

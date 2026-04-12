@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "jcraft:monastery",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 34,
+    "separation": 8,
+    "salt": 765389028
+  }
+}

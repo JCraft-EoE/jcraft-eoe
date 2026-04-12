@@ -23,6 +23,9 @@ public interface LivingEntityInvoker {
     @Accessor("lastDamageStamp")
     void setLastDamageTime(long lastDamageTime);
 
+    @Accessor("lastHurtByPlayerTime")
+    void setLastHurtByPlayerTime(int lastHurtByPlayerTime);
+
     @Invoker
     void callPlayHurtSound(DamageSource source);
 }

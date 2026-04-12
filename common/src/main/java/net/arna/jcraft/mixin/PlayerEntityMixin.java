@@ -10,6 +10,7 @@ import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.food.IFoodData;
 import net.arna.jcraft.common.network.s2c.ComboCounterPacket;
 import net.arna.jcraft.common.util.IComboCounter;
+import net.arna.jcraft.common.util.IOwnable;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.server.level.ServerPlayer;
@@ -102,12 +103,12 @@ public abstract class PlayerEntityMixin implements IComboCounter, IFoodData {
 
     @Inject(at = @At("TAIL"), method = "tick")
     public void jcraft$playerTickTail(CallbackInfo info) {
-        Player player = (Player) (Object) this;
+        final Player player = (Player) (Object) this;
         if (JUtils.isAffectedByTimeStop(player)) {
             return;
         }
 
-        JSpec<?, ?> spec = JComponentPlatformUtils.getSpecData(player).getSpec();
+        final JSpec<?, ?> spec = JComponentPlatformUtils.getSpecData(player).getSpec();
         if (spec != null) {
             spec.tickSpec();
         }
@@ -116,8 +117,11 @@ public abstract class PlayerEntityMixin implements IComboCounter, IFoodData {
             return;
         }
 
-        LivingEntity attacker = lastAttacked.getLastHurtByMob();
-        if (attacker == null || attacker == player) {
+        final LivingEntity attacker = lastAttacked.getLastHurtByMob();
+        if (
+                attacker == null || attacker == player ||
+                (attacker instanceof IOwnable ownableAttacker && ownableAttacker.getMaster() == player))
+        {
             return;
         }
         lastAttacked = null;

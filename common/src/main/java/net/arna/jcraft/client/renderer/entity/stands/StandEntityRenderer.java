@@ -1,65 +1,196 @@
 package net.arna.jcraft.client.renderer.entity.stands;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import mod.azure.azurelib.cache.object.BakedGeoModel;
-import mod.azure.azurelib.cache.object.GeoBone;
-import mod.azure.azurelib.constant.DataTickets;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.model.data.EntityModelData;
-import mod.azure.azurelib.renderer.GeoEntityRenderer;
-import net.arna.jcraft.client.JClientConfig;
-import net.arna.jcraft.client.model.entity.stand.StandEntityModel;
-import net.arna.jcraft.client.util.JClientUtils;
+import lombok.NonNull;
+import mod.azure.azurelib.render.AzRendererPipelineContext;
+import mod.azure.azurelib.render.entity.AzEntityRendererConfig;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.api.stand.StandType;
+import net.arna.jcraft.client.JClientConfig;
+import net.arna.jcraft.client.renderer.entity.AbstractEntityRenderer;
+import net.arna.jcraft.client.renderer.entity.StandEntityModelRenderer;
+import net.arna.jcraft.client.util.JClientUtils;
+import net.arna.jcraft.common.entity.stand.SilverChariotEntity;
+import net.arna.jcraft.common.entity.stand.TheFoolEntity;
 import net.arna.jcraft.common.util.JUtils;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Pose;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.LightLayer;
-import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 /**
- * The {@link GeoEntityRenderer} for stands of any {@link net.arna.jcraft.api.stand.StandType StandType}.
+ * The {@link AbstractEntityRenderer} for stands of any {@link StandType StandType}.
  * @param <T> the entity to render
- * @see StandEntityModel
  */
-public class StandEntityRenderer<T extends StandEntity<?, ?>> extends GeoEntityRenderer<T> {
+@Environment(EnvType.CLIENT)
+public class StandEntityRenderer<T extends StandEntity<?, ?>> extends AbstractEntityRenderer<T> {
 
-    protected ItemStack mainHandItem, offHandItem;
+    protected static final String TEXTURE_STR_TEMPLATE = "textures/entity/stands/%s/%s.png";
+    protected static final ResourceLocation SAND_TEXTURE = JCraft.id("textures/entity/stands/the_fool/sand.png");
+    protected static final ResourceLocation ARMORLESS_TEXTURE = JCraft.id("textures/entity/stands/silver_chariot/no_armor.png");
+    protected static final ResourceLocation[] POSSESSED_TEXTURES = new ResourceLocation[] {
+            JCraft.id("textures/entity/stands/silver_chariot/possessed0.png"),
+            JCraft.id("textures/entity/stands/silver_chariot/possessed1.png"),
+            JCraft.id("textures/entity/stands/silver_chariot/possessed2.png"),
+            JCraft.id("textures/entity/stands/silver_chariot/possessed3.png")
+    };
 
-    protected static final String LEFT_HAND = "bipedHandLeft";
-    protected static final String RIGHT_HAND = "bipedHandRight";
+    protected static final Map<TypeSkin, ResourceLocation> TEXTURE_MAP = new HashMap<>();
 
-    //private final StandEntityModel<T> standEntityModel;
-    protected StandEntityRenderer(final EntityRendererProvider.Context renderManager, final StandEntityModel<T> modelProvider) {
-        super(renderManager, modelProvider);
+    protected static <T extends StandEntity<?, ?>> StandEntityRenderer<T> of(
+            final @NonNull AzEntityRendererConfig<T> config, final @NonNull EntityRendererProvider.Context context,
+            final @NonNull ResourceLocation model, final @NonNull ResourceLocation texture) {
+        return new StandEntityRenderer<>(config, context, model, texture);
+    }
+    private StandEntityRenderer(final @NonNull AzEntityRendererConfig<T> config, final @NonNull EntityRendererProvider.Context context,
+                                final @NonNull ResourceLocation model, final @NonNull ResourceLocation texture) {
+        super(config, context, model, texture);
     }
 
-    @Override
-    public ResourceLocation getTextureLocation(T animatable) {
-        return getGeoModel().getTextureResource(animatable);
+    protected StandEntityRenderer(final @NonNull EntityRendererProvider.Context context, final @NonNull Function<AzEntityRendererConfig.Builder<T>, AzEntityRendererConfig.Builder<T>> additionalConfigs,
+                                  final @NonNull Function<T, ResourceLocation> model, final @NonNull Function<T, ResourceLocation> texture,
+                                  final @NonNull StandType type, final boolean flipBody, final boolean flipHead, final float torsoPitchOffset, final float headPitchOffset, final float velInfluence) {
+        super(additionalConfigs.apply(
+                AzEntityRendererConfig.builder(model, texture)
+                        .setAnimatorProvider(() -> new StandAnimator<>(type.getId().getPath(), flipBody, flipHead, torsoPitchOffset, headPitchOffset, velInfluence))
+                        .setModelRenderer(StandEntityModelRenderer::new)
+                        .setRenderType(renderType())
+                        .setPrerenderEntry(preRenderEntry())
+                        // .setRenderEntry(renderEntry())
+        ).build(), context, type.getId().getPath());
     }
 
-    public static boolean standIsFirstPersonViewers(final StandEntity<?, ?> stand)
-    {
+    protected StandEntityRenderer(final @NonNull EntityRendererProvider.Context context, final @NonNull Function<AzEntityRendererConfig.Builder<T>, AzEntityRendererConfig.Builder<T>> additionalConfigs, final @NonNull StandType type, final boolean flipBody, final boolean flipHead, final float torsoPitchOffset, final float headPitchOffset, final float velInfluence) {
+        this(context, additionalConfigs,
+                entity -> type.getId().withPath(MODEL_STR_TEMPLATE.formatted(type.getId().getPath())),
+                entity -> getTextureLocation(type),
+                type, flipBody, flipHead, torsoPitchOffset, headPitchOffset, velInfluence);
+    }
+
+    protected StandEntityRenderer(final @NonNull EntityRendererProvider.Context context, final @NonNull Function<AzEntityRendererConfig.Builder<T>, AzEntityRendererConfig.Builder<T>> additionalConfigs, final @NonNull StandType type, final float torsoPitchOffset, final float headPitchOffset, final float velInfluence) {
+        this(context, additionalConfigs, type, false, false, torsoPitchOffset, headPitchOffset, velInfluence);
+    }
+
+    public StandEntityRenderer(final @NonNull EntityRendererProvider.Context context, final @NonNull Function<AzEntityRendererConfig.Builder<T>, AzEntityRendererConfig.Builder<T>> additionalConfigs, final @NonNull StandType type, final float torsoPitchOffset, final float headPitchOffset) {
+        this(context, additionalConfigs, type, false, false, torsoPitchOffset, headPitchOffset, 90f);
+    }
+
+    public StandEntityRenderer(final @NonNull EntityRendererProvider.Context context, final @NonNull StandType type, final float torsoPitchOffset, final float headPitchOffset, final float velInfluence) {
+        this(context, UnaryOperator.identity(), type, false, false, torsoPitchOffset, headPitchOffset, velInfluence);
+    }
+
+    public StandEntityRenderer(final @NonNull EntityRendererProvider.Context context, final @NonNull StandType type, final float torsoPitchOffset, final float headPitchOffset) {
+        this(context, UnaryOperator.identity(), type, false, false, torsoPitchOffset, headPitchOffset, 90f);
+    }
+
+    public StandEntityRenderer(final @NonNull EntityRendererProvider.Context context, final @NonNull StandType type) {
+        this(context, UnaryOperator.identity(), type, 0f, 0f);
+    }
+
+    protected static @NonNull <T extends StandEntity<?,?>> Function<T, RenderType> renderType() {
+        return stand -> StandEntityRenderer.renderTypeOf(stand, getTextureLocation(stand));
+    }
+
+    protected static @NonNull <T extends StandEntity<?,?>> Function<T, RenderType> renderType(final @NonNull Function<ResourceLocation, RenderType> renderTypeSelector) {
+        return stand -> renderTypeSelector.apply(getTextureLocation(stand));
+    }
+
+    public record TypeSkin(StandType type, Integer skin) {
+        // intentionally left empty
+    }
+
+    protected static ResourceLocation typeSkinToTexture(final @NonNull TypeSkin ts) {
+        return ts.type().getId().withPath(TEXTURE_STR_TEMPLATE.formatted(ts.type().getId().getPath(), ts.skin() == 0 ? "default" : "skin" + ts.skin()));
+    }
+    
+    protected static @NonNull ResourceLocation getTextureLocation(final @NonNull StandEntity<?,?> stand) {
+        final int skin = stand.getSkin();
+        final StandType type = stand.getStandType();
+
+        if (stand instanceof TheFoolEntity fool && fool.isSand()) {
+            return SAND_TEXTURE;
+        } else if (stand instanceof SilverChariotEntity chariot) {
+            final SilverChariotEntity.Mode mode = chariot.getMode();
+
+            if (mode == SilverChariotEntity.Mode.ARMORLESS) {
+                return ARMORLESS_TEXTURE;
+            } else if (mode == SilverChariotEntity.Mode.POSSESSED) {
+                return POSSESSED_TEXTURES[chariot.getSkin()];
+            }
+        }
+
+        return TEXTURE_MAP.computeIfAbsent(new TypeSkin(type, skin), StandEntityRenderer::typeSkinToTexture);
+    }
+
+    protected static @NonNull ResourceLocation getTextureLocation(final @NonNull StandType type) {
+        return TEXTURE_MAP.computeIfAbsent(new TypeSkin(type, 0), StandEntityRenderer::typeSkinToTexture);
+    }
+
+    protected static @NonNull <T extends StandEntity<?,?>> Function<AzRendererPipelineContext<UUID, T>, AzRendererPipelineContext<UUID, T>> preRenderEntry() {
+        return pc -> {
+            final var animatable = pc.animatable();
+            final var partialTick = pc.partialTick();
+
+            if (animatable.tickCount == 0) {
+                pc.setAlpha(0.2f * partialTick);
+                pc.poseStack().scale(partialTick, 1, partialTick);
+                return pc;
+            } else if (animatable.tickCount == 1) {
+                if (animatable.getMoveStun() <= 0 && animatable.isPlaySummonAnim()) {
+                    animatable.playSummonAnimation();
+                } else {
+                    // TODO: fix this hack. animations cant be played for entities that just spawned.
+                    // this is also probably what stops the summon from working as intended.
+                    animatable.playStateAnimation();
+                }
+            } else if (animatable.tickCount > animatable.getStandData().getSummonData().getAnimDuration()) { // average summon anim duration
+                if (animatable.isIdle()) {
+                    animatable.playStateAnimation();
+                }
+            }
+
+            float a = getAlpha(animatable, partialTick);
+            a *= pc.alpha();
+
+            if (a > 0.01f) {
+                pc.setAlpha(a);
+            }
+
+            return pc;
+        };
+    }
+
+    /*
+    private static @NonNull <T extends StandEntity<?,?>> Function<AzRendererPipelineContext<UUID, T>, AzRendererPipelineContext<UUID, T>> renderEntry() {
+        return pc -> {
+            final var animatable = pc.animatable();
+
+            if (animatable.isPlaySummonAnim() && animatable.getMoveStun() <= 0) {
+                StandEntity.SUMMON_ANIMATION.sendForEntity(animatable);
+            }
+
+            return pc;
+        };
+    }
+     */
+
+    public static boolean standIsFirstPersonViewers(final StandEntity<?, ?> stand) {
         final Minecraft mcClient = Minecraft.getInstance();
         return mcClient.options.getCameraType().isFirstPerson() && mcClient.player != null && JUtils.getStand(mcClient.player) == stand;
     }
 
     /*
     Cutout - no alpha
-    CutoutNoCull - identical (copium)
+    CutoutNoCull - identical (hopium)
     Alpha - no lighting
     Translucent - with alpha, nothing renders through
     Decal - invisible
@@ -70,164 +201,6 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends GeoEntityR
      */
     public static RenderType renderTypeOf(final StandEntity<?, ?> stand, final ResourceLocation textureLocation) {
         return standIsFirstPersonViewers(stand) ? RenderType.entityNoOutline(textureLocation) : RenderType.entityTranslucent(textureLocation);
-    }
-
-    @Override
-    public RenderType getRenderType(final T animatable, final ResourceLocation texture, final @Nullable MultiBufferSource bufferSource, final float partialTick) {
-        return renderTypeOf(animatable, texture);
-    }
-
-    // Adds the ability to change render alpha
-    @Override
-    public void preRender(final PoseStack poseStack, final T stand, final BakedGeoModel model, final MultiBufferSource bufferSource, final VertexConsumer buffer,
-                          final boolean isReRender, final float partialTick, final int packedLight, final int packedOverlay, final float red, final float green, final float blue, final float alpha) {
-
-        float a = getAlpha(stand, partialTick);
-        a *= alpha;
-        if (a <= 0.01f) {
-            return;
-        }
-
-        super.preRender(poseStack, stand, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, getRed(stand, red, a), getGreen(stand, green, a), getBlue(stand, blue, a), alpha);
-    }
-
-    // Better than a mixin, makes stands look towards the users HEAD rotation as opposed to body
-    @Override
-    public void actuallyRender(final PoseStack poseStack, final T animatable, final BakedGeoModel model, RenderType renderType, final MultiBufferSource bufferSource,
-                               VertexConsumer buffer, final boolean isReRender, final float partialTick, final int packedLight, final int packedOverlay, final float red, final float green, final float blue, final float alpha) {
-        if (animatable == null) return;
-        poseStack.pushPose();
-
-        final boolean shouldSit = animatable.isPassenger() && (animatable.getVehicle() != null);
-        float lerpBodyRot = Mth.rotLerp(partialTick, animatable.yBodyRotO, animatable.yBodyRot);
-        float lerpHeadRot = Mth.rotLerp(partialTick, animatable.yHeadRotO, animatable.yHeadRot);
-        float netHeadYaw = lerpHeadRot - lerpBodyRot;
-
-        if (shouldSit && !animatable.isFree() && animatable.getVehicle() instanceof LivingEntity livingentity) {
-            lerpBodyRot = Mth.rotLerp(partialTick, livingentity.yHeadRotO, livingentity.yHeadRot);
-            netHeadYaw = lerpHeadRot - lerpBodyRot;
-            float clampedHeadYaw = Mth.clamp(Mth.wrapDegrees(netHeadYaw), -85, 85);
-            lerpBodyRot = lerpHeadRot - clampedHeadYaw;
-
-            if (clampedHeadYaw * clampedHeadYaw > 2500f)
-                lerpBodyRot += clampedHeadYaw * 0.2f;
-
-            netHeadYaw = lerpHeadRot - lerpBodyRot;
-        }
-
-        if (animatable.getPose() == Pose.SLEEPING) {
-            Direction bedDirection = animatable.getBedOrientation();
-
-            if (bedDirection != null) {
-                float eyePosOffset = animatable.getEyeHeight(Pose.STANDING) - 0.1F;
-
-                poseStack.translate(-bedDirection.getStepX() * eyePosOffset, 0, -bedDirection.getStepZ() * eyePosOffset);
-            }
-        }
-
-        final float ageInTicks = animatable.tickCount + partialTick;
-        float limbSwingAmount = 0;
-        float limbSwing = 0;
-
-        applyRotations(animatable, poseStack, ageInTicks, lerpBodyRot, partialTick);
-
-        if (!shouldSit && animatable.isAlive()) {
-            limbSwingAmount = animatable.walkAnimation.speed(partialTick); // FIRST NOTABLE DIFF FROM super.actuallyRender();
-            limbSwing = animatable.walkAnimation.position(partialTick);
-
-            if (animatable.isBaby())
-                limbSwing *= 3f;
-
-            if (limbSwingAmount > 1f)
-                limbSwingAmount = 1f;
-        }
-
-        if (!isReRender) {
-            final float headPitch = Mth.lerp(partialTick, animatable.xRotO, animatable.getXRot());
-            final float motionThreshold = getMotionAnimThreshold(animatable);
-            final Vec3 velocity = animatable.getDeltaMovement();
-            final float avgVelocity = (float)(Math.abs(velocity.x) + Math.abs(velocity.z) / 2f);
-            final AnimationState<T> animationState = new AnimationState<>(animatable, limbSwing, limbSwingAmount,
-                    partialTick, avgVelocity >= motionThreshold && limbSwingAmount != 0);
-            final long instanceId = getInstanceId(animatable);
-
-            animationState.setData(DataTickets.TICK, animatable.getTick(animatable));
-            animationState.setData(DataTickets.ENTITY, animatable);
-            EntityModelData data = new EntityModelData(shouldSit, animatable.isBaby(), -netHeadYaw, -headPitch);
-            animationState.setData(DataTickets.ENTITY_MODEL_DATA, data);
-            this.model.addAdditionalStateData(animatable, instanceId, animationState::setData);
-            this.model.handleAnimations(animatable, instanceId, animationState);
-        }
-
-        poseStack.translate(0, 0.01f, 0);
-
-        this.modelRenderTranslations = new Matrix4f(poseStack.last().pose());
-
-        if (animatable.isInvisibleTo(Minecraft.getInstance().player)) {
-            if (Minecraft.getInstance().shouldEntityAppearGlowing(animatable)) {
-                buffer = bufferSource.getBuffer(renderType = RenderType.outline(getTextureLocation(animatable)));
-            }
-            else {
-                renderType = null;
-            }
-        }
-
-        if (renderType != null) {
-            updateAnimatedTextureFrame(animatable);
-
-            // Color renderColor = getRenderColor(animatable, partialTick, packedLight);
-
-            for (GeoBone group : model.topLevelBones()) {
-                renderRecursively(poseStack, animatable, group, renderType, bufferSource, buffer, isReRender, partialTick, packedLight,
-                        packedOverlay,
-                        red,
-                        green,
-                        blue,
-                        alpha
-                );
-            }
-        }
-
-        poseStack.popPose();
-
-        // Clear rotation modifications - SUPER hacky, please find a better way :)
-        // better way found - just zero out all the anims at the start (THANKS GECKO!(irony))
-        /*
-        AnimationProcessor<?> animationProcessor = this.standEntityModel.getAnimationProcessor();
-        CoreGeoBone torso = animationProcessor.getBone("torso");
-        if (torso != null) torso.setRotX(standEntityModel.prevTorsoPitch);
-        CoreGeoBone head = animationProcessor.getBone("head");
-        if (head != null) head.setRotX(standEntityModel.prevHeadPitch);
-        CoreGeoBone base = animationProcessor.getBone("base");
-        if (base != null) base.setRotX(standEntityModel.prevBasePitch);
-         */
-    }
-
-    @Override
-    protected int getBlockLightLevel(final T stand, final BlockPos pos) {
-        if (!stand.hasUser()) {
-            return super.getBlockLightLevel(stand, pos);
-        }
-
-        if (stand.isOnFire() || stand.getUserOrThrow().isOnFire()) {
-            return 15;
-        }
-        return stand.level().getBrightness(LightLayer.BLOCK, stand.getUserOrThrow().blockPosition());
-    }
-
-    @Override
-    protected int getSkyLightLevel(final T stand, final BlockPos pos) {
-        return stand.hasUser() ? stand.level().getBrightness(LightLayer.SKY, stand.getUserOrThrow().blockPosition()) :
-                super.getSkyLightLevel(stand, pos);
-    }
-
-    @Override
-    public boolean firePreRenderEvent(final PoseStack poseStack, final BakedGeoModel model, final MultiBufferSource bufferSource, final float partialTick, final int packedLight) {
-        if (!JClientUtils.shouldRenderStands()) {
-            return false;
-        }
-
-        return super.firePreRenderEvent(poseStack, model, bufferSource, partialTick, packedLight);
     }
 
     public static boolean shouldApplyAlpha(final StandEntity<?, ?> stand) {
@@ -271,5 +244,32 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends GeoEntityR
 
     protected float getBlue(final T stand, final float blue, final float alpha) {
         return blue;
+    }
+
+    public static class StandAnimator<T extends StandEntity<?,?>> extends EntityAnimator<T> {
+
+        protected boolean flipBody;
+        protected boolean flipHead;
+        protected float torsoPitchOffset;
+        protected float headPitchOffset;
+        protected float velInfluence;
+
+        public StandAnimator(final @NonNull ResourceLocation animation, final boolean flipBody, final boolean flipHead, final float torsoPitchOffset, final float headPitchOffset, final float velInfluence) {
+            super(animation);
+            this.flipBody = flipBody;
+            this.flipHead = flipHead;
+            this.torsoPitchOffset = torsoPitchOffset;
+            this.headPitchOffset = headPitchOffset;
+            this.velInfluence = velInfluence;
+        }
+
+        public StandAnimator(final @NonNull String id, final boolean flipBody, final boolean flipHead, final float torsoPitchOffset, final float headPitchOffset, final float velInfluence) {
+            this(JCraft.id(ANIMATION_STR_TEMPLATE.formatted(id)), flipBody, flipHead, torsoPitchOffset, headPitchOffset, velInfluence);
+        }
+
+        @Override
+        public void setCustomAnimations(final @NonNull T animatable, final float partialTicks) {
+            JClientUtils.animateGenericHumanoid(context(), animatable, flipBody, flipHead, torsoPitchOffset, headPitchOffset, velInfluence);
+        }
     }
 }

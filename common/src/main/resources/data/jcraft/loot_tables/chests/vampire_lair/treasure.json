@@ -83,11 +83,6 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:air",
-          "weight": 3
-        },
-        {
-          "type": "minecraft:item",
           "name": "jcraft:stone_mask",
           "weight": 1
         }

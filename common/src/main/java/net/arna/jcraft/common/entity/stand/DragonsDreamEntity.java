@@ -1,7 +1,6 @@
 package net.arna.jcraft.common.entity.stand;
 
 import lombok.NonNull;
-import mod.azure.azurelib.core.animation.AnimationState;
 import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
@@ -12,13 +11,10 @@ import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * The {@link StandEntity} for <a href="https://jojowiki.com/Dragon%27s_Dream">Dragon's Dream</a>.
  * @see JStandTypeRegistry#DRAGONS_DREAM
- * @see net.arna.jcraft.client.model.entity.stand.DragonsDreamModel DragonsDreamModel
- * @see net.arna.jcraft.client.renderer.entity.stands.DragonsDreamRenderer DragonsDreamRenderer
  */
 public class DragonsDreamEntity extends StandEntity<DragonsDreamEntity, DragonsDreamEntity.State> {
     public static final MoveSet<DragonsDreamEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.DRAGONS_DREAM,
@@ -39,7 +35,7 @@ public class DragonsDreamEntity extends StandEntity<DragonsDreamEntity, DragonsD
         BLOCK;
 
         @Override
-        public void playAnimation(DragonsDreamEntity attacker, AnimationState<DragonsDreamEntity> state) {
+        public void playAnimation(DragonsDreamEntity attacker) {
             // TODO Arna
         }
     }
@@ -52,11 +48,6 @@ public class DragonsDreamEntity extends StandEntity<DragonsDreamEntity, DragonsD
     @Override
     protected State[] getStateValues() {
         return State.values();
-    }
-
-    @Override
-    protected @Nullable String getSummonAnimation() {
-        return "animation.dragons_dream.summon";
     }
 
     @Override

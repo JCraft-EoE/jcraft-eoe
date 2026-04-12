@@ -1,24 +1,34 @@
 package net.arna.jcraft.datagen.providers.data;
 
 import dev.architectury.registry.registries.RegistrySupplier;
+import lombok.NonNull;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.api.registry.JSpecTypeRegistry;
+import net.arna.jcraft.api.registry.*;
 import net.arna.jcraft.api.spec.SpecType;
 import net.arna.jcraft.api.stand.StandType;
+import net.arna.jcraft.common.advancements.Hamon1Trigger;
+import net.arna.jcraft.common.advancements.Hamon2Trigger;
+import net.arna.jcraft.common.advancements.Hamon3Trigger;
+import net.arna.jcraft.common.advancements.Hamon4Trigger;
+import net.arna.jcraft.common.advancements.Hamon5Trigger;
+import net.arna.jcraft.common.advancements.Hamon6Trigger;
 import net.arna.jcraft.common.advancements.ObtainedSpecTrigger;
 import net.arna.jcraft.common.advancements.ObtainedStandTrigger;
-import net.arna.jcraft.api.registry.JBlockRegistry;
-import net.arna.jcraft.api.registry.JItemRegistry;
-import net.arna.jcraft.api.registry.JStandTypeRegistry;
-import net.arna.jcraft.api.registry.JTagRegistry;
+import net.arna.jcraft.common.item.CosplayItem;
+import net.arna.jcraft.common.item.SpecDiscItem;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricAdvancementProvider;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.FrameType;
+import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.advancements.critereon.KilledTrigger;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ArmorMaterials;
+import net.minecraft.world.item.Item;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -100,7 +110,9 @@ public class JAdvancementProvider extends FabricAdvancementProvider {
                 JStandTypeRegistry.SHADOW_THE_WORLD,
                 JStandTypeRegistry.METALLICA,
                 JStandTypeRegistry.THE_HAND,
-                JStandTypeRegistry.MANDOM
+                JStandTypeRegistry.MANDOM,
+                JStandTypeRegistry.AEROSMITH
+                //, JStandTypeRegistry.CRAZY_DIAMOND
         );
         final Advancement.Builder obtainAllStandsBuilder = Advancement.Builder.advancement()
                 .display(JItemRegistry.STAND_DISC.get(),
@@ -202,22 +214,18 @@ public class JAdvancementProvider extends FabricAdvancementProvider {
                 .build(JCraft.id("obtain_coffin"));
         consumer.accept(obtainCoffin);
         // obtain sun protections
-        final Advancement obtainSunProtection = Advancement.Builder.advancement()
-                .display(JItemRegistry.KARS_HEADWRAP.get(),
-                        Component.translatable("advancements.jcraft.obtain_sun_protection.title"),
-                        Component.translatable("advancements.jcraft.obtain_sun_protection.description"),
-                        null,
-                        FrameType.GOAL,
-                        true,
-                        false,
-                        false)
-                .parent(findStoneMask)
-                .addCriterion("has_kars_headwrap", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.KARS_HEADWRAP.get()))
-                .addCriterion("has_red_hat", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.RED_HAT.get()))
-                .addCriterion("has_puccis_hat", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.PUCCIS_HAT.get()))
-                .addCriterion("has_risotto_cap", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.RISOTTO_CAP.get()))
-                .addCriterion("has_diego_cap", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.DIEGO_HAT.get()))
-                .build(JCraft.id("obtain_sun_protection"));
+        final Advancement obtainSunProtection = generateCosplayAdvancement(
+                "sun_protection",
+                JItemRegistry.KARS_HEADWRAP.get(ArmorMaterials.IRON).get(),
+                FrameType.GOAL,
+                findStoneMask,
+                JItemRegistry.KARS_HEADWRAP,
+                JItemRegistry.RED_HAT,
+                JItemRegistry.PUCCIS_HAT,
+                JItemRegistry.RISOTTO_CAP,
+                JItemRegistry.DIEGO_HAT,
+                JItemRegistry.COWBOY_HAT,
+                JItemRegistry.MOUNTAIN_TIM_HAT);
         consumer.accept(obtainSunProtection);
         // obtain blood bottle
         final Advancement obtainBloodBottle = Advancement.Builder.advancement()
@@ -237,7 +245,8 @@ public class JAdvancementProvider extends FabricAdvancementProvider {
         final var obtainableSpecs = List.of(
                 JSpecTypeRegistry.ANUBIS,
                 JSpecTypeRegistry.BRAWLER,
-                JSpecTypeRegistry.VAMPIRE
+                JSpecTypeRegistry.VAMPIRE,
+                JSpecTypeRegistry.HAMON
         );
         final Advancement.Builder obtainAllSpecsBuilder = Advancement.Builder.advancement()
                 .display(JItemRegistry.SPEC_DISC.get(),
@@ -256,7 +265,7 @@ public class JAdvancementProvider extends FabricAdvancementProvider {
         consumer.accept(obtainAllSpecsBuilder.build(JCraft.id("obtain_all_specs")));
         // obtain any cosplay
         final Advancement obtainCosplay = Advancement.Builder.advancement()
-                .display(JItemRegistry.DIO_CAPE.get(),
+                .display(JItemRegistry.DIO_CAPE.get(ArmorMaterials.NETHERITE).get(),
                         Component.translatable("advancements.jcraft.obtain_cosplay.title"),
                         Component.translatable("advancements.jcraft.obtain_cosplay.description"),
                         null,
@@ -269,343 +278,290 @@ public class JAdvancementProvider extends FabricAdvancementProvider {
                 .build(JCraft.id("obtain_cosplay"));
         consumer.accept(obtainCosplay);
         // obtain Dio P1 outfit
-        final Advancement obtainDioP1Outfit = Advancement.Builder.advancement()
-                .display(JItemRegistry.DIO_P1_WIG.get(),
-                        Component.translatable("advancements.jcraft.obtain_dio_p1_outfit.title"),
-                        Component.translatable("advancements.jcraft.obtain_dio_p1_outfit.description"),
-                        null,
-                        FrameType.CHALLENGE,
-                        true,
-                        true,
-                        false)
-                .parent(obtainCosplay)
-                .addCriterion("has_dio_p1_wig", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.DIO_P1_WIG.get()))
-                .addCriterion("has_dio_p1_jacket", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.DIO_P1_JACKET.get()))
-                .addCriterion("has_dio_p1_pants", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.DIO_P1_PANTS.get()))
-                .addCriterion("has_dio_p1_boots", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.DIO_P1_BOOTS.get()))
-                .rewards(AdvancementRewards.Builder.experience(200))
-                .build(JCraft.id("obtain_dio_p1_outfit"));
+        final Advancement obtainDioP1Outfit = generateCosplayAdvancement(
+                "dio_p1_outfit",
+                JItemRegistry.DIO_P1_WIG.get(ArmorMaterials.NETHERITE).get(),
+                FrameType.CHALLENGE,
+                obtainCosplay,
+                JItemRegistry.DIO_P1_WIG,
+                JItemRegistry.DIO_P1_JACKET,
+                JItemRegistry.DIO_P1_PANTS,
+                JItemRegistry.DIO_P1_BOOTS
+        );
         consumer.accept(obtainDioP1Outfit);
         // obtain Jotaro P3 outfit
-        final Advancement obtainJotaroOutfit = Advancement.Builder.advancement()
-                .display(JItemRegistry.JOTARO_CAP.get(),
-                        Component.translatable("advancements.jcraft.obtain_jotaro_outfit.title"),
-                        Component.translatable("advancements.jcraft.obtain_jotaro_outfit.description"),
-                        null,
-                        FrameType.CHALLENGE,
-                        true,
-                        true,
-                        false)
-                .parent(obtainCosplay)
-                .addCriterion("has_jotaro_cap", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.JOTARO_CAP.get()))
-                .addCriterion("has_jotaro_jacket", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.JOTARO_JACKET.get()))
-                .addCriterion("has_jotaro_pants", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.JOTARO_PANTS.get()))
-                .addCriterion("has_jotaro_boots", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.JOTARO_BOOTS.get()))
-                .rewards(AdvancementRewards.Builder.experience(200))
-                .build(JCraft.id("obtain_jotaro_outfit"));
+        final Advancement obtainJotaroOutfit = generateCosplayAdvancement(
+                "jotaro_outfit",
+                JItemRegistry.JOTARO_CAP.get(ArmorMaterials.NETHERITE).get(),
+                FrameType.CHALLENGE,
+                obtainCosplay,
+                JItemRegistry.JOTARO_CAP,
+                JItemRegistry.JOTARO_JACKET,
+                JItemRegistry.JOTARO_PANTS,
+                JItemRegistry.JOTARO_BOOTS
+        );
         consumer.accept(obtainJotaroOutfit);
         // obtain Jotaro P4 outfit
-        final Advancement obtainJotaroP4Outfit = Advancement.Builder.advancement()
-                .display(JItemRegistry.JOTARO_P4_CAP.get(),
-                        Component.translatable("advancements.jcraft.obtain_jotaro_p4_outfit.title"),
-                        Component.translatable("advancements.jcraft.obtain_jotaro_p4_outfit.description"),
-                        null,
-                        FrameType.CHALLENGE,
-                        true,
-                        true,
-                        false)
-                .parent(obtainJotaroOutfit)
-                .addCriterion("has_jotaro_p4_cap", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.JOTARO_P4_CAP.get()))
-                .addCriterion("has_jotaro_p4_jacket", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.JOTARO_P4_JACKET.get()))
-                .addCriterion("has_jotaro_p4_pants", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.JOTARO_P4_PANTS.get()))
-                .addCriterion("has_jotaro_p4_boots", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.JOTARO_P4_BOOTS.get()))
-                .rewards(AdvancementRewards.Builder.experience(200))
-                .build(JCraft.id("obtain_jotaro_p4_outfit"));
+        final Advancement obtainJotaroP4Outfit = generateCosplayAdvancement(
+                "jotaro_p4_outfit",
+                JItemRegistry.JOTARO_P4_CAP.get(ArmorMaterials.NETHERITE).get(),
+                FrameType.CHALLENGE,
+                obtainJotaroOutfit,
+                JItemRegistry.JOTARO_P4_CAP,
+                JItemRegistry.JOTARO_P4_JACKET,
+                JItemRegistry.JOTARO_P4_PANTS,
+                JItemRegistry.JOTARO_P4_BOOTS
+        );
         consumer.accept(obtainJotaroP4Outfit);
+        // obtain Jotaro P6 outfit
+        final Advancement obtainJotaroP6Outfit = generateCosplayAdvancement(
+                "jotaro_p6_outfit",
+                JItemRegistry.JOTARO_P6_CAP.get(ArmorMaterials.NETHERITE).get(),
+                FrameType.CHALLENGE,
+                obtainJotaroP4Outfit,
+                JItemRegistry.JOTARO_P6_CAP,
+                JItemRegistry.JOTARO_P6_JACKET,
+                JItemRegistry.JOTARO_P6_PANTS,
+                JItemRegistry.JOTARO_P6_BOOTS
+        );
+        consumer.accept(obtainJotaroP6Outfit);
         // obtain Kakyoin outfit
-        final Advancement obtainKakyoinOutfit = Advancement.Builder.advancement()
-                .display(JItemRegistry.KAKYOIN_WIG.get(),
-                        Component.translatable("advancements.jcraft.obtain_kakyoin_outfit.title"),
-                        Component.translatable("advancements.jcraft.obtain_kakyoin_outfit.description"),
-                        null,
-                        FrameType.CHALLENGE,
-                        true,
-                        true,
-                        false)
-                .parent(obtainCosplay)
-                .addCriterion("has_kakyoin_wig", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.KAKYOIN_WIG.get()))
-                .addCriterion("has_kakyoin_coat", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.KAKYOIN_COAT.get()))
-                .addCriterion("has_kakyoin_pants", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.KAKYOIN_PANTS.get()))
-                .addCriterion("has_kakyoin_boots", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.KAKYOIN_BOOTS.get()))
-                .rewards(AdvancementRewards.Builder.experience(200))
-                .build(JCraft.id("obtain_kakyoin_outfit"));
+        final Advancement obtainKakyoinOutfit = generateCosplayAdvancement(
+                "kakyoin_outfit",
+                JItemRegistry.KAKYOIN_WIG.get(ArmorMaterials.NETHERITE).get(),
+                FrameType.CHALLENGE,
+                obtainCosplay,
+                JItemRegistry.KAKYOIN_WIG,
+                JItemRegistry.KAKYOIN_COAT,
+                JItemRegistry.KAKYOIN_PANTS,
+                JItemRegistry.KAKYOIN_BOOTS
+        );
         consumer.accept(obtainKakyoinOutfit);
+        // obtain Polnareff outfit
+        final Advancement obtainPolnareffOutfit = generateCosplayAdvancement(
+                "polnareff_outfit",
+                JItemRegistry.POLNAREFF_WIG.get(ArmorMaterials.NETHERITE).get(),
+                FrameType.CHALLENGE,
+                obtainCosplay,
+                JItemRegistry.POLNAREFF_WIG,
+                JItemRegistry.POLNAREFF_SHIRT,
+                JItemRegistry.POLNAREFF_PANTS,
+                JItemRegistry.POLNAREFF_BOOTS
+        );
+        consumer.accept(obtainPolnareffOutfit);
         // obtain Kira outfit
-        final Advancement obtainKiraOutfit = Advancement.Builder.advancement()
-                .display(JItemRegistry.KIRA_WIG.get(),
-                        Component.translatable("advancements.jcraft.obtain_kira_outfit.title"),
-                        Component.translatable("advancements.jcraft.obtain_kira_outfit.description"),
-                        null,
-                        FrameType.CHALLENGE,
-                        true,
-                        true,
-                        false)
-                .parent(obtainCosplay)
-                .addCriterion("has_kira_wig", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.KIRA_WIG.get()))
-                .addCriterion("has_kira_jacket", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.KIRA_JACKET.get()))
-                .addCriterion("has_kira_pants", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.KIRA_PANTS.get()))
-                .addCriterion("has_kira_boots", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.KIRA_BOOTS.get()))
-                .rewards(AdvancementRewards.Builder.experience(200))
-                .build(JCraft.id("obtain_kira_outfit"));
+        final Advancement obtainKiraOutfit = generateCosplayAdvancement(
+                "kira_outfit",
+                JItemRegistry.KIRA_WIG.get(ArmorMaterials.NETHERITE).get(),
+                FrameType.CHALLENGE,
+                obtainCosplay,
+                JItemRegistry.KIRA_WIG,
+                JItemRegistry.KIRA_JACKET,
+                JItemRegistry.KIRA_PANTS,
+                JItemRegistry.KIRA_BOOTS
+        );
         consumer.accept(obtainKiraOutfit);
         // obtain Kosaku outfit
-        final Advancement obtainKosakuOutfit = Advancement.Builder.advancement()
-                .display(JItemRegistry.KOSAKU_WIG.get(),
-                        Component.translatable("advancements.jcraft.obtain_kosaku_outfit.title"),
-                        Component.translatable("advancements.jcraft.obtain_kosaku_outfit.description"),
-                        null,
-                        FrameType.CHALLENGE,
-                        true,
-                        true,
-                        false)
-                .parent(obtainKiraOutfit)
-                .addCriterion("has_kosaku_wig", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.KOSAKU_WIG.get()))
-                .addCriterion("has_kosaku_jacket", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.KOSAKU_JACKET.get()))
-                .addCriterion("has_kosaku_pants", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.KOSAKU_PANTS.get()))
-                .addCriterion("has_kosaku_boots", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.KOSAKU_BOOTS.get()))
-                .rewards(AdvancementRewards.Builder.experience(200))
-                .build(JCraft.id("obtain_kosaku_outfit"));
+        final Advancement obtainKosakuOutfit = generateCosplayAdvancement(
+                "kosaku_outfit",
+                JItemRegistry.KOSAKU_WIG.get(ArmorMaterials.NETHERITE).get(),
+                FrameType.CHALLENGE,
+                obtainKiraOutfit,
+                JItemRegistry.KOSAKU_WIG,
+                JItemRegistry.KOSAKU_JACKET,
+                JItemRegistry.KOSAKU_PANTS,
+                JItemRegistry.KOSAKU_BOOTS
+        );
         consumer.accept(obtainKosakuOutfit);
         // obtain Final Kira outfit
-        final Advancement obtainFinalKiraOutfit = Advancement.Builder.advancement()
-                .display(JItemRegistry.FINAL_KIRA_WIG.get(),
-                        Component.translatable("advancements.jcraft.obtain_final_kira_outfit.title"),
-                        Component.translatable("advancements.jcraft.obtain_final_kira_outfit.description"),
-                        null,
-                        FrameType.CHALLENGE,
-                        true,
-                        true,
-                        false)
-                .parent(obtainKosakuOutfit)
-                .addCriterion("has_final_kira_wig", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.FINAL_KIRA_WIG.get()))
-                .addCriterion("has_final_kira_jacket", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.FINAL_KIRA_JACKET.get()))
-                .addCriterion("has_final_kira_pants", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.FINAL_KIRA_PANTS.get()))
-                .addCriterion("has_final_kira_boots", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.FINAL_KIRA_BOOTS.get()))
-                .rewards(AdvancementRewards.Builder.experience(200))
-                .build(JCraft.id("obtain_final_kira_outfit"));
+        final Advancement obtainFinalKiraOutfit = generateCosplayAdvancement(
+                "final_kira_outfit",
+                JItemRegistry.FINAL_KIRA_WIG.get(ArmorMaterials.NETHERITE).get(),
+                FrameType.CHALLENGE,
+                obtainKiraOutfit,
+                JItemRegistry.FINAL_KIRA_WIG,
+                JItemRegistry.FINAL_KIRA_JACKET,
+                JItemRegistry.FINAL_KIRA_PANTS,
+                JItemRegistry.FINAL_KIRA_BOOTS
+        );
         consumer.accept(obtainFinalKiraOutfit);
         // obtain Giorno outfit
-        final Advancement obtainGiornoOutfit = Advancement.Builder.advancement()
-                .display(JItemRegistry.GIORNO_WIG.get(),
-                        Component.translatable("advancements.jcraft.obtain_giorno_outfit.title"),
-                        Component.translatable("advancements.jcraft.obtain_giorno_outfit.description"),
-                        null,
-                        FrameType.CHALLENGE,
-                        true,
-                        true,
-                        false)
-                .parent(obtainCosplay)
-                .addCriterion("has_giorno_wig", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.GIORNO_WIG.get()))
-                .addCriterion("has_giorno_jacket", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.GIORNO_JACKET.get()))
-                .addCriterion("has_giorno_pants", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.GIORNO_PANTS.get()))
-                .addCriterion("has_giorno_boots", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.GIORNO_BOOTS.get()))
-                .rewards(AdvancementRewards.Builder.experience(200))
-                .build(JCraft.id("obtain_giorno_outfit"));
+        final Advancement obtainGiornoOutfit = generateCosplayAdvancement(
+                "giorno_outfit",
+                JItemRegistry.GIORNO_WIG.get(ArmorMaterials.NETHERITE).get(),
+                FrameType.CHALLENGE,
+                obtainCosplay,
+                JItemRegistry.GIORNO_WIG,
+                JItemRegistry.GIORNO_JACKET,
+                JItemRegistry.GIORNO_PANTS,
+                JItemRegistry.GIORNO_BOOTS
+        );
         consumer.accept(obtainGiornoOutfit);
         // obtain Risotto outfit
-        final Advancement obtainRisottoOutfit = Advancement.Builder.advancement()
-                .display(JItemRegistry.RISOTTO_CAP.get(),
-                        Component.translatable("advancements.jcraft.obtain_risotto_outfit.title"),
-                        Component.translatable("advancements.jcraft.obtain_risotto_outfit.description"),
-                        null,
-                        FrameType.CHALLENGE,
-                        true,
-                        true,
-                        false)
-                .parent(obtainCosplay)
-                .addCriterion("has_risotto_cap", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.RISOTTO_CAP.get()))
-                .addCriterion("has_risotto_jacket", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.RISOTTO_JACKET.get()))
-                .addCriterion("has_risotto_pants", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.RISOTTO_PANTS.get()))
-                .addCriterion("has_risotto_boots", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.RISOTTO_BOOTS.get()))
-                .rewards(AdvancementRewards.Builder.experience(200))
-                .build(JCraft.id("obtain_risotto_outfit"));
+        final Advancement obtainRisottoOutfit = generateCosplayAdvancement(
+                "risotto_outfit",
+                JItemRegistry.RISOTTO_CAP.get(ArmorMaterials.IRON).get(),
+                FrameType.CHALLENGE,
+                obtainCosplay,
+                JItemRegistry.RISOTTO_CAP,
+                JItemRegistry.RISOTTO_JACKET,
+                JItemRegistry.RISOTTO_PANTS,
+                JItemRegistry.RISOTTO_BOOTS
+        );
         consumer.accept(obtainRisottoOutfit);
         // obtain Doppio outfit
-        final Advancement obtainDoppioOutfit = Advancement.Builder.advancement()
-                .display(JItemRegistry.DOPPIO_WIG.get(),
-                        Component.translatable("advancements.jcraft.obtain_doppio_outfit.title"),
-                        Component.translatable("advancements.jcraft.obtain_doppio_outfit.description"),
-                        null,
-                        FrameType.GOAL,
-                        true,
-                        false,
-                        false)
-                .parent(obtainCosplay)
-                .addCriterion("has_doppio_wig", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.DOPPIO_WIG.get()))
-                .addCriterion("has_doppio_jacket", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.DOPPIO_SHIRT.get()))
-                .build(JCraft.id("obtain_doppio_outfit"));
+        final Advancement obtainDoppioOutfit = generateCosplayAdvancement(
+                "doppio_outfit",
+                JItemRegistry.DOPPIO_WIG.get(ArmorMaterials.NETHERITE).get(),
+                FrameType.GOAL,
+                obtainCosplay,
+                JItemRegistry.DOPPIO_WIG,
+                JItemRegistry.DOPPIO_SHIRT
+        );
         consumer.accept(obtainDoppioOutfit);
         // obtain Diavolo outfit
-        final Advancement obtainDiavoloOutfit = Advancement.Builder.advancement()
-                .display(JItemRegistry.DIAVOLO_WIG.get(),
-                        Component.translatable("advancements.jcraft.obtain_diavolo_outfit.title"),
-                        Component.translatable("advancements.jcraft.obtain_diavolo_outfit.description"),
-                        null,
-                        FrameType.CHALLENGE,
-                        true,
-                        true,
-                        false)
-                .parent(obtainDoppioOutfit)
-                .addCriterion("has_diavolo_wig", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.DIAVOLO_WIG.get()))
-                .addCriterion("has_diavolo_shirt", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.DIAVOLO_SHIRT.get()))
-                .addCriterion("has_diavolo_pants", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.DIAVOLO_PANTS.get()))
-                .addCriterion("has_diavolo_boots", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.DIAVOLO_BOOTS.get()))
-                .rewards(AdvancementRewards.Builder.experience(200))
-                .build(JCraft.id("obtain_diavolo_outfit"));
+        final Advancement obtainDiavoloOutfit = generateCosplayAdvancement(
+                "diavolo_outfit",
+                JItemRegistry.DIAVOLO_WIG.get(ArmorMaterials.NETHERITE).get(),
+                FrameType.CHALLENGE,
+                obtainDoppioOutfit,
+                JItemRegistry.DIAVOLO_WIG,
+                JItemRegistry.DIAVOLO_SHIRT,
+                JItemRegistry.DIAVOLO_PANTS,
+                JItemRegistry.DIAVOLO_BOOTS
+        );
         consumer.accept(obtainDiavoloOutfit);
         // obtain Johnny outfit
-        final Advancement obtainJohnnyOutfit = Advancement.Builder.advancement()
-                .display(JItemRegistry.JOHNNY_CAP.get(),
-                        Component.translatable("advancements.jcraft.obtain_johnny_outfit.title"),
-                        Component.translatable("advancements.jcraft.obtain_johnny_outfit.description"),
-                        null,
-                        FrameType.CHALLENGE,
-                        true,
-                        true,
-                        false)
-                .parent(obtainCosplay)
-                .addCriterion("has_johnny_cap", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.JOHNNY_CAP.get()))
-                .addCriterion("has_johnny_jacket", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.JOHNNY_JACKET.get()))
-                .addCriterion("has_johnny_pants", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.JOHNNY_PANTS.get()))
-                .addCriterion("has_johnny_boots", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.JOHNNY_BOOTS.get()))
-                .rewards(AdvancementRewards.Builder.experience(200))
-                .build(JCraft.id("obtain_johnny_outfit"));
+        final Advancement obtainJohnnyOutfit = generateCosplayAdvancement(
+                "johnny_outfit",
+                JItemRegistry.JOHNNY_CAP.get(ArmorMaterials.NETHERITE).get(),
+                FrameType.CHALLENGE,
+                obtainCosplay,
+                JItemRegistry.JOHNNY_CAP,
+                JItemRegistry.JOHNNY_JACKET,
+                JItemRegistry.JOHNNY_PANTS,
+                JItemRegistry.JOHNNY_BOOTS
+        );
         consumer.accept(obtainJohnnyOutfit);
         // obtain Gyro outfit
-        final Advancement obtainGyroOutfit = Advancement.Builder.advancement()
-                .display(JItemRegistry.GYRO_HAT.get(),
-                        Component.translatable("advancements.jcraft.obtain_gyro_outfit.title"),
-                        Component.translatable("advancements.jcraft.obtain_gyro_outfit.description"),
-                        null,
-                        FrameType.CHALLENGE,
-                        true,
-                        true,
-                        false)
-                .parent(obtainCosplay)
-                .addCriterion("has_gyro_hat", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.GYRO_HAT.get()))
-                .addCriterion("has_gyro_shirt", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.GYRO_SHIRT.get()))
-                .addCriterion("has_gyro_pants", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.GYRO_PANTS.get()))
-                .addCriterion("has_gyro_boots", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.GYRO_BOOTS.get()))
-                .rewards(AdvancementRewards.Builder.experience(200))
-                .build(JCraft.id("obtain_gyro_outfit"));
+        final Advancement obtainGyroOutfit = generateCosplayAdvancement(
+                "gyro_outfit",
+                JItemRegistry.GYRO_HAT.get(ArmorMaterials.NETHERITE).get(),
+                FrameType.CHALLENGE,
+                obtainCosplay,
+                JItemRegistry.GYRO_HAT,
+                JItemRegistry.GYRO_SHIRT,
+                JItemRegistry.GYRO_PANTS,
+                JItemRegistry.GYRO_BOOTS
+        );
         consumer.accept(obtainGyroOutfit);
+        // obtain Cowboy outfit
+        final Advancement obtainCowboyOutfit = generateCosplayAdvancement(
+                "cowboy_outfit",
+                JItemRegistry.COWBOY_HAT.get(ArmorMaterials.IRON).get(),
+                FrameType.GOAL,
+                obtainCosplay,
+                JItemRegistry.COWBOY_HAT,
+                JItemRegistry.COWBOY_PONCHO,
+                JItemRegistry.COWBOY_GUNBELT_SPURS
+        );
+        consumer.accept(obtainCowboyOutfit);
         // obtain Diego outfit
-        final Advancement obtainDiegoOutfit = Advancement.Builder.advancement()
-                .display(JItemRegistry.DIEGO_HAT.get(),
-                        Component.translatable("advancements.jcraft.obtain_diego_outfit.title"),
-                        Component.translatable("advancements.jcraft.obtain_diego_outfit.description"),
-                        null,
-                        FrameType.CHALLENGE,
-                        true,
-                        true,
-                        false)
-                .parent(obtainCosplay)
-                .addCriterion("has_diego_hat", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.DIEGO_HAT.get()))
-                .addCriterion("has_diego_shirt", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.DIEGO_SHIRT.get()))
-                .addCriterion("has_diego_pants", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.DIEGO_PANTS.get()))
-                .addCriterion("has_diego_boots", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.DIEGO_BOOTS.get()))
-                .rewards(AdvancementRewards.Builder.experience(200))
-                .build(JCraft.id("obtain_diego_outfit"));
+        final Advancement obtainDiegoOutfit = generateCosplayAdvancement(
+                "diego_outfit",
+                JItemRegistry.DIEGO_HAT.get(ArmorMaterials.IRON).get(),
+                FrameType.CHALLENGE,
+                obtainCosplay,
+                JItemRegistry.DIEGO_HAT,
+                JItemRegistry.DIEGO_SHIRT,
+                JItemRegistry.DIEGO_PANTS,
+                JItemRegistry.DIEGO_BOOTS
+        );
         consumer.accept(obtainDiegoOutfit);
         // obtain Ringo outfit
-        final Advancement obtainRingoOutfit = Advancement.Builder.advancement()
-                .display(JItemRegistry.RINGO_OUTFIT.get(),
-                        Component.translatable("advancements.jcraft.obtain_ringo_outfit.title"),
-                        Component.translatable("advancements.jcraft.obtain_ringo_outfit.description"),
-                        null,
-                        FrameType.GOAL,
-                        true,
-                        false,
-                        false)
-                .parent(obtainCosplay)
-                .addCriterion("has_ringo_outfit", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.RINGO_OUTFIT.get()))
-                .addCriterion("has_ringo_boots", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.RINGO_BOOTS.get()))
-                .build(JCraft.id("obtain_ringo_outfit"));
+        final Advancement obtainRingoOutfit = generateCosplayAdvancement(
+                "ringo_outfit",
+                JItemRegistry.RINGO_OUTFIT.get(ArmorMaterials.NETHERITE).get(),
+                FrameType.GOAL,
+                obtainCosplay,
+                JItemRegistry.RINGO_OUTFIT,
+                JItemRegistry.RINGO_BOOTS
+        );
         consumer.accept(obtainRingoOutfit);
         // obtain Valentine outfit
-        final Advancement obtainValentineOutfit = Advancement.Builder.advancement()
-                .display(JItemRegistry.VALENTINE_WIG.get(),
-                        Component.translatable("advancements.jcraft.obtain_valentine_outfit.title"),
-                        Component.translatable("advancements.jcraft.obtain_valentine_outfit.description"),
-                        null,
-                        FrameType.CHALLENGE,
-                        true,
-                        true,
-                        false)
-                .parent(obtainCosplay)
-                .addCriterion("has_valentine_hat", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.VALENTINE_WIG.get()))
-                .addCriterion("has_valentine_shirt", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.VALENTINE_JACKET.get()))
-                .addCriterion("has_valentine_pants", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.VALENTINE_PANTS.get()))
-                .addCriterion("has_valentine_boots", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.VALENTINE_BOOTS.get()))
-                .rewards(AdvancementRewards.Builder.experience(200))
-                .build(JCraft.id("obtain_valentine_outfit"));
+        final Advancement obtainValentineOutfit = generateCosplayAdvancement(
+                "valentine_outfit",
+                JItemRegistry.VALENTINE_WIG.get(ArmorMaterials.NETHERITE).get(),
+                FrameType.CHALLENGE,
+                obtainCosplay,
+                JItemRegistry.VALENTINE_WIG,
+                JItemRegistry.VALENTINE_JACKET,
+                JItemRegistry.VALENTINE_PANTS,
+                JItemRegistry.VALENTINE_BOOTS
+        );
         consumer.accept(obtainValentineOutfit);
         // obtain Pucci outfit
-        final Advancement obtainPucciOutfit = Advancement.Builder.advancement()
-                .display(JItemRegistry.PUCCIS_HAT.get(),
-                        Component.translatable("advancements.jcraft.obtain_pucci_outfit.title"),
-                        Component.translatable("advancements.jcraft.obtain_pucci_outfit.description"),
-                        null,
-                        FrameType.CHALLENGE,
-                        true,
-                        true,
-                        false)
-                .parent(obtainCosplay)
-                .addCriterion("has_pucci_hat", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.PUCCIS_HAT.get()))
-                .addCriterion("has_pucci_robe", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.PUCCI_ROBE.get()))
-                .addCriterion("has_pucci_pants", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.PUCCI_PANTS.get()))
-                .addCriterion("has_pucci_boots", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.PUCCI_BOOTS.get()))
-                .rewards(AdvancementRewards.Builder.experience(200))
-                .build(JCraft.id("obtain_pucci_outfit"));
+        final Advancement obtainPucciOutfit = generateCosplayAdvancement(
+                "pucci_outfit",
+                JItemRegistry.PUCCIS_HAT.get(ArmorMaterials.IRON).get(),
+                FrameType.CHALLENGE,
+                obtainCosplay,
+                JItemRegistry.PUCCIS_HAT,
+                JItemRegistry.PUCCI_ROBE,
+                JItemRegistry.PUCCI_PANTS,
+                JItemRegistry.PUCCI_BOOTS
+        );
         consumer.accept(obtainPucciOutfit);
-        // obtain Dio outfit
-        final Advancement obtainDioOutfit = Advancement.Builder.advancement()
-                .display(JItemRegistry.DIO_HEADBAND.get(),
-                        Component.translatable("advancements.jcraft.obtain_dio_outfit.title"),
-                        Component.translatable("advancements.jcraft.obtain_dio_outfit.description"),
-                        null,
-                        FrameType.CHALLENGE,
-                        true,
-                        true,
-                        false)
-                .parent(obtainDioP1Outfit)
-                .addCriterion("has_dio_headband", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.DIO_HEADBAND.get()))
-                .addCriterion("has_dio_jacket", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.DIO_JACKET.get()))
-                .addCriterion("has_dio_cape", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.DIO_CAPE.get()))
-                .addCriterion("has_dio_pants", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.DIO_PANTS.get()))
-                .addCriterion("has_dio_boots", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.DIO_BOOTS.get()))
-                .rewards(AdvancementRewards.Builder.experience(200))
-                .rewards(AdvancementRewards.Builder.recipe(JCraft.id("dios_diary")))
-                .build(JCraft.id("obtain_dio_outfit"));
+        // obtain DIO outfit
+        final Advancement obtainDioOutfit = generateCosplayAdvancement(
+                "dio_outfit",
+                JItemRegistry.DIO_HEADBAND.get(ArmorMaterials.NETHERITE).get(),
+                FrameType.CHALLENGE,
+                obtainDioP1Outfit,
+                JItemRegistry.DIO_HEADBAND,
+                JItemRegistry.DIO_JACKET,
+                JItemRegistry.DIO_CAPE,
+                JItemRegistry.DIO_PANTS,
+                JItemRegistry.DIO_BOOTS
+        );
         consumer.accept(obtainDioOutfit);
+        // obtain OH DIO outfit
+        final Advancement obtainOhDioOutfit = generateCosplayAdvancement(
+                "oh_dio_outfit",
+                JItemRegistry.OH_DIO_WIG.get(ArmorMaterials.NETHERITE).get(),
+                FrameType.CHALLENGE,
+                obtainDioOutfit,
+                JItemRegistry.OH_DIO_WIG,
+                JItemRegistry.OH_DIO_JACKET,
+                JItemRegistry.OH_DIO_PANTS,
+                JItemRegistry.OH_DIO_BOOTS
+        );
+        consumer.accept(obtainOhDioOutfit);
         // obtain Heaven Attained outfit
-        final Advancement obtainHeavenAttainedOutfit = Advancement.Builder.advancement()
-                .display(JItemRegistry.HEAVEN_ATTAINED_WIG.get(),
-                        Component.translatable("advancements.jcraft.obtain_heaven_attained_outfit.title"),
-                        Component.translatable("advancements.jcraft.obtain_heaven_attained_outfit.description"),
-                        null,
-                        FrameType.CHALLENGE,
-                        true,
-                        true,
-                        false)
-                .parent(obtainDioOutfit)
-                .addCriterion("has_heaven_attained_headband", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.HEAVEN_ATTAINED_WIG.get()))
-                .addCriterion("has_heaven_attained_shirt", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.HEAVEN_ATTAINED_SHIRT.get()))
-                .addCriterion("has_heaven_attained_pants", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.HEAVEN_ATTAINED_PANTS.get()))
-                .addCriterion("has_heaven_attained_boots", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.HEAVEN_ATTAINED_BOOTS.get()))
-                .rewards(AdvancementRewards.Builder.experience(200))
-                .build(JCraft.id("obtain_heaven_attained_outfit"));
+        final Advancement obtainHeavenAttainedOutfit = generateCosplayAdvancement(
+                "heaven_attained_outfit",
+                JItemRegistry.HEAVEN_ATTAINED_WIG.get(ArmorMaterials.NETHERITE).get(),
+                FrameType.CHALLENGE,
+                obtainOhDioOutfit,
+                JItemRegistry.HEAVEN_ATTAINED_WIG,
+                JItemRegistry.HEAVEN_ATTAINED_SHIRT,
+                JItemRegistry.HEAVEN_ATTAINED_PANTS,
+                JItemRegistry.HEAVEN_ATTAINED_BOOTS
+        );
         consumer.accept(obtainHeavenAttainedOutfit);
+        // obtain DIO outfit
+        final Advancement obtainMountainTimOutfit = generateCosplayAdvancement(
+                "mountain_tim_outfit",
+                JItemRegistry.MOUNTAIN_TIM_HAT.get(ArmorMaterials.IRON).get(),
+                FrameType.CHALLENGE,
+                obtainCosplay,
+                JItemRegistry.MOUNTAIN_TIM_HAT,
+                JItemRegistry.MOUNTAIN_TIM_SHIRT,
+                JItemRegistry.MOUNTAIN_TIM_COAT,
+                JItemRegistry.MOUNTAIN_TIM_PANTS,
+                JItemRegistry.MOUNTAIN_TIM_BOOTS
+        );
+        consumer.accept(obtainMountainTimOutfit);
         // obtain Diary Page
         final Advancement obtainDiaryPage = Advancement.Builder.advancement()
                 .display(JItemRegistry.DIARY_PAGE.get(),
@@ -636,5 +592,126 @@ public class JAdvancementProvider extends FabricAdvancementProvider {
                 .rewards(AdvancementRewards.Builder.experience(800))
                 .build(JCraft.id("obtain_dios_diary"));
         consumer.accept(obtainDiosDiary);
+        // kill dummy
+        final Advancement killDummy = Advancement.Builder.advancement()
+                .display(JItemRegistry.TRAINING_DUMMY.get(),
+                        Component.translatable("advancements.jcraft.kill_dummy.title"),
+                        Component.translatable("advancements.jcraft.kill_dummy.description"),
+                        null,
+                        FrameType.CHALLENGE,
+                        true,
+                        true,
+                        true)
+                .parent(obtainMeteoriteIronOre)
+                .addCriterion("killed_dummy", KilledTrigger.TriggerInstance.playerKilledEntity(EntityPredicate.Builder.entity().of(JEntityTypeRegistry.TRAINING_DUMMY.get())))
+                .rewards(AdvancementRewards.Builder.experience(1000))
+                .build(JCraft.id("kill_dummy"));
+        consumer.accept(killDummy);
+        // hamon advancements
+        final ItemStack hamon = SpecDiscItem.createDiscStack(JSpecTypeRegistry.HAMON.get());
+        final Advancement hamon1 = Advancement.Builder.advancement()
+                .display(hamon,
+                        Component.translatable("advancements.jcraft.hamon1.title"),
+                        Component.translatable("advancements.jcraft.hamon1.description"),
+                        null,
+                        FrameType.TASK,
+                        true,
+                        true,
+                        false)
+                .parent(obtainAnySpec)
+                .addCriterion("breathed", Hamon1Trigger.TriggerInstance.trigger())
+                .build(JCraft.id("hamon1"));
+        consumer.accept(hamon1);
+        final Advancement hamon2 = Advancement.Builder.advancement()
+                .display(hamon,
+                        Component.translatable("advancements.jcraft.hamon2.title"),
+                        Component.translatable("advancements.jcraft.hamon2.description"),
+                        null,
+                        FrameType.TASK,
+                        true,
+                        true,
+                        false)
+                .parent(hamon1)
+                .addCriterion("toggled", Hamon2Trigger.TriggerInstance.trigger())
+                .build(JCraft.id("hamon2"));
+        consumer.accept(hamon2);
+        final Advancement hamon3 = Advancement.Builder.advancement()
+                .display(hamon,
+                        Component.translatable("advancements.jcraft.hamon3.title"),
+                        Component.translatable("advancements.jcraft.hamon3.description"),
+                        null,
+                        FrameType.TASK,
+                        true,
+                        true,
+                        false)
+                .parent(hamon2)
+                .addCriterion("punched", Hamon3Trigger.TriggerInstance.trigger())
+                .build(JCraft.id("hamon3"));
+        consumer.accept(hamon3);
+        final Advancement hamon4 = Advancement.Builder.advancement()
+                .display(hamon,
+                        Component.translatable("advancements.jcraft.hamon4.title"),
+                        Component.translatable("advancements.jcraft.hamon4.description"),
+                        null,
+                        FrameType.GOAL,
+                        true,
+                        true,
+                        false)
+                .parent(hamon3)
+                .addCriterion("sendoed", Hamon4Trigger.TriggerInstance.trigger())
+                .build(JCraft.id("hamon4"));
+        consumer.accept(hamon4);
+        final Advancement hamon5 = Advancement.Builder.advancement()
+                .display(hamon,
+                        Component.translatable("advancements.jcraft.hamon5.title"),
+                        Component.translatable("advancements.jcraft.hamon5.description"),
+                        null,
+                        FrameType.GOAL,
+                        true,
+                        true,
+                        false)
+                .parent(hamon4)
+                .addCriterion("waved", Hamon5Trigger.TriggerInstance.hitAtLeastEnemies(3))
+                .build(JCraft.id("hamon5"));
+        consumer.accept(hamon5);
+        final Advancement hamon6 = Advancement.Builder.advancement()
+                .display(hamon,
+                        Component.translatable("advancements.jcraft.hamon6.title"),
+                        Component.translatable("advancements.jcraft.hamon6.description"),
+                        null,
+                        FrameType.CHALLENGE,
+                        true,
+                        true,
+                        false)
+                .parent(hamon5)
+                .addCriterion("waved", Hamon6Trigger.TriggerInstance.trigger())
+                .build(JCraft.id("hamon6"));
+        consumer.accept(hamon6);
+    }
+
+    protected Advancement generateCosplayAdvancement(final @NonNull String name, final @NonNull Item display, final @NonNull FrameType frame, final @NonNull Advancement parent, final @NonNull CosplayItem<?>... pieces) {
+        if (pieces.length == 0) {
+            throw new IllegalArgumentException("At least one cosplay piece must be specified!");
+        }
+        final String keyBase = "advancements." + JCraft.MOD_ID + ".obtain_" + name;
+        var builder = Advancement.Builder.advancement()
+                .display(display,
+                        Component.translatable(keyBase + ".title"),
+                        Component.translatable(keyBase + ".description"),
+                        null,
+                        frame,
+                        true,
+                        true,
+                        false)
+                .parent(parent);
+        if (frame == FrameType.CHALLENGE) {
+            builder = builder.rewards(AdvancementRewards.Builder.experience(200));
+        }
+        for (final CosplayItem<?> piece : pieces) {
+            builder.addCriterion("has_" + piece.getName(),
+                    InventoryChangeTrigger.TriggerInstance.hasItems(
+                            ItemPredicate.Builder.item().of(piece.getTag()).build()));
+        }
+        return builder.build(JCraft.id("obtain_" + name));
     }
 }

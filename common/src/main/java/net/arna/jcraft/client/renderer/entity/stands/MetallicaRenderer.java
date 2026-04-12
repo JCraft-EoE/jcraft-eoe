@@ -1,38 +1,31 @@
 package net.arna.jcraft.client.renderer.entity.stands;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
-import mod.azure.azurelib.cache.object.BakedGeoModel;
-import mod.azure.azurelib.util.RenderUtils;
-import net.arna.jcraft.client.model.entity.stand.MetallicaModel;
+import lombok.NonNull;
+import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.common.entity.stand.MetallicaEntity;
-import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.ItemInHandRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.phys.Vec3;
 
 /**
  * The {@link StandEntityRenderer} for {@link MetallicaEntity}.
- * @see MetallicaModel
  */
+@Environment(EnvType.CLIENT)
 public class MetallicaRenderer extends StandEntityRenderer<MetallicaEntity> {
+
     private final ItemInHandRenderer heldItemRenderer;
-    public MetallicaRenderer(final EntityRendererProvider.Context context) {
-        super(context, new MetallicaModel());
+
+    public MetallicaRenderer(final @NonNull EntityRendererProvider.Context context) {
+        super(context, JStandTypeRegistry.METALLICA.get());
         this.heldItemRenderer = context.getItemInHandRenderer();
     }
 
     private static final ItemStack IRON_NUGGET = Items.IRON_NUGGET.getDefaultInstance();
 
+    /*
     @Override
     public void actuallyRender(final PoseStack matrixStack, final MetallicaEntity animatable, final BakedGeoModel model,
                                final RenderType renderType, final MultiBufferSource bufferSource, final VertexConsumer buffer,
@@ -69,5 +62,5 @@ public class MetallicaRenderer extends StandEntityRenderer<MetallicaEntity> {
             }
             matrixStack.popPose();
         }
-    }
+    }*/
 }

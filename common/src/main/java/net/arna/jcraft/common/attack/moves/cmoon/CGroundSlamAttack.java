@@ -3,22 +3,19 @@ package net.arna.jcraft.common.attack.moves.cmoon;
 import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
+import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.common.entity.stand.CMoonEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
-import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
-
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -49,7 +46,8 @@ public final class CGroundSlamAttack extends AbstractSimpleAttack<CGroundSlamAtt
         final Level world = attacker.level();
         final Vec3i gravityVector = GravityChangerAPI.getGravityDirection(attacker).getNormal();
 
-        if (world.getGameRules().getBoolean(JCraft.STAND_GRIEFING)) {
+        LivingEntity user = attacker.getUserOrThrow();
+        if (mayBreak(user, null)) {
             BlockPos bPos = attacker.blockPosition();
 
             // Adjust pancake shape for gravity
@@ -62,13 +60,12 @@ public final class CGroundSlamAttack extends AbstractSimpleAttack<CGroundSlamAtt
                 for (int y = min.getY(); y < max.getY(); y++) {
                     for (int z = min.getZ(); z < max.getZ(); z++) {
                         final BlockPos curPos = bPos.offset(x, y, z);
-                        final BlockState curState = world.getBlockState(curPos);
-                        final Block block = curState.getBlock();
 
-                        if (block.defaultDestroyTime() < 0 || block.getExplosionResistance() > 10f || curState.isAir()) {
+                        if (mayBreak(user, curPos, s -> s.getBlock().getExplosionResistance() <= 10 && !s.isAir())) {
                             continue;
                         }
 
+                        final BlockState curState = world.getBlockState(curPos);
                         final FallingBlockEntity fallingBlock = FallingBlockEntity.fall(world, curPos, curState);
                         fallingBlock.setDeltaMovement(-gravityVector.getX() * 0.5, -gravityVector.getY() * 0.5, -gravityVector.getZ() * 0.5);
                         fallingBlock.time = -120;

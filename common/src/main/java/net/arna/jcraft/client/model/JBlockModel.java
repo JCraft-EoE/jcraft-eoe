@@ -1,13 +1,11 @@
 package net.arna.jcraft.client.model;
 
 import lombok.NonNull;
-import mod.azure.azurelib.core.animatable.GeoAnimatable;
-import mod.azure.azurelib.model.GeoModel;
 import net.arna.jcraft.JCraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-public class JBlockModel<T extends BlockEntity & GeoAnimatable> extends GeoModel<T> {
+public class JBlockModel<T extends BlockEntity> {
     private final ResourceLocation model, texture, animation;
 
     public JBlockModel(@NonNull String name) {
@@ -15,7 +13,8 @@ public class JBlockModel<T extends BlockEntity & GeoAnimatable> extends GeoModel
         texture = JCraft.id("textures/block/" + name + ".png");
         animation = JCraft.id("animations/" + name + ".animation.json");
     }
-    @Override
+
+    /*@Override
     public @NonNull ResourceLocation getModelResource(T animatable) {
         return model;
     }
@@ -28,5 +27,5 @@ public class JBlockModel<T extends BlockEntity & GeoAnimatable> extends GeoModel
     @Override
     public @NonNull ResourceLocation getAnimationResource(T animatable) {
         return animation;
-    }
+    }*/
 }

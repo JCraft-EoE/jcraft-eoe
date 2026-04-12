@@ -1,21 +1,25 @@
 package net.arna.jcraft.common.entity.stand;
 
 import lombok.NonNull;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.Attacks;
 import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.MoveSet;
 import net.arna.jcraft.api.attack.MoveSetManager;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.pose.modifier.IPoseModifier;
 import net.arna.jcraft.api.pose.modifier.LevitationPoseModifier;
+import net.arna.jcraft.api.registry.JMarkerExtractorRegistry;
+import net.arna.jcraft.api.registry.JMarkerInjectorRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.common.attack.moves.goldexperience.requiem.*;
+import net.arna.jcraft.common.attack.moves.mandom.CountdownMove;
 import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.JParticleType;
@@ -32,10 +36,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static net.arna.jcraft.api.component.living.CommonHitPropertyComponent.HitAnimation.CRUSH;
@@ -134,13 +136,15 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
                     Component.literal("Punch"),
                     Component.literal("quick combo starter")
             );
+
+    // TODO: add an armored, high-damage knockdown with a cooldown (cr.H) which does the job of this move but without being spam material
     public static final KnockdownAttack<GEREntity> OVERHEAD_SMASH = new KnockdownAttack<GEREntity>(0, 10, 19,
             1f, 9f, 10, 1.5f, 1.1f, 0f, 30)
             .withAerialVariant(OVERHEAD_KICK)
             .withSound(JSoundRegistry.GER_HEAVY)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withHitSpark(JParticleType.HIT_SPARK_3)
-            .withHyperArmor()
+            .withArmor(1)
             .withLaunch()
             .withExtraHitBox(1.5)
             .withInfo(
@@ -192,7 +196,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
                     Component.literal("Nullification"),
                     Component.literal("0.25s windup, 1.5s counter, stuns on hit")
             );
-    public static final ReturnToZeroMove RETURN_TO_ZERO = new ReturnToZeroMove(1200, 30, 32, 1f)
+    public static final ReturnToZeroMove RETURN_TO_ZERO = new ReturnToZeroMove(1200, 30, 32, 1f, 64, 200, CountdownMove.ENTITY_STUFF_TO_SAVE, JMarkerExtractorRegistry.ALL.get(), JMarkerInjectorRegistry.ALL.get())
             .withSound(JSoundRegistry.GER_SETUP)
             .withInfo(
                     Component.literal("Return to Zero"),
@@ -241,10 +245,12 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
     @Override
     public boolean initMove(MoveClass moveClass) {
         if (moveClass == MoveClass.ULTIMATE) {
-            ReturnToZeroMove rtzMove = getMoveMap().findMoveByType(ReturnToZeroMove.class).orElse(null);
+            final ReturnToZeroMove rtzMove = getMoveMap().findMoveByType(ReturnToZeroMove.class).orElse(null);
             if (rtzMove != null && rtzMove.returnToZero(this)) {
                 return true;
-            } else return super.initMove(moveClass);
+            } else {
+                return super.initMove(moveClass);
+            }
         } else if (tryFollowUp(moveClass, MoveClass.LIGHT)) {
             return true;
         } else {
@@ -316,43 +322,38 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
 
     // Animation code
     public enum State implements StandAnimationState<GEREntity> {
-        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.ger.idle"))),
-        LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ger.light"))),
-        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.ger.block"))),
-        HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ger.heavy"))),
-        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.ger.barrage"))),
-        HEAL_SELF(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ger.healself"))),
-        HEAL(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ger.heal"))),
-        LASER(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ger.laser"))),
-        LASER_FIRE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ger.laser_fire"))),
-        COUNTER(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ger.counter"))),
-        COUNTER_MISS(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ger.counter_miss"))),
-        AIR_HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ger.airheavy"))),
-        AIR_LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ger.airlight"))),
-        AIR_BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ger.airbarrage"))),
-        SETUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ger.setup"))),
-        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ger.light_followup")));
+        IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.ger.idle", AzPlayBehaviors.LOOP)),
+        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ger.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.ger.block", AzPlayBehaviors.LOOP)),
+        HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ger.heavy", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ger.barrage", AzPlayBehaviors.LOOP)),
+        HEAL_SELF(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ger.healself", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        HEAL(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ger.heal", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LASER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ger.laser", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LASER_FIRE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ger.laser_fire", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        COUNTER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ger.counter", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        COUNTER_MISS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ger.counter_miss", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        AIR_HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ger.airheavy", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        AIR_LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ger.airlight", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        AIR_BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ger.airbarrage", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        SETUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ger.setup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ger.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME));
 
-        private final Consumer<AnimationState<GEREntity>> animator;
+        private final AzCommand animator;
 
-        State(Consumer<AnimationState<GEREntity>> animator) {
+        State(AzCommand animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(GEREntity attacker, AnimationState<GEREntity> state) {
-            animator.accept(state);
+        public void playAnimation(GEREntity attacker) {
+            animator.sendForEntity(attacker);
         }
     }
 
     @Override
     protected State[] getStateValues() {
         return State.values();
-    }
-
-    @Override
-    protected @Nullable String getSummonAnimation() {
-        return "animation.ger.summon";
     }
 
     @Override

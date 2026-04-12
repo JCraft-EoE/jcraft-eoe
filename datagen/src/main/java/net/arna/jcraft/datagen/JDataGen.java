@@ -29,6 +29,7 @@ public final class JDataGen implements DataGeneratorEntrypoint {
         pack.addProvider(JTagProviders.JBlockTags::new);
         pack.addProvider(JTagProviders.JItemTags::new);
         pack.addProvider(JTagProviders.JEntityTypeTags::new);
+        pack.addProvider(JTagProviders.JTemplatePoolTags::new);
         pack.addProvider(JAdvancementProvider::new);
         pack.addProvider(JRecipeProvider::new);
         pack.addProvider(JWorldProvider::new);

@@ -6,10 +6,6 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "jcraft:stand_arrow"
-        },
-        {
-          "type": "minecraft:item",
           "name": "jcraft:stand_arrowhead"
         },
         {

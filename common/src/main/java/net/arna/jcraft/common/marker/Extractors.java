@@ -4,9 +4,13 @@ import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.JRegistries;
+import net.arna.jcraft.api.component.living.CommonHamonComponent;
 import net.arna.jcraft.api.component.living.CommonVampireComponent;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
+import net.arna.jcraft.common.spec.HamonSpec;
+import net.arna.jcraft.common.spec.VampireSpec;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.NbtUtils;
 import net.arna.jcraft.common.util.TriConsumer;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
@@ -188,6 +192,16 @@ public interface Extractors {TriConsumer<ResourceLocation, Entity, CompoundTag> 
         }
     };
 
+    TriConsumer<ResourceLocation, Entity, CompoundTag> HAMON = (id, entity, compoundTag) -> {
+        if (id == null || !(entity instanceof final LivingEntity livingEntity)) {
+            return;
+        }
+        final CommonHamonComponent hamon = JComponentPlatformUtils.getHamon(livingEntity);
+        if (hamon != null && JUtils.getSpec(livingEntity) instanceof HamonSpec && id.equals(HAMON_CHARGE)) {
+            compoundTag.putFloat(HAMON_CHARGE.toString(), hamon.getHamonCharge());
+        }
+    };
+
     TriConsumer<ResourceLocation, Entity, CompoundTag> ALL = (id, entity, compoundTag) -> {
         ENTITY.accept(id, entity, compoundTag);
         LIVING_ENTITY.accept(id, entity, compoundTag);
@@ -195,5 +209,6 @@ public interface Extractors {TriConsumer<ResourceLocation, Entity, CompoundTag> 
         MOB.accept(id, entity, compoundTag);
         AGEABLE_MOB.accept(id, entity, compoundTag);
         VAMPIRE.accept(id, entity, compoundTag);
+        HAMON.accept(id, entity, compoundTag);
     };
 }

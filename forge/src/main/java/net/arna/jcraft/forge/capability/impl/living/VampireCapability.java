@@ -2,7 +2,8 @@ package net.arna.jcraft.forge.capability.impl.living;
 
 import dev.architectury.networking.NetworkManager;
 import io.netty.buffer.Unpooled;
-import net.arna.jcraft.common.component.impl.CommonVampireComponentImpl;
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.component.impl.living.CommonVampireComponentImpl;
 import net.arna.jcraft.forge.capability.api.JCapability;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -15,10 +16,8 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.util.LazyOptional;
 
-import static net.arna.jcraft.JCraft.MOD_ID;
-
 public class VampireCapability extends CommonVampireComponentImpl implements JCapability {
-    public static ResourceLocation VAMP_S2C = new ResourceLocation(MOD_ID, "vamp_s2c");
+    public static ResourceLocation VAMP_S2C = JCraft.id("vamp_s2c");
     public static Capability<VampireCapability> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
 
     public VampireCapability(LivingEntity living) {

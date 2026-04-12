@@ -1,22 +1,26 @@
 package net.arna.jcraft.client.renderer.entity.projectiles;
 
-import net.arna.jcraft.client.model.JProjectileModel;
+import lombok.NonNull;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.projectile.BloodProjectile;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.resources.ResourceLocation;
 
 /**
- * The {@link GeoProjectileRenderer} for {@link BloodProjectile}.
+ * The {@link ProjectileRenderer} for {@link BloodProjectile}.
  */
-public class BloodProjectileRenderer extends GeoProjectileRenderer<BloodProjectile> {
-    public BloodProjectileRenderer(final EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, new JProjectileModel<>("bloodprojectile"));
+@Environment(EnvType.CLIENT)
+public class BloodProjectileRenderer extends ProjectileRenderer<BloodProjectile> {
+
+    public static final String ID = "bloodprojectile";
+    private static final RenderType RENDER_TYPE = RenderType.entityTranslucent(JCraft.id(TEXTURE_STR_TEMPLATE.formatted(ID)));
+
+    public BloodProjectileRenderer(final @NonNull EntityRendererProvider.Context context) {
+        super(context, () -> new EntityAnimator<>(ID), b -> b
+                .setRenderType(RENDER_TYPE),
+                ID);
     }
 
-    @Override
-    public RenderType getRenderType(final BloodProjectile animatable, final ResourceLocation texture, final MultiBufferSource bufferSource, final float partialTick) {
-        return RenderType.entityTranslucent(texture);
-    }
 }

@@ -23,18 +23,20 @@ dependencies {
     // Architectury API. This is optional, and you can comment it out if you don't need it.
     modImplementation "dev.architectury:architectury:$rootProject.architectury_api_version"
 
-    //Geckolib
-    //modImplementation("software.bernie.geckolib:geckolib-fabric-${minecraft_version}:${geckolib_version}")
-    //implementation("com.eliotlash.mclib:mclib:20")
-    compileOnly "mod.azure.azurelib:azurelib-common-1.20.1:${azurelib_version}"
+    // AzureLib
+    modImplementation "mod.azure.azurelib:azurelib-fabric-${minecraft_version}:${azurelib_version}"
 
     //Player Anim
     modImplementation "dev.kosmx.player-anim:player-animation-lib:${rootProject.player_anim_version}"
     modImplementation "dev.kosmx.player-anim:anim-core:${rootProject.player_anim_version}"
 
-
     //Cloth
     modApi "me.shedaniel.cloth:cloth-config:11.1.118"
+
+    // FTB Chunks
+    modImplementation "dev.ftb.mods:ftb-chunks:${rootProject.ftb_chunks_version}"
+    modImplementation "dev.ftb.mods:ftb-library:${rootProject.ftb_lib_version}"
+    modImplementation "dev.ftb.mods:ftb-teams:${rootProject.ftb_teams_version}"
 
     //modImplementation "com.fusionflux:gravity_api-common-${gravity_api_version}"
 

@@ -5,6 +5,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.arna.jcraft.client.rendering.CloneSkinTracker;
 import net.arna.jcraft.client.util.PlayerCloneClientPlayerEntity;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
@@ -18,6 +20,7 @@ import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.resources.ResourceLocation;
 import java.util.UUID;
 
+@Environment(EnvType.CLIENT)
 public class PlayerCloneRenderer extends HumanoidMobRenderer<PlayerCloneEntity, HumanoidModel<PlayerCloneEntity>> {
     private final PlayerRenderer parent;
 

@@ -1,7 +1,7 @@
 {
 	"format_version": "1.8.0",
 	"animations": {
-		"animation.shadow_the_world.summon": {
+		"summon": {
 			"animation_length": 1,
 			"bones": {
 				"base": {

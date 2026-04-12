@@ -1,14 +1,7 @@
 package net.arna.jcraft.common.entity.projectile;
 
 import lombok.NonNull;
-import mod.azure.azurelib.animatable.GeoEntity;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.core.animation.AnimationController;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
-import mod.azure.azurelib.core.object.PlayState;
-import mod.azure.azurelib.util.AzureLibUtil;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
@@ -40,9 +33,10 @@ import java.util.Set;
 import static net.arna.jcraft.api.Attacks.damageLogic;
 import static net.arna.jcraft.common.util.JUtils.canDamage;
 
-public class SunBeamProjectile extends AbstractArrow implements GeoEntity {
-    private int length = 0;
+public class SunBeamProjectile extends AbstractArrow {
     private static final int MAX_LENGTH = 64;
+
+    private int length = 0;
     private final @Nullable TheSunEntity sun;
     private DamageSource damageSource;
 
@@ -124,6 +118,8 @@ public class SunBeamProjectile extends AbstractArrow implements GeoEntity {
         }
 
         if (level().isClientSide()) {
+            FIRE.sendForEntity(this);
+
             if (tickCount <= 20) {
                 Vec3 velocity = getDeltaMovement().scale(random.nextDouble() * length * 10.0);
                 level().addParticle(
@@ -182,21 +178,5 @@ public class SunBeamProjectile extends AbstractArrow implements GeoEntity {
         }
     }
 
-    // Animations
-    private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
-
-    @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "controller", 0, this::predicate));
-    }
-
-    private static final RawAnimation FIRE = RawAnimation.begin().thenLoop("animation.sunbeam.fire");
-    private PlayState predicate(AnimationState<SunBeamProjectile> state) {
-        return state.setAndContinue(FIRE);
-    }
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return cache;
-    }
+    private static final AzCommand FIRE = AzCommand.create(JCraft.BASE_CONTROLLER, "animation.sunbeam.fire");
 }

@@ -1,31 +1,37 @@
 package net.arna.jcraft.client.renderer.armor;
 
-import net.arna.jcraft.client.model.armor.JArmorModel;
-import net.arna.jcraft.common.item.FlutteringArmorItem;
+import mod.azure.azurelib.render.armor.bone.AzArmorBoneContext;
+import net.arna.jcraft.JCraft;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 
-public class KiraArmorRenderer extends JArmor<FlutteringArmorItem> {
+public class KiraArmorRenderer extends ArmorRenderer {
+    public static final String ID = "kiraoutfit";
+    public static final ResourceLocation MODEL = JCraft.id(MODEL_STR_TEMPLATE.formatted(ID));
+    public static final ResourceLocation TEXTURE = JCraft.id(TEXTURE_STR_TEMPLATE.formatted(ID));
+
     public KiraArmorRenderer() {
-        super(new JArmorModel<>("kiraoutfit"));
+        super(() -> new ArmorAnimator(ID), new KiraArmorBoneContext(), MODEL, TEXTURE);
     }
 
-    @Override
-    protected void applyBoneVisibilityBySlot(EquipmentSlot currentSlot) {
-        setAllVisible(false);
+    public static class KiraArmorBoneContext extends AzArmorBoneContext {
+        public void applyBoneVisibilityBySlot(EquipmentSlot currentSlot) {
+            setAllVisible(false);
 
-        if (currentSlot == EquipmentSlot.LEGS) {
-            setBoneVisible(this.body, true);
-            setBoneVisible(this.leftLeg, true);
-            setBoneVisible(this.rightLeg, true);
-            setBoneVisible(this.leftArm, true);
-            setBoneVisible(this.rightArm, true);
-        }
-        else if (currentSlot == EquipmentSlot.FEET) {
-            setBoneVisible(this.leftBoot, true);
-            setBoneVisible(this.rightBoot, true);
-        }
-        else if (currentSlot == EquipmentSlot.HEAD) {
-            setBoneVisible(this.head, true);
+            if (currentSlot == EquipmentSlot.LEGS) {
+                setBoneVisible(this.body, true);
+                setBoneVisible(this.leftLeg, true);
+                setBoneVisible(this.rightLeg, true);
+                setBoneVisible(this.leftArm, true);
+                setBoneVisible(this.rightArm, true);
+            }
+            else if (currentSlot == EquipmentSlot.FEET) {
+                setBoneVisible(this.leftBoot, true);
+                setBoneVisible(this.rightBoot, true);
+            }
+            else if (currentSlot == EquipmentSlot.HEAD) {
+                setBoneVisible(this.head, true);
+            }
         }
     }
 }

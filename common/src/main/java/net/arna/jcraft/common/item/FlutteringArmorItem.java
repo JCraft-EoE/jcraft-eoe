@@ -1,96 +1,43 @@
 package net.arna.jcraft.common.item;
 
-import lombok.NonNull;
-import mod.azure.azurelib.animatable.GeoItem;
-import mod.azure.azurelib.animatable.client.RenderProvider;
-import mod.azure.azurelib.constant.DataTickets;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.core.animation.AnimationController;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
-import mod.azure.azurelib.core.object.PlayState;
-import mod.azure.azurelib.renderer.GeoArmorRenderer;
-import mod.azure.azurelib.util.AzureLibUtil;
-import net.arna.jcraft.client.renderer.armor.DIOCapeRenderer;
-import net.arna.jcraft.client.renderer.armor.GyroTopRenderer;
-import net.arna.jcraft.client.renderer.armor.HeavenAttainedArmorRenderer;
-import net.arna.jcraft.client.renderer.armor.JotaroCoatP4Renderer;
-import net.arna.jcraft.client.renderer.armor.JotaroCoatRenderer;
-import net.arna.jcraft.client.renderer.armor.RisottoTopRenderer;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.renderer.armor.*;
 import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.api.registry.JItemRegistry;
-import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * {@link ArmorItem} animated by GeckoLib to flutter when its wearer is moving.
  */
-public class FlutteringArmorItem extends ArmorItem implements GeoItem {
-    private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
-    private final Supplier<Object> renderProvider = GeoItem.makeRenderer(this);
+public class FlutteringArmorItem extends ArmorItem {
+
+    protected static final AzCommand IDLE_CMD = AzCommand.create(JCraft.BASE_CONTROLLER, "animation.idle", AzPlayBehaviors.LOOP);
+    protected static final AzCommand MOVING_CMD = AzCommand.create(JCraft.BASE_CONTROLLER, "animation.moving", AzPlayBehaviors.LOOP);
 
     public FlutteringArmorItem(ArmorMaterial materialIn, Type slot, Properties builder) {
         super(materialIn, slot, builder);
     }
 
     @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "controller", 10, this::predicate));
+    public void inventoryTick(final @NotNull ItemStack stack, final @NotNull Level level, final @NotNull Entity entity, final int slotId, final boolean isSelected) {
+        super.inventoryTick(stack, level, entity, slotId, isSelected);
+        if (level.isClientSide()) {
+            final boolean moving = entity.getDeltaMovement().horizontalDistanceSqr() > 0.01;
+            if (moving) {
+                MOVING_CMD.sendForItem(entity, stack);
+            }
+            else {
+                IDLE_CMD.sendForItem(entity, stack);
+            }
+        }
     }
 
-    private PlayState predicate(AnimationState<FlutteringArmorItem> state) {
-        Entity entity = state.getData(DataTickets.ENTITY);
-
-        boolean moving = (entity instanceof Player player) ? !JUtils.deltaPos(player).equals(Vec3.ZERO) : entity.getDeltaMovement().horizontalDistanceSqr() > 0.01;
-        state.getController().setAnimation(RawAnimation.begin().thenLoop(moving ? "animation.moving" : "animation.idle"));
-        return PlayState.CONTINUE;
-    }
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return cache;
-    }
-
-    @Override
-    public void createRenderer(Consumer<Object> consumer) {
-        consumer.accept(new RenderProvider() {
-            private GeoArmorRenderer<?> renderer;
-            @SuppressWarnings("unchecked")
-            @Override public @NonNull HumanoidModel<LivingEntity> getHumanoidArmorModel(
-                    LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<LivingEntity> original) {
-                if (this.renderer == null) {
-                    if (itemStack.is(JItemRegistry.DIO_CAPE.get())) {
-                        this.renderer = new DIOCapeRenderer();
-                    } else if (itemStack.is(JItemRegistry.JOTARO_JACKET.get())) {
-                        this.renderer = new JotaroCoatRenderer();
-                    } else if (itemStack.is(JItemRegistry.JOTARO_P4_JACKET.get())) {
-                        this.renderer = new JotaroCoatP4Renderer();
-                    } else if (itemStack.is(JItemRegistry.HEAVEN_ATTAINED_SHIRT.get())) {
-                        this.renderer = new HeavenAttainedArmorRenderer();
-                    } else if (itemStack.is(JItemRegistry.RISOTTO_JACKET.get())) {
-                        this.renderer = new RisottoTopRenderer();
-                    } else {
-                        this.renderer = new GyroTopRenderer();
-                    }
-                }
-                renderer.prepForRender(livingEntity, itemStack, equipmentSlot, original);
-                return renderer;
-            }});
-    }
-
-    @Override
-    public Supplier<Object> getRenderProvider() {
-        return renderProvider;
-    }
 }

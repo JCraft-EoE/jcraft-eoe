@@ -2,10 +2,12 @@ package net.arna.jcraft.common.entity.stand;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.NonNull;
-import mod.azure.azurelib.core.animation.AnimationController;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.dispatch.command.action.AzAction;
+import mod.azure.azurelib.animation.dispatch.command.action.impl.controller.AzControllerSetAnimationSpeedAction;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.Attacks;
 import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
@@ -39,16 +41,14 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The {@link StandEntity} for <a href="https://jojowiki.com/Silver_Chariot">Silver Chariot</a>.
  * @see JStandTypeRegistry#SILVER_CHARIOT
- * @see net.arna.jcraft.client.model.entity.stand.SilverChariotModel SilverChariotModel
  * @see net.arna.jcraft.client.renderer.entity.stands.SilverChariotRenderer SilverChariotRenderer
  * @see ArmorOffAttack
  * @see CircleSlashAttack
@@ -286,6 +286,16 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
     }
 
     @Override
+    public void playSummonAnimation() {
+        if (isPossessed()) {
+            POSSESSED_SUMMON.sendForEntity(this);
+            return;
+        }
+
+        super.playSummonAnimation();
+    }
+
+    @Override
     protected void switchMoveSet(String name) {
         final Vec3 lookDir = getMoveMap().findMoveByType(SCChargeAttack.class)
                 .map(SCChargeAttack::getLookDir)
@@ -480,64 +490,97 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
     }
 
     // Animation code
+
+    private static final AzCommand POSSESSED_SUMMON = AzCommand.create(JCraft.BASE_CONTROLLER, "summon_possessed");
+
     public enum State implements StandAnimationState<SilverChariotEntity> {
-        IDLE((silverChariot, builder) -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.silverchariot.idle" + switch (silverChariot.getMode()) {
-            case REGULAR -> "";
-            case ARMORLESS -> "_armorless";
-            case POSSESSED -> "_possessed";
-        }))),
-        STAB(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.silverchariot.stab"))),
-        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.silverchariot.block"))),
-        HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.silverchariot.heavy"))),
-        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.silverchariot.barrage"))),
-        SPIN(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.silverchariot.spin"))),
-        SPIN_2(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.silverchariot.spin_2"))),
+        IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.silverchariot.idle", AzPlayBehaviors.LOOP)),
+        STAB(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.silverchariot.stab", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.silverchariot.block", AzPlayBehaviors.LOOP)),
+        HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.silverchariot.heavy", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.silverchariot.barrage", AzPlayBehaviors.LOOP)),
+        SPIN(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.silverchariot.spin", AzPlayBehaviors.LOOP)),
+        SPIN_2(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.silverchariot.spin_2", AzPlayBehaviors.LOOP)),
 
-        CHARGE_LOW(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.silverchariot.charge_low"))),
-        CHARGE_HIGH(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.silverchariot.charge_high"))),
+        CHARGE_LOW(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.silverchariot.charge_low", AzPlayBehaviors.LOOP)),
+        CHARGE_HIGH(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.silverchariot.charge_high", AzPlayBehaviors.LOOP)),
 
-        P_CHARGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.silverchariot.pcharge"))),
-        P_CHARGE_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.silverchariot.pchargehit"))),
-        COUNTER(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.silverchariot.counter"))),
-        BEAT_DOWN_START(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.silverchariot.beatdownstart"))),
-        BEAT_DOWN(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.silverchariot.beatdown"))),
-        CLEAVE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.silverchariot.cleave"))),
-        ARMOR_OFF(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.silverchariot.armor_off"))),
-        COUNTER_MISS(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.silverchariot.counter_miss"))),
-        LAST_SHOT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.silverchariot.lastshot"))),
-        CIRCLE_CHARGE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.silverchariot.circle_charge"))),
-        CIRCLE_SLASH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.silverchariot.circle_slash"))),
-        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.silverchariot.light_followup")));
+        P_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.silverchariot.pcharge", AzPlayBehaviors.LOOP)),
+        P_CHARGE_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.silverchariot.pchargehit", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        COUNTER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.silverchariot.counter", AzPlayBehaviors.LOOP)),
+        BEAT_DOWN_START(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.silverchariot.beatdownstart", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BEAT_DOWN(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.silverchariot.beatdown", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        CLEAVE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.silverchariot.cleave", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ARMOR_OFF(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.silverchariot.armor_off", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        COUNTER_MISS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.silverchariot.counter_miss", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LAST_SHOT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.silverchariot.lastshot", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        CIRCLE_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.silverchariot.circle_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        CIRCLE_SLASH(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.silverchariot.circle_slash", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.silverchariot.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
 
-        private final BiConsumer<SilverChariotEntity, AnimationState<SilverChariotEntity>> animator;
+        POSSESSED_IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.silverchariot.idle_possessed", AzPlayBehaviors.LOOP)),
+        ARMORLESS_IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.silverchariot.idle_armorless", AzPlayBehaviors.LOOP)),
+        ;
 
-        State(Consumer<AnimationState<SilverChariotEntity>> animator) {
-            this((silverChariot, builder) -> animator.accept(builder));
-        }
+        private final AzCommand animator;
 
-        State(BiConsumer<SilverChariotEntity, AnimationState<SilverChariotEntity>> animator) {
+        State(AzCommand animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(SilverChariotEntity attacker, AnimationState<SilverChariotEntity> builder) {
-            animator.accept(attacker, builder);
+        public void playAnimation(SilverChariotEntity attacker) {
+            final Mode mode = attacker.getMode();
+
+            if (this == IDLE) {
+                switch (mode) {
+                    case REGULAR -> IDLE.animator.sendForEntity(attacker);
+                    case ARMORLESS -> ARMORLESS_IDLE.animator.sendForEntity(attacker);
+                    case POSSESSED -> POSSESSED_IDLE.animator.sendForEntity(attacker);
+                }
+
+                return;
+            }
+
+            if (mode == Mode.ARMORLESS) {
+                doubleSpeedAnimations[ordinal()].sendForEntity(attacker);
+                return;
+            }
+
+            animator.sendForEntity(attacker);
         }
 
-        @Override
-        public void configureController(SilverChariotEntity attacker, AnimationController<SilverChariotEntity> controller) {
-            controller.setAnimationSpeed(attacker.getMode() == Mode.ARMORLESS ? 1.5f : 1f);
+        private static final State[] allStates = State.values();
+        private static final AzCommand[] doubleSpeedAnimations = new AzCommand[allStates.length];
+
+        static {
+            for (int i = 0; i < allStates.length; i++) {
+                final AzCommand original = allStates[i].animator;
+
+                final List<AzAction> modifiedActions = new ArrayList<>();
+
+                for (final AzAction action : original.actions()) {
+                    if (action instanceof AzControllerSetAnimationSpeedAction speedAction) { // Should only happen once
+                        final AzControllerSetAnimationSpeedAction adjustedSpeedAction =
+                                new AzControllerSetAnimationSpeedAction(
+                                        speedAction.controllerName(),
+                                speedAction.animationSpeed() * 1.33
+                                );
+
+                        modifiedActions.add(adjustedSpeedAction);
+                    } else {
+                        modifiedActions.add(action);
+                    }
+                }
+
+                doubleSpeedAnimations[i] = new AzCommand(modifiedActions);
+            }
         }
     }
 
     @Override
     protected State[] getStateValues() {
         return State.values();
-    }
-
-    @Override
-    protected @Nullable String getSummonAnimation() {
-        return "animation.silverchariot.summon" + (isPossessed() ? "_possessed" : "");
     }
 
     @Override

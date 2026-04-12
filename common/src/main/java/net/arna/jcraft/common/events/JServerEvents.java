@@ -4,8 +4,9 @@ import dev.architectury.event.CompoundEventResult;
 import dev.architectury.event.EventResult;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import lombok.NonNull;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
+import net.arna.jcraft.api.attack.moves.BlockMarkerMove;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.api.component.living.CommonVampireComponent;
 import net.arna.jcraft.api.registry.*;
@@ -18,10 +19,12 @@ import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.data.AttackerDataLoader;
 import net.arna.jcraft.common.entity.StandMeteorEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
-import net.arna.jcraft.common.item.MockItem;
+import net.arna.jcraft.common.item.AuMockItem;
+import net.arna.jcraft.common.item.RewindMockItem;
 import net.arna.jcraft.common.marker.BlockMarkerMoves;
 import net.arna.jcraft.common.network.s2c.AttackerDataPacket;
 import net.arna.jcraft.common.saveddata.ExclusiveStandsData;
+import net.arna.jcraft.common.spec.VampireSpec;
 import net.arna.jcraft.common.tickable.*;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.mixin_logic.EntityAddon;
@@ -59,6 +62,7 @@ import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.phys.AABB;
@@ -89,6 +93,12 @@ public class JServerEvents {
 
     public static void saveExclusives(final MinecraftServer server) {
         JCraft.getExclusiveStandsData().saveToDefaultFile(server);
+    }
+
+    public static AABB createBurstHitbox(final Vec3 pPos) {
+        final Vec3 min = pPos.subtract(2.0, 2.0, 2.0);
+        final Vec3 max = pPos.add(2.0, 2.0, 2.0);
+        return new AABB(min, max);
     }
 
     public static void serverPostTick(MinecraftServer server) {
@@ -146,7 +156,7 @@ public class JServerEvents {
 
             Vec3 pPos = player.getEyePosition();
 
-            AABB burstHitbox = AbstractSimpleAttack.createBox(pPos, 4);
+            AABB burstHitbox = createBurstHitbox(pPos);
             List<? extends Entity> toPush = player.level().getEntitiesOfClass(Entity.class, burstHitbox,
                     EntitySelector.LIVING_ENTITY_STILL_ALIVE.and(e -> !filter.contains(e)));
             JUtils.displayHitbox(player.level(), burstHitbox);
@@ -313,18 +323,18 @@ public class JServerEvents {
 
             // ... in the AU
             if (world.dimension().equals(JDimensionRegistry.AU_DIMENSION_KEY)) {
-                if (item.getOwner() != null || MockItem.isMockItem(stack)) {
+                if (item.getOwner() != null || stack.getItem() instanceof AuMockItem) {
                     return EventResult.pass();
                 }
 
-                ItemStack mockStack = MockItem.createMockStack(stack); // Convert it to a mock item (incompatible and useless)
+                ItemStack mockStack = AuMockItem.createMockStack(stack); // Convert it to a mock item (incompatible and useless)
                 if (stack.getItem() instanceof BlockItem) // ... and mark down all relevant data
                 {
                     mockStack.getOrCreateTag().putIntArray("AttractPos", new int[]{item.getBlockX(), item.getBlockY(), item.getBlockZ()});
                 }
                 item.setItem(mockStack);
             } else { // ... outside the AU
-                if (MockItem.isMockItem(stack)) {
+                if (stack.getItem() instanceof AuMockItem) {
                     // Mark it as an item of interest, and save relevant data
                     CompoundTag stackData = stack.getOrCreateTag();
                     if (stackData.contains("AttractPos")) { // if attracted to a specific position
@@ -377,7 +387,7 @@ public class JServerEvents {
             if (100 - random.nextInt(0, 100) > gameRules.getInt(CHANCE_MOB_SPAWNS_WITH_STAND)) {
                 return EventResult.pass();
             }
-            final StandType type = StandTypeUtil.generateStandTypeForMob(entity, gameRules);
+            final StandType type = StandTypeUtil.generateStandTypeForMob(gameRules);
             standData.setType(type);
 
             // ATTRIBUTES
@@ -403,7 +413,7 @@ public class JServerEvents {
                 handItems.set(0, new ItemStack(JItemRegistry.ANUBIS.get()));
             }
 
-            if (random.nextInt(0, 100) >= 90) {
+            if (random.nextInt(0, 100) <= 100 * JServerConfig.STAND_ARROW_SPAWN_RATE.getValue()) {
                 handItems.set(1, new ItemStack(JItemRegistry.STAND_ARROW.get()));
                 mob.setDropChance(EquipmentSlot.OFFHAND, 100f);
             }
@@ -500,7 +510,7 @@ public class JServerEvents {
                             killerPlayer.getFoodData().eat(20, 20f);
                             CommonVampireComponent vampireComponent = JComponentPlatformUtils.getVampirism(killerPlayer);
                             if (vampireComponent.isVampire()) {
-                                vampireComponent.setBlood(20.0f);
+                                vampireComponent.setBlood(VampireSpec.MAX_BLOOD);
                             }
                         }
 
@@ -669,14 +679,38 @@ public class JServerEvents {
         }
     }
 
-    public static EventResult beforeBlockSet(BlockPos blockPos, BlockState oldBlockState, BlockState newBlockState) {
+    public static EventResult beforeBlockSet(final @NonNull BlockPos blockPos, final @NonNull BlockState oldBlockState, final @NonNull BlockState newBlockState, final @NonNull Level level) {
         if (oldBlockState.is(BlockTags.LEAVES) && newBlockState.is(BlockTags.LEAVES)) {
             return EventResult.pass();
         }
 
         BlockMarkerMoves.mergeQueues();
-        BlockMarkerMoves.forEach(move -> move.addBlock(blockPos, oldBlockState));
+        BlockMarkerMoves.forEach(move -> move.addBlock(blockPos, oldBlockState, level));
 
+        return EventResult.pass();
+    }
+
+    public static EventResult processBlockLoot(final @NonNull List<ItemStack> loot, final @NonNull BlockState state, final @NonNull ServerLevel serverLevel, final @NonNull BlockPos pos, final @Nullable BlockEntity blockEntity) {
+        if (JServerConfig.MANDOM_AFFECTS_BLOCKS.getValue()) {
+            final Optional<BlockMarkerMove> move = BlockMarkerMoves.findFirst(m -> m.isRecording() && m.isInRange(pos, serverLevel));
+            if (move.isPresent()) {
+                final List<ItemStack> modifiedList = new LinkedList<>();
+                for (ItemStack stack : loot) {
+                    if (stack.getItem() instanceof RewindMockItem) {
+                        modifiedList.add(stack);
+                    } else {
+                        modifiedList.add(RewindMockItem.createMockStack(stack, move.get()));
+                    }
+                }
+                loot.clear();
+                loot.addAll(modifiedList);
+            }
+        }
+        return EventResult.pass();
+    }
+
+    public static EventResult afterExplosion(final @NonNull Level level, final @NonNull BlockPos pos, final @NonNull Explosion explosion) {
+        BlockMarkerMoves.forEach(move -> move.removeBlock(pos, level));
         return EventResult.pass();
     }
 }

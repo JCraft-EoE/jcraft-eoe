@@ -41,7 +41,7 @@ public class LevelMixin {
                 }
             }
             // actually invoke the hook
-            if (JBlockEvents.BEFORE_SET.invoker().setBlock(pos, oldState, newState).interruptsFurtherEvaluation()) {
+            if (JBlockEvents.BEFORE_SET.invoker().setBlock(pos, oldState, newState, level).interruptsFurtherEvaluation()) {
                 cir.setReturnValue(false);
                 cir.cancel();
             }
