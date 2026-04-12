@@ -277,7 +277,8 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> TUSK_NAIL_SHOT = register("tusk_nail_shot", NailShotAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> TUSK_NAIL_WHEEL = register("tusk_nail_wheel", NailWheelAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> TUSK_GOLDEN_RECTANGLE_NAIL = register("tusk_golden_rectangle_nail", GoldenRectangleNailAttack.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> TUSK_PERFECT_GOLDEN_ROTATION_CHARGE = register("tusk_perfect_golden_rotation_charge", PerfectGoldenRotationAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> TUSK_DRILL_SHOT_CHARGE = register("tusk_drill_shot_charge", DrillShotChargeMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> TUSK_PERFECT_GOLDEN_ROTATION = register("tusk_perfect_golden_rotation", PerfectGoldenRotationAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> TUSK_SPINNING_NAIL_CHARGE = register("tusk_spinning_nail_charge", SpinningNailChargeMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> TUSK_SPINNING_NAIL = register("tusk_spinning_nail", SpinningNailAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> TUSK_WORMHOLE = register("tusk_wormhole", WormholeAttack.Type.INSTANCE);
@@ -287,24 +288,11 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> TUSK_HANDHOLE = register("tusk_handhole", HandholeAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> TUSK_VORTEX = register("tusk_vortex", VortexAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> TUSK_VOID_SHOT = register("tusk_void_shot", VoidShotAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> TUSK_FAN_NAIL_ATTACK = register("tusk_fan_nail_attack", FanNailAttack.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> AEROSMITH_BULLET_ATTACK = register("aerosmith_bullet_attack", MuzzleHitscanAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> AEROSMITH_BOMB_DROP_ATTACK = register("aerosmith_bomb_drop_attack", BombDropAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> AEROSMITH_PATROL_MOVE = register("aerosmith_patrol_move", PatrolMove.Type.INSTANCE);
-
-    RegistrySupplier<MoveType<?>> TUSK_NAIL_SHOT = register("tusk_nail_shot", NailShotAttack.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> TUSK_NAIL_WHEEL = register("tusk_nail_wheel", NailWheelAttack.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> TUSK_GOLDEN_RECTANGLE_NAIL = register("tusk_golden_rectangle_nail", GoldenRectangleNailAttack.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> TUSK_PERFECT_GOLDEN_ROTATION_CHARGE = register("tusk_perfect_golden_rotation_charge", PerfectGoldenRotationAttack.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> TUSK_SPINNING_NAIL_CHARGE = register("tusk_spinning_nail_charge", SpinningNailChargeMove.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> TUSK_SPINNING_NAIL = register("tusk_spinning_nail", SpinningNailAttack.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> TUSK_WORMHOLE = register("tusk_wormhole", WormholeAttack.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> TUSK_ACT_SWITCH = register("tusk_act_switch", TuskActCycleMove.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> TUSK_ACT3_NAIL_SHOT = register("tusk_act3_nail_shot", Act3NailShotAttack.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> TUSK_NAIL_BARRAGE = register("tusk_nail_barrage", NailBarrageAttack.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> TUSK_HANDHOLE = register("tusk_handhole", HandholeAttack.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> TUSK_VORTEX = register("tusk_vortex", VortexAttack.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> TUSK_VOID_SHOT = register("tusk_void_shot", VoidShotAttack.Type.INSTANCE);
 
     private static RegistrySupplier<MoveType<?>> register(String id, MoveType<?> type) {
         return MOVE_TYPE_REGISTRY.register(id, () -> type);

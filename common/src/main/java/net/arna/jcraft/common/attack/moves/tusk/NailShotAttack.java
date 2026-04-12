@@ -9,6 +9,8 @@ import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.common.attack.core.itfs.AttackRotationOffsetOverride;
 import net.arna.jcraft.common.entity.projectile.NailProjectile;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.sounds.SoundEvent;
@@ -21,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-public final class NailShotAttack<A extends IAttacker<A, ?>> extends AbstractMove<NailShotAttack<A>, A> {
+public final class NailShotAttack<A extends IAttacker<A, ?>> extends AbstractMove<NailShotAttack<A>, A> implements AttackRotationOffsetOverride {
     @Getter
     private final float baseSpeed;
     @Getter
@@ -80,6 +82,19 @@ public final class NailShotAttack<A extends IAttacker<A, ?>> extends AbstractMov
     @Override
     public @NonNull NailShotAttack<A> copy() {
         return copyExtras(new NailShotAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), baseSpeed, maxRange));
+    }
+
+    @Override
+    public float getAttackRotationOffset(StandEntity<?, ?> attacker) {
+        return 0f;
+    }
+
+    @Override
+    public void tick(final A attacker) {
+        if (!(attacker.getCurrentMove() instanceof NailShotAttack)) {
+            return;
+        }
+        super.tick(attacker);
     }
 
     public static class Type extends AbstractMove.Type<NailShotAttack<?>> {

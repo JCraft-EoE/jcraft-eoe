@@ -20,6 +20,7 @@ import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.api.stand.SummonData;
 import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.common.attack.actions.UserAnimationAction;
 import net.arna.jcraft.common.attack.conditions.TuskNailCondition;
 import net.arna.jcraft.common.entity.projectile.NailProjectile;
 import net.arna.jcraft.common.item.Peacemaker;
@@ -54,6 +55,7 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
 
     public static final StandData DATA = StandData.builder()
             .idleRotation(315f)
+            .idleDistance(1.75f)
             .blockDistance(0f)
             .info(StandInfo.builder()
                     .name(Component.translatable("entity.jcraft.tusk_act3"))
@@ -73,6 +75,7 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
 
     public static final Act3NailShotAttack NAIL_SHOT = new Act3NailShotAttack(0, 10, 15, 0.75f, 2.7f, 20.0f, 15.0f)
             .withCondition(TuskNailCondition.atLeast(1.0f))
+            .withInitAction(UserAnimationAction.play("tsk.grn"))
             .withSound(JSoundRegistry.TUSK_SHOT)
             .withInfo(
                     Component.literal("Golden Rectangle Nail"),
@@ -82,6 +85,7 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
     public static final SimpleAttack<TuskAct3Entity> NAIL_JAB = new SimpleAttack<TuskAct3Entity>(
             200, 5, 15, 1f, 7.0f, 15, 2f, 0.5f, 0.0f)
             .withCondition(TuskNailCondition.atLeast(1.0f))
+            .withInitAction(UserAnimationAction.play("tsk.njb"))
             .withImpactSound(JSoundRegistry.ARMORED_HIT)
             .withInfo(
                     Component.literal("Nail Jab"),
@@ -89,7 +93,7 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
 
     // Barrage: Nail Swipes — 5 hits, quick startup
     public static final NailBarrageAttack NAIL_SWIPES = new NailBarrageAttack(
-            280, 2, 50, 1f, 3.0f, 12, 2.0f, 0.3f, 0.0f, 10)
+            280, 2, 36, 1f, 3.0f, 12, 2.0f, 0.3f, 0.0f, 6)
             .withCondition(TuskNailCondition.atLeast(1.0f))
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withInfo(
@@ -97,13 +101,15 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
                     Component.literal("Quick 5-hit nail swipes. Medium cooldown."));
 
     public static final HandholeAttack HANDHOLE = new HandholeAttack(80, 8, 15, 0.75f)
+            .withInitAction(UserAnimationAction.play("tsk.hh"))
             .withSound(JSoundRegistry.TUSK_SHOT)
             .withInfo(
                     Component.literal("Handhole"),
                     Component.literal("Fires a hole onto a surface or entity. While active, ALL attacks fire from that position.\nPress Sp1 again to recall the arm."))
             .withCondition(TuskNailCondition.atLeast(1.0f));
 
-    public static final VortexAttack VORTEX = new VortexAttack(120, 8, 15, 0.75f)
+    public static final VortexAttack VORTEX = new VortexAttack(120, 1, 15, 0.75f)
+            .withInitAction(UserAnimationAction.play("tsk.nls"))
             .withSound(JSoundRegistry.TUSK_SHOT)
             .withInfo(
                     Component.literal("Vortex"),
@@ -111,6 +117,7 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
             .withCondition(TuskNailCondition.atLeast(1.0f));
 
     public static final VoidShotAttack VOID_SHOT = new VoidShotAttack(300, 25, 30, 0.75f)
+            .withInitAction(UserAnimationAction.play("tsk.vs"))
             .withInfo(
                     Component.literal("Voidshot"),
                     Component.literal("Fire at your own head and enter the wormhole.\nInvulnerable for up to 1 second. Punishable on entry/exit."))
@@ -126,6 +133,7 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
                             "Shift + Utility → Cycle backward (Act 3→2→1→3...)"));
 
     public static final WormholeAttack WORMHOLE = new WormholeAttack(200, 5, 10, 0.75f)
+            .withInitAction(UserAnimationAction.play("tsk.grn"))
             .withTeleportDamage(6.0f, 2.0f)
             .withSound(JSoundRegistry.TUSK_SHOT)
             .withImpactSound(JSoundRegistry.IMPACT_1)
@@ -384,12 +392,12 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
     public enum State implements StandAnimationState<TuskAct3Entity> {
         IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.tusk_act_3.idle", AzPlayBehaviors.LOOP)),
         NAIL_SHOT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_3.nail_shot", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        NAIL_JAB(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_3.nail_shot", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        NAIL_SWIPES(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_3.nail_shot", AzPlayBehaviors.LOOP)),
-        WORMHOLE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_3.wormhole", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        HANDHOLE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_3.wormhole", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        VORTEX(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_3.wormhole", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        VOID_SHOT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_3.wormhole", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        NAIL_JAB(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_3.heavy", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        NAIL_SWIPES(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_3.barrage", AzPlayBehaviors.LOOP)),
+        WORMHOLE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_3.wormhole_shoot", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        HANDHOLE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_3.hand_hole", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        VORTEX(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_3.vortex", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        VOID_SHOT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_3.void_shot", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         ACT_CYCLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.tusk_act_3.idle", AzPlayBehaviors.LOOP));
 
         private final AzCommand animator;

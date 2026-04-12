@@ -8,6 +8,8 @@ import lombok.NonNull;
 import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
+import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.common.attack.core.itfs.AttackRotationOffsetOverride;
 import net.arna.jcraft.common.entity.projectile.NailProjectile;
 import net.arna.jcraft.common.entity.stand.TuskAct2Entity;
 import net.arna.jcraft.common.entity.stand.TuskAct3Entity;
@@ -16,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-public final class SpinningNailAttack<A extends IAttacker<A, ?>> extends AbstractMove<SpinningNailAttack<A>, A> {
+public final class SpinningNailAttack<A extends IAttacker<A, ?>> extends AbstractMove<SpinningNailAttack<A>, A> implements AttackRotationOffsetOverride {
     @Getter
     private final float baseSpeed;
 
@@ -24,6 +26,11 @@ public final class SpinningNailAttack<A extends IAttacker<A, ?>> extends Abstrac
         super(cooldown, windup, duration, moveDistance);
         this.baseSpeed = baseSpeed;
         ranged = true;
+    }
+
+    @Override
+    public float getAttackRotationOffset(StandEntity<?, ?> attacker) {
+        return 0f;
     }
 
     @Override

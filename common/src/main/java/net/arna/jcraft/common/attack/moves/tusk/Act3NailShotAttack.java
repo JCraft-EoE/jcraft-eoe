@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
+import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.common.attack.core.itfs.AttackRotationOffsetOverride;
 import net.arna.jcraft.common.entity.projectile.NailProjectile;
 import net.arna.jcraft.common.entity.stand.TuskAct3Entity;
 import net.arna.jcraft.common.util.JUtils;
@@ -20,7 +22,7 @@ import java.util.Set;
  * Tusk Act 3 - M1 (same stats as Act 2 Golden Rectangle Nail).
  * Spinning nail, 15-block range, creeps 8 blocks after hit.
  */
-public final class Act3NailShotAttack extends AbstractMove<Act3NailShotAttack, TuskAct3Entity> {
+public final class Act3NailShotAttack extends AbstractMove<Act3NailShotAttack, TuskAct3Entity> implements AttackRotationOffsetOverride {
     @Getter
     private final float baseSpeed;
     @Getter
@@ -35,6 +37,11 @@ public final class Act3NailShotAttack extends AbstractMove<Act3NailShotAttack, T
         this.maxRange = maxRange;
         this.creepDistance = creepDistance;
         ranged = true;
+    }
+
+    @Override
+    public float getAttackRotationOffset(StandEntity<?, ?> attacker) {
+        return 0f;
     }
 
     @Override

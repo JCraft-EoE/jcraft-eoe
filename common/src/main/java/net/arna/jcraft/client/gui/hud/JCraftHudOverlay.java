@@ -47,8 +47,7 @@ public class JCraftHudOverlay {
             BLOODLUST_GAUGE = new Gauge(0.8f, 0.1f, 0.2f, 5),
             HAMON_GAUGE = new Gauge(0.8f, 0.5f, 0.2f, (int) HamonSpec.MAX_CHARGE),
             IRON_GAUGE = new Gauge(0.7f, 0.7f, 0.9f, (int) MetallicaEntity.IRON_MAX),
-            NAIL_GAUGE = new Gauge(0.4f, 0.6f, 1.0f, 10);
-            IRON_GAUGE = new Gauge(0.7f, 0.7f, 0.9f, (int) MetallicaEntity.IRON_MAX),
+            NAIL_GAUGE = new Gauge(0.4f, 0.6f, 1.0f, 10),
             OVERHEAT_GAUGE = new Gauge(0.8f, 0.1f, 0.2f, (int) AerosmithEntity.OVERHEAT_MAX);
 
     public static void render(final GuiGraphics ctx) {

@@ -19,6 +19,7 @@ import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.api.stand.SummonData;
+import net.arna.jcraft.common.attack.actions.UserAnimationAction;
 import net.arna.jcraft.common.attack.conditions.TuskNailCondition;
 import net.arna.jcraft.common.attack.moves.tusk.NailShotAttack;
 import net.arna.jcraft.common.attack.moves.tusk.NailWheelAttack;
@@ -51,8 +52,6 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
             TuskAct1Entity::registerMoves, State.class);
 
     public static final StandData DATA = StandData.builder()
-            .idleRotation(315f)
-            .blockDistance(0f)
             .info(StandInfo.builder()
                     .name(Component.translatable("entity.jcraft.tusk_act1"))
                     .proCount(2)
@@ -70,6 +69,7 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
 
     public static final NailShotAttack<TuskAct1Entity> TOENAIL_SHOT = new NailShotAttack<TuskAct1Entity>(0, 10, 15, 0.75f, 1.5f, 8.0f)
             .withCondition(TuskNailCondition.atLeast(0.5f))
+            .withInitAction(UserAnimationAction.play("tsk.tnls"))
             .withInfo(
                     Component.literal("Toenail Shot"),
                     Component.literal("Short range nail (5 blocks), costs 0.5 nails, longer windup")
@@ -77,6 +77,7 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
 
     public static final NailShotAttack<TuskAct1Entity> NAIL_SHOT = new NailShotAttack<TuskAct1Entity>(0, 1, 10, 0.75f, 4.0f, 20.0f)
             .withCondition(TuskNailCondition.atLeast(1.0f))
+            .withInitAction(UserAnimationAction.play("tsk.nls"))
             .withCrouchingVariant(TOENAIL_SHOT)
             .withInfo(
                     Component.literal("Nail Shot"),
@@ -85,6 +86,7 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
 
     public static final NailWheelAttack NAIL_WHEEL = new NailWheelAttack(
             500, 8, 30, 0.75f, 2.0f, 20, 2f, 1.5f, 0.4f, 2, 0.15f)
+            .withInitAction(UserAnimationAction.play("tsk.nwl"))
             .withInfo(
                     Component.literal("Nail Wheel"),
                     Component.literal("Dash forward dealing repeated damage. Distance and stun based on nail meter.")
@@ -285,7 +287,7 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
         IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.tusk_act_1.idle", AzPlayBehaviors.LOOP)),
         NAIL_SHOT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_1.nail_shot", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         TOENAIL_SHOT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_1.toenail_shot", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        NAIL_WHEEL(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_1.nail_shot", AzPlayBehaviors.HOLD_ON_LAST_FRAME)), // TODO: replace with nail_wheel animation when available
+        NAIL_WHEEL(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_1.nail_wheel", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         ACT_CYCLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.tusk_act_1.idle", AzPlayBehaviors.LOOP));
 
         private final AzCommand animator;

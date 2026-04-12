@@ -20,7 +20,10 @@ import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.api.stand.SummonData;
 import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.common.attack.actions.UserAnimationAction;
 import net.arna.jcraft.common.attack.conditions.TuskNailCondition;
+import net.arna.jcraft.common.attack.moves.tusk.DrillShotChargeMove;
+import net.arna.jcraft.common.attack.moves.tusk.FanNailAttack;
 import net.arna.jcraft.common.attack.moves.tusk.GoldenRectangleNailAttack;
 import net.arna.jcraft.common.attack.moves.tusk.NailShotAttack;
 import net.arna.jcraft.common.attack.moves.tusk.PerfectGoldenRotationAttack;
@@ -50,6 +53,7 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
 
     public static final StandData DATA = StandData.builder()
             .idleRotation(315f)
+            .idleDistance(1.75f)
             .blockDistance(0f)
             .info(StandInfo.builder()
                     .name(Component.translatable("entity.jcraft.tusk_act2"))
@@ -68,6 +72,7 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
 
     public static final NailShotAttack<TuskAct2Entity> TOENAIL_SHOT = new NailShotAttack<TuskAct2Entity>(0, 10, 15, 0.75f, 1.5f, 8.0f)
             .withCondition(TuskNailCondition.atLeast(0.5f))
+            .withInitAction(UserAnimationAction.play("tsk.tnls"))
             .withInfo(
                     Component.literal("Toenail Shot"),
                     Component.literal("Short range nail (5 blocks), costs 0.5 nails, longer windup")
@@ -75,15 +80,31 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
 
     public static final GoldenRectangleNailAttack GOLDEN_RECTANGLE_NAIL = new GoldenRectangleNailAttack(0, 10, 15, 0.75f, 2.7f, 20.0f, 15.0f)
             .withCondition(TuskNailCondition.atLeast(1.0f))
+            .withInitAction(UserAnimationAction.play("tsk.grn"))
             .withCrouchingVariant(TOENAIL_SHOT)
             .withInfo(
                     Component.literal("Golden Rectangle Nail"),
                     Component.literal("Fires a spinning nail (15 blocks). On hit, creeps 8 blocks through terrain towards nearby enemies."));
 
-    public static final PerfectGoldenRotationAttack PERFECT_GOLDEN_ROTATION = new PerfectGoldenRotationAttack(500, 10, 100, 0.75f, 2.0f, 20.0f)
+    public static final PerfectGoldenRotationAttack PERFECT_GOLDEN_ROTATION = new PerfectGoldenRotationAttack(0, 1, 15, 0.75f, 2.0f, 20.0f)
+            .withInitAction(UserAnimationAction.play("tsk.pgrs"))
             .withInfo(
                     Component.literal("Perfect Golden Rotation"),
                     Component.literal("Hold to charge. Fires a drilling nail that hits once per tick. Damage (6-12) and speed (1x-2x) increase with charge."));
+
+    public static final DrillShotChargeMove DRILL_SHOT_CHARGE = new DrillShotChargeMove(500, 10, 100, 0.75f, 1) //TODO: fix this
+            .withFollowup(PERFECT_GOLDEN_ROTATION)
+            .withInitAction(UserAnimationAction.play("tsk.pgrc"))
+            .withInfo(
+                    Component.literal("Drill Shot"),
+                    Component.literal("Hold to charge. Release to fire a drilling nail. Charge longer for more damage and speed."));
+
+    public static final FanNailAttack FAN_NAIL_ATTACK = new FanNailAttack(300, 10, 15, 0.75f)
+            .withInitAction(UserAnimationAction.play("tsk.fn"))
+            .withCondition(TuskNailCondition.atLeast(5.0f))
+            .withInfo(
+                    Component.literal("Homing Nail Fan"),
+                    Component.literal("Fires 5 spinning nails in a spread. Each homes toward the nearest enemy and flies through blocks."));
 
     public static final TuskActCycleMove<TuskAct2Entity> ACT_CYCLE = new TuskActCycleMove<TuskAct2Entity>(
             0, 1, 1, 0f, 2, false)
@@ -99,6 +120,10 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
     @Getter
     @Setter
     private CommonMiscComponent miscComponent;
+
+    @Getter
+    @Setter
+    private int drillChargeTime = 0;
 
     private int regenTick = 40;
 
@@ -130,7 +155,8 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
 
     private static void registerMoves(MoveMap<TuskAct2Entity, State> moves) {
         moves.register(MoveClass.LIGHT, GOLDEN_RECTANGLE_NAIL, State.GOLDEN_RECTANGLE_NAIL).withCrouchingVariant(TuskAct2Entity.State.TOENAIL_SHOT);
-        moves.register(MoveClass.ULTIMATE, PERFECT_GOLDEN_ROTATION, State.PERFECT_GOLDEN_ROTATION);
+        moves.register(MoveClass.HEAVY, DRILL_SHOT_CHARGE, State.DRILL_SHOT_CHARGE).withFollowup(State.PERFECT_GOLDEN_ROTATION);
+        moves.register(MoveClass.ULTIMATE, FAN_NAIL_ATTACK, State.FAN_NAIL);
         moves.register(MoveClass.UTILITY, ACT_CYCLE, State.ACT_CYCLE);
     }
 
@@ -183,7 +209,7 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
         MoveClass moveClass = type.getMoveClass(standby);
         if (moveClass == null) return;
 
-        if (moveClass != MoveClass.LIGHT && moveClass != MoveClass.ULTIMATE && moveClass != MoveClass.UTILITY) {
+        if (moveClass != MoveClass.LIGHT && moveClass != MoveClass.HEAVY && moveClass != MoveClass.ULTIMATE && moveClass != MoveClass.UTILITY) {
             if (hasUser() && getUser() instanceof Player player) {
                 JSpec<?, ?> spec = JUtils.getSpec(player);
                 if (spec != null && spec.canAttack()) {
@@ -238,8 +264,10 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
     public enum State implements StandAnimationState<TuskAct2Entity> {
         IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.tusk_act_2.idle", AzPlayBehaviors.LOOP)),
         GOLDEN_RECTANGLE_NAIL(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_2.golden_rectangle_nail", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        TOENAIL_SHOT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_1.toenail_shot", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        PERFECT_GOLDEN_ROTATION(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_2.perfect_golden_rotation", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        TOENAIL_SHOT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_2.toe_shot", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        DRILL_SHOT_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_2.spinning_nail_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        PERFECT_GOLDEN_ROTATION(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_2.spinning_nail_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        FAN_NAIL(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_2.nail_shot", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         ACT_CYCLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.tusk_act_2.idle", AzPlayBehaviors.LOOP));
 
         private final AzCommand animator;
