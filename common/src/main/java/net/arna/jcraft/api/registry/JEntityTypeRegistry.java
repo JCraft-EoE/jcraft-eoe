@@ -543,6 +543,17 @@ public interface JEntityTypeRegistry {
                     .build("item_toss_projectile")
     );
 
+    RegistrySupplier<EntityType<FireSparkProjectile>> FIRE_SPARK_PROJECTILE = ENTITY_TYPE_REGISTRY.register(JCraft.id("fire_spark_projectile"),
+            () -> EntityType.Builder.of(
+                            WorldOnlyEntityFactory.from(FireSparkProjectile::new),
+                            MobCategory.MISC
+                    ).sized(0.5f, 0.5f)
+                    .clientTrackingRange(4)
+                    .updateInterval(10)
+                    .build("fire_spark_projectile")
+    );
+
+
     RegistrySupplier<EntityType<SunBeamProjectile>> SUN_BEAM = ENTITY_TYPE_REGISTRY.register(JCraft.id("sunbeam"),
             () -> EntityType.Builder.of(
                             (EntityType<SunBeamProjectile> entityType, Level world) -> new SunBeamProjectile(world, null, null),
@@ -744,6 +755,13 @@ public interface JEntityTypeRegistry {
             ).sized(0.6f, 1.8f).build("random_spec_user")
     );
 
+    RegistrySupplier<EntityType<SpeedKingEntity>> SPEED_KING = ENTITY_TYPE_REGISTRY.register(JCraft.id("speed_king"),
+            () -> EntityType.Builder.of(
+                    WorldOnlyEntityFactory.from(SpeedKingEntity::new),
+                    MobCategory.CREATURE
+            ).sized(0.6f, 1.8f).build("speed_king")
+    );
+
     static void registerAttributes() {
         EntityAttributeRegistry.register(STAR_PLATINUM, StarPlatinumEntity::createMobAttributes);
         EntityAttributeRegistry.register(SPTW, SPTWEntity::createMobAttributes);
@@ -760,6 +778,7 @@ public interface JEntityTypeRegistry {
         EntityAttributeRegistry.register(C_MOON, CMoonEntity::createMobAttributes);
 
         EntityAttributeRegistry.register(MANDOM, MandomEntity::createMobAttributes);
+        EntityAttributeRegistry.register(SPEED_KING, SpeedKingEntity::createMobAttributes);
 
         EntityAttributeRegistry.register(MADE_IN_HEAVEN, MadeInHeavenEntity::createMobAttributes);
         EntityAttributeRegistry.register(SHADOW_THE_WORLD, ShadowTheWorldEntity::createMobAttributes);

@@ -18,6 +18,7 @@ public interface JStatusRegistry {
     RegistrySupplier<MobEffect> BLEEDING = EFFECTS.register("jbleeding", BleedingEffect::new);
     RegistrySupplier<MobEffect> PHPOISON = EFFECTS.register("phpoison", PurpleInfectionEffect::new);
     RegistrySupplier<MobEffect> HYPOXIA = EFFECTS.register("hypoxia", HypoxiaEffect::new);
+    RegistrySupplier<MobEffect> BOILING = EFFECTS.register("boiling", BoilingEffect::new);
 
     static void init() {
         // intentionally left empty

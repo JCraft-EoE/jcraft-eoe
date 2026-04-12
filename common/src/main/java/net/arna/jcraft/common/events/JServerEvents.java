@@ -13,6 +13,7 @@ import net.arna.jcraft.api.registry.*;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
+import net.arna.jcraft.common.attack.moves.speedking.PureHeatAccumulationAttack;
 import net.arna.jcraft.common.block.CoffinBlock;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.data.AttackerDataLoader;
@@ -115,6 +116,10 @@ public class JServerEvents {
         FrameDataRequests.tick();
         MagneticFields.tick();
         RazorCoughs.tick();
+
+        for (ServerLevel serverLevel : server.getAllLevels()) {
+            PureHeatAccumulationAttack.tickGeyser(serverLevel);
+        }
 
         // Player logic (cooldown handling and DamageTimer counting)
         for (ServerPlayer player : JUtils.all(server)) {
@@ -616,6 +621,35 @@ public class JServerEvents {
                 serverWorld.setBlockAndUpdate(sleepingPos, state.setValue(CoffinBlock.OCCUPIED, false));
             }
         }
+    }
+
+    public static EventResult itemPickup(Player player, ItemEntity itemEntity, ItemStack stack) {
+        if (stack.hasTag()) {
+            assert stack.getTag() != null;
+            if (stack.getTag().getBoolean("SpeedKingHeated")) {
+                UUID userUUID = stack.getTag().getUUID("SpeedKingUser");
+
+                // If the player picking it up is the same as the user, allow normal pickup
+                if (player.getUUID().equals(userUUID)) {
+                    // Remove the heated tags so it becomes a normal item
+                    stack.getTag().remove("SpeedKingHeated");
+                    stack.getTag().remove("HeatedTime");
+                    stack.getTag().remove("SpeedKingUser");
+                    return EventResult.pass();
+                }
+
+                // Different player - deal damage and prevent pickup
+                player.hurt(player.damageSources().inFire(), 4.0f);
+                player.setSecondsOnFire(5);
+
+                Vec3 knockback = player.getLookAngle().scale(-1.5).add(0, 0.5, 0);
+                player.setDeltaMovement(knockback);
+                player.hurtMarked = true;
+
+                return EventResult.interruptFalse();
+            }
+        }
+        return EventResult.pass();
     }
 
     public static void serverLevelPostTick(ServerLevel serverLevel) {

@@ -20,6 +20,7 @@ public interface JEventsRegistry {
         TickEvent.SERVER_POST.register(JServerEvents::serverPostTick);
         TickEvent.SERVER_LEVEL_POST.register(JServerEvents::serverLevelPostTick);
         JBlockEvents.BEFORE_SET.register(JServerEvents::beforeBlockSet);
+        PlayerEvent.PICKUP_ITEM_PRE.register(JServerEvents::itemPickup);
         JBlockEvents.BEFORE_BLOCK_LOOT.register(JServerEvents::processBlockLoot);
         JBlockEvents.AFTER_EXPLOSION.register(JServerEvents::afterExplosion);
 

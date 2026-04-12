@@ -8,6 +8,7 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.JRegistries;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.common.entity.stand.SpeedKingEntity;
 import net.minecraft.Util;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -61,6 +62,7 @@ public interface JStandTypeRegistry {
     RegistrySupplier<StandType> METALLICA = register("metallica", JEntityTypeRegistry.METALLICA);
     RegistrySupplier<StandType> THE_HAND = register("the_hand", JEntityTypeRegistry.THE_HAND);
     RegistrySupplier<StandType> MANDOM = register("mandom", JEntityTypeRegistry.MANDOM);
+    RegistrySupplier<StandType> SPEED_KING = register("speed_king", JEntityTypeRegistry.SPEED_KING);
     RegistrySupplier<StandType> CRAZY_DIAMOND = register("crazy_diamond", JEntityTypeRegistry.CRAZY_DIAMOND);
     RegistrySupplier<StandType> AEROSMITH = register("aerosmith", JEntityTypeRegistry.AEROSMITH);
 
