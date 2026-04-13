@@ -64,7 +64,7 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
     public boolean homingFan = false;
     private final Map<UUID, Integer> drillingEntityLastHit = new java.util.HashMap<>();
     private static final int DRILLING_HIT_INTERVAL = 2; // hit once every 2 ticks
-    private float creepSpeed = 0.5f;
+    private float creepSpeed = 0.2f;
     public boolean isHandhole = false;
     public boolean isVortex = false;
     private boolean growing = false; // Act 3 M1: +5 creep range per entity hit
@@ -204,7 +204,7 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
                 setCustomDamage(customDamage * 0.5f);
                 // Speed halving on first hit: creep at half the current flight speed
                 if (slowsOnHit) {
-                    creepSpeed = (float)(getDeltaMovement().length() * 0.5f);
+                    creepSpeed = (float)(getDeltaMovement().length() * 0.2f);
                 }
             } else {
                 discard();
@@ -337,7 +337,7 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
                             1, 0, 0, 0, 0.0);
                 }
                 hitEntityIds.add(creepTarget.getUUID());
-                if (slowsOnHit) { creepSpeed *= 0.5f; }
+                if (slowsOnHit) { creepSpeed *= 0.2f; }
 
                 if (growing) {
                     // Chain: +5 range, find next target excluding already-hit entities
@@ -623,7 +623,7 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
         nail.setCustomDamage(6.0f); // Act 2: 1.5x Act 1
         nail.maxRange = maxRange;
         nail.creepDistance = creepDistance;
-        nail.maxLifetimeTicks = 300; // 15 seconds
+        nail.maxLifetimeTicks = 400; // 15 seconds
         nail.slowsOnHit = true;
         return nail;
     }

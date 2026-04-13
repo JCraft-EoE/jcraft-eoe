@@ -78,7 +78,7 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
                     Component.literal("Short range nail (5 blocks), costs 0.5 nails, longer windup")
             );
 
-    public static final GoldenRectangleNailAttack GOLDEN_RECTANGLE_NAIL = new GoldenRectangleNailAttack(0, 10, 15, 0.75f, 2.7f, 20.0f, 15.0f)
+    public static final GoldenRectangleNailAttack GOLDEN_RECTANGLE_NAIL = new GoldenRectangleNailAttack(0, 10, 15, 0.75f, 2.7f, 40.0f, 15.0f)
             .withCondition(TuskNailCondition.atLeast(1.0f))
             .withInitAction(UserAnimationAction.play("tsk.grn"))
             .withCrouchingVariant(TOENAIL_SHOT)
