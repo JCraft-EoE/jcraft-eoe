@@ -1262,5 +1262,30 @@
     "sounds": [
       "jcraft:stands/tusk/chu"
     ]
+  },
+  "tusksummon1": {
+    "sounds": [
+      "jcraft:stands/tusk/summon1"
+    ]
+  },
+  "tusksummon2": {
+    "sounds": [
+      "jcraft:stands/tusk/summon2"
+    ]
+  },
+  "tusksummon3": {
+    "sounds": [
+      "jcraft:stands/tusk/summon3"
+    ]
+  },
+  "tuskbarrage": {
+    "sounds": [
+      "jcraft:stands/tusk/barrage"
+    ]
+  },
+  "tusknailwheel": {
+    "sounds": [
+      "jcraft:stands/tusk/nailwheel"
+    ]
   }
 }

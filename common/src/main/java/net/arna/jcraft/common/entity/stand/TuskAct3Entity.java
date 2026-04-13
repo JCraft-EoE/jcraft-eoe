@@ -65,7 +65,7 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
                             Contains up to 10 nails. Nails regenerate passively at the cost of hunger.
                             Herbal Tea grants Keratin Growth, speeding up nail regen."""))
                     .build())
-            .summonData(SummonData.of(JSoundRegistry.TUSK_MIMIMIN))
+            .summonData(SummonData.of(JSoundRegistry.TUSK_SUMMON3))
             .build();
 
     public static final EntityDataAccessor<Float> NAILS = SynchedEntityData.defineId(TuskAct3Entity.class, EntityDataSerializers.FLOAT);
@@ -95,6 +95,7 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
     public static final NailBarrageAttack NAIL_SWIPES = new NailBarrageAttack(
             280, 2, 36, 1f, 3.0f, 12, 2.0f, 0.3f, 0.0f, 6)
             .withCondition(TuskNailCondition.atLeast(1.0f))
+            .withSound(JSoundRegistry.TUSK_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withInfo(
                     Component.literal("Nail Swipes"),

@@ -61,7 +61,7 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
                             Herbal Tea grants Keratin Growth, speeding up nail regen.
                             Layerable with specs."""))
                     .build())
-            .summonData(SummonData.of(JSoundRegistry.TUSK_MIMIMIN))
+            .summonData(SummonData.of(JSoundRegistry.TUSK_SUMMON1))
             .build();
 
     public static final EntityDataAccessor<Float> NAILS = SynchedEntityData.defineId(TuskAct1Entity.class, EntityDataSerializers.FLOAT);
@@ -87,6 +87,7 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
     public static final NailWheelAttack NAIL_WHEEL = new NailWheelAttack(
             500, 8, 30, 0.75f, 2.0f, 20, 2f, 1.5f, 0.4f, 2, 0.15f)
             .withInitAction(UserAnimationAction.play("tsk.nwl"))
+            .withSound(JSoundRegistry.TUSK_NAILWHEEL)
             .withInfo(
                     Component.literal("Nail Wheel"),
                     Component.literal("Dash forward dealing repeated damage. Distance and stun based on nail meter.")

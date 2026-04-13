@@ -64,7 +64,7 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
                             Herbal Tea grants Keratin Growth, speeding up nail regen.
                             Layerable with specs."""))
                     .build())
-            .summonData(SummonData.of(JSoundRegistry.TUSK_MIMIMIN))
+            .summonData(SummonData.of(JSoundRegistry.TUSK_SUMMON2))
             .build();
 
     public static final EntityDataAccessor<Float> NAILS = SynchedEntityData.defineId(TuskAct2Entity.class, EntityDataSerializers.FLOAT);

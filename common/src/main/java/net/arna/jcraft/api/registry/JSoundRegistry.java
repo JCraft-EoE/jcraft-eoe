@@ -326,6 +326,11 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> TUSK_NAIL_GROWTH = register("tusknailgrowth");
     RegistrySupplier<SoundEvent> TUSK_MIMIMIN = register("tuskmimimin");
     RegistrySupplier<SoundEvent> TUSK_CHU = register("tuskchu");
+    RegistrySupplier<SoundEvent> TUSK_SUMMON1 = register("tusksummon1");
+    RegistrySupplier<SoundEvent> TUSK_SUMMON2 = register("tusksummon2");
+    RegistrySupplier<SoundEvent> TUSK_SUMMON3 = register("tusksummon3");
+    RegistrySupplier<SoundEvent> TUSK_NAILWHEEL = register("tusknailwheel");
+    RegistrySupplier<SoundEvent> TUSK_BARRAGE = register("tuskbarrage");
 
     // ROAD ROLLER
     RegistrySupplier<SoundEvent> ROAD_ROLLER_HIT = register("rrhit");
