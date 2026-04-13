@@ -1,13 +1,10 @@
 package net.arna.jcraft.datagen.providers.data;
 
-import dev.architectury.registry.registries.RegistrySupplier;
-import lombok.SneakyThrows;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.registry.*;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
 import net.arna.jcraft.common.gravity.util.EntityTags;
-import net.arna.jcraft.common.item.CosplayItem;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
@@ -17,13 +14,10 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.*;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 
-import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 public class JTagProviders {
@@ -98,13 +92,6 @@ public class JTagProviders {
 
             getOrCreateRawBuilder(JTagRegistry.SOUL_LOG_ITEMS).addElement(JItemRegistry.SOUL_WOOD_BLOCK.getId());
 
-            addCosplayTags();
-
-            final var cosplay = getOrCreateTagBuilder(JTagRegistry.COSPLAY);
-            for (final CosplayItem<?> cosplayItem : CosplayItem.all()) {
-                cosplay.addTag(cosplayItem.getTag());
-            }
-
             final var equipables = getOrCreateTagBuilder(JTagRegistry.EQUIPABLES);
             equipables.add(Items.LEATHER_HELMET);
             equipables.add(Items.LEATHER_CHESTPLATE);
@@ -141,7 +128,6 @@ public class JTagProviders {
             equipables.add(Items.WITHER_SKELETON_SKULL);
             equipables.add(Items.ZOMBIE_HEAD);
             equipables.add(JItemRegistry.STONE_MASK.get());
-            equipables.addTag(JTagRegistry.COSPLAY);
 
             final var sandBlocks = getOrCreateTagBuilder(JTagRegistry.SAND_BLOCKS);
             sandBlocks.forceAddTag(ItemTags.SAND);
@@ -189,8 +175,6 @@ public class JTagProviders {
             blindsOnImpact.add(Items.NETHERRACK);
             blindsOnImpact.add(Items.GLOWSTONE);
             blindsOnImpact.add(Items.SHROOMLIGHT);
-            blindsOnImpact.addTag(JItemRegistry.DIO_CAPE.getTag());
-            blindsOnImpact.addTag(JItemRegistry.KARS_HEADWRAP.getTag());
 
             final var slowsOnImpact = getOrCreateTagBuilder(JTagRegistry.SLOWS_ON_IMPACT);
             slowsOnImpact.add(Items.STICK);
@@ -501,33 +485,6 @@ public class JTagProviders {
             discs.add(JItemRegistry.DISC.get());
             discs.add(JItemRegistry.STAND_DISC.get());
             discs.add(JItemRegistry.SPEC_DISC.get());
-
-            final var spurs = getOrCreateTagBuilder(JTagRegistry.BOOTS_WITH_THE_SPURS);
-            addAll(spurs, JItemRegistry.GYRO_BOOTS.getAll());
-            addAll(spurs, JItemRegistry.MOUNTAIN_TIM_BOOTS.getAll());
-            addAll(spurs, JItemRegistry.DIEGO_BOOTS.getAll());
-            addAll(spurs, JItemRegistry.COWBOY_GUNBELT_SPURS.getAll());
-        }
-
-        @SneakyThrows
-        protected void addCosplayTags() {
-            final var cosplayTag = getOrCreateTagBuilder(JTagRegistry.COSPLAY);
-            final var protectsFromSunTag = getOrCreateTagBuilder(JTagRegistry.PROTECTS_FROM_SUN);
-            for (final CosplayItem<?> cosplayItem : CosplayItem.all()) {
-                final var pieceTag = getOrCreateTagBuilder(cosplayItem.getTag());
-                cosplayTag.addTag(cosplayItem.getTag());
-                for (final RegistrySupplier<? extends ArmorItem> item : cosplayItem) {
-                    pieceTag.add(item.get());
-                    if (cosplayItem.isVampireProtection() && cosplayItem.getSlot() == ArmorItem.Type.HELMET) {
-                        protectsFromSunTag.add(item.get());
-                    }
-                }
-            }
-        }
-
-        private static void addAll(final FabricTagBuilder tagBuilder,
-                                   final Collection<? extends RegistrySupplier<? extends Item>> collection) {
-            collection.forEach(i -> tagBuilder.add(i.get()));
         }
     }
 

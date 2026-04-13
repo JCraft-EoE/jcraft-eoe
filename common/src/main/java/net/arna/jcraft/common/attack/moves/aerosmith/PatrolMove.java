@@ -12,12 +12,12 @@ import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.JUtils;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3f;
 
 import java.util.Set;
 
@@ -62,7 +62,6 @@ public class PatrolMove<A extends StandEntity<? extends A, ?>> extends AbstractM
         if (user == null) {
             return Set.of();
         }
-        // TODO implement
         onPatrol = !onPatrol;
         attacker.setRemote(onPatrol);
         if (onPatrol) {
@@ -122,8 +121,7 @@ public class PatrolMove<A extends StandEntity<? extends A, ?>> extends AbstractM
             }
             final Vec3 diff = positions[currentGoalIndex].subtract(attacker.position());
             attacker.setDeltaMovement(diff.normalize().scale(actualSpeed));
-            // TODO Arna work your magic
-            attacker.setYRot((float)(diff.toVector3f().angle(new Vector3f(0f, 0f, 1f)) * 57.2957763671875));
+            attacker.setYRot(Mth.wrapDegrees(-(float)Math.atan2(diff.x(), diff.z()) * 57.2957763671875f));
         }
     }
 

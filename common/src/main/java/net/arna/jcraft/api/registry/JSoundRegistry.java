@@ -39,7 +39,6 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> TIME_SKIP = register("timeskip");
     RegistrySupplier<SoundEvent> COIN_TOSS = register("cointoss");
     RegistrySupplier<SoundEvent> TOSS = register("throw");
-    RegistrySupplier<SoundEvent> JANGLE = register("jangle");
 
     // Star Platinum
     RegistrySupplier<SoundEvent> STAR_PLATINUM_SUMMON = register("spsummon");
@@ -279,9 +278,14 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> METALLICA_RAZOR_VOMIT_PREPARE = register("mrazorvomitprepare");
     RegistrySupplier<SoundEvent> METALLICA_BLADE_SWIPE = register("mbladeswipe");
 
+    // Mandom
     RegistrySupplier<SoundEvent> MANDOM_REWIND = register("mandomrewind");
     RegistrySupplier<SoundEvent> MANDOM_SUMMON = register("mandomsummon");
     RegistrySupplier<SoundEvent> MANDOM_COUNTDOWN = register("mandomcountdown");
+
+    // Aerosmith
+    RegistrySupplier<SoundEvent> AS_SHOOT = register("asshoot");
+    RegistrySupplier<SoundEvent> AS_SUMMON = register("assummon");
 
     //// SPECS
     // Brawler

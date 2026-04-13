@@ -5,11 +5,9 @@ import net.arna.jcraft.common.events.EntityTickEvent;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.mixin_logic.EntityAddon;
 import net.arna.jcraft.mixin_logic.EntityMixinLogic;
-import net.arna.jcraft.mixin_logic.Jangler;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -17,11 +15,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = Entity.class)
-public abstract class EntityMixin implements EntityAddon, Jangler {
-    @Shadow
-    public int tickCount;
-    private @Unique boolean fromSpawner = false;
-    private @Unique int lastJangle = 0;
+public abstract class EntityMixin implements EntityAddon {
+
+    @Unique
+    private boolean fromSpawner = false;
 
     /**
      * Stand positioning mixin function
@@ -57,15 +54,5 @@ public abstract class EntityMixin implements EntityAddon, Jangler {
     @Override
     public boolean jcraft$isFromSpawner() {
         return fromSpawner;
-    }
-
-    @Override
-    public int jcraft$getLastJangleAge() {
-        return lastJangle;
-    }
-
-    @Override
-    public void jcraft$markJangle() {
-        lastJangle = tickCount;
     }
 }

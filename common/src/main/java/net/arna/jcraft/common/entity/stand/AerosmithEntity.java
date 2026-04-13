@@ -15,6 +15,7 @@ import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
+import net.arna.jcraft.api.stand.SummonData;
 import net.arna.jcraft.common.attack.moves.aerosmith.BombDropAttack;
 import net.arna.jcraft.common.attack.moves.aerosmith.MuzzleHitscanAttack;
 import net.arna.jcraft.common.attack.moves.aerosmith.PatrolMove;
@@ -40,9 +41,9 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     // TODO Arna balance this
     public static final MuzzleHitscanAttack BULLET = new MuzzleHitscanAttack(
             1, 1, 2, 0f, 1f, 0, 0f, 30f, 10f, 1/6f, 0.01f)
-            .withSound(JSoundRegistry.BULLET_PENETRATE) // TODO record improve
-            .withHitSpark(JParticleType.HIT_SPARK_2) // TODO record improve
-            .withShootSpark(JParticleType.LEMON) // TODO record improve
+            .withSound(JSoundRegistry.AS_SHOOT)
+            .withHitSpark(JParticleType.HIT_SPARK_1)
+            .withShootSpark(JParticleType.LEMON)
             .withStunType(StunType.WINDED);
     // TODO Arna description
 
@@ -63,6 +64,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                     .skinName(Component.literal("Vento Aureo"))
                     .skinName(Component.literal("Interceptor"))
                     .build())
+            .summonData(SummonData.of(JSoundRegistry.AS_SUMMON).withAnimDuration(48))
             .build();
 
     private CommonMiscComponent miscComponent;
@@ -95,7 +97,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     public void tick() {
         super.tick();
         if (!(getCurrentMove() instanceof MuzzleHitscanAttack) && ++overheatTick % 5 == 0) {
-            addOverheat(-0.2f);
+            addOverheat(-0.4f);
         }
     }
 
@@ -133,6 +135,12 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
     public void addOverheat(float amount) {
         setOverheat(Mth.clamp(entityData.get(OVERHEAT) + amount, 0f, OVERHEAT_MAX));
+    }
+
+    @Override
+    public void setRemote(final boolean r) {
+        super.setRemote(r);
+        setAlphaOverride(r ? 1f : -1f);
     }
 
     public enum State implements StandAnimationState<AerosmithEntity> {

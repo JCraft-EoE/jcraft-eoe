@@ -470,6 +470,20 @@ public class ClientPacketHandler {
                     }
                 });
             }
+
+            // hitscan trace particle
+            case (14) -> {
+                final double x = buf.readDouble();
+                final double y = buf.readDouble();
+                final double z = buf.readDouble();
+                final double velX = buf.readDouble();
+                final double velY = buf.readDouble();
+                final double velZ = buf.readDouble();
+                final JParticleType particleType = buf.readEnum(JParticleType.class);
+
+                client.execute(() -> client.level.addParticle(particleType.getParticleType(), true, x, y, z,
+                        velX, velY, velZ));
+            }
         }
     }
 
