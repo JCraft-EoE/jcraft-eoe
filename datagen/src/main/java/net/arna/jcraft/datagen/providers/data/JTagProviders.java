@@ -129,6 +129,8 @@ public class JTagProviders {
             equipables.add(Items.ZOMBIE_HEAD);
             equipables.add(JItemRegistry.STONE_MASK.get());
 
+            getOrCreateTagBuilder(JTagRegistry.PROTECTS_FROM_SUN).add(JItemRegistry.RED_HAT.get());
+
             final var sandBlocks = getOrCreateTagBuilder(JTagRegistry.SAND_BLOCKS);
             sandBlocks.forceAddTag(ItemTags.SAND);
             sandBlocks.add(Items.SANDSTONE);
