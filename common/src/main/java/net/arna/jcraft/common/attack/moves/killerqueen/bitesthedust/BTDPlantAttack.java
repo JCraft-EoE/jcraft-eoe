@@ -111,21 +111,22 @@ public final class BTDPlantAttack extends AbstractSimpleAttack<BTDPlantAttack, K
 
         AABB bBox = null;
 
-        if (bombEntity != null) { // If the bomb isn't a block
-            dX1 = bombEntity.getX();
-            dY1 = bombEntity.getY();
-            dZ1 = bombEntity.getZ();
 
-            bBox = bombEntity.getBoundingBox();
-
-            dX2 = bBox.getXsize();
-            dY2 = bBox.getYsize();
-            dZ2 = bBox.getZsize();
-        }
-
-        if (!bombExists) {
+        if (!bombExists || bombEntity.level() != stand.level()) {
             return;
         }
+
+        // If the bomb isn't a block
+        dX1 = bombEntity.getX();
+        dY1 = bombEntity.getY();
+        dZ1 = bombEntity.getZ();
+
+        bBox = bombEntity.getBoundingBox();
+
+        dX2 = bBox.getXsize();
+        dY2 = bBox.getYsize();
+        dZ2 = bBox.getZsize();
+
         final FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         buf.writeShort(9);
 
