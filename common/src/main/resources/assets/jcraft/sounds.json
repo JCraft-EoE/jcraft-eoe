@@ -1246,5 +1246,10 @@
     "sounds": [
       "jcraft:stands/aerosmith/summon"
     ]
+  },
+  "whoosh": {
+    "sounds": [
+      "jcraft:generic/whoosh"
+    ]
   }
 }

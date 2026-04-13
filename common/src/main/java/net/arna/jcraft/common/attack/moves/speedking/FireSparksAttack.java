@@ -13,11 +13,28 @@ import net.minecraft.world.phys.Vec3;
 import java.util.Set;
 
 public final class FireSparksAttack extends AbstractMove<FireSparksAttack, SpeedKingEntity> {
+    /** Ticks between single-spark shots during hold */
+    private final int shootInterval;
+    /** Number of sparks fired in the initial burst */
+    private final int initialBurst;
+    /** Total spread angle of the initial burst in degrees */
+    private final float burstSpread;
+    /** Random spread half-range for held shots in degrees */
+    private final float heldSpread;
+    /** Base damage per spark */
+    private final float sparkDamage;
 
-    public FireSparksAttack(final int cooldown, final int windup, final int duration, final float moveDistance) {
+    public FireSparksAttack(final int cooldown, final int windup, final int duration, final float moveDistance,
+                            final int shootInterval, final int initialBurst, final float burstSpread,
+                            final float heldSpread, final float sparkDamage) {
         super(cooldown, windup, duration, moveDistance);
+        this.shootInterval = shootInterval;
+        this.initialBurst = initialBurst;
+        this.burstSpread = burstSpread;
+        this.heldSpread = heldSpread;
+        this.sparkDamage = sparkDamage;
         ranged = true;
-        withHoldable(true); // This is a holdable attack
+        withHoldable(true);
     }
 
     @Override
@@ -27,54 +44,45 @@ public final class FireSparksAttack extends AbstractMove<FireSparksAttack, Speed
 
     @Override
     public @NonNull Set<LivingEntity> perform(final SpeedKingEntity attacker, final LivingEntity user) {
-        final int sparkCount = 5;
-        final float spreadAngle = 30f;
-
-        for (int i = 0; i < sparkCount; i++) {
-            float angleOffset = (spreadAngle / (sparkCount - 1)) * i - (spreadAngle / 2);
-
-            final FireSparkProjectile spark = new FireSparkProjectile(attacker.level(), user);
-
-            Vec3 startPos = getOffsetHeightPos(attacker);
-            spark.setPos(startPos);
-
-            Vec3 direction = user.getLookAngle();
-            Vec3 spreadDirection = direction.yRot((float) Math.toRadians(angleOffset));
-
-            spark.setDeltaMovement(spreadDirection.scale(1.0f));
-            spark.hurtMarked = true;
-
-            // Configure for Fire Sparks Heavy - no stun, chip damage, boiling
-            spark.setBaseDamage(1.5f); // Minor chip damage - this will trigger the boiling-only mode
-
-            attacker.level().addFreshEntity(spark);
+        // Initial burst — spread across burstSpread degrees
+        for (int i = 0; i < initialBurst; i++) {
+            float angleOffset = (initialBurst > 1)
+                    ? (burstSpread / (initialBurst - 1)) * i - (burstSpread / 2f)
+                    : 0f;
+            shootSpark(attacker, user, angleOffset, 1.0f);
         }
-
         return Set.of();
     }
 
     @Override
     public void activeTick(SpeedKingEntity attacker, int moveStun) {
         super.activeTick(attacker, moveStun);
+        if (!attacker.hasUser()) return;
 
-        // Continue shooting sparks while held (every 5 ticks)
-        if (moveStun % 5 == 0 && attacker.hasUser()) {
-            final FireSparkProjectile spark = new FireSparkProjectile(attacker.level(), attacker.getUserOrThrow());
-
-            Vec3 startPos = getOffsetHeightPos(attacker);
-            spark.setPos(startPos);
-
-            Vec3 direction = attacker.getUserOrThrow().getLookAngle();
-            // Add slight random spread
-            Vec3 spreadDirection = direction.yRot((float) Math.toRadians((attacker.level().random.nextFloat() - 0.5f) * 20f));
-
-            spark.setDeltaMovement(spreadDirection.scale(1.0f));
-            spark.hurtMarked = true;
-
-            spark.setBaseDamage(1.5f); // Low damage triggers boiling-only behavior in the projectile
-
-            attacker.level().addFreshEntity(spark);
+        // Stop as soon as the player releases the keybind
+        if (!attacker.isHolding()) {
+            attacker.setMoveStun(1);
+            return;
         }
+
+        // One spark every shootInterval ticks while held
+        if (moveStun % shootInterval == 0) {
+            LivingEntity user = attacker.getUserOrThrow();
+            float spread = (attacker.level().random.nextFloat() - 0.5f) * heldSpread * 2f;
+            shootSpark(attacker, user, spread, 1.0f);
+        }
+    }
+
+    private void shootSpark(SpeedKingEntity attacker, LivingEntity user, float yawOffset, float speed) {
+        final FireSparkProjectile spark = new FireSparkProjectile(attacker.level(), user);
+        spark.setPos(getOffsetHeightPos(attacker));
+
+        Vec3 dir = user.getLookAngle().yRot((float) Math.toRadians(yawOffset));
+        spark.setDeltaMovement(dir.scale(speed));
+        spark.hurtMarked = true;
+        spark.setBaseDamage(sparkDamage);
+
+        attacker.level().addFreshEntity(spark);
     }
 
     @Override
@@ -84,7 +92,8 @@ public final class FireSparksAttack extends AbstractMove<FireSparksAttack, Speed
 
     @Override
     public @NonNull FireSparksAttack copy() {
-        return copyExtras(new FireSparksAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
+        return copyExtras(new FireSparksAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(),
+                shootInterval, initialBurst, burstSpread, heldSpread, sparkDamage));
     }
 
     public static class Type extends AbstractMove.Type<FireSparksAttack> {
@@ -92,7 +101,8 @@ public final class FireSparksAttack extends AbstractMove<FireSparksAttack, Speed
 
         @Override
         protected @NonNull App<RecordCodecBuilder.Mu<FireSparksAttack>, FireSparksAttack> buildCodec(RecordCodecBuilder.Instance<FireSparksAttack> instance) {
-            return baseDefault(instance, FireSparksAttack::new);
+            return baseDefault(instance, (cd, wu, dur, md) ->
+                    new FireSparksAttack(cd, wu, dur, md, 5, 5, 30f, 15f, 1.5f));
         }
     }
 }

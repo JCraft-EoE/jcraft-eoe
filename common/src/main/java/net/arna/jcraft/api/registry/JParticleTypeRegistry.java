@@ -37,6 +37,9 @@ public interface JParticleTypeRegistry {
     RegistrySupplier<SimpleParticleType> HAMON_SPARK = PARTICLES.register("hamon_spark", () -> new SimpleParticleType(false));
     RegistrySupplier<SimpleParticleType> LEMON = PARTICLES.register("lemon", () -> new SimpleParticleType(false));
 
+    // Speed King
+    RegistrySupplier<SimpleParticleType> UPDRAFT = PARTICLES.register("updraft", () -> new SimpleParticleType(false));
+
     // Metallica mosh
     RegistrySupplier<SimpleParticleType> METALLICA_MOSH_1 = PARTICLES.register("metallica_mosh_1", () -> new SimpleParticleType(false));
     RegistrySupplier<SimpleParticleType> METALLICA_MOSH_2 = PARTICLES.register("metallica_mosh_2", () -> new SimpleParticleType(false));

@@ -27,7 +27,8 @@ public enum JParticleType {
     AURA_BLOB(JParticleTypeRegistry.AURA_BLOB),
     STUN_SLASH(JParticleTypeRegistry.STUN_SLASH),
     STUN_PIERCE(JParticleTypeRegistry.STUN_PIERCE),
-    LEMON(JParticleTypeRegistry.LEMON);
+    LEMON(JParticleTypeRegistry.LEMON),
+    UPDRAFT(JParticleTypeRegistry.UPDRAFT);
 
     public static final Codec<JParticleType> CODEC = JCodecUtils.createEnumCodec(JParticleType.class);
     private final Supplier<? extends SimpleParticleType> particleType;

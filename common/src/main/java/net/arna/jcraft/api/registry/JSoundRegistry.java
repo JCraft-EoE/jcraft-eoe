@@ -330,6 +330,9 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> ROAD_ROLLER_IGNITION = register("rrignition");
     RegistrySupplier<SoundEvent> ROAD_ROLLER_ACTIVE = register("rractive");
 
+    //// SPEED KING
+    RegistrySupplier<SoundEvent> WHOOSH = register("whoosh");
+
     static void init() {
         // intentionally left empty
     }

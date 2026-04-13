@@ -109,7 +109,7 @@ public interface JEntityRendererRegister {
             new RendererData<>(JEntityTypeRegistry.METEOR, MeteorRenderer::new),
             new RendererData<>(JEntityTypeRegistry.PH_CAPSULE, context -> new ProjectileRenderer<>(context, "ph_capsule")),
             new RendererData<>(JEntityTypeRegistry.PURPLE_HAZE_CLOUD, JEntityRendererRegister::createEmpty),
-            new RendererData<>(JEntityTypeRegistry.STAND_ARROW_PROJECTILE, StandArrowRenderer::new),
+            new RendererData<>(JEntityTypeRegistry.STAND_ARROW_PROJECTILE, context -> new ProjectileRenderer<>(context, "stand_arrow")),
             new RendererData<>(JEntityTypeRegistry.FIRE_SPARK_PROJECTILE, FireSparkRenderer::new),
             new RendererData<>(JEntityTypeRegistry.STAND_ARROW_PROJECTILE, context -> new ProjectileRenderer<>(context, "stand_arrow")),
             new RendererData<>(JEntityTypeRegistry.AEROBOMB, context -> new ProjectileRenderer<>(context, "aerobomb")),

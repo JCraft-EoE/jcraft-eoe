@@ -204,9 +204,13 @@ public class FireSparkProjectile extends ThrowableProjectile {
     }
 
     private void createHeatWave(BlockPos impactPos) {
-        // Create a 2-block radius heat wave similar to Pure Heat Accumulation
         int radius = 2;
         Vec3 center = Vec3.atCenterOf(impactPos);
+
+        // TNT-style explosion — handles particles and sound automatically, no block damage
+        if (!level().isClientSide()) {
+            level().explode(this, center.x, center.y, center.z, 0.5f, false, Level.ExplosionInteraction.NONE);
+        }
 
         // Apply boiling to entities in the area
         List<LivingEntity> entitiesInArea = level().getEntitiesOfClass(LivingEntity.class,
@@ -215,6 +219,7 @@ public class FireSparkProjectile extends ThrowableProjectile {
 
         for (LivingEntity entity : entitiesInArea) {
             entity.addEffect(new MobEffectInstance(JStatusRegistry.BOILING.get(), 200, 0, false, true));
+            entity.hurt(entity.damageSources().explosion(null, getOwner()), 2.0f);
         }
 
         // Destroy plants and water in the area

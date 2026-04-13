@@ -102,6 +102,7 @@ public class JCraftForgeClient {
         event.registerSpriteSet(JParticleTypeRegistry.DAMAGE_NUMBER.get(), DamageNumberParticle.Factory::new);
         DamageIndicatorManager.setDamageNumberParticle(JParticleTypeRegistry.DAMAGE_NUMBER.get());
         event.registerSpriteSet(JParticleTypeRegistry.HAMON_SPARK.get(), provider -> new HitsparkParticle.Factory(provider, 0.2f, 4));
+        event.registerSpriteSet(JParticleTypeRegistry.UPDRAFT.get(), UpdraftParticle.Factory::new);
     }
 
     private static void registerClientCapabilityReceivers() {
