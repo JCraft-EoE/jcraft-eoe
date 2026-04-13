@@ -3,6 +3,7 @@ package net.arna.jcraft.mixin.client;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.arna.jcraft.client.rendering.api.callbacks.PostWorldRenderCallback;
+import net.arna.jcraft.client.rendering.shader.JShaderRegistry;
 import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
 import net.arna.jcraft.client.util.JClientUtils;
 import net.arna.jcraft.mixin_logic.StillDepthHolder;
@@ -14,6 +15,7 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.world.entity.Entity;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -47,6 +49,10 @@ public class LevelRendererMixin {
     private void hookPostWorldRender(PoseStack matrices, float tickDelta, long nanoTime, boolean renderBlockOutline,
                                      Camera camera, GameRenderer renderer, LightTexture lmTexManager, Matrix4f matrix4f, CallbackInfo ci) {
         ((StillDepthHolder) Minecraft.getInstance().getMainRenderTarget()).jcraft$freezeDepth();
+
+        JShaderRegistry.TIMESTOP_EFFECT.update(tickDelta);
+        JShaderRegistry.TIMESTOP_EFFECT.renderBubble(camera, new Vector3f(0.f, 60.f, 0.f), 50.f);
+
         PostWorldRenderCallback.EVENT.invoker().onWorldRendered(matrices, camera, tickDelta, nanoTime);
     }
 

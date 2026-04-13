@@ -13,4 +13,5 @@ public abstract class BakedProgram {
 
     public abstract int getUniformLocation(String name);
     public abstract <T> @Nullable T getUniform(Class<T> type, String name);
+    public abstract void setUniform(String name, Object type);
 }

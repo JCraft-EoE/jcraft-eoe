@@ -5,9 +5,15 @@ import com.mojang.blaze3d.vertex.*;
 import net.arna.jcraft.client.rendering.shader.api.BakedProgram;
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL20C;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
 import static org.lwjgl.opengl.GL33C.*;
@@ -82,6 +88,14 @@ public class GLBakedProgram extends BakedProgram {
             Integer.class, GL20C::glGetUniformi
     );
 
+    private static final Map<Class<?>, BiConsumer<Integer, Object>> UNIFORM_ENCODERS = Map.of(
+            Float.class, (location, value) -> glUniform1f(location, (float) value),
+            Integer.class, (location, value) -> glUniform1i(location, (int) value),
+            Matrix4f.class, (location, value) -> glUniformMatrix4fv(location, false, ((Matrix4f)value).get(BufferUtils.createFloatBuffer(16))),
+            Vector2f.class, (location, value) -> {Vector2f v = (Vector2f)value; glUniform2f(location, v.x, v.y);},
+            Vector3f.class, (location, value) -> {Vector3f v = (Vector3f)value; glUniform3f(location, v.x, v.y, v.z);}
+    );
+
     @Override
     public @Nullable <T> T getUniform(Class<T> type, String name) {
         int uniformLoc = getUniformLocation(name);
@@ -92,5 +106,23 @@ public class GLBakedProgram extends BakedProgram {
 
         //noinspection unchecked
         return (T)decoder.apply(handle, uniformLoc);
+    }
+
+    private final HashMap<String, Integer> UNIFORM_LOCATION_CACHE = new HashMap<>();
+
+    @Override
+    public void setUniform(String name, Object value) {
+        int location = UNIFORM_LOCATION_CACHE.getOrDefault(name, glGetUniformLocation(handle, name));
+        if (location == -1)
+            return;
+
+        UNIFORM_LOCATION_CACHE.putIfAbsent(name, location);
+
+        BiConsumer<Integer, Object> encoder = UNIFORM_ENCODERS.get(value.getClass());
+        if (encoder == null) return;
+
+        glUseProgram(handle);
+        encoder.accept(location, value);
+        glUseProgram(0);
     }
 }

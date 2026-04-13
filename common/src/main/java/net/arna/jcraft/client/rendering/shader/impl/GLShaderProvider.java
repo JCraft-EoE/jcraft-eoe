@@ -19,6 +19,11 @@ public class GLShaderProvider implements JShaderProvider<GLBakedProgram> {
             int shaderHandle = glCreateShader(shader.type().getCode());
             glShaderSource(shaderHandle, shader.source());
             glCompileShader(shaderHandle);
+            if (glGetShaderi(shaderHandle, GL_COMPILE_STATUS) == GL_FALSE)
+            {
+                JCraft.LOGGER.error("Failed to compile shader:\n\t{}", glGetShaderInfoLog(shaderHandle));
+                return null;
+            }
             compiled[i] = shaderHandle;
 
             glAttachShader(handle, shaderHandle);
