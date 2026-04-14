@@ -39,7 +39,6 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> TIME_SKIP = register("timeskip");
     RegistrySupplier<SoundEvent> COIN_TOSS = register("cointoss");
     RegistrySupplier<SoundEvent> TOSS = register("throw");
-    RegistrySupplier<SoundEvent> JANGLE = register("jangle");
 
     // Star Platinum
     RegistrySupplier<SoundEvent> STAR_PLATINUM_SUMMON = register("spsummon");

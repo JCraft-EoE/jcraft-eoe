@@ -1,15 +1,12 @@
 package net.arna.jcraft.datagen.providers.assets;
 
-import dev.architectury.registry.registries.RegistrySupplier;
 import lombok.NonNull;
-import lombok.SneakyThrows;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.JRegistries;
 import net.arna.jcraft.api.registry.JBlockRegistry;
 import net.arna.jcraft.api.registry.JItemRegistry;
 import net.arna.jcraft.api.registry.JSpecTypeRegistry;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
-import net.arna.jcraft.common.item.CosplayItem;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
 import net.minecraft.data.models.BlockModelGenerators;
@@ -17,9 +14,7 @@ import net.minecraft.data.models.ItemModelGenerators;
 import net.minecraft.data.models.model.ModelTemplate;
 import net.minecraft.data.models.model.ModelTemplates;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ArmorItem;
 
-import java.util.Locale;
 import java.util.Optional;
 
 public class JModelProvider extends FabricModelProvider {
@@ -61,14 +56,13 @@ public class JModelProvider extends FabricModelProvider {
         generator.generateFlatItem(JItemRegistry.STAND_ARROWHEAD.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.ROAD_ROLLER.get(), ModelTemplates.FLAT_ITEM);
 
-        generateCosplayModels(generator);
-
         generator.generateFlatItem(JItemRegistry.DISC.get(), ModelTemplates.FLAT_ITEM);
         generateSpecDiscModels(generator);
         generateStandDiscModels(generator);
 
         generator.generateFlatItem(JItemRegistry.STELLAR_IRON_INGOT.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.STONE_MASK.get(), ModelTemplates.FLAT_ITEM);
+        generator.generateFlatItem(JItemRegistry.RED_HAT.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.PLANKTON_VIAL.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.PRISON_KEY.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.STEEL_BALL.get(), ModelTemplates.FLAT_ITEM);
@@ -83,16 +77,6 @@ public class JModelProvider extends FabricModelProvider {
         generator.generateFlatItem(JItemRegistry.AYA_TSUJI_SPAWN_EGG.get(), SPAWN_EGG_MODEL);
         generator.generateFlatItem(JItemRegistry.DARBY_OLDER_SPAWN_EGG.get(), SPAWN_EGG_MODEL);
         generator.generateFlatItem(JItemRegistry.DARBY_YOUNGER_SPAWN_EGG.get(), SPAWN_EGG_MODEL);
-    }
-
-    @SneakyThrows
-    private void generateCosplayModels(final @NonNull ItemModelGenerators generator) {
-        for (final CosplayItem<?> cosplayItem : CosplayItem.all()) {
-            for (final RegistrySupplier<? extends ArmorItem> item : cosplayItem) {
-                generator.generateLayeredItem(item.getId().withPath(p -> "item/" + p),
-                        JCraft.id("item/" + cosplayItem.getName()), JCraft.id("item/cosplay/" + item.get().getMaterial().getName().toLowerCase(Locale.ROOT)));
-            }
-        }
     }
 
     private void generateSpecDiscModels(final @NonNull ItemModelGenerators generator) {

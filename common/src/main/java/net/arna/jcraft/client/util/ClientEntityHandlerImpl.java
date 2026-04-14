@@ -231,6 +231,7 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
 
     private void displayMoshParticles(ClientLevel clientWorld, RandomSource random, Entity entity,
                                       Vector3f maxBox, int count, Vector3f color) {
+        MoshParticle.Factory.parent = entity;
         MoshParticle.Factory.color = color;
         final Vec3 pos = entity.position();
         final int typeIndex = random.nextInt(JParticleTypeRegistry.MOSH_TYPES.size());
@@ -240,7 +241,7 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
                     pos.y + maxBox.y() * random.triangle(0.5, 0.5),
                     pos.z + maxBox.z() * random.triangle(0, 2),
                     0, 0, 0);
-        }
+        } //TODO: make particle spawn faster relative to the iron bar (less iron less particles & vice versa)
     }
 
     @Override

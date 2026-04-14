@@ -1225,14 +1225,6 @@
       "jcraft:vehicles/roadroller/ignition"
     ]
   },
-  "jangle": {
-    "sounds": [
-      "jcraft:generic/jangle1",
-      "jcraft:generic/jangle2",
-      "jcraft:generic/jangle3",
-      "jcraft:generic/jangle4"
-    ]
-  },
   "asshoot": {
     "sounds": [
       "jcraft:stands/aerosmith/burst1",

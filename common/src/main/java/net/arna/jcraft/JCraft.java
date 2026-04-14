@@ -4,7 +4,6 @@ import com.mojang.brigadier.StringReader;
 import dev.architectury.event.events.common.CommandRegistrationEvent;
 import dev.architectury.networking.NetworkManager;
 import dev.architectury.registry.registries.DeferredRegister;
-import dev.architectury.registry.registries.RegistrySupplier;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
@@ -29,7 +28,6 @@ import net.arna.jcraft.common.entity.projectile.KnifeProjectile;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.config.GravityChangerConfig;
 import net.arna.jcraft.common.gravity.util.GravityChannel;
-import net.arna.jcraft.common.item.CosplayItem;
 import net.arna.jcraft.common.loot.JLootTableHelper;
 import net.arna.jcraft.common.network.RemoteStandInteractPacket;
 import net.arna.jcraft.common.network.c2s.*;
@@ -70,7 +68,6 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -135,6 +132,7 @@ public final class JCraft {
     public static final GameRules.Key<IntegerValue> STAND_ARROW_BASE_DAMAGE = register("standArrowBaseDamage", Category.MISC, IntegerValue.create(2));
 
     public static final GameRules.Key<BooleanValue> FALLING_METEORS = register("doFallingMeteors", Category.SPAWNING, BooleanValue.create(true));
+
     /**
      * String ID of the base controller.
      */
@@ -252,14 +250,8 @@ public final class JCraft {
     }
 
     private static void registerAzArmor() {
-        AzIdentityRegistry.register(
-                JItemRegistry.STONE_MASK.get()
-        );
-        for (final CosplayItem<?> cosplayItem : CosplayItem.all()) {
-            for (final RegistrySupplier<? extends ArmorItem> item : cosplayItem) {
-                AzIdentityRegistry.register(item.get());
-            }
-        }
+        AzIdentityRegistry.register(JItemRegistry.STONE_MASK.get());
+        AzIdentityRegistry.register(JItemRegistry.RED_HAT.get());
     }
 
     public static void postInit() {

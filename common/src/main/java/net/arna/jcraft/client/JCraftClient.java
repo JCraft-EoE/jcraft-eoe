@@ -6,18 +6,16 @@ import com.mojang.blaze3d.platform.InputConstants;
 import dev.architectury.registry.ReloadListenerRegistry;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
 import dev.architectury.registry.client.particle.ParticleProviderRegistry;
-import dev.architectury.registry.registries.RegistrySupplier;
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import lombok.Getter;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
-import mod.azure.azurelib.render.armor.AzArmorRenderer;
 import mod.azure.azurelib.render.armor.AzArmorRendererRegistry;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.pose.PoseModifiers;
 import net.arna.jcraft.api.registry.JItemRegistry;
-import net.arna.jcraft.client.renderer.armor.*;
+import net.arna.jcraft.client.renderer.armor.ArmorRenderer;
 import net.arna.jcraft.client.rendering.DamageIndicatorManager;
 import net.arna.jcraft.client.particle.DamageNumberParticle;
 import net.arna.jcraft.client.rendering.StandUserPoseLoader;
@@ -34,7 +32,6 @@ import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
 import net.arna.jcraft.client.util.TrackedKeyBinding;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.stand.StandEntity;
-import net.arna.jcraft.common.item.CosplayItem;
 import net.arna.jcraft.common.util.MovementInputType;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.fabricmc.api.EnvType;
@@ -50,7 +47,6 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.Unit;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.item.ArmorItem;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -110,7 +106,8 @@ public class JCraftClient {
         JCraftAbilityHud.init();
         PoseModifiers.register();
 
-        initCosplay();
+        AzArmorRendererRegistry.register(ArmorRenderer.simple("stone_mask"), JItemRegistry.STONE_MASK.get());
+        AzArmorRendererRegistry.register(ArmorRenderer.simple("red_hat"), JItemRegistry.RED_HAT.get());
 
         SpecialParticleShaderHandler.INSTANCE.init();
         ZaWarudoShaderHandler.INSTANCE.init();
@@ -120,119 +117,11 @@ public class JCraftClient {
         BoilingHeatstrokeShaderHandler.INSTANCE.init();
 
         // Renderer registration
-        // JArmorRendererRegistry.registerArmorRenderers();
 
         ClientPacketHandler.init();
 
         AttackHitboxEffectRenderer.init();
         TimeErasePredictionEffectRenderer.init();
-    }
-
-    private static void initCosplay() {
-        initCosplay(JItemRegistry.COWBOY_HAT, ArmorRenderer.simple("cowboy_outfit"));
-        initCosplay(JItemRegistry.COWBOY_PONCHO, ArmorRenderer.simple("cowboy_poncho"));
-        initCosplay(JItemRegistry.COWBOY_GUNBELT_SPURS, CowboyGunbeltRenderer::new);
-        initCosplay(JItemRegistry.DIAVOLO_WIG, ArmorRenderer.simple("diavoloclothes"));
-        initCosplay(JItemRegistry.DIAVOLO_SHIRT, ArmorRenderer.flutter("diavoloshirt"));
-        initCosplay(JItemRegistry.DIAVOLO_PANTS, ArmorRenderer.simple("diavoloclothes"));
-        initCosplay(JItemRegistry.DIAVOLO_BOOTS, ArmorRenderer.simple("diavoloclothes"));
-        initCosplay(JItemRegistry.DIEGO_HAT, ArmorRenderer.simple("diegooutfit"));
-        initCosplay(JItemRegistry.DIEGO_SHIRT, ArmorRenderer.simple("diegooutfit"));
-        initCosplay(JItemRegistry.DIEGO_PANTS, ArmorRenderer.simple("diegooutfit"));
-        initCosplay(JItemRegistry.DIEGO_BOOTS, ArmorRenderer.simple("diegooutfit"));
-        initCosplay(JItemRegistry.DIO_HEADBAND, ArmorRenderer.flutter("diojacket"));
-        initCosplay(JItemRegistry.DIO_JACKET, ArmorRenderer.flutter("diojacket"));
-        initCosplay(JItemRegistry.DIO_PANTS, DIOtardRenderer::new);
-        initCosplay(JItemRegistry.DIO_BOOTS, DIOtardRenderer::new);
-        initCosplay(JItemRegistry.DIO_CAPE, DIOCapeRenderer::new);
-        initCosplay(JItemRegistry.DIO_P1_WIG, ArmorRenderer.simple("diooutfit"));
-        initCosplay(JItemRegistry.DIO_P1_JACKET, ArmorRenderer.simple("diooutfit"));
-        initCosplay(JItemRegistry.DIO_P1_PANTS, ArmorRenderer.simple("diooutfit"));
-        initCosplay(JItemRegistry.DIO_P1_BOOTS, ArmorRenderer.simple("diooutfit"));
-        initCosplay(JItemRegistry.OH_DIO_WIG, ArmorRenderer.simple("oh_diojacket"));
-        initCosplay(JItemRegistry.OH_DIO_JACKET, ArmorRenderer.simple("oh_diojacket"));
-        initCosplay(JItemRegistry.OH_DIO_PANTS, OhDIOtardRenderer::new);
-        initCosplay(JItemRegistry.OH_DIO_BOOTS, OhDIOtardRenderer::new);
-        initCosplay(JItemRegistry.DOPPIO_WIG, ArmorRenderer.simple("doppiotop"));
-        initCosplay(JItemRegistry.DOPPIO_SHIRT, ArmorRenderer.simple("doppiotop"));
-        initCosplay(JItemRegistry.FINAL_KIRA_WIG, FinalKiraArmorRenderer::new);
-        initCosplay(JItemRegistry.FINAL_KIRA_JACKET, FinalKiraJacketRenderer::new);
-        initCosplay(JItemRegistry.FINAL_KIRA_PANTS, FinalKiraArmorRenderer::new);
-        initCosplay(JItemRegistry.FINAL_KIRA_BOOTS, FinalKiraArmorRenderer::new);
-        initCosplay(JItemRegistry.GIORNO_WIG, GiornoArmorRenderer::new);
-        initCosplay(JItemRegistry.GIORNO_JACKET, GiornoJacketRenderer::new);
-        initCosplay(JItemRegistry.GIORNO_PANTS, GiornoArmorRenderer::new);
-        initCosplay(JItemRegistry.GIORNO_BOOTS, GiornoArmorRenderer::new);
-        initCosplay(JItemRegistry.GYRO_HAT, ArmorRenderer.simple("gyrotop"));
-        initCosplay(JItemRegistry.GYRO_SHIRT, ArmorRenderer.simple("gyrotop"));
-        initCosplay(JItemRegistry.GYRO_PANTS, GyroBottomRenderer::new);
-        initCosplay(JItemRegistry.GYRO_BOOTS, GyroBottomRenderer::new);
-        initCosplay(JItemRegistry.HEAVEN_ATTAINED_WIG, ArmorRenderer.simple("heavenattainedoutfit"));
-        initCosplay(JItemRegistry.HEAVEN_ATTAINED_SHIRT, ArmorRenderer.simple("heavenattainedoutfit"));
-        initCosplay(JItemRegistry.HEAVEN_ATTAINED_PANTS, ArmorRenderer.simple("heavenattainedoutfit"));
-        initCosplay(JItemRegistry.HEAVEN_ATTAINED_BOOTS, ArmorRenderer.simple("heavenattainedoutfit"));
-        initCosplay(JItemRegistry.JOHNNY_CAP, ArmorRenderer.simple("johnnyclothes"));
-        initCosplay(JItemRegistry.JOHNNY_JACKET, ArmorRenderer.simple("johnnyclothes"));
-        initCosplay(JItemRegistry.JOHNNY_PANTS, ArmorRenderer.simple("johnnyclothes"));
-        initCosplay(JItemRegistry.JOHNNY_BOOTS, ArmorRenderer.simple("johnnyclothes"));
-        initCosplay(JItemRegistry.JOTARO_CAP, JotaroArmorRenderer::new);
-        initCosplay(JItemRegistry.JOTARO_JACKET, JotaroCoatRenderer::new);
-        initCosplay(JItemRegistry.JOTARO_PANTS, JotaroArmorRenderer::new);
-        initCosplay(JItemRegistry.JOTARO_BOOTS, JotaroArmorRenderer::new);
-        initCosplay(JItemRegistry.JOTARO_P4_CAP, JotaroArmorP4Renderer::new);
-        initCosplay(JItemRegistry.JOTARO_P4_JACKET, JotaroCoatP4Renderer::new);
-        initCosplay(JItemRegistry.JOTARO_P4_PANTS, JotaroArmorP4Renderer::new);
-        initCosplay(JItemRegistry.JOTARO_P4_BOOTS, JotaroArmorP4Renderer::new);
-        initCosplay(JItemRegistry.JOTARO_P6_CAP, JotaroArmorP6Renderer::new);
-        initCosplay(JItemRegistry.JOTARO_P6_JACKET, JotaroCoatP6Renderer::new);
-        initCosplay(JItemRegistry.JOTARO_P6_PANTS, JotaroArmorP6Renderer::new);
-        initCosplay(JItemRegistry.JOTARO_P6_BOOTS, JotaroArmorP6Renderer::new);
-        initCosplay(JItemRegistry.KAKYOIN_WIG, ArmorRenderer.simple("kakyoinclothes"));
-        initCosplay(JItemRegistry.KAKYOIN_COAT, KakyoinCoatRenderer::new);
-        initCosplay(JItemRegistry.KAKYOIN_PANTS, ArmorRenderer.simple("kakyoinclothes"));
-        initCosplay(JItemRegistry.KAKYOIN_BOOTS, ArmorRenderer.simple("kakyoinclothes"));
-        initCosplay(JItemRegistry.MOUNTAIN_TIM_HAT, ArmorRenderer.simple("mountain_tim_clothes"));
-        initCosplay(JItemRegistry.MOUNTAIN_TIM_SHIRT, ArmorRenderer.simple("mountain_tim_top"));
-        initCosplay(JItemRegistry.MOUNTAIN_TIM_COAT, MountainTimCoatRenderer::new);
-        initCosplay(JItemRegistry.MOUNTAIN_TIM_PANTS, MountainTimPantsRenderer::new);
-        initCosplay(JItemRegistry.MOUNTAIN_TIM_BOOTS, ArmorRenderer.simple("mountain_tim_clothes"));
-        initCosplay(JItemRegistry.POLNAREFF_WIG, ArmorRenderer.simple("polnareffoutfit"));
-        initCosplay(JItemRegistry.POLNAREFF_SHIRT, ArmorRenderer.simple("polnareffoutfit"));
-        initCosplay(JItemRegistry.POLNAREFF_PANTS, ArmorRenderer.simple("polnareffoutfit"));
-        initCosplay(JItemRegistry.POLNAREFF_BOOTS, ArmorRenderer.simple("polnareffoutfit"));
-        initCosplay(JItemRegistry.KARS_HEADWRAP, ArmorRenderer.simple("karsoutfit"));
-        initCosplay(JItemRegistry.KIRA_WIG, KiraArmorRenderer::new);
-        initCosplay(JItemRegistry.KIRA_JACKET, ArmorRenderer.simple("kirajacket"));
-        initCosplay(JItemRegistry.KIRA_PANTS, KiraArmorRenderer::new);
-        initCosplay(JItemRegistry.KIRA_BOOTS, KiraArmorRenderer::new);
-        initCosplay(JItemRegistry.KOSAKU_WIG, KosakuArmorRenderer::new);
-        initCosplay(JItemRegistry.KOSAKU_JACKET, KosakuJacketRenderer::new);
-        initCosplay(JItemRegistry.KOSAKU_PANTS, KosakuArmorRenderer::new);
-        initCosplay(JItemRegistry.KOSAKU_BOOTS, KosakuArmorRenderer::new);
-        initCosplay(JItemRegistry.PUCCIS_HAT, ArmorRenderer.simple("puccis_hat"));
-        initCosplay(JItemRegistry.PUCCI_ROBE, PucciRobeRenderer::new);
-        initCosplay(JItemRegistry.PUCCI_PANTS, ArmorRenderer.simple("puccibottom"));
-        initCosplay(JItemRegistry.PUCCI_BOOTS, ArmorRenderer.simple("puccibottom"));
-        initCosplay(JItemRegistry.RED_HAT, ArmorRenderer.simple("red_hat"));
-        initCosplay(JItemRegistry.RINGO_OUTFIT, RingoOutfitRenderer::new);
-        initCosplay(JItemRegistry.RINGO_BOOTS, RingoOutfitRenderer::new);
-        initCosplay(JItemRegistry.RISOTTO_CAP, RisottoCapRenderer::new);
-        initCosplay(JItemRegistry.RISOTTO_JACKET, ArmorRenderer.simple("risottotop"));
-        initCosplay(JItemRegistry.RISOTTO_PANTS, RisottoBottomRenderer::new);
-        initCosplay(JItemRegistry.RISOTTO_BOOTS, RisottoBottomRenderer::new);
-        AzArmorRendererRegistry.register(ArmorRenderer.simple("stone_mask"), JItemRegistry.STONE_MASK.get());
-        initCosplay(JItemRegistry.STRAIZO_PONCHO, ArmorRenderer.simple("straizoponcho"));
-        initCosplay(JItemRegistry.STRAIZO_PONCHO, ArmorRenderer.simple("straizoponcho"));
-        initCosplay(JItemRegistry.VALENTINE_WIG, ValentineWigRenderer::new);
-        initCosplay(JItemRegistry.VALENTINE_JACKET, ValentineTopRenderer::new);
-        initCosplay(JItemRegistry.VALENTINE_PANTS, ValentineBottomRenderer::new);
-        initCosplay(JItemRegistry.VALENTINE_BOOTS, ValentineBottomRenderer::new);
-    }
-
-    private static void initCosplay(CosplayItem<?> cosplay, Supplier<AzArmorRenderer> renderer) {
-        for (RegistrySupplier<? extends ArmorItem> item : cosplay) {
-            AzArmorRendererRegistry.register(renderer, item.get());
-        }
     }
     
     public static void registerKeyBindings(@Nullable Consumer<KeyMapping> register) {
