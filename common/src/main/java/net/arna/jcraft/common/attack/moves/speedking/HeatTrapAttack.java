@@ -2,38 +2,26 @@ package net.arna.jcraft.common.attack.moves.speedking;
 
 import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.common.entity.projectile.FireSparkProjectile;
 import net.arna.jcraft.common.entity.stand.SpeedKingEntity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.phys.Vec3;
 
 import java.util.Set;
 
-@Getter
-public final class FlashbangAttack extends AbstractMove<FlashbangAttack, SpeedKingEntity> {
+public final class HeatTrapAttack extends AbstractMove<HeatTrapAttack, SpeedKingEntity> {
     private static final int PROJECTILE_COUNT = 5;
     private static final float SPREAD_DEGREES = 40f;
     private static final float PROJECTILE_SPEED = 1.2f;
 
-    private final float detonateTagDamage;
-    private final int blindnessDuration;
-    private final int confusionDuration;
-
-    public FlashbangAttack(final int cooldown, final int windup, final int duration, final float moveDistance,
-                           final float detonateTagDamage,
-                           final int blindnessDuration, final int confusionDuration) {
+    public HeatTrapAttack(final int cooldown, final int windup, final int duration, final float moveDistance) {
         super(cooldown, windup, duration, moveDistance);
-        this.detonateTagDamage = detonateTagDamage;
-        this.blindnessDuration = blindnessDuration;
-        this.confusionDuration = confusionDuration;
     }
 
     @Override
-    public @NonNull MoveType<FlashbangAttack> getMoveType() {
+    public @NonNull MoveType<HeatTrapAttack> getMoveType() {
         return Type.INSTANCE;
     }
 
@@ -49,8 +37,6 @@ public final class FlashbangAttack extends AbstractMove<FlashbangAttack, SpeedKi
             spark.setDeltaMovement(user.getLookAngle().yRot((float) Math.toRadians(yawOffset)).scale(PROJECTILE_SPEED));
             spark.hurtMarked = true;
             spark.setHeatTrapMode(true);
-            spark.setBaseDamage(detonateTagDamage);
-            spark.setHeatTrapDurations(blindnessDuration, confusionDuration);
 
             attacker.level().addFreshEntity(spark);
         }
@@ -59,21 +45,19 @@ public final class FlashbangAttack extends AbstractMove<FlashbangAttack, SpeedKi
     }
 
     @Override
-    protected @NonNull FlashbangAttack getThis() { return this; }
+    protected @NonNull HeatTrapAttack getThis() { return this; }
 
     @Override
-    public @NonNull FlashbangAttack copy() {
-        return copyExtras(new FlashbangAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(),
-                detonateTagDamage, blindnessDuration, confusionDuration));
+    public @NonNull HeatTrapAttack copy() {
+        return copyExtras(new HeatTrapAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
     }
 
-    public static class Type extends AbstractMove.Type<FlashbangAttack> {
+    public static class Type extends AbstractMove.Type<HeatTrapAttack> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NonNull App<RecordCodecBuilder.Mu<FlashbangAttack>, FlashbangAttack> buildCodec(RecordCodecBuilder.Instance<FlashbangAttack> instance) {
-            return baseDefault(instance, (cd, wu, dur, md) ->
-                    new FlashbangAttack(cd, wu, dur, md, 10.0f, 120, 80));
+        protected @NonNull App<RecordCodecBuilder.Mu<HeatTrapAttack>, HeatTrapAttack> buildCodec(RecordCodecBuilder.Instance<HeatTrapAttack> instance) {
+            return baseDefault(instance, HeatTrapAttack::new);
         }
     }
 }

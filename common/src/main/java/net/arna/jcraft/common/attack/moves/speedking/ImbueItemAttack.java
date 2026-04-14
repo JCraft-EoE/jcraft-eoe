@@ -28,42 +28,25 @@ import java.util.Set;
 import java.util.UUID;
 
 public final class ImbueItemAttack extends AbstractMove<ImbueItemAttack, SpeedKingEntity> {
-    /** How long items stay heated (ticks) */
+    private static final double CONTACT_KNOCKBACK = 1.2;
+    private static final double UPWARD_KNOCKBACK = 0.3;
+    private static final double SEARCH_RADIUS = 5.0;
+    private static final int FIRE_DURATION = 1;
+    private static final double CONTACT_INFLATE = 0.4;
+
     private final int heatDuration;
-    /** Damage dealt when a living entity contacts a heated item */
     private final float contactDamage;
-    /** Horizontal knockback strength on contact */
-    private final double contactKnockback;
-    /** Upward knockback applied on contact */
-    private final double upwardKnockback;
-    /** Search radius for nearby items (blocks) */
-    private final double searchRadius;
-    /** Seconds the item is visually on fire after imbuing */
-    private final int fireDuration;
-    /** How much to inflate the item bounding box for contact detection */
-    private final double contactInflate;
-    /** Duration of the Boiling effect applied on contact (ticks) */
     private final int boilingDuration;
 
-    /** UUIDs of currently heated ItemEntities */
     private static final Set<UUID> HEATED_ITEM_IDS = new HashSet<>();
-    /** Items that have already triggered (prevent double-hits) */
     private static final Set<UUID> TRIGGERED_ITEMS = new HashSet<>();
-    /** Per-item imbue config, populated when an item is imbued */
     private static final Map<UUID, ImbueConfig> ITEM_CONFIGS = new HashMap<>();
 
     public ImbueItemAttack(final int cooldown, final int windup, final int duration, final float moveDistance,
-                           final int heatDuration, final float contactDamage, final double contactKnockback,
-                           final double upwardKnockback, final double searchRadius, final int fireDuration,
-                           final double contactInflate, final int boilingDuration) {
+                           final int heatDuration, final float contactDamage, final int boilingDuration) {
         super(cooldown, windup, duration, moveDistance);
         this.heatDuration = heatDuration;
         this.contactDamage = contactDamage;
-        this.contactKnockback = contactKnockback;
-        this.upwardKnockback = upwardKnockback;
-        this.searchRadius = searchRadius;
-        this.fireDuration = fireDuration;
-        this.contactInflate = contactInflate;
         this.boilingDuration = boilingDuration;
     }
 
@@ -75,32 +58,24 @@ public final class ImbueItemAttack extends AbstractMove<ImbueItemAttack, SpeedKi
     @Override
     public @NonNull Set<LivingEntity> perform(final SpeedKingEntity attacker, final LivingEntity user) {
         if (attacker.level().isClientSide()) return Set.of();
-
-        final Level world = attacker.level();
-        final Vec3 standPos = attacker.position();
-
-        imbueItems(world, standPos, user);
-
+        imbueItems(attacker.level(), attacker.position(), user);
         return Set.of();
     }
 
     private void imbueItems(Level world, Vec3 centerPos, LivingEntity user) {
         AABB searchArea = new AABB(
-                centerPos.add(-searchRadius, -3, -searchRadius),
-                centerPos.add(searchRadius, 3, searchRadius));
-        List<ItemEntity> nearbyItems = world.getEntitiesOfClass(ItemEntity.class, searchArea, EntitySelector.ENTITY_STILL_ALIVE);
+                centerPos.add(-SEARCH_RADIUS, -3, -SEARCH_RADIUS),
+                centerPos.add(SEARCH_RADIUS, 3, SEARCH_RADIUS));
 
-        for (ItemEntity item : nearbyItems) {
+        for (ItemEntity item : world.getEntitiesOfClass(ItemEntity.class, searchArea, EntitySelector.ENTITY_STILL_ALIVE)) {
             item.getItem().getOrCreateTag().putBoolean("SpeedKingHeated", true);
             item.getItem().getOrCreateTag().putLong("HeatedTime", world.getGameTime());
             item.getItem().getOrCreateTag().putUUID("SpeedKingUser", user.getUUID());
-            item.setSecondsOnFire(fireDuration);
+            item.setSecondsOnFire(FIRE_DURATION);
             HEATED_ITEM_IDS.add(item.getUUID());
-            TRIGGERED_ITEMS.remove(item.getUUID()); // reset if re-imbued
-            ITEM_CONFIGS.put(item.getUUID(), new ImbueConfig(
-                    heatDuration, contactDamage, contactKnockback, upwardKnockback, contactInflate, boilingDuration));
+            TRIGGERED_ITEMS.remove(item.getUUID());
+            ITEM_CONFIGS.put(item.getUUID(), new ImbueConfig(heatDuration, contactDamage, boilingDuration));
 
-            // Fire particles burst around the item
             if (world instanceof ServerLevel serverLevel) {
                 Vec3 pos = item.position();
                 for (int i = 0; i < 8; i++) {
@@ -115,7 +90,6 @@ public final class ImbueItemAttack extends AbstractMove<ImbueItemAttack, SpeedKi
             }
         }
 
-        // Also light nearby blocks (candles, campfires, etc.)
         imbueBlocks(world, centerPos);
     }
 
@@ -136,11 +110,6 @@ public final class ImbueItemAttack extends AbstractMove<ImbueItemAttack, SpeedKi
         }
     }
 
-    /**
-     * Called every tick from SpeedKingEntity. Detects living entities touching
-     * heated items — deals damage, knockback, and applies Boiling, then disarms
-     * the trap so it can't trigger again.
-     */
     public static void tickImbuedItems(Level level) {
         if (level.isClientSide()) return;
         ServerLevel serverLevel = (ServerLevel) level;
@@ -155,7 +124,6 @@ public final class ImbueItemAttack extends AbstractMove<ImbueItemAttack, SpeedKi
 
             ImbueConfig cfg = ITEM_CONFIGS.getOrDefault(uuid, ImbueConfig.DEFAULT);
 
-            // Expire after heatDuration
             long heatedAt = item.getItem().getOrCreateTag().getLong("HeatedTime");
             if (level.getGameTime() - heatedAt > cfg.heatDuration) {
                 item.getItem().getOrCreateTag().putBoolean("SpeedKingHeated", false);
@@ -164,18 +132,15 @@ public final class ImbueItemAttack extends AbstractMove<ImbueItemAttack, SpeedKi
                 return true;
             }
 
-            // Only trigger once per item
             if (TRIGGERED_ITEMS.contains(uuid)) return false;
 
-            // Resolve the Speed King user UUID so we can skip them
             UUID ownerUUID = item.getItem().hasTag()
                     ? (item.getItem().getOrCreateTag().hasUUID("SpeedKingUser")
                         ? item.getItem().getOrCreateTag().getUUID("SpeedKingUser")
                         : null)
                     : null;
 
-            // Check for entities touching the item (exclude the Speed King user)
-            AABB contactBox = item.getBoundingBox().inflate(cfg.contactInflate);
+            AABB contactBox = item.getBoundingBox().inflate(CONTACT_INFLATE);
             List<LivingEntity> touching = level.getEntitiesOfClass(LivingEntity.class, contactBox,
                     e -> e.isAlive() && !e.isSpectator() && !e.getUUID().equals(ownerUUID));
 
@@ -183,13 +148,12 @@ public final class ImbueItemAttack extends AbstractMove<ImbueItemAttack, SpeedKi
                 Vec3 itemPos = item.position();
                 for (LivingEntity target : touching) {
                     target.hurt(target.damageSources().magic(), cfg.contactDamage);
-                    Vec3 kb = target.position().subtract(itemPos).normalize().scale(cfg.contactKnockback);
-                    target.setDeltaMovement(target.getDeltaMovement().add(kb.x, cfg.upwardKnockback, kb.z));
+                    Vec3 kb = target.position().subtract(itemPos).normalize().scale(CONTACT_KNOCKBACK);
+                    target.setDeltaMovement(target.getDeltaMovement().add(kb.x, UPWARD_KNOCKBACK, kb.z));
                     target.hurtMarked = true;
                     target.addEffect(new MobEffectInstance(JStatusRegistry.BOILING.get(), cfg.boilingDuration, 1, false, true));
                 }
 
-                // Mark as triggered — won't fire again
                 TRIGGERED_ITEMS.add(uuid);
                 item.getItem().getOrCreateTag().putBoolean("SpeedKingHeated", false);
             }
@@ -206,21 +170,11 @@ public final class ImbueItemAttack extends AbstractMove<ImbueItemAttack, SpeedKi
     @Override
     public @NonNull ImbueItemAttack copy() {
         return copyExtras(new ImbueItemAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(),
-                heatDuration, contactDamage, contactKnockback, upwardKnockback,
-                searchRadius, fireDuration, contactInflate, boilingDuration));
+                heatDuration, contactDamage, boilingDuration));
     }
 
-    /** Snapshot of per-item configurable values, stored when the item is imbued. */
-    public record ImbueConfig(
-            int heatDuration,
-            float contactDamage,
-            double contactKnockback,
-            double upwardKnockback,
-            double contactInflate,
-            int boilingDuration
-    ) {
-        /** Fallback defaults used if a UUID is missing from the map. */
-        public static final ImbueConfig DEFAULT = new ImbueConfig(300, 6.0f, 1.2, 0.3, 0.4, 200);
+    public record ImbueConfig(int heatDuration, float contactDamage, int boilingDuration) {
+        public static final ImbueConfig DEFAULT = new ImbueConfig(300, 6.0f, 200);
     }
 
     public static class Type extends AbstractMove.Type<ImbueItemAttack> {
@@ -229,7 +183,7 @@ public final class ImbueItemAttack extends AbstractMove<ImbueItemAttack, SpeedKi
         @Override
         protected @NonNull App<RecordCodecBuilder.Mu<ImbueItemAttack>, ImbueItemAttack> buildCodec(RecordCodecBuilder.Instance<ImbueItemAttack> instance) {
             return baseDefault(instance, (cd, wu, dur, md) ->
-                    new ImbueItemAttack(cd, wu, dur, md, 300, 6.0f, 1.2, 0.3, 5.0, 1, 0.4, 200));
+                    new ImbueItemAttack(cd, wu, dur, md, 300, 6.0f, 200));
         }
     }
 }

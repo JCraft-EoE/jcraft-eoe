@@ -14,11 +14,13 @@ import net.arna.jcraft.common.attack.moves.speedking.FireGrabAttack;
 import net.arna.jcraft.common.attack.moves.speedking.FireGrabHitAttack;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import net.arna.jcraft.api.attack.enums.StunType;
-import net.arna.jcraft.common.attack.moves.speedking.FlashbangAttack;
+import net.arna.jcraft.common.attack.moves.speedking.BoilingPointAttack;
+import net.arna.jcraft.common.attack.moves.speedking.HeatTrapAttack;
+import net.arna.jcraft.common.attack.moves.speedking.HeatTrapManager;
 import net.arna.jcraft.common.attack.moves.speedking.ImbueItemAttack;
 import net.arna.jcraft.common.attack.moves.speedking.PureHeatAccumulationAttack;
-import net.arna.jcraft.common.attack.moves.speedking.FireSparksAttack;
 import net.arna.jcraft.common.attack.moves.speedking.HeatWavesAttack;
+import net.arna.jcraft.common.attack.moves.speedking.OverheatAttack;
 import net.arna.jcraft.common.attack.moves.speedking.SiroccoAttack;
 import net.arna.jcraft.common.attack.moves.speedking.UpdraftAttack;
 import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
@@ -35,6 +37,7 @@ import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.attack.StateContainer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import org.joml.Vector3f;
@@ -49,11 +52,8 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
                     .name(Component.translatable("entity.jcraft.speed_king"))
                     .freeSpace(Component.literal("""
                 BNBs:
-                    -the quickie
-                    Punch>Barrage>Head Smack
-
                     -the dutch oven
-                    Punch>Barrage>Fire grab>Flashbang"""))
+                    Punch>Barrage>Head Smack>Fire grab>Overheat"""))
 
                     .skinName(Component.literal("Rudolph"))
                     .skinName(Component.literal("Something"))
@@ -63,7 +63,7 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
             .build();
 
     public static final SimpleAttack<SpeedKingEntity> PUNCH_FOLLOWUP = new SimpleAttack<SpeedKingEntity>(
-            0, 7, 11, 0.75f, 6f, 8, 1.5f, 1f, 0)
+            0, 7, 11, 0.75f, 5f, 8, 1.5f, 1f, 0)
             .withAnim(State.PUNCH_FOLLOWUP)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
@@ -74,7 +74,13 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
                     Component.literal("quick combo finisher")
             );
 
-    private static final FlamePunchAttack FLAME_PUNCH = new FlamePunchAttack(20, 14, 15, 0.75f, 5f, 16, 2f, 0.3f, -0.1f,
+    public static final OverheatAttack OVERHEAT = new OverheatAttack(60, 10, 10, 1f)
+            .withInfo(
+                    Component.literal("Overheat"),
+                    Component.literal("detonates all stored heat on every target simultaneously — damage scales with heat level")
+            );
+
+    public static final FlamePunchAttack FLAME_PUNCH = new FlamePunchAttack(20, 9, 15, 0.75f, 5f, 16, 2f, 0.3f, -0.1f,
             3)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(
@@ -82,12 +88,10 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
                     Component.literal("slower heat-imbued punch, sets target on fire")
             );
 
-    public static final SimpleAttack<SpeedKingEntity> PUNCH
-            = SimpleAttack.<SpeedKingEntity>lightAttack(
-                    5, 7, 0.75f, 5, 10, 0.1f, -0.1f)
+    public static final SimpleAttack<SpeedKingEntity> PUNCH = SimpleAttack.<SpeedKingEntity>lightAttack(5, 7, 0.75f, 4, 10, 0.1f, -0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withFollowup(PUNCH_FOLLOWUP)
-            .withCrouchingVariant(FLAME_PUNCH)
+            .withCrouchingVariant(OVERHEAT)
             .withInfo(
                     Component.literal("Punch"),
                     Component.literal("quick combo starter")
@@ -110,13 +114,14 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
             .withHitSpark(JParticleType.HIT_SPARK_3)
             .withHyperArmor()
             .withLaunch()
+            .withCrouchingVariant(FLAME_PUNCH)
             .withAerialVariant(HEAD_SMACK)
             .withInfo(
                     Component.literal("Lunge"),
                     Component.literal("charge forward with heat, uninterruptible launcher"));
 
     public static final MainBarrageAttack<SpeedKingEntity> HEAT_BARRAGE = new MainBarrageAttack<SpeedKingEntity>(200,
-            0, 35, 0.75f, 1.2f, 30, 2f, 0.25f, 0f, 2, Blocks.STONE.defaultDestroyTime())
+            0, 35, 0.75f, 0.8f, 30, 2f, 0.25f, 0f, 2, Blocks.STONE.defaultDestroyTime())
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withInfo(
                     Component.literal("Heat Barrage"),
@@ -124,56 +129,51 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
             );
 
     public static final FireGrabHitAttack FIRE_GRAB_HIT = new FireGrabHitAttack(0, 40, 0.75f, 2f, 24, 2f, 0.4f, 0f,
-            IntSet.of(10, 20, 30, 40), 0.9f, 2.0f, 3, 1.5f)
+            IntSet.of(10, 20, 30, 40), 3, 1.5f)
             .withStunType(StunType.UNBURSTABLE)
-            .withLift(false) // minor hits don't lift; final blow overrides this in processTarget
+            .withLift(false)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withHitSpark(JParticleType.HIT_SPARK_1)
             .withInfo(Component.literal("Fire Grab Hit"), Component.empty());
 
     public static final FireGrabAttack FIRE_GRAB = new FireGrabAttack(
-            100, 10, 16, 1.5f, 0f, 0, 2.0f, 0f, 0.0f, FIRE_GRAB_HIT, StateContainer.of(State.FIRE_GRAB),
+            100, 10, 16, 1.5f, 0f, 15, 2.0f, 0f, 0.0f, FIRE_GRAB_HIT, StateContainer.of(State.FIRE_GRAB),
             40, 1.0)
             .withInfo(
                     Component.literal("Fire Grab"),
                     Component.literal("grabs enemy — 3 burning hits then a fiery launcher")
             );
 
-    public static final FlashbangAttack FLASHBANG = new FlashbangAttack(
-            200, 8, 12, 0.75f, 7.0f, 1.5, 4, 3, 2.5, 80,
-            60, 2.0)
-            .withInfo(
-                    Component.literal("Flashbang"),
-                    Component.literal("tags nearby enemies — detonates after a delay for heavy damage and blindness")
-            );
-
-    public static final PureHeatAccumulationAttack PURE_HEAT = new PureHeatAccumulationAttack(
-            300, 15, 25, 1f, 1f, 20, 8f, 0, 0, 200, 9.0, 2.0, 5,
-            100, 6.0, 3.0, 5)
-            .withInfo(
-                    Component.literal("Pure Heat Accumulation"),
-                    Component.literal("AoE burst causing heat accumulation")
-            );
-
-    public static final FireSparksAttack FIRE_SPARKS = new FireSparksAttack(
-            0, 20, 240, 0.75f, 5, 5, 30f, 15f, 1.5f)
-            .withInfo(
-                    Component.literal("Fire Sparks"),
-                    Component.literal("holdable attack that shoots spreading sparks causing boiling")
-            )
-            .withHoldable();
-
     public static final HeatWavesAttack HEAT_WAVES = new HeatWavesAttack(
             800, 20, 30, 0.75f, 3, 40f, 1.2f, 1.5f, 2)
-            .withCrouchingVariant(FIRE_SPARKS)
             .withInfo(
                     Component.literal("Heat Waves"),
                     Component.literal("shoots projectiles that create heat wave explosions on impact")
             );
 
+    public static final HeatTrapAttack HEAT_TRAP = new HeatTrapAttack(200, 5, 12, 0.75f)
+            .withCrouchingVariant(HEAT_WAVES)
+            .withInfo(
+                    Component.literal("Heat Trap"),
+                    Component.literal("fires projectiles that store heat on targets")
+            );
+
+    public static final PureHeatAccumulationAttack PURE_HEAT_ACCUMULATION = new PureHeatAccumulationAttack(
+            300, 15, 25, 1f, 1f, 20, 7f, 0, 0, 200)
+            .withInfo(
+                    Component.literal("Pure Heat Accumulation"),
+                    Component.literal("charges the ground — coats a wide area in heat traps")
+            );
+
+    public static final BoilingPointAttack BOILING_POINT = new BoilingPointAttack(
+            600, 20, 30, 8f, 8f, 30, 3f)
+            .withInfo(
+                    Component.literal("Boiling Point"),
+                    Component.literal("heats the ground below a target — heat travels into their body for massive damage and boiling")
+            );
+
     public static final ImbueItemAttack IMBUE_ITEM = new ImbueItemAttack(
-            150, 12, 18, 0.75f, 300, 6.0f, 1.2, 0.3, 5.0, 1,
-            0.4, 200)
+            150, 12, 18, 0.75f, 300, 6.0f, 200)
             .withInfo(
                     Component.literal("Imbue Item with Heat"),
                     Component.literal("heats nearby items/blocks, causes boiling on pickup")
@@ -181,6 +181,7 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
 
     public static final SiroccoAttack SIROCCO = new SiroccoAttack(
             200, 1, 12, 0f, 4.0)
+            .withSound(JSoundRegistry.WHOOSH)
             .withInfo(
                     Component.literal("Sirocco"),
                     Component.literal("superheats the air behind you — flings you and nearby enemies forward")
@@ -207,23 +208,29 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
     }
 
     private static void registerMoves(MoveMap<SpeedKingEntity, State> moves) {
-        moves.register(MoveClass.LIGHT, PUNCH, State.PUNCH).withFollowup(State.PUNCH_FOLLOWUP);
+        final var punch = moves.register(MoveClass.LIGHT, PUNCH, State.PUNCH);
+        punch.withCrouchingVariant(State.OVERHEAT);
+        punch.withFollowup(State.PUNCH_FOLLOWUP);
 
-        moves.register(MoveClass.HEAVY, LUNGE, State.LUNGE).withAerialVariant(State.HEAD_SMACK);
+        final var lunge = moves.register(MoveClass.HEAVY, LUNGE, State.LUNGE);
+        lunge.withCrouchingVariant(State.FLAME_PUNCH);
+        lunge.withAerialVariant(State.HEAD_SMACK);
         moves.register(MoveClass.BARRAGE, HEAT_BARRAGE, State.BARRAGE);
 
         moves.register(MoveClass.SPECIAL1, FIRE_GRAB, State.FIRE_GRAB);
-        moves.register(MoveClass.SPECIAL2, FLASHBANG, State.FLASHBANG);
-        moves.register(MoveClass.SPECIAL3, PURE_HEAT, State.PURE_HEAT);
+        moves.register(MoveClass.SPECIAL2, HEAT_TRAP, State.HEAT_TRAP).withCrouchingVariant(State.HEAT_WAVES);
+        moves.register(MoveClass.SPECIAL3, PURE_HEAT_ACCUMULATION, State.PURE_HEAT_ACCUMULATION);
 
-        moves.register(MoveClass.ULTIMATE, HEAT_WAVES, State.HEAT_WAVES).withCrouchingVariant(State.FIRE_SPARKS);
+        moves.register(MoveClass.ULTIMATE, BOILING_POINT, State.BOILING_POINT);
 
         moves.register(MoveClass.UTILITY, UPDRAFT, State.UPDRAFT).withAerialVariant(State.SIROCCO);
     }
 
     @Override
     public boolean initMove(MoveClass moveClass) {
-        if (moveClass == MoveClass.LIGHT && getCurrentMove() != null && getCurrentMove().getMoveClass() == MoveClass.LIGHT && getMoveStun() < getCurrentMove().getWindupPoint()) {
+        if (moveClass == MoveClass.LIGHT && !getUserOrThrow().isCrouching()
+                && getCurrentMove() != null && getCurrentMove().getMoveClass() == MoveClass.LIGHT
+                && getMoveStun() < getCurrentMove().getWindupPoint()) {
             if (tryFollowUp(moveClass, MoveClass.LIGHT)) return true;
         }
         return super.initMove(moveClass);
@@ -234,9 +241,11 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
         super.tick();
 
         if (!level().isClientSide()) {
-            FlashbangAttack.tickTimers(level());
             UpdraftAttack.tickUpdraftPads(level());
             ImbueItemAttack.tickImbuedItems(level());
+            if (hasUser() && level() instanceof ServerLevel serverLevel) {
+                HeatTrapManager.tick(serverLevel, this);
+            }
         }
 
         if (!hasUser()) {
@@ -254,18 +263,19 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
         BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.speed_king.block", AzPlayBehaviors.LOOP)),
         PUNCH(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         PUNCH_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        FLAME_PUNCH(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.flame_punch", AzPlayBehaviors.HOLD_ON_LAST_FRAME)), //TODO: garlic please make anim
+        FLAME_PUNCH(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.flame_punch", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         LUNGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.lunge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         HEAD_SMACK(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.head_smack", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.barrage", AzPlayBehaviors.LOOP)),
         FIRE_GRAB(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.grab", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         IMBUE_ITEM(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.imbue_item", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        PURE_HEAT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.heat_accumilation", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        FIRE_SPARKS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.fire_sparks", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        HEAT_WAVES(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.heat_waves", AzPlayBehaviors.HOLD_ON_LAST_FRAME)), //TODO: garlic please make anim
-        FLASHBANG(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.flashbang", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        UPDRAFT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.updraft", AzPlayBehaviors.HOLD_ON_LAST_FRAME)), //TODO: garlic please make anim
-        SIROCCO(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.sirocco", AzPlayBehaviors.HOLD_ON_LAST_FRAME)), //TODO: garlic please make anim
+        PURE_HEAT_ACCUMULATION(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.heat_accumilation", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BOILING_POINT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.boiling_point", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        HEAT_WAVES(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.heat_waves", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        HEAT_TRAP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.flashbang", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        OVERHEAT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.overheat", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        UPDRAFT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.updraft", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        SIROCCO(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.sirocco", AzPlayBehaviors.HOLD_ON_LAST_FRAME))
         ;
 
         private final AzCommand animator;

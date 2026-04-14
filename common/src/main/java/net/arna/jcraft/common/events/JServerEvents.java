@@ -13,7 +13,6 @@ import net.arna.jcraft.api.registry.*;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
-import net.arna.jcraft.common.attack.moves.speedking.PureHeatAccumulationAttack;
 import net.arna.jcraft.common.block.CoffinBlock;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.data.AttackerDataLoader;
@@ -116,10 +115,6 @@ public class JServerEvents {
         FrameDataRequests.tick();
         MagneticFields.tick();
         RazorCoughs.tick();
-
-        for (ServerLevel serverLevel : server.getAllLevels()) {
-            PureHeatAccumulationAttack.tickGeyser(serverLevel);
-        }
 
         // Player logic (cooldown handling and DamageTimer counting)
         for (ServerPlayer player : JUtils.all(server)) {

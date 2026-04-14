@@ -55,8 +55,6 @@ public final class SiroccoAttack extends AbstractMove<SiroccoAttack, SpeedKingEn
                     e.fallDistance = 0f;
                 });
 
-        attacker.playSound(JSoundRegistry.WHOOSH.get(), 1, 1);
-
         // Heat wind particles behind the user (server-side)
         if (!attacker.level().isClientSide() && attacker.level() instanceof ServerLevel serverLevel) {
             Vec3 pos = user.position();

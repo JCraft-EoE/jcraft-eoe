@@ -282,8 +282,9 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> SPEEDKING_UPDRAFT_ATTACK = register("speedking_updraft_attack", UpdraftAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SPEEDKING_IMBUE_ITEM_ATTACK = register("speedking_imbue_item_attack", ImbueItemAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SPEEDKING_PURE_HEAT_ACCUMULATION_ATTACK = register("speedking_pure_heat_accumulation_attack", PureHeatAccumulationAttack.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> SPEEDKING_FIRE_SPARKS_ATTACK = register("speedking_fire_sparks_attack", FireSparksAttack.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> SPEEDKING_FLASHBANG_ATTACK = register("speedking_flashbang_attack", FlashbangAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> SPEEDKING_HEAT_TRAP_ATTACK = register("speedking_heat_trap_attack", HeatTrapAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> SPEEDKING_BOILING_POINT_ATTACK = register("speedking_boiling_point_attack", BoilingPointAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> SPEEDKING_OVERHEAT_ATTACK = register("speedking_overheat_attack", OverheatAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SPEEDKING_SIROCCO_ATTACK = register("speedking_sirocco_attack", SiroccoAttack.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> AEROSMITH_BULLET_ATTACK = register("aerosmith_bullet_attack", MuzzleHitscanAttack.Type.INSTANCE);

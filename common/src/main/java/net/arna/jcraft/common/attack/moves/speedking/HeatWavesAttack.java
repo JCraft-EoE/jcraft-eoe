@@ -62,8 +62,6 @@ public final class HeatWavesAttack extends AbstractMove<HeatWavesAttack, SpeedKi
 
             spark.setDeltaMovement(spreadDirection.scale(sparkSpeed));
             spark.hurtMarked = true;
-
-            // Configure for Heat Waves - bouncing mode with heat wave creation
             spark.setBouncingMode(true);
             spark.setBaseDamage(sparkDamage);
             spark.setBounceCount(0);

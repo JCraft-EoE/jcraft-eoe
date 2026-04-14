@@ -91,6 +91,7 @@ public class ClientPacketHandler {
         register(S2C_MANDOM_DATA, ClientPacketHandler::handleMandomData);
         register(S2C_IPS_TRIGGERED, ClientPacketHandler::handleIPSTriggered);
         register(S2C_DAMAGE_NUMBER, ClientPacketHandler::handleDamageNumber);
+        register(S2C_HEAT_PARTICLE, ClientPacketHandler::handleHeatParticle);
     }
 
     private static void handleDamageNumber(final @NonNull Minecraft client, final FriendlyByteBuf buf) {
@@ -117,6 +118,24 @@ public class ClientPacketHandler {
     private static final int
             NUM_MAGNETIC_CIRCLES = 16,
             NUM_MAGNETIC_PARTICLES = 32;
+
+    private static void handleHeatParticle(final @NonNull Minecraft client, final FriendlyByteBuf buf) {
+        final Vec3 pos = new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
+        final float bbHeight = buf.readFloat();
+        final float spread = buf.readFloat();
+        final int heat = buf.readInt();
+
+        client.execute(() -> {
+            for (int i = 0; i < heat; i++) {
+                client.level.addParticle(
+                        ParticleTypes.CRIMSON_SPORE,
+                        pos.x + (client.level.random.nextDouble() - 0.5) * spread * 2,
+                        pos.y + (client.level.random.nextDouble() - 0.5) * bbHeight,
+                        pos.z + (client.level.random.nextDouble() - 0.5) * spread * 2,
+                        0, 0.05, 0.01);
+            }
+        });
+    }
 
     private static void handleMagneticFieldParticle(final @NonNull Minecraft client, final FriendlyByteBuf buf) {
         final double strength = buf.readDouble();
