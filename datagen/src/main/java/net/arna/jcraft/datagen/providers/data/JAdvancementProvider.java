@@ -106,7 +106,8 @@ public class JAdvancementProvider extends FabricAdvancementProvider {
                 JStandTypeRegistry.METALLICA,
                 JStandTypeRegistry.THE_HAND,
                 JStandTypeRegistry.MANDOM,
-                JStandTypeRegistry.AEROSMITH
+                JStandTypeRegistry.AEROSMITH,
+                JStandTypeRegistry.SPEED_KING
                 //, JStandTypeRegistry.CRAZY_DIAMOND
         );
         final Advancement.Builder obtainAllStandsBuilder = Advancement.Builder.advancement()
