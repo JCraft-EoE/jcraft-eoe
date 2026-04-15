@@ -23,6 +23,7 @@ public final class ThermalShockwaveAttack extends AbstractSimpleAttack<ThermalSh
     // Per-activation state (safe because copyOnUse = true)
     private final Set<UUID> hitThisActivation = new HashSet<>();
     private Vec3 lockedDirection = null;
+    private Vec3 lockedOrigin = null;
 
     public ThermalShockwaveAttack(final int cooldown, final int windup, final int duration, final float moveDistance,
                                   final float damage, final int stun, final float hitboxSize,
@@ -40,7 +41,8 @@ public final class ThermalShockwaveAttack extends AbstractSimpleAttack<ThermalSh
     @Override
     public void onInitiate(final SpeedKingEntity attacker) {
         hitThisActivation.clear();
-        lockedDirection = attacker.getUserOrThrow().getLookAngle().normalize();
+        lockedDirection = null;
+        lockedOrigin = null;
     }
 
     /** Fire the hitbox every tick once windup has passed. */
@@ -56,13 +58,14 @@ public final class ThermalShockwaveAttack extends AbstractSimpleAttack<ThermalSh
     @Override
     protected Vec3 getOffsetForwardPos(final SpeedKingEntity attacker, final Vec3 offsetHeightPos,
                                        final Vec3 upVec, final Vec3 rotVec) {
+        if (lockedDirection == null) {
+            LivingEntity user = attacker.getUserOrThrow();
+            lockedDirection = user.getLookAngle().normalize();
+            lockedOrigin = user.position().add(0, user.getBbHeight() * 0.5, 0);
+        }
         int elapsed = getDuration() - attacker.getMoveStun();
         double dist = Math.max(0, elapsed - getWindup()) * getMoveDistance();
-        Vec3 dir = lockedDirection != null ? lockedDirection : rotVec;
-        LivingEntity user = attacker.getUserOrThrow();
-        return user.position()
-                .add(0, user.getBbHeight() * 0.5, 0)
-                .add(dir.scale(dist));
+        return lockedOrigin.add(lockedDirection.scale(dist));
     }
 
     @Override

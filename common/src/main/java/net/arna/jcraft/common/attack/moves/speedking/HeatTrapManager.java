@@ -14,6 +14,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +69,32 @@ public class HeatTrapManager {
         HEAT_MAP.remove(target.getUUID());
     }
 
+    private static void setHeat(LivingEntity target, UUID attackerUUID, int amount, long expiryTick) {
+        if (target instanceof StandEntity<?, ?>) return;
+        HEAT_MAP.put(target.getUUID(), new HeatEntry(attackerUUID, new WeakReference<>(target), Math.min(MAX_HEAT, amount), expiryTick));
+    }
+
+    /** Removes all heated blocks belonging to the attacker in this level and returns their positions. */
+    public static List<BlockPos> detonateHeatedBlocks(Level level, UUID attackerUUID) {
+        List<BlockPos> result = new ArrayList<>();
+        String dimPrefix = level.dimension().location() + ";";
+        HEATED_BLOCKS.entrySet().removeIf(e -> {
+            if (!e.getValue().attackerUUID().equals(attackerUUID)) return false;
+            String key = e.getKey();
+            if (!key.startsWith(dimPrefix)) return false;
+            String[] coords = key.substring(dimPrefix.length()).split(";", 3);
+            if (coords.length < 3) return false;
+            try {
+                result.add(new BlockPos(
+                        Integer.parseInt(coords[0]),
+                        Integer.parseInt(coords[1]),
+                        Integer.parseInt(coords[2])));
+            } catch (NumberFormatException ignored) {}
+            return true;
+        });
+        return result;
+    }
+
     public static void tick(ServerLevel level, SpeedKingEntity stand) {
         if (!stand.hasUser()) return;
         LivingEntity user = stand.getUserOrThrow();
@@ -117,6 +144,43 @@ public class HeatTrapManager {
                     }
                 }
             } catch (NumberFormatException ignored) {}
+        }
+
+        // Heat spread via hitbox collision (every 5 ticks)
+        if (now % 5 == 0) {
+            // Collect all spread events first to avoid same-tick cascading
+            record SpreadEvent(UUID sourceId, LivingEntity dest, int spreadHeat, UUID attackerUUID, long expiry) {}
+            List<SpreadEvent> events = new ArrayList<>();
+
+            for (Map.Entry<UUID, HeatEntry> heatEntry : HEAT_MAP.entrySet()) {
+                HeatEntry he = heatEntry.getValue();
+                if (!he.attackerUUID().equals(user.getUUID())) continue;
+                LivingEntity source = he.target().get();
+                if (source == null || !source.isAlive() || source.level() != level) continue;
+
+                int sourceHeat = he.heatLevel();
+                if (sourceHeat <= 0) continue;
+                int spreadHeat = (sourceHeat + 1) / 2; // ceil(sourceHeat / 2)
+
+                level.getEntitiesOfClass(LivingEntity.class, source.getBoundingBox(),
+                        e -> e != source && e != user && e.isAlive() && !e.isSpectator() && !(e instanceof StandEntity<?, ?>))
+                    .forEach(dest -> {
+                        int destHeat = getHeat(dest.getUUID());
+                        if (destHeat < spreadHeat) {
+                            events.add(new SpreadEvent(heatEntry.getKey(), dest, spreadHeat, he.attackerUUID(), level.getGameTime() + HEAT_DURATION));
+                        }
+                    });
+            }
+
+            for (SpreadEvent ev : events) {
+                // Set source to spreadHeat
+                HeatEntry src = HEAT_MAP.get(ev.sourceId());
+                if (src != null) {
+                    HEAT_MAP.put(ev.sourceId(), new HeatEntry(src.attackerUUID(), src.target(), ev.spreadHeat(), src.expiryTick()));
+                }
+                // Set dest to spreadHeat
+                setHeat(ev.dest(), ev.attackerUUID(), ev.spreadHeat(), ev.expiry());
+            }
         }
 
         for (HeatEntry entry : HEAT_MAP.values()) {

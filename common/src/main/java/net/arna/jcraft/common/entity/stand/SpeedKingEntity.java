@@ -47,7 +47,7 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
             JStandTypeRegistry.SPEED_KING, "default", SpeedKingEntity::registerMoves, State.class);
 
     public static final StandData DATA = StandData.builder()
-            .idleRotation(270f)
+            .idleRotation(315f)
             .info(StandInfo.builder()
                     .name(Component.translatable("entity.jcraft.speed_king"))
                     .freeSpace(Component.literal("""
@@ -144,7 +144,7 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
             );
 
     public static final HeatWavesAttack HEAT_WAVES = new HeatWavesAttack(
-            800, 20, 30, 0.75f, 3, 40f, 1.2f, 1.5f, 2)
+            300, 20, 30, 0.75f, 4, 40f, 1.2f, 1.5f, 2)
             .withInfo(
                     Component.literal("Heat Waves"),
                     Component.literal("shoots projectiles that create heat wave explosions on impact")
@@ -158,14 +158,14 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
             );
 
     public static final PureHeatAccumulationAttack PURE_HEAT_ACCUMULATION = new PureHeatAccumulationAttack(
-            300, 15, 25, 1f, 0f, 0, 7f, 0, 0)
+            300, 15, 25, 1f, 0f, 0, 7f, 0, 1)
             .withInfo(
                     Component.literal("Pure Heat Accumulation"),
                     Component.literal("charges the ground and coats a wide area in heat traps")
             );
 
     public static final ThermalShockwaveAttack THERMAL_SHOCKWAVE = new ThermalShockwaveAttack(
-            600, 20, 50, 0.75f, 4f, 20, 2.5f, 0.5f, 0f)
+            600, 14, 50, 0.75f, 4f, 20, 2.5f, 0.5f, 0f)
             .withInfo(
                     Component.literal("Thermal Shockwave"),
                     Component.literal("Speed King imbues the ground in front of him with heat, spreading it forward")
@@ -220,7 +220,7 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
         moves.register(MoveClass.SPECIAL2, HEAT_TRAP, State.HEAT_TRAP).withCrouchingVariant(State.HEAT_WAVES);
         moves.register(MoveClass.SPECIAL3, PURE_HEAT_ACCUMULATION, State.PURE_HEAT_ACCUMULATION);
 
-        moves.register(MoveClass.ULTIMATE, THERMAL_SHOCKWAVE, State.BOILING_POINT);
+        moves.register(MoveClass.ULTIMATE, THERMAL_SHOCKWAVE, State.THERMAL_SHOCKWAVE);
 
         moves.register(MoveClass.UTILITY, UPDRAFT, State.UPDRAFT).withAerialVariant(State.SIROCCO);
     }
@@ -272,7 +272,7 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
         FIRE_GRAB(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.grab", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         IMBUE_ITEM(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.imbue_item", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         PURE_HEAT_ACCUMULATION(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.heat_accumilation", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        BOILING_POINT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.boiling_point", AzPlayBehaviors.HOLD_ON_LAST_FRAME)), //TODO: garlic please make anim
+        THERMAL_SHOCKWAVE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.thermal_shockwave", AzPlayBehaviors.HOLD_ON_LAST_FRAME)), //TODO: garlic please make anim
         HEAT_WAVES(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.heat_waves", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         HEAT_TRAP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.flashbang", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         OVERHEAT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.overheat", AzPlayBehaviors.HOLD_ON_LAST_FRAME)), //TODO: garlic please make anim
