@@ -7,13 +7,16 @@ import net.arna.jcraft.client.rendering.shader.api.ShaderEffect;
 import net.arna.jcraft.client.rendering.shader.impl.GLBakedProgram;
 import net.arna.jcraft.client.rendering.shader.texture.impl.GLShaderSampler;
 import net.arna.jcraft.client.rendering.shader.texture.impl.GLShaderTexture;
-import net.arna.jcraft.mixin_logic.StillDepthHolder;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
+import org.joml.*;
+
+import java.lang.Math;
 
 public class TimestopShaderEffect extends ShaderEffect {
+    private static final float MAX_RADIUS = 100.f;
+    private static final float DURATION = 40.f;
+
     private GLShaderSampler depthSampler;
     private GLShaderSampler colorSampler;
 
@@ -28,8 +31,8 @@ public class TimestopShaderEffect extends ShaderEffect {
     public void link(BakedProgram program) {
         super.link(program);
 
-        this.depthSampler = new GLShaderSampler((GLBakedProgram) this.program, "DepthSampler");
-        this.colorSampler = new GLShaderSampler((GLBakedProgram) this.program, "DiffuseSampler");
+        this.depthSampler = new GLShaderSampler((GLBakedProgram) this.program, "DepthSampler", 1);
+        this.colorSampler = new GLShaderSampler((GLBakedProgram) this.program, "DiffuseSampler", 0);
     }
 
     private float time = 0.0f;
@@ -39,44 +42,57 @@ public class TimestopShaderEffect extends ShaderEffect {
         time += tickProgress;
     }
 
-    public void renderBubble(Camera camera, Vector3f center, float radius)
+    public void renderBubble(float tickProgress, Camera camera, Vector3f center, float radius)
     {
+        float expansionProgress = (time % DURATION)/DURATION;
+        JCraft.LOGGER.info("Time: {} | Expansion Progress: {}", time, expansionProgress);
+        float rad = MAX_RADIUS * Math.min(expansionProgress*2.f, 1.f);
+
         Minecraft minecraft = Minecraft.getInstance();
 
-        uniformWriter.reset();
+        this.program.bind();
 
-        uniformWriter.pushVec2(
-                minecraft.getMainRenderTarget().width,
-                minecraft.getMainRenderTarget().height
-        );
+//        uniformWriter.reset();
+//
+//        uniformWriter.pushVec2(
+//                minecraft.getMainRenderTarget().width,
+//                minecraft.getMainRenderTarget().height
+//        );
+//
+//        uniformWriter.pushFloat(time);
+//
+//        uniformWriter.write();
 
-        uniformWriter.pushFloat(time);
-
-        uniformWriter.write();
+        this.program.setUniform("Viewport", new Vector2f(minecraft.getMainRenderTarget().width, minecraft.getMainRenderTarget().height));
 
 //        uniform sampler2D DiffuseSampler;
 //        uniform sampler2D DepthSampler;
 //
 //        uniform vec3 CameraPosition;
         this.program.setUniform("CameraPosition", camera.getPosition().toVector3f());
+        Quaternionf cameraRot = new Quaternionf(camera.rotation()).conjugate();
+        this.program.setUniform("CameraRot", new Vector4f(cameraRot.x, cameraRot.y, cameraRot.z, cameraRot.w));
 //        uniform vec3 Center;
         this.program.setUniform("Center", center);
 
 //        uniform float Radius;
-        this.program.setUniform("Radius", radius);
+        this.program.setUniform("Radius", rad);
 //        uniform float OuterSat;
-        this.program.setUniform("OuterSat", 1.0f);
+        this.program.setUniform("OuterSat", (expansionProgress <= 0.3f) ? 1.0f : 0.3f);
+        this.program.setUniform("FOV", minecraft.gameRenderer.getFov(camera, tickProgress, false));
 
 //        uniform mat4 InverseTransformMatrix;
         this.program.setUniform("InverseTransformMatrix", getInverseTransformMatrix(new Matrix4f()));
 
-        GLShaderTexture depthTexture = GLShaderTexture.fromGlHandle(((StillDepthHolder) minecraft.getMainRenderTarget()).jcraft$getDepthTexture());
         GLShaderTexture colorTexture = GLShaderTexture.fromGlHandle(minecraft.getMainRenderTarget().getColorTextureId());
+        GLShaderTexture depthTexture = GLShaderTexture.fromGlHandle(minecraft.getMainRenderTarget().getDepthTextureId());
 
-        this.depthSampler.bindTexture(depthTexture);
         this.colorSampler.bindTexture(colorTexture);
+        this.depthSampler.bindTexture(depthTexture);
 
         this.program.renderFullscreen();
+
+        this.program.unbind();
     }
 
     private static Matrix4f getInverseTransformMatrix(Matrix4f outMat) {

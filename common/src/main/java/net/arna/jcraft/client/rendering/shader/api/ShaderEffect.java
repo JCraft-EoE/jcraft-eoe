@@ -23,7 +23,7 @@ public abstract class ShaderEffect {
     public void link(BakedProgram program)
     {
         this.program = program;
-        this.uniformWriter = new UniformWriter(new UniformWriter.UniformBlock("ShaderUniforms", 0), program);
+//        this.uniformWriter = new UniformWriter(new UniformWriter.UniformBlock("ShaderUniforms", 0), program);
     }
 
     public record LinkData(ShaderSourceRef... programMembers) {

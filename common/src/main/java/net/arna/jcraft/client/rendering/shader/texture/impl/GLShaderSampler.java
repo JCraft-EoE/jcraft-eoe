@@ -12,13 +12,19 @@ import static org.lwjgl.opengl.GL33C.*;
 public class GLShaderSampler extends ShaderSampler<GLBakedProgram, GLShaderTexture> {
     private final int unit;
 
-    public GLShaderSampler(GLBakedProgram program, String name) {
+    public GLShaderSampler(GLBakedProgram program, String name, int unit) {
         super(program, name);
 
-        Integer i = program.getUniform(Integer.class, name);
-        this.unit = Objects.requireNonNullElse(i, -1);
-        if (i == null) {
+        int location = program.getUniformLocation(name);
+        if (location == -1) {
             JCraft.LOGGER.warn("Sampler '{}' does not exist/is unused in shader", name);
+            this.unit = -1;
+        } else {
+            this.unit = unit;
+            JCraft.LOGGER.info("Bound '{}' (@ {}) to '{}'", name, location, unit);
+            program.bind();
+            glUniform1i(location, unit);
+            program.unbind();
         }
     }
 

@@ -51,7 +51,7 @@ public class LevelRendererMixin {
         ((StillDepthHolder) Minecraft.getInstance().getMainRenderTarget()).jcraft$freezeDepth();
 
         JShaderRegistry.TIMESTOP_EFFECT.update(tickDelta);
-        JShaderRegistry.TIMESTOP_EFFECT.renderBubble(camera, new Vector3f(0.f, 60.f, 0.f), 50.f);
+        JShaderRegistry.TIMESTOP_EFFECT.renderBubble(tickDelta, camera, new Vector3f(-20.f, 95.f, 173.f), 50.f);
 
         PostWorldRenderCallback.EVENT.invoker().onWorldRendered(matrices, camera, tickDelta, nanoTime);
     }

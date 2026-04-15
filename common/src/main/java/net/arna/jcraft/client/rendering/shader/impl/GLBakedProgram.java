@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL20C;
 
@@ -38,7 +39,7 @@ public class GLBakedProgram extends BakedProgram {
 
     @Override
     public void renderFullscreen() {
-        bind();
+//        bind();
 
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder builder = tesselator.getBuilder();
@@ -70,7 +71,7 @@ public class GLBakedProgram extends BakedProgram {
         VertexBuffer.unbind();
         buffer.close();
 
-        unbind();
+//        unbind();
     }
 
     @Override
@@ -93,7 +94,8 @@ public class GLBakedProgram extends BakedProgram {
             Integer.class, (location, value) -> glUniform1i(location, (int) value),
             Matrix4f.class, (location, value) -> glUniformMatrix4fv(location, false, ((Matrix4f)value).get(BufferUtils.createFloatBuffer(16))),
             Vector2f.class, (location, value) -> {Vector2f v = (Vector2f)value; glUniform2f(location, v.x, v.y);},
-            Vector3f.class, (location, value) -> {Vector3f v = (Vector3f)value; glUniform3f(location, v.x, v.y, v.z);}
+            Vector3f.class, (location, value) -> {Vector3f v = (Vector3f)value; glUniform3f(location, v.x, v.y, v.z);},
+            Vector4f.class, (location, value) -> {Vector4f v = (Vector4f)value; glUniform4f(location, v.x, v.y, v.z, v.w);}
     );
 
     @Override
@@ -121,8 +123,8 @@ public class GLBakedProgram extends BakedProgram {
         BiConsumer<Integer, Object> encoder = UNIFORM_ENCODERS.get(value.getClass());
         if (encoder == null) return;
 
-        glUseProgram(handle);
+//        glUseProgram(handle);
         encoder.accept(location, value);
-        glUseProgram(0);
+//        glUseProgram(0);
     }
 }

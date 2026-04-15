@@ -1,41 +1,19 @@
-//#version 330
-//
-//uniform sampler2D DepthTexture;
-//
-//layout (std140) uniform ShaderUniforms
-//{
-//    vec2 Viewport;
-//    float Time;
-//};
-//
-//in vec2 texCoord;
-//
-//out vec4 fragColor;
-//
-//void main()
-//{
-//    float depth = pow(texture(DepthTexture, texCoord).r, 50.);
-//    fragColor = vec4(depth, depth, depth, 0.5);
-//}
-
 #version 330
 
-layout (std140) uniform ShaderUniforms
-{
-    vec2 Viewport;
-    float Time;
-};
+#define DISTORTION
 
 uniform sampler2D DiffuseSampler;
 uniform sampler2D DepthSampler;
 
 uniform vec3 CameraPosition;
+uniform vec4 CameraRotation;
 uniform vec3 Center;
 #define MAX_RADIUS 100.
 uniform float Radius;
 uniform float OuterSat;
 
 uniform mat4 InverseTransformMatrix;
+uniform vec2 Viewport;
 
 in vec2 texCoord;
 
@@ -43,7 +21,7 @@ out vec4 fragColor;
 
 vec4 calcEyeFromWindow(in float depth){
     vec3 ndcPos;
-    ndcPos.xy = (2.0 * gl_FragCoord.xy) / (Viewport) - 1;
+    ndcPos.xy = ((2.0 * gl_FragCoord.xy)) / (Viewport) - 1;
     ndcPos.z = (2.0 * depth - gl_DepthRange.near - gl_DepthRange.far) / (gl_DepthRange.far - gl_DepthRange.near);
     vec4 clipPos = vec4(ndcPos, 1.);
     vec4 homogeneous = InverseTransformMatrix * clipPos;
@@ -68,11 +46,9 @@ vec3 hsv2rgb(vec3 c){
 }
 
 void main(){
-//    vec3 ndc = vPosition.xyz / vPosition.w;
-//    vec2 viewportCoord = ndc.xy * 0.5 + 0.5;
-
-    float sceneDepth = texture(DepthSampler, texCoord).r;
+    float sceneDepth = texture(DepthSampler, texCoord).x;
     vec3 pixelPosition = calcEyeFromWindow(sceneDepth).xyz + CameraPosition;
+    float aspect = Viewport.x/Viewport.y;
 
     float pct = distance(pixelPosition, Center);
 
@@ -86,21 +62,22 @@ void main(){
     float inside = smoothstep(rad + 1., rad, pct);
     float outside2 = smoothstep(rad - 2.5, rad - 2., pct);
     float inside2 = smoothstep(rad - 1.5, rad - 2., pct);
-    float aspect = Viewport.x / Viewport.y;
     vec2 m = vec2(0.5, 0.5 / aspect);
     vec2 d = texCoord - m;
     float r = sqrt(dot(d, d));
     float power = ( 1.0 * 3.141592 / (2.0 * sqrt(dot(m, m))) ) * (inside * -0.2);
     float bind = (aspect < 1.0) ? m.x : m.y;
 
-    vec2 uv;
+
+    vec2 uv = texCoord;
+#ifdef DISTORTION
     if (power < 0.0 && rad > 0)
-    {uv = m + normalize(d) * atan(r * -power * 10.0) * bind / atan(-power * bind * 10.0);}
-    else
-    {uv = texCoord;}
+    {
+        uv = m + normalize(d) * atan(r * -power * 10.0) * bind / atan(-power * bind * 10.0);
+    }
+#endif
 
     vec3 color = texture(DiffuseSampler, uv).rgb;
-
     if(rad > 0){
         //Change this to modify the color of the "ring"
         color += pow(vec3(1.) * (outside * inside + outside2 * inside2), vec3(3.));
