@@ -114,7 +114,7 @@ subprojects {
         repositories {
             maven {
                 name = 'planetMaven'
-                url = 'https://maven-up.jcraft-eoe.com/releases/'
+                url = 'https://maven.jcraft-eoe.com/releases/'
                 credentials(org.gradle.api.credentials.PasswordCredentials)
                 authentication {
                     //noinspection GroovyAssignabilityCheck
