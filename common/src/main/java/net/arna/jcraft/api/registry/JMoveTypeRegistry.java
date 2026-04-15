@@ -275,7 +275,6 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> MANDOM_REWIND_MOVE = register("mandom_rewind_move", RewindMove.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> SPEEDKING_FLAME_PUNCH_ATTACK = register("speedking_flame_punch_attack", FlamePunchAttack.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> SPEEDKING_HEAD_SMACK_ATTACK = register("speedking_head_smack_attack", HeadSmackAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SPEEDKING_FIRE_GRAB_ATTACK = register("speedking_fire_grab_attack", FireGrabAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SPEEDKING_FIRE_GRAB_HIT_ATTACK = register("speedking_fire_grab_hit_attack", FireGrabHitAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SPEEDKING_HEAT_WAVES_ATTACK = register("speedking_heat_waves_attack", HeatWavesAttack.Type.INSTANCE);
@@ -283,7 +282,7 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> SPEEDKING_IMBUE_ITEM_ATTACK = register("speedking_imbue_item_attack", ImbueItemAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SPEEDKING_PURE_HEAT_ACCUMULATION_ATTACK = register("speedking_pure_heat_accumulation_attack", PureHeatAccumulationAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SPEEDKING_HEAT_TRAP_ATTACK = register("speedking_heat_trap_attack", HeatTrapAttack.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> SPEEDKING_BOILING_POINT_ATTACK = register("speedking_boiling_point_attack", BoilingPointAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> SPEEDKING_THERMAL_SHOCKWAVE_ATTACK = register("speedking_thermal_shockwave_attack", ThermalShockwaveAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SPEEDKING_OVERHEAT_ATTACK = register("speedking_overheat_attack", OverheatAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SPEEDKING_SIROCCO_ATTACK = register("speedking_sirocco_attack", SiroccoAttack.Type.INSTANCE);
 

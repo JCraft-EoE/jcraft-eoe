@@ -4,9 +4,12 @@ import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.AttackData;
+import net.arna.jcraft.api.MoveUsage;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
-import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
+import net.arna.jcraft.api.attack.enums.StunType;
+import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
@@ -20,14 +23,23 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static net.arna.jcraft.api.Attacks.damageLogic;
 
 public final class OverheatAttack extends AbstractMove<OverheatAttack, SpeedKingEntity> {
-    private static final double EXPLOSION_RADIUS = 4.4;
     private static final double SEARCH_RANGE = 32.0;
+    private static final float BURST_DAMAGE = 0.5f;
+
+    private record BurstEntry(WeakReference<LivingEntity> target, AtomicInteger hitsRemaining, MoveUsage moveUsage) {}
+    private static final Map<UUID, List<BurstEntry>> ACTIVE_BURSTS = new HashMap<>();
 
     public OverheatAttack(final int cooldown, final int windup, final int duration, final float moveDistance) {
         super(cooldown, windup, duration, moveDistance);
@@ -49,32 +61,50 @@ public final class OverheatAttack extends AbstractMove<OverheatAttack, SpeedKing
                         && HeatTrapManager.getHeat(e) > 0
                         && user.getUUID().equals(HeatTrapManager.getAttackerUUID(e)));
 
+        if (heatedTargets.isEmpty()) return Set.of();
+
+        List<BurstEntry> entries = new ArrayList<>();
         for (LivingEntity target : heatedTargets) {
             int heat = HeatTrapManager.getHeat(target);
-            explode(attacker, user, target.position().add(0, target.getBbHeight() * 0.5, 0), heat);
+            entries.add(new BurstEntry(new WeakReference<>(target), new AtomicInteger(heat * 2), attacker.getMoveUsage()));
             HeatTrapManager.clearHeat(target);
+
+            JCraft.createParticle((ServerLevel) attacker.level(),
+                    target.getX(), target.getY() + target.getBbHeight() * 0.5, target.getZ(), JParticleType.BOOM);
         }
+        ACTIVE_BURSTS.put(attacker.getUUID(), entries);
+        JUtils.serverPlaySound(JSoundRegistry.KQ_EXPLODE.get(), (ServerLevel) attacker.level(), user.position(), 96);
 
         return Set.of();
     }
 
-    public static void explode(final SpeedKingEntity stand, final LivingEntity user, final Vec3 pos, int heat) {
-        final ServerLevel serverLevel = (ServerLevel) stand.level();
+    public static void tickBursts(final ServerLevel level, final SpeedKingEntity stand) {
+        List<BurstEntry> entries = ACTIVE_BURSTS.get(stand.getUUID());
+        if (entries == null) return;
 
-        JCraft.createParticle(serverLevel, pos.x, pos.y, pos.z, JParticleType.BOOM);
-        JUtils.serverPlaySound(JSoundRegistry.KQ_EXPLODE.get(), serverLevel, pos, 96);
+        LivingEntity user = stand.getUserOrThrow();
+        DamageSource damageSource = JDamageSources.stand(stand);
 
-        final DamageSource damageSource = JDamageSources.stand(stand);
-        final Set<? extends LivingEntity> toExplode = AbstractSimpleAttack.findHits(stand, pos, EXPLOSION_RADIUS, damageSource);
+        entries.removeIf(entry -> {
+            LivingEntity target = entry.target().get();
+            if (target == null || !target.isAlive() || target.level() != level) return true;
 
-        float damage = 5.5f + (heat * 1.5f);
-        int boilingDuration = heat * 80;
+            int hits = entry.hitsRemaining().getAndSet(0);
+            if (hits <= 0) return true;
 
-        for (LivingEntity living : toExplode) {
-            final Vec3 kbVec = living.getEyePosition().subtract(pos).normalize();
-            damageLogic(stand.level(), living, kbVec, 2, 3, true, damage, false, 4, damageSource, user, null);
-            living.addEffect(new MobEffectInstance(JStatusRegistry.BOILING.get(), boilingDuration, 0, false, true));
-        }
+            Vec3 kbVec = target.position().subtract(user.position()).normalize().scale(0.1);
+            for (int i = 0; i < hits; i++) {
+                target.invulnerableTime = 0;
+                damageLogic(level, target, new AttackData(
+                        kbVec, 10, StunType.UNBURSTABLE.ordinal(), true,
+                        BURST_DAMAGE, false, 0, damageSource, user,
+                        CommonHitPropertyComponent.HitAnimation.MID, entry.moveUsage(), false, true));
+            }
+            target.addEffect(new MobEffectInstance(JStatusRegistry.BOILING.get(), 80, 0, false, true));
+            return true;
+        });
+
+        if (entries.isEmpty()) ACTIVE_BURSTS.remove(stand.getUUID());
     }
 
     @Override

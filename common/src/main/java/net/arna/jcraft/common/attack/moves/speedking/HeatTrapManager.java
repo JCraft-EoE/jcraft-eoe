@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.attack.moves.speedking;
 
+import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.SpeedKingEntity;
 import net.arna.jcraft.common.network.s2c.HeatParticlePacket;
 import net.minecraft.core.BlockPos;
@@ -7,6 +8,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -37,23 +40,9 @@ public class HeatTrapManager {
         HEATED_BLOCKS.put(blockKey(level, pos), new BlockHeatEntry(attackerUUID, level.getGameTime() + durationTicks));
     }
 
-    /** Convenience overload — no attacker attribution. */
-    public static void heatBlock(Level level, BlockPos pos, int durationTicks) {
-        heatBlock(level, pos, durationTicks, null);
-    }
-
-    public static boolean isBlockHeated(Level level, BlockPos pos) {
-        BlockHeatEntry entry = HEATED_BLOCKS.get(blockKey(level, pos));
-        if (entry == null) return false;
-        if (level.getGameTime() >= entry.expiryTick()) {
-            HEATED_BLOCKS.remove(blockKey(level, pos));
-            return false;
-        }
-        return true;
-    }
-
     public static void addHeat(LivingEntity target, LivingEntity attacker) {
         if (target.level().isClientSide()) return;
+        if (target instanceof StandEntity<?, ?>) return;
         UUID targetId = target.getUUID();
         HeatEntry existing = HEAT_MAP.get(targetId);
         int current = (existing != null && existing.attackerUUID().equals(attacker.getUUID())) ? existing.heatLevel() : 0;
@@ -88,12 +77,10 @@ public class HeatTrapManager {
         HEAT_MAP.entrySet().removeIf(e -> now >= e.getValue().expiryTick());
         HEATED_BLOCKS.entrySet().removeIf(e -> now >= e.getValue().expiryTick());
 
-        // Apply heat stacks to entities standing on heated blocks
         for (Map.Entry<String, BlockHeatEntry> blockEntry : HEATED_BLOCKS.entrySet()) {
             BlockHeatEntry blockHeat = blockEntry.getValue();
             if (!user.getUUID().equals(blockHeat.attackerUUID())) continue;
 
-            // key format: "namespace:path;x;y;z"
             String key = blockEntry.getKey();
             int first = key.indexOf(';');
             if (first == -1) continue;
@@ -111,6 +98,23 @@ public class HeatTrapManager {
 
                 for (LivingEntity entity : standing) {
                     addHeat(entity, user);
+                }
+
+                BlockState bs = level.getBlockState(pos);
+                if (bs.is(Blocks.WATER)) {
+                    if (now % 10 == 0) {
+                        level.getEntitiesOfClass(LivingEntity.class,
+                                new AABB(pos).inflate(0.1),
+                                e -> e != user && e.isAlive() && !e.isSpectator() && !e.fireImmune())
+                            .forEach(e -> e.hurt(level.damageSources().inFire(), 1.0f));
+                    }
+                } else if (!bs.isAir()) {
+                    if (now % 20 == 0) {
+                        level.getEntitiesOfClass(LivingEntity.class,
+                                new AABB(pos.above()).inflate(0.2, 0.1, 0.2),
+                                e -> e != user && e.isAlive() && !e.isSpectator() && !e.fireImmune() && e.onGround())
+                            .forEach(e -> e.hurt(level.damageSources().hotFloor(), 1.0f));
+                    }
                 }
             } catch (NumberFormatException ignored) {}
         }

@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.entity.projectile;
 
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.attack.enums.StunType;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
@@ -25,8 +26,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 public class FireSparkProjectile extends ThrowableProjectile {
     private static final EntityDataAccessor<Boolean> HEAT_TRAP_MODE = SynchedEntityData.defineId(FireSparkProjectile.class, EntityDataSerializers.BOOLEAN);
@@ -38,7 +38,7 @@ public class FireSparkProjectile extends ThrowableProjectile {
     private static final EntityDataAccessor<Integer> HEAT_TRAP_BLINDNESS = SynchedEntityData.defineId(FireSparkProjectile.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> HEAT_TRAP_CONFUSION = SynchedEntityData.defineId(FireSparkProjectile.class, EntityDataSerializers.INT);
 
-    private boolean isStationary = false;
+    private final boolean isStationary = false;
     private int stationaryTimer = 0;
     private static final int STATIONARY_LIFETIME = 200;
 
@@ -69,14 +69,6 @@ public class FireSparkProjectile extends ThrowableProjectile {
 
     public void setHeatTrapMode(boolean heatTrap) { this.entityData.set(HEAT_TRAP_MODE, heatTrap); }
     public boolean isHeatTrapMode() { return this.entityData.get(HEAT_TRAP_MODE); }
-
-    public void setHeatTrapDurations(int blindness, int confusion) {
-        this.entityData.set(HEAT_TRAP_BLINDNESS, blindness);
-        this.entityData.set(HEAT_TRAP_CONFUSION, confusion);
-    }
-
-    public int getHeatTrapBlindness() { return this.entityData.get(HEAT_TRAP_BLINDNESS); }
-    public int getHeatTrapConfusion() { return this.entityData.get(HEAT_TRAP_CONFUSION); }
 
     public void setBouncingMode(boolean bouncing) { this.entityData.set(BOUNCING_MODE, bouncing); }
     public boolean isBouncingMode() { return this.entityData.get(BOUNCING_MODE); }
@@ -121,7 +113,7 @@ public class FireSparkProjectile extends ThrowableProjectile {
     }
 
     @Override
-    protected void onHit(HitResult hitResult) {
+    protected void onHit(@NotNull HitResult hitResult) {
         if (isStationary) return;
 
         if (hitResult.getType() == HitResult.Type.ENTITY) {
@@ -146,7 +138,7 @@ public class FireSparkProjectile extends ThrowableProjectile {
     }
 
     @Override
-    public void remove(RemovalReason reason) {
+    public void remove(@NotNull RemovalReason reason) {
         if (isHeatWaveMode()) HeatWavesAttack.cleanupProjectile(this);
         super.remove(reason);
     }
@@ -202,10 +194,6 @@ public class FireSparkProjectile extends ThrowableProjectile {
         }
     }
 
-    public void explodeAsHeatWave() {
-        createHeatWave(blockPosition());
-    }
-
     private void handleBounce(BlockHitResult blockHit) {
         if (getBounceCount() >= getMaxBounces()) {
             destroyPlantsAndWater(blockHit.getBlockPos());
@@ -241,22 +229,24 @@ public class FireSparkProjectile extends ThrowableProjectile {
     }
 
     private void destroyPlantsAndWater(BlockPos center) {
-        for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y <= 1; y++) {
-                for (int z = -1; z <= 1; z++) {
-                    BlockPos pos = center.offset(x, y, z);
-                    BlockState state = level().getBlockState(pos);
+        if (level().getGameRules().getBoolean(JCraft.STAND_GRIEFING)) {
+            for (int x = -1; x <= 1; x++) {
+                for (int y = -1; y <= 1; y++) {
+                    for (int z = -1; z <= 1; z++) {
+                        BlockPos pos = center.offset(x, y, z);
+                        BlockState state = level().getBlockState(pos);
 
-                    if (state.is(BlockTags.FLOWERS) || state.is(BlockTags.CROPS) || state.is(BlockTags.SAPLINGS) ||
-                            state.is(Blocks.GRASS) || state.is(Blocks.TALL_GRASS) || state.is(Blocks.FERN) ||
-                            state.is(Blocks.LARGE_FERN) || state.is(Blocks.DEAD_BUSH) || state.is(Blocks.SEAGRASS) ||
-                            state.is(Blocks.TALL_SEAGRASS) || state.is(Blocks.VINE) || state.is(Blocks.LILY_PAD) ||
-                            state.is(Blocks.KELP) || state.is(Blocks.KELP_PLANT)) {
-                        level().destroyBlock(pos, false);
-                    }
+                        if (state.is(BlockTags.FLOWERS) || state.is(BlockTags.CROPS) || state.is(BlockTags.SAPLINGS) ||
+                                state.is(Blocks.GRASS) || state.is(Blocks.TALL_GRASS) || state.is(Blocks.FERN) ||
+                                state.is(Blocks.LARGE_FERN) || state.is(Blocks.DEAD_BUSH) || state.is(Blocks.SEAGRASS) ||
+                                state.is(Blocks.TALL_SEAGRASS) || state.is(Blocks.VINE) || state.is(Blocks.LILY_PAD) ||
+                                state.is(Blocks.KELP) || state.is(Blocks.KELP_PLANT)) {
+                            level().destroyBlock(pos, false);
+                        }
 
-                    if (state.is(Blocks.WATER)) {
-                        level().setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
+                        if (state.is(Blocks.WATER)) {
+                            level().setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
+                        }
                     }
                 }
             }

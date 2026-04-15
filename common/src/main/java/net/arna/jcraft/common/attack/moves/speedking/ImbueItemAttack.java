@@ -7,7 +7,6 @@ import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.common.entity.stand.SpeedKingEntity;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -15,8 +14,6 @@ import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -90,24 +87,6 @@ public final class ImbueItemAttack extends AbstractMove<ImbueItemAttack, SpeedKi
             }
         }
 
-        imbueBlocks(world, centerPos);
-    }
-
-    private void imbueBlocks(Level world, Vec3 centerPos) {
-        final int radius = 3;
-        final BlockPos center = new BlockPos((int) centerPos.x, (int) centerPos.y, (int) centerPos.z);
-
-        for (int x = -radius; x <= radius; x++) {
-            for (int y = -2; y <= 2; y++) {
-                for (int z = -radius; z <= radius; z++) {
-                    BlockPos pos = center.offset(x, y, z);
-                    BlockState state = world.getBlockState(pos);
-                    if (state.hasProperty(BlockStateProperties.LIT) && !state.getValue(BlockStateProperties.LIT)) {
-                        world.setBlockAndUpdate(pos, state.setValue(BlockStateProperties.LIT, true));
-                    }
-                }
-            }
-        }
     }
 
     public static void tickImbuedItems(Level level) {

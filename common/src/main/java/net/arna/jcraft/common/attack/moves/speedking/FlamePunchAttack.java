@@ -14,19 +14,11 @@ public final class FlamePunchAttack extends AbstractSimpleAttack<FlamePunchAttac
     /** Seconds the target burns after being hit */
     private final int fireDuration;
 
-    /** Full constructor. */
     public FlamePunchAttack(final int cooldown, final int windup, final int duration, final float moveDistance,
                             final float damage, final int stun, final float hitboxSize, final float knockback,
                             final float offset, final int fireDuration) {
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset);
         this.fireDuration = fireDuration;
-    }
-
-    /** Legacy constructor used by the codec — delegates with default fireDuration. */
-    public FlamePunchAttack(final int cooldown, final int windup, final int duration, final float moveDistance,
-                            final float damage, final int stun, final float hitboxSize, final float knockback,
-                            final float offset) {
-        this(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset, 3);
     }
 
     @Override
@@ -56,7 +48,8 @@ public final class FlamePunchAttack extends AbstractSimpleAttack<FlamePunchAttac
 
         @Override
         protected @NonNull App<RecordCodecBuilder.Mu<FlamePunchAttack>, FlamePunchAttack> buildCodec(RecordCodecBuilder.Instance<FlamePunchAttack> instance) {
-            return attackDefault(instance, FlamePunchAttack::new);
+            return attackDefault(instance, (cd, wu, dur, md, dmg, st, hb, kb, off) ->
+                    new FlamePunchAttack(cd, wu, dur, md, dmg, st, hb, kb, off, 3));
         }
     }
 }

@@ -11,8 +11,10 @@ import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.enums.StunType;
 import net.arna.jcraft.api.attack.moves.AbstractMultiHitAttack;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
+import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.common.entity.stand.SpeedKingEntity;
 import net.arna.jcraft.common.entity.stand.SpeedKingEntity.State;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
@@ -50,7 +52,12 @@ public final class FireGrabHitAttack extends AbstractMultiHitAttack<FireGrabHitA
         } else {
             super.processTarget(attacker, target, kbVec, damageSource);
         }
+        // Critical Mass: pump 2 heat per hit; mark with Boiling on the final blow
         HeatTrapManager.addHeat(target, attacker.getUserOrThrow());
+        HeatTrapManager.addHeat(target, attacker.getUserOrThrow());
+        if (isFinalBlow) {
+            target.addEffect(new MobEffectInstance(JStatusRegistry.BOILING.get(), 300, 0, false, true));
+        }
     }
 
     @Override

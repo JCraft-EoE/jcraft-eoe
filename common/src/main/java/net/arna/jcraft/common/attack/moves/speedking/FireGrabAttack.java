@@ -15,7 +15,6 @@ import net.arna.jcraft.common.entity.stand.SpeedKingEntity;
  */
 public final class FireGrabAttack extends AbstractGrabAttack<FireGrabAttack, SpeedKingEntity, SpeedKingEntity.State> {
 
-    /** Full constructor. */
     public FireGrabAttack(final int cooldown, final int windup, final int duration, final float moveDistance,
                           final float damage, final int stun, final float hitboxSize, final float knockback,
                           final float offset, final AbstractMove<?, ? super SpeedKingEntity> hitMove,
@@ -23,15 +22,6 @@ public final class FireGrabAttack extends AbstractGrabAttack<FireGrabAttack, Spe
                           final int grabDuration, final double grabOffset) {
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset,
                 hitMove, hitState, grabDuration, grabOffset);
-    }
-
-    /** Legacy constructor used by the codec — delegates with default grabDuration/grabOffset. */
-    public FireGrabAttack(final int cooldown, final int windup, final int duration, final float moveDistance,
-                          final float damage, final int stun, final float hitboxSize, final float knockback,
-                          final float offset, final AbstractMove<?, ? super SpeedKingEntity> hitMove,
-                          final StateContainer<SpeedKingEntity.State> hitState) {
-        this(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset,
-                hitMove, hitState, 40, 1.0);
     }
 
     @Override
@@ -56,7 +46,9 @@ public final class FireGrabAttack extends AbstractGrabAttack<FireGrabAttack, Spe
 
         @Override
         protected @NonNull App<RecordCodecBuilder.Mu<FireGrabAttack>, FireGrabAttack> buildCodec(RecordCodecBuilder.Instance<FireGrabAttack> instance) {
-            return this.<SpeedKingEntity, SpeedKingEntity.State>grabDefault(instance, FireGrabAttack::new);
+            return this.<SpeedKingEntity, SpeedKingEntity.State>grabDefault(instance,
+                    (cd, wu, dur, md, dmg, st, hb, kb, off, hitMove, hitState) ->
+                            new FireGrabAttack(cd, wu, dur, md, dmg, st, hb, kb, off, hitMove, hitState, 40, 1.0));
         }
     }
 }

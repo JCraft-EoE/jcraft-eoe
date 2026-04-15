@@ -5,7 +5,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
-import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.entity.stand.SpeedKingEntity;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -39,10 +38,28 @@ public final class SiroccoAttack extends AbstractMove<SiroccoAttack, SpeedKingEn
 
     @Override
     public @NonNull Set<LivingEntity> perform(final SpeedKingEntity attacker, final LivingEntity user) {
-        final Vec3 lookVec = user.getLookAngle().scale(2);
+        // Direction: mirrors the regular dash (DashData.tryDash) — WASD relative to look angle,
+        // falling back to mouse aim if no keys are held.
+        final int forward = (int) attacker.getRemoteForwardInput();
+        final int side = (int) attacker.getRemoteSideInput();
+
+        final Vec3 dashVec;
+        if (forward != 0 || side != 0) {
+            Vec3 dir = Vec3.directionFromRotation(user.getXRot(), user.getYRot());
+            dir = dir.yRot(1.57079632679f * side);
+            if (side != 0 && forward == 1) {
+                dir = dir.yRot(-0.785398163397f * side); // forward diagonal
+            }
+            if (forward == -1) {
+                dir = dir.yRot(side == 0 ? 3.14159265359f : 0.785398163397f * side); // backward
+            }
+            dashVec = dir.normalize().scale(2);
+        } else {
+            dashVec = user.getLookAngle().scale(2);
+        }
 
         // Apply velocity exactly like KQ dash
-        user.setDeltaMovement(user.getDeltaMovement().add(lookVec));
+        user.setDeltaMovement(user.getDeltaMovement().add(dashVec));
         user.hurtMarked = true;
 
         // Fling all nearby entities in the same direction
@@ -50,7 +67,7 @@ public final class SiroccoAttack extends AbstractMove<SiroccoAttack, SpeedKingEn
         attacker.level().getEntitiesOfClass(LivingEntity.class, area,
                 e -> e != user && e != attacker && e.isAlive() && !e.isSpectator())
                 .forEach(e -> {
-                    e.setDeltaMovement(e.getDeltaMovement().add(lookVec));
+                    e.setDeltaMovement(e.getDeltaMovement().add(dashVec));
                     e.hurtMarked = true;
                     e.fallDistance = 0f;
                 });
@@ -58,22 +75,22 @@ public final class SiroccoAttack extends AbstractMove<SiroccoAttack, SpeedKingEn
         // Heat wind particles behind the user (server-side)
         if (!attacker.level().isClientSide() && attacker.level() instanceof ServerLevel serverLevel) {
             Vec3 pos = user.position();
-            Vec3 behind = pos.subtract(lookVec.normalize().scale(1.5));
+            Vec3 behind = pos.subtract(dashVec.normalize().scale(1.5));
             for (int i = 0; i < 8; i++) {
                 double ox = (serverLevel.random.nextDouble() - 0.5) * 1.2;
                 double oy = (serverLevel.random.nextDouble() - 0.5) * 0.8 + 0.5;
                 double oz = (serverLevel.random.nextDouble() - 0.5) * 1.2;
                 serverLevel.sendParticles(ParticleTypes.CLOUD,
                         behind.x + ox, behind.y + oy, behind.z + oz,
-                        1, -lookVec.x * 0.2, 0.05, -lookVec.z * 0.2, 0.0);
+                        1, -dashVec.x * 0.2, 0.05, -dashVec.z * 0.2, 0.0);
             }
             for (int i = 0; i < 4; i++) {
                 double ox = (serverLevel.random.nextDouble() - 0.5) * 0.6;
-                double oy = serverLevel.random.nextDouble() * 1.0;
+                double oy = serverLevel.random.nextDouble();
                 double oz = (serverLevel.random.nextDouble() - 0.5) * 0.6;
                 serverLevel.sendParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE,
                         behind.x + ox, behind.y + oy, behind.z + oz,
-                        1, -lookVec.x * 0.1, 0.05, -lookVec.z * 0.1, 0.0);
+                        1, -dashVec.x * 0.1, 0.05, -dashVec.z * 0.1, 0.0);
             }
         }
 
