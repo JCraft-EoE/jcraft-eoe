@@ -27,7 +27,6 @@ import net.arna.jcraft.common.item.Peacemaker;
 import java.lang.ref.WeakReference;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.tusk.*;
@@ -54,6 +53,7 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
             TuskAct3Entity::registerMoves, State.class);
 
     public static final StandData DATA = StandData.builder()
+            .evolution(true)
             .idleRotation(315f)
             .idleDistance(1.75f)
             .blockDistance(0f)

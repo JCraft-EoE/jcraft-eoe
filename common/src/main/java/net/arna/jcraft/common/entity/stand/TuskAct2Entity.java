@@ -52,6 +52,7 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
             TuskAct2Entity::registerMoves, State.class);
 
     public static final StandData DATA = StandData.builder()
+            .evolution(true)
             .idleRotation(315f)
             .idleDistance(1.75f)
             .blockDistance(0f)
