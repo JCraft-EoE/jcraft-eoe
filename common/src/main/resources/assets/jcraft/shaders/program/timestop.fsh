@@ -60,8 +60,8 @@ void main(){
 
     float outside = smoothstep(rad - 1., rad, pct);
     float inside = smoothstep(rad + 1., rad, pct);
-    float outside2 = smoothstep(rad - 2.5, rad - 2., pct);
-    float inside2 = smoothstep(rad - 1.5, rad - 2., pct);
+//    float outside2 = smoothstep(rad - 2.5, rad - 2., pct);
+//    float inside2 = smoothstep(rad - 1.5, rad - 2., pct);
     vec2 m = vec2(0.5, 0.5 / aspect);
     vec2 d = texCoord - m;
     float r = sqrt(dot(d, d));
@@ -80,7 +80,7 @@ void main(){
     vec3 color = texture(DiffuseSampler, uv).rgb;
     if(rad > 0){
         //Change this to modify the color of the "ring"
-        color += pow(vec3(1.) * (outside * inside + outside2 * inside2), vec3(3.));
+        color += pow(vec3(1.) * (outside * inside), vec3(3.));
     }
 
     vec3 hsv = rgb2hsv(color);
