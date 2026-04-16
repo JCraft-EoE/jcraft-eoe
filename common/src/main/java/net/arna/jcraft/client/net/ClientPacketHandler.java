@@ -22,6 +22,8 @@ import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer
 import net.arna.jcraft.client.rendering.DamageIndicatorManager;
 import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
 import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
+import net.arna.jcraft.client.rendering.shader.JShaderRegistry;
+import net.arna.jcraft.client.rendering.shader.TimestopShaderEffect;
 import net.arna.jcraft.client.util.JClientUtils;
 import net.arna.jcraft.common.config.ConfigOption;
 import net.arna.jcraft.common.data.AttackerDataLoader;
@@ -513,11 +515,15 @@ public class ClientPacketHandler {
                     final Entity sourceShader = world.getEntity(id);
                     if (sourceShader instanceof final LivingEntity livingEntity) {
 
-                        ZaWarudoShaderHandler zaWarudoShaderHandler = ZaWarudoShaderHandler.INSTANCE;
-                        zaWarudoShaderHandler.shaderSourceEntity = Optional.of(livingEntity).orElse(client.player);
-                        zaWarudoShaderHandler.effectLength = duration;
-                        zaWarudoShaderHandler.shouldRender = true;
+//                        ZaWarudoShaderHandler zaWarudoShaderHandler = ZaWarudoShaderHandler.INSTANCE;
+//                        zaWarudoShaderHandler.shaderSourceEntity = Optional.of(livingEntity).orElse(client.player);
+//                        zaWarudoShaderHandler.effectLength = duration;
+//                        zaWarudoShaderHandler.shouldRender = true;
 
+                        if (JShaderRegistry.TIMESTOP_EFFECT != null)
+                        {
+                            JShaderRegistry.TIMESTOP_EFFECT.queueBubble(Optional.of(livingEntity).orElse(client.player), duration);
+                        }
                     }
                 });
             }
