@@ -108,9 +108,10 @@ public class TimestopShaderEffect extends ShaderEffect {
             float began = source.getB().getA();
             float duration = source.getB().getB();
 
-            float t = Math.min((time-began)/duration, 1.f);
+            final float maxOvertime = 1.48f;
+            float t = Math.min((time-began)/duration, maxOvertime);
 
-            if (t == 1.f)
+            if (t == maxOvertime)
             {
                 TIMESTOP_SOURCES.remove(source);
                 continue;
@@ -119,8 +120,8 @@ public class TimestopShaderEffect extends ShaderEffect {
             float radius;
             if (t < 0.33f) {
                 radius = MAX_RADIUS * (t / 0.33f);
-            } else if (t > 0.85f) {
-                radius = MAX_RADIUS * (1f - (t - 0.85f) / 0.15f);
+            } else if (t > 1f) {
+                radius = MAX_RADIUS * (1f - (t - 1f) / 0.48f);
             } else {
                 radius = MAX_RADIUS;
             }
