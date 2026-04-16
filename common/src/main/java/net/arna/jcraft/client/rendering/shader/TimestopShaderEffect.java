@@ -119,8 +119,8 @@ public class TimestopShaderEffect extends ShaderEffect {
             float radius;
             if (t < 0.33f) {
                 radius = MAX_RADIUS * (t / 0.33f);
-            } else if (t > 0.8f) {
-                radius = MAX_RADIUS * (1f - (t - 0.8f) / 0.2f);
+            } else if (t > 0.85f) {
+                radius = MAX_RADIUS * (1f - (t - 0.85f) / 0.15f);
             } else {
                 radius = MAX_RADIUS;
             }
