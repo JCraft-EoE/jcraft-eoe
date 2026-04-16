@@ -2,6 +2,7 @@
 
 //#define DISTORTION
 //#define RING_NOISE
+#define RAYMARCHED_BUBBLE
 
 uniform sampler2D DiffuseSampler;
 uniform sampler2D DepthSampler;
@@ -20,6 +21,7 @@ in vec2 texCoord;
 
 out vec4 fragColor;
 
+#ifdef RING_NOISE
 // 2D Random
 float random (in vec2 st) {
     return fract(sin(dot(st.xy,
@@ -50,6 +52,7 @@ float noise (in vec2 st) {
     (c - a)* u.y * (1.0 - u.x) +
     (d - b) * u.x * u.y;
 }
+#endif
 
 vec4 calcEyeFromWindow(in float depth){
     vec3 ndcPos;
@@ -98,14 +101,39 @@ void main(){
     float outside = smoothstep(rad - 1., rad, pct);
     float inside = smoothstep(rad + 1., rad, pct);
 
-//    float outside2 = smoothstep(rad - 2.5, rad - 2., pct);
-//    float inside2 = smoothstep(rad - 1.5, rad - 2., pct);
+#ifdef RAYMARCHED_BUBBLE
+    float bubbleMask = 0.;
+    float fresnel = 0.;
+
+    vec3 rayDir = normalize(pixelPosition - CameraPosition);
+    vec3 rayPos = CameraPosition;
+
+    for (int i = 0; i < 64; i++)
+    {
+        if (distance(rayPos, CameraPosition) >= distance(CameraPosition, pixelPosition))
+        { break; }
+
+        float d = max(length(rayPos-Center)-rad, 0.001);
+        rayPos += rayDir*d;
+        if (d < 0.01)
+        {
+            bubbleMask = 1.0;
+            vec3 normal = normalize(Center - rayPos);
+            if (distance(CameraPosition, Center) > rad)
+            {
+                // the fresnel effect looks weird in the bubble
+                fresnel = pow(1.-clamp(dot(rayDir, normal), 0., 1.), 3.)*2.;
+            }
+            break;
+        }
+    }
+#endif
+
     vec2 m = vec2(0.5, 0.5 / aspect);
     vec2 d = texCoord - m;
     float r = sqrt(dot(d, d));
     float power = ( 1.0 * 3.141592 / (2.0 * sqrt(dot(m, m))) ) * (inside * -0.2);
     float bind = (aspect < 1.0) ? m.x : m.y;
-
 
     vec2 uv = texCoord;
 #ifdef DISTORTION
@@ -117,13 +145,22 @@ void main(){
 
     vec3 color = texture(DiffuseSampler, uv).rgb;
     if(rad > 0){
-        //Change this to modify the color of the "ring"
+        // Change this to modify the color of the "ring"
         color += pow(vec3(1.) * (outside * inside), vec3(3.));
     }
 
     vec3 hsv = rgb2hsv(color);
+#ifdef RAYMARCHED_BUBBLE
+    hsv[0] = mix(hsv[0], 1.0 - hsv[0], bubbleMask);
+    hsv.b += fresnel;
+#else
     hsv[0] = mix(hsv[0], 1.0 - hsv[0], inside);
-    hsv[1] = mix(hsv[1], hsv[1] * OuterSat, outside);
+#endif
+    float saturation = 1.;
+    if (pct >= rad)
+    { saturation = 0.3; }
+
+    hsv[1] = mix(hsv[1], hsv[1] * saturation, outside);
     color = hsv2rgb(hsv);
 
     fragColor  = vec4(color, 1.0);
