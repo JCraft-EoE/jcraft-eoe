@@ -7,6 +7,7 @@ import net.arna.jcraft.client.rendering.shader.api.ShaderEffect;
 import net.arna.jcraft.client.rendering.shader.impl.GLBakedProgram;
 import net.arna.jcraft.client.rendering.shader.texture.impl.GLShaderSampler;
 import net.arna.jcraft.client.rendering.shader.texture.impl.GLShaderTexture;
+import net.arna.jcraft.mixin_logic.StillDepthHolder;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import org.joml.*;
@@ -16,6 +17,7 @@ import java.lang.Math;
 public class TimestopShaderEffect extends ShaderEffect {
     private static final float MAX_RADIUS = 100.f;
     private static final float DURATION = 40.f;
+    private static final Matrix4f FROZEN_INV_TRANSFORM_MAT = new Matrix4f();
 
     private GLShaderSampler depthSampler;
     private GLShaderSampler colorSampler;
@@ -82,10 +84,10 @@ public class TimestopShaderEffect extends ShaderEffect {
         this.program.setUniform("FOV", minecraft.gameRenderer.getFov(camera, tickProgress, false));
 
 //        uniform mat4 InverseTransformMatrix;
-        this.program.setUniform("InverseTransformMatrix", getInverseTransformMatrix(new Matrix4f()));
+        this.program.setUniform("InverseTransformMatrix", FROZEN_INV_TRANSFORM_MAT);
 
         GLShaderTexture colorTexture = GLShaderTexture.fromGlHandle(minecraft.getMainRenderTarget().getColorTextureId());
-        GLShaderTexture depthTexture = GLShaderTexture.fromGlHandle(minecraft.getMainRenderTarget().getDepthTextureId());
+        GLShaderTexture depthTexture = GLShaderTexture.fromGlHandle(((StillDepthHolder)minecraft.getMainRenderTarget()).jcraft$getDepthTexture());
 
         this.colorSampler.bindTexture(colorTexture);
         this.depthSampler.bindTexture(depthTexture);
@@ -95,13 +97,12 @@ public class TimestopShaderEffect extends ShaderEffect {
         this.program.unbind();
     }
 
-    private static Matrix4f getInverseTransformMatrix(Matrix4f outMat) {
+    public static void freezeInvTransformMat() {
         Matrix4f projection = RenderSystem.getProjectionMatrix();
         Matrix4f modelView = RenderSystem.getModelViewMatrix();
-        outMat.identity();
-        outMat.mul(projection);
-        outMat.mul(modelView);
-        outMat.invert();
-        return outMat;
+        FROZEN_INV_TRANSFORM_MAT.identity();
+        FROZEN_INV_TRANSFORM_MAT.mul(projection);
+        FROZEN_INV_TRANSFORM_MAT.mul(modelView);
+        FROZEN_INV_TRANSFORM_MAT.invert();
     }
 }
