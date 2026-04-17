@@ -693,26 +693,30 @@ public class JServerEvents {
     }
 
     public static EventResult processBlockLoot(final @NonNull List<ItemStack> loot, final @NonNull BlockState state, final @NonNull ServerLevel serverLevel, final @NonNull BlockPos pos, final @Nullable BlockEntity blockEntity) {
-        if (JServerConfig.MANDOM_AFFECTS_BLOCKS.getValue()) {
-            final Optional<BlockMarkerMove> move = BlockMarkerMoves.findFirst(m -> m.isRecording() && m.isInRange(pos, serverLevel));
-            if (move.isPresent()) {
-                final List<ItemStack> modifiedList = new LinkedList<>();
-                for (ItemStack stack : loot) {
-                    if (stack.getItem() instanceof RewindMockItem) {
-                        modifiedList.add(stack);
-                    } else {
-                        modifiedList.add(RewindMockItem.createMockStack(stack, move.get()));
-                    }
-                }
-                loot.clear();
-                loot.addAll(modifiedList);
+        if (!JServerConfig.MANDOM_AFFECTS_BLOCKS.getValue()) {
+            return EventResult.pass();
+        }
+
+        final Optional<BlockMarkerMove> move = BlockMarkerMoves.findFirst(m -> m.isRecording() && m.isInRange(pos, serverLevel));
+        if (move.isEmpty()) {
+            return EventResult.pass();
+        }
+
+        final List<ItemStack> modifiedList = new LinkedList<>();
+        for (ItemStack stack : loot) {
+            if (stack.getItem() instanceof RewindMockItem) {
+                modifiedList.add(stack);
+            } else {
+                modifiedList.add(RewindMockItem.createMockStack(stack, move.get()));
             }
         }
+        loot.clear();
+        loot.addAll(modifiedList);
         return EventResult.pass();
     }
 
     public static EventResult afterExplosion(final @NonNull Level level, final @NonNull BlockPos pos, final @NonNull Explosion explosion) {
-        BlockMarkerMoves.forEach(move -> move.removeBlock(pos, level));
+//        BlockMarkerMoves.forEach(move -> move.removeBlock(pos, level));
         return EventResult.pass();
     }
 }

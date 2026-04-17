@@ -95,7 +95,8 @@ public class Splatter {
             if (type == SplatterType.ACID && age % 4 == 0) {
                 for (LivingEntity hit : world.getEntitiesOfClass(LivingEntity.class, mainBox, EntitySelector.LIVING_ENTITY_STILL_ALIVE)) {
                     if (intersects(hit.getBoundingBox())) {
-                        if (hit.isPassengerOfSameVehicle(creator) || (hit instanceof StandEntity<?, ?> stand && stand.getUser() == creator)) {
+                        if (creator != null && (hit.isPassengerOfSameVehicle(creator) ||
+                                (hit instanceof StandEntity<?, ?> stand && stand.getUser() == creator))) {
                             continue;
                         }
                         hit.addEffect(new MobEffectInstance(JStatusRegistry.WSPOISON.get(), 20, 0, true, false));

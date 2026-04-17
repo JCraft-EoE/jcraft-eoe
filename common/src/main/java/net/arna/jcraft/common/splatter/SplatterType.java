@@ -7,7 +7,8 @@ import net.minecraft.resources.ResourceLocation;
 @Getter
 public enum SplatterType {
     BLOOD("blood.png", 80),
-    ACID("acid.png", 100);
+    ACID("acid.png", 100),
+    GASOLINE("gasoline.png", 300);
 
     private final ResourceLocation texture;
     private final int maxAge;

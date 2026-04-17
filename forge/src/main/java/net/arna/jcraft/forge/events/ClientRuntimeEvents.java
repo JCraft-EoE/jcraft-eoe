@@ -38,7 +38,7 @@ public class ClientRuntimeEvents {
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_ENTITIES) {
             AttackHitboxEffectRenderer.render(event.getPoseStack(), event.getCamera().getPosition(), event.getLevelRenderer(), renderBuffers.bufferSource());
             ShockwaveEffectRenderer.render(event.getPoseStack(), event.getCamera().getPosition(), level, renderBuffers.bufferSource());
-            SplatterEffectRenderer.render(event.getPoseStack(), event.getCamera().getPosition(), level, event.getPartialTick());
+            SplatterEffectRenderer.render(event.getPoseStack(), event.getCamera().getPosition(), level, event.getPartialTick(), renderBuffers.bufferSource());
             TimeErasePredictionEffectRenderer.render(event.getPoseStack(), event.getCamera().getPosition(), level, event.getPartialTick(), renderBuffers.bufferSource());
 //            EpitaphOverlay.render();
         }
