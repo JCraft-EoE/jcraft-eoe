@@ -4,9 +4,7 @@ import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.JRegistries;
-import net.arna.jcraft.common.attack.conditions.HamonChargeCondition;
-import net.arna.jcraft.common.attack.conditions.HoldingAnubisCondition;
-import net.arna.jcraft.common.attack.conditions.MetallicaIronCondition;
+import net.arna.jcraft.common.attack.conditions.*;
 import net.arna.jcraft.api.attack.core.MoveConditionType;
 
 public interface JMoveConditionTypeRegistry {
