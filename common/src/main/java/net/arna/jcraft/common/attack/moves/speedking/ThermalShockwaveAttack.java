@@ -13,15 +13,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 public final class ThermalShockwaveAttack extends AbstractSimpleAttack<ThermalShockwaveAttack, SpeedKingEntity> {
-    private static final int HEAT_PER_HIT = 5;
+    private static final int HEAT_PER_HIT = 2;
 
-    // Per-activation state (safe because copyOnUse = true)
-    private final Set<UUID> hitThisActivation = new HashSet<>();
     private Vec3 lockedDirection = null;
     private Vec3 lockedOrigin = null;
 
@@ -40,7 +35,6 @@ public final class ThermalShockwaveAttack extends AbstractSimpleAttack<ThermalSh
 
     @Override
     public void onInitiate(final SpeedKingEntity attacker) {
-        hitThisActivation.clear();
         lockedDirection = null;
         lockedOrigin = null;
     }
@@ -71,13 +65,16 @@ public final class ThermalShockwaveAttack extends AbstractSimpleAttack<ThermalSh
     @Override
     protected void processTarget(final SpeedKingEntity attacker, final LivingEntity target,
                                  final Vec3 kbVec, final DamageSource damageSource) {
-        if (!hitThisActivation.add(target.getUUID())) return;
         super.processTarget(attacker, target, kbVec, damageSource);
         LivingEntity user = attacker.getUserOrThrow();
         for (int i = 0; i < HEAT_PER_HIT; i++) {
             HeatTrapManager.addHeat(target, user);
         }
-        target.addEffect(new MobEffectInstance(JStatusRegistry.BOILING.get(), 200, 0, false, true));
+        target.addEffect(new MobEffectInstance(JStatusRegistry.BOILING.get(), 100, 0, false, true));
+        if (lockedDirection != null) {
+            target.setDeltaMovement(target.getDeltaMovement().add(lockedDirection.scale(0.6)));
+            target.hurtMarked = true;
+        }
     }
 
     @Override

@@ -25,8 +25,8 @@ import java.util.Set;
 import java.util.UUID;
 
 public final class ImbueItemAttack extends AbstractMove<ImbueItemAttack, SpeedKingEntity> {
-    private static final double CONTACT_KNOCKBACK = 1.2;
-    private static final double UPWARD_KNOCKBACK = 0.3;
+    private static final double CONTACT_KNOCKBACK = 0.24;
+    private static final double UPWARD_KNOCKBACK = 0.06;
     private static final double SEARCH_RADIUS = 5.0;
     private static final int FIRE_DURATION = 1;
     private static final double CONTACT_INFLATE = 0.4;
@@ -153,7 +153,7 @@ public final class ImbueItemAttack extends AbstractMove<ImbueItemAttack, SpeedKi
     }
 
     public record ImbueConfig(int heatDuration, float contactDamage, int boilingDuration) {
-        public static final ImbueConfig DEFAULT = new ImbueConfig(300, 6.0f, 200);
+        public static final ImbueConfig DEFAULT = new ImbueConfig(300, 3.0f, 100);
     }
 
     public static class Type extends AbstractMove.Type<ImbueItemAttack> {
@@ -162,7 +162,7 @@ public final class ImbueItemAttack extends AbstractMove<ImbueItemAttack, SpeedKi
         @Override
         protected @NonNull App<RecordCodecBuilder.Mu<ImbueItemAttack>, ImbueItemAttack> buildCodec(RecordCodecBuilder.Instance<ImbueItemAttack> instance) {
             return baseDefault(instance, (cd, wu, dur, md) ->
-                    new ImbueItemAttack(cd, wu, dur, md, 300, 6.0f, 200));
+                    new ImbueItemAttack(cd, wu, dur, md, 300, 3.0f, 100));
         }
     }
 }

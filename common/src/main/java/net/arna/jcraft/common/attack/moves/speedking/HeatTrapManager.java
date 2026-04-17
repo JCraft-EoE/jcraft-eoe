@@ -1,8 +1,11 @@
 package net.arna.jcraft.common.attack.moves.speedking;
 
+
+import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.SpeedKingEntity;
 import net.arna.jcraft.common.network.s2c.HeatParticlePacket;
+import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,7 +25,7 @@ import java.util.UUID;
 
 public class HeatTrapManager {
     public static final int MAX_HEAT = 10;
-    private static final int HEAT_DURATION = 300;
+    private static final int HEAT_DURATION = 500;
 
     private record HeatEntry(UUID attackerUUID, WeakReference<LivingEntity> target, int heatLevel, long expiryTick) {}
 
@@ -124,7 +127,9 @@ public class HeatTrapManager {
                         e -> e != user && e.isAlive() && !e.isSpectator());
 
                 for (LivingEntity entity : standing) {
-                    addHeat(entity, user);
+                    if (now % 20 == 0) {
+                        addHeat(entity, user);
+                    }
                 }
 
                 BlockState bs = level.getBlockState(pos);

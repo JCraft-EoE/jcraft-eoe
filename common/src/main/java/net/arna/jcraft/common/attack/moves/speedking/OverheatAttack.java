@@ -71,7 +71,7 @@ public final class OverheatAttack extends AbstractMove<OverheatAttack, SpeedKing
         List<BurstEntry> entries = new ArrayList<>();
         for (LivingEntity target : heatedTargets) {
             int heat = HeatTrapManager.getHeat(target);
-            entries.add(new BurstEntry(new WeakReference<>(target), new AtomicInteger(heat * 2), attacker.getMoveUsage(), new AtomicInteger(1)));
+            entries.add(new BurstEntry(new WeakReference<>(target), new AtomicInteger((int)(heat * 1.5)), attacker.getMoveUsage(), new AtomicInteger(1)));
             HeatTrapManager.clearHeat(target);
 
             JCraft.createParticle((ServerLevel) attacker.level(),
@@ -112,6 +112,15 @@ public final class OverheatAttack extends AbstractMove<OverheatAttack, SpeedKing
         return Set.of();
     }
 
+    public static void triggerAutoOverheat(SpeedKingEntity stand, LivingEntity target, int hits) {
+        if (stand.level().isClientSide()) return;
+        List<BurstEntry> entries = ACTIVE_BURSTS.computeIfAbsent(stand.getUUID(), k -> new ArrayList<>());
+        entries.add(new BurstEntry(new WeakReference<>(target), new AtomicInteger(hits), stand.getMoveUsage(), new AtomicInteger(1)));
+        JCraft.createParticle((ServerLevel) target.level(),
+                target.getX(), target.getY() + target.getBbHeight() * 0.5, target.getZ(), JParticleType.BOOM);
+        JUtils.serverPlaySound(JSoundRegistry.KQ_EXPLODE.get(), (ServerLevel) stand.level(), target.position(), 96);
+    }
+
     public static void tickBursts(final ServerLevel level, final SpeedKingEntity stand) {
         List<BurstEntry> entries = ACTIVE_BURSTS.get(stand.getUUID());
         if (entries == null) return;
@@ -130,7 +139,7 @@ public final class OverheatAttack extends AbstractMove<OverheatAttack, SpeedKing
             target.invulnerableTime = 0;
             Vec3 kbVec = target.position().subtract(user.position()).normalize().scale(0.1);
             damageLogic(level, target, new AttackData(
-                    kbVec, 10, StunType.UNBURSTABLE.ordinal(), true,
+                    kbVec, 3, StunType.UNBURSTABLE.ordinal(), true,
                     BURST_DAMAGE, false, 0, damageSource, user,
                     CommonHitPropertyComponent.HitAnimation.MID, entry.moveUsage(), false, true));
 

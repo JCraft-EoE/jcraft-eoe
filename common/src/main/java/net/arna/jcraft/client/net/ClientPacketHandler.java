@@ -127,11 +127,13 @@ public class ClientPacketHandler {
 
         client.execute(() -> {
             for (int i = 0; i < heat; i++) {
+                SimpleParticleType pType = ParticleTypes.CRIMSON_SPORE;
+                if (heat > 5 && client.level.random.nextInt(12) < heat) pType = ParticleTypes.LAVA;
                 client.level.addParticle(
-                        ParticleTypes.CRIMSON_SPORE,
-                        pos.x + (client.level.random.nextDouble() - 0.5) * spread * 2,
+                        pType,
+                        pos.x + (client.level.random.nextDouble() - 0.5) * spread,
                         pos.y + (client.level.random.nextDouble() - 0.5) * bbHeight,
-                        pos.z + (client.level.random.nextDouble() - 0.5) * spread * 2,
+                        pos.z + (client.level.random.nextDouble() - 0.5) * spread,
                         0, 0.05, 0.01);
             }
         });

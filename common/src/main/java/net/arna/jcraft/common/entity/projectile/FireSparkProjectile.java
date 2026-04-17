@@ -7,7 +7,9 @@ import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.common.attack.moves.speedking.HeatTrapManager;
 import net.arna.jcraft.common.attack.moves.speedking.HeatWavesAttack;
+import net.arna.jcraft.common.entity.stand.SpeedKingEntity;
 import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -27,6 +29,8 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import net.arna.jcraft.api.component.living.CommonStandComponent;
+import net.arna.jcraft.common.attack.moves.speedking.OverheatAttack;
 
 public class FireSparkProjectile extends ThrowableProjectile {
     private static final EntityDataAccessor<Boolean> HEAT_TRAP_MODE = SynchedEntityData.defineId(FireSparkProjectile.class, EntityDataSerializers.BOOLEAN);
@@ -120,7 +124,7 @@ public class FireSparkProjectile extends ThrowableProjectile {
             EntityHitResult entityHit = (EntityHitResult) hitResult;
             if (entityHit.getEntity() instanceof LivingEntity livingEntity && entityHit.getEntity() != getOwner()) {
                 hitEntity(livingEntity);
-                if (!isBouncingMode() && !isHeatWaveMode()) discard();
+                if (!isHeatWaveMode()) discard();
             }
         } else if (hitResult.getType() == HitResult.Type.BLOCK) {
             BlockHitResult blockHit = (BlockHitResult) hitResult;
@@ -154,11 +158,20 @@ public class FireSparkProjectile extends ThrowableProjectile {
         if (isHeatTrapMode()) {
             if (getOwner() instanceof LivingEntity owner) {
                 HeatTrapManager.addHeat(realTarget, owner);
+                HeatTrapManager.addHeat(realTarget, owner);
             }
-        } else if (getBaseDamage() <= 2.0f) {
-            realTarget.addEffect(new MobEffectInstance(JStatusRegistry.BOILING.get(), 100, 0, false, true));
+            discard();
+            return;
+        } else if (isHeatWaveMode()) {
+            realTarget.addEffect(new MobEffectInstance(JStatusRegistry.BOILING.get(), 50, 0, false, true));
+            if (getOwner() instanceof LivingEntity ownerOwner) {
+                CommonStandComponent standComp = JComponentPlatformUtils.getStandComponent(ownerOwner);
+                if (standComp != null && standComp.getStand() instanceof SpeedKingEntity speedKing) {
+                    OverheatAttack.triggerAutoOverheat(speedKing, realTarget, 3);
+                }
+            }
         } else if (isBouncingMode()) {
-            realTarget.addEffect(new MobEffectInstance(JStatusRegistry.BOILING.get(), 200, 0, false, true));
+            realTarget.addEffect(new MobEffectInstance(JStatusRegistry.BOILING.get(), 100, 0, false, true));
             realTarget.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 60, 10, false, true));
             realTarget.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 1, false, true));
         } else {
@@ -180,7 +193,7 @@ public class FireSparkProjectile extends ThrowableProjectile {
         for (LivingEntity entity : level().getEntitiesOfClass(LivingEntity.class,
                 new net.minecraft.world.phys.AABB(center.add(-radius, -2, -radius), center.add(radius, 2, radius)),
                 entity -> entity != owner)) {
-            entity.addEffect(new MobEffectInstance(JStatusRegistry.BOILING.get(), 200, 0, false, true));
+            entity.addEffect(new MobEffectInstance(JStatusRegistry.BOILING.get(), 100, 0, false, true));
             JUtils.projectileDamageLogic(this, level(), entity, entity.getEyePosition().subtract(center).normalize(),
                     400, StunType.WINDED.ordinal(), true, 2.0f, 0, CommonHitPropertyComponent.HitAnimation.MID);
         }

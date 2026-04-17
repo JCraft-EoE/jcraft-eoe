@@ -150,7 +150,7 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
                     Component.literal("shoots projectiles that create heat wave explosions on impact")
             );
 
-    public static final HeatTrapAttack HEAT_TRAP = new HeatTrapAttack(200, 5, 12, 0.75f)
+    public static final HeatTrapAttack HEAT_TRAP = new HeatTrapAttack(400, 5, 12, 0.75f)
             .withCrouchingVariant(HEAT_WAVES)
             .withInfo(
                     Component.literal("Heat Trap"),
@@ -158,7 +158,7 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
             );
 
     public static final PureHeatAccumulationAttack PURE_HEAT_ACCUMULATION = new PureHeatAccumulationAttack(
-            300, 15, 25, 1f, 0f, 0, 7f, 0, 1)
+            600, 15, 25, 1f, 0f, 0, 7f, 0, 1)
             .withInfo(
                     Component.literal("Pure Heat Accumulation"),
                     Component.literal("charges the ground and coats a wide area in heat traps")
@@ -172,7 +172,7 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
             );
 
     public static final ImbueItemAttack IMBUE_ITEM = new ImbueItemAttack(
-            150, 12, 18, 0.75f, 300, 6.0f, 200)
+            150, 12, 18, 0.75f, 300, 3.0f, 100)
             .withInfo(
                     Component.literal("Imbue Item with Heat"),
                     Component.literal("heats nearby items/blocks, causes boiling on pickup")
