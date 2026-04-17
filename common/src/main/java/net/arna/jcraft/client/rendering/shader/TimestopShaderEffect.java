@@ -74,7 +74,7 @@ public class TimestopShaderEffect extends ShaderEffect {
 //
 //        uniform vec3 CameraPosition;
         this.program.setUniform("CameraPosition", camera.getPosition().toVector3f());
-        Quaternionf cameraRot = new Quaternionf(camera.rotation()).conjugate();
+        Quaternionf cameraRot = new Quaternionf(camera.rotation()).normalize();
         this.program.setUniform("CameraRot", new Vector4f(cameraRot.x, cameraRot.y, cameraRot.z, cameraRot.w));
 //        uniform vec3 Center;
         this.program.setUniform("Center", center);

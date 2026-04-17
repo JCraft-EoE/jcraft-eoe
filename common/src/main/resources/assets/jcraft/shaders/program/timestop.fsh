@@ -80,10 +80,22 @@ vec3 hsv2rgb(vec3 c){
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
+vec3 quat_transform(in vec4 q, in vec3 v)
+{
+    return v + 2.*cross( q.xyz, cross( q.xyz, v ) + q.w*v );
+}
+
+vec2 getUV(in vec3 viewDir, in float aspect)
+{
+    return (vec2(viewDir.x/viewDir.z, viewDir.y/viewDir.z)/vec2(aspect, 1.))+0.5;
+}
+
 void main(){
     float sceneDepth = texture(DepthSampler, texCoord).x;
     vec3 pixelPosition = calcEyeFromWindow(sceneDepth).xyz + CameraPosition;
     float aspect = Viewport.x/Viewport.y;
+    vec2 cUV = texCoord-0.5;
+    cUV.x *= aspect;
 
     float pct = distance(pixelPosition, Center);
 
@@ -100,6 +112,11 @@ void main(){
 
     float outside = smoothstep(rad - 1., rad, pct);
     float inside = smoothstep(rad + 1., rad, pct);
+
+#ifdef DISTORTION
+    vec3 viewDir = normalize(vec3(cUV.xy, 1.));
+    viewDir = quat_transform(CameraRotation, viewDir);
+#endif
 
 #ifdef RAYMARCHED_BUBBLE
     float bubbleMask = 0.;
@@ -122,8 +139,16 @@ void main(){
             if (distance(CameraPosition, Center) > rad)
             {
                 // the fresnel effect looks weird in the bubble
-                fresnel = pow(1.-clamp(dot(rayDir, normal), 0., 1.), 3.)*2.;
+                fresnel = clamp(pow(1.-clamp(dot(rayDir, normal), 0., 1.), 3.)*2., 0., 1.);
             }
+
+#ifdef DISTORTION
+            vec3 idealRayDir = normalize(CameraPosition - Center);
+            float distortion = abs(dot(rayDir, idealRayDir))*0.4;
+            distortion = clamp(distortion, 0., 1.);
+
+            viewDir = normalize(mix(viewDir, idealRayDir, distortion));
+#endif
             break;
         }
     }
@@ -135,12 +160,11 @@ void main(){
     float power = ( 1.0 * 3.141592 / (2.0 * sqrt(dot(m, m))) ) * (inside * -0.2);
     float bind = (aspect < 1.0) ? m.x : m.y;
 
-    vec2 uv = texCoord;
 #ifdef DISTORTION
-    if (power < 0.0 && rad > 0)
-    {
-        uv = m + normalize(d) * atan(r * -power * 10.0) * bind / atan(-power * bind * 10.0);
-    }
+    viewDir = quat_transform(vec4(-CameraRotation.xyz, CameraRotation.w), viewDir);
+    vec2 uv = getUV(viewDir, aspect);
+#else
+    vec2 uv = texCoord;
 #endif
 
     vec3 color = texture(DiffuseSampler, uv).rgb;
