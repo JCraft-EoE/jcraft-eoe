@@ -12,6 +12,7 @@ import net.arna.jcraft.common.advancements.Hamon3Trigger;
 import net.arna.jcraft.common.advancements.Hamon4Trigger;
 import net.arna.jcraft.common.advancements.Hamon5Trigger;
 import net.arna.jcraft.common.advancements.Hamon6Trigger;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementProgress;
@@ -25,13 +26,13 @@ import net.minecraft.world.entity.LivingEntity;
 
 import java.util.Collection;
 
-public class ResetSpecCommand {
+public class UnlockSpecCommand {
     public static void register(final CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("spec")
-                .then(Commands.literal("reset")
+                .then(Commands.literal("unlock")
                         .requires(source -> source.hasPermission(2))
                         .then(Commands.argument("entities", EntityArgument.entities())
-                                    .executes(ResetSpecCommand::run)
+                                    .executes(UnlockSpecCommand::run)
                         )
                 )
         );
@@ -47,36 +48,22 @@ public class ResetSpecCommand {
             for (final Entity entity : targets) {
                 if (entity instanceof LivingEntity living) {
                     final SpecType specType = JComponentPlatformUtils.getSpecData(living).getType();
-                    if (specType == JSpecTypeRegistry.VAMPIRE.get()) {
-                        JComponentPlatformUtils.getVampirism(living).resetBlood();
-                    }
-                    else if (specType == JSpecTypeRegistry.HAMON.get()) {
+                    if (specType == JSpecTypeRegistry.HAMON.get()) {
                         var hamon = JComponentPlatformUtils.getHamon(living);
-                        hamon.resetHamonCharge();
-                        hamon.resetLastZoomPunched();
-                        hamon.resetLastSendoed();
-                        hamon.resetLastSendoAired();
-                        hamon.resetLastStomped();
-                        if (living instanceof final ServerPlayer player) {
-                            revoke(player, Hamon1Trigger.ID);
-                            revoke(player, Hamon2Trigger.ID);
-                            revoke(player, Hamon3Trigger.ID);
-                            revoke(player, Hamon4Trigger.ID);
-                            revoke(player, Hamon5Trigger.ID);
-                            revoke(player, Hamon6Trigger.ID);
-                        }
-                        for (int i = 1; i <= 6; i++) {
-                            hamon.resetLessonTicks(i);
+                        if (living instanceof ServerPlayer player) {
+                            JUtils.awardAdvancement(player, Hamon1Trigger.ID);
+                            JUtils.awardAdvancement(player, Hamon2Trigger.ID);
+                            JUtils.awardAdvancement(player, Hamon3Trigger.ID);
+                            JUtils.awardAdvancement(player, Hamon4Trigger.ID);
+                            JUtils.awardAdvancement(player, Hamon5Trigger.ID);
+                            JUtils.awardAdvancement(player, Hamon6Trigger.ID);
                         }
                         hamon.setActiveLesson(0);
-                    }
-                    else if (specType == JSpecTypeRegistry.ANUBIS.get()) {
-                        JComponentPlatformUtils.getMiscData(living).setAttackSpeedMult(1f);
                     }
                 }
             }
         } catch (final Exception ex) {
-            JCraft.LOGGER.error("Failed to reset spec!", ex);
+            JCraft.LOGGER.error("Failed to unlock spec!", ex);
             return 0;
         }
 

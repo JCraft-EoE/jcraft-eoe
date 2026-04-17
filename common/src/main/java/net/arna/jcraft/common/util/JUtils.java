@@ -897,6 +897,20 @@ public final class JUtils {
         return items[rng.nextInt(items.length)];
     }
 
+    public static void awardAdvancement(final ServerPlayer player, final ResourceLocation advancementLoc) {
+        final MinecraftServer server = player.getServer();
+        if (server == null) {
+            return;
+        }
+        final Advancement advancement = server.getAdvancements().getAdvancement(advancementLoc);
+        if (advancement == null) {
+            return;
+        }
+        for (final String criterion : advancement.getCriteria().keySet()) {
+            player.getAdvancements().award(advancement, criterion);
+        }
+    }
+
     public static boolean hasAdvancement(final ServerPlayer player, final ResourceLocation advancementLoc) {
         final MinecraftServer server = player.getServer();
         if (server == null) {
