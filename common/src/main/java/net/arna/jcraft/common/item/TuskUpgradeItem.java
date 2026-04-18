@@ -1,6 +1,12 @@
 package net.arna.jcraft.common.item;
 
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.api.registry.JAdvancementTriggerRegistry;
+import net.arna.jcraft.api.stand.StandType;
+import net.arna.jcraft.common.attack.moves.tusk.TuskActCycleMove;
+import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.network.chat.Component;
@@ -57,6 +63,22 @@ public class TuskUpgradeItem extends Item {
             JAdvancementTriggerRegistry.TUSK_ACT2.trigger(sp);
         } else if (targetAct == 3) {
             JAdvancementTriggerRegistry.TUSK_ACT3.trigger(sp);
+        }
+
+        // Auto-switch to the new act if the player is currently using any Tusk act
+        CommonStandComponent standData = JComponentPlatformUtils.getStandComponent(sp);
+        StandType currentType = standData.getType();
+        StandType act1 = TuskActCycleMove.getActStandType(1);
+        StandType act2 = TuskActCycleMove.getActStandType(2);
+        StandType act3 = TuskActCycleMove.getActStandType(3);
+        if (currentType == act1 || currentType == act2 || currentType == act3) {
+            StandType newType = TuskActCycleMove.getActStandType(targetAct);
+            if (newType != null) {
+                standData.setTypeAndSkin(newType, standData.getSkin());
+                JUtils.maySendStandAboutInfo(sp);
+                sp.unRide();
+                JCraft.summon(sp.level(), sp);
+            }
         }
 
         stack.shrink(1);

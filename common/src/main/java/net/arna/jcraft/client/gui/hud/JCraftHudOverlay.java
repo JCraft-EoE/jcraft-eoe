@@ -117,16 +117,31 @@ public class JCraftHudOverlay {
                 float nails = tusk1.getNails();
                 String nailText = formatNails(nails);
                 NAIL_GAUGE.renderWithText(ctx, gaugeX, height + gaugeHeightOffset, (int) nails, nailText);
+
+                String actName = "Tusk Act 1";
+                int textX = gaugeX + gaugeWidth / 2 - client.font.width(actName) / 2;
+                ctx.drawString(client.font, actName, textX, height + gaugeHeightOffset, 0xFFFFFF, true);
+                gaugeHeightOffset -= 10;
             }
             if (stand instanceof TuskAct2Entity tusk2) {
                 float nails = tusk2.getNails();
                 String nailText = formatNails(nails);
                 NAIL_GAUGE.renderWithText(ctx, gaugeX, height + gaugeHeightOffset, (int) nails, nailText);
+
+                String actName = "Tusk Act 2";
+                int textX = gaugeX + gaugeWidth / 2 - client.font.width(actName) / 2;
+                ctx.drawString(client.font, actName, textX, height + gaugeHeightOffset, 0xFFFFFF, true);
+                gaugeHeightOffset -= 10;
             }
             if (stand instanceof TuskAct3Entity tusk3) {
                 float nails = tusk3.getNails();
                 String nailText = formatNails(nails);
                 NAIL_GAUGE.renderWithText(ctx, gaugeX, height + gaugeHeightOffset, (int) nails, nailText);
+
+                String actName = "Tusk Act 3";
+                int textX = gaugeX + gaugeWidth / 2 - client.font.width(actName) / 2;
+                ctx.drawString(client.font, actName, textX, height + gaugeHeightOffset, 0xFFFFFF, true);
+                gaugeHeightOffset -= 10;
             }
             if (stand instanceof AerosmithEntity aerosmith) {
                 OVERHEAT_GAUGE.render(ctx, gaugeX, height + gaugeHeightOffset, (int) aerosmith.getOverheat());

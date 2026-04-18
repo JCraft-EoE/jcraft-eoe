@@ -1,7 +1,12 @@
 package net.arna.jcraft.common.util;
 
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.api.component.living.CommonMiscComponent;
 import net.arna.jcraft.api.registry.JAdvancementTriggerRegistry;
+import net.arna.jcraft.api.registry.JStandTypeRegistry;
+import net.arna.jcraft.api.stand.StandType;
+import net.arna.jcraft.common.attack.moves.tusk.TuskActCycleMove;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -42,6 +47,27 @@ public class TuskProgressionHelper {
 
         String actName = "Act " + act;
         player.sendSystemMessage(Component.literal("§6§lTusk " + actName + " Unlocked!"));
+
+        // Automatically switch to the new act if the player is currently using Tusk
+        if (player instanceof ServerPlayer serverPlayer) {
+            CommonStandComponent standData = JComponentPlatformUtils.getStandComponent(serverPlayer);
+            StandType currentType = standData.getType();
+
+            // Check if current stand is a Tusk act
+            if (currentType == JStandTypeRegistry.TUSK_ACT_1.get() ||
+                    currentType == JStandTypeRegistry.TUSK_ACT_2.get() ||
+                    currentType == JStandTypeRegistry.TUSK_ACT_3.get()) {
+
+                StandType newType = TuskActCycleMove.getActStandType(act);
+                if (newType != null) {
+                    standData.setTypeAndSkin(newType, standData.getSkin());
+                    JUtils.maySendStandAboutInfo(serverPlayer);
+                    serverPlayer.unRide();
+                    JCraft.summon(serverPlayer.level(), serverPlayer);
+                }
+            }
+        }
+
         return true;
     }
 
