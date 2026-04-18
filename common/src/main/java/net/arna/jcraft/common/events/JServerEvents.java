@@ -1,7 +1,9 @@
 package net.arna.jcraft.common.events;
 
+import com.jcraft_eoe.jjbacosplay.CosplayItem;
 import dev.architectury.event.CompoundEventResult;
 import dev.architectury.event.EventResult;
+import dev.architectury.platform.Platform;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import lombok.NonNull;
@@ -51,6 +53,9 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.ArmorMaterials;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -75,6 +80,7 @@ import static net.arna.jcraft.common.util.EntityInterest.blockAttractionInterest
 import static net.arna.jcraft.common.util.EntityInterest.itemAttractionInterest;
 
 public class JServerEvents {
+
     private static final List<Enchantment> JCRAFT_ARMOR_ENCHANTS = List.of(
             Enchantments.ALL_DAMAGE_PROTECTION, Enchantments.PROJECTILE_PROTECTION, Enchantments.BLAST_PROTECTION, Enchantments.FIRE_PROTECTION, Enchantments.UNBREAKING);
 
@@ -85,9 +91,23 @@ public class JServerEvents {
             List.of(Items.AIR, Items.GOLDEN_HELMET,     Items.CHAINMAIL_HELMET,     Items.IRON_HELMET,     Items.DIAMOND_HELMET,     Items.NETHERITE_HELMET     )
     );
 
+    private static final List<ArmorMaterial> VANILLA_MATERIAL = Arrays.asList(ArmorMaterials.values());
+
+    private static final List<List<CosplayItem<?>>> COSPLAY = List.of(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+
     public static void finishLoading(final MinecraftServer server) {
         JCraft.auWorld = server.getLevel(JDimensionRegistry.AU_DIMENSION_KEY);
         JCraft.setExclusiveStandsData(ExclusiveStandsData.fromDefaultFile(server));
+        if (Platform.isModLoaded("jjbacosplay")) {
+            for (final CosplayItem<?> cosplay : CosplayItem.all()) {
+                switch (cosplay.getSlot()) {
+                    case HELMET -> COSPLAY.get(3).add(cosplay);
+                    case CHESTPLATE -> COSPLAY.get(2).add(cosplay);
+                    case LEGGINGS -> COSPLAY.get(1).add(cosplay);
+                    case BOOTS -> COSPLAY.get(0).add(cosplay);
+                }
+            }
+        }
     }
 
     public static void saveExclusives(final MinecraftServer server) {
@@ -428,17 +448,33 @@ public class JServerEvents {
         ItemStack itemStack;
         int baseArmorLevel = random.nextInt(1, 6);
         int enchantsSize = JCRAFT_ARMOR_ENCHANTS.size();
-        for (int i = 0; i < 4; i++) {
-            final int armorLevel = baseArmorLevel + random.nextInt(-1, 1);
+        for (int slot = 0; slot < 4; slot++) {
+            int armorLevel = 0;
+            final int diamondLevel = 4; // Check above
 
-            itemStack = new ItemStack(EQUIPMENT.get(i).get(armorLevel));
+            if (Platform.isModLoaded("jjbacosplay")) {
+                List<CosplayItem<?>> slottedCosplay = COSPLAY.get(slot);
+                ArmorItem selected = JUtils.chooseRandom(random,
+                        slottedCosplay.get(random.nextInt(slottedCosplay.size())).getAll()
+                ).get();
+                itemStack = new ItemStack(selected);
+                if (VANILLA_MATERIAL.contains(selected.getMaterial())) {
+                    armorLevel = ((ArmorMaterials)selected.getMaterial()).ordinal();
+                }
+                else {
+                    armorLevel = diamondLevel;
+                }
+            }
+            else {
+                armorLevel = baseArmorLevel + random.nextInt(-1, 1);
+                itemStack = new ItemStack(EQUIPMENT.get(slot).get(armorLevel));
+            }
             enchantment = JCRAFT_ARMOR_ENCHANTS.get(random.nextInt(enchantsSize));
             itemStack.enchant(enchantment, enchantment.getMaxLevel());
-            armorItems.set(i, itemStack);
+            armorItems.set(slot, itemStack);
 
-            final int diamondLevel = 4; // Check above
             if (armorLevel >= diamondLevel) {
-                mob.setDropChance(EquipmentSlot.byTypeAndIndex(EquipmentSlot.Type.ARMOR, i), 0f);
+                mob.setDropChance(EquipmentSlot.byTypeAndIndex(EquipmentSlot.Type.ARMOR, slot), 0f);
             }
         }
     }

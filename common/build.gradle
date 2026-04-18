@@ -38,6 +38,9 @@ dependencies {
     modImplementation "dev.ftb.mods:ftb-library:${rootProject.ftb_lib_version}"
     modImplementation "dev.ftb.mods:ftb-teams:${rootProject.ftb_teams_version}"
 
+    // jjbacosplay
+    modImplementation "com.jcraft-eoe.jjbacosplay:jjbacosplay-common:${rootProject.jjbacosplay_version}"
+
     //modImplementation "com.fusionflux:gravity_api-common-${gravity_api_version}"
 
     // JUnit for testing

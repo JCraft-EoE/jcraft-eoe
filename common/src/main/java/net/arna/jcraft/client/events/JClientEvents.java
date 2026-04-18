@@ -12,8 +12,6 @@ import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
 import net.arna.jcraft.api.registry.JPacketRegistry;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
-import net.arna.jcraft.api.registry.JSoundRegistry;
-import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
@@ -26,7 +24,6 @@ import net.arna.jcraft.common.network.c2s.PlayerInputPacket;
 import net.arna.jcraft.common.network.c2s.StandBlockPacket;
 import net.arna.jcraft.common.tickable.Timestops;
 import net.arna.jcraft.common.util.*;
-import net.arna.jcraft.mixin_logic.Jangler;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -36,18 +33,13 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.client.resources.sounds.SoundInstance;
-import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
@@ -316,9 +308,6 @@ public class JClientEvents {
         // Menacing (ゴ/ド) particles — 4-second burst when a stand user enters 100-block radius.
         // Works regardless of whether the local player or target has their stand summoned.
         tickMenacing(client, player);
-
-        // Play jangle sound (from spurs) for all entities
-        playJangle();
     }
 
     private static void tickMenacing(final Minecraft client, final LocalPlayer player) {
@@ -420,61 +409,5 @@ public class JClientEvents {
                 minY + rng.nextDouble() * (maxY - minY),
                 pos.z + rng.triangle(0, spread),
                 0, 0, 0);
-    }
-
-    private static void playJangle() {
-        Minecraft mc = Minecraft.getInstance();
-        LocalPlayer player = mc.player;
-        ClientLevel level = mc.level;
-        SoundManager soundManager = mc.getSoundManager();
-        if (player == null || level == null) return;
-
-        List<Entity> entities = level.getEntities(player, AABB.ofSize(player.position(), 20, 20, 20),
-                e -> e instanceof LivingEntity);
-        if (!player.isCrouching()) entities.add(player);
-
-        for (Entity entity : entities) {
-            if (!entity.onGround() || !level.getBlockState(entity.blockPosition()).getFluidState().isEmpty()) {
-                continue;
-            }
-            Jangler jangler = (Jangler) entity;
-
-            for (ItemStack armorSlot : entity.getArmorSlots()) {
-                if (!armorSlot.is(JTagRegistry.BOOTS_WITH_THE_SPURS)) {
-                    continue;
-                }
-
-                double speedMin    = 0.02,  speedMax    = 0.10;
-                double intervalMin = 4,    intervalMax = 12;
-
-                double dx = entity.xOld - entity.getX();
-                double dy = entity.yOld - entity.getY();
-                double dz = entity.zOld - entity.getZ();
-                double speed = dx * dx + dy * dy + dz * dz;
-                if (speed < speedMin) continue;
-
-                double t     = (speed - speedMin) / (speedMax - speedMin);
-                double delta = 1.0 - Mth.clamp(t, 0.0, 1.0);
-                int interval = (int) Mth.lerp(delta, intervalMin, intervalMax);
-
-                // Play jangle once every few tick, depending on their speed
-                if (entity.tickCount - jangler.jcraft$getLastJangleAge() < interval) {
-                    continue;
-                }
-
-                // We found an armor piece that has spurs for an entity that is moving,
-                // and we haven't played this sound in 5 ticks, play jangle sound.
-                RandomSource random = player.getRandom();
-                float volume = 1f - random.nextFloat() * 0.3f;
-                float pitch = 1f - random.nextFloat() * 0.3f;
-
-                SoundSource soundSource = entity.getSoundSource();
-                SoundInstance sound = new SimpleSoundInstance(JSoundRegistry.JANGLE.get(), soundSource, volume, pitch,
-                        random, entity.getX(), entity.getY(), entity.getZ());
-                soundManager.play(sound);
-                jangler.jcraft$markJangle();
-                break;
-            }
-        }
     }
 }

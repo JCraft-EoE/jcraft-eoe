@@ -73,6 +73,9 @@ dependencies {
     modImplementation "dev.ftb.mods:ftb-library-forge:${rootProject.ftb_lib_version}"
     modImplementation "dev.ftb.mods:ftb-teams-forge:${rootProject.ftb_teams_version}"
 
+    // jjbacosplay
+    modImplementation "com.jcraft-eoe.jjbacosplay:jjbacosplay-forge:${rootProject.jjbacosplay_version}"
+
     //modImplementation("com.fusionflux:gravity_api-forge-${gravity_api_version}"){ transitive = false }
 
     // compatibilities

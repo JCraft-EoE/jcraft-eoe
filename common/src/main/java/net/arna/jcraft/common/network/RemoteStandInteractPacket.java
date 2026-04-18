@@ -16,6 +16,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.Objects;
+
 public class RemoteStandInteractPacket {
 
     public static void handle(FriendlyByteBuf buf, NetworkManager.PacketContext context) {
@@ -43,6 +45,8 @@ public class RemoteStandInteractPacket {
             return;
         }
         BlockPos hitPos = hitResult.getBlockPos();
-        world.getBlockState(hitPos).use(world, new FakePlayer(world), InteractionHand.MAIN_HAND, hitResult);
+
+        Objects.requireNonNull(serverPlayer.getServer()).execute(() ->
+                world.getBlockState(hitPos).use(world, new FakePlayer(world), InteractionHand.MAIN_HAND, hitResult));
     }
 }

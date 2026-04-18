@@ -1,20 +1,15 @@
 package net.arna.jcraft.api.registry;
 
-import dev.architectury.registry.registries.RegistrySupplier;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.spec.SpecType;
 import net.arna.jcraft.api.spec.SpecTypeUtil;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
-import net.arna.jcraft.common.config.JServerConfig;
-import net.arna.jcraft.common.item.CosplayItem;
 import net.arna.jcraft.common.item.SpecDiscItem;
 import net.arna.jcraft.common.item.StandDiscItem;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterials;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -28,7 +23,6 @@ public interface JCreativeMenuTabRegistry {
     @SuppressWarnings("UnstableApiUsage") // we do not care :)
     static void init() {
         JCraft.CREATIVE_TAB_REGISTRY.register("general", JCreativeMenuTabRegistry::createJcraftItemGroup);
-        JCraft.CREATIVE_TAB_REGISTRY.register("cosplay", JCreativeMenuTabRegistry::createJcraftCosplayGroup);
         JCraft.CREATIVE_TAB_REGISTRY.register("stand_discs", JCreativeMenuTabRegistry::createStandDiscItemGroup);
         // building blocks
         /*CreativeTabRegistry.modifyBuiltin(BuiltInRegistries.CREATIVE_MODE_TAB.get(CreativeModeTabs.BUILDING_BLOCKS.location()), (flags, output, canUseGameMasterBlocks) -> {
@@ -230,6 +224,7 @@ public interface JCreativeMenuTabRegistry {
                             entries.accept(JItemRegistry.ANUBIS.get());
                             entries.accept(JItemRegistry.BOXING_GLOVES.get());
                             entries.accept(JItemRegistry.STONE_MASK.get());
+                            entries.accept(JItemRegistry.RED_HAT.get());
                             entries.accept(JItemRegistry.COFFIN_BLOCK.get());
                             entries.accept(JItemRegistry.PEACEMAKER.get());
 
@@ -292,32 +287,6 @@ public interface JCreativeMenuTabRegistry {
                     // weird items
                     if (JItemRegistry.DEBUG_WAND != null) {
                         entries.accept(JItemRegistry.DEBUG_WAND.get());
-                    }
-                })
-                .build();
-    }
-
-    static CreativeModeTab createJcraftCosplayGroup() {
-        return CreativeModeTab.builder(CreativeModeTab.Row.TOP, 2)
-                .title(Component.translatable("itemGroup.jcraft.cosplay"))
-                .icon(() -> JItemRegistry.DIO_CAPE.get(ArmorMaterials.NETHERITE).get().getDefaultInstance())
-                // order of the creative tab
-                .displayItems((displayContext, entries) -> {
-                    // cosplay
-                    for (final CosplayItem<?> cosplayItem : CosplayItem.all()) {
-                        if (JServerConfig.SHOW_ALL_COSPLAY.getValue()) {
-                            for (final RegistrySupplier<? extends ArmorItem> item : cosplayItem) {
-                                entries.accept(item.get());
-                            }
-                        }
-                        else {
-                            if (cosplayItem.isVampireProtection()) {
-                                entries.accept(cosplayItem.get(ArmorMaterials.IRON).get());
-                            }
-                            else {
-                                entries.accept(cosplayItem.get(ArmorMaterials.NETHERITE).get());
-                            }
-                        }
                     }
                 })
                 .build();

@@ -24,6 +24,12 @@ import net.arna.jcraft.common.attack.actions.LungeAction;
 import net.arna.jcraft.common.attack.actions.NotifyHamonStompAction;
 import net.arna.jcraft.common.attack.actions.UserAnimationAction;
 import net.arna.jcraft.common.attack.conditions.HamonChargeCondition;
+import net.arna.jcraft.common.attack.conditions.HamonBreathCondition;
+import net.arna.jcraft.common.attack.conditions.HamonOverdriveCondition;
+import net.arna.jcraft.common.attack.conditions.HamonSendoWaveKickAerialCondition;
+import net.arna.jcraft.common.attack.conditions.HamonSendoWaveKickGroundedCondition;
+import net.arna.jcraft.common.attack.conditions.HamonWaveCondition;
+import net.arna.jcraft.common.attack.conditions.HamonZoomPunchCondition;
 import net.arna.jcraft.common.attack.moves.hamon.*;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.config.JServerConfig;
@@ -73,6 +79,7 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
     }
 
     public static final ChargeHamonMove CHARGE_HAMON = new ChargeHamonMove(60 * 20, 0, 1)
+            .withCondition(HamonBreathCondition.of(1800)) // in ticks
             .withInfo(
                     Component.literal("Charge Hamon"),
                     Component.literal("")
@@ -88,6 +95,7 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
                     Component.literal("Focus Strike"),
                     Component.literal("Charge with hamon for Zoom Punch, a slow yet far-reaching, launching strike. Can take one hit without being stopped.")
             );
+
     public static final ZoomPunchAttack ZOOM_PUNCH = new ZoomPunchAttack(0, 18,
             24, 1f, 7f, 13, 1.5f, 1.5f, -0.5f)
             .withSound(JSoundRegistry.HAMON_CRASH)
@@ -96,6 +104,7 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withLaunch()
             .withCondition(HamonChargeCondition.atLeast(ZoomPunchAttack.CHARGE_COST))
+            .withCondition(HamonZoomPunchCondition.of(1800)) // in ticks
             .withExtraHitBox(1.5)
             .withExtraHitBox(-0.5, 0.0, 1.5)
             .withMobilityType(MobilityType.DASH)
@@ -120,6 +129,7 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withStaticY()
             .withCondition(HamonChargeCondition.atLeast(RippleAttack.CHARGE_COST))
+            .withCondition(HamonWaveCondition.of(1800)) // in ticks
             .withAnim(State.RIPPLE)
             .markRanged()
             .withInfo(
@@ -141,6 +151,7 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
             .withSound(JSoundRegistry.HAMON_SWOOSH)
             .withImpactSound(JSoundRegistry.HAMON_CRACKLE_IMPACT)
             .withCondition(HamonChargeCondition.atLeast(SendoAttack.CHARGE_COST))
+            .withCondition(HamonSendoWaveKickAerialCondition.of(1800)) // in ticks
             .withInitAction(LungeAction.lunge(0.5f, 0.25f))
             .withLaunch()
             .withMobilityType(MobilityType.DASH)
@@ -165,6 +176,7 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
             .withImpactSound(JSoundRegistry.HAMON_CRACKLE_IMPACT)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withCondition(HamonChargeCondition.atLeast(SendoAttack.CHARGE_COST))
+            .withCondition(HamonSendoWaveKickGroundedCondition.of(1800)) // in ticks
             .withAction(LaunchUpAction.launchUp(1.0f))
             .withAerialVariant(SENDO_KICK)
             .withMobilityType(MobilityType.DASH)
@@ -179,6 +191,7 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
             .withSound(JSoundRegistry.HAMON_SURGE)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withCondition(HamonChargeCondition.atLeast(SendoAttack.CHARGE_COST))
+            .withCondition(HamonSendoWaveKickGroundedCondition.of(-1)) // in ticks
             .withInfo(
                     Component.literal("Improviser"),
                     Component.literal("""
@@ -190,6 +203,7 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
     private final RippleAttack rippleAttack = RIPPLE_ATTACK.copy();
     private final SendoAttack sendoKick = SENDO_KICK.copy().markAerialVariant();
     private final SendoAttack sendoUppercut = SENDO_UPPERCUT.copy();
+    private final HamonOverdriveCondition overdriveCondition = HamonOverdriveCondition.of(1800);
 
     private static void registerMoves(MoveMap<HamonSpec, HamonSpec.State> moves) {
         moves.register(MoveClass.HEAVY, FOCUS_STRIKE, CooldownType.HEAVY, null);
@@ -203,7 +217,7 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
 
     @Override
     public boolean initMove(MoveClass moveClass) {
-        if (moveClass == MoveClass.BARRAGE) {
+        if (moveClass == MoveClass.BARRAGE && overdriveCondition.test(this)) {
             setUseHamonNext(!useHamonNext);
 
             if (useHamonNext) {

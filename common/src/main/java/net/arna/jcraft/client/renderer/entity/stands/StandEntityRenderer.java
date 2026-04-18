@@ -152,7 +152,7 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends AbstractEn
                     // this is also probably what stops the summon from working as intended.
                     animatable.playStateAnimation();
                 }
-            } else if (animatable.tickCount > 20) { // average summon anim duration
+            } else if (animatable.tickCount > animatable.getStandData().getSummonData().getAnimDuration()) { // average summon anim duration
                 if (animatable.isIdle()) {
                     animatable.playStateAnimation();
                 }

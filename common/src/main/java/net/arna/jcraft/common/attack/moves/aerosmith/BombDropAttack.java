@@ -14,6 +14,7 @@ import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
 import net.arna.jcraft.common.entity.projectile.AerobombProjectile;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.JUtils;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ClipContext;
@@ -78,7 +79,9 @@ public class BombDropAttack<A extends StandEntity<? extends A, ?>> extends Abstr
                 returning = false;
             }
             else {
-                attacker.setDeltaMovement(user.getEyePosition().subtract(attacker.position()).normalize().scale(speed));
+                final Vec3 diff = user.getEyePosition().subtract(attacker.position());
+                attacker.setDeltaMovement(diff.normalize().scale(speed));
+                attacker.setYRot(Mth.wrapDegrees(-(float)Math.atan2(diff.x(), diff.z()) * 57.2957763671875f));
             }
         }
     }

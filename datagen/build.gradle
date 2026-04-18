@@ -63,6 +63,9 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-convention-tags-v1:1.5.5+1802ada577"
     modImplementation "dev.architectury:architectury-fabric:$rootProject.architectury_api_version"
 
+    // jjbacosplay
+    modImplementation "com.jcraft-eoe.jjbacosplay:jjbacosplay-datagen:${rootProject.jjbacosplay_version}"
+
     // Copy all mod dependencies from fabric project.
     // Doing this manually gives us more control over what transitive dependencies are included.
     project(':fabric').configurations.modImplementation.allDependencies.each { dep ->

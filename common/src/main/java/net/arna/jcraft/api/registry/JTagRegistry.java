@@ -15,7 +15,6 @@ public interface JTagRegistry {
     TagKey<Item> EQUIPABLES = TagKey.create(Registries.ITEM, new ResourceLocation("c", "equipables"));
     TagKey<Item> PROTECTS_FROM_SUN = TagKey.create(Registries.ITEM, JCraft.id("protects_from_sun"));
     TagKey<Item> SAND_BLOCKS = TagKey.create(Registries.ITEM, new ResourceLocation("c", "sand_blocks"));
-    TagKey<Item> COSPLAY = TagKey.create(Registries.ITEM, JCraft.id("cosplay"));
     TagKey<Item> BLINDS_ON_IMPACT = TagKey.create(Registries.ITEM, JCraft.id("blinds_on_impact"));
     TagKey<Item> SLOWS_ON_IMPACT = TagKey.create(Registries.ITEM, JCraft.id("slows_on_impact"));
     TagKey<Item> BURNS_ON_IMPACT = TagKey.create(Registries.ITEM, JCraft.id("burns_on_impact"));
@@ -33,7 +32,6 @@ public interface JTagRegistry {
     TagKey<Item> OBTUSE = TagKey.create(Registries.ITEM, JCraft.id("obtuse"));
     TagKey<Item> DISCS = TagKey.create(Registries.ITEM, JCraft.id("discs"));
     TagKey<Item> SOUL_LOG_ITEMS = TagKey.create(Registries.ITEM, JCraft.id("soul_logs"));
-    TagKey<Item> BOOTS_WITH_THE_SPURS = TagKey.create(Registries.ITEM, JCraft.id("has_spurs"));
 
     TagKey<Block> SOUL_LOG_BLOCKS = TagKey.create(Registries.BLOCK, JCraft.id("soul_logs"));
     TagKey<Block> IRON_BLOCKS = TagKey.create(Registries.BLOCK, JCraft.id("iron_blocks"));
