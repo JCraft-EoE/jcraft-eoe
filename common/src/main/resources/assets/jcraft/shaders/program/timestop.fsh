@@ -2,9 +2,6 @@
 
 //#define DISTORTION
 //#define RING_NOISE
-#define RAYMARCHED_BUBBLE
-
-#define MAX_RADIUS 100.
 
 uniform sampler2D DiffuseSampler;
 uniform sampler2D DepthSampler;
@@ -12,7 +9,10 @@ uniform sampler2D DepthSampler;
 uniform vec3 CameraPosition;
 uniform vec4 CameraRotation;
 uniform vec3 Center;
+#define MAX_RADIUS 100.
+uniform float DesatRadius;
 uniform float Radius;
+uniform float HueOffset;
 uniform float OuterSat;
 
 uniform mat4 InverseTransformMatrix;
@@ -91,7 +91,26 @@ vec2 getUV(in vec3 viewDir, in float aspect)
     return (vec2(viewDir.x/viewDir.z, viewDir.y/viewDir.z)/vec2(aspect, 1.))+0.5;
 }
 
-void main(){
+// Created by wwwtyro from https://gist.github.com/wwwtyro/beecc31d65d1004f5a9d
+float raySphereIntersect(vec3 r0, vec3 rd, vec3 s0, float sr) {
+    // - r0: ray origin
+    // - rd: normalized ray direction
+    // - s0: sphere center
+    // - sr: sphere radius
+    // - Returns distance from r0 to first intersecion with sphere,
+    //   or -1.0 if no intersection.
+    float a = dot(rd, rd);
+    vec3 s0_r0 = r0 - s0;
+    float b = 2.0 * dot(rd, s0_r0);
+    float c = dot(s0_r0, s0_r0) - (sr * sr);
+    if (b*b - 4.0*a*c < 0.0) {
+        return -1.0;
+    }
+    return (-b - sqrt((b*b) - 4.0*a*c))/(2.0*a);
+}
+
+void main()
+{
     float sceneDepth = texture(DepthSampler, texCoord).x;
     vec3 pixelPosition = calcEyeFromWindow(sceneDepth).xyz + CameraPosition;
     float aspect = Viewport.x/Viewport.y;
@@ -100,60 +119,47 @@ void main(){
 
     float pct = distance(pixelPosition, Center);
 
-    // TODO: Getting the time from the radius/max radius is garbage and needs to be replaced with a time or lifetime uniform.
-    // Although in the code it looks like the radius can be at maximum 100.
-    float t = clamp(Radius/MAX_RADIUS, 0., 1.);
-    t = clamp(1-pow(2, -10*t), 0., 1.);
-    float rad = MAX_RADIUS * t;
+//#ifdef RING_NOISE
+//    float noise = noise(pixelPosition.xz)*2.;
+//    rad += noise;
+//#endif
 
-#ifdef RING_NOISE
-    float noise = noise(pixelPosition.xz)*2.;
-    rad += noise;
-#endif
+    float outside = smoothstep(Radius - 1., Radius, pct);
+    float inside = smoothstep(Radius + 1., Radius, pct);
 
-    float outside = smoothstep(rad - 1., rad, pct);
-    float inside = smoothstep(rad + 1., rad, pct);
+    float desatOutside = smoothstep(DesatRadius - 1., DesatRadius, pct);
+    float desatInside = smoothstep(DesatRadius + 1., DesatRadius, pct);
 
 #ifdef DISTORTION
     vec3 viewDir = normalize(vec3(cUV.xy, 1.));
     viewDir = quat_transform(CameraRotation, viewDir);
 #endif
 
-#ifdef RAYMARCHED_BUBBLE
-    float bubbleMask = 0.;
+    float desatBubbleMask = 0.;
+    float satBubbleMask = 0.;
     float fresnel = 0.;
 
     vec3 rayDir = normalize(pixelPosition - CameraPosition);
     vec3 rayPos = CameraPosition;
 
-    for (int i = 0; i < 64; i++)
+    float desatIntersect = raySphereIntersect(rayPos, rayDir, Center, DesatRadius);
+    float satIntersect = raySphereIntersect(rayPos, rayDir, Center, Radius);
+
+    float pixCamDist = distance(pixelPosition, CameraPosition);
+
+    if (desatIntersect >= 0.0 && desatIntersect < pixCamDist)
     {
-        if (distance(rayPos, CameraPosition) >= distance(CameraPosition, pixelPosition))
-        { break; }
-
-        float d = max(length(rayPos-Center)-rad, 0.001);
-        rayPos += rayDir*d;
-        if (d < 0.01)
-        {
-            bubbleMask = 1.0;
-            vec3 normal = normalize(Center - rayPos);
-            if (distance(CameraPosition, Center) > rad)
-            {
-                // the fresnel effect looks weird in the bubble
-                fresnel = clamp(pow(1.-clamp(dot(rayDir, normal), 0., 1.), 3.)*2., 0., 1.);
-            }
-
-#ifdef DISTORTION
-            vec3 idealRayDir = normalize(CameraPosition - Center);
-            float distortion = abs(dot(rayDir, idealRayDir))*0.4;
-            distortion = clamp(distortion, 0., 1.);
-
-            viewDir = normalize(mix(viewDir, idealRayDir, distortion));
-#endif
-            break;
-        }
+        desatBubbleMask = 1.0;
+        vec3 normal = normalize(Center - (rayPos + (rayDir*desatIntersect)));
+        fresnel += clamp(pow(1.-clamp(dot(rayDir, normal), 0., 1.), 3.)*2., 0., 1.);
     }
-#endif
+
+    if (satIntersect >= 0.0 && satIntersect < pixCamDist)
+    {
+        satBubbleMask = 1.0;
+        vec3 normal = normalize(Center - (rayPos + (rayDir*satIntersect)));
+        fresnel += clamp(pow(1.-clamp(dot(rayDir, normal), 0., 1.), 3.)*2., 0., 1.);
+    }
 
     vec2 m = vec2(0.5, 0.5 / aspect);
     vec2 d = texCoord - m;
@@ -169,24 +175,28 @@ void main(){
 #endif
 
     vec3 color = texture(DiffuseSampler, uv).rgb;
-    if(rad > 0){
+    if(DesatRadius > 0)
+    {
         // Change this to modify the color of the "ring"
-        color += pow(vec3(1.) * (outside * inside), vec3(3.));
+        color += pow(vec3(1.) * (outside * inside + desatOutside * desatInside), vec3(3.));
     }
 
     vec3 hsv = rgb2hsv(color);
-#ifdef RAYMARCHED_BUBBLE
-    hsv[0] = mix(hsv[0], 1.0 - hsv[0], bubbleMask);
-    hsv.b += fresnel;
-#else
-    hsv[0] = mix(hsv[0], 1.0 - hsv[0], inside);
-#endif
-    float saturation = 1.;
-    if (pct >= rad)
-    { saturation = 0.3; }
+    // if we hit the saturated bubble, use satHSV
+    // otherwise, use desatHSV if we hit the desaturated bubble
+    if (satBubbleMask > 0. || (pct <= Radius))
+    {
+        hsv.r += HueOffset;
+        hsv.g = 1.-hsv.g;
+    }
+    else {
+        if (desatBubbleMask > 0. || (pct > Radius && pct <= DesatRadius))
+        {
+            hsv.g = 0.1;
+        }
+    }
 
-    hsv[1] = mix(hsv[1], hsv[1] * saturation, outside);
-    color = hsv2rgb(hsv);
+    color = hsv2rgb(hsv)+fresnel;
 
     fragColor  = vec4(color, 1.0);
 }

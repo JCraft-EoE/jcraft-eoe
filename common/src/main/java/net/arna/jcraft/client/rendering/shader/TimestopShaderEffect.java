@@ -54,12 +54,12 @@ public class TimestopShaderEffect extends ShaderEffect {
         time += tickProgress;
     }
 
-    public void renderBubble(float tickProgress, Camera camera, Vector3f center, float radius)
+    public void renderBubble(float tickProgress, Camera camera, Vector3f center, float desatRadius, float radius, float hueOffset)
     {
         Minecraft minecraft = Minecraft.getInstance();
 
         this.program.pass(() -> {
-            setUniforms(camera, center, radius);
+            setUniforms(camera, center, desatRadius, radius, hueOffset);
 
             GLShaderTexture colorTexture = GLShaderTexture.fromGlHandle(minecraft.getMainRenderTarget().getColorTextureId());
             GLShaderTexture depthTexture = GLShaderTexture.fromGlHandle(((StillDepthHolder)minecraft.getMainRenderTarget()).jcraft$getDepthTexture());
@@ -71,12 +71,13 @@ public class TimestopShaderEffect extends ShaderEffect {
         });
     }
 
-    private void setUniforms(Camera camera, Vector3f center, float radius)
+    private void setUniforms(Camera camera, Vector3f center, float desatRadius, float radius, float hueOffset)
     {
         /* == SHADER UNIFORMS ==
          * vec3 CameraPosition;
          * vec4 CameraRotation;
          * vec3 Center;
+         * float DesatRadius;
          * float Radius;
          * float OuterSat;
          * mat4 InverseTransformMatrix;
@@ -91,8 +92,10 @@ public class TimestopShaderEffect extends ShaderEffect {
         this.program.setUniform("CameraRotation", new Vector4f(cameraRot.x, cameraRot.y, cameraRot.z, cameraRot.w));
 
         this.program.setUniform("Center", center);
+        this.program.setUniform("DesatRadius", desatRadius);
         this.program.setUniform("Radius", radius);
         this.program.setUniform("OuterSat", 1.0f);
+        this.program.setUniform("HueOffset", hueOffset);
 
         this.program.setUniform("InverseTransformMatrix", FROZEN_INV_TRANSFORM_MAT);
         this.program.setUniform("Viewport", new Vector2f(minecraft.getMainRenderTarget().width, minecraft.getMainRenderTarget().height));
@@ -116,18 +119,24 @@ public class TimestopShaderEffect extends ShaderEffect {
                 continue;
             }
 
-            renderBubble(tickProgress, camera, sourceEntity.position().toVector3f(), getRadius(t));
-        }
-    }
+            // TODO: this code is so sloppy and needs to be redone
+            float radius = 0f, desatRadius = 0f;
+            if (t < 0.33f) {
+                radius = MAX_RADIUS * (t / 0.33f);
+                desatRadius = radius;
+            } else {
+                desatRadius = MAX_RADIUS;
+                radius = 0.f;
+            }
 
-    private static float getRadius(float time)
-    {
-        if (time < 0.33f) {
-            return MAX_RADIUS * (time / 0.33f);
-        } else if (time > 1f) {
-            return MAX_RADIUS * (1f - (time - 1f) / 0.48f);
-        } else {
-            return MAX_RADIUS;
+            if (t >= 0.33f && t <= 0.7f) {
+                radius = MAX_RADIUS*(1.f-((t-0.33f)/0.37f));
+            }
+
+            radius      = MAX_RADIUS*(float)(1.f-Math.pow(2.f, -10.f*(radius/MAX_RADIUS)));
+            desatRadius = MAX_RADIUS*(float)(1.f-Math.pow(2.f, -10.f*(desatRadius/MAX_RADIUS)));
+
+            renderBubble(tickProgress, camera, sourceEntity.position().toVector3f(), desatRadius, radius, t/maxOvertime);
         }
     }
 

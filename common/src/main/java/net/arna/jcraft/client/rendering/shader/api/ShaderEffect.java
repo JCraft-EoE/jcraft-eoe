@@ -1,6 +1,7 @@
 package net.arna.jcraft.client.rendering.shader.api;
 
 import lombok.Getter;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.rendering.shader.api.uniform.UniformWriter;
 import net.arna.jcraft.client.rendering.shader.except.ShaderLinkDataException;
 import net.arna.jcraft.client.rendering.shader.texture.api.ShaderSampler;
@@ -58,7 +59,10 @@ public abstract class ShaderEffect {
             for (String name : linkSamplers) {
                 ShaderSampler sampler = program.initializeSampler(name, iota++);
                 if (sampler == null)
-                    throw new ShaderLinkDataException("Sampler '" + name + "' was not found in shader '" + program.name + "'");
+                {
+                    JCraft.LOGGER.warn("Sampler '{}' was not found/unused in shader '{}'", name, program.name);
+                    continue;
+                }
 
                 this.samplers.put(name, sampler);
             }

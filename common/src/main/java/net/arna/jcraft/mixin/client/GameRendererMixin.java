@@ -68,7 +68,7 @@ public class GameRendererMixin {
         // This is right before it renders the hand, meaning all terrain, entities, etc... have been rendered.
         if (JShaderRegistry.TIMESTOP_EFFECT != null)
         {
-            JShaderRegistry.TIMESTOP_EFFECT.renderBubble(tickDelta, mainCamera, new Vector3f(-20.f, 95.f, 173.f), 50.f);
+//            JShaderRegistry.TIMESTOP_EFFECT.renderBubble(tickDelta, mainCamera, new Vector3f(-20.f, 95.f, 173.f), 100.f, 50.f);
             JShaderRegistry.TIMESTOP_EFFECT.renderQueuedBubbles(tickDelta, mainCamera);
         }
     }
