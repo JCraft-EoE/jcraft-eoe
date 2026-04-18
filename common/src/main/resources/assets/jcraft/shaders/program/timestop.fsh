@@ -1,6 +1,6 @@
 #version 330
 
-//#define DISTORTION
+#define DISTORTION
 //#define RING_NOISE
 
 uniform sampler2D DiffuseSampler;
@@ -9,7 +9,6 @@ uniform sampler2D DepthSampler;
 uniform vec3 CameraPosition;
 uniform vec4 CameraRotation;
 uniform vec3 Center;
-#define MAX_RADIUS 100.
 uniform float DesatRadius;
 uniform float Radius;
 uniform float HueOffset;
@@ -130,11 +129,6 @@ void main()
     float desatOutside = smoothstep(DesatRadius - 1., DesatRadius, pct);
     float desatInside = smoothstep(DesatRadius + 1., DesatRadius, pct);
 
-#ifdef DISTORTION
-    vec3 viewDir = normalize(vec3(cUV.xy, 1.));
-    viewDir = quat_transform(CameraRotation, viewDir);
-#endif
-
     float desatBubbleMask = 0.;
     float satBubbleMask = 0.;
     float fresnel = 0.;
@@ -168,6 +162,15 @@ void main()
     float bind = (aspect < 1.0) ? m.x : m.y;
 
 #ifdef DISTORTION
+    vec3 viewDir = normalize(vec3(cUV.xy, 1.));
+    viewDir = quat_transform(CameraRotation, viewDir);
+
+    if (satIntersect > 0. && satIntersect < pixCamDist) {
+        vec3 idealViewDir = normalize(Center - CameraPosition);
+        float distortion = clamp(pow(fresnel, 0.8), 0., 1.);
+        viewDir = mix(viewDir, idealViewDir, distortion);
+    }
+
     viewDir = quat_transform(vec4(-CameraRotation.xyz, CameraRotation.w), viewDir);
     vec2 uv = getUV(viewDir, aspect);
 #else
@@ -175,7 +178,7 @@ void main()
 #endif
 
     vec3 color = texture(DiffuseSampler, uv).rgb;
-    if(DesatRadius > 0)
+    if(DesatRadius > 0.)
     {
         // Change this to modify the color of the "ring"
         color += pow(vec3(1.) * (outside * inside + desatOutside * desatInside), vec3(3.));
