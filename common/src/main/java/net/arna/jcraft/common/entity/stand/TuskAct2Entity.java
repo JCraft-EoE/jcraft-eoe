@@ -52,6 +52,7 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
             TuskAct2Entity::registerMoves, State.class);
 
     public static final StandData DATA = StandData.builder()
+            .evolution(true)
             .idleRotation(315f)
             .idleDistance(1.75f)
             .blockDistance(0f)
@@ -64,7 +65,7 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
                             Herbal Tea grants Keratin Growth, speeding up nail regen.
                             Layerable with specs."""))
                     .build())
-            .summonData(SummonData.of(JSoundRegistry.TUSK_MIMIMIN))
+            .summonData(SummonData.of(JSoundRegistry.TUSK_SUMMON2))
             .build();
 
     public static final EntityDataAccessor<Float> NAILS = SynchedEntityData.defineId(TuskAct2Entity.class, EntityDataSerializers.FLOAT);
@@ -78,7 +79,7 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
                     Component.literal("Short range nail (5 blocks), costs 0.5 nails, longer windup")
             );
 
-    public static final GoldenRectangleNailAttack GOLDEN_RECTANGLE_NAIL = new GoldenRectangleNailAttack(0, 10, 15, 0.75f, 2.7f, 20.0f, 15.0f)
+    public static final GoldenRectangleNailAttack GOLDEN_RECTANGLE_NAIL = new GoldenRectangleNailAttack(0, 10, 15, 0.75f, 2.7f, 40.0f, 15.0f)
             .withCondition(TuskNailCondition.atLeast(1.0f))
             .withInitAction(UserAnimationAction.play("tsk.grn"))
             .withCrouchingVariant(TOENAIL_SHOT)

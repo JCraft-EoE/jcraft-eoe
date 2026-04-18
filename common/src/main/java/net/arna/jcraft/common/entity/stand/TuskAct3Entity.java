@@ -27,7 +27,6 @@ import net.arna.jcraft.common.item.Peacemaker;
 import java.lang.ref.WeakReference;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.tusk.*;
@@ -54,6 +53,7 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
             TuskAct3Entity::registerMoves, State.class);
 
     public static final StandData DATA = StandData.builder()
+            .evolution(true)
             .idleRotation(315f)
             .idleDistance(1.75f)
             .blockDistance(0f)
@@ -65,7 +65,7 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
                             Contains up to 10 nails. Nails regenerate passively at the cost of hunger.
                             Herbal Tea grants Keratin Growth, speeding up nail regen."""))
                     .build())
-            .summonData(SummonData.of(JSoundRegistry.TUSK_MIMIMIN))
+            .summonData(SummonData.of(JSoundRegistry.TUSK_SUMMON3))
             .build();
 
     public static final EntityDataAccessor<Float> NAILS = SynchedEntityData.defineId(TuskAct3Entity.class, EntityDataSerializers.FLOAT);
@@ -95,6 +95,7 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
     public static final NailBarrageAttack NAIL_SWIPES = new NailBarrageAttack(
             280, 2, 36, 1f, 3.0f, 12, 2.0f, 0.3f, 0.0f, 6)
             .withCondition(TuskNailCondition.atLeast(1.0f))
+            .withSound(JSoundRegistry.TUSK_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withInfo(
                     Component.literal("Nail Swipes"),
