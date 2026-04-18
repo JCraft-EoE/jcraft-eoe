@@ -1,15 +1,33 @@
 package net.arna.jcraft.client.rendering.shader;
 
+import net.arna.jcraft.client.rendering.shader.api.BakedProgram;
 import net.arna.jcraft.client.rendering.shader.api.ShaderEffect;
+import net.arna.jcraft.client.rendering.shader.api.uniform.UniformWriter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
+import org.joml.Vector2f;
 
 public class BasicShaderEffect extends ShaderEffect {
+    private UniformWriter shaderUniforms;
+
     public BasicShaderEffect(ResourceLocation vertexPath, ResourceLocation fragmentPath) {
-        super(LinkData.vertexFragment(
-                vertexPath,
-                fragmentPath
-        ));
+        super(
+                new LinkData(
+                        vertexPath,
+                        fragmentPath
+                )
+        );
+
+        linkData.addUniformBuffer("ShaderUniforms");
+
+        linkData.freeze();
+    }
+
+    @Override
+    public void link(BakedProgram program) {
+        super.link(program);
+
+        this.shaderUniforms = getUniformWriter("ShaderUniforms");
     }
 
     private float time = 0.0f;
@@ -19,15 +37,11 @@ public class BasicShaderEffect extends ShaderEffect {
         time += tickProgress;
         Minecraft minecraft = Minecraft.getInstance();
 
-        uniformWriter.reset();
+        shaderUniforms.reset();
 
-        uniformWriter.pushVec2(
-                minecraft.getMainRenderTarget().width,
-                minecraft.getMainRenderTarget().height
-        );
+        shaderUniforms.push(new Vector2f(minecraft.getMainRenderTarget().width, minecraft.getMainRenderTarget().height));
+        shaderUniforms.push(time);
 
-        uniformWriter.pushFloat(time);
-
-        uniformWriter.write();
+        shaderUniforms.write();
     }
 }

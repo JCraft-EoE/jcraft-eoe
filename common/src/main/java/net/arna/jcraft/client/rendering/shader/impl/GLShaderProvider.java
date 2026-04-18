@@ -9,7 +9,7 @@ import static org.lwjgl.opengl.GL33C.*;
 /// The OpenGL Shader Provider.
 public class GLShaderProvider implements JShaderProvider<GLBakedProgram> {
     @Override
-    public GLBakedProgram compile(UnbakedShader... sources)
+    public GLBakedProgram compile(String name, UnbakedShader... sources)
     {
         int handle = glCreateProgram();
         int[] compiled = new int[sources.length];
@@ -21,7 +21,7 @@ public class GLShaderProvider implements JShaderProvider<GLBakedProgram> {
             glCompileShader(shaderHandle);
             if (glGetShaderi(shaderHandle, GL_COMPILE_STATUS) == GL_FALSE)
             {
-                JCraft.LOGGER.error("Failed to compile shader:\n\t{}", glGetShaderInfoLog(shaderHandle));
+                JCraft.LOGGER.error("Failed to compile {} shader '{}':\n\t{}", shader.type().name(), name, glGetShaderInfoLog(shaderHandle));
                 return null;
             }
             compiled[i] = shaderHandle;
@@ -32,13 +32,13 @@ public class GLShaderProvider implements JShaderProvider<GLBakedProgram> {
         glLinkProgram(handle);
         if (glGetProgrami(handle, GL_LINK_STATUS) == GL_FALSE)
         {
-            JCraft.LOGGER.error("Failed to link shader program:\n\t{}", glGetProgramInfoLog(handle));
+            JCraft.LOGGER.error("Failed to link shader program '{}':\n\t{}", name, glGetProgramInfoLog(handle));
             return null;
         }
 
         for (int shader : compiled)
         { glDeleteShader(shader); }
 
-        return new GLBakedProgram(handle);
+        return new GLBakedProgram(name, handle);
     }
 }

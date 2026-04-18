@@ -3,6 +3,8 @@ package net.arna.jcraft.client.rendering.shader.impl;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.arna.jcraft.client.rendering.shader.api.BakedProgram;
+import net.arna.jcraft.client.rendering.shader.texture.api.ShaderSampler;
+import net.arna.jcraft.client.rendering.shader.texture.impl.GLShaderSampler;
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
@@ -22,24 +24,25 @@ import static org.lwjgl.opengl.GL33C.*;
 public class GLBakedProgram extends BakedProgram {
     private final int handle;
 
-    public GLBakedProgram(int handle)
+    public GLBakedProgram(String name, int handle)
     {
+        super(name);
         this.handle = handle;
     }
 
     @Override
-    public void bind() {
+    protected void bindProgram() {
         glUseProgram(handle);
     }
 
     @Override
-    public void unbind() {
+    protected void unbindProgram() {
         glUseProgram(0);
     }
 
     @Override
     public void renderFullscreen() {
-//        bind();
+        requireBound("rendering fullscreen");
 
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder builder = tesselator.getBuilder();
@@ -70,8 +73,6 @@ public class GLBakedProgram extends BakedProgram {
 
         VertexBuffer.unbind();
         buffer.close();
-
-//        unbind();
     }
 
     @Override
@@ -114,6 +115,8 @@ public class GLBakedProgram extends BakedProgram {
 
     @Override
     public void setUniform(String name, Object value) {
+        requireBound("setting uniforms");
+
         int location = UNIFORM_LOCATION_CACHE.getOrDefault(name, glGetUniformLocation(handle, name));
         if (location == -1)
             return;
@@ -123,8 +126,12 @@ public class GLBakedProgram extends BakedProgram {
         BiConsumer<Integer, Object> encoder = UNIFORM_ENCODERS.get(value.getClass());
         if (encoder == null) return;
 
-//        glUseProgram(handle);
         encoder.accept(location, value);
-//        glUseProgram(0);
+    }
+
+    @Override
+    public @Nullable ShaderSampler initializeSampler(String name, int index) {
+        GLShaderSampler sampler = new GLShaderSampler(this, name, index);
+        return sampler.valid() ? sampler : null;
     }
 }

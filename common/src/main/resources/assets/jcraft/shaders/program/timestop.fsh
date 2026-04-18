@@ -4,13 +4,14 @@
 //#define RING_NOISE
 #define RAYMARCHED_BUBBLE
 
+#define MAX_RADIUS 100.
+
 uniform sampler2D DiffuseSampler;
 uniform sampler2D DepthSampler;
 
 uniform vec3 CameraPosition;
 uniform vec4 CameraRotation;
 uniform vec3 Center;
-#define MAX_RADIUS 100.
 uniform float Radius;
 uniform float OuterSat;
 
