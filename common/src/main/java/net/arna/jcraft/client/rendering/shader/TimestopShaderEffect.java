@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TimestopShaderEffect extends ShaderEffect {
-    private static final float MAX_RADIUS = 50.f;
+    private static final float MAX_RADIUS = 100.f;
     private static final Matrix4f FROZEN_INV_TRANSFORM_MAT = new Matrix4f();
 
     private static final List<Pair<LivingEntity, Pair<Float, Float>>> TIMESTOP_SOURCES = new ArrayList<>();
