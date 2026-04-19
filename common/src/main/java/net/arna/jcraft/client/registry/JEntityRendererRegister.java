@@ -80,7 +80,7 @@ public interface JEntityRendererRegister {
             new RendererData<>(JEntityTypeRegistry.ICE_BRANCH, IceBranchRenderer::new),
 
             new RendererData<>(JEntityTypeRegistry.CRAZY_DIAMOND, context -> new StandEntityRenderer<>(context, JStandTypeRegistry.CRAZY_DIAMOND.get())),
-            new RendererData<>(JEntityTypeRegistry.AEROSMITH, context -> new StandEntityRenderer<>(context, JStandTypeRegistry.AEROSMITH.get())),
+            new RendererData<>(JEntityTypeRegistry.AEROSMITH, AerosmithRenderer::new),
 
             new RendererData<>(JEntityTypeRegistry.CINDERELLA, context -> new StandEntityRenderer<>(context, JStandTypeRegistry.CINDERELLA.get())),
             new RendererData<>(JEntityTypeRegistry.OSIRIS, context -> new StandEntityRenderer<>(context, JStandTypeRegistry.OSIRIS.get())),

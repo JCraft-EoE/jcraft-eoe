@@ -22,7 +22,6 @@ public interface JEventsRegistry {
         JBlockEvents.BEFORE_SET.register(JServerEvents::beforeBlockSet);
         PlayerEvent.PICKUP_ITEM_PRE.register(JServerEvents::itemPickup);
         JBlockEvents.BEFORE_BLOCK_LOOT.register(JServerEvents::processBlockLoot);
-        JBlockEvents.AFTER_EXPLOSION.register(JServerEvents::afterExplosion);
 
         // Disable item/block usage while stunned
         InteractionEvent.RIGHT_CLICK_ITEM.register(JServerEvents::rightClick);

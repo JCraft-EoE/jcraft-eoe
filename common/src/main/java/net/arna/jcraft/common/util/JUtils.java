@@ -893,8 +893,28 @@ public final class JUtils {
      */
     @SafeVarargs
     public static <T> @NonNull T chooseRandom(@NonNull RandomSource rng, T... items) {
-        if (items == null || items.length == 0) throw new IllegalArgumentException("At least one item must be provided.");
+        if (items == null || items.length == 0) {
+            throw new IllegalArgumentException("At least one item must be provided.");
+        }
         return items[rng.nextInt(items.length)];
+    }
+
+    /**
+     * Selects a random element from the given collection using the provided {@link RandomSource}.
+     *
+     * @throws IllegalArgumentException If no items are provided.
+     */
+    public static <T> @NonNull T chooseRandom(@NonNull RandomSource rng, Collection<T> items) {
+        if (items == null || items.isEmpty()) {
+            throw new IllegalArgumentException("At least one item must be provided.");
+        }
+        final Iterator<T> it = items.iterator();
+        int selection = rng.nextInt(items.size());
+        while (selection > 0) {
+            it.next();
+            selection--;
+        }
+        return it.next();
     }
 
     public static void awardAdvancement(final ServerPlayer player, final ResourceLocation advancementLoc) {

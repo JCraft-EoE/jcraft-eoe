@@ -65,6 +65,9 @@ dependencies {
     modImplementation "dev.ftb.mods:ftb-library-fabric:${rootProject.ftb_lib_version}"
     modImplementation "dev.ftb.mods:ftb-teams-fabric:${rootProject.ftb_teams_version}"
 
+    // jjbacosplay
+    modImplementation "com.jcraft-eoe.jjbacosplay:jjbacosplay-fabric:${rootProject.jjbacosplay_version}"
+
     //Modmenu
     modApi "com.terraformersmc:modmenu:7.2.2"
 

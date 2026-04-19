@@ -1,6 +1,8 @@
 package net.arna.jcraft.common.entity.stand;
 
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import mod.azure.azurelib.animation.dispatch.command.AzCommand;
 import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
 import net.arna.jcraft.JCraft;
@@ -17,6 +19,7 @@ import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.api.stand.SummonData;
 import net.arna.jcraft.common.attack.moves.aerosmith.BombDropAttack;
+import net.arna.jcraft.common.attack.moves.aerosmith.ItemDropAttack;
 import net.arna.jcraft.common.attack.moves.aerosmith.MuzzleHitscanAttack;
 import net.arna.jcraft.common.attack.moves.aerosmith.PatrolMove;
 import net.arna.jcraft.common.util.JParticleType;
@@ -27,7 +30,9 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.Mth;
+import net.minecraft.world.Containers;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,8 +53,14 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     // TODO Arna description
 
     // TODO Arna balance this
-    public static final BombDropAttack<AerosmithEntity> BOMB_DROP = new BombDropAttack<>(
+    public static final ItemDropAttack ITEM_DROP = new ItemDropAttack(
             200, 1, 100, 0f, 30f);
+    // TODO Arna description
+
+    // TODO Arna balance this
+    public static final BombDropAttack<AerosmithEntity> BOMB_DROP = new BombDropAttack<AerosmithEntity>(
+            200, 1, 100, 0f, 30f)
+            .withCrouchingVariant(ITEM_DROP);
     // TODO Arna description
 
     // TODO Arna balance this
@@ -69,6 +80,10 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
     private CommonMiscComponent miscComponent;
     private int overheatTick;
+    @Getter
+    @Setter
+    @Nullable
+    private ItemStack holdItem;
 
     public AerosmithEntity(final Level world) {
         super(JStandTypeRegistry.AEROSMITH.get(), world);
@@ -141,6 +156,14 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     public void setRemote(final boolean r) {
         super.setRemote(r);
         setAlphaOverride(r ? 1f : -1f);
+    }
+
+    @Override
+    public void desummon() {
+        if (!level().isClientSide()) {
+            Containers.dropItemStack(level(), getX(), getY(), getZ(), holdItem);
+        }
+        super.desummon();
     }
 
     public enum State implements StandAnimationState<AerosmithEntity> {
