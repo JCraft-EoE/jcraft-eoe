@@ -11,6 +11,7 @@ uniform vec4 CameraRotation;
 uniform vec3 Center;
 uniform float DesatRadius;
 uniform float Radius;
+uniform float DistortionMul;
 uniform float HueOffset;
 uniform float OuterSat;
 
@@ -167,7 +168,7 @@ void main()
 
     if (satIntersect > 0. && satIntersect < pixCamDist) {
         vec3 idealViewDir = normalize(Center - CameraPosition);
-        float distortion = clamp(pow(fresnel, 0.8), 0., 1.);
+        float distortion = clamp(pow(fresnel, 0.8), 0., 1.) * DistortionMul;
         viewDir = mix(viewDir, idealViewDir, distortion);
     }
 
