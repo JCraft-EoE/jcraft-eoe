@@ -266,10 +266,17 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         this.entityData.set(FLIGHT_TIME, i);
     }
 
+    public void stopFlight() {
+        setFlightTime(0);
+        if (hasUser() && getUserOrThrow() instanceof Player player && !player.isCreative() && !player.isSpectator()) {
+            player.getAbilities().flying = false;
+        }
+    }
+
     @Override
     public void desummon() {
         if (getFlightTime() > 0) {
-            setFlightTime(0);
+            stopFlight();
             return;
         }
         super.desummon();
