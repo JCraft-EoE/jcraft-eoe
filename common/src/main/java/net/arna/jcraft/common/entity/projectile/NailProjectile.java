@@ -60,10 +60,14 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
     private boolean wasInBlock = false;
     /** Velocity-scaled damage drill: damage = min(4, speed), slows on hit, noPhysics above speed 2.0 */
     public boolean velocityDrilling = false;
-    /** Fan nail: gently homes toward nearest entity from the start, manual hit detection */
+    /** Fan nail: flies straight until first entity hit, then homes toward nearest entity */
+    public boolean fanNail = false;
+    /** Fan nail: gently homes toward nearest entity, manual hit detection */
     public boolean homingFan = false;
     private final Map<UUID, Integer> drillingEntityLastHit = new java.util.HashMap<>();
+    private final Map<UUID, Integer> drillingEntityHitCount = new java.util.HashMap<>();
     private static final int DRILLING_HIT_INTERVAL = 2; // hit once every 2 ticks
+    private static final int DRILLING_MAX_HITS = 10; // max hits per entity
     private float creepSpeed = 0.2f;
     public boolean isHandhole = false;
     public boolean isVortex = false;
@@ -185,7 +189,8 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
             // Find nearby entity to creep towards (exclude current target and owner)
             List<LivingEntity> nearbyTargets = level().getEntitiesOfClass(LivingEntity.class,
                     getBoundingBox().inflate(creepDistance),
-                    e -> e != owner && e != target && !(e instanceof JAttackEntity) && !(e instanceof StandEntity<?, ?>) && !e.isSpectator() && e.isAlive());
+                    e -> e != owner && e != target && !(e instanceof JAttackEntity) && !(e instanceof StandEntity<?, ?>)
+                            && !e.isSpectator() && e.isAlive() && !(e.getVehicle() instanceof NailProjectile));
 
             if (!nearbyTargets.isEmpty()) {
                 // Find closest target
@@ -231,7 +236,8 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
             Entity owner = getOwner();
             List<LivingEntity> nearbyTargets = level().getEntitiesOfClass(LivingEntity.class,
                     getBoundingBox().inflate(creepDistance),
-                    e -> e != owner && !(e instanceof JAttackEntity) && !(e instanceof StandEntity<?, ?>) && !e.isSpectator() && e.isAlive());
+                    e -> e != owner && !(e instanceof JAttackEntity) && !(e instanceof StandEntity<?, ?>)
+                            && !e.isSpectator() && e.isAlive() && !(e.getVehicle() instanceof NailProjectile));
             if (!nearbyTargets.isEmpty()) {
                 LivingEntity closest = nearbyTargets.get(0);
                 double closestDist = distanceToSqr(closest);
@@ -348,7 +354,8 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
                     List<LivingEntity> nextTargets = level().getEntitiesOfClass(LivingEntity.class,
                             getBoundingBox().inflate(creepDistance),
                             e -> e != owner && !(e instanceof JAttackEntity) && !(e instanceof StandEntity<?, ?>)
-                                    && !hitEntityIds.contains(e.getUUID()) && !e.isSpectator() && e.isAlive());
+                                    && !hitEntityIds.contains(e.getUUID()) && !e.isSpectator() && e.isAlive()
+                                    && !(e.getVehicle() instanceof NailProjectile));
                     if (!nextTargets.isEmpty()) {
                         LivingEntity closest = nextTargets.get(0);
                         double closestDist = distanceToSqr(closest);
@@ -376,13 +383,40 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
             return;
         }
 
+        // Fan nail straight-line phase: manual entity hit detection (noPhysics=true bypasses vanilla)
+        // Capture state before the straight-line check so the homing block doesn't run the same tick we switch
+        final boolean wasHomingFan = homingFan;
+        if (fanNail && !homingFan && !inGround && level() instanceof ServerLevel sl) {
+            Entity fanOwner = getOwner();
+            List<LivingEntity> hit = level().getEntitiesOfClass(LivingEntity.class,
+                    getBoundingBox().inflate(0.3),
+                    e -> e != fanOwner && e.isAlive() && !e.isSpectator()
+                            && !(e instanceof JAttackEntity) && !(e instanceof StandEntity)
+                            && !(e.getVehicle() instanceof NailProjectile));
+            if (!hit.isEmpty()) {
+                LivingEntity target = JUtils.getUserIfStand(hit.get(0));
+                if (target != null) {
+                    playSound(JSoundRegistry.IMPACT_11.get(), 1.0f, 1.0f);
+                    sl.sendParticles(JParticleTypeRegistry.HITSPARK_1.get(),
+                            target.getX(), target.getY() + target.getBbHeight() * 0.5, target.getZ(),
+                            1, 0, 0, 0, 0.0);
+                    JUtils.projectileDamageLogic(this, level(), target, Vec3.ZERO, 5, 1, false,
+                            customDamage, 2, CommonHitPropertyComponent.HitAnimation.MID, false, false);
+                    // Switch to homing phase at half speed
+                    homingFan = true;
+                    setDeltaMovement(getDeltaMovement().scale(0.5));
+                }
+            }
+        }
+
         // Homing fan nails: gently steer toward nearest entity, manual hit detection
-        if (homingFan && !inGround && !isCreeping && level() instanceof ServerLevel sl) {
+        if (wasHomingFan && !inGround && !isCreeping && level() instanceof ServerLevel sl) {
             Entity fanOwner = getOwner();
             List<LivingEntity> fanTargets = level().getEntitiesOfClass(LivingEntity.class,
                     getBoundingBox().inflate(20.0),
                     e -> e != fanOwner && e.isAlive() && !e.isSpectator()
-                            && !(e instanceof JAttackEntity) && !(e instanceof StandEntity));
+                            && !(e instanceof JAttackEntity) && !(e instanceof StandEntity)
+                            && !(e.getVehicle() instanceof NailProjectile));
 
             if (!fanTargets.isEmpty()) {
                 // Find the closest target
@@ -442,10 +476,13 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
                 int currentTick = tickCount;
                 AABB hitBox = getBoundingBox().inflate(0.5);
                 List<LivingEntity> targets = world.getEntitiesOfClass(LivingEntity.class, hitBox,
-                        entity -> entity != getOwner() && !entity.isSpectator() && entity.isAlive());
+                        entity -> entity != getOwner() && !entity.isSpectator() && entity.isAlive()
+                                && !(entity.getVehicle() instanceof NailProjectile));
 
                 for (LivingEntity target : targets) {
                     java.util.UUID uid = target.getUUID();
+                    int hitCount = drillingEntityHitCount.getOrDefault(uid, 0);
+                    if (hitCount >= DRILLING_MAX_HITS) continue;
                     int lastHit = drillingEntityLastHit.getOrDefault(uid, -DRILLING_HIT_INTERVAL);
                     if (currentTick - lastHit >= DRILLING_HIT_INTERVAL) {
                         LivingEntity actualTarget = JUtils.getUserIfStand(target);
@@ -464,6 +501,7 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
                                     1, 0, 0, 0, 0.0);
                         }
                         drillingEntityLastHit.put(uid, currentTick);
+                        drillingEntityHitCount.put(uid, hitCount + 1);
                     }
                 }
             }
@@ -555,6 +593,8 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
         tag.putInt("ChargeTime", this.chargeTime);
         tag.putBoolean("Penetrating", this.penetrating);
         tag.putBoolean("Drilling", this.isDrilling);
+        tag.putBoolean("FanNail", this.fanNail);
+        tag.putBoolean("HomingFan", this.homingFan);
         tag.putFloat("CustomDamage", this.customDamage);
         tag.putFloat("MaxRange", this.maxRange);
         tag.putFloat("CreepDistance", this.creepDistance);
@@ -571,6 +611,8 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
         this.chargeTime = tag.getInt("ChargeTime");
         this.penetrating = tag.getBoolean("Penetrating");
         this.isDrilling = tag.getBoolean("Drilling");
+        this.fanNail = tag.getBoolean("FanNail");
+        this.homingFan = tag.getBoolean("HomingFan");
         this.customDamage = tag.getFloat("CustomDamage");
         this.maxRange = tag.getFloat("MaxRange");
         this.creepDistance = tag.getFloat("CreepDistance");
@@ -663,8 +705,8 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
         nail.setSpinning(true);
         nail.setCustomDamage(4.0f);
         nail.maxRange = 20.0f;
-        nail.noPhysics = true; // fly through blocks until hitting an entity
-        nail.homingFan = true;
+        nail.noPhysics = true; // phases through blocks in straight-line phase
+        nail.fanNail = true; // straight-line phase, switches to homing on first entity hit
         return nail;
     }
 

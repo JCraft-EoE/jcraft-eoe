@@ -22,8 +22,10 @@ import net.arna.jcraft.api.stand.SummonData;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.attack.actions.UserAnimationAction;
 import net.arna.jcraft.common.attack.conditions.TuskNailCondition;
+import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.projectile.NailProjectile;
 import net.arna.jcraft.common.item.Peacemaker;
+import net.minecraft.world.phys.AABB;
 import java.lang.ref.WeakReference;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -71,8 +73,6 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
     public static final EntityDataAccessor<Float> NAILS = SynchedEntityData.defineId(TuskAct3Entity.class, EntityDataSerializers.FLOAT);
     public static final float NAILS_MAX = 10.0f;
 
-    // ---- Moves ----
-
     public static final Act3NailShotAttack NAIL_SHOT = new Act3NailShotAttack(0, 10, 15, 0.75f, 2.7f, 20.0f, 15.0f)
             .withCondition(TuskNailCondition.atLeast(1.0f))
             .withInitAction(UserAnimationAction.play("tsk.grn"))
@@ -81,7 +81,6 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
                     Component.literal("Golden Rectangle Nail"),
                     Component.literal("Fires a spinning nail (15 blocks). On hit, creeps 8 blocks through terrain."));
 
-    // Heavy: Nail Jab — close-range spinning nail poke
     public static final SimpleAttack<TuskAct3Entity> NAIL_JAB = new SimpleAttack<TuskAct3Entity>(
             200, 5, 15, 1f, 7.0f, 15, 2f, 0.5f, 0.0f)
             .withCondition(TuskNailCondition.atLeast(1.0f))
@@ -91,10 +90,10 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
                     Component.literal("Nail Jab"),
                     Component.literal("Close-range nail poke."));
 
-    // Barrage: Nail Swipes — 5 hits, quick startup
     public static final NailBarrageAttack NAIL_SWIPES = new NailBarrageAttack(
-            280, 2, 36, 1f, 3.0f, 12, 2.0f, 0.3f, 0.0f, 6)
+            280, 2, 36, 0f, 3.0f, 12, 2.0f, 0.3f, 1.0f, 6)
             .withCondition(TuskNailCondition.atLeast(1.0f))
+            .withInitAction(UserAnimationAction.play("tsk.barrage"))
             .withSound(JSoundRegistry.TUSK_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withInfo(
@@ -118,10 +117,11 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
             .withCondition(TuskNailCondition.atLeast(1.0f));
 
     public static final VoidShotAttack VOID_SHOT = new VoidShotAttack(300, 25, 30, 0.75f)
+            .withExitDamage(8.0f, 3.0f)
             .withInitAction(UserAnimationAction.play("tsk.vs"))
             .withInfo(
                     Component.literal("Voidshot"),
-                    Component.literal("Fire at your own head and enter the wormhole.\nInvulnerable for up to 1 second. Punishable on entry/exit."))
+                    Component.literal("Fire at your own head and enter the wormhole.\nInvulnerable for up to 1.4 seconds. Deals 8 damage in a 3-block radius on impact. Punishable on entry/exit."))
             .withCondition(TuskNailCondition.atLeast(1.0f));
 
 
@@ -135,12 +135,12 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
 
     public static final WormholeAttack WORMHOLE = new WormholeAttack(200, 5, 10, 0.75f)
             .withInitAction(UserAnimationAction.play("tsk.grn"))
-            .withTeleportDamage(6.0f, 2.0f)
+            .withTeleportDamage(10.0f, 4.0f)
             .withSound(JSoundRegistry.TUSK_SHOT)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(
                     Component.literal("Wormhole Nail"),
-                    Component.literal("First use: fires a slow homing nail.\nSecond use: teleports to nail, dealing 6 damage in 2-block radius."))
+                    Component.literal("First use: fires a slow homing nail.\nSecond use: teleports to nail, dealing 10 damage in 4-block radius."))
             .withCondition(TuskNailCondition.atLeast(1.0f));
     
     @Getter
@@ -190,8 +190,8 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
         moves.register(MoveClass.HEAVY, NAIL_JAB, State.NAIL_JAB);
         moves.register(MoveClass.SPECIAL1, HANDHOLE, State.HANDHOLE);
         moves.register(MoveClass.SPECIAL2, VORTEX, State.VORTEX);
-        moves.register(MoveClass.SPECIAL3, VOID_SHOT, State.VOID_SHOT);
-        moves.register(MoveClass.ULTIMATE, WORMHOLE, State.WORMHOLE);
+        moves.register(MoveClass.SPECIAL3, WORMHOLE, State.WORMHOLE);
+        moves.register(MoveClass.ULTIMATE, VOID_SHOT, State.VOID_SHOT);
         moves.register(MoveClass.UTILITY, ACT_CYCLE, State.ACT_CYCLE);
     }
 
@@ -291,7 +291,20 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
             if (voidTicks > 0) {
                 NailProjectile nail = voidNail == null ? null : voidNail.get();
                 if (nail == null || !nail.isAlive() || nail.inGround) {
-                    // Nail stopped, hit something, or gone — exit void
+                    // Nail hit something — apply exit AoE if configured
+                    if (nail != null && nail.inGround) {
+                        VoidShotAttack vs = getMove(VoidShotAttack.class);
+                        if (vs != null && vs.getExitDamage() > 0) {
+                            float r = vs.getExitBlastRadius();
+                            Vec3 nailPos = nail.position();
+                            AABB blastBox = new AABB(nailPos.x - r, nailPos.y - r, nailPos.z - r,
+                                    nailPos.x + r, nailPos.y + r, nailPos.z + r);
+                            LivingEntity finalUser = user;
+                            level().getEntitiesOfClass(LivingEntity.class, blastBox,
+                                    e -> e != finalUser && e.isAlive() && !e.isSpectator())
+                                    .forEach(e -> Attacks.trueDamage(vs.getExitDamage(), JDamageSources.stand(this), e));
+                        }
+                    }
                     exitVoid();
                 } else if (!nail.hasPassenger(user)) {
                     // Player dismounted (pressed sneak, etc.)
@@ -364,7 +377,7 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
         }
 
         // Wormhole teleport: if nail is alive, teleport instead of firing a new nail
-        if (moveClass == MoveClass.ULTIMATE) {
+        if (moveClass == MoveClass.SPECIAL3) {
             WormholeAttack wormhole = getMove(WormholeAttack.class);
             if (wormhole != null && wormhole.isNailActive()) {
                 wormhole.doTeleportNow(this, user);
@@ -394,7 +407,7 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
         IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.tusk_act_3.idle", AzPlayBehaviors.LOOP)),
         NAIL_SHOT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_3.nail_shot", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         NAIL_JAB(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_3.heavy", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        NAIL_SWIPES(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_3.barrage", AzPlayBehaviors.LOOP)),
+        NAIL_SWIPES(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_3.barrage", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         WORMHOLE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_3.wormhole_shoot", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         HANDHOLE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_3.hand_hole", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         VORTEX(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.tusk_act_3.vortex", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),

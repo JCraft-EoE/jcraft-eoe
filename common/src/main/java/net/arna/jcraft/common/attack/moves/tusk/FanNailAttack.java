@@ -60,7 +60,7 @@ public final class FanNailAttack extends AbstractMove<FanNailAttack, TuskAct2Ent
 
             Vec3 spawnPos = user.position().add(0, user.getBbHeight() * 0.55, 0);
             nail.setPos(spawnPos);
-            nail.setDeltaMovement(rotVec.scale(0.7)); // slow so homing is effective
+            nail.setDeltaMovement(rotVec.scale(1.4)); // fast in straight-line phase; halved on first hit for homing
             attacker.level().addFreshEntity(nail);
         }
         attacker.playSound(JSoundRegistry.TUSK_SHOT.get(), 1.0f, 0.8f);

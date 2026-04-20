@@ -21,11 +21,23 @@ import java.util.Set;
  * Using any other move while in the void forces them out immediately.
  */
 public final class VoidShotAttack extends AbstractMove<VoidShotAttack, TuskAct3Entity> {
-    public static final int VOID_DURATION = 20;
+    public static final int VOID_DURATION = 28;
+
+    private float exitDamage = 0f;
+    private float exitBlastRadius = 0f;
 
     public VoidShotAttack(int cooldown, int windup, int duration, float moveDistance) {
         super(cooldown, windup, duration, moveDistance);
     }
+
+    public VoidShotAttack withExitDamage(float damage, float blastRadius) {
+        this.exitDamage = damage;
+        this.exitBlastRadius = blastRadius;
+        return this;
+    }
+
+    public float getExitDamage() { return exitDamage; }
+    public float getExitBlastRadius() { return exitBlastRadius; }
 
     @Override
     public @NotNull MoveType<VoidShotAttack> getMoveType() {
@@ -40,7 +52,7 @@ public final class VoidShotAttack extends AbstractMove<VoidShotAttack, TuskAct3E
 
         nail.setNoGravity(true);
         nail.setPos(user.position().add(0, user.getBbHeight() * 0.55, 0));
-        nail.shootFromRotation(user, user.getXRot(), user.getYRot(), 0.0F, 2.5F, 0.0F);
+        nail.shootFromRotation(user, user.getXRot(), user.getYRot(), 0.0F, 2.125F, 0.0F);
         attacker.level().addFreshEntity(nail);
 
         attacker.enterVoid(nail);
@@ -54,7 +66,10 @@ public final class VoidShotAttack extends AbstractMove<VoidShotAttack, TuskAct3E
 
     @Override
     public @NonNull VoidShotAttack copy() {
-        return copyExtras(new VoidShotAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
+        VoidShotAttack copy = new VoidShotAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance());
+        copy.exitDamage = this.exitDamage;
+        copy.exitBlastRadius = this.exitBlastRadius;
+        return copyExtras(copy);
     }
 
     public static class Type extends AbstractMove.Type<VoidShotAttack> {
