@@ -1,5 +1,8 @@
 {
   "textures": [
-    "jcraft:nail_trail"
+    "jcraft:nail/nail1",
+    "jcraft:nail/nail2",
+    "jcraft:nail/nail3",
+    "jcraft:nail/nail4"
   ]
 }

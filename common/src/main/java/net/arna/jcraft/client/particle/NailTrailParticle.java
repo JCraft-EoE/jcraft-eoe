@@ -6,47 +6,56 @@ import net.minecraft.core.particles.SimpleParticleType;
 
 public class NailTrailParticle extends TextureSheetParticle {
     private final SpriteSet spriteProvider;
+    // Base spin speed (radians/tick) — fast enough from tick 0 to blur into a circle
+    private static final float BASE_SPIN = (float) (Math.PI * 2);
+    // Additional acceleration per tick so it spins even faster over time
+    private static final float ANGULAR_ACCELERATION = 0.2f;
+    // Tracks which sprite frame to show
+    private int frameIndex = 0;
+    private float frameTicker = 0f;
 
     protected NailTrailParticle(ClientLevel world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, SpriteSet spriteProvider) {
         super(world, x, y, z, 0, 0, 0);
         this.spriteProvider = spriteProvider;
 
-        // Set lifespan to 30 ticks
         this.lifetime = 30;
-
-        // Small size that doesn't change
         this.quadSize = 0.15f;
 
-        // Blue-ish color (cyan/light blue)
         this.rCol = 0.4f;
         this.gCol = 0.7f;
         this.bCol = 1.0f;
 
-        // Start fully opaque
         this.alpha = 1.0f;
-
-        // No gravity
         this.gravity = 0.0f;
 
-        // Don't move
         this.xd = 0;
         this.yd = 0;
         this.zd = 0;
 
-        this.setSpriteFromAge(spriteProvider);
+        this.roll = this.random.nextFloat() * (float) (Math.PI * 2);
+        this.oRoll = this.roll;
+
+        this.setSprite(spriteProvider.get(0, 4));
     }
 
     @Override
     public void tick() {
+        this.oRoll = this.roll;
         super.tick();
 
-        // Calculate age ratio (0.0 at start, 1.0 at end)
         float ageRatio = (float) this.age / (float) this.lifetime;
 
-        // Fade out over lifetime
         this.alpha = 1.0f - ageRatio;
 
-        this.setSpriteFromAge(spriteProvider);
+        float angularVelocity = BASE_SPIN + ANGULAR_ACCELERATION * this.age;
+        this.roll += angularVelocity;
+
+        frameTicker += angularVelocity;
+        if (frameTicker >= (float) (Math.PI / 2)) {
+            frameTicker -= (float) (Math.PI / 2);
+            frameIndex = (frameIndex + 1) % 4;
+        }
+        this.setSprite(spriteProvider.get(frameIndex, 4));
     }
 
     @Override
@@ -56,7 +65,6 @@ public class NailTrailParticle extends TextureSheetParticle {
 
     @Override
     protected int getLightColor(float tint) {
-        // Full brightness like glowing particles
         return 240 | 240 << 16;
     }
 
