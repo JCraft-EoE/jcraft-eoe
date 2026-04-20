@@ -10,6 +10,7 @@ import net.arna.jcraft.api.registry.JItemRegistry;
 import net.arna.jcraft.api.registry.JPacketRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.registry.JTagRegistry;
+import net.arna.jcraft.common.entity.spec.BrawlerSpecUser;
 import net.arna.jcraft.common.network.s2c.DamageNumberPacket;
 import net.arna.jcraft.common.util.ICustomDamageHandler;
 import net.minecraft.core.BlockPos;
@@ -135,6 +136,16 @@ public class TrainingDummyEntity extends Mob implements ICustomDamageHandler {
                 player.getInventory().add(dummyItem);
                 if (isLeashed()) {
                     dropLeash(false, true);
+                }
+                final List<BrawlerSpecUser> brawlers = player.level().getEntitiesOfClass(BrawlerSpecUser.class, AABB.ofSize(position(), 100, 10, 100), Entity::isAlive);
+                for (Mob brawler : brawlers) {
+                    if (brawler.getTarget() == this) {
+                        brawler.setTarget(null);
+                    }
+                    // aggro brawlers
+                    if (!player.isCreative()) {
+                        brawler.setTarget(player);
+                    }
                 }
                 this.discard();
             }

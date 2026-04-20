@@ -160,7 +160,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
     @Override
     public void desummon() {
-        if (!level().isClientSide()) {
+        if (!level().isClientSide() && holdItem != null) {
             Containers.dropItemStack(level(), getX(), getY(), getZ(), holdItem);
         }
         super.desummon();

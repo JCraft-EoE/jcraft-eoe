@@ -111,7 +111,9 @@ public class JServerEvents {
     }
 
     public static void saveExclusives(final MinecraftServer server) {
-        JCraft.getExclusiveStandsData().saveToDefaultFile(server);
+        if (JCraft.getExclusiveStandsData() != null) {
+            JCraft.getExclusiveStandsData().saveToDefaultFile(server);
+        }
     }
 
     public static AABB createBurstHitbox(final Vec3 pPos) {
@@ -445,7 +447,7 @@ public class JServerEvents {
         final NonNullList<ItemStack> armorItems = (NonNullList<ItemStack>) mob.getArmorSlots();
 
         Enchantment enchantment;
-        ItemStack itemStack;
+        ItemStack itemStack = null;
         int baseArmorLevel = random.nextInt(1, 6);
         int enchantsSize = JCRAFT_ARMOR_ENCHANTS.size();
         for (int slot = 0; slot < 4; slot++) {
@@ -454,27 +456,30 @@ public class JServerEvents {
 
             if (Platform.isModLoaded("jjbacosplay")) {
                 List<CosplayItem<?>> slottedCosplay = COSPLAY.get(slot);
-                ArmorItem selected = JUtils.chooseRandom(random,
-                        slottedCosplay.get(random.nextInt(slottedCosplay.size())).getAll()
-                ).get();
-                itemStack = new ItemStack(selected);
-                if (VANILLA_MATERIAL.contains(selected.getMaterial())) {
-                    armorLevel = ((ArmorMaterials)selected.getMaterial()).ordinal();
-                }
-                else {
-                    armorLevel = diamondLevel;
+                if (!slottedCosplay.isEmpty()) {
+                    ArmorItem selected = JUtils.chooseRandom(random,
+                            slottedCosplay.get(random.nextInt(slottedCosplay.size())).getAll()
+                    ).get();
+                    itemStack = new ItemStack(selected);
+                    if (VANILLA_MATERIAL.contains(selected.getMaterial())) {
+                        armorLevel = ((ArmorMaterials) selected.getMaterial()).ordinal();
+                    } else {
+                        armorLevel = diamondLevel;
+                    }
                 }
             }
             else {
                 armorLevel = baseArmorLevel + random.nextInt(-1, 1);
                 itemStack = new ItemStack(EQUIPMENT.get(slot).get(armorLevel));
             }
-            enchantment = JCRAFT_ARMOR_ENCHANTS.get(random.nextInt(enchantsSize));
-            itemStack.enchant(enchantment, enchantment.getMaxLevel());
-            armorItems.set(slot, itemStack);
+            if (itemStack != null) {
+                enchantment = JCRAFT_ARMOR_ENCHANTS.get(random.nextInt(enchantsSize));
+                itemStack.enchant(enchantment, enchantment.getMaxLevel());
+                armorItems.set(slot, itemStack);
 
-            if (armorLevel >= diamondLevel) {
-                mob.setDropChance(EquipmentSlot.byTypeAndIndex(EquipmentSlot.Type.ARMOR, slot), 0f);
+                if (armorLevel >= diamondLevel) {
+                    mob.setDropChance(EquipmentSlot.byTypeAndIndex(EquipmentSlot.Type.ARMOR, slot), 0f);
+                }
             }
         }
     }
@@ -711,8 +716,4 @@ public class JServerEvents {
         return EventResult.pass();
     }
 
-    public static EventResult afterExplosion(final @NonNull Level level, final @NonNull BlockPos pos, final @NonNull Explosion explosion) {
-        BlockMarkerMoves.forEach(move -> move.removeBlock(pos, level));
-        return EventResult.pass();
-    }
 }
