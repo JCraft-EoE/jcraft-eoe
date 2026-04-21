@@ -256,6 +256,13 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
                             Can be held, and released 0.75s in.
                             Depending on how much you hold, the damage and launch height increase."""
                     ));
+    // TODO add move info x2
+    // TODO balance x2
+    public static final TossMove<SilverChariotEntity> TOSS = new TossMove<SilverChariotEntity>(0, 1, 1, 0.75f)
+            .withAnim(SilverChariotEntity.State.ITEM_TOSS);
+    public static final TossChargeMove<SilverChariotEntity> TOSS_CHARGE = new TossChargeMove<SilverChariotEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+            .withFollowup(TOSS);
+
     private static final EntityDataAccessor<Boolean> HAS_RAPIER;
     private static final EntityDataAccessor<Integer> MODE;
     private static final EntityDataAccessor<Integer> ARMOR_TIME;
@@ -348,6 +355,8 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         moves.register(MoveClass.ULTIMATE, ARMOR_OFF, State.ARMOR_OFF);
 
         moves.register(MoveClass.UTILITY, CIRCLE_CHARGE, State.CIRCLE_CHARGE).withFollowup(State.CIRCLE_SLASH);
+
+        moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
 
     private static void registerPossessedMoves(MoveMap<SilverChariotEntity, State> moves) {
@@ -520,6 +529,9 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
 
         POSSESSED_IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.silverchariot.idle_possessed", AzPlayBehaviors.LOOP)),
         ARMORLESS_IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.silverchariot.idle_armorless", AzPlayBehaviors.LOOP)),
+
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE))
         ;
 
         private final AzCommand animator;

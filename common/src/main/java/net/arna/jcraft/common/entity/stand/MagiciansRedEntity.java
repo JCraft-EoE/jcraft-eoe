@@ -15,11 +15,12 @@ import net.arna.jcraft.common.attack.actions.PlaySoundAction;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
-import net.arna.jcraft.common.attack.core.MoveMapImpl;
 import net.arna.jcraft.common.attack.moves.magiciansred.*;
 import net.arna.jcraft.common.attack.moves.shared.KnockdownAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
+import net.arna.jcraft.common.attack.moves.shared.TossChargeMove;
+import net.arna.jcraft.common.attack.moves.shared.TossMove;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.api.registry.JSoundRegistry;
@@ -182,6 +183,12 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
                     Component.literal("Life Detector"),
                     Component.literal("tracks down nearby life, lasts 15s")
             );
+    // TODO add move info x2
+    // TODO balance x2
+    public static final TossMove<MagiciansRedEntity> TOSS = new TossMove<MagiciansRedEntity>(0, 1, 1, 0.75f)
+            .withAnim(MagiciansRedEntity.State.ITEM_TOSS);
+    public static final TossChargeMove<MagiciansRedEntity> TOSS_CHARGE = new TossChargeMove<MagiciansRedEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+            .withFollowup(TOSS);
 
     public MagiciansRedEntity(Level worldIn) {
         super(JStandTypeRegistry.MAGICIANS_RED.get(), worldIn);
@@ -207,6 +214,8 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
         moves.register(MoveClass.ULTIMATE, CROSSFIRE_HURRICANE, State.CROSSFIRE_HURRICANE);
 
         moves.register(MoveClass.UTILITY, LIFE_DETECTOR, State.DETECTOR);
+
+        moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
 
     @Override
@@ -311,7 +320,9 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
         RED_BIND(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.redbind", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         DETECTOR(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.detector", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        HAMMER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.hammer", AzPlayBehaviors.HOLD_ON_LAST_FRAME));
+        HAMMER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.hammer", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
         private final AzCommand animator;
 

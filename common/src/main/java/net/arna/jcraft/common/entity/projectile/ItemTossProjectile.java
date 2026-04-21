@@ -3,12 +3,14 @@ package net.arna.jcraft.common.entity.projectile;
 import com.mojang.datafixers.util.Pair;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.component.living.CommonVampireComponent;
+import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.common.entity.stand.AbstractKillerQueenEntity;
 import net.arna.jcraft.common.item.BloodBottleItem;
 import net.arna.jcraft.common.spec.VampireSpec;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JItemRegistry;
@@ -141,7 +143,8 @@ public class ItemTossProjectile extends AbstractArrow {
         if (!level().isClientSide && (getItem().is(JTagRegistry.EXPLODES_ON_IMPACT) ||
                 (getOwner() instanceof AbstractKillerQueenEntity<?,?>))) {
             final boolean grief = level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
-            level().explode(this, getX(), getY(), getZ(), 1, grief, Level.ExplosionInteraction.MOB);
+            final boolean standGrief = !(getOwner() instanceof StandEntity<?,?>) || level().getGameRules().getBoolean(JCraft.STAND_GRIEFING);
+            level().explode(this, getX(), getY(), getZ(), 1, grief && standGrief, Level.ExplosionInteraction.MOB);
             discard();
             return true;
         }
@@ -163,7 +166,7 @@ public class ItemTossProjectile extends AbstractArrow {
     protected void onHitEntity(final EntityHitResult result) {
         // this part has been heavily inspired by AbstractArrow
         Entity entity = result.getEntity();
-        Entity entity2 = this.getOwner();
+        Entity entity2 = JUtils.getUserIfStand(this.getOwner());
         DamageSource damageSource;
         if (entity2 == null) {
             damageSource = this.damageSources().arrow(this, this);
@@ -227,7 +230,7 @@ public class ItemTossProjectile extends AbstractArrow {
             if (itemStand != null && !JCraft.getExclusiveStandsData().isStandUsed(itemStand)) {
                 final CommonStandComponent standData = JComponentPlatformUtils.getStandComponent(livingEntity);
                 if (standData.getType() == null) { // don't override current stand
-                    standData.setTypeAndSkin(itemStand, itemSkin);
+                    standData.setTypeAndSkin(itemStand, itemSkin, false);
                     JCraft.summon(level(), livingEntity);
                 }
                 effectActivated = true;
@@ -240,8 +243,6 @@ public class ItemTossProjectile extends AbstractArrow {
         }
 
         // TODO spec obtainment items
-
-        // TODO stand upgrade items
 
         // force feed
         if (entity instanceof LivingEntity livingEntity && getItem().isEdible()) {
@@ -361,7 +362,8 @@ public class ItemTossProjectile extends AbstractArrow {
             if (item.is(JTagRegistry.BRITTLE) && hardness >= Blocks.STONE.defaultDestroyTime()) {
                 // brittle things get destroyed
             }
-            else if (!level().getGameRules().getRule(JCraft.STAND_GRIEFING).get() && InteractionResult.SUCCESS != block.place(new BlockPlaceContext(new UseOnContext(level(), null, InteractionHand.MAIN_HAND, item, result)))) {
+            else if ((!(getOwner() instanceof StandEntity<?,?>) || level().getGameRules().getBoolean(JCraft.STAND_GRIEFING)) &&
+                    InteractionResult.SUCCESS != block.place(new BlockPlaceContext(new UseOnContext(level(), null, InteractionHand.MAIN_HAND, item, result)))) {
                 dropItem(result.getLocation());
             }
         }

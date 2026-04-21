@@ -192,15 +192,8 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
                     Component.translatable("jcraft.starplatinum.sp3"),
                     Component.literal("Fast combo starter/extender, medium stun, extremely punishable on whiff.")
             );
-    // TODO add move info x2
-    // TODO balance x2
-    public static final StandbyActivationMove<StarPlatinumEntity> STANDBY_ON = new StandbyActivationMove<>(0, 1, 1, 0.75f)
-            ;
-    public static final StandbyDeactivationMove<StarPlatinumEntity> STANDBY_OFF = new StandbyDeactivationMove<>(0, 1, 1, -0.75f)
-            ;
     public static final JumpMove<StarPlatinumEntity> JUMP = new JumpMove<StarPlatinumEntity>(300, 5,
             14, 1f, 1.5f)
-            //.withCrouchingVariant(STANDBY_ON)
             .withInfo(
                     Component.translatable("jcraft.starplatinum.util"),
                     Component.literal("Jumps in looked direction with slight upward bias, you must stay on the ground until Star Platinum jumps.")
@@ -239,9 +232,8 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
         moves.register(MoveClass.SPECIAL3, CHARGE_BARRAGE, State.BARRAGE).withCrouchingVariant(State.BARRAGE);
         moves.register(MoveClass.ULTIMATE, INHALE, State.INHALE);
 
-        moves.register(MoveClass.UTILITY, JUMP, State.JUMP);//.withCrouchingVariant(State.IDLE);
+        moves.register(MoveClass.UTILITY, JUMP, State.JUMP);
 
-        moves.register(MoveClass.STANDBY_OFF, STANDBY_OFF, State.IDLE);
         moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
 
@@ -298,8 +290,8 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
         GRAB_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.star_platinum.grabhit", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         UPPERCUT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.star_platinum.uppercut", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.star_platinum.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.star_platinum.itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.star_platinum.itemthrow", AzPlayBehaviors.PLAY_ONCE));
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
         private final AzCommand animator;
 

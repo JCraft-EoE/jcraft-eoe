@@ -26,6 +26,8 @@ import net.arna.jcraft.api.stand.SummonData;
 import net.arna.jcraft.common.attack.moves.killerqueen.bitesthedust.*;
 import net.arna.jcraft.common.attack.moves.shared.GrabAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
+import net.arna.jcraft.common.attack.moves.shared.TossChargeMove;
+import net.arna.jcraft.common.attack.moves.shared.TossMove;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -125,6 +127,12 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                     Component.literal("Takedown"),
                     Component.literal("high damage grab")
             );
+    // TODO add move info x2
+    // TODO balance x2
+    public static final TossMove<KQBTDEntity> TOSS = new TossMove<KQBTDEntity>(0, 1, 1, 0.75f)
+            .withAnim(KQBTDEntity.State.ITEM_TOSS);
+    public static final TossChargeMove<KQBTDEntity> TOSS_CHARGE = new TossChargeMove<KQBTDEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+            .withFollowup(TOSS);
 
     // Light chain implementation
     public static final SimpleAttack<AbstractKillerQueenEntity<?, ?>> LOW = AbstractKillerQueenEntity.LOW.copy().withAnim(State.LOW);
@@ -169,6 +177,8 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
         moves.register(MoveClass.SPECIAL2, BUBBLE, State.BUBBLE).withCrouchingVariant(State.BUBBLE_COUNTER);
         moves.register(MoveClass.SPECIAL3, GRAB, State.GRAB);
         moves.register(MoveClass.ULTIMATE, BTD_PLANT, State.BTD_PLANT);
+
+        moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
 
     @Override
@@ -207,7 +217,9 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
         COUNTER_MISS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kqbtd.counter_miss", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         BTD_PLANT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kqbtd.btdplant", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         GRAB(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kqbtd.grab", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        GRAB_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kqbtd.grab_hit", AzPlayBehaviors.HOLD_ON_LAST_FRAME));
+        GRAB_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kqbtd.grab_hit", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
         private final AzCommand animator;
 

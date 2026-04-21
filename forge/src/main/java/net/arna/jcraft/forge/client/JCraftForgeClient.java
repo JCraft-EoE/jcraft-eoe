@@ -133,7 +133,7 @@ public class JCraftForgeClient {
 
             if (Minecraft.getInstance().level != null && Minecraft.getInstance().level.getEntity(id) instanceof LivingEntity livingEntity) {
                 StandCapability.getCapabilityOptional(livingEntity).ifPresent(c -> {
-                    c.setTypeAndSkin(standType, skin);
+                    c.setTypeAndSkin(standType, skin, true);
                     c.applySyncPacket(buf);
                 });
             }

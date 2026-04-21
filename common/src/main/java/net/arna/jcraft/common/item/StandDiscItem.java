@@ -82,7 +82,7 @@ public class StandDiscItem extends Item {
             return InteractionResultHolder.fail(itemStack);
         }
 
-        standData.setTypeAndSkin(itemStand, itemSkin);
+        standData.setTypeAndSkin(itemStand, itemSkin, false);
         if (userStand == null) {
             data.remove("StandID");
             data.remove("Skin");

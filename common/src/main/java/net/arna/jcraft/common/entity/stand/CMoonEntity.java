@@ -23,6 +23,8 @@ import net.arna.jcraft.common.attack.actions.CMoonInversionAction;
 import net.arna.jcraft.common.attack.moves.cmoon.*;
 import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
+import net.arna.jcraft.common.attack.moves.shared.TossChargeMove;
+import net.arna.jcraft.common.attack.moves.shared.TossMove;
 import net.arna.jcraft.common.entity.projectile.BlockProjectile;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -190,6 +192,14 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
                     Component.literal("Gravitational Hop/Local Gravity Change"),
                     Component.literal("if used mid air, jumps up and grants 2s slow falling/otherwise changes your gravitational direction")
             );
+
+    // TODO add move info x2
+    // TODO balance x2
+    public static final TossMove<CMoonEntity> TOSS = new TossMove<CMoonEntity>(0, 1, 1, 0.75f)
+            .withAnim(CMoonEntity.State.ITEM_TOSS);
+    public static final TossChargeMove<CMoonEntity> TOSS_CHARGE = new TossChargeMove<CMoonEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+            .withFollowup(TOSS);
+
     private final List<Inversion> inversions = new ArrayList<>();
 
     public CMoonEntity(Level worldIn) {
@@ -219,6 +229,8 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
         moves.register(MoveClass.ULTIMATE, GRAV_SHIFT_PULSE, State.DIRECTIONAL_SHIFT).withCrouchingVariant(State.GRAV_SHIFT);
 
         moves.register(MoveClass.UTILITY, GRAVITATIONAL_HOP);
+
+        moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
 
     @Override
@@ -351,7 +363,9 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
         GRAV_SHIFT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cmoon.gravshift", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         DIRECTIONAL_SHIFT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cmoon.directionalshift", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         INVERSION_PUNCH(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cmoon.inversionpunch", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cmoon.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME));
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cmoon.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
         private final AzCommand animator;
 

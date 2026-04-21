@@ -209,6 +209,12 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
                     Component.literal("Flight"),
                     Component.literal("1 second of flight")
             );
+    // TODO add move info x2
+    // TODO balance x2
+    public static final TossMove<GEREntity> TOSS = new TossMove<GEREntity>(0, 1, 1, 0.75f)
+            .withAnim(GEREntity.State.ITEM_TOSS);
+    public static final TossChargeMove<GEREntity> TOSS_CHARGE = new TossChargeMove<GEREntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+            .withFollowup(TOSS);
 
     private static final EntityDataAccessor<Integer> FLIGHT_TIME = SynchedEntityData.defineId(GEREntity.class, EntityDataSerializers.INT);
 
@@ -234,6 +240,8 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         moves.register(MoveClass.ULTIMATE, RETURN_TO_ZERO, State.SETUP);
 
         moves.register(MoveClass.UTILITY, FLIGHT);
+
+        moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
 
     @Override
@@ -344,7 +352,9 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
         AIR_LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ger.airlight", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         AIR_BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ger.airbarrage", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         SETUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ger.setup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ger.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME));
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ger.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
         private final AzCommand animator;
 

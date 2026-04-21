@@ -7,9 +7,9 @@ import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractHoldableMove;
 import net.arna.jcraft.api.stand.StandEntity;
-import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 public final class TossChargeMove<A extends IAttacker<A, ?>> extends AbstractHoldableMove<TossChargeMove<A>, A> {
@@ -39,7 +39,9 @@ public final class TossChargeMove<A extends IAttacker<A, ?>> extends AbstractHol
                 final ItemStack oldProjectile = stand.getItemInHand(InteractionHand.MAIN_HAND);
                 if (oldProjectile.isEmpty()) {
                     stand.setItemInHand(InteractionHand.MAIN_HAND, projectileSource.copyWithCount(1));
-                    projectileSource.shrink(1);
+                    if (!(user instanceof Player player) || !player.isCreative()) {
+                        projectileSource.shrink(1);
+                    }
                 }
             }
         }

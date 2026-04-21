@@ -855,6 +855,12 @@ public final class JUtils {
             knifeProjectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
             level.addFreshEntity(knifeProjectile);
         }
+        else if (itemStack.getItem() instanceof EnderpearlItem) {
+            final ThrownEnderpearl enderpearlProjectile = new ThrownEnderpearl(level, JUtils.getUserIfStand(shooter));
+            enderpearlProjectile.setItem(itemStack);
+            enderpearlProjectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0.0F, 1.5F, 1.0F);
+            level.addFreshEntity(enderpearlProjectile);
+        }
         else {
             final AbstractArrow projectile = new ItemTossProjectile(shooter, level, itemStack);
             projectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);

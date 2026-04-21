@@ -4,6 +4,7 @@ import com.mojang.datafixers.util.Either;
 import lombok.NonNull;
 import mod.azure.azurelib.animation.dispatch.command.AzCommand;
 import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.Attacks;
 import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.MoveSet;
@@ -214,6 +215,12 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
                     Component.literal("Timestop"),
                     Component.literal("4 seconds")
             );
+    // TODO add move info x2
+    // TODO balance x2
+    public static final TossMove<TheWorldEntity> TOSS = new TossMove<TheWorldEntity>(0, 1, 1, 0.75f)
+            .withAnim(TheWorldEntity.State.ITEM_TOSS);
+    public static final TossChargeMove<TheWorldEntity> TOSS_CHARGE = new TossChargeMove<TheWorldEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+            .withFollowup(TOSS);
 
     public TheWorldEntity(Level worldIn) {
         super(JStandTypeRegistry.THE_WORLD.get(), worldIn);
@@ -238,6 +245,8 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
         moves.register(MoveClass.ULTIMATE, TIME_STOP, State.TIME_STOP);
 
         moves.register(MoveClass.UTILITY, TIME_SKIP, State.IDLE);
+
+        moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
 
     @Override
@@ -282,7 +291,9 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
         LOW(Attacks.createAnimationCommand("base_controller", "animation.theworld.low", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         TIMESKIP(Attacks.createAnimationCommand("base_controller", "animation.theworld.idle", AzPlayBehaviors.LOOP)),
         LIGHT_FOLLOWUP(Attacks.createAnimationCommand("base_controller", "animation.theworld.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        LUNGE(Attacks.createAnimationCommand("base_controller", "animation.theworld.lunge", AzPlayBehaviors.HOLD_ON_LAST_FRAME));
+        LUNGE(Attacks.createAnimationCommand("base_controller", "animation.theworld.lunge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
         private final AzCommand animator;
 

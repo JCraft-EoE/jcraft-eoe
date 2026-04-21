@@ -72,7 +72,7 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends AbstractEn
     protected StandEntityRenderer(final @NonNull EntityRendererProvider.Context context, final @NonNull Function<AzEntityRendererConfig.Builder<T>, AzEntityRendererConfig.Builder<T>> additionalConfigs, final @NonNull StandType type, final boolean flipBody, final boolean flipHead, final float torsoPitchOffset, final float headPitchOffset, final float velInfluence) {
         this(context, additionalConfigs,
                 entity -> type.getId().withPath(MODEL_STR_TEMPLATE.formatted(type.getId().getPath())),
-                entity -> getTextureLocation(type),
+                StandEntityRenderer::getTextureLocation,
                 type, flipBody, flipHead, torsoPitchOffset, headPitchOffset, velInfluence);
     }
 

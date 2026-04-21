@@ -450,7 +450,7 @@
 					]
 				},
 				{
-					"name": "redbind",
+					"name": "prop",
 					"parent": "lower_armRight",
 					"pivot": [-6, 12, 0],
 					"cubes": [
@@ -471,7 +471,7 @@
 				},
 				{
 					"name": "rope2",
-					"parent": "redbind",
+					"parent": "prop",
 					"pivot": [-6, 6, 0],
 					"cubes": [
 						{

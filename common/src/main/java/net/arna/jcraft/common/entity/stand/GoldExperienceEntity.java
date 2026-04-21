@@ -192,6 +192,12 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
                     Component.literal("Rekka Series"),
                     Component.literal("a set of three attacks, which cancel into each other during recovery")
             );
+    // TODO add move info x2
+    // TODO balance x2
+    public static final TossMove<GoldExperienceEntity> TOSS = new TossMove<GoldExperienceEntity>(0, 1, 1, 0.75f)
+            .withAnim(GoldExperienceEntity.State.ITEM_TOSS);
+    public static final TossChargeMove<GoldExperienceEntity> TOSS_CHARGE = new TossChargeMove<GoldExperienceEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+            .withFollowup(TOSS);
 
     public GoldExperienceEntity(Level worldIn) {
         super(JStandTypeRegistry.GOLD_EXPERIENCE.get(), worldIn);
@@ -216,6 +222,8 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
         moves.register(MoveClass.ULTIMATE, OVERCLOCK, State.OVERCLOCK);
 
         moves.register(MoveClass.UTILITY, TREE, State.TREE);
+
+        moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
 
     // Moveset
@@ -319,7 +327,9 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
         REKKA2(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.rekka2", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         REKKA3(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.rekka3", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         OVERCLOCK(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.overclock", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME));
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
         private final AzCommand animator;
 
