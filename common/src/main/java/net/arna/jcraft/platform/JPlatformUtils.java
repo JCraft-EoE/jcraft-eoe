@@ -4,6 +4,7 @@ import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.arna.jcraft.client.rendering.api.MultiInstancePostProcessor;
 import net.arna.jcraft.client.rendering.post.TimestopShaderFX;
 import net.minecraft.client.renderer.ShaderInstance;
+import net.minecraft.server.level.ServerPlayer;
 
 public class JPlatformUtils {
 
@@ -19,6 +20,11 @@ public class JPlatformUtils {
 
     @ExpectPlatform
     public static ShaderInstance getRred() {
+        throw new AssertionError("This shouldn't happen");
+    }
+
+    @ExpectPlatform
+    public static void callMainMenu(final ServerPlayer player) {
         throw new AssertionError("This shouldn't happen");
     }
 }

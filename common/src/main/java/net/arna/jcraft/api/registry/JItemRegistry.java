@@ -21,6 +21,7 @@ public interface JItemRegistry {
     Map<RegistrySupplier<? extends Item>, ResourceLocation> ITEMS = new LinkedHashMap<>();
 
     RegistrySupplier<Item> DEBUG_WAND = Platform.isDevelopmentEnvironment() ? register("debug_wand", () -> new DebugWand(settings())) : null;
+    RegistrySupplier<Item> HANDBOOK = register("handbook", () -> new HandbookItem(settings()));
 
     RegistrySupplier<Item> STAND_ARROW = register("stand_arrow", () -> new StandArrowItem(settings().rarity(Rarity.RARE).fireResistant()));
 
