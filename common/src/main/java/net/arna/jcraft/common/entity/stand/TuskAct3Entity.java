@@ -19,6 +19,7 @@ import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.api.stand.SummonData;
+import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.attack.actions.UserAnimationAction;
 import net.arna.jcraft.common.attack.conditions.TuskNailCondition;
@@ -40,6 +41,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -287,6 +289,10 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
                 }
             }
 
+            if (!isInVoid() && getCurrentMove() != null && tickCount % 3 == 0 && level() instanceof ServerLevel sl) {
+                spawnHandNailParticles(sl, user);
+            }
+
             // Voidshot — player rides the nail
             if (voidTicks > 0) {
                 NailProjectile nail = voidNail == null ? null : voidNail.get();
@@ -401,6 +407,14 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
     @NonNull
     public TuskAct3Entity getThis() {
         return this;
+    }
+
+    private void spawnHandNailParticles(ServerLevel sl, LivingEntity user) {
+        if (getNails() <= 0) return;
+        double ox = (random.nextDouble() - 0.5) * 0.4;
+        double oy = getBbHeight() * 0.6 + (random.nextDouble() - 0.5) * 0.3;
+        double oz = (random.nextDouble() - 0.5) * 0.4;
+        sl.sendParticles(JParticleTypeRegistry.NAIL_TRAIL.get(), getX() + ox, getY() + oy, getZ() + oz, 1, 0, 0, 0, 0.0);
     }
 
     public enum State implements StandAnimationState<TuskAct3Entity> {

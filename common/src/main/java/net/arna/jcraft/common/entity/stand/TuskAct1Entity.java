@@ -25,8 +25,10 @@ import net.arna.jcraft.common.attack.moves.tusk.NailShotAttack;
 import net.arna.jcraft.common.attack.moves.tusk.NailWheelAttack;
 import net.arna.jcraft.common.attack.moves.tusk.TuskActCycleMove;
 import net.arna.jcraft.common.item.Peacemaker;
+import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -37,10 +39,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -182,6 +186,10 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
                     }
                 }
             }
+
+            if (getCurrentMove() != null && tickCount % 3 == 0 && level() instanceof ServerLevel sl) {
+                spawnHandNailParticles(sl, user);
+            }
         }
     }
 
@@ -258,6 +266,10 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
         if (player.hasEffect(JStatusRegistry.KERATIN_GROWTH.get())) {
             interval = interval * 2 / 3;
         }
+        float multiplier = JServerConfig.TUSK_NAIL_REGEN_MULTIPLIER.getValue();
+        if (multiplier != 1.0f) {
+            interval = Math.max(1, Math.round(interval / multiplier));
+        }
         return interval;
     }
 
@@ -282,6 +294,14 @@ public class TuskAct1Entity extends StandEntity<TuskAct1Entity, TuskAct1Entity.S
                 if (hunger > 0) player.getFoodData().setFoodLevel(hunger - 1);
             }
         }
+    }
+
+    private void spawnHandNailParticles(ServerLevel sl, LivingEntity user) {
+        if (getNails() <= 0) return;
+        double ox = (random.nextDouble() - 0.5) * 0.4;
+        double oy = getBbHeight() * 0.6 + (random.nextDouble() - 0.5) * 0.3;
+        double oz = (random.nextDouble() - 0.5) * 0.4;
+        sl.sendParticles(JParticleTypeRegistry.NAIL_TRAIL.get(), getX() + ox, getY() + oy, getZ() + oz, 1, 0, 0, 0, 0.0);
     }
 
     public enum State implements StandAnimationState<TuskAct1Entity> {

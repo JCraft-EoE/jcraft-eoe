@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
+import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.entity.projectile.NailProjectile;
 import net.arna.jcraft.common.entity.stand.TuskAct3Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -12,14 +13,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-/**
- * Tusk Act 3 - Voidshot (Special 3)
- *
- * The user fires a shot at their own head, then briefly enters their own wormhole.
- * While inside the void the user is invulnerable (up to 20 ticks = 1 second).
- * Punishable on windup and recovery.
- * Using any other move while in the void forces them out immediately.
- */
 public final class VoidShotAttack extends AbstractMove<VoidShotAttack, TuskAct3Entity> {
     public static final int VOID_DURATION = 28;
 
@@ -46,7 +39,7 @@ public final class VoidShotAttack extends AbstractMove<VoidShotAttack, TuskAct3E
 
     @Override
     public @NonNull Set<LivingEntity> perform(TuskAct3Entity attacker, LivingEntity user) {
-        // Fire the wormhole nail — user will pilot it
+        attacker.playSound(JSoundRegistry.TUSK_HEAVY_SHOT.get(), 1.0f, 0.8f);
         NailProjectile nail = NailProjectile.wormholeFromTuskAct3(attacker);
         if (nail == null) return Set.of();
 

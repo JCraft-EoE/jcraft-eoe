@@ -21,12 +21,14 @@ public abstract class AbstractHoldableMove<T extends AbstractHoldableMove<T, A>,
     protected boolean setMoveStun = false;
     private final int minimumCharge;
     private int chargeTime = 0;
+    private boolean followedUp = false;
     // Maximum charge is the end of the move
 
     protected AbstractHoldableMove(final int cooldown, final int windup, final int duration, final float moveDistance,
                                    final int minimumCharge) {
         super(cooldown, windup, duration, moveDistance);
         this.minimumCharge = minimumCharge;
+        this.copyOnUse = true;
 
         withHoldable();
     }
@@ -40,6 +42,7 @@ public abstract class AbstractHoldableMove<T extends AbstractHoldableMove<T, A>,
     public void onInitiate(A attacker) {
         super.onInitiate(attacker);
         chargeTime = 0;
+        followedUp = false;
     }
 
     /**
@@ -81,6 +84,8 @@ public abstract class AbstractHoldableMove<T extends AbstractHoldableMove<T, A>,
     }
 
     private void followUp(final A attacker) {
+        if (followedUp) return;
+        followedUp = true;
         attacker.getMoveMap().initiateFollowup(attacker, getThis(), setMoveStun, chargeTime);
     }
 

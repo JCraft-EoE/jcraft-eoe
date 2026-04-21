@@ -17,6 +17,7 @@ import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -79,8 +80,10 @@ public final class TuskActCycleMove<A extends IAttacker<A, ?>> extends AbstractM
             CommonStandComponent standData = JComponentPlatformUtils.getStandComponent(sp);
             standData.setTypeAndSkin(newType, 0);
             JUtils.maySendStandAboutInfo(sp);
+            Entity vehicle = sp.getVehicle();
             sp.unRide();
             JCraft.summon(sp.level(), sp);
+            if (vehicle != null && vehicle.isAlive()) sp.startRiding(vehicle, true);
             return true;
         } finally {
             cycling = false;

@@ -165,8 +165,9 @@ public interface MoveMap<A extends IAttacker<? extends A, S>, S extends Enum<?>>
         }
 
         move = entry.getMove();
-        move.setChargeTime(chargeTime);
-        attacker.setMove(move.isCopyOnUse() ? move.copy() : move, entry.getAnimState());
+        AbstractMove<?, ? super A> nextMove = move.isCopyOnUse() ? move.copy() : move;
+        nextMove.setChargeTime(chargeTime);
+        attacker.setMove(nextMove, entry.getAnimState());
         if (setMoveStun) {
             attacker.setMoveStun(move.getDuration());
         }

@@ -25,6 +25,7 @@ public final class PerfectGoldenRotationAttack extends AbstractMove<PerfectGolde
         super(cooldown, windup, duration, moveDistance);
         this.baseSpeed = baseSpeed;
         this.maxRange = maxRange;
+        this.copyOnUse = true;
         ranged = true;
     }
 
@@ -35,18 +36,13 @@ public final class PerfectGoldenRotationAttack extends AbstractMove<PerfectGolde
 
     @Override
     public @NonNull Set<LivingEntity> perform(TuskAct2Entity attacker, LivingEntity user) {
-        int chargeTime = attacker.getDrillChargeTime();
-
-        // Drain nails based on charge (1-3 nails)
-        float nailCost = 1.0f + Math.min(chargeTime / 50.0f, 2.0f);
-
-        NailProjectile nail = NailProjectile.fromTuskAct2Perfect(attacker, nailCost, chargeTime, maxRange);
+        int chargeTime = Math.min(getChargeTime(), DrillShotChargeMove.MAX_CHARGE);
+        NailProjectile nail = NailProjectile.fromTuskAct2Perfect(attacker, chargeTime, maxRange);
         if (nail == null) return Set.of();
 
         attacker.playSound(JSoundRegistry.TUSK_HEAVY_SHOT.get(), 1.0f, 1.0f);
         nail.setPos(user.position().add(0, user.getBbHeight() * 0.55, 0));
 
-        // Speed increases with charge: 1.0x to 2.0x
         float speedMultiplier = 1.0f + (Math.min(chargeTime, 100) / 100.0f);
         nail.shootFromRotation(user, user.getXRot(), user.getYRot(), 0.0F, baseSpeed * speedMultiplier, 0.5F);
 

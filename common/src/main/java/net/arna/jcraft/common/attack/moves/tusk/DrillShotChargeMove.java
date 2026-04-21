@@ -14,6 +14,8 @@ import net.minecraft.world.entity.LivingEntity;
 import java.util.Set;
 
 public final class DrillShotChargeMove extends AbstractHoldableMove<DrillShotChargeMove, TuskAct2Entity> implements AttackRotationOffsetOverride {
+    public static final int MAX_CHARGE = 60;
+
     public DrillShotChargeMove(int cooldown, int windup, int duration, float moveDistance, int minimumCharge) {
         super(cooldown, windup, duration, moveDistance, minimumCharge);
     }
@@ -21,18 +23,6 @@ public final class DrillShotChargeMove extends AbstractHoldableMove<DrillShotCha
     @Override
     public float getAttackRotationOffset(StandEntity<?, ?> attacker) {
         return 0f;
-    }
-
-    @Override
-    public void onInitiate(TuskAct2Entity attacker) {
-        super.onInitiate(attacker);
-        attacker.setDrillChargeTime(0);
-    }
-
-    @Override
-    public void activeTick(TuskAct2Entity attacker, int moveStun) {
-        super.activeTick(attacker, moveStun);
-        attacker.setDrillChargeTime(attacker.getDrillChargeTime() + 1);
     }
 
     @Override

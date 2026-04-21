@@ -19,11 +19,13 @@ import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.api.stand.SummonData;
+import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.attack.actions.UserAnimationAction;
 import net.arna.jcraft.common.attack.conditions.TuskNailCondition;
 import net.arna.jcraft.common.attack.moves.tusk.DrillShotChargeMove;
 import net.arna.jcraft.common.attack.moves.tusk.FanNailAttack;
+import net.arna.jcraft.common.attack.moves.shared.SimpleHoldableMove;
 import net.arna.jcraft.common.attack.moves.tusk.GoldenRectangleNailAttack;
 import net.arna.jcraft.common.attack.moves.tusk.NailShotAttack;
 import net.arna.jcraft.common.attack.moves.tusk.PerfectGoldenRotationAttack;
@@ -37,6 +39,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -93,9 +96,9 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
                     Component.literal("Perfect Golden Rotation"),
                     Component.literal("Hold to charge. Fires a drilling nail that hits once per tick. Damage (6-12) and speed (1x-2x) increase with charge."));
 
-    public static final DrillShotChargeMove DRILL_SHOT_CHARGE = new DrillShotChargeMove(500, 10, 100, 0.75f, 1)
+    public static final SimpleHoldableMove<TuskAct2Entity> DRILL_SHOT_CHARGE = new SimpleHoldableMove<TuskAct2Entity>(200, 1, DrillShotChargeMove.MAX_CHARGE, 0.75f, 5)
+            .withCondition(TuskNailCondition.atLeast(1.0f))
             .withFollowup(PERFECT_GOLDEN_ROTATION)
-            .shouldSetMoveStun()
             .withInitAction(UserAnimationAction.play("tsk.pgrc"))
             .withInfo(
                     Component.literal("Drill Shot"),
@@ -122,10 +125,6 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
     @Getter
     @Setter
     private CommonMiscComponent miscComponent;
-
-    @Getter
-    @Setter
-    private int drillChargeTime = 0;
 
     private int regenTick = 40;
 
@@ -201,12 +200,20 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
                     }
                 }
             }
+
+            if (getCurrentMove() != null && tickCount % 3 == 0 && level() instanceof ServerLevel sl) {
+                spawnHandNailParticles(sl, user);
+            }
         }
     }
 
     @Override
     public void onUserMoveInput(AbstractMove<?, ? super TuskAct2Entity> currentMove, MoveInputType type, boolean pressed, boolean moveInitiated) {
-        if (!pressed) return;
+        if (!pressed) {
+            if (getHoldingType() == type) setHolding(false);
+            if (currentMove != null) currentMove.onUserMoveInput(this, type, pressed, moveInitiated);
+            return;
+        }
 
         MoveClass moveClass = type.getMoveClass(standby);
         if (moveClass == null) return;
@@ -215,9 +222,7 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
             if (hasUser() && getUser() instanceof Player player) {
                 JSpec<?, ?> spec = JUtils.getSpec(player);
                 if (spec != null && spec.canAttack()) {
-                    if (spec.initMove(moveClass)) {
-                        // Move was successful
-                    } else if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT) {
+                    if (!spec.initMove(moveClass) && spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT) {
                         spec.queuedMove = type;
                     }
                 }
@@ -225,10 +230,9 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
             return;
         }
 
-        if (canAttack()) {
-            initMove(moveClass);
-        } else if (getMoveStun() > 0 && getMoveStun() < QUEUE_MOVESTUN_LIMIT) {
-            queueMove(type);
+        if (moveInitiated && canHoldMove(type)) {
+            setHoldingType(type);
+            setHolding(true);
         }
     }
 
@@ -261,6 +265,14 @@ public class TuskAct2Entity extends StandEntity<TuskAct2Entity, TuskAct2Entity.S
     @NonNull
     public TuskAct2Entity getThis() {
         return this;
+    }
+
+    private void spawnHandNailParticles(ServerLevel sl, LivingEntity user) {
+        if (getNails() <= 0) return;
+        double ox = (random.nextDouble() - 0.5) * 0.4;
+        double oy = getBbHeight() * 0.6 + (random.nextDouble() - 0.5) * 0.3;
+        double oz = (random.nextDouble() - 0.5) * 0.4;
+        sl.sendParticles(JParticleTypeRegistry.NAIL_TRAIL.get(), getX() + ox, getY() + oy, getZ() + oz, 1, 0, 0, 0, 0.0);
     }
 
     public enum State implements StandAnimationState<TuskAct2Entity> {
