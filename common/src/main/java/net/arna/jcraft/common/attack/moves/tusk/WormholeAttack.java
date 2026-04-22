@@ -2,6 +2,7 @@ package net.arna.jcraft.common.attack.moves.tusk;
 
 import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.api.Attacks;
 import net.arna.jcraft.api.attack.MoveType;
@@ -29,6 +30,7 @@ import java.util.Set;
  */
 public final class WormholeAttack extends AbstractMove<WormholeAttack, TuskAct3Entity> {
     private WeakReference<NailProjectile> wormholeNail;
+    @Getter
     private boolean nailActive = false;
 
     // Configurable via .withTeleportDamage() in the moveset definition
@@ -51,10 +53,6 @@ public final class WormholeAttack extends AbstractMove<WormholeAttack, TuskAct3E
     @Override
     public @NotNull MoveType<WormholeAttack> getMoveType() {
         return Type.INSTANCE;
-    }
-
-    public boolean isNailActive() {
-        return nailActive;
     }
 
     /**
@@ -106,7 +104,7 @@ public final class WormholeAttack extends AbstractMove<WormholeAttack, TuskAct3E
         NailProjectile nail = NailProjectile.wormholeFromTuskAct3(attacker);
         if (nail == null) return;
 
-        JComponentPlatformUtils.getCooldowns(user).setCooldown(CooldownType.STAND_ULTIMATE, getCooldown());
+        JComponentPlatformUtils.getCooldowns(user).setCooldown(CooldownType.STAND_SP3, getCooldown());
 
         // Redirect through handhole if active, otherwise fire from eye level with crosshair aim
         if (!attacker.redirectThroughHandhole(nail, user, 0.5f)) {

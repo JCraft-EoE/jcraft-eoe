@@ -6,7 +6,6 @@ import lombok.Setter;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
-import net.arna.jcraft.common.entity.projectile.JAttackEntity;
 import net.arna.jcraft.common.entity.stand.TuskAct1Entity;
 import net.arna.jcraft.common.entity.stand.TuskAct2Entity;
 import net.arna.jcraft.common.entity.stand.TuskAct3Entity;
@@ -29,6 +28,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -601,14 +601,14 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
         return nail;
     }
 
-    public static @Nullable NailProjectile fromTuskAct1Toenail(TuskAct1Entity tusk, float maxRange) {
+    public static @NotNull NailProjectile fromTuskAct1Toenail(TuskAct1Entity tusk, float maxRange) {
         NailProjectile nail = new NailProjectile(tusk.level(), tusk.getUserOrThrow());
         nail.setCustomDamage(5.0f);
         nail.maxRange = maxRange;
         return nail;
     }
 
-    public static @Nullable NailProjectile fromTuskAct1Toenail2(TuskAct2Entity tusk, float maxRange) {
+    public static @NotNull NailProjectile fromTuskAct1Toenail2(TuskAct2Entity tusk, float maxRange) {
         NailProjectile nail = new NailProjectile(tusk.level(), tusk.getUserOrThrow());
         nail.setCustomDamage(5.0f);
         nail.maxRange = maxRange;
@@ -683,6 +683,7 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
         NailProjectile nail = new NailProjectile(tusk.level(), tusk.getUserOrThrow());
         nail.wormhole = true;
         nail.homing = true;
+        nail.noPhysics = true;
         nail.setCustomDamage(0.0f);
         return nail;
     }
@@ -716,21 +717,5 @@ public class NailProjectile extends AbstractArrow implements IOwnable {
         nail.setCustomDamage(3.0f);
         nail.maxRange = 25.0f;
         return nail;
-    }
-
-    public boolean isWormhole() {
-        return wormhole;
-    }
-
-    public boolean isSpinning() {
-        return spinning;
-    }
-
-    public int getChargeTime() {
-        return chargeTime;
-    }
-
-    public boolean isDrilling() {
-        return isDrilling;
     }
 }

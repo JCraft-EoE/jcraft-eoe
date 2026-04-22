@@ -274,6 +274,11 @@ public class TuskAct3Entity extends StandEntity<TuskAct3Entity, TuskAct3Entity.S
         super.tick();
 
         if (!level().isClientSide() && hasUser()) {
+            if (getCurrentMove() != null) {
+                setRotationOffset(getStandData().getIdleRotation());
+                setDistanceOffset(getStandData().getIdleDistance());
+            }
+
             // Nail regeneration
             LivingEntity user = getUser();
             if (user instanceof Player player) {

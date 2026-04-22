@@ -69,7 +69,6 @@ public class JCraftHudOverlay {
         if (stand != null) {
             standGaugeFlashTicks--;
 
-            // Skip blocking gauge for stands that can't block
             boolean shouldRenderBlockGauge = !(stand instanceof TuskAct1Entity ||
                     stand instanceof TuskAct2Entity ||
                     stand instanceof TuskAct3Entity ||
@@ -114,41 +113,22 @@ public class JCraftHudOverlay {
                 IRON_GAUGE.render(ctx, gaugeX, height + gaugeHeightOffset, (int) metallica.getIron());
             }
             if (stand instanceof TuskAct1Entity tusk1) {
-                float nails = tusk1.getNails();
-                String nailText = formatNails(nails);
-                NAIL_GAUGE.renderWithText(ctx, gaugeX, height + gaugeHeightOffset, (int) nails, nailText);
-
-                String actName = "Tusk Act 1";
-                int textX = gaugeX + gaugeWidth / 2 - client.font.width(actName) / 2;
-                ctx.drawString(client.font, actName, textX, height + gaugeHeightOffset, 0xFFFFFF, true);
-                gaugeHeightOffset -= 10;
+                String fullText = formatTuskText(1, tusk1.getNails());
+                NAIL_GAUGE.renderWithText(ctx, gaugeX, height + gaugeHeightOffset, (int) tusk1.getNails(), fullText);
             }
             if (stand instanceof TuskAct2Entity tusk2) {
-                float nails = tusk2.getNails();
-                String nailText = formatNails(nails);
-                NAIL_GAUGE.renderWithText(ctx, gaugeX, height + gaugeHeightOffset, (int) nails, nailText);
-
-                String actName = "Tusk Act 2";
-                int textX = gaugeX + gaugeWidth / 2 - client.font.width(actName) / 2;
-                ctx.drawString(client.font, actName, textX, height + gaugeHeightOffset, 0xFFFFFF, true);
-                gaugeHeightOffset -= 10;
+                String fullText = formatTuskText(2, tusk2.getNails());
+                NAIL_GAUGE.renderWithText(ctx, gaugeX, height + gaugeHeightOffset, (int) tusk2.getNails(), fullText);
             }
             if (stand instanceof TuskAct3Entity tusk3) {
-                float nails = tusk3.getNails();
-                String nailText = formatNails(nails);
-                NAIL_GAUGE.renderWithText(ctx, gaugeX, height + gaugeHeightOffset, (int) nails, nailText);
-
-                String actName = "Tusk Act 3";
-                int textX = gaugeX + gaugeWidth / 2 - client.font.width(actName) / 2;
-                ctx.drawString(client.font, actName, textX, height + gaugeHeightOffset, 0xFFFFFF, true);
-                gaugeHeightOffset -= 10;
+                String fullText = formatTuskText(3, tusk3.getNails());
+                NAIL_GAUGE.renderWithText(ctx, gaugeX, height + gaugeHeightOffset, (int) tusk3.getNails(), fullText);
             }
             if (stand instanceof AerosmithEntity aerosmith) {
                 OVERHEAT_GAUGE.render(ctx, gaugeX, height + gaugeHeightOffset, (int) aerosmith.getOverheat());
             }
         }
 
-        // don't display spec gauges in spectator
         if (player == null || player.isSpectator()) {
             return;
         }
@@ -166,19 +146,10 @@ public class JCraftHudOverlay {
         }
     }
 
-    /**
-     * Formats nail count to show .5 decimals (e.g., 7.5, 6.0, 3.5)
-     */
-    private static String formatNails(float nails) {
-        float rounded = Math.round(nails * 2) / 2.0f; // Round to nearest 0.5
-
-        if (rounded == (int) rounded) {
-            // Whole number, show without decimal
-            return "Nails: " + (int) rounded + "/10";
-        } else {
-            // Has .5, show with decimal
-            return String.format("Nails: %.1f/10", rounded);
-        }
+    private static String formatTuskText(int act, float nails) {
+        float rounded = Math.round(nails * 2) / 2.0f;
+        String nailPart = (rounded == (int) rounded) ? String.valueOf((int) rounded) : String.format("%.1f", rounded);
+        return act + " | " + nailPart + "/10";
     }
 
     protected record Gauge(float red, float green, float blue, int max) {
@@ -203,7 +174,6 @@ public class JCraftHudOverlay {
         }
 
         public void renderWithText(GuiGraphics ctx, int x, int y, int value, String text) {
-            // Don't call render() here - do it directly to avoid double rendering
             RenderSystem.setShaderColor(red, green, blue, 1);
             ctx.blit(EMPTY_GAUGE, x, y, 0, 0, gaugeWidth, 5, gaugeWidth, 5);
             ctx.blit(FULL_GAUGE, x, y, 0, 0, value * gaugeWidth / max, 5, gaugeWidth, 5);
@@ -212,9 +182,9 @@ public class JCraftHudOverlay {
             int textX = x + gaugeWidth / 2 - Minecraft.getInstance().font.width(text) / 2;
             int textY = y + 6;
 
-            ctx.drawString(Minecraft.getInstance().font, text, textX, textY, 0x5599FF, true);
+            ctx.drawString(Minecraft.getInstance().font, text, textX, textY, 0x6699FF, true);
 
-            gaugeHeightOffset -= 15; // 5px gauge + 1px spacing + 9px text
+            gaugeHeightOffset -= 15;
         }
     }
 }
