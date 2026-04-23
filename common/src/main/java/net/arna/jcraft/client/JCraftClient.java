@@ -238,9 +238,9 @@ public class JCraftClient {
                 JItemRegistry.VALENTINE_BOOTS.get());
 
         SpecialParticleShaderHandler.INSTANCE.init();
-        ZaWarudoShaderHandler.INSTANCE.init();
+//        ZaWarudoShaderHandler.INSTANCE.init();
         CrimsonShaderHandler.INSTANCE.init();
-        EpitaphVignetteShaderHandler.INSTANCE.init();
+//        EpitaphVignetteShaderHandler.INSTANCE.init();
 
         // Renderer registration
         // JArmorRendererRegistry.registerArmorRenderers();

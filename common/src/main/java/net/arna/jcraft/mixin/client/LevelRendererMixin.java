@@ -2,6 +2,7 @@ package net.arna.jcraft.mixin.client;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
 import net.arna.jcraft.client.rendering.api.callbacks.PostWorldRenderCallback;
 import net.arna.jcraft.client.rendering.shader.JShaderRegistry;
 import net.arna.jcraft.client.rendering.shader.TimestopShaderEffect;
@@ -53,6 +54,14 @@ public class LevelRendererMixin {
 
         TimestopShaderEffect.freezeInvTransformMat();
         JShaderRegistry.TIMESTOP_EFFECT.update(tickDelta);
+
+        if (EpitaphOverlay.shouldRenderVignette() && JShaderRegistry.EPITAPH_VIGNETTE != null)
+        {
+            JShaderRegistry.EPITAPH_VIGNETTE.renderVignette(
+                    EpitaphOverlay.getVignetteIntensity(),
+                    EpitaphOverlay.getVignetteExtend()
+            );
+        }
 
         PostWorldRenderCallback.EVENT.invoker().onWorldRendered(matrices, camera, tickDelta, nanoTime);
     }

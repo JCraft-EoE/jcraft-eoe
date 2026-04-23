@@ -21,16 +21,18 @@ public class JShaderRegistry {
 
     private static Map<String, ShaderEffect> RELOADABLE_SHADER_EFFECTS = new HashMap<>();
     private static boolean frozen = false;
-
-    public static @Nullable BasicShaderEffect BASIC_PROGRAM = null;
     private static ShaderSourceProvider sourceProvider = null;
     private static ShaderPreprocessor preprocessor = null;
+
+    public static @Nullable BasicShaderEffect BASIC_PROGRAM = null;
     public static @Nullable TimestopShaderEffect TIMESTOP_EFFECT = null;
+    public static @Nullable EpitaphVignetteShaderEffect EPITAPH_VIGNETTE = null;
 
     public static void init()
     {
-        BASIC_PROGRAM   = register("Basic", new BasicShaderEffect(JCraft.id("shaders/program/blit.vsh"), JCraft.id("shaders/program/basic.fsh")));
-        TIMESTOP_EFFECT = register("Timestop", new TimestopShaderEffect());
+        BASIC_PROGRAM    = register("Basic", new BasicShaderEffect(JCraft.id("shaders/program/blit.vsh"), JCraft.id("shaders/program/basic.fsh")));
+        TIMESTOP_EFFECT  = register("Timestop", new TimestopShaderEffect());
+        EPITAPH_VIGNETTE = register("Epitaph Vignette", new EpitaphVignetteShaderEffect());
 
         freezeRegistry();
     }
