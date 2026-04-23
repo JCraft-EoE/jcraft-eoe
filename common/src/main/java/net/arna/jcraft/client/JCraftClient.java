@@ -237,7 +237,7 @@ public class JCraftClient {
                 JItemRegistry.VALENTINE_PANTS.get(),
                 JItemRegistry.VALENTINE_BOOTS.get());
 
-        SpecialParticleShaderHandler.INSTANCE.init();
+//        SpecialParticleShaderHandler.INSTANCE.init();
 //        ZaWarudoShaderHandler.INSTANCE.init();
         CrimsonShaderHandler.INSTANCE.init();
 //        EpitaphVignetteShaderHandler.INSTANCE.init();

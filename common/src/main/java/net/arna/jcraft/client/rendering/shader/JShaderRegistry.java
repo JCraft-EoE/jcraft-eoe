@@ -27,12 +27,16 @@ public class JShaderRegistry {
     public static @Nullable BasicShaderEffect BASIC_PROGRAM = null;
     public static @Nullable TimestopShaderEffect TIMESTOP_EFFECT = null;
     public static @Nullable EpitaphVignetteShaderEffect EPITAPH_VIGNETTE = null;
+    public static @Nullable SpecialParticleShaderEffects.InversionShaderEffect INVERSION = null;
+    public static @Nullable SpecialParticleShaderEffects.OverlapShaderEffect OVERLAP = null;
 
     public static void init()
     {
         BASIC_PROGRAM    = register("Basic", new BasicShaderEffect(JCraft.id("shaders/program/blit.vsh"), JCraft.id("shaders/program/basic.fsh")));
         TIMESTOP_EFFECT  = register("Timestop", new TimestopShaderEffect());
         EPITAPH_VIGNETTE = register("Epitaph Vignette", new EpitaphVignetteShaderEffect());
+        INVERSION = register("Inversion", new SpecialParticleShaderEffects.InversionShaderEffect());
+        OVERLAP = register("Overlap", new SpecialParticleShaderEffects.OverlapShaderEffect());
 
         freezeRegistry();
     }
