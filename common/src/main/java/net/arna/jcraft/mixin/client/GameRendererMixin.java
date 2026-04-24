@@ -66,11 +66,6 @@ public class GameRendererMixin {
     {
         // NOTE: The main depth buffer has been cleared by now
         // This is right before it renders the hand, meaning all terrain, entities, etc... have been rendered.
-        if (JShaderRegistry.TIMESTOP_EFFECT != null)
-        {
-//            JShaderRegistry.TIMESTOP_EFFECT.renderBubble(tickDelta, mainCamera, new Vector3f(-20.f, 95.f, 173.f), 60.f, 50.f, 0.5f);
-            JShaderRegistry.TIMESTOP_EFFECT.renderQueuedBubbles(tickDelta, mainCamera);
-        }
     }
 
     @Inject(method = "reloadShaders", at = @At("RETURN"))

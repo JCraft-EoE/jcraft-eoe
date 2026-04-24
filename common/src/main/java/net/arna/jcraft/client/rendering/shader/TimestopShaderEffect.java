@@ -2,6 +2,7 @@ package net.arna.jcraft.client.rendering.shader;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.rendering.api.callbacks.PostShaderRenderCallback;
 import net.arna.jcraft.client.rendering.shader.api.BakedProgram;
 import net.arna.jcraft.client.rendering.shader.api.ShaderEffect;
 import net.arna.jcraft.client.rendering.shader.api.uniform.UniformWriter;
@@ -18,7 +19,7 @@ import java.lang.Math;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TimestopShaderEffect extends ShaderEffect {
+public class TimestopShaderEffect extends ShaderEffect implements PostShaderRenderCallback {
     private static final float MAX_RADIUS = 100.f;
     private static final Matrix4f FROZEN_INV_TRANSFORM_MAT = new Matrix4f();
 
@@ -37,6 +38,8 @@ public class TimestopShaderEffect extends ShaderEffect {
         linkData.addSampler("DepthSampler");
 
         linkData.freeze();
+
+        PostShaderRenderCallback.EVENT.register(this);
     }
 
     @Override
@@ -104,8 +107,30 @@ public class TimestopShaderEffect extends ShaderEffect {
         this.program.setUniform("Viewport", new Vector2f(minecraft.getMainRenderTarget().width, minecraft.getMainRenderTarget().height));
     }
 
-    public void renderQueuedBubbles(float tickProgress, Camera camera)
+    public void queueBubble(LivingEntity source, float duration)
     {
+        TIMESTOP_SOURCES.add(
+                new Pair<>(source, new Pair<>(
+                        time,       // Began
+                        duration    // Lasts
+                ))
+        );
+    }
+
+    public static void freezeInvTransformMat() {
+        Matrix4f projection = RenderSystem.getProjectionMatrix();
+        Matrix4f modelView = RenderSystem.getModelViewMatrix();
+        FROZEN_INV_TRANSFORM_MAT.identity();
+        FROZEN_INV_TRANSFORM_MAT.mul(projection);
+        FROZEN_INV_TRANSFORM_MAT.mul(modelView);
+        FROZEN_INV_TRANSFORM_MAT.invert();
+    }
+
+    @Override
+    public void renderEffect(float tickProgress) {
+        Minecraft minecraft = Minecraft.getInstance();
+        Camera camera = minecraft.gameRenderer.getMainCamera();
+
         List<Pair<LivingEntity, Pair<Float, Float>>> copied = new ArrayList<>(TIMESTOP_SOURCES);
         for (Pair<LivingEntity, Pair<Float, Float>> source : copied)
         {
@@ -143,24 +168,5 @@ public class TimestopShaderEffect extends ShaderEffect {
 
             renderBubble(tickProgress, camera, sourceEntity.position().toVector3f(), desatRadius, radius, distortionMul, t/maxOvertime);
         }
-    }
-
-    public void queueBubble(LivingEntity source, float duration)
-    {
-        TIMESTOP_SOURCES.add(
-                new Pair<>(source, new Pair<>(
-                        time,       // Began
-                        duration    // Lasts
-                ))
-        );
-    }
-
-    public static void freezeInvTransformMat() {
-        Matrix4f projection = RenderSystem.getProjectionMatrix();
-        Matrix4f modelView = RenderSystem.getModelViewMatrix();
-        FROZEN_INV_TRANSFORM_MAT.identity();
-        FROZEN_INV_TRANSFORM_MAT.mul(projection);
-        FROZEN_INV_TRANSFORM_MAT.mul(modelView);
-        FROZEN_INV_TRANSFORM_MAT.invert();
     }
 }
