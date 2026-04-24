@@ -47,7 +47,7 @@ public class JParticleTextureSheet {
             // Doesn't seem to work by using a blend function, so we'll use a shader instead.
             // Think that is because of the render order, but I'm not sure.
             if (JShaderRegistry.INVERSION == null) return;
-            JShaderRegistry.INVERSION.prepare();
+            JShaderRegistry.INVERSION.prepare(true);
 
             RenderSystem.disableBlend();
             RenderSystem.enableDepthTest();
@@ -72,7 +72,7 @@ public class JParticleTextureSheet {
     public static final ParticleRenderType OVERLAP_SHEET = new ParticleRenderType() {
         public void begin(final BufferBuilder builder, final @NotNull TextureManager textureManager) {
             if (JShaderRegistry.OVERLAP == null) return;
-            JShaderRegistry.OVERLAP.prepare();
+            JShaderRegistry.OVERLAP.prepare(false);
 
             RenderSystem.disableBlend();
             RenderSystem.disableDepthTest(); // No depth

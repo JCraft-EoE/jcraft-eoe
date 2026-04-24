@@ -17,7 +17,6 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.world.entity.Entity;
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -53,7 +52,7 @@ public class LevelRendererMixin {
         ((StillDepthHolder) Minecraft.getInstance().getMainRenderTarget()).jcraft$freezeDepth();
 
         TimestopShaderEffect.freezeInvTransformMat();
-        JShaderRegistry.TIMESTOP_EFFECT.update(tickDelta);
+        if (JShaderRegistry.TIMESTOP_EFFECT != null) JShaderRegistry.TIMESTOP_EFFECT.update(tickDelta);
 
         if (EpitaphOverlay.shouldRenderVignette() && JShaderRegistry.EPITAPH_VIGNETTE != null)
         {
