@@ -22,6 +22,7 @@ import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer
 import net.arna.jcraft.client.rendering.DamageIndicatorManager;
 import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
 import net.arna.jcraft.client.rendering.shader.JShaderRegistry;
+import net.arna.jcraft.client.rendering.shader.TimeEraseShaderEffect;
 import net.arna.jcraft.client.util.JClientUtils;
 import net.arna.jcraft.common.config.ConfigOption;
 import net.arna.jcraft.common.data.AttackerDataLoader;
@@ -524,11 +525,8 @@ public class ClientPacketHandler {
                     return;
                 }
 
-                final CrimsonShaderHandler crimsonShaderHandler = CrimsonShaderHandler.INSTANCE;
-                crimsonShaderHandler.effectLength = duration;
-                crimsonShaderHandler.shouldRender = true;
-
-
+                TimeEraseShaderEffect effect = JShaderRegistry.TIME_ERASE;
+                if (effect != null) { effect.enabled = true; }
             });
         }
     }
@@ -542,14 +540,10 @@ public class ClientPacketHandler {
                 }
                 case ZA_WARUDO -> client.execute(() -> {
 
-
                 });
                 case CRIMSON -> client.execute(() -> {
-
-                    CrimsonShaderHandler crimsonShaderHandler = CrimsonShaderHandler.INSTANCE;
-                    crimsonShaderHandler.shouldRender = false;
-                    crimsonShaderHandler.renderingEffect = false;
-
+                    TimeEraseShaderEffect effect = JShaderRegistry.TIME_ERASE;
+                    if (effect != null) { effect.enabled = false; }
                 });
             }
         }

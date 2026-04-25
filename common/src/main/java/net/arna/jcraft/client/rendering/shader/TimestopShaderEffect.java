@@ -128,6 +128,11 @@ public class TimestopShaderEffect extends ShaderEffect implements PostWorldRende
         FROZEN_INV_TRANSFORM_MAT.invert();
     }
 
+    public static Matrix4f getInvTransformMat()
+    {
+        return FROZEN_INV_TRANSFORM_MAT;
+    }
+
     @Override
     public void onWorldRendered(PoseStack matrices, Camera camera, float tickDelta, long nanoTime) {
         Minecraft minecraft = Minecraft.getInstance();
