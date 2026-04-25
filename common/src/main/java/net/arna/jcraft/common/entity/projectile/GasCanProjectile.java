@@ -3,12 +3,12 @@ package net.arna.jcraft.common.entity.projectile;
 import lombok.Getter;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JItemRegistry;
+import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.splatter.JSplatterManager;
 import net.arna.jcraft.common.splatter.SplatterType;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
@@ -62,7 +62,7 @@ public class GasCanProjectile extends ThrowableItemProjectile {
             }
 
             // Play sound
-            playSound(SoundEvents.BUCKET_EMPTY);
+            playSound(JSoundRegistry.GAS_CAN_CRASH.get());
         }
     }
 
@@ -95,7 +95,7 @@ public class GasCanProjectile extends ThrowableItemProjectile {
         float zRange = (random.nextFloat() * 0.5f + 0.5f) * sizeMult;
         splatterManager.addSplatter(pos, SplatterType.GASOLINE, xRange, zRange, (LivingEntity) getOwner());
 
-        level().playSound(this, BlockPos.containing(pos), SoundEvents.SLIME_SQUISH_SMALL, SoundSource.NEUTRAL,
+        level().playSound(this, BlockPos.containing(pos), JSoundRegistry.GAS_CAN_SPILL.get(), SoundSource.NEUTRAL,
                 1f, 1f);
     }
 }

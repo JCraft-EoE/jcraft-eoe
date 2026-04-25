@@ -1243,5 +1243,15 @@
     "sounds": [
       "jcraft:projectiles/gas_can/toss"
     ]
+  },
+  "gas_can_spill": {
+    "sounds": [
+      "jcraft:projectiles/gas_can/spill"
+    ]
+  },
+  "gas_can_crash": {
+    "sounds": [
+      "jcraft:projectiles/gas_can/crash"
+    ]
   }
 }
