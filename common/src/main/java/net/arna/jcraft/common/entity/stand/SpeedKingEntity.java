@@ -9,6 +9,8 @@ import net.arna.jcraft.api.attack.MoveSetManager;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.common.attack.moves.shared.KnockdownAttack;
+import net.arna.jcraft.common.attack.moves.shared.TossChargeMove;
+import net.arna.jcraft.common.attack.moves.shared.TossMove;
 import net.arna.jcraft.common.attack.moves.speedking.FlamePunchAttack;
 import net.arna.jcraft.common.attack.moves.speedking.FireGrabAttack;
 import net.arna.jcraft.common.attack.moves.speedking.FireGrabHitAttack;
@@ -195,6 +197,13 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
                     Component.literal("creates wind launcher that sends you up after 3 seconds")
             );
 
+    // TODO add move info x2
+    // TODO balance x2
+    public static final TossMove<SpeedKingEntity> TOSS = new TossMove<SpeedKingEntity>(0, 1, 1, 0.75f)
+            .withAnim(SpeedKingEntity.State.ITEM_TOSS);
+    public static final TossChargeMove<SpeedKingEntity> TOSS_CHARGE = new TossChargeMove<SpeedKingEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+            .withFollowup(TOSS);
+
     public SpeedKingEntity(Level worldIn) {
         super(JStandTypeRegistry.SPEED_KING.get(), worldIn);
 
@@ -223,6 +232,8 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
         moves.register(MoveClass.ULTIMATE, THERMAL_SHOCKWAVE, State.THERMAL_SHOCKWAVE);
 
         moves.register(MoveClass.UTILITY, UPDRAFT, State.UPDRAFT).withAerialVariant(State.SIROCCO);
+
+        moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
 
     @Override
@@ -277,7 +288,9 @@ public class SpeedKingEntity extends StandEntity<SpeedKingEntity, SpeedKingEntit
         HEAT_TRAP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.flashbang", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         OVERHEAT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.overheat", AzPlayBehaviors.HOLD_ON_LAST_FRAME)), //TODO: garlic please make anim
         UPDRAFT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.updraft", AzPlayBehaviors.HOLD_ON_LAST_FRAME)), //TODO: garlic please make anim
-        SIROCCO(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.sirocco", AzPlayBehaviors.HOLD_ON_LAST_FRAME)) //TODO: garlic please make anim
+        SIROCCO(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.speed_king.sirocco", AzPlayBehaviors.HOLD_ON_LAST_FRAME)), //TODO: garlic please make anim
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE))
         ;
 
         private final AzCommand animator;
