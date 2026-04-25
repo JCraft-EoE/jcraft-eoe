@@ -40,7 +40,7 @@ public class GasCanProjectile extends ThrowableItemProjectile {
         prevDeltaMovement = getDeltaMovement();
         super.baseTick();
 
-        if (checkHitFire())
+        if (!level().isClientSide() && checkHitFire())
             discard();
     }
 
@@ -52,7 +52,7 @@ public class GasCanProjectile extends ThrowableItemProjectile {
     @Override
     protected void onHit(@NotNull HitResult result) {
         super.onHit(result);
-        if (!this.level().isClientSide) {
+        if (!level().isClientSide()) {
             this.discard();
 
             if (checkHitFire()) return;
