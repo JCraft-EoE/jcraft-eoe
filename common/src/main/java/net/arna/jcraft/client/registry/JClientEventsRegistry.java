@@ -7,7 +7,6 @@ import dev.architectury.event.events.client.ClientTickEvent;
 import dev.architectury.registry.menu.MenuRegistry;
 import net.arna.jcraft.client.events.JClientEvents;
 import net.arna.jcraft.client.gui.screen.MainMenuScreen;
-import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
 import net.arna.jcraft.api.registry.JMenuRegistry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -19,7 +18,6 @@ public interface JClientEventsRegistry {
 
         // This HAS to be registered before TrackingKeyBinding is initialized.
         ClientTickEvent.CLIENT_POST.register(JClientEvents::tickClient);
-        ClientTickEvent.CLIENT_LEVEL_POST.register(level -> new SkyBoxManager());
 
         ClientGuiEvent.RENDER_HUD.register(JClientEvents::renderHud);
 

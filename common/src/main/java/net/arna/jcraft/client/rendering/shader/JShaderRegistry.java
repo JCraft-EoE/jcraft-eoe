@@ -30,6 +30,8 @@ public class JShaderRegistry {
 
     public static void init()
     {
+        if (frozen) return;
+
         BASIC_PROGRAM    = register("Basic", new BasicShaderEffect(JCraft.id("shaders/program/blit.vsh"), JCraft.id("shaders/program/basic.fsh")));
         TIMESTOP_EFFECT  = register("Timestop", new TimestopShaderEffect());
         TIME_ERASE       = register("Time Erase", new TimeEraseShaderEffect());
@@ -38,10 +40,14 @@ public class JShaderRegistry {
         OVERLAP          = register("Overlap", new SpecialParticleShaderEffect(JCraft.id("shaders/program/overlap.fsh")));
 
         freezeRegistry();
+
+        JCraft.LOGGER.info("Initialized shaders");
     }
 
     private static void loadShaders(ResourceManager resourceManager)
     {
+        init();
+
         sourceProvider = new ShaderSourceProvider(resourceManager);
         preprocessor = new ShaderPreprocessor(resourceManager);
 

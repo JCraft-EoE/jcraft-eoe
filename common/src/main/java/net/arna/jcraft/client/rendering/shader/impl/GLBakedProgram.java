@@ -64,14 +64,13 @@ public class GLBakedProgram extends BakedProgram {
         buffer.bind();
         buffer.upload(rendered);
 
-        Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
 
         RenderSystem.disableDepthTest();
         RenderSystem.depthMask(false);
         RenderSystem.disableBlend();
 
-        buffer.draw();
         Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
+        buffer.draw();
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();

@@ -20,7 +20,6 @@ import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
 import net.arna.jcraft.client.renderer.effects.AttackHitboxEffectRenderer;
 import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer;
 import net.arna.jcraft.client.rendering.DamageIndicatorManager;
-import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
 import net.arna.jcraft.client.rendering.shader.JShaderRegistry;
 import net.arna.jcraft.client.rendering.shader.TimeEraseShaderEffect;
 import net.arna.jcraft.client.util.JClientUtils;

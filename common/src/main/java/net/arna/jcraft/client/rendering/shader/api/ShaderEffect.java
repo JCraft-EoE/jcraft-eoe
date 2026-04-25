@@ -34,6 +34,9 @@ public abstract class ShaderEffect {
     @ApiStatus.Internal
     public void link(BakedProgram program)
     {
+        if (program == null)
+        { throw new RuntimeException("Cannot link a null baked program to a shader effect! Did it fail to compile?"); }
+
         this.program = program;
 
         List<String> uniformBlocks = this.linkData.getUniformBuffers();
