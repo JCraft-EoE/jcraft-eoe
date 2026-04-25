@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.item;
 
 import lombok.NonNull;
+import net.arna.jcraft.api.registry.JItemRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.entity.projectile.GasCanProjectile;
 import net.minecraft.sounds.SoundSource;
@@ -14,6 +15,8 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
 public class GasCanItem extends Item {
+    public static int COOLDOWN_DURATION = 5 * 20;
+
     public GasCanItem(Properties properties) {
         super(properties);
     }
@@ -31,6 +34,7 @@ public class GasCanItem extends Item {
                 0.5F,
                 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F)
         );
+        player.getCooldowns().addCooldown(JItemRegistry.GAS_CAN.get(), COOLDOWN_DURATION);
         if (!level.isClientSide) {
             GasCanProjectile projectile = new GasCanProjectile(player, level);
             projectile.setItem(itemStack);
