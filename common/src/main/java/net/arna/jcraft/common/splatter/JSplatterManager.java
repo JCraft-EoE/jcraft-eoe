@@ -3,13 +3,12 @@ package net.arna.jcraft.common.splatter;
 import dev.architectury.networking.NetworkManager;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.Pair;
-import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.api.registry.JPacketRegistry;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -45,7 +44,7 @@ public class JSplatterManager {
      * @param type  The type of this splatter
      * @param range The range of this splatter in both directions
      */
-    public Splatter addSplatter(Vec3 pos, SplatterType type, float range, @Nullable Entity creator) {
+    public Splatter addSplatter(Vec3 pos, SplatterType type, float range, @Nullable LivingEntity creator) {
         return addSplatter(pos, type, range, range, creator);
     }
 

@@ -51,7 +51,7 @@ public class WSAcidProjectile extends AbstractArrow {
     }
 
     private void splat() {
-        JUtils.getSplatterManager(level()).addSplatter(position(), SplatterType.ACID, 1, getOwner());
+        JUtils.getSplatterManager(level()).addSplatter(position(), SplatterType.ACID, 1, (LivingEntity) getOwner());
         discard();
     }
 

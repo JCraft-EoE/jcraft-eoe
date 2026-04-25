@@ -26,17 +26,14 @@ import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.attack.actions.PlaySoundAction;
 import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
-import net.arna.jcraft.common.compat.FtbChunksCompat;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.ExtraProducts;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -834,29 +831,19 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      */
     public static boolean mayBreak(final @NonNull Level level, @Nullable final LivingEntity user, @Nullable final BlockPos pos,
                                    @Nullable Predicate<BlockState> pred) {
-        ServerLevel serverLevel = level instanceof ServerLevel sl ? sl : null;
-        ServerPlayer player = user instanceof ServerPlayer p ? p : null;
+        Predicate<BlockState> isDestructable = state -> {
+            if (state.isAir()) return true;
+            else {
+                Block block = state.getBlock();
+                float destroyTime = block.defaultDestroyTime();
 
-        boolean isPlayer = player != null;
-        boolean mobGriefing = level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
+                return destroyTime > 0;
+            }
+        };
+
         boolean standGriefing = level.getGameRules().getBoolean(JCraft.STAND_GRIEFING);
-        boolean isSpawnProtected = serverLevel != null && player != null && pos != null &&
-                serverLevel.getServer().isUnderSpawnProtection(serverLevel, pos, player);
-        boolean mayBuild = !isPlayer || pos == null ||
-                player.mayBuild() && FtbChunksCompat.get().mayEdit(player, serverLevel, pos);
-
-        boolean mayAttempt = (isPlayer || mobGriefing) && standGriefing && !isSpawnProtected && mayBuild;
-        if (!mayAttempt || pos == null) return mayAttempt;
-
-        // The move may attempt to destroy this block, check if it should be possible to.
-        BlockState state = level.getBlockState(pos);
-        Block block = state.getBlock();
-        float destroyTime = block.defaultDestroyTime();
-
-        boolean mayDestroy = destroyTime > 0;
-        boolean extraChecks = pred == null || pred.test(state);
-
-        return mayDestroy && extraChecks;
+        pred = pred == null ? isDestructable : pred.and(isDestructable);
+        return standGriefing && JUtils.mayAlter(level, user, pos, pred);
     }
 
     /**

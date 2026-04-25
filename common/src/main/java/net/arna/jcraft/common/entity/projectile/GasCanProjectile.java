@@ -8,6 +8,8 @@ import net.arna.jcraft.common.splatter.SplatterType;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
@@ -58,6 +60,9 @@ public class GasCanProjectile extends ThrowableItemProjectile {
                 Vec3 pos = result.getLocation().add(dx, dy, dz);
                 splatter(pos, size);
             }
+
+            // Play sound
+            playSound(SoundEvents.BUCKET_EMPTY);
         }
     }
 
@@ -89,5 +94,8 @@ public class GasCanProjectile extends ThrowableItemProjectile {
         float xRange = (random.nextFloat() * 0.5f + 0.5f) * sizeMult;
         float zRange = (random.nextFloat() * 0.5f + 0.5f) * sizeMult;
         splatterManager.addSplatter(pos, SplatterType.GASOLINE, xRange, zRange, (LivingEntity) getOwner());
+
+        level().playSound(this, BlockPos.containing(pos), SoundEvents.SLIME_SQUISH_SMALL, SoundSource.NEUTRAL,
+                1f, 1f);
     }
 }

@@ -16,6 +16,7 @@ import net.arna.jcraft.api.spec.JSpecHolder;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
+import net.arna.jcraft.common.compat.FtbChunksCompat;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.projectile.ItemTossProjectile;
@@ -64,6 +65,7 @@ import net.minecraft.world.entity.projectile.*;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SupportType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -953,5 +955,25 @@ public final class JUtils {
         if (!hasAdvancement(player, JCraft.id("obtain_any_spec"))) {
             player.sendSystemMessage(Component.translatable("info.jcraft.first_spec"));
         }
+    }
+
+    public static boolean mayAlter(final @NonNull Level level, @Nullable final LivingEntity user, @Nullable final BlockPos pos,
+                                   @Nullable Predicate<BlockState> pred) {
+        ServerLevel serverLevel = level instanceof ServerLevel sl ? sl : null;
+        ServerPlayer player = user instanceof ServerPlayer p ? p : null;
+
+        boolean isPlayer = player != null;
+        boolean mobGriefing = level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
+        boolean isSpawnProtected = serverLevel != null && player != null && pos != null &&
+                serverLevel.getServer().isUnderSpawnProtection(serverLevel, pos, player);
+        boolean mayBuild = !isPlayer || pos == null ||
+                player.mayBuild() && FtbChunksCompat.get().mayEdit(player, serverLevel, pos);
+
+        boolean mayAttempt = (isPlayer || mobGriefing) && !isSpawnProtected && mayBuild;
+        if (!mayAttempt || pos == null || pred == null) return mayAttempt;
+
+        // The move may attempt to destroy this block, check if it should be possible to.
+        BlockState state = level.getBlockState(pos);
+        return pred.test(state);
     }
 }

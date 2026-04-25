@@ -3,12 +3,14 @@ package net.arna.jcraft.common.splatter;
 import dev.architectury.event.events.common.TickEvent;
 import lombok.Data;
 import lombok.Getter;
-import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -138,7 +140,7 @@ public class Splatter {
                         // Ensure we can place fire here
                         .filter(p -> FireBlock.canBePlacedAt(world, p, d))
                         // Ensure we're allowed to place fire here
-                        .filter(p -> creator != null && AbstractMove.mayBreak(creator, p))
+                        .filter(p -> creator != null && JUtils.mayAlter(world, creator, p, null))
                         .map(BlockPos::new) // They're re-using a mutable object
                         .toList();
 
@@ -157,7 +159,10 @@ public class Splatter {
                     // We place the fire after all splatters have been ticked so
                     // a new fire block placed by this splatter won't cause another splatter
                     // to light on fire in the same tick.
-                    toRunAfterTick.add(() -> world.setBlockAndUpdate(posToLight, newState));
+                    toRunAfterTick.add(() -> {
+                        world.setBlockAndUpdate(posToLight, newState);
+                        world.playSound(null, posToLight, SoundEvents.FIRECHARGE_USE, SoundSource.NEUTRAL, 1f, 1f);
+                    });
                 }
             }
 
