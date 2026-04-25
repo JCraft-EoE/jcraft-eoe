@@ -110,7 +110,7 @@ public class Splatter {
         if (!world.isClientSide) {
             if (type == SplatterType.ACID && age % 4 == 0) {
                 tickAcid();
-            } else if (type == SplatterType.GASOLINE && gasolineTickCount % 4 == 0) {
+            } else if (type == SplatterType.GASOLINE && gasolineTickCount % 2 == 0) {
                 toRunAfterTick.addAll(tickGasoline());
             }
         }
@@ -151,6 +151,9 @@ public class Splatter {
                         newState.setValue(dirProp, true);
                     }
 
+                    // We place the fire after all splatters have been ticked so
+                    // a new fire block placed by this splatter won't cause another splatter
+                    // to light on fire in the same tick.
                     toRunAfterTick.add(() -> world.setBlockAndUpdate(posToLight, newState));
                 }
             }

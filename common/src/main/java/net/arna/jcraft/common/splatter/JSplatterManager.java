@@ -135,6 +135,7 @@ public class JSplatterManager {
     public void tick() {
         splatters.stream()
                 .flatMap(s -> s.tick().stream())
+                .toList()
                 .forEach(Runnable::run);
         splatters.removeIf(Splatter::isRemoved);
     }
