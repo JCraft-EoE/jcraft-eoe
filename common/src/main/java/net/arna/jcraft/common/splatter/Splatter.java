@@ -1,29 +1,38 @@
 package net.arna.jcraft.common.splatter;
 
+import dev.architectury.event.events.common.TickEvent;
 import lombok.Data;
 import lombok.Getter;
-import net.arna.jcraft.common.entity.damage.JDamageSources;
-import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.registry.JStatusRegistry;
+import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.FireBlock;
+import net.minecraft.world.level.block.PipeBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 
 @Data
 public class Splatter {
     public static final int MAX_AGE = 80;
+    private static long gasolineTickCount;
     private final Level world;
     private final Vec3 pos;
     private final Direction direction;
@@ -39,6 +48,11 @@ public class Splatter {
     private final AABB mainBox;
     private int age;
     private boolean removed;
+    private boolean litThisTick = false;
+
+    static {
+        TickEvent.SERVER_POST.register(s -> gasolineTickCount++);
+    }
 
     Splatter(Level world, Vec3 pos, Direction direction, SplatterType type, float xRange, float zRange, @Nullable Entity creator) {
         this.world = world;
@@ -81,28 +95,23 @@ public class Splatter {
         return Mth.clamp((maxAge - age) / 20f, 0f, 1f);
     }
 
-    public void tick() {
+    public List<Runnable> tick() {
+        List<Runnable> toRunAfterTick = new ArrayList<>();
+
         if (removed) {
-            return;
+            return toRunAfterTick;
         }
 
         if (age++ == type.getMaxAge()) {
             removed = true;
-            return;
+            return toRunAfterTick;
         }
 
         if (!world.isClientSide) {
             if (type == SplatterType.ACID && age % 4 == 0) {
-                for (LivingEntity hit : world.getEntitiesOfClass(LivingEntity.class, mainBox, EntitySelector.LIVING_ENTITY_STILL_ALIVE)) {
-                    if (intersects(hit.getBoundingBox())) {
-                        if (creator != null && (hit.isPassengerOfSameVehicle(creator) ||
-                                (hit instanceof StandEntity<?, ?> stand && stand.getUser() == creator))) {
-                            continue;
-                        }
-                        hit.addEffect(new MobEffectInstance(JStatusRegistry.WSPOISON.get(), 20, 0, true, false));
-                        hit.hurt(JDamageSources.whitesnakePoison(creator), 2f);
-                    }
-                }
+                tickAcid();
+            } else if (type == SplatterType.GASOLINE && gasolineTickCount % 4 == 0) {
+                toRunAfterTick.addAll(tickGasoline());
             }
         }
 
@@ -110,6 +119,59 @@ public class Splatter {
                 .filter(section -> !section.isRemoved())
                 .peek(SplatterSection::tick)
                 .allMatch(SplatterSection::isRemoved);
+
+        return toRunAfterTick;
+    }
+
+    private List<Runnable> tickGasoline() {
+        List<Runnable> toRunAfterTick = new ArrayList<>();
+
+        List<BlockPos> posList = BlockPos.betweenClosedStream(mainBox.inflate(1)).map(BlockPos::new).toList();
+        for (BlockPos pos : posList) {
+            BlockState state = world.getBlockState(pos);
+            if (!state.is(BlockTags.FIRE)) continue;
+
+            // We found fire nearby, light this splatter on fire.
+            for (SplatterSection section : sections) {
+                Direction d = section.getDirection().getOpposite();
+                List<BlockPos> toLight = BlockPos.betweenClosedStream(section.getHitBox())
+                        .filter(p -> FireBlock.canBePlacedAt(world, p, d))
+                        .map(BlockPos::new)
+                        .toList();
+
+                for (BlockPos posToLight : toLight) {
+                    BlockState toLightState = world.getBlockState(posToLight);
+
+                    BlockState newState = toLightState.is(BlockTags.FIRE)
+                            ? toLightState : Blocks.FIRE.defaultBlockState();
+
+                    // All directions false is down, there's no separate down prop on fire.
+                    if (d != Direction.DOWN) {
+                        BooleanProperty dirProp = PipeBlock.PROPERTY_BY_DIRECTION.get(d);
+                        newState.setValue(dirProp, true);
+                    }
+
+                    toRunAfterTick.add(() -> world.setBlockAndUpdate(posToLight, newState));
+                }
+            }
+
+            break;
+        }
+
+        return toRunAfterTick;
+    }
+
+    private void tickAcid() {
+        for (LivingEntity hit : world.getEntitiesOfClass(LivingEntity.class, mainBox, EntitySelector.LIVING_ENTITY_STILL_ALIVE)) {
+            if (intersects(hit.getBoundingBox())) {
+                if (creator != null && (hit.isPassengerOfSameVehicle(creator) ||
+                        (hit instanceof StandEntity<?, ?> stand && stand.getUser() == creator))) {
+                    continue;
+                }
+                hit.addEffect(new MobEffectInstance(JStatusRegistry.WSPOISON.get(), 20, 0, true, false));
+                hit.hurt(JDamageSources.whitesnakePoison(creator), 2f);
+            }
+        }
     }
 
     public boolean intersects(AABB box) {
