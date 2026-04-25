@@ -473,6 +473,15 @@ public interface JEntityTypeRegistry {
                     .build("ph_capsule")
     );
 
+    RegistrySupplier<EntityType<GasCanProjectile>> GAS_CAN_PROJECTILE = ENTITY_TYPE_REGISTRY.register(JCraft.id("gas_can"),
+            () -> EntityType.Builder.of(
+                            WorldOnlyEntityFactory.from(GasCanProjectile::new),
+                            MobCategory.MISC
+                    ).sized(0.5f, 0.5f)
+                    .clientTrackingRange(4)
+                    .updateInterval(20)
+                    .build("gas_can"));
+
     RegistrySupplier<EntityType<LifeDetectorEntity>> LIFE_DETECTOR = ENTITY_TYPE_REGISTRY.register(JCraft.id("lifedetector"),
             () -> EntityType.Builder.of(
                             WorldOnlyEntityFactory.from(LifeDetectorEntity::new),
