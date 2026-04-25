@@ -39,6 +39,9 @@ public class GasCanProjectile extends ThrowableItemProjectile {
     public void baseTick() {
         prevDeltaMovement = getDeltaMovement();
         super.baseTick();
+
+        if (checkHitFire())
+            discard();
     }
 
     @Override
@@ -52,14 +55,7 @@ public class GasCanProjectile extends ThrowableItemProjectile {
         if (!this.level().isClientSide) {
             this.discard();
 
-            Vec3 pos = position();
-            if (level().getBlockState(BlockPos.containing(pos)).is(BlockTags.FIRE)) {
-                // We hit fire, explode into a fireball
-                JUtils.explode(level(), pos.x, pos.y, pos.z, 2f, JExplosionModifier.builder()
-                        .createFire(true)
-                        .build());
-                return;
-            }
+            if (checkHitFire()) return;
 
             // Drop 5 splatters close to where the can hit.
             for (int i = 0; i < 5; i++) {
@@ -87,6 +83,19 @@ public class GasCanProjectile extends ThrowableItemProjectile {
             dropSplatter();
             lastSplatterPos = position();
         }
+    }
+
+    private boolean checkHitFire() {
+        Vec3 pos = position();
+        if (!level().getBlockState(BlockPos.containing(pos)).is(BlockTags.FIRE))
+            return false;
+
+        // We hit fire, explode into a fireball
+        JUtils.explode(level(), pos.x, pos.y, pos.z, 2f, JExplosionModifier.builder()
+                .createFire(true)
+                .build());
+        return true;
+
     }
 
     // Places a splatter on the ground directly below the projectile.
