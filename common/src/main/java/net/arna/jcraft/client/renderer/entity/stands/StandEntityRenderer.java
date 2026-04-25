@@ -51,7 +51,7 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends AbstractEn
             final @NonNull ResourceLocation model, final @NonNull ResourceLocation texture) {
         return new StandEntityRenderer<>(config, context, model, texture);
     }
-    private StandEntityRenderer(final @NonNull AzEntityRendererConfig<T> config, final @NonNull EntityRendererProvider.Context context,
+    protected StandEntityRenderer(final @NonNull AzEntityRendererConfig<T> config, final @NonNull EntityRendererProvider.Context context,
                                 final @NonNull ResourceLocation model, final @NonNull ResourceLocation texture) {
         super(config, context, model, texture);
     }
@@ -72,7 +72,7 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends AbstractEn
     protected StandEntityRenderer(final @NonNull EntityRendererProvider.Context context, final @NonNull Function<AzEntityRendererConfig.Builder<T>, AzEntityRendererConfig.Builder<T>> additionalConfigs, final @NonNull StandType type, final boolean flipBody, final boolean flipHead, final float torsoPitchOffset, final float headPitchOffset, final float velInfluence) {
         this(context, additionalConfigs,
                 entity -> type.getId().withPath(MODEL_STR_TEMPLATE.formatted(type.getId().getPath())),
-                entity -> getTextureLocation(type),
+                StandEntityRenderer::getTextureLocation,
                 type, flipBody, flipHead, torsoPitchOffset, headPitchOffset, velInfluence);
     }
 

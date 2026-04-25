@@ -113,6 +113,12 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
                     Component.literal("Grab"),
                     Component.literal("unblockable, combo finisher")
             );
+    // TODO add move info x2
+    // TODO balance x2
+    public static final TossMove<PurpleHazeDistortionEntity> TOSS = new TossMove<PurpleHazeDistortionEntity>(0, 1, 1, 0.75f)
+            .withAnim(PurpleHazeDistortionEntity.State.ITEM_TOSS);
+    public static final TossChargeMove<PurpleHazeDistortionEntity> TOSS_CHARGE = new TossChargeMove<PurpleHazeDistortionEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+            .withFollowup(TOSS);
 
     public PurpleHazeDistortionEntity(Level worldIn) {
         super(JStandTypeRegistry.PURPLE_HAZE_DISTORTION.get(), worldIn);
@@ -140,6 +146,8 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
         moves.register(MoveClass.ULTIMATE, FULL_RELEASE, State.FULL_RELEASE);
 
         moves.register(MoveClass.UTILITY, DISTORTION).withCrouchingVariant(CooldownType.UTILITY, null);
+
+        moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
 
     @Override
@@ -207,6 +215,8 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
         BACKWARD_DASH(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.purple_haze.bdash", AzPlayBehaviors.LOOP)),
         LEFT_DASH(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.purple_haze.ldash", AzPlayBehaviors.LOOP)),
         RIGHT_DASH(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.purple_haze.rdash", AzPlayBehaviors.LOOP)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE))
         ;
 
         private final AzCommand animator;

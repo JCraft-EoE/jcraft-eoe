@@ -69,7 +69,7 @@
 						}
 					}
 				},
-				"flag": {
+				"prop": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -263,7 +263,7 @@
 						}
 					}
 				},
-				"flag": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -651,7 +651,7 @@
 						}
 					}
 				},
-				"flag": {
+				"prop": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -681,7 +681,7 @@
 						"easing": "linear"
 					}
 				},
-				"flag": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -1063,7 +1063,7 @@
 						}
 					}
 				},
-				"flag": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -1270,7 +1270,7 @@
 						}
 					}
 				},
-				"flag": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -1402,7 +1402,7 @@
 						}
 					}
 				},
-				"flag": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -1578,7 +1578,7 @@
 						"easing": "linear"
 					}
 				},
-				"flag": {
+				"prop": {
 					"rotation": {
 						"vector": [72.5, 0, 180],
 						"easing": "linear"
@@ -2786,7 +2786,7 @@
 						}
 					}
 				},
-				"flag": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -4668,7 +4668,7 @@
 						}
 					}
 				},
-				"flag": {
+				"prop": {
 					"rotation": {
 						"vector": [72.5, 0, 180],
 						"easing": "linear"
@@ -5291,5 +5291,10 @@
 			}
 		}
 	},
-	"azurelib_format_version": 2
+  "includes": [
+    {
+      "file_id": "jcraft:animations/base_stand.animation.json",
+      "animations": ["itemthrow", "itemthrow_charge"]
+    }
+  ]
 }

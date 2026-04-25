@@ -23,6 +23,7 @@ import net.arna.jcraft.common.entity.projectile.ItemTossProjectile;
 import net.arna.jcraft.common.entity.projectile.KnifeProjectile;
 import net.arna.jcraft.common.entity.projectile.ScalpelProjectile;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.item.KnifeBundleItem;
 import net.arna.jcraft.common.item.KnifeItem;
 import net.arna.jcraft.common.item.ScalpelItem;
@@ -819,7 +820,7 @@ public final class JUtils {
         }
 
         else if (itemStack.getItem() instanceof TridentItem) {
-            final ThrownTrident thrownTrident = new ThrownTrident(level, shooter, itemStack);
+            final ThrownTrident thrownTrident = new ThrownTrident(level, getUserIfStand(shooter), itemStack);
             thrownTrident.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
             level.addFreshEntity(thrownTrident);
         }
@@ -856,6 +857,12 @@ public final class JUtils {
             final KnifeProjectile knifeProjectile = new KnifeProjectile(level, shooter);
             knifeProjectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
             level.addFreshEntity(knifeProjectile);
+        }
+        else if (itemStack.getItem() instanceof EnderpearlItem) {
+            final ThrownEnderpearl enderpearlProjectile = new ThrownEnderpearl(level, JUtils.getUserIfStand(shooter));
+            enderpearlProjectile.setItem(itemStack);
+            enderpearlProjectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0.0F, 1.5F, 1.0F);
+            level.addFreshEntity(enderpearlProjectile);
         }
         else {
             final AbstractArrow projectile = new ItemTossProjectile(shooter, level, itemStack);
@@ -955,6 +962,24 @@ public final class JUtils {
         if (!hasAdvancement(player, JCraft.id("obtain_any_spec"))) {
             player.sendSystemMessage(Component.translatable("info.jcraft.first_spec"));
         }
+    }
+
+    /**
+     * @return Whether the player is 'mortal', i.e. vulnerable, not in creative or spectator.
+     */
+    public static boolean isMortal(@Nullable final ServerPlayer player) {
+        if (player == null) return false;
+        return !player.isSpectator() && !player.isCreative() && !player.isInvulnerable();
+    }
+
+    @NonNull
+    public static Vec3 getLocalUp(@NonNull final LivingEntity ent) {
+        return RotationUtil.vecPlayerToWorld(0, 1.0d, 0, GravityChangerAPI.getGravityDirection(ent));
+    }
+
+    @NonNull
+    public static Vec3 getLocalDown(@NonNull final LivingEntity ent) {
+        return RotationUtil.vecPlayerToWorld(0, -1.0d, 0, GravityChangerAPI.getGravityDirection(ent));
     }
 
     public static boolean mayAlter(final @NonNull Level level, @Nullable final LivingEntity user, @Nullable final BlockPos pos,

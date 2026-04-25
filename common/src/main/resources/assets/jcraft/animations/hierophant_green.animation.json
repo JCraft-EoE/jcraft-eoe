@@ -184,7 +184,7 @@
 						}
 					}
 				},
-				"armRightTentacle": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -454,7 +454,7 @@
 						}
 					}
 				},
-				"armRightTentacle": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -718,7 +718,7 @@
 						}
 					}
 				},
-				"armRightTentacle": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -935,7 +935,7 @@
 						}
 					}
 				},
-				"armRightTentacle": {
+				"prop": {
 					"rotation": {
 						"0.28": {
 							"vector": [0, 0, 0],
@@ -991,7 +991,7 @@
 						}
 					}
 				},
-				"armRightTentacle2": {
+				"prop2": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0],
@@ -1023,7 +1023,7 @@
 						}
 					}
 				},
-				"armRightTentacle3": {
+				"prop3": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0],
@@ -1548,7 +1548,7 @@
 						}
 					}
 				},
-				"armRightTentacle": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -1676,7 +1676,7 @@
 						"easing": "linear"
 					}
 				},
-				"armRightTentacle": {
+				"prop": {
 					"position": {
 						"0.0": {
 							"vector": [0, 0, 0],
@@ -1698,7 +1698,7 @@
 						}
 					}
 				},
-				"armRightTentacle2": {
+				"prop2": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0],
@@ -1720,7 +1720,7 @@
 						}
 					}
 				},
-				"armRightTentacle3": {
+				"prop3": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0],
@@ -2141,7 +2141,7 @@
 						}
 					}
 				},
-				"armRightTentacle": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -2385,7 +2385,7 @@
 						}
 					}
 				},
-				"armRightTentacle": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -2754,7 +2754,7 @@
 						}
 					}
 				},
-				"armRightTentacle": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -2890,7 +2890,7 @@
 						}
 					}
 				},
-				"armRightTentacle": {
+				"prop": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0],
@@ -2927,7 +2927,7 @@
 						}
 					}
 				},
-				"armRightTentacle2": {
+				"prop2": {
 					"rotation": {
 						"0.4": {
 							"vector": [0, 0, 0],
@@ -2954,7 +2954,7 @@
 						}
 					}
 				},
-				"armRightTentacle3": {
+				"prop3": {
 					"rotation": {
 						"0.44": {
 							"vector": [0, 0, 0],
@@ -3721,7 +3721,7 @@
 						}
 					}
 				},
-				"armRightTentacle": {
+				"prop": {
 					"position": {
 						"0.0": {
 							"vector": [0, 0, 0],
@@ -3793,7 +3793,7 @@
 						"easing": "linear"
 					}
 				},
-				"armRightTentacle2": {
+				"prop2": {
 					"scale": {
 						"0.0": {
 							"vector": [1, 1, 1],
@@ -3813,7 +3813,7 @@
 						}
 					}
 				},
-				"armRightTentacle3": {
+				"prop3": {
 					"scale": {
 						"0.125": {
 							"vector": [0.5, 0.5, 0.5],
@@ -4177,7 +4177,7 @@
 						}
 					}
 				},
-				"armRightTentacle": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -4588,7 +4588,7 @@
 						}
 					}
 				},
-				"armRightTentacle": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -4885,7 +4885,7 @@
 						"easing": "linear"
 					}
 				},
-				"armRightTentacle": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -5008,7 +5008,7 @@
 						}
 					}
 				},
-				"armRightTentacle": {
+				"prop": {
 					"scale": {
 						"0.0": {
 							"vector": [0, 0, 0],
@@ -5596,7 +5596,7 @@
 						}
 					}
 				},
-				"armRightTentacle": {
+				"prop": {
 					"scale": {
 						"0.0": {
 							"vector": [0, 0, 0],
@@ -5888,7 +5888,7 @@
 						"easing": "linear"
 					}
 				},
-				"armRightTentacle": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -6146,7 +6146,7 @@
 						}
 					}
 				},
-				"armRightTentacle": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -6414,7 +6414,7 @@
 						}
 					}
 				},
-				"armRightTentacle": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -6682,7 +6682,7 @@
 						}
 					}
 				},
-				"armRightTentacle": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -6950,7 +6950,7 @@
 						}
 					}
 				},
-				"armRightTentacle": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -6993,5 +6993,14 @@
 			}
 		}
 	},
+    "includes": [
+      {
+        "file_id": "jcraft:animations/base_stand.animation.json",
+        "animations": [
+          "itemthrow",
+          "itemthrow_charge"
+        ]
+      }
+    ],
 	"azurelib_format_version": 2
 }

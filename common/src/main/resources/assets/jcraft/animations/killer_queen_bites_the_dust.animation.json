@@ -6550,5 +6550,14 @@
 			}
 		}
 	},
+    "includes": [
+      {
+        "file_id": "jcraft:animations/base_stand.animation.json",
+        "animations": [
+          "itemthrow",
+          "itemthrow_charge"
+        ]
+      }
+    ],
 	"azurelib_format_version": 2
 }

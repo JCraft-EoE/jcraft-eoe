@@ -18,11 +18,9 @@ public class TheSunRenderer extends StandEntityRenderer<TheSunEntity> {
 
     public TheSunRenderer(final @NonNull EntityRendererProvider.Context context) {
         super(context, b -> b
-                        .setScale((sun) -> {
-                            return sun.getRawScale();
-                        })
+                        .setScale(TheSunEntity::getRawScale)
                         .addRenderLayer(new SunGlowLayer())
-                        //TODO: translucent layer that isn't layered over and has no shading
+                        //TODO: translucent layer that isn't layered over and has no shading @Zetalasis
                         .setRenderType(renderType(RenderType::dragonExplosionAlpha)),
                 JStandTypeRegistry.THE_SUN.get(), false, false, 0f, 0f, 90f);
     }

@@ -5,10 +5,7 @@ import dev.architectury.registry.registries.RegistrySupplier;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.JRegistries;
 import net.arna.jcraft.api.attack.MoveType;
-import net.arna.jcraft.common.attack.moves.aerosmith.BombDropAttack;
-import net.arna.jcraft.common.attack.moves.aerosmith.ItemDropAttack;
-import net.arna.jcraft.common.attack.moves.aerosmith.MuzzleHitscanAttack;
-import net.arna.jcraft.common.attack.moves.aerosmith.PatrolMove;
+import net.arna.jcraft.common.attack.moves.aerosmith.*;
 import net.arna.jcraft.common.attack.moves.anubis.*;
 import net.arna.jcraft.common.attack.moves.cmoon.*;
 import net.arna.jcraft.common.attack.moves.cream.*;
@@ -195,8 +192,6 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> SHARED_TIME_SKIP_MOVE = register("shared_time_skip_move", TimeSkipMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SHARED_TIME_STOP_MOVE = register("shared_time_stop_move", TimeStopMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SHARED_RESTORATION_ATTACK = register("shared_restoration_attack", RestorationAttack.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> SHARED_STANDBY_ON_MOVE = register("shared_standby_on_move", StandbyActivationMove.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> SHARED_STANDBY_OFF_MOVE = register("shared_standby_off_move", StandbyDeactivationMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SHARED_TOSS_CHARGE_MOVE = register("shared_toss_charge_move", TossChargeMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SHARED_TOSS_MOVE = register("shared_toss_move", TossMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SHARED_SIMPLE_HITSCAN_ATTACK = register("shared_simple_hitscan_attack", SimpleHitscanAttack.Type.INSTANCE);
@@ -263,6 +258,7 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> HAMON_SENDO_ATTACK = register("hamon_sendo_attack", SendoAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> HAMON_ZOOM_PUNCH_ATTACK = register("hamon_zoom_punch_attack", ZoomPunchAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> HAMON_IMPROVISER_ATTACK = register("hamon_improviser_attack", ImproviserAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> HAMON_IMPROVISER_MOVE = register("hamon_improviser_move", ImproviserMove.Type.INSTANCE);
 
 
     RegistrySupplier<MoveType<?>> WHITESNAKE_CHARGED_SPEW_ATTACK = register("whitesnake_charged_spew_attack", ChargedSpewAttack.Type.INSTANCE);
@@ -278,6 +274,7 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> AEROSMITH_BOMB_DROP_ATTACK = register("aerosmith_bomb_drop_attack", BombDropAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> AEROSMITH_ITEM_DROP_ATTACK = register("aerosmith_item_drop_attack", ItemDropAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> AEROSMITH_PATROL_MOVE = register("aerosmith_patrol_move", PatrolMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> AEROSMITH_CHARGE_ATTACK = register("aerosmith_charge_attack", AerosmithChargeAttack.Type.INSTANCE);
 
 
 

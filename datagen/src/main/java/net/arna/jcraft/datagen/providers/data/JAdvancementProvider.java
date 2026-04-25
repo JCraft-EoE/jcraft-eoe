@@ -222,6 +222,20 @@ public class JAdvancementProvider extends FabricAdvancementProvider {
                 .addCriterion("has_bottle", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.BLOOD_BOTTLE.get()))
                 .build(JCraft.id("obtain_blood_bottle"));
         consumer.accept(obtainBloodBottle);
+        // find stone mask
+        final Advancement obtainRedHat = Advancement.Builder.advancement()
+                .display(JItemRegistry.STONE_MASK.get(),
+                        Component.translatable("advancements.jcraft.obtain_red_hat.title"),
+                        Component.translatable("advancements.jcraft.obtain_red_hat.description"),
+                        null,
+                        FrameType.TASK,
+                        true,
+                        false,
+                        false)
+                .parent(findStoneMask)
+                .addCriterion("has_hat", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.RED_HAT.get()))
+                .build(JCraft.id("obtain_red_hat"));
+        consumer.accept(obtainRedHat);
         // obtain all specs
         final var obtainableSpecs = List.of(
                 JSpecTypeRegistry.ANUBIS,

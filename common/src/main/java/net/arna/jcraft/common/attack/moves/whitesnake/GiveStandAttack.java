@@ -77,7 +77,7 @@ public final class GiveStandAttack extends AbstractSimpleAttack<GiveStandAttack,
                 itemSkin = data.getInt("Skin");
             }
 
-            standData.setTypeAndSkin(itemStand, itemSkin);
+            standData.setTypeAndSkin(itemStand, itemSkin, false);
 
             StandEntity<?, ?> stand = standData.getStand();
             if (stand != null) {

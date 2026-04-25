@@ -84,28 +84,40 @@ public abstract class AbstractHitscanAttack<T extends AbstractHitscanAttack<T, A
 
     @Override
     public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
-        if (user == null) {
-            return Set.of();
+        if (user != null) {
+            fire(attacker, user, user.position().add(GravityChangerAPI.getEyeOffset(user)), user.getLookAngle());
         }
+
+        return Set.of();
+    }
+
+    protected Vec3 fire(final A attacker, final LivingEntity user, final Vec3 start, final Vec3 direction) {
         final RandomSource random = user.getRandom();
+        final LivingEntity base = attacker.getBaseEntity();
         // finding target
-        final Vec3 userEyePos = user.position().add(GravityChangerAPI.getEyeOffset(user));
-        final Vec3 rotVec = user.getLookAngle();
-        final HitResult goal = JUtils.raycastAll(user, userEyePos, userEyePos.add(rotVec.scale(getRange())), ClipContext.Fluid.NONE, EntitySelector.LIVING_ENTITY_STILL_ALIVE.and(EntitySelector.NO_SPECTATORS));
-        final Vec3 goalLocation = goal.getLocation().add(rotVec);
-        final Vec3 attackerEyePos = attacker.getBaseEntity().position().add(GravityChangerAPI.getEyeOffset(attacker.getBaseEntity()));
+        final HitResult goal = JUtils.raycastAll(attacker.isRemote() ? base : user, start, start.add(direction.scale(getRange())), ClipContext.Fluid.NONE,
+                EntitySelector.LIVING_ENTITY_STILL_ALIVE
+                        .and(EntitySelector.NO_SPECTATORS)
+        );
+        final Vec3 hitPos = goal.getLocation();
+        final Vec3 goalLocation = hitPos.add(direction);
+        final Vec3 attackerEyePos = base.position().add(GravityChangerAPI.getEyeOffset(base));
         final Vec3 attackVector = goalLocation.subtract(attackerEyePos)
                 .xRot((float)random.nextGaussian() * spread)
                 .yRot((float)random.nextGaussian() * spread)
                 .zRot((float)random.nextGaussian() * spread);
-        final HitResult hitResult = JUtils.raycastAll(attacker.getBaseEntity(), attackerEyePos, attackerEyePos.add(attackVector), ClipContext.Fluid.ANY, EntitySelector.LIVING_ENTITY_STILL_ALIVE.and(EntitySelector.NO_SPECTATORS));
+
+        final HitResult hitResult = JUtils.raycastAll(base, attackerEyePos, attackerEyePos.add(attackVector), ClipContext.Fluid.ANY,
+                EntitySelector.LIVING_ENTITY_STILL_ALIVE
+                        .and(EntitySelector.NO_SPECTATORS)
+        );
+
         // entity hit
         if (hitResult.getType() == HitResult.Type.ENTITY) {
             final Entity hitEntity = ((EntityHitResult)hitResult).getEntity();
             if (hitEntity instanceof LivingEntity living) { // should always happen
-                final Vec3 kbVec = rotVec.scale(getKnockback()).add(new Vec3(0.0, Math.abs(getKnockback()) / 4, 0.0));
+                final Vec3 kbVec = direction.scale(getKnockback()).add(new Vec3(0.0, Math.abs(getKnockback()) / 4, 0.0));
                 processTarget(attacker, living, kbVec, attacker.getDamageSource());
-                return Set.of(living);
             }
         }
         // block mining
@@ -123,8 +135,15 @@ public abstract class AbstractHitscanAttack<T extends AbstractHitscanAttack<T, A
                 }
             }
         }
+
         // create particles
-        JCraft.createHitscanTraceParticle((ServerLevel)user.level(), hitscanTraceParticleOrigin(attacker), hitscanTraceParticleVelocity(attacker, hitResult.getLocation()), shootSpark);
+        JCraft.createHitscanTraceParticle(
+                (ServerLevel)user.level(),
+                hitscanTraceParticleOrigin(attacker),
+                hitscanTraceParticleVelocity(attacker, hitResult.getLocation()),
+                shootSpark
+        );
+
         // TODO Arna add hit/block particles?
         if (hitResult.getType() != HitResult.Type.MISS) {
             JCraft.createParticle((ServerLevel)user.level(),
@@ -133,7 +152,8 @@ public abstract class AbstractHitscanAttack<T extends AbstractHitscanAttack<T, A
                     hitResult.getLocation().z() + random.nextGaussian() * 0.25,
                     hitSpark);
         }
-        return Set.of();
+
+        return hitPos;
     }
 
     protected Vec3 hitscanTraceParticleOrigin(final A attacker) {

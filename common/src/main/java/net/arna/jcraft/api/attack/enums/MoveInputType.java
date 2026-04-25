@@ -17,10 +17,11 @@ public enum MoveInputType {
     SPECIAL2(MoveClass.SPECIAL2),
     SPECIAL3(MoveClass.SPECIAL3),
     ULTIMATE(MoveClass.ULTIMATE),
-    UTILITY(MoveClass.UTILITY, MoveClass.STANDBY_OFF),
-    STAND_SUMMON(null);
+    UTILITY(MoveClass.UTILITY),
+    STAND_SUMMON(null),
+    TOSS(MoveClass.TOSS);
 
-    public static final int types = 9;
+    public static final int types = 10;
     @Getter(value = AccessLevel.PRIVATE, lazy = true)
     private static final Map<MoveClass, MoveInputType> fromMoveType = Arrays.stream(values())
             .filter(v -> v.getMoveClass() != null)
@@ -39,10 +40,6 @@ public enum MoveInputType {
 
     MoveInputType(final @Nullable MoveClass moveClass, final boolean holdable) {
         this(moveClass, holdable, null, false);
-    }
-
-    MoveInputType(final @Nullable MoveClass moveClass, final @Nullable MoveClass moveClassStandby) {
-        this(moveClass, false, moveClassStandby, false);
     }
 
     MoveInputType(final @Nullable MoveClass moveClass, final boolean holdable, final @Nullable MoveClass moveClassStandby, final boolean holdableStandby) {

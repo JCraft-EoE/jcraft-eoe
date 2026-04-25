@@ -202,7 +202,7 @@ public class JRecipeProvider extends FabricRecipeProvider {
                 .unlockedBy("has_yellow_bed", InventoryChangeTrigger.TriggerInstance.hasItems(Items.YELLOW_BED))
                 .save(exporter);
         // red hat
-        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, JItemRegistry.RED_HAT.get(), 4)
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, JItemRegistry.RED_HAT.get())
                 .pattern(" R ")
                 .pattern("LHL")
                 .define('H', Items.LEATHER_HELMET)

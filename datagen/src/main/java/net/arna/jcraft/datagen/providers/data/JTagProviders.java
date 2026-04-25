@@ -154,6 +154,10 @@ public class JTagProviders {
             sandBlocks.add(Items.CUT_RED_SANDSTONE);
             sandBlocks.add(Items.CUT_RED_SANDSTONE_SLAB);
 
+            final var unthrowable = getOrCreateTagBuilder(JTagRegistry.UNTHROWABLE);
+            unthrowable.add(JItemRegistry.ANUBIS.get());
+            unthrowable.add(JItemRegistry.ANUBIS_SHEATHED.get());
+
             final var blindsOnImpact = getOrCreateTagBuilder(JTagRegistry.BLINDS_ON_IMPACT);
             blindsOnImpact.add(Items.PACKED_MUD);
             blindsOnImpact.addTag(JTagRegistry.SAND_BLOCKS);

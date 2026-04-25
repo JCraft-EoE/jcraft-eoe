@@ -5,13 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
 import net.arna.jcraft.api.attack.core.MoveCondition;
 import net.arna.jcraft.api.attack.core.MoveConditionType;
-import net.arna.jcraft.api.component.living.CommonHamonComponent;
-import net.arna.jcraft.common.advancements.Hamon5Trigger;
 import net.arna.jcraft.common.spec.HamonSpec;
-import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.platform.JComponentPlatformUtils;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
@@ -30,13 +24,7 @@ public class HamonWaveCondition extends MoveCondition<HamonWaveCondition, HamonS
 
     @Override
     public boolean test(final HamonSpec attacker) {
-        if (!attacker.hasUser()) {
-            return false;
-        }
-        final LivingEntity user = attacker.getUserOrThrow();
-        final boolean hasCompletedTraining = !(user instanceof ServerPlayer player) || JUtils.hasAdvancement(player, Hamon5Trigger.ID);
-        final CommonHamonComponent hamon = JComponentPlatformUtils.getHamon(user);
-        return hasCompletedTraining || (hamon.getActiveLesson() == 5 && hamon.getLessonTicks(5) <= lessonTime);
+        return HamonConditions.test(attacker.getUser(), 5, lessonTime);
     }
 
     @Override

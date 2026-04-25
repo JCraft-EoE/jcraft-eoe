@@ -14,7 +14,6 @@ public enum CooldownType {
     STAND_SP2,
     STAND_SP3,
     STAND_ULTIMATE(Category.STAND, true, true),
-    STAND_STANDBY,
     STAND_TOSS,
 
     // Spec Cooldowns

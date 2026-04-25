@@ -164,7 +164,7 @@
 						"easing": "linear"
 					}
 				},
-				"erase": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -401,7 +401,7 @@
 						}
 					}
 				},
-				"erase": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -2465,7 +2465,7 @@
 						}
 					}
 				},
-				"erase": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -2724,7 +2724,7 @@
 						"easing": "linear"
 					}
 				},
-				"erase": {
+				"prop": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0],
@@ -3096,7 +3096,7 @@
 						"easing": "linear"
 					}
 				},
-				"erase": {
+				"prop": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0],
@@ -3432,7 +3432,7 @@
 						"easing": "linear"
 					}
 				},
-				"erase": {
+				"prop": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0],
@@ -3751,7 +3751,7 @@
 						}
 					}
 				},
-				"erase": {
+				"prop": {
 					"scale": {
 						"0.0": {
 							"vector": [0, 0, 0],
@@ -3940,7 +3940,7 @@
 						"easing": "linear"
 					}
 				},
-				"erase": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -4201,7 +4201,7 @@
 						"easing": "linear"
 					}
 				},
-				"erase": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -4496,7 +4496,7 @@
 						"easing": "linear"
 					}
 				},
-				"erase": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -4753,7 +4753,7 @@
 						}
 					}
 				},
-				"erase": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -4996,7 +4996,7 @@
 						"easing": "linear"
 					}
 				},
-				"erase": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -5264,7 +5264,7 @@
 						}
 					}
 				},
-				"erase": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -5438,7 +5438,7 @@
 						"easing": "linear"
 					}
 				},
-				"erase": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -5633,7 +5633,7 @@
 						"easing": "linear"
 					}
 				},
-				"erase": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -6114,7 +6114,7 @@
 						}
 					}
 				},
-				"erase": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -6450,7 +6450,7 @@
 						}
 					}
 				},
-				"erase": {
+				"prop": {
 					"rotation": {
 						"0.36": {
 							"vector": [0, 0, 0],
@@ -7003,7 +7003,7 @@
 						}
 					}
 				},
-				"erase": {
+				"prop": {
 					"rotation": {
 						"1.24": {
 							"vector": [0, 0, 0],
@@ -8149,5 +8149,14 @@
 			}
 		}
 	},
+    "includes": [
+      {
+        "file_id": "jcraft:animations/base_stand.animation.json",
+        "animations": [
+          "itemthrow",
+          "itemthrow_charge"
+        ]
+      }
+    ],
 	"azurelib_format_version": 2
 }
