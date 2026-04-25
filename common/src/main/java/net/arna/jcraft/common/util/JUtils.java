@@ -19,11 +19,13 @@ import net.arna.jcraft.api.stand.StandTypeUtil;
 import net.arna.jcraft.common.compat.FtbChunksCompat;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
+import net.arna.jcraft.common.entity.projectile.GasCanProjectile;
 import net.arna.jcraft.common.entity.projectile.ItemTossProjectile;
 import net.arna.jcraft.common.entity.projectile.KnifeProjectile;
 import net.arna.jcraft.common.entity.projectile.ScalpelProjectile;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
+import net.arna.jcraft.common.item.GasCanItem;
 import net.arna.jcraft.common.item.KnifeBundleItem;
 import net.arna.jcraft.common.item.KnifeItem;
 import net.arna.jcraft.common.item.ScalpelItem;
@@ -863,6 +865,12 @@ public final class JUtils {
             enderpearlProjectile.setItem(itemStack);
             enderpearlProjectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0.0F, 1.5F, 1.0F);
             level.addFreshEntity(enderpearlProjectile);
+        }
+        else if (itemStack.getItem() instanceof GasCanItem) {
+            final GasCanProjectile gasCan = new GasCanProjectile(JUtils.getUserIfStand(shooter), level);
+            gasCan.setItem(itemStack);
+            gasCan.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0.0F, 1.5F, 1.0F);
+            level.addFreshEntity(gasCan);
         }
         else {
             final AbstractArrow projectile = new ItemTossProjectile(shooter, level, itemStack);
