@@ -2,10 +2,12 @@ package net.arna.jcraft.client.rendering.shader.impl;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.rendering.shader.api.BakedProgram;
 import net.arna.jcraft.client.rendering.shader.texture.api.ShaderSampler;
 import net.arna.jcraft.client.rendering.shader.texture.impl.GLShaderSampler;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ShaderInstance;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
@@ -65,11 +67,24 @@ public class GLBakedProgram extends BakedProgram {
         Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
 
         RenderSystem.disableDepthTest();
+        RenderSystem.depthMask(false);
+        RenderSystem.disableBlend();
+
+        buffer.draw();
+        Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
+
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        buffer.draw();
-        RenderSystem.disableBlend();
         RenderSystem.enableDepthTest();
+        RenderSystem.depthMask(true);
+
+        // NOTE: this is not modified because we do not use the Minecraft shader instance
+        ShaderInstance previousShader = RenderSystem.getShader();
+        if (previousShader != null)
+        {
+            // restore the previous render state
+            previousShader.apply();
+        }
 
         VertexBuffer.unbind();
         buffer.close();

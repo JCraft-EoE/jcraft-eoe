@@ -1,8 +1,10 @@
 package net.arna.jcraft.client.rendering.shader;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.rendering.api.callbacks.PostShaderRenderCallback;
+import net.arna.jcraft.client.rendering.api.callbacks.PostWorldRenderCallback;
 import net.arna.jcraft.client.rendering.shader.api.BakedProgram;
 import net.arna.jcraft.client.rendering.shader.api.ShaderEffect;
 import net.arna.jcraft.client.rendering.shader.api.uniform.UniformWriter;
@@ -19,7 +21,7 @@ import java.lang.Math;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TimestopShaderEffect extends ShaderEffect implements PostShaderRenderCallback {
+public class TimestopShaderEffect extends ShaderEffect implements PostWorldRenderCallback {
     private static final float MAX_RADIUS = 100.f;
     private static final Matrix4f FROZEN_INV_TRANSFORM_MAT = new Matrix4f();
 
@@ -39,7 +41,7 @@ public class TimestopShaderEffect extends ShaderEffect implements PostShaderRend
 
         linkData.freeze();
 
-        PostShaderRenderCallback.EVENT.register(this);
+        PostWorldRenderCallback.EVENT.register(this);
     }
 
     @Override
@@ -127,9 +129,8 @@ public class TimestopShaderEffect extends ShaderEffect implements PostShaderRend
     }
 
     @Override
-    public void renderEffect(float tickProgress) {
+    public void onWorldRendered(PoseStack matrices, Camera camera, float tickDelta, long nanoTime) {
         Minecraft minecraft = Minecraft.getInstance();
-        Camera camera = minecraft.gameRenderer.getMainCamera();
 
         List<Pair<LivingEntity, Pair<Float, Float>>> copied = new ArrayList<>(TIMESTOP_SOURCES);
         for (Pair<LivingEntity, Pair<Float, Float>> source : copied)
@@ -166,7 +167,7 @@ public class TimestopShaderEffect extends ShaderEffect implements PostShaderRend
             radius      = MAX_RADIUS*(float)(1.f-Math.pow(2.f, -10.f*(radius/MAX_RADIUS)));
             desatRadius = MAX_RADIUS*(float)(1.f-Math.pow(2.f, -10.f*(desatRadius/MAX_RADIUS)));
 
-            renderBubble(tickProgress, camera, sourceEntity.position().toVector3f(), desatRadius, radius, distortionMul, t/maxOvertime);
+            renderBubble(tickDelta, camera, sourceEntity.position().toVector3f(), desatRadius, radius, distortionMul, t/maxOvertime);
         }
     }
 }

@@ -30,8 +30,8 @@ public class SpecialParticleShaderEffect extends ShaderEffect implements Display
 
         linkData.freeze();
 
-        DisplayResizeCallback.EVENT.register(this);
-        PostShaderRenderCallback.EVENT.register(this);
+//        DisplayResizeCallback.EVENT.register(this);
+//        PostShaderRenderCallback.EVENT.register(this);
     }
 
     @Override
