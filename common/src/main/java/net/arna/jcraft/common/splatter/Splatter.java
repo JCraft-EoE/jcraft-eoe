@@ -14,6 +14,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -22,6 +23,7 @@ import net.minecraft.world.level.block.FireBlock;
 import net.minecraft.world.level.block.PipeBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -129,44 +131,54 @@ public class Splatter {
         List<Runnable> toRunAfterTick = new ArrayList<>();
 
         List<BlockPos> posList = BlockPos.betweenClosedStream(mainBox.inflate(1)).map(BlockPos::new).toList();
+        boolean light = false;
         for (BlockPos pos : posList) {
             BlockState state = world.getBlockState(pos);
             if (!state.is(BlockTags.FIRE)) continue;
 
-            // We found fire nearby, light this splatter on fire.
-            for (SplatterSection section : sections) {
-                Direction d = section.getDirection().getOpposite();
-                List<BlockPos> toLight = BlockPos.betweenClosedStream(section.getHitBox())
-                        // Ensure we can place fire here
-                        .filter(p -> FireBlock.canBePlacedAt(world, p, d))
-                        // Ensure we're allowed to place fire here
-                        .filter(p -> creator != null && JUtils.mayAlter(world, creator, p, null))
-                        .map(BlockPos::new) // They're re-using a mutable object
-                        .toList();
-
-                for (BlockPos posToLight : toLight) {
-                    BlockState toLightState = world.getBlockState(posToLight);
-
-                    BlockState newState = toLightState.is(BlockTags.FIRE)
-                            ? toLightState : Blocks.FIRE.defaultBlockState();
-
-                    // All directions false is down, there's no separate down prop on fire.
-                    if (d != Direction.DOWN) {
-                        BooleanProperty dirProp = PipeBlock.PROPERTY_BY_DIRECTION.get(d);
-                        newState.setValue(dirProp, true);
-                    }
-
-                    // We place the fire after all splatters have been ticked so
-                    // a new fire block placed by this splatter won't cause another splatter
-                    // to light on fire in the same tick.
-                    toRunAfterTick.add(() -> {
-                        world.setBlockAndUpdate(posToLight, newState);
-                        world.playSound(null, posToLight, SoundEvents.FIRECHARGE_USE, SoundSource.NEUTRAL, 1f, 1f);
-                    });
-                }
-            }
-
+            light = true;
             break;
+        }
+
+        if (!light) {
+            // Found no fire, check whether there's an entity that's on fire in the vicinity.
+            light = !world.getEntities(EntityTypeTest.forClass(Entity.class),
+                    getMainBox(), Entity::isOnFire).isEmpty();
+        }
+
+        if (!light) return toRunAfterTick;
+
+        // We're lighting this baby up.
+        for (SplatterSection section : sections) {
+            Direction d = section.getDirection().getOpposite();
+            List<BlockPos> toLight = BlockPos.betweenClosedStream(section.getHitBox())
+                    // Ensure we can place fire here
+                    .filter(p -> FireBlock.canBePlacedAt(world, p, d))
+                    // Ensure we're allowed to place fire here
+                    .filter(p -> creator != null && JUtils.mayAlter(world, creator, p, null))
+                    .map(BlockPos::new) // They're re-using a mutable object
+                    .toList();
+
+            for (BlockPos posToLight : toLight) {
+                BlockState toLightState = world.getBlockState(posToLight);
+
+                BlockState newState = toLightState.is(BlockTags.FIRE)
+                        ? toLightState : Blocks.FIRE.defaultBlockState();
+
+                // All directions false is down, there's no separate down prop on fire.
+                if (d != Direction.DOWN) {
+                    BooleanProperty dirProp = PipeBlock.PROPERTY_BY_DIRECTION.get(d);
+                    newState.setValue(dirProp, true);
+                }
+
+                // We place the fire after all splatters have been ticked so
+                // a new fire block placed by this splatter won't cause another splatter
+                // to light on fire in the same tick.
+                toRunAfterTick.add(() -> {
+                    world.setBlockAndUpdate(posToLight, newState);
+                    world.playSound(null, posToLight, SoundEvents.FIRECHARGE_USE, SoundSource.NEUTRAL, 1f, 1f);
+                });
+            }
         }
 
         return toRunAfterTick;
