@@ -1,8 +1,8 @@
 package net.arna.jcraft.common.item;
 
 import lombok.NonNull;
+import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.entity.projectile.GasCanProjectile;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
@@ -26,7 +26,7 @@ public class GasCanItem extends Item {
                 player.getX(),
                 player.getY(),
                 player.getZ(),
-                SoundEvents.SNOWBALL_THROW,
+                JSoundRegistry.GAS_CAN_TOSS.get(),
                 SoundSource.NEUTRAL,
                 0.5F,
                 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F)

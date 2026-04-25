@@ -1238,5 +1238,10 @@
     "sounds": [
       "jcraft:stands/aerosmith/summon"
     ]
+  },
+  "gas_can_toss": {
+    "sounds": [
+      "jcraft:projectiles/gas_can/toss"
+    ]
   }
 }
