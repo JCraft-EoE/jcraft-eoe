@@ -88,6 +88,6 @@ public class GasCanProjectile extends ThrowableItemProjectile {
         JSplatterManager splatterManager = JUtils.getSplatterManager(level());
         float xRange = (random.nextFloat() * 0.5f + 0.5f) * sizeMult;
         float zRange = (random.nextFloat() * 0.5f + 0.5f) * sizeMult;
-        splatterManager.addSplatter(pos, SplatterType.GASOLINE, xRange, zRange, this);
+        splatterManager.addSplatter(pos, SplatterType.GASOLINE, xRange, zRange, (LivingEntity) getOwner());
     }
 }

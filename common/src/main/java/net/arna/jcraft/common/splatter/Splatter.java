@@ -3,6 +3,7 @@ package net.arna.jcraft.common.splatter;
 import dev.architectury.event.events.common.TickEvent;
 import lombok.Data;
 import lombok.Getter;
+import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
@@ -11,7 +12,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -38,7 +38,7 @@ public class Splatter {
     private final Direction direction;
     private final SplatterType type;
     @Nullable
-    private final Entity creator;
+    private final LivingEntity creator;
     // Half of the width on the x-axis and half of the width on the z-axis.
     private final float xRange, zRange;
     private final List<SplatterSection> sections;
@@ -54,7 +54,7 @@ public class Splatter {
         TickEvent.SERVER_POST.register(s -> gasolineTickCount++);
     }
 
-    Splatter(Level world, Vec3 pos, Direction direction, SplatterType type, float xRange, float zRange, @Nullable Entity creator) {
+    Splatter(Level world, Vec3 pos, Direction direction, SplatterType type, float xRange, float zRange, @Nullable LivingEntity creator) {
         this.world = world;
         this.pos = pos;
         this.direction = direction;
@@ -135,8 +135,11 @@ public class Splatter {
             for (SplatterSection section : sections) {
                 Direction d = section.getDirection().getOpposite();
                 List<BlockPos> toLight = BlockPos.betweenClosedStream(section.getHitBox())
+                        // Ensure we can place fire here
                         .filter(p -> FireBlock.canBePlacedAt(world, p, d))
-                        .map(BlockPos::new)
+                        // Ensure we're allowed to place fire here
+                        .filter(p -> creator != null && AbstractMove.mayBreak(creator, p))
+                        .map(BlockPos::new) // They're re-using a mutable object
                         .toList();
 
                 for (BlockPos posToLight : toLight) {

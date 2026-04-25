@@ -10,6 +10,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -57,7 +58,7 @@ public class JSplatterManager {
      * @param zRange The range of this splatter on the z-axis
      */
     public Splatter addSplatter(Vec3 pos, final SplatterType type, final float xRange, final float zRange,
-                                @Nullable final Entity creator) {
+                                @Nullable final LivingEntity creator) {
         final Pair<Vec3, Direction> anchoredPos = anchorPos(pos);
         pos = anchoredPos.left();
 
