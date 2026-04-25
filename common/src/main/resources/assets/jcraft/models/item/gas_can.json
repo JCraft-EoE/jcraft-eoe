@@ -14,7 +14,7 @@
       ],
       "translation": [
         0,
-        -5.75,
+        -2,
         4
       ]
     },
@@ -26,21 +26,21 @@
       ],
       "translation": [
         0,
-        -5.75,
+        -2,
         4
       ]
     },
     "firstperson_righthand": {
       "translation": [
         0,
-        4,
+        8,
         0
       ]
     },
     "firstperson_lefthand": {
       "translation": [
         0,
-        4,
+        8,
         0
       ]
     },
@@ -52,7 +52,7 @@
       ],
       "translation": [
         -7.75,
-        -5,
+        -1,
         0
       ]
     },
@@ -64,7 +64,7 @@
       ],
       "translation": [
         0,
-        9,
+        13,
         0
       ],
       "scale": [
