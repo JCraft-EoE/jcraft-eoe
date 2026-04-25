@@ -6,10 +6,12 @@ import net.arna.jcraft.api.registry.JItemRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.splatter.JSplatterManager;
 import net.arna.jcraft.common.splatter.SplatterType;
+import net.arna.jcraft.common.util.JExplosionModifier;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
@@ -50,6 +52,15 @@ public class GasCanProjectile extends ThrowableItemProjectile {
         if (!this.level().isClientSide) {
             this.discard();
 
+            Vec3 pos = position();
+            if (level().getBlockState(BlockPos.containing(pos)).is(BlockTags.FIRE)) {
+                // We hit fire, explode into a fireball
+                JUtils.explode(level(), pos.x, pos.y, pos.z, 2f, JExplosionModifier.builder()
+                        .createFire(true)
+                        .build());
+                return;
+            }
+
             // Drop 5 splatters close to where the can hit.
             for (int i = 0; i < 5; i++) {
                 float dx = random.nextFloat() - 0.5f;
@@ -57,8 +68,8 @@ public class GasCanProjectile extends ThrowableItemProjectile {
                 float dz = random.nextFloat() - 0.5f;
                 float size = random.nextFloat() * 0.25f + 0.75f;
 
-                Vec3 pos = result.getLocation().add(dx, dy, dz);
-                splatter(pos, size);
+                Vec3 splatterPos = result.getLocation().add(dx, dy, dz);
+                splatter(splatterPos, size);
             }
 
             // Play sound
