@@ -1253,5 +1253,10 @@
     "sounds": [
       "jcraft:projectiles/gas_can/crash"
     ]
+  },
+  "matchbox_use": {
+    "sounds": [
+      "jcraft:projectiles/matchbox/use"
+    ]
   }
 }

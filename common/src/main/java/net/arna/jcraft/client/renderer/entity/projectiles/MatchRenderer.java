@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,6 +19,12 @@ public class MatchRenderer extends EntityRenderer<MatchProjectile> {
 
     public MatchRenderer(EntityRendererProvider.Context context) {
         super(context);
+    }
+
+    @Override
+    protected int getBlockLightLevel(@NotNull MatchProjectile entity, @NotNull BlockPos pos) {
+        // They're on fire, so fullbright.
+        return 15;
     }
 
     @Override

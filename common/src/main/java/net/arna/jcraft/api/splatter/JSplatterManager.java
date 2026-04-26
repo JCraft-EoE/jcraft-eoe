@@ -15,6 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -176,8 +177,20 @@ public class JSplatterManager {
         pred = pred == null ? s -> true : pred;
 
         return splatters.stream()
+                .filter(s -> !s.isRemoved())
                 .filter(s -> s.getMainBox().contains(pos) &&
                         s.getSections().stream().anyMatch(ss -> ss.getHitBox().contains(pos)))
+                .filter(pred)
+                .toList();
+    }
+
+    public List<Splatter> getIntersections(AABB box, @Nullable Predicate<Splatter> pred) {
+        pred = pred == null ? s -> true : pred;
+
+        return splatters.stream()
+                .filter(s -> !s.isRemoved())
+                .filter(s -> s.getMainBox().intersects(box) &&
+                        s.getSections().stream().anyMatch(ss -> ss.getHitBox().intersects(box)))
                 .filter(pred)
                 .toList();
     }

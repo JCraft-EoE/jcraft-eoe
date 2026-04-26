@@ -1,7 +1,6 @@
 package net.arna.jcraft.common.item;
 
 import lombok.NonNull;
-import net.arna.jcraft.api.registry.JItemRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.common.entity.projectile.GasCanProjectile;
@@ -18,7 +17,7 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
 public class GasCanItem extends Item {
-    public static int COOLDOWN_DURATION = 5 * 20;
+    public static final int COOLDOWN_DURATION = 5 * 20;
 
     public GasCanItem(Properties properties) {
         super(properties);
@@ -71,7 +70,7 @@ public class GasCanItem extends Item {
         }
 
         if (!(user instanceof Player player)) return;
-        player.getCooldowns().addCooldown(JItemRegistry.GAS_CAN.get(), COOLDOWN_DURATION);
+        player.getCooldowns().addCooldown(this, COOLDOWN_DURATION);
         player.awardStat(Stats.ITEM_USED.get(this));
         if (!player.getAbilities().instabuild) {
             stack.shrink(1);
