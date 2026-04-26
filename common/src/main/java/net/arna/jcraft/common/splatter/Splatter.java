@@ -90,12 +90,13 @@ public class Splatter {
 
     public float getStrength(float tickDelta) {
         if (tickDelta <= 0.001) {
-            return getStrength(type.getMaxAge(), age);
+            return getStrength(maxAge, age);
         }
-        return Mth.lerpInt(tickDelta, (int) getStrength(type.getMaxAge(), age - 1), (int) getStrength(type.getMaxAge(), age));
+        return Mth.lerp(tickDelta, getStrength(maxAge, age - 1), getStrength(maxAge, age));
     }
 
     private static float getStrength(int maxAge, int age) {
+        // Always returns 1, except for the last 20 ticks of its lifetime.
         return Mth.clamp((maxAge - age) / 20f, 0f, 1f);
     }
 
