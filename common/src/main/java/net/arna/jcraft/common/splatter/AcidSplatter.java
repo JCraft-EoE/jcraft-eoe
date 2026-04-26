@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class AcidSplatter extends Splatter {
-    private static final ResourceLocation texture = JCraft.id("textures/effect/splatter/blood.png");
+    private static final ResourceLocation texture = JCraft.id("textures/effect/splatter/acid.png");
 
     public AcidSplatter(Level world, Vec3 pos, Direction direction, float xRange, float zRange, int maxAge, @Nullable LivingEntity creator) {
         super(world, pos, direction, xRange, zRange, maxAge, creator);
