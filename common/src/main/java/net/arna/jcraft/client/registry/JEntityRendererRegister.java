@@ -113,6 +113,7 @@ public interface JEntityRendererRegister {
             new RendererData<>(JEntityTypeRegistry.AEROBOMB, context -> new ProjectileRenderer<>(context, "aerobomb")),
             new RendererData<>(JEntityTypeRegistry.HAMON_WAVE, JEntityRendererRegister::createEmpty),
             new RendererData<>(JEntityTypeRegistry.GAS_CAN_PROJECTILE, GasCanRenderer::new),
+            new RendererData<>(JEntityTypeRegistry.MATCH_PROJECTILE, MatchRenderer::new),
 
             new RendererData<>(JEntityTypeRegistry.ROAD_ROLLER, RoadRollerRenderer::new),
 

@@ -480,6 +480,15 @@ public interface JEntityTypeRegistry {
                     .updateInterval(20)
                     .build("gas_can"));
 
+    RegistrySupplier<EntityType<MatchProjectile>> MATCH_PROJECTILE = ENTITY_TYPE_REGISTRY.register(JCraft.id("match"),
+            () -> EntityType.Builder.of(
+                            WorldOnlyEntityFactory.from(MatchProjectile::new),
+                            MobCategory.MISC
+                    ).sized(0.2f, 0.2f)
+                    .clientTrackingRange(4)
+                    .updateInterval(20)
+                    .build("match"));
+
     RegistrySupplier<EntityType<LifeDetectorEntity>> LIFE_DETECTOR = ENTITY_TYPE_REGISTRY.register(JCraft.id("lifedetector"),
             () -> EntityType.Builder.of(
                             WorldOnlyEntityFactory.from(LifeDetectorEntity::new),

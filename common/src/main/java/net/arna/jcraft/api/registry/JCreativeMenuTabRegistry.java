@@ -220,6 +220,7 @@ public interface JCreativeMenuTabRegistry {
                     // entries.accept(JItemRegistry.SHIV.get());
                     // entries.accept(JItemRegistry.STEEL_BALL.get());
                     entries.accept(JItemRegistry.GAS_CAN.get());
+                    entries.accept(JItemRegistry.MATCHBOX.get());
                     // spec items + related except blood bottles
                     entries.accept(JItemRegistry.ANUBIS_SHEATHED.get());
                     entries.accept(JItemRegistry.ANUBIS.get());
