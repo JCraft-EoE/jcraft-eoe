@@ -227,6 +227,7 @@ public interface JCreativeMenuTabRegistry {
                             entries.accept(JItemRegistry.RED_HAT.get());
                             entries.accept(JItemRegistry.COFFIN_BLOCK.get());
                             entries.accept(JItemRegistry.PEACEMAKER.get());
+                            entries.accept(JItemRegistry.BLUE_POISON_FROG.get());
 
                             // vehicles
                             entries.accept(JItemRegistry.ROAD_ROLLER.get());

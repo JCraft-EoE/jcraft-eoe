@@ -47,7 +47,7 @@ public class LargeIcicleRenderer extends ProjectileRenderer<LargeIcicleProjectil
                         var partialTick = pc.partialTick();
 
                         poseStack.mulPose(Axis.YP.rotationDegrees(Mth.lerp(partialTick, animatable.yRotO, animatable.getYRot()) - 90.0f));
-                        poseStack.mulPose(Axis.ZN.rotationDegrees(Mth.lerp(partialTick, animatable.xRotO, animatable.getXRot())));
+                        poseStack.mulPose(Axis.ZP.rotationDegrees(Mth.lerp(partialTick, animatable.xRotO, animatable.getXRot())));
 
                         final float scale = animatable.getScale();
                         poseStack.scale(scale, scale, scale);

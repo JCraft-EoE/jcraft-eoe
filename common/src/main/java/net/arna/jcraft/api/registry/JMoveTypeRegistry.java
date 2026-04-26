@@ -55,6 +55,7 @@ import net.arna.jcraft.common.attack.moves.whitesnake.ChargedSpewAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.GiveStandAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.MeltYourHeartAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.PoisonSpewAttack;
+import net.arna.jcraft.common.attack.moves.weatherreport.*;
 import net.arna.jcraft.common.attack.moves.whitesnake.StealStandAttack;
 
 public interface JMoveTypeRegistry {
@@ -262,8 +263,7 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> HAMON_ZOOM_PUNCH_ATTACK = register("hamon_zoom_punch_attack", ZoomPunchAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> HAMON_IMPROVISER_ATTACK = register("hamon_improviser_attack", ImproviserAttack.Type.INSTANCE);
     //RegistrySupplier<MoveType<?>> HAMON_IMPROVISER_MOVE = register("hamon_improviser_move", ImproviserMove.Type.INSTANCE);
-
-
+    
     RegistrySupplier<MoveType<?>> WHITESNAKE_CHARGED_SPEW_ATTACK = register("whitesnake_charged_spew_attack", ChargedSpewAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> WHITESNAKE_GIVE_STAND_ATTACK = register("whitesnake_give_stand_attack", GiveStandAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> WHITESNAKE_MELT_YOUR_HEART_ATTACK = register("whitesnake_melt_your_heart_attack", MeltYourHeartAttack.Type.INSTANCE);
@@ -272,6 +272,25 @@ public interface JMoveTypeRegistry {
 
     RegistrySupplier<MoveType<?>> MANDOM_COUNTDOWN_MOVE = register("mandom_countdown_move", CountdownMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> MANDOM_REWIND_MOVE = register("mandom_rewind_move", RewindMove.Type.INSTANCE);
+
+    RegistrySupplier<MoveType<?>> WEATHERREPORT_ATMOSPHERIC_ACCUMULATION_ATTACK = register("weatherreport_atmospheric_accumulation_attack", AtmosphericAccumulationAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> WEATHERREPORT_ELECTRIFIED_BARRAGE_ATTACK = register("weatherreport_electrified_barrage_attack", ElectrifiedBarrageAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> WEATHERREPORT_ELECTRIFIED_GROUND_RIPPLE_ATTACK = register("weatherreport_electrified_ground_ripple_attack", ElectrifiedGroundRippleAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> WEATHERREPORT_ELECTRIFIED_SHOT_ATTACK = register("weatherreport_electrified_shot_attack", ElectrifiedShotAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> WEATHERREPORT_HAILSTORM_BARRAGE_ATTACK = register("weatherreport_hailstorm_barrage_attack", HailstormBarrageAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> WEATHERREPORT_ICICLE_ACCUMULATION_CHARGE_MOVE = register("weatherreport_icicle_accumulation_charge_move", IcicleAccumulationChargeMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> WEATHERREPORT_ICICLE_ACCUMULATION_FIRE_ATTACK = register("weatherreport_icicle_accumulation_fire_attack", IcicleAccumulationFireAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> WEATHERREPORT_LIGHTNING_CHARGE_MOVE = register("weatherreport_lightning_charge_move", LightningChargeMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> WEATHERREPORT_THUNDERSTORM_SHOCK_ATTACK = register("weatherreport_thunderstorm_shock_attack", ThunderstormShockAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> WEATHERREPORT_WEATHER_TOGGLE_MOVE = register("weatherreport_weather_toggle_move", WeatherToggleMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> WEATHERREPORT_WIND_MOVEMENT_DETECTION_MOVE = register("weatherreport_wind_movement_detection_move", WindMovementDetectionMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> WEATHERREPORT_WIND_SHOCKWAVE_ATTACK = register("weatherreport_wind_shockwave_attack", WindShockwaveAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> WEATHERREPORT_WIND_TUNNEL_ATTACK = register("weatherreport_wind_tunnel_attack", WindTunnelAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> WEATHERREPORT_WIND_TUNNEL_SPEED_SELECT_MOVE = register("weatherreport_wind_tunnel_speed_select_move", WindTunnelSpeedSelectMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> WEATHERREPORT_WIND_DISPLACEMENT_ATTACK = register("weatherreport_wind_displacement_attack", WindDisplacementAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> WEATHERREPORT_HEAVY_WIND_SLASH_ATTACK = register("weatherreport_heavy_wind_slash_attack", HeavyWindSlashAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> WEATHERREPORT_UPDRAFT_ATTACK = register("weatherreport_updraft_attack", UpdraftAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> WEATHERREPORT_DRY_ICE_MOVE = register("weatherreport_dry_ice_move", DryIceMove.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> AEROSMITH_BULLET_ATTACK = register("aerosmith_bullet_attack", MuzzleHitscanAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> AEROSMITH_BOMB_DROP_ATTACK = register("aerosmith_bomb_drop_attack", BombDropAttack.Type.INSTANCE);

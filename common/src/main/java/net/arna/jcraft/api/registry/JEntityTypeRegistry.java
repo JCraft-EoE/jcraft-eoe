@@ -285,6 +285,103 @@ public interface JEntityTypeRegistry {
                     0.9f
             ).build("aerosmith"));
 
+    RegistrySupplier<EntityType<WeatherReportEntity>> WEATHER_REPORT = ENTITY_TYPE_REGISTRY.register(JCraft.id("weather_report"),
+            () -> EntityType.Builder.of(
+                    WorldOnlyEntityFactory.from(WeatherReportEntity::new),
+                    MobCategory.CREATURE
+            ).sized(0.6f, 1.8f).build("weather_report")
+    );
+
+    RegistrySupplier<EntityType<HailProjectile>> HAIL = ENTITY_TYPE_REGISTRY.register(JCraft.id("hail"),
+            () -> EntityType.Builder.of(
+                            WorldOnlyEntityFactory.from(HailProjectile::new),
+                            MobCategory.MISC
+                    ).sized(0.25f, 0.25f)
+                    .clientTrackingRange(6)
+                    .updateInterval(3)
+                    .build("hail")
+    );
+
+    RegistrySupplier<EntityType<ElectricBoltProjectile>> ELECTRIC_BOLT = ENTITY_TYPE_REGISTRY.register(JCraft.id("electric_bolt"),
+            () -> EntityType.Builder.of(
+                            WorldOnlyEntityFactory.from(ElectricBoltProjectile::new),
+                            MobCategory.MISC
+                    ).sized(0.3f, 0.3f)
+                    .clientTrackingRange(8)
+                    .updateInterval(3)
+                    .build("electric_bolt")
+    );
+
+    RegistrySupplier<EntityType<WeatherTornadoEntity>> WEATHER_TORNADO = ENTITY_TYPE_REGISTRY.register(JCraft.id("weather_tornado"),
+            () -> EntityType.Builder.of(
+                            WorldOnlyEntityFactory.from(WeatherTornadoEntity::new),
+                            MobCategory.MISC
+                    ).sized(1f, 3f)
+                    .build("weather_tornado")
+    );
+
+    RegistrySupplier<EntityType<WinterStormEntity>> WINTER_STORM = ENTITY_TYPE_REGISTRY.register(JCraft.id("winter_storm"),
+            () -> EntityType.Builder.of(
+                            WorldOnlyEntityFactory.from(WinterStormEntity::new),
+                            MobCategory.MISC
+                    ).sized(1f, 1f)
+                    .build("winter_storm")
+    );
+
+    RegistrySupplier<EntityType<StormCloudEntity>> STORM_CLOUD = ENTITY_TYPE_REGISTRY.register(JCraft.id("storm_cloud"),
+            () -> EntityType.Builder.of(
+                            WorldOnlyEntityFactory.from(StormCloudEntity::new),
+                            MobCategory.MISC
+                    ).sized(3f, 1f)
+                    .build("storm_cloud")
+    );
+
+    RegistrySupplier<EntityType<FrogRainCloudEntity>> FROG_RAIN_CLOUD = ENTITY_TYPE_REGISTRY.register(JCraft.id("frog_rain_cloud"),
+            () -> EntityType.Builder.of(
+                            WorldOnlyEntityFactory.from(FrogRainCloudEntity::new),
+                            MobCategory.MISC
+                    ).sized(4f, 2f)
+                    .build("frog_rain_cloud")
+    );
+
+    RegistrySupplier<EntityType<BluePoisonFrogEntity>> BLUE_POISON_FROG = ENTITY_TYPE_REGISTRY.register(JCraft.id("blue_poison_frog"),
+            () -> EntityType.Builder.of(
+                            (BluePoisonFrogEntity::new),
+                            MobCategory.CREATURE
+                    ).sized(0.3f, 0.3f)
+                    .build("blue_poison_frog")
+    );
+
+    RegistrySupplier<EntityType<WindGustEntity>> WIND_GUST = ENTITY_TYPE_REGISTRY.register(JCraft.id("wind_gust"),
+            () -> EntityType.Builder.of(
+                            WorldOnlyEntityFactory.from(WindGustEntity::new),
+                            MobCategory.MISC
+                    ).sized(0.5f, 0.5f)
+                    .clientTrackingRange(10)
+                    .updateInterval(2)
+                    .build("wind_gust")
+    );
+
+    RegistrySupplier<EntityType<ThrownFrogProjectile>> THROWN_FROG = ENTITY_TYPE_REGISTRY.register(JCraft.id("thrown_frog"),
+            () -> EntityType.Builder.of(
+                            WorldOnlyEntityFactory.from(ThrownFrogProjectile::new),
+                            MobCategory.MISC
+                    ).sized(0.25f, 0.25f)
+                    .clientTrackingRange(6)
+                    .updateInterval(3)
+                    .build("thrown_frog")
+    );
+
+    RegistrySupplier<EntityType<CloudPuffEntity>> CLOUD_PUFF = ENTITY_TYPE_REGISTRY.register(JCraft.id("cloud_puff"),
+            () -> EntityType.Builder.of(
+                            WorldOnlyEntityFactory.from(CloudPuffEntity::new),
+                            MobCategory.MISC
+                    ).sized(0.5f, 0.5f)
+                    .clientTrackingRange(8)
+                    .updateInterval(4)
+                    .build("cloud_puff")
+    );
+
     RegistrySupplier<EntityType<GEREntity>> GER = ENTITY_TYPE_REGISTRY.register(JCraft.id("ger"),
             () -> EntityType.Builder.of(
                     WorldOnlyEntityFactory.from(GEREntity::new),
@@ -381,6 +478,16 @@ public interface JEntityTypeRegistry {
                     .clientTrackingRange(6)
                     .updateInterval(20)
                     .build("large_icicle")
+    );
+
+    RegistrySupplier<EntityType<FiredIcicleProjectile>> FIRED_ICICLE = ENTITY_TYPE_REGISTRY.register(JCraft.id("fired_icicle"),
+            () -> EntityType.Builder.of(
+                            WorldOnlyEntityFactory.from(FiredIcicleProjectile::new),
+                            MobCategory.MISC
+                    ).sized(1.0f, 1.0f)
+                    .clientTrackingRange(6)
+                    .updateInterval(20)
+                    .build("fired_icicle")
     );
 
     RegistrySupplier<EntityType<IceBranchProjectile>> ICE_BRANCH = ENTITY_TYPE_REGISTRY.register(JCraft.id("ice_branch"),
@@ -773,6 +880,7 @@ public interface JEntityTypeRegistry {
         EntityAttributeRegistry.register(HORUS, HorusEntity::createMobAttributes);
         EntityAttributeRegistry.register(CRAZY_DIAMOND, CrazyDiamondEntity::createMobAttributes);
         EntityAttributeRegistry.register(AEROSMITH, AerosmithEntity::createMobAttributes);
+        EntityAttributeRegistry.register(WEATHER_REPORT, WeatherReportEntity::createMobAttributes);
         EntityAttributeRegistry.register(CINDERELLA, CinderellaEntity::createMobAttributes);
         EntityAttributeRegistry.register(OSIRIS, OsirisEntity::createMobAttributes);
         EntityAttributeRegistry.register(ATUM, AtumEntity::createMobAttributes);
@@ -809,6 +917,13 @@ public interface JEntityTypeRegistry {
         EntityAttributeRegistry.register(RED_BIND, RedBindEntity::createLivingAttributes);
         EntityAttributeRegistry.register(BLOCK_PROJECTILE, BlockProjectile::createBlockAttributes);
         EntityAttributeRegistry.register(SAND_TORNADO, SandTornadoEntity::createTornadoAttributes);
+        EntityAttributeRegistry.register(WEATHER_TORNADO, WeatherTornadoEntity::createAttributes);
+        EntityAttributeRegistry.register(WINTER_STORM, WinterStormEntity::createAttributes);
+        EntityAttributeRegistry.register(STORM_CLOUD, StormCloudEntity::createAttributes);
+        EntityAttributeRegistry.register(FROG_RAIN_CLOUD, FrogRainCloudEntity::createAttributes);
+        EntityAttributeRegistry.register(BLUE_POISON_FROG, BluePoisonFrogEntity::createAttributes);
+        EntityAttributeRegistry.register(WIND_GUST, WindGustEntity::createAttributes);
+        EntityAttributeRegistry.register(CLOUD_PUFF, CloudPuffEntity::createAttributes);
         EntityAttributeRegistry.register(HAMON_WAVE, HamonWaveEntity::createLivingAttributes);
 
         EntityAttributeRegistry.register(PETSHOP, PetshopEntity::createPetshopAttributes);

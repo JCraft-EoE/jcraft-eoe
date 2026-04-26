@@ -39,6 +39,11 @@ public class LargeIcicleProjectile extends AbstractArrow {
     private boolean projectile = false;
     private boolean instant = false;
     private boolean lockVelocity = false;
+    private boolean managed = false;
+
+    public void setManaged(boolean managed) {
+        this.managed = managed;
+    }
     public void lock() {
         lockVelocity = true;
     }
@@ -129,7 +134,9 @@ public class LargeIcicleProjectile extends AbstractArrow {
             return;
         }
 
-        if (projectile) {
+        if (managed) {
+            return;
+        } else if (projectile) {
             final Vec3 velocity = getDeltaMovement();
             final BlockPos blockPos = blockPosition();
             final BlockPos forward = blockPosition().offset((int)velocity.x, (int)velocity.y, (int)velocity.z);

@@ -84,6 +84,8 @@ public interface JItemRegistry {
 
     RegistrySupplier<Item> BLOOD_BOTTLE = register("blood_bottle", () -> new BloodBottleItem(settings().stacksTo(1)));
 
+    RegistrySupplier<Item> BLUE_POISON_FROG = register("blue_poison_frog", () -> new BluePoisonFrogItem(settings().stacksTo(4)));
+
     RegistrySupplier<Item> STELLAR_IRON_INGOT = register("stellar_iron_ingot", () -> new Item(settings()));
     RegistrySupplier<Item> STAND_ARROWHEAD = register("stand_arrowhead", () -> new Item(settings()));
     RegistrySupplier<Item> PRISON_KEY = register("prison_key", () -> new Item(settings()));
