@@ -15,6 +15,7 @@ public interface JTagRegistry {
     TagKey<Item> EQUIPABLES = TagKey.create(Registries.ITEM, new ResourceLocation("c", "equipables"));
     TagKey<Item> PROTECTS_FROM_SUN = TagKey.create(Registries.ITEM, JCraft.id("protects_from_sun"));
     TagKey<Item> SAND_BLOCKS = TagKey.create(Registries.ITEM, new ResourceLocation("c", "sand_blocks"));
+    TagKey<Item> UNTHROWABLE = TagKey.create(Registries.ITEM, JCraft.id("unthrowable"));
     TagKey<Item> BLINDS_ON_IMPACT = TagKey.create(Registries.ITEM, JCraft.id("blinds_on_impact"));
     TagKey<Item> SLOWS_ON_IMPACT = TagKey.create(Registries.ITEM, JCraft.id("slows_on_impact"));
     TagKey<Item> BURNS_ON_IMPACT = TagKey.create(Registries.ITEM, JCraft.id("burns_on_impact"));
