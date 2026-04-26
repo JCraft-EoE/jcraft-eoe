@@ -85,6 +85,7 @@ public class GasCanProjectile extends ThrowableItemProjectile {
         }
     }
 
+    // Gas can explodes when it hits fire
     private boolean checkHitFire() {
         Vec3 pos = position();
         if (!level().getBlockState(BlockPos.containing(pos)).is(BlockTags.FIRE))
@@ -95,7 +96,6 @@ public class GasCanProjectile extends ThrowableItemProjectile {
                 .createFire(true)
                 .build());
         return true;
-
     }
 
     // Places a splatter on the ground directly below the projectile.

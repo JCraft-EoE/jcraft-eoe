@@ -74,38 +74,42 @@ public class GasolineSplatter extends Splatter {
 
         // We're lighting this baby up.
         for (SplatterSection section : getSections()) {
-            Direction d = section.getDirection().getOpposite();
-            List<BlockPos> toLight = BlockPos.betweenClosedStream(section.getHitBox())
-                    // Ensure we can place fire here
-                    .filter(p -> FireBlock.canBePlacedAt(getWorld(), p, d))
-                    // Ensure we're allowed to place fire here
-                    .filter(p -> getCreator() != null && JUtils.mayAlter(getWorld(), getCreator(), p, null))
-                    .map(BlockPos::new) // They're re-using a mutable object
-                    .toList();
+            lightSection(toRunAfterTick, section);
+        }
+    }
 
-            for (BlockPos posToLight : toLight) {
-                BlockState toLightState = getWorld().getBlockState(posToLight);
+    private void lightSection(List<Runnable> toRunAfterTick, SplatterSection section) {
+        Direction d = section.getDirection().getOpposite();
+        List<BlockPos> toLight = BlockPos.betweenClosedStream(section.getHitBox())
+                // Ensure we can place fire here
+                .filter(p -> FireBlock.canBePlacedAt(getWorld(), p, d))
+                // Ensure we're allowed to place fire here
+                .filter(p -> getCreator() != null && JUtils.mayAlter(getWorld(), getCreator(), p, null))
+                .map(BlockPos::new) // They're re-using a mutable object
+                .toList();
 
-                BlockState newState = toLightState.is(BlockTags.FIRE)
-                        ? toLightState : Blocks.FIRE.defaultBlockState();
+        for (BlockPos posToLight : toLight) {
+            BlockState toLightState = getWorld().getBlockState(posToLight);
 
-                // All directions false is down, there's no separate down prop on fire.
-                if (d != Direction.DOWN) {
-                    BooleanProperty dirProp = PipeBlock.PROPERTY_BY_DIRECTION.get(d);
-                    newState.setValue(dirProp, true);
-                }
+            BlockState newState = toLightState.is(BlockTags.FIRE)
+                    ? toLightState : Blocks.FIRE.defaultBlockState();
 
-                // We place the fire after all splatters have been ticked so
-                // a new fire block placed by this splatter won't cause another splatter
-                // to light on fire in the same tick.
-                toRunAfterTick.add(() -> {
-                    getWorld().setBlockAndUpdate(posToLight, newState);
-                    if (!litBefore) {
-                        getWorld().playSound(null, posToLight, SoundEvents.FIRECHARGE_USE, SoundSource.NEUTRAL, 1f, 1f);
-                        litBefore = true;
-                    }
-                });
+            // All directions false is down, there's no separate down prop on fire.
+            if (d != Direction.DOWN) {
+                BooleanProperty dirProp = PipeBlock.PROPERTY_BY_DIRECTION.get(d);
+                newState.setValue(dirProp, true);
             }
+
+            // We place the fire after all splatters have been ticked so
+            // a new fire block placed by this splatter won't cause another splatter
+            // to light on fire in the same tick.
+            toRunAfterTick.add(() -> {
+                getWorld().setBlockAndUpdate(posToLight, newState);
+                if (!litBefore) {
+                    getWorld().playSound(null, posToLight, SoundEvents.FIRECHARGE_USE, SoundSource.NEUTRAL, 1f, 1f);
+                    litBefore = true;
+                }
+            });
         }
     }
 }
