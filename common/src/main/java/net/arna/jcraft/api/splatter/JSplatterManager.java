@@ -1,4 +1,4 @@
-package net.arna.jcraft.common.splatter;
+package net.arna.jcraft.api.splatter;
 
 import dev.architectury.networking.NetworkManager;
 import dev.architectury.registry.registries.RegistrySupplier;
@@ -6,7 +6,7 @@ import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.Pair;
 import net.arna.jcraft.api.JRegistries;
 import net.arna.jcraft.api.registry.JPacketRegistry;
-import net.arna.jcraft.api.splatter.SplatterFactory;
+import net.arna.jcraft.common.splatter.SplatterSplitter;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

@@ -3,6 +3,7 @@ package net.arna.jcraft.common.splatter;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.registry.JSplatterTypeRegistry;
+import net.arna.jcraft.api.splatter.Splatter;
 import net.arna.jcraft.api.splatter.SplatterFactory;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;

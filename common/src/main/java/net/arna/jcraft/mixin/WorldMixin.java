@@ -1,6 +1,6 @@
 package net.arna.jcraft.mixin;
 
-import net.arna.jcraft.common.splatter.JSplatterManager;
+import net.arna.jcraft.api.splatter.JSplatterManager;
 import net.arna.jcraft.common.util.IJSplatterManagerHolder;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;

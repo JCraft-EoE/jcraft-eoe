@@ -5,7 +5,7 @@ import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JItemRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JSplatterTypeRegistry;
-import net.arna.jcraft.common.splatter.JSplatterManager;
+import net.arna.jcraft.api.splatter.JSplatterManager;
 import net.arna.jcraft.common.util.JExplosionModifier;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.BlockPos;

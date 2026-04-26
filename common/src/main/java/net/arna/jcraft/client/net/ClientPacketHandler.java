@@ -30,7 +30,7 @@ import net.arna.jcraft.common.entity.stand.MadeInHeavenEntity;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
 import net.arna.jcraft.api.spec.JSpec;
-import net.arna.jcraft.common.splatter.Splatter;
+import net.arna.jcraft.api.splatter.Splatter;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.minecraft.client.Minecraft;

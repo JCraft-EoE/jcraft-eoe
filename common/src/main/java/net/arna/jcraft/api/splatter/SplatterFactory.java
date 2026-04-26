@@ -1,6 +1,5 @@
 package net.arna.jcraft.api.splatter;
 
-import net.arna.jcraft.common.splatter.Splatter;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;

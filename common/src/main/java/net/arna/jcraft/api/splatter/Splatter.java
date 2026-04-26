@@ -1,9 +1,10 @@
-package net.arna.jcraft.common.splatter;
+package net.arna.jcraft.api.splatter;
 
 import dev.architectury.registry.registries.RegistrySupplier;
 import lombok.Data;
 import lombok.Getter;
-import net.arna.jcraft.api.splatter.SplatterFactory;
+import net.arna.jcraft.common.splatter.SplatterSection;
+import net.arna.jcraft.common.splatter.SplatterSplitter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;

@@ -4,6 +4,7 @@ import dev.architectury.event.events.common.TickEvent;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.registry.JSplatterTypeRegistry;
+import net.arna.jcraft.api.splatter.Splatter;
 import net.arna.jcraft.api.splatter.SplatterFactory;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.BlockPos;

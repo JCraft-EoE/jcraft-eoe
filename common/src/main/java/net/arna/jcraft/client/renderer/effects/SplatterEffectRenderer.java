@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import net.arna.jcraft.common.splatter.JSplatterManager;
+import net.arna.jcraft.api.splatter.JSplatterManager;
 import net.arna.jcraft.common.splatter.SplatterSection;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.Util;

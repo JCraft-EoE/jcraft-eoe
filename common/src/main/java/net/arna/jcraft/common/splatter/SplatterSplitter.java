@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectBooleanPair;
 import lombok.experimental.ExtensionMethod;
 import lombok.experimental.UtilityClass;
+import net.arna.jcraft.api.splatter.Splatter;
 import net.arna.jcraft.common.util.extensions.VecExtensions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -23,7 +24,7 @@ import static net.minecraft.core.Direction.*;
 
 @ExtensionMethod(VecExtensions.class)
 @UtilityClass
-class SplatterSplitter {
+public class SplatterSplitter {
     public static boolean isValidAnchor(Level world, BlockPos pos) {
         return world.getBlockState(pos).isCollisionShapeFullBlock(world, pos);
     }
