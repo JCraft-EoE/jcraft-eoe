@@ -26,6 +26,10 @@ public class AttackerBrainInfo {
 
     @Getter
     private final CombatInstantContext combatCtx;
+
+    /**
+     * The level of combat competency of this individual. 0 means disabled.
+     */
     @Getter
     private final int aiLevel;
     @Getter
