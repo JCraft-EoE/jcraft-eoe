@@ -635,6 +635,12 @@ public class JTagProviders {
             gravityForbiddenEntitiesRendering.add(EntityType.GLOW_ITEM_FRAME);
             gravityForbiddenEntitiesRendering.add(EntityType.PAINTING);
 
+            final var unaffectedByEpitaph = getOrCreateTagBuilder(JTagRegistry.UNAFFECTED_BY_EPITAPH);
+            unaffectedByEpitaph.add(EntityType.ITEM_FRAME);
+            unaffectedByEpitaph.add(EntityType.GLOW_ITEM_FRAME);
+            unaffectedByEpitaph.add(EntityType.PAINTING);
+            unaffectedByEpitaph.add(EntityType.ARMOR_STAND);
+
             addTagsForCompatibilities(arg);
         }
 
