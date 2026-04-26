@@ -7,9 +7,9 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.AttackData;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
+import net.arna.jcraft.api.registry.JSplatterTypeRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
-import net.arna.jcraft.common.splatter.SplatterType;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -51,7 +51,8 @@ public class WSAcidProjectile extends AbstractArrow {
     }
 
     private void splat() {
-        JUtils.getSplatterManager(level()).addSplatter(position(), SplatterType.ACID, 1, (LivingEntity) getOwner());
+        JUtils.getSplatterManager(level()).addSplatter(position(), JSplatterTypeRegistry.ACID_SPLATTER_TYPE,
+                1, 100, (LivingEntity) getOwner());
         discard();
     }
 

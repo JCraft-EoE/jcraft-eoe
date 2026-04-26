@@ -4,8 +4,8 @@ import lombok.Getter;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JItemRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.registry.JSplatterTypeRegistry;
 import net.arna.jcraft.common.splatter.JSplatterManager;
-import net.arna.jcraft.common.splatter.SplatterType;
 import net.arna.jcraft.common.util.JExplosionModifier;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.BlockPos;
@@ -113,7 +113,8 @@ public class GasCanProjectile extends ThrowableItemProjectile {
         JSplatterManager splatterManager = JUtils.getSplatterManager(level());
         float xRange = (random.nextFloat() * 0.5f + 0.5f) * sizeMult;
         float zRange = (random.nextFloat() * 0.5f + 0.5f) * sizeMult;
-        splatterManager.addSplatter(pos, SplatterType.GASOLINE, xRange, zRange, (LivingEntity) getOwner());
+        splatterManager.addSplatter(pos, JSplatterTypeRegistry.GASOLINE_SPLATTER_TYPE, xRange, zRange, 300,
+                (LivingEntity) getOwner());
 
         level().playSound(this, BlockPos.containing(pos), JSoundRegistry.GAS_CAN_SPILL.get(), SoundSource.NEUTRAL,
                 1f, 1f);

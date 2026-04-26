@@ -675,7 +675,7 @@ public class ClientPacketHandler {
 
         final Splatter splatter = JUtils.getSplatterManager(world).readSplatter(buf);
 
-        long ageMs = splatter.getType().getMaxAge() * 50L;
+        long ageMs = splatter.getMaxAge() * 50L;
         AttackHitboxEffectRenderer.addHitbox(splatter.getMainBox(), ageMs, true);
         splatter.getSections().stream()
                 .filter(section -> !section.isRemoved())

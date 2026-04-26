@@ -37,7 +37,7 @@ public class SplatterEffectRenderer {
                 return;
             }
 
-            final VertexConsumer vc = bufferSource.getBuffer(SPLATTER_RENDER_TYPE.apply(splatter.getType().getTexture()));
+            final VertexConsumer vc = bufferSource.getBuffer(SPLATTER_RENDER_TYPE.apply(splatter.getTexture()));
             final float alpha = splatter.getStrength(tickDelta);
 
             for (SplatterSection section : splatter.getSections()) {
