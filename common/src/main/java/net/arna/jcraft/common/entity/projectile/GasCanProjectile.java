@@ -40,7 +40,7 @@ public class GasCanProjectile extends ThrowableItemProjectile {
         prevDeltaMovement = getDeltaMovement();
         super.baseTick();
 
-        if (!level().isClientSide() && checkHitFire())
+        if (!level().isClientSide() && checkHitFire(position()))
             discard();
     }
 
@@ -55,7 +55,7 @@ public class GasCanProjectile extends ThrowableItemProjectile {
         if (!level().isClientSide()) {
             this.discard();
 
-            if (checkHitFire()) return;
+            if (checkHitFire(result.getLocation())) return;
 
             // Drop 5 splatters close to where the can hit.
             for (int i = 0; i < 5; i++) {
@@ -86,8 +86,7 @@ public class GasCanProjectile extends ThrowableItemProjectile {
     }
 
     // Gas can explodes when it hits fire
-    private boolean checkHitFire() {
-        Vec3 pos = position();
+    private boolean checkHitFire(Vec3 pos) {
         if (!level().getBlockState(BlockPos.containing(pos)).is(BlockTags.FIRE))
             return false;
 
