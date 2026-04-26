@@ -869,7 +869,7 @@ public final class JUtils {
         else if (itemStack.getItem() instanceof GasCanItem) {
             final GasCanProjectile gasCan = new GasCanProjectile(JUtils.getUserIfStand(shooter), level);
             gasCan.setItem(itemStack);
-            gasCan.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0.0F, 1.5F, 1.0F);
+            gasCan.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0.0F, 1F, 1.0F);
             level.addFreshEntity(gasCan);
         }
         else {
