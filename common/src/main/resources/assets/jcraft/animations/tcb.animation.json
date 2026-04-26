@@ -1,0 +1,201 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.20th_century_boy.summon": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 0.5,
+      "bones": {
+        "armorHead": {
+          "rotation": {
+            "0.0": {
+              "vector": [-105, 0, 0],
+              "easing": "linear"
+            },
+            "0.5": {
+              "vector": [7.5, 0, 0],
+              "easing": "easeInBack",
+              "easingArgs": []
+            }
+          },
+          "position": {
+            "0.3333": {
+              "vector": [0, 3, 2],
+              "easing": "linear"
+            },
+            "0.5": {
+              "vector": [0, 0, 0],
+              "easing": "linear"
+            }
+          },
+          "scale": {
+            "0.2083": {
+              "vector": [0, 0, 0],
+              "easing": "linear"
+            },
+            "0.5": {
+              "vector": [1, 1, 1],
+              "easing": "linear"
+            }
+          }
+        },
+        "armorBody": {
+          "scale": {
+            "0.0": {
+              "vector": [0, 0, 0],
+              "easing": "linear"
+            },
+            "0.2083": {
+              "vector": [1, 1, 1],
+              "easing": "linear"
+            }
+          }
+        },
+        "armorRightArm": {
+          "rotation": {
+            "0.0833": {
+              "vector": [0, 90, 0],
+              "easing": "linear"
+            },
+            "0.375": {
+              "vector": [0, 0, 0],
+              "easing": "linear"
+            }
+          },
+          "position": {
+            "0.0833": {
+              "vector": [-0.75, 0, 2.5],
+              "easing": "linear"
+            },
+            "0.25": {
+              "vector": [-2.32, 0, 0.07],
+              "easing": "linear"
+            },
+            "0.375": {
+              "vector": [0, 0, 0],
+              "easing": "linear"
+            }
+          },
+          "scale": {
+            "0.0833": {
+              "vector": [0, 0, 0],
+              "easing": "linear"
+            },
+            "0.25": {
+              "vector": [0.8571, 0.8571, 1.3571],
+              "easing": "linear"
+            },
+            "0.375": {
+              "vector": [1, 1, 1],
+              "easing": "linear"
+            }
+          }
+        },
+        "armorLeftArm": {
+          "rotation": {
+            "0.0833": {
+              "vector": [0, -90, 0],
+              "easing": "linear"
+            },
+            "0.375": {
+              "vector": [0, 0, 0],
+              "easing": "linear"
+            }
+          },
+          "position": {
+            "0.0833": {
+              "vector": [0.75, 0, 2.5],
+              "easing": "linear"
+            },
+            "0.25": {
+              "vector": [2.32, 0, 0.07],
+              "easing": "linear"
+            },
+            "0.375": {
+              "vector": [0, 0, 0],
+              "easing": "linear"
+            }
+          },
+          "scale": {
+            "0.0833": {
+              "vector": [0, 0, 0],
+              "easing": "linear"
+            },
+            "0.25": {
+              "vector": [0.8571, 0.8571, 1.3571],
+              "easing": "linear"
+            },
+            "0.375": {
+              "vector": [1, 1, 1],
+              "easing": "linear"
+            }
+          }
+        },
+        "armorLeftLeg": {
+          "rotation": {
+            "0.0": {
+              "vector": [0, 102.5, 0],
+              "easing": "linear"
+            },
+            "0.25": {
+              "vector": [0, 0, 0],
+              "easing": "linear"
+            }
+          },
+          "position": {
+            "0.0": {
+              "vector": [0, 2, 0],
+              "easing": "linear"
+            },
+            "0.25": {
+              "vector": [0, 0, 0],
+              "easing": "linear"
+            }
+          },
+          "scale": {
+            "0.0": {
+              "vector": [0, 0, 0],
+              "easing": "linear"
+            },
+            "0.25": {
+              "vector": [1, 1, 1],
+              "easing": "linear"
+            }
+          }
+        },
+        "armorRightLeg": {
+          "rotation": {
+            "0.0": {
+              "vector": [0, -102.5, 0],
+              "easing": "linear"
+            },
+            "0.25": {
+              "vector": [0, 0, 0],
+              "easing": "linear"
+            }
+          },
+          "position": {
+            "0.0": {
+              "vector": [0, 2, 0],
+              "easing": "linear"
+            },
+            "0.25": {
+              "vector": [0, 0, 0],
+              "easing": "linear"
+            }
+          },
+          "scale": {
+            "0.0": {
+              "vector": [0, 0, 0],
+              "easing": "linear"
+            },
+            "0.25": {
+              "vector": [1, 1, 1],
+              "easing": "linear"
+            }
+          }
+        }
+      }
+    }
+  },
+  "azurelib_format_version": 2
+}

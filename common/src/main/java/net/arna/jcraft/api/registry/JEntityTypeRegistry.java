@@ -692,6 +692,11 @@ public interface JEntityTypeRegistry {
                     MobCategory.CREATURE
             ).sized(0.3f, 0.9f).build("mandom")
     );
+    RegistrySupplier<EntityType<TCBEntity>> TCB = ENTITY_TYPE_REGISTRY.register(JCraft.id("tcb"),
+            () -> EntityType.Builder.of(
+                    WorldOnlyEntityFactory.from(TCBEntity::new),
+                    MobCategory.CREATURE
+            ).sized(0.3f, 0.9f).build("tcb")
     RegistrySupplier<EntityType<TrainingDummyEntity>> TRAINING_DUMMY = ENTITY_TYPE_REGISTRY.register(JCraft.id("training_dummy"),
             () -> EntityType.Builder.of(
                     (EntityType<TrainingDummyEntity> entityType, Level world) -> new TrainingDummyEntity(entityType, world),
@@ -779,6 +784,7 @@ public interface JEntityTypeRegistry {
         EntityAttributeRegistry.register(DRAGONS_DREAM, DragonsDreamEntity::createMobAttributes);
         EntityAttributeRegistry.register(FOO_FIGHTERS, FooFightersEntity::createMobAttributes);
         EntityAttributeRegistry.register(GOO_GOO_DOLLS, GooGooDollsEntity::createMobAttributes);
+        EntityAttributeRegistry.register(TCB, TCBEntity::createMobAttributes);
 
         EntityAttributeRegistry.register(PURPLE_HAZE, () -> AbstractPurpleHazeEntity.createMobAttributes()
                 .add(Attributes.MOVEMENT_SPEED, 0.55));
