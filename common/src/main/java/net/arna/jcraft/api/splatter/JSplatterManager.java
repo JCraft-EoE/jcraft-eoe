@@ -16,6 +16,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
@@ -27,8 +28,18 @@ public class JSplatterManager {
     private final Level world;
     private final Set<Splatter> splatters = ConcurrentHashMap.newKeySet();
 
+    @ApiStatus.Internal
     public JSplatterManager(Level world) {
         this.world = world;
+    }
+
+    /**
+     * Acquires the instance of {@link JSplatterManager} for the given world.
+     * @param world The world to get the splatter manager for.
+     * @return The splatter manager for the given world.
+     */
+    public static JSplatterManager get(Level world) {
+        return JUtils.getSplatterManager(world);
     }
 
     /**
