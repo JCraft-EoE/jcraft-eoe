@@ -42,7 +42,7 @@ public class SplatterEffectRenderer {
 
             for (SplatterSection section : splatter.getSections()) {
                 if (!section.isRemoved()) {
-                    renderSection(section, vc, matrices, camPos, alpha, splatter.getOffset());
+                    renderSection(section, vc, matrices, camPos, alpha, splatter.getOffset(), splatter.getRotation());
                 }
             }
         });
@@ -50,7 +50,7 @@ public class SplatterEffectRenderer {
 
     @SuppressWarnings("DuplicatedCode") // I do not care how similar the different directions' code is. (vased)
     private static void renderSection(final SplatterSection section, final VertexConsumer vc, final PoseStack matrices,
-                                      final Vec3 camPos, final float alpha, final float offset) {
+                                      final Vec3 camPos, final float alpha, final float offset, final int rotation) {
         matrices.pushPose();
         final Vector3f offsetVec = section.getDirection().step();
         offsetVec.mul(offset, offset, offset); // Prevent z-fighting with anchor block and other splatters.
@@ -64,6 +64,14 @@ public class SplatterEffectRenderer {
         final Vec2 minUv = section.getMinUv();
         final Vec2 maxUv = section.getMaxUv();
 
+        // Apply rotation as a UV coordinate transform so that neighbouring sections
+        // sharing a UV value transform it identically, keeping seams aligned.
+        // UV corners: 0=TL(minU,minV), 1=TR(maxU,minV), 2=BR(maxU,maxV), 3=BL(minU,maxV)
+        final float[] rTL = rotateUv(minUv.x, minUv.y, rotation);
+        final float[] rTR = rotateUv(maxUv.x, minUv.y, rotation);
+        final float[] rBR = rotateUv(maxUv.x, maxUv.y, rotation);
+        final float[] rBL = rotateUv(minUv.x, maxUv.y, rotation);
+
         final Vector3d min = new Vector3d(section.getMinPos()).sub(camPos.x(), camPos.y(), camPos.z());
         final float minX = (float) min.x(), minY = (float) min.y(), minZ = (float) min.z();
         final Vector3d max = new Vector3d(section.getMaxPos()).sub(camPos.x(), camPos.y(), camPos.z());
@@ -74,44 +82,57 @@ public class SplatterEffectRenderer {
 
         switch (section.getDirection()) {
             case UP -> {
-                vertex(vc, m, minX, minY, minZ, minUv.x, minUv.y, alpha, light, nx, ny, nz);
-                vertex(vc, m, maxX, minY, minZ, maxUv.x, minUv.y, alpha, light, nx, ny, nz);
-                vertex(vc, m, maxX, minY, maxZ, maxUv.x, maxUv.y, alpha, light, nx, ny, nz);
-                vertex(vc, m, minX, minY, maxZ, minUv.x, maxUv.y, alpha, light, nx, ny, nz);
+                vertex(vc, m, minX, minY, minZ, rTL[0], rTL[1], alpha, light, nx, ny, nz);
+                vertex(vc, m, maxX, minY, minZ, rTR[0], rTR[1], alpha, light, nx, ny, nz);
+                vertex(vc, m, maxX, minY, maxZ, rBR[0], rBR[1], alpha, light, nx, ny, nz);
+                vertex(vc, m, minX, minY, maxZ, rBL[0], rBL[1], alpha, light, nx, ny, nz);
             }
             case DOWN -> {
-                vertex(vc, m, maxX, minY, minZ, maxUv.x, minUv.y, alpha, light, nx, ny, nz);
-                vertex(vc, m, minX, minY, minZ, minUv.x, minUv.y, alpha, light, nx, ny, nz);
-                vertex(vc, m, minX, minY, maxZ, minUv.x, maxUv.y, alpha, light, nx, ny, nz);
-                vertex(vc, m, maxX, minY, maxZ, maxUv.x, maxUv.y, alpha, light, nx, ny, nz);
+                vertex(vc, m, maxX, minY, minZ, rTR[0], rTR[1], alpha, light, nx, ny, nz);
+                vertex(vc, m, minX, minY, minZ, rTL[0], rTL[1], alpha, light, nx, ny, nz);
+                vertex(vc, m, minX, minY, maxZ, rBL[0], rBL[1], alpha, light, nx, ny, nz);
+                vertex(vc, m, maxX, minY, maxZ, rBR[0], rBR[1], alpha, light, nx, ny, nz);
             }
             case NORTH -> {
-                vertex(vc, m, minX, minY, minZ, minUv.x, minUv.y, alpha, light, nx, ny, nz);
-                vertex(vc, m, minX, maxY, minZ, minUv.x, maxUv.y, alpha, light, nx, ny, nz);
-                vertex(vc, m, maxX, maxY, minZ, maxUv.x, maxUv.y, alpha, light, nx, ny, nz);
-                vertex(vc, m, maxX, minY, minZ, maxUv.x, minUv.y, alpha, light, nx, ny, nz);
+                vertex(vc, m, minX, minY, minZ, rTL[0], rTL[1], alpha, light, nx, ny, nz);
+                vertex(vc, m, minX, maxY, minZ, rBL[0], rBL[1], alpha, light, nx, ny, nz);
+                vertex(vc, m, maxX, maxY, minZ, rBR[0], rBR[1], alpha, light, nx, ny, nz);
+                vertex(vc, m, maxX, minY, minZ, rTR[0], rTR[1], alpha, light, nx, ny, nz);
             }
             case EAST -> {
-                vertex(vc, m, maxX, minY, minZ, maxUv.x, minUv.y, alpha, light, nx, ny, nz);
-                vertex(vc, m, maxX, maxY, minZ, minUv.x, minUv.y, alpha, light, nx, ny, nz);
-                vertex(vc, m, maxX, maxY, maxZ, minUv.x, maxUv.y, alpha, light, nx, ny, nz);
-                vertex(vc, m, maxX, minY, maxZ, maxUv.x, maxUv.y, alpha, light, nx, ny, nz);
+                vertex(vc, m, maxX, minY, minZ, rTR[0], rTR[1], alpha, light, nx, ny, nz);
+                vertex(vc, m, maxX, maxY, minZ, rTL[0], rTL[1], alpha, light, nx, ny, nz);
+                vertex(vc, m, maxX, maxY, maxZ, rBL[0], rBL[1], alpha, light, nx, ny, nz);
+                vertex(vc, m, maxX, minY, maxZ, rBR[0], rBR[1], alpha, light, nx, ny, nz);
             }
             case SOUTH -> {
-                vertex(vc, m, minX, minY, maxZ, minUv.x, maxUv.y, alpha, light, nx, ny, nz);
-                vertex(vc, m, maxX, minY, maxZ, maxUv.x, maxUv.y, alpha, light, nx, ny, nz);
-                vertex(vc, m, maxX, maxY, maxZ, maxUv.x, minUv.y, alpha, light, nx, ny, nz);
-                vertex(vc, m, minX, maxY, maxZ, minUv.x, minUv.y, alpha, light, nx, ny, nz);
+                vertex(vc, m, minX, minY, maxZ, rBL[0], rBL[1], alpha, light, nx, ny, nz);
+                vertex(vc, m, maxX, minY, maxZ, rBR[0], rBR[1], alpha, light, nx, ny, nz);
+                vertex(vc, m, maxX, maxY, maxZ, rTR[0], rTR[1], alpha, light, nx, ny, nz);
+                vertex(vc, m, minX, maxY, maxZ, rTL[0], rTL[1], alpha, light, nx, ny, nz);
             }
             case WEST -> {
-                vertex(vc, m, minX, minY, minZ, minUv.x, minUv.y, alpha, light, nx, ny, nz);
-                vertex(vc, m, minX, minY, maxZ, minUv.x, maxUv.y, alpha, light, nx, ny, nz);
-                vertex(vc, m, minX, maxY, maxZ, maxUv.x, maxUv.y, alpha, light, nx, ny, nz);
-                vertex(vc, m, minX, maxY, minZ, maxUv.x, minUv.y, alpha, light, nx, ny, nz);
+                vertex(vc, m, minX, minY, minZ, rTL[0], rTL[1], alpha, light, nx, ny, nz);
+                vertex(vc, m, minX, minY, maxZ, rBL[0], rBL[1], alpha, light, nx, ny, nz);
+                vertex(vc, m, minX, maxY, maxZ, rBR[0], rBR[1], alpha, light, nx, ny, nz);
+                vertex(vc, m, minX, maxY, minZ, rTR[0], rTR[1], alpha, light, nx, ny, nz);
             }
         }
 
         matrices.popPose();
+    }
+
+    /**
+     * Rotates a UV coordinate within [0,1]² space.
+     * Rotation: 0=none, 1=90°CW, 2=180°, 3=90°CCW.
+     */
+    private static float[] rotateUv(float u, float v, int rotation) {
+        return switch (rotation) {
+            case 1  -> new float[]{v,     1 - u};  // 90° CW
+            case 2  -> new float[]{1 - u, 1 - v};  // 180°
+            case 3  -> new float[]{1 - v, u    };  // 90° CCW
+            default -> new float[]{u,     v    };  // 0°, no change
+        };
     }
 
     private static void vertex(final VertexConsumer vc, final Matrix4f matrix, final float x, final float y, final float z,

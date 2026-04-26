@@ -18,6 +18,7 @@ import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.function.BiFunction;
 
 @Data
@@ -38,7 +39,9 @@ public abstract class Splatter {
     private final AABB mainBox;
     private int age;
     private boolean removed;
-    private boolean litThisTick = false;
+    // Number between 0 and 4 that determines the rotation of the texture.
+    @Getter
+    protected int rotation = new Random().nextInt(4);
 
     protected Splatter(Level world, Vec3 pos, Direction direction, float xRange, float zRange, int maxAge, @Nullable LivingEntity creator) {
         this.world = world;
