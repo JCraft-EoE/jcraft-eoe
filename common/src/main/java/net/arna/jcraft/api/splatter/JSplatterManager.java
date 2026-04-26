@@ -19,10 +19,12 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.DoubleUnaryOperator;
+import java.util.function.Predicate;
 
 public class JSplatterManager {
     private final Level world;
@@ -168,5 +170,15 @@ public class JSplatterManager {
 
     public void iterateSplatters(Consumer<Splatter> consumer) {
         splatters.forEach(consumer);
+    }
+
+    public List<Splatter> getHit(Vec3 pos, @Nullable Predicate<Splatter> pred) {
+        pred = pred == null ? s -> true : pred;
+
+        return splatters.stream()
+                .filter(s -> s.getMainBox().contains(pos) &&
+                        s.getSections().stream().anyMatch(ss -> ss.getHitBox().contains(pos)))
+                .filter(pred)
+                .toList();
     }
 }

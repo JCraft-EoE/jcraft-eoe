@@ -25,6 +25,7 @@ import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GasolineSplatter extends Splatter {
@@ -76,6 +77,15 @@ public class GasolineSplatter extends Splatter {
         for (SplatterSection section : getSections()) {
             lightSection(toRunAfterTick, section);
         }
+    }
+
+    public void lightOnFire() {
+        List<Runnable> toRun = new ArrayList<>();
+        for (SplatterSection section : getSections()) {
+            lightSection(toRun, section);
+        }
+
+        toRun.forEach(Runnable::run);
     }
 
     private void lightSection(List<Runnable> toRunAfterTick, SplatterSection section) {
