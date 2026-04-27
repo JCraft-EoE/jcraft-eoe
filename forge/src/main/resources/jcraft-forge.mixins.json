@@ -5,7 +5,6 @@
   "mixins": [
     "EntityMixin",
     "ServerPlayerEntityMixin",
-    "StructureTemplatePoolAccessor",
     "TimestopBlockMixin",
     "WalkNodeEvaluatorMixin",
     "gravity.EntityMixin",
