@@ -16,6 +16,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -90,9 +91,15 @@ public class GasCanProjectile extends ThrowableItemProjectile {
         if (!level().getBlockState(BlockPos.containing(pos)).is(BlockTags.FIRE))
             return false;
 
+        // Only destroy blocks if we're allowed to.
+        Explosion.BlockInteraction blockInteraction = getOwner() instanceof LivingEntity owner &&
+                JUtils.mayAlter(level(), owner, BlockPos.containing(pos), null)
+                ? Explosion.BlockInteraction.DESTROY_WITH_DECAY : Explosion.BlockInteraction.KEEP;
+
         // We hit fire, explode into a fireball
         JUtils.explode(level(), pos.x, pos.y, pos.z, 2f, JExplosionModifier.builder()
                 .createFire(true)
+                .blockInteraction(blockInteraction)
                 .build());
         return true;
     }
