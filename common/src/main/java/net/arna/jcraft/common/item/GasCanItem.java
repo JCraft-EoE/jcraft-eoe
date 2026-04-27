@@ -51,6 +51,11 @@ public class GasCanItem extends Item {
             return;
         }
 
+        // Fix for a Minecraft bug where this method does get called on the client,
+        // but not on the server when you switch to a different item the moment you release.
+        // The actual selected item stack is already a different one, but this method still gets called.
+        if (user.getItemInHand(user.getUsedItemHand()) != stack) return;
+
         level.playSound(
                 null,
                 user.getX(),
