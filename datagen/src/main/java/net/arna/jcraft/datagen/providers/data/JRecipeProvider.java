@@ -325,6 +325,32 @@ public class JRecipeProvider extends FabricRecipeProvider {
                 .define('G', Items.GRINDSTONE)
                 .unlockedBy("has_iron_block", InventoryChangeTrigger.TriggerInstance.hasItems(Items.IRON_BLOCK))
                 .save(exporter);
+
+        // gas can
+        ShapedRecipeBuilder.shaped(RecipeCategory.TRANSPORTATION, JItemRegistry.GAS_CAN.get())
+                .pattern("AAA")
+                .pattern("ABA")
+                .pattern("CDE")
+                .define('A', Items.IRON_NUGGET)
+                .define('B', Items.WATER_BUCKET)
+                .define('C', Items.CHARCOAL)
+                .define('D', Items.COAL_BLOCK)
+                .define('E', Items.GUNPOWDER)
+                .unlockedBy("has_gunpowder", InventoryChangeTrigger.TriggerInstance.hasItems(Items.GUNPOWDER))
+                .save(exporter);
+
+        // matchbox
+        ShapedRecipeBuilder.shaped(RecipeCategory.TRANSPORTATION, JItemRegistry.MATCHBOX.get())
+                .pattern("ABC")
+                .pattern("ABD")
+                .pattern("ABC")
+                .define('A', Items.GUNPOWDER)
+                .define('B', Items.STICK)
+                .define('C', Items.PAPER)
+                .define('D', Items.RED_DYE)
+                .unlockedBy("has_gunpowder", InventoryChangeTrigger.TriggerInstance.hasItems(Items.GUNPOWDER))
+                .save(exporter);
+
         // steel ball
 //        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.STEEL_BALL.get())
 //                .pattern(" I ")
