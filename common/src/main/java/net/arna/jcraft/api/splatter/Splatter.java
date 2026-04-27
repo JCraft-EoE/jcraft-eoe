@@ -1,16 +1,14 @@
-package net.arna.jcraft.common.splatter;
+package net.arna.jcraft.api.splatter;
 
+import dev.architectury.registry.registries.RegistrySupplier;
 import lombok.Data;
 import lombok.Getter;
-import net.arna.jcraft.common.entity.damage.JDamageSources;
-import net.arna.jcraft.api.stand.StandEntity;
-import net.arna.jcraft.api.registry.JStatusRegistry;
+import net.arna.jcraft.common.splatter.SplatterSection;
+import net.arna.jcraft.common.splatter.SplatterSplitter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -18,18 +16,19 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 
 @Data
-public class Splatter {
+public abstract class Splatter {
     public static final int MAX_AGE = 80;
     private final Level world;
     private final Vec3 pos;
     private final Direction direction;
-    private final SplatterType type;
+    private final int maxAge;
     @Nullable
-    private final Entity creator;
+    private final LivingEntity creator;
     // Half of the width on the x-axis and half of the width on the z-axis.
     private final float xRange, zRange;
     private final List<SplatterSection> sections;
@@ -39,14 +38,17 @@ public class Splatter {
     private final AABB mainBox;
     private int age;
     private boolean removed;
+    // Number between 0 and 4 that determines the rotation of the texture.
+    @Getter
+    protected SplatterRotation rotation = SplatterRotation.getRandom();
 
-    Splatter(Level world, Vec3 pos, Direction direction, SplatterType type, float xRange, float zRange, @Nullable Entity creator) {
+    protected Splatter(Level world, Vec3 pos, Direction direction, float xRange, float zRange, int maxAge, @Nullable LivingEntity creator) {
         this.world = world;
         this.pos = pos;
         this.direction = direction;
-        this.type = type;
         this.xRange = xRange;
         this.zRange = zRange;
+        this.maxAge = maxAge;
         this.creator = creator;
         sections = SplatterSplitter.splitAndWrap(this);
 
@@ -54,6 +56,10 @@ public class Splatter {
         Vector3f max = findEdge(sections, true);
         mainBox = new AABB(new Vec3(min), new Vec3(max)).inflate(.1);
     }
+
+    public abstract ResourceLocation getTexture();
+
+    public abstract RegistrySupplier<SplatterFactory> getType();
 
     private static Vector3f findEdge(List<SplatterSection> sections, boolean max) {
         float f = max ? Float.NEGATIVE_INFINITY : Float.POSITIVE_INFINITY;
@@ -72,44 +78,40 @@ public class Splatter {
 
     public float getStrength(float tickDelta) {
         if (tickDelta <= 0.001) {
-            return getStrength(type.getMaxAge(), age);
+            return getStrength(maxAge, age);
         }
-        return Mth.lerpInt(tickDelta, (int) getStrength(type.getMaxAge(), age - 1), (int) getStrength(type.getMaxAge(), age));
+        return Mth.lerp(tickDelta, getStrength(maxAge, age - 1), getStrength(maxAge, age));
     }
 
     private static float getStrength(int maxAge, int age) {
+        // Always returns 1, except for the last 20 ticks of its lifetime.
         return Mth.clamp((maxAge - age) / 20f, 0f, 1f);
     }
 
-    public void tick() {
+    public List<Runnable> tick() {
+        List<Runnable> toRunAfterTick = new ArrayList<>();
+
         if (removed) {
-            return;
+            return toRunAfterTick;
         }
 
-        if (age++ == type.getMaxAge()) {
+        if (age++ == maxAge) {
             removed = true;
-            return;
+            return toRunAfterTick;
         }
 
-        if (!world.isClientSide) {
-            if (type == SplatterType.ACID && age % 4 == 0) {
-                for (LivingEntity hit : world.getEntitiesOfClass(LivingEntity.class, mainBox, EntitySelector.LIVING_ENTITY_STILL_ALIVE)) {
-                    if (intersects(hit.getBoundingBox())) {
-                        if (hit.isPassengerOfSameVehicle(creator) || (hit instanceof StandEntity<?, ?> stand && stand.getUser() == creator)) {
-                            continue;
-                        }
-                        hit.addEffect(new MobEffectInstance(JStatusRegistry.WSPOISON.get(), 20, 0, true, false));
-                        hit.hurt(JDamageSources.whitesnakePoison(creator), 2f);
-                    }
-                }
-            }
-        }
+        if (!world.isClientSide)
+            baseTick(toRunAfterTick);
 
         removed = sections.stream()
                 .filter(section -> !section.isRemoved())
                 .peek(SplatterSection::tick)
                 .allMatch(SplatterSection::isRemoved);
+
+        return toRunAfterTick;
     }
+
+    protected void baseTick(List<Runnable> toRunAfterTick) {}
 
     public boolean intersects(AABB box) {
         if (box == null || !mainBox.intersects(box)) {
