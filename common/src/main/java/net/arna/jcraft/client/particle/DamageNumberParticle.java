@@ -71,7 +71,7 @@ public class DamageNumberParticle extends Particle {
         poseStack.pushPose();
         poseStack.translate(particleX, particleY, particleZ);
 
-        double distanceFromCam = new Vec3(particleX, particleY, particleZ).length();
+        double distanceFromCam = 4f;//new Vec3(particleX, particleY, particleZ).length();
         double inc = Mth.clamp(distanceFromCam / 32f, 0, 5f);
 
         // Animation
