@@ -37,7 +37,7 @@ public class GasCanRenderer extends AzEntityRenderer<GasCanProjectile> {
         );
 
         // Rotate the gas can to follow the velocity.
-        if (velocity.lengthSqr() > 1e-6) {
+        if (velocity.lengthSqr() > 1e-5) {
             // Pitch: angle between the velocity vector and the horizontal plane
             double horizontalDist = Math.sqrt(velocity.x * velocity.x + velocity.z * velocity.z);
             float pitch = (float) Math.toDegrees(Math.atan2(-velocity.y, horizontalDist)) + 90f;
